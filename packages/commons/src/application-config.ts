@@ -24,6 +24,8 @@ export const SearchCriteria = z.enum([
 
 export const ApplicationConfig = z.object({
   APPLICATION_NAME: z.string(),
+  /** ISO-style country code of the instance (e.g. "FAR"). Reported with telemetry. */
+  COUNTRY_CODE: z.string(),
   COUNTRY_LOGO: z.object({
     fileName: z.string(),
     file: z.string()
@@ -33,6 +35,12 @@ export const ApplicationConfig = z.object({
     languagesAndCountry: z.array(z.string()),
     isoCode: z.string()
   }),
+  /** When true, the events service reports daily usage telemetry. */
+  TELEMETRY_ENABLED: z.boolean().optional().default(false),
+  /** Optional environment label (e.g. "staging") reported with telemetry. */
+  TELEMETRY_ENVIRONMENT: z.string().optional(),
+  /** Public domain of this instance reported with telemetry. */
+  TELEMETRY_DOMAIN: z.string().optional(),
   ADMIN_STRUCTURE: z.array(
     z.object({
       id: z.string(),

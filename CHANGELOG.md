@@ -98,7 +98,15 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 
 #### Daily usage telemetry
 
-The events service can report a small daily usage summary (registered/pending declaration counts, active user counts, uptime) to the OpenCRVS telemetry endpoint. It is off by default and controlled per instance via `TELEMETRY_ENABLED`; `TELEMETRY_URL`, `TELEMETRY_DOMAIN`, and `TELEMETRY_ENVIRONMENT` configure the target and identity. The worker sends at most once per UTC day and uses a stable `reported_at` so retries and restarts don't double-count. Enabled by default in the Helm chart (with `domain` taken from `.Values.hostname`); local development stays off.
+The events service can report a small daily usage summary (registered/pending declaration counts, active user counts, uptime) to the OpenCRVS telemetry endpoint. The worker sends at most once per UTC day and uses a stable `reported_at` so retries and restarts don't double-count.
+
+Whether telemetry is sent, and the identity reported with it, come from the country's application config (served by countryconfig), so they can be changed without restarting the events service:
+
+- **`COUNTRY_CODE`** — new **required** `ApplicationConfig` field; reported as the telemetry `country_code`. Country configs must add it (the Farajaland template sets `'FAR'`).
+- **`TELEMETRY_ENABLED`** — new `ApplicationConfig` field (default `false`); master on/off switch, the same across a country's environments.
+- **`TELEMETRY_ENVIRONMENT`** / **`TELEMETRY_DOMAIN`** — new optional `ApplicationConfig` fields. In the country config template these are sourced from env vars of the same name so each environment (staging, production, …) can report a different domain and environment label. The Helm chart sets `TELEMETRY_DOMAIN` on the countryconfig deployment from `.Values.hostname`.
+
+The only telemetry env var on the events service is `TELEMETRY_URL` (the ingest endpoint).
 
 ### Bug fixes
 

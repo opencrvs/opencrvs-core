@@ -23,8 +23,6 @@ services:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      # Keep local development from reporting to the live telemetry endpoint.
-      - TELEMETRY_ENABLED=false
     ports:
       - "5555:5555"
 

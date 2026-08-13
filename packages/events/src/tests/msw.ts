@@ -83,9 +83,13 @@ const handlers = [
   http.get(`${env.COUNTRY_CONFIG_URL}/config/application`, () =>
     HttpResponse.json({
       APPLICATION_NAME: 'Test',
+      COUNTRY_CODE: 'FAR',
       COUNTRY_LOGO: { fileName: 'logo.png', file: '' },
       SYSTEM_IANA_TIMEZONE: 'UTC',
       CURRENCY: { isoCode: 'USD', languagesAndCountry: ['en-US'] },
+      TELEMETRY_ENABLED: true,
+      TELEMETRY_ENVIRONMENT: 'production',
+      TELEMETRY_DOMAIN: 'farajaland.opencrvs.org',
       ADMIN_STRUCTURE: [],
       PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
       USER_NOTIFICATION_DELIVERY_METHOD: 'email',

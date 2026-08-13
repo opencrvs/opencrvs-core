@@ -34,10 +34,6 @@ spec:
               value: "http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040"
             - name: DOCUMENTS_URL
               value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
-            - name: TELEMETRY_ENABLED
-              value: "true"
-            - name: TELEMETRY_DOMAIN
-              value: {{ .Values.hostname | quote }}
           {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
             - name: ES_URL
               value: "http://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"

@@ -93,8 +93,11 @@ describe('sendTelemetryReport', () => {
     const report = buildTelemetryReport(
       { 'events.total': 3, 'system.health': 'ok' },
       '2026-08-13T00:00:00.000Z',
-      'FAR',
-      'farajaland.opencrvs.org'
+      {
+        countryCode: 'FAR',
+        domain: 'farajaland.opencrvs.org',
+        environment: 'production'
+      }
     )
     const result = await sendTelemetryReport(report)
 
@@ -109,6 +112,7 @@ describe('sendTelemetryReport', () => {
       country_code: 'FAR',
       domain: 'farajaland.opencrvs.org',
       instance: {
+        environment: 'production',
         app_version: process.env.npm_package_version
       },
       metrics: { 'events.total': 3, 'system.health': 'ok' }
@@ -128,8 +132,7 @@ describe('sendTelemetryReport', () => {
     const report = buildTelemetryReport(
       { 'events.total': 3 },
       '2026-08-13T00:00:00.000Z',
-      'FAR',
-      null
+      { countryCode: 'FAR', domain: null }
     )
     expect(await sendTelemetryReport(report)).toEqual({
       status: 'duplicate',
@@ -149,8 +152,7 @@ describe('sendTelemetryReport', () => {
     const report = buildTelemetryReport(
       { 'events.total': 3 },
       '2026-08-13T00:00:00.000Z',
-      'FAR',
-      null
+      { countryCode: 'FAR', domain: null }
     )
     const result = await sendTelemetryReport(report)
     expect(result.status).toBe('error')
@@ -165,7 +167,12 @@ describe('runDailyTelemetry', () => {
     await setupTestCase()
 
     let receivedBody:
-      | { reported_at: string; country_code: string; domain: string | null }
+      | {
+          reported_at: string
+          country_code: string
+          domain: string | null
+          instance: { environment?: string }
+        }
       | undefined
     mswServer.use(
       http.post(env.TELEMETRY_URL, async ({ request }) => {
@@ -182,9 +189,35 @@ describe('runDailyTelemetry', () => {
 
     expect(result.status).toBe('accepted')
     expect(receivedBody?.reported_at).toBe(reportedAt)
-    // country_code comes from the default /config/application msw handler
-    // (CURRENCY.languagesAndCountry[0] === 'en-US'); domain is unset in tests.
-    expect(receivedBody?.country_code).toBe('en-US')
-    expect(receivedBody?.domain).toBeNull()
+    // country_code / domain / environment come from the default
+    // /config/application msw handler (COUNTRY_CODE, TELEMETRY_DOMAIN,
+    // TELEMETRY_ENVIRONMENT).
+    expect(receivedBody?.country_code).toBe('FAR')
+    expect(receivedBody?.domain).toBe('farajaland.opencrvs.org')
+    expect(receivedBody?.instance.environment).toBe('production')
+  })
+
+  it('skips when telemetry is disabled in the application config', async () => {
+    await setupTestCase()
+
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/application`, () =>
+        HttpResponse.json({
+          APPLICATION_NAME: 'Test',
+          COUNTRY_CODE: 'FAR',
+          COUNTRY_LOGO: { fileName: 'logo.png', file: '' },
+          SYSTEM_IANA_TIMEZONE: 'UTC',
+          CURRENCY: { isoCode: 'USD', languagesAndCountry: ['en-US'] },
+          TELEMETRY_ENABLED: false,
+          PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
+          USER_NOTIFICATION_DELIVERY_METHOD: 'email',
+          INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
+          ADMIN_STRUCTURE: []
+        })
+      )
+    )
+
+    const result = await runDailyTelemetry('2026-08-13T00:00:00.000Z')
+    expect(result.status).toBe('skipped')
   })
 })

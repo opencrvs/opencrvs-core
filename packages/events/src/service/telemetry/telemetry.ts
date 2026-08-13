@@ -38,16 +38,18 @@ export interface TelemetryReport {
   metrics: TelemetryMetrics
 }
 
+/** Instance identity for a report, resolved from the application config. */
+export interface TelemetryContext {
+  countryCode: string
+  domain: string | null
+  environment?: string
+}
+
 export type TelemetrySendResult =
   | { status: 'accepted'; reportId: string; metricsRecorded: number }
   | { status: 'duplicate'; reportId: string }
   | { status: 'skipped'; reason: string }
   | { status: 'error'; httpStatus?: number; message: string }
-
-/** Telemetry only runs when explicitly enabled for the instance. */
-export function isTelemetryEnabled(): boolean {
-  return env.TELEMETRY_ENABLED
-}
 
 /**
  * Midnight (UTC) of the given day as an ISO 8601 string. Used as `reported_at`
@@ -64,16 +66,15 @@ export function startOfUtcDay(date: Date = new Date()): string {
 export function buildTelemetryReport(
   metrics: TelemetryMetrics,
   reportedAt: string,
-  countryCode: string,
-  domain: string | null
+  context: TelemetryContext
 ): TelemetryReport {
   return {
     schema_version: TELEMETRY_SCHEMA_VERSION,
     reported_at: reportedAt,
-    country_code: countryCode,
-    domain,
+    country_code: context.countryCode,
+    domain: context.domain,
     instance: {
-      environment: env.TELEMETRY_ENVIRONMENT,
+      environment: context.environment,
       // Set by the package manager when the service is started via a script.
       app_version: process.env.npm_package_version
     },
@@ -149,27 +150,21 @@ export async function sendTelemetryReport(
 export async function runDailyTelemetry(
   reportedAt: string = startOfUtcDay()
 ): Promise<TelemetrySendResult> {
-  if (!isTelemetryEnabled()) {
-    return { status: 'skipped', reason: 'TELEMETRY_ENABLED is false' }
-  }
-
   const applicationConfig = await getApplicationConfig()
-  const countryCode = applicationConfig.CURRENCY.languagesAndCountry[0]
-  if (!countryCode) {
+
+  if (!applicationConfig.TELEMETRY_ENABLED) {
     return {
       status: 'skipped',
-      reason:
-        'CURRENCY.languagesAndCountry is empty — no country code to report'
+      reason: 'TELEMETRY_ENABLED is false in the application config'
     }
   }
 
   const metrics = await collectTelemetryMetrics()
-  const report = buildTelemetryReport(
-    metrics,
-    reportedAt,
-    countryCode,
-    env.TELEMETRY_DOMAIN ?? null
-  )
+  const report = buildTelemetryReport(metrics, reportedAt, {
+    countryCode: applicationConfig.COUNTRY_CODE,
+    domain: applicationConfig.TELEMETRY_DOMAIN ?? null,
+    environment: applicationConfig.TELEMETRY_ENVIRONMENT
+  })
   const result = await sendTelemetryReport(report)
 
   if (result.status === 'accepted') {

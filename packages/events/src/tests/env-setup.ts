@@ -10,6 +10,3 @@
  */
 import path from 'path'
 process.env.CERT_PUBLIC_KEY_PATH = path.resolve(__dirname, 'cert.public.key')
-// Enables the telemetry code path under test; the worker itself is not started
-// in tests, so this only affects code that explicitly calls into telemetry.
-process.env.TELEMETRY_ENABLED = 'true'

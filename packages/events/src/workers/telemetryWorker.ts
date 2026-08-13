@@ -10,11 +10,7 @@
  */
 
 import { logger } from '@opencrvs/commons'
-import {
-  isTelemetryEnabled,
-  runDailyTelemetry,
-  startOfUtcDay
-} from '@events/service/telemetry'
+import { runDailyTelemetry, startOfUtcDay } from '@events/service/telemetry'
 
 /**
  * How often the worker wakes up to check whether today's report has been sent.
@@ -48,11 +44,9 @@ export async function runTelemetryTick(): Promise<void> {
 }
 
 export function startTelemetryWorker(): void {
-  if (!isTelemetryEnabled()) {
-    logger.info('Telemetry worker: disabled (TELEMETRY_ENABLED is false)')
-    return
-  }
-
+  // The worker always runs; whether a report is actually sent is decided per
+  // tick from the application config (TELEMETRY_ENABLED), so toggling telemetry
+  // in countryconfig takes effect without restarting the events service.
   const tick = () =>
     runTelemetryTick().catch((err) => {
       logger.error(

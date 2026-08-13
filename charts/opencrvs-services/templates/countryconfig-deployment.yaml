@@ -93,6 +93,11 @@ spec:
               value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
             - name: DOMAIN
               value: {{ .Values.hostname | quote }}
+            # Public domain reported with events telemetry (read by the country
+            # config's application config). TELEMETRY_ENVIRONMENT, if needed, is
+            # set per-deployment via countryconfig.env values.
+            - name: TELEMETRY_DOMAIN
+              value: {{ .Values.hostname | quote }}
             - name: SUBDOMAIN_SEPARATOR
               value: {{ .Values.subdomain_separator | quote }}
             - name: GATEWAY_URL

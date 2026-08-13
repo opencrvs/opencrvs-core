@@ -13,6 +13,7 @@ import { defineApplicationConfig } from '@opencrvs/toolkit/application-config'
 
 export const applicationConfig = defineApplicationConfig({
   APPLICATION_NAME: 'Farajaland CRS',
+  COUNTRY_CODE: 'FAR',
   COUNTRY_LOGO: countryLogo,
   SYSTEM_IANA_TIMEZONE: 'Asia/Dhaka', // Default timezone for the country. Basis for date and time calculations during searches.
   CURRENCY: {
