@@ -218,6 +218,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('Inactivating an office keeps its Notified/Declared records reachable and processable to the same administrative area', async ({
     browser
   }) => {
+    test.setTimeout(180_000) // full office+user provisioning cycle plus first-login ceremony
     const officeName = `E2E Inactivate Office ${uuidv4()}`
     const office = await createOffice(
       systemAdminToken,
