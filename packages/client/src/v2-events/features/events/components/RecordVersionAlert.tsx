@@ -307,6 +307,18 @@ export function RecordVersionAlert({
           <span key={index}>{sentence}</span>
         ))}
       </Sentences>
+      {changeCount > 0 && onToggleChanges && (
+        <ChangeControl>
+          <Checkbox
+            id="record-version-changes"
+            label={changeLabel}
+            name="record-version-changes"
+            selected={showChanges}
+            value="changes"
+            onChange={onToggleChanges}
+          />
+        </ChangeControl>
+      )}
     </Alert>
   )
 }
