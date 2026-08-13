@@ -96,6 +96,10 @@ An integration's audit log can now be read through the `integrations.audit` endp
 
 A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
 
+#### Daily usage telemetry
+
+The events service can report a small daily usage summary (registered/pending declaration counts, active user counts, uptime) to the OpenCRVS telemetry endpoint. It is off by default and controlled per instance via `TELEMETRY_ENABLED`; `TELEMETRY_URL`, `TELEMETRY_DOMAIN`, and `TELEMETRY_ENVIRONMENT` configure the target and identity. The worker sends at most once per UTC day and uses a stable `reported_at` so retries and restarts don't double-count. Enabled by default in the Helm chart (with `domain` taken from `.Values.hostname`); local development stays off.
+
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)

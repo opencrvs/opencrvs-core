@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import path from 'path'
-process.env.CERT_PUBLIC_KEY_PATH = path.resolve(__dirname, 'cert.public.key')
-// Enables the telemetry code path under test; the worker itself is not started
-// in tests, so this only affects code that explicitly calls into telemetry.
-process.env.TELEMETRY_ENABLED = 'true'
+
+export * from './metrics'
+export * from './telemetry'

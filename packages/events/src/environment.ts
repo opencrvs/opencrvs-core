@@ -35,5 +35,21 @@ export const env = cleanEnv(process.env, {
   EVENT_CONFIG_CACHE_TTL_MS: num({
     default: 60_000,
     desc: 'How long (ms) the events service caches event/workqueue configuration fetched from countryconfig before refetching. Bounds how stale served config can be after a countryconfig deploy that does not restart the events service.'
+  }),
+  TELEMETRY_ENABLED: bool({
+    default: false,
+    desc: 'When true, the events service reports daily usage telemetry to TELEMETRY_URL.'
+  }),
+  TELEMETRY_URL: url({
+    default: 'https://status.opencrvs.dev/v1/telemetry',
+    desc: 'Ingest endpoint for daily usage telemetry.'
+  }),
+  TELEMETRY_ENVIRONMENT: str({
+    default: undefined,
+    desc: 'Optional environment label (e.g. "staging") reported with telemetry.'
+  }),
+  TELEMETRY_DOMAIN: str({
+    default: undefined,
+    desc: 'Public domain of this instance (e.g. "farajaland.opencrvs.org") reported with telemetry. Omitted from the payload when unset.'
   })
 })
