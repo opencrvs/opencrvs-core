@@ -61,11 +61,26 @@ export function useRecordVersions({
 
   const versions = useMemo(() => getRecordVersions(event), [event])
 
-  const latest = versions.at(-1)
-  const selectedIndex = versions.findIndex(
+  const requestedIndex = versions.findIndex(
     ({ actionId }) => actionId === version
   )
-  const selected = versions[selectedIndex] ?? latest
+
+  /*
+   * Resolve the index, not just the version. An absent, unknown or stale
+   * `version` falls back to the newest — and everything downstream of the
+   * selection, `previous` included, has to fall back with it.
+   */
+  const selectedIndex =
+    requestedIndex >= 0 ? requestedIndex : versions.length - 1
+
+  /*
+   * `at` rather than an index, because a record with no versions yet leaves
+   * `selectedIndex` at -1 and there is genuinely nothing to select. Indexing
+   * types that away as a `RecordVersion`, which then makes every guard
+   * downstream look redundant when it is the one thing holding the empty case
+   * up.
+   */
+  const selected = versions.at(selectedIndex)
 
   /*
    * Compare against the previous *version*, never the previous action. A
@@ -121,7 +136,7 @@ export function useRecordVersions({
     selectedState,
     previous,
     previousState,
-    isLatest: !latest || selected?.actionId === latest.actionId,
+    isLatest: selectedIndex === versions.length - 1,
     selectVersion,
     showChanges: Boolean(changes && previous),
     setShowChanges

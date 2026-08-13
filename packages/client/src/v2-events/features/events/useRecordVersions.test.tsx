@@ -18,6 +18,7 @@ import {
   RecordForm,
   generateEventDocument,
   getCurrentEventState,
+  getRecordVersions,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { useRecordVersions } from './useRecordVersions'
@@ -83,6 +84,31 @@ describe('useRecordVersions', () => {
     expect(result.current.selected?.form).toBe(RecordForm.REGISTRATION)
     expect(result.current.selected?.isLatestOfForm).toBe(true)
     expect(result.current.isLatest).toBe(true)
+  })
+
+  /*
+   * Regression: the fallback used to resolve `selected` but not the index it
+   * came from, so with no `version` in the url — the default when the Record
+   * tab opens — there was never a previous version to compare against.
+   */
+  it('resolves the previous version when no version param is given', () => {
+    const event = editedThenRegistered()
+    const { result } = renderVersions(event)
+
+    expect(result.current.previous).toBeDefined()
+    expect(result.current.previous?.actionId).toBe(
+      result.current.versions.at(-2)?.actionId
+    )
+    expect(result.current.previousState).toBeDefined()
+  })
+
+  it('has no previous version on the first one', () => {
+    const event = editedThenRegistered()
+    const first = getRecordVersions(event)[0]
+    const { result } = renderVersions(event, `?version=${first.actionId}`)
+
+    expect(result.current.previous).toBeUndefined()
+    expect(result.current.previousState).toBeUndefined()
   })
 
   it('honours a version search param', () => {
