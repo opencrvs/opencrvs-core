@@ -10,7 +10,8 @@
  */
 
 import { logger } from '../logger'
-import { triggerUserEventNotification, TriggerEvent } from './UserNotifications'
+import { triggerUserEventNotification } from './dispatch'
+import { TriggerEvent } from './UserNotifications'
 
 const recipient = {
   name: { firstname: 'John', surname: 'Doe' },
