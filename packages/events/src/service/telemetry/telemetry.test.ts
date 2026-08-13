@@ -95,6 +95,7 @@ describe('sendTelemetryReport', () => {
       '2026-08-13T00:00:00.000Z',
       {
         countryCode: 'FAR',
+        applicationName: 'Farajaland CRS',
         domain: 'farajaland.opencrvs.org',
         environment: 'production'
       }
@@ -112,6 +113,7 @@ describe('sendTelemetryReport', () => {
       country_code: 'FAR',
       domain: 'farajaland.opencrvs.org',
       instance: {
+        application_name: 'Farajaland CRS',
         environment: 'production',
         app_version: process.env.npm_package_version
       },
@@ -132,7 +134,7 @@ describe('sendTelemetryReport', () => {
     const report = buildTelemetryReport(
       { 'events.total': 3 },
       '2026-08-13T00:00:00.000Z',
-      { countryCode: 'FAR', domain: null }
+      { countryCode: 'FAR', applicationName: 'Farajaland CRS', domain: null }
     )
     expect(await sendTelemetryReport(report)).toEqual({
       status: 'duplicate',
@@ -152,7 +154,7 @@ describe('sendTelemetryReport', () => {
     const report = buildTelemetryReport(
       { 'events.total': 3 },
       '2026-08-13T00:00:00.000Z',
-      { countryCode: 'FAR', domain: null }
+      { countryCode: 'FAR', applicationName: 'Farajaland CRS', domain: null }
     )
     const result = await sendTelemetryReport(report)
     expect(result.status).toBe('error')
@@ -171,7 +173,7 @@ describe('runDailyTelemetry', () => {
           reported_at: string
           country_code: string
           domain: string | null
-          instance: { environment?: string }
+          instance: { environment?: string; application_name: string }
         }
       | undefined
     mswServer.use(
@@ -195,6 +197,8 @@ describe('runDailyTelemetry', () => {
     expect(receivedBody?.country_code).toBe('FAR')
     expect(receivedBody?.domain).toBe('farajaland.opencrvs.org')
     expect(receivedBody?.instance.environment).toBe('production')
+    // application_name comes from APPLICATION_NAME in the msw config handler.
+    expect(receivedBody?.instance.application_name).toBe('Test')
   })
 
   it('skips when telemetry is disabled in the application config', async () => {

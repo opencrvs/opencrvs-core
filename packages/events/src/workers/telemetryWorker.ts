@@ -33,7 +33,6 @@ export async function runTelemetryTick(): Promise<void> {
   if (reportedAt === lastReportedAt) {
     return
   }
-
   const result = await runDailyTelemetry(reportedAt)
 
   // `accepted` and `duplicate` both mean the day is covered; anything else

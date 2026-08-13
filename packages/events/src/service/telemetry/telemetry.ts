@@ -32,6 +32,7 @@ export interface TelemetryReport {
   country_code: string
   domain: string | null
   instance: {
+    application_name: string
     environment?: string
     app_version?: string
   }
@@ -41,6 +42,7 @@ export interface TelemetryReport {
 /** Instance identity for a report, resolved from the application config. */
 export interface TelemetryContext {
   countryCode: string
+  applicationName: string
   domain: string | null
   environment?: string
 }
@@ -74,6 +76,7 @@ export function buildTelemetryReport(
     country_code: context.countryCode,
     domain: context.domain,
     instance: {
+      application_name: context.applicationName,
       environment: context.environment,
       // Set by the package manager when the service is started via a script.
       app_version: process.env.npm_package_version
@@ -151,19 +154,30 @@ export async function runDailyTelemetry(
   reportedAt: string = startOfUtcDay()
 ): Promise<TelemetrySendResult> {
   const applicationConfig = await getApplicationConfig()
-
   if (!applicationConfig.TELEMETRY_ENABLED) {
+    logger.info(
+      'Telemetry: disabled in application config (TELEMETRY_ENABLED is false) — skipping report'
+    )
     return {
       status: 'skipped',
       reason: 'TELEMETRY_ENABLED is false in the application config'
     }
   }
 
+  const domain = applicationConfig.TELEMETRY_DOMAIN ?? null
+  const environment = applicationConfig.TELEMETRY_ENVIRONMENT
+  logger.info(
+    `Telemetry: enabled for ${applicationConfig.COUNTRY_CODE} — domain=${
+      domain ?? '(unset)'
+    }, environment=${environment ?? '(unset)'}, reporting for ${reportedAt}`
+  )
+
   const metrics = await collectTelemetryMetrics()
   const report = buildTelemetryReport(metrics, reportedAt, {
     countryCode: applicationConfig.COUNTRY_CODE,
-    domain: applicationConfig.TELEMETRY_DOMAIN ?? null,
-    environment: applicationConfig.TELEMETRY_ENVIRONMENT
+    applicationName: applicationConfig.APPLICATION_NAME,
+    domain,
+    environment
   })
   const result = await sendTelemetryReport(report)
 
