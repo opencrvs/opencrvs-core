@@ -101,7 +101,7 @@ export const CheckedCheckboxShouldAppearOnReview: StoryObj<typeof Review.Body> =
 
       await expect(canvas.queryByText('No recommender')).toBeInTheDocument()
       await expect(
-        canvas.queryByTestId('row-value-recommender.none')
+        canvas.queryByTestId('recommender.none-value')
       ).toHaveTextContent('Yes')
     }
   }
@@ -134,7 +134,7 @@ export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<
 
     await expect(await canvas.findByText('No recommender')).toBeInTheDocument()
     await expect(
-      (await canvas.findByTestId('row-value-recommender.none')).textContent
+      (await canvas.findByTestId('recommender.none-value')).textContent
     ).toEqual('No')
   }
 }

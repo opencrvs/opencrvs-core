@@ -29,10 +29,10 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import {
-  ComparisonListView,
   Content,
   ContentSize,
   FullBodyContent,
+  List,
   Stack,
   Text
 } from '@opencrvs/components'
@@ -51,12 +51,6 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
-
-const RightAlignedOnSmallScreen = styled(Text)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    text-align: end;
-  }
-`
 
 const SupportingDocumentWrapper = styled(Stack)`
   position: sticky;
@@ -127,7 +121,13 @@ function UserFullName({ userId }: { userId: string }) {
   return getUsersFullName(user.name)
 }
 
-function RegisteredAtOfficeName({ id, anchor }: { id?: UUID; anchor: PlainDate }) {
+function RegisteredAtOfficeName({
+  id,
+  anchor
+}: {
+  id?: UUID
+  anchor: PlainDate
+}) {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
@@ -183,8 +183,7 @@ export function DuplicateComparison({
   const originalRegistrationAnchor =
     (originalEventState.legalStatuses.REGISTERED
       ? toPlainDate(originalEventState.legalStatuses.REGISTERED.createdAt)
-      : undefined) ??
-    todayISO()
+      : undefined) ?? todayISO()
   const potentialDuplicateRegistrationAnchor =
     (potentialDuplicateEventState.legalStatuses.REGISTERED
       ? toPlainDate(
@@ -405,44 +404,28 @@ export function DuplicateComparison({
                   <Text color="grey600" element="span" variant="bold18">
                     {sections.title}
                   </Text>
-                  <ComparisonListView
-                    key={`comparison-${index}`}
-                    headings={[
-                      originalEventState.trackingId,
-                      potentialDuplicateEventState.trackingId
-                    ]}
-                  >
+                  <List key={`comparison-${index}`}>
+                    <List.Header
+                      value={
+                        <Text color="negative" element="span" variant="reg16">
+                          {originalEventState.trackingId}
+                        </Text>
+                      }
+                      value2={
+                        <Text color="grey600" element="span" variant="reg16">
+                          {potentialDuplicateEventState.trackingId}
+                        </Text>
+                      }
+                    />
                     {sections.data.map((item, id) => (
-                      <ComparisonListView.Row
+                      <List.Item
                         key={`row-${id}`}
-                        heading={{
-                          right: potentialDuplicateEventState.trackingId,
-                          left: originalEventState.trackingId
-                        }}
-                        label={
-                          <Text color="grey600" element="span" variant="bold16">
-                            {item.label}
-                          </Text>
-                        }
-                        leftValue={
-                          <RightAlignedOnSmallScreen
-                            element="span"
-                            variant="reg16"
-                          >
-                            {item.leftValue}
-                          </RightAlignedOnSmallScreen>
-                        }
-                        rightValue={
-                          <RightAlignedOnSmallScreen
-                            element="span"
-                            variant="reg16"
-                          >
-                            {item.rightValue}
-                          </RightAlignedOnSmallScreen>
-                        }
+                        label={item.label}
+                        value={item.leftValue}
+                        value2={item.rightValue}
                       />
                     ))}
-                  </ComparisonListView>
+                  </List>
                 </div>
               )
             })}

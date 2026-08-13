@@ -76,7 +76,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     await canvas.findByText("Applicant's name")
 
     await expect(
-      await canvas.findByTestId('row-value-applicant.name')
+      await canvas.findByTestId('applicant.name-value')
     ).toHaveTextContent('Riku This value is from a draft')
 
     await canvas.findByText(
