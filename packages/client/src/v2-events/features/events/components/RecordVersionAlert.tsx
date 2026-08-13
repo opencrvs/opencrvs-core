@@ -15,7 +15,8 @@ import styled from 'styled-components'
 import { uniq } from 'lodash'
 import { ActionType, RecordForm, RecordVersion } from '@opencrvs/commons/client'
 import { Alert } from '@opencrvs/components/lib/Alert'
-import { Checkbox } from '@opencrvs/components/lib/Checkbox'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 
@@ -145,14 +146,10 @@ const BY_ACTION: Partial<Record<ActionType, MessageDescriptor>> = {
   [ActionType.APPROVE_CORRECTION]: messages.byCorrected
 }
 
-/* The design-system checkbox labels at 17px, which is page copy, not alert copy. */
+/* Pulled left by the button's own padding so it lines up with the sentences. */
 const ChangeControl = styled.div`
   margin-top: 12px;
-
-  label {
-    ${({ theme }) => theme.fonts.reg14};
-    gap: 8px;
-  }
+  margin-left: -8px;
 `
 
 /** Sentences are joined at their boundaries, which every language tolerates. */
@@ -309,14 +306,15 @@ export function RecordVersionAlert({
       </Sentences>
       {changeCount > 0 && onToggleChanges && (
         <ChangeControl>
-          <Checkbox
-            id="record-version-changes"
-            label={changeLabel}
-            name="record-version-changes"
-            selected={showChanges}
-            value="changes"
-            onChange={onToggleChanges}
-          />
+          <Button
+            pressed={showChanges}
+            size="small"
+            type="tertiary"
+            onClick={onToggleChanges}
+          >
+            <Icon name="Eye" size="small" />
+            {changeLabel}
+          </Button>
         </ChangeControl>
       )}
     </Alert>

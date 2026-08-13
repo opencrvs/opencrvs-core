@@ -245,7 +245,10 @@ export const CorrectionsShown: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByRole('checkbox')).toBeChecked()
+    await expect(await canvas.findByRole('button')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
   }
 }
 
@@ -258,7 +261,7 @@ export const NoChangesToShow: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.queryByRole('checkbox')).toBeNull()
+    await expect(canvas.queryByRole('button')).toBeNull()
   }
 }
 
