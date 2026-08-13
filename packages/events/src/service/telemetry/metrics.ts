@@ -18,7 +18,7 @@ import { getClient } from '@events/storage/postgres/events'
  * allowed — breakdowns are folded into the dotted key instead
  * (e.g. `declarations.registered.birth`).
  */
-export type TelemetryMetricValue = number | string | boolean
+type TelemetryMetricValue = number | string | boolean
 
 /** Flat map of dotted metric keys to primitive values. */
 export type TelemetryMetrics = Record<string, TelemetryMetricValue>

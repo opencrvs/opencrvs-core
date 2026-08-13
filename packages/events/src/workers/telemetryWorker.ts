@@ -18,7 +18,7 @@ import { runDailyTelemetry, startOfUtcDay } from '@events/service/telemetry'
  * failed attempt is retried within the hour without a dedicated scheduler, and
  * a service that restarts mid-day still reports that day.
  */
-export const TELEMETRY_POLL_INTERVAL_MS = 60 * 60 * 1000
+const TELEMETRY_POLL_INTERVAL_MS = 60 * 60 * 1000
 
 /**
  * `reported_at` of the most recent successful send. While it equals today's
@@ -28,7 +28,7 @@ export const TELEMETRY_POLL_INTERVAL_MS = 60 * 60 * 1000
  */
 let lastReportedAt: string | undefined
 
-export async function runTelemetryTick(): Promise<void> {
+async function runTelemetryTick(): Promise<void> {
   const reportedAt = startOfUtcDay()
   if (reportedAt === lastReportedAt) {
     return
