@@ -15,6 +15,7 @@ import styled from 'styled-components'
 import { uniq } from 'lodash'
 import { ActionType, RecordForm, RecordVersion } from '@opencrvs/commons/client'
 import { Alert } from '@opencrvs/components/lib/Alert'
+import { Checkbox } from '@opencrvs/components/lib/Checkbox'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 
@@ -121,24 +122,13 @@ const messages = defineMessages({
     id: 'v2.event.record.alert.changes.showEdits',
     defaultMessage: 'Show edits',
     description:
-      'Action that marks up what changed from the previous notification or declaration'
-  },
-  hideEdits: {
-    id: 'v2.event.record.alert.changes.hideEdits',
-    defaultMessage: 'Hide edits',
-    description:
-      'Action that stops marking up changes on a notification or declaration'
+      'Labels the control that marks up what changed from the previous notification or declaration'
   },
   showCorrection: {
     id: 'v2.event.record.alert.changes.showCorrection',
     defaultMessage: 'Show correction',
     description:
-      'Action that marks up what changed from the previous registration'
-  },
-  hideCorrection: {
-    id: 'v2.event.record.alert.changes.hideCorrection',
-    defaultMessage: 'Hide correction',
-    description: 'Action that stops marking up changes on a registration'
+      'Labels the control that marks up what changed from the previous registration'
   }
 })
 
@@ -154,6 +144,16 @@ const BY_ACTION: Partial<Record<ActionType, MessageDescriptor>> = {
   [ActionType.REGISTER]: messages.byRegistered,
   [ActionType.APPROVE_CORRECTION]: messages.byCorrected
 }
+
+/* The design-system checkbox labels at 17px, which is page copy, not alert copy. */
+const ChangeControl = styled.div`
+  margin-top: 12px;
+
+  label {
+    ${({ theme }) => theme.fonts.reg14};
+    gap: 8px;
+  }
+`
 
 /** Sentences are joined at their boundaries, which every language tolerates. */
 const Sentences = styled.div`
@@ -285,24 +285,20 @@ export function RecordVersionAlert({
    * one correction, so a number here would count changed fields while the
    * words name events — "2 corrections" for one correction touching two
    * fields would read as two correction requests.
+   *
+   * A checkbox rather than a button: the comparison is a state you leave on
+   * or off, not something you do once. The label stays put and the check
+   * carries whether it is on.
    */
-  const CHANGE_ACTION = {
-    hide: isRegistration ? messages.hideCorrection : messages.hideEdits,
-    show: isRegistration ? messages.showCorrection : messages.showEdits
-  }
-
-  const actionText =
-    changeCount > 0 && onToggleChanges
-      ? intl.formatMessage(CHANGE_ACTION[showChanges ? 'hide' : 'show'])
-      : undefined
+  const changeLabel = intl.formatMessage(
+    isRegistration ? messages.showCorrection : messages.showEdits
+  )
 
   return (
     <Alert
-      actionText={actionText}
       data-testid="record-version-alert"
       title={title}
       type={selected.isLatestOfForm ? 'info' : 'warning'}
-      onActionClick={actionText ? onToggleChanges : undefined}
     >
       <Sentences>
         {sentences.map((sentence, index) => (

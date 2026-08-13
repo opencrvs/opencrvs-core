@@ -234,8 +234,8 @@ export const OffersToShowCorrections: Story = {
   }
 }
 
-/** With the comparison on, the action offers the way back. */
-export const OffersToHideCorrections: Story = {
+/** With the comparison on, the label stays and the box is checked. */
+export const CorrectionsShown: Story = {
   args: {
     versions: correctedTwice,
     selected: correctedTwice[3],
@@ -245,7 +245,7 @@ export const OffersToHideCorrections: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText('Hide correction')).toBeVisible()
+    await expect(await canvas.findByRole('checkbox')).toBeChecked()
   }
 }
 
@@ -258,7 +258,7 @@ export const NoChangesToShow: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.queryByText(/Show (edits|correction)/)).toBeNull()
+    await expect(canvas.queryByRole('checkbox')).toBeNull()
   }
 }
 
