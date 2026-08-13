@@ -13,19 +13,19 @@ import { CLIENT_URL, CREDENTIALS } from '../../constants'
 import { getToken } from '../../helpers'
 
 /*
- * Documents are only ever served through presigned URLs, so the storage bucket
- * must not grant anonymous reads. The bucket used to be created world-readable
- * with a separate migration making it private afterwards; when migrations were
- * flattened for 2.0 that migration disappeared, and fresh installs were left
- * permanently public. Feature environments are created fresh, so this is the
- * scenario that regressed.
+ * The storage bucket must not give anonymous read access. Users get documents
+ * only through presigned URLs. Before, the code created the bucket with public
+ * read access, and a migration made the bucket private. That migration was lost
+ * when the migrations were made flat for 2.0. New installations stayed public.
+ * Feature environments are always new installations. This test finds that
+ * fault.
  *
  * @see https://github.com/opencrvs/opencrvs-core/issues/13436
  */
 test.describe('Document storage', () => {
   /*
-   * Presigning does not check that the object exists, so an arbitrary key is
-   * enough to probe the bucket policy without uploading anything first.
+   * Minio does not check that the object exists when it signs a URL. Any key is
+   * sufficient to test the bucket policy. An upload is not necessary.
    */
   const objectPath = 'events/00000000-0000-4000-8000-000000000000/probe.png'
 
@@ -44,18 +44,19 @@ test.describe('Document storage', () => {
     unsignedURL.search = ''
 
     /*
-     * A signed request is allowed past the bucket policy, so the missing key
-     * answers 404 rather than being refused outright. This is the positive
-     * control: it proves the request reached Minio and that signing works, so
-     * the assertion below cannot pass merely because the host is unreachable.
+     * The bucket policy accepts a signed request. The key does not exist, and
+     * Minio thus answers 404. It does not refuse the request. This is the
+     * positive control. It shows that the request came to Minio, and that the
+     * signature is correct. The check below cannot pass only because the host
+     * does not answer.
      */
     const signed = await fetch(presignedURL)
     expect(signed.status).toBe(404)
 
     /*
-     * The same object without its signature must be refused. A 404 here would
-     * mean anonymous s3:GetObject is granted, making every document URL
-     * readable by anyone who ever sees it, for as long as the object exists.
+     * Minio must refuse the same object when the URL has no signature. A 404
+     * here shows that the bucket gives anonymous s3:GetObject. Then all persons
+     * who see a document URL can read that document while the object exists.
      */
     const unsigned = await fetch(unsignedURL)
     expect(unsigned.status).toBe(403)

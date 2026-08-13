@@ -21,8 +21,8 @@ jest.mock('minio', () => ({
 }))
 
 /*
- * test/setupJest.ts mocks this module for every other suite, so reach past it
- * to exercise the real implementation.
+ * test/setupJest.ts replaces this module with a mock in all other test files.
+ * Get the real functions, because these tests must use them.
  */
 const { ensureDefaultMinioBucket, ensureDefaultMinioBucketIsPrivate } =
   jest.requireActual<typeof import('@documents/minio/client')>(

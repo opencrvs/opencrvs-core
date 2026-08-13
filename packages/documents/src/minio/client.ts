@@ -35,17 +35,17 @@ export async function ensureDefaultMinioBucket() {
 }
 
 /**
- * Documents are only ever served through presigned URLs, so the bucket must not
- * grant anonymous access. An empty policy removes any existing one, which is
- * what we want: Minio denies unauthenticated requests when no policy grants
- * them, while presigned requests keep working.
+ * The bucket must not give anonymous access. Users get documents only through
+ * presigned URLs. An empty policy removes the policy from the bucket. Minio
+ * then refuses requests that have no signature, but presigned requests continue
+ * to work.
  *
- * This runs on every startup rather than only when the bucket is created. The
- * bucket used to be created with a public-read policy and a separate migration
- * flipped it to private afterwards. When migrations were flattened for 2.0 that
- * migration disappeared, leaving fresh installs permanently world-readable.
- * Reconciling on boot keeps the guarantee in one place that cannot be dropped,
- * and repairs environments that were created without it.
+ * This function runs at each start, and not only when the bucket is new.
+ * Before, the code created the bucket with a public-read policy, and a
+ * migration made the bucket private. That migration was lost when the
+ * migrations were made flat for 2.0. New installations stayed readable by all
+ * persons. A check at each start keeps the rule in one place. It also repairs
+ * the installations that have no private policy.
  *
  * @see https://github.com/opencrvs/opencrvs-core/issues/13436
  */
