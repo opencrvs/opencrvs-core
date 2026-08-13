@@ -337,21 +337,11 @@ export async function refetchDraftsList() {
 export async function cleanUpOnUnassign(
   updatedEvent: EventDocumentOnlyLastAction
 ) {
-  const localEvent = findLocalEventDocument(updatedEvent.id)
-
   // If unassign is performed when it's assigned someone else, user does not necessarily have the event.get cached.
-  if (!localEvent) {
-    // Assuming unassign needs to be done online, we'll just refetch the query.
-    await refetchSearchQuery(updatedEvent.id)
-  } else {
-    const updatedEventWithActions = {
-      ...updatedEvent,
-      actions: localEvent.actions.concat(updatedEvent.actions)
-    }
+  await deleteEventData(updatedEvent)
+  // Assuming unassign needs to be done online, we'll just refetch the query.
+  // NOTE: local event cannot be used to recreate EventIndex cache. Record might be sealed, which causes inconsistencies in UI.
+  await refetchSearchQuery(updatedEvent.id)
 
-    await deleteEventData(updatedEventWithActions)
-
-    updateLocalEventIndex(updatedEventWithActions.id, updatedEventWithActions)
-  }
   await invalidateWorkqueues()
 }

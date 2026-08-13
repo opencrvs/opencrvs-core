@@ -28,7 +28,7 @@ import { openRecordByTitle } from '../../print-certificate/birth/helpers'
 test.describe.serial('6. Death declaration case - 6', () => {
   let page: Page
   async function expectRowValue(fieldName: string, assertionText: string) {
-    await expect(page.getByTestId(`row-value-${fieldName}`)).toContainText(
+    await expect(page.getByTestId(`${fieldName}-value`)).toContainText(
       assertionText
     )
   }
