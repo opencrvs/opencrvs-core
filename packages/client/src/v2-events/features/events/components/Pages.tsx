@@ -21,7 +21,7 @@ import {
   PageConfig,
   ValidatorContext,
   isNameFieldType,
-  NameField
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -153,24 +153,34 @@ export function Pages({
       return
     }
 
+    /**
+     * A cleared field falls back to its configured default value. Fields with no
+     * default clear to `null`, except NAME fields: those hold an object, and
+     * `null` leaves the sub-inputs rendering the values that were just cleared,
+     * so they need an explicitly empty name instead.
+     */
+    function getClearedValue(field: FieldConfig) {
+      const defaultValue = getDefaultValue(field, {})
+
+      if (defaultValue !== undefined) {
+        return defaultValue
+      }
+
+      const candidate = { config: field, value: formData[field.id] }
+
+      if (!isNameFieldType(candidate)) {
+        return null
+      }
+
+      return candidate.config.configuration?.name?.middlename
+        ? { firstname: '', middlename: '', surname: '' }
+        : { firstname: '', surname: '' }
+    }
+
     const clearedPageValues = Object.fromEntries(
       page.fields
         .filter((field) => !isNonInteractiveFieldType(field))
-        .map((field) => [
-          field.id,
-          // Handling name field when performing the clear page action.
-          // eslint-disable-next-line no-nested-ternary
-          (getDefaultValue(field, {}) ??
-          isNameFieldType({ config: field, value: formData[field.id] }))
-            ? (field as NameField).configuration?.name?.middlename
-              ? {
-                  firstname: '',
-                  middlename: '',
-                  surname: ''
-                }
-              : { firstname: '', surname: '' }
-            : null
-        ])
+        .map((field) => [field.id, getClearedValue(field)])
     )
 
     setFormData({ ...formData, ...clearedPageValues })
