@@ -16198,7 +16198,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     UnarchiveAction:
       type: object
