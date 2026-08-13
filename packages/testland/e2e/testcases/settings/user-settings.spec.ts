@@ -37,25 +37,20 @@ test.describe.serial('1. Settings Page', () => {
     })
 
     test('1.1.2 Validate content', async () => {
-      // Target desktop view only, ignore mobile duplicates
-      const desktopView = page.locator('[data-testid="list-view-value"]')
-
       // User details displayed
-      await expect(
-        desktopView.filter({ hasText: 'Kennedy Mweene' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: '0923232323' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: 'kalushabwa.lya17@gmail.com' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: 'Registrar' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: 'Ibombo District Office' }).first()
-      ).toBeVisible()
+      await expect(page.getByTestId('name-value')).toContainText(
+        'Kennedy Mweene'
+      )
+      await expect(page.getByTestId('phone-number-value')).toContainText(
+        '0923232323'
+      )
+      await expect(page.getByTestId('email-address-value')).toContainText(
+        'kalushabwa.lya17@gmail.com'
+      )
+      await expect(page.getByTestId('role-value')).toContainText('Registrar')
+      await expect(page.getByTestId('assigned-office-value')).toContainText(
+        'Ibombo District Office'
+      )
 
       // Editable fields
       await expect(
@@ -69,7 +64,9 @@ test.describe.serial('1. Settings Page', () => {
       await expect(page.locator('#btnChangePassword').first()).toBeEnabled()
 
       await expect(
-        desktopView.getByRole('img', { name: 'Kennedy Mweene' }).first()
+        page
+          .getByTestId('profile-image-value')
+          .getByRole('img', { name: 'Kennedy Mweene' })
       ).toBeVisible()
     })
 
@@ -78,7 +75,7 @@ test.describe.serial('1. Settings Page', () => {
 
       // Until a photo is uploaded the avatar renders initials, not an image.
       await expect(
-        page.locator('[data-testid="list-view-value"] img')
+        page.getByTestId('profile-image-value').locator('img')
       ).toHaveCount(0)
 
       const attachmentPath = path.join(__dirname, '../test-data/image.png')
@@ -99,9 +96,7 @@ test.describe.serial('1. Settings Page', () => {
 
       await page.getByText('Profile image successfully updated')
 
-      const newAvatar = page
-        .locator('[data-testid="list-view-value"] img')
-        .first()
+      const newAvatar = page.getByTestId('profile-image-value').locator('img')
       await expect(newAvatar).toBeVisible()
 
       const profileSettingsImageSrc = await page.locator(

@@ -8,4 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './ListViewSimplified'
+export * from './List'
+export type { ListItemProps } from './components/Item'
+export type { ListHeaderProps } from './components/Header'
+export type {
+  ListHeadingProps,
+  ListHeadingFontVariant
+} from './components/Heading'

@@ -9,13 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
+  DynamicHeightLinkButton,
+  SettingsRow
 } from '@client/views/Settings/items/components'
 import {
   constantsMessages,
@@ -25,7 +23,7 @@ import {
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 import { useOnlineStatus } from '@client/utils'
 
-export function Password() {
+export function usePassword(): SettingsRow {
   const intl = useIntl()
   const isOnline = useOnlineStatus()
   const [showModal, setShowModal] = React.useState(false)
@@ -45,36 +43,35 @@ export function Password() {
     toggleSuccessNotification()
   }
 
-  return (
-    <>
-      <ListViewItemSimplified
-        label={
-          <LabelContainer>
-            {intl.formatMessage(constantsMessages.labelPassword)}
-          </LabelContainer>
-        }
-        value={<ValueContainer>********</ValueContainer>}
-        actions={
-          <DynamicHeightLinkButton
-            id="btnChangePassword"
-            onClick={togglePasswordChangeModal}
-            disabled={!isOnline}
-          >
-            {intl.formatMessage(buttonMessages.change)}
-          </DynamicHeightLinkButton>
-        }
-      />
-      {showModal && (
-        <PasswordChangeModal
-          togglePasswordChangeModal={togglePasswordChangeModal}
-          passwordChanged={changePassword}
-        />
-      )}
-      {showSuccessNotification && (
-        <Toast type="success" onClose={toggleSuccessNotification}>
-          <FormattedMessage {...userMessages.passwordUpdated} />
-        </Toast>
-      )}
-    </>
-  )
+  return {
+    id: 'password',
+    item: {
+      label: intl.formatMessage(constantsMessages.labelPassword),
+      value: '********',
+      actions: (
+        <DynamicHeightLinkButton
+          id="btnChangePassword"
+          onClick={togglePasswordChangeModal}
+          disabled={!isOnline}
+        >
+          {intl.formatMessage(buttonMessages.change)}
+        </DynamicHeightLinkButton>
+      )
+    },
+    overlay: (
+      <>
+        {showModal && (
+          <PasswordChangeModal
+            togglePasswordChangeModal={togglePasswordChangeModal}
+            passwordChanged={changePassword}
+          />
+        )}
+        {showSuccessNotification && (
+          <Toast type="success" onClose={toggleSuccessNotification}>
+            <FormattedMessage {...userMessages.passwordUpdated} />
+          </Toast>
+        )}
+      </>
+    )
+  }
 }
