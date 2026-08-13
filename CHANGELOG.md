@@ -27,7 +27,7 @@
   **Deployment notes:**
 
   - Images served over plain HTTP are now blocked in both apps. Serve those assets over HTTPS.
-  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain. It is substituted verbatim, so an explicit space-separated origin list can be used instead; minimum sets are documented in `packages/client/nginx.conf` and `packages/login/nginx.conf`.
+  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain. It is substituted verbatim, so an explicit space-separated origin list can be used instead; the minimum set is documented next to the policy in `packages/client/nginx.conf`. The login app no longer uses the wildcard at all — every origin it contacts is proxied same-origin through its own nginx.
   - Reverse-proxy TLS cipher suites are outside OpenCRVS core. Proxies without explicit TLS options often fall back to a TLS 1.2 list offering CBC suites with HMAC-SHA-1; restricting to AEAD suites satisfies guidance such as ANSSI-BP-035.
 
 ### Bug fixes

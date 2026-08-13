@@ -48,16 +48,18 @@ describe('login Content-Security-Policy', () => {
   const directives = getDirectives(nginxConf)
 
   it('defines the directives the ANSSI audit requires', () => {
-    // frame-ancestors mirrors X-Frame-Options: SAMEORIGIN, which is also still sent
-    expect(directives['frame-ancestors']).toEqual(["'self'"])
+    // Stricter than the X-Frame-Options: SAMEORIGIN header, which is also still sent.
+    // The login form is never framed.
+    expect(directives['frame-ancestors']).toEqual(["'none'"])
     expect(directives['base-uri']).toEqual(["'self'"])
     expect(directives['form-action']).toEqual(["'self'"])
     expect(directives['object-src']).toEqual(["'none'"])
   })
 
-  it('does not allow plain-http images', () => {
-    // 'http:' in img-src permits mixed content on an https deployment
-    expect(directives['img-src']).not.toContain('http:')
+  it('serves images only from this origin', () => {
+    // 'http:' permits mixed content on an https deployment; a blanket 'https:' is
+    // unnecessary because every image login renders is proxied same-origin.
+    expect(directives['img-src']).toEqual(["'self'", 'data:'])
   })
 
   /*
@@ -71,14 +73,17 @@ describe('login Content-Security-Policy', () => {
   })
 
   /*
-   * The only scripts login loads are its own bundle and login-config.js, which is proxied
-   * same-origin via /api/countryconfig/. Nothing needs the deploy-time *.<domain> wildcard,
-   * which the ANSSI report flagged as an over-broad source.
+   * Everything login fetches — its own bundle, login-config.js, public config, auth — is
+   * proxied same-origin through this nginx, so no directive needs the deploy-time
+   * *.<domain> wildcard, which the ANSSI report flagged as an over-broad source. Asserted
+   * across the whole header rather than script-src alone: a wildcard in default-src is
+   * inherited by every directive that isn't set explicitly, connect-src included.
    */
-  it('loads scripts from no wildcard origin', () => {
-    expect(directives['script-src']).not.toContain(
-      '{{CONTENT_SECURITY_POLICY_WILDCARD}}'
+  it('names no wildcard origin in any directive', () => {
+    expect(nginxConf).not.toMatch(
+      /add_header Content-Security-Policy "[^"]*\{\{CONTENT_SECURITY_POLICY_WILDCARD\}\}/
     )
+    expect(directives['default-src']).toEqual(["'self'"])
   })
 })
 
