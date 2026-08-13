@@ -109,8 +109,12 @@ export const RegistrationOnlyVersion: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
+    const alert = canvas.getByTestId('record-version-alert')
+    await expect(alert).toHaveTextContent(
       'Registration — This is the only version'
+    )
+    await expect(alert).toHaveTextContent(
+      'This is the legal record of the event.'
     )
   }
 }
@@ -127,9 +131,8 @@ export const DeclarationOnARegisteredRecord: Story = {
     await expect(alert).toHaveTextContent(
       'Declaration — This is the only version'
     )
-    await expect(alert).toHaveTextContent('The record was registered on')
     await expect(alert).toHaveTextContent(
-      'The registration is the legal record of the event.'
+      'This record has since been registered.'
     )
   }
 }
@@ -139,6 +142,12 @@ export const NotificationOnAProgressedRecord: Story = {
   args: {
     versions: [notification, declaration, registration],
     selected: notification
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
+      'This record has since been declared and registered.'
+    )
   }
 }
 
@@ -154,7 +163,9 @@ export const RegistrationLatestOfThree: Story = {
     await expect(alert).toHaveTextContent(
       'Registration — You are viewing the latest version'
     )
-    await expect(alert).toHaveTextContent('corrected twice since')
+    await expect(alert).toHaveTextContent(
+      'This is the legal record of the event.'
+    )
   }
 }
 
@@ -166,9 +177,12 @@ export const RegistrationAsFirstRegistered: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
+    const alert = canvas.getByTestId('record-version-alert')
+    await expect(alert).toHaveTextContent(
       'Registration — You are viewing the original version'
     )
+    // A superseded registration is not the legal record.
+    await expect(alert).not.toHaveTextContent('This is the legal record')
   }
 }
 

@@ -91,35 +91,26 @@ const messages = defineMessages({
       '{name, select, __UNKNOWN__ {Corrected on {date}.} other {Corrected by {name} on {date}.}}',
     description: 'Provenance of a corrected registration version'
   },
-  historyDeclaration: {
-    id: 'v2.event.record.alert.history.declaration',
-    defaultMessage: 'First declared on {date}.',
+  sinceDeclared: {
+    id: 'v2.event.record.alert.since.declared',
+    defaultMessage: 'This record has since been declared.',
     description:
-      'Shown on a declaration that has been edited, naming when it opened'
+      'Shown on a notification of a record that has been declared but not registered'
   },
-  historyRegistration: {
-    id: 'v2.event.record.alert.history.registration',
-    defaultMessage:
-      '{count, plural, =1 {First registered on {date}, and corrected once since.} =2 {First registered on {date}, and corrected twice since.} other {First registered on {date}, and corrected {count} times since.}}',
-    description: 'Shown on a registration that has been corrected',
-    values: { count: 0, date: '' }
+  sinceDeclaredAndRegistered: {
+    id: 'v2.event.record.alert.since.declaredAndRegistered',
+    defaultMessage: 'This record has since been declared and registered.',
+    description: 'Shown on a notification of a record that has been registered'
   },
-  recordDeclared: {
-    id: 'v2.event.record.alert.record.declared',
-    defaultMessage: 'The record was declared on {date}.',
-    description: 'Shown when a later form exists — the record has been declared'
+  sinceRegistered: {
+    id: 'v2.event.record.alert.since.registered',
+    defaultMessage: 'This record has since been registered.',
+    description: 'Shown on a declaration of a record that has been registered'
   },
-  recordRegistered: {
-    id: 'v2.event.record.alert.record.registered',
-    defaultMessage: 'The record was registered on {date}.',
-    description:
-      'Shown when a later form exists — the record has been registered'
-  },
-  registrationIsLegal: {
-    id: 'v2.event.record.alert.registrationIsLegal',
-    defaultMessage: 'The registration is the legal record of the event.',
-    description:
-      'Shown alongside a declaration on a record that has been registered'
+  isLegalRecord: {
+    id: 'v2.event.record.alert.isLegalRecord',
+    defaultMessage: 'This is the legal record of the event.',
+    description: 'Shown on the current registration'
   }
 })
 
@@ -178,7 +169,6 @@ export function RecordVersionAlert({
   }
 
   const ofSameForm = versions.filter((v) => v.form === selected.form)
-  const oldestOfForm = ofSameForm[0]
 
   const statement = (() => {
     if (ofSameForm.length === 1) {
@@ -200,7 +190,8 @@ export function RecordVersionAlert({
 
   const sentences: string[] = []
 
-  // 1. Where this version came from. Always.
+  // 1. Where this version came from. Always — it is the one thing neither the
+  //    title nor the version selector says.
   const provenance = BY_ACTION[selected.actionType]
   if (provenance) {
     sentences.push(
@@ -211,53 +202,34 @@ export function RecordVersionAlert({
     )
   }
 
-  // 2. What has happened to this form. Only when it holds more than one
-  //    version, and pointing at the original so it does not restate the date
-  //    the provenance sentence just gave.
-  if (ofSameForm.length > 1) {
-    if (selected.form === RecordForm.REGISTRATION) {
-      sentences.push(
-        intl.formatMessage(messages.historyRegistration, {
-          count: ofSameForm.length - 1,
-          date: formatDate(oldestOfForm.createdAt)
-        })
-      )
-    } else if (selected.form === RecordForm.DECLARATION) {
-      sentences.push(
-        intl.formatMessage(messages.historyDeclaration, {
-          date: formatDate(oldestOfForm.createdAt)
-        })
-      )
-    }
-  }
-
-  // 3. What the record has done since this form. Only for forms that came
-  //    after the one on screen.
-  const laterForms = (
-    [RecordForm.DECLARATION, RecordForm.REGISTRATION] as RecordForm[]
-  ).filter(
-    (form) =>
-      form !== selected.form &&
-      versions.some((v) => v.form === form) &&
-      // Registration follows declaration follows notification.
-      (selected.form === RecordForm.NOTIFICATION ||
-        form === RecordForm.REGISTRATION)
+  /*
+   * 2. What follows from being on this form — and only when it changes what
+   *    the reader would conclude. Dates are deliberately absent: the selector
+   *    carries them, and repeating them here made the alert read as a log.
+   */
+  const hasDeclaration = versions.some((v) => v.form === RecordForm.DECLARATION)
+  const hasRegistration = versions.some(
+    (v) => v.form === RecordForm.REGISTRATION
   )
 
-  for (const form of laterForms) {
-    const opened = versions.filter((v) => v.form === form)[0]
-    sentences.push(
-      intl.formatMessage(
-        form === RecordForm.REGISTRATION
-          ? messages.recordRegistered
-          : messages.recordDeclared,
-        { date: formatDate(opened.createdAt) }
-      )
-    )
-  }
+  const consequence = (() => {
+    if (selected.form === RecordForm.NOTIFICATION) {
+      if (hasRegistration) {
+        return messages.sinceDeclaredAndRegistered
+      }
+      return hasDeclaration ? messages.sinceDeclared : undefined
+    }
 
-  if (laterForms.includes(RecordForm.REGISTRATION)) {
-    sentences.push(intl.formatMessage(messages.registrationIsLegal))
+    if (selected.form === RecordForm.DECLARATION) {
+      return hasRegistration ? messages.sinceRegistered : undefined
+    }
+
+    // Only the newest registration is the legal record; an earlier one is not.
+    return selected.isLatestOfForm ? messages.isLegalRecord : undefined
+  })()
+
+  if (consequence) {
+    sentences.push(intl.formatMessage(consequence))
   }
 
   return (
@@ -269,7 +241,7 @@ export function RecordVersionAlert({
       <Sentences>
         {sentences.map((sentence, index) => (
           // Sentences are generated in a fixed order and never reordered.
-           
+
           <span key={index}>{sentence}</span>
         ))}
       </Sentences>
