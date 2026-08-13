@@ -16,6 +16,7 @@ spec:
         app: elasticsearch-reindex
     spec:
       {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       initContainers:
       {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 8 }}
       containers:
