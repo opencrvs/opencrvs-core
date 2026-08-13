@@ -41,8 +41,8 @@ function failure(overrides: Partial<SeedFailure> = {}): SeedFailure {
   return {
     headline: CREATING_INITIAL_USERS,
     subject: {
-      about: 'record',
-      record: { position: 44, username: 'k.mweene' }
+      about: 'initialUser',
+      user: { position: 44, username: 'k.mweene' }
     },
     reason: 'DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use',
     ...overrides
@@ -103,7 +103,7 @@ describe('what an operator reads', () => {
     expect(failedInitialUser).toMatchInlineSnapshot(`
       "Seeding failed while creating initial users.
 
-        record 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
+        initial user 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
 
       The database now holds incomplete seed-data. Clear the database before you seed again."
     `)

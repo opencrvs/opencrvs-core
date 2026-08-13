@@ -125,21 +125,21 @@ The data seed job now validates the whole of the seed-data before it writes anyt
 
 Validated up front: duplicate email, mobile and username within the seed-data; every mobile number against the country config's configured phone pattern (a pattern that is not a usable expression is itself reported); every user's primary office against the location seed-data the job has already fetched, which is both earlier and more accurate than a database lookup; and the location hierarchy's parent-existence and location-to-administrative-area checks. The five checks that already existed and each aborted the run on its own — user and role schema parse failures, an unknown role, duplicate role ids, and the requirement that at least one initial user carry the `config.update-all` scope — are folded into the same report, so a typo'd role name and a duplicate email now read alike.
 
-Problems identify a record by its position in the seed-data and its username, and a validation failure always ends with `nothing was seeded`:
+Problems identify an initial user by its position in the seed-data and its username, and a validation failure always ends with `nothing was seeded`:
 
 ```
-4 problems found in 55 user records; nothing was seeded.
-  record 44 (k.mweene): email "k.mweene@x.com" duplicates record 12 — emails must be unique
+4 problems found in 55 initial users; nothing was seeded.
+  initial user 44 (k.mweene): email "k.mweene@x.com" duplicates initial user 12 — emails must be unique
 ```
 
 Duplicate usernames are a hard error rather than a rename. The service renumbers colliding usernames when it creates a user, which is right for self-service creation but wrong at seed time.
 
-Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing record and states that the database holds incomplete seed-data:
+Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing initial user and states that the database holds incomplete seed-data:
 
 ```
 Seeding failed while creating initial users.
 
-  record 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
+  initial user 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
 
 The database now holds incomplete seed-data. Clear the database before you seed again.
 ```

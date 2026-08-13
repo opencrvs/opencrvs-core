@@ -91,8 +91,8 @@ describe('duplicate emails within the seed-data', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 3 user records; nothing was seeded.',
-      '  record 3 (e.mweene): email "k.mweene@x.com" duplicates record 1 — emails must be unique'
+      '1 problem found in 3 initial users; nothing was seeded.',
+      '  initial user 3 (e.mweene): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique'
     ])
   })
 
@@ -105,8 +105,8 @@ describe('duplicate emails within the seed-data', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 2 user records; nothing was seeded.',
-      '  record 2 (two): email "k.mweene@x.com" duplicates record 1 — emails must be unique'
+      '1 problem found in 2 initial users; nothing was seeded.',
+      '  initial user 2 (two): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique'
     ])
   })
 })
@@ -121,8 +121,8 @@ describe('duplicate mobile numbers within the seed-data', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 2 user records; nothing was seeded.',
-      '  record 2 (f.katongo): mobile "+260911111111" duplicates record 1 — mobile numbers must be unique'
+      '1 problem found in 2 initial users; nothing was seeded.',
+      '  initial user 2 (f.katongo): mobile "+260911111111" duplicates initial user 1 — mobile numbers must be unique'
     ])
   })
 })
@@ -137,8 +137,8 @@ describe('duplicate usernames within the seed-data', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 2 user records; nothing was seeded.',
-      '  record 2 (k.mweene): username "k.mweene" duplicates record 1 — usernames must be unique'
+      '1 problem found in 2 initial users; nothing was seeded.',
+      '  initial user 2 (k.mweene): username "k.mweene" duplicates initial user 1 — usernames must be unique'
     ])
   })
 })
@@ -153,7 +153,7 @@ describe("an initial user's primary office", () => {
     })
   ]
 
-  it('is reported by record, naming the office, when the seed-data does not declare it', () => {
+  it('is reported by initial user, naming the office, when the seed-data does not declare it', () => {
     expect(
       report({
         users: [
@@ -164,8 +164,8 @@ describe("an initial user's primary office", () => {
         locations
       })
     ).toEqual([
-      '1 problem found in 2 user records; nothing was seeded.',
-      '  record 2 (f.katongo): primaryOfficeId "atlantis_ATL1" resolves to office "ATL1", which the seed-data does not declare — an initial user\'s primary office must be a location the seed-data declares'
+      '1 problem found in 2 initial users; nothing was seeded.',
+      '  initial user 2 (f.katongo): primaryOfficeId "atlantis_ATL1" resolves to office "ATL1", which the seed-data does not declare — an initial user\'s primary office must be a location the seed-data declares'
     ])
   })
 
@@ -197,7 +197,7 @@ describe('the administrative hierarchy', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 1 user record; nothing was seeded.',
+      '1 problem found in 1 initial user; nothing was seeded.',
       '  location "Ibombo District Office" (id HPGiE9Jjh2r): partOf "Location/atlantis" names no declared administrative area — partOf must name an administrative area the seed-data declares, or the root "0"'
     ])
   })
@@ -217,7 +217,7 @@ describe('the administrative hierarchy', () => {
   })
 })
 
-describe('an initial user record that did not parse', () => {
+describe('an initial user entry that did not parse', () => {
   it('is named by its position alone when it carries no usable username', () => {
     expect(
       report({
@@ -229,8 +229,8 @@ describe('an initial user record that did not parse', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 1 user record; nothing was seeded.',
-      '  record 1: does not parse — Invalid input: expected string, received number'
+      '1 problem found in 1 initial user; nothing was seeded.',
+      '  initial user 1: does not parse — Invalid input: expected string, received number'
     ])
   })
 })
@@ -242,7 +242,7 @@ describe('a seed-data document that did not parse at all', () => {
         malformedUserList: 'Invalid input: expected array, received object'
       })
     ).toEqual([
-      '1 problem found in 0 user records; nothing was seeded.',
+      '1 problem found in 0 initial users; nothing was seeded.',
       "  the country config's initial users: do not parse — Invalid input: expected array, received object"
     ])
   })
@@ -260,7 +260,7 @@ describe('a role that did not parse', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 0 user records; nothing was seeded.',
+      '1 problem found in 0 initial users; nothing was seeded.',
       '  role "LOCAL_REGISTRAR": does not parse — Invalid scope: "recorddeclare" at "scopes[0]"'
     ])
   })
@@ -277,7 +277,7 @@ describe('duplicate role ids', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 0 user records; nothing was seeded.',
+      '1 problem found in 0 initial users; nothing was seeded.',
       '  the country config\'s roles: id "LOCAL_REGISTRAR" is declared more than once — role ids must be unique'
     ])
   })
@@ -300,7 +300,7 @@ describe("an initial user's role", () => {
     ).toEqual([])
   })
 
-  it('is reported by record, naming the role, when no declared role matches', () => {
+  it('is reported by initial user, naming the role, when no declared role matches', () => {
     expect(
       report({
         users: [
@@ -310,8 +310,8 @@ describe("an initial user's role", () => {
         roles
       })
     ).toEqual([
-      '1 problem found in 2 user records; nothing was seeded.',
-      '  record 2 (f.katongo): role "LOCAL_REGISTRARR" names no role the country config declares — an initial user\'s role must be one of the roles the country config declares'
+      '1 problem found in 2 initial users; nothing was seeded.',
+      '  initial user 2 (f.katongo): role "LOCAL_REGISTRARR" names no role the country config declares — an initial user\'s role must be one of the roles the country config declares'
     ])
   })
 
@@ -324,7 +324,7 @@ describe("an initial user's role", () => {
         malformedRoleList: 'Invalid input: expected array, received object'
       })
     ).toEqual([
-      '1 problem found in 1 user record; nothing was seeded.',
+      '1 problem found in 1 initial user; nothing was seeded.',
       "  the country config's roles: do not parse — Invalid input: expected array, received object"
     ])
   })
@@ -341,12 +341,12 @@ describe('the ability to configure the seeded system', () => {
         ]
       })
     ).toEqual([
-      '1 problem found in 1 user record; nothing was seeded.',
+      '1 problem found in 1 initial user; nothing was seeded.',
       '  the initial users: include nobody who could configure the system — at least one initial user must carry a role with the "config.update-all" scope'
     ])
   })
 
-  it('stands down when no record names a role to check', () => {
+  it('stands down when no initial user names a role to check', () => {
     expect(
       validateSeedData(seedData({ users: [user({ username: 'k.mweene' })] }))
     ).toEqual([])
@@ -358,7 +358,7 @@ describe("an initial user's mobile number", () => {
    * digits beginning `07` or `09`. */
   const PHONE_NUMBER_PATTERN = '^0(7|9)[0-9]{8}$'
 
-  it('is reported by record, naming the number and the pattern, when it does not match', () => {
+  it('is reported by initial user, naming the number and the pattern, when it does not match', () => {
     expect(
       report({
         users: [
@@ -368,8 +368,8 @@ describe("an initial user's mobile number", () => {
         PHONE_NUMBER_PATTERN
       })
     ).toEqual([
-      '1 problem found in 2 user records; nothing was seeded.',
-      '  record 2 (f.katongo): mobile "+260733333333" does not match the configured pattern ^0(7|9)[0-9]{8}$ — an initial user\'s mobile number must match the country config\'s PHONE_NUMBER_PATTERN'
+      '1 problem found in 2 initial users; nothing was seeded.',
+      '  initial user 2 (f.katongo): mobile "+260733333333" does not match the configured pattern ^0(7|9)[0-9]{8}$ — an initial user\'s mobile number must match the country config\'s PHONE_NUMBER_PATTERN'
     ])
   })
 })
@@ -377,14 +377,14 @@ describe("an initial user's mobile number", () => {
 describe('a configured phone number pattern that is not a regular expression', () => {
   const PHONE_NUMBER_PATTERN = '^0(7|9)[0-9{8}$'
 
-  it('is reported as a problem of the country config rather than of any record', () => {
+  it('is reported as a problem of the country config rather than of any initial user', () => {
     expect(
       report({
         users: [user({ username: 'k.mweene', mobile: '0733333333' })],
         PHONE_NUMBER_PATTERN
       })
     ).toEqual([
-      '1 problem found in 1 user record; nothing was seeded.',
+      '1 problem found in 1 initial user; nothing was seeded.',
       '  the country config\'s application configuration: PHONE_NUMBER_PATTERN "^0(7|9)[0-9{8}$" is not a valid regular expression — a configured phone number pattern must be a valid regular expression'
     ])
   })
@@ -402,7 +402,7 @@ describe('a configured phone number pattern that is not a regular expression', (
         PHONE_NUMBER_PATTERN
       })
     ).toEqual([
-      '1 problem found in 3 user records; nothing was seeded.',
+      '1 problem found in 3 initial users; nothing was seeded.',
       '  the country config\'s application configuration: PHONE_NUMBER_PATTERN "^0(7|9)[0-9{8}$" is not a valid regular expression — a configured phone number pattern must be a valid regular expression'
     ])
   })
@@ -418,12 +418,12 @@ describe('a set of seed-data with several problems', () => {
 
   it('reports every problem in one run rather than stopping at the first', () => {
     expect(report({ users })).toEqual([
-      '5 problems found in 4 user records; nothing was seeded.',
-      '  record 2 (f.katongo): mobile "+2601" duplicates record 1 — mobile numbers must be unique',
-      '  record 3 (e.mweene): email "k.mweene@x.com" duplicates record 1 — emails must be unique',
-      '  record 4 (f.katongo): email "k.mweene@x.com" duplicates record 1 — emails must be unique',
-      '  record 4 (f.katongo): mobile "+2601" duplicates record 1 — mobile numbers must be unique',
-      '  record 4 (f.katongo): username "f.katongo" duplicates record 2 — usernames must be unique'
+      '5 problems found in 4 initial users; nothing was seeded.',
+      '  initial user 2 (f.katongo): mobile "+2601" duplicates initial user 1 — mobile numbers must be unique',
+      '  initial user 3 (e.mweene): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique',
+      '  initial user 4 (f.katongo): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique',
+      '  initial user 4 (f.katongo): mobile "+2601" duplicates initial user 1 — mobile numbers must be unique',
+      '  initial user 4 (f.katongo): username "f.katongo" duplicates initial user 2 — usernames must be unique'
     ])
   })
 })

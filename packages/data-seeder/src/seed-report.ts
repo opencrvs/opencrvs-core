@@ -15,19 +15,23 @@
  *
  * It sits apart from either report because both must agree. Validation runs
  * before the first write and a failure after it, and an operator who sees one
- * and then the other must find the same record identified the same way — so
+ * and then the other must find the same initial user identified the same way — so
  * the format is shared code rather than a convention held in two places.
  */
 
 /**
- * A user record's identity in the seed-data. `position` is 1-based and is
- * deliberately not a line number: seed-data arrives as parsed objects over
- * HTTP with no row provenance, and the job cannot know the country config
- * serves users from a file at all.
+ * How a report names one initial user: by its position in the seed-data, and
+ * by its username when it has one.
+ *
+ * `position` is 1-based and is deliberately not a line number — seed-data
+ * arrives as parsed objects over HTTP with no row provenance, and the job
+ * cannot know the country config serves users from a file at all. Not called a
+ * record either: in this domain a record is a submitted vital-event record,
+ * which this is not.
  */
-export interface SeedDataRecord {
+export interface InitialUserRef {
   position: number
-  /** Absent when the record did not parse; it may be missing anything. */
+  /** Absent when the entry did not parse; it may be missing anything. */
   username?: string
 }
 
@@ -39,7 +43,7 @@ export interface SeedDataRecord {
  * which would leave an operator a line they cannot place.
  */
 export type SeedSubject =
-  | { about: 'record'; record: SeedDataRecord }
+  | { about: 'initialUser'; user: InitialUserRef }
   | { about: 'subject'; subject: string }
 
 /** The offending field, when the problem is about one. */
@@ -55,11 +59,11 @@ export function renderSubject(subject: SeedSubject): string {
     return `${subject.subject}: `
   }
 
-  const { record } = subject
+  const { user } = subject
 
-  return record.username === undefined
-    ? `record ${record.position}: `
-    : `record ${record.position} (${record.username}): `
+  return user.username === undefined
+    ? `initial user ${user.position}: `
+    : `initial user ${user.position} (${user.username}): `
 }
 
 export function renderOffending({ field, value }: Offending): string {

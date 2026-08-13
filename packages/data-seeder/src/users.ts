@@ -152,8 +152,8 @@ async function createUser(token: string, userPayload: CreateUserInputInternal) {
 }
 
 /** Validation has already passed, so a failure here lands with earlier users
- * in the database. Each record is attempted inside a handler because this is
- * the one place that knows which record it is. */
+ * in the database. Each entry is attempted inside a handler because this is
+ * the one place that knows which initial user it is. */
 export async function seedUsers(token: string, users: SeedUsers) {
   for (const [index, userMetadata] of users.entries()) {
     const {
@@ -206,9 +206,9 @@ export async function seedUsers(token: string, users: SeedUsers) {
         formatSeedFailure({
           headline: CREATING_INITIAL_USERS,
           subject: {
-            about: 'record',
-            // 1-based, matching how the validator identifies a record.
-            record: { position: index + 1, username }
+            about: 'initialUser',
+            // 1-based, matching how the validator identifies an initial user.
+            user: { position: index + 1, username }
           },
           reason: describeInitialUserFailure(error, user)
         })

@@ -22,22 +22,23 @@
  * cross-referential checks need.
  *
  * The accepted consequence is that no problem cites a line number. Seed-data
- * arrives as parsed objects over HTTP with no row provenance, so a record is
- * identified by its position in the array and reported as `record <N>`.
+ * arrives as parsed objects over HTTP with no row provenance, so an initial
+ * user is identified by its position in the array and reported as
+ * `initial user <N>`.
  */
 import { EncodedScope, hasScope } from '@opencrvs/commons'
 import { officeExternalId } from './office-external-id'
 import {
+  InitialUserRef,
   NOTHING_WAS_SEEDED,
   Offending,
-  SeedDataRecord,
   SeedSubject,
   renderOffending,
   renderSubject
 } from './seed-report'
 
 /** Every field is optional, including those the country config's schema
- * requires: a record that did not parse still arrives here and may be missing
+ * requires: an entry that did not parse still arrives here and may be missing
  * anything, so a check reads only what is there. */
 export interface SeedDataUser {
   username?: string
@@ -112,7 +113,7 @@ const UNIQUE_USER_FIELDS: UniqueUserField[] = [
   }
 ]
 
-function identifyRecord(user: SeedDataUser, index: number): SeedDataRecord {
+function identifyUser(user: SeedDataUser, index: number): InitialUserRef {
   return { position: index + 1, username: user.username }
 }
 
@@ -139,11 +140,11 @@ function duplicatesOf(
     }
 
     problems.push({
-      about: 'record',
-      record: identifyRecord(user, index),
+      about: 'initialUser',
+      user: identifyUser(user, index),
       field,
       value,
-      problem: `duplicates record ${original}`,
+      problem: `duplicates initial user ${original}`,
       rule
     })
   })
@@ -170,8 +171,8 @@ function unknownOffices({ users, locations }: SeedData): SeedDataProblem[] {
     }
 
     problems.push({
-      about: 'record',
-      record: identifyRecord(user, index),
+      about: 'initialUser',
+      user: identifyUser(user, index),
       field: 'primaryOfficeId',
       value: user.primaryOfficeId,
       problem: `resolves to office "${externalId}", which the seed-data does not declare`,
@@ -235,8 +236,8 @@ function unparsedDocuments({
   return problems
 }
 
-/** No `record`: a role lives in the country config's roles rather than in the
- * employees spreadsheet. */
+/** No `initialUser`: a role lives in the country config's roles rather than in
+ * the employees spreadsheet. */
 function unparsedRoles({ roles }: SeedData): SeedDataProblem[] {
   return roles.flatMap((role, index) =>
     role.malformed === undefined
@@ -311,8 +312,8 @@ function unknownRoles({
       ? []
       : [
           {
-            about: 'record',
-            record: identifyRecord(user, index),
+            about: 'initialUser',
+            user: identifyUser(user, index),
             field: 'role',
             value: user.role,
             problem: 'names no role the country config declares',
@@ -369,8 +370,8 @@ function misformattedMobileNumbers({
       ? []
       : [
           {
-            about: 'record',
-            record: identifyRecord(user, index),
+            about: 'initialUser',
+            user: identifyUser(user, index),
             field: 'mobile',
             value: user.mobile,
             problem: `does not match the configured pattern ${PHONE_NUMBER_PATTERN}`,
@@ -384,7 +385,7 @@ function misformattedMobileNumbers({
 const CONFIGURE_SCOPE = 'config.update-all'
 
 /** Stands down where the answer cannot be known: the role list did not parse,
- * no record names a role, or a named role did not parse and its scopes might
+ * no initial user names a role, or a named role did not parse and its scopes might
  * have been the ones in question. An undeclared role grants nothing, so it
  * does not stand the check down. */
 function missingConfigurationAdministrator({
@@ -439,8 +440,8 @@ function unparsedRecords({ users }: SeedData): SeedDataProblem[] {
       ? []
       : [
           {
-            about: 'record',
-            record: identifyRecord(user, index),
+            about: 'initialUser',
+            user: identifyUser(user, index),
             problem: 'does not parse',
             rule: user.malformed
           }
@@ -464,7 +465,7 @@ function brokenHierarchy({
   ]
 }
 
-/** Every problem with a set of seed-data, in record order. An empty list means
+/** Every problem with a set of seed-data, in seed-data order. An empty list means
  * it is safe to write. */
 export function validateSeedData(seedData: SeedData): SeedDataProblem[] {
   const problems = [
@@ -483,13 +484,13 @@ export function validateSeedData(seedData: SeedData): SeedDataProblem[] {
     ...misformattedMobileNumbers(seedData)
   ]
 
-  // Stable, so two problems with one record keep the order they were checked in.
+  // Stable, so two problems with one initial user keep their checked order.
   return problems.sort((a, b) => positionOf(a) - positionOf(b))
 }
 
-/** Problems about something other than a record sort to the front. */
+/** Problems about something other than an initial user sort to the front. */
 function positionOf(problem: SeedDataProblem) {
-  return problem.about === 'record' ? problem.record.position : 0
+  return problem.about === 'initialUser' ? problem.user.position : 0
 }
 
 function pluralise(count: number, singular: string, plural: string) {
@@ -511,7 +512,7 @@ export function formatValidationReport(
 ): string {
   const header =
     `${pluralise(problems.length, 'problem', 'problems')} found in ` +
-    `${pluralise(seedData.users.length, 'user record', 'user records')}; ` +
+    `${pluralise(seedData.users.length, 'initial user', 'initial users')}; ` +
     `${NOTHING_WAS_SEEDED}`
 
   return [header, ...problems.map(renderProblem)].join('\n')
