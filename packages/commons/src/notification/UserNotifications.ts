@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
 import * as z from 'zod/v4'
 
@@ -19,6 +18,8 @@ export const TriggerEvent = {
   USERNAME_REMINDER: 'username-reminder',
   RESET_PASSWORD: 'reset-password',
   RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
+  PASSWORD_RESET_LINK: 'password-reset-link',
+  USERNAME_REMINDER_LINK: 'username-reminder-link',
   RESEND_INVITE: 'resend-invite',
   TWO_FA: '2fa',
   ALL_USER_NOTIFICATION: 'all-user-notification',
@@ -66,6 +67,12 @@ export const TriggerPayload = {
       role: z.string()
     })
   }),
+  [TriggerEvent.PASSWORD_RESET_LINK]: BasePayload.extend({
+    token: z.string()
+  }),
+  [TriggerEvent.USERNAME_REMINDER_LINK]: BasePayload.extend({
+    token: z.string()
+  }),
   [TriggerEvent.RESEND_INVITE]: BasePayload.extend({
     username: z.string(),
     temporaryPassword: z.string()
@@ -87,43 +94,6 @@ export const TriggerPayload = {
 
 export type TriggerPayload = {
   [K in TriggerEvent]: z.infer<(typeof TriggerPayload)[K]>
-}
-
-// authHeader is not required for all-user-notification endpoint.
-export async function triggerUserEventNotification(args: {
-  event: typeof TriggerEvent.ALL_USER_NOTIFICATION
-  payload: TriggerPayload[typeof TriggerEvent.ALL_USER_NOTIFICATION]
-  countryConfigUrl: string
-}): Promise<Response>
-
-export async function triggerUserEventNotification<
-  T extends Exclude<TriggerEvent, typeof TriggerEvent.ALL_USER_NOTIFICATION>
->(args: {
-  event: T
-  payload: TriggerPayload[T]
-  countryConfigUrl: string
-  authHeader: { Authorization: string }
-}): Promise<Response>
-
-export async function triggerUserEventNotification<T extends TriggerEvent>({
-  event,
-  payload,
-  countryConfigUrl,
-  authHeader
-}: {
-  event: T
-  payload: TriggerPayload[T]
-  countryConfigUrl: string
-  authHeader?: { Authorization: string }
-}): Promise<Response> {
-  return await fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
 }
 
 export function parseUserEventTrigger<T extends TriggerEvent>(

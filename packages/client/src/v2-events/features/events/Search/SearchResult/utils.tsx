@@ -12,6 +12,7 @@
 import { defineMessages, IntlShape } from 'react-intl'
 import React from 'react'
 import { first } from 'lodash'
+import styled from 'styled-components'
 import { ColumnContentAlignment, SORT_ORDER } from '@opencrvs/components'
 import {
   defaultWorkqueueColumns,
@@ -310,6 +311,38 @@ export function getNoResultsText({
   return noResultText
 }
 
+/**
+ * Reserves the space of the assignment icon even when it is not rendered.
+ * `DownloadButton` renders nothing when the READ action is not visible (e.g.
+ * sealed records). Since the action column is right-aligned, a collapsed icon
+ * would let the preceding action CTA slide right, leaving the CTAs misaligned
+ * between rows.
+ */
+const AssignmentActionSlot = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 40px;
+  width: 40px;
+`
+
+function AssignmentAction({
+  id,
+  event,
+  isDraft
+}: {
+  id?: string
+  event: EventIndex
+  isDraft: boolean
+}) {
+  return (
+    <AssignmentActionSlot>
+      <DownloadButton event={event} id={id} isDraft={isDraft} />
+    </AssignmentActionSlot>
+  )
+}
+
 function buildAvailableActionComponents({
   event,
   localEventStatus,
@@ -351,7 +384,7 @@ function buildAvailableActionComponents({
   // useResolveAssignmentActionConditionals's doc comment for why.
   actionConfigs.push({
     actionComponent: () => (
-      <DownloadButton
+      <AssignmentAction
         key={`DownloadButton-${event.id}`}
         event={event}
         isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
