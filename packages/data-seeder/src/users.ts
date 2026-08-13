@@ -13,17 +13,10 @@ import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
 
-import {
-  decodeScope,
-  EventConfig,
-  joinUrl,
-  parseConfigurableScope,
-  EncodedScope,
-  CreateUserInputInternal
-} from '@opencrvs/commons'
-import { fromZodError } from 'zod-validation-error'
+import { CreateUserInputInternal } from '@opencrvs/commons'
 import { createInitialisationClient } from './initialisation-client'
 import { officeExternalId } from './office-external-id'
+import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import {
   CREATING_INITIAL_USERS,
   PartialSeedError,
@@ -31,52 +24,7 @@ import {
   formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
-import { SeedData, SeedDataRole, SeedDataUser } from './validate-seed-data'
-
-const RoleRecordSchema = (eventIds: string[]) =>
-  z.object({
-    id: z.string(),
-    label: z.object({
-      defaultMessage: z.string(),
-      description: z.string(),
-      id: z.string()
-    }),
-    scopes: z.array(
-      EncodedScope.superRefine((scope, ctx) => {
-        const parsedConfigurableScope = parseConfigurableScope(scope)
-        const parsedV2Scopes = decodeScope(scope)
-
-        if (!parsedConfigurableScope && !parsedV2Scopes) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Invalid scope: "${scope}"`
-          })
-          return
-        }
-
-        if (parsedV2Scopes?.type) {
-          if (!('options' in parsedV2Scopes)) {
-            return
-          }
-
-          const options = parsedV2Scopes.options
-
-          if (options && 'event' in options && Array.isArray(options.event)) {
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
-
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
-            }
-          }
-        }
-      })
-    )
-  })
+import { SeedData, SeedDataUser } from './validate-seed-data'
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -103,34 +51,9 @@ const UserRecordSchema = WithoutContact.extend({
     surname: familyName
   }))
 
-/** Parsing a list and parsing its elements are separate steps, so that one bad
- * element does not take the whole document down with it. */
-const ListSchema = z.array(z.unknown())
-
 export type SeedUsers = z.output<typeof UserRecordSchema>[]
 
-type UserSeedData = Omit<
-  SeedData,
-  'administrativeAreas' | 'locations' | 'PHONE_NUMBER_PATTERN'
->
-
-/** As text, not as the error: a `ZodError` reaching `console.error` prints as
- * a stack trace, where the report needs one line. */
-function describeParseFailure(error: z.ZodError): string {
-  return fromZodError(error, { prefix: null }).message
-}
-
-/** A field read back off a record that did not parse. Nothing else about such
- * a record can be trusted. */
-function readString(record: unknown, field: string): string | undefined {
-  if (typeof record !== 'object' || record === null) {
-    return undefined
-  }
-
-  const value = (record as Record<string, unknown>)[field]
-
-  return typeof value === 'string' ? value : undefined
-}
+type UserSeedData = Pick<SeedData, 'users' | 'malformedUserList'>
 
 /** Named one by one rather than spread, so that renaming a field on the schema
  * without telling the validator is a compile error rather than a check that
@@ -174,25 +97,9 @@ function parseRecords(records: unknown[]): {
   return { users, seedData }
 }
 
-function parseRoles(roles: unknown[], eventIds: string[]): SeedDataRole[] {
-  const schema = RoleRecordSchema(eventIds)
-
-  return roles.map((role) => {
-    const parsed = schema.safeParse(role)
-
-    return parsed.success
-      ? { id: parsed.data.id, scopes: parsed.data.scopes }
-      : {
-          id: readString(role, 'id'),
-          scopes: [],
-          malformed: describeParseFailure(parsed.error)
-        }
-  })
-}
-
-/** The initial users and the roles, fetched and parsed but not written and
- * nothing about them judged here; the validator answers everything in one
- * report. A failing *fetch* is still fatal: there is nothing to report on. */
+/** The initial users, fetched and parsed but not written and nothing about them
+ * judged here; the validator answers everything in one report. A failing
+ * *fetch* is still fatal: there is nothing to report on. */
 export async function getUsers(
   token: string
 ): Promise<{ users: SeedUsers; seedData: UserSeedData }> {
@@ -212,46 +119,13 @@ export async function getUsers(
   const userList = ListSchema.safeParse(await res.json())
   const records = parseRecords(userList.success ? userList.data : [])
 
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
-
-  const [rolesResponse, eventsResponse] = await Promise.all([
-    fetch(rolesUrl),
-    fetch(eventsUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-  ])
-
-  if (!rolesResponse.ok) {
-    raise(
-      formatUnwrittenFailure(`Error fetching roles: ${rolesResponse.status}`)
-    )
-  }
-
-  if (!eventsResponse.ok) {
-    raise(
-      formatUnwrittenFailure(`Error fetching events: ${eventsResponse.status}`)
-    )
-  }
-
-  const eventsConfig = (await eventsResponse.json()) as EventConfig[]
-  const eventIds = eventsConfig.map((event) => event.id)
-  const roleList = ListSchema.safeParse(await rolesResponse.json())
-
   return {
     users: records.users,
     seedData: {
       users: records.seedData,
-      roles: roleList.success ? parseRoles(roleList.data, eventIds) : [],
       malformedUserList: userList.success
         ? undefined
-        : describeParseFailure(userList.error),
-      malformedRoleList: roleList.success
-        ? undefined
-        : describeParseFailure(roleList.error)
+        : describeParseFailure(userList.error)
     }
   }
 }

@@ -12,6 +12,7 @@ import { env } from './environment'
 import fetch from 'node-fetch'
 import { getApplicationConfig } from './application-config'
 import { SeedLocations, getLocations, seedLocations } from './locations'
+import { getRoles } from './roles'
 import { SeedUsers, getUsers, seedUsers } from './users'
 import { raise } from './utils'
 import { createInitialisationClient } from './initialisation-client'
@@ -106,9 +107,11 @@ async function main() {
 
   const locations = await getLocations()
   const users = await getUsers(token)
+  const roles = await getRoles(token)
   const applicationConfig = await getApplicationConfig()
   const seedData = {
     ...users.seedData,
+    ...roles.seedData,
     ...locations.seedData,
     ...applicationConfig.seedData
   }
