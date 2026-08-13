@@ -18,6 +18,7 @@ import {
   Draft,
   EventConfig,
   EventDocument,
+  EventDocumentOnlyLastAction,
   EventIndex,
   findLastAssignmentAction,
   getCurrentEventState,
@@ -127,6 +128,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
     )
   }
   const updatedEventIndex = getCurrentEventState(updatedEvent, config)
+
   // Update the local event index with the updated event
   setEventSearchQuery(updatedEventIndex)
 
@@ -307,15 +309,23 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
   return refetchAllSearchQueries()
 }
 
-export async function onAssign(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
+export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
   await invalidateWorkqueues()
+  await refetchSearchQuery(updatedEvent.id)
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
+  const localEvent = findLocalEventDocument(updatedEvent.id)
+
+  const localActions = localEvent?.actions ?? []
 
   if (!lastAssignment) {
     return
   }
+
+  setEventData(updatedEvent.id, {
+    ...updatedEvent,
+    actions: localActions.concat(updatedEvent.actions)
+  })
 }
 
 export async function refetchDraftsList() {
@@ -324,8 +334,24 @@ export async function refetchDraftsList() {
   })
 }
 
-export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
-  await deleteEventData(updatedEvent)
-  updateLocalEventIndex(updatedEvent.id, updatedEvent)
+export async function cleanUpOnUnassign(
+  updatedEvent: EventDocumentOnlyLastAction
+) {
+  const localEvent = findLocalEventDocument(updatedEvent.id)
+
+  // If unassign is performed when it's assigned someone else, user does not necessarily have the event.get cached.
+  if (!localEvent) {
+    // Assuming unassign needs to be done online, we'll just refetch the query.
+    await refetchSearchQuery(updatedEvent.id)
+  } else {
+    const updatedEventWithActions = {
+      ...updatedEvent,
+      actions: localEvent.actions.concat(updatedEvent.actions)
+    }
+
+    await deleteEventData(updatedEventWithActions)
+
+    updateLocalEventIndex(updatedEventWithActions.id, updatedEventWithActions)
+  }
   await invalidateWorkqueues()
 }
