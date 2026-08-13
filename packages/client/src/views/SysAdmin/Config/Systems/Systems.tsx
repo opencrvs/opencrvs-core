@@ -18,8 +18,7 @@ import {
   Alert,
   InputField,
   Link,
-  ListViewItemSimplified,
-  ListViewSimplified,
+  List,
   Pill,
   Select,
   Spinner,
@@ -302,11 +301,11 @@ export function SystemList() {
 
         {isLoading && <Spinner id="system-list-spinner" size={24} />}
 
-        <ListViewSimplified>
+        <List>
           {integrations.map((integration: IntegrationItem) => {
             const user = users.find((user) => user.id === integration.createdBy)
             return (
-              <ListViewItemSimplified
+              <List.Item
                 key={integration.id}
                 actions={
                   <>
@@ -365,7 +364,7 @@ export function SystemList() {
               />
             )
           })}
-        </ListViewSimplified>
+        </List>
       </Content>
 
       {/* Client Details Modal */}

@@ -47,12 +47,11 @@ test.describe.serial('1. Team Page -1', () => {
     test('1.1.1 Verify Team Members, Roles and their statuses', async () => {
       for (const member of team) {
         const row = page
-          .locator('#user_list tr:has(td)')
+          .locator('#user_list tbody tr')
           .filter({ hasText: member.name })
-        const cells = row.locator('td')
-        await expect(cells.nth(1)).toHaveText(member.name)
-        await expect(cells.nth(2)).toHaveText(member.role)
-        await expect(cells.nth(3)).toHaveText('Active')
+        await expect(row.getByTestId(/-label$/)).toHaveText(member.name)
+        await expect(row.getByTestId(/-value$/)).toHaveText(member.role)
+        await expect(row.getByTestId(/-actions$/)).toHaveText('Active')
       }
     })
   })

@@ -147,10 +147,11 @@ export async function ensureAssignedToUser(
 ) {
   const userFullName = usernameToFullNameMap[username]
 
-  const assignedTo = page.getByTestId('assignedTo-value').locator('span')
+  /* A value renders as bare text; only a placeholder or bar adds an element. */
+  const assignedTo = page.getByTestId('assignedTo-value')
 
   // Wait for the value to actually render before deciding
-  await assignedTo.first().waitFor({ state: 'visible' })
+  await assignedTo.waitFor({ state: 'visible' })
 
   if (await assignedTo.filter({ hasText: userFullName }).isVisible()) {
     return
@@ -178,9 +179,7 @@ export async function ensureAssignedToUser(
   // Wait for the assignment API call to complete and the UI to update.
   await assignResponse
 
-  await expect(
-    page.getByTestId('assignedTo-value').locator('span')
-  ).toContainText(userFullName)
+  await expect(assignedTo).toContainText(userFullName)
 }
 
 export async function expectInUrl(page: Page, assertionString: string) {
