@@ -18,7 +18,8 @@ import {
   UserFilter,
   createPrng,
   encodeScope,
-  getDeclarationFields
+  getDeclarationFields,
+  getOrThrow
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -29,7 +30,10 @@ import {
 } from '@events/tests/utils'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
-import { payloadGenerator, setupHierarchyWithUsers } from '@events/tests/generators'
+import {
+  payloadGenerator,
+  setupHierarchyWithUsers
+} from '@events/tests/generators'
 import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.get', async () => {
@@ -76,6 +80,7 @@ test('Check scopes against event.get', async () => {
       { nil: undefined }
     ),
     placeOfEvent: jurisdictionOptions,
+    createdIn: jurisdictionOptions,
     declaredBy: userOptions,
     declaredIn: jurisdictionOptions,
     registeredBy: userOptions,
@@ -189,4 +194,56 @@ test('Check createdBy scope against event.get', async () => {
     }),
     { numRuns: 20 }
   )
+}, 120000)
+
+test('Check createdIn scope against event.get', async () => {
+  const rng = createPrng(55443322)
+  const generator = payloadGenerator(rng)
+
+  const { users } = await setupHierarchyWithUsers()
+
+  const author = users[0]
+  const authorClient = createTestClient(author, TEST_USER_DEFAULT_SCOPES)
+  const { id: eventId } = await authorClient.event.create(
+    generator.event.create()
+  )
+
+  const colleague = getOrThrow(
+    users.find(
+      (user) =>
+        user.primaryOfficeId === author.primaryOfficeId && user.id !== author.id
+    ),
+    'No other user in the same office'
+  )
+
+  const outsider = getOrThrow(
+    users.find((user) => user.primaryOfficeId !== author.primaryOfficeId),
+    'No user in another office'
+  )
+
+  const createdInLocation = encodeScope({
+    type: 'record.read',
+    options: { createdIn: JurisdictionFilter.enum.location }
+  })
+
+  await expect(
+    createTestClient(author, [createdInLocation]).event.get({ eventId })
+  ).resolves.toEqual(expect.objectContaining({ id: eventId }))
+
+  await expect(
+    createTestClient(colleague, [createdInLocation]).event.get({ eventId })
+  ).resolves.toEqual(expect.objectContaining({ id: eventId }))
+
+  await expect(
+    createTestClient(outsider, [createdInLocation]).event.get({ eventId })
+  ).rejects.toThrow(EventNotFoundError)
+
+  await expect(
+    createTestClient(author, [
+      encodeScope({
+        type: 'record.read',
+        options: { declaredIn: JurisdictionFilter.enum.location }
+      })
+    ]).event.get({ eventId })
+  ).rejects.toThrow(EventNotFoundError)
 }, 120000)

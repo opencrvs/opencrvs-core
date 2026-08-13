@@ -5,6 +5,7 @@
 ### Improvements
 
 - Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+- Added `createdIn` as a config parameter to filter records by the office or administrative area they were created in. Unlike `declaredIn` it is populated before the record is declared, and it is never reassigned by a later declaration [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
 - Expose `POST /locations` and `POST /administrative-areas` REST endpoints to create or update a single location or administrative area, for correcting individual data-seeding errors. Bulk seeding is unaffected and still uses the existing `locations.set`/`administrativeAreas.set` tRPC mutations. [#13336](https://github.com/opencrvs/opencrvs-core/pull/13336)
 
 ### Bug fixes
