@@ -8,27 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { RouteHandlerMethod } from "fastify";
+import { RouteHandlerMethod } from 'fastify'
 
 export const packetManagerAuthHandler: RouteHandlerMethod = async (
   _request,
-  reply,
+  reply
 ) => {
-  const token = "some-token";
+  const token = 'some-token'
   reply.header(
-    "set-cookie",
-    `Authorization=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`,
-  );
+    'set-cookie',
+    `Authorization=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
+  )
 
   return reply.status(200).send({
-    id: "string",
-    version: "string",
+    id: 'string',
+    version: 'string',
     responsetime: new Date().toISOString(),
     metadata: null,
     response: {
-      status: "Success",
-      message: "Clientid and Token combination had been validated successfully",
+      status: 'Success',
+      message: 'Clientid and Token combination had been validated successfully'
     },
-    errors: null,
-  });
-};
+    errors: null
+  })
+}

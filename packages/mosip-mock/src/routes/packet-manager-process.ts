@@ -8,19 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { RouteHandlerMethod } from "fastify";
+import { RouteHandlerMethod } from 'fastify'
 
 export const packetManagerProcessHandler: RouteHandlerMethod = async (
   _request,
-  reply,
+  reply
 ) => {
   return reply.status(200).send({
-    id: "mosip.registration.processor.workflow.instance",
-    version: "v1",
+    id: 'mosip.registration.processor.workflow.instance',
+    version: 'v1',
     responsetime: new Date().toISOString(),
     response: {
-      workflowInstanceId: "dd9f218b-279c-4d93-8cda-9857976293ea",
+      workflowInstanceId: 'dd9f218b-279c-4d93-8cda-9857976293ea'
     },
-    errors: null,
-  });
-};
+    errors: null
+  })
+}

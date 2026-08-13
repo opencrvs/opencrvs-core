@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
 
 /*
  * This config previously extended recommendedTypeChecked, but it was never
@@ -26,20 +26,20 @@ import tseslint from "typescript-eslint";
  */
 export default tseslint.config(
   {
-    ignores: ["build/**", "certs/**", "docs/**"],
+    ignores: ['build/**', 'certs/**', 'docs/**']
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
     rules: {
-      "no-console": "warn",
+      'no-console': 'warn',
       // The codebase omits fields by destructuring them out (`const { proof,
       // ...payload } = credential`) and marks deliberately unused handler
       // arguments with a leading underscore.
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { ignoreRestSiblings: true, argsIgnorePattern: "^_" },
-      ],
-    },
-  },
-);
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true, argsIgnorePattern: '^_' }
+      ]
+    }
+  }
+)

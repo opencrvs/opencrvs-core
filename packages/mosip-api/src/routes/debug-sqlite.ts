@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FastifyReply, FastifyRequest } from "fastify";
-import { getAllTransactions, getTransactionAndDiscard } from "../database";
-import { EncodedScope, hasScope } from "@opencrvs/toolkit/scopes";
-import { TokenPayload } from "./websub-credential-issued";
-import { decode } from "jsonwebtoken";
+import { FastifyReply, FastifyRequest } from 'fastify'
+import { getAllTransactions, getTransactionAndDiscard } from '../database'
+import { EncodedScope, hasScope } from '@opencrvs/toolkit/scopes'
+import { TokenPayload } from './websub-credential-issued'
+import { decode } from 'jsonwebtoken'
 
 interface AuthenticatedUser {
-  scope: string[];
+  scope: string[]
 }
 
 /**
@@ -31,7 +31,7 @@ interface AuthenticatedUser {
  * `record.search[event=birth]` alone now passes where they previously would not.
  */
 const isAllowedToSearch = (scope: string[]) =>
-  hasScope(scope as EncodedScope[], "record.search");
+  hasScope(scope as EncodedScope[], 'record.search')
 
 /**
  * Allow deleting transactions for users that have `record.reject-registration` scope.
@@ -40,59 +40,59 @@ const isAllowedToSearch = (scope: string[]) =>
  * - This should be accompanied with a `client.event.actions.register.reject` call via Postman which requires this scope.
  */
 const isAllowedToDelete = (scope: string[]) =>
-  hasScope(scope as EncodedScope[], "record.reject-registration");
+  hasScope(scope as EncodedScope[], 'record.reject-registration')
 
 export const getAllTransactionsHandler = async (
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) => {
-  const { scope } = request.user as AuthenticatedUser;
+  const { scope } = request.user as AuthenticatedUser
 
   if (!isAllowedToSearch(scope)) {
     return reply.status(403).send({
-      error: "You do not have permission to access this resource.",
-    });
+      error: 'You do not have permission to access this resource.'
+    })
   }
 
-  const transactions = getAllTransactions();
+  const transactions = getAllTransactions()
 
   return transactions.map(({ token, ...rest }) => {
-    const { eventId, actionId } = decode(token) as TokenPayload;
+    const { eventId, actionId } = decode(token) as TokenPayload
 
     return {
       eventId,
       actionId,
-      ...rest,
-    };
-  });
-};
+      ...rest
+    }
+  })
+}
 
 export type DeleteTransactionRequest = FastifyRequest<{
-  Params: { id: string };
-}>;
+  Params: { id: string }
+}>
 
 export const deleteTransactionHandler = async (
   request: DeleteTransactionRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) => {
-  const { scope } = request.user as AuthenticatedUser;
+  const { scope } = request.user as AuthenticatedUser
 
   if (!isAllowedToDelete(scope)) {
     return reply.status(403).send({
-      error: "You do not have permission to access this resource.",
-    });
+      error: 'You do not have permission to access this resource.'
+    })
   }
 
-  const { id } = request.params;
+  const { id } = request.params
 
   try {
-    const transaction = getTransactionAndDiscard(id);
+    const transaction = getTransactionAndDiscard(id)
 
-    reply.status(200).send(transaction);
+    reply.status(200).send(transaction)
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Unknown error occurred";
+      error instanceof Error ? error.message : 'Unknown error occurred'
 
-    reply.status(404).send({ error: message });
+    reply.status(404).send({ error: message })
   }
-};
+}

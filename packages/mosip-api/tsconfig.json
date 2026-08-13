@@ -7,17 +7,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
-      "@mosip/ida-auth-sdk": [
-        "./src/ida-auth-sdk"
-      ],
+      "@mosip/ida-auth-sdk": ["./src/ida-auth-sdk"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "eslint.config.mjs"
-  ]
+  "include": ["src/**/*.ts", "eslint.config.mjs"]
 }

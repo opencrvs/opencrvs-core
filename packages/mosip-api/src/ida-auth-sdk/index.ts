@@ -8,5 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import MOSIPAuthenticator from "./mosip-authenticator";
-export default MOSIPAuthenticator;
+import MOSIPAuthenticator from './mosip-authenticator'
+export default MOSIPAuthenticator

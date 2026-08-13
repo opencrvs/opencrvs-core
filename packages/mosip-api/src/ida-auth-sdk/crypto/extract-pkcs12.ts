@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { asn1, pkcs12, pki } from "node-forge";
+import { asn1, pkcs12, pki } from 'node-forge'
 
 /**
  * Reads and extracts private key and certificate from a PKCS#12 file.
@@ -18,13 +18,13 @@ import { asn1, pkcs12, pki } from "node-forge";
  */
 export const extractKeysFromPkcs12 = (
   fileContents: string,
-  password: string,
+  password: string
 ) => {
-  const p12Asn1 = asn1.fromDer(fileContents);
-  const p12Object = pkcs12.pkcs12FromAsn1(p12Asn1, password);
+  const p12Asn1 = asn1.fromDer(fileContents)
+  const p12Object = pkcs12.pkcs12FromAsn1(p12Asn1, password)
 
-  let privateKeyPkcs8: pki.PEM | null = null;
-  let certificate: pki.PEM | null = null;
+  let privateKeyPkcs8: pki.PEM | null = null
+  let certificate: pki.PEM | null = null
 
   // Extract private key and certificate
   p12Object.safeContents.forEach((safeContent) => {
@@ -32,23 +32,23 @@ export const extractKeysFromPkcs12 = (
       if (safeBag.type === pki.oids.pkcs8ShroudedKeyBag && safeBag.key) {
         // To return PKCS#1:
         // privateKeyPkcs1 = pki.privateKeyToPem(safeBag.key);
-        const privateKeyAsn1 = pki.privateKeyToAsn1(safeBag.key);
-        const privateKeyPkcs8Asn1 = pki.wrapRsaPrivateKey(privateKeyAsn1);
-        privateKeyPkcs8 = pki.privateKeyInfoToPem(privateKeyPkcs8Asn1);
+        const privateKeyAsn1 = pki.privateKeyToAsn1(safeBag.key)
+        const privateKeyPkcs8Asn1 = pki.wrapRsaPrivateKey(privateKeyAsn1)
+        privateKeyPkcs8 = pki.privateKeyInfoToPem(privateKeyPkcs8Asn1)
       } else if (safeBag.type === pki.oids.certBag && safeBag.cert) {
-        certificate = pki.certificateToPem(safeBag.cert);
+        certificate = pki.certificateToPem(safeBag.cert)
       }
-    });
-  });
+    })
+  })
 
   if (privateKeyPkcs8 === null)
-    throw new Error("PEM private key not available in keystore");
+    throw new Error('PEM private key not available in keystore')
 
   if (certificate === null)
-    throw new Error("PEM certificate not available in keystore");
+    throw new Error('PEM certificate not available in keystore')
 
   return { privateKeyPkcs8, certificate } as {
-    privateKeyPkcs8: pki.PEM;
-    certificate: pki.PEM;
-  };
-};
+    privateKeyPkcs8: pki.PEM
+    certificate: pki.PEM
+  }
+}

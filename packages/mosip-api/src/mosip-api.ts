@@ -8,24 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from "zod";
-import { env } from "./constants";
-import MOSIPAuthenticator from "@mosip/ida-auth-sdk";
-import { schemaJson as defaultSchemaJson } from "./types/idSchemaJson";
+import { z } from 'zod'
+import { env } from './constants'
+import MOSIPAuthenticator from '@mosip/ida-auth-sdk'
+import { schemaJson as defaultSchemaJson } from './types/idSchemaJson'
 import {
   BirthRequestFields,
   CorrectionRequestFields,
   DeathRequestFields,
-  MosipInteropPayload,
-} from "@opencrvs/mosip/api";
+  MosipInteropPayload
+} from '@opencrvs/mosip/api'
 
 /**
  * @knipignore Thrown by this module; exported so callers can narrow on it.
  */
 export class MOSIPError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = "MOSIPError";
+    super(message)
+    this.name = 'MOSIPError'
   }
 }
 
@@ -38,90 +38,88 @@ const MosipErrorEnvelope = z.object({
   errors: z
     .array(z.object({ message: z.string().optional() }))
     .nullish()
-    .optional(),
-});
+    .optional()
+})
 
 function throwIfMosipReportedError(body: unknown, context: string) {
-  const { data } = MosipErrorEnvelope.safeParse(body);
+  const { data } = MosipErrorEnvelope.safeParse(body)
 
   if (data?.errors?.length) {
-    throw new Error(
-      `Error in ${context}, response: ${data.errors[0]?.message}`,
-    );
+    throw new Error(`Error in ${context}, response: ${data.errors[0]?.message}`)
   }
 }
 
 function fetchWithLog(url: string, options?: RequestInit): Promise<Response> {
   // NOTE! Be cautious with UNSAFE_DEBUG_LOG as it may log sensitive information. Make sure to disable it in production or when handling real data.
   if (env.UNSAFE_DEBUG_LOG) {
-    console.log(`[MOSIP-API] Request URL: ${url}`);
+    console.log(`[MOSIP-API] Request URL: ${url}`)
     if (options?.body) {
-      console.log(`[MOSIP-API] Request Body: ${options.body}`);
+      console.log(`[MOSIP-API] Request Body: ${options.body}`)
     }
     if (options?.headers) {
       console.log(
-        `[MOSIP-API] Request Headers: ${JSON.stringify(options.headers)}`,
-      );
+        `[MOSIP-API] Request Headers: ${JSON.stringify(options.headers)}`
+      )
     }
   }
-  return fetch(url, options);
+  return fetch(url, options)
 }
 
-export type AuthType = "PACKET" | "WEBSUB";
+export type AuthType = 'PACKET' | 'WEBSUB'
 
 export async function getMosipAuthToken(authType: AuthType) {
   const response = await fetchWithLog(env.MOSIP_AUTH_URL, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      id: "string",
-      version: "string",
+      id: 'string',
+      version: 'string',
       requesttime: new Date().toISOString(),
       metadata: {},
       request: {
         clientId:
-          authType === "PACKET"
+          authType === 'PACKET'
             ? env.MOSIP_PACKET_AUTH_CLIENT_ID
             : env.MOSIP_WEBSUB_AUTH_CLIENT_ID,
         secretKey:
-          authType === "PACKET"
+          authType === 'PACKET'
             ? env.MOSIP_PACKET_AUTH_CLIENT_SECRET
             : env.MOSIP_WEBSUB_AUTH_CLIENT_SECRET,
-        appId: env.MOSIP_AUTH_CLIENT_APP_ID,
-      },
-    }),
-  });
+        appId: env.MOSIP_AUTH_CLIENT_APP_ID
+      }
+    })
+  })
 
   if (!response.ok) {
     throw new MOSIPError(
       `Failed getting MOSIP auth token. Response: ${
         response.status
-      }, response: ${await response.text()}`,
-    );
+      }, response: ${await response.text()}`
+    )
   }
 
   // Get the 'Set-Cookie' header from the response
-  const cookie: string | null = response.headers.get("Set-Cookie");
+  const cookie: string | null = response.headers.get('Set-Cookie')
 
   if (!cookie) {
     throw new MOSIPError(
       `Failed getting MOSIP auth token. Response: ${
         response.status
-      }, response: ${await response.text()}`,
-    );
+      }, response: ${await response.text()}`
+    )
   }
 
   // Split the string by ';' to separate the cookie parts
-  const cookieParts = cookie.split(";");
+  const cookieParts = cookie.split(';')
 
   // The first part will be the Authorization token
-  const authorizationPart = cookieParts[0];
+  const authorizationPart = cookieParts[0]
 
   // Extract the token by splitting on '='
-  const token = authorizationPart.split("=")[1];
-  return token;
+  const token = authorizationPart.split('=')[1]
+  return token
 }
 
 export const postBirthRecord = async ({
@@ -130,105 +128,105 @@ export const postBirthRecord = async ({
   schemaJson,
   audit,
   metaInfo,
-  notification,
+  notification
 }: {
   event: {
-    id: string;
-    trackingId: string;
-  };
-  requestFields: BirthRequestFields;
-  schemaJson?: string;
-  audit: MosipInteropPayload["audit"];
-  metaInfo: MosipInteropPayload["metaInfo"];
-  notification: MosipInteropPayload["notification"];
+    id: string
+    trackingId: string
+  }
+  requestFields: BirthRequestFields
+  schemaJson?: string
+  audit: MosipInteropPayload['audit']
+  metaInfo: MosipInteropPayload['metaInfo']
+  notification: MosipInteropPayload['notification']
 }) => {
   const requestBody = JSON.stringify(
     {
-      id: "string",
-      version: "string",
+      id: 'string',
+      version: 'string',
       requesttime: new Date().toISOString(),
       request: {
         id: event.id,
         refId: `${env.MOSIP_CENTER_ID}_${env.MOSIP_MACHINE_ID}`,
         offlineMode: false,
-        process: "CRVS_NEW",
-        source: "CRVS1",
-        schemaVersion: "0.500",
+        process: 'CRVS_NEW',
+        source: 'CRVS1',
+        schemaVersion: '0.500',
         fields: requestFields,
         metaInfo: metaInfo,
         audits: Array.of(audit),
-        schemaJson: schemaJson ?? defaultSchemaJson,
-      },
+        schemaJson: schemaJson ?? defaultSchemaJson
+      }
     },
     null,
-    2,
-  );
+    2
+  )
 
-  const authToken = await getMosipAuthToken("PACKET");
+  const authToken = await getMosipAuthToken('PACKET')
 
   // packet manager: create packet
   const createPacketResponse = await fetchWithLog(env.MOSIP_CREATE_PACKET_URL, {
-    method: "PUT",
+    method: 'PUT',
     body: requestBody,
     headers: {
-      "Content-Type": "application/json",
-      Cookie: `Authorization=${authToken};`,
-    },
-  });
+      'Content-Type': 'application/json',
+      Cookie: `Authorization=${authToken};`
+    }
+  })
 
   if (!createPacketResponse.ok) {
     throw new Error(
-      `Failed sending record to MOSIP, response: ${await createPacketResponse.text()}`,
-    );
+      `Failed sending record to MOSIP, response: ${await createPacketResponse.text()}`
+    )
   }
 
-  await createPacketResponse.json();
+  await createPacketResponse.json()
 
   // packet manager: process packet API.
   const processPacketRequestBody = JSON.stringify(
     {
-      id: "mosip.registration.processor.workflow.instance",
+      id: 'mosip.registration.processor.workflow.instance',
       requesttime: new Date().toISOString(),
-      version: "v1",
+      version: 'v1',
       request: {
         registrationId: event.id,
-        process: "CRVS_NEW",
-        source: "CRVS1",
-        additionalInfoReqId: "",
+        process: 'CRVS_NEW',
+        source: 'CRVS1',
+        additionalInfoReqId: '',
         notificationInfo: {
           name: notification.recipientFullName,
-          phone: notification.recipientPhone || "",
-          email: notification.recipientEmail || "",
-        },
-      },
+          phone: notification.recipientPhone || '',
+          email: notification.recipientEmail || ''
+        }
+      }
     },
     null,
-    2,
-  );
+    2
+  )
 
   const processPacketResponse = await fetchWithLog(
     env.MOSIP_PROCESS_PACKET_URL,
     {
-      method: "POST",
+      method: 'POST',
       body: processPacketRequestBody,
       headers: {
-        "Content-Type": "application/json",
-        Cookie: `Authorization=${authToken};`,
-      },
-    },
-  );
+        'Content-Type': 'application/json',
+        Cookie: `Authorization=${authToken};`
+      }
+    }
+  )
 
   if (!processPacketResponse.ok) {
     throw new Error(
-      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`,
-    );
+      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`
+    )
   }
 
   throwIfMosipReportedError(
     await processPacketResponse.json(),
-    "processing packet",
-  );
-};
+    'processing packet'
+  )
+}
 
 export const postDeathRecord = async ({
   event,
@@ -236,110 +234,110 @@ export const postDeathRecord = async ({
   schemaJson,
   audit,
   metaInfo,
-  notification,
+  notification
 }: {
   event: {
-    id: string;
-    trackingId: string;
-  };
-  requestFields: DeathRequestFields;
-  schemaJson?: string;
-  audit: MosipInteropPayload["audit"];
-  metaInfo: MosipInteropPayload["metaInfo"];
-  notification: MosipInteropPayload["notification"];
+    id: string
+    trackingId: string
+  }
+  requestFields: DeathRequestFields
+  schemaJson?: string
+  audit: MosipInteropPayload['audit']
+  metaInfo: MosipInteropPayload['metaInfo']
+  notification: MosipInteropPayload['notification']
 }) => {
-  const authToken = await getMosipAuthToken("PACKET");
+  const authToken = await getMosipAuthToken('PACKET')
 
-  const { deathCertificateNumber, ...newRequestBody } = requestFields;
+  const { deathCertificateNumber, ...newRequestBody } = requestFields
 
   const deactivatePacketRequestBody = JSON.stringify(
     {
-      id: "string",
-      version: "string",
+      id: 'string',
+      version: 'string',
       requesttime: new Date().toISOString(),
       request: {
         id: event.id,
         refId: `${env.MOSIP_CENTER_ID}_${env.MOSIP_MACHINE_ID}`,
         offlineMode: false,
-        process: "CRVS_DEATH",
-        source: "CRVS1",
-        schemaVersion: "0.500",
+        process: 'CRVS_DEATH',
+        source: 'CRVS1',
+        schemaVersion: '0.500',
         fields: newRequestBody,
         metaInfo: metaInfo,
         audits: Array.of(audit),
-        schemaJson: schemaJson ?? defaultSchemaJson,
-      },
+        schemaJson: schemaJson ?? defaultSchemaJson
+      }
     },
     null,
-    2,
-  );
+    2
+  )
 
   // packet manager: deactivate packet
   const deactivatePacketResponse = await fetchWithLog(
     env.MOSIP_CREATE_PACKET_URL,
     {
-      method: "PUT",
+      method: 'PUT',
       body: deactivatePacketRequestBody,
       headers: {
-        "Content-Type": "application/json",
-        Cookie: `Authorization=${authToken};`,
-      },
-    },
-  );
+        'Content-Type': 'application/json',
+        Cookie: `Authorization=${authToken};`
+      }
+    }
+  )
 
   if (!deactivatePacketResponse.ok) {
     throw new Error(
-      `Failed sending record to MOSIP, response: ${await deactivatePacketResponse.text()}`,
-    );
+      `Failed sending record to MOSIP, response: ${await deactivatePacketResponse.text()}`
+    )
   }
 
-  await deactivatePacketResponse.json();
+  await deactivatePacketResponse.json()
 
   // packet manager: process packet API.
   const processPacketRequestBody = JSON.stringify(
     {
-      id: "mosip.registration.processor.workflow.instance",
+      id: 'mosip.registration.processor.workflow.instance',
       requesttime: new Date().toISOString(),
-      version: "v1",
+      version: 'v1',
       request: {
         registrationId: event.id,
-        process: "CRVS_DEATH",
-        source: "CRVS1",
-        additionalInfoReqId: "",
+        process: 'CRVS_DEATH',
+        source: 'CRVS1',
+        additionalInfoReqId: '',
         notificationInfo: {
           name: notification.recipientFullName,
-          phone: notification.recipientPhone || "",
-          email: notification.recipientEmail || "",
-        },
-      },
+          phone: notification.recipientPhone || '',
+          email: notification.recipientEmail || ''
+        }
+      }
     },
     null,
-    2,
-  );
+    2
+  )
 
   const processPacketResponse = await fetchWithLog(
     env.MOSIP_PROCESS_PACKET_URL,
     {
-      method: "POST",
+      method: 'POST',
       body: processPacketRequestBody,
       headers: {
-        "Content-Type": "application/json",
-        Cookie: `Authorization=${authToken};`,
-      },
-    },
-  );
+        'Content-Type': 'application/json',
+        Cookie: `Authorization=${authToken};`
+      }
+    }
+  )
 
   if (!processPacketResponse.ok) {
     throw new Error(
-      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`,
-    );
+      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`
+    )
   }
 
   throwIfMosipReportedError(
     await processPacketResponse.json(),
-    "processing packet",
-  );
-};
+    'processing packet'
+  )
+}
 
 export const postDemographicUpdateRecord = async ({
   event,
@@ -347,115 +345,115 @@ export const postDemographicUpdateRecord = async ({
   schemaJson,
   audit,
   metaInfo,
-  notification,
+  notification
 }: {
   event: {
-    id: string;
-    trackingId: string;
-  };
-  requestFields: CorrectionRequestFields;
-  schemaJson?: string;
-  audit: MosipInteropPayload["audit"];
-  metaInfo: MosipInteropPayload["metaInfo"];
-  notification: MosipInteropPayload["notification"];
+    id: string
+    trackingId: string
+  }
+  requestFields: CorrectionRequestFields
+  schemaJson?: string
+  audit: MosipInteropPayload['audit']
+  metaInfo: MosipInteropPayload['metaInfo']
+  notification: MosipInteropPayload['notification']
 }) => {
-  const authToken = await getMosipAuthToken("PACKET");
+  const authToken = await getMosipAuthToken('PACKET')
 
   const updatePacketRequestBody = JSON.stringify(
     {
-      id: "string",
-      version: "string",
+      id: 'string',
+      version: 'string',
       requesttime: new Date().toISOString(),
       request: {
         id: event.id,
         refId: `${env.MOSIP_CENTER_ID}_${env.MOSIP_MACHINE_ID}`,
         offlineMode: false,
-        process: "CRVS_UPDATE",
-        source: "CRVS1",
-        schemaVersion: "0.500",
+        process: 'CRVS_UPDATE',
+        source: 'CRVS1',
+        schemaVersion: '0.500',
         fields: requestFields,
         metaInfo: metaInfo,
         audits: Array.of(audit),
-        schemaJson: schemaJson ?? defaultSchemaJson,
-      },
+        schemaJson: schemaJson ?? defaultSchemaJson
+      }
     },
     null,
-    2,
-  );
+    2
+  )
 
   const updatePacketResponse = await fetchWithLog(env.MOSIP_CREATE_PACKET_URL, {
-    method: "PUT",
+    method: 'PUT',
     body: updatePacketRequestBody,
     headers: {
-      "Content-Type": "application/json",
-      Cookie: `Authorization=${authToken};`,
-    },
-  });
+      'Content-Type': 'application/json',
+      Cookie: `Authorization=${authToken};`
+    }
+  })
 
   if (!updatePacketResponse.ok) {
     throw new Error(
-      `Failed sending record to MOSIP, response: ${await updatePacketResponse.text()}`,
-    );
+      `Failed sending record to MOSIP, response: ${await updatePacketResponse.text()}`
+    )
   }
 
-  await updatePacketResponse.json();
+  await updatePacketResponse.json()
 
   const processPacketRequestBody = JSON.stringify(
     {
-      id: "mosip.registration.processor.workflow.instance",
+      id: 'mosip.registration.processor.workflow.instance',
       requesttime: new Date().toISOString(),
-      version: "v1",
+      version: 'v1',
       request: {
         registrationId: event.id,
-        process: "CRVS_UPDATE",
-        source: "CRVS1",
-        additionalInfoReqId: "",
+        process: 'CRVS_UPDATE',
+        source: 'CRVS1',
+        additionalInfoReqId: '',
         notificationInfo: {
           name: notification.recipientFullName,
-          phone: notification.recipientPhone || "",
-          email: notification.recipientEmail || "",
-        },
-      },
+          phone: notification.recipientPhone || '',
+          email: notification.recipientEmail || ''
+        }
+      }
     },
     null,
-    2,
-  );
+    2
+  )
 
   const processPacketResponse = await fetchWithLog(
     env.MOSIP_PROCESS_PACKET_URL,
     {
-      method: "POST",
+      method: 'POST',
       body: processPacketRequestBody,
       headers: {
-        "Content-Type": "application/json",
-        Cookie: `Authorization=${authToken};`,
-      },
-    },
-  );
+        'Content-Type': 'application/json',
+        Cookie: `Authorization=${authToken};`
+      }
+    }
+  )
 
   if (!processPacketResponse.ok) {
     throw new Error(
-      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`,
-    );
+      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`
+    )
   }
 
   throwIfMosipReportedError(
     await processPacketResponse.json(),
-    "processing packet",
-  );
-};
+    'processing packet'
+  )
+}
 
 export const verifyNid = async ({
   nid,
   name,
   gender,
-  dob,
+  dob
 }: {
-  nid: string;
+  nid: string
   /** date of birth as YYYY/MM/DD */
-  dob: string | undefined;
-  name: { language: string; value: string }[] | undefined;
-  gender: { language: string; value: string }[] | undefined;
+  dob: string | undefined
+  name: { language: string; value: string }[] | undefined
+  gender: { language: string; value: string }[] | undefined
 }) => {
   const authenticator = new MOSIPAuthenticator({
     partnerApiKey: env.PARTNER_APIKEY,
@@ -467,26 +465,26 @@ export const verifyNid = async ({
     decryptP12FilePath: env.DECRYPT_P12_FILE_PATH,
     decryptP12FilePassword: env.DECRYPT_P12_FILE_PASSWORD,
     signP12FilePath: env.SIGN_P12_FILE_PATH,
-    signP12FilePassword: env.SIGN_P12_FILE_PASSWORD,
-  });
+    signP12FilePassword: env.SIGN_P12_FILE_PASSWORD
+  })
 
   const response = await authenticator.auth({
     individualId: nid,
-    individualIdType: "UIN",
+    individualIdType: 'UIN',
     demographicData: {
       dob,
       name,
-      gender,
+      gender
     },
-    consent: true,
-  });
+    consent: true
+  })
 
   if (!response.ok) {
-    throw new Error(`Error in MOSIP Authenticator: ${await response.text()}`);
+    throw new Error(`Error in MOSIP Authenticator: ${await response.text()}`)
   }
 
   return (await response.json()) as {
-    responseTime: string;
-    response: { authStatus: boolean; authToken: string };
-  };
-};
+    responseTime: string
+    response: { authStatus: boolean; authToken: string }
+  }
+}

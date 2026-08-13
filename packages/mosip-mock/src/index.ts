@@ -8,73 +8,73 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import Fastify from "fastify";
-import formbody from "@fastify/formbody";
-import { EMAIL_ENABLED, env, PRIVATE_KEY } from "./constants";
-import { packetManagerCreateHandler } from "./routes/packet-manager-create";
-import { packetManagerProcessHandler } from "./routes/packet-manager-process";
-import { idAuthenticationHandler } from "./ida-auth-sdk/id-authentication";
-import { webSubHubHandler } from "./websub/websub-hub";
-import { packetManagerAuthHandler } from "./routes/packet-manager-auth";
-import { createPrivateKey, createPublicKey } from "node:crypto";
-import { PUBLIC_KEY_URL } from "./verifiable-credentials/issue";
+import Fastify from 'fastify'
+import formbody from '@fastify/formbody'
+import { EMAIL_ENABLED, env, PRIVATE_KEY } from './constants'
+import { packetManagerCreateHandler } from './routes/packet-manager-create'
+import { packetManagerProcessHandler } from './routes/packet-manager-process'
+import { idAuthenticationHandler } from './ida-auth-sdk/id-authentication'
+import { webSubHubHandler } from './websub/websub-hub'
+import { packetManagerAuthHandler } from './routes/packet-manager-auth'
+import { createPrivateKey, createPublicKey } from 'node:crypto'
+import { PUBLIC_KEY_URL } from './verifiable-credentials/issue'
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true })
 
-app.register(formbody);
+app.register(formbody)
 
-app.post("/idauthentication/v1/auth/:mispLk/:partnerId/:apiKey", {
-  handler: idAuthenticationHandler,
-});
-app.get("/.well-known/public-key.json", (_, reply) => {
-  const privateKey = createPrivateKey(PRIVATE_KEY);
-  const publicKey = createPublicKey(privateKey);
+app.post('/idauthentication/v1/auth/:mispLk/:partnerId/:apiKey', {
+  handler: idAuthenticationHandler
+})
+app.get('/.well-known/public-key.json', (_, reply) => {
+  const privateKey = createPrivateKey(PRIVATE_KEY)
+  const publicKey = createPublicKey(privateKey)
 
   const publicKeyPem = publicKey
-    .export({ format: "pem", type: "spki" })
-    .toString();
+    .export({ format: 'pem', type: 'spki' })
+    .toString()
 
   const publicKeyJson = {
-    "@context": "https://w3id.org/security/v2",
-    type: "RsaVerificationKey2018",
+    '@context': 'https://w3id.org/security/v2',
+    type: 'RsaVerificationKey2018',
     id: PUBLIC_KEY_URL,
     controller: `${env.ISSUER_URL}/.well-known/controller.json`,
-    publicKeyPem,
-  };
-  reply.send(publicKeyJson);
-});
+    publicKeyPem
+  }
+  reply.send(publicKeyJson)
+})
 
 /**
  * MOSIP WebSub hub
  */
-app.post("/websub/hub", { handler: webSubHubHandler });
-app.post("/v1/authmanager/authenticate/clientidsecretkey", {
-  handler: packetManagerAuthHandler,
-});
-app.put("/commons/v1/packetmanager/createPacket", {
-  handler: packetManagerCreateHandler,
-});
-app.post("/registrationprocessor/v1/workflowmanager/workflowinstance", {
-  handler: packetManagerProcessHandler,
-});
+app.post('/websub/hub', { handler: webSubHubHandler })
+app.post('/v1/authmanager/authenticate/clientidsecretkey', {
+  handler: packetManagerAuthHandler
+})
+app.put('/commons/v1/packetmanager/createPacket', {
+  handler: packetManagerCreateHandler
+})
+app.post('/registrationprocessor/v1/workflowmanager/workflowinstance', {
+  handler: packetManagerProcessHandler
+})
 
 async function run() {
   if (env.isProd) {
     app.log.warn(
-      "You are running MOCK national ID server in production. Identifiers can be logged.",
-    );
+      'You are running MOCK national ID server in production. Identifiers can be logged.'
+    )
   }
 
-  await app.ready();
+  await app.ready()
   await app.listen({
     port: env.PORT,
-    host: env.HOST,
-  });
+    host: env.HOST
+  })
 
-  const emailStatus = EMAIL_ENABLED ? "Emails enabled" : "Emails disabled";
+  const emailStatus = EMAIL_ENABLED ? 'Emails enabled' : 'Emails disabled'
 
-  app.log.info(`MOSIP mock server running at http://${env.HOST}:${env.PORT}`);
-  app.log.info(emailStatus);
+  app.log.info(`MOSIP mock server running at http://${env.HOST}:${env.PORT}`)
+  app.log.info(emailStatus)
 }
 
-void run();
+void run()

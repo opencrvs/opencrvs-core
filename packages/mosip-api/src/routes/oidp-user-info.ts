@@ -8,62 +8,62 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from 'fastify'
 import {
   OIDPQuerySchema,
   OIDPUserInfoSchema,
   fetchToken,
-  fetchUserInfo,
-} from "../esignet-api";
-import { z } from "zod";
+  fetchUserInfo
+} from '../esignet-api'
+import { z } from 'zod'
 
 export type OIDPUserInfoRequest = FastifyRequest<{
-  Body: z.infer<typeof OIDPUserInfoSchema>;
-  Querystring: z.infer<typeof OIDPQuerySchema>;
-}>;
+  Body: z.infer<typeof OIDPUserInfoSchema>
+  Querystring: z.infer<typeof OIDPQuerySchema>
+}>
 
 export const OIDPUserInfoHandler = async (
   request: OIDPUserInfoRequest,
-  _reply: FastifyReply,
+  _reply: FastifyReply
 ) => {
-  const { clientId, redirectUri } = request.body;
-  const code = request.query.code;
+  const { clientId, redirectUri } = request.body
+  const code = request.query.code
 
   request.log.info({
-    event: "esignet.userinfo.request.received",
+    event: 'esignet.userinfo.request.received',
     clientId,
-    redirectUri: redirectUri.split("?")[0],
-    hasCode: Boolean(code),
-  });
+    redirectUri: redirectUri.split('?')[0],
+    hasCode: Boolean(code)
+  })
 
   const tokenResponse = await fetchToken({
     code,
     clientId,
     redirectUri,
-    logger: request.log,
-  });
+    logger: request.log
+  })
 
   if (!tokenResponse.access_token) {
     request.log.warn(
       {
-        event: "esignet.token.request.missing-access-token",
+        event: 'esignet.token.request.missing-access-token'
       },
-      "E-Signet token response did not include access token",
-    );
+      'E-Signet token response did not include access token'
+    )
 
     throw new Error(
-      "Something went wrong with the OIDP token request. No access token was returned.",
-    );
+      'Something went wrong with the OIDP token request. No access token was returned.'
+    )
   }
 
-  const userInfo = await fetchUserInfo(tokenResponse.access_token, request.log);
+  const userInfo = await fetchUserInfo(tokenResponse.access_token, request.log)
 
   request.log.info(
     {
-      event: "esignet.userinfo.request.succeeded",
+      event: 'esignet.userinfo.request.succeeded'
     },
-    "Successfully fetched OIDP user info",
-  );
+    'Successfully fetched OIDP user info'
+  )
 
-  return userInfo;
-};
+  return userInfo
+}

@@ -8,5 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from "./encrypt";
-export * from "./extract-pkcs12";
+export * from './encrypt'
+export * from './extract-pkcs12'

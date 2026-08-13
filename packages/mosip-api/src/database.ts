@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import DatabaseSync, { Database } from "better-sqlite3";
+import DatabaseSync, { Database } from 'better-sqlite3'
 
 /*
  * Lightweight SQLite database for storing transaction id with a JWT token
@@ -24,53 +24,53 @@ const DATABASE_SCHEMA = `
     registration_number TEXT UNIQUE NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   ) STRICT
-`;
+`
 
-let database: Database;
+let database: Database
 
 export const initSqlite = (path: string) => {
-  database = new DatabaseSync(path);
+  database = new DatabaseSync(path)
 
   const tableExists = database
     .prepare(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='transactions'",
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='transactions'"
     )
-    .get();
+    .get()
 
   if (!tableExists) {
-    database.exec(DATABASE_SCHEMA);
+    database.exec(DATABASE_SCHEMA)
   }
 
-  return { wasCreated: !tableExists, wasConnected: tableExists, database };
-};
+  return { wasCreated: !tableExists, wasConnected: tableExists, database }
+}
 
 export const insertTransaction = (
   id: string,
   token: string,
-  registrationNumber: string,
+  registrationNumber: string
 ) =>
   database
     .prepare(
-      "INSERT INTO transactions (id, token, registration_number) VALUES (?, ?, ?)",
+      'INSERT INTO transactions (id, token, registration_number) VALUES (?, ?, ?)'
     )
-    .run(id, token, registrationNumber);
+    .run(id, token, registrationNumber)
 
 export const getTransactionAndDiscard = (id: string) => {
   const remove = database
     .prepare(
-      "DELETE FROM transactions WHERE id = ? RETURNING token, registration_number",
+      'DELETE FROM transactions WHERE id = ? RETURNING token, registration_number'
     )
-    .get(id) as { token: string; registration_number: string } | undefined;
+    .get(id) as { token: string; registration_number: string } | undefined
 
   if (!remove) {
-    throw new Error(`Transaction with id '${id}' not found.`);
+    throw new Error(`Transaction with id '${id}' not found.`)
   }
 
   return {
     token: remove.token,
-    registrationNumber: remove.registration_number,
-  };
-};
+    registrationNumber: remove.registration_number
+  }
+}
 
 /**
  * Retrieves all transactions from the database.
@@ -81,14 +81,14 @@ export const getTransactionAndDiscard = (id: string) => {
 export const getAllTransactions = () => {
   return database
     .prepare(
-      "SELECT id, registration_number, token, created_at FROM transactions",
+      'SELECT id, registration_number, token, created_at FROM transactions'
     )
     .all() as Array<{
-    id: string;
-    registration_number: string;
-    token: string;
-    created_at: string;
-  }>;
-};
+    id: string
+    registration_number: string
+    token: string
+    created_at: string
+  }>
+}
 
-export const exit = () => database.close();
+export const exit = () => database.close()

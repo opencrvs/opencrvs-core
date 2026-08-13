@@ -8,45 +8,45 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DateValue, NameFieldValue, TextValue } from "@opencrvs/toolkit/events";
-import { FastifyReply, FastifyRequest } from "fastify";
-import { verifyNid } from "../mosip-api";
-import { z } from "zod";
+import { DateValue, NameFieldValue, TextValue } from '@opencrvs/toolkit/events'
+import { FastifyReply, FastifyRequest } from 'fastify'
+import { verifyNid } from '../mosip-api'
+import { z } from 'zod'
 
 export const VerifySchema = z.object({
   nid: TextValue,
   dob: DateValue,
   name: NameFieldValue,
   gender: TextValue.optional(),
-  transactionId: z.string().optional(),
-});
+  transactionId: z.string().optional()
+})
 
 /** Handles the calls coming from OpenCRVS countryconfig */
 export const verifyHandler = async (
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) => {
-  const body = VerifySchema.parse(request.body);
+  const body = VerifySchema.parse(request.body)
 
   const {
-    response: { authStatus },
+    response: { authStatus }
   } = await verifyNid({
     nid: body.nid,
-    dob: body.dob.replaceAll("-", "/"),
+    dob: body.dob.replaceAll('-', '/'),
     name: [
       {
-        language: "eng",
-        value: `${body.name.firstname} ${body.name.surname}`,
-      },
+        language: 'eng',
+        value: `${body.name.firstname} ${body.name.surname}`
+      }
     ],
-    gender: body.gender ? [{ language: "eng", value: body.gender }] : undefined,
-  });
+    gender: body.gender ? [{ language: 'eng', value: body.gender }] : undefined
+  })
 
-  const transactionId = body.transactionId;
+  const transactionId = body.transactionId
 
   if (transactionId) {
-    request.log.info({ transactionId, authStatus });
+    request.log.info({ transactionId, authStatus })
   }
 
-  return reply.code(200).send(authStatus ? "verified" : "failed");
-};
+  return reply.code(200).send(authStatus ? 'verified' : 'failed')
+}

@@ -4,15 +4,5 @@
   "useTabs": false,
   "tabWidth": 2,
   "trailingComma": "none",
-  "semi": false,
-  "overrides": [
-    {
-      "files": "packages/{mosip,mosip-api,mosip-mock,esignet-mock}/**",
-      "options": {
-        "singleQuote": false,
-        "semi": true,
-        "trailingComma": "all"
-      }
-    }
-  ]
+  "semi": false
 }

@@ -8,24 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as nodemailer from "nodemailer";
-import { EMAIL_ENABLED, env } from "./constants";
-import type { FastifyBaseLogger } from "fastify";
+import * as nodemailer from 'nodemailer'
+import { EMAIL_ENABLED, env } from './constants'
+import type { FastifyBaseLogger } from 'fastify'
 
 export const sendEmail = async (
   subject: string,
   text: string,
-  logger?: FastifyBaseLogger,
+  logger?: FastifyBaseLogger
 ) => {
   if (!EMAIL_ENABLED) {
     logger?.info(
       {
-        event: "mailer.skipped",
+        event: 'mailer.skipped'
       },
-      "Skipping email send because SMTP is disabled",
-    );
+      'Skipping email send because SMTP is disabled'
+    )
 
-    return;
+    return
   }
   try {
     const emailTransport = nodemailer.createTransport({
@@ -34,23 +34,23 @@ export const sendEmail = async (
       secure: env.SMTP_SECURE,
       auth: {
         user: env.SMTP_USERNAME,
-        pass: env.SMTP_PASSWORD,
-      },
-    });
+        pass: env.SMTP_PASSWORD
+      }
+    })
     // Without awaiting, error never reaches catch.
     return await emailTransport.sendMail({
       from: env.SENDER_EMAIL_ADDRESS,
       to: env.ALERT_EMAIL,
       subject,
-      text,
-    });
+      text
+    })
   } catch (e) {
     logger?.info(
       {
-        event: "mailer.error",
+        event: 'mailer.error'
       },
-      "Could not send email. Usually this is because the SMTP environment variables are not set up correctly.",
-    );
-    logger?.error(e);
+      'Could not send email. Usually this is because the SMTP environment variables are not set up correctly.'
+    )
+    logger?.error(e)
   }
-};
+}
