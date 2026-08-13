@@ -11,7 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { IListItemProps } from '@opencrvs/components/lib/List'
+import { ListItemProps } from '@opencrvs/components/lib/List'
 
 export const DynamicHeightLinkButton = styled(LinkButton)`
   height: auto;
@@ -32,6 +32,6 @@ export const Label = styled.label`
 export interface SettingsRow {
   /** Identifies the setting, for the row's key and test id. */
   id: string
-  item: IListItemProps
+  item: ListItemProps
   overlay?: React.ReactNode
 }

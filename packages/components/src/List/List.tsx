@@ -12,9 +12,9 @@ import React from 'react'
 import styled from 'styled-components'
 import * as styles from './List.styles'
 import { ListColumns, ListContext } from './ListContext'
-import { Header, IListHeaderProps } from './components/Header'
+import { Header, ListHeaderProps } from './components/Header'
 import { Heading } from './components/Heading'
-import { IListItemProps, Item, itemColumns } from './components/Item'
+import { Item, ListItemProps, itemColumns } from './components/Item'
 
 /*
  * The roles are the ones these elements already have. Stating them keeps the
@@ -33,7 +33,7 @@ const HeadGroup = styled.thead`
   ${styles.rowGroup}
 `
 
-export interface IListProps
+export interface ListProps
   extends Omit<React.HTMLAttributes<HTMLTableElement>, 'children'> {
   /** An optional `<List.Header>`, then the rows. */
   children: React.ReactNode
@@ -67,11 +67,11 @@ const flatten = (children: React.ReactNode): React.ReactElement[] =>
  * Use `<Table>` instead where the reader compares values down a grid of columns
  * that carry their own affordances — click-to-sort, totals, per-column filters.
  */
-export const List = ({ children, redactedLabel, ...props }: IListProps) => {
+export const List = ({ children, redactedLabel, ...props }: ListProps) => {
   const elements = flatten(children)
 
   const header = elements.find(
-    (element): element is React.ReactElement<IListHeaderProps> =>
+    (element): element is React.ReactElement<ListHeaderProps> =>
       element.type === Header
   )
 
@@ -81,7 +81,7 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
   )
 
   const items = body.filter(
-    (element): element is React.ReactElement<IListItemProps> =>
+    (element): element is React.ReactElement<ListItemProps> =>
       element.type === Item
   )
 

@@ -55,7 +55,7 @@ const Actions = styled.div`
   ${styles.actions}
 `
 
-export interface IListItemProps {
+export interface ListItemProps {
   id?: string
   /** Names the row's subject — a field, a setting, a person. */
   label: React.ReactNode
@@ -118,7 +118,7 @@ export const Item = ({
   start,
   actions,
   ...props
-}: IListItemProps) => {
+}: ListItemProps) => {
   const { columns, columnNames, redactedLabel } = useListContext()
   const testId = props['data-testid']
 
@@ -185,7 +185,7 @@ export const Item = ({
 
 /** The value columns this row occupies, read by `<List>` to size the table. */
 export const itemColumns = (
-  props: IListItemProps
+  props: ListItemProps
 ): { start: boolean; value: boolean; value2: boolean; actions: boolean } => ({
   start: !rendersNothing(props.start),
   value: hasContent({

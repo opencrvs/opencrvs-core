@@ -21,7 +21,7 @@ const HeaderCell = styled.th`
   ${styles.headerCell}
 `
 
-export interface IListHeaderProps {
+export interface ListHeaderProps {
   id?: string
   /** Names the label column. */
   label?: React.ReactNode
@@ -35,7 +35,7 @@ export interface IListHeaderProps {
  * Column names for the rows beneath, on the same grid so headers and values
  * line up. Hidden when the list stacks — a stacked row carries its own label.
  */
-export const Header = ({ id, label, value, value2 }: IListHeaderProps) => {
+export const Header = ({ id, label, value, value2 }: ListHeaderProps) => {
   const { columns } = useListContext()
 
   return (

@@ -30,7 +30,7 @@ const HeadingCell = styled.th<{ $fontVariant: ListHeadingFontVariant }>`
   ${({ theme, $fontVariant }) => theme.fonts[$fontVariant]};
 `
 
-export interface IListHeadingProps {
+export interface ListHeadingProps {
   id?: string
   label: React.ReactNode
   fontVariant?: ListHeadingFontVariant
@@ -46,7 +46,7 @@ export const Heading = ({
   id,
   label,
   fontVariant = 'h4'
-}: IListHeadingProps) => {
+}: ListHeadingProps) => {
   const { columns } = useListContext()
 
   return (

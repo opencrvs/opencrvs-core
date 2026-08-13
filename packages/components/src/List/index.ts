@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './List'
-export type { IListItemProps } from './components/Item'
-export type { IListHeaderProps } from './components/Header'
+export type { ListItemProps } from './components/Item'
+export type { ListHeaderProps } from './components/Header'
 export type {
-  IListHeadingProps,
+  ListHeadingProps,
   ListHeadingFontVariant
 } from './components/Heading'
