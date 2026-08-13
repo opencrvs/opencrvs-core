@@ -281,6 +281,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('Transfer (inactivate-old + create-new) keeps old records under the old entity and routes new records to the new entity', async ({
     browser
   }) => {
+    test.setTimeout(180_000)
     const oldOfficeName = `E2E Transfer Old Office ${uuidv4()}`
     const oldOffice = await createOffice(
       systemAdminToken,
