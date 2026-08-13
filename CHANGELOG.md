@@ -55,6 +55,7 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 - Enable OpenTelemetry for Traefik and NGINX [#10685](https://github.com/opencrvs/opencrvs-core/issues/10685)
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
 - Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
+- Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 
 ### New features
 
