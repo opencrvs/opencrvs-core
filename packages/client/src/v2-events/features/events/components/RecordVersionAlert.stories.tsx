@@ -101,7 +101,7 @@ export default meta
 
 type Story = StoryObj<typeof RecordVersionAlert>
 
-/** Figma section 11, band A — the newest version of its form reads as info. */
+/** The newest version of its form reads as info. */
 export const RegistrationOnlyVersion: Story = {
   args: {
     versions: [declaration, registration],
@@ -153,7 +153,7 @@ export const NotificationOnAProgressedRecord: Story = {
   }
 }
 
-/** Figma section 11, band A — newest of three. */
+/** Newest of three. */
 export const RegistrationLatestOfThree: Story = {
   args: {
     versions: correctedTwice,
@@ -171,7 +171,7 @@ export const RegistrationLatestOfThree: Story = {
   }
 }
 
-/** Figma section 11, band B — an older version of its form warns. */
+/** An older version of its form warns. */
 export const RegistrationAsFirstRegistered: Story = {
   args: {
     versions: correctedTwice,
