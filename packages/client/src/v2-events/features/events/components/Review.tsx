@@ -282,6 +282,7 @@ function FormReview({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
+  showValidationErrors = true,
   validatorContext,
   anchor
 }: {
@@ -297,6 +298,19 @@ function FormReview({
   isCorrection?: boolean
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
+  /**
+   * Whether a field that fails validation reports it in place of its value.
+   *
+   * A validation message tells the reader to go and fill something in, so it
+   * belongs where they can: on the version the record is currently at. There
+   * it explains what is holding up the next action. On a superseded version
+   * there is nothing to act on, and the fields it lacks were either filled
+   * later or never wanted — a notification needs less than a declaration and
+   * would otherwise read as a deficient one. A historical version would also
+   * be judged against whatever validation says today rather than what it said
+   * when the version was captured.
+   */
+  showValidationErrors?: boolean
   /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
   anchor: PlainDate
 }) {
@@ -350,7 +364,7 @@ function FormReview({
               ).flatMap(([, errs]) => errs)
 
               const errorDisplay =
-                errors.length > 0 ? (
+                showValidationErrors && errors.length > 0 ? (
                   <ValidationError key={field.id}>
                     {intl.formatMessage(errors[0].message)}
                   </ValidationError>
@@ -486,6 +500,7 @@ function FormReview({
 function ReviewComponent({
   formConfig,
   previousFormValues,
+  showValidationErrors,
   form,
   validatorContext,
   annotation,
@@ -516,6 +531,8 @@ function ReviewComponent({
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
+  /** See FormReview. Defaults to on, which is what every action flow needs. */
+  showValidationErrors?: boolean
   onEdit: ({
     pageId,
     fieldId,
@@ -582,6 +599,7 @@ function ReviewComponent({
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            showValidationErrors={showValidationErrors}
             treatMissingValuesAsCleared={treatMissingValuesAsCleared}
             validatorContext={validatorContext}
             onEdit={onEdit}

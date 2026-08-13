@@ -74,7 +74,6 @@ const OfflineMessageWrapper = styled.div`
   text-align: center;
 `
 
-
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
@@ -187,6 +186,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
+      showValidationErrors={isLatest}
       title={formatMessage(title, eventStateWithDraft.declaration)}
       validatorContext={validatorContext}
       onEdit={noop}
