@@ -119,13 +119,14 @@ function offlineHandlers(document: typeof eventDocument) {
 }
 
 /**
- * The declaration differs from the notification before it, so the toggle is
- * offered and names the number of changes.
+ * A first declaration is the record being completed rather than edited — the
+ * notification before it was only ever asked a subset — so nothing is offered.
  */
-export const OffersToShowChanges: Story = {
+export const NoComparisonOnAFirstDeclaration: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText('Show edits')).toBeVisible()
+    await canvas.findByText("Applicant's name")
+    await expect(canvas.queryByText('Show edits')).toBeNull()
   },
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,

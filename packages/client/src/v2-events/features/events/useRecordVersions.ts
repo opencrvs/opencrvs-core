@@ -83,12 +83,29 @@ export function useRecordVersions({
   const selected = versions.at(selectedIndex)
 
   /*
-   * Compare against the previous *version*, never the previous action. A
+   * Compare against the previous version *of the same form*.
+   *
+   * Crossing forms does not describe a change anyone made. A notification is
+   * deliberately partial — it asks only what its sender's role is shown — so
+   * the difference between it and the first declaration is the record being
+   * completed, not edited. A first registration carries exactly what the
+   * declaration before it carried, since REGISTER never alters declaration
+   * data. In both cases the first version of a form is that form being
+   * opened, and there is nothing yet to compare it against.
+   *
+   * It also keeps the labels honest: what a declaration shows is the edits
+   * made to that declaration, and a registration the correction made to that
+   * registration.
+   *
+   * Comparison is against a previous *version*, never a previous action — a
    * record's first declaration is preceded by CREATE, which carries an empty
-   * declaration — diffing against it would report every field as an addition.
-   * CREATE is not a version, so indexing into `versions` avoids that.
+   * declaration, and diffing against that would report every field as an
+   * addition. CREATE is not a version, so working from `versions` avoids it.
    */
-  const previous = selectedIndex > 0 ? versions[selectedIndex - 1] : undefined
+  const previous = versions
+    .slice(0, Math.max(selectedIndex, 0))
+    .filter(({ form }) => form === selected?.form)
+    .at(-1)
 
   const selectedState = useMemo(
     () =>
