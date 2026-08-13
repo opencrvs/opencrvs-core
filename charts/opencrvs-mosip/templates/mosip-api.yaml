@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
         - name: mosip-api
-          image: {{ .Values.mosip_api.image.repository }}:{{ .Values.mosip_api.image.tag }}
+          image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_api) }}
           env:
             - name: CLIENT_APP_URL
               value: {{ include "render-external-url" (dict "service_name" "register" "Values" .Values) }}

@@ -1,11 +1,19 @@
 hostname: opencrvs.localhost
 ingress:
   ssl_enabled: false
+
+image:
+  # Tag applied to all three images below. Empty means "use the chart's
+  # appVersion", which tracks the core release these images are built from.
+  # Override it to deploy a specific build, e.g. a commit sha from a branch:
+  #   helm upgrade ... --set image.tag=8cd820b
+  # A single service can still pin its own tag under <service>.image.tag.
+  tag: ''
+
 mosip_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/ocrvs-mosip-mock
-    tag: 2.0.0
   env:
     FOO: bar
     SENDER_EMAIL_ADDRESS: 'test@opencrvs.org'
@@ -21,7 +29,6 @@ esignet_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/ocrvs-esignet-mock
-    tag: 2.0.0
   env:
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
 
@@ -29,7 +36,6 @@ mosip_api:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/ocrvs-mosip-api
-    tag: 2.0.0
   env:
     LOCALE: en
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
