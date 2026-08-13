@@ -78,6 +78,7 @@ For the integration's own release history prior to this move, see [`packages/mos
 - Keep filebeat index for 30 days by default [#13005](https://github.com/opencrvs/opencrvs-core/issues/13005)
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
 - Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
+- `pnpm dev` now runs the MOSIP stack alongside the rest of core, so local registrations exercise the same MOSIP path as a real deployment. The testland `NO_MOSIP` escape hatch is gone — it only ever short-circuited local development, and production already defaulted to `false`.
 
 ### New features
 

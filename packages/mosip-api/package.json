@@ -8,7 +8,9 @@
   "scripts": {
     "start": "NODE_ENV=development tsx watch --env-file-if-exists=../../.env src/index.ts",
     "start:prod": "NODE_ENV=production tsx src/index.ts",
-    "pretest": "mkdir -p certs && cp -n docs/example-certs/* certs/ || true",
+    "copy-example-certs": "mkdir -p certs && cp -n docs/example-certs/* certs/ || true",
+    "prestart": "pnpm copy-example-certs",
+    "pretest": "pnpm copy-example-certs",
     "test": "NODE_ENV=development tsx --test",
     "test:compilation": "tsc --noEmit",
     "lint": "eslint -c eslint.config.mjs"
