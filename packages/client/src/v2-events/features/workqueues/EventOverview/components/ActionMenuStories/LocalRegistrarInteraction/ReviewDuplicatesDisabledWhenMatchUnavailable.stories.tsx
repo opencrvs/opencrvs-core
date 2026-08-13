@@ -142,6 +142,29 @@ async function openActionMenu(canvasElement: HTMLElement) {
 }
 
 /*
+ * Before the record is downloaded its matches have not been fetched either, so
+ * their absence says nothing about access. The ordinary warning is shown, not the
+ * "you cannot review" banner.
+ */
+export const WarningShownBeforeDownload: StoryObj = {
+  parameters: parameters({ offlineEvents: [] }),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Not downloaded: the ordinary warning is shown', async () => {
+      await expect(
+        await canvas.findByText(
+          `Potential duplicate of record ${duplicateTrackingId}`
+        )
+      ).toBeVisible()
+      await expect(
+        canvas.queryByText('You cannot review this record for duplicates')
+      ).toBeNull()
+    })
+  }
+}
+
+/*
  * The server refuses `getDuplicates` as a whole when the user's duplicate review
  * scopes do not cover every matched record (e.g. one of them is sealed), so
  * nothing is cached for the match. There is then nothing to review, and the entry
@@ -150,10 +173,33 @@ async function openActionMenu(canvasElement: HTMLElement) {
 export const ReviewDisabledWhenMatchUnavailable: StoryObj = {
   parameters: parameters({ offlineEvents: [eventUnderReview] }),
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Downloaded, match missing: the banner explains why',
+      async () => {
+        await expect(
+          await canvas.findByText(
+            'You cannot review this record for duplicates'
+          )
+        ).toBeVisible()
+        await expect(
+          await canvas.findByText(
+            'It is flagged against a record registered outside your jurisdiction, which you are not permitted to view. The review must be completed by someone with access to both records.'
+          )
+        ).toBeVisible()
+        await expect(
+          canvas.queryByText(
+            `Potential duplicate of record ${duplicateTrackingId}`
+          )
+        ).toBeNull()
+      }
+    )
+
     await step(
       'Matched record missing from cache: Review potential duplicates is disabled',
       async () => {
-        const canvas = await openActionMenu(canvasElement)
+        await openActionMenu(canvasElement)
         const reviewItem = await canvas.findByText(
           'Review potential duplicates'
         )
@@ -170,10 +216,23 @@ export const ReviewDisabledWhenMatchUnavailable: StoryObj = {
 export const ReviewEnabledWhenMatchAvailable: StoryObj = {
   parameters: parameters({ offlineEvents: [eventUnderReview, matchedEvent] }),
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('The record shows the ordinary duplicate warning', async () => {
+      await expect(
+        await canvas.findByText(
+          `Potential duplicate of record ${duplicateTrackingId}`
+        )
+      ).toBeVisible()
+      await expect(
+        canvas.queryByText('You cannot review this record for duplicates')
+      ).toBeNull()
+    })
+
     await step(
       'Matched record present in cache: Review potential duplicates is enabled',
       async () => {
-        const canvas = await openActionMenu(canvasElement)
+        await openActionMenu(canvasElement)
         const reviewItem = await canvas.findByText(
           'Review potential duplicates'
         )
