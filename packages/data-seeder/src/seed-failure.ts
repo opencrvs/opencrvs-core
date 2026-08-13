@@ -13,27 +13,34 @@
  * Failure reports, in the two kinds this job distinguishes: before the first
  * write the database is untouched and the report names no remedy; after
  * writing has begun re-running collides on an external-id unique constraint
- * rather than resuming, so the report says to clear the database. The remedy
- * names no command — one would be wrong for two of the three ways this runs.
+ * rather than resuming, so the report says to clear the database.
+ *
+ * Unlike validation, which accumulates, a failure here is single and fatal —
+ * the run is over at the first one.
  */
+import {
+  NO_WRITE_ATTEMPTED,
+  REMEDY,
+  SeedSubject,
+  renderSubject
+} from './seed-report'
 
-interface FailedRecord {
-  position: number
-  username: string
-}
+/** The two headlines a post-write failure can carry. Named rather than written
+ * at the raise site, so the wording stays in one place. */
+export const CREATING_INITIAL_USERS =
+  'Seeding failed while creating initial users.'
 
-export interface InitialUserFailure {
-  record: FailedRecord
+export const AFTER_WRITING_BEGAN = 'Seeding failed after writing had begun.'
+
+export interface SeedFailure {
+  headline: string
+  /**
+   * Absent when the failure is about nothing an operator can name — a dropped
+   * connection, the post-seed trigger. Naming a subject there would invent one.
+   */
+  subject?: SeedSubject
   reason: string
-  created: number
-  total: number
 }
-
-const REMEDY =
-  'The database now holds incomplete seed-data. ' +
-  'Clear the database before you seed again.'
-
-const NOTHING_WAS_SEEDED = 'No write was attempted; nothing was seeded.'
 
 function renderReport(headline: string, details: string[], closing: string) {
   return [
@@ -45,34 +52,19 @@ function renderReport(headline: string, details: string[], closing: string) {
   ].join('\n')
 }
 
-export function formatInitialUserFailure({
-  record,
-  reason,
-  created,
-  total
-}: InitialUserFailure): string {
-  const counted =
-    total === 1
-      ? `${created} of 1 initial user was created before this failure`
-      : `${created} of ${total} initial users were created before this failure`
+export function formatSeedFailure({
+  headline,
+  subject,
+  reason
+}: SeedFailure): string {
+  const detail =
+    subject === undefined ? reason : `${renderSubject(subject)}${reason}`
 
-  return renderReport(
-    'Seeding failed while creating initial users.',
-    [`record ${record.position} (${record.username}): ${reason}`, counted],
-    REMEDY
-  )
-}
-
-export function formatPartialSeedFailure(reason: string): string {
-  return renderReport(
-    'Seeding failed after writing had begun.',
-    [reason],
-    REMEDY
-  )
+  return renderReport(headline, [detail], REMEDY)
 }
 
 export function formatUnwrittenFailure(reason: string): string {
-  return `${reason}\n${NOTHING_WAS_SEEDED}`
+  return `${reason}\n${NO_WRITE_ATTEMPTED}`
 }
 
 export function describeError(error: unknown): string {

@@ -16,9 +16,10 @@ import { SeedUsers, getUsers, seedUsers } from './users'
 import { raise } from './utils'
 import { createInitialisationClient } from './initialisation-client'
 import {
+  AFTER_WRITING_BEGAN,
   PartialSeedError,
   describeError,
-  formatPartialSeedFailure,
+  formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
 import {
@@ -148,7 +149,12 @@ async function write(
     // `seedUsers` knows which record failed, so its report stands.
     throw error instanceof PartialSeedError
       ? error
-      : new PartialSeedError(formatPartialSeedFailure(describeError(error)))
+      : new PartialSeedError(
+          formatSeedFailure({
+            headline: AFTER_WRITING_BEGAN,
+            reason: describeError(error)
+          })
+        )
   }
 }
 

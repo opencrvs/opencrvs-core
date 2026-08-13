@@ -27,6 +27,14 @@
  */
 import { EncodedScope, hasScope } from '@opencrvs/commons'
 import { officeExternalId } from './office-external-id'
+import {
+  NOTHING_WAS_SEEDED,
+  Offending,
+  SeedDataRecord,
+  SeedSubject,
+  renderOffending,
+  renderSubject
+} from './seed-report'
 
 /** Every field is optional, including those the country config's schema
  * requires: a record that did not parse still arrives here and may be missing
@@ -64,24 +72,11 @@ export interface SeedData {
   locations: SeedDataLocation[]
 }
 
-interface SeedDataRecord {
-  position: number
-  username?: string
-}
-
-interface ProblemDetail {
-  field?: string
-  value?: string
-  problem: string
-  rule: string
-}
-
-/** A problem is about a user record or about something else, never both and
- * never neither — the tag is what stops a problem rendering with no subject at
- * all, which would leave an operator a line they cannot place. */
-export type SeedDataProblem =
-  | (ProblemDetail & { about: 'record'; record: SeedDataRecord })
-  | (ProblemDetail & { about: 'subject'; subject: string })
+export type SeedDataProblem = SeedSubject &
+  Offending & {
+    problem: string
+    rule: string
+  }
 
 /** `normalise` mirrors how the write path compares the field, so both agree on
  * what a duplicate is: emails and usernames are lowercased on write, mobile
@@ -501,26 +496,6 @@ function pluralise(count: number, singular: string, plural: string) {
   return `${count} ${count === 1 ? singular : plural}`
 }
 
-function renderSubject(problem: SeedDataProblem) {
-  if (problem.about === 'subject') {
-    return `${problem.subject}: `
-  }
-
-  const { record } = problem
-
-  return record.username === undefined
-    ? `record ${record.position}: `
-    : `record ${record.position} (${record.username}): `
-}
-
-function renderOffending({ field, value }: SeedDataProblem) {
-  if (field === undefined) {
-    return ''
-  }
-
-  return value === undefined ? `${field} ` : `${field} "${value}" `
-}
-
 function renderProblem(problem: SeedDataProblem) {
   return (
     `  ${renderSubject(problem)}${renderOffending(problem)}` +
@@ -537,7 +512,7 @@ export function formatValidationReport(
   const header =
     `${pluralise(problems.length, 'problem', 'problems')} found in ` +
     `${pluralise(seedData.users.length, 'user record', 'user records')}; ` +
-    `nothing was seeded.`
+    `${NOTHING_WAS_SEEDED}`
 
   return [header, ...problems.map(renderProblem)].join('\n')
 }

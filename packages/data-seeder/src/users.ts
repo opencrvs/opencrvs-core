@@ -25,9 +25,10 @@ import { fromZodError } from 'zod-validation-error'
 import { createInitialisationClient } from './initialisation-client'
 import { officeExternalId } from './office-external-id'
 import {
+  CREATING_INITIAL_USERS,
   PartialSeedError,
   describeInitialUserFailure,
-  formatInitialUserFailure,
+  formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
 import { SeedData, SeedDataRole, SeedDataUser } from './validate-seed-data'
@@ -278,10 +279,8 @@ async function createUser(token: string, userPayload: CreateUserInputInternal) {
 
 /** Validation has already passed, so a failure here lands with earlier users
  * in the database. Each record is attempted inside a handler because this is
- * the one place that knows both which record it is and how far the run got. */
+ * the one place that knows which record it is. */
 export async function seedUsers(token: string, users: SeedUsers) {
-  let created = 0
-
   for (const [index, userMetadata] of users.entries()) {
     const {
       firstname,
@@ -330,17 +329,16 @@ export async function seedUsers(token: string, users: SeedUsers) {
       await createUser(token, userPayload)
     } catch (error) {
       throw new PartialSeedError(
-        formatInitialUserFailure({
-          // 1-based, matching how the validator identifies a record.
-          record: { position: index + 1, username },
-          reason: describeInitialUserFailure(error, user),
-          // Skipped users are not counted; they were not created.
-          created,
-          total: users.length
+        formatSeedFailure({
+          headline: CREATING_INITIAL_USERS,
+          subject: {
+            about: 'record',
+            // 1-based, matching how the validator identifies a record.
+            record: { position: index + 1, username }
+          },
+          reason: describeInitialUserFailure(error, user)
         })
       )
     }
-
-    created = created + 1
   }
 }

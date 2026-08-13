@@ -134,13 +134,12 @@ Problems identify a record by its position in the seed-data and its username, an
 
 Duplicate usernames are a hard error rather than a rename. The service renumbers colliding usernames when it creates a user, which is right for self-service creation but wrong at seed time.
 
-Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing record, reports how many initial users were created before it, and states that the database holds incomplete seed-data:
+Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing record and states that the database holds incomplete seed-data:
 
 ```
 Seeding failed while creating initial users.
 
   record 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
-  32 of 55 initial users were created before this failure
 
 The database now holds incomplete seed-data. Clear the database before you seed again.
 ```

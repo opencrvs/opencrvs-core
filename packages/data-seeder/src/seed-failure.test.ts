@@ -11,10 +11,9 @@
 
 /**
  * These tests assert what an operator reads when the seed job fails: which
- * record is named, how much of the seed-data the report says was written, and
- * — the part worth guarding — which of the two closing sentences they get.
- * Confusing the two sends an operator either to destroy a clean database or to
- * re-run against a dirty one.
+ * record is named, and — the part worth guarding — which of the two closing
+ * sentences they get. Confusing the two sends an operator either to destroy a
+ * clean database or to re-run against a dirty one.
  *
  * The seed loop itself is not tested here, by an explicit decision recorded in
  * the plan: there are no mocked-transport tests of the job's orchestration.
@@ -22,50 +21,42 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
-  InitialUserFailure,
+  AFTER_WRITING_BEGAN,
+  CREATING_INITIAL_USERS,
   PartialSeedError,
+  SeedFailure,
   describeInitialUserFailure,
-  formatInitialUserFailure,
-  formatPartialSeedFailure,
+  formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
 import { formatValidationReport } from './validate-seed-data'
 
-function failure(overrides: Partial<InitialUserFailure> = {}) {
+function failure(overrides: Partial<SeedFailure> = {}): SeedFailure {
   return {
-    record: { position: 44, username: 'k.mweene' },
+    headline: CREATING_INITIAL_USERS,
+    subject: {
+      about: 'record',
+      record: { position: 44, username: 'k.mweene' }
+    },
     reason: 'DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use',
-    created: 32,
-    total: 55,
     ...overrides
   }
 }
 
-/** Anything that would read as an instruction to run one environment's tooling. */
-const COMMANDS =
-  /pnpm|npm |npx|yarn|docker|docker-compose|compose|kubectl|helm|psql|db:clear|seed:|\$ /i
-
 describe('a failure while creating initial users', () => {
   it('reads as the operator-facing report', () => {
-    expect(formatInitialUserFailure(failure()).split('\n')).toEqual([
+    expect(formatSeedFailure(failure()).split('\n')).toEqual([
       'Seeding failed while creating initial users.',
       '',
       '  record 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use',
-      '  32 of 55 initial users were created before this failure',
       '',
       'The database now holds incomplete seed-data. Clear the database before you seed again.'
     ])
   })
-
-  it('counts a lone initial user in the singular', () => {
-    expect(
-      formatInitialUserFailure(failure({ created: 0, total: 1 }))
-    ).toContain('0 of 1 initial user was created before this failure')
-  })
 })
 
 describe('the two failure reports', () => {
-  const written = formatInitialUserFailure(failure())
+  const written = formatSeedFailure(failure())
 
   it('are distinguishable from the validation report, which says the same thing as the unwritten one', () => {
     const validation = formatValidationReport([], {
@@ -101,9 +92,11 @@ describe('a failure of the post-seed system-ready trigger', () => {
    * failures travel `write()`'s catch and are rendered like any other
    * post-write failure — rather than exiting on the spot, as they once did.
    */
-  const report = formatPartialSeedFailure(
-    'System ready trigger failed with unexpected status: 500 Internal Server Error'
-  )
+  const report = formatSeedFailure({
+    headline: AFTER_WRITING_BEGAN,
+    reason:
+      'System ready trigger failed with unexpected status: 500 Internal Server Error'
+  })
 
   it('tells the operator the database holds incomplete seed-data', () => {
     expect(report.split('\n')).toEqual([
@@ -121,10 +114,13 @@ describe('a failure of the post-seed system-ready trigger', () => {
 })
 
 describe('any other failure after writing had begun', () => {
-  const report = formatPartialSeedFailure('connect ECONNREFUSED 127.0.0.1:7070')
+  const report = formatSeedFailure({
+    headline: AFTER_WRITING_BEGAN,
+    reason: 'connect ECONNREFUSED 127.0.0.1:7070'
+  })
 
-  it('names no command', () => {
-    expect(report).not.toMatch(COMMANDS)
+  it('names no subject, having none to name', () => {
+    expect(report).toContain('  connect ECONNREFUSED 127.0.0.1:7070')
   })
 })
 
