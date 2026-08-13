@@ -15,15 +15,17 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { noop } from 'lodash'
+import { isUndefined, noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   ActionType,
   applyDraftToEventIndex,
+  FieldConfig,
   EventState,
   getActionAnnotationFields,
   getDeclaration,
+  RecordForm,
   getOrThrow,
   getCurrentEventState,
   UUID,
@@ -120,7 +122,40 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const intl = useIntl()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  const formConfig = getDeclaration(configuration)
+  /*
+   * A notification shows only the fields it captured.
+   *
+   * A notification is configured by hiding questions from the role that sends
+   * it — a user holding only record.notify is never asked most of the
+   * declaration. That hiding cannot be replayed here: conditionals evaluate
+   * against the reader's scopes, not the notifier's, so a registrar opening
+   * the record would see the whole declaration with gaps where the questions
+   * were never put.
+   *
+   * Filtering on value says the same thing from the record itself, and does
+   * not depend on role configuration that changes over time: what a
+   * notification contains is what it captured. The distinction it cannot draw
+   * — never asked versus asked and left blank — has no consequence for a
+   * notification, which is why this is not applied to the other forms, where
+   * an empty optional field means the question was put and not answered.
+   */
+  const fullFormConfig = getDeclaration(configuration)
+  const formConfig = useMemo(() => {
+    if (selected?.form !== RecordForm.NOTIFICATION) {
+      return fullFormConfig
+    }
+
+    const captured = ({ id }: FieldConfig) =>
+      !isUndefined(eventStateWithDraft.declaration[id]) &&
+      eventStateWithDraft.declaration[id] !== ''
+
+    return {
+      ...fullFormConfig,
+      pages: fullFormConfig.pages
+        .map((page) => ({ ...page, fields: page.fields.filter(captured) }))
+        .filter(({ fields }) => fields.length > 0)
+    }
+  }, [fullFormConfig, selected?.form, eventStateWithDraft])
 
   const annotation = useMemo((): EventState | undefined => {
     // Collect annotations from all past non-READ actions that have annotation fields
