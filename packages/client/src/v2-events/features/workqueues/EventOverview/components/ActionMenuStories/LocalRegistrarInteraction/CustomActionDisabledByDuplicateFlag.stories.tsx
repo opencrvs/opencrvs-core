@@ -16,6 +16,7 @@ import {
   ActionType,
   createPrng,
   EventDocument,
+  EventDocumentOnlyLastAction,
   generateActionDocument,
   generateTrackingId,
   getCurrentEventState,
@@ -185,8 +186,13 @@ export const ApproveActionStateTransitions: StoryObj = {
           tRPCMsw.event.getDuplicates.query(() => []),
           tRPCMsw.event.actions.assignment.assign.mutation(() => {
             currentDoc = eventAssignedWithFlag
-            return eventAssignedWithFlag
+
+            return EventDocumentOnlyLastAction.parse({
+              ...currentDoc,
+              actions: [assignAction]
+            })
           }),
+
           tRPCMsw.event.actions.duplicate.markNotDuplicate.mutation(() => {
             currentDoc = eventAssignedNoFlag
             return eventAssignedNoFlag
