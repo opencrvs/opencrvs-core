@@ -659,14 +659,11 @@ test('Can not add action with same [transactionId, type, status]', async () => {
     generator.event.actions.edit(originalEvent.id)
   )
 
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-
-  const eventBeforeDuplicateAttempt = await client.event.get({
-    eventId: originalEvent.id
-  })
+  const eventBeforeDuplicateAttempt =
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
 
   const eventWithDuplicateAttempt = await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id, {

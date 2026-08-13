@@ -10,8 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { last } from 'lodash'
-import { getOrThrow, TokenWithBearer } from '@opencrvs/commons'
+import { TokenWithBearer } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -40,30 +39,18 @@ export async function assignRecord({
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
     if (lastAssignmentAction.assignedTo === input.assignedTo) {
-      return {
-        ...storedEvent,
-        actions: []
-      }
+      return storedEvent
     }
     throw new TRPCError({
       code: 'CONFLICT'
     })
   }
 
-  const event = await processAction(input, {
+  return processAction(input, {
     eventId: storedEvent.id,
     user,
     token,
     status: ActionStatus.Accepted,
     configuration
   })
-
-  const lastAction = getOrThrow(
-    last(event.actions),
-    'Event did not have any actions. This should never happen.'
-  )
-  return {
-    ...event,
-    actions: [lastAction]
-  }
 }

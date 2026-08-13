@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { EventDocumentOnlyLastAction, getUUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -339,13 +339,11 @@ export const eventRouter = router({
     assignment: router({
       assign: userOnlyProcedure
         .input(AssignActionInput)
-        .output(EventDocumentOnlyLastAction)
         .use(middleware.canAccessEventWithScopes(['record.read']))
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
-
           await writeAuditLog({
             clientId: user.id,
             clientType: user.type,
@@ -362,7 +360,6 @@ export const eventRouter = router({
         }),
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
-        .output(EventDocumentOnlyLastAction)
         .use(middleware.validateAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
