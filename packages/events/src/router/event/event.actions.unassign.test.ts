@@ -14,8 +14,10 @@ import {
   ActionStatus,
   ActionType,
   encodeScope,
-  getUUID
+  getUUID,
+  EventDocumentOnlyLastAction
 } from '@opencrvs/commons'
+
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe('Without scope: record.unassign-others', () => {
@@ -93,7 +95,7 @@ describe('Without scope: record.unassign-others', () => {
     })
 
     test(`If there is ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should not add unassign action`, async () => {
-      const { user, generator } = await setupTestCase()
+      const { user, generator, eventsDb } = await setupTestCase()
       const client = createTestClient(user, [
         encodeScope({
           type: 'record.read',
@@ -116,14 +118,32 @@ describe('Without scope: record.unassign-others', () => {
           assignedTo: user.id
         })
       )
-      const eventWithUnAssign = await client.event.actions.assignment.unassign(
+      const firstResponse = await client.event.actions.assignment.unassign(
         generator.event.actions.unassign(originalEvent.id)
       )
 
-      const response = await client.event.actions.assignment.unassign(
+      const actionsBeforeSecondAssign = await eventsDb
+        .selectFrom('eventActions')
+        .where('eventId', '=', originalEvent.id)
+        .execute()
+
+      const secondResponse = await client.event.actions.assignment.unassign(
         generator.event.actions.unassign(originalEvent.id)
       )
-      expect(response).toEqual(eventWithUnAssign)
+
+      const actionsAfterSecondAssign = await eventsDb
+        .selectFrom('eventActions')
+        .where('eventId', '=', originalEvent.id)
+        .execute()
+
+      // Action is idempotent (state stays the same regardless of multiple calls)
+      expect(actionsAfterSecondAssign).toEqual(actionsBeforeSecondAssign)
+
+      EventDocumentOnlyLastAction.parse(firstResponse)
+      EventDocumentOnlyLastAction.parse(secondResponse)
+      // Second request will not receive action on the response payload.
+      expect(firstResponse.actions).toHaveLength(1)
+      expect(secondResponse.actions).toHaveLength(0)
     })
   })
 })
@@ -213,7 +233,7 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
 })
 
 test(`${ActionType.UNASSIGN} is idempotent`, async () => {
-  const { user, generator } = await setupTestCase()
+  const { user, generator, eventsDb } = await setupTestCase()
   const client = createTestClient(user, [
     encodeScope({
       type: 'record.read',
@@ -258,8 +278,26 @@ test(`${ActionType.UNASSIGN} is idempotent`, async () => {
   const unassignPayload = generator.event.actions.unassign(originalEvent.id)
   const firstResponse =
     await client.event.actions.assignment.unassign(unassignPayload)
+
+  const actionsBeforeSecondAssign = await eventsDb
+    .selectFrom('eventActions')
+    .where('eventId', '=', originalEvent.id)
+    .execute()
+
   const secondResponse =
     await client.event.actions.assignment.unassign(unassignPayload)
 
-  expect(firstResponse).toEqual(secondResponse)
+  const actionsAfterSecondAssign = await eventsDb
+    .selectFrom('eventActions')
+    .where('eventId', '=', originalEvent.id)
+    .execute()
+
+  // Action is idempotent (state stays the same regardless of multiple calls)
+  expect(actionsAfterSecondAssign).toEqual(actionsBeforeSecondAssign)
+
+  EventDocumentOnlyLastAction.parse(firstResponse)
+  EventDocumentOnlyLastAction.parse(secondResponse)
+  // Second request will not receive action on the response payload.
+  expect(firstResponse.actions).toHaveLength(1)
+  expect(secondResponse.actions).toHaveLength(0)
 })
