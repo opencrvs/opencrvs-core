@@ -125,7 +125,7 @@ function offlineHandlers(document: typeof eventDocument) {
 export const OffersToShowChanges: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText(/Show 1 edit/)).toBeVisible()
+    await expect(await canvas.findByText('Show edits')).toBeVisible()
   },
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
@@ -171,7 +171,7 @@ export const NoChangesOnAFirstRegistration: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await canvas.findByText("Applicant's name")
-    await expect(canvas.queryByText(/Show \d+ (edit|correction)/)).toBeNull()
+    await expect(canvas.queryByText(/Show (edits|correction)/)).toBeNull()
   },
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,

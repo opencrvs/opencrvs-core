@@ -215,7 +215,7 @@ export const OffersToShowEdits: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText('Show 3 edits')).toBeVisible()
+    await expect(await canvas.findByText('Show edits')).toBeVisible()
   }
 }
 
@@ -230,7 +230,7 @@ export const OffersToShowCorrections: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText('Show 1 correction')).toBeVisible()
+    await expect(await canvas.findByText('Show correction')).toBeVisible()
   }
 }
 
@@ -245,7 +245,7 @@ export const OffersToHideCorrections: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(await canvas.findByText('Hide corrections')).toBeVisible()
+    await expect(await canvas.findByText('Hide correction')).toBeVisible()
   }
 }
 
@@ -258,6 +258,37 @@ export const NoChangesToShow: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.queryByText(/Show \d+/)).toBeNull()
+    await expect(canvas.queryByText(/Show (edits|correction)/)).toBeNull()
+  }
+}
+
+/** Every declaration after the first came from an edit, and says so. */
+export const RedeclaredWithEdits: Story = {
+  args: {
+    versions: [
+      declaration,
+      version(
+        'd2',
+        RecordForm.DECLARATION,
+        ActionType.DECLARE,
+        1,
+        true,
+        '2026-05-12T09:00:00.000Z'
+      )
+    ],
+    selected: version(
+      'd2',
+      RecordForm.DECLARATION,
+      ActionType.DECLARE,
+      1,
+      true,
+      '2026-05-12T09:00:00.000Z'
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
+      'Re-declared with edits'
+    )
   }
 }

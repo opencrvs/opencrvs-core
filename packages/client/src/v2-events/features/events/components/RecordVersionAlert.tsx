@@ -83,6 +83,13 @@ const messages = defineMessages({
       '{name, select, __UNKNOWN__ {Registered on {date}.} other {Registered by {name} on {date}.}}',
     description: 'Provenance of a registration version'
   },
+  byRedeclared: {
+    id: 'v2.event.record.alert.by.redeclared',
+    defaultMessage:
+      '{name, select, __UNKNOWN__ {Re-declared with edits on {date}.} other {Re-declared with edits by {name} on {date}.}}',
+    description:
+      'Provenance of a declaration that replaced an earlier one through an edit'
+  },
   byCorrected: {
     id: 'v2.event.record.alert.by.corrected',
     defaultMessage:
@@ -112,10 +119,9 @@ const messages = defineMessages({
   },
   showEdits: {
     id: 'v2.event.record.alert.changes.showEdits',
-    defaultMessage: '{count, plural, one {Show # edit} other {Show # edits}}',
+    defaultMessage: 'Show edits',
     description:
-      'Action that marks up what changed from the previous notification or declaration',
-    values: { count: 0 }
+      'Action that marks up what changed from the previous notification or declaration'
   },
   hideEdits: {
     id: 'v2.event.record.alert.changes.hideEdits',
@@ -123,17 +129,15 @@ const messages = defineMessages({
     description:
       'Action that stops marking up changes on a notification or declaration'
   },
-  showCorrections: {
-    id: 'v2.event.record.alert.changes.showCorrections',
-    defaultMessage:
-      '{count, plural, one {Show # correction} other {Show # corrections}}',
+  showCorrection: {
+    id: 'v2.event.record.alert.changes.showCorrection',
+    defaultMessage: 'Show correction',
     description:
-      'Action that marks up what changed from the previous registration',
-    values: { count: 0 }
+      'Action that marks up what changed from the previous registration'
   },
-  hideCorrections: {
-    id: 'v2.event.record.alert.changes.hideCorrections',
-    defaultMessage: 'Hide corrections',
+  hideCorrection: {
+    id: 'v2.event.record.alert.changes.hideCorrection',
+    defaultMessage: 'Hide correction',
     description: 'Action that stops marking up changes on a registration'
   }
 })
@@ -220,8 +224,17 @@ export function RecordVersionAlert({
 
   const sentences: string[] = []
 
-  // Where this version came from — neither the title nor the selector says it.
-  const provenance = BY_ACTION[selected.actionType]
+  /*
+   * Where this version came from — neither the title nor the selector says it.
+   * Every declaration after the first came from an edit, and says so rather
+   * than reading as a second, independent declaration.
+   */
+  const isRedeclaration =
+    selected.actionType === ActionType.DECLARE && selected.indexInForm > 0
+
+  const provenance = isRedeclaration
+    ? messages.byRedeclared
+    : BY_ACTION[selected.actionType]
   if (provenance) {
     sentences.push(
       intl.formatMessage(provenance, {
@@ -267,16 +280,20 @@ export function RecordVersionAlert({
    */
   const isRegistration = selected.form === RecordForm.REGISTRATION
 
+  /*
+   * No count. Between two consecutive versions there is exactly one edit or
+   * one correction, so a number here would count changed fields while the
+   * words name events — "2 corrections" for one correction touching two
+   * fields would read as two correction requests.
+   */
   const CHANGE_ACTION = {
-    hide: isRegistration ? messages.hideCorrections : messages.hideEdits,
-    show: isRegistration ? messages.showCorrections : messages.showEdits
+    hide: isRegistration ? messages.hideCorrection : messages.hideEdits,
+    show: isRegistration ? messages.showCorrection : messages.showEdits
   }
 
   const actionText =
     changeCount > 0 && onToggleChanges
-      ? intl.formatMessage(CHANGE_ACTION[showChanges ? 'hide' : 'show'], {
-          count: changeCount
-        })
+      ? intl.formatMessage(CHANGE_ACTION[showChanges ? 'hide' : 'show'])
       : undefined
 
   return (
