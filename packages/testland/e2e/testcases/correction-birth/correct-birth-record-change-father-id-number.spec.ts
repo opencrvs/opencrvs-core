@@ -178,11 +178,11 @@ test.describe.serial("Correct record - Change father's ID number", () => {
       .click()
 
     await expect(
-      page.getByTestId('row-value-father.nid').getByRole('deletion')
+      page.getByTestId('father.nid-value').getByRole('deletion')
     ).toHaveText(oldIdNumber)
 
     await expect(
-      page.getByTestId('row-value-father.nid').getByText(newIdNumber)
+      page.getByTestId('father.nid-value').getByText(newIdNumber)
     ).toBeVisible()
   })
 
@@ -249,7 +249,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await page.getByRole('button', { name: 'Record', exact: true }).click()
 
     await expect(
-      page.getByTestId('row-value-father.nid').getByText(newIdNumber)
+      page.getByTestId('father.nid-value').getByText(newIdNumber)
     ).toBeVisible()
   })
 })

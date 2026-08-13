@@ -19,7 +19,7 @@ import {
   Accordion,
   Button,
   Link,
-  ListReview,
+  List,
   Dialog,
   Stack,
   Text,
@@ -364,7 +364,7 @@ function FormReview({
                 labelForShowAction="Show"
                 name={'Accordion_' + page.id}
               >
-                <ListReview id={'Section_' + page.id}>
+                <List id={'Section_' + page.id}>
                   {displayedFields.map((field) => {
                     const {
                       id,
@@ -382,18 +382,16 @@ function FormReview({
                     const showSectionHeading = type === FieldType.HEADING
 
                     return (
-                      <>
+                      <React.Fragment key={id}>
                         {showSectionHeading ? (
-                          <ListReview.Header
+                          <List.Heading
                             fontVariant={
                               field.configuration.styles?.fontVariant
                             }
                             label={intl.formatMessage(label)}
-                            value={null}
                           />
                         ) : (
-                          <ListReview.Row
-                            key={id}
+                          <List.Item
                             actions={
                               !shouldHideEditLink && (
                                 <Link
@@ -412,15 +410,16 @@ function FormReview({
                                 </Link>
                               )
                             }
+                            data-testid={id}
                             id={id}
                             label={intl.formatMessage(label)}
                             value={errorDisplay || valueDisplay}
                           />
                         )}
-                      </>
+                      </React.Fragment>
                     )
                   })}
-                </ListReview>
+                </List>
               </Accordion>
             </DeclarationDataContainer>
           )
@@ -573,11 +572,12 @@ function ReviewComponent({
                       labelForShowAction="Show"
                       name="annotation"
                     >
-                      <ListReview id="annotation">
+                      <List id="annotation">
                         {displayedAnnotationFields.map((field) => (
-                          <ListReview.Row
+                          <List.Item
                             key={field.id}
                             actions={null}
+                            data-testid={field.id}
                             id={field.id}
                             label={intl.formatMessage(field.label)}
                             value={
@@ -589,7 +589,7 @@ function ReviewComponent({
                             }
                           />
                         ))}
-                      </ListReview>
+                      </List>
                     </Accordion>
                   </DeclarationDataContainer>
                 </ReviewContainter>
