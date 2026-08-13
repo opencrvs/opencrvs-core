@@ -203,3 +203,61 @@ export const RegistrationInBetween: Story = {
     )
   }
 }
+
+/** A declaration's changes are edits. */
+export const OffersToShowEdits: Story = {
+  args: {
+    versions: [notification, declaration, registration],
+    selected: declaration,
+    changeCount: 3,
+    showChanges: false,
+    onToggleChanges: () => undefined
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Show 3 edits')).toBeVisible()
+  }
+}
+
+/** A registration only ever changes by correction. */
+export const OffersToShowCorrections: Story = {
+  args: {
+    versions: correctedTwice,
+    selected: correctedTwice[3],
+    changeCount: 1,
+    showChanges: false,
+    onToggleChanges: () => undefined
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Show 1 correction')).toBeVisible()
+  }
+}
+
+/** With the comparison on, the action offers the way back. */
+export const OffersToHideCorrections: Story = {
+  args: {
+    versions: correctedTwice,
+    selected: correctedTwice[3],
+    changeCount: 1,
+    showChanges: true,
+    onToggleChanges: () => undefined
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Hide corrections')).toBeVisible()
+  }
+}
+
+/** Nothing changed, so the alert carries no action. */
+export const NoChangesToShow: Story = {
+  args: {
+    versions: [declaration, registration],
+    selected: registration,
+    changeCount: 0
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.queryByText(/Show \d+/)).toBeNull()
+  }
+}

@@ -109,6 +109,32 @@ const messages = defineMessages({
     id: 'v2.event.record.alert.isLegalRecord',
     defaultMessage: 'This is the legal record of the event.',
     description: 'Shown on the current registration'
+  },
+  showEdits: {
+    id: 'v2.event.record.alert.changes.showEdits',
+    defaultMessage: '{count, plural, one {Show # edit} other {Show # edits}}',
+    description:
+      'Action that marks up what changed from the previous notification or declaration',
+    values: { count: 0 }
+  },
+  hideEdits: {
+    id: 'v2.event.record.alert.changes.hideEdits',
+    defaultMessage: 'Hide edits',
+    description:
+      'Action that stops marking up changes on a notification or declaration'
+  },
+  showCorrections: {
+    id: 'v2.event.record.alert.changes.showCorrections',
+    defaultMessage:
+      '{count, plural, one {Show # correction} other {Show # corrections}}',
+    description:
+      'Action that marks up what changed from the previous registration',
+    values: { count: 0 }
+  },
+  hideCorrections: {
+    id: 'v2.event.record.alert.changes.hideCorrections',
+    defaultMessage: 'Hide corrections',
+    description: 'Action that stops marking up changes on a registration'
   }
 })
 
@@ -135,6 +161,10 @@ const Sentences = styled.div`
 interface RecordVersionAlertProps {
   versions: RecordVersion[]
   selected: RecordVersion
+  /** Fields that differ from the previous version. Zero hides the action. */
+  changeCount?: number
+  showChanges?: boolean
+  onToggleChanges?: () => void
 }
 
 /**
@@ -147,7 +177,10 @@ interface RecordVersionAlertProps {
  */
 export function RecordVersionAlert({
   versions,
-  selected
+  selected,
+  changeCount = 0,
+  showChanges = false,
+  onToggleChanges
 }: RecordVersionAlertProps) {
   const intl = useIntl()
   const { getUsers } = useUsers()
@@ -227,11 +260,32 @@ export function RecordVersionAlert({
     sentences.push(intl.formatMessage(consequence))
   }
 
+  /*
+   * A registration only ever changes by correction, and a notification or
+   * declaration only by edit, so the action names what happened rather than
+   * describing the mechanism.
+   */
+  const isRegistration = selected.form === RecordForm.REGISTRATION
+
+  const CHANGE_ACTION = {
+    hide: isRegistration ? messages.hideCorrections : messages.hideEdits,
+    show: isRegistration ? messages.showCorrections : messages.showEdits
+  }
+
+  const actionText =
+    changeCount > 0 && onToggleChanges
+      ? intl.formatMessage(CHANGE_ACTION[showChanges ? 'hide' : 'show'], {
+          count: changeCount
+        })
+      : undefined
+
   return (
     <Alert
+      actionText={actionText}
       data-testid="record-version-alert"
       title={title}
       type={selected.isLatestOfForm ? 'info' : 'warning'}
+      onActionClick={actionText ? onToggleChanges : undefined}
     >
       <Sentences>
         {sentences.map((sentence, index) => (

@@ -1550,6 +1550,10 @@ v2.event.record.alert.by.corrected,Provenance of a corrected registration versio
 v2.event.record.alert.by.declared,Provenance of a declaration version,"{name, select, __UNKNOWN__ {Declared on {date}.} other {Declared by {name} on {date}.}}",
 v2.event.record.alert.by.registered,Provenance of a registration version,"{name, select, __UNKNOWN__ {Registered on {date}.} other {Registered by {name} on {date}.}}",
 v2.event.record.alert.by.sent,Provenance of a notification version,"{name, select, __UNKNOWN__ {Sent on {date}.} other {Sent by {name} on {date}.}}",
+v2.event.record.alert.changes.hideCorrections,Action that stops marking up changes on a registration,Hide corrections,
+v2.event.record.alert.changes.hideEdits,Action that stops marking up changes on a notification or declaration,Hide edits,
+v2.event.record.alert.changes.showCorrections,Action that marks up what changed from the previous registration,"{count, plural, one {Show # correction} other {Show # corrections}}",
+v2.event.record.alert.changes.showEdits,Action that marks up what changed from the previous notification or declaration,"{count, plural, one {Show # edit} other {Show # edits}}",
 v2.event.record.alert.isLegalRecord,Shown on the current registration,This is the legal record of the event.,
 v2.event.record.alert.since.declared,Shown on a notification of a record that has been declared but not registered,This record has since been declared.,
 v2.event.record.alert.since.declaredAndRegistered,Shown on a notification of a record that has been registered,This record has since been declared and registered.,
@@ -1559,8 +1563,6 @@ v2.event.record.alert.title.earlier,Record alert title on a version that is neit
 v2.event.record.alert.title.latest,Record alert title on the newest of several versions,You are viewing the latest version,
 v2.event.record.alert.title.only,Record alert title when the form has a single version,This is the only version,
 v2.event.record.alert.title.original,Record alert title on the oldest of several versions,You are viewing the original version,
-v2.event.record.changes.hide,Button that stops marking up changes from the previous version,Hide changes,
-v2.event.record.changes.show,Button that marks up what changed from the previous version of the record,"{count, plural, one {Show # change} other {Show # changes}}",
 v2.event.record.offline.description,Message shown on the Record page when the user is offline and the record has not been cached locally,This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.,Cet enregistrement n’a pas encore été téléchargé et ne peut donc pas être ouvert hors ligne. Veuillez vous reconnecter à Internet pour le consulter.
 v2.event.record.offline.title,Title shown on the Record page when the user is offline,No connection,Pas de connexion
 v2.event.record.title,Heading of the card on the Record tab,Record,

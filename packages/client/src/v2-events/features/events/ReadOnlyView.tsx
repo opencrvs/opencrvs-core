@@ -34,8 +34,6 @@ import {
   AssignmentStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { getAnnotationForActionType } from '@client/v2-events/features/events/components/Action/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -58,20 +56,6 @@ import { getChangedDeclarationDiff } from '@client/v2-events/features/events/use
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
-  showChanges: {
-    id: 'v2.event.record.changes.show',
-    defaultMessage:
-      '{count, plural, one {Show # change} other {Show # changes}}',
-    description:
-      'Button that marks up what changed from the previous version of the record',
-    values: { count: 0 }
-  },
-  hideChanges: {
-    id: 'v2.event.record.changes.hide',
-    defaultMessage: 'Hide changes',
-    description:
-      'Button that stops marking up changes from the previous version'
-  },
   offlineTitle: {
     id: 'v2.event.record.offline.title',
     defaultMessage: 'No connection',
@@ -279,7 +263,13 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       readonlyMode
       alert={
         selected ? (
-          <RecordVersionAlert selected={selected} versions={versions} />
+          <RecordVersionAlert
+            changeCount={changeCount}
+            selected={selected}
+            showChanges={showChanges}
+            versions={versions}
+            onToggleChanges={() => setShowChanges(!showChanges)}
+          />
         ) : undefined
       }
       anchor={recordAnchorDate(eventStateWithDraft)}
@@ -288,26 +278,6 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
         title: intl.formatMessage(messages.recordTitle),
         actions: selected
           ? [
-              ...(changeCount > 0
-                ? [
-                    <Button
-                      key="record-changes"
-                      size="small"
-                      type={showChanges ? 'secondary' : 'tertiary'}
-                      onClick={() => setShowChanges(!showChanges)}
-                    >
-                      <Icon
-                        name={showChanges ? 'EyeSlash' : 'Eye'}
-                        size="small"
-                      />
-                      {showChanges
-                        ? intl.formatMessage(messages.hideChanges)
-                        : intl.formatMessage(messages.showChanges, {
-                            count: changeCount
-                          })}
-                    </Button>
-                  ]
-                : []),
               <RecordVersionMenu
                 key="record-version"
                 selected={selected}
