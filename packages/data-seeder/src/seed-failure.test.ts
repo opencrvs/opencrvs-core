@@ -10,25 +10,31 @@
  */
 
 /**
- * These tests assert what an operator reads when the seed job fails: which
- * record is named, and — the part worth guarding — which of the two closing
- * sentences they get. Confusing the two sends an operator either to destroy a
- * clean database or to re-run against a dirty one.
+ * Two kinds of assertion here, and the difference is deliberate.
+ *
+ * The invariant — which of the two closing sentences an operator gets — is
+ * asserted by phase, over every renderer of both phases. Confusing the two
+ * sends an operator either to destroy a clean database or to re-run against a
+ * dirty one, so it is checked in both directions and does not depend on any
+ * other wording.
+ *
+ * The prose is held in snapshots. They are goldens: they exist so a change to
+ * what an operator reads shows up in review as a diff, not so that any
+ * particular sentence is load-bearing. Update them freely.
  *
  * The seed loop itself is not tested here, by an explicit decision recorded in
  * the plan: there are no mocked-transport tests of the job's orchestration.
- * These are plain unit tests of the rendering, like the validator's.
  */
 import { describe, expect, it } from 'vitest'
 import {
   AFTER_WRITING_BEGAN,
   CREATING_INITIAL_USERS,
-  PartialSeedError,
   SeedFailure,
   describeInitialUserFailure,
   formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
+import { NOTHING_WAS_SEEDED, REMEDY } from './seed-report'
 import { formatValidationReport } from './validate-seed-data'
 
 function failure(overrides: Partial<SeedFailure> = {}): SeedFailure {
@@ -43,84 +49,81 @@ function failure(overrides: Partial<SeedFailure> = {}): SeedFailure {
   }
 }
 
-describe('a failure while creating initial users', () => {
-  it('reads as the operator-facing report', () => {
-    expect(formatSeedFailure(failure()).split('\n')).toEqual([
-      'Seeding failed while creating initial users.',
-      '',
-      '  record 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use',
-      '',
-      'The database now holds incomplete seed-data. Clear the database before you seed again.'
-    ])
+const NO_SEED_DATA = {
+  users: [],
+  roles: [],
+  administrativeAreas: [],
+  locations: [],
+  PHONE_NUMBER_PATTERN: '^0[0-9]{10}$'
+}
+
+const fetchFailure = formatUnwrittenFailure(
+  'Expected to get the users from http://localhost:3040/config/users'
+)
+
+const failedInitialUser = formatSeedFailure(failure())
+
+/**
+ * The post-seed trigger runs after the locations and the users are written, so
+ * its failures travel `write()`'s catch and are rendered like any other
+ * post-write failure — rather than exiting on the spot, as they once did.
+ */
+const failedTrigger = formatSeedFailure({
+  headline: AFTER_WRITING_BEGAN,
+  reason:
+    'System ready trigger failed with unexpected status: 500 Internal Server Error'
+})
+
+const droppedConnection = formatSeedFailure({
+  headline: AFTER_WRITING_BEGAN,
+  reason: 'connect ECONNREFUSED 127.0.0.1:7070'
+})
+
+describe('the closing sentence, by phase', () => {
+  it.each([
+    ['a seed-data fetch failure', fetchFailure],
+    ['a validation report', formatValidationReport([], NO_SEED_DATA)]
+  ])('%s says nothing was seeded, and names no remedy', (_, report) => {
+    expect(report).toContain(NOTHING_WAS_SEEDED)
+    expect(report).not.toContain(REMEDY)
+  })
+
+  it.each([
+    ['a failed initial user', failedInitialUser],
+    ['a failed post-seed trigger', failedTrigger],
+    ['a dropped connection', droppedConnection]
+  ])('%s names the remedy, and claims no clean database', (_, report) => {
+    expect(report).toContain(REMEDY)
+    expect(report).not.toContain(NOTHING_WAS_SEEDED)
   })
 })
 
-describe('the two failure reports', () => {
-  const written = formatSeedFailure(failure())
+describe('what an operator reads', () => {
+  it('when an initial user could not be created', () => {
+    expect(failedInitialUser).toMatchInlineSnapshot(`
+      "Seeding failed while creating initial users.
 
-  it('are distinguishable from the validation report, which says the same thing as the unwritten one', () => {
-    const validation = formatValidationReport([], {
-      users: [],
-      roles: [],
-      administrativeAreas: [],
-      locations: [],
-      PHONE_NUMBER_PATTERN: '^0[0-9]{10}$'
-    })
+        record 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
 
-    expect(validation).toContain('nothing was seeded')
-    expect(validation).not.toContain('Clear the database')
-    expect(written).not.toContain('nothing was seeded')
-  })
-})
-
-describe('a failure before anything was written', () => {
-  const report = formatUnwrittenFailure(
-    'Expected to get the users from http://localhost:3040/config/users'
-  )
-
-  it('ends with the phrase that says the database is untouched', () => {
-    expect(report.split('\n')).toEqual([
-      'Expected to get the users from http://localhost:3040/config/users',
-      'No write was attempted; nothing was seeded.'
-    ])
-  })
-})
-
-describe('a failure of the post-seed system-ready trigger', () => {
-  /**
-   * The trigger runs after the locations and the users are written, so its
-   * failures travel `write()`'s catch and are rendered like any other
-   * post-write failure — rather than exiting on the spot, as they once did.
-   */
-  const report = formatSeedFailure({
-    headline: AFTER_WRITING_BEGAN,
-    reason:
-      'System ready trigger failed with unexpected status: 500 Internal Server Error'
+      The database now holds incomplete seed-data. Clear the database before you seed again."
+    `)
   })
 
-  it('tells the operator the database holds incomplete seed-data', () => {
-    expect(report.split('\n')).toEqual([
-      'Seeding failed after writing had begun.',
-      '',
-      '  System ready trigger failed with unexpected status: 500 Internal Server Error',
-      '',
-      'The database now holds incomplete seed-data. Clear the database before you seed again.'
-    ])
+  it('when the failure is about nothing that can be named', () => {
+    expect(droppedConnection).toMatchInlineSnapshot(`
+      "Seeding failed after writing had begun.
+
+        connect ECONNREFUSED 127.0.0.1:7070
+
+      The database now holds incomplete seed-data. Clear the database before you seed again."
+    `)
   })
 
-  it('carries its report out of the writing phase by type', () => {
-    expect(new PartialSeedError(report).report).toBe(report)
-  })
-})
-
-describe('any other failure after writing had begun', () => {
-  const report = formatSeedFailure({
-    headline: AFTER_WRITING_BEGAN,
-    reason: 'connect ECONNREFUSED 127.0.0.1:7070'
-  })
-
-  it('names no subject, having none to name', () => {
-    expect(report).toContain('  connect ECONNREFUSED 127.0.0.1:7070')
+  it('when nothing had been written yet', () => {
+    expect(fetchFailure).toMatchInlineSnapshot(`
+      "Expected to get the users from http://localhost:3040/config/users
+      No write was attempted; nothing was seeded."
+    `)
   })
 })
 
