@@ -17,17 +17,12 @@ import { raise } from './utils'
 import { formatUnwrittenFailure } from './seed-failure'
 import { SeedData } from './validate-seed-data'
 
-/** Narrower than `ApplicationConfig` in `@opencrvs/commons` on purpose: the
- * seed job should not refuse to seed over a field it never reads. */
 const ApplicationConfigSchema = z.object({
   PHONE_NUMBER_PATTERN: z.string()
 })
 
 type ApplicationSeedData = Pick<SeedData, 'PHONE_NUMBER_PATTERN'>
 
-/** The pattern mobile numbers must match, fetched but neither compiled nor
- * judged here — the validator does both. The endpoint is served without
- * authentication, so this needs no token, unlike the users and the roles. */
 export async function getApplicationConfig(): Promise<{
   seedData: ApplicationSeedData
 }> {

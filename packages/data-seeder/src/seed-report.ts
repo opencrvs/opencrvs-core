@@ -10,16 +10,6 @@
  */
 
 /**
- * The vocabulary both operator reports render in: what a problem is about, how
- * an offending field reads, and the two closing sentences.
- *
- * It sits apart from either report because both must agree. Validation runs
- * before the first write and a failure after it, and an operator who sees one
- * and then the other must find the same initial user identified the same way — so
- * the format is shared code rather than a convention held in two places.
- */
-
-/**
  * How a report names one initial user: by its position in the seed-data, and
  * by its username when it has one.
  *
@@ -74,22 +64,10 @@ export function renderOffending({ field, value }: Offending): string {
   return value === undefined ? `${field} ` : `${field} "${value}" `
 }
 
-/**
- * The two closing sentences, and the whole of what an operator has to act on.
- * One says the database is untouched, the other says go clear it; confusing
- * them sends an operator either to destroy a clean database or to re-run
- * against a dirty one.
- *
- * Neither names a command. The same job runs locally, as a container service
- * and as a deployment job, so any command would be wrong for two of the three.
- */
 export const REMEDY =
   'The database now holds incomplete seed-data. ' +
   'Clear the database before you seed again.'
 
-/** The phrase itself, because the two pre-write reports lead into it
- * differently: validation counts the problems it found first, a fetch failure
- * says no write was attempted. */
 export const NOTHING_WAS_SEEDED = 'nothing was seeded.'
 
 export const NO_WRITE_ATTEMPTED = `No write was attempted; ${NOTHING_WAS_SEEDED}`

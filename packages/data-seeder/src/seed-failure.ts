@@ -8,16 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * Failure reports, in the two kinds this job distinguishes: before the first
- * write the database is untouched and the report names no remedy; after
- * writing has begun re-running collides on an external-id unique constraint
- * rather than resuming, so the report says to clear the database.
- *
- * Unlike validation, which accumulates, a failure here is single and fatal —
- * the run is over at the first one.
- */
 import {
   NO_WRITE_ATTEMPTED,
   REMEDY,
@@ -25,8 +15,6 @@ import {
   renderSubject
 } from './seed-report'
 
-/** The two headlines a post-write failure can carry. Named rather than written
- * at the raise site, so the wording stays in one place. */
 export const CREATING_INITIAL_USERS =
   'Seeding failed while creating initial users.'
 

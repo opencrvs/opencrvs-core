@@ -8,17 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * The country config's roles, fetched and parsed but not written and nothing
- * about them judged here; the validator answers everything in one report. A
- * failing *fetch* is still fatal: there is nothing to report on.
- *
- * The event configuration is fetched alongside them, which looks like a stray
- * dependency and is not: event ids parameterise the role schema, because a
- * scope may name the events it applies to and those must be events the country
- * config declares. It is fetched for role validation and for nothing else.
- */
 import {
   decodeScope,
   EncodedScope,

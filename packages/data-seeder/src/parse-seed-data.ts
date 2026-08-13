@@ -8,16 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * Reading a seed-data document the country config served: the list, its
- * elements, and what to say when either does not parse.
- *
- * Shared by the fetch modules rather than owned by one of them, because a
- * record that did not parse is still reported by its position and still has
- * fields read back off it, and that has to work the same way whichever
- * document it came from.
- */
 import { z } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 

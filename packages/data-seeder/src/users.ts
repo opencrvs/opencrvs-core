@@ -97,9 +97,6 @@ function parseRecords(records: unknown[]): {
   return { users, seedData }
 }
 
-/** The initial users, fetched and parsed but not written and nothing about them
- * judged here; the validator answers everything in one report. A failing
- * *fetch* is still fatal: there is nothing to report on. */
 export async function getUsers(
   token: string
 ): Promise<{ users: SeedUsers; seedData: UserSeedData }> {

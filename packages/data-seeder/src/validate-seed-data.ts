@@ -8,24 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * Pre-flight validation of a whole set of seed-data, before any of it is
- * written. Pure, and it accumulates every problem rather than stopping at the
- * first, so an operator can correct a spreadsheet in one editing pass.
- *
- * Validation lives here rather than in the country config, which owns the
- * employees spreadsheet and its row numbers: that template is a scaffold each
- * country forks into a separate repository and adopts once by copy, so
- * validation added there would never reach a country that has already forked
- * it. It also cannot see roles, locations or database state, which the
- * cross-referential checks need.
- *
- * The accepted consequence is that no problem cites a line number. Seed-data
- * arrives as parsed objects over HTTP with no row provenance, so an initial
- * user is identified by its position in the array and reported as
- * `initial user <N>`.
- */
 import { EncodedScope, hasScope } from '@opencrvs/commons'
 import { officeExternalId } from './office-external-id'
 import {
@@ -209,7 +191,7 @@ function unparentedNodes(
     }))
 }
 
-function unparsedDocuments({
+function unparsedLists({
   malformedUserList,
   malformedRoleList
 }: SeedData): SeedDataProblem[] {
@@ -434,7 +416,7 @@ function missingConfigurationAdministrator({
 }
 
 /** The schema's own message is the rule. */
-function unparsedRecords({ users }: SeedData): SeedDataProblem[] {
+function unparsedUsers({ users }: SeedData): SeedDataProblem[] {
   return users.flatMap((user, index) =>
     user.malformed === undefined
       ? []
@@ -469,13 +451,13 @@ function brokenHierarchy({
  * it is safe to write. */
 export function validateSeedData(seedData: SeedData): SeedDataProblem[] {
   const problems = [
-    ...unparsedDocuments(seedData),
+    ...unparsedLists(seedData),
     ...invalidPhoneNumberPattern(seedData),
     ...brokenHierarchy(seedData),
     ...unparsedRoles(seedData),
     ...duplicateRoleIds(seedData),
     ...missingConfigurationAdministrator(seedData),
-    ...unparsedRecords(seedData),
+    ...unparsedUsers(seedData),
     ...UNIQUE_USER_FIELDS.flatMap((uniqueField) =>
       duplicatesOf(seedData.users, uniqueField)
     ),
