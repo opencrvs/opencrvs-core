@@ -176,6 +176,10 @@ elasticsearch:
 # - elastic-apm
 monitoring:
   enabled: false
+  logs:
+    retention_days: 30
+  metrics:
+    retention_days: 30
 
 apm_server:
   image:
