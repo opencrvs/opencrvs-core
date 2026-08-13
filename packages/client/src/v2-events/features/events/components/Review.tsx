@@ -291,6 +291,7 @@ function FormReview({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   showValidationErrors = true,
+  includeFieldsVisibleInPreviousForm = false,
   validatorContext,
   anchor
 }: {
@@ -314,13 +315,31 @@ function FormReview({
    * said when the version was captured.
    */
   showValidationErrors?: boolean
+
+  /**
+   * Also render pages and fields that were visible in `previousForm` but are
+   * not in `form`. Visibility is computed from the form's own values, so a
+   * conditional that has since turned a field off would otherwise remove the
+   * row entirely and hide the very change being looked for.
+   *
+   * Off by default: the correction, declare, edit, print and dedup flows all
+   * pass `previousForm` and expect visibility to follow the current values.
+   */
+  includeFieldsVisibleInPreviousForm?: boolean
   /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
   anchor: PlainDate
 }) {
   const intl = useIntl()
 
+  const isVisibleNowOrBefore = (
+    check: (values: EventState) => boolean
+  ): boolean =>
+    check(form) || (includeFieldsVisibleInPreviousForm && check(previousForm))
+
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form, validatorContext)
+    isVisibleNowOrBefore((values) =>
+      isPageVisible(page, values, validatorContext)
+    )
   )
 
   return (
@@ -329,7 +348,9 @@ function FormReview({
         {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) =>
-              isFieldDisplayedOnReview(field, form, validatorContext)
+              isVisibleNowOrBefore((values) =>
+                isFieldDisplayedOnReview(field, values, validatorContext)
+              )
             )
             .map((field) => {
               const value = form[field.id]
@@ -504,6 +525,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   showValidationErrors,
+  includeFieldsVisibleInPreviousForm,
   form,
   validatorContext,
   annotation,
@@ -543,6 +565,8 @@ function ReviewComponent({
   previousFormValues?: EventState
   /** See FormReview. Defaults to on, which is what every action flow needs. */
   showValidationErrors?: boolean
+  /** See FormReview — only the Record tab's version comparison sets this. */
+  includeFieldsVisibleInPreviousForm?: boolean
   onEdit: ({
     pageId,
     fieldId,
@@ -602,6 +626,9 @@ function ReviewComponent({
             anchor={anchor}
             form={form}
             formConfig={formConfig}
+            includeFieldsVisibleInPreviousForm={
+              includeFieldsVisibleInPreviousForm
+            }
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
             paddedBody={content === undefined}

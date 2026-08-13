@@ -69,6 +69,123 @@ const modifiedDraft = generateEventDraftDocument({
   rng
 })
 
+/*
+ * A notification, then a declaration that changed the applicant's surname.
+ * The notification keeps its own data — editing a notification emits EDIT plus
+ * a fresh DECLARE and leaves the NOTIFY untouched — so the two versions differ
+ * and the comparison has something to show.
+ */
+const changedEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.NOTIFY,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Mwansa' }
+      }
+    },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Banda' }
+      }
+    }
+  ],
+  rng: createPrng(305)
+})
+
+function offlineHandlers(document: typeof eventDocument) {
+  return {
+    workqueues: [
+      tRPCMsw.workqueue.config.list.query(() => generateWorkqueues()),
+      tRPCMsw.workqueue.count.query((input) =>
+        input.reduce((acc, { slug }) => ({ ...acc, [slug]: 7 }), {})
+      )
+    ],
+    event: [
+      tRPCMsw.event.get.query(() => document),
+      tRPCMsw.event.search.query(() => ({
+        total: 1,
+        results: [getCurrentEventState(document, tennisClubMembershipEvent)]
+      }))
+    ],
+    drafts: [tRPCMsw.event.draft.list.query(() => [])],
+    user: [
+      tRPCMsw.user.list.query(() => [generator.user.localRegistrar().summary]),
+      tRPCMsw.user.get.query(() => generator.user.localRegistrar().v2)
+    ]
+  }
+}
+
+/**
+ * The declaration differs from the notification before it, so the toggle is
+ * offered and names the number of changes.
+ */
+export const OffersToShowChanges: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText(/Show 1 change/)).toBeVisible()
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: changedEventDocument.id
+      })
+    },
+    offline: { events: [changedEventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(changedEventDocument) }
+  }
+}
+
+/** With the toggle on, the superseded value is shown struck through. */
+export const ShowsWhatChanged: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const row = await canvas.findByTestId('row-value-applicant.name')
+    // The value it replaced, and the value that replaced it.
+    await expect(row).toHaveTextContent('Mwansa')
+    await expect(row).toHaveTextContent('Banda')
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: `${ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: changedEventDocument.id
+      })}?changes=true`
+    },
+    offline: { events: [changedEventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(changedEventDocument) }
+  }
+}
+
+/*
+ * REGISTER never alters declaration data — the combined flows send a DECLARE
+ * first — so a first registration always matches the declaration before it and
+ * the toggle is not offered.
+ */
+export const NoChangesOnAFirstRegistration: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await canvas.findByText("Applicant's name")
+    await expect(canvas.queryByText(/Show \d+ change/)).toBeNull()
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: eventDocument.id
+      })
+    },
+    offline: { events: [eventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(eventDocument) }
+  }
+}
+
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)

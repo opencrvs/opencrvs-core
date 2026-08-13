@@ -28,8 +28,15 @@ interface UseRecordVersions {
   /** Undefined only when there are no versions at all. */
   selected?: RecordVersion
   selectedState: EventIndex
+  /** The version immediately before the selected one. Absent on the first. */
+  previous?: RecordVersion
+  /** State at `previous`, for comparing against. Absent on the first version. */
+  previousState?: EventIndex
   isLatest: boolean
   selectVersion: (actionId: UUID) => void
+  /** Whether the view marks up what changed from `previous`. */
+  showChanges: boolean
+  setShowChanges: (show: boolean) => void
 }
 
 /**
@@ -48,15 +55,25 @@ export function useRecordVersions({
   /** Used when the record has no selectable version yet. */
   currentState: EventIndex
 }): UseRecordVersions {
-  const [{ version }, setSearchParams] = useTypedSearchParams(
+  const [{ version, changes }, setSearchParams] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EVENT.RECORD
   )
 
   const versions = useMemo(() => getRecordVersions(event), [event])
 
   const latest = versions.at(-1)
-  const selected =
-    versions.find(({ actionId }) => actionId === version) ?? latest
+  const selectedIndex = versions.findIndex(
+    ({ actionId }) => actionId === version
+  )
+  const selected = versions[selectedIndex] ?? latest
+
+  /*
+   * Compare against the previous *version*, never the previous action. A
+   * record's first declaration is preceded by CREATE, which carries an empty
+   * declaration — diffing against it would report every field as an addition.
+   * CREATE is not a version, so indexing into `versions` avoids that.
+   */
+  const previous = selectedIndex > 0 ? versions[selectedIndex - 1] : undefined
 
   const selectedState = useMemo(
     () =>
@@ -66,9 +83,35 @@ export function useRecordVersions({
     [event, configuration, selected, currentState]
   )
 
+  const previousState = useMemo(
+    () =>
+      previous
+        ? getEventStateAtVersion(event, configuration, previous.actionId)
+        : undefined,
+    [event, configuration, previous]
+  )
+
+  const setShowChanges = useCallback(
+    (show: boolean) =>
+      setSearchParams((current) => ({
+        ...current,
+        changes: show || undefined
+      })),
+    [setSearchParams]
+  )
+
   const selectVersion = useCallback(
     (actionId: UUID) =>
-      setSearchParams((previous) => ({ ...previous, version: actionId })),
+      /*
+       * Selecting a version drops the comparison. The new version may have no
+       * previous version or no changes, in which case there is nothing to show
+       * and the toggle would not be offered.
+       */
+      setSearchParams((current) => ({
+        ...current,
+        version: actionId,
+        changes: undefined
+      })),
     [setSearchParams]
   )
 
@@ -76,7 +119,11 @@ export function useRecordVersions({
     versions,
     selected,
     selectedState,
+    previous,
+    previousState,
     isLatest: !latest || selected?.actionId === latest.actionId,
-    selectVersion
+    selectVersion,
+    showChanges: Boolean(changes && previous),
+    setShowChanges
   }
 }

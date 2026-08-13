@@ -1559,6 +1559,8 @@ v2.event.record.alert.title.earlier,Record alert title on a version that is neit
 v2.event.record.alert.title.latest,Record alert title on the newest of several versions,You are viewing the latest version,
 v2.event.record.alert.title.only,Record alert title when the form has a single version,This is the only version,
 v2.event.record.alert.title.original,Record alert title on the oldest of several versions,You are viewing the original version,
+v2.event.record.changes.hide,Button that stops marking up changes from the previous version,Hide changes,
+v2.event.record.changes.show,Button that marks up what changed from the previous version of the record,"{count, plural, one {Show # change} other {Show # changes}}",
 v2.event.record.offline.description,Message shown on the Record page when the user is offline and the record has not been cached locally,This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.,Cet enregistrement n’a pas encore été téléchargé et ne peut donc pas être ouvert hors ligne. Veuillez vous reconnecter à Internet pour le consulter.
 v2.event.record.offline.title,Title shown on the Record page when the user is offline,No connection,Pas de connexion
 v2.event.record.title,Heading of the card on the Record tab,Record,
