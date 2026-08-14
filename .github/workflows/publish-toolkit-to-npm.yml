@@ -140,11 +140,6 @@ jobs:
         run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit/create-countryconfig
 
-      # @opencrvs/mosip is the countryconfig-facing library for the MOSIP
-      # integration (packages/mosip). It used to be released from the separate
-      # opencrvs/mosip repository against a pinned @opencrvs/toolkit release
-      # candidate; now it shares core's version and is published alongside the
-      # toolkit it is built against.
       - name: Check if mosip version exists on npm
         id: check-mosip-version
         run: |
