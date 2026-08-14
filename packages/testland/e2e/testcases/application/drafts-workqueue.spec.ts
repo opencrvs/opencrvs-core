@@ -77,9 +77,7 @@ test.describe.serial('1: Validate my draft tab', () => {
   test('1.4 Record has "Update" -CTA', async () => {
     await clickWorkqueueActionByTitle(page, formattedName, 'Update')
 
-    await expect(page.getByTestId('row-value-child.name')).toHaveText(
-      formattedName
-    )
+    await expect(page.getByTestId('child.name-value')).toHaveText(formattedName)
     await expect(page.getByTestId('change-button-child.name')).toBeVisible()
   })
 
