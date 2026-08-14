@@ -28,7 +28,7 @@ import {
 } from '@events/tests/utils'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
-import { EventNotFoundError } from '../../service/events/events'
+import { EventAccessDeniedError } from '../../service/events/events'
 
 test('Check scopes against event.getDuplicates', async () => {
   await createIndex(
@@ -122,7 +122,7 @@ test('Check scopes against event.getDuplicates', async () => {
 
         result = { success: true, event: eventFetchedAsAdmin }
       } catch (error) {
-        if (error instanceof EventNotFoundError) {
+        if (error instanceof EventAccessDeniedError) {
           // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
           const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
             eventId

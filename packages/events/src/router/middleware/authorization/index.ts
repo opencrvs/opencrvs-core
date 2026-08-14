@@ -44,7 +44,10 @@ import {
   CreateUserInput,
   canAccessUserWithScope
 } from '@opencrvs/commons'
-import { EventNotFoundError, getEventById } from '@events/service/events/events'
+import {
+  EventAccessDeniedError,
+  getEventById
+} from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { AsyncActionInput } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
@@ -336,7 +339,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     )
 
     if (!hasAccess) {
-      throw new EventNotFoundError(input.eventId)
+      throw new EventAccessDeniedError(input.eventId)
     }
 
     return next({

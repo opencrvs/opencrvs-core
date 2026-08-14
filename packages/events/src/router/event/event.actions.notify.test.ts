@@ -31,7 +31,7 @@ import {
   TEST_SYSTEM_ID_2
 } from '@events/tests/utils'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
-import { EventNotFoundError } from '@events/service/events/events'
+import { EventAccessDeniedError } from '@events/service/events/events'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -85,8 +85,8 @@ describe('event.actions.notify', () => {
         notifyClient.event.actions.notify.request(
           generator.event.actions.notify(event.id)
         )
-        // User has record.notify scope, but not for the correct event type, so should get not found to prevent information leakage about the existence of the event
-      ).rejects.toMatchObject(new EventNotFoundError(event.id))
+        // User has record.notify scope, but not for the correct event type, so access is denied
+      ).rejects.toMatchObject(new EventAccessDeniedError(event.id))
     })
 
     test('allows access with API scope with correct event type', async () => {

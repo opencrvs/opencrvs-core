@@ -46,7 +46,7 @@ import { SystemContext, UserContext } from '@opencrvs/commons'
 import { t, tService } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import { getClient } from '@events/storage/postgres/events'
-import { EventNotFoundError } from '@events/service/events/events'
+import { EventAccessDeniedError } from '@events/service/events/events'
 import { internalRouter } from '@events/router/internalRouter'
 import { initialisationRouter } from '@events/router/initialisation'
 import { getLocations } from '../service/locations/locations'
@@ -1102,7 +1102,7 @@ export async function attemptScopedAction(
     const event = await action(testClient)
     return { success: true, event }
   } catch (error) {
-    if (error instanceof EventNotFoundError) {
+    if (error instanceof EventAccessDeniedError) {
       // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
       const event = await clientReadingAllEvents.event.get({ eventId })
       return { success: false, event }
