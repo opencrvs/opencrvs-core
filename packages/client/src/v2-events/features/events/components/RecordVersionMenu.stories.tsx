@@ -129,7 +129,7 @@ export const RegistrationWithThreeVersions: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId('record-version-select'))
+    await userEvent.click(await canvas.findByTestId('record-version-select'))
     await expect(
       await canvas.findByTestId('record-version-option-r3')
     ).toHaveTextContent('Latest')
@@ -160,7 +160,7 @@ export const OneVersionPerForm: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByTestId('record-version-select'))
+    await userEvent.click(await canvas.findByTestId('record-version-select'))
     // No form expands, because none has more than one version.
     await expect(
       await canvas.findByTestId('record-version-form-REGISTRATION')
