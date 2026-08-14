@@ -74,33 +74,22 @@ export function useRecordVersions({
     requestedIndex >= 0 ? requestedIndex : versions.length - 1
 
   /*
-   * `at` rather than an index, because a record with no versions yet leaves
-   * `selectedIndex` at -1 and there is genuinely nothing to select. Indexing
-   * types that away as a `RecordVersion`, which then makes every guard
-   * downstream look redundant when it is the one thing holding the empty case
-   * up.
+   * `at` rather than an index: a record with no versions leaves
+   * `selectedIndex` at -1, and indexing would type that away as a
+   * `RecordVersion`, making the guards downstream look redundant.
    */
   const selected = versions.at(selectedIndex)
 
   /*
-   * Compare against the previous version *of the same form*.
+   * The previous version *of the same form*. Crossing forms describes no
+   * change anyone made: a notification is partial by design, so its difference
+   * from the first declaration is the record being completed rather than
+   * edited, and a first registration carries what the declaration before it
+   * carried.
    *
-   * Crossing forms does not describe a change anyone made. A notification is
-   * deliberately partial — it asks only what its sender's role is shown — so
-   * the difference between it and the first declaration is the record being
-   * completed, not edited. A first registration carries exactly what the
-   * declaration before it carried, since REGISTER never alters declaration
-   * data. In both cases the first version of a form is that form being
-   * opened, and there is nothing yet to compare it against.
-   *
-   * It also keeps the labels honest: what a declaration shows is the edits
-   * made to that declaration, and a registration the correction made to that
-   * registration.
-   *
-   * Comparison is against a previous *version*, never a previous action — a
-   * record's first declaration is preceded by CREATE, which carries an empty
-   * declaration, and diffing against that would report every field as an
-   * addition. CREATE is not a version, so working from `versions` avoids it.
+   * A version, never the previous action — CREATE precedes the first
+   * declaration and carries an empty declaration, which would read as every
+   * field being added.
    */
   const previous = versions
     .slice(0, Math.max(selectedIndex, 0))

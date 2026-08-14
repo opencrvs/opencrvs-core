@@ -278,14 +278,9 @@ export function RecordVersionAlert({
   const isRegistration = selected.form === RecordForm.REGISTRATION
 
   /*
-   * No count. Between two consecutive versions there is exactly one edit or
-   * one correction, so a number here would count changed fields while the
-   * words name events — "2 corrections" for one correction touching two
-   * fields would read as two correction requests.
-   *
-   * A checkbox rather than a button: the comparison is a state you leave on
-   * or off, not something you do once. The label stays put and the check
-   * carries whether it is on.
+   * No count: between two consecutive versions there is exactly one edit or
+   * correction, so a number would count changed fields while the words name
+   * events — "2 corrections" for one correction touching two fields.
    */
   const changeLabel = intl.formatMessage(
     isRegistration ? messages.showCorrection : messages.showEdits

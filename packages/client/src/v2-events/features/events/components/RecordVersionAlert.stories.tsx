@@ -234,7 +234,7 @@ export const OffersToShowCorrections: Story = {
   }
 }
 
-/** With the comparison on, the label stays and the box is checked. */
+/** With the comparison on, the label stays and the control reads as pressed. */
 export const CorrectionsShown: Story = {
   args: {
     versions: correctedTwice,
