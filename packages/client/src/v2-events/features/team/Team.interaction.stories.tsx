@@ -136,7 +136,7 @@ export const CancelDiscardsEdits: Story = {
 
     await step('Wait for review page to load', async () => {
       await canvas.findByText('Kennedy Mweene', {
-        selector: '[data-testid="row-value-name"]',
+        selector: '[data-testid="name-value"]',
         exact: false
       })
     })
@@ -187,7 +187,7 @@ export const CancelDiscardsEdits: Story = {
       'Verify email was not persisted (shows original value)',
       async () => {
         await canvas.findByText('kalushabwalya1.7@gmail.com', {
-          selector: '[data-testid="row-value-email"]',
+          selector: '[data-testid="email-value"]',
           exact: false
         })
         const backButton = await canvas.findByTestId('crcl-btn')
@@ -220,7 +220,7 @@ export const Navigation: Story = {
 
     await step("Verify Felix's review page is shown", async () => {
       await canvas.findByText('Felix Katongo', {
-        selector: '[data-testid="row-value-name"]',
+        selector: '[data-testid="name-value"]',
         exact: false
       })
     })
@@ -247,7 +247,7 @@ export const Navigation: Story = {
 
     await step("Verify Kennedy's review page is shown", async () => {
       await canvas.findByText('Kennedy Mweene', {
-        selector: '[data-testid="row-value-name"]',
+        selector: '[data-testid="name-value"]',
         exact: false
       })
       const backButton = await canvas.findByTestId('crcl-btn')

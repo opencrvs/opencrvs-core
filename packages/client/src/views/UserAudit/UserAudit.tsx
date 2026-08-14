@@ -34,7 +34,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { Summary } from '@opencrvs/components/lib/Summary'
+import { List } from '@opencrvs/components/lib/List'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { stringify } from 'qs'
@@ -231,8 +231,8 @@ export const UserAudit = () => {
           size={ContentSize.LARGE}
         >
           <>
-            <Summary>
-              <Summary.Row
+            <List>
+              <List.Item
                 data-testid="office-link"
                 label={intl.formatMessage(userSetupMessages.assignedOffice)}
                 value={
@@ -255,15 +255,15 @@ export const UserAudit = () => {
                   </Link>
                 }
               />
-              <Summary.Row
+              <List.Item
                 label={intl.formatMessage(userFormMessages.labelRole)}
                 value={userRole}
               />
-              <Summary.Row
+              <List.Item
                 label={intl.formatMessage(userFormMessages.userDevice)}
                 value={user.device === null ? 'N/A' : user.device}
               />
-            </Summary>
+            </List>
 
             {user.id && (
               <UserAuditHistory userId={user.id} userName={userName} />

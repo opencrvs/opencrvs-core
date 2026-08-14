@@ -205,11 +205,11 @@ test.describe.serial('Correct record - Change ages', () => {
       .click()
 
     await expect(
-      page.getByTestId('row-value-informant.age').getByRole('deletion')
+      page.getByTestId('informant.age-value').getByRole('deletion')
     ).toHaveText(informantAgeBefore)
 
     await expect(
-      page.getByTestId('row-value-informant.age').getByText(informantAgeAfter)
+      page.getByTestId('informant.age-value').getByText(informantAgeAfter)
     ).toBeVisible()
   })
 
@@ -220,7 +220,7 @@ test.describe.serial('Correct record - Change ages', () => {
     await page
       .getByRole('button', { name: 'Go to review', exact: true })
       .click()
-    await expect(page.getByTestId('row-value-mother.address')).toHaveText(
+    await expect(page.getByTestId('mother.address-value')).toHaveText(
       'State is required'
     )
 
@@ -230,7 +230,7 @@ test.describe.serial('Correct record - Change ages', () => {
     await page
       .getByRole('button', { name: 'Go to review', exact: true })
       .click()
-    await expect(page.getByTestId('row-value-mother.address')).toHaveText(
+    await expect(page.getByTestId('mother.address-value')).toHaveText(
       'District is required'
     )
 
@@ -240,7 +240,7 @@ test.describe.serial('Correct record - Change ages', () => {
       .getByRole('button', { name: 'Go to review', exact: true })
       .click()
 
-    await expect(page.getByTestId('row-value-mother.address')).toHaveText(
+    await expect(page.getByTestId('mother.address-value')).toHaveText(
       'FarajalandCentralIbomboKlowEthiopiaOromiaWoreda'
     )
   })
@@ -255,11 +255,11 @@ test.describe.serial('Correct record - Change ages', () => {
       .click()
 
     await expect(
-      page.getByTestId('row-value-mother.age').getByRole('deletion')
+      page.getByTestId('mother.age-value').getByRole('deletion')
     ).toHaveText(motherAgeBefore)
 
     await expect(
-      page.getByTestId('row-value-mother.age').getByText(motherAgeAfter)
+      page.getByTestId('mother.age-value').getByText(motherAgeAfter)
     ).toBeVisible()
   })
 
@@ -348,11 +348,11 @@ test.describe.serial('Correct record - Change ages', () => {
     await page.getByRole('button', { name: 'Record', exact: true }).click()
 
     await expect(
-      page.getByTestId('row-value-informant.age').getByText(informantAgeAfter)
+      page.getByTestId('informant.age-value').getByText(informantAgeAfter)
     ).toBeVisible()
 
     await expect(
-      page.getByTestId('row-value-mother.age').getByText(motherAgeAfter)
+      page.getByTestId('mother.age-value').getByText(motherAgeAfter)
     ).toBeVisible()
   })
 })

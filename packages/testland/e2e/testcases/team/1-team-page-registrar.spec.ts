@@ -45,14 +45,14 @@ test.describe.serial('1. Team Page -1', () => {
     ]
 
     test('1.1.1 Verify Team Members, Roles and their statuses', async () => {
-      const rows = page.locator('#user_list tr:has(td)')
+      const rows = page.locator('#user_list tbody tr')
       await expect(rows).toHaveCount(team.length)
 
       for (let i = 0; i < team.length; i++) {
-        const cells = rows.nth(i).locator('td')
-        await expect(cells.nth(1)).toHaveText(team[i].name)
-        await expect(cells.nth(2)).toHaveText(team[i].role)
-        await expect(cells.nth(3)).toHaveText('Active')
+        const row = rows.nth(i)
+        await expect(row.getByTestId(/-label$/)).toHaveText(team[i].name)
+        await expect(row.getByTestId(/-value$/)).toHaveText(team[i].role)
+        await expect(row.getByTestId(/-actions$/)).toHaveText('Active')
       }
     })
   })

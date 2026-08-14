@@ -412,7 +412,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
     await adminPage.locator('#sub-page-header-munu-button-dropdownMenu').click()
     await adminPage.getByText('Edit details').click()
     await expect(
-      adminPage.getByTestId('row-value-primaryOfficeId')
+      adminPage.getByTestId('primaryOfficeId-value')
     ).toContainText(officeName)
 
     // The user themselves can still log in — no forced lockout as a

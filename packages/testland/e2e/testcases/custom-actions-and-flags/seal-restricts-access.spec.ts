@@ -14,7 +14,8 @@ import {
   login,
   REDACTED_RECORD_TITLE,
   searchFromSearchBar,
-  uploadImage
+  uploadImage,
+  waitForActionResponses
 } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { ensureAssignedToUser, selectAction } from '../../utils'
@@ -26,10 +27,11 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
 }) => {
   const page = await browser.newPage()
   let childName: string
-
+  let eventId: string
   await test.step('Registrar (k.mweene) registers a birth record', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
     const res = await createDeclaration(token)
+    eventId = res.eventId
     childName = formatV2ChildName(res.declaration as Declaration)
   })
 
@@ -37,6 +39,7 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
     await login(page, CREDENTIALS.REGISTRAR_GENERAL)
     await searchFromSearchBar(page, childName)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_GENERAL)
+
     await selectAction(page, 'Seal')
 
     await expect(page.getByRole('button', { name: 'Confirm' })).toBeDisabled()
@@ -68,6 +71,45 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
     await expect(
       page.getByRole('button', { name: 'Record', exact: true })
     ).toBeVisible()
+
+    const overviewTitle = await page.locator('#content-name').textContent()
+    expect(overviewTitle).toEqual(REDACTED_RECORD_TITLE)
+
+    const pageTitle = await page.locator('#page-title h1').textContent()
+
+    expect(pageTitle).toEqual(REDACTED_RECORD_TITLE)
+  })
+
+  await test.step('Redacted fields are immediately updated based on assignment status', async () => {
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_GENERAL)
+
+    const overviewTitleAssigned = await page
+      .locator('#content-name')
+      .textContent()
+    expect(overviewTitleAssigned).toEqual(childName)
+
+    const pageTitleAssigned = await page.locator('#page-title h1').textContent()
+
+    expect(pageTitleAssigned).toEqual(childName)
+
+    await selectAction(page, 'Unassign')
+    await waitForActionResponses(
+      page,
+      ['event.actions.assignment.unassign'],
+      async () => await page.getByRole('button', { name: 'Unassign' }).click(),
+      eventId
+    )
+
+    const overviewTitleUnssigned = await page
+      .locator('#content-name')
+      .textContent()
+    expect(overviewTitleUnssigned).toEqual(REDACTED_RECORD_TITLE)
+
+    const pageTitleUnassigned = await page
+      .locator('#page-title h1')
+      .textContent()
+
+    expect(pageTitleUnassigned).toEqual(REDACTED_RECORD_TITLE)
   })
 
   await test.step('Registrar (k.mweene) can still find the sealed record via search', async () => {
