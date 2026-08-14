@@ -18,17 +18,9 @@ import { createClient } from '@opencrvs/toolkit/api'
 export const REQUIRED_VALIDATION_ERROR = 'Required'
 
 /**
- * Assert that the Record tab does not show a field at all.
- *
- * A notification is a deliberately partial form: its sender is only asked the
- * questions their role is shown, so the fields they were never asked are not
- * omissions. The Record tab therefore renders only what the notification
- * captured, and a field with no value has no row rather than a row reading
- * `Required`.
- *
- * This is about reading a record, not filling one. The declare and edit review
- * pages still mark every unfilled mandatory field, because there the reader is
- * the one who has to go and complete it.
+ * A notification's Record tab renders only the fields it captured, so a field
+ * with no value has no row rather than a row reading `Required`. The declare
+ * and edit review pages still mark every unfilled mandatory field.
  */
 export async function expectFieldNotCaptured(page: Page, fieldId: string) {
   await expect(page.getByTestId(`${fieldId}-value`)).toHaveCount(0)

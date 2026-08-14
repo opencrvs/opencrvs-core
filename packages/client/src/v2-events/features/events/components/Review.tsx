@@ -301,14 +301,9 @@ function FormReview({
   /**
    * Whether a field that fails validation reports it in place of its value.
    *
-   * A validation message tells the reader to go and fill something in, so it
-   * belongs where they can: on the version the record is currently at. There
-   * it explains what is holding up the next action. On a superseded version
-   * there is nothing to act on, and the fields it lacks were either filled
-   * later or never wanted — a notification needs less than a declaration and
-   * would otherwise read as a deficient one. A historical version would also
-   * be judged against whatever validation says today rather than what it said
-   * when the version was captured.
+   * Off for a superseded version: there is nothing there to act on, and it
+   * would be judged against what validation says today rather than what it
+   * said when the version was captured.
    */
   showValidationErrors?: boolean
   /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */

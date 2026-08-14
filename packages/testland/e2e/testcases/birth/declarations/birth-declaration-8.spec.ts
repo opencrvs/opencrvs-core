@@ -295,7 +295,7 @@ test.describe.serial('8. Birth declaration case - 8', () => {
 
     test('8.2.2 Verify information on preview page', async () => {
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's First Name
        * - Child's Family Name
        */
@@ -306,19 +306,19 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       )
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's Gender
        */
       await expectFieldNotCaptured(page, 'child.gender')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's date of birth
        */
       await expectFieldNotCaptured(page, 'child.dob')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
@@ -336,38 +336,38 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       ).toContainText(declaration.informant.relation)
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Informant's Email
        */
       await expectFieldNotCaptured(page, 'informant.email')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Informant's First Name
        * - Informant's Family Name
        */
       await expectFieldNotCaptured(page, 'informant.name')
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Informant's date of birth
        */
       await expectFieldNotCaptured(page, 'informant.dob')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Informant's Type of Id
        */
       await expectFieldNotCaptured(page, 'informant.idType')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Mother's First Name
        * - Mother's Family Name
        */
       await expectFieldNotCaptured(page, 'mother.name')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Mother's date of birth
        */
       await expectFieldNotCaptured(page, 'mother.dob')
@@ -381,26 +381,26 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       ).toContainText(declaration.mother.maritalStatus)
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Mother's Type of Id
        */
       await expectFieldNotCaptured(page, 'mother.idType')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Father's First Name
        * - Father's Family Name
        */
       await expectFieldNotCaptured(page, 'father.name')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Father's date of birth
        */
       await expectFieldNotCaptured(page, 'father.dob')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Father's Type of Id
        */
       await expectFieldNotCaptured(page, 'father.idType')

@@ -116,10 +116,7 @@ test('Cleared field values are removed after editing and re-notifying a declarat
     await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
     await switchEventTab(page, 'Record')
 
-    // The cleared values must not persist. A notification's Record tab shows
-    // only the fields it captured, so clearing a field removes its row
-    // outright rather than leaving an empty one — which is the strongest form
-    // of "the old value is no longer shown".
+    // Clearing a field removes its row outright, so the old value cannot show.
     await expectFieldNotCaptured(page, 'child.dob')
     await expectFieldNotCaptured(page, 'child.name')
     await expectFieldNotCaptured(page, 'child.weightAtBirth')

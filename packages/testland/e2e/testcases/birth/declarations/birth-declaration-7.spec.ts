@@ -247,19 +247,19 @@ test.describe.serial('7. Birth declaration case - 7', () => {
       )
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's Gender
        */
       await expectFieldNotCaptured(page, 'child.gender')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's date of birth
        */
       await expectFieldNotCaptured(page, 'child.dob')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
@@ -274,13 +274,13 @@ test.describe.serial('7. Birth declaration case - 7', () => {
       ).toContainText(declaration.informantType)
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Informant's Email
        */
       await expectFieldNotCaptured(page, 'informant.email')
 
       /*
-       * Expected result: should not show, the notification never captured it
+       * Expected result: not captured, so not shown
        * - Informant's First Name
        * - Informant's Family Name
        */

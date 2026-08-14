@@ -125,19 +125,10 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   /*
    * A notification shows only the fields it captured.
    *
-   * A notification is configured by hiding questions from the role that sends
-   * it — a user holding only record.notify is never asked most of the
-   * declaration. That hiding cannot be replayed here: conditionals evaluate
-   * against the reader's scopes, not the notifier's, so a registrar opening
-   * the record would see the whole declaration with gaps where the questions
-   * were never put.
-   *
-   * Filtering on value says the same thing from the record itself, and does
-   * not depend on role configuration that changes over time: what a
-   * notification contains is what it captured. The distinction it cannot draw
-   * — never asked versus asked and left blank — has no consequence for a
-   * notification, which is why this is not applied to the other forms, where
-   * an empty optional field means the question was put and not answered.
+   * Filtering on value rather than replaying the notifier's conditionals,
+   * because conditionals evaluate against the reader's scopes, not the
+   * notifier's — a registrar would see every question the notifier was never
+   * asked.
    */
   const fullFormConfig = getDeclaration(configuration)
   const formConfig = useMemo(() => {
