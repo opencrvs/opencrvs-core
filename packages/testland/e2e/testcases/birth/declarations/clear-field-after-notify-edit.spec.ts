@@ -19,7 +19,7 @@ import {
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '../../../constants'
 import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { fillDate } from '../helpers'
+import { expectFieldNotCaptured, fillDate } from '../helpers'
 import { openRecordByTitle } from '../../print-certificate/birth/helpers'
 
 test('Cleared field values are removed after editing and re-notifying a declaration', async ({
@@ -32,8 +32,6 @@ test('Cleared field values are removed after editing and re-notifying a declarat
   const formattedChildName = formatName(childName)
   const childDob = { dd: '12', mm: '03', yyyy: '2015' }
   const childWeight = '3.5'
-  let dobValueBefore = ''
-  let nameValueBefore = ''
   let recordUrl = ''
 
   await test.step('Login as Community Leader', async () => {
@@ -70,13 +68,12 @@ test('Cleared field values are removed after editing and re-notifying a declarat
     await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
     await switchEventTab(page, 'Record')
 
-    const dob = page.getByTestId('child.dob-value')
-    await expect(dob).toContainText(childDob.yyyy)
-    dobValueBefore = (await dob.innerText()).trim()
-
-    const name = page.getByTestId('child.name-value')
-    await expect(name).toContainText(childName.familyName)
-    nameValueBefore = (await name.innerText()).trim()
+    await expect(page.getByTestId('child.dob-value')).toContainText(
+      childDob.yyyy
+    )
+    await expect(page.getByTestId('child.name-value')).toContainText(
+      childName.familyName
+    )
   })
 
   await test.step('Edit the notification and clear the date of birth, the name and the weight', async () => {
@@ -119,16 +116,12 @@ test('Cleared field values are removed after editing and re-notifying a declarat
     await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
     await switchEventTab(page, 'Record')
 
-    // The cleared values must not persist: neither the date of birth nor the
-    // name row may still display the value entered before the edit.
-    await expect(page.getByTestId('child.dob-value')).not.toHaveText(
-      dobValueBefore
-    )
-    await expect(page.getByTestId('child.name-value')).not.toHaveText(
-      nameValueBefore
-    )
-    await expect(
-      page.getByTestId('child.weightAtBirth-value')
-    ).not.toContainText(childWeight)
+    // The cleared values must not persist. A notification's Record tab shows
+    // only the fields it captured, so clearing a field removes its row
+    // outright rather than leaving an empty one — which is the strongest form
+    // of "the old value is no longer shown".
+    await expectFieldNotCaptured(page, 'child.dob')
+    await expectFieldNotCaptured(page, 'child.name')
+    await expectFieldNotCaptured(page, 'child.weightAtBirth')
   })
 })

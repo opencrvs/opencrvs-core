@@ -21,7 +21,7 @@ import {
 } from '../../../helpers'
 import { CREDENTIALS } from '../../../constants'
 import { faker } from '@faker-js/faker'
-import { REQUIRED_VALIDATION_ERROR } from '../helpers'
+import { expectFieldNotCaptured, REQUIRED_VALIDATION_ERROR } from '../helpers'
 import { ensureAssignedToUser } from '../../../utils'
 import { openRecordByTitle } from '../../print-certificate/birth/helpers'
 
@@ -295,7 +295,7 @@ test.describe.serial('8. Birth declaration case - 8', () => {
 
     test('8.2.2 Verify information on preview page', async () => {
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Child's First Name
        * - Child's Family Name
        */
@@ -306,29 +306,23 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Child's Gender
        */
-      await expect(page.getByTestId('child.gender-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'child.gender')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Child's date of birth
        */
-      await expect(page.getByTestId('child.dob-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'child.dob')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
-      await expect(
-        page.getByTestId('child.placeOfBirth-value')
-      ).toContainText(REQUIRED_VALIDATION_ERROR)
+      await expectFieldNotCaptured(page, 'child.placeOfBirth')
 
       /*
        * Expected result: should include
@@ -342,53 +336,41 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       ).toContainText(declaration.informant.relation)
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Informant's Email
        */
-      await expect(page.getByTestId('informant.email-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'informant.email')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Informant's First Name
        * - Informant's Family Name
        */
-      await expect(page.getByTestId('informant.name-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'informant.name')
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Informant's date of birth
        */
-      await expect(page.getByTestId('informant.dob-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'informant.dob')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Informant's Type of Id
        */
-      await expect(
-        page.getByTestId('informant.idType-value')
-      ).toContainText(REQUIRED_VALIDATION_ERROR)
+      await expectFieldNotCaptured(page, 'informant.idType')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Mother's First Name
        * - Mother's Family Name
        */
-      await expect(page.getByTestId('mother.name-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'mother.name')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Mother's date of birth
        */
-      await expect(page.getByTestId('mother.dob-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'mother.dob')
 
       /*
        * Expected result: should include
@@ -399,37 +381,29 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       ).toContainText(declaration.mother.maritalStatus)
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Mother's Type of Id
        */
-      await expect(page.getByTestId('mother.idType-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'mother.idType')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Father's First Name
        * - Father's Family Name
        */
-      await expect(page.getByTestId('father.name-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'father.name')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Father's date of birth
        */
-      await expect(page.getByTestId('father.dob-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'father.dob')
 
       /*
-       * Expected result: should require
+       * Expected result: should not show, the notification never captured it
        * - Father's Type of Id
        */
-      await expect(page.getByTestId('father.idType-value')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectFieldNotCaptured(page, 'father.idType')
 
       /*
        * Expected result: should include
