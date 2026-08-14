@@ -282,6 +282,10 @@ const Line = styled.div<{ $selected?: boolean; $indent?: boolean }>`
     background: ${({ theme, $selected }) =>
       $selected ? theme.colors.primaryLighter : theme.colors.grey100};
   }
+  &:active {
+    background: ${({ theme, $selected }) =>
+      $selected ? theme.colors.primaryLight : theme.colors.grey200};
+  }
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.primary};
     outline-offset: -2px;
