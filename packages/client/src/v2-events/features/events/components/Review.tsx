@@ -141,8 +141,8 @@ const FormData = styled.div<{ $padded?: boolean }>`
   }
 `
 
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
+const ReviewContainter = styled.div<{ $padded?: boolean }>`
+  padding: ${({ $padded }) => ($padded === false ? '0' : '0px 32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
   }
@@ -317,7 +317,7 @@ function FormReview({
 
   return (
     <FormData $padded={paddedBody}>
-      <ReviewContainter>
+      <ReviewContainter $padded={paddedBody}>
         {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) =>
@@ -602,8 +602,8 @@ function ReviewComponent({
 
           {/* edit annotation fields  */}
           {hasAnnotationFieldsToShow && onAnnotationChange && (
-            <FormData>
-              <ReviewContainter>
+            <FormData $padded={content === undefined}>
+              <ReviewContainter $padded={content === undefined}>
                 <DeclarationDataContainer>
                   <Accordion
                     expand={true}
