@@ -203,6 +203,9 @@ const SelectTrigger = styled.button.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
 })<{ popovertarget?: string; dropdownName?: string }>`
+  /* The popover anchors to its trigger, and asChild leaves that to the child. */
+  ${({ dropdownName }) =>
+    dropdownName && `anchor-name: --Dropdown-Anchor-${dropdownName};`}
   display: inline-flex;
   align-items: center;
   gap: 8px;
