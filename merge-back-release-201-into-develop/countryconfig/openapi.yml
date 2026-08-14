@@ -3050,6 +3050,7 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -3329,6 +3330,7 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -4006,6 +4008,7 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9155,6 +9158,7 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9644,6 +9648,7 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -15160,6 +15165,7 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
@@ -15475,6 +15481,7 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
