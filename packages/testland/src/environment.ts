@@ -20,7 +20,6 @@ export const env = cleanEnv(process.env, {
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   SENTRY_DSN: str({ default: undefined }),
-  EMPLOYEES_CSV: str({ default: 'default-employees.csv' }),
   ESIGNET_REDIRECT_URL: url({ devDefault: 'http://localhost:20260/authorize' }),
   OPENID_PROVIDER_CLIENT_ID: str({ devDefault: 'mock-client_id' }),
   OPENID_PROVIDER_CLAIMS: str({
