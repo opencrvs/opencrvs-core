@@ -12,7 +12,7 @@ spec:
     - web
   {{- end }}
   routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && !Path(`/email`) && !Path(`/notification`) && !Path(`/trigger/telemetry`) && !Path(`/dashboards/queries.json`)'
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && !Path(`/email`) && !Path(`/notification`) && !Path(`/dashboards/queries.json`)'
     kind: Rule
     services:
     - name: countryconfig
@@ -21,14 +21,6 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/trigger/telemetry`)'
-    kind: Rule
-    services:
-    - name: countryconfig
-      namespace: {{ .Release.Namespace }}
-      port: {{ .Values.countryconfig.port }}
-    middlewares:
-      - name: block-internal-routes
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/email`)'
     kind: Rule
     services:

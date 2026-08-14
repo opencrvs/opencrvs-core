@@ -11,6 +11,7 @@
 
 import { logger, joinUrl } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import { getAnonymousToken } from '@events/service/auth'
 import { collectTelemetryMetrics, TelemetryMetrics } from './metrics'
 
 /** Metrics map size limits enforced by the telemetry ingest endpoint. */
@@ -59,12 +60,16 @@ export function buildTelemetryReport(
 }
 
 /**
- * POSTs a report to countryconfig's telemetry trigger. Network and server
- * errors are returned rather than thrown so the caller (the daily worker) can
- * decide whether to retry — the stable `reported_at` makes a retry safe.
+ * POSTs a report to countryconfig's telemetry trigger. The `authorization`
+ * header is an OpenCRVS bearer token (issued by the auth service); countryconfig
+ * verifies it with the auth public key it fetches on startup, proving the report
+ * came from a legitimate core service. Network and server errors are returned
+ * rather than thrown so the caller (the daily worker) can decide whether to
+ * retry — the stable `reported_at` makes a retry safe.
  */
 export async function sendTelemetryReport(
-  report: TelemetryReport
+  report: TelemetryReport,
+  authorization: string
 ): Promise<TelemetrySendResult> {
   const entries = Object.keys(report.metrics).length
   if (entries < MIN_METRICS || entries > MAX_METRICS) {
@@ -81,7 +86,8 @@ export async function sendTelemetryReport(
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: authorization
         },
         body: JSON.stringify(report)
       }
@@ -116,9 +122,20 @@ export async function sendTelemetryReport(
 export async function runDailyTelemetry(
   reportedAt: string = startOfUtcDay()
 ): Promise<TelemetrySendResult> {
+  let authorization: string
+  try {
+    authorization = `Bearer ${await getAnonymousToken()}`
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    logger.error(
+      `Telemetry: could not obtain an auth token for ${reportedAt}: ${message}`
+    )
+    return { status: 'error', message }
+  }
+
   const metrics = await collectTelemetryMetrics()
   const report = buildTelemetryReport(metrics, reportedAt)
-  const result = await sendTelemetryReport(report)
+  const result = await sendTelemetryReport(report, authorization)
 
   if (result.status === 'sent') {
     logger.info(`Telemetry: report for ${reportedAt} handed to countryconfig`)

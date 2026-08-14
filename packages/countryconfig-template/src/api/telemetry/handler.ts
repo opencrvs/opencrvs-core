@@ -47,6 +47,18 @@ interface TelemetryReport {
  * is enabled or of the country code / domain / environment reported.
  */
 export async function telemetryHandler(request: Request, h: ResponseToolkit) {
+  // Only accept OpenCRVS *system* tokens (the events service's anonymous
+  // token has userType 'system'). A logged-in user's token is a 'user' token,
+  // so a user cannot submit telemetry with their own credentials — and the
+  // anonymous-token endpoint is not reachable through the public gateway.
+  const credentials = request.auth.credentials as
+    | { userType?: string }
+    | undefined
+  if (credentials?.userType !== 'system') {
+    logger.warn('Telemetry: rejected a request that is not from a system token')
+    return h.response({ error: 'forbidden' }).code(403)
+  }
+
   if (!env.TELEMETRY_ENABLED) {
     logger.info('Telemetry: disabled — not forwarding report')
     return h.response({ status: 'skipped' }).code(200)

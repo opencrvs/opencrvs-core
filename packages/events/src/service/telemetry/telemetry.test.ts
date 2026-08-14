@@ -100,12 +100,14 @@ describe('startOfUtcDay', () => {
 })
 
 describe('sendTelemetryReport', () => {
-  it('posts the report to countryconfig and maps a 2xx to sent', async () => {
+  it('posts the report to countryconfig with a bearer token and maps a 2xx to sent', async () => {
     let capturedBody: unknown = null
+    let capturedAuth: string | null = null
 
     mswServer.use(
       http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
         capturedBody = await request.json()
+        capturedAuth = request.headers.get('authorization')
         return HttpResponse.json({ status: 'forwarded' }, {
           status: 202
         } as HttpResponseInit)
@@ -116,9 +118,10 @@ describe('sendTelemetryReport', () => {
       { 'events.total': 3, 'users.active': 5 },
       '2026-08-13T00:00:00.000Z'
     )
-    const result = await sendTelemetryReport(report)
+    const result = await sendTelemetryReport(report, 'Bearer test-token')
 
     expect(result).toEqual({ status: 'sent' })
+    expect(capturedAuth).toBe('Bearer test-token')
     // core sends only the window, its own version, and the metrics — no
     // country code / domain / environment (countryconfig stamps those).
     expect(capturedBody).toEqual({
@@ -141,7 +144,7 @@ describe('sendTelemetryReport', () => {
       { 'events.total': 3 },
       '2026-08-13T00:00:00.000Z'
     )
-    const result = await sendTelemetryReport(report)
+    const result = await sendTelemetryReport(report, 'Bearer test-token')
     expect(result.status).toBe('error')
     if (result.status === 'error') {
       expect(result.httpStatus).toBe(502)
@@ -156,9 +159,11 @@ describe('runDailyTelemetry', () => {
     let receivedBody:
       | { reported_at: string; metrics: Record<string, unknown> }
       | undefined
+    let receivedAuth: string | null = null
     mswServer.use(
       http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
         receivedBody = (await request.json()) as typeof receivedBody
+        receivedAuth = request.headers.get('authorization')
         return HttpResponse.json({ status: 'forwarded' }, {
           status: 202
         } as HttpResponseInit)
@@ -171,5 +176,7 @@ describe('runDailyTelemetry', () => {
     expect(result.status).toBe('sent')
     expect(receivedBody?.reported_at).toBe(reportedAt)
     expect(receivedBody?.metrics['events.total']).toBeDefined()
+    // the worker fetched an anonymous token (msw handler) and sent it as bearer
+    expect(receivedAuth).toBe('Bearer anon-token')
   })
 })

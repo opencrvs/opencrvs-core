@@ -137,6 +137,9 @@ const handlers = [
     HttpResponse.json({
       access_token: 'some-token'
     })
+  ),
+  http.get(`${env.AUTH_URL}/internal/anonymous-token`, () =>
+    HttpResponse.json({ token: 'anon-token' })
   )
 ]
 

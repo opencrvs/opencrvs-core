@@ -563,10 +563,10 @@ export async function createServer() {
     path: '/trigger/telemetry',
     handler: telemetryHandler,
     options: {
-      // Internal service-to-service call from the events worker, which has no
-      // user token. Blocked from external access by Traefik (see the
-      // countryconfig IngressRoute), like /email and /notification.
-      auth: false,
+      // Authenticated with the default JWT strategy: the events worker sends an
+      // OpenCRVS bearer token (audience includes opencrvs:countryconfig-user),
+      // which is verified against the auth public key fetched on startup — so we
+      // know the report came from a legitimate core service.
       tags: ['api', 'triggers'],
       validate: {
         payload: telemetrySchema
