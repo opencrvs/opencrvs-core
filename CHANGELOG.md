@@ -103,7 +103,7 @@ The events service collects a small daily usage summary (registered/pending decl
 Responsibilities are split so the events service stays unaware of telemetry policy:
 
 - **events service** — collects metrics and `POST`s `{ reported_at, app_version, metrics }` to countryconfig's `POST /trigger/telemetry`, authenticated with an OpenCRVS **system** token from the auth service (its anonymous token). countryconfig verifies the token against the auth public key it fetches on startup and rejects anything that is not a system token, so a logged-in user cannot submit telemetry with their own credentials. The events service has no telemetry configuration of its own.
-- **countryconfig** — the new `/trigger/telemetry` handler decides whether telemetry is enabled (`TELEMETRY_ENABLED`), stamps the instance identity (`country_code`, `domain`, `environment`, `application_name`), and forwards the enriched report to `TELEMETRY_URL` (the status service). Configured via env vars on the countryconfig deployment: `TELEMETRY_ENABLED`, `TELEMETRY_URL`, `COUNTRY_CODE`, and the existing `DOMAIN` / `OPENCRVS_ENVIRONMENT`. Enabled by default in the Helm chart.
+- **countryconfig** — the new `/trigger/telemetry` handler decides whether telemetry is enabled (`TELEMETRY_ENABLED`), stamps the instance identity (`country_code`, `organisation`, `domain`, `environment`, `application_name`), and forwards the enriched report to `TELEMETRY_URL` (the status service). Configured via env vars on the countryconfig deployment: `TELEMETRY_ENABLED`, `TELEMETRY_URL`, `COUNTRY_CODE`, `ENVIRONMENT_NAME` (reported environment), `ORGANISATION` (empty by default), and the existing `DOMAIN`. Enabled by default in the Helm chart.
 
 No telemetry fields are added to `ApplicationConfig`.
 

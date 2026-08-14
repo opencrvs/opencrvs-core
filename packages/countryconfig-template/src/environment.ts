@@ -38,5 +38,13 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CODE: str({
     default: 'FAR',
     desc: 'ISO-style country code of this instance, reported with telemetry.'
+  }),
+  ENVIRONMENT_NAME: str({
+    default: 'development',
+    desc: 'Environment name (e.g. "production", "staging") reported as the telemetry environment.'
+  }),
+  ORGANISATION: str({
+    default: '',
+    desc: 'Organisation running this instance, reported with telemetry. Empty by default.'
   })
 })
