@@ -386,7 +386,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's name
          */
-        await expect(page.getByTestId('row-value-deceased.name')).toContainText(
+        await expect(page.getByTestId('deceased.name-value')).toContainText(
           declaration.deceased.name.firstname +
             ' ' +
             declaration.deceased.name.surname
@@ -409,7 +409,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's gender
          */
         await expect(
-          page.getByTestId('row-value-deceased.gender')
+          page.getByTestId('deceased.gender-value')
         ).toContainText(declaration.deceased.gender)
       })
 
@@ -427,7 +427,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's birthday
          */
-        await expect(page.getByTestId('row-value-deceased.dob')).toContainText(
+        await expect(page.getByTestId('deceased.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.deceased.dob)
         )
       })
@@ -449,7 +449,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's place of birth
          */
         await expect(
-          page.getByTestId('row-value-deceased.idType')
+          page.getByTestId('deceased.idType-value')
         ).toContainText(declaration.deceased.idType)
       })
       test("8.1.2.5 Change deceased's ID", async () => {
@@ -467,7 +467,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's ID
          */
         await expect(
-          page.getByTestId('row-value-deceased.passport')
+          page.getByTestId('deceased.passport-value')
         ).toContainText(declaration.deceased.passport)
       })
 
@@ -489,7 +489,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change informant type
          */
         await expect(
-          page.getByTestId('row-value-informant.relation')
+          page.getByTestId('informant.relation-value')
         ).toContainText(declaration.informant.relation)
       })
 
@@ -505,7 +505,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change registration email
          */
         await expect(
-          page.getByTestId('row-value-informant.email')
+          page.getByTestId('informant.email-value')
         ).toContainText(declaration.informant.email)
       })
 
@@ -520,7 +520,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's name
          */
-        await expect(page.getByTestId('row-value-spouse.name')).toContainText(
+        await expect(page.getByTestId('spouse.name-value')).toContainText(
           declaration.spouse.name.firstname +
             ' ' +
             declaration.spouse.name.surname
@@ -538,7 +538,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's birthday
          */
 
-        await expect(page.getByTestId('row-value-spouse.dob')).toContainText(
+        await expect(page.getByTestId('spouse.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.spouse.dob)
         )
       })
@@ -557,7 +557,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's nationality
          */
         await expect(
-          page.getByTestId('row-value-spouse.nationality')
+          page.getByTestId('spouse.nationality-value')
         ).toContainText(declaration.spouse.nationality)
       })
       test("8.1.2.12 Change spouse's ID type", async () => {
@@ -574,7 +574,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's ID type
          */
-        await expect(page.getByTestId('row-value-spouse.idType')).toContainText(
+        await expect(page.getByTestId('spouse.idType-value')).toContainText(
           declaration.spouse.idType
         )
       })
@@ -590,7 +590,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's ID
          */
         await expect(
-          page.getByTestId('row-value-spouse.passport')
+          page.getByTestId('spouse.passport-value')
         ).toContainText(declaration.spouse.passport)
       })
     })
@@ -939,7 +939,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's name
          */
-        await expect(page.getByTestId('row-value-deceased.name')).toContainText(
+        await expect(page.getByTestId('deceased.name-value')).toContainText(
           declaration.deceased.name.firstname +
             ' ' +
             declaration.deceased.name.surname
@@ -961,7 +961,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's gender
          */
         await expect(
-          page.getByTestId('row-value-deceased.gender')
+          page.getByTestId('deceased.gender-value')
         ).toContainText(declaration.deceased.gender)
       })
 
@@ -978,7 +978,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's birthday
          */
-        await expect(page.getByTestId('row-value-deceased.dob')).toContainText(
+        await expect(page.getByTestId('deceased.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.deceased.dob)
         )
       })
@@ -999,7 +999,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's place of birth
          */
         await expect(
-          page.getByTestId('row-value-deceased.idType')
+          page.getByTestId('deceased.idType-value')
         ).toContainText(declaration.deceased.idType)
       })
       test("8.2.2.5 Change deceased's ID", async () => {
@@ -1013,7 +1013,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's ID
          */
-        await expect(page.getByTestId('row-value-deceased.brn')).toContainText(
+        await expect(page.getByTestId('deceased.brn-value')).toContainText(
           declaration.deceased.brn
         )
       })
@@ -1042,10 +1042,10 @@ test.describe.serial('8. Validate declaration review page', () => {
         await page.getByRole('button', { name: 'Go to review' }).click()
 
         await expect(
-          page.getByTestId('row-value-deceased.address')
+          page.getByTestId('deceased.address-value')
         ).toContainText(declaration.deceased.address.district)
         await expect(
-          page.getByTestId('row-value-deceased.address')
+          page.getByTestId('deceased.address-value')
         ).toContainText(declaration.deceased.address.province)
       })
 
@@ -1066,7 +1066,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change informant type
          */
         await expect(
-          page.getByTestId('row-value-informant.relation')
+          page.getByTestId('informant.relation-value')
         ).toContainText(declaration.informant.relation)
       })
 
@@ -1081,7 +1081,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change registration email
          */
         await expect(
-          page.getByTestId('row-value-informant.email')
+          page.getByTestId('informant.email-value')
         ).toContainText(declaration.informant.email)
       })
 
@@ -1095,7 +1095,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's name
          */
-        await expect(page.getByTestId('row-value-spouse.name')).toContainText(
+        await expect(page.getByTestId('spouse.name-value')).toContainText(
           declaration.spouse.name.firstname +
             ' ' +
             declaration.spouse.name.surname
@@ -1112,7 +1112,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's birthday
          */
 
-        await expect(page.getByTestId('row-value-spouse.dob')).toContainText(
+        await expect(page.getByTestId('spouse.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.spouse.dob)
         )
       })
@@ -1130,7 +1130,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's nationality
          */
         await expect(
-          page.getByTestId('row-value-spouse.nationality')
+          page.getByTestId('spouse.nationality-value')
         ).toContainText(declaration.spouse.nationality)
       })
       test("8.2.2.12 Change spouse's ID type", async () => {
@@ -1146,7 +1146,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's ID type
          */
-        await expect(page.getByTestId('row-value-spouse.idType')).toContainText(
+        await expect(page.getByTestId('spouse.idType-value')).toContainText(
           declaration.spouse.idType
         )
       })
@@ -1158,7 +1158,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's ID
          */
-        await expect(page.getByTestId('row-value-spouse.brn')).toContainText(
+        await expect(page.getByTestId('spouse.brn-value')).toContainText(
           declaration.spouse.brn
         )
       })
@@ -1372,7 +1372,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's name
          */
-        await expect(page.getByTestId('row-value-deceased.name')).toContainText(
+        await expect(page.getByTestId('deceased.name-value')).toContainText(
           declaration.deceased.name.firstname +
             ' ' +
             declaration.deceased.name.surname
@@ -1394,7 +1394,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's gender
          */
         await expect(
-          page.getByTestId('row-value-deceased.gender')
+          page.getByTestId('deceased.gender-value')
         ).toContainText(declaration.deceased.gender)
       })
 
@@ -1411,7 +1411,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change deceased's birthday
          */
-        await expect(page.getByTestId('row-value-deceased.dob')).toContainText(
+        await expect(page.getByTestId('deceased.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.deceased.dob)
         )
       })
@@ -1432,7 +1432,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's place of birth
          */
         await expect(
-          page.getByTestId('row-value-deceased.idType')
+          page.getByTestId('deceased.idType-value')
         ).toContainText(declaration.deceased.idType)
       })
       test("8.3.2.5 Change deceased's ID", async () => {
@@ -1449,7 +1449,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's ID
          */
         await expect(
-          page.getByTestId('row-value-deceased.passport')
+          page.getByTestId('deceased.passport-value')
         ).toContainText(declaration.deceased.passport)
       })
 
@@ -1467,10 +1467,10 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change deceased's address
          */
         await expect(
-          page.getByTestId('row-value-deceased.address')
+          page.getByTestId('deceased.address-value')
         ).toContainText(declaration.deceased.address.district)
         await expect(
-          page.getByTestId('row-value-deceased.address')
+          page.getByTestId('deceased.address-value')
         ).toContainText(declaration.deceased.address.province)
       })
 
@@ -1524,7 +1524,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change informant type
          */
         await expect(
-          page.getByTestId('row-value-informant.relation')
+          page.getByTestId('informant.relation-value')
         ).toContainText(declaration.informant.relation)
       })
 
@@ -1539,7 +1539,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change registration email
          */
         await expect(
-          page.getByTestId('row-value-informant.email')
+          page.getByTestId('informant.email-value')
         ).toContainText(declaration.informant.email)
       })
 
@@ -1553,7 +1553,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's name
          */
-        await expect(page.getByTestId('row-value-spouse.name')).toContainText(
+        await expect(page.getByTestId('spouse.name-value')).toContainText(
           declaration.spouse.name.firstname +
             ' ' +
             declaration.spouse.name.surname
@@ -1570,7 +1570,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's birthday
          */
 
-        await expect(page.getByTestId('row-value-spouse.dob')).toContainText(
+        await expect(page.getByTestId('spouse.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.spouse.dob)
         )
       })
@@ -1588,7 +1588,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's nationality
          */
         await expect(
-          page.getByTestId('row-value-spouse.nationality')
+          page.getByTestId('spouse.nationality-value')
         ).toContainText(declaration.spouse.nationality)
       })
       test("8.3.2.12 Change spouse's ID type", async () => {
@@ -1604,7 +1604,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change spouse's ID type
          */
-        await expect(page.getByTestId('row-value-spouse.idType')).toContainText(
+        await expect(page.getByTestId('spouse.idType-value')).toContainText(
           declaration.spouse.idType
         )
       })
@@ -1619,7 +1619,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change spouse's ID
          */
         await expect(
-          page.getByTestId('row-value-spouse.passport')
+          page.getByTestId('spouse.passport-value')
         ).toContainText(declaration.spouse.passport)
       })
     })

@@ -503,7 +503,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     await page.locator('#close-dialog').click()
 
     await page.getByRole('button', { name: 'Record', exact: true }).click()
-    await expect(page.getByTestId('row-value-child.name')).toHaveText(
+    await expect(page.getByTestId('child.name-value')).toHaveText(
       formatName(childName)
     )
   })
@@ -648,11 +648,11 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Edit')
 
-      await expect(page.getByTestId('row-value-child.name')).toHaveText(
+      await expect(page.getByTestId('child.name-value')).toHaveText(
         formatV2ChildName({ 'child.name': childName })
       )
 
-      await expect(page.getByTestId('row-value-child.dob')).toHaveText(
+      await expect(page.getByTestId('child.dob-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -680,7 +680,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await page.getByTestId('text__surname').fill(newChildName.surname)
       await page.getByRole('button', { name: 'Go to review' }).click()
 
-      await expect(page.getByTestId('row-value-child.dob')).not.toHaveText(
+      await expect(page.getByTestId('child.dob-value')).not.toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
     })

@@ -147,6 +147,14 @@ jobs:
             -p @opencrvs/commons @opencrvs/components @opencrvs/events @opencrvs/toolkit
           pnpm exec nx run-many -t build:types -p @opencrvs/events
 
+      # https://github.com/bojanbass/nx-aws/pull/376#issuecomment-1710695419
+      # Nx stamps the machine id that produced each entry into
+      # `<hash>/source` and, on a cache hit, refuses any entry whose
+      # stamp is not the current machine's. Removing the source files before
+      # publishing avoids that problem and allows any machine to restore.
+      - name: Drop machine markers before publishing
+        run: find .nx/cache -mindepth 2 -maxdepth 2 -name source -type f -delete
+
       - name: Save Nx cache
         uses: actions/cache/save@v4
         with:
@@ -669,3 +677,39 @@ jobs:
       # commons and events are built first (cache hits when warm)
       - name: Build toolkit and dependencies
         run: pnpm exec nx run @opencrvs/toolkit:build
+
+  required-checks:
+    name: Required checks
+    # The single context branch protection requires from this workflow.
+    #
+    # Per-job names cannot be required directly any more: `nx affected`
+    # makes the `test` matrix dynamic, and a matrix job that is skipped is
+    # skipped before its matrix expands. Either way the check runs for
+    # unselected entries are never created, so a required context named
+    # after one of them waits for a status that will never be reported and
+    # blocks the PR forever. A skipped *non-matrix* job does report, as
+    # "success" — which is exactly why this job tolerates `skipped` below
+    # and fails only on real failures.
+    needs:
+      - setup
+      - test
+      - countryconfig-template
+      - prepare-client-tests
+      - lint-client
+      - test-storybook
+      - test-client
+      - lint-knip
+      - build-toolkit
+    # `always()`, or a skipped dependency would skip this job too and take
+    # the gate down with it
+    if: always()
+    runs-on: ubuntu-26.04
+    permissions: {}
+    steps:
+      # For a matrix dependency, `result` is the aggregate: `failure` if
+      # any entry failed.
+      - name: Fail unless every dependency succeeded or was skipped
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more required jobs failed or were cancelled."
+          exit 1
