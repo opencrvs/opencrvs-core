@@ -52,7 +52,6 @@ import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { getClient } from '@events/storage/postgres/events'
-import { getViolatedConstraint } from '@events/storage/postgres/unique-violation'
 import Schema from '@events/storage/postgres/events/schema/Database'
 import { getRoles } from '../config/config'
 import {
@@ -84,44 +83,10 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-/**
- * The field each unique constraint on the user tables protects. Only the name
- * of the tripped constraint says which value was the duplicate, so the map is
- * keyed by it.
- */
-const USER_UNIQUE_CONSTRAINT_FIELDS: Record<string, string> = {
-  users_email_key: 'email',
-  users_mobile_key: 'mobile',
-  user_credentials_username_key: 'username'
-}
-
-/**
- * Turns a unique violation on the user tables into a conflict naming the
- * offending field, and rethrows anything else untouched.
- *
- * A safety net rather than the normal path: the application-level duplicate
- * checks are broader than these constraints and still fire first, so a
- * violation only reaches here when two creates race. Without the mapping it
- * would surface as an internal server error, whose cause production masks
- * entirely.
- */
-function rethrowAsUserConflict(error: unknown): never {
-  const constraint = getViolatedConstraint(error)
-  const field = constraint && USER_UNIQUE_CONSTRAINT_FIELDS[constraint]
-
-  if (field) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: `A user with the same ${field} already exists`
-    })
-  }
-
-  throw error
-}
-
 async function findAvailableUsername(
   newUsername: string,
   existingUsername?: string,
+  trx?: Kysely<Schema>,
   i = 0
 ): Promise<string> {
   const candidate = i === 0 ? newUsername : `${newUsername}${i}`
@@ -129,9 +94,9 @@ async function findAvailableUsername(
     return candidate
   }
 
-  const taken = await isUsernameTaken(candidate)
+  const taken = await isUsernameTaken(candidate, trx)
   return taken
-    ? findAvailableUsername(newUsername, existingUsername, i + 1)
+    ? findAvailableUsername(newUsername, existingUsername, trx, i + 1)
     : candidate
 }
 
@@ -220,7 +185,8 @@ async function handleUsernameUpdate(
 
   const newUsername = await findAvailableUsername(
     newUsernameCandidate,
-    oldUsername
+    oldUsername,
+    trx
   )
 
   await updateUsernameByIdInTrx(trx, userId, newUsername)
@@ -255,43 +221,40 @@ export async function updateUser(
     ...otherFields
   } = input
 
-  const dbUser = await db
-    .transaction()
-    .execute(async (trx) => {
-      const existingUser = await getUserByIdInTrx(trx, userId)
+  const dbUser = await db.transaction().execute(async (trx) => {
+    const existingUser = await getUserByIdInTrx(trx, userId)
 
-      if (!existingUser) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: `User not found: ${userId}`
-        })
-      }
-
-      await updateUserByIdInTrx(trx, userId, {
-        ...otherFields,
-        firstname: incomingName?.firstname,
-        surname: incomingName?.surname,
-        signaturePath: signature?.path,
-        officeId: incomingOfficeId
+    if (!existingUser) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `User not found: ${userId}`
       })
+    }
 
-      if (incomingOfficeId && incomingOfficeId !== existingUser.officeId) {
-        await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
-      }
-
-      if (incomingName) {
-        await handleUsernameUpdate(trx, {
-          userId,
-          incomingName,
-          oldUsername: existingUser.username,
-          input,
-          token
-        })
-      }
-
-      return getUserByIdInTrx(trx, userId)
+    await updateUserByIdInTrx(trx, userId, {
+      ...otherFields,
+      firstname: incomingName?.firstname,
+      surname: incomingName?.surname,
+      signaturePath: signature?.path,
+      officeId: incomingOfficeId
     })
-    .catch(rethrowAsUserConflict)
+
+    if (incomingOfficeId && incomingOfficeId !== existingUser.officeId) {
+      await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+    }
+
+    if (incomingName) {
+      await handleUsernameUpdate(trx, {
+        userId,
+        incomingName,
+        oldUsername: existingUser.username,
+        input,
+        token
+      })
+    }
+
+    return getUserByIdInTrx(trx, userId)
+  })
 
   if (!dbUser) {
     throw new TRPCError({
@@ -406,7 +369,7 @@ export async function createUser(
   const postgresId = await createUserWithCredentials(
     userPayload,
     userCredentialPayload
-  ).catch(rethrowAsUserConflict)
+  )
 
   return getUser(postgresId)
 }

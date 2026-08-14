@@ -36,11 +36,11 @@ export function isUniqueViolation(error: unknown) {
  * reported no constraint name.
  */
 export function getViolatedConstraint(error: unknown): string | undefined {
-  if (!isUniqueViolation(error) || !('constraint' in (error as object))) {
+  if (!isUniqueViolation(error)) {
     return undefined
   }
 
-  const { constraint } = error as { constraint: unknown }
+  const { constraint } = error as { constraint?: unknown }
 
   return typeof constraint === 'string' ? constraint : undefined
 }
