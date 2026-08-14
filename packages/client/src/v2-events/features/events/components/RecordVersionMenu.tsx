@@ -460,6 +460,9 @@ export function RecordVersionMenu({
   }
 
   const rowLabel = (version: RecordVersion, total: number) => {
+    if (total === 1) {
+      return undefined
+    }
     if (version.isLatestOfForm) {
       return intl.formatMessage(messages.labelLatest)
     }
@@ -481,6 +484,11 @@ export function RecordVersionMenu({
       .sort((a, b) => b.indexInForm - a.indexInForm)
   })).filter(({ items }) => items.length > 0)
 
+  const selectedLabel = rowLabel(
+    selected,
+    versions.filter((v) => v.form === selected.form).length
+  )
+
   const toggle = (form: RecordForm) =>
     setExpanded((open) =>
       open.includes(form) ? open.filter((f) => f !== form) : [...open, form]
@@ -495,11 +503,8 @@ export function RecordVersionMenu({
             data-testid="record-version-select"
             type="button"
           >
-            {intl.formatMessage(FORM_NAME[selected.form])} {'·'}{' '}
-            {rowLabel(
-              selected,
-              versions.filter((v) => v.form === selected.form).length
-            )}
+            {intl.formatMessage(FORM_NAME[selected.form])}
+            {selectedLabel && ` · ${selectedLabel}`}
             <CaretDown size={16} />
           </SelectTrigger>
         </DropdownMenu.Trigger>
