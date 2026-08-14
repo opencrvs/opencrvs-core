@@ -12,54 +12,26 @@
 // TestRail Test Case ID: 2482---https://ocrvs.testrail.io/index.php?/cases/view/2482
 import { expect, test } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { format, subDays, addDays, subYears } from 'date-fns'
-import { v4 as uuidv4 } from 'uuid'
-import { createClient } from '@opencrvs/toolkit/api'
+import { subDays, addDays, subYears } from 'date-fns'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { getToken, login } from '../../../../helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../../../constants'
+import { getToken, login, triggerDeclarationAction } from '../../../../helpers'
+import { CREDENTIALS } from '../../../../constants'
 import { createDeclaration } from '../../../test-data/birth-declaration-with-mother-father'
-import { getSignatureFile, uploadFile } from '../../../test-data/utils'
 import {
   formatV2ChildName,
   assertRecordInWorkqueue
 } from '../../../birth/helpers'
-import { ensureAssignedToUser } from '../../../../utils'
+import { ensureAssignedToUser, selectAction } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-
-const isoDate = (date: Date) => format(date, 'yyyy-MM-dd')
-
-function fakerNameAtLeast(min: number, generator: () => string): string {
-  let value = generator()
-  while (value.length < min) {
-    value = generator()
-  }
-  return value
-}
-
-function withOneLetterChanged(value: string): string {
-  const first = value[0]
-  const base = first.toLowerCase()
-  const replacement =
-    base === 'z' ? 'a' : String.fromCharCode(base.charCodeAt(0) + 1)
-  const isUpperCase = first === first.toUpperCase()
-
-  return (
-    (isUpperCase ? replacement.toUpperCase() : replacement) + value.slice(1)
-  )
-}
-
-async function buildAnnotation(token: string) {
-  const filename = await uploadFile(getSignatureFile(), token)
-  return {
-    'review.comment': 'Edited before re-submitting',
-    'review.signature': filename
-  }
-}
-
-function getUserIdFromToken(token: string): string {
-  return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
-}
+import {
+  isoDate,
+  toDateParts,
+  fakerNameAtLeast,
+  withOneLetterChanged,
+  editNameField,
+  editDateField,
+  editTextField
+} from './helpers'
 
 test('3.1. Editing a declaration to match an existing record flags it as a potential duplicate on re-declare', async ({
   page
@@ -68,10 +40,12 @@ test('3.1. Editing a declaration to match an existing record flags it as a poten
   const childSurname = fakerNameAtLeast(4, () => faker.person.lastName())
   const motherFirstName = fakerNameAtLeast(4, () => faker.person.firstName())
   const motherSurname = fakerNameAtLeast(4, () => faker.person.lastName())
-  const motherDob = isoDate(subYears(new Date(), 28))
+  const motherDobDate = subYears(new Date(), 28)
+  const motherDob = isoDate(motherDobDate)
   const motherNid = faker.string.numeric(10)
   const childOneDob = isoDate(subDays(new Date(), 30))
-  const childTwoDob = isoDate(addDays(subDays(new Date(), 30), 3))
+  const childTwoDobDate = addDays(subDays(new Date(), 30), 3)
+  const childTwoDob = isoDate(childTwoDobDate)
 
   const baselineDetails = {
     'child.name': { firstname: childFirstName, surname: childSurname },
@@ -97,24 +71,25 @@ test('3.1. Editing a declaration to match an existing record flags it as a poten
     'mother.nid': faker.string.numeric(10)
   }
 
+  const editedChildName = {
+    firstname: withOneLetterChanged(childFirstName),
+    surname: withOneLetterChanged(childSurname)
+  }
+  const editedMotherName = {
+    firstname: withOneLetterChanged(motherFirstName),
+    surname: withOneLetterChanged(motherSurname)
+  }
+
   const editedDetails = {
-    'child.name': {
-      firstname: withOneLetterChanged(childFirstName),
-      surname: withOneLetterChanged(childSurname)
-    },
+    'child.name': editedChildName,
     'child.dob': childTwoDob,
-    'mother.name': {
-      firstname: withOneLetterChanged(motherFirstName),
-      surname: withOneLetterChanged(motherSurname)
-    },
+    'mother.name': editedMotherName,
     'mother.dob': motherDob,
     'mother.idType': 'NATIONAL_ID',
     'mother.nid': motherNid
   }
 
   let baselineTrackingId: string
-  let editedToken: string
-  let editedEventId: string
 
   await test.step('Register the baseline declaration', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
@@ -124,49 +99,27 @@ test('3.1. Editing a declaration to match an existing record flags it as a poten
   })
 
   await test.step('Declare a second, dissimilar declaration (not yet a duplicate)', async () => {
-    editedToken = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(
-      editedToken,
-      dissimilarDetails,
-      ActionType.DECLARE
-    )
-    editedEventId = res.eventId
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+    await createDeclaration(token, dissimilarDetails, ActionType.DECLARE)
   })
 
   await test.step('Edit it to match the baseline declaration, then re-declare', async () => {
-    const client = createClient(
-      `${GATEWAY_HOST}/events`,
-      `Bearer ${editedToken}`
-    )
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByRole('button', { name: 'Pending registration' }).click()
+    await openRecordByTitle(page, formatV2ChildName(dissimilarDetails))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await selectAction(page, 'Edit')
 
-    await client.event.actions.assignment.assign.mutate({
-      eventId: editedEventId,
-      transactionId: uuidv4(),
-      type: ActionType.ASSIGN,
-      assignedTo: getUserIdFromToken(editedToken)
-    })
+    await editNameField(page, 'child.name', editedChildName)
+    await editDateField(page, 'child.dob', toDateParts(childTwoDobDate))
+    await editNameField(page, 'mother.name', editedMotherName)
+    await editDateField(page, 'mother.dob', toDateParts(motherDobDate))
+    await editTextField(page, 'mother.nid', 'text__mother____nid', motherNid)
 
-    const annotation = await buildAnnotation(editedToken)
-
-    await client.event.actions.edit.request.mutate({
-      eventId: editedEventId,
-      transactionId: uuidv4(),
-      declaration: editedDetails,
-      annotation,
-      keepAssignmentIfAccepted: true
-    })
-
-    await client.event.actions.declare.request.mutate({
-      eventId: editedEventId,
-      transactionId: uuidv4(),
-      declaration: editedDetails,
-      annotation,
-      keepAssignment: true
-    })
+    await triggerDeclarationAction(page, 'Declare with edits')
   })
 
   await test.step('Open the edited declaration from the Potential duplicate workqueue', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
     await page.getByRole('button', { name: 'Potential duplicate' }).click()
     await openRecordByTitle(page, formatV2ChildName(editedDetails))
   })
@@ -213,13 +166,11 @@ test('3.2. Editing a declaration while keeping it dissimilar does not flag it as
     'mother.nid': faker.string.numeric(10)
   }
 
+  const editedMotherNid = faker.string.numeric(10)
   const editedDetails = {
     ...dissimilarDetails,
-    'mother.nid': faker.string.numeric(10)
+    'mother.nid': editedMotherNid
   }
-
-  let editedToken: string
-  let editedEventId: string
 
   await test.step('Register the baseline declaration', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
@@ -228,50 +179,28 @@ test('3.2. Editing a declaration while keeping it dissimilar does not flag it as
   })
 
   await test.step('Declare a second, dissimilar declaration', async () => {
-    editedToken = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(
-      editedToken,
-      dissimilarDetails,
-      ActionType.DECLARE
-    )
-    editedEventId = res.eventId
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+    await createDeclaration(token, dissimilarDetails, ActionType.DECLARE)
   })
 
   await test.step('Edit it (still dissimilar), then re-declare', async () => {
-    const client = createClient(
-      `${GATEWAY_HOST}/events`,
-      `Bearer ${editedToken}`
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByRole('button', { name: 'Pending registration' }).click()
+    await openRecordByTitle(page, formatV2ChildName(dissimilarDetails))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await selectAction(page, 'Edit')
+
+    await editTextField(
+      page,
+      'mother.nid',
+      'text__mother____nid',
+      editedMotherNid
     )
 
-    await client.event.actions.assignment.assign.mutate({
-      eventId: editedEventId,
-      transactionId: uuidv4(),
-      type: ActionType.ASSIGN,
-      assignedTo: getUserIdFromToken(editedToken)
-    })
-
-    const annotation = await buildAnnotation(editedToken)
-
-    await client.event.actions.edit.request.mutate({
-      eventId: editedEventId,
-      transactionId: uuidv4(),
-      declaration: editedDetails,
-      annotation,
-      keepAssignmentIfAccepted: true
-    })
-
-    await client.event.actions.declare.request.mutate({
-      eventId: editedEventId,
-      transactionId: uuidv4(),
-      declaration: editedDetails,
-      annotation,
-      keepAssignment: true
-    })
+    await triggerDeclarationAction(page, 'Declare with edits')
   })
 
   await test.step('The edited declaration is not flagged as a potential duplicate', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-
     await assertRecordInWorkqueue({
       page,
       name: formatV2ChildName(editedDetails),

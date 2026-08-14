@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // TestRail Test Case ID: 2474---https://ocrvs.testrail.io/index.php?/cases/view/2474
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { format, subDays, addDays, subYears } from 'date-fns'
+import { subDays, addDays, subYears } from 'date-fns'
 import {
   getToken,
   login,
@@ -19,8 +19,7 @@ import {
   goToSection,
   drawSignature,
   triggerDeclarationAction,
-  formatName,
-  searchFromSearchBar
+  formatName
 } from '../../../../helpers'
 import { CREDENTIALS } from '../../../../constants'
 import { createDeclaration } from '../../../test-data/birth-declaration-with-mother-father'
@@ -33,38 +32,18 @@ import {
 import { ActionType } from '@opencrvs/toolkit/events'
 import { ensureAssignedToUser } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
+import {
+  isoDate,
+  toDateParts,
+  fakerNameAtLeast,
+  withOneLetterChanged
+} from './helpers'
+import { trackAndDeleteCreatedEvents } from '../../../test-data/eventDeletion'
 
-const isoDate = (date: Date) => format(date, 'yyyy-MM-dd')
-
-const toDateParts = (date: Date) => ({
-  dd: format(date, 'dd'),
-  mm: format(date, 'MM'),
-  yyyy: format(date, 'yyyy')
-})
-
-function fakerNameAtLeast(min: number, generator: () => string): string {
-  let value = generator()
-  while (value.length < min) {
-    value = generator()
-  }
-  return value
-}
-
-function withOneLetterChanged(value: string): string {
-  const first = value[0]
-  const base = first.toLowerCase()
-  const replacement =
-    base === 'z' ? 'a' : String.fromCharCode(base.charCodeAt(0) + 1)
-  const isUpperCase = first === first.toUpperCase()
-
-  return (
-    (isUpperCase ? replacement.toUpperCase() : replacement) + value.slice(1)
-  )
-}
-
-test('1.1. Standard checks for duplicate record flag the second declaration as a potential duplicate', async ({
-  page
-}) => {
+async function verifyDuplicateFlaggedRegardlessOfDeclaringUser(
+  page: Page,
+  declaringUser: (typeof CREDENTIALS)[keyof typeof CREDENTIALS]
+) {
   const childFirstName = fakerNameAtLeast(4, () => faker.person.firstName())
   const childSurname = fakerNameAtLeast(4, () => faker.person.lastName())
   const motherFirstName = fakerNameAtLeast(4, () => faker.person.firstName())
@@ -110,7 +89,7 @@ test('1.1. Standard checks for duplicate record flag the second declaration as a
   })
 
   await test.step('Declare a second, similar declaration', async () => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+    const token = await getToken(declaringUser)
     await createDeclaration(token, secondDeclarationDetails, ActionType.DECLARE)
   })
 
@@ -127,6 +106,15 @@ test('1.1. Standard checks for duplicate record flag the second declaration as a
       page.getByText(`Potential duplicate of record ${trackingId}`)
     ).toBeVisible()
   })
+}
+
+test('1.1. Standard checks for duplicate record flag the second declaration as a potential duplicate', async ({
+  page
+}) => {
+  await verifyDuplicateFlaggedRegardlessOfDeclaringUser(
+    page,
+    CREDENTIALS.REGISTRAR
+  )
 })
 
 test('1.2. Standard checks for duplicate record do not flag dissimilar declarations as duplicates', async ({
@@ -163,7 +151,6 @@ test('1.2. Standard checks for duplicate record do not flag dissimilar declarati
   }
 
   const secondDeclarationName = formatV2ChildName(secondDeclarationDetails)
-  let trackingId: string
 
   await test.step('Register the first declaration', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
@@ -173,19 +160,20 @@ test('1.2. Standard checks for duplicate record do not flag dissimilar declarati
 
   await test.step('Declare a second, dissimilar declaration', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(
-      token,
-      secondDeclarationDetails,
-      ActionType.DECLARE
-    )
-    trackingId = res.trackingId!
+    await createDeclaration(token, secondDeclarationDetails, ActionType.DECLARE)
   })
 
   await test.step('The second declaration is not flagged as a potential duplicate', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await searchFromSearchBar(page, trackingId, false)
-    await openRecordByTitle(page, secondDeclarationName)
-    await expect(page.getByText(/Potential duplicate of record/)).toBeHidden()
+
+    await assertRecordInWorkqueue({
+      page,
+      name: secondDeclarationName,
+      workqueues: [
+        { title: 'Potential duplicate', exists: false },
+        { title: 'Pending registration', exists: true }
+      ]
+    })
   })
 })
 
@@ -390,4 +378,22 @@ test('1.4. A child re-declared with an increased or decreased age is flagged as 
 
     await expect(page.getByText(/Potential duplicate of record/)).toBeVisible()
   })
+})
+
+test('1.5. A second declaration declared by a Registration Officer is still flagged as a potential duplicate', async ({
+  page
+}) => {
+  await verifyDuplicateFlaggedRegardlessOfDeclaringUser(
+    page,
+    CREDENTIALS.REGISTRATION_OFFICER
+  )
+})
+
+test('1.6. A second declaration declared by a Community Leader is still flagged as a potential duplicate', async ({
+  page
+}) => {
+  await verifyDuplicateFlaggedRegardlessOfDeclaringUser(
+    page,
+    CREDENTIALS.COMMUNITY_LEADER
+  )
 })

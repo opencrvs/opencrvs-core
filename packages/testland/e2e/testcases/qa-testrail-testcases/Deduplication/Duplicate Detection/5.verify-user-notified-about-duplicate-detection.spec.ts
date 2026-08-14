@@ -11,7 +11,7 @@
 // TestRail Test Case ID: 2481---https://ocrvs.testrail.io/index.php?/cases/view/2481
 import { expect, test, type Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { format, subDays, addDays, subYears } from 'date-fns'
+import { subDays, addDays, subYears } from 'date-fns'
 import { ActionType } from '@opencrvs/toolkit/events'
 import {
   continueForm,
@@ -25,23 +25,13 @@ import { CREDENTIALS } from '../../../../constants'
 import { createDeclaration as createBirthDeclaration } from '../../../test-data/birth-declaration-with-mother-father'
 import { createDeclaration as createDeathDeclaration } from '../../../test-data/death-declaration'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
-import { ensureAssignedToUser } from '../../../../utils'
+import { ensureAssignedToUser, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-
-const isoDate = (date: Date) => format(date, 'yyyy-MM-dd')
-const toDateParts = (date: Date) => ({
-  dd: format(date, 'dd'),
-  mm: format(date, 'MM'),
-  yyyy: format(date, 'yyyy')
-})
+import { isoDate, toDateParts, formatDeceasedName } from './helpers'
+import { trackAndDeleteCreatedEvents } from '../../../test-data/eventDeletion'
 
 const DUPLICATE_TOAST_TEXT =
   /is a potential duplicate\. Record is ready for review\./
-
-const formatDeceasedName = (obj: {
-  'deceased.name': { firstname: string; surname: string }
-  [key: string]: any
-}) => `${obj['deceased.name'].firstname} ${obj['deceased.name'].surname}`
 
 async function declareMatchingBirthViaUi(
   page: Page,
@@ -63,11 +53,21 @@ async function declareMatchingBirthViaUi(
   await page.getByText('Female', { exact: true }).click()
   await fillDate(page, match.childDob)
   await page.locator('#child____placeOfBirth').click()
-  await page.getByText('Health Institution', { exact: true }).click()
-  await page
-    .locator('#child____birthLocation')
-    .fill('Klow Village Hospital'.slice(0, 3))
-  await page.getByText('Klow Village Hospital').click()
+  await page.getByText('Residential address', { exact: true }).click()
+
+  await expect(page.locator('#child____placeOfBirth')).toContainText(
+    'Residential address'
+  )
+
+  // Village is pre-filled and disabled when the declaring user's own office
+  // is anchored at village level (e.g. a Community Leader) — only pick it
+  // when it's left open for selection (e.g. a district-level office).
+  const villageInput = page.locator('#village')
+  if (!(await villageInput.isDisabled())) {
+    await villageInput.click()
+    await selectLocationOption(page, 'Klow')
+  }
+
   await continueForm(page)
 
   await page.locator('#informant____relation').click()
@@ -88,7 +88,7 @@ async function declareMatchingBirthViaUi(
     .getByText('Farajaland', { exact: true })
     .click()
   await page.locator('#village').click()
-  await page.getByText('Klow', { exact: true }).click()
+  await selectLocationOption(page, 'Klow')
   await continueForm(page)
 
   await page.locator('#firstname').fill(faker.person.firstName('male'))
@@ -232,4 +232,10 @@ test('5.3. Registering a record that only becomes a duplicate afterwards shows t
   await test.step('The potential-duplicate toast is shown', async () => {
     await expect(page.getByText(DUPLICATE_TOAST_TEXT)).toBeVisible()
   })
+})
+
+test('5.4. Declaring a matching record through the UI shows the same toast for a Community Leader', async ({
+  page
+}) => {
+  await declareMatchingBirthAndExpectToast(page, CREDENTIALS.COMMUNITY_LEADER)
 })
