@@ -67,7 +67,10 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { cleanupUnreferencedFiles } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { getDuplicateEvents } from '../../service/deduplication/deduplication'
+import {
+  assertCanReviewDuplicatesOf,
+  getDuplicateEvents
+} from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
@@ -248,6 +251,8 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
 
+      await assertCanReviewDuplicatesOf(event, ctx)
+
       return getDuplicateEvents(event, ctx)
     }),
   delete: userOnlyProcedure
@@ -400,6 +405,9 @@ export const eventRouter = router({
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
@@ -433,6 +441,9 @@ export const eventRouter = router({
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
