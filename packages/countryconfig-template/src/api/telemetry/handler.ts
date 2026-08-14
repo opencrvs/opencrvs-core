@@ -11,16 +11,10 @@
 
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import * as Joi from 'joi'
-import fetch from 'node-fetch'
+import { sendTelemetry, TelemetryReport } from '@opencrvs/toolkit/telemetry'
 import { env } from '@countryconfig/environment'
 import { logger } from '@countryconfig/logger'
 import { applicationConfig } from '@countryconfig/api/application/application-config'
-
-/**
- * Payload contract version of the status/telemetry service. Part of its
- * idempotency key `(country_code, domain, reported_at, schema_version)`.
- */
-const TELEMETRY_SCHEMA_VERSION = '1.0'
 
 /** Report the events service posts to `/trigger/telemetry`. */
 export const telemetrySchema = Joi.object({
@@ -34,7 +28,7 @@ export const telemetrySchema = Joi.object({
     .required()
 })
 
-interface TelemetryReport {
+interface IncomingReport {
   reported_at: string
   app_version?: string
   metrics: Record<string, number | string | boolean>
@@ -43,8 +37,9 @@ interface TelemetryReport {
 /**
  * Receives a usage report from the events service and, when telemetry is
  * enabled for this instance, stamps the instance identity onto it and forwards
- * it to the status service. The events service is unaware of whether telemetry
- * is enabled or of the country code / domain / environment reported.
+ * it to the status service via the toolkit's `sendTelemetry` (which owns the
+ * endpoint and payload schema). The events service is unaware of whether
+ * telemetry is enabled or of the country code / domain / environment reported.
  */
 export async function telemetryHandler(request: Request, h: ResponseToolkit) {
   // Only accept OpenCRVS *system* tokens (the events service's anonymous
@@ -64,11 +59,10 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
     return h.response({ status: 'skipped' }).code(200)
   }
 
-  const report = request.payload as TelemetryReport
+  const incoming = request.payload as IncomingReport
 
-  const envelope = {
-    schema_version: TELEMETRY_SCHEMA_VERSION,
-    reported_at: report.reported_at,
+  const report: TelemetryReport = {
+    reported_at: incoming.reported_at,
     country_code: env.COUNTRY_CODE,
     organisation: env.ORGANISATION,
     // env.DOMAIN defaults to a wildcard for CORS in some setups; treat that as
@@ -77,28 +71,23 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
     instance: {
       application_name: applicationConfig.APPLICATION_NAME,
       environment: env.ENVIRONMENT_NAME,
-      app_version: report.app_version
+      app_version: incoming.app_version
     },
-    metrics: report.metrics
+    metrics: incoming.metrics
   }
 
-  let response
+  let result
   try {
-    response = await fetch(env.TELEMETRY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(envelope)
-    })
+    result = await sendTelemetry(report)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     logger.error(`Telemetry: forwarding to status service failed: ${message}`)
     return h.response({ status: 'error' }).code(502)
   }
 
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '')
+  if (!result.ok) {
     logger.error(
-      `Telemetry: status service rejected report (HTTP ${response.status}): ${detail}`
+      `Telemetry: status service rejected report (HTTP ${result.status}): ${result.detail ?? ''}`
     )
     return h.response({ status: 'error' }).code(502)
   }

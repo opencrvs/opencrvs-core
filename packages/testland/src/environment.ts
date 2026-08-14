@@ -78,11 +78,7 @@ export const env = cleanEnv(process.env, {
     // Telemetry is enabled for deployed Testland; local development stays off.
     devDefault: false,
     default: true,
-    desc: 'When true, usage telemetry received from the events service is forwarded to TELEMETRY_URL.'
-  }),
-  TELEMETRY_URL: url({
-    default: 'https://status.opencrvs.dev/v1/telemetry',
-    desc: 'Ingest endpoint of the OpenCRVS status/telemetry service.'
+    desc: 'When true, usage telemetry received from the events service is forwarded to the OpenCRVS status service.'
   }),
   COUNTRY_CODE: str({
     default: 'FAR',

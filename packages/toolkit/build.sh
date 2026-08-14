@@ -17,6 +17,9 @@ npx tsc --build
 
 # Build common events
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
+
+# Build telemetry client (self-contained; .d.ts comes from tsc --build above)
+npx esbuild src/telemetry/index.ts --bundle --format=cjs --outdir=./dist/telemetry --allow-overwrite --packages=external
 mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 mkdir -p ./dist/commons/events/state

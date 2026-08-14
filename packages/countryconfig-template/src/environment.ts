@@ -29,11 +29,7 @@ export const env = cleanEnv(process.env, {
   }),
   TELEMETRY_ENABLED: bool({
     default: false,
-    desc: 'When true, usage telemetry received from the events service is forwarded to TELEMETRY_URL.'
-  }),
-  TELEMETRY_URL: url({
-    default: 'https://status.opencrvs.dev/v1/telemetry',
-    desc: 'Ingest endpoint of the OpenCRVS status/telemetry service.'
+    desc: 'When true, usage telemetry received from the events service is forwarded to the OpenCRVS status service.'
   }),
   COUNTRY_CODE: str({
     default: 'FAR',
