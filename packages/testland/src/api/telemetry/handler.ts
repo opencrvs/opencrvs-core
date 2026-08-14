@@ -34,6 +34,14 @@ interface IncomingReport {
   metrics: Record<string, number | string | boolean>
 }
 
+/** Logged once at countryconfig startup while telemetry is disabled. */
+export const TELEMETRY_DISABLED_NOTICE =
+  'Telemetry is disabled. Help improve OpenCRVS by sharing anonymous, ' +
+  'aggregate usage metrics (registration and certificate counts, active ' +
+  'users, uptime) — no personal, health, or otherwise protected record data ' +
+  'ever leaves your instance. Enable it by setting TELEMETRY_ENABLED=true on ' +
+  'the countryconfig service.'
+
 /**
  * Receives a usage report from the events service and, when telemetry is
  * enabled for this instance, stamps the instance identity onto it and forwards
@@ -55,7 +63,8 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
   }
 
   if (!env.TELEMETRY_ENABLED) {
-    logger.info('Telemetry: disabled — not forwarding report')
+    // The encouraging notice is logged once at startup (see index.ts); keep the
+    // per-report path quiet.
     return h.response({ status: 'skipped' }).code(200)
   }
 
@@ -85,11 +94,18 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
     return h.response({ status: 'error' }).code(502)
   }
 
-  if (!result.ok) {
+  if (result.outcome === 'rejected') {
     logger.error(
       `Telemetry: status service rejected report (HTTP ${result.status}): ${result.detail ?? ''}`
     )
     return h.response({ status: 'error' }).code(502)
+  }
+
+  if (result.outcome === 'skipped') {
+    logger.info(
+      `Telemetry: report for ${report.reported_at} was not sent — only production instances report`
+    )
+    return h.response({ status: 'skipped' }).code(200)
   }
 
   logger.info(

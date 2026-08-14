@@ -48,22 +48,35 @@ export interface TelemetryReport {
 
 /** Outcome of a {@link sendTelemetry} call. */
 export interface TelemetryResult {
-  /** Whether the status service accepted the report (2xx). */
-  ok: boolean
-  /** HTTP status returned by the status service. */
+  /**
+   * How the send resolved:
+   * - `sent` — the status service accepted the report (2xx);
+   * - `skipped` — nothing was sent because the instance is not running in
+   *   production;
+   * - `rejected` — the status service returned a non-2xx response.
+   */
+  outcome: 'sent' | 'skipped' | 'rejected'
+  /** HTTP status of the request; `0` when skipped. */
   status: number
-  /** Response body when the report was rejected. */
+  /** Response body for a `rejected` outcome. */
   detail?: string
 }
 
 /**
  * Sends a telemetry report to the OpenCRVS status service. The endpoint and the
- * schema version are fixed by this version of the toolkit. Resolves with the
- * outcome for 2xx and non-2xx responses alike; network errors reject.
+ * schema version are fixed by this version of the toolkit.
+ *
+ * Only production instances actually report: outside `NODE_ENV=production` the
+ * report is never sent (`skipped`), so staging, QA and local instances cannot
+ * pollute the status service. Network errors reject.
  */
 export async function sendTelemetry(
   report: TelemetryReport
 ): Promise<TelemetryResult> {
+  if (process.env.NODE_ENV !== 'production') {
+    return { outcome: 'skipped', status: 0 }
+  }
+
   const response = await fetch(TELEMETRY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -71,9 +84,9 @@ export async function sendTelemetry(
   })
 
   if (response.ok) {
-    return { ok: true, status: response.status }
+    return { outcome: 'sent', status: response.status }
   }
 
   const detail = await response.text().catch(() => '')
-  return { ok: false, status: response.status, detail }
+  return { outcome: 'rejected', status: response.status, detail }
 }

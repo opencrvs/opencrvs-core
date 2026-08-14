@@ -42,7 +42,11 @@ import clientConfigProd from './client-config.prod'
 import loginConfig from './login-config'
 import loginConfigProd from './login-config.prod'
 import { emailHandler, emailSchema } from './api/notification/handler'
-import { telemetryHandler, telemetrySchema } from './api/telemetry/handler'
+import {
+  telemetryHandler,
+  telemetrySchema,
+  TELEMETRY_DISABLED_NOTICE
+} from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { locationsHandler } from './data-seeding/locations/handler'
@@ -678,6 +682,10 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    if (!env.TELEMETRY_ENABLED) {
+      logger.info(TELEMETRY_DISABLED_NOTICE)
+    }
   }
 
   return { server, start, stop }
