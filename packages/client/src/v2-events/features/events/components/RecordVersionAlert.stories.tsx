@@ -109,7 +109,7 @@ export const RegistrationOnlyVersion: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const alert = canvas.getByTestId('record-version-alert')
+    const alert = await canvas.findByTestId('record-version-alert')
     await expect(alert).toHaveTextContent(
       'Registration — This is the only version'
     )
@@ -127,7 +127,7 @@ export const DeclarationOnARegisteredRecord: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const alert = canvas.getByTestId('record-version-alert')
+    const alert = await canvas.findByTestId('record-version-alert')
     await expect(alert).toHaveTextContent(
       'Declaration — This is the only version'
     )
@@ -145,7 +145,9 @@ export const NotificationOnAProgressedRecord: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
+    await expect(
+      await canvas.findByTestId('record-version-alert')
+    ).toHaveTextContent(
       'This record has since been declared and registered.'
     )
   }
@@ -159,7 +161,7 @@ export const RegistrationLatestOfThree: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const alert = canvas.getByTestId('record-version-alert')
+    const alert = await canvas.findByTestId('record-version-alert')
     await expect(alert).toHaveTextContent(
       'Registration — You are viewing the latest version'
     )
@@ -177,7 +179,7 @@ export const RegistrationAsFirstRegistered: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const alert = canvas.getByTestId('record-version-alert')
+    const alert = await canvas.findByTestId('record-version-alert')
     await expect(alert).toHaveTextContent(
       'Registration — You are viewing the original version'
     )
@@ -194,7 +196,9 @@ export const RegistrationInBetween: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
+    await expect(
+      await canvas.findByTestId('record-version-alert')
+    ).toHaveTextContent(
       'Registration — You are viewing an earlier version'
     )
   }
