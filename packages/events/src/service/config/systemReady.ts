@@ -67,10 +67,9 @@ async function attemptSystemReady() {
  * surfaces far from the cause — e.g. MOSIP cannot authenticate as itself, so
  * its actions are attributed to the registrar in the audit trail.
  *
- * The data seeder calls the same trigger during provisioning, after the whole
- * stack is up, so a fresh environment does not depend on this path. It matters
- * for integrations added to an already-provisioned environment, where the
- * seeder no longer runs and this is the only thing that registers them.
+ * The data seeder no longer calls the trigger, so this is the only thing that
+ * registers those integrations — on a fresh environment and on an
+ * already-provisioned one alike.
  */
 export async function triggerSystemReady() {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -82,7 +81,7 @@ export async function triggerSystemReady() {
 
       if (attempt === MAX_ATTEMPTS) {
         logger.error(
-          `system/ready trigger failed after ${attempt} attempts: ${message}. Integrations declared by the country config are not registered.`
+          `system/ready trigger failed after ${attempt} attempts: ${message}. Integrations declared by the country config may not be registered.`
         )
         return
       }
