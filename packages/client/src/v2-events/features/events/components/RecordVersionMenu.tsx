@@ -19,7 +19,6 @@ import {
   RecordVersion,
   UUID
 } from '@opencrvs/commons/client'
-import { Button } from '@opencrvs/components/lib/Button'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useDropdown } from '@opencrvs/components/lib/Dropdown/DropdownContext'
 import {
@@ -199,6 +198,42 @@ const FORM_ORDER: RecordForm[] = [
   RecordForm.DECLARATION,
   RecordForm.NOTIFICATION
 ]
+
+const SelectTrigger = styled.button.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
+})<{ popovertarget?: string; dropdownName?: string }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 8px 4px 12px;
+  ${({ theme }) => theme.fonts.reg14}
+  white-space: nowrap;
+  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.yellow};
+  }
+`
+
+const Picker = styled.div`
+  display: flex;
+
+  &:has([popover]:popover-open) ${SelectTrigger} {
+    background: ${({ theme }) => theme.colors.grey200};
+    border-color: ${({ theme }) => theme.colors.grey400};
+  }
+`
 
 const Menu = styled.div`
   width: 520px;
@@ -449,95 +484,96 @@ export function RecordVersionMenu({
     )
 
   return (
-    <DropdownMenu id="record-version">
-      <DropdownMenu.Trigger asChild>
-        <Button
-          data-testid="record-version-select"
-          size="medium"
-          type="tertiary"
-        >
-          {intl.formatMessage(messages.triggerLabel)}{' '}
-          {intl.formatMessage(FORM_NAME[selected.form])} {'·'}{' '}
-          {rowLabel(
-            selected,
-            versions.filter((v) => v.form === selected.form).length
-          )}
-          <CaretDown />
-        </Button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <Menu data-testid="record-version-menu">
-          {groups.map(({ form, items }) => {
-            const holdsSelection = selected.form === form
-            const single = items.length === 1
-            const isOpen = expanded.includes(form)
-            const oldest = items[items.length - 1]
+    <Picker>
+      <DropdownMenu id="record-version">
+        <DropdownMenu.Trigger asChild>
+          <SelectTrigger
+            aria-label={intl.formatMessage(messages.triggerLabel)}
+            data-testid="record-version-select"
+            type="button"
+          >
+            {intl.formatMessage(FORM_NAME[selected.form])} {'·'}{' '}
+            {rowLabel(
+              selected,
+              versions.filter((v) => v.form === selected.form).length
+            )}
+            <CaretDown size={16} />
+          </SelectTrigger>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <Menu data-testid="record-version-menu">
+            {groups.map(({ form, items }) => {
+              const holdsSelection = selected.form === form
+              const single = items.length === 1
+              const isOpen = expanded.includes(form)
+              const oldest = items[items.length - 1]
 
-            return (
-              <Card key={form} $holdsSelection={holdsSelection}>
-                <HeadLine
-                  actionId={items[0].actionId}
-                  form={form}
-                  selectable={single}
-                  selected={single && holdsSelection}
-                  onSelect={onSelect}
-                  onToggle={() => toggle(form)}
-                >
-                  <Badge $onTint={single && holdsSelection}>
-                    {React.createElement(FORM_ICON[form], { size: 20 })}
-                  </Badge>
-                  <Texts>
-                    <Title>{intl.formatMessage(FORM_NAME[form])}</Title>
-                    <Sub>{intl.formatMessage(FORM_ABOUT[form])}</Sub>
-                    {/* The count repeats the rows, so it hides while open. */}
-                    {!(isOpen && !single) && (
-                      <Meta>
-                        {single
-                          ? provenance(items[0])
-                          : intl.formatMessage(messages.versionCount, {
-                              count: items.length,
-                              opened: intl.formatMessage(FORM_OPENED[form], {
-                                date: formatDate(oldest.createdAt)
-                              })
-                            })}
-                      </Meta>
-                    )}
-                  </Texts>
-                  {!single &&
-                    (isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />)}
-                  {single && holdsSelection && <Check size={20} />}
-                </HeadLine>
+              return (
+                <Card key={form} $holdsSelection={holdsSelection}>
+                  <HeadLine
+                    actionId={items[0].actionId}
+                    form={form}
+                    selectable={single}
+                    selected={single && holdsSelection}
+                    onSelect={onSelect}
+                    onToggle={() => toggle(form)}
+                  >
+                    <Badge $onTint={single && holdsSelection}>
+                      {React.createElement(FORM_ICON[form], { size: 20 })}
+                    </Badge>
+                    <Texts>
+                      <Title>{intl.formatMessage(FORM_NAME[form])}</Title>
+                      <Sub>{intl.formatMessage(FORM_ABOUT[form])}</Sub>
+                      {/* The count repeats the rows, so it hides while open. */}
+                      {!(isOpen && !single) && (
+                        <Meta>
+                          {single
+                            ? provenance(items[0])
+                            : intl.formatMessage(messages.versionCount, {
+                                count: items.length,
+                                opened: intl.formatMessage(FORM_OPENED[form], {
+                                  date: formatDate(oldest.createdAt)
+                                })
+                              })}
+                        </Meta>
+                      )}
+                    </Texts>
+                    {!single &&
+                      (isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />)}
+                    {single && holdsSelection && <Check size={20} />}
+                  </HeadLine>
 
-                {!single && isOpen && (
-                  <Versions>
-                    {items.map((version) => {
-                      const isSelected = version.actionId === selected.actionId
-                      return (
-                        <SelectLine
-                          key={version.actionId}
-                          indent
-                          actionId={version.actionId}
-                          selected={isSelected}
-                          testId={`record-version-option-${version.actionId}`}
-                          onSelect={onSelect}
-                        >
-                          <Texts $tight>
-                            <RowTitle>
-                              {rowLabel(version, items.length)}
-                            </RowTitle>
-                            <Sub>{provenance(version)}</Sub>
-                          </Texts>
-                          {isSelected && <Check size={20} />}
-                        </SelectLine>
-                      )
-                    })}
-                  </Versions>
-                )}
-              </Card>
-            )
-          })}
-        </Menu>
-      </DropdownMenu.Content>
-    </DropdownMenu>
+                  {!single && isOpen && (
+                    <Versions>
+                      {items.map((version) => {
+                        const isSelected = version.actionId === selected.actionId
+                        return (
+                          <SelectLine
+                            key={version.actionId}
+                            indent
+                            actionId={version.actionId}
+                            selected={isSelected}
+                            testId={`record-version-option-${version.actionId}`}
+                            onSelect={onSelect}
+                          >
+                            <Texts $tight>
+                              <RowTitle>
+                                {rowLabel(version, items.length)}
+                              </RowTitle>
+                              <Sub>{provenance(version)}</Sub>
+                            </Texts>
+                            {isSelected && <Check size={20} />}
+                          </SelectLine>
+                        )
+                      })}
+                    </Versions>
+                  )}
+                </Card>
+              )
+            })}
+          </Menu>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    </Picker>
   )
 }
