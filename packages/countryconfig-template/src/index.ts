@@ -42,6 +42,7 @@ import clientConfigProd from './client-config.prod'
 import loginConfig from './login-config'
 import loginConfigProd from './login-config.prod'
 import { emailHandler, emailSchema } from './api/notification/handler'
+import { telemetryHandler, telemetrySchema } from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { locationsHandler } from './data-seeding/locations/handler'
@@ -556,6 +557,24 @@ export async function createServer() {
   })
 
   server.route(getUserNotificationRoutes())
+
+  server.route({
+    method: 'POST',
+    path: '/trigger/telemetry',
+    handler: telemetryHandler,
+    options: {
+      // Internal service-to-service call from the events worker, which has no
+      // user token. Blocked from external access by Traefik (see the
+      // countryconfig IngressRoute), like /email and /notification.
+      auth: false,
+      tags: ['api', 'triggers'],
+      validate: {
+        payload: telemetrySchema
+      },
+      description:
+        'Receives a usage report from the events service and forwards it to the status service when telemetry is enabled'
+    }
+  })
 
   server.route({
     method: 'GET',

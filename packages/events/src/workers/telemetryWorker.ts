@@ -21,10 +21,10 @@ import { runDailyTelemetry, startOfUtcDay } from '@events/service/telemetry'
 const TELEMETRY_POLL_INTERVAL_MS = 60 * 60 * 1000
 
 /**
- * `reported_at` of the most recent successful send. While it equals today's
- * window we skip sending; a failed attempt leaves it unchanged so the next
- * poll retries. Reset on restart — a retry then hits the server's idempotency
- * key and returns a harmless `200 duplicate`.
+ * `reported_at` of the most recent report handed to countryconfig. While it
+ * equals today's window we skip; a failed attempt leaves it unchanged so the
+ * next poll retries. Reset on restart — a retry then reuses the same stable
+ * `reported_at`, which the status service idempotency key collapses.
  */
 let lastReportedAt: string | undefined
 
@@ -35,17 +35,18 @@ async function runTelemetryTick(): Promise<void> {
   }
   const result = await runDailyTelemetry(reportedAt)
 
-  // `accepted` and `duplicate` both mean the day is covered; anything else
+  // `sent` means countryconfig accepted the report (whether it forwarded it or
+  // skipped because telemetry is disabled); the day is covered. Anything else
   // leaves lastReportedAt unset so the next tick retries.
-  if (result.status === 'accepted' || result.status === 'duplicate') {
+  if (result.status === 'sent') {
     lastReportedAt = reportedAt
   }
 }
 
 export function startTelemetryWorker(): void {
-  // The worker always runs; whether a report is actually sent is decided per
-  // tick from the application config (TELEMETRY_ENABLED), so toggling telemetry
-  // in countryconfig takes effect without restarting the events service.
+  // The worker always runs; whether a report is forwarded to the status service
+  // is decided by countryconfig, so the events service stays unaware of whether
+  // telemetry is enabled.
   const tick = () =>
     runTelemetryTick().catch((err) => {
       logger.error(

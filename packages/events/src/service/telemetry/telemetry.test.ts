@@ -20,9 +20,10 @@ import {
   buildTelemetryReport,
   sendTelemetryReport,
   runDailyTelemetry,
-  startOfUtcDay,
-  TELEMETRY_SCHEMA_VERSION
+  startOfUtcDay
 } from '@events/service/telemetry'
+
+const TELEMETRY_TRIGGER_URL = `${env.COUNTRY_CONFIG_URL}/trigger/telemetry`
 
 describe('collectTelemetryMetrics', () => {
   it('counts registered, pending, users and folds event type into the key', async () => {
@@ -73,155 +74,76 @@ describe('startOfUtcDay', () => {
 })
 
 describe('sendTelemetryReport', () => {
-  it('posts the envelope and maps 202 to accepted', async () => {
+  it('posts the report to countryconfig and maps a 2xx to sent', async () => {
     let capturedBody: unknown = null
 
     mswServer.use(
-      http.post(env.TELEMETRY_URL, async ({ request }) => {
+      http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
         capturedBody = await request.json()
-        return HttpResponse.json(
-          {
-            report_id: 'report-123',
-            status: 'accepted',
-            metrics_recorded: 2
-          },
-          { status: 202 } as HttpResponseInit
-        )
+        return HttpResponse.json({ status: 'forwarded' }, {
+          status: 202
+        } as HttpResponseInit)
       })
     )
 
     const report = buildTelemetryReport(
       { 'events.total': 3, 'system.health': 'ok' },
-      '2026-08-13T00:00:00.000Z',
-      {
-        countryCode: 'FAR',
-        applicationName: 'Farajaland CRS',
-        domain: 'farajaland.opencrvs.org',
-        environment: 'production'
-      }
+      '2026-08-13T00:00:00.000Z'
     )
     const result = await sendTelemetryReport(report)
 
-    expect(result).toEqual({
-      status: 'accepted',
-      reportId: 'report-123',
-      metricsRecorded: 2
-    })
+    expect(result).toEqual({ status: 'sent' })
+    // core sends only the window, its own version, and the metrics — no
+    // country code / domain / environment (countryconfig stamps those).
     expect(capturedBody).toEqual({
-      schema_version: TELEMETRY_SCHEMA_VERSION,
       reported_at: '2026-08-13T00:00:00.000Z',
-      country_code: 'FAR',
-      domain: 'farajaland.opencrvs.org',
-      instance: {
-        application_name: 'Farajaland CRS',
-        environment: 'production',
-        app_version: process.env.npm_package_version
-      },
+      app_version: process.env.npm_package_version,
       metrics: { 'events.total': 3, 'system.health': 'ok' }
-    })
-  })
-
-  it('maps a 200 idempotent duplicate to duplicate', async () => {
-    mswServer.use(
-      http.post(env.TELEMETRY_URL, () =>
-        HttpResponse.json(
-          { report_id: 'report-123', status: 'duplicate', metrics_recorded: 0 },
-          { status: 200 } as HttpResponseInit
-        )
-      )
-    )
-
-    const report = buildTelemetryReport(
-      { 'events.total': 3 },
-      '2026-08-13T00:00:00.000Z',
-      { countryCode: 'FAR', applicationName: 'Farajaland CRS', domain: null }
-    )
-    expect(await sendTelemetryReport(report)).toEqual({
-      status: 'duplicate',
-      reportId: 'report-123'
     })
   })
 
   it('returns an error result for a non-2xx response', async () => {
     mswServer.use(
-      http.post(env.TELEMETRY_URL, () =>
-        HttpResponse.json({ error: 'validation_failed' }, {
-          status: 400
+      http.post(TELEMETRY_TRIGGER_URL, () =>
+        HttpResponse.json({ error: 'boom' }, {
+          status: 502
         } as HttpResponseInit)
       )
     )
 
     const report = buildTelemetryReport(
       { 'events.total': 3 },
-      '2026-08-13T00:00:00.000Z',
-      { countryCode: 'FAR', applicationName: 'Farajaland CRS', domain: null }
+      '2026-08-13T00:00:00.000Z'
     )
     const result = await sendTelemetryReport(report)
     expect(result.status).toBe('error')
     if (result.status === 'error') {
-      expect(result.httpStatus).toBe(400)
+      expect(result.httpStatus).toBe(502)
     }
   })
 })
 
 describe('runDailyTelemetry', () => {
-  it('collects metrics and reports them for the given day', async () => {
+  it('collects metrics and hands them to countryconfig for the given day', async () => {
     await setupTestCase()
 
     let receivedBody:
-      | {
-          reported_at: string
-          country_code: string
-          domain: string | null
-          instance: { environment?: string; application_name: string }
-        }
+      | { reported_at: string; metrics: Record<string, unknown> }
       | undefined
     mswServer.use(
-      http.post(env.TELEMETRY_URL, async ({ request }) => {
+      http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
         receivedBody = (await request.json()) as typeof receivedBody
-        return HttpResponse.json(
-          { report_id: 'r1', status: 'accepted', metrics_recorded: 5 },
-          { status: 202 } as HttpResponseInit
-        )
+        return HttpResponse.json({ status: 'forwarded' }, {
+          status: 202
+        } as HttpResponseInit)
       })
     )
 
     const reportedAt = '2026-08-13T00:00:00.000Z'
     const result = await runDailyTelemetry(reportedAt)
 
-    expect(result.status).toBe('accepted')
+    expect(result.status).toBe('sent')
     expect(receivedBody?.reported_at).toBe(reportedAt)
-    // country_code / domain / environment come from the default
-    // /config/application msw handler (COUNTRY_CODE, TELEMETRY_DOMAIN,
-    // TELEMETRY_ENVIRONMENT).
-    expect(receivedBody?.country_code).toBe('FAR')
-    expect(receivedBody?.domain).toBe('farajaland.opencrvs.org')
-    expect(receivedBody?.instance.environment).toBe('production')
-    // application_name comes from APPLICATION_NAME in the msw config handler.
-    expect(receivedBody?.instance.application_name).toBe('Test')
-  })
-
-  it('skips when telemetry is disabled in the application config', async () => {
-    await setupTestCase()
-
-    mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/config/application`, () =>
-        HttpResponse.json({
-          APPLICATION_NAME: 'Test',
-          COUNTRY_CODE: 'FAR',
-          COUNTRY_LOGO: { fileName: 'logo.png', file: '' },
-          SYSTEM_IANA_TIMEZONE: 'UTC',
-          CURRENCY: { isoCode: 'USD', languagesAndCountry: ['en-US'] },
-          TELEMETRY_ENABLED: false,
-          PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
-          USER_NOTIFICATION_DELIVERY_METHOD: 'email',
-          INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
-          ADMIN_STRUCTURE: []
-        })
-      )
-    )
-
-    const result = await runDailyTelemetry('2026-08-13T00:00:00.000Z')
-    expect(result.status).toBe('skipped')
+    expect(receivedBody?.metrics['events.total']).toBeDefined()
   })
 })

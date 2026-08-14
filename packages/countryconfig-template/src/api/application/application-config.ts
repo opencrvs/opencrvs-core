@@ -14,7 +14,6 @@ import { defineApplicationConfig } from '@opencrvs/toolkit/application-config'
 
 export const applicationConfig = defineApplicationConfig({
   APPLICATION_NAME: 'Farajaland CRS',
-  COUNTRY_CODE: 'FAR',
   COUNTRY_LOGO: countryLogo,
   SYSTEM_IANA_TIMEZONE: 'Asia/Dhaka', // Default timezone for the country. Basis for date and time calculations during searches.
   CURRENCY: {
@@ -50,13 +49,7 @@ export const applicationConfig = defineApplicationConfig({
   PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',
   USER_NOTIFICATION_DELIVERY_METHOD: 'email', // or 'sms', or '' ... You can use 'sms' for WhatsApp
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email', // or 'sms', or '' ... You can use 'sms' for WhatsApp
-  SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID',
-  // Daily usage telemetry. Enablement is the same across a country's
-  // environments; the domain and environment label differ per environment, so
-  // they are sourced from env vars set on the country config deployment.
-  TELEMETRY_ENABLED: true,
-  TELEMETRY_ENVIRONMENT: process.env.TELEMETRY_ENVIRONMENT,
-  TELEMETRY_DOMAIN: process.env.TELEMETRY_DOMAIN
+  SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID'
   /*
    * SEARCH_DEFAULT_CRITERIA's value can be one of the following
    * | 'TRACKING_ID',

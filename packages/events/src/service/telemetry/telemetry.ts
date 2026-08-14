@@ -9,55 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { logger } from '@opencrvs/commons'
+import { logger, joinUrl } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getApplicationConfig } from '@events/service/config/config'
 import { collectTelemetryMetrics, TelemetryMetrics } from './metrics'
 
-/**
- * Payload contract version. Bumped only for breaking changes to the envelope;
- * additive metric keys do not require a bump. Part of the server's idempotency
- * key `(country_code, domain, reported_at, schema_version)`.
- */
-export const TELEMETRY_SCHEMA_VERSION = '1.0'
-
-/** Metrics map size limits enforced by the ingest endpoint. */
+/** Metrics map size limits enforced by the telemetry ingest endpoint. */
 const MIN_METRICS = 1
 const MAX_METRICS = 500
 
-/** The `/v1/telemetry` request envelope. */
+/**
+ * Report the events service sends to countryconfig's `/trigger/telemetry`.
+ * countryconfig decides whether telemetry is enabled, stamps the instance
+ * identity (country code, domain, environment, application name) and forwards
+ * it to the status service — so core stays unaware of any of that.
+ */
 export interface TelemetryReport {
-  schema_version: string
   reported_at: string
-  country_code: string
-  domain: string | null
-  instance: {
-    application_name: string
-    environment?: string
-    app_version?: string
-  }
+  app_version?: string
   metrics: TelemetryMetrics
 }
 
-/** Instance identity for a report, resolved from the application config. */
-export interface TelemetryContext {
-  countryCode: string
-  applicationName: string
-  domain: string | null
-  environment?: string
-}
-
 export type TelemetrySendResult =
-  | { status: 'accepted'; reportId: string; metricsRecorded: number }
-  | { status: 'duplicate'; reportId: string }
+  | { status: 'sent' }
   | { status: 'skipped'; reason: string }
   | { status: 'error'; httpStatus?: number; message: string }
 
 /**
  * Midnight (UTC) of the given day as an ISO 8601 string. Used as `reported_at`
  * so that retries — and restarts — within the same day resolve to the same
- * value. The server's idempotency key then collapses duplicate sends to a
- * single report, which keeps at-most-once daily reporting from double-counting.
+ * value. The status service's idempotency key then collapses duplicate sends to
+ * a single report, keeping at-most-once daily reporting from double-counting.
  */
 export function startOfUtcDay(date: Date = new Date()): string {
   const d = new Date(date)
@@ -67,26 +48,18 @@ export function startOfUtcDay(date: Date = new Date()): string {
 
 export function buildTelemetryReport(
   metrics: TelemetryMetrics,
-  reportedAt: string,
-  context: TelemetryContext
+  reportedAt: string
 ): TelemetryReport {
   return {
-    schema_version: TELEMETRY_SCHEMA_VERSION,
     reported_at: reportedAt,
-    country_code: context.countryCode,
-    domain: context.domain,
-    instance: {
-      application_name: context.applicationName,
-      environment: context.environment,
-      // Set by the package manager when the service is started via a script.
-      app_version: process.env.npm_package_version
-    },
+    // Set by the package manager when the service is started via a script.
+    app_version: process.env.npm_package_version,
     metrics
   }
 }
 
 /**
- * POSTs a single report to the telemetry ingest endpoint. Network and server
+ * POSTs a report to countryconfig's telemetry trigger. Network and server
  * errors are returned rather than thrown so the caller (the daily worker) can
  * decide whether to retry — the stable `reported_at` makes a retry safe.
  */
@@ -103,13 +76,16 @@ export async function sendTelemetryReport(
 
   let response: Response
   try {
-    response = await fetch(env.TELEMETRY_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(report)
-    })
+    response = await fetch(
+      joinUrl(env.COUNTRY_CONFIG_URL, 'trigger/telemetry'),
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(report)
+      }
+    )
   } catch (error) {
     return {
       status: 'error',
@@ -117,25 +93,11 @@ export async function sendTelemetryReport(
     }
   }
 
-  // 202 Accepted — stored; 200 OK — idempotent duplicate. Anything else is an
-  // error we surface to the caller.
-  if (response.status === 202) {
-    const body = (await response.json().catch(() => ({}))) as {
-      report_id?: string
-      metrics_recorded?: number
-    }
-    return {
-      status: 'accepted',
-      reportId: body.report_id ?? '',
-      metricsRecorded: body.metrics_recorded ?? entries
-    }
-  }
-
-  if (response.status === 200) {
-    const body = (await response.json().catch(() => ({}))) as {
-      report_id?: string
-    }
-    return { status: 'duplicate', reportId: body.report_id ?? '' }
+  // countryconfig replies 2xx whether it forwarded the report or skipped it
+  // (telemetry disabled); either way the day is covered. Anything else is an
+  // error we surface so the worker retries.
+  if (response.ok) {
+    return { status: 'sent' }
   }
 
   const detail = await response.text().catch(() => '')
@@ -147,49 +109,22 @@ export async function sendTelemetryReport(
 }
 
 /**
- * Collects the current metrics and reports them for the given day. Defaults to
- * today's UTC window so the same report is produced across retries.
+ * Collects the current metrics and hands them to countryconfig for the given
+ * day. Defaults to today's UTC window so the same report is produced across
+ * retries.
  */
 export async function runDailyTelemetry(
   reportedAt: string = startOfUtcDay()
 ): Promise<TelemetrySendResult> {
-  const applicationConfig = await getApplicationConfig()
-  if (!applicationConfig.TELEMETRY_ENABLED) {
-    logger.info(
-      'Telemetry: disabled in application config (TELEMETRY_ENABLED is false) — skipping report'
-    )
-    return {
-      status: 'skipped',
-      reason: 'TELEMETRY_ENABLED is false in the application config'
-    }
-  }
-
-  const domain = applicationConfig.TELEMETRY_DOMAIN ?? null
-  const environment = applicationConfig.TELEMETRY_ENVIRONMENT
-  logger.info(
-    `Telemetry: enabled for ${applicationConfig.COUNTRY_CODE} — domain=${
-      domain ?? '(unset)'
-    }, environment=${environment ?? '(unset)'}, reporting for ${reportedAt}`
-  )
-
   const metrics = await collectTelemetryMetrics()
-  const report = buildTelemetryReport(metrics, reportedAt, {
-    countryCode: applicationConfig.COUNTRY_CODE,
-    applicationName: applicationConfig.APPLICATION_NAME,
-    domain,
-    environment
-  })
+  const report = buildTelemetryReport(metrics, reportedAt)
   const result = await sendTelemetryReport(report)
 
-  if (result.status === 'accepted') {
-    logger.info(
-      `Telemetry: reported ${result.metricsRecorded} metrics for ${reportedAt} (report ${result.reportId})`
-    )
-  } else if (result.status === 'duplicate') {
-    logger.info(`Telemetry: report for ${reportedAt} already recorded`)
+  if (result.status === 'sent') {
+    logger.info(`Telemetry: report for ${reportedAt} handed to countryconfig`)
   } else if (result.status === 'error') {
     logger.error(
-      `Telemetry: failed to report for ${reportedAt}: ${
+      `Telemetry: failed to hand report for ${reportedAt} to countryconfig: ${
         result.httpStatus ? `HTTP ${result.httpStatus} — ` : ''
       }${result.message}`
     )

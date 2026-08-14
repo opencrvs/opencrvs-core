@@ -35,9 +35,5 @@ export const env = cleanEnv(process.env, {
   EVENT_CONFIG_CACHE_TTL_MS: num({
     default: 60_000,
     desc: 'How long (ms) the events service caches event/workqueue configuration fetched from countryconfig before refetching. Bounds how stale served config can be after a countryconfig deploy that does not restart the events service.'
-  }),
-  TELEMETRY_URL: url({
-    default: 'https://status.opencrvs.dev/v1/telemetry',
-    desc: 'Ingest endpoint for daily usage telemetry. Whether telemetry is sent, and the country code / domain / environment reported, come from the application config served by countryconfig.'
   })
 })
