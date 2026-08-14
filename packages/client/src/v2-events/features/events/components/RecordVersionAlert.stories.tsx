@@ -290,8 +290,8 @@ export const RedeclaredWithEdits: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByTestId('record-version-alert')).toHaveTextContent(
-      'Re-declared with edits'
-    )
+    await expect(
+      await canvas.findByTestId('record-version-alert')
+    ).toHaveTextContent('Re-declared with edits')
   }
 }

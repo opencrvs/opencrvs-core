@@ -69,12 +69,7 @@ const modifiedDraft = generateEventDraftDocument({
   rng
 })
 
-/*
- * A notification, then a declaration that changed the applicant's surname.
- * The notification keeps its own data — editing a notification emits EDIT plus
- * a fresh DECLARE and leaves the NOTIFY untouched — so the two versions differ
- * and the comparison has something to show.
- */
+/* A notification, then the first declaration: two forms, one version each. */
 const changedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
@@ -93,6 +88,37 @@ const changedEventDocument = generateEventDocument({
     }
   ],
   rng: createPrng(305)
+})
+
+/*
+ * A declaration, then an edit that changed the applicant's surname. Editing
+ * emits EDIT followed by a fresh DECLARE, so the record holds two declaration
+ * versions and the comparison has something to show.
+ */
+const editedEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Mwansa' }
+      }
+    },
+    {
+      type: ActionType.EDIT,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Banda' }
+      }
+    },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Banda' }
+      }
+    }
+  ],
+  rng: createPrng(418)
 })
 
 function offlineHandlers(document: typeof eventDocument) {
@@ -145,7 +171,7 @@ export const NoComparisonOnAFirstDeclaration: Story = {
 export const ShowsWhatChanged: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const row = await canvas.findByTestId('row-value-applicant.name')
+    const row = await canvas.findByTestId('applicant.name-value')
     // The value it replaced, and the value that replaced it.
     await expect(row).toHaveTextContent('Mwansa')
     await expect(row).toHaveTextContent('Banda')
@@ -155,11 +181,11 @@ export const ShowsWhatChanged: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: `${ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
-        eventId: changedEventDocument.id
+        eventId: editedEventDocument.id
       })}?changes=true`
     },
-    offline: { events: [changedEventDocument], drafts: [] },
-    msw: { handlers: offlineHandlers(changedEventDocument) }
+    offline: { events: [editedEventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(editedEventDocument) }
   }
 }
 
