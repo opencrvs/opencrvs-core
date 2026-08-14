@@ -80,7 +80,7 @@ export const roles: Role[] = [
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.unarchive', options: { declaredIn: 'administrativeArea' } },
-      { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.register', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.correct', options: { registeredIn: 'administrativeArea' } },
