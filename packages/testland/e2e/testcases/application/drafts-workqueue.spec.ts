@@ -66,7 +66,12 @@ test.describe.serial('1: Validate my draft tab', () => {
   test('1.3 Record appears in draft', async () => {
     await page.getByRole('button', { name: 'Drafts' }).click()
 
-    await expect(page.getByTestId('search-result')).toContainText(formattedName)
+    // 5s (Playwright's default) wasn't always enough for the drafts
+    // workqueue query to reflect a just-created draft under CI load.
+    await expect(page.getByTestId('search-result')).toContainText(
+      formattedName,
+      { timeout: 15000 }
+    )
   })
 
   test('1.4 Record has "Update" -CTA', async () => {
