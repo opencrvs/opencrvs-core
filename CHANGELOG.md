@@ -98,7 +98,7 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 
 #### Daily usage telemetry
 
-The events service collects a small daily usage summary (registered/pending declaration counts, active user counts, uptime) and hands it to countryconfig, which forwards it to the OpenCRVS status service. The worker collects at most once per UTC day and uses a stable `reported_at` so retries and restarts don't double-count.
+The events service collects a small daily usage summary (registered/pending declaration counts, certificates printed, active user counts, uptime — declaration and certificate counts also broken down per event type) and hands it to countryconfig, which forwards it to the OpenCRVS status service. The worker collects at most once per UTC day and uses a stable `reported_at` so retries and restarts don't double-count.
 
 Responsibilities are split so the events service stays unaware of telemetry policy:
 

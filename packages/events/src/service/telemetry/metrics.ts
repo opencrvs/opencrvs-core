@@ -39,64 +39,84 @@ function toCount(value: number | string | bigint): number {
 export async function collectTelemetryMetrics(): Promise<TelemetryMetrics> {
   const db = getClient()
 
-  const [totalEvents, registeredByType, pending, users] = await Promise.all([
-    db
-      .selectFrom('events')
-      .select((eb) => eb.fn.countAll<string>().as('count'))
-      .executeTakeFirstOrThrow(),
-    // Registered declarations, broken down by event type. An event counts as
-    // registered once it has an Accepted REGISTER action.
-    db
-      .selectFrom('eventActions')
-      .innerJoin('events', 'events.id', 'eventActions.eventId')
-      .select((eb) => [
-        'events.eventType as eventType',
-        eb.fn.count<string>('eventActions.eventId').distinct().as('count')
-      ])
-      .where('eventActions.actionType', '=', ActionType.REGISTER)
-      .where('eventActions.status', '=', ActionStatus.Accepted)
-      .groupBy('events.eventType')
-      .execute(),
-    // Events that have been declared but not yet registered.
-    db
-      .selectFrom('events')
-      .select((eb) => eb.fn.countAll<string>().as('count'))
-      .where((eb) =>
-        eb.exists(
-          eb
-            .selectFrom('eventActions as declared')
-            .select('declared.id')
-            .whereRef('declared.eventId', '=', 'events.id')
-            .where('declared.actionType', '=', ActionType.DECLARE)
-            .where('declared.status', '=', ActionStatus.Accepted)
-        )
-      )
-      .where((eb) =>
-        eb.not(
+  const [totalEvents, registeredByType, certificatesByType, pending, users] =
+    await Promise.all([
+      db
+        .selectFrom('events')
+        .select((eb) => eb.fn.countAll<string>().as('count'))
+        .executeTakeFirstOrThrow(),
+      // Registered declarations, broken down by event type. An event counts as
+      // registered once it has an Accepted REGISTER action.
+      db
+        .selectFrom('eventActions')
+        .innerJoin('events', 'events.id', 'eventActions.eventId')
+        .select((eb) => [
+          'events.eventType as eventType',
+          eb.fn.count<string>('eventActions.eventId').distinct().as('count')
+        ])
+        .where('eventActions.actionType', '=', ActionType.REGISTER)
+        .where('eventActions.status', '=', ActionStatus.Accepted)
+        .groupBy('events.eventType')
+        .execute(),
+      // Certificates printed, broken down by event type. A record can be
+      // printed more than once, so every Accepted PRINT_CERTIFICATE action is
+      // counted (not distinct events) — this total typically exceeds the number
+      // of registrations.
+      db
+        .selectFrom('eventActions')
+        .innerJoin('events', 'events.id', 'eventActions.eventId')
+        .select((eb) => [
+          'events.eventType as eventType',
+          eb.fn.countAll<string>().as('count')
+        ])
+        .where('eventActions.actionType', '=', ActionType.PRINT_CERTIFICATE)
+        .where('eventActions.status', '=', ActionStatus.Accepted)
+        .groupBy('events.eventType')
+        .execute(),
+      // Events that have been declared but not yet registered.
+      db
+        .selectFrom('events')
+        .select((eb) => eb.fn.countAll<string>().as('count'))
+        .where((eb) =>
           eb.exists(
             eb
-              .selectFrom('eventActions as registered')
-              .select('registered.id')
-              .whereRef('registered.eventId', '=', 'events.id')
-              .where('registered.actionType', '=', ActionType.REGISTER)
-              .where('registered.status', '=', ActionStatus.Accepted)
+              .selectFrom('eventActions as declared')
+              .select('declared.id')
+              .whereRef('declared.eventId', '=', 'events.id')
+              .where('declared.actionType', '=', ActionType.DECLARE)
+              .where('declared.status', '=', ActionStatus.Accepted)
           )
         )
-      )
-      .executeTakeFirstOrThrow(),
-    db
-      .selectFrom('users')
-      .select((eb) => [
-        eb.fn.countAll<string>().as('total'),
-        eb.fn
-          .countAll<string>()
-          .filterWhere('status', '=', 'active')
-          .as('active')
-      ])
-      .executeTakeFirstOrThrow()
-  ])
+        .where((eb) =>
+          eb.not(
+            eb.exists(
+              eb
+                .selectFrom('eventActions as registered')
+                .select('registered.id')
+                .whereRef('registered.eventId', '=', 'events.id')
+                .where('registered.actionType', '=', ActionType.REGISTER)
+                .where('registered.status', '=', ActionStatus.Accepted)
+            )
+          )
+        )
+        .executeTakeFirstOrThrow(),
+      db
+        .selectFrom('users')
+        .select((eb) => [
+          eb.fn.countAll<string>().as('total'),
+          eb.fn
+            .countAll<string>()
+            .filterWhere('status', '=', 'active')
+            .as('active')
+        ])
+        .executeTakeFirstOrThrow()
+    ])
 
   const registeredTotal = registeredByType.reduce(
+    (sum, row) => sum + toCount(row.count),
+    0
+  )
+  const certificatesTotal = certificatesByType.reduce(
     (sum, row) => sum + toCount(row.count),
     0
   )
@@ -105,16 +125,19 @@ export async function collectTelemetryMetrics(): Promise<TelemetryMetrics> {
     'events.total': toCount(totalEvents.count),
     'declarations.registered': registeredTotal,
     'declarations.pending': toCount(pending.count),
+    'certificates.printed': certificatesTotal,
     'users.total': toCount(users.total),
     'users.active': toCount(users.active),
-    'system.uptime_seconds': Math.floor(process.uptime()),
-    'system.health': 'ok'
+    'system.uptime_seconds': Math.floor(process.uptime())
   }
 
-  // Fold the per-event-type breakdown into the key, e.g.
-  // `declarations.registered.v2.birth`.
+  // Fold the per-event-type breakdowns into the key, e.g.
+  // `declarations.registered.v2.birth` and `certificates.printed.v2.birth`.
   for (const row of registeredByType) {
     metrics[`declarations.registered.${row.eventType}`] = toCount(row.count)
+  }
+  for (const row of certificatesByType) {
+    metrics[`certificates.printed.${row.eventType}`] = toCount(row.count)
   }
 
   return metrics

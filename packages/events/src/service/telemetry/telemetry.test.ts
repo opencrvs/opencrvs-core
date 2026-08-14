@@ -10,7 +10,13 @@
  */
 
 import { http, HttpResponse, HttpResponseInit } from 'msw'
-import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  ActionType,
+  getUUID,
+  TENNIS_CLUB_MEMBERSHIP,
+  TokenUserType
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { setupTestCase, seedEvent } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -50,16 +56,36 @@ describe('collectTelemetryMetrics', () => {
       rng
     })
 
+    // Print certificates: 2 on the first event, 1 on the second — a record can
+    // be printed more than once, so the total (3) exceeds registrations (2).
+    const events = await eventsDb.selectFrom('events').select('id').execute()
+    await eventsDb
+      .insertInto('eventActions')
+      .values(
+        [events[0].id, events[0].id, events[1].id].map((eventId) => ({
+          actionType: ActionType.PRINT_CERTIFICATE,
+          status: ActionStatus.Accepted,
+          eventId,
+          createdBy: user.id,
+          createdByUserType: TokenUserType.enum.user,
+          transactionId: getUUID(),
+          declaration: {}
+        }))
+      )
+      .execute()
+
     const metrics = await collectTelemetryMetrics()
 
     expect(metrics['events.total']).toBe(3)
     expect(metrics['declarations.registered']).toBe(2)
     expect(metrics[`declarations.registered.${TENNIS_CLUB_MEMBERSHIP}`]).toBe(2)
     expect(metrics['declarations.pending']).toBe(1)
+    // Certificates printed exceed registrations (3 prints across 2 records).
+    expect(metrics['certificates.printed']).toBe(3)
+    expect(metrics[`certificates.printed.${TENNIS_CLUB_MEMBERSHIP}`]).toBe(3)
     // setupTestCase seeds two active users.
     expect(metrics['users.total']).toBe(2)
     expect(metrics['users.active']).toBe(2)
-    expect(metrics['system.health']).toBe('ok')
     expect(typeof metrics['system.uptime_seconds']).toBe('number')
   })
 })
@@ -87,7 +113,7 @@ describe('sendTelemetryReport', () => {
     )
 
     const report = buildTelemetryReport(
-      { 'events.total': 3, 'system.health': 'ok' },
+      { 'events.total': 3, 'users.active': 5 },
       '2026-08-13T00:00:00.000Z'
     )
     const result = await sendTelemetryReport(report)
@@ -98,7 +124,7 @@ describe('sendTelemetryReport', () => {
     expect(capturedBody).toEqual({
       reported_at: '2026-08-13T00:00:00.000Z',
       app_version: process.env.npm_package_version,
-      metrics: { 'events.total': 3, 'system.health': 'ok' }
+      metrics: { 'events.total': 3, 'users.active': 5 }
     })
   })
 
