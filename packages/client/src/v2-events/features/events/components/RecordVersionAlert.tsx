@@ -19,10 +19,8 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 
 /*
- * Each key is one whole sentence. Guards decide which sentences appear, never
- * parts of one — a translator handed half a sentence cannot control the
- * conjunction, the word order or the case of the other half, and cannot see
- * what that half will be.
+ * Each key is one whole sentence, never half of one: a translator cannot
+ * control word order or case across a join they cannot see.
  */
 const messages = defineMessages({
   titlePattern: {
@@ -140,13 +138,12 @@ interface RecordVersionAlertProps {
 }
 
 /**
- * Says which of the record's forms is on screen, which version of it, where
- * that version came from, and what has happened to the record since.
+ * Says which form and version is on screen, where it came from, and what has
+ * happened to the record since.
  *
- * The tone turns on one fact: whether this is the newest version of its form.
- * Being an older version of a form is what warrants a warning — reading the
- * declaration of a registered record does not, because the declaration is
- * still the latest declaration.
+ * The tone turns on whether this is the newest version of its form. A
+ * declaration on a registered record is not a warning — it is still the latest
+ * declaration.
  */
 export function RecordVersionAlert({
   versions,
@@ -190,8 +187,7 @@ export function RecordVersionAlert({
 
   const sentences: string[] = []
 
-  // 1. Where this version came from. Always — it is the one thing neither the
-  //    title nor the version selector says.
+  // Where this version came from — neither the title nor the selector says it.
   const provenance = BY_ACTION[selected.actionType]
   if (provenance) {
     sentences.push(
@@ -203,9 +199,8 @@ export function RecordVersionAlert({
   }
 
   /*
-   * 2. What follows from being on this form — and only when it changes what
-   *    the reader would conclude. Dates are deliberately absent: the selector
-   *    carries them, and repeating them here made the alert read as a log.
+   * What follows from being on this form, and only when it changes what the
+   * reader would conclude. No dates — the selector carries them.
    */
   const hasDeclaration = versions.some((v) => v.form === RecordForm.DECLARATION)
   const hasRegistration = versions.some(
