@@ -635,8 +635,8 @@ function ReviewComponent({
           {hasAnnotationFieldsToShow &&
             readonlyMode &&
             displayedAnnotationFields.length > 0 && (
-              <FormData>
-                <ReviewContainter>
+              <FormData $padded={content === undefined}>
+                <ReviewContainter $padded={content === undefined}>
                   <DeclarationDataContainer>
                     <Accordion
                       expand={true}
