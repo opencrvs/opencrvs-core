@@ -11,22 +11,24 @@
 import { ENVIRONMENT_NAME } from '@countryconfig/constants'
 import { readCSVToJSON } from '@countryconfig/utils'
 import { Request, ResponseToolkit } from '@hapi/hapi'
+import { existsSync } from 'fs'
 import { join } from 'path'
 
 const EMPLOYEES_SOURCE_DIR = './src/data-seeding/employees/source'
 const DEFAULT_EMPLOYEES_CSV = 'default-employees.csv'
 
 /**
- * Which employees CSV in `src/data-seeding/employees/source/` to seed for a
- * given environment. Any environment not listed here uses
- * `default-employees.csv`.
+ * Employees CSV to seed for the given environment: `<environment>-employees.csv`
+ * when that file exists in the source directory, otherwise
+ * `default-employees.csv`. Add a `production-employees.csv` (etc.) to the source
+ * directory to seed a different set of users per environment — no code change
+ * needed.
  */
-const EMPLOYEES_CSV_BY_ENVIRONMENT: Record<string, string> = {
-  production: 'production-employees.csv'
-}
-
 export function employeesCsvForEnvironment(environmentName: string): string {
-  return EMPLOYEES_CSV_BY_ENVIRONMENT[environmentName] ?? DEFAULT_EMPLOYEES_CSV
+  const environmentFile = `${environmentName}-employees.csv`
+  return existsSync(join(EMPLOYEES_SOURCE_DIR, environmentFile))
+    ? environmentFile
+    : DEFAULT_EMPLOYEES_CSV
 }
 
 export async function usersHandler(_: Request, h: ResponseToolkit) {

@@ -12,17 +12,15 @@ import { describe, expect, test } from 'vitest'
 import { employeesCsvForEnvironment } from './handler'
 
 describe('employeesCsvForEnvironment', () => {
-  test('picks production-employees.csv for the production environment', () => {
-    expect(employeesCsvForEnvironment('production')).toBe(
-      'production-employees.csv'
-    )
+  test('uses <environment>-employees.csv when that file exists', () => {
+    // `default-employees.csv` ships in the source directory, so 'default'
+    // resolves to it through the environment-file branch.
+    expect(employeesCsvForEnvironment('default')).toBe('default-employees.csv')
   })
 
-  test('falls back to default-employees.csv for any other environment', () => {
-    expect(employeesCsvForEnvironment('staging')).toBe('default-employees.csv')
-    expect(employeesCsvForEnvironment('development')).toBe(
+  test('falls back to default-employees.csv when no environment file exists', () => {
+    expect(employeesCsvForEnvironment('no-such-environment')).toBe(
       'default-employees.csv'
     )
-    expect(employeesCsvForEnvironment('')).toBe('default-employees.csv')
   })
 })
