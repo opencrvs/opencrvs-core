@@ -21,6 +21,10 @@ How the migration runs during the v2.0.0 upgrade:
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.
 
+#### `POST /locations` / `POST /administrative-areas` no longer upsert
+
+In 2.0.1, `POST /locations` and `POST /administrative-areas` upserted a record by id — creating it if new, or overwriting its fields if it already existed. In 2.1.0 these same routes are create-only: posting an id that already exists with different values now returns a `CONFLICT` error instead of overwriting it. Updating an existing location or administrative area requires the new `PUT /locations/{id}` / `PUT /administrative-areas/{id}` endpoints, which append a version rather than overwrite in place. Integrators using the 2.0.1 upsert endpoint to update existing records must switch to `PUT`.
+
 #### MongoDB removed
 
 MongoDB, the `mongodb`/`mongoose` dependencies, the MongoDB Helm resources and dependency chart, and all MongoDB references in compose files, dev scripts, and CI have been removed. See "Upgrade guidance" above for the required upgrade path.
@@ -94,7 +98,16 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 
 ## 2.0.1 Release Candidate
 
-## 2.0.0
+### Improvements
+
+- Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+- Expose `POST /locations` and `POST /administrative-areas` REST endpoints to create or update a single location or administrative area, for correcting individual data-seeding errors. Bulk seeding is unaffected and still uses the existing `locations.set`/`administrativeAreas.set` tRPC mutations. [#13336](https://github.com/opencrvs/opencrvs-core/pull/13336)
+
+### Bug fixes
+
+- Re-enable ARM-based images in the Tiltfile so local developers can run OpenCRVS on Apple silicon. [#13285](https://github.com/opencrvs/opencrvs-core/pull/13285)
+
+## 2.0.0 Release
 
 ### Upgrade guidance
 

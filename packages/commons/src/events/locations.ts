@@ -418,6 +418,10 @@ export function canAccessEventWithScope(
     return false
   }
 
+  if (opts?.createdBy === UserFilter.enum.user && event.createdBy !== user.id) {
+    return false
+  }
+
   if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
 

@@ -62,12 +62,12 @@ describe('canAccessEventWithScope()', () => {
     type: 'birth',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    createdBy: generateUuid(rng),
     status: 'DECLARED' as const,
     trackingId: generateUuid(rng),
     declaration: {},
     flags: [],
     potentialDuplicates: [],
+    createdBy: createdById,
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       NOTIFIED: undefined,
@@ -121,6 +121,7 @@ describe('canAccessEventWithScope()', () => {
   ] satisfies RecordScopeV2['options'][]
 
   const userOptions = [
+    { createdBy: 'user' },
     { declaredBy: 'user' },
     { registeredBy: 'user' }
   ] satisfies RecordScopeV2['options'][]
@@ -302,6 +303,165 @@ describe('canAccessEventWithScope()', () => {
         ).toBe(true)
       }
     )
+
+    test('should access an event they created even when it was declared by another user (createdBy:user)', () => {
+      // The user created the record, but a different user re-declared it, so
+      // DECLARED.createdBy no longer points to them. createdBy is based on the
+      // immutable CREATE author, so it should still grant access...
+      const reDeclaredByAnotherUser = {
+        ...declaredEvent,
+        createdBy: userContext.id,
+        legalStatuses: {
+          DECLARED: {
+            acceptedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            createdBy: generateUuid(rng),
+            createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+          },
+          NOTIFIED: undefined,
+          REGISTERED: undefined
+        }
+      } satisfies EventIndexWithAdministrativeHierarchy
+
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { createdBy: 'user' } },
+          userContext
+        )
+      ).toBe(true)
+
+      // ...whereas a declaredBy:user scope would not, since the latest DECLARE
+      // was authored by someone else.
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { declaredBy: 'user' } },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
   })
 
   describe('flags option', () => {
@@ -438,6 +598,7 @@ describe('canAccessEventWithScope()', () => {
     const singleOptions = [
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
+      { createdBy: 'user' },
       { notifiedIn: 'location' },
       { notifiedIn: 'administrativeArea' },
       { notifiedBy: 'user' },

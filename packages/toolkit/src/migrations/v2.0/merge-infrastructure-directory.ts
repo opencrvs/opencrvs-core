@@ -45,7 +45,7 @@
  *     so `git merge-base HEAD upstream/develop` typically returns nothing.
  *   - With no merge-base, a 3-way merge degenerates to a 2-way diff against
  *     an empty file — every line that differs becomes a conflict.
- *   - `release-v1.9` is the latest 1.9.x release line on upstream and is a
+ *   - `release/1.9.15` is the latest 1.9.x release on upstream and is a
  *     near-perfect representation of "what `infrastructure/` looked like
  *     before v2.0", regardless of whether the fork's git history reaches it.
  *   - For files the country config never modified relative to that baseline,
@@ -70,7 +70,7 @@
  *     sides changed a binary file, the result will be invalid and a warning
  *     is printed.
  *   - Forks that are on a much older 1.9.x and never merged later 1.9 patches
- *     may see a few extra conflicts on files where 1.9.x → release-v1.9
+ *     may see a few extra conflicts on files where 1.9.x → release/1.9.15
  *     patches and v1.9 → v2.0 changes textually overlap.
  */
 
@@ -96,7 +96,7 @@ const INFRASTRUCTURE_DIR = 'infrastructure'
 // Synthetic merge-base: the tip of upstream's latest 1.9.x release line.
 // We use this branch's content as the "common ancestor" for every file,
 // since most country forks don't share git history with upstream.
-const BASE_BRANCH = 'release-v1.9'
+const BASE_BRANCH = 'release/1.9.15'
 
 /**
  * Reads `git show <ref>:<path>` as a Uint8Array (binary-safe).
