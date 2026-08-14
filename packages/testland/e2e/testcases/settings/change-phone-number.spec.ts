@@ -92,12 +92,9 @@ test('Phone number changed from settings is stored as entered', async ({
   })
 
   await test.step('New number is shown as entered on the settings page', async () => {
-    await expect(
-      page
-        .locator('[data-testid="list-view-value"]')
-        .filter({ hasText: newPhoneNumber })
-        .first()
-    ).toBeVisible()
+    await expect(page.getByTestId('phone-number-value')).toHaveText(
+      newPhoneNumber
+    )
   })
 
   await test.step('Phone number is correct when viewed by national system admin', async () => {
@@ -122,7 +119,7 @@ test('Phone number changed from settings is stored as entered', async ({
     await adminPage.getByText('Edit details').click()
     await expect(adminPage.getByText('Confirm details')).toBeVisible()
 
-    await expect(adminPage.getByTestId('row-value-phoneNumber')).toHaveText(
+    await expect(adminPage.getByTestId('phoneNumber-value')).toHaveText(
       newPhoneNumber
     )
 

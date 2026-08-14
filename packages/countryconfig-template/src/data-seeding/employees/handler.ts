@@ -8,15 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { OPENCRVS_ENVIRONMENT } from '@countryconfig/constants'
+import { EMPLOYEES_CSV } from '@countryconfig/constants'
 import { readCSVToJSON } from '@countryconfig/utils'
 import { Request, ResponseToolkit } from '@hapi/hapi'
+import { basename, join } from 'path'
+
+const EMPLOYEES_SOURCE_DIR = './src/data-seeding/employees/source'
 
 export async function usersHandler(_: Request, h: ResponseToolkit) {
+  if (basename(EMPLOYEES_CSV) !== EMPLOYEES_CSV) {
+    throw new Error(
+      `EMPLOYEES_CSV must be a file name inside ${EMPLOYEES_SOURCE_DIR}, not a path. Received: ${EMPLOYEES_CSV}`
+    )
+  }
+
   const users: unknown[] = await readCSVToJSON(
-    ['staging', 'production'].includes(OPENCRVS_ENVIRONMENT)
-      ? './src/data-seeding/employees/source/prod-employees.csv'
-      : './src/data-seeding/employees/source/default-employees.csv'
+    join(EMPLOYEES_SOURCE_DIR, EMPLOYEES_CSV)
   )
   return h.response(users)
 }

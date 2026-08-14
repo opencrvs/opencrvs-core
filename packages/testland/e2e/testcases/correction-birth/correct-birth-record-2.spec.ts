@@ -201,11 +201,11 @@ test.describe.serial('Correct record - 2', () => {
       await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
       await expect(
-        page.getByTestId('row-value-informant.relation').getByRole('deletion')
+        page.getByTestId('informant.relation-value').getByRole('deletion')
       ).toHaveText('Mother')
 
       await expect(
-        page.getByTestId('row-value-informant.relation')
+        page.getByTestId('informant.relation-value')
       ).toContainText('Brother')
     })
 

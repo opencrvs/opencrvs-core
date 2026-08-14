@@ -300,19 +300,19 @@ test.describe.serial(' Correct record - 3', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page.getByTestId('row-value-mother.name').getByRole('deletion')
+          await page.getByTestId('mother.name-value').getByRole('deletion')
         ).toHaveText(
           `${declaration['mother.name'].firstname} ${declaration['mother.name'].surname}`
         )
 
         await expect(
           await page
-            .getByTestId('row-value-mother.name')
+            .getByTestId('mother.name-value')
             .getByText(updatedMotherDetails.firstNames)
         ).toBeVisible()
         await expect(
           await page
-            .getByTestId('row-value-mother.name')
+            .getByTestId('mother.name-value')
             .getByText(updatedMotherDetails.familyName)
         ).toBeVisible()
       })
@@ -347,12 +347,12 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.age')
+            .getByTestId('mother.age-value')
             .getByText(updatedMotherDetails.age.toString())
         ).toBeVisible()
 
         await expect(
-          await page.getByTestId('row-value-mother.age').getByRole('deletion')
+          await page.getByTestId('mother.age-value').getByRole('deletion')
         ).toHaveText('-')
       })
 
@@ -384,13 +384,13 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.nationality')
+            .getByTestId('mother.nationality-value')
             .getByRole('deletion')
         ).toHaveText('Farajaland')
 
         await expect(
           await page
-            .getByTestId('row-value-mother.nationality')
+            .getByTestId('mother.nationality-value')
             .getByText(updatedMotherDetails.nationality)
         ).toBeVisible()
       })
@@ -423,13 +423,13 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.idType')
+            .getByTestId('mother.idType-value')
             .getByRole('deletion')
         ).toHaveText('National ID')
 
         await expect(
           await page
-            .getByTestId('row-value-mother.idType')
+            .getByTestId('mother.idType-value')
             .getByText(updatedMotherDetails.idType)
         ).toBeVisible()
       })
@@ -437,7 +437,7 @@ test.describe.serial(' Correct record - 3', () => {
       test('3.4.5 Change passport', async () => {
         await expect(
           await page
-            .getByTestId('row-value-mother.passport')
+            .getByTestId('mother.passport-value')
             .getByText('Required')
         ).toBeVisible()
 
@@ -469,13 +469,13 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.passport')
+            .getByTestId('mother.passport-value')
             .getByRole('deletion')
         ).toHaveText('-')
 
         await expect(
           await page
-            .getByTestId('row-value-mother.passport')
+            .getByTestId('mother.passport-value')
             .getByText(updatedMotherDetails.passport)
         ).toBeVisible()
       })
@@ -544,55 +544,55 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText('Farajaland')
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.province)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.district)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.village)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.town)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.residentialArea)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.street)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.number)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-mother.address')
+            .getByTestId('mother.address-value')
             .getByText(updatedMotherDetails.address.zipCode)
         ).toBeVisible()
       }) // <-- Add this closing brace for test('3.4.6 Change usual place of residence')
@@ -625,7 +625,7 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.maritalStatus')
+            .getByTestId('mother.maritalStatus-value')
             .getByRole('deletion')
         ).toHaveText(declaration['mother.maritalStatus'], {
           ignoreCase: true
@@ -633,7 +633,7 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.maritalStatus')
+            .getByTestId('mother.maritalStatus-value')
             .getByText(updatedMotherDetails.maritalStatus)
         ).toBeVisible()
       })
@@ -668,13 +668,13 @@ test.describe.serial(' Correct record - 3', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-mother.educationalAttainment')
+            .getByTestId('mother.educationalAttainment-value')
             .getByRole('deletion')
         ).toHaveText('No schooling')
 
         await expect(
           await page
-            .getByTestId('row-value-mother.educationalAttainment')
+            .getByTestId('mother.educationalAttainment-value')
             .getByText(updatedMotherDetails.educationLevel)
         ).toBeVisible()
       })
@@ -728,7 +728,7 @@ test.describe.serial(' Correct record - 3', () => {
 
       await expect(
         page
-          .getByTestId('row-value-child.placeOfBirth')
+          .getByTestId('child.placeOfBirth-value')
           .getByRole('deletion')
           .nth(0)
       ).toHaveText('Health Institution')
@@ -736,12 +736,12 @@ test.describe.serial(' Correct record - 3', () => {
       /*
         assertion fails
         await expect(
-        await  page.getByTestId('row-value-child.placeOfBirth').getByRole('deletion').nth(1)
+        await  page.getByTestId('child.placeOfBirth-value').getByRole('deletion').nth(1)
         ).toHaveText('Chikobo Rural Health Centre')
       */
       await expect(
         await page
-          .getByTestId('row-value-child.placeOfBirth')
+          .getByTestId('child.placeOfBirth-value')
           .getByText(updatedChildDetails.placeOfBirth)
       ).toBeVisible()
 
@@ -759,7 +759,7 @@ test.describe.serial(' Correct record - 3', () => {
       for (const part of addressParts) {
         await expect(
           page
-            .getByTestId('row-value-child.birthLocation.other')
+            .getByTestId('child.birthLocation.other-value')
             .getByText(part)
         ).toBeVisible()
       }
