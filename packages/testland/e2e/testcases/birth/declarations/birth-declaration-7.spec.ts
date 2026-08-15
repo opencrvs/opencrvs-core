@@ -23,7 +23,7 @@ import {
 } from '../../../helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '../../../constants'
-import { expectFieldNotCaptured, REQUIRED_VALIDATION_ERROR } from '../helpers'
+import { REQUIRED_VALIDATION_ERROR } from '../helpers'
 import { ensureAssignedToUser } from '../../../utils'
 import { openRecordByTitle } from '../../print-certificate/birth/helpers'
 
@@ -247,23 +247,29 @@ test.describe.serial('7. Birth declaration case - 7', () => {
       )
 
       /*
-       * Expected result: not captured, so not shown
+       * Expected result: should require
        * - Child's Gender
        */
-      await expectFieldNotCaptured(page, 'child.gender')
+      await expect(page.getByTestId('child.gender-value')).toContainText(
+        REQUIRED_VALIDATION_ERROR
+      )
 
       /*
-       * Expected result: not captured, so not shown
+       * Expected result: should require
        * - Child's date of birth
        */
-      await expectFieldNotCaptured(page, 'child.dob')
+      await expect(page.getByTestId('child.dob-value')).toContainText(
+        REQUIRED_VALIDATION_ERROR
+      )
 
       /*
-       * Expected result: not captured, so not shown
+       * Expected result: should require
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
-      await expectFieldNotCaptured(page, 'child.placeOfBirth')
+      await expect(
+        page.getByTestId('child.placeOfBirth-value')
+      ).toContainText(REQUIRED_VALIDATION_ERROR)
 
       /*
        * Expected result: should include
@@ -274,17 +280,20 @@ test.describe.serial('7. Birth declaration case - 7', () => {
       ).toContainText(declaration.informantType)
 
       /*
-       * Expected result: not captured, so not shown
+       * Expected result: should require
        * - Informant's Email
        */
-      await expectFieldNotCaptured(page, 'informant.email')
-
+      await expect(page.getByTestId('informant.email-value')).toContainText(
+        REQUIRED_VALIDATION_ERROR
+      )
       /*
-       * Expected result: not captured, so not shown
+       * Expected result: should require
        * - Informant's First Name
        * - Informant's Family Name
        */
-      await expectFieldNotCaptured(page, 'informant.name')
+      await expect(page.getByTestId('informant.name-value')).toContainText(
+        REQUIRED_VALIDATION_ERROR
+      )
     })
   })
 })

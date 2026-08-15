@@ -15,17 +15,15 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { isUndefined, noop } from 'lodash'
+import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   ActionType,
   applyDraftToEventIndex,
-  FieldConfig,
   EventState,
   getActionAnnotationFields,
   getDeclaration,
-  RecordForm,
   getOrThrow,
   getCurrentEventState,
   UUID,
@@ -122,31 +120,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const intl = useIntl()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  /*
-   * A notification shows only the fields it captured.
-   *
-   * Filtering on value rather than replaying the notifier's conditionals,
-   * because conditionals evaluate against the reader's scopes, not the
-   * notifier's — a registrar would see every question the notifier was never
-   * asked.
-   */
-  const fullFormConfig = getDeclaration(configuration)
-  const formConfig = useMemo(() => {
-    if (selected?.form !== RecordForm.NOTIFICATION) {
-      return fullFormConfig
-    }
-
-    const captured = ({ id }: FieldConfig) =>
-      !isUndefined(eventStateWithDraft.declaration[id]) &&
-      eventStateWithDraft.declaration[id] !== ''
-
-    return {
-      ...fullFormConfig,
-      pages: fullFormConfig.pages
-        .map((page) => ({ ...page, fields: page.fields.filter(captured) }))
-        .filter(({ fields }) => fields.length > 0)
-    }
-  }, [fullFormConfig, selected?.form, eventStateWithDraft])
+  const formConfig = getDeclaration(configuration)
 
   const annotation = useMemo((): EventState | undefined => {
     // Collect annotations from all past non-READ actions that have annotation fields

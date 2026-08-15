@@ -17,15 +17,6 @@ import { createClient } from '@opencrvs/toolkit/api'
 
 export const REQUIRED_VALIDATION_ERROR = 'Required'
 
-/**
- * A notification's Record tab renders only the fields it captured, so a field
- * with no value has no row rather than a row reading `Required`. The declare
- * and edit review pages still mark every unfilled mandatory field.
- */
-export async function expectFieldNotCaptured(page: Page, fieldId: string) {
-  await expect(page.getByTestId(`${fieldId}-value`)).toHaveCount(0)
-}
-
 export async function validateAddress(
   page: Page,
   address: Record<string, any>,
