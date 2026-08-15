@@ -145,8 +145,8 @@ function offlineHandlers(document: typeof eventDocument) {
 }
 
 /**
- * A first declaration is the record being completed rather than edited — the
- * notification before it was only ever asked a subset — so nothing is offered.
+ * A first declaration has no earlier declaration to compare against — the
+ * notification before it belongs to a different form — so nothing is offered.
  */
 export const NoComparisonOnAFirstDeclaration: Story = {
   play: async ({ canvasElement }) => {
