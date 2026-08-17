@@ -271,6 +271,11 @@ async function main() {
   ensureTargetDirectoryDoesNotExist(countryconfigDirName)
   ensureTargetDirectoryDoesNotExist(infrastructureDirName)
 
+  // Gather all answers up front so the operator isn't interrupted mid-clone.
+  const organisation = await promptOrganisation()
+  const countryCode = await promptCountryCode()
+  const telemetryEnabled = await promptEnableTelemetry()
+
   try {
     await cloneRepository(
       {
@@ -296,14 +301,12 @@ async function main() {
     process.exit(1)
   }
 
-  const organisation = await promptOrganisation()
-  const countryCode = await promptCountryCode()
   setTelemetryIdentityInEnvironment(countryconfigTargetPath, {
     organisation,
     countryCode
   })
 
-  if (await promptEnableTelemetry()) {
+  if (telemetryEnabled) {
     enableTelemetryInEnvironment(countryconfigTargetPath)
   }
 
