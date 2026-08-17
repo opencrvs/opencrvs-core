@@ -102,7 +102,7 @@ describe('Declare action', () => {
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
       )
-    ).rejects.toMatchObject(new EventNotFoundError(eventId))
+    ).rejects.toMatchObject(new EventNotFoundError())
   })
 
   test('allows access if required scope is present', async () => {

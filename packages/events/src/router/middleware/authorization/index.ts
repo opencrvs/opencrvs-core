@@ -336,7 +336,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     )
 
     if (!hasAccess) {
-      throw new EventNotFoundError(input.eventId)
+      throw new EventNotFoundError()
     }
 
     return next({

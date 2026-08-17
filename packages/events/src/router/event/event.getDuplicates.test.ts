@@ -62,7 +62,7 @@ test('prevents forbidden access if the scope doesnt allow the event type', async
 
   await expect(
     myClient.event.getDuplicates({ eventId: event.id })
-  ).rejects.toMatchObject(new EventNotFoundError(event.id))
+  ).rejects.toMatchObject(new EventNotFoundError())
 })
 
 test('prevents forbidden access without assignment but with right scope', async () => {

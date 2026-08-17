@@ -86,7 +86,7 @@ describe('event.actions.notify', () => {
           generator.event.actions.notify(event.id)
         )
         // User has record.notify scope, but not for the correct event type, so should get not found to prevent information leakage about the existence of the event
-      ).rejects.toMatchObject(new EventNotFoundError(event.id))
+      ).rejects.toMatchObject(new EventNotFoundError())
     })
 
     test('allows access with API scope with correct event type', async () => {

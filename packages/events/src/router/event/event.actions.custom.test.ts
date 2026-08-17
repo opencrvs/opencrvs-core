@@ -129,7 +129,7 @@ describe('event.actions.custom', () => {
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.toMatchObject(new EventNotFoundError(payload.eventId))
+      ).rejects.toMatchObject(new EventNotFoundError())
     })
 
     test('prevents forbidden access if user has custom action scope but for wrong custom action type', async () => {
@@ -139,7 +139,7 @@ describe('event.actions.custom', () => {
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.toMatchObject(new EventNotFoundError(payload.eventId))
+      ).rejects.toMatchObject(new EventNotFoundError())
     })
 
     test('prevents forbidden access if user has two custom action scopes, but neither of them for correct event and action combination', async () => {
@@ -150,7 +150,7 @@ describe('event.actions.custom', () => {
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.toMatchObject(new EventNotFoundError(payload.eventId))
+      ).rejects.toMatchObject(new EventNotFoundError())
     })
 
     test('allows access if user has custom action scope for correct event type and custom action type', async () => {

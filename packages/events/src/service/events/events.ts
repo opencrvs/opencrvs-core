@@ -50,7 +50,7 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
-  constructor(_id: string) {
+  constructor() {
     super({
       code: 'NOT_FOUND',
       message: 'Forbidden'
@@ -64,7 +64,7 @@ export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
     return await eventsRepo.getEventById(eventId)
   } catch (error) {
     if (error instanceof NoResultError) {
-      throw new EventNotFoundError(eventId)
+      throw new EventNotFoundError()
     }
     throw error
   }
