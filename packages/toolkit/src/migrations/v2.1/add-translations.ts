@@ -38,7 +38,7 @@ import {
   readCsvFile,
   toCsvLine,
   writeCsvFile
-} from '../csv'
+} from '../../csv'
 
 const REPOSITORY = 'opencrvs/opencrvs-core'
 const TEMPLATE_TRANSLATIONS = 'packages/countryconfig-template/src/translations'

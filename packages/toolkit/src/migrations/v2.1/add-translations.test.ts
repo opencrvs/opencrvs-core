@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { describe, expect, it } from 'vitest'
-import { CsvFile, addRows } from '../csv'
+import { CsvFile, addRows } from '../../csv'
 import { rowsToAdd } from './add-translations'
 
 function fileOf(header: string, body: string[]): CsvFile {

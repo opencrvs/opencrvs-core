@@ -58,7 +58,7 @@ import {
 } from 'ts-morph'
 import { existsSync, writeFileSync } from 'fs'
 import path from 'path'
-import { addRows, readCsvFile, writeCsvFile } from '../csv'
+import { addRows, readCsvFile, writeCsvFile } from '../../csv'
 
 const EMAIL_TEMPLATES_FILE = 'src/api/notification/email-templates/index.ts'
 const SMS_SERVICE_FILE = 'src/api/notification/sms-service.ts'
