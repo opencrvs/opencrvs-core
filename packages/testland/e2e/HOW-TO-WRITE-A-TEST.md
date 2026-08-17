@@ -61,3 +61,25 @@ action_, and it carries `clauses: [{ id: eventId }]` in its body. Two consequenc
 1. We have only few users in parallel tests. We cannot check "if outbox is empty" since the test run cannot guarantee it.
 2. We constantly poll workqueues. This is a good thing for the actual application. With our setup, we might select the right row, but UI changes underneath us and we end up in wrong event.
 3. We cannot await the queries due to offline requirements. Fire & forget, but tests need to wait for responses.
+
+## QA-traceable specs (`qa-testrail-testcases/`)
+
+When writing a spec that maps 1:1 to a TestRail/QA case (i.e. anything under
+`qa-testrail-testcases/`), keep one QA case as **one top-level `test()`**,
+with `test.step(...)` for each QA sub-step. Do not wrap it in
+`test.describe(...)` at all - not `.serial`, not plain either. The file is
+already the grouping; if a QA case needs more than one `test()` (e.g. a
+positive/negative pair), they just sit side by side at the top level. See
+`qa-testrail-testcases/Deduplication/Duplicate Review/*.spec.ts` for the
+shape to follow:
+
+```ts
+test('1. Cancelling the "X" confirmation leaves the record flagged', async ({ page }) => {
+  await test.step('Register the first declaration', async () => { ... })
+  await test.step('Declare a second, identical declaration', async () => { ... })
+  await test.step('Open the modal and cancel', async () => { ... })
+})
+```
+
+File names take a numeric prefix matching the QA case's position in its
+suite, e.g. `1.birth-event-declaration.spec.ts`.
