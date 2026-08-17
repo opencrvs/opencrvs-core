@@ -125,6 +125,16 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
 
   const incoming = request.payload as IncomingReport
 
+  // Only production instances report; staging, QA and local build the report
+  // but never reach the status service. (This gate used to live in the
+  // toolkit's sendTelemetry; each country config now owns it.)
+  if (!env.isProduction) {
+    logger.info(
+      \`Telemetry: report for \${incoming.reported_at} was not sent — only production instances report\`
+    )
+    return h.response({ status: 'skipped' }).code(200)
+  }
+
   const report: TelemetryReport = {
     reported_at: incoming.reported_at,
     country_code: env.COUNTRY_CODE,
@@ -154,13 +164,6 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
       \`Telemetry: status service rejected report (HTTP \${result.status}): \${result.detail ?? ''}\`
     )
     return h.response({ status: 'error' }).code(502)
-  }
-
-  if (result.outcome === 'skipped') {
-    logger.info(
-      \`Telemetry: report for \${report.reported_at} was not sent — only production instances report\`
-    )
-    return h.response({ status: 'skipped' }).code(200)
   }
 
   logger.info(
