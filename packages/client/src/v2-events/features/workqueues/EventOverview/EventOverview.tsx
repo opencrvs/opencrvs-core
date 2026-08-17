@@ -55,6 +55,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     : getCurrentEventState(event, eventConfiguration)
 
   const { getUsers } = useUsers()
+  const intl = useIntl()
 
   const assignedToUser = getUsers.useQueryById(
     eventWithDrafts.assignedTo || '',
@@ -167,7 +168,6 @@ function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { eventIndex, fullEvent, shouldShowFullOverview } =
     useEventOverviewInfo(params.eventId)
-
   const areDuplicatesAvailable = useDuplicatesAvailable(eventIndex)
   const isDownloaded = fullEvent !== undefined
   /*
