@@ -104,21 +104,6 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
-function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
-  if (!updatedEventIndex) {
-    return
-  }
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: updatedEventIndex.id }]
-      }
-    }),
-    () => ({ results: [updatedEventIndex], total: 1 })
-  )
-}
-
 export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
 
@@ -128,9 +113,6 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
     )
   }
   const updatedEventIndex = getCurrentEventState(updatedEvent, config)
-
-  // Update the local event index with the updated event
-  setEventSearchQuery(updatedEventIndex)
 
   /*
    * Ensure there exists a local cached search query for this event
@@ -251,11 +233,13 @@ export async function refetchAllSearchQueries() {
    * Invalidate search queries
    */
   await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
-      return queryClient.refetchQueries({
-        queryKey
-      })
-    })
+    getQueriesData(trpcOptionsProxy.event.search).map(
+      async ([queryKey, ...rest]) => {
+        return queryClient.refetchQueries({
+          queryKey
+        })
+      }
+    )
   )
 }
 
@@ -282,6 +266,7 @@ export async function invalidateWorkqueueSearchQueries(slug: string) {
 async function deleteEventData(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+
   queryClient.removeQueries({
     queryKey: trpcOptionsProxy.event.get.queryKey({
       eventId: id,
@@ -305,11 +290,17 @@ export function updateLocalEvent(data: EventDocument) {
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
-  await invalidateWorkqueues()
 
-  // As part of event creation, we add the just created event to local event.search cache.
-  // After any successful action after it, we should clear it explicitly, since `refetchAllSearchQueries` does not invalidate single-item search result.
-  await refetchSearchQuery(updatedEvent.id)
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id: updatedEvent.id }]
+      }
+    })
+  })
+
+  await invalidateWorkqueues()
 
   return refetchAllSearchQueries()
 }
