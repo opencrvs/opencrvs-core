@@ -189,7 +189,10 @@ export async function expectInUrl(page: Page, assertionString: string) {
 }
 
 export async function selectLocationOption(page: Page, locationName: string) {
-  await page.locator('[id^="locationOption"]').getByText(locationName).click()
+  await page
+    .locator('[id^="locationOption"]')
+    .getByText(locationName, { exact: true })
+    .click()
 }
 
 export async function type(page: Page, locator: string, text: string) {
