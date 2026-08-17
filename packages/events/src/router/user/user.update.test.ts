@@ -183,6 +183,22 @@ test('throws CONFLICT with DUPLICATE_EMAIL if email is already in use by another
   )
 })
 
+test("allows update when the email is only a substring of another user's email", async () => {
+  const { user, users } = await setupTestCase()
+  const [, secondUser] = users
+
+  await updateUserById(secondUser.id, { email: 'ba@x.com' })
+
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update({
+      ...generateUpdateInput(user),
+      email: 'a@x.com'
+    })
+  ).resolves.not.toThrow()
+})
+
 test("allows update when mobile is the same user's own mobile", async () => {
   const { user } = await setupTestCase()
   await updateUserById(user.id, { mobile: '01812345678' })
