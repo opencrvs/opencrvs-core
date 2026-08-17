@@ -22,6 +22,16 @@ import path from 'path'
 
 const TESTCASES_MARKER = 'e2e/testcases/'
 
+// Minimal shape of a CTRF report.json (playwright-ctrf-json-reporter output)
+// - only the fields this script reads; the real report has many more.
+type CtrfReport = {
+  results?: {
+    tests?: Array<{ filePath?: string; duration?: number }>
+  }
+}
+
+// Recursively walks `dir`, since report artifacts are downloaded one
+// subdirectory per shard (e.g. ctrf-report-shard-1-<run-id>/report.json).
 function findJsonFiles(dir: string): string[] {
   const results: string[] = []
 
@@ -39,6 +49,8 @@ function findJsonFiles(dir: string): string[] {
 
 function relativeToTestcases(filePath: string): string {
   const index = filePath.indexOf(TESTCASES_MARKER)
+  // No marker means an unexpected path shape (e.g. from a report generated
+  // outside this repo layout) - keep it as-is rather than dropping the test.
   return index === -1
     ? filePath
     : filePath.slice(index + TESTCASES_MARKER.length)
@@ -55,8 +67,10 @@ function main() {
   const reportFiles = findJsonFiles(reportsDir)
 
   for (const file of reportFiles) {
-    const report = JSON.parse(fs.readFileSync(file, 'utf8'))
+    const report: CtrfReport = JSON.parse(fs.readFileSync(file, 'utf8'))
     for (const test of report.results?.tests ?? []) {
+      // Playwright's CTRF reporter always sets both fields - this guards
+      // against a malformed/truncated report.json, not expected data.
       if (!test.filePath || typeof test.duration !== 'number') {
         continue
       }

@@ -37,6 +37,8 @@ const DEFAULT_WEIGHT_MS = 55100
 function parseArgs(argv: string[]) {
   const args: Record<string, string> = {}
   for (const arg of argv) {
+    // Matches --key=value, e.g. --shards=25; splits on the first '=' only,
+    // so a value itself containing '=' is captured whole.
     const match = /^--([^=]+)=(.*)$/.exec(arg)
     if (match) {
       args[match[1]] = match[2]
@@ -56,6 +58,8 @@ function collectSpecFiles(dir: string): string[] {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, entry.name)
     if (entry.isDirectory()) {
+      // dashboard/ specs need a separate DASHBOARD_E2E-gated deployment and
+      // aren't part of the normal shard plan.
       if (
         !includeDashboard &&
         path.relative(TESTCASES_DIR, fullPath) === 'dashboard'
@@ -81,6 +85,10 @@ function loadWeights(weightsPath: string): Record<string, number> {
 
 type Shard = { shard: number; files: string[]; totalWeightMs: number }
 
+// Longest Processing Time (LPT) bin-packing: place the heaviest files first,
+// each one into whichever shard currently has the smallest total. Placing
+// heavy files first matters — packing small ones first can leave a shard
+// with no room left for a large one, and no reshuffling happens afterwards.
 function packShards(
   files: string[],
   weights: Record<string, number>,
@@ -94,14 +102,14 @@ function packShards(
 
   const weighted = files
     .map((file) => ({ file, weight: weights[file] ?? DEFAULT_WEIGHT_MS }))
-    .sort((a, b) => b.weight - a.weight)
+    .sort((a, b) => b.weight - a.weight) // descending, e.g. [90s, 60s, 10s]
 
   for (const { file, weight } of weighted) {
-    const lightest = shards.reduce((min, s) =>
-      s.totalWeightMs < min.totalWeightMs ? s : min
+    const lightestShard = shards.reduce((lightest, shard) =>
+      shard.totalWeightMs < lightest.totalWeightMs ? shard : lightest
     )
-    lightest.files.push(file)
-    lightest.totalWeightMs += weight
+    lightestShard.files.push(file)
+    lightestShard.totalWeightMs += weight
   }
 
   return shards.sort((a, b) => b.totalWeightMs - a.totalWeightMs)
