@@ -22,9 +22,13 @@ for i in "$@"; do
       write=true
       shift
       ;;
-    *)
+    -*)
       echo "Unknown option $i"
       exit 1
+      ;;
+    *)
+      # lint-staged appends the staged filenames; the check always covers the
+      # whole package, so they are ignored.
       ;;
   esac
 done

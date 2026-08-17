@@ -175,8 +175,13 @@ function handleCheckTranslations() {
     return
   }
 
+  /*
+   * Only options are inspected. This runs from lint-staged, which appends the
+   * staged filenames to the command, and the check always covers the whole
+   * package rather than a file list.
+   */
   const unknownFlags = checkArgs.filter(
-    (arg) => !['--write', '--outdated'].includes(arg)
+    (arg) => arg.startsWith('-') && !['--write', '--outdated'].includes(arg)
   )
 
   if (unknownFlags.length > 0) {
