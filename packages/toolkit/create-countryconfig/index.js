@@ -13,6 +13,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const readline = require('readline/promises')
 const degit = require('degit').default
 
 const INFRASTRUCTURE_REPOSITORY = 'opencrvs/infrastructure'
@@ -62,6 +63,64 @@ function ensureTargetDirectoryDoesNotExist(directoryName) {
     )
     process.exit(1)
   }
+}
+
+/**
+ * Asks whether to enable telemetry. Defaults to yes, and answers yes without
+ * prompting when not attached to a terminal (e.g. non-interactive scaffolding).
+ */
+async function promptEnableTelemetry() {
+  if (!process.stdin.isTTY) {
+    return true
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  try {
+    const answer = (
+      await rl.question(
+        '\nEnable anonymous usage telemetry to help improve OpenCRVS? Only ' +
+          'aggregate metrics are shared — no personal or protected data. [Y/n] '
+      )
+    )
+      .trim()
+      .toLowerCase()
+    return answer === '' || answer === 'y' || answer === 'yes'
+  } finally {
+    rl.close()
+  }
+}
+
+/**
+ * Flips the `TELEMETRY_ENABLED` env var default in the cloned country config's
+ * environment to `true`. The template ships it defaulting to `false`.
+ */
+function enableTelemetryInEnvironment(targetPath) {
+  const environmentPath = path.join(targetPath, 'src', 'environment.ts')
+  if (!fs.existsSync(environmentPath)) {
+    console.warn(
+      '\nWarning: could not find src/environment.ts; telemetry default not changed.'
+    )
+    return
+  }
+
+  const original = fs.readFileSync(environmentPath, 'utf-8')
+  const updated = original.replace(
+    /(TELEMETRY_ENABLED:\s*bool\(\{[\s\S]*?default:\s*)false/,
+    '$1true'
+  )
+
+  if (updated === original) {
+    console.warn(
+      '\nWarning: could not update the TELEMETRY_ENABLED default in src/environment.ts.'
+    )
+    return
+  }
+
+  fs.writeFileSync(environmentPath, updated)
+  console.log('\nTelemetry enabled (TELEMETRY_ENABLED now defaults to true).')
 }
 
 function updatePackageJsonName(targetPath, newName) {
@@ -134,6 +193,10 @@ async function main() {
   } catch (err) {
     console.error('Failed to clone the infrastructure repository:', err.message)
     process.exit(1)
+  }
+
+  if (await promptEnableTelemetry()) {
+    enableTelemetryInEnvironment(countryconfigTargetPath)
   }
 
   console.log('\nDone! Your project has been set up in two directories:\n')
