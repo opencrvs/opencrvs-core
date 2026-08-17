@@ -94,6 +94,62 @@ async function promptEnableTelemetry() {
 }
 
 /**
+ * Prompts for a single line of input, re-asking until `validate` accepts the
+ * trimmed answer. `validate` returns an error message string when the answer is
+ * invalid, or a falsy value when it is accepted. Exits when not attached to a
+ * terminal, since a mandatory value cannot be gathered non-interactively.
+ */
+async function promptRequired(question, validate) {
+  if (!process.stdin.isTTY) {
+    console.error(
+      '\nError: interactive input is required to set the organisation name and country code.'
+    )
+    process.exit(1)
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  try {
+    while (true) {
+      const answer = (await rl.question(question)).trim()
+      const error = validate(answer)
+      if (!error) {
+        return answer
+      }
+      console.error(error)
+    }
+  } finally {
+    rl.close()
+  }
+}
+
+/**
+ * Prompts for the organisation name reported with telemetry. Mandatory.
+ */
+function promptOrganisation() {
+  return promptRequired('\nOrganisation running this instance: ', (answer) =>
+    answer === '' ? 'Please enter an organisation name.' : undefined
+  )
+}
+
+/**
+ * Prompts for the alpha-3 ISO country code reported with telemetry, re-asking
+ * until a valid three-letter code is given. Mandatory.
+ */
+async function promptCountryCode() {
+  const answer = await promptRequired(
+    '\nAlpha-3 ISO country code of this instance (e.g. "GBR"): ',
+    (value) =>
+      /^[A-Za-z]{3}$/.test(value)
+        ? undefined
+        : 'Please enter a three-letter alpha-3 ISO country code (e.g. "GBR").'
+  )
+  return answer.toUpperCase()
+}
+
+/**
  * Flips the `TELEMETRY_ENABLED` env var default in the cloned country config's
  * environment to `true`. The template ships it defaulting to `false`.
  */
@@ -121,6 +177,52 @@ function enableTelemetryInEnvironment(targetPath) {
 
   fs.writeFileSync(environmentPath, updated)
   console.log('\nTelemetry enabled (TELEMETRY_ENABLED now defaults to true).')
+}
+
+/**
+ * Replaces the string `default` of an envalid `str({ ... })` field in the
+ * cloned country config's environment. Returns the updated source, or the
+ * original source (with a warning) when the field could not be located.
+ */
+function setEnvironmentStringDefault(source, key, value) {
+  const pattern = new RegExp(
+    `(${key}:\\s*str\\(\\{[\\s\\S]*?default:\\s*)'[^']*'`
+  )
+  // Escape for a single-quoted TS string literal, and use a function replacer
+  // so `$` in the value is not treated as a replacement pattern.
+  const literal = "'" + value.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'"
+  const updated = source.replace(pattern, (_, prefix) => prefix + literal)
+
+  if (updated === source) {
+    console.warn(
+      `\nWarning: could not update the ${key} default in src/environment.ts.`
+    )
+  }
+
+  return updated
+}
+
+/**
+ * Writes the given organisation name and alpha-3 country code as the defaults
+ * for the `ORGANISATION` and `COUNTRY_CODE` env vars in the cloned country
+ * config's environment.
+ */
+function setTelemetryIdentityInEnvironment(
+  targetPath,
+  { organisation, countryCode }
+) {
+  const environmentPath = path.join(targetPath, 'src', 'environment.ts')
+  if (!fs.existsSync(environmentPath)) {
+    console.warn(
+      '\nWarning: could not find src/environment.ts; organisation and country code defaults not changed.'
+    )
+    return
+  }
+
+  let source = fs.readFileSync(environmentPath, 'utf-8')
+  source = setEnvironmentStringDefault(source, 'ORGANISATION', organisation)
+  source = setEnvironmentStringDefault(source, 'COUNTRY_CODE', countryCode)
+  fs.writeFileSync(environmentPath, source)
 }
 
 function updatePackageJsonName(targetPath, newName) {
@@ -193,6 +295,13 @@ async function main() {
     console.error('Failed to clone the infrastructure repository:', err.message)
     process.exit(1)
   }
+
+  const organisation = await promptOrganisation()
+  const countryCode = await promptCountryCode()
+  setTelemetryIdentityInEnvironment(countryconfigTargetPath, {
+    organisation,
+    countryCode
+  })
 
   if (await promptEnableTelemetry()) {
     enableTelemetryInEnvironment(countryconfigTargetPath)

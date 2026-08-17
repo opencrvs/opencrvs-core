@@ -185,48 +185,46 @@ const TELEMETRY_DISABLED: TelemetryConfig = {
 }
 
 /**
- * Asks for the country code and organisation reported with telemetry. Telemetry
- * is enabled only when both are supplied; leaving either blank keeps it
- * disabled. Non-interactive upgrades cannot supply them, so telemetry stays
- * disabled there.
+ * Asks whether to enable telemetry and, when enabled, for the country code and
+ * organisation reported with it — both mandatory, re-asking until supplied.
+ * Non-interactive upgrades cannot answer, so telemetry stays disabled there.
  */
 async function promptTelemetryConfig(): Promise<TelemetryConfig> {
   if (!process.stdin.isTTY) {
     return TELEMETRY_DISABLED
   }
 
-  const { input } = await import('@inquirer/prompts')
+  const { confirm, input } = await import('@inquirer/prompts')
 
-  console.log(
-    '\nTelemetry shares anonymous, aggregate usage metrics to help improve ' +
-      'OpenCRVS — no personal or protected data. To enable it, provide your ' +
-      'country code and organisation below; leave either blank to keep ' +
-      'telemetry disabled.\n'
-  )
+  const enabled = await confirm({
+    message:
+      'Enable anonymous usage telemetry to help improve OpenCRVS? Only ' +
+      'aggregate metrics are shared — no personal or protected data.',
+    default: true
+  })
+
+  if (!enabled) {
+    return TELEMETRY_DISABLED
+  }
 
   const countryCode = (
     await input({
       message: 'Country code (ISO alpha-3, e.g. FAR):',
       validate: (value) =>
-        value.trim() === '' ||
         /^[A-Za-z]{3}$/.test(value.trim()) ||
-        'Enter a 3-letter ISO alpha-3 code, or leave blank to keep telemetry disabled.'
+        'Enter a 3-letter ISO alpha-3 code.'
     })
   )
     .trim()
     .toUpperCase()
 
-  if (!countryCode) {
-    return TELEMETRY_DISABLED
-  }
-
   const organisation = (
-    await input({ message: 'Organisation running this instance:' })
+    await input({
+      message: 'Organisation running this instance:',
+      validate: (value) =>
+        value.trim() !== '' || 'Enter an organisation name.'
+    })
   ).trim()
-
-  if (!organisation) {
-    return TELEMETRY_DISABLED
-  }
 
   return { enabled: true, countryCode, organisation }
 }
