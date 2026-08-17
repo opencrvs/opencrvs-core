@@ -80,7 +80,7 @@ export const roles: Role[] = [
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.unarchive', options: { declaredIn: 'administrativeArea' } },
-      { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.register', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.correct', options: { registeredIn: 'administrativeArea' } },
@@ -291,6 +291,26 @@ export const roles: Role[] = [
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY'], placeOfEvent: 'location' } },
       { type: 'record.print-certified-copies', options: { placeOfEvent: 'location' } },
       { type: 'record.correct', options: { placeOfEvent: 'location' } }
+    ])
+  },
+  {
+    id: 'QA_HOSPITAL_CLERK',
+    label: {
+      defaultMessage: 'QA Hospital Official',
+      description: 'Name for user role QA Hospital Official. Used for regression testing',
+      id: 'userRole.hospitalClerk'
+    },
+    scopes: defineScopes([
+      { type: 'user.read-only-my-audit' },
+      { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation', 'pending-updates'] } },
+      { type: 'record.create', options: { placeOfEvent: 'location' } },
+      { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.edit', options: { status: ['NOTIFIED'] } },
+      { type: 'record.notify', options: { placeOfEvent: 'location' } },
+      { type: 'record.declare', options: { placeOfEvent: 'location' } },
+      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
+      { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])
   }
 ]
