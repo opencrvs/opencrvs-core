@@ -13,7 +13,7 @@
     "pretest": "pnpm copy-example-certs",
     "test": "NODE_ENV=development tsx --test",
     "test:compilation": "tsc --noEmit",
-    "lint": "eslint -c eslint.config.mjs"
+    "lint": "eslint -c eslint.config.js"
   },
   "dependencies": {
     "@opencrvs/mosip": "workspace:*",
@@ -42,12 +42,14 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@eslint/js": "^9.13.0",
-    "@types/eslint__js": "^8.42.3",
     "@types/jsonwebtoken": "^9.0.7",
-    "eslint": "^9.13.0",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.5",
     "msw": "^2.7.3",
-    "pino-pretty": "^11.3.0",
-    "typescript-eslint": "^8.12.1"
+    "pino-pretty": "^11.3.0"
   }
 }
