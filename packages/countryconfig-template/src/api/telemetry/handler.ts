@@ -43,6 +43,33 @@ export const TELEMETRY_DISABLED_NOTICE =
   'the countryconfig service.'
 
 /**
+ * Logs the telemetry configuration once at countryconfig startup: when enabled,
+ * the instance identity that will be reported (so operators can confirm the env
+ * vars are set as expected); otherwise the encouraging opt-in notice.
+ */
+export function logTelemetryStartupStatus() {
+  if (!env.TELEMETRY_ENABLED) {
+    logger.info(TELEMETRY_DISABLED_NOTICE)
+    return
+  }
+
+  // Matches the handler's `domain` stamping: a wildcard/empty DOMAIN is not
+  // reported.
+  const domain = env.DOMAIN && env.DOMAIN !== '*' ? env.DOMAIN : '(not reported)'
+
+  logger.info(
+    'Telemetry is enabled — anonymous, aggregate usage metrics will be ' +
+      'forwarded to the OpenCRVS status service. Reporting this instance as:\n' +
+      `  COUNTRY_CODE     = ${env.COUNTRY_CODE}\n` +
+      `  ORGANISATION     = ${env.ORGANISATION || '(not set)'}\n` +
+      `  ENVIRONMENT_NAME = ${env.ENVIRONMENT_NAME}\n` +
+      `  DOMAIN           = ${domain}\n` +
+      `  application      = ${applicationConfig.APPLICATION_NAME}\n` +
+      'Reports are only ever sent from production instances (NODE_ENV=production).'
+  )
+}
+
+/**
  * Receives a usage report from the events service and, when telemetry is
  * enabled for this instance, stamps the instance identity onto it and forwards
  * it to the status service via the toolkit's `sendTelemetry` (which owns the

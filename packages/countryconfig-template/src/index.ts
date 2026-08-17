@@ -45,7 +45,7 @@ import { emailHandler, emailSchema } from './api/notification/handler'
 import {
   telemetryHandler,
   telemetrySchema,
-  TELEMETRY_DISABLED_NOTICE
+  logTelemetryStartupStatus
 } from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
@@ -683,9 +683,7 @@ export async function createServer() {
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
 
-    if (!env.TELEMETRY_ENABLED) {
-      logger.info(TELEMETRY_DISABLED_NOTICE)
-    }
+    logTelemetryStartupStatus()
   }
 
   return { server, start, stop }
