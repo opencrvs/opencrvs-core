@@ -51,6 +51,7 @@ type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
+const ci = process.argv.includes('--ci')
 
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
@@ -66,6 +67,37 @@ function writeTranslations(data: LocalisationFile) {
 function readTranslations() {
   return readCSVToJSON<CSVRow[]>(
     `${COUNTRY_CONFIG_PATH}/src/translations/login.csv`
+  )
+}
+
+/**
+ * The value of a property, when the source says what it is outright. A plain
+ * string literal and a template literal with nothing interpolated into it both
+ * qualify; anything assembled at runtime does not.
+ */
+function staticStringOf(
+  node: ts.ObjectLiteralExpression,
+  name: string
+): string | undefined {
+  const property = node.properties.find(
+    (p) => ts.isPropertyAssignment(p) && p.name.getText() === name
+  )
+
+  if (!property || !ts.isPropertyAssignment(property)) {
+    return undefined
+  }
+
+  const { initializer } = property
+
+  return ts.isStringLiteral(initializer) ||
+    ts.isNoSubstitutionTemplateLiteral(initializer)
+    ? initializer.text
+    : undefined
+}
+
+function hasProperty(node: ts.ObjectLiteralExpression, name: string) {
+  return node.properties.some(
+    (p) => ts.isPropertyAssignment(p) && p.name.getText() === name
   )
 }
 
@@ -86,25 +118,22 @@ function findObjectLiteralsWithIdAndDefaultMessage(
       ts.forEachChild(node, visit)
       return
     }
-    const idProperty = node.properties.find(
-      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'id'
-    )
-    const defaultMessageProperty = node.properties.find(
-      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'defaultMessage'
-    )
 
-    if (!(idProperty && defaultMessageProperty)) {
+    if (!(hasProperty(node, 'id') && hasProperty(node, 'defaultMessage'))) {
       ts.forEachChild(node, visit)
       return
     }
 
-    const objectText = node.getText(sourceFile) // The source code representation of the object
+    /*
+     * Each property is read on its own rather than by evaluating the whole
+     * object. Evaluating it means one interpolated `description` — which is
+     * harmless, nothing reads it at runtime — hides the message entirely, and
+     * the key silently stops being checked.
+     */
+    const id = staticStringOf(node, 'id')
+    const objectText = node.getText(sourceFile)
 
-    try {
-      const func = new Function(`return (${objectText});`)
-      const objectValue = func()
-      matches.push(objectValue)
-    } catch (error) {
+    if (id === undefined) {
       console.log(chalk.yellow.bold('Warning'))
       console.error(
         `Found a dynamic message identifier in file ${filePath}.`,
@@ -114,7 +143,28 @@ function findObjectLiteralsWithIdAndDefaultMessage(
         objectText,
         '\n'
       )
+      ts.forEachChild(node, visit)
+      return
     }
+
+    const defaultMessage = staticStringOf(node, 'defaultMessage')
+
+    if (defaultMessage === undefined) {
+      console.log(chalk.yellow.bold('Warning'))
+      console.error(
+        `Found a dynamic default message for ${id} in file ${filePath}.`,
+        'The key is still checked, but --write cannot fill in its English copy.',
+        '\n',
+        objectText,
+        '\n'
+      )
+    }
+
+    matches.push({
+      id,
+      defaultMessage: defaultMessage ?? '',
+      description: staticStringOf(node, 'description') ?? ''
+    })
 
     ts.forEachChild(node, visit)
   }
@@ -174,9 +224,12 @@ async function extractMessages() {
   )
 
   if (outdated) {
+    // Membership, not truthiness: a message with an empty description is still
+    // a message, and reporting it as outdated sends people deleting live keys.
+    const extractedIds = new Set(messagesParsedFromApp.map(({ id }) => id))
     const extraKeys = translations
       .map(({ id }) => id)
-      .filter((key) => !reactIntlDescriptions[key])
+      .filter((key) => !extractedIds.has(key))
 
     console.log(chalk.yellow.bold('Potentially outdated translations'))
     console.log(
@@ -188,10 +241,37 @@ async function extractMessages() {
 
   if (missingKeys.length > 0) {
     console.log(chalk.red.bold('Missing translations'))
-    console.log(`You are missing the following content keys from your country configuration package:\n
+
+    if (ci) {
+      // CSV-shaped, so the workflow can lift the block straight into the job
+      // summary and a reviewer can paste it into the file.
+      const emptyLanguages = Object.fromEntries(
+        knownLanguages.filter((lang) => lang != 'en').map((lang) => [lang, ''])
+      )
+      const defaultsToBeAdded = missingKeys.map(
+        (key): CSVRow => ({
+          id: key,
+          description: reactIntlDescriptions[key],
+          en:
+            messagesParsedFromApp
+              .find(({ id }) => id === key)
+              ?.defaultMessage?.toString() || '',
+          ...emptyLanguages
+        })
+      )
+      const message = defaultsToBeAdded
+        .map((row) => Object.values(row).join(','))
+        .join('\n')
+      console.log(`You are missing the following content keys from your country configuration package:\n
+${chalk.white(message)}\n
+ Add them to this file and run again:
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/login.csv`)}`)
+    } else {
+      console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(missingKeys.join('\n'))}\n
 Translate the keys and add them to this file:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/login.csv`)}`)
+    }
 
     if (write) {
       console.log(

@@ -1,8 +1,10 @@
 id,description,en,fr
 action.action,Label for action button,Action,Action
+action.assign.label,,Assign,Attribuer
 action.assignee,Label for asignee,Assigned to {name } at {officeName},Attribué à {name} chez {officeName}
 action.correct,Label for correct record button in dropdown menu,Correct record,Enregistrement correct
 action.noActionsAvailable,Message shown on action menu if no actions are available,No actions available,Aucune action disponible
+action.unassign.label,,Unassign,Retirer l'attribution
 action.view,Label for view button in dropdown menu,View {recordOrDeclaration},"voir {recordOrDeclaration, select, record{enregistrer} other{déclaration}}"
 actionModal.cancel,The label for cancel button of action modal,Cancel,Annuler
 actionModal.confirm,The label for confirm button of action modal,Confirm,Confirmer
@@ -612,6 +614,7 @@ event.summary.assignedTo.value,Assigned to value,{event.assignedTo},{event.assig
 event.summary.event.label,Label for the event field,Event,Événement
 event.summary.flags.label,Flags of the event,Flags,Drapeaux
 event.summary.flags.placeholder,Message when no flags are present,No flags,Pas de drapeaux
+event.summary.redacted,Accessible name for a value the user is not permitted to see,Hidden,Masqué
 event.summary.registrationNumber.empty,No registration number message,No registration number,Aucun numéro d'inscription
 event.summary.registrationNumber.label,Label for the registration number field,Registration Number,Numéro d'inscription
 event.summary.registrationNumber.value,Value for the registration number field,{event.registrationNumber},{event.registrationNumber}
