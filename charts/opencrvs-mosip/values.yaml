@@ -2,6 +2,8 @@ hostname: opencrvs.localhost
 ingress:
   ssl_enabled: false
 
+storage_type: host_path
+
 platform:
   tag: 'v2.1.0'
 
@@ -29,6 +31,7 @@ esignet_mock:
 
 mosip_api:
   enabled: true
+  host_data_path: /data/mosip-api
   image:
     repository: ghcr.io/opencrvs/mosip-api
   env:
