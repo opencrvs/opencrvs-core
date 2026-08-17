@@ -49,6 +49,14 @@ export async function readCSVToJSON<T>(filename: string) {
 
 type CSVRow = { id: string; description: string } & Record<string, string>
 
+/**
+ * Most descriptions contain a comma, and a row printed for someone to paste
+ * into the file has to survive being pasted.
+ */
+function toCSVValue(value: string) {
+  return /["\n,]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
+}
+
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
 const ci = process.argv.includes('--ci')
@@ -260,7 +268,7 @@ async function extractMessages() {
         })
       )
       const message = defaultsToBeAdded
-        .map((row) => Object.values(row).join(','))
+        .map((row) => Object.values(row).map(toCSVValue).join(','))
         .join('\n')
       console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(message)}\n
