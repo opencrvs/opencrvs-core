@@ -233,13 +233,11 @@ export async function refetchAllSearchQueries() {
    * Invalidate search queries
    */
   await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(
-      async ([queryKey, ...rest]) => {
-        return queryClient.refetchQueries({
-          queryKey
-        })
-      }
-    )
+    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
+      return queryClient.refetchQueries({
+        queryKey
+      })
+    })
   )
 }
 
@@ -288,7 +286,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
-  queryClient.resetQueries({
+  await queryClient.resetQueries({
     queryKey: trpcOptionsProxy.event.search.queryKey({
       query: {
         type: 'and',
