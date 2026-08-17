@@ -43,7 +43,7 @@ function getEventWithDraftOrThrow(
   const event = findLocalEventDocument(id)
 
   if (!event || !maybeDraft) {
-    throw new Error(`No event or draft found with id: ${id}`)
+    throw new Error('Forbidden')
   }
 
   const configuration = getOrThrow(

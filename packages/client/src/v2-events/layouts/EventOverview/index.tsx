@@ -168,7 +168,7 @@ export function EventOverviewLayout({
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   if (eventResults.total === 0) {
-    throw new Error(`Event details with id ${eventId} not found`)
+    throw new Error('Forbidden')
   }
 
   const event = eventResults.results[0]
