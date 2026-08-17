@@ -281,6 +281,18 @@ async function deleteEventData(updatedEvent: EventDocument) {
    */
   queryClient.removeQueries({ queryKey: [['view-event', id]] })
 
+  // When event is created, We derive local cache for search query from that (event with no declaration data).
+  // If we delete only the event.get, we will have stale data until event is explicitly searched again.
+  // e.g. After performing declaration action, overview would show event as it was on 'created' state first, and then update.
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id }]
+      }
+    })
+  })
+
   await removeCachedFiles(updatedEvent)
 }
 
@@ -290,18 +302,6 @@ export function updateLocalEvent(data: EventDocument) {
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
-
-  // When event is created, We derive local cache for search query from that (event with no declaration data).
-  // If we delete only the event.get, we will have stale data until event is explicitly searched again.
-  // e.g. After performing declaration action, overview would show event as it was on 'created' state first, and then update.
-  queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: updatedEvent.id }]
-      }
-    })
-  })
 
   await invalidateWorkqueues()
 
