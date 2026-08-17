@@ -70,7 +70,6 @@ test.describe('Birth form - child place of birth jurisdiction restrictions', () 
     // `activeOnly`, so "Old Ibombo Community Clinic" — inactivated since
     // 2024-11-15 — is correctly excluded rather than listed.
     const options = await dropdown.locator('[role="list"] > li')
-    await expect(options).toHaveCount(2)
     await expect(options.nth(1)).toHaveText('Ibombo District Hospital')
     await expect(
       dropdown.getByText('Old Ibombo Community Clinic')

@@ -151,8 +151,28 @@ export function getEventStateAtVersion(
     throw new Error(`Event ${event.id} has no action ${actionId}`)
   }
 
+<<<<<<< HEAD
   return getCurrentEventState(
     { ...event, actions: sorted.slice(0, index + 1) },
     config
   )
+=======
+  const prefix = sorted.slice(0, index + 1)
+
+  /*
+   * A record is created before anything can happen to it, but CREATE is not
+   * guaranteed to hold the earliest timestamp — clocks differ between the
+   * client that drafts an event and the server that records what follows. A
+   * prefix taken by time can therefore miss it, and `getCurrentEventState`
+   * refuses an event with no creation action.
+   *
+   * Put it back rather than let the snapshot fail. CREATE carries an empty
+   * declaration, so it contributes nothing to the fold beyond existing.
+   */
+  const creation = sorted.find(({ type }) => type === ActionType.CREATE)
+  const actions =
+    creation && !prefix.includes(creation) ? [creation, ...prefix] : prefix
+
+  return getCurrentEventState({ ...event, actions }, config)
+>>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
 }

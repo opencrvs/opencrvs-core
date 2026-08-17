@@ -275,4 +275,48 @@ describe('getEventStateAtVersion', () => {
       )
     ).toThrow()
   })
+<<<<<<< HEAD
+=======
+
+  test('snapshots a record whose creation action is not the earliest', () => {
+    /*
+     * Clocks differ between the client that drafts an event and the server
+     * that records what follows, so CREATE can carry a later timestamp than
+     * the actions it precedes. A prefix taken by time then misses it, and a
+     * snapshot of an event with no creation action is refused outright.
+     */
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: { 'applicant.email': 'declared@example.com' }
+        }
+      ]
+    })
+
+    const skewed = {
+      ...event,
+      actions: event.actions.map((action) =>
+        action.type === ActionType.CREATE
+          ? { ...action, createdAt: '2030-01-01T00:00:00.000Z' }
+          : action
+      )
+    }
+
+    const declareVersion = getRecordVersions(skewed).find(
+      (v) => v.form === RecordForm.DECLARATION
+    )
+
+    if (!declareVersion) {
+      throw new Error('the declaration version was not found')
+    }
+
+    expect(
+      getEventStateAtVersion(skewed, configuration, declareVersion.actionId)
+        .declaration['applicant.email']
+    ).toBe('declared@example.com')
+  })
+>>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
 })

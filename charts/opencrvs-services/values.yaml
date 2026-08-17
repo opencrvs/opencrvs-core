@@ -196,7 +196,6 @@ resources:
 # Global environment variables applied to
 # all OpenCRVS microservices (Kubernetes PODs):
 env:
-  # OPENCRVS_ENVIRONMENT: explicit environment detection in employee seeder
   OPENCRVS_ENVIRONMENT: production
   NODE_ENV: production
   MINIO_BUCKET: ocrvs
@@ -297,6 +296,11 @@ countryconfig:
     name: opencrvs/ocrvs-countryconfig
     tag: v2.0.0
   port: 3040
+  env:
+    # Name of the file in `src/data-seeding/employees/source/` of your country
+    # configuration the employee seeder reads users from. Override it per
+    # environment to control which users get seeded into that environment.
+    EMPLOYEES_CSV: default-employees.csv
 
 dashboards:
   enabled: false
@@ -413,6 +417,21 @@ data_seed:
     # When users are seeded, are they immediately active using a test password and
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
     ACTIVATE_USERS: 'false'
+
+validation:
+  enabled: false
+  timeout_seconds: 5
+  active_deadline_seconds: 300
+  cert_endpoint: 'https://traefik.traefik.svc.cluster.local'
+  monitoring_enabled: false
+  allow_insecure_https: false
+  smtp_secret_name: smtp-config
+  preflight:
+    enabled: true
+    hook_weight: '0'
+  postdeploy:
+    enabled: true
+    hook_weight: '5'
 
 on_restore_cronjob:
   enabled: false

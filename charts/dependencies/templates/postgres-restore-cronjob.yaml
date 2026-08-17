@@ -1,9 +1,8 @@
 {{ if and .Values.postgres.enabled (eq (include "postgres.restore_enabled" .) "true") }}
-{{- $run_as_cronjob := or .Values.restore.cronjob .Values.postgres.restore.cronjob }}
 {{ if eq .Values.postgres.restore.type "dump" }}
 ---
 apiVersion: batch/v1
-{{- if $run_as_cronjob }}
+{{- if .Values.restore.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
@@ -14,7 +13,7 @@ metadata:
     app: postgres
     job-type: restore
 spec:
-  {{- if $run_as_cronjob }}
+  {{- if .Values.restore.cronjob }}
   schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
@@ -96,7 +95,7 @@ spec:
 {{- if eq .Values.postgres.restore.type "differential" }}
 ---
 apiVersion: batch/v1
-{{- if $run_as_cronjob }}
+{{- if .Values.restore.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
@@ -104,7 +103,7 @@ kind: Job
 metadata:
   name: postgres-restore
 spec:
-  {{- if $run_as_cronjob }}
+  {{- if .Values.restore.cronjob }}
   schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}

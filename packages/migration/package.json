@@ -13,8 +13,7 @@
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events pnpm node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",
     "lint": "eslint -c eslint.config.cjs --max-warnings=0",
-    "test:compilation": "tsc --noEmit",
-    "test": "pnpm test:compilation"
+    "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

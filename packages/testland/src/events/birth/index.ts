@@ -722,7 +722,18 @@ export const birthEvent = defineConfig({
                 description:
                   'Option label for provincial registrar in escalate to field'
               },
-              value: 'PROVINCIAL_REGISTRAR'
+              value: 'PROVINCIAL_REGISTRAR',
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: not(
+                    or(
+                      user.hasRole('EMBASSY_OFFICIAL'),
+                      user.hasRole('PROVINCIAL_REGISTRAR')
+                    )
+                  )
+                }
+              ]
             },
             {
               label: {
@@ -1268,7 +1279,7 @@ export const birthEvent = defineConfig({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: not(flag('sealed'))
+          conditional: and(status('REGISTERED'), not(flag('sealed')))
         }
       ],
       flags: [{ id: 'sealed', operation: 'add' }],

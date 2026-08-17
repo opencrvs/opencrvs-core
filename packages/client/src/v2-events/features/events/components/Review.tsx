@@ -20,7 +20,7 @@ import {
   Accordion,
   Button,
   Link,
-  ListReview,
+  List,
   Dialog,
   Stack,
   Text,
@@ -141,8 +141,8 @@ const FormData = styled.div<{ $padded?: boolean }>`
   }
 `
 
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
+const ReviewContainter = styled.div<{ $padded?: boolean }>`
+  padding: ${({ $padded }) => ($padded === false ? '0' : '0px 32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
   }
@@ -282,6 +282,7 @@ function FormReview({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
+  showValidationErrors = true,
   validatorContext,
   anchor
 }: {
@@ -297,6 +298,14 @@ function FormReview({
   isCorrection?: boolean
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
+  /**
+   * Whether a field that fails validation reports it in place of its value.
+   *
+   * Off for a superseded version: there is nothing there to act on, and it
+   * would be judged against what validation says today rather than what it
+   * said when the version was captured.
+   */
+  showValidationErrors?: boolean
   /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
   anchor: PlainDate
 }) {
@@ -308,7 +317,11 @@ function FormReview({
 
   return (
     <FormData $padded={paddedBody}>
+<<<<<<< HEAD
       <ReviewContainter>
+=======
+      <ReviewContainter $padded={paddedBody}>
+>>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
         {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) =>
@@ -350,7 +363,7 @@ function FormReview({
               ).flatMap(([, errs]) => errs)
 
               const errorDisplay =
-                errors.length > 0 ? (
+                showValidationErrors && errors.length > 0 ? (
                   <ValidationError key={field.id}>
                     {intl.formatMessage(errors[0].message)}
                   </ValidationError>
@@ -414,7 +427,7 @@ function FormReview({
                 labelForShowAction="Show"
                 name={'Accordion_' + page.id}
               >
-                <ListReview id={'Section_' + page.id}>
+                <List id={'Section_' + page.id}>
                   {displayedFields.map((field) => {
                     const {
                       id,
@@ -434,15 +447,18 @@ function FormReview({
                     return (
                       <React.Fragment key={id}>
                         {showSectionHeading ? (
-                          <ListReview.Header
+                          <List.Heading
                             fontVariant={
                               field.configuration.styles?.fontVariant
                             }
                             label={intl.formatMessage(label)}
-                            value={null}
                           />
                         ) : (
+<<<<<<< HEAD
                           <ListReview.Row
+=======
+                          <List.Item
+>>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
                             actions={
                               !shouldHideEditLink && (
                                 <Link
@@ -461,6 +477,7 @@ function FormReview({
                                 </Link>
                               )
                             }
+                            data-testid={id}
                             id={id}
                             label={intl.formatMessage(label)}
                             value={errorDisplay || valueDisplay}
@@ -469,7 +486,7 @@ function FormReview({
                       </React.Fragment>
                     )
                   })}
-                </ListReview>
+                </List>
               </Accordion>
             </DeclarationDataContainer>
           )
@@ -486,6 +503,7 @@ function FormReview({
 function ReviewComponent({
   formConfig,
   previousFormValues,
+  showValidationErrors,
   form,
   validatorContext,
   annotation,
@@ -516,6 +534,8 @@ function ReviewComponent({
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
+  /** See FormReview. Defaults to on, which is what every action flow needs. */
+  showValidationErrors?: boolean
   onEdit: ({
     pageId,
     fieldId,
@@ -582,6 +602,7 @@ function ReviewComponent({
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            showValidationErrors={showValidationErrors}
             treatMissingValuesAsCleared={treatMissingValuesAsCleared}
             validatorContext={validatorContext}
             onEdit={onEdit}
@@ -589,8 +610,8 @@ function ReviewComponent({
 
           {/* edit annotation fields  */}
           {hasAnnotationFieldsToShow && onAnnotationChange && (
-            <FormData>
-              <ReviewContainter>
+            <FormData $padded={content === undefined}>
+              <ReviewContainter $padded={content === undefined}>
                 <DeclarationDataContainer>
                   <Accordion
                     expand={true}
@@ -622,8 +643,8 @@ function ReviewComponent({
           {hasAnnotationFieldsToShow &&
             readonlyMode &&
             displayedAnnotationFields.length > 0 && (
-              <FormData>
-                <ReviewContainter>
+              <FormData $padded={content === undefined}>
+                <ReviewContainter $padded={content === undefined}>
                   <DeclarationDataContainer>
                     <Accordion
                       expand={true}
@@ -634,11 +655,12 @@ function ReviewComponent({
                       labelForShowAction="Show"
                       name="annotation"
                     >
-                      <ListReview id="annotation">
+                      <List id="annotation">
                         {displayedAnnotationFields.map((field) => (
-                          <ListReview.Row
+                          <List.Item
                             key={field.id}
                             actions={null}
+                            data-testid={field.id}
                             id={field.id}
                             label={intl.formatMessage(field.label)}
                             value={
@@ -650,7 +672,7 @@ function ReviewComponent({
                             }
                           />
                         ))}
-                      </ListReview>
+                      </List>
                     </Accordion>
                   </DeclarationDataContainer>
                 </ReviewContainter>

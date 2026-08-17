@@ -174,7 +174,11 @@ const MarkAsDuplicateAction = ActionBase.extend(
 const ArchiveAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    content: ReasonContent
+    /**
+     * Archiving does not collect a reason on its own. Only the
+     * "mark as duplicate" flow archives with a reason attached.
+     */
+    content: ReasonContent.optional()
   }).shape
 )
 

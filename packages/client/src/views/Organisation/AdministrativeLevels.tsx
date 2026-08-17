@@ -16,8 +16,7 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   Content,
   Link,
-  ListViewItemSimplified,
-  ListViewSimplified,
+  List,
   BreadCrumb,
   Divider
 } from '@opencrvs/components/lib'
@@ -151,55 +150,50 @@ export function AdministrativeLevels() {
           onSelect={onClickBreadCrumb}
         />
         <Divider />
-        <ListViewSimplified bottomBorder rowHeight={'small'}>
-          {dataLocations.childLocations.length > 0 ? (
-            dataLocations.childLocations
+        {dataLocations.childLocations.length > 0 ? (
+          <List>
+            {dataLocations.childLocations
               ?.slice(
                 (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
                 currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
               )
-              .map(
-                (
-                  level: ClientLocation | ClientAdministrativeArea,
-                  index: number
-                ) => (
-                  <ListViewItemSimplified
-                    key={index}
-                    label={
-                      ClientAdministrativeArea.safeParse(level).success ? (
-                        <Link
-                          onClick={(e) => {
-                            setCurrentPageNumber(1)
-                            changeLevelAction(e, level.id)
-                          }}
-                        >
-                          {nameToday(level)}
-                        </Link>
-                      ) : (
-                        <Link
-                          disabled={!canAccessOffice(level)}
-                          onClick={() =>
-                            navigate({
-                              pathname: routes.TEAM_USER_LIST,
-                              search: stringify({
-                                locationId: level.id
-                              })
+              .map((level: ClientLocation | ClientAdministrativeArea) => (
+                <List.Item
+                  key={level.id}
+                  label={
+                    ClientAdministrativeArea.safeParse(level).success ? (
+                      <Link
+                        onClick={(e) => {
+                          setCurrentPageNumber(1)
+                          changeLevelAction(e, level.id)
+                        }}
+                      >
+                        {nameToday(level)}
+                      </Link>
+                    ) : (
+                      <Link
+                        disabled={!canAccessOffice(level)}
+                        onClick={() =>
+                          navigate({
+                            pathname: routes.TEAM_USER_LIST,
+                            search: stringify({
+                              locationId: level.id
                             })
-                          }
-                        >
-                          {nameToday(level)}
-                        </Link>
-                      )
-                    }
-                  />
-                )
-              )
-          ) : (
-            <NoRecord id="no-record">
-              {intl.formatMessage(constantsMessages.noResults)}
-            </NoRecord>
-          )}
-        </ListViewSimplified>
+                          })
+                        }
+                      >
+                        {nameToday(level)}
+                      </Link>
+                    )
+                  }
+                />
+              ))}
+          </List>
+        ) : (
+          <NoRecord id="no-record">
+            {intl.formatMessage(constantsMessages.noResults)}
+          </NoRecord>
+        )}
       </Fragment>
       {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (
         <Pagination

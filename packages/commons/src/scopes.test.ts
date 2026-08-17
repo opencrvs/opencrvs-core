@@ -258,17 +258,6 @@ describe('2.0 scopes', () => {
         }
       },
       {
-        type: 'record.review-duplicates',
-        options: {
-          event: ['birth', 'death'],
-          placeOfEvent: 'location',
-          notifiedIn: 'administrativeArea',
-          notifiedBy: 'user',
-          declaredIn: 'administrativeArea',
-          declaredBy: 'user'
-        }
-      },
-      {
         type: 'record.register',
         options: {
           event: ['birth', 'death'],
@@ -364,6 +353,19 @@ describe('2.0 scopes', () => {
           registeredIn: 'administrativeArea',
           registeredBy: 'user'
         }
+      },
+      {
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
       }
     ])
   })
@@ -392,6 +394,24 @@ describe('2.0 scopes', () => {
         registeredIn: 'administrativeArea',
         registeredBy: 'user',
         templates: ['cert-1', 'cert-2']
+      }
+    })
+  })
+
+  it('Supports status option for record.edit', () => {
+    const scopeWithStatus = encodeScope({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
+      }
+    })
+
+    expect(decodeScope(scopeWithStatus)).toEqual({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
       }
     })
   })

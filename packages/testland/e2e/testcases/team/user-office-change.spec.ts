@@ -366,10 +366,10 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await page.getByText('Hospital Official', { exact: true }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
-    await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+    await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Isamba District Office, Isamba, Central, Farajaland'
     )
-    await expect(page.getByTestId('row-value-role')).toHaveText(
+    await expect(page.getByTestId('role-value')).toHaveText(
       'Hospital Official'
     )
 
