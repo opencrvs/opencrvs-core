@@ -172,22 +172,63 @@ export async function telemetryHandler(request: Request, h: ResponseToolkit) {
 
 // ─── Prompt ──────────────────────────────────────────────────────────────────
 
+interface TelemetryConfig {
+  enabled: boolean
+  countryCode: string
+  organisation: string
+}
+
+const TELEMETRY_DISABLED: TelemetryConfig = {
+  enabled: false,
+  countryCode: '',
+  organisation: ''
+}
+
 /**
- * Asks whether to enable telemetry. Defaults to yes, and answers yes without
- * prompting when not attached to a terminal (e.g. non-interactive upgrades).
+ * Asks for the country code and organisation reported with telemetry. Telemetry
+ * is enabled only when both are supplied; leaving either blank keeps it
+ * disabled. Non-interactive upgrades cannot supply them, so telemetry stays
+ * disabled there.
  */
-async function promptEnableTelemetry(): Promise<boolean> {
+async function promptTelemetryConfig(): Promise<TelemetryConfig> {
   if (!process.stdin.isTTY) {
-    return true
+    return TELEMETRY_DISABLED
   }
 
-  const inquirer = await import('@inquirer/prompts')
-  return inquirer.confirm({
-    message:
-      'Enable anonymous usage telemetry to help improve OpenCRVS? Only ' +
-      'aggregate metrics are shared — no personal or protected data.',
-    default: true
-  })
+  const { input } = await import('@inquirer/prompts')
+
+  console.log(
+    '\nTelemetry shares anonymous, aggregate usage metrics to help improve ' +
+      'OpenCRVS — no personal or protected data. To enable it, provide your ' +
+      'country code and organisation below; leave either blank to keep ' +
+      'telemetry disabled.\n'
+  )
+
+  const countryCode = (
+    await input({
+      message: 'Country code (ISO alpha-3, e.g. FAR):',
+      validate: (value) =>
+        value.trim() === '' ||
+        /^[A-Za-z]{3}$/.test(value.trim()) ||
+        'Enter a 3-letter ISO alpha-3 code, or leave blank to keep telemetry disabled.'
+    })
+  )
+    .trim()
+    .toUpperCase()
+
+  if (!countryCode) {
+    return TELEMETRY_DISABLED
+  }
+
+  const organisation = (
+    await input({ message: 'Organisation running this instance:' })
+  ).trim()
+
+  if (!organisation) {
+    return TELEMETRY_DISABLED
+  }
+
+  return { enabled: true, countryCode, organisation }
 }
 
 // ─── Steps ───────────────────────────────────────────────────────────────────
@@ -251,10 +292,76 @@ function ensureEnvalidNamedImports(sourceFile: SourceFile, names: string[]) {
   }
 }
 
+function getCleanEnvObject(sourceFile: SourceFile) {
+  const options = sourceFile
+    .getDescendantsOfKind(SyntaxKind.CallExpression)
+    .find((call) => call.getExpression().getText() === 'cleanEnv')
+    ?.getArguments()[1]
+  return options && Node.isObjectLiteralExpression(options)
+    ? options
+    : undefined
+}
+
+/**
+ * Ensures an env var exists in the cleanEnv config with the given default.
+ *
+ * - `update: true` sets the default even when the var already exists (used for
+ *   the values the operator just supplied).
+ * - `update: false` only adds the var when missing, never touching an existing
+ *   one (so disabling never clobbers a country's own values).
+ *
+ * Every call re-resolves the config object: a prior `insertText` invalidates
+ * nodes previously read from the file.
+ */
+function upsertEnvVar(
+  sourceFile: SourceFile,
+  name: string,
+  kind: 'bool' | 'str',
+  defaultExpr: string,
+  desc: string,
+  update: boolean
+) {
+  const object = getCleanEnvObject(sourceFile)
+  if (!object) return
+
+  const existing = object.getProperty(name)
+  if (existing && Node.isPropertyAssignment(existing)) {
+    if (!update) return
+
+    const options = existing
+      .getInitializerIfKind(SyntaxKind.CallExpression)
+      ?.getArguments()[0]
+    if (options && Node.isObjectLiteralExpression(options)) {
+      const defaultProperty = options.getProperty('default')
+      if (defaultProperty && Node.isPropertyAssignment(defaultProperty)) {
+        defaultProperty.setInitializer(defaultExpr)
+      } else {
+        options.insertPropertyAssignment(0, {
+          name: 'default',
+          initializer: defaultExpr
+        })
+      }
+      console.log(`  ✓ ${ENVIRONMENT_FILE}: ${name} default set`)
+    }
+    return
+  }
+
+  if (
+    appendProperty(sourceFile, object, name, [
+      `${kind}({`,
+      `  default: ${defaultExpr},`,
+      `  desc: ${JSON.stringify(desc)}`,
+      '})'
+    ])
+  ) {
+    console.log(`  ✓ ${ENVIRONMENT_FILE}: ${name}`)
+  }
+}
+
 function addEnvironmentVariables(
   project: Project,
   cwd: string,
-  telemetryDefault: 'true' | 'false'
+  config: TelemetryConfig
 ) {
   const sourceFile = project.addSourceFileAtPathIfExists(
     path.join(cwd, ENVIRONMENT_FILE)
@@ -266,12 +373,7 @@ function addEnvironmentVariables(
     return
   }
 
-  const cleanEnvCall = sourceFile
-    .getDescendantsOfKind(SyntaxKind.CallExpression)
-    .find((call) => call.getExpression().getText() === 'cleanEnv')
-  const options = cleanEnvCall?.getArguments()[1]
-
-  if (!options || !Node.isObjectLiteralExpression(options)) {
+  if (!getCleanEnvObject(sourceFile)) {
     warnSkipped(
       `Could not find the cleanEnv(...) config object in ${ENVIRONMENT_FILE}; add the telemetry env vars by hand`
     )
@@ -280,77 +382,42 @@ function addEnvironmentVariables(
 
   ensureEnvalidNamedImports(sourceFile, ['bool', 'str'])
 
-  // TELEMETRY_ENABLED: set its default when it already exists, otherwise add it.
-  const telemetryEnabled = options.getProperty('TELEMETRY_ENABLED')
-  if (telemetryEnabled && Node.isPropertyAssignment(telemetryEnabled)) {
-    const defaultProperty = telemetryEnabled
-      .getInitializerIfKind(SyntaxKind.CallExpression)
-      ?.getArguments()[0]
-    if (defaultProperty && Node.isObjectLiteralExpression(defaultProperty)) {
-      const existingDefault = defaultProperty.getProperty('default')
-      if (existingDefault && Node.isPropertyAssignment(existingDefault)) {
-        existingDefault.setInitializer(telemetryDefault)
-      } else {
-        defaultProperty.insertPropertyAssignment(0, {
-          name: 'default',
-          initializer: telemetryDefault
-        })
-      }
-    }
-  } else {
-    appendProperty(sourceFile, options, 'TELEMETRY_ENABLED', [
-      'bool({',
-      `  default: ${telemetryDefault},`,
-      `  desc: 'When true, usage telemetry received from the events service is forwarded to the OpenCRVS status service.'`,
-      '})'
-    ])
-    console.log(`  ✓ ${ENVIRONMENT_FILE}: TELEMETRY_ENABLED`)
-  }
+  // Reflect the operator's choice in the on/off default.
+  upsertEnvVar(
+    sourceFile,
+    'TELEMETRY_ENABLED',
+    'bool',
+    config.enabled ? 'true' : 'false',
+    'When true, usage telemetry received from the events service is forwarded to the OpenCRVS status service.',
+    true
+  )
 
-  const additions: Array<{ name: string; lines: string[] }> = [
-    {
-      name: 'COUNTRY_CODE',
-      lines: [
-        'str({',
-        `  default: 'FAR',`,
-        `  desc: 'ISO-style country code of this instance, reported with telemetry.'`,
-        '})'
-      ]
-    },
-    {
-      name: 'ENVIRONMENT_NAME',
-      lines: [
-        'str({',
-        `  default: 'development',`,
-        `  desc: 'Environment name (e.g. "production", "staging") reported as the telemetry environment.'`,
-        '})'
-      ]
-    },
-    {
-      name: 'ORGANISATION',
-      lines: [
-        'str({',
-        `  default: '',`,
-        `  desc: 'Organisation running this instance, reported with telemetry. Empty by default.'`,
-        '})'
-      ]
-    }
-  ]
-
-  for (const addition of additions) {
-    // Re-resolve the object literal each time: a previous insertText
-    // invalidates nodes read from this file.
-    const object = sourceFile
-      .getDescendantsOfKind(SyntaxKind.CallExpression)
-      .find((call) => call.getExpression().getText() === 'cleanEnv')
-      ?.getArguments()[1]
-    if (!object || !Node.isObjectLiteralExpression(object)) return
-
-    if (object.getProperty(addition.name)) continue
-    if (appendProperty(sourceFile, object, addition.name, addition.lines)) {
-      console.log(`  ✓ ${ENVIRONMENT_FILE}: ${addition.name}`)
-    }
-  }
+  // When enabled, bake the supplied identity into the defaults; when disabled,
+  // only seed placeholders if the vars are missing (never overwrite).
+  upsertEnvVar(
+    sourceFile,
+    'COUNTRY_CODE',
+    'str',
+    config.enabled ? JSON.stringify(config.countryCode) : `'FAR'`,
+    'ISO-style country code of this instance, reported with telemetry.',
+    config.enabled
+  )
+  upsertEnvVar(
+    sourceFile,
+    'ORGANISATION',
+    'str',
+    config.enabled ? JSON.stringify(config.organisation) : `''`,
+    'Organisation running this instance, reported with telemetry. Empty by default.',
+    config.enabled
+  )
+  upsertEnvVar(
+    sourceFile,
+    'ENVIRONMENT_NAME',
+    'str',
+    `'development'`,
+    'Environment name (e.g. "production", "staging") reported as the telemetry environment.',
+    false
+  )
 }
 
 function wireIndex(project: Project, cwd: string) {
@@ -469,11 +536,10 @@ function wireIndex(project: Project, cwd: string) {
 async function main() {
   const cwd = process.cwd()
 
-  const enable = await promptEnableTelemetry()
-  const telemetryDefault = enable ? 'true' : 'false'
+  const config = await promptTelemetryConfig()
 
   console.log(
-    `\nAdding daily usage telemetry (${enable ? 'enabled' : 'disabled'} by default)...\n`
+    `\nAdding daily usage telemetry (${config.enabled ? `enabled for ${config.countryCode}` : 'disabled'} by default)...\n`
   )
 
   writeTelemetryHandler(cwd)
@@ -487,7 +553,7 @@ async function main() {
     }
   })
 
-  addEnvironmentVariables(project, cwd, telemetryDefault)
+  addEnvironmentVariables(project, cwd, config)
   wireIndex(project, cwd)
 
   await project.save()
