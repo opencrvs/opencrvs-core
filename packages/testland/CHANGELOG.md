@@ -5,7 +5,7 @@
 ### Breaking changes
 
 - Removed InfluxDB from deployment infrastructure and data-generator references.
-- The employee seeder now reads the file named by the `EMPLOYEES_CSV` environment variable from `src/data-seeding/employees/source/`, instead of always reading `default-employees.csv`. Set it on the `countryconfig` container, e.g. in `environments/<environment>/opencrvs-services/values.yaml`, to control which users get seeded per environment. It defaults to `default-employees.csv`. `prod-employees.csv` has been removed — add your own per-environment files instead [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
+- The employee seeder seeds `<ENVIRONMENT_NAME>-employees.csv` from `src/data-seeding/employees/source/` when that file exists, otherwise `default-employees.csv`. It uses the `ENVIRONMENT_NAME` env var (also the telemetry environment label); add per-environment files such as `production-employees.csv` to seed different users per environment — no code change needed. The previous `EMPLOYEES_CSV` env var and the `OPENCRVS_ENVIRONMENT`-based `prod-employees.csv` selection have been removed [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
 
 ## 2.0.0
 

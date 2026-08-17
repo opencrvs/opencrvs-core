@@ -98,6 +98,16 @@ An integration's audit log can now be read through the `integrations.audit` endp
 
 A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
 
+#### Daily usage telemetry
+
+OpenCRVS can now share a small **daily usage summary** with the OpenCRVS status service — aggregate counts only (registrations, pending declarations, certificates printed, active users, uptime), never personal or record data. It is collected at most once per UTC day and only ever sent from production instances.
+
+Enable it on the countryconfig service with `TELEMETRY_ENABLED=true`, and identify your instance with `COUNTRY_CODE`, `ORGANISATION`, and `ENVIRONMENT_NAME`. While disabled, countryconfig logs a startup notice explaining what would be shared and how to opt in.
+
+- **New country configs** — `create-countryconfig` asks for your organisation, ISO alpha-3 country code, and whether to enable telemetry, then writes them as the env defaults.
+- **Existing country configs** — `opencrvs upgrade` wires telemetry into a v2.0 config (the `/trigger/telemetry` handler, its route, and the new env vars). It asks whether to enable it and, if so, requires your country code and organisation.
+- **Toolkit** — `@opencrvs/toolkit/telemetry` exposes `sendTelemetry(report)`, which owns the status service URL and payload schema so upgrades stay type-safe.
+
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
