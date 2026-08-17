@@ -32,8 +32,6 @@ import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
 import { trackAndDeleteCreatedEvents } from '../../../test-data/eventDeletion'
 
-trackAndDeleteCreatedEvents()
-
 /**
  * react-select options render as plain divs with no `option` role, and the
  * field's already-selected value can match the same text once the dropdown
@@ -42,7 +40,10 @@ trackAndDeleteCreatedEvents()
  * rather than a page-wide text match.
  */
 async function selectDropdownOption(page: Page, value: string) {
-  await page.locator('.react-select__option').getByText(value, { exact: true }).click()
+  await page
+    .locator('.react-select__option')
+    .getByText(value, { exact: true })
+    .click()
 }
 
 test('1. Complete birth declaration by a Community Leader - residential delivery, both parents present, same residence', async ({
