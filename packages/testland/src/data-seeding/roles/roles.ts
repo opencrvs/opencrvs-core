@@ -292,5 +292,25 @@ export const roles: Role[] = [
       { type: 'record.print-certified-copies', options: { placeOfEvent: 'location' } },
       { type: 'record.correct', options: { placeOfEvent: 'location' } }
     ])
+  },
+  {
+    id: 'QA_HOSPITAL_CLERK',
+    label: {
+      defaultMessage: 'QA Hospital Official',
+      description: 'Name for user role QA Hospital Official. Used for regression testing',
+      id: 'userRole.hospitalClerk'
+    },
+    scopes: defineScopes([
+      { type: 'user.read-only-my-audit' },
+      { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation', 'pending-updates'] } },
+      { type: 'record.create', options: { placeOfEvent: 'location' } },
+      { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.edit', options: { status: ['NOTIFIED'] } },
+      { type: 'record.notify', options: { placeOfEvent: 'location' } },
+      { type: 'record.declare', options: { placeOfEvent: 'location' } },
+      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
+      { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
+    ])
   }
 ]
