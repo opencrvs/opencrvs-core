@@ -36,7 +36,7 @@ import {
 } from '@events/tests/generators'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
-import { EventAccessDeniedError } from '../../service/events/events'
+import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.get', async () => {
   await createIndex(
@@ -107,7 +107,7 @@ test('Check scopes against event.get', async () => {
         const eventFetchedAsUser = await testClient.event.get({ eventId })
         result = { success: true, event: eventFetchedAsUser }
       } catch (error) {
-        if (error instanceof EventAccessDeniedError) {
+        if (error instanceof EventNotFoundError) {
           // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
           const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
             eventId
@@ -181,7 +181,7 @@ test('Check notifiedIn and notifiedBy scopes against event.get', async () => {
         const eventFetchedAsUser = await testClient.event.get({ eventId })
         result = { success: true, event: eventFetchedAsUser }
       } catch (error) {
-        if (error instanceof EventAccessDeniedError) {
+        if (error instanceof EventNotFoundError) {
           const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
             eventId
           })
@@ -228,7 +228,7 @@ test('Check flags scope option against event.get', async () => {
 
   await expect(
     clientRestrictedByFlags.event.get({ eventId: event.id })
-  ).rejects.toBeInstanceOf(EventAccessDeniedError)
+  ).rejects.toBeInstanceOf(EventNotFoundError)
 
   const clientMatchingFlags = createTestClient(user, [
     encodeScope({

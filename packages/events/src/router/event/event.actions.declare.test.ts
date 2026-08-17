@@ -49,7 +49,7 @@ import {
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
-import { EventAccessDeniedError } from '@events/service/events/events'
+import { EventNotFoundError } from '@events/service/events/events'
 
 function getRequestedRegisterAction(response: EventDocument) {
   const savedAction = response.actions.find(
@@ -102,7 +102,7 @@ describe('Declare action', () => {
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
       )
-    ).rejects.toMatchObject(new EventAccessDeniedError(eventId))
+    ).rejects.toMatchObject(new EventNotFoundError(eventId))
   })
 
   test('allows access if required scope is present', async () => {

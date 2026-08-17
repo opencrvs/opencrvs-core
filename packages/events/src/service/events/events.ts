@@ -58,15 +58,6 @@ export class EventNotFoundError extends TRPCError {
   }
 }
 
-export class EventAccessDeniedError extends TRPCError {
-  constructor(id: string) {
-    super({
-      code: 'FORBIDDEN',
-      message: `You do not have access to event with ID: ${id}`
-    })
-  }
-}
-
 /** Get event by ID. Throws tRPC HTTP 404 if event is not found */
 export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
   try {
