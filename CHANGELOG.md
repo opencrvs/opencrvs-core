@@ -105,6 +105,7 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
 - Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
 - Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
+- Stop reporting an email or mobile number as already in use when it is merely contained in an existing one. Duplicate and existence checks on users matched substrings, so creating a user with the email `a@x.com` was rejected as a duplicate of an existing `ba@x.com`. Email, mobile and username now match whole values; email and username stay case-insensitive in effect. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 
 ## 2.0.0
 
