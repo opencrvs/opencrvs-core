@@ -76,7 +76,7 @@ test('stored events can be deleted', async () => {
 
   // now event should be removed
   await expect(client.event.get({ eventId: event.id })).rejects.toThrow(
-    `Event not found with ID: ${event.id}`
+    'Forbidden'
   )
 })
 

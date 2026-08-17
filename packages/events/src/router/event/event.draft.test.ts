@@ -39,7 +39,7 @@ test('Throws error when creating a draft against non-existent id', async () => {
       status: 'Accepted',
       transactionId: 'trnx-id'
     })
-  ).rejects.toThrow(`Event not found with ID: ${uuid}`)
+  ).rejects.toThrow('Forbidden')
 })
 
 test('Throws error when creating a draft for event without assignment', async () => {

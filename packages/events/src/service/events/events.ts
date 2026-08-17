@@ -50,10 +50,10 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
-  constructor(id: string) {
+  constructor(_id: string) {
     super({
       code: 'NOT_FOUND',
-      message: `Event not found with ID: ${id}`
+      message: 'Forbidden'
     })
   }
 }
