@@ -88,7 +88,7 @@
     "dotenv": "^16.4.5",
     "elastic-apm-node": "^3.29.0",
     "envalid": "^8.0.0",
-    "esbuild": "^0.18.9",
+    "esbuild": "^0.25.0",
     "handlebars": "^4.7.9",
     "hapi-auth-jwt2": "10.4.0",
     "hapi-pino": "^9.0.0",
