@@ -306,6 +306,11 @@ export function updateLocalEvent(data: EventDocument) {
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
+
+  // As part of event creation, we add the just created event to local event.search cache.
+  // After any successful action after it, we should clear it explicitly, since `refetchAllSearchQueries` does not invalidate single-item search result.
+  await refetchSearchQuery(updatedEvent.id)
+
   return refetchAllSearchQueries()
 }
 
