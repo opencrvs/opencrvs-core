@@ -3,12 +3,7 @@ ingress:
   ssl_enabled: false
 
 platform:
-  # Tag applied to all three images below. Empty means "use the chart's
-  # appVersion", which tracks the core release these images are built from.
-  # Override it to deploy a specific build, e.g. a commit sha from a branch:
-  #   helm upgrade ... --set image.tag=8cd820b
-  # A single service can still pin its own tag under <service>.image.tag.
-  tag: ''
+  tag: 'v2.1.0'
 
 mosip_mock:
   enabled: true
