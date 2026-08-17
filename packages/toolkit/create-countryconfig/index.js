@@ -173,8 +173,7 @@ async function main() {
     await cloneRepository(
       {
         repository: CORE_REPOSITORY,
-        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH,
-        branch: 'ocrvs-13179' // @todo: remove this hardcoded branch once the countryconfig-template is merged into main
+        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH
       },
       countryconfigTargetPath
     )
