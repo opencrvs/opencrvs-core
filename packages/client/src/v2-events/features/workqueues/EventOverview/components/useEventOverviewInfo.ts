@@ -17,6 +17,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { findLocalEventIndex } from '@client/v2-events/features/events/useEvents/api'
 
 type EventOverviewInfo =
   | {
@@ -31,7 +32,7 @@ type EventOverviewInfo =
     }
 
 export function useEventOverviewInfo(eventId: string): EventOverviewInfo {
-  const { searchEventById, getEvent } = useEvents()
+  const { getEvent } = useEvents()
   const fullEvent = getEvent.useFindEventFromCache(eventId).data
 
   const maybeAuth = useAuthentication()
@@ -40,8 +41,7 @@ export function useEventOverviewInfo(eventId: string): EventOverviewInfo {
     'Authentication is not available but is required'
   )
 
-  const getEventQuery = searchEventById.useQuery(eventId)
-  const eventIndex = getEventQuery.data?.results[0]
+  const eventIndex = findLocalEventIndex(eventId)
 
   if (!eventIndex) {
     throw new Error('Record not found')
