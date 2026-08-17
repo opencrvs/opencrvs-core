@@ -18,15 +18,6 @@ import {
 } from './users'
 import { NewUsers } from './schema/app/Users'
 
-/**
- * These tests run against the real postgres in `global-setup.ts`, and that is
- * the point: the conflicts under test are built from the `pg` driver's SQLSTATE
- * and the constraint names the migrations actually created. Asserting against a
- * hand-written `{ code: '23505' }` would only prove the mapping agrees with the
- * fixture the test invented, and would stay green if either the driver's error
- * shape or a constraint name changed underneath it.
- */
-
 function newUser(officeId: UUID, overrides: Partial<NewUsers> = {}) {
   const id = getUUID()
 
