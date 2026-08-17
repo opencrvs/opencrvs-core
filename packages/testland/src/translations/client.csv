@@ -590,6 +590,8 @@ duplicates.content.subtitle,Duplicates content subtitle message,"This record was
 duplicates.content.title,Duplicates content title message,Is {name} ({trackingId}) a duplicate?,Est-ce que {name} ({trackingId}) est un doublon?
 duplicates.review.header,Review page header for duplicates declarations,Potential {event} duplicate review,Potentiel {event} examen de doublon
 duplicates.reviewUnavailable.description,Body of the banner shown when the user cannot access every record matched as a potential duplicate,"It is flagged against a record registered outside your jurisdiction, which you are not permitted to view. The review must be completed by someone with access to both records.","Il est signalé par rapport à un enregistrement enregistré en dehors de votre juridiction, que vous n'êtes pas autorisé à consulter. L'examen doit être effectué par une personne ayant accès aux deux enregistrements."
+duplicates.reviewUnavailable.description,Body of the banner shown when the user cannot access every record matched as a potential duplicate,It is flagged against a record registered outside your jurisdiction, which you are not permitted to view. The review must be completed by someone with access to both records.,
+duplicates.reviewUnavailable.title,Title of the banner shown when the user cannot access every record matched as a potential duplicate,You cannot review this record for duplicates,
 duplicates.reviewUnavailable.title,Title of the banner shown when the user cannot access every record matched as a potential duplicate,You cannot review this record for duplicates,Vous ne pouvez pas examiner cet enregistrement pour les doublons
 duplicates.warning,The warning message shown when a declaration has potential duplicates,Potential duplicate of record {trackingId},Duplicata potentiel de l'enregistrement {trackingId}
 editPageBanner.declaredMessage,The message for the edit page banner,You are editing a record declared by {name} ({role} at {location}),Vous modifiez un dossier déclaré par {name} ({role} à {location})
@@ -897,6 +899,7 @@ event.summary.assignedTo.value,Assigned to value,{event.assignedTo},{event.assig
 event.summary.event.label,Label for the event field,Event,Événement
 event.summary.flags.label,Flags of the event,Flags,Drapeaux
 event.summary.flags.placeholder,Message when no flags are present,No flags,Pas de drapeaux
+event.summary.redacted,Accessible name for a value the user is not permitted to see,Hidden,
 event.summary.registrationNumber.empty,No registration number message,No registration number,Aucun numéro d'inscription
 event.summary.registrationNumber.label,Label for the registration number field,Registration Number,Numéro d'inscription
 event.summary.registrationNumber.value,Value for the registration number field,{event.registrationNumber},{event.registrationNumber}
@@ -1602,4 +1605,3 @@ workqueues.pendingValidation.title,Title of pending validation workqueue,Pending
 workqueues.potentialDuplicate.title,Title of potential duplicate workqueue,Potential duplicate,Duplicata potentiel
 workqueues.recent.title,Title of recent workqueue,Recent,Récent
 workqueues.requiresApproval.title,Title of pending approval workqueue,Pending approval,En attente d'approbation
-event.summary.redacted,Accessible name for a value the user is not permitted to see,Hidden,
