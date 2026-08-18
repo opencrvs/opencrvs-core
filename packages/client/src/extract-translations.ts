@@ -331,12 +331,22 @@ ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
       })
 
       await writeTranslations(sortBy(allTranslations, (row) => row.id))
+
+      console.log(`
+${chalk.green('Added')} ${missingKeys.length} key(s). The non-English copy is still yours to write.`)
+
+      // The rows are in the file, so there is nothing left to fail on. Exiting
+      // non-zero here reads as a failed run and sends people running the very
+      // same command a second time.
+      return
     } else {
       console.log(`
 ${chalk.green('Tip 🪄')}: ${chalk.white(
-        `If you want this command to add the missing English keys for you, run it with the ${chalk.bold(
-          '--write'
-        )} flag. Note that you still need to add non-English translations to the file.`
+        `If you want this command to add the missing English keys for you, run ${chalk.bold(
+          'pnpm extract:translations --write'
+        )} in ${chalk.bold(
+          'packages/client'
+        )}. Note that you still need to add non-English translations to the file.`
       )}`)
     }
 

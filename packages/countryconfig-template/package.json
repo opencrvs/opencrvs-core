@@ -27,7 +27,7 @@
     "port-forward": "bash assets/port-forward.sh",
     "environment:init": "tsx assets/environments/setup-environment.ts",
     "environment:upgrade": "pnpm environment:init",
-    "check:translations": "opencrvs check-translations",
+    "extract:translations": "opencrvs check-translations",
     "sort-translations": "cross-env NODE_ENV=development tsx src/sort-translations.ts"
   },
   "devDependencies": {
@@ -119,7 +119,7 @@
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
-      "sh -c 'pnpm check:translations'",
+      "sh -c 'pnpm extract:translations'",
       "eslint --fix",
       "prettier --write",
       "git add"

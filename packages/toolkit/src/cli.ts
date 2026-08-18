@@ -219,7 +219,7 @@ function handleCheckTranslations() {
 
   if (!checkArgs.includes('--write')) {
     console.error(
-      '\nRun `opencrvs check-translations --write` to add them with their English copy.'
+      '\nRun `pnpm extract:translations --write` to add them with their English copy.'
     )
     process.exit(1)
   }

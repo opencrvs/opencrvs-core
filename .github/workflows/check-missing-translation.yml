@@ -83,7 +83,7 @@ jobs:
           for config in testland countryconfig-template; do
             output="$RUNNER_TEMP/$config-countryconfig-translations.txt"
 
-            if pnpm --dir "packages/$config" run check:translations 2>&1 | tee "$output"; then
+            if pnpm --dir "packages/$config" run extract:translations 2>&1 | tee "$output"; then
               continue
             fi
 
@@ -93,7 +93,7 @@ jobs:
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             awk '/have no row in src\/translations\/countryconfig.csv:/ {flag=1; next} /^Run / {flag=0} flag && NF' "$output" >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            echo "Run \`pnpm check:translations --write\` in \`packages/$config\` to add them with their English copy, then write the copy for the languages other than English." >> $GITHUB_STEP_SUMMARY
+            echo "Run \`pnpm extract:translations --write\` in \`packages/$config\` to add them with their English copy, then write the copy for the languages other than English." >> $GITHUB_STEP_SUMMARY
           done
 
           exit $status
