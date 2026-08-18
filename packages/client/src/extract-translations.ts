@@ -216,6 +216,7 @@ async function extractMessages() {
     ignore: [
       '**/*.test.@(tsx|ts)',
       'src/tests/**/*.*',
+      'src/setupTests.ts',
       '**/*.stories.@(tsx|ts)'
     ]
   })

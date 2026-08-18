@@ -24,9 +24,7 @@ describe('getLanguages', () => {
     // Declared by core's client package, synced by `opencrvs upgrade`.
     expect(messages['action.action']).toBe('Action')
     // Declared by this country config, never touched by an upgrade.
-    expect(messages['birth.search.criteria.label.prefix.child']).toBe(
-      "Child's"
-    )
+    expect(messages['birth.search.criteria.label.prefix.child']).toBe("Child's")
   })
 
   it('leaves applications without a merge list reading a single file', async () => {

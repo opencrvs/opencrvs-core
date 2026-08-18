@@ -8,8 +8,6 @@ constants.phoneNumber,Label used for phone number input field,Phone number,Numé
 constants.skipToMainContent,Label for a keyboard accessibility link which skips to the main content,Skip to main content,Passer au contenu principal
 error.networkError,The error that appears when there is no internet connection,Unable to connect to server,Impossible de se connecter au serveur
 error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
-field.address.district.label,Label for district in address,District,District
-field.address.province.label,Label for province in address,Province,Province
 label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
 login.clearForm,,Clear form,Effacer le formulaire
 login.codeSubmissionError,The error that appears when the user entered sms code is unauthorised,Incorrect verification code. Please try again,"Désolé, ce code n'a pas fonctionné."

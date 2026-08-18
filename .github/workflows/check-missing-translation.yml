@@ -34,6 +34,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check for missing translations
+        # chalk colours its output whenever GITHUB_ACTIONS is set, TTY or not.
+        # The missing rows are lifted out of this output and into the job
+        # summary for a reviewer to paste straight into the CSV, and ANSI
+        # escapes would be pasted along with them.
+        env:
+          FORCE_COLOR: '0'
         run: |
           set -o pipefail
 

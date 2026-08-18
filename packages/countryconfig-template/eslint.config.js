@@ -11,6 +11,7 @@
  */
 
 const { FlatCompat } = require('@eslint/eslintrc')
+const js = require('@eslint/js')
 const globals = require('globals')
 const path = require('path')
 const tsParser = require('@typescript-eslint/parser')
@@ -23,6 +24,7 @@ module.exports = defineConfig([
   {
     ignores: ['eslint*.js', 'build/**/*', 'assets/**/*', 'tilt/**/*']
   },
+  js.configs.recommended,
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
     'plugin:import/recommended'
@@ -66,7 +68,7 @@ module.exports = defineConfig([
       'import/no-duplicates': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-empty-interface': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/explicit-member-accessibility': 'off',

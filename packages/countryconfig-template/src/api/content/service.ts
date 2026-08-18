@@ -78,7 +78,9 @@ export async function getLanguages(
   return languages.map((lang) => {
     const messages: IMessageIdentifier = {}
     csvData.forEach((row) => {
-      messages[row.id] = row[lang]
+      if (row[lang] !== undefined) {
+        messages[row.id] = row[lang]
+      }
     })
 
     return {

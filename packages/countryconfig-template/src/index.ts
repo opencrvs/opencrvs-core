@@ -271,8 +271,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-
-    handler: (request: any, h: any) => {
+    handler: () => {
       // Perform any health checks and return true or false for success prop
       return {
         success: true

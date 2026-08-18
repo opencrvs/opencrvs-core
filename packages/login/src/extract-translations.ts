@@ -213,7 +213,12 @@ async function extractMessages() {
   console.log()
 
   const files = await promisify(glob)('src/**/*.@(tsx|ts)', {
-    ignore: ['**/*.test.@(tsx|ts)', 'src/tests/**/*.*']
+    ignore: [
+      '**/*.test.@(tsx|ts)',
+      'src/tests/**/*.*',
+      'src/setupTests.ts',
+      '**/*.stories.@(tsx|ts)'
+    ]
   })
 
   const messagesParsedFromApp: MessageDescriptor[] = files
