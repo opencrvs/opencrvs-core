@@ -66,10 +66,6 @@ async function attemptSystemReady() {
  * declared by the country config simply never gets registered. The symptom
  * surfaces far from the cause — e.g. MOSIP cannot authenticate as itself, so
  * its actions are attributed to the registrar in the audit trail.
- *
- * The data seeder no longer calls the trigger, so this is the only thing that
- * registers those integrations — on a fresh environment and on an
- * already-provisioned one alike.
  */
 export async function triggerSystemReady() {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
