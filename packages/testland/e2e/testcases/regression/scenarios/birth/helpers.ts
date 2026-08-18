@@ -11,8 +11,10 @@
 // Every spec in this directory declares one row from the QA regression-test
 // sheet's "Birth" tab:
 // https://docs.google.com/spreadsheets/d/1g0ReIDGw8lbHC6Am3O0A16S1y0jje8BZ/edit?gid=1406739219#gid=1406739219
-import { type Locator, type Page } from '@playwright/test'
-import { uploadImage } from '../../../../helpers'
+import { expect, type Locator, type Page } from '@playwright/test'
+import { getToken, uploadImage } from '../../../../helpers'
+import { CREDENTIALS } from '../../../../constants'
+import { createDeclaration as registerBirthForBrn } from '../../../test-data/birth-declaration'
 
 /**
  * react-select options render as plain divs with no `option` role, and the
@@ -26,6 +28,31 @@ export async function selectDropdownOption(page: Page, value: string) {
     .locator('.react-select__option')
     .getByText(value, { exact: true })
     .click()
+}
+
+/**
+ * The country field is a searchable typeahead - matches the convention used
+ * elsewhere in the package (e.g. death-declaration-3.spec.ts), scoping to
+ * the open option list rather than `#country` as a whole, which also
+ * contains the field's own current-value text once something is selected.
+ */
+export async function selectCountry(page: Page, countryName: string) {
+  await page.locator('#country').click()
+  await page.locator('#country input').fill(countryName.slice(0, 3))
+  await page
+    .locator('#country .react-select__option', { hasText: countryName })
+    .click()
+}
+
+/**
+ * Registers a birth via the API purely to mint a real registration number,
+ * for declarations where a family member is identified by an existing BRN.
+ */
+export async function fetchBirthRegistrationNumberForTesting() {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await registerBirthForBrn(token)
+  expect(res.registrationNumber).toBeDefined()
+  return res.registrationNumber!
 }
 
 /**

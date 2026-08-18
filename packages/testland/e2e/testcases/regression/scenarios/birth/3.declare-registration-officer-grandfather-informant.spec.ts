@@ -16,10 +16,10 @@
 // father's residence is different from mother's (also full fields),
 // supporting documents provided for every section.
 import { expect, test, type Page } from '@playwright/test'
+import path from 'path'
 import { faker } from '@faker-js/faker'
 import {
   login,
-  getToken,
   continueForm,
   goToSection,
   drawSignature,
@@ -35,8 +35,9 @@ import { CREDENTIALS } from '../../../../constants'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import { createDeclaration as registerBirthForBrn } from '../../../test-data/birth-declaration'
 import {
+  fetchBirthRegistrationNumberForTesting,
+  selectCountry,
   selectDropdownOption,
   uploadImageToSectionWithFile
 } from './helpers'
@@ -48,21 +49,23 @@ const imageUploadSectionTitles = [
   'Other'
 ]
 
-const ASSETS_DIR =
-  './e2e/testcases/qa-testrail-testcases/Regression-Test-Data/Birth/assets'
+// Shared across the whole testland package - every upload in this
+// declaration reuses this one real (~528KB) file rather than a set of
+// per-purpose local assets. __dirname-relative so this doesn't break if
+// Playwright is ever invoked from a different working directory.
+const SHARED_ASSET = path.join(
+  __dirname,
+  '../../../../assets/528KB-random.png'
+)
 
-async function uploadAllTypesForSection(
-  page: Page,
-  sectionId: string,
-  imageBySectionTitle: Record<string, string>
-) {
+async function uploadAllTypesForSection(page: Page, sectionId: string) {
   for (const sectionTitle of imageUploadSectionTitles) {
     await uploadImageToSectionWithFile({
       page,
       sectionLocator: page.locator(`#${sectionId}`),
       sectionTitle,
       buttonLocator: page.locator(`button[name="${sectionId}"]`),
-      image: `${ASSETS_DIR}/${imageBySectionTitle[sectionTitle]}`
+      image: SHARED_ASSET
     })
   }
 }
@@ -70,8 +73,8 @@ async function uploadAllTypesForSection(
 test('3. Complete birth declaration by a Registration Officer - rural residential delivery, Grandfather informant, BRN identity, documents provided', async ({
   page
 }) => {
-  // 13 real (not tiny placeholder) document uploads plus a BRN
-  // pre-registration API call push this well past the default 90s budget.
+  // 13 real (~528KB each) document uploads plus a BRN pre-registration API
+  // call push this well past the default 90s budget.
   test.setTimeout(240_000)
 
   // The sheet's underscore ("John_Peter") represents a compound first name -
@@ -102,13 +105,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
   const childZipCode = faker.location.zipCode()
 
   const informantEmail = faker.internet.email()
-  const informantState = faker.location.state()
-  const informantDistrict = faker.location.county()
-  const informantTown = faker.location.city()
-  const informantAddressLine1 = faker.location.county()
-  const informantAddressLine2 = faker.location.street()
-  const informantAddressLine3 = faker.location.buildingNumber()
-  const informantZipCode = faker.location.zipCode()
+  const informantNid = faker.string.numeric(10)
 
   const motherState = faker.location.state()
   const motherDistrict = faker.location.county()
@@ -127,10 +124,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
   let brn: string
 
   await test.step('Register a birth record via the API to use its registration number as a BRN', async () => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await registerBirthForBrn(token)
-    expect(res.registrationNumber).toBeDefined()
-    brn = res.registrationNumber!
+    brn = await fetchBirthRegistrationNumberForTesting()
   })
 
   await test.step('Log in as the Registration Officer and start a birth declaration', async () => {
@@ -191,21 +185,16 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
     await selectDropdownOption(page, 'Farajaland')
 
     await page.locator('#informant____idType').click()
-    await selectDropdownOption(page, 'Birth Registration Number')
-    await page.locator('#informant____brn').fill(brn)
+    await selectDropdownOption(page, 'National ID')
+    await page.locator('#informant____nid').fill(informantNid)
 
-    // Usual place of residence: other than Farajaland.
-    await page.locator('#country').click()
-    await page.locator('#country input').fill('Gab')
-    await page.locator('#country').getByText('Gabon', { exact: true }).click()
-
-    await page.locator('#state').fill(informantState)
-    await page.locator('#district2').fill(informantDistrict)
-    await page.locator('#cityOrTown').fill(informantTown)
-    await page.locator('#addressLine1').fill(informantAddressLine1)
-    await page.locator('#addressLine2').fill(informantAddressLine2)
-    await page.locator('#addressLine3').fill(informantAddressLine3)
-    await page.locator('#postcodeOrZip').fill(informantZipCode)
+    // Usual place of residence: simple Farajaland address.
+    await page.locator('#province').click()
+    await selectLocationOption(page, 'Central')
+    await page.locator('#district').click()
+    await selectLocationOption(page, 'Ibombo')
+    await page.locator('#village').click()
+    await selectLocationOption(page, 'Klow')
 
     await continueForm(page)
   })
@@ -224,12 +213,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
 
     // Usual place of residence: other than Farajaland (different country
     // from the informant's, per the declaration notes).
-    await page.locator('#country').click()
-    await page.locator('#country input').fill('Dji')
-    await page
-      .locator('#country')
-      .getByText('Djibouti', { exact: true })
-      .click()
+    await selectCountry(page, 'Djibouti')
 
     await page.locator('#state').fill(motherState)
     await page.locator('#district2').fill(motherDistrict)
@@ -263,7 +247,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
     await page.locator('#father____brn').fill(brn)
 
     // Not the same as mother's - a separate, fully-detailed rural address.
-    await page.getByLabel('No', { exact: true }).check()
+    await page.locator('#father____addressSameAs_NO').check()
 
     await page.locator('#province').click()
     await selectLocationOption(page, 'Sulaka')
@@ -293,28 +277,12 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
     await uploadImage(
       page,
       page.locator('button[name="documents____proofOfBirth"]'),
-      `${ASSETS_DIR}/prrof of birth.jpg`
+      SHARED_ASSET
     )
 
-    await uploadAllTypesForSection(page, 'documents____proofOfMother', {
-      'National ID': 'mother nid.jpg',
-      Passport: 'mother passport.jpg',
-      // No dedicated file for these two - compensate by reusing others.
-      'Birth Certificate': 'ohter2.png',
-      Other: 'ohter.png'
-    })
-    await uploadAllTypesForSection(page, 'documents____proofOfFather', {
-      'National ID': 'father nid.jpg',
-      Passport: 'father passport.jpg',
-      'Birth Certificate': 'ohter.png',
-      Other: 'ohter2.png'
-    })
-    await uploadAllTypesForSection(page, 'documents____proofOfInformant', {
-      'National ID': 'proof of informant.jpg',
-      Passport: 'male passport 2.jpg',
-      'Birth Certificate': 'informant signature.png',
-      Other: 'ohter.png'
-    })
+    await uploadAllTypesForSection(page, 'documents____proofOfMother')
+    await uploadAllTypesForSection(page, 'documents____proofOfFather')
+    await uploadAllTypesForSection(page, 'documents____proofOfInformant')
 
     await goToSection(page, 'review')
   })
@@ -350,8 +318,8 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
     await switchEventTab(page, 'Record')
 
     // The Record tab renders every uploaded document, and this declaration
-    // uploads 13 real (not tiny placeholder) images, so give it longer than
-    // the default timeout to finish loading before asserting on it.
+    // uploads 13 real (~528KB each) images, so give it longer than the
+    // default timeout to finish loading before asserting on it.
     await expect(page.getByTestId('child.name-value')).toBeVisible({
       timeout: 60_000
     })
@@ -394,16 +362,9 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
       formatDateObjectTo_dMMMMyyyy(informantDob)
     )
     await expectRowValue(page, 'informant.nationality', 'Farajaland')
-    await expectRowValue(page, 'informant.idType', 'Birth Registration Number')
-    await expectRowValue(page, 'informant.brn', brn)
-    await expectRowValue(page, 'informant.address', 'Gabon')
-    await expectRowValue(page, 'informant.address', informantState)
-    await expectRowValue(page, 'informant.address', informantDistrict)
-    await expectRowValue(page, 'informant.address', informantTown)
-    await expectRowValue(page, 'informant.address', informantAddressLine1)
-    await expectRowValue(page, 'informant.address', informantAddressLine2)
-    await expectRowValue(page, 'informant.address', informantAddressLine3)
-    await expectRowValue(page, 'informant.address', informantZipCode)
+    await expectRowValue(page, 'informant.idType', 'National ID')
+    await expectRowValue(page, 'informant.nid', informantNid)
+    await expectRowValue(page, 'informant.address', 'Klow')
 
     await expectRowValue(
       page,

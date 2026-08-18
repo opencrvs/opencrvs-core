@@ -33,7 +33,7 @@ import { CREDENTIALS } from '../../../../constants'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import { selectDropdownOption } from './helpers'
+import { selectCountry, selectDropdownOption } from './helpers'
 
 test('4. Complete birth declaration by a Registration Officer - "Other" urban delivery location, Grandmother informant, no ID for either parent', async ({
   page
@@ -185,14 +185,9 @@ test('4. Complete birth declaration by a Registration Officer - "Other" urban de
 
     // Not the same as mother's - a simple address abroad (only the two
     // required international fields, no "fill up all fields" this time).
-    await page.getByLabel('No', { exact: true }).check()
+    await page.locator('#father____addressSameAs_NO').check()
 
-    await page.locator('#country').click()
-    await page.locator('#country input').fill('Dji')
-    await page
-      .locator('#country')
-      .getByText('Djibouti', { exact: true })
-      .click()
+    await selectCountry(page, 'Djibouti')
 
     await page.locator('#state').fill(fatherState)
     await page.locator('#district2').fill(fatherDistrict2)

@@ -161,7 +161,7 @@ test('2. Complete birth declaration by a Community Leader - urban residential de
     await page.locator('#father____passport').fill(fatherPassport)
 
     // Not the same as mother's - a separate, fully-detailed urban address.
-    await page.getByLabel('No', { exact: true }).check()
+    await page.locator('#father____addressSameAs_NO').check()
 
     await page.locator('#province').click()
     await selectLocationOption(page, 'Sulaka')
@@ -234,11 +234,7 @@ test('2. Complete birth declaration by a Community Leader - urban residential de
     )
     await expectRowValue(page, 'child.birthLocation.privateHome', childStreet)
     await expectRowValue(page, 'child.birthLocation.privateHome', childNumber)
-    await expectRowValue(
-      page,
-      'child.birthLocation.privateHome',
-      childZipCode
-    )
+    await expectRowValue(page, 'child.birthLocation.privateHome', childZipCode)
     await expectRowValue(page, 'child.attendantAtBirth', 'Nurse')
     await expectRowValue(page, 'child.birthType', 'Twin')
 

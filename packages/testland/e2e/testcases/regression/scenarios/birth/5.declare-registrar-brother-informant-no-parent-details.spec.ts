@@ -18,7 +18,6 @@ import { expect, test } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import {
   login,
-  getToken,
   continueForm,
   goToSection,
   drawSignature,
@@ -33,8 +32,11 @@ import { CREDENTIALS } from '../../../../constants'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import { createDeclaration as registerBirthForBrn } from '../../../test-data/birth-declaration'
-import { selectDropdownOption } from './helpers'
+import {
+  fetchBirthRegistrationNumberForTesting,
+  selectCountry,
+  selectDropdownOption
+} from './helpers'
 
 test('5. Complete birth declaration by a Local Registrar - rural "Other" delivery location, Brother informant with BRN identity, neither parent\'s details available', async ({
   page
@@ -67,10 +69,7 @@ test('5. Complete birth declaration by a Local Registrar - rural "Other" deliver
   let brn: string
 
   await test.step('Register a birth record via the API to use its registration number as a BRN', async () => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await registerBirthForBrn(token)
-    expect(res.registrationNumber).toBeDefined()
-    brn = res.registrationNumber!
+    brn = await fetchBirthRegistrationNumberForTesting()
   })
 
   await test.step('Log in as the Local Registrar and start a birth declaration', async () => {
@@ -136,9 +135,7 @@ test('5. Complete birth declaration by a Local Registrar - rural "Other" deliver
 
     // Usual place of residence: other than Farajaland (simple - only the
     // two required international fields, no "fill up all fields" here).
-    await page.locator('#country').click()
-    await page.locator('#country input').fill('Ken')
-    await page.locator('#country').getByText('Kenya', { exact: true }).click()
+    await selectCountry(page, 'Kenya')
 
     await page.locator('#state').fill(informantState)
     await page.locator('#district2').fill(informantDistrict)
