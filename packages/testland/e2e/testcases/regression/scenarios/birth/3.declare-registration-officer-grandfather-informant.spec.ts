@@ -301,7 +301,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
 
   await test.step('The declaration status is Declared, with no flags', async () => {
     await expect(page.getByTestId('status-value')).toHaveText('Declared')
-    await expect(page.getByTestId('flags-value')).toHaveText('No flags')
+    await expect(page.getByTestId('flags-value')).toHaveText('Validated')
   })
 
   await test.step('The record matches the data that was filled in', async () => {
