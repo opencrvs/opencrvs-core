@@ -132,7 +132,7 @@ jobs:
         uses: Wandalen/wretry.action@v3.8.0
         with:
           attempt_limit: 3
-          action: docker/build-push-action@v6
+          action: docker/build-push-action@v7
           with: |
             file: packages/Dockerfile.base
             provenance: false
@@ -222,7 +222,7 @@ jobs:
         uses: Wandalen/wretry.action@v3.8.0
         with:
           attempt_limit: 3
-          action: docker/build-push-action@v6
+          action: docker/build-push-action@v7
           with: |
             file: packages/${{ steps.package.outputs.name }}/Dockerfile
             build-args: |
@@ -317,7 +317,7 @@ jobs:
         uses: Wandalen/wretry.action@v3.8.0
         with:
           attempt_limit: 3
-          action: docker/build-push-action@v6
+          action: docker/build-push-action@v7
           with: |
             file: packages/testland/Dockerfile.assets
             provenance: false
@@ -346,7 +346,7 @@ jobs:
         uses: Wandalen/wretry.action@v3.8.0
         with:
           attempt_limit: 3
-          action: docker/build-push-action@v6
+          action: docker/build-push-action@v7
           with: |
             file: packages/countryconfig-template/Dockerfile
             context: packages/countryconfig-template
@@ -356,7 +356,7 @@ jobs:
         uses: Wandalen/wretry.action@v3.8.0
         with:
           attempt_limit: 3
-          action: docker/build-push-action@v6
+          action: docker/build-push-action@v7
           with: |
             file: packages/countryconfig-template/Dockerfile.assets
             context: packages/countryconfig-template
