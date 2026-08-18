@@ -49,7 +49,7 @@ test('6. Complete birth declaration by a National Registrar - foreign "Other" de
   // (only a plain ASCII apostrophe is accepted, not a curly quote); unique
   // suffix avoids colliding with any stray same-titled record left behind
   // by a previous run of this test.
-  const childSurname = `${generateSurnameWithApostrophe()}${faker.string.alphanumeric(6)}`
+  const childSurname = generateSurnameWithApostrophe()
   const informantFirstName = faker.person.firstName('female')
   const informantSurname = faker.person.lastName('female')
   const fatherFirstName = faker.person.firstName('male')

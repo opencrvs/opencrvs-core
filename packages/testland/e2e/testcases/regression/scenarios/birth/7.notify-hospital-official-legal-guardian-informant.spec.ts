@@ -40,7 +40,7 @@ test("7. Notify a birth as a Hospital Official - Health Institution delivery, Le
   const childFirstName = faker.person.firstName('female')
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test.
-  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
+  const childSurname = faker.person.lastName()
   const informantFirstName = faker.person.firstName('female')
   const informantSurname = faker.person.lastName('female')
   const motherFirstName = faker.person.firstName('female')

@@ -80,7 +80,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
   const childFirstName = faker.person.firstName()
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test.
-  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
+  const childSurname = faker.person.lastName()
   const informantFirstName = faker.person.firstName('male')
   const informantSurname = faker.person.lastName('male')
   const motherFirstName = faker.person.firstName('female')

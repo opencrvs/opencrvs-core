@@ -36,7 +36,7 @@ test('1. Complete birth declaration by a Community Leader - residential delivery
   page
 }) => {
   const childFirstName = faker.person.firstName('male')
-  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(5)}`
+  const childSurname = faker.person.lastName()
   const motherFirstName = faker.person.firstName('female')
   const motherSurname = faker.person.lastName('female')
   const fatherFirstName = faker.person.firstName('male')
