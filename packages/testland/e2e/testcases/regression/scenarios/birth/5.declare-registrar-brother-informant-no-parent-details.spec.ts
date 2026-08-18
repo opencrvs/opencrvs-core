@@ -32,19 +32,15 @@ import { CREDENTIALS } from '../../../../constants'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import {
-  fetchBirthRegistrationNumberForTesting,
-  selectCountry,
-  selectDropdownOption
-} from './helpers'
-
+import { selectCountry, selectDropdownOption } from './helpers'
+import { fetchBirthRegistrationNumberForTesting } from '../../helper'
 test('5. Complete birth declaration by a Local Registrar - rural "Other" delivery location, Brother informant with BRN identity, neither parent\'s details available', async ({
   page
 }) => {
-  const childFirstName = 'Richard the 3rd'
+  const childFirstName = `${faker.person.firstName('male')} the 3rd`
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test.
-  const childSurname = `Doppler${faker.string.alphanumeric(6)}`
+  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   const informantFirstName = faker.person.firstName('male')
   const informantSurname = faker.person.lastName('male')
 
@@ -87,18 +83,11 @@ test('5. Complete birth declaration by a Local Registrar - rural "Other" deliver
     await page.locator('#child____placeOfBirth').click()
     await selectDropdownOption(page, 'Other')
 
-    // Province/district are pre-filled and disabled, anchored to the
-    // declaring user's own office - village is left open unless the
-    // office itself is anchored at village level.
-    const villageInput = page.locator('#village')
-    if (!(await villageInput.isDisabled())) {
-      await villageInput.click()
-      await selectLocationOption(page, 'Klow')
-    }
-
     // Farajaland-rural "fill up all fields".
     await page.locator('#town').fill(childTown)
     await page.locator('#residentialArea').fill(childResidentialArea)
+    await page.locator('#village').click()
+    await selectLocationOption(page, 'Klow')
     await page.locator('#street').fill(childStreet)
     await page.locator('#number').fill(childNumber)
     await page.locator('#zipCode').fill(childZipCode)
