@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { cleanEnv, port, str, url } from 'envalid'
+import { cleanEnv, port, str, url, bool } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
