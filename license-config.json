@@ -58,7 +58,8 @@
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
-    "packages/api-docs/public-key.pem"
+    "packages/api-docs/public-key.pem",
+    ".codex/config.toml"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

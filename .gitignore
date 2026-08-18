@@ -11,8 +11,8 @@ coverage
 build
 
 # misc
-.claude
-CLAUDE.md
+.claude/*
+!.claude/settings.json
 .claude-working/
 .claude
 CLAUDE.md

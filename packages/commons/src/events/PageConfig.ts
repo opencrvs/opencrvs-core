@@ -26,6 +26,12 @@ const PageConfigBase = z
       .describe(
         'If true, all required fields must be filled before continuing to the next page'
       ),
+    showClearButton: z
+      .boolean()
+      .optional()
+      .describe(
+        'If true, a "Clear" button is shown at the top of the page allowing the user to reset all fields on the page to their default state'
+      ),
     fields: z.array(FieldConfig).describe('Fields to be rendered on the page'),
     conditional: Conditional.optional().describe(
       'Page will be shown if condition is met. If conditional is not defined, the page will be always shown.'

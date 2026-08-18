@@ -260,6 +260,7 @@ export function SearchableSelect<T = string>({
   error,
   touched,
   disabled,
+  isClearable = true,
   ['data-testid']: dataTestId
 }: SearchableSelectProps<T>) {
   // React-select provides their own filteringOptions method, but it doesn't work with large option sets and virtualization.
@@ -285,6 +286,7 @@ export function SearchableSelect<T = string>({
       id={`searchable-select-${id}`}
       innerProps={{ 'data-testid': dataTestId }}
       inputId={id}
+      isClearable={isClearable}
       isDisabled={disabled}
       loadOptions={loadOptions}
       touched={touched}

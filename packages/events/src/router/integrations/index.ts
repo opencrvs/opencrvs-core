@@ -12,7 +12,8 @@
 import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { EncodedScope, UUID } from '@opencrvs/commons'
+import { DatabaseError } from 'pg'
+import { EncodedScope, TokenUserType, UUID } from '@opencrvs/commons'
 import {
   publicProcedure,
   router,
@@ -30,9 +31,25 @@ import {
 } from '@events/storage/postgres/events/system-clients'
 import { compare, generateSaltedHash } from '@events/service/auth/hash'
 
+/** Postgres `unique_violation`, raised when a pre-shared client id is taken */
+const PG_UNIQUE_VIOLATION = '23505'
+
 const CreateIntegrationInput = z.object({
   name: z.string().min(1, 'Integration name is required'),
-  scopes: z.array(z.string()).min(1, 'At least one scope is required')
+  scopes: z.array(z.string()).min(1, 'At least one scope is required'),
+  /**
+   * Pre-shared credentials. When given, the client is seeded with exactly
+   * these values, so an integrating system (e.g. mosip-api) can authenticate
+   * immediately using the pair it already carries in its own environment — no
+   * manual "Reveal keys" step. Omit to have credentials generated, which is
+   * what the Integrations UI does.
+   *
+   * Nested so that seeding one half without the other — a client nobody can
+   * authenticate as — cannot be expressed.
+   */
+  credentials: z.optional(
+    z.object({ clientId: UUID, clientSecret: z.string().min(1) })
+  )
 })
 
 const CreateIntegrationOutput = z.object({
@@ -54,7 +71,9 @@ const ListIntegrationsOutput = z.array(
     scopes: z.array(z.string()),
     status: z.string(),
     createdAt: z.iso.datetime(),
-    createdBy: UUID
+    // Null for integrations registered from the country configuration on
+    // startup — those are created by a system token, not by a user
+    createdBy: UUID.nullable()
   })
 )
 
@@ -80,7 +99,7 @@ const GetIntegrationOutput = z.object({
   status: z.string(),
   shaSecret: z.string().nullable(),
   createdAt: z.string(),
-  createdBy: UUID
+  createdBy: UUID.nullable()
 })
 
 const ToggleStatusOutput = z.object({
@@ -113,18 +132,36 @@ export const integrationsRouter = router({
     .output(CreateIntegrationOutput)
     .use(allowedWithAnyOfScopes(['integration.create']))
     .mutation(async ({ input, ctx }) => {
-      const clientSecret = randomUUID()
+      const clientSecret = input.credentials?.clientSecret ?? randomUUID()
       const shaSecret = randomUUID()
       const { hash: secretHash, salt } = await generateSaltedHash(clientSecret)
 
       const row = await createSystemClient({
+        // Kysely treats `undefined` as "not provided", so the column default
+        // generates an id when no pre-shared one is given
+        id: input.credentials?.clientId,
         name: input.name,
         scopes: input.scopes,
-        createdBy: ctx.user.id,
+        // A system caller is the startup bootstrap token, which has no
+        // users(id) behind it to reference
+        createdBy:
+          ctx.user.type === TokenUserType.enum.system ? null : ctx.user.id,
         secretHash,
         salt,
         shaSecret,
         status: 'active'
+      }).catch((error: unknown) => {
+        if (
+          input.credentials &&
+          error instanceof DatabaseError &&
+          error.code === PG_UNIQUE_VIOLATION
+        ) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: `An integration with client id ${input.credentials.clientId} already exists`
+          })
+        }
+        throw error
       })
 
       const result = {
