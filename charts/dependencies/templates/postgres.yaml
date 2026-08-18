@@ -124,10 +124,7 @@ spec:
                   name: {{ default .Values.postgres.backup.server_secret .Values.backup.backup_server_secret }}
                   key: user
             - name: PGBACKREST_REPO1_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: {{ default .Values.postgres.backup.server_secret .Values.backup.backup_server_secret }}
-                  key: host
+              value: {{ default .Values.backup.host .Values.postgres.backup.host }}
             - name: PGBACKREST_REPO1_TYPE
               value: posix
             - name: PGBACKREST_REPO1_CIPHER_TYPE
