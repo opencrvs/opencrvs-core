@@ -990,6 +990,19 @@ paths:
                   type: array
                   items:
                     type: string
+                credentials:
+                  type: object
+                  properties:
+                    clientId:
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    clientSecret:
+                      type: string
+                      minLength: 1
+                  required:
+                    - clientId
+                    - clientSecret
               required:
                 - name
                 - scopes
@@ -1056,9 +1069,11 @@ paths:
                       format: date-time
                       pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
                     createdBy:
-                      type: string
-                      format: uuid
-                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
                   required:
                     - id
                     - name
@@ -12780,6 +12795,10 @@ components:
               description: If true, all required fields must be filled before continuing to
                 the next page
               type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
+              type: boolean
             fields:
               type: array
               items:
@@ -12812,6 +12831,10 @@ components:
               default: false
               description: If true, all required fields must be filled before continuing to
                 the next page
+              type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
               type: boolean
             fields:
               type: array
@@ -13076,6 +13099,11 @@ components:
                 default: false
                 description: If true, all required fields must be filled before continuing to
                   the next page
+                type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
                 type: boolean
               fields:
                 type: array
