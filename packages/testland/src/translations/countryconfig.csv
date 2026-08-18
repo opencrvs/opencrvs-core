@@ -251,8 +251,9 @@ event.birth.action.registrar-feedback.audit-history-label,The label to show in a
 event.birth.action.registrar-general-feedback.label,This is shown when the registrar general feedback can be triggered from the action from,Registrar general feedback,Retour du registraire général
 event.birth.action.registrar-general-feedback.supportingCopy,Confirmation text for registrar general feedback action,Your feedback will be officially recorded and may influence the final decision on the declaration.,Votre retour sera officiellement enregistré et pourra influencer la décision finale concernant la déclaration.
 event.birth.action.reinstate-registration.audit-history-label,The label to show in audit history for the reinstate registration action,Registration reinstated,Enregistrement rétabli
+event.birth.action.reinstate-registration.label,This is shown as the action name anywhere the user can trigger the action from,Reinstate registration,Rétablir l'enregistrement
 event.birth.action.revoke-registration.audit-history-label,The label to show in audit history for the revoke registration action,Revoked,Révoqué
-event.birth.action.revoke-registration.label,This is shown as the action name anywhere the user can trigger the action from,Reinstate registration,Rétablir l'enregistrement
+event.birth.action.revoke-registration.label,This is shown as the action name anywhere the user can trigger the action from,Revoke registration,Révoqué l'enregistrement
 event.birth.action.revoke-registration.supportingCopy,This is the confirmation text for the reinstate revoke registration action,This will restore a previously revoked registration to active status.,Cela rétablira à l'état actif un enregistrement précédemment révoqué.
 event.birth.custom.action.approve.field.collector.label,Label for collector field,Collector,le collectionneur
 event.birth.custom.action.approve.field.notes.label,This is the label for the field for a custom action,Comments,Commentaires
