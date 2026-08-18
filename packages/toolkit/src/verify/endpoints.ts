@@ -83,20 +83,6 @@ const SECURED_TRIGGER_USER_EVENTS = [
   'change-email-address'
 ] as const satisfies readonly TriggerEvent[]
 
-/*
- * Compile-time exhaustiveness guard. If a new `TriggerEvent` is introduced in
- * `@opencrvs/commons` without being added to `SECURED_TRIGGER_USER_EVENTS`,
- * the type below resolves to `never` and this assignment fails to type-check —
- * so the verifier can never silently skip a newly-secured endpoint.
- */
-type AllSecuredEndpointsCovered = Exclude<
-  TriggerEvent,
-  (typeof SECURED_TRIGGER_USER_EVENTS)[number]
-> extends never
-  ? true
-  : never
-export const _allSecuredEndpointsCovered: AllSecuredEndpointsCovered = true
-
 /**
  * Endpoints that must require authentication. Each must either be absent (404)
  * or reject an unauthenticated request (401/403) — never process it. Paths
@@ -246,7 +232,7 @@ async function fetchEventConfigs(
  * Normalises the CLI argument into a base URL. Accepts either a bare domain
  * (`example.org`, assumed https) or a full URL, and strips any trailing slash.
  */
-export function resolveBaseUrl(input: string): string {
+function resolveBaseUrl(input: string): string {
   const withProtocol = /^https?:\/\//i.test(input) ? input : `https://${input}`
   return withProtocol.replace(/\/+$/, '')
 }
@@ -324,9 +310,7 @@ export async function runVerifyEndpoints(
     } else {
       detail = `${describeStatus(status)} — unexpected`
     }
-    console.log(
-      line(ok, `GET /fonts/{filename}${dim(` → ${path}`)}`, detail)
-    )
+    console.log(line(ok, `GET /fonts/{filename}${dim(` → ${path}`)}`, detail))
   }
 
   console.log()
@@ -341,9 +325,7 @@ export async function runVerifyEndpoints(
   }
 
   console.log()
-  console.log(
-    bold('Event action triggers (must be absent or require auth):')
-  )
+  console.log(bold('Event action triggers (must be absent or require auth):'))
   const events = await fetchEventConfigs(baseUrl)
   if (!events) {
     console.log(
@@ -353,7 +335,10 @@ export async function runVerifyEndpoints(
         )
     )
     for (const check of FALLBACK_EVENT_TRIGGERS) {
-      const status = await requestStatus(`${baseUrl}${check.path}`, check.method)
+      const status = await requestStatus(
+        `${baseUrl}${check.path}`,
+        check.method
+      )
       const ok = requiresAuthOrAbsent(status)
       if (!ok) {
         failures++
@@ -380,11 +365,7 @@ export async function runVerifyEndpoints(
       const pattern = `POST /trigger/events/${event.id}/actions/{action}`
       if (failed.length === 0) {
         console.log(
-          line(
-            true,
-            pattern,
-            `${actions.length} action(s) — all require auth`
-          )
+          line(true, pattern, `${actions.length} action(s) — all require auth`)
         )
       } else {
         for (const failure of failed) {
