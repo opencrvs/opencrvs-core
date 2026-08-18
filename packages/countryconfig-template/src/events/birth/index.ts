@@ -131,7 +131,7 @@ export const birthEvent = defineConfig({
         emptyValueMessage: {
           defaultMessage: 'No date of birth',
           description: 'This is shown when there is no child information',
-          id: 'event.birth.summary.child.dob.empty'
+          id: 'countryconfig.template.test'
         }
       },
       // Render the 'fallback value' when selection has not been made.

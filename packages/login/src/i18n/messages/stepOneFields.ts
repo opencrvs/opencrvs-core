@@ -26,6 +26,11 @@ const messagesToDefine = {
     id: 'login.passwordLabel',
     defaultMessage: 'Password',
     description: 'The label that appears on the password input'
+  },
+  loginTest: {
+    id: 'login.test',
+    defaultMessage: 'Test',
+    description: 'Test'
   }
 }
 

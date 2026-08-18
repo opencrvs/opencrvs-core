@@ -16,6 +16,11 @@ export const constantsMessages = defineMessages({
     description: 'Action Label',
     id: 'constants.label.action'
   },
+  clientTest: {
+    id: 'client.test',
+    defaultMessage: 'Test',
+    description: 'Test'
+  },
   address: {
     defaultMessage: 'Address',
     description: 'Label for address',
