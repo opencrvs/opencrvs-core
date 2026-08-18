@@ -13,12 +13,22 @@ import { joinUrl } from '../url'
 import { logger } from '../logger'
 import { TriggerEvent, TriggerPayload } from './UserNotifications'
 
-/*
- * Every event carries an Authorization header. Interactive flows forward the
- * acting user's token; the background announcement worker fetches an anonymous
- * token first (see getAnonymousToken in the events service). This lets country
- * configs require authentication on all `/triggers/user/*` routes.
- */
+// authHeader is not required for all-user-notification endpoint.
+export async function triggerUserEventNotification(args: {
+  event: typeof TriggerEvent.ALL_USER_NOTIFICATION
+  payload: TriggerPayload[typeof TriggerEvent.ALL_USER_NOTIFICATION]
+  countryConfigUrl: string
+}): Promise<Response>
+
+export async function triggerUserEventNotification<
+  T extends Exclude<TriggerEvent, typeof TriggerEvent.ALL_USER_NOTIFICATION>
+>(args: {
+  event: T
+  payload: TriggerPayload[T]
+  countryConfigUrl: string
+  authHeader: { Authorization: string }
+}): Promise<Response>
+
 export async function triggerUserEventNotification<T extends TriggerEvent>({
   event,
   payload,
@@ -28,7 +38,7 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   event: T
   payload: TriggerPayload[T]
   countryConfigUrl: string
-  authHeader: { Authorization: string }
+  authHeader?: { Authorization: string }
 }): Promise<Response> {
   const response = await fetch(
     joinUrl(countryConfigUrl, `triggers/user/${event}`),
@@ -48,7 +58,8 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
    * would otherwise vanish silently. The body is left unread so callers that
    * consume it still can.
    *
-   * Logs the event and status only — the recipient must never reach the log.
+   * Logs the event and status only — this is reachable from an unauthenticated
+   * endpoint, so the recipient must never reach the log.
    */
   if (!response.ok) {
     logger.error(
