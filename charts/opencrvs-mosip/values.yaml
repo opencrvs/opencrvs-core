@@ -31,7 +31,7 @@ esignet_mock:
 
 mosip_api:
   enabled: true
-  host_data_path: /data/mosip-api
+  host_data_path: /data/sqlite
   image:
     repository: ghcr.io/opencrvs/mosip-api
   env:
@@ -46,7 +46,7 @@ mosip_api:
     PARTNER_MISP_LK: crvs-partner
     SIGN_P12_FILE_PATH: /certs/keystore.p12
     SIGN_P12_FILE_PASSWORD: mosip123
-    SQLITE_DATABASE_PATH: /mosip-api.db
+    SQLITE_DATABASE_PATH: /data/sqlite/mosip-api.db
     MOSIP_AUTH_CLIENT_APP_ID: admin
     MOSIP_PACKET_AUTH_CLIENT_ID: mosip-regproc-client
     MOSIP_PACKET_AUTH_CLIENT_SECRET: abcdeABCDE123456
