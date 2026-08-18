@@ -227,14 +227,9 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await selectAction(page, 'Review correction request')
     await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
   })
 
   test('View record', async () => {
