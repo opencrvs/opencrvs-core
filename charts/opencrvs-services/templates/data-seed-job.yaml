@@ -17,6 +17,7 @@ spec:
         app: data-seed
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.data_seed) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       containers:
         - name: data-seed
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.data_seed) }}
@@ -47,4 +48,5 @@ spec:
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_seed" "Values" .Values) }}
       restartPolicy: "OnFailure"
+
 {{- end }}

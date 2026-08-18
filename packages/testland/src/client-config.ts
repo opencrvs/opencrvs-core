@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineClientConfig } from '@opencrvs/toolkit/application-config'
+import { env } from './environment'
 
 export default defineClientConfig({
   // Country code in uppercase ALPHA-3 format
-  COUNTRY: 'FAR',
+  COUNTRY: env.COUNTRY_CODE,
   LANGUAGES: ['en', 'fr'],
   SENTRY: '',
   REGISTER_BACKGROUND: { backgroundColor: '36304E' },

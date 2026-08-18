@@ -11,6 +11,7 @@
     "./api": "./dist/api/index.js",
     "./application-config": "./dist/application-config/index.js",
     "./events": "./dist/events/index.js",
+    "./telemetry": "./dist/telemetry/index.js",
     "./scopes": "./dist/scopes/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",

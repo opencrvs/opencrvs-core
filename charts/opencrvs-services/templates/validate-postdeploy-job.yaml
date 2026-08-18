@@ -19,6 +19,7 @@ spec:
         helm.sh/revision: {{ .Release.Revision | quote }}
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       containers:
         {{- include "opencrvs-validate.containerSpec" (dict "root" . "mode" "postdeploy") | nindent 8 }}
       restartPolicy: "Never"

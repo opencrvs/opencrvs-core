@@ -79,7 +79,7 @@ jobs:
           fi
 
       - name: Build and push countryconfig image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           provenance: false
@@ -88,7 +88,7 @@ jobs:
             ${{ secrets.DOCKERHUB_ACCOUNT}}/${{ secrets.DOCKERHUB_REPO }}:${{ steps.country_config.outputs.version }}
 
       - name: Build and push assets image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           provenance: false
