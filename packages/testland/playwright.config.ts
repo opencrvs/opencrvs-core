@@ -22,7 +22,7 @@ const ignoreHTTPSErrors = process.env.CI ? true : false
 
 const optInSuites = [
   { envVar: 'DASHBOARD_E2E', pattern: /testcases\/dashboard\// },
-  { envVar: 'REGRESSION_E2E', pattern: /testcases\/qa-testrail-testcases\// }
+  { envVar: 'REGRESSION_E2E', pattern: /testcases\regression\// }
 ]
 /**
  * Read environment variables from file.
