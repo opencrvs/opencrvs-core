@@ -48,7 +48,8 @@ describe('User notification - Email', () => {
       await server.server.inject({
         method: 'POST',
         url: `/triggers/user/${event}`,
-        payload
+        payload,
+        auth: { strategy: 'jwt', credentials: {} }
       })
       expect(sendMailMock).toHaveBeenCalledTimes(1)
       expect(sendMailMock.mock.calls[0][0]).toMatchSnapshot()
