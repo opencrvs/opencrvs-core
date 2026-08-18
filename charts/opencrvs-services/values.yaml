@@ -186,6 +186,15 @@ pdb:
   enabled: true
   minAvailable: 50%
 
+# ServiceAccount configuration.
+# By default, the chart creates one ServiceAccount per workload.
+# Override annotations globally here, or per workload under
+# <workload>.service_account.annotations.
+service_account:
+  create: true
+  annotations: {}
+  automount_service_account_token: true
+
 # Resources allocated to OpenCRVS microservices (Kubernetes PODs):
 resources:
   memoryRequest: '128Mi'
@@ -196,7 +205,6 @@ resources:
 # Global environment variables applied to
 # all OpenCRVS microservices (Kubernetes PODs):
 env:
-  # OPENCRVS_ENVIRONMENT: explicit environment detection in employee seeder
   OPENCRVS_ENVIRONMENT: production
   NODE_ENV: production
   MINIO_BUCKET: ocrvs
@@ -392,6 +400,14 @@ events:
 
 ##############################################################
 # One time jobs:
+# Common service account for Helm pre/post deployment jobs.
+deployment_jobs:
+  service_account:
+    name: deployment-jobs
+    annotations:
+      "helm.sh/hook": pre-install,pre-upgrade
+      "helm.sh/hook-weight": "-10"
+      "helm.sh/hook-delete-policy": before-hook-creation
 
 # data_migration: Job to migrate datastores while deployment
 data_migration:

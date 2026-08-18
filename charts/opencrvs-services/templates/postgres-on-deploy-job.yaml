@@ -15,6 +15,7 @@ spec:
         app: postgres-on-deploy
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.dashboards) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       containers:
         {{- include "postgres-on-deploy.containerSpec" . | nindent 8 }}
         {{- include "render-env-vars" (dict "service_name" "postgres_on_deploy" "Values" .Values) }}

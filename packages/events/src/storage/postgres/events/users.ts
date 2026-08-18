@@ -256,24 +256,24 @@ function buildSearchUsersBaseQuery(
       'locations.administrativeAreaId'
     ])
 
+  /*
+   * Emails and usernames are lowercase in storage, so lowercasing the input
+   * keeps matching case-insensitive. Mobile numbers are stored verbatim.
+   */
   if (input.username) {
     query = query.where(
       'userCredentials.username',
-      'ilike',
-      `%${input.username.toLowerCase()}%`
+      '=',
+      input.username.toLowerCase()
     )
   }
 
   if (input.mobile) {
-    query = query.where('users.mobile', 'ilike', `%${input.mobile}%`)
+    query = query.where('users.mobile', '=', input.mobile)
   }
 
   if (input.email) {
-    query = query.where(
-      'users.email',
-      'ilike',
-      `%${input.email.toLowerCase()}%`
-    )
+    query = query.where('users.email', '=', input.email.toLowerCase())
   }
 
   if (input.status) {

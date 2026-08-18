@@ -377,6 +377,21 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Number of PODs not available while deployment within ReplicaSet</td>
         </tr>
         <tr>
+            <td>service_account.create</td>
+            <td>true</td>
+            <td>Create Kubernetes ServiceAccount resources for OpenCRVS workloads. Each workload gets its own ServiceAccount. Configuration is available per workload as well, add <code>&ltservice_name&gt.service_account.&ltkey&gt</code>. For more information see <a href="#service-accounts">Service accounts</a>.</td>
+        </tr>
+        <tr>
+            <td>service_account.annotations</td>
+            <td>{}</td>
+            <td>Annotations applied to all workload ServiceAccounts. Per-workload annotations override global annotations with the same key.</td>
+        </tr>
+        <tr>
+            <td>service_account.automount_service_account_token</td>
+            <td>true</td>
+            <td>Controls <code>automountServiceAccountToken</code> on generated ServiceAccounts and workload Pod specs. Can be overridden per workload.</td>
+        </tr>
+        <tr>
             <td>resources</td>
             <td>{}</td>
             <td>Resources allocated to OpenCRVS microservices (Kubernetes PODs). Properties in this section could be defined per microservice as well.</td>
@@ -432,6 +447,16 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Use default OpenCRVS login/password or generate random values</td>
         </tr>
         <tr>
+            <td>deployment_jobs.service_account.name</td>
+            <td>deployment-jobs</td>
+            <td>Common ServiceAccount name used by Helm pre/post deployment jobs.</td>
+        </tr>
+        <tr>
+            <td>deployment_jobs.service_account.annotations</td>
+            <td>{}</td>
+            <td>Annotations applied to the common ServiceAccount used by Helm pre/post deployment jobs.</td>
+        </tr>
+        <tr>
             <td>on_restore_cronjob.enabled</td>
             <td><pre>false</pre></td>
             <td>Special cronjob for OpenCRVS maintenance after database restore. Job runs reindex and postgres passwords update.</td>
@@ -443,6 +468,62 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         </tr>
     </tbody>
 </table>
+
+# Service accounts
+
+OpenCRVS Helm chart creates a Kubernetes ServiceAccount for each regular workload and injects the matching `serviceAccountName` into the workload Pod spec.
+
+By default, ServiceAccount names match workload names:
+
+- `auth`
+- `client`
+- `countryconfig`
+- `dashboards`, when `dashboards.enabled` is `true`
+- `documents`
+- `events`
+- `gateway`
+- `login`
+- `data-cleanup`, when `data_cleanup.enabled` is `true`
+- `on-db-restore-cronjob`, when `on_restore_cronjob.enabled` is `true`
+
+Helm pre/post deployment jobs use one shared ServiceAccount named `deployment-jobs` by default. This includes validation, datastore setup, data migration, data seed, and Elasticsearch reindex jobs.
+
+**Example: global annotations**
+
+```yaml
+service_account:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-default
+```
+
+**Example: workload-specific annotations**
+
+```yaml
+auth:
+  service_account:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-auth
+```
+
+**Example: deployment job annotations**
+
+```yaml
+deployment_jobs:
+  service_account:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-deployment-jobs
+```
+
+If ServiceAccounts are managed outside of this chart, set `service_account.create` to `false` and provide matching existing ServiceAccounts in the namespace. A custom name can be set per workload:
+
+```yaml
+service_account:
+  create: false
+
+auth:
+  service_account:
+    name: existing-auth-service-account
+```
 
 # Authentication configuration
 
