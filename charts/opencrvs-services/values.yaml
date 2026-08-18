@@ -296,11 +296,6 @@ countryconfig:
     name: opencrvs/ocrvs-countryconfig
     tag: v2.0.0
   port: 3040
-  env:
-    # Name of the file in `src/data-seeding/employees/source/` of your country
-    # configuration the employee seeder reads users from. Override it per
-    # environment to control which users get seeded into that environment.
-    EMPLOYEES_CSV: default-employees.csv
 
 dashboards:
   enabled: false

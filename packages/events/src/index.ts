@@ -18,6 +18,7 @@ import { getInMemoryEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
+import { startTelemetryWorker } from './workers/telemetryWorker'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -49,6 +50,7 @@ export async function main() {
     return
   }
   startAnnouncementWorker()
+  startTelemetryWorker()
   server().listen(5555)
 }
 
