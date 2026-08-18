@@ -11,10 +11,8 @@
 // Every spec in this directory declares one row from the QA regression-test
 // sheet's "Birth" tab:
 // https://docs.google.com/spreadsheets/d/1g0ReIDGw8lbHC6Am3O0A16S1y0jje8BZ/edit?gid=1406739219#gid=1406739219
-import { expect, type Locator, type Page } from '@playwright/test'
-import { getToken, uploadImage } from '../../../../helpers'
-import { CREDENTIALS } from '../../../../constants'
-import { createDeclaration as registerBirthForBrn } from '../../../test-data/birth-declaration'
+import { type Locator, type Page } from '@playwright/test'
+import { uploadImage } from '../../../../helpers'
 
 /**
  * react-select options render as plain divs with no `option` role, and the
@@ -42,17 +40,6 @@ export async function selectCountry(page: Page, countryName: string) {
   await page
     .locator('#country .react-select__option', { hasText: countryName })
     .click()
-}
-
-/**
- * Registers a birth via the API purely to mint a real registration number,
- * for declarations where a family member is identified by an existing BRN.
- */
-export async function fetchBirthRegistrationNumberForTesting() {
-  const token = await getToken(CREDENTIALS.REGISTRAR)
-  const res = await registerBirthForBrn(token)
-  expect(res.registrationNumber).toBeDefined()
-  return res.registrationNumber!
 }
 
 /**

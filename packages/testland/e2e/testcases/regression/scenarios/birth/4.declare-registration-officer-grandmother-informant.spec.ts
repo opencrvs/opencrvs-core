@@ -38,10 +38,10 @@ import { selectCountry, selectDropdownOption } from './helpers'
 test('4. Complete birth declaration by a Registration Officer - "Other" urban delivery location, Grandmother informant, no ID for either parent', async ({
   page
 }) => {
-  const childFirstName = 'James-Peter'
+  const childFirstName = `${faker.person.firstName('male')}-${faker.person.firstName('male')}`
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test.
-  const childSurname = `Collen${faker.string.alphanumeric(6)}`
+  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   const informantFirstName = faker.person.firstName('female')
   const informantSurname = faker.person.lastName('female')
   const motherFirstName = faker.person.firstName('female')
@@ -83,18 +83,11 @@ test('4. Complete birth declaration by a Registration Officer - "Other" urban de
     await page.locator('#child____placeOfBirth').click()
     await selectDropdownOption(page, 'Other')
 
-    // Province/district are pre-filled and disabled, anchored to the
-    // declaring user's own office - village is left open unless the
-    // office itself is anchored at village level.
-    const villageInput = page.locator('#village')
-    if (!(await villageInput.isDisabled())) {
-      await villageInput.click()
-      await selectLocationOption(page, 'Klow')
-    }
-
     // Farajaland-urban "fill up all fields".
     await page.locator('#town').fill(childTown)
     await page.locator('#residentialArea').fill(childResidentialArea)
+    await page.locator('#village').click()
+    await selectLocationOption(page, 'Klow')
     await page.locator('#street').fill(childStreet)
     await page.locator('#number').fill(childNumber)
     await page.locator('#zipCode').fill(childZipCode)

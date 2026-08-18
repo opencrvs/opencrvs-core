@@ -36,11 +36,11 @@ import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
 import {
-  fetchBirthRegistrationNumberForTesting,
   selectCountry,
   selectDropdownOption,
   uploadImageToSectionWithFile
 } from './helpers'
+import { fetchBirthRegistrationNumberForTesting } from '../../helper'
 
 const imageUploadSectionTitles = [
   'National ID',
@@ -53,10 +53,7 @@ const imageUploadSectionTitles = [
 // declaration reuses this one real (~528KB) file rather than a set of
 // per-purpose local assets. __dirname-relative so this doesn't break if
 // Playwright is ever invoked from a different working directory.
-const SHARED_ASSET = path.join(
-  __dirname,
-  '../../../../assets/528KB-random.png'
-)
+const SHARED_ASSET = path.join(__dirname, '../../../../assets/528KB-random.png')
 
 async function uploadAllTypesForSection(page: Page, sectionId: string) {
   for (const sectionTitle of imageUploadSectionTitles) {
@@ -80,10 +77,10 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
   // The sheet's underscore ("John_Peter") represents a compound first name -
   // the app's name validator only allows letters/digits/hyphens/apostrophes
   // (no underscore), so a space is the closest value it will actually accept.
-  const childFirstName = 'John Peter'
+  const childFirstName = faker.person.firstName()
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test.
-  const childSurname = `Smith${faker.string.alphanumeric(6)}`
+  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   const informantFirstName = faker.person.firstName('male')
   const informantSurname = faker.person.lastName('male')
   const motherFirstName = faker.person.firstName('female')
@@ -142,18 +139,11 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
     await page.locator('#child____placeOfBirth').click()
     await selectDropdownOption(page, 'Residential address')
 
-    // Province/district are pre-filled and disabled, anchored to the
-    // declaring user's own office - village is left open unless the
-    // office itself is anchored at village level.
-    const villageInput = page.locator('#village')
-    if (!(await villageInput.isDisabled())) {
-      await villageInput.click()
-      await selectLocationOption(page, 'Klow')
-    }
-
     // Farajaland-rural "fill up all fields".
     await page.locator('#town').fill(childTown)
     await page.locator('#residentialArea').fill(childResidentialArea)
+    await page.locator('#village').click()
+    await selectLocationOption(page, 'Klow')
     await page.locator('#street').fill(childStreet)
     await page.locator('#number').fill(childNumber)
     await page.locator('#zipCode').fill(childZipCode)

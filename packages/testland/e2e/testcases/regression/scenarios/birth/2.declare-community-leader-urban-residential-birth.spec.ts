@@ -36,10 +36,10 @@ import { selectDropdownOption } from './helpers'
 test('2. Complete birth declaration by a Community Leader - urban residential delivery, Father informant, parents at different residences', async ({
   page
 }) => {
-  const childFirstName = 'Emma'
+  const childFirstName = faker.person.firstName('female')
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test (see declaration 1's note).
-  const childSurname = `Wilson${faker.string.alphanumeric(5)}`
+  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(5)}`
   const motherFirstName = faker.person.firstName('female')
   const motherSurname = faker.person.lastName('female')
   const fatherFirstName = faker.person.firstName('male')
@@ -79,15 +79,6 @@ test('2. Complete birth declaration by a Community Leader - urban residential de
 
     await page.locator('#child____placeOfBirth').click()
     await selectDropdownOption(page, 'Residential address')
-
-    // Province/district are pre-filled and disabled, anchored to the
-    // declaring user's own office - village is left open unless the
-    // office itself is anchored at village level.
-    const villageInput = page.locator('#village')
-    if (!(await villageInput.isDisabled())) {
-      await villageInput.click()
-      await selectLocationOption(page, 'Klow')
-    }
 
     // Farajaland-urban "fill up all fields".
     await page.locator('#town').fill(childTown)
