@@ -71,6 +71,18 @@ spec:
       labels:
         app: mosip-api
     spec:
+      initContainers:
+        # Change ownership to the node user the mosip-api image runs as
+        - name: volume-permission-fix
+          image: busybox
+          command:
+            - chown
+            - -R
+            - "1000:1000"
+            - /data/sqlite
+          volumeMounts:
+            - name: mosip-api
+              mountPath: /data/sqlite
       containers:
         - name: mosip-api
           image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_api) }}
