@@ -68,8 +68,18 @@ async function matchingRefs(namespace: string, prefix: string) {
     headers: { accept: 'application/vnd.github+json' }
   })
 
+  /*
+   * An empty list and a failed request are not the same thing: GitHub answers
+   * 200 with `[]` for a prefix nothing matches, so anything else is the request
+   * failing rather than the version having no release branch. Swallowing it
+   * would leave `develop` as the only candidate left, and an unauthenticated
+   * api.github.com allows 60 requests an hour per IP — a country upgrading from
+   * a shared network or a CI runner would quietly get unreleased copy.
+   */
   if (!response.ok) {
-    return []
+    throw new Error(
+      `GitHub answered ${response.status} ${response.statusText} for ${url}`
+    )
   }
 
   const refs = (await response.json()) as Array<{ ref: string }>
@@ -101,6 +111,15 @@ async function fetchTemplate(refs: string[], application: string) {
 
     if (response.ok) {
       return { ref, contents: await response.text() }
+    }
+
+    // 404 means this ref does not carry the file and the next one is worth a
+    // try. Anything else is the request failing, and moving on would read the
+    // template from a ref older than the one that was asked for.
+    if (response.status !== 404) {
+      throw new Error(
+        `GitHub answered ${response.status} ${response.statusText} for ${url}`
+      )
     }
   }
 
