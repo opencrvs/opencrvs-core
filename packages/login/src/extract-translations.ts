@@ -79,9 +79,13 @@ function readTranslations() {
 }
 
 /**
- * The value of a property, when the source says what it is outright. A plain
- * string literal and a template literal with nothing interpolated into it both
- * qualify; anything assembled at runtime does not.
+ * The value of `node`'s `name` property, when the source gives it as a fixed
+ * string. Reading the 'id' property of each of these:
+ *
+ *   { id: 'foo' }             -> 'foo'
+ *   { id: `foo` }             -> 'foo'      backticks, nothing substituted in
+ *   { id: `x.${country}` }    -> undefined  differs every time it runs
+ *   { defaultMessage: 'foo' } -> undefined  no id property at all
  */
 function staticStringOf(
   node: ts.ObjectLiteralExpression,
@@ -109,37 +113,40 @@ function hasProperty(node: ts.ObjectLiteralExpression, name: string) {
   )
 }
 
-function findObjectLiteralsWithIdAndDefaultMessage(
+/** Anything shaped like a react-intl message: `{ id, defaultMessage, ... }`. */
+function isMessageDescriptor(
+  node: ts.Node
+): node is ts.ObjectLiteralExpression {
+  return (
+    ts.isObjectLiteralExpression(node) &&
+    hasProperty(node, 'id') &&
+    hasProperty(node, 'defaultMessage')
+  )
+}
+
+/**
+ * Every message declared in one file.
+ *
+ * The properties are read one at a time rather than by evaluating the object
+ * as a whole. Evaluating it would drop the whole message the moment any one
+ * property was interpolated, and `description` often is — harmlessly, since
+ * nothing reads it at runtime. The key would then stop being checked, with
+ * nothing to say so.
+ */
+function messagesDeclaredIn(
   filePath: string,
   sourceCode: string
 ): MessageDescriptor[] {
   const sourceFile = ts.createSourceFile(
-    'temp.ts',
+    filePath,
     sourceCode,
     ts.ScriptTarget.Latest,
     true
   )
-  const matches: MessageDescriptor[] = []
+  const messages: MessageDescriptor[] = []
 
-  function visit(node: ts.Node) {
-    if (!ts.isObjectLiteralExpression(node)) {
-      ts.forEachChild(node, visit)
-      return
-    }
-
-    if (!(hasProperty(node, 'id') && hasProperty(node, 'defaultMessage'))) {
-      ts.forEachChild(node, visit)
-      return
-    }
-
-    /*
-     * Each property is read on its own rather than by evaluating the whole
-     * object. Evaluating it means one interpolated `description` — which is
-     * harmless, nothing reads it at runtime — hides the message entirely, and
-     * the key silently stops being checked.
-     */
+  function collect(node: ts.ObjectLiteralExpression) {
     const id = staticStringOf(node, 'id')
-    const objectText = node.getText(sourceFile)
 
     if (id === undefined) {
       console.log(chalk.yellow.bold('Warning'))
@@ -148,10 +155,9 @@ function findObjectLiteralsWithIdAndDefaultMessage(
         'Message identifiers should never be dynamic and should always be hardcoded instead.',
         'This enables us to confidently verify that a country configuration has all required keys.',
         '\n',
-        objectText,
+        node.getText(sourceFile),
         '\n'
       )
-      ts.forEachChild(node, visit)
       return
     }
 
@@ -163,23 +169,29 @@ function findObjectLiteralsWithIdAndDefaultMessage(
         `Found a dynamic default message for ${id} in file ${filePath}.`,
         'The key is still checked, but --write cannot fill in its English copy.',
         '\n',
-        objectText,
+        node.getText(sourceFile),
         '\n'
       )
     }
 
-    matches.push({
+    messages.push({
       id,
       defaultMessage: defaultMessage ?? '',
       description: staticStringOf(node, 'description') ?? ''
     })
+  }
+
+  function visit(node: ts.Node) {
+    if (isMessageDescriptor(node)) {
+      collect(node)
+    }
 
     ts.forEachChild(node, visit)
   }
 
   visit(sourceFile)
 
-  return matches
+  return messages
 }
 
 async function extractMessages() {
@@ -224,7 +236,7 @@ async function extractMessages() {
   const messagesParsedFromApp: MessageDescriptor[] = files
     .map((f) => {
       const contents = fs.readFileSync(f).toString()
-      return findObjectLiteralsWithIdAndDefaultMessage(f, contents)
+      return messagesDeclaredIn(f, contents)
     })
     .flat()
 

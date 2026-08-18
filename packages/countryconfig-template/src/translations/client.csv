@@ -600,6 +600,7 @@ event.birth.action.unarchive.label,Label for unarchive record button in dropdown
 event.declaration.potentialDuplicateDetected,Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.,{trackingId} is a potential duplicate. Record is ready for review.,{trackingId} est un doublon potentiel. L’enregistrement est prêt pour révision.
 event.default.action.certificate.template.type.label,Select certificate template,Type,Taper
 event.default.action.certificate.template.type.notFound,Select certificate template options not found,"No template available for this event, contact Admin","Aucun modèle disponible pour cette event, contactez l’admin"
+event.edit.cancelEdits,"Label for ""Cancel edits"" in edit action menu",Cancel edits,
 event.edit.comment.label,The label for the comment,Comments,Commentaires
 event.edit.declareWithEdits.label,Label for `Declare with edits` in edit action menu,Declare with edits,Déclarer avec modifications
 event.edit.notifyWithEdits.label,Label for `Notify with edits` in edit action menu,Notify with edits,Notifier avec modifications
