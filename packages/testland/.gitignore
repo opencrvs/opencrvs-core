@@ -42,6 +42,8 @@ graphql.schema.json
 /blob-report/
 /playwright/.cache/
 notebooks
+/.playwright-cli/
+/.playwright-mcp/ 
 
 ctrf/
 
