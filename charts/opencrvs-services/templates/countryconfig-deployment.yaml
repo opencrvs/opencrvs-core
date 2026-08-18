@@ -74,6 +74,7 @@ spec:
         service_name: opencrvs_countryconfig
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "countryconfig" "Values" .Values) | nindent 6 }}
       containers:
         - name: countryconfig
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
@@ -129,6 +130,8 @@ spec:
                 path: public-key.pem
             name: {{ .Release.Name }}-cert-tls
           name: public-key
+
+{{- include "service-account-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 
