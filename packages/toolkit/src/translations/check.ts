@@ -72,7 +72,7 @@ function staticStringOf(node: ObjectLiteralExpression, name: string) {
     : undefined
 }
 
-export function messagesDeclaredIn(cwd: string) {
+function messagesDeclaredIn(cwd: string) {
   const project = new Project({ skipAddingFilesFromTsConfig: true })
   project.addSourceFilesAtPaths([
     path.join(cwd, 'src/**/*.ts'),
