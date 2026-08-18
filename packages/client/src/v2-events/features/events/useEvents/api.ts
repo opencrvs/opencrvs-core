@@ -104,21 +104,6 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
-function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
-  if (!updatedEventIndex) {
-    return
-  }
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: updatedEventIndex.id }]
-      }
-    }),
-    () => ({ results: [updatedEventIndex], total: 1 })
-  )
-}
-
 export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
 
@@ -128,9 +113,6 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
     )
   }
   const updatedEventIndex = getCurrentEventState(updatedEvent, config)
-
-  // Update the local event index with the updated event
-  setEventSearchQuery(updatedEventIndex)
 
   /*
    * Ensure there exists a local cached search query for this event
@@ -282,6 +264,7 @@ export async function invalidateWorkqueueSearchQueries(slug: string) {
 async function deleteEventData(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+
   queryClient.removeQueries({
     queryKey: trpcOptionsProxy.event.get.queryKey({
       eventId: id,
@@ -296,6 +279,22 @@ async function deleteEventData(updatedEvent: EventDocument) {
    */
   queryClient.removeQueries({ queryKey: [['view-event', id]] })
 
+  /* When event is created, We derive local cache for search query from that (event with no declaration data).
+   * If we delete only the event.get, we will have stale data until event is explicitly searched again.
+   * e.g. After performing declaration action, overview would show event as it was on 'created' state first, and then update.
+   *
+   *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
+   *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
+   */
+  await queryClient.resetQueries({
+    queryKey: trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id }]
+      }
+    })
+  })
+
   await removeCachedFiles(updatedEvent)
 }
 
@@ -305,7 +304,9 @@ export function updateLocalEvent(data: EventDocument) {
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
+
   await invalidateWorkqueues()
+
   return refetchAllSearchQueries()
 }
 
