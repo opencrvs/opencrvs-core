@@ -12,12 +12,8 @@
 // Sent by a Hospital Official as an incomplete NOTIFY (not a full DECLARE),
 // delivery at a Health Institution, Legal Guardian informant with the full
 // extra-fields flow. Mother's details are available (date of birth
-// intentionally left blank); father's are not. The sheet also calls for a
-// supporting document, but NOTIFY is a pre-declaration action (see
-// ActionType.ts) - the review page for this submission never renders an
-// "Upload supporting documents" section at all (confirmed live: Child,
-// Informant, Mother, Father and Annotations are the only sections listed),
-// so there is no document step to use here.
+// intentionally left blank); father's are not. No supporting documents are
+// filled in - a NOTIFY submission never renders a documents section.
 import { expect, test } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import {
@@ -41,10 +37,10 @@ import { selectDropdownOption } from './helpers'
 test("7. Notify a birth as a Hospital Official - Health Institution delivery, Legal guardian informant, mother's DOB intentionally blank, father unavailable", async ({
   page
 }) => {
-  const childFirstName = 'Anna'
+  const childFirstName = faker.person.firstName('female')
   // Unique suffix avoids colliding with any stray same-titled record left
   // behind by a previous run of this test.
-  const childSurname = `Brown${faker.string.alphanumeric(6)}`
+  const childSurname = `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   const informantFirstName = faker.person.firstName('female')
   const informantSurname = faker.person.lastName('female')
   const motherFirstName = faker.person.firstName('female')

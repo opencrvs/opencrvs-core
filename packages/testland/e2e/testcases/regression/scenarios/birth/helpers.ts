@@ -12,6 +12,7 @@
 // sheet's "Birth" tab:
 // https://docs.google.com/spreadsheets/d/1g0ReIDGw8lbHC6Am3O0A16S1y0jje8BZ/edit?gid=1406739219#gid=1406739219
 import { type Locator, type Page } from '@playwright/test'
+import { faker } from '@faker-js/faker'
 import { uploadImage } from '../../../../helpers'
 
 /**
@@ -40,6 +41,15 @@ export async function selectCountry(page: Page, countryName: string) {
   await page
     .locator('#country .react-select__option', { hasText: countryName })
     .click()
+}
+
+/**
+ * A random last name with an apostrophe prefix (e.g. "O'Neill") - exercises
+ * the app's apostrophe-in-name validation without hardcoding a single fixed
+ * value every run reuses.
+ */
+export function generateSurnameWithApostrophe() {
+  return `O'${faker.person.lastName()}`
 }
 
 /**

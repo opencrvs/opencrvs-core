@@ -31,7 +31,11 @@ import { CREDENTIALS } from '../../../../constants'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import { selectCountry, selectDropdownOption } from './helpers'
+import {
+  generateSurnameWithApostrophe,
+  selectCountry,
+  selectDropdownOption
+} from './helpers'
 
 test('6. Complete birth declaration by a National Registrar - foreign "Other" delivery location, Sister informant, mother\'s details not available', async ({
   page
@@ -40,13 +44,12 @@ test('6. Complete birth declaration by a National Registrar - foreign "Other" de
   // form steps - give this more headroom than the 90s default.
   test.setTimeout(150_000)
 
-  // The sheet's curly apostrophe ("O’Neill") isn't accepted by the name
-  // validator (only the plain ASCII apostrophe is) - the closest value it
-  // will actually accept.
-  const childFirstName = "O'Neill"
-  // Unique suffix avoids colliding with any stray same-titled record left
-  // behind by a previous run of this test.
-  const childSurname = `Samson${faker.string.alphanumeric(6)}`
+  const childFirstName = faker.person.firstName('male')
+  // Apostrophe prefix exercises the app's apostrophe-in-name validation
+  // (only a plain ASCII apostrophe is accepted, not a curly quote); unique
+  // suffix avoids colliding with any stray same-titled record left behind
+  // by a previous run of this test.
+  const childSurname = `${generateSurnameWithApostrophe()}${faker.string.alphanumeric(6)}`
   const informantFirstName = faker.person.firstName('female')
   const informantSurname = faker.person.lastName('female')
   const fatherFirstName = faker.person.firstName('male')
