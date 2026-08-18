@@ -25,7 +25,14 @@
 
 import { Node, ObjectLiteralExpression, Project } from 'ts-morph'
 import path from 'path'
-import { CsvFile, addRows, readCsvFile, toCsvLine, writeCsvFile } from '../csv'
+import {
+  CsvFile,
+  addRows,
+  idOf,
+  readCsvFile,
+  toCsvLine,
+  writeCsvFile
+} from '../csv'
 
 const TRANSLATIONS = 'src/translations'
 const OWN_FILE = `${TRANSLATIONS}/countryconfig.csv`
@@ -71,7 +78,9 @@ export function messagesDeclaredIn(cwd: string) {
     path.join(cwd, 'src/**/*.ts'),
     path.join(cwd, 'src/**/*.tsx'),
     `!${path.join(cwd, 'src/**/*.test.ts')}`,
-    `!${path.join(cwd, 'src/**/*.test.tsx')}`
+    `!${path.join(cwd, 'src/**/*.test.tsx')}`,
+    `!${path.join(cwd, 'src/**/*.stories.ts')}`,
+    `!${path.join(cwd, 'src/**/*.stories.tsx')}`
   ])
 
   const messages: Message[] = []
@@ -112,7 +121,7 @@ export function check(cwd: string): CheckResult {
   const covered = new Set(
     [own, ...CORE_FILES.map((file) => readCsvFile(path.join(cwd, file)))]
       .flatMap((csv: CsvFile | undefined) => csv?.body ?? [])
-      .map((line: string) => line.slice(0, line.indexOf(',')))
+      .map(idOf)
   )
 
   // The same message is often declared in more than one place.
@@ -126,7 +135,7 @@ export function check(cwd: string): CheckResult {
 
   const declared = new Set(messages.map(({ id }) => id))
   const outdated = (own?.body ?? [])
-    .map((line: string) => line.slice(0, line.indexOf(',')))
+    .map(idOf)
     .filter((id: string) => !declared.has(id))
 
   return { missing, outdated, dynamicIds }

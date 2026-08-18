@@ -177,7 +177,14 @@ async function updateApplication(
     return
   }
 
-  writeCsvFile(path.join(cwd, relativePath), local)
+  try {
+    writeCsvFile(path.join(cwd, relativePath), local)
+  } catch (error) {
+    warnSkipped(
+      `Could not write ${relativePath} (${(error as Error).message}); translations not added`
+    )
+    return
+  }
 
   for (const id of added) {
     console.log(`  ✓ ${relativePath}: ${id}`)
@@ -195,24 +202,35 @@ function readTemplate(contents: string): CsvFile {
   }
 }
 
+/** Refs to read the template from. Undefined when GitHub cannot be asked. */
+async function listRefs() {
+  try {
+    return await candidateRefs()
+  } catch (error) {
+    warnSkipped(
+      `Could not list the ${TARGET_VERSION} refs on GitHub (${(error as Error).message}); translations not added`
+    )
+    return undefined
+  }
+}
+
 async function main() {
   const cwd = process.cwd()
 
   console.log('Adding the translation keys core gained this version...\n')
 
-  try {
-    const refs = await candidateRefs()
+  const refs = await listRefs()
 
+  if (refs) {
     for (const application of APPLICATIONS) {
-      await updateApplication(cwd, refs, application)
+      try {
+        await updateApplication(cwd, refs, application)
+      } catch (error) {
+        warnSkipped(
+          `Could not read ${application}.csv from the country config template on GitHub (${(error as Error).message}); ${application}.csv not updated`
+        )
+      }
     }
-  } catch (error) {
-    // An upgrade run on a machine that cannot reach GitHub should report what
-    // it could not do and let the rest of the upgrade finish, rather than
-    // failing the whole thing on a network error.
-    warnSkipped(
-      `Could not read the country config template from GitHub (${(error as Error).message}); translations not added`
-    )
   }
 
   if (skipped.length > 0) {

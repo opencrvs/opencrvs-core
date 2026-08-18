@@ -8,8 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { describe, expect, it } from 'vitest'
-import { CsvFile, addRows, idOf, parseCsvLine, toCsvLine } from './csv'
+import { afterEach, describe, expect, it } from 'vitest'
+import { mkdtempSync, rmSync, writeFileSync } from 'fs'
+import { tmpdir } from 'os'
+import path from 'path'
+import {
+  CsvFile,
+  addRows,
+  idOf,
+  parseCsvLine,
+  readCsvFile,
+  toCsvLine
+} from './csv'
 
 describe('parseCsvLine', () => {
   it('splits plain values', () => {
@@ -62,6 +72,34 @@ describe('idOf', () => {
     expect(idOf('buttons.confirm,Label used,Confirm,Confirmer')).toBe(
       'buttons.confirm'
     )
+  })
+
+  it('reads a line with no comma whole', () => {
+    expect(idOf('buttons.confirm')).toBe('buttons.confirm')
+  })
+})
+
+describe('readCsvFile', () => {
+  const directories: string[] = []
+
+  afterEach(() => {
+    for (const directory of directories.splice(0)) {
+      rmSync(directory, { recursive: true, force: true })
+    }
+  })
+
+  function fileWith(contents: string) {
+    const directory = mkdtempSync(path.join(tmpdir(), 'opencrvs-csv-'))
+    directories.push(directory)
+    const file = path.join(directory, 'translations.csv')
+    writeFileSync(file, contents)
+    return file
+  }
+
+  it('drops the empty entry a trailing blank line leaves behind', () => {
+    const file = readCsvFile(fileWith('id,description,en\na,,A\nb,,B\n\n'))
+
+    expect(file?.body).toEqual(['a,,A', 'b,,B'])
   })
 })
 

@@ -255,18 +255,20 @@ async function extractMessages() {
   if (missingKeys.length > 0) {
     console.log(chalk.red.bold('Missing translations '))
     if (ci) {
-      const emptyLanguages = Object.fromEntries(
-        knownLanguages.filter((lang) => lang != 'en').map((lang) => [lang, ''])
-      )
       const defaultsToBeAdded = missingKeys.map(
         (key): CSVRow => ({
           id: key,
           description: reactIntlDescriptions[key],
-          en:
-            messagesParsedFromApp
-              .find(({ id }) => id === key)
-              ?.defaultMessage?.toString() || '',
-          ...emptyLanguages
+          ...Object.fromEntries(
+            knownLanguages.map((lang) => [
+              lang,
+              lang === 'en'
+                ? messagesParsedFromApp
+                    .find(({ id }) => id === key)
+                    ?.defaultMessage?.toString() || ''
+                : ''
+            ])
+          )
         })
       )
       const message = defaultsToBeAdded

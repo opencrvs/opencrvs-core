@@ -77,7 +77,10 @@ export function toCsvLine(values: string[]): string {
  * comma or a quote, so this does not need the parser.
  */
 export function idOf(line: string): string {
-  return line.slice(0, line.indexOf(','))
+  const comma = line.indexOf(',')
+
+  // No comma: `slice(0, -1)` would eat the last character.
+  return comma === -1 ? line : line.slice(0, comma)
 }
 
 export function readCsvFile(path: string): CsvFile | undefined {
@@ -90,7 +93,11 @@ export function readCsvFile(path: string): CsvFile | undefined {
   const trailingNewline = /\r?\n$/.test(contents)
   const lines = contents.replace(/\r?\n$/, '').split(/\r?\n/)
 
-  return { header: lines[0], body: lines.slice(1), newline, trailingNewline }
+  // Trailing blank line leaves an empty entry. It sorts before every id, so
+  // the file reads as unsorted.
+  const body = lines.slice(1).filter((line) => line !== '')
+
+  return { header: lines[0], body, newline, trailingNewline }
 }
 
 export function writeCsvFile(path: string, file: CsvFile): void {

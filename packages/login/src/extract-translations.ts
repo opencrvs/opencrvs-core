@@ -258,18 +258,20 @@ async function extractMessages() {
     if (ci) {
       // CSV-shaped, so the workflow can lift the block straight into the job
       // summary and a reviewer can paste it into the file.
-      const emptyLanguages = Object.fromEntries(
-        knownLanguages.filter((lang) => lang != 'en').map((lang) => [lang, ''])
-      )
       const defaultsToBeAdded = missingKeys.map(
         (key): CSVRow => ({
           id: key,
           description: reactIntlDescriptions[key],
-          en:
-            messagesParsedFromApp
-              .find(({ id }) => id === key)
-              ?.defaultMessage?.toString() || '',
-          ...emptyLanguages
+          ...Object.fromEntries(
+            knownLanguages.map((lang) => [
+              lang,
+              lang === 'en'
+                ? messagesParsedFromApp
+                    .find(({ id }) => id === key)
+                    ?.defaultMessage?.toString() || ''
+                : ''
+            ])
+          )
         })
       )
       const message = defaultsToBeAdded
