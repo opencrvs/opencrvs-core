@@ -33,6 +33,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install the country config template's own dependencies
+        # It is deliberately outside core's workspace, so it installs the way a
+        # country config repo does. Installing it frozen also catches its
+        # package.json and pnpm-lock.yaml drifting apart.
+        run: pnpm install --ignore-workspace --frozen-lockfile
+        working-directory: packages/countryconfig-template
+
       - name: Check for missing translations
         # chalk colours its output whenever GITHUB_ACTIONS is set, TTY or not.
         # The missing rows are lifted out of this output and into the job
@@ -61,6 +68,32 @@ jobs:
             awk '/You are missing the following content keys from your country configuration package:/ {flag=1; next} /Add them to this file and run again:/ {flag=0} flag && NF' "$output" >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             echo "Run \`pnpm extract:translations --write\` in \`packages/$package\` to add these to both country configs, then write the copy for the languages other than English." >> $GITHUB_STEP_SUMMARY
+          done
+
+          exit $status
+
+      - name: Check for missing country config translations
+        env:
+          FORCE_COLOR: '0'
+        run: |
+          set -o pipefail
+
+          status=0
+
+          for config in testland countryconfig-template; do
+            output="$RUNNER_TEMP/$config-countryconfig-translations.txt"
+
+            if pnpm --dir "packages/$config" run check:translations 2>&1 | tee "$output"; then
+              continue
+            fi
+
+            status=1
+
+            echo "### Missing translations in \`packages/$config\`" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            awk '/have no row in src\/translations\/countryconfig.csv:/ {flag=1; next} /^Run / {flag=0} flag && NF' "$output" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`pnpm check:translations --write\` in \`packages/$config\` to add them with their English copy, then write the copy for the languages other than English." >> $GITHUB_STEP_SUMMARY
           done
 
           exit $status
