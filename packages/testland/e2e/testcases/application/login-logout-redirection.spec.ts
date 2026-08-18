@@ -9,9 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, type Page, expect } from '@playwright/test'
-import { login, logout } from '../../helpers'
+import { joinValuesWith, login, logout } from '../../helpers'
 import { CREDENTIALS, LOGIN_URL } from '../../constants'
 import { setMobileViewport } from '../../mobile-helpers'
+
+const child = {
+  firstname: 'John-Peter',
+  surname: 'Smith'
+}
+
+const fullName = joinValuesWith([child.firstname, child.surname])
 
 test.describe('Desktop', () => {
   let page: Page
