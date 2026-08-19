@@ -21,6 +21,9 @@ import styled from 'styled-components'
 import {
   ActionType,
   applyDraftToEventIndex,
+  FieldConfig,
+  FieldType,
+  RecordForm,
   EventState,
   getActionAnnotationFields,
   getDeclaration,
@@ -70,6 +73,19 @@ const messages = defineMessages({
     description: 'Heading of the card on the Record tab'
   }
 })
+
+/**
+ * What an informant submits with a declaration and attests to by signing it.
+ * A registration can move on from that declaration through corrections the
+ * informant never confirmed, so none of it carries over.
+ */
+function isSupportingField(field: FieldConfig) {
+  return (
+    field.type === FieldType.FILE ||
+    field.type === FieldType.FILE_WITH_OPTIONS ||
+    field.type === FieldType.SIGNATURE
+  )
+}
 
 const OfflineMessageWrapper = styled.div`
   text-align: center;
@@ -122,7 +138,34 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const intl = useIntl()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  const formConfig = getDeclaration(configuration)
+  /*
+   * A registration shows neither supporting documents nor the signature. The
+   * signature attests to the declaration as it stood, and a registration can
+   * be corrected afterwards without the informant seeing it. The documents
+   * stay reachable from the Documents tab.
+   *
+   * Filters the config rather than the values — Review decides whether to
+   * render the document viewer from the config alone.
+   */
+  const fullFormConfig = getDeclaration(configuration)
+
+  const formConfig = useMemo(() => {
+    if (selected?.form !== RecordForm.REGISTRATION) {
+      return fullFormConfig
+    }
+
+    return {
+      ...fullFormConfig,
+      pages: fullFormConfig.pages
+        .map((page) => ({
+          ...page,
+          fields: page.fields.filter((field) => !isSupportingField(field))
+        }))
+        .filter(({ fields }) => fields.length > 0)
+    }
+  }, [fullFormConfig, selected?.form])
+
+  const isRegistration = selected?.form === RecordForm.REGISTRATION
 
   const annotation = useMemo((): EventState | undefined => {
     // Collect annotations from all past non-READ actions that have annotation fields
@@ -167,6 +210,18 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
 
   const { title, fields } = actionConfiguration.review
 
+  /*
+   * Only signatures, not the whole of isSupportingField. An annotation belongs
+   * to the action that captured it, so a file in one is evidence attached to
+   * that action — a correction request, say — and that evidence does belong to
+   * the registration, because the correction does. A signature captured this
+   * way is still the informant confirming their declaration, so it is subject
+   * to the same rule as the documents above.
+   */
+  const reviewFields = isRegistration
+    ? fields.filter(({ type }) => type !== FieldType.SIGNATURE)
+    : fields
+
   return (
     <ReviewComponent.Body
       readonlyMode
@@ -192,7 +247,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       }}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
-      reviewFields={fields}
+      reviewFields={reviewFields}
       showValidationErrors={isLatest}
       title={formatMessage(title, eventStateWithDraft.declaration)}
       validatorContext={validatorContext}
