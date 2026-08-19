@@ -71,6 +71,13 @@ for dir in "${dirs[@]}"; do
   fi
 done
 
+PROJECT_ROOT=$(cd "$DIR/.."; pwd)
+if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
+  echo "Creating $PROJECT_ROOT/.secrets"
+  mkdir -p "$PROJECT_ROOT/.secrets"
+  pnpm dev:secrets:gen
+fi
+
 if $dependencies; then
   concurrently "pnpm run compose:deps"
   exit 0
