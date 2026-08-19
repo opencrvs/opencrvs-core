@@ -18,9 +18,6 @@ export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
 export const ACCESS_TOKEN_REFRESH_BUFFER_MS = 60 * 1000 // refresh when < 60s remain
 
-export const AVATAR_API =
-  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
-
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
