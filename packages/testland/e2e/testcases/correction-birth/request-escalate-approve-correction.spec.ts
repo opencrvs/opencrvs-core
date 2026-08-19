@@ -285,14 +285,9 @@ test.describe
   test('Approve the correction', async () => {
     await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
 
     await expectInUrl(page, `/events/${eventId}`)
 

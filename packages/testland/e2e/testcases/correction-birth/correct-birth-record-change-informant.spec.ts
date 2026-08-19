@@ -331,14 +331,9 @@ test.describe.serial('Correct record - change informant type', () => {
 
     await page.getByRole('button', { name: 'Correct record' }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
 
     await expectInUrl(page, `/events/${eventId}`)
 
