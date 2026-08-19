@@ -228,14 +228,9 @@ test.describe.serial('Birth Record correction flow', () => {
 
     await expect(page.getByText('Correct record?')).toBeVisible()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
     await expectInUrl(page, `/workqueue/pending-certification`)
   })
 
