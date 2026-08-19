@@ -12,7 +12,10 @@ import { test, expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '../../../../constants'
 import { ensureAssignedToUser } from '../../utils'
-import { fillDate } from '../../../../testcases/birth/helpers'
+import {
+  fillDate,
+  openBirthDeclaration
+} from '../../../../testcases/birth/helpers'
 import {
   formatName,
   goToSection,
@@ -55,10 +58,7 @@ test('Verify user can notify complete record', async ({ page }) => {
   })
 
   await test.step('Fill a complete birth declaration', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
+    await openBirthDeclaration(page)
 
     await page.locator('#firstname').fill(childName.firstNames)
     await page.locator('#surname').fill(childName.familyName)
@@ -197,10 +197,7 @@ test('Verify user can notify completely blank record', async ({ page }) => {
   })
 
   await test.step('Start a birth declaration with only the child’s name filled in', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
+    await openBirthDeclaration(page)
 
     await page.locator('#firstname').fill(childName.firstNames)
     await page.locator('#surname').fill(childName.familyName)

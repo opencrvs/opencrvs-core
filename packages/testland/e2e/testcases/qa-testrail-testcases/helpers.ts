@@ -116,6 +116,9 @@ export type DuplicateDeathDeclaration = DeathDeclaration
  * deceased.idType/nid here (caller overrides in `dec` still win) makes every
  * call default to the same ID, so two calls sharing just a `dec` with a
  * matching `deceased.name` reliably collide on all four checks.
+ *
+ * NOTE: unused in this PR - consumed by the follow-up core actions PR's
+ * el-archive.spec.ts (delete/archive/edit/reject).
  */
 export async function createDuplicateDeathDeclaration(
   token: string,

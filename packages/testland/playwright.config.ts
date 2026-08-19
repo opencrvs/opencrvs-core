@@ -36,6 +36,13 @@ const optInSuites = [
 export default defineConfig({
   timeout: TEST_TIMEOUT,
   testDir: './e2e/testcases',
+  /*
+   * Resolves DOMAIN (e2e.opencrvs.dev, falling back to qa.opencrvs.dev) when
+   * it isn't already set. Runs before workers are spawned, so this only
+   * matters for the unset-DOMAIN, non-CI/local-run case - CI always sets
+   * DOMAIN explicitly before invoking Playwright.
+   */
+  globalSetup: require.resolve('./e2e/global-setup'),
 
   /* Run tests in files in parallel */
   fullyParallel: true,

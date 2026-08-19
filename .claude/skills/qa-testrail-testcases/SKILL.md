@@ -243,8 +243,12 @@ For anything not confidently pinned down by source + existing specs (exact
 modal copy, whether a field is required, action menu contents/ordering after
 a given action, etc.), check the real app instead of guessing:
 
-- URL: `https://register.qa.opencrvs.dev/` — this is the deployed `CLIENT_URL`
-  for `DOMAIN=qa.opencrvs.dev`, matching `packages/testland/e2e/constants.ts`.
+- URL: `https://register.e2e.opencrvs.dev/` — this is the deployed
+  `CLIENT_URL` for `DOMAIN=e2e.opencrvs.dev`, matching
+  `packages/testland/e2e/constants.ts`. The suite falls back to
+  `qa.opencrvs.dev` automatically (via `e2e/global-setup.ts`) if
+  `e2e.opencrvs.dev` doesn't respond — if the app seems to be behaving
+  unexpectedly, check which domain the run actually resolved to.
 - Login: username + password, then a 6-digit verification code. Password is
   `TEST_USER_PASSWORD` (`'test'`) from `constants.ts`; the code is always
   `000000` in this environment (see `getAuthTokens` in `e2e/helpers.ts` — the
@@ -263,9 +267,10 @@ a given action, etc.), check the real app instead of guessing:
   first call complains the skill doesn't match the tool version, run `npx
   --yes @playwright/cli@latest install --skills` once to sync it, then
   continue normally. Verified working end-to-end (login → 6-digit code →
-  PIN setup → profile check) against `register.qa.opencrvs.dev` as
-  Community Leader (`g.phiri`).
-- **This is a shared, persistent QA environment**, not a throwaway sandbox.
+  PIN setup → profile check) against `register.qa.opencrvs.dev` (the
+  environment in use before the e2e.opencrvs.dev switch — behavior should be
+  identical) as Community Leader (`g.phiri`).
+- **This is a shared, persistent environment**, not a throwaway sandbox.
   Read-only exploration and assigning/validating your own freshly-created
   throwaway declaration is fine. Be careful firing hard-to-reverse actions
   (Register, Revoke, Archive, delete) against records you didn't create —

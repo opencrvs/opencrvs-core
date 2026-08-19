@@ -22,7 +22,11 @@ import {
   createDeclaration as createDeathDeclaration,
   type Declaration as DeathDeclaration
 } from '../../../../testcases/test-data/death-declaration'
-import { fillDate, formatV2ChildName } from '../../../../testcases/birth/helpers'
+import {
+  fillDate,
+  formatV2ChildName,
+  openBirthDeclaration
+} from '../../../../testcases/birth/helpers'
 import {
   getToken,
   goToSection,
@@ -66,10 +70,7 @@ test('Verify user unable to declare incomplete record', async ({ page }) => {
   })
 
   await test.step('Start an incomplete birth declaration', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
+    await openBirthDeclaration(page)
 
     await page.locator('#firstname').fill(childName.firstNames)
     await page.locator('#surname').fill(childName.familyName)
@@ -184,7 +185,7 @@ test('Verify Registration Officer can declare a previously NOTIFIED birth record
 // Known issue: When CL notifies a death record, the 'Attestation required' flag is added.
 // Which shouldn't have. If fixed it'll pass.
 
-test.skip('Verify Community Leader can declare their own previously NOTIFIED death record via edit', async ({  // Known issue: When CL notifies a death record, the 'Attestation required' flag is added. Which shouldn't have. If fixed it'll pass.
+test.skip('Verify Community Leader can declare their own previously NOTIFIED death record via edit', async ({
   page
 }) => {
   test.setTimeout(180_000)

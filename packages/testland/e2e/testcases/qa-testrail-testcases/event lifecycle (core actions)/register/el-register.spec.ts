@@ -22,7 +22,12 @@ import {
   type Declaration as DeathDeclaration
 } from '../../../../testcases/test-data/death-declaration'
 import { formatV2ChildName } from '../../../../testcases/birth/helpers'
-import { getToken, joinValuesWith, login } from '../../../../helpers'
+import {
+  getToken,
+  joinValuesWith,
+  login,
+  triggerDeclarationAction
+} from '../../../../helpers'
 import { openRecordByTitle, searchFromSearchBar } from '../../helpers'
 
 const formatV2DeceasedName = (declaration: {
@@ -72,9 +77,7 @@ test("Validate the 'Register?' modal for birth events", async ({ page }) => {
     ).toBeVisible()
     await expect(page.getByText('WARNING!', { exact: false })).toBeVisible()
 
-    await expect(
-      page.getByText('Supporting documents reviewed?')
-    ).toBeVisible()
+    await expect(page.getByText('Supporting documents reviewed?')).toBeVisible()
     await expect(page.getByText('Register book number')).toBeVisible()
     await expect(page.getByText('Register page number')).toBeVisible()
     await expect(page.getByText('Additional comments')).toBeVisible()
@@ -99,15 +102,7 @@ test("Validate the 'Register?' modal for birth events", async ({ page }) => {
   })
 
   await test.step('Confirm registers the record', async () => {
-    await selectAction(page, 'Register')
-    await page.locator('#documents-verified').click()
-    await page.locator('.react-select__option', { hasText: /^Yes$/ }).click()
-
-    const registerResponse = page.waitForResponse(
-      (res) => res.url().includes('event.actions.register') && res.ok()
-    )
-    await page.getByRole('button', { name: 'Confirm' }).click()
-    await registerResponse
+    await triggerDeclarationAction(page, 'Register')
 
     // Register navigates the user out of the record view - re-find it.
     await searchFromSearchBar(page, formatV2ChildName(declaration))
@@ -166,13 +161,7 @@ test("Validate the 'Register?' modal for death events", async ({ page }) => {
   })
 
   await test.step('Confirm registers the record', async () => {
-    await selectAction(page, 'Register')
-
-    const registerResponse = page.waitForResponse(
-      (res) => res.url().includes('event.actions.register') && res.ok()
-    )
-    await page.getByRole('button', { name: 'Confirm' }).click()
-    await registerResponse
+    await triggerDeclarationAction(page, 'Register')
 
     // Register navigates the user out of the record view - re-find it.
     await searchFromSearchBar(page, formatV2DeceasedName(declaration))
