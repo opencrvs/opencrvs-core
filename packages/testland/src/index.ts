@@ -46,6 +46,11 @@ import clientConfigProd from './client-config.prod'
 import loginConfig from './login-config'
 import loginConfigProd from './login-config.prod'
 import { emailHandler, emailSchema } from './api/notification/handler'
+import {
+  telemetryHandler,
+  telemetrySchema,
+  logTelemetryStartupStatus
+} from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { locationsHandler } from './data-seeding/locations/handler'
@@ -665,6 +670,22 @@ export async function createServer() {
   server.route(getVerifiableCredentialRoutes())
 
   server.route({
+    method: 'POST',
+    path: '/trigger/telemetry',
+    handler: telemetryHandler,
+    options: {
+      // Authenticated with the default JWT strategy; the handler additionally
+      // requires an OpenCRVS system token (see the handler).
+      tags: ['api', 'triggers'],
+      validate: {
+        payload: telemetrySchema
+      },
+      description:
+        'Receives a usage report from the events service and forwards it to the status service when telemetry is enabled'
+    }
+  })
+
+  server.route({
     method: 'GET',
     path: '/triggers/system/ready',
     handler: (_request, h) => {
@@ -833,6 +854,8 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    logTelemetryStartupStatus()
   }
 
   return { server, start, stop }

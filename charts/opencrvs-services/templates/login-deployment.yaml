@@ -46,6 +46,7 @@ spec:
         app: login
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.login) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "login" "Values" .Values) | nindent 6 }}
       containers:
         - name: login
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.login) }}
@@ -90,6 +91,8 @@ spec:
             name: {{ $config_name }}
       {{- end }}
       {{- end }}
+
+{{- include "service-account-helper" (dict "service_name" "login" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "login" "Values" .Values) }}
 

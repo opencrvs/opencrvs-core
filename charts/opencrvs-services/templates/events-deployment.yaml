@@ -20,6 +20,7 @@ spec:
         service_name: opencrvs_events
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.events) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "events" "Values" .Values) | nindent 6 }}
       containers:
         - name: events
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.events) }}
@@ -69,6 +70,8 @@ spec:
             items:
               - key: public-key.pem
                 path: public-key.pem
+
+{{- include "service-account-helper" (dict "service_name" "events" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "events" "Values" .Values) }}
 

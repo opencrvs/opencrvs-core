@@ -86,6 +86,7 @@ export type SearchUsersPayload = {
 async function findAvailableUsername(
   newUsername: string,
   existingUsername?: string,
+  trx?: Kysely<Schema>,
   i = 0
 ): Promise<string> {
   const candidate = i === 0 ? newUsername : `${newUsername}${i}`
@@ -93,9 +94,9 @@ async function findAvailableUsername(
     return candidate
   }
 
-  const taken = await isUsernameTaken(candidate)
+  const taken = await isUsernameTaken(candidate, trx)
   return taken
-    ? findAvailableUsername(newUsername, existingUsername, i + 1)
+    ? findAvailableUsername(newUsername, existingUsername, trx, i + 1)
     : candidate
 }
 
@@ -184,7 +185,8 @@ async function handleUsernameUpdate(
 
   const newUsername = await findAvailableUsername(
     newUsernameCandidate,
-    oldUsername
+    oldUsername,
+    trx
   )
 
   await updateUsernameByIdInTrx(trx, userId, newUsername)
