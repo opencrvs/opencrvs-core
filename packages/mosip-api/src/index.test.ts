@@ -13,7 +13,7 @@ import assert from 'node:assert'
 import { buildFastify } from './index'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import { env } from './constants'
+import { env, OPENCRVS_PUBLIC_KEY_URL } from './constants'
 import { generateKeyPairSync } from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import { schemaJson as defaultSchemaJson } from './types/idSchemaJson'
@@ -43,7 +43,7 @@ const createPacketRequests: Array<{
 }> = []
 
 const mswServer = setupServer(
-  http.get(env.OPENCRVS_PUBLIC_KEY_URL, () => {
+  http.get(OPENCRVS_PUBLIC_KEY_URL, () => {
     return HttpResponse.text(publicKey)
   }),
   http.post(env.MOSIP_AUTH_URL, () => {

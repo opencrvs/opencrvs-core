@@ -28,13 +28,9 @@ export const env = cleanEnv(process.env, {
     devDefault: 'http://localhost:7070',
     desc: 'The URL of the OpenCRVS GraphQL Gateway'
   }),
-  OPENCRVS_PUBLIC_KEY_URL: str({
-    devDefault: 'http://localhost:4040/.well-known',
-    desc: 'OpenCRVS public key URL. Used to verify JWT authenticity'
-  }),
   OPENCRVS_AUTH_URL: str({
     devDefault: 'http://localhost:4040',
-    desc: "OpenCRVS auth service URL. Used to obtain tokens with the integration's own client credentials"
+    desc: "OpenCRVS auth service URL. Used to verify JWT authenticity and to obtain tokens with the integration's own client credentials"
   }),
   OPENCRVS_CLIENT_ID: str({
     default: '',
@@ -150,6 +146,9 @@ export const env = cleanEnv(process.env, {
     desc: 'Enable debug logging for requests and payloads'
   })
 })
+
+/** OpenCRVS public key endpoint, served by the auth service. Used to verify JWT authenticity. */
+export const OPENCRVS_PUBLIC_KEY_URL = `${env.OPENCRVS_AUTH_URL}/.well-known`
 
 /**
  * @knipignore Feeds the verifiable-credential allowlist check in routes/websub-credential-issued.ts, which is currently commented out pending a canonicalization fix. Kept so re-enabling that check needs no new plumbing.

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { env } from './constants'
+import { env, OPENCRVS_PUBLIC_KEY_URL } from './constants'
 import { createClient } from '@opencrvs/toolkit/api'
 import crypto from 'node:crypto'
 import type { FastifyBaseLogger } from 'fastify'
@@ -26,13 +26,13 @@ export const getPublicKey = async (
   logger: FastifyBaseLogger
 ): Promise<string> => {
   try {
-    const response = await fetch(env.OPENCRVS_PUBLIC_KEY_URL)
+    const response = await fetch(OPENCRVS_PUBLIC_KEY_URL)
     return response.text()
   } catch (error) {
     logger.warn(
       {
         event: 'opencrvs.public-key.fetch.failed',
-        opencrvsPublicKeyUrl: env.OPENCRVS_PUBLIC_KEY_URL,
+        opencrvsPublicKeyUrl: OPENCRVS_PUBLIC_KEY_URL,
         err: error
       },
       'Failed to fetch OpenCRVS public key'
