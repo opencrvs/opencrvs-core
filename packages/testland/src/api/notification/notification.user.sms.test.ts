@@ -60,7 +60,8 @@ describe('User notification - sms', () => {
         .inject({
           method: 'POST',
           url: `/triggers/user/${event}`,
-          payload
+          payload,
+          auth: { strategy: 'jwt', credentials: {} }
         })
         .catch(() => {})
       expect((fetch as any).mock.calls[1][1].body).toMatchSnapshot()
@@ -104,7 +105,8 @@ describe('User notification - sms - recovery link URL escaping', () => {
           payload: {
             recipient,
             token: hostileToken
-          }
+          },
+          auth: { strategy: 'jwt', credentials: {} }
         })
         .catch(() => {})
 

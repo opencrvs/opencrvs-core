@@ -149,7 +149,9 @@ const Title = styled.div`
 `
 
 const Icon = styled.div`
-  height: 24px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
   background-color: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
