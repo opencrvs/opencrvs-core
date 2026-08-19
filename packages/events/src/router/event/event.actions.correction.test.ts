@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { omit } from 'lodash'
+import { HttpResponse, http } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -19,14 +20,18 @@ import {
   EventDocument,
   EventState,
   generateActionDeclarationInput,
+  getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  createCountryConfigClient,
   createEvent,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test('REQUEST_CORRECTION prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -495,4 +500,101 @@ test('a correction request is not allowed if the event is already waiting for co
       generator.event.actions.correction.request(event.id)
     )
   ).rejects.toThrowErrorMatchingSnapshot()
+})
+
+/*
+ * A record can end up holding a value in a permanently hidden field: the async confirmation
+ * route (`accept`) is a systemProcedure and does not run declaration validation, so an
+ * integration can write any field. MOSIP does exactly this - `register.accept` sets
+ * `child.nid`, which the country config configures as `SHOW: never()`.
+ *
+ * Corrections must not be rejected because of a value the record inherited that way.
+ * https://github.com/opencrvs/opencrvs-core/issues/13322
+ */
+test('REQUEST_CORRECTION is not rejected because of a hidden field inherited from the record', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  // Declaring with an unknown date of birth makes `applicant.dob` a hidden field.
+  const declarePayload = generator.event.actions.declare(event.id, {
+    keepAssignment: true
+  })
+  await client.event.actions.declare.request({
+    ...declarePayload,
+    declaration: {
+      ...omit(declarePayload.declaration, ['applicant.dob']),
+      'applicant.dobUnknown': true,
+      'applicant.age': 19
+    }
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id, {
+      declaration: {},
+      keepAssignment: true
+    })
+  )
+
+  // Register asynchronously so that the integration gets to confirm the action.
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${ActionType.REGISTER}`,
+      // @ts-expect-error - msw types complain about numeric status
+      () => HttpResponse.json({}, { status: 202 })
+    )
+  )
+
+  const registerResponse = await client.event.actions.register.request(
+    generator.event.actions.register(event.id, {
+      declaration: {},
+      keepAssignment: true
+    })
+  )
+
+  const registerActionId = registerResponse.actions.find(
+    (action) =>
+      action.type === ActionType.REGISTER &&
+      action.status === ActionStatus.Requested
+  )?.id
+
+  if (!registerActionId) {
+    throw new Error('Requested REGISTER action not found')
+  }
+
+  // The integration writes a value into the hidden field, bypassing validation.
+  const countryConfigClient = createCountryConfigClient(
+    user,
+    event.id,
+    registerActionId
+  )
+
+  await countryConfigClient.event.actions.register.accept({
+    type: ActionType.REGISTER,
+    eventId: event.id,
+    actionId: registerActionId,
+    transactionId: getUUID(),
+    registrationNumber: '2026TENNIS0001',
+    declaration: { 'applicant.dob': '2000-01-01' },
+    keepAssignment: true
+  })
+
+  const registeredEvent = await client.event.get(event.id)
+  expect(
+    getCurrentEventState(registeredEvent, tennisClubMembershipEvent)
+      .declaration['applicant.dob']
+  ).toBe('2000-01-01')
+
+  // The correction does not touch `applicant.dob`, so it must be accepted.
+  await expect(
+    client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id, {
+        declaration: {
+          'applicant.name': { firstname: 'Jane', surname: 'Doe' }
+        },
+        keepAssignment: true
+      })
+    )
+  ).resolves.not.toThrow()
 })
