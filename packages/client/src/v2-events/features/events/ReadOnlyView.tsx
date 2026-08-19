@@ -46,6 +46,8 @@ import { useOnlineStatus } from '@client/utils'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import { useRecordVersions } from '@client/v2-events/features/events/useRecordVersions'
+import { RecordVersionMenu } from '@client/v2-events/features/events/components/RecordVersionMenu'
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
@@ -60,12 +62,18 @@ const messages = defineMessages({
       'This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.',
     description:
       'Message shown on the Record page when the user is offline and the record has not been cached locally'
+  },
+  recordTitle: {
+    id: 'v2.event.record.title',
+    defaultMessage: 'Record',
+    description: 'Heading of the card on the Record tab'
   }
 })
 
 const OfflineMessageWrapper = styled.div`
   text-align: center;
 `
+
 
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
@@ -84,19 +92,33 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     event.type
   )
 
-  const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration)
+  const currentState = useMemo(
+    () => getCurrentEventState(event, configuration),
+    [event, configuration]
+  )
 
-    return draft
-      ? applyDraftToEventIndex(eventState, draft, configuration)
-      : eventState
-  }, [draft, event, configuration])
+  const { versions, selected, selectedState, isLatest, selectVersion } =
+    useRecordVersions({ event, configuration, currentState })
+
+  /*
+   * A draft is unsaved work on top of the current state, so it belongs to the
+   * newest version only. Applying it to a historical version would show data
+   * that never existed at that point.
+   */
+  const eventStateWithDraft = useMemo(
+    () =>
+      draft && isLatest
+        ? applyDraftToEventIndex(selectedState, draft, configuration)
+        : selectedState,
+    [draft, isLatest, selectedState, configuration]
+  )
 
   const assignmentStatus = getAssignmentStatus(
     eventStateWithDraft,
     authentication.sub
   )
 
+  const intl = useIntl()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
@@ -149,9 +171,23 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       readonlyMode
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
+      content={{
+        title: intl.formatMessage(messages.recordTitle),
+        actions: selected
+          ? [
+              <RecordVersionMenu
+                key="record-version"
+                selected={selected}
+                versions={versions}
+                onSelect={selectVersion}
+              />
+            ]
+          : []
+      }}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
+      showValidationErrors={isLatest}
       title={formatMessage(title, eventStateWithDraft.declaration)}
       validatorContext={validatorContext}
       onEdit={noop}
