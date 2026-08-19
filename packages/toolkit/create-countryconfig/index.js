@@ -38,9 +38,10 @@ function tagExists(repoUrl, tag) {
 }
 
 function resolveRef() {
-  if (version.includes('-')) {
+  console.log('version: ' + version)
+  /* if (version.includes('-')) {
     return 'develop'
-  }
+  } */
 
   const tag = 'v' + version
   if (
