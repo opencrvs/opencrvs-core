@@ -13,14 +13,6 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts'],
-    /**
-     * Well above what any assertion here needs. The importability tests load a
-     * seeding module through a dynamic `import()`, and the first one pays for
-     * transforming `@opencrvs/commons` with it — several seconds on a cold
-     * cache, which overruns vitest's five-second default and fails a test that
-     * is only ever waiting on the bundler.
-     */
-    testTimeout: 30_000
+    include: ['src/**/*.test.ts']
   }
 })
