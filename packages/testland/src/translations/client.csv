@@ -1621,3 +1621,4 @@ workqueues.pendingValidation.title,Title of pending validation workqueue,Pending
 workqueues.potentialDuplicate.title,Title of potential duplicate workqueue,Potential duplicate,Duplicata potentiel
 workqueues.recent.title,Title of recent workqueue,Recent,Récent
 workqueues.requiresApproval.title,Title of pending approval workqueue,Pending approval,En attente d'approbation
+event.summary.redacted,Accessible name for a value the user is not permitted to see,Hidden,
