@@ -22,13 +22,66 @@ import {
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 /**
- * During 1.9.0 we support only docker swarm configuration.
- * In docker swarm deployment process updates all the containers.
- * There shouldn't be a situation where countryconfig changes and events do not restart.
+ * Configuration is served from countryconfig, which can be deployed
+ * independently of the events service (e.g. a Kubernetes rollout that updates
+ * countryconfig but not events). A time-boxed cache keeps configuration off the
+ * hot path (it is read on nearly every request, including auth middleware)
+ * while bounding how stale it can be to `EVENT_CONFIG_CACHE_TTL_MS` — no events
+ * restart is required to pick up a config change.
  */
+function createTtlConfigCache<T>(
+  label: string,
+  fetcher: (token: TokenWithBearer) => Promise<T>
+) {
+  let value: T | null = null
+  let fetchedAt = 0
+  let inFlight: Promise<T> | null = null
 
-let inMemoryEventConfigurations: EventConfig[] | null = null
-let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
+  return async function getCached(token: TokenWithBearer): Promise<T> {
+    // In development always fetch, so config changes are picked up immediately.
+    if (!env.isProduction) {
+      return fetcher(token)
+    }
+
+    if (
+      value !== null &&
+      Date.now() - fetchedAt < env.EVENT_CONFIG_CACHE_TTL_MS
+    ) {
+      return value
+    }
+
+    // Coalesce concurrent refetches into a single request so an expiry doesn't
+    // stampede countryconfig from the many call sites.
+    if (!inFlight) {
+      logger.info(`Refetching ${label} from countryconfig`)
+      inFlight = fetcher(token)
+        .then((fetched) => {
+          value = fetched
+          fetchedAt = Date.now()
+          return fetched
+        })
+        .finally(() => {
+          inFlight = null
+        })
+    }
+
+    try {
+      return await inFlight
+    } catch (error) {
+      // Serve the last good value if a refetch fails, so a transient
+      // countryconfig outage doesn't break event operations.
+      if (value !== null) {
+        logger.error(
+          `Failed to refetch ${label}; serving previously cached value. ${String(
+            error
+          )}`
+        )
+        return value
+      }
+      throw error
+    }
+  }
+}
 
 export async function getEventConfigurations(token: TokenWithBearer) {
   const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
@@ -48,25 +101,13 @@ export async function getEventConfigurations(token: TokenWithBearer) {
 }
 
 /**
- * @returns in-memory event configurations when running in production-like environment.
+ * @returns event configurations, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
  */
-export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  if (!env.isProduction) {
-    logger.info(
-      `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
-    )
-    // In development, we should always fetch the latest configurations
-    return getEventConfigurations(token)
-  }
-
-  if (inMemoryEventConfigurations) {
-    logger.info('Returning in-memory event configurations')
-    return inMemoryEventConfigurations
-  }
-
-  inMemoryEventConfigurations = await getEventConfigurations(token)
-  return inMemoryEventConfigurations
-}
+export const getInMemoryEventConfigurations = createTtlConfigCache(
+  'event configurations',
+  getEventConfigurations
+)
 
 async function findEventConfigurationById({
   eventType,
@@ -114,27 +155,13 @@ async function getWorkqueueConfigurations(token: TokenWithBearer) {
 }
 
 /**
- * @returns in-memory workqueue configurations when running in production-like environment.
+ * @returns workqueue configurations, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
  */
-export async function getInMemoryWorkqueueConfigurations(
-  token: TokenWithBearer
-) {
-  if (!env.isProduction) {
-    logger.info(
-      `Running in ${process.env.NODE_ENV} mode. Fetching workqueue configurations from API`
-    )
-    // In production, we should always fetch the latest configurations
-    return getWorkqueueConfigurations(token)
-  }
-
-  if (inMemoryWorkqueueConfigurations) {
-    logger.info('Returning in-memory workqueue configurations')
-    return inMemoryWorkqueueConfigurations
-  }
-
-  inMemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
-  return inMemoryWorkqueueConfigurations
-}
+export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
+  'workqueue configurations',
+  getWorkqueueConfigurations
+)
 
 export async function getRoles() {
   const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
