@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AvatarLarge } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import {
   buttonMessages,
@@ -162,9 +162,10 @@ export function ForgotPIN({ goBack, onVerifyPassword }: IForgotPINProps) {
           </Button>
         </Stack>
         <Stack direction="column">
-          <AvatarLarge
+          <Avatar
             name={getUserName(userDetails)}
-            avatar={userDetails?.avatar}
+            size="xl"
+            src={userDetails?.avatar}
           />
         </Stack>
 
