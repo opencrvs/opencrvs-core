@@ -69,6 +69,150 @@ const modifiedDraft = generateEventDraftDocument({
   rng
 })
 
+/* A notification, then the first declaration: two forms, one version each. */
+const changedEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.NOTIFY,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Mwansa' }
+      }
+    },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Banda' }
+      }
+    }
+  ],
+  rng: createPrng(305)
+})
+
+/*
+ * A declaration, then an edit that changed the applicant's surname. Editing
+ * emits EDIT followed by a fresh DECLARE, so the record holds two declaration
+ * versions and the comparison has something to show.
+ */
+const editedEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Mwansa' }
+      }
+    },
+    {
+      type: ActionType.EDIT,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Banda' }
+      }
+    },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Woodrow', surname: 'Banda' }
+      }
+    }
+  ],
+  rng: createPrng(418)
+})
+
+function offlineHandlers(document: typeof eventDocument) {
+  return {
+    workqueues: [
+      tRPCMsw.workqueue.config.list.query(() => generateWorkqueues()),
+      tRPCMsw.workqueue.count.query((input) =>
+        input.reduce((acc, { slug }) => ({ ...acc, [slug]: 7 }), {})
+      )
+    ],
+    event: [
+      tRPCMsw.event.get.query(() => document),
+      tRPCMsw.event.search.query(() => ({
+        total: 1,
+        results: [getCurrentEventState(document, tennisClubMembershipEvent)]
+      }))
+    ],
+    drafts: [tRPCMsw.event.draft.list.query(() => [])],
+    user: [
+      tRPCMsw.user.list.query(() => [generator.user.localRegistrar().summary]),
+      tRPCMsw.user.get.query(() => generator.user.localRegistrar().v2)
+    ]
+  }
+}
+
+/**
+ * A first declaration has no earlier declaration to compare against — the
+ * notification before it belongs to a different form — so nothing is offered.
+ */
+export const NoComparisonOnAFirstDeclaration: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await canvas.findByText("Applicant's name")
+    await expect(canvas.queryByText('Show edits')).toBeNull()
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: changedEventDocument.id
+      })
+    },
+    offline: { events: [changedEventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(changedEventDocument) }
+  }
+}
+
+/** With the toggle on, the superseded value is shown struck through. */
+export const ShowsWhatChanged: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const row = await canvas.findByTestId('applicant.name-value')
+    // The value it replaced, and the value that replaced it.
+    await expect(row).toHaveTextContent('Mwansa')
+    await expect(row).toHaveTextContent('Banda')
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: `${ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: editedEventDocument.id
+      })}?changes=true`
+    },
+    offline: { events: [editedEventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(editedEventDocument) }
+  }
+}
+
+/*
+ * REGISTER never alters declaration data — the combined flows send a DECLARE
+ * first — so a first registration always matches the declaration before it and
+ * the toggle is not offered.
+ */
+export const NoChangesOnAFirstRegistration: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await canvas.findByText("Applicant's name")
+    await expect(canvas.queryByText(/Show (edits|correction)/)).toBeNull()
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: eventDocument.id
+      })
+    },
+    offline: { events: [eventDocument], drafts: [] },
+    msw: { handlers: offlineHandlers(eventDocument) }
+  }
+}
+
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)

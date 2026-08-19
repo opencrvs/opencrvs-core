@@ -52,6 +52,7 @@ import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAcces
 import { useRecordVersions } from '@client/v2-events/features/events/useRecordVersions'
 import { RecordVersionMenu } from '@client/v2-events/features/events/components/RecordVersionMenu'
 import { RecordVersionAlert } from '@client/v2-events/features/events/components/RecordVersionAlert'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
@@ -114,8 +115,16 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     [event, configuration]
   )
 
-  const { versions, selected, selectedState, isLatest, selectVersion } =
-    useRecordVersions({ event, configuration, currentState })
+  const {
+    versions,
+    selected,
+    selectedState,
+    previousState,
+    isLatest,
+    selectVersion,
+    showChanges,
+    setShowChanges
+  } = useRecordVersions({ event, configuration, currentState })
 
   /*
    * A draft is unsaved work on top of the current state, so it belongs to the
@@ -208,6 +217,34 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     throw new Error('Action configuration not found')
   }
 
+  /*
+   * The toggle is offered only when there is something to show: a previous
+   * version, and at least one field that differs from it. That covers the
+   * first version of a record, and a first registration — REGISTER never
+   * alters declaration data, so it always matches the declaration before it.
+   */
+  const changed = useMemo(() => {
+    if (!previousState) {
+      return {}
+    }
+
+    return getChangedDeclarationDiff(
+      fullFormConfig.pages.flatMap((page) => page.fields),
+      eventStateWithDraft.declaration,
+      previousState.declaration,
+      configuration,
+      validatorContext
+    )
+  }, [
+    previousState,
+    fullFormConfig,
+    eventStateWithDraft,
+    configuration,
+    validatorContext
+  ])
+
+  const changeCount = Object.keys(changed).length
+
   const { title, fields } = actionConfiguration.review
 
   /*
@@ -227,7 +264,13 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       readonlyMode
       alert={
         selected ? (
-          <RecordVersionAlert selected={selected} versions={versions} />
+          <RecordVersionAlert
+            changeCount={changeCount}
+            selected={selected}
+            showChanges={showChanges}
+            versions={versions}
+            onToggleChanges={() => setShowChanges(!showChanges)}
+          />
         ) : undefined
       }
       anchor={recordAnchorDate(eventStateWithDraft)}
@@ -247,6 +290,8 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       }}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
+      includeFieldsVisibleInPreviousForm={showChanges}
+      previousFormValues={showChanges ? previousState?.declaration : undefined}
       reviewFields={reviewFields}
       showValidationErrors={isLatest}
       title={formatMessage(title, eventStateWithDraft.declaration)}

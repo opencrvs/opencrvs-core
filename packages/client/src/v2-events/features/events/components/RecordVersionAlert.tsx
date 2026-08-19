@@ -15,6 +15,8 @@ import styled from 'styled-components'
 import { uniq } from 'lodash'
 import { ActionType, RecordForm, RecordVersion } from '@opencrvs/commons/client'
 import { Alert } from '@opencrvs/components/lib/Alert'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 
@@ -83,6 +85,13 @@ const messages = defineMessages({
       '{name, select, __UNKNOWN__ {Registered on {date}.} other {Registered by {name} on {date}.}}',
     description: 'Provenance of a registration version'
   },
+  byRedeclared: {
+    id: 'v2.event.record.alert.by.redeclared',
+    defaultMessage:
+      '{name, select, __UNKNOWN__ {Re-declared with edits on {date}.} other {Re-declared with edits by {name} on {date}.}}',
+    description:
+      'Provenance of a declaration that replaced an earlier one through an edit'
+  },
   byCorrected: {
     id: 'v2.event.record.alert.by.corrected',
     defaultMessage:
@@ -109,6 +118,18 @@ const messages = defineMessages({
     id: 'v2.event.record.alert.isLegalRecord',
     defaultMessage: 'This is the legal record of the event.',
     description: 'Shown on the current registration'
+  },
+  showEdits: {
+    id: 'v2.event.record.alert.changes.showEdits',
+    defaultMessage: 'Show edits',
+    description:
+      'Labels the control that marks up what changed from the previous notification or declaration'
+  },
+  showCorrection: {
+    id: 'v2.event.record.alert.changes.showCorrection',
+    defaultMessage: 'Show correction',
+    description:
+      'Labels the control that marks up what changed from the previous registration'
   }
 })
 
@@ -125,6 +146,12 @@ const BY_ACTION: Partial<Record<ActionType, MessageDescriptor>> = {
   [ActionType.APPROVE_CORRECTION]: messages.byCorrected
 }
 
+/* Pulled left by the button's own padding so it lines up with the sentences. */
+const ChangeControl = styled.div`
+  margin-top: 12px;
+  margin-left: -8px;
+`
+
 /** Sentences are joined at their boundaries, which every language tolerates. */
 const Sentences = styled.div`
   display: flex;
@@ -135,6 +162,10 @@ const Sentences = styled.div`
 interface RecordVersionAlertProps {
   versions: RecordVersion[]
   selected: RecordVersion
+  /** Fields that differ from the previous version. Zero hides the action. */
+  changeCount?: number
+  showChanges?: boolean
+  onToggleChanges?: () => void
 }
 
 /**
@@ -147,7 +178,10 @@ interface RecordVersionAlertProps {
  */
 export function RecordVersionAlert({
   versions,
-  selected
+  selected,
+  changeCount = 0,
+  showChanges = false,
+  onToggleChanges
 }: RecordVersionAlertProps) {
   const intl = useIntl()
   const { getUsers } = useUsers()
@@ -187,8 +221,17 @@ export function RecordVersionAlert({
 
   const sentences: string[] = []
 
-  // Where this version came from — neither the title nor the selector says it.
-  const provenance = BY_ACTION[selected.actionType]
+  /*
+   * Where this version came from — neither the title nor the selector says it.
+   * Every declaration after the first came from an edit, and says so rather
+   * than reading as a second, independent declaration.
+   */
+  const isRedeclaration =
+    selected.actionType === ActionType.DECLARE && selected.indexInForm > 0
+
+  const provenance = isRedeclaration
+    ? messages.byRedeclared
+    : BY_ACTION[selected.actionType]
   if (provenance) {
     sentences.push(
       intl.formatMessage(provenance, {
@@ -227,6 +270,22 @@ export function RecordVersionAlert({
     sentences.push(intl.formatMessage(consequence))
   }
 
+  /*
+   * A registration only ever changes by correction, and a notification or
+   * declaration only by edit, so the action names what happened rather than
+   * describing the mechanism.
+   */
+  const isRegistration = selected.form === RecordForm.REGISTRATION
+
+  /*
+   * No count: between two consecutive versions there is exactly one edit or
+   * correction, so a number would count changed fields while the words name
+   * events — "2 corrections" for one correction touching two fields.
+   */
+  const changeLabel = intl.formatMessage(
+    isRegistration ? messages.showCorrection : messages.showEdits
+  )
+
   return (
     <Alert
       data-testid="record-version-alert"
@@ -240,6 +299,19 @@ export function RecordVersionAlert({
           <span key={index}>{sentence}</span>
         ))}
       </Sentences>
+      {changeCount > 0 && onToggleChanges && (
+        <ChangeControl>
+          <Button
+            pressed={showChanges}
+            size="small"
+            type="tertiary"
+            onClick={onToggleChanges}
+          >
+            <Icon name="Eye" size="small" />
+            {changeLabel}
+          </Button>
+        </ChangeControl>
+      )}
     </Alert>
   )
 }

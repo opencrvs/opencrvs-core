@@ -120,7 +120,6 @@ export default meta
 
 type Story = StoryObj<typeof RecordVersionMenu>
 
-/** Figma section 12, variant A. */
 export const RegistrationWithThreeVersions: Story = {
   args: {
     versions: corrected,
@@ -146,7 +145,7 @@ export const RegistrationWithThreeVersions: Story = {
   }
 }
 
-/** Figma section 12, variant C — the check moves to the selected row. */
+/** The check moves to the selected row. */
 export const AnEarlierVersionSelected: Story = {
   args: {
     versions: corrected,
@@ -155,7 +154,7 @@ export const AnEarlierVersionSelected: Story = {
   }
 }
 
-/** Figma section 12, variant D2 — single-version forms are plain rows. */
+/** Single-version forms are plain rows. */
 export const OneVersionPerForm: Story = {
   args: {
     versions: oneEach,
@@ -179,7 +178,7 @@ export const OneVersionPerForm: Story = {
   }
 }
 
-/** Figma section 12, variant E — the menu lists only the forms that exist. */
+/** The menu lists only the forms that exist. */
 export const NoNotification: Story = {
   args: {
     versions: corrected.filter((v) => v.form !== RecordForm.NOTIFICATION),

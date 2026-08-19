@@ -101,7 +101,7 @@ export default meta
 
 type Story = StoryObj<typeof RecordVersionAlert>
 
-/** Figma section 11, band A — the newest version of its form reads as info. */
+/** The newest version of its form reads as info. */
 export const RegistrationOnlyVersion: Story = {
   args: {
     versions: [declaration, registration],
@@ -153,7 +153,7 @@ export const NotificationOnAProgressedRecord: Story = {
   }
 }
 
-/** Figma section 11, band A — newest of three. */
+/** Newest of three. */
 export const RegistrationLatestOfThree: Story = {
   args: {
     versions: correctedTwice,
@@ -171,7 +171,7 @@ export const RegistrationLatestOfThree: Story = {
   }
 }
 
-/** Figma section 11, band B — an older version of its form warns. */
+/** An older version of its form warns. */
 export const RegistrationAsFirstRegistered: Story = {
   args: {
     versions: correctedTwice,
@@ -201,5 +201,97 @@ export const RegistrationInBetween: Story = {
     ).toHaveTextContent(
       'Registration — You are viewing an earlier version'
     )
+  }
+}
+
+/** A declaration's changes are edits. */
+export const OffersToShowEdits: Story = {
+  args: {
+    versions: [notification, declaration, registration],
+    selected: declaration,
+    changeCount: 3,
+    showChanges: false,
+    onToggleChanges: () => undefined
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Show edits')).toBeVisible()
+  }
+}
+
+/** A registration only ever changes by correction. */
+export const OffersToShowCorrections: Story = {
+  args: {
+    versions: correctedTwice,
+    selected: correctedTwice[3],
+    changeCount: 1,
+    showChanges: false,
+    onToggleChanges: () => undefined
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Show correction')).toBeVisible()
+  }
+}
+
+/** With the comparison on, the label stays and the control reads as pressed. */
+export const CorrectionsShown: Story = {
+  args: {
+    versions: correctedTwice,
+    selected: correctedTwice[3],
+    changeCount: 1,
+    showChanges: true,
+    onToggleChanges: () => undefined
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByRole('button')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+  }
+}
+
+/** Nothing changed, so the alert carries no action. */
+export const NoChangesToShow: Story = {
+  args: {
+    versions: [declaration, registration],
+    selected: registration,
+    changeCount: 0
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.queryByRole('button')).toBeNull()
+  }
+}
+
+/** Every declaration after the first came from an edit, and says so. */
+export const RedeclaredWithEdits: Story = {
+  args: {
+    versions: [
+      declaration,
+      version(
+        'd2',
+        RecordForm.DECLARATION,
+        ActionType.DECLARE,
+        1,
+        true,
+        '2026-05-12T09:00:00.000Z'
+      )
+    ],
+    selected: version(
+      'd2',
+      RecordForm.DECLARATION,
+      ActionType.DECLARE,
+      1,
+      true,
+      '2026-05-12T09:00:00.000Z'
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(
+      await canvas.findByTestId('record-version-alert')
+    ).toHaveTextContent('Re-declared with edits')
   }
 }
