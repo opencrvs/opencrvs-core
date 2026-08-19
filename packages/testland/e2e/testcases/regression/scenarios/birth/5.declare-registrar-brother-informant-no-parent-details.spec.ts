@@ -38,8 +38,6 @@ test('5. Complete birth declaration by a Local Registrar - rural "Other" deliver
   page
 }) => {
   const childFirstName = `${faker.person.firstName('male')} the 3rd`
-  // Unique suffix avoids colliding with any stray same-titled record left
-  // behind by a previous run of this test.
   const childSurname = faker.person.lastName()
   const informantFirstName = faker.person.firstName('male')
   const informantSurname = faker.person.lastName('male')

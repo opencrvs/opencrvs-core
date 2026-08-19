@@ -37,8 +37,6 @@ test('2. Complete birth declaration by a Community Leader - urban residential de
   page
 }) => {
   const childFirstName = faker.person.firstName('female')
-  // Unique suffix avoids colliding with any stray same-titled record left
-  // behind by a previous run of this test (see declaration 1's note).
   const childSurname = faker.person.lastName()
   const motherFirstName = faker.person.firstName('female')
   const motherSurname = faker.person.lastName('female')

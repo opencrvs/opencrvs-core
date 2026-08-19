@@ -74,12 +74,8 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
   // call push this well past the default 90s budget.
   test.setTimeout(240_000)
 
-  // The sheet's underscore ("John_Peter") represents a compound first name -
-  // the app's name validator only allows letters/digits/hyphens/apostrophes
-  // (no underscore), so a space is the closest value it will actually accept.
-  const childFirstName = faker.person.firstName()
-  // Unique suffix avoids colliding with any stray same-titled record left
-  // behind by a previous run of this test.
+  // The sheet says: "John_Peter"
+  const childFirstName = `${faker.person.firstName()}_${faker.person.firstName()}`
   const childSurname = faker.person.lastName()
   const informantFirstName = faker.person.firstName('male')
   const informantSurname = faker.person.lastName('male')

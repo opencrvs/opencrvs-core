@@ -46,9 +46,7 @@ test('6. Complete birth declaration by a National Registrar - foreign "Other" de
 
   const childFirstName = faker.person.firstName('male')
   // Apostrophe prefix exercises the app's apostrophe-in-name validation
-  // (only a plain ASCII apostrophe is accepted, not a curly quote); unique
-  // suffix avoids colliding with any stray same-titled record left behind
-  // by a previous run of this test.
+  // (only a plain ASCII apostrophe is accepted, not a curly quote)
   const childSurname = generateSurnameWithApostrophe()
   const informantFirstName = faker.person.firstName('female')
   const informantSurname = faker.person.lastName('female')
