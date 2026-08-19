@@ -105,10 +105,10 @@ export const TELEMETRY_DISABLED_NOTICE =
  * telemetry is enabled or of the country code / domain / environment reported.
  */
 export async function telemetryHandler(request: Request, h: ResponseToolkit) {
-  // Only accept OpenCRVS *system* tokens (the events service's anonymous
+  // Only accept OpenCRVS *system* tokens (the events service's service
   // token has userType 'system'). A logged-in user's token is a 'user' token,
   // so a user cannot submit telemetry with their own credentials — and the
-  // anonymous-token endpoint is not reachable through the public gateway.
+  // service-token endpoint is not reachable through the public gateway.
   const credentials = request.auth.credentials as
     | { userType?: string }
     | undefined
