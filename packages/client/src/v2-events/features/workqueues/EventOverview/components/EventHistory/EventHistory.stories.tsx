@@ -109,7 +109,7 @@ export const HistoryLinksAreLeftAligned: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Wait for the event history table to load', async () => {
       await waitFor(
-        () =>
+        async () =>
           expect(
             canvasElement.querySelectorAll('#listTable-task-history button')
               .length
@@ -126,7 +126,7 @@ export const HistoryLinksAreLeftAligned: Story = {
       )
 
       for (const link of links) {
-        expect(getComputedStyle(link).textAlign).toBe('left')
+        await expect(getComputedStyle(link).textAlign).toBe('left')
       }
     })
 
@@ -143,7 +143,7 @@ export const HistoryLinksAreLeftAligned: Story = {
         { timeout: 5000 }
       )
 
-      expect(getComputedStyle(profileLink).textAlign).toBe('left')
+      await expect(getComputedStyle(profileLink).textAlign).toBe('left')
     })
   }
 }
