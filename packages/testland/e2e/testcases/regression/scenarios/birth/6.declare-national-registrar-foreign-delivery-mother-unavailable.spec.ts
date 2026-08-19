@@ -131,8 +131,8 @@ test('6. Complete birth declaration by a National Registrar - foreign "Other" de
     await page.locator('#informant____idType').click()
     await selectDropdownOption(page, 'None')
 
-    // Usual place of residence isn't specified in the sheet - a simple
-    // Farajaland address.
+    // Usual place of residence isn't specified - a simple Farajaland
+    // address.
     await page.locator('#province').click()
     await selectLocationOption(page, 'Central')
     await page.locator('#district').click()

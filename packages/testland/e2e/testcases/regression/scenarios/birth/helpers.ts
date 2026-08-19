@@ -8,12 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// Every spec in this directory declares one row from the QA regression-test
-// sheet's "Birth" tab:
-// https://docs.google.com/spreadsheets/d/1g0ReIDGw8lbHC6Am3O0A16S1y0jje8BZ/edit?gid=1406739219#gid=1406739219
-import { type Locator, type Page } from '@playwright/test'
+import { type Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { uploadImage } from '../../../../helpers'
 
 /**
  * react-select options render as plain divs with no `option` role, and the
@@ -50,29 +46,4 @@ export async function selectCountry(page: Page, countryName: string) {
  */
 export function generateSurnameWithApostrophe() {
   return `O'${faker.person.lastName()}`
-}
-
-/**
- * Same steps as the shared `uploadImageToSection` in e2e/helpers.ts, but
- * lets the caller pick which file to upload instead of always falling back
- * to the default random image - kept local rather than changing the shared
- * helper's signature for every other caller.
- */
-export async function uploadImageToSectionWithFile({
-  page,
-  sectionLocator,
-  sectionTitle,
-  buttonLocator,
-  image
-}: {
-  page: Page
-  sectionLocator: Locator
-  buttonLocator: Locator
-  sectionTitle: string
-  image: string
-}) {
-  await sectionLocator.getByText('Select', { exact: true }).click()
-  await sectionLocator.getByText(sectionTitle, { exact: true }).click()
-
-  await uploadImage(page, buttonLocator, image)
 }

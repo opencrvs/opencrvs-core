@@ -29,17 +29,14 @@ import {
   getRandomDate,
   expectRowValue,
   switchEventTab,
-  uploadImage
+  uploadImage,
+  uploadImageToSection
 } from '../../../../helpers'
 import { CREDENTIALS } from '../../../../constants'
 import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
 import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
 import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import {
-  selectCountry,
-  selectDropdownOption,
-  uploadImageToSectionWithFile
-} from './helpers'
+import { selectCountry, selectDropdownOption } from './helpers'
 import { fetchBirthRegistrationNumberForTesting } from '../../helper'
 
 const imageUploadSectionTitles = [
@@ -57,12 +54,11 @@ const SHARED_ASSET = path.join(__dirname, '../../../../assets/528KB-random.png')
 
 async function uploadAllTypesForSection(page: Page, sectionId: string) {
   for (const sectionTitle of imageUploadSectionTitles) {
-    await uploadImageToSectionWithFile({
+    await uploadImageToSection({
       page,
       sectionLocator: page.locator(`#${sectionId}`),
       sectionTitle,
-      buttonLocator: page.locator(`button[name="${sectionId}"]`),
-      image: SHARED_ASSET
+      buttonLocator: page.locator(`button[name="${sectionId}"]`)
     })
   }
 }
@@ -74,8 +70,7 @@ test('3. Complete birth declaration by a Registration Officer - rural residentia
   // call push this well past the default 90s budget.
   test.setTimeout(240_000)
 
-  // The sheet says: "John_Peter"
-  const childFirstName = `${faker.person.firstName()}_${faker.person.firstName()}`
+  const childFirstName = `${faker.person.firstName()}-${faker.person.firstName()}`
   const childSurname = faker.person.lastName()
   const informantFirstName = faker.person.firstName('male')
   const informantSurname = faker.person.lastName('male')

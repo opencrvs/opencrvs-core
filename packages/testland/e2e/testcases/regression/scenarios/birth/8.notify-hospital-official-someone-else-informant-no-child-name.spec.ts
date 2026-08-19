@@ -98,8 +98,8 @@ test('8. Notify a birth as a Hospital Official - no child\'s name at all, "Someo
     await page.locator('#informant____idType').click()
     await selectDropdownOption(page, 'None')
 
-    // Usual place of residence isn't specified in the sheet - a simple
-    // Farajaland address.
+    // Usual place of residence isn't specified - a simple Farajaland
+    // address.
     await page.locator('#province').click()
     await selectLocationOption(page, 'Central')
     await page.locator('#district').click()
@@ -123,8 +123,8 @@ test('8. Notify a birth as a Hospital Official - no child\'s name at all, "Someo
     await page.locator('#mother____idType').click()
     await selectDropdownOption(page, 'None')
 
-    // Usual place of residence isn't specified in the sheet - a simple
-    // Farajaland address.
+    // Usual place of residence isn't specified - a simple Farajaland
+    // address.
     await page.locator('#province').click()
     await selectLocationOption(page, 'Central')
     await page.locator('#district').click()
