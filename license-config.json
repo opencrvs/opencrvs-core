@@ -77,7 +77,7 @@
   ],
   "license": "license-header.txt",
   "licenseFormats": {
-    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1|prettierignore": {
       "eachLine": {
         "prepend": "# "
       }
