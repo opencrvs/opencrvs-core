@@ -23,6 +23,7 @@ import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { buttonMessages } from '@client/i18n/messages'
+import { useDuplicatesAvailable } from '@client/v2-events/features/events/actions/dedup/useDuplicatesAvailable'
 import {
   useAssignmentActions,
   useEventActionsOnClick
@@ -57,6 +58,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
+  const areDuplicatesAvailable = useDuplicatesAvailable(event)
 
   const resolveAction = useCallback(
     <T extends WorkqueueActionType | ClientSpecificAction>(
@@ -76,7 +78,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         eventConfiguration,
         isOnline,
         isDownloaded,
-        isAssigning
+        isAssigning,
+        areDuplicatesAvailable
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
@@ -105,6 +108,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isOnline,
       isDownloaded,
       isAssigning,
+      areDuplicatesAvailable,
       onClick
     ]
   )
@@ -115,9 +119,12 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
 /**
  *
  * Given event,
- * @returns resolver function for assignment action configuration conditionals.
+ * @returns resolver function for assignment (and READ) action configuration conditionals.
  *
- * Separated due to limited use and poor-ish performance in list views.
+ * Separated from {@link useEventActionConfigurationResolver} due to limited
+ * use and poor-ish performance in list views — it skips the costly
+ * `useEventActionsOnClick`, so it's safe to call from components rendered
+ * per-row (e.g. `DownloadButton`), unlike the full resolver.
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -132,7 +139,12 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveConditionals = useCallback(
-    (actionType: typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN) => {
+    (
+      actionType:
+        | typeof ActionType.ASSIGN
+        | typeof ActionType.UNASSIGN
+        | typeof ActionType.READ
+    ) => {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
@@ -179,6 +191,14 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
       const { enabled, visible } = resolveConditionals(actionType)
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
+      // Assigning always self-assigns and requires `record.read` on the
+      // server (accounting for jurisdiction/flags scope options), so it
+      // shouldn't be offered unless the user could actually read this event.
+      const canRead =
+        actionType === ActionType.ASSIGN
+          ? resolveConditionals(ActionType.READ)
+          : { enabled: true, visible: true }
+
       return {
         label: actionConfig?.label ?? actionLabels[actionType],
         type: actionType,
@@ -189,8 +209,8 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
           actionType === ActionType.ASSIGN
             ? async () => onAssign()
             : async () => onUnassign(),
-        disabled: !enabled,
-        hidden: !visible
+        disabled: !(enabled && canRead.enabled),
+        hidden: !(visible && canRead.visible)
       }
     },
     [resolveConditionals, eventConfiguration, onAssign, onUnassign]

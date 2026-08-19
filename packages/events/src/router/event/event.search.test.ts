@@ -1480,6 +1480,12 @@ test('Returns events assigned to a specific user', async () => {
       }
     }),
     encodeScope({
+      type: 'record.read',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
       type: 'record.create',
       options: {
         event: ['birth', 'death', 'tennis-club-membership']

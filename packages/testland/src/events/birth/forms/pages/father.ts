@@ -494,7 +494,9 @@ export const father = defineFormPage({
         administrativeArea: user('administrativeAreaId')
       },
       configuration: {
-        streetAddressForm: defaultStreetAddressConfiguration
+        streetAddressForm: defaultStreetAddressConfiguration,
+        // Self-reported present-tense address (e.g. late registration years after birth), not tied to the event date.
+        activeOnly: true
       }
     },
     {

@@ -314,16 +314,9 @@ test.describe.serial('Birth correction flow', () => {
 
     test('Approve correction request', async () => {
       await page.getByRole('button', { name: 'Approve', exact: true }).click()
-      await waitForCorrectionAction(
-        page,
-        'approve',
-        async () => {
-          await page
-            .getByRole('button', { name: 'Confirm', exact: true })
-            .click()
-        },
-        { waitForUnassign: true, eventId }
-      )
+      await waitForCorrectionAction(page, 'approve', async () => {
+        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+      })
       await expectInUrl(page, `/workqueue/correction-requested`)
 
       await page.getByRole('button', { name: 'Pending certification' }).click()
@@ -350,8 +343,8 @@ test.describe.serial('Birth correction flow', () => {
     test('Enter the direct correction form to ensure form is reset', async () => {
       await selectAction(page, 'Correct')
 
-      await expect(page.locator('#requester____type')).toHaveText('Select...')
-      await expect(page.locator('#reason____option')).toHaveText('Select...')
+      await expect(page.locator('#requester____type')).toHaveText('Select')
+      await expect(page.locator('#reason____option')).toHaveText('Select')
       await page.getByTestId('exit-button')
     })
   })

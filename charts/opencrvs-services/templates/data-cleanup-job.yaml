@@ -13,6 +13,7 @@ spec:
         app: data-cleanup
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       containers:
         - name: cleanup-postgres
           image: {{ include "opencrvs.imageReference" .Values.postgres }}
@@ -95,6 +96,7 @@ spec:
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-elasticsearch
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+          imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -128,4 +130,5 @@ spec:
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
       restartPolicy: "OnFailure"
+
 {{- end }}

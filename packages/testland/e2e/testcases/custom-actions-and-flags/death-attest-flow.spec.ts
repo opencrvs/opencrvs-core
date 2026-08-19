@@ -23,6 +23,7 @@ import { ActionType } from '@opencrvs/toolkit/events'
 test('Death notified at a health facility is held for attestation, then reaches the registrar once attested', async ({
   browser
 }) => {
+  test.setTimeout(180_000)
   let declaration: Declaration
   let name: string
 
@@ -68,13 +69,20 @@ test('Death notified at a health facility is held for attestation, then reaches 
 
     // Re-notify should be allowed, but declare should be blocked by 'Attestation required' flag.
     await validateActionMenuButton(page, 'Notify with edits', true)
-    await validateActionMenuButton(page, 'Declare with edits', false)
 
-    // Exit and unassign
-    await page.getByRole('button', { name: 'Action' }).click()
+    await page.getByRole('button', { name: 'Action', exact: true }).click()
+    const declareButton = page.getByText('Declare with edits', { exact: true })
+    await expect(declareButton).not.toBeVisible()
+
     await page.getByText('Cancel edits').click()
+
+    const unassignResponse = page.waitForResponse(
+      (res) =>
+        res.url().includes('event.actions.assignment.unassign') && res.ok()
+    )
     await selectAction(page, 'Unassign')
     await page.getByRole('button', { name: 'Unassign' }).click()
+    await unassignResponse
   })
 
   await test.step('Health Administrator sees the record in Pending attestation and attests it', async () => {

@@ -13,14 +13,22 @@ import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, LocationVersion } from '@opencrvs/commons'
 import { createInitialisationClient } from './index'
+
+const RawLocationVersionSchema = z.object({
+  effectiveFrom: z.string().optional(),
+  name: z.string(),
+  externalId: z.string().optional(),
+  status: z.enum(['active', 'inactive'])
+})
 
 const RawLocationSchema = z.object({
   id: z.string(),
   name: z.string(),
   partOf: z.string(),
-  locationType: z.string()
+  locationType: z.string(),
+  versions: z.array(RawLocationVersionSchema).optional()
 })
 
 const RawAdministrativeAreaSchema = RawLocationSchema.omit({
@@ -62,6 +70,29 @@ function validateAdminStructure(
   })
 
   return locationsMap
+}
+
+/**
+ * Builds a seedable `versions` history from the country config's raw version
+ * rows: assigns each element a fresh `versionId` and defaults an empty
+ * `effectiveFrom` to the beginning-of-time sentinel, since the `set`
+ * mutation's schema requires every element to carry both, unlike the raw
+ * wire format.
+ */
+function buildSeededVersions(
+  rawVersions: z.output<typeof RawLocationVersionSchema>[] | undefined
+): LocationVersion[] | undefined {
+  if (!rawVersions) {
+    return undefined
+  }
+
+  return rawVersions.map((version) => ({
+    versionId: getUUID(),
+    effectiveFrom: version.effectiveFrom || '0001-01-01',
+    name: version.name,
+    externalId: version.externalId ?? null,
+    status: version.status
+  }))
 }
 
 async function getLocations() {
@@ -111,7 +142,8 @@ async function getLocations() {
       name: a.name,
       parentId:
         administrativeHierarchyIdMap.get(a.partOf.split('/')[1]) || null,
-      externalId: a.id
+      externalId: a.id,
+      versions: buildSeededVersions(a.versions)
     })),
     locations: locations.map((loc) => ({
       id: locationIdMap.get(loc.id)!,
@@ -119,7 +151,8 @@ async function getLocations() {
       administrativeAreaId:
         administrativeHierarchyIdMap.get(loc.partOf.split('/')[1]) || null,
       locationType: loc.locationType,
-      externalId: loc.id
+      externalId: loc.id,
+      versions: buildSeededVersions(loc.versions)
     }))
   }
 }

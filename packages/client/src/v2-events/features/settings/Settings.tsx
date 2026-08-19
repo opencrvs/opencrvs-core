@@ -10,21 +10,21 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { List } from '@opencrvs/components/lib/List'
 import { Content } from '@opencrvs/components/lib/Content'
 import { userMessages as messages } from '@client/i18n/messages'
 import {
-  Name,
-  Role,
-  Language,
-  Password,
-  PIN,
-  PhoneNumber,
-  ProfileImage
+  useAssignedOffice,
+  useEmailAddress,
+  useLanguage,
+  useName,
+  usePassword,
+  usePhoneNumber,
+  usePIN,
+  useProfileImage,
+  useRole
 } from '@client/views/Settings/items'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
-import { EmailAddress } from '@client/views/Settings/items/EmailAddress'
-import { AssignedOffice } from '@client/views/Settings/items/AssignedOffice'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const settingsTitle = {
@@ -35,24 +35,34 @@ const settingsTitle = {
 
 function SettingsPageComponent() {
   const intl = useIntl()
+
+  const settings = [
+    useName(),
+    usePhoneNumber(),
+    useEmailAddress(),
+    useRole(),
+    useAssignedOffice(),
+    useLanguage(),
+    usePassword(),
+    usePIN(),
+    useProfileImage()
+  ]
+
   return (
     <WorkqueueLayout title={intl.formatMessage(settingsTitle)}>
       <Content
         showTitleOnMobile={true}
         title={intl.formatMessage(messages.settingsTitle)}
       >
-        <ListViewSimplified>
-          <Name />
-          <PhoneNumber />
-          <EmailAddress />
-          <Role />
-          <AssignedOffice />
-          <Language />
-          <Password />
-          <PIN />
-          <ProfileImage />
-        </ListViewSimplified>
+        <List id="settings">
+          {settings.map(({ id, item }) => (
+            <List.Item key={id} {...item} data-testid={id} />
+          ))}
+        </List>
       </Content>
+      {settings.map(({ id, overlay }) => (
+        <React.Fragment key={id}>{overlay}</React.Fragment>
+      ))}
     </WorkqueueLayout>
   )
 }

@@ -1,9 +1,8 @@
 {{ if and .Values.postgres.enabled (eq (include "postgres.backup_enabled" .) "true") }}
-{{- $run_as_cronjob := or .Values.backup.cronjob .Values.postgres.backup.cronjob }}
 {{- if eq .Values.postgres.backup.type "differential" }}
 ---
 apiVersion: batch/v1
-{{ if $run_as_cronjob }}
+{{ if .Values.backup.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
@@ -11,7 +10,7 @@ kind: Job
 metadata:
   name: postgres-backup-full
 spec:
-  {{ if $run_as_cronjob }}
+  {{ if .Values.backup.cronjob }}
   schedule: {{ .Values.postgres.backup.schedule.full }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
@@ -31,7 +30,7 @@ spec:
                 - -c
                 - |
                   kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
-                    pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" backup --type=full
+                    su postgres -c 'pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" backup --type=full'
           restartPolicy: OnFailure
 {{- end }}
 {{- end }}

@@ -74,6 +74,10 @@ function getInformant(eventType: string, declaration: Record<string, any>) {
       : declaration['informant.name']
   }
 
+  if (eventType === Event.Adoption) {
+    return declaration['adoptiveMother.name']
+  }
+
   throw new Error('Invalid event type')
 }
 

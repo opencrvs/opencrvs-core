@@ -46,6 +46,7 @@ import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
+import { getCurrentEventState } from '../events/state'
 
 const ajv = new Ajv({
   $data: true,
@@ -169,11 +170,12 @@ export function buildClientFunctionContext(input: {
 }): ClientFunctionContext {
   return {
     $form: input.form,
+    $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event,
+    $event: input.validatorContext?.event?.document,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -451,18 +453,67 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
   context: ValidatorContext,
-  _event: EventIndex
+  event: EventIndex
 ) {
+  // Overrides `$flags`/`$status` with the real event data (same as `isActionConditionMet`)
+  // so `flag(...)`/`status(...)` conditionals work for data-display fields, e.g. in EventSummary.
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(values, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    validate(condition.conditional, clientFunctionContext)
   )
+}
+
+/**
+ * Given a field's `secured` property (a boolean, or a JSONSchema conditional
+ * evaluated against the event, e.g. `flag('sealed')`), returns whether the
+ * field is currently secured for the given event.
+ */
+export function isFieldSecured(
+  field: Pick<FieldConfig, 'secured'>,
+  event: EventIndex,
+  context: ValidatorContext = {}
+): boolean {
+  if (typeof field.secured !== 'object' || field.secured === null) {
+    return Boolean(field.secured)
+  }
+
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
+  return validate(field.secured as JSONSchema, clientFunctionContext)
+}
+
+export type EventValidatorContext = {
+  document: EventDocument
+  state: EventIndex
+}
+
+export function getEventValidatorContext(
+  document: EventDocument,
+  config: EventConfig
+): EventValidatorContext {
+  return { document, state: getCurrentEventState(document, config) }
 }
 
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  event?: EventDocument
   baseFormState?: EventState
+  event?: EventValidatorContext
 }
 
 function isFieldConditionMet(

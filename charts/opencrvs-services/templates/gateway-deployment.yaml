@@ -50,14 +50,13 @@ spec:
         service.name: opencrvs_gateway
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.gateway) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "gateway" "Values" .Values) | nindent 6 }}
       containers:
         - name: gateway
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.gateway) }}
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
-            - name: APN_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
             - name: DOMAIN
@@ -108,6 +107,8 @@ spec:
                 path: public-key.pem
             name: {{ .Release.Name }}-cert-tls
           name: public-key
+
+{{- include "service-account-helper" (dict "service_name" "gateway" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "gateway" "Values" .Values) }}
 

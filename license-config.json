@@ -2,7 +2,14 @@
   "ignore": [
     "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs|sql)",
     "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    ".nxignore",
     "packages/testland/reqs-gathering-templates",
+    "packages/countryconfig-template/pnpm-lock.yaml",
+    "packages/countryconfig-template/.nvmrc",
+    "packages/countryconfig-template/.tiltignore",
+    "packages/countryconfig-template/Tiltfile",
+    "packages/countryconfig-template/.husky",
     ".husky",
     "**/*.ipynb",
     "**/.wireit",
@@ -62,7 +69,7 @@
   ],
   "license": "license-header.txt",
   "licenseFormats": {
-    "sh|yml|yaml|toml|conf|txt|dotfile": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1": {
       "eachLine": {
         "prepend": "# "
       }

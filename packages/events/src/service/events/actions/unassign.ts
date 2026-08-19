@@ -10,7 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { getAcceptedScopesFromToken, TokenWithBearer } from '@opencrvs/commons'
+import { last } from 'lodash'
+import {
+  getAcceptedScopesFromToken,
+  getOrThrow,
+  TokenWithBearer
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -43,7 +48,10 @@ export async function unassignRecord({
 
   // If last assignment action is not 'ASSIGN', simply return the event as it's already unassigned
   if (lastAssignmentAction?.type !== ActionType.ASSIGN) {
-    return event
+    return {
+      ...event,
+      actions: []
+    }
   }
 
   // If event is not assigned to the user who is unassigning, we need to ensure that the user may unassign others
@@ -72,11 +80,20 @@ export async function unassignRecord({
     }
   }
 
-  return processAction(input, {
+  const eventWithUnassign = await processAction(input, {
     eventId: event.id,
     user,
     token,
     status: ActionStatus.Accepted,
     configuration
   })
+
+  const lastAction = getOrThrow(
+    last(eventWithUnassign.actions),
+    'Event did not have any actions. This should never happen.'
+  )
+  return {
+    ...eventWithUnassign,
+    actions: [lastAction]
+  }
 }

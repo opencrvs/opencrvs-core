@@ -42,7 +42,7 @@ import {
 } from '@opencrvs/components/lib/Content'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NoWifi } from '@opencrvs/components/lib/icons'
-import { ListUser } from '@opencrvs/components/lib/ListUser'
+import { List } from '@opencrvs/components/lib/List'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { Dialog } from '@opencrvs/components/lib/Dialog'
@@ -504,7 +504,9 @@ function UserListComponent({ userDetails }: UserListProps) {
         }
 
         return {
-          image: (
+          id: user.id,
+          'data-testid': user.id,
+          start: (
             <Link
               onClick={() =>
                 navigate(
@@ -630,16 +632,15 @@ function UserListComponent({ userDetails }: UserListProps) {
               {intl.formatMessage(constantsMessages.noResults)}
             </NoRecord>
           ) : (
-            <ListUser
-              rows={userContent.map((content) => ({
-                avatar: content.image,
-                label: content.label,
-                value: content.value,
-                actions: content.actions ? [content.actions] : []
-              }))}
-              labelHeader={intl.formatMessage(constantsMessages.user)}
-              valueHeader={intl.formatMessage(constantsMessages.labelRole)}
-            />
+            <List>
+              <List.Header
+                label={intl.formatMessage(constantsMessages.user)}
+                value={intl.formatMessage(constantsMessages.labelRole)}
+              />
+              {userContent.map((content) => (
+                <List.Item key={content.id} {...content} />
+              ))}
+            </List>
           )}
           {totalData > USERS_PER_PAGE && (
             <Pagination

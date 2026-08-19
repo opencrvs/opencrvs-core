@@ -682,13 +682,6 @@ export async function seedEvent(
                 administrativeHierarchy
               )
 
-        // ARCHIVE requires a `content.reason`, which this raw seed path doesn't
-        // otherwise populate.
-        const content =
-          actionType === ActionType.ARCHIVE
-            ? { reason: 'Seeded archive' }
-            : undefined
-
         return [
           {
             ...baseAction,
@@ -697,8 +690,7 @@ export async function seedEvent(
             transactionId: generateUuid(rng),
             status: ActionStatus.Requested,
             createdAt: new Date(baseTime + ++offset).toISOString(),
-            declaration,
-            content
+            declaration
           },
           {
             ...baseAction,
@@ -711,8 +703,7 @@ export async function seedEvent(
               actionType === ActionTypes.enum.REGISTER
                 ? generateRegistrationNumber(rng)
                 : null,
-            declaration: {},
-            content
+            declaration: {}
           }
         ]
       }
@@ -1087,7 +1078,15 @@ export async function attemptScopedAction(
     testClient: ReturnType<typeof createTestClient>
   ) => Promise<EventDocument>
 ): Promise<{ success: boolean; event: EventDocument }> {
-  const testClient = createTestClient(user, [scope])
+  // Assignment always assigns to the calling user (processAction ignores
+  // `input.assignedTo`), so it must be self-assigned by `testClient` — but
+  // it also requires `record.read`, which the scope under test may not
+  // grant. Add unrestricted `record.read` alongside it; this only affects
+  // the assign/get endpoints, not the action under test.
+  const testClient = createTestClient(user, [
+    scope,
+    encodeScope({ type: 'record.read' })
+  ])
 
   await expect(
     testClient.event.actions.assignment.assign({

@@ -20,7 +20,7 @@ import {
   deepDropNulls
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -29,6 +29,8 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
+import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
+import { useDuplicatesAvailable } from '../../events/actions/dedup/useDuplicatesAvailable'
 import { EventSummary } from './components/EventSummary'
 import { useEventOverviewInfo } from './components/useEventOverviewInfo'
 
@@ -79,7 +81,13 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
+      icon={() => (
+        <EventIcon
+          event={eventIndex}
+          eventConfig={eventConfiguration}
+          name={''}
+        />
+      )}
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
@@ -135,7 +143,13 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
+      icon={() => (
+        <EventIcon
+          event={eventIndex}
+          eventConfig={eventConfiguration}
+          name={''}
+        />
+      )}
       size={ContentSize.LARGE}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
@@ -154,16 +168,26 @@ function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { eventIndex, fullEvent, shouldShowFullOverview } =
     useEventOverviewInfo(params.eventId)
+  const areDuplicatesAvailable = useDuplicatesAvailable(eventIndex)
+  const isDownloaded = fullEvent !== undefined
+  /*
+   * Until the record is downloaded the matches have not been fetched either, so
+   * their absence says nothing about whether the user may review them.
+   */
+  const canNotReviewDuplicate = isDownloaded && !areDuplicatesAvailable
 
   return (
     <>
-      {eventIndex.potentialDuplicates.length > 0 && (
-        <DuplicateWarning
-          duplicateTrackingIds={eventIndex.potentialDuplicates.map(
-            ({ trackingId }) => trackingId
-          )}
-        />
-      )}
+      {eventIndex.potentialDuplicates.length > 0 &&
+        (canNotReviewDuplicate ? (
+          <DuplicateReviewUnavailable />
+        ) : (
+          <DuplicateWarning
+            duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+              ({ trackingId }) => trackingId
+            )}
+          />
+        ))}
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (

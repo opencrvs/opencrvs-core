@@ -23,6 +23,7 @@ import {
   FieldValue,
   getDeclarationFieldById,
   isAgeFieldType,
+  isFieldSecured,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
@@ -368,7 +369,7 @@ export function removeSecuredFields(
     declaration: Object.fromEntries(
       Object.entries(event.declaration).filter(
         ([fieldId]) =>
-          getDeclarationFieldById(eventConfig, fieldId).secured !== true
+          !isFieldSecured(getDeclarationFieldById(eventConfig, fieldId), event)
       )
     )
   }
@@ -495,7 +496,9 @@ export function resolveRecordActionScopeToIds(
         options?.declaredBy === UserFilter.enum.user ? user.id : undefined,
       registeredIn: getLocationIdsFromScopeOptions(options?.registeredIn, user),
       registeredBy:
-        options?.registeredBy === UserFilter.enum.user ? user.id : undefined
+        options?.registeredBy === UserFilter.enum.user ? user.id : undefined,
+      // `flags` requires no user-context resolution, so it's passed through unchanged.
+      flags: options?.flags
     }
   })
 

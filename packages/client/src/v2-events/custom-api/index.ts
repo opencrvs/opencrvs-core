@@ -48,7 +48,7 @@ export interface CorrectionRequestParams extends CustomMutationParams {
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
-  content: ArchiveActionInput['content'] &
+  content: NonNullable<ArchiveActionInput['content']> &
     Partial<MarkAsDuplicateActionInput['content']>
 }
 

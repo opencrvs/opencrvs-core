@@ -12,8 +12,11 @@ import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
   ActionDocument,
+  EventConfig,
   EventIndex,
+  EventState,
   WorkqueueConfigWithoutQuery,
+  isFieldReference,
   joinValues,
   LocationVersion,
   PlainDate,
@@ -29,7 +32,8 @@ import {
   RecordScopeTypeV2,
   EncodedScope,
   getAdministrativeAreaHierarchy,
-  resolveVersion
+  resolveVersion,
+  ZodDate
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
@@ -38,6 +42,25 @@ export function getUsersFullName(name: UserOrSystem['name']) {
   }
 
   return joinValues([name.firstname, name.surname])
+}
+
+/**
+ * Builds advanced-search filter options for a set of locations: one row per
+ * distinct name the location has ever carried (across all its versions), so a
+ * record saved under an outdated name stays findable. Rows are in version order
+ * and every row resolves to the same location id. Ordinary forms list a single
+ * current-name option instead of calling this.
+ */
+export function buildHistoricalLocationNameOptions<
+  T extends { id: UUID; versions: LocationVersion[] }
+>(items: T[]): { value: UUID; label: string }[] {
+  return items.flatMap((item) => {
+    const distinctNames = [
+      ...new Set(item.versions.map((version) => version.name))
+    ]
+
+    return distinctNames.map((name) => ({ value: item.id, label: name }))
+  })
 }
 
 /** Utility to get all keys from union */
@@ -113,6 +136,35 @@ export function recordAnchorDate(eventState: {
   createdAt: string
 }): PlainDate {
   return toPlainDate(eventState.dateOfEvent ?? eventState.createdAt)
+}
+
+/**
+ * Same anchor as {@link recordAnchorDate}, computed while a declaration is
+ * still being filled in: the event's date-of-event field read off the
+ * in-progress form values (there is no persisted record yet to resolve it
+ * from), falling back to the record's creation date when that field is
+ * empty or not yet configured.
+ */
+export function liveAnchorDate({
+  dateOfEvent,
+  form,
+  createdAt
+}: {
+  dateOfEvent?: EventConfig['dateOfEvent']
+  form: EventState
+  createdAt: string
+}): PlainDate {
+  const fieldValue =
+    dateOfEvent && isFieldReference(dateOfEvent)
+      ? form[dateOfEvent.$$field]
+      : undefined
+
+  const parsedDate = ZodDate.safeParse(fieldValue)
+
+  return recordAnchorDate({
+    dateOfEvent: parsedDate.success ? parsedDate.data : undefined,
+    createdAt
+  })
 }
 
 /**

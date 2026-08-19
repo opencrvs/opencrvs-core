@@ -258,17 +258,6 @@ describe('2.0 scopes', () => {
         }
       },
       {
-        type: 'record.review-duplicates',
-        options: {
-          event: ['birth', 'death'],
-          placeOfEvent: 'location',
-          notifiedIn: 'administrativeArea',
-          notifiedBy: 'user',
-          declaredIn: 'administrativeArea',
-          declaredBy: 'user'
-        }
-      },
-      {
         type: 'record.register',
         options: {
           event: ['birth', 'death'],
@@ -364,6 +353,19 @@ describe('2.0 scopes', () => {
           registeredIn: 'administrativeArea',
           registeredBy: 'user'
         }
+      },
+      {
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
       }
     ])
   })
@@ -392,6 +394,24 @@ describe('2.0 scopes', () => {
         registeredIn: 'administrativeArea',
         registeredBy: 'user',
         templates: ['cert-1', 'cert-2']
+      }
+    })
+  })
+
+  it('Supports status option for record.edit', () => {
+    const scopeWithStatus = encodeScope({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
+      }
+    })
+
+    expect(decodeScope(scopeWithStatus)).toEqual({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
       }
     })
   })
@@ -565,16 +585,16 @@ it('migrate legacy scopes to v2', () => {
     'type=user.read-only-my-audit',
     'type=organisation.read-locations&accessLevel=location',
     'type=workqueue&ids=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue',
-    'type=record.search&event=birth&placeOfEvent=all',
-    'type=record.search&event=death&placeOfEvent=all',
-    'type=record.search&event=tennis-club-membership&placeOfEvent=all',
-    'type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all',
+    'type=record.search&event[]=birth&placeOfEvent=all',
+    'type=record.search&event[]=death&placeOfEvent=all',
+    'type=record.search&event[]=tennis-club-membership&placeOfEvent=all',
+    'type=record.search&event[]=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all',
     'type=record.create&event=birth,death,tennis-club-membership',
     'type=record.read&event=birth,death,tennis-club-membership',
     'type=record.declare&event=birth,death,tennis-club-membership',
     'type=record.reject&event=birth,death,tennis-club-membership',
     'type=record.archive&event=birth,death,tennis-club-membership',
-    'type=record.custom-action&event=birth,death,tennis-club-membership&customActionTypes=VALIDATE_DECLARATION',
+    'type=record.custom-action&event=birth,death,tennis-club-membership&customActionTypes[]=VALIDATE_DECLARATION',
     'type=record.register&event=birth,death,tennis-club-membership',
     'type=record.print-certified-copies&event=birth,death,tennis-club-membership',
     'type=record.correct&event=birth,death,tennis-club-membership',

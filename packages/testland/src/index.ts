@@ -46,6 +46,11 @@ import clientConfigProd from './client-config.prod'
 import loginConfig from './login-config'
 import loginConfigProd from './login-config.prod'
 import { emailHandler, emailSchema } from './api/notification/handler'
+import {
+  telemetryHandler,
+  telemetrySchema,
+  logTelemetryStartupStatus
+} from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { locationsHandler } from './data-seeding/locations/handler'
@@ -70,6 +75,7 @@ import {
   EventDocument
 } from '@opencrvs/toolkit/events'
 import {
+  onAdoptionRegisterHandler,
   onMosipBirthRegisterHandler,
   onMosipDeathRegisterHandler,
   onRegisterHandler
@@ -91,6 +97,8 @@ import { getClient } from './analytics/postgres'
 import { createClient } from '@opencrvs/toolkit/api'
 import { getBearerToken } from '@countryconfig/utils'
 import { getGovernmentPortalApiRoutes } from './government-portal-api/routes'
+import { getLocationsQaRoutes } from './qa-tools/locations.routes'
+import { getAdministrativeAreasQaRoutes } from './qa-tools/administrative-areas.routes'
 import { Event } from './events/utils/types'
 import { syncReferenceData } from './data-seeding/reference-data/reference-data'
 import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
@@ -472,6 +480,8 @@ export async function createServer() {
   })
 
   server.route(getGovernmentPortalApiRoutes())
+  server.route(getLocationsQaRoutes())
+  server.route(getAdministrativeAreasQaRoutes())
 
   server.route({
     method: 'GET',
@@ -645,8 +655,35 @@ export async function createServer() {
     }
   })
 
+  server.route<{ Payload: EventDocument }>({
+    method: 'POST',
+    path: `/trigger/events/${Event.Adoption}/actions/${ActionType.REGISTER}`,
+    handler: onAdoptionRegisterHandler,
+    options: {
+      tags: ['api', 'events'],
+      description:
+        'Seals the original birth record matching the adopted child once the adoption is registered'
+    }
+  })
+
   server.route(getUserNotificationRoutes())
   server.route(getVerifiableCredentialRoutes())
+
+  server.route({
+    method: 'POST',
+    path: '/trigger/telemetry',
+    handler: telemetryHandler,
+    options: {
+      // Authenticated with the default JWT strategy; the handler additionally
+      // requires an OpenCRVS system token (see the handler).
+      tags: ['api', 'triggers'],
+      validate: {
+        payload: telemetrySchema
+      },
+      description:
+        'Receives a usage report from the events service and forwards it to the status service when telemetry is enabled'
+    }
+  })
 
   server.route({
     method: 'GET',
@@ -817,6 +854,8 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    logTelemetryStartupStatus()
   }
 
   return { server, start, stop }

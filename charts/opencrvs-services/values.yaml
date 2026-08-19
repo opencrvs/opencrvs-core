@@ -63,8 +63,7 @@ minio:
   # Image used as client to run OpenCRVS configuration scripts
   image:
     repository: minio/mc
-    tag: "latest"
-
+    tag: 'latest'
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
@@ -187,6 +186,15 @@ pdb:
   enabled: true
   minAvailable: 50%
 
+# ServiceAccount configuration.
+# By default, the chart creates one ServiceAccount per workload.
+# Override annotations globally here, or per workload under
+# <workload>.service_account.annotations.
+service_account:
+  create: true
+  annotations: {}
+  automount_service_account_token: true
+
 # Resources allocated to OpenCRVS microservices (Kubernetes PODs):
 resources:
   memoryRequest: '128Mi'
@@ -197,7 +205,6 @@ resources:
 # Global environment variables applied to
 # all OpenCRVS microservices (Kubernetes PODs):
 env:
-  # OPENCRVS_ENVIRONMENT: explicit environment detection in employee seeder
   OPENCRVS_ENVIRONMENT: production
   NODE_ENV: production
   MINIO_BUCKET: ocrvs
@@ -208,6 +215,16 @@ env:
   # Sentry DSN (Data Source Name) configuration for error tracking.
   # Note: The SENTRY_DSN should be defined at the global level of environment variables.
   # SENTRY_DSN: https://...@o309867.ingest.sentry.io/....
+
+# OpenTelemetry tracing configuration for instrumented OpenCRVS services.
+# When enabled, auth, countryconfig, documents, events and gateway receive
+# OTEL exporter and resource environment variables.
+otel:
+  enabled: false
+  # Defaults to env.NODE_ENV
+  # deployment_environment: production
+  exporter_otlp_endpoint: ''
+  exporter_otlp_protocol: grpc
 
 # OpenCRVS core image tag:
 # Deprecated: use platform.tag instead.
@@ -222,7 +239,7 @@ imagePullSecrets: []
 # by a service-specific image configuration.
 platform:
   # Default tag for all OpenCRVS images.
-  tag: v2.1.0
+  tag: v2.0.0
 
   # Default repository for all OpenCRVS images,
   # for example: ghcr.io/opencrvs or myorg
@@ -286,7 +303,7 @@ config:
 countryconfig:
   image:
     name: opencrvs/ocrvs-countryconfig
-    tag: v2.1.0
+    tag: v2.0.0
   port: 3040
 
 dashboards:
@@ -383,6 +400,14 @@ events:
 
 ##############################################################
 # One time jobs:
+# Common service account for Helm pre/post deployment jobs.
+deployment_jobs:
+  service_account:
+    name: deployment-jobs
+    annotations:
+      "helm.sh/hook": pre-install,pre-upgrade
+      "helm.sh/hook-weight": "-10"
+      "helm.sh/hook-delete-policy": before-hook-creation
 
 # data_migration: Job to migrate datastores while deployment
 data_migration:
@@ -404,6 +429,21 @@ data_seed:
     # When users are seeded, are they immediately active using a test password and
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
     ACTIVATE_USERS: 'false'
+
+validation:
+  enabled: false
+  timeout_seconds: 5
+  active_deadline_seconds: 300
+  cert_endpoint: 'https://traefik.traefik.svc.cluster.local'
+  monitoring_enabled: false
+  allow_insecure_https: false
+  smtp_secret_name: smtp-config
+  preflight:
+    enabled: true
+    hook_weight: '0'
+  postdeploy:
+    enabled: true
+    hook_weight: '5'
 
 on_restore_cronjob:
   enabled: false

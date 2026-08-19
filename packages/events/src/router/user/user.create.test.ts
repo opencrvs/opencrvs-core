@@ -170,6 +170,65 @@ test('Throws error when creating user with existing email', async () => {
   )
 })
 
+test('Allows creating a user whose email is a substring of an existing email', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      email: 'ba@x.com',
+      role: 'admin',
+      name: { firstname: 'given1', surname: 'family1' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  // 'a@x.com' is a substring of 'ba@x.com' but a different address
+  await expect(
+    client.user.create({
+      email: 'a@x.com',
+      role: 'admin',
+      name: { firstname: 'given2', surname: 'family2' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Throws error when creating user with an existing email in different case', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      email: 'casing+123@opencrvs.org',
+      role: 'admin',
+      name: { firstname: 'given1', surname: 'family1' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.create({
+      email: 'CASING+123@OPENCRVS.ORG',
+      role: 'admin',
+      name: { firstname: 'given2', surname: 'family2' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toThrowError(
+    new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+  )
+})
+
 test('Persists custom data field when provided', async () => {
   const { user } = await setupTestCase()
 

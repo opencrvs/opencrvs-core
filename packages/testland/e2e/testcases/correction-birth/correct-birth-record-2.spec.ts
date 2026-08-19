@@ -140,7 +140,7 @@ test.describe.serial('Correct record - 2', () => {
     await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible()
     await page.getByRole('button', { name: 'Confirm' }).click()
 
-    await page.getByText('Select...').click()
+    await page.getByText('Select', { exact: true }).click()
     await page.getByText('Affidavit', { exact: true }).click()
     await uploadImage(
       page,
@@ -201,12 +201,12 @@ test.describe.serial('Correct record - 2', () => {
       await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
       await expect(
-        page.getByTestId('row-value-informant.relation').getByRole('deletion')
+        page.getByTestId('informant.relation-value').getByRole('deletion')
       ).toHaveText('Mother')
 
-      await expect(
-        page.getByTestId('row-value-informant.relation')
-      ).toContainText('Brother')
+      await expect(page.getByTestId('informant.relation-value')).toContainText(
+        'Brother'
+      )
     })
 
     test('2.4.2 Change place of delivery', async () => {
@@ -369,16 +369,9 @@ test.describe.serial('Correct record - 2', () => {
 
       await page.locator('#reject-correction-reason').fill('No legal proof')
 
-      await waitForCorrectionAction(
-        page,
-        'reject',
-        async () => {
-          await page
-            .getByRole('button', { name: 'Confirm', exact: true })
-            .click()
-        },
-        { waitForUnassign: true, eventId }
-      )
+      await waitForCorrectionAction(page, 'reject', async () => {
+        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+      })
 
       await expectInUrl(page, `/events/${eventId}`)
     })

@@ -13,9 +13,13 @@ import {
   and,
   ConditionalType,
   defineConfig,
+  DocumentMimeType,
+  event,
+  EventStatus,
   field,
   FieldType,
   flag,
+  ImageMimeType,
   InherentFlags,
   not,
   or,
@@ -52,6 +56,12 @@ export const birthEvent = defineConfig({
     defaultMessage: '{child.name.firstname} {child.name.surname}',
     description: 'This is the title of the summary',
     id: 'event.birth.title'
+  },
+  icon: {
+    FileLock: and(
+      event.hasStatus(EventStatus.enum.REGISTERED),
+      event.hasFlag('sealed')
+    )
   },
   fallbackTitle: {
     id: 'event.tennis-club-membership.fallbackTitle',
@@ -141,16 +151,50 @@ export const birthEvent = defineConfig({
         description: 'Flag label for corrected record'
       },
       requiresAction: false
+    },
+    {
+      id: 'sealed',
+      label: {
+        id: 'event.birth.flag.sealed',
+        defaultMessage: 'Sealed',
+        description: 'Flag label for sealed'
+      },
+      requiresAction: false
     }
   ],
   summary: {
+    banners: [
+      {
+        type: 'negative',
+        icon: 'FileLock',
+        heading: {
+          id: 'event.birth.summary.banner.sealed.title',
+          defaultMessage: 'Record is protected',
+          description: 'Heading of the info box shown when a record is sealed'
+        },
+        description: {
+          id: 'event.birth.summary.banner.sealed.description',
+          defaultMessage: 'Request to unseal to view this record',
+          description: 'Description of the banner shown when a record is sealed'
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: flag('sealed')
+          }
+        ]
+      }
+    ],
     fields: [
       {
         fieldId: 'child.nid',
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: not(field('child.nid').isFalsy())
+            conditional: and(
+              not(field('child.nid').isFalsy()),
+              not(flag('sealed'))
+            )
           }
         ]
       },
@@ -160,7 +204,13 @@ export const birthEvent = defineConfig({
           defaultMessage: 'No date of birth',
           description: 'This is shown when there is no child information',
           id: 'event.birth.summary.child.dob.empty'
-        }
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: not(flag('sealed'))
+          }
+        ]
       },
       // Render the 'fallback value' when selection has not been made.
       // This hides the default values of the field when no selection has been made. (e.g. when address is prefilled with user's details, we don't want to show the address before selecting the option)
@@ -179,7 +229,10 @@ export const birthEvent = defineConfig({
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: field('child.placeOfBirth').isFalsy()
+            conditional: and(
+              not(flag('sealed')),
+              field('child.placeOfBirth').isFalsy()
+            )
           }
         ]
       },
@@ -198,8 +251,11 @@ export const birthEvent = defineConfig({
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: field('child.placeOfBirth').isEqualTo(
-              PlaceOfBirth.HEALTH_FACILITY
+            conditional: and(
+              not(flag('sealed')),
+              field('child.placeOfBirth').isEqualTo(
+                PlaceOfBirth.HEALTH_FACILITY
+              )
             )
           }
         ]
@@ -219,8 +275,9 @@ export const birthEvent = defineConfig({
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: field('child.placeOfBirth').isEqualTo(
-              PlaceOfBirth.PRIVATE_HOME
+            conditional: and(
+              not(flag('sealed')),
+              field('child.placeOfBirth').isEqualTo(PlaceOfBirth.PRIVATE_HOME)
             )
           }
         ]
@@ -240,8 +297,9 @@ export const birthEvent = defineConfig({
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: field('child.placeOfBirth').isEqualTo(
-              PlaceOfBirth.OTHER
+            conditional: and(
+              not(flag('sealed')),
+              field('child.placeOfBirth').isEqualTo(PlaceOfBirth.OTHER)
             )
           }
         ]
@@ -262,7 +320,13 @@ export const birthEvent = defineConfig({
           defaultMessage: '{informant.phoneNo} {informant.email}',
           description: 'This is the contact value of the informant',
           id: 'event.birth.summary.informant.contact.value'
-        }
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: not(flag('sealed'))
+          }
+        ]
       }
     ]
   },
@@ -287,7 +351,9 @@ export const birthEvent = defineConfig({
     'REVOKE_REGISTRATION',
     'REINSTATE_REVOKE_REGISTRATION',
     'ISSUE_VERIFIABLE_CREDENTIAL',
-    ActionType.UNASSIGN
+    ActionType.UNASSIGN,
+    'SEAL',
+    'UNSEAL'
   ],
   actions: [
     {
@@ -656,7 +722,18 @@ export const birthEvent = defineConfig({
                 description:
                   'Option label for provincial registrar in escalate to field'
               },
-              value: 'PROVINCIAL_REGISTRAR'
+              value: 'PROVINCIAL_REGISTRAR',
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: not(
+                    or(
+                      user.hasRole('EMBASSY_OFFICIAL'),
+                      user.hasRole('PROVINCIAL_REGISTRAR')
+                    )
+                  )
+                }
+              ]
             },
             {
               label: {
@@ -1109,7 +1186,154 @@ export const birthEvent = defineConfig({
         description: 'Confirmation body for unarchiving a declaration'
       }
     },
-    verifiableCredentialActions.issueBirthCredentialAction
+    verifiableCredentialActions.issueBirthCredentialAction,
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'SEAL',
+      icon: 'Lock',
+      label: {
+        defaultMessage: 'Seal',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.custom.action.seal.label'
+      },
+      form: [
+        {
+          id: 'reason',
+          type: FieldType.SELECT,
+          required: true,
+          label: {
+            defaultMessage: 'Seal reason / legal basis',
+            description: 'This is the label for the seal reason field',
+            id: 'event.birth.custom.action.seal.field.reason.label'
+          },
+          options: [
+            {
+              value: 'ADOPTION',
+              label: {
+                defaultMessage: 'Adoption',
+                description: 'Option label for adoption as the seal reason',
+                id: 'event.birth.custom.action.seal.field.reason.option.adoption.label'
+              }
+            },
+            {
+              value: 'COURT_ORDER',
+              label: {
+                defaultMessage: 'Court order',
+                description: 'Option label for court order as the seal reason',
+                id: 'event.birth.custom.action.seal.field.reason.option.courtOrder.label'
+              }
+            },
+            {
+              value: 'OTHER',
+              label: {
+                defaultMessage: 'Other',
+                description: 'Option label for other seal reasons',
+                id: 'event.birth.custom.action.seal.field.reason.option.other.label'
+              }
+            }
+          ]
+        },
+        {
+          id: 'courtOrderReference',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            defaultMessage: 'Court order reference',
+            description:
+              'This is the label for the court order reference field',
+            id: 'event.birth.custom.action.seal.field.courtOrderReference.label'
+          }
+        },
+        {
+          id: 'requestingParty',
+          type: FieldType.TEXT,
+          required: false,
+          label: {
+            defaultMessage: 'Requesting party',
+            description: 'This is the label for the requesting party field',
+            id: 'event.birth.custom.action.seal.field.requestingParty.label'
+          }
+        },
+        {
+          id: 'courtOrderCopy',
+          type: FieldType.FILE,
+          required: true,
+          uncorrectable: true,
+          configuration: {
+            maxFileSize: 5 * 1024 * 1024,
+            acceptedFileTypes: [
+              ImageMimeType.enum['image/jpeg'],
+              ImageMimeType.enum['image/png'],
+              ImageMimeType.enum['image/jpg'],
+              DocumentMimeType.enum['application/pdf']
+            ]
+          },
+          label: {
+            defaultMessage: 'Supporting document — court order copy',
+            description: 'This is the label for the supporting document field',
+            id: 'event.birth.custom.action.seal.field.courtOrderCopy.label'
+          }
+        }
+      ],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: and(status('REGISTERED'), not(flag('sealed')))
+        }
+      ],
+      flags: [{ id: 'sealed', operation: 'add' }],
+      auditHistoryLabel: {
+        defaultMessage: 'Sealed',
+        description: 'The label to show in audit history for the seal action',
+        id: 'event.birth.custom.action.seal.audit-history-label'
+      }
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'UNSEAL',
+      icon: 'Unlock',
+      label: {
+        defaultMessage: 'Unseal',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.custom.action.unseal.label'
+      },
+      auditHistoryLabel: {
+        defaultMessage: 'Unsealed',
+        description: 'The label to show in audit history for the seal action',
+        id: 'event.birth.custom.action.seal.audit-history-label'
+      },
+      form: [
+        {
+          id: 'reason',
+          type: FieldType.TEXTAREA,
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description: 'This is the label for reason field',
+            id: 'form.field.label.reason'
+          }
+        },
+        {
+          id: 'comments',
+          type: FieldType.TEXTAREA,
+          required: true,
+          label: {
+            defaultMessage: 'Additional comments',
+            description: 'This is the label for additional comments field',
+            id: 'form.field.label.additionalComments'
+          }
+        }
+      ],
+      flags: [{ id: 'sealed', operation: 'remove' }],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: flag('sealed')
+        }
+      ]
+    }
   ],
   advancedSearch: advancedSearchBirth
 })

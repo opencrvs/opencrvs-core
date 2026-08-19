@@ -16,6 +16,7 @@ import { validate as validateEmail } from 'email-validator'
 import {
   EventConfig,
   FieldConfig,
+  AdministrativeAreas,
   QueryInputType,
   AdvancedSearchField,
   EventFieldId,
@@ -543,6 +544,58 @@ function generateSearchFieldConfig(
   return applySearchFieldOverridesToFieldConfig(baseFieldConfig, searchField)
 }
 
+/**
+ * Stamps advanced-search behaviour onto a resolved location/admin-area field
+ * so the (presentational) selectors know to list every historical name and,
+ * for admin structures, offer only currently-active areas. This is where the
+ * search view "amends" the field config rather than the country configuring it.
+ */
+export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
+  if (field.type === FieldType.LOCATION) {
+    // Offices / health facilities: list historical names, keep inactive ones
+    // — override activeOnly regardless of what the declaration field (which
+    // anchors capture to exclude inactive locations) set it to. There's no
+    // event being captured in a search form, so never anchor to one either.
+    return {
+      ...field,
+      configuration: {
+        ...field.configuration,
+        listHistoricalNames: true,
+        activeOnly: false,
+        anchorToDateOfEvent: false
+      }
+    }
+  }
+
+  if (field.type === FieldType.ADMINISTRATIVE_AREA) {
+    return {
+      ...field,
+      configuration: {
+        ...field.configuration,
+        listHistoricalNames: true,
+        activeOnly:
+          field.configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE,
+        anchorToDateOfEvent: false
+      }
+    }
+  }
+
+  if (field.type === FieldType.ADDRESS) {
+    // Address admin structures: list historical names, exclude inactive areas.
+    return {
+      ...field,
+      configuration: {
+        ...field.configuration,
+        listHistoricalNames: true,
+        activeOnly: true,
+        anchorToDateOfEvent: false
+      }
+    }
+  }
+
+  return field
+}
+
 export function resolveAdvancedSearchConfig(
   eventConfig: EventConfig
 ): AdvancedSearchConfigWithFieldsResolved[] {
@@ -557,19 +610,21 @@ export function resolveAdvancedSearchConfig(
     return {
       ...section,
       fields: section.fields.map((field) => {
+        let resolved: FieldConfig
         if (isEventFieldId(field.fieldId)) {
-          return defaultSearchFieldGenerator[field.fieldId](field)
+          resolved = defaultSearchFieldGenerator[field.fieldId](field)
         } else if (
           field.config.searchFields &&
           field.config.searchFields.length > 0
         ) {
-          return generateSearchFieldConfig(field)
+          resolved = generateSearchFieldConfig(field)
         } else {
-          return applySearchFieldOverridesToFieldConfig(
+          resolved = applySearchFieldOverridesToFieldConfig(
             declarationFieldsMap[field.fieldId],
             field
           )
         }
+        return withSearchLocationBehaviour(resolved)
       })
     }
   })

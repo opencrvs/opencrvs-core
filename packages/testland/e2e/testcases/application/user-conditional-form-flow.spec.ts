@@ -18,6 +18,7 @@ import {
 } from '../../helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '../../constants'
+import { openRecordByTitle } from '../print-certificate/birth/helpers'
 
 test.describe.serial('1. User conditional form flow', () => {
   let page: Page
@@ -109,24 +110,21 @@ test.describe.serial('1. User conditional form flow', () => {
         .isVisible()
 
       await expect(
-        page.getByTestId('row-value-applicant.isRecommendedByFieldAgent')
+        page.getByTestId('applicant.isRecommendedByFieldAgent-value')
       ).toHaveText('Yes')
     })
 
-    test('1.1.5 Declare', async () => {
-      await triggerDeclarationAction(page, 'Declare')
+    test('1.1.5 Notify', async () => {
+      await triggerDeclarationAction(page, 'Notify')
     })
   })
 
-  test.describe('1.2 Declaration Review by Registration Officer', async () => {
-    test('1.2.1 Navigate to the declaration "Pending validation"-tab', async () => {
+  test.describe('1.2 Notification Review by Registration Officer', async () => {
+    test('1.2.1 Navigate to the declaration "Notifications"-tab', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-      await page.getByText('Pending validation').click()
-      await page
-        .getByRole('button', {
-          name: formatName(declaration.applicant.name)
-        })
-        .click()
+
+      await page.getByText('Notifications').click()
+      openRecordByTitle(page, formatName(declaration.applicant.name))
 
       await page.getByRole('button', { name: 'Record', exact: true }).click()
 

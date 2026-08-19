@@ -33,11 +33,31 @@ InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs)
 
 Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE` as a side effect. Since `UNARCHIVE` restores the record to its pre-archive status without amending flags, `ARCHIVE` is now consistent with it by default: the flag freezes across an archive/unarchive round trip and comes back exactly as it was. Country configs can still add/remove flags on either action explicitly via configuration. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
 
+#### `/auth/verifyUser` no longer reveals account existence; `/auth/verifyNumber` removed
+
+`POST /auth/verifyUser` was an unauthenticated account-enumeration oracle: `401` for an unknown email/mobile, `200` for a known one, and on the username-reminder flow it returned the user's security-question key with no proof the caller controlled the mailbox. It now always returns an empty `200` and, only when the identifier matches an account, emails or texts a time-limited, single-use recovery link instead of any account data.
+
+- **Country configs must add two new notification templates, `password-reset-link` and `username-reminder-link`, before upgrading.** Without them the recovery notification cannot be sent, so account recovery fails closed for every user.
+- **`POST /auth/verifyNumber` has been removed**, together with its gateway route. A client running a login bundle built before this release posts to a route that no longer exists and loses account recovery until it updates.
+- **Recovery links are built from each country config's `LOGIN_URL`.** If that value is wrong for an environment, every recovery link emailed or texted in that environment 404s when clicked.
+- **Operators may want to drop stale `retrieval_step_*` Redis keys at deploy.** Records written by the pre-branch flow used `redis.set` with no expiry at all, so any left over from before this upgrade persist indefinitely rather than aging out with a TTL. They are rejected on use regardless (a legacy record has no `retrieveFlow`), so this is hygiene rather than a required step.
+
+[#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
+
 ### Improvements
 
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
 - Moved Ansible inventory files into environment-specific folders so each environment is self-contained and portable [#13181](https://github.com/opencrvs/opencrvs-core/pull/13181)
+- Replace Elastic APM tracing with OpenTelemetry [#12304](https://github.com/opencrvs/opencrvs-core/issues/12304)
+- Advanced search keeps records at renamed or inactivated offices, facilities and admin areas findable — filters list historical names and, for offices/facilities, inactivated locations [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+- Updates Kubernetes node networking and firewall configuration for multi-node clusters with private node communication [#353](https://github.com/opencrvs/infrastructure/pull/353)
+- Enable OpenTelemetry for Traefik and NGINX [#10685](https://github.com/opencrvs/opencrvs-core/issues/10685)
+- Keep filebeat index for 30 days by default [#13005](https://github.com/opencrvs/opencrvs-core/issues/13005)
+- Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
+- Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
+- Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
+- Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
 
 ### New features
 
@@ -48,6 +68,10 @@ Locations and administrative areas can now be created, renamed, recoded, and ina
 #### Notification-based scope filtering
 
 Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.read`, `record.edit`, `record.search`, etc.), mirroring the existing `declaredIn`/`declaredBy` and `registeredIn`/`registeredBy` patterns — enables role configurations to restrict access based on where or by whom an event was notified. [#11875](https://github.com/opencrvs/opencrvs-core/issues/11875)
+
+#### Status-based scope filtering
+
+Added a `status` scope option for record scopes (`record.edit`, `record.reject`, `record.archive`, `record.search`, etc.) — e.g. `{ type: 'record.edit', options: { status: ['DECLARED'] } }` restricts the scope to records currently in one of the given `EventStatus` values.
 
 #### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
 
@@ -61,10 +85,39 @@ Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.rea
 
 The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)
 
+#### `listHistoricalNames` / `activeOnly` location field config options
+
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept two optional booleans: `listHistoricalNames` lists every name a location has ever had (across its `versions[]`) as a separate, selectable option — so records saved under an outdated name stay findable — and `activeOnly` offers only currently-active locations, excluding inactivated ones. Advanced search sets these itself for its location/address filters (offices and health institutions list all names and keep inactive entries; address filters list all names but drop inactive admin structures), so no country configuration is required for that behaviour; they are documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+
+#### `anchorToDateOfEvent` location field config option
+
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves the field's displayed/selectable versions against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). It does not by itself exclude inactive versions — combine with `activeOnly` for that; when both are set, `activeOnly`'s active/inactive check is evaluated at the event-date anchor rather than today, so a location that has since become inactive can still be selected for a historical record, and one not yet active as at the event's date is excluded even if it's active today. A selection is automatically cleared if the date-of-event later changes such that it resolves to a different version than before. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
+
+#### Integration audit log retrieval
+
+An integration's audit log can now be read through the `integrations.audit` endpoint which returns a paginated, newest-first list of the operations a single system client performed. The endpoint returns what the client itself did; an integration's lifecycle (who created, disabled or re-keyed it) stays in the audit logs of the administrators who performed those actions.
+
+A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
+
+#### Daily usage telemetry
+
+OpenCRVS can now share a small **daily usage summary** with the OpenCRVS status service — aggregate counts only (registrations, pending declarations, certificates printed, active users, uptime), never personal or record data. It is collected at most once per UTC day and only ever sent from production instances.
+
+Enable it on the countryconfig service with `TELEMETRY_ENABLED=true`, and identify your instance with `COUNTRY_CODE`, `ORGANISATION`, and `ENVIRONMENT_NAME`. While disabled, countryconfig logs a startup notice explaining what would be shared and how to opt in.
+
+- **New country configs** — `create-countryconfig` asks for your organisation, ISO alpha-3 country code, and whether to enable telemetry, then writes them as the env defaults.
+- **Existing country configs** — `opencrvs upgrade` wires telemetry into a v2.0 config (the `/trigger/telemetry` handler, its route, and the new env vars). It asks whether to enable it and, if so, requires your country code and organisation.
+- **Toolkit** — `@opencrvs/toolkit/telemetry` exposes `sendTelemetry(report)`, which owns the status service URL and payload schema so upgrades stay type-safe.
+
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
+- Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
+- Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
+- Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
+- Stop reporting an email or mobile number as already in use when it is merely contained in an existing one. Duplicate and existence checks on users matched substrings, so creating a user with the email `a@x.com` was rejected as a duplicate of an existing `ba@x.com`. Email, mobile and username now match whole values; email and username stay case-insensitive in effect. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
+- Return a conflict naming the offending field, instead of an internal server error, when a write trips a unique constraint on a user's email, mobile or username. The application-level duplicate checks are broader than the constraints, so this is reachable only when two requests race — but the cause was masked in production and reached the caller as `Internal server error`. Covers creating a user as well as changing an existing user's email, phone number or name. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 
 ## 2.0.0
 

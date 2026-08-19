@@ -9,16 +9,28 @@
 
 # Overwriting https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
 namespaceOverride: "traefik"
-logs:
-  general:
-    # "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
-    level: "INFO"
-    # format: "common" # For local environment
-    format: "json" # For server environment
-  access:
-    # -- To enable access logs
+log:
+  # "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
+  level: "INFO"
+  # format: "common" # For local environment
+  format: "json" # For server environment
+accessLog:
+  # -- To enable access logs
+  enabled: true
+  format: "json"
+
+tracing:
+  serviceName: traefik
+  resourceAttributes:
+    deployment.environment.name: "{{env}}"
+    service.namespace: traefik
+  otlp:
     enabled: true
-    format: "json"
+    grpc:
+      enabled: true
+      endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
+      insecure: true
+
 
 ingressRoute:
   dashboard:
@@ -98,6 +110,8 @@ tlsStore:
 
 deployment:
   hostNetwork: true
+  podLabels:
+    service_name: traefik
   {{#if static_ssl}}
   kind: DaemonSet
   {{/if}}

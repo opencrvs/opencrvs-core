@@ -353,7 +353,9 @@ export const child = defineFormPage({
         locationTypes: ['HEALTH_FACILITY'],
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
@@ -402,7 +404,9 @@ export const child = defineFormPage({
         streetAddressForm: defaultStreetAddressConfiguration,
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
@@ -450,7 +454,9 @@ export const child = defineFormPage({
         streetAddressForm: defaultStreetAddressConfiguration,
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {

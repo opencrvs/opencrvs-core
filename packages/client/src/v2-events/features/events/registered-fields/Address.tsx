@@ -252,7 +252,12 @@ function generateAddressFields(
 
     const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      allowedLocations: addressConfig.configuration?.allowedLocations
+      allowedLocations: addressConfig.configuration?.allowedLocations,
+      // Propagate advanced-search and event-date-anchoring behaviour to the
+      // embedded admin-area selectors.
+      listHistoricalNames: addressConfig.configuration?.listHistoricalNames,
+      activeOnly: addressConfig.configuration?.activeOnly,
+      anchorToDateOfEvent: addressConfig.configuration?.anchorToDateOfEvent
     }
 
     if (!isFirst && prevItem?.id) {

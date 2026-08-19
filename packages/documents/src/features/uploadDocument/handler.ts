@@ -20,7 +20,7 @@ import {
 import { fromBuffer } from 'file-type'
 import { v4 as uuid } from 'uuid'
 
-import { badRequest, notFound } from '@hapi/boom'
+import { badRequest, forbidden } from '@hapi/boom'
 import { Readable } from 'stream'
 import { z } from 'zod'
 export interface IDocumentPayload {
@@ -60,6 +60,21 @@ const Payload = z.object({
 })
 
 /**
+ * @returns the object's metadata, or null when it does not exist.
+ */
+async function statObjectIfExists(documentPath: DocumentPath) {
+  try {
+    return await minioClient.statObject(MINIO_BUCKET, documentPath)
+  } catch (error) {
+    if ((error as { code?: string }).code === 'NotFound') {
+      return null
+    }
+
+    throw error
+  }
+}
+
+/**
  * V2 version of the file upload handler.
  */
 export async function fileUploadHandler(
@@ -78,6 +93,20 @@ export async function fileUploadHandler(
   const filePath = (
     path ? joinUrlPaths(path, filename) : filename
   ) as DocumentPath
+
+  /*
+   * The caller chooses the path, so an upload to a key that already exists
+   * would replace its contents and take over `created-by` — which then also
+   * satisfies the ownership check in deleteDocument. Replacing a file requires
+   * the same ownership that deleting one does.
+   */
+  const existing = await statObjectIfExists(filePath)
+
+  if (existing && existing.metaData['created-by'] !== userId) {
+    throw forbidden(
+      `request failed: user with id ${userId} does not have permission to replace this document`
+    )
+  }
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
@@ -102,25 +131,16 @@ export async function fileExistsHandler(
 
   const documentPath = DocumentPath.parse(filePath)
 
-  let stat
-
-  try {
-    stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if ((error as { code?: string }).code === 'NotFound') {
-      return h
-        .response(
-          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
-        )
-        .code(404)
-    }
-
-    throw error
-  }
+  const stat = await statObjectIfExists(documentPath)
 
   if (!stat) {
-    return notFound('File not found')
+    return h
+      .response(
+        `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
+      )
+      .code(404)
   }
+
   return h.response().code(200)
 }
 

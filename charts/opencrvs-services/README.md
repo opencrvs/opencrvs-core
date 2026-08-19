@@ -257,6 +257,31 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Global environment variables, each variable defined here is available to all workloads (service) deployed by helm chart. See example at <a href="values.yaml">values.yaml</a></td>
         </tr>
         <tr>
+            <td>otel.enabled</td>
+            <td>false</td>
+            <td>Enable OpenTelemetry tracing environment variables for instrumented services.</td>
+        </tr>
+        <tr>
+            <td>otel.deployment_environment</td>
+            <td>production</td>
+            <td>Value used for <code>OTEL_DEPLOYMENT_ENVIRONMENT</code> and <code>deployment.environment.name</code> in <code>OTEL_RESOURCE_ATTRIBUTES</code>.</td>
+        </tr>
+        <tr>
+            <td>otel.exporter_otlp_endpoint</td>
+            <td></td>
+            <td>OTLP/gRPC collector endpoint, for example <code>opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4317</code>. Required when <code>otel.enabled</code> is <code>true</code>. Node.js receives this as an insecure gRPC URL with <code>http://</code> added automatically; nginx receives the host and port without a scheme.</td>
+        </tr>
+        <tr>
+            <td>otel.exporter_otlp_protocol</td>
+            <td>grpc</td>
+            <td>OTLP exporter protocol.</td>
+        </tr>
+        <tr>
+            <td>OTEL_RESOURCE_ATTRIBUTES</td>
+            <td></td>
+            <td>Generated automatically when <code>otel.enabled</code> is <code>true</code>. It includes <code>service.version</code> from <code>platform.tag</code>, <code>deployment.environment.name</code> from <code>otel.deployment_environment</code>, and <code>service.namespace</code> from the Helm release namespace.</td>
+        </tr>
+        <tr>
             <td>timezone</td>
             <td></td>
             <td>Time zone for a backup and restore CronJobs, by default local time zone is used from server. See example at <a href="values.yaml">values.yaml</a></td>
@@ -280,6 +305,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>platform.imagePullSecrets</td>
         <td>[]</td>
         <td>Defines the image pull secrets applied at Pod level for authenticating with private registries.</td>
+        </tr>
+        <tr>
+        <td>platform.imagePullPolicy</td>
+        <td>-</td>
+        <td>Default <code>imagePullPolicy</code> applied to all OpenCRVS service containers. Leave unset to use Kubernetes' own tag-based default (<code>IfNotPresent</code> for versioned tags, <code>Always</code> for <code>:latest</code>). Environments deploying a floating tag (e.g. <code>develop</code>) should set this to <code>Always</code>, otherwise nodes keep serving whatever image was first cached under that tag. Can be overridden at service level.</td>
         </tr>
         <tr>
             <th>Common Service properties</th>
@@ -312,6 +342,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>Overrides the default repository defined in <code>platform.repository</code>.</td>
         </tr>
         <tr>
+        <td>image.pullPolicy</td>
+        <td>platform.imagePullPolicy</td>
+        <td>Overrides the default <code>imagePullPolicy</code> defined in <code>platform.imagePullPolicy</code> for this service only.</td>
+        </tr>
+        <tr>
             <td>hpa.enabled</td>
             <td>true</td>
             <td>Enable Horizontal Pod Autoscaler (HPA) configuration. Configuration is available per service as well, add <code>&ltservice_name&gt.hpa.&ltkey&gt</code></td>
@@ -340,6 +375,21 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>pdb.minAvailable</td>
             <td>50%</td>
             <td>Number of PODs not available while deployment within ReplicaSet</td>
+        </tr>
+        <tr>
+            <td>service_account.create</td>
+            <td>true</td>
+            <td>Create Kubernetes ServiceAccount resources for OpenCRVS workloads. Each workload gets its own ServiceAccount. Configuration is available per workload as well, add <code>&ltservice_name&gt.service_account.&ltkey&gt</code>. For more information see <a href="#service-accounts">Service accounts</a>.</td>
+        </tr>
+        <tr>
+            <td>service_account.annotations</td>
+            <td>{}</td>
+            <td>Annotations applied to all workload ServiceAccounts. Per-workload annotations override global annotations with the same key.</td>
+        </tr>
+        <tr>
+            <td>service_account.automount_service_account_token</td>
+            <td>true</td>
+            <td>Controls <code>automountServiceAccountToken</code> on generated ServiceAccounts and workload Pod specs. Can be overridden per workload.</td>
         </tr>
         <tr>
             <td>resources</td>
@@ -397,6 +447,16 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Use default OpenCRVS login/password or generate random values</td>
         </tr>
         <tr>
+            <td>deployment_jobs.service_account.name</td>
+            <td>deployment-jobs</td>
+            <td>Common ServiceAccount name used by Helm pre/post deployment jobs.</td>
+        </tr>
+        <tr>
+            <td>deployment_jobs.service_account.annotations</td>
+            <td>{}</td>
+            <td>Annotations applied to the common ServiceAccount used by Helm pre/post deployment jobs.</td>
+        </tr>
+        <tr>
             <td>on_restore_cronjob.enabled</td>
             <td><pre>false</pre></td>
             <td>Special cronjob for OpenCRVS maintenance after database restore. Job runs reindex and postgres passwords update.</td>
@@ -408,6 +468,62 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         </tr>
     </tbody>
 </table>
+
+# Service accounts
+
+OpenCRVS Helm chart creates a Kubernetes ServiceAccount for each regular workload and injects the matching `serviceAccountName` into the workload Pod spec.
+
+By default, ServiceAccount names match workload names:
+
+- `auth`
+- `client`
+- `countryconfig`
+- `dashboards`, when `dashboards.enabled` is `true`
+- `documents`
+- `events`
+- `gateway`
+- `login`
+- `data-cleanup`, when `data_cleanup.enabled` is `true`
+- `on-db-restore-cronjob`, when `on_restore_cronjob.enabled` is `true`
+
+Helm pre/post deployment jobs use one shared ServiceAccount named `deployment-jobs` by default. This includes validation, datastore setup, data migration, data seed, and Elasticsearch reindex jobs.
+
+**Example: global annotations**
+
+```yaml
+service_account:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-default
+```
+
+**Example: workload-specific annotations**
+
+```yaml
+auth:
+  service_account:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-auth
+```
+
+**Example: deployment job annotations**
+
+```yaml
+deployment_jobs:
+  service_account:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-deployment-jobs
+```
+
+If ServiceAccounts are managed outside of this chart, set `service_account.create` to `false` and provide matching existing ServiceAccounts in the namespace. A custom name can be set per workload:
+
+```yaml
+service_account:
+  create: false
+
+auth:
+  service_account:
+    name: existing-auth-service-account
+```
 
 # Authentication configuration
 

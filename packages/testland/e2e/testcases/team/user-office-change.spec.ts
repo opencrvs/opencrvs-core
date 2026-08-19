@@ -22,7 +22,8 @@ import {
   loginWithNewUser,
   logout,
   NEW_USER_PASSWORD,
-  searchFromSearchBar
+  searchFromSearchBar,
+  waitForAuthenticatedLanding
 } from '../../helpers'
 import { createDeclaration } from '../test-data/birth-declaration'
 import {
@@ -136,9 +137,7 @@ test('Scope changes after office change - user loses access when the office chan
     )
 
     await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', {
-      state: 'visible'
-    })
+    await waitForAuthenticatedLanding(page, 60_000)
     await createPIN(page)
     await page.goto(CLIENT_URL)
 
@@ -178,7 +177,7 @@ test('Scope changes after office change - user loses access when the office chan
 
     await page.getByRole('button', { name: 'Organisation' }).click()
     await page.getByRole('button', { name: 'Central' }).click()
-    await page.getByRole('button', { name: 'Ibombo' }).click()
+    await page.getByRole('button', { name: 'Ibombo', exact: true }).click()
     await page.getByRole('button', { name: 'Ibombo District Office' }).click()
     await expect(page.locator('#content-name')).toHaveText(
       'Ibombo District Office'
@@ -224,9 +223,7 @@ test('Scope changes after office change - user loses access when the office chan
     expect(refreshToken).toBeDefined()
 
     await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', {
-      state: 'visible'
-    })
+    await waitForAuthenticatedLanding(page, 60_000)
 
     await searchFromSearchBar(page, trackingId, false)
     await expect(
@@ -299,9 +296,7 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     )
 
     await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', {
-      state: 'visible'
-    })
+    await waitForAuthenticatedLanding(page, 60_000)
     await createPIN(page)
     await page.goto(CLIENT_URL)
 
@@ -348,7 +343,7 @@ test('Scope changes after office and role changes', async ({ browser }) => {
 
     await page.getByRole('button', { name: 'Organisation' }).click()
     await page.getByRole('button', { name: 'Central' }).click()
-    await page.getByRole('button', { name: 'Ibombo' }).click()
+    await page.getByRole('button', { name: 'Ibombo', exact: true }).click()
     await page.getByRole('button', { name: 'Ibombo District Office' }).click()
     await expect(page.locator('#content-name')).toHaveText(
       'Ibombo District Office'
@@ -371,10 +366,10 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await page.getByText('Hospital Official', { exact: true }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
-    await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+    await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Isamba District Office, Isamba, Central, Farajaland'
     )
-    await expect(page.getByTestId('row-value-role')).toHaveText(
+    await expect(page.getByTestId('role-value')).toHaveText(
       'Hospital Official'
     )
 
@@ -396,9 +391,7 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     expect(refreshToken).toBeDefined()
 
     await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', {
-      state: 'visible'
-    })
+    await waitForAuthenticatedLanding(page, 60_000)
 
     await searchFromSearchBar(page, trackingId, false)
     await expect(

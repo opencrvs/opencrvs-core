@@ -100,7 +100,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
        */
       await expect(
         page
-          .locator('[data-testid="row-value-mother.name"]')
+          .locator('[data-testid="mother.name-value"]')
           .getByText(REQUIRED_VALIDATION_ERROR)
       ).toBeVisible()
     })
@@ -121,7 +121,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
 
   test.describe.serial('3.2 Validate the "National ID" field', async () => {
     test.beforeEach(async ({ page }) => {
-      await page.locator('#mother____idType').getByText('Select...').click()
+      await page.locator('#mother____idType').getByText('Select', { exact: true }).click()
       await page.getByText('National ID', { exact: true }).click()
     })
 
@@ -185,7 +185,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
       await page.getByTestId('text__mother____nid').fill('1234567890')
       await page.getByRole('button', { name: 'Continue' }).click()
 
-      await page.locator('#father____idType').getByText('Select...').click()
+      await page.locator('#father____idType').getByText('Select', { exact: true }).click()
       await page.getByText('National ID', { exact: true }).click()
       await page.getByTestId('text__father____nid').fill('1234567890')
       await page.getByRole('heading', { name: 'Birth' }).click()

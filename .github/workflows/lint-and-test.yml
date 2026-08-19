@@ -21,6 +21,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      # nx-set-shas queries the API for the last successful workflow run
+      actions: read
     runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -28,6 +30,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # nx affected needs history to resolve the base SHA
+          fetch-depth: 0
 
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
@@ -42,11 +47,49 @@ jobs:
               - Answer "What's new?", "Why was the change made?" and "Why should I care?" for each change.
               - If it's a breaking change, include a migration guide answering "What do I need to do to upgrade?".
 
-      - name: Get list of packages
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Nx needs node_modules to compute the project graph; lifecycle
+      # scripts are irrelevant for that.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Sets NX_BASE/NX_HEAD. On PRs: the PR base. On develop pushes: the
+      # SHA of the last successful run of this workflow, so commits whose
+      # run failed are re-included in the next run's affected set.
+      - name: Derive SHAs for nx affected
+        uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: develop
+
+      # create-countryconfig lives under packages/toolkit/ and has no
+      # lint/test targets — it never ran in this workflow's matrix.
+      #
+      # Changes to this workflow (and the scripts it drives) are invisible
+      # to `nx affected`, so a CI-only PR would yield an empty matrix and
+      # skip every job below — merging CI changes without ever running
+      # them. Select every project instead when that happens. Dependency
+      # builds still come from the nx cache; what needs exercising is the
+      # workflow's own steps, not a cold rebuild.
+      - name: Get list of affected packages
         id: set-matrix
         run: |
-          PACKAGES=$(ls -d packages/* | jq -R -s -c 'split("\n")[:-1]')
-          echo "Found packages: $PACKAGES"
+          if git diff --name-only "$NX_BASE" "$NX_HEAD" \
+            | grep -qE '^\.github/(workflows/lint-and-test\.yml|scripts/changed-files-affect-storybook\.mjs)$'; then
+            echo "CI configuration changed — selecting every project"
+            PROJECTS=$(pnpm exec nx show projects --exclude @opencrvs/create-countryconfig --json)
+          else
+            PROJECTS=$(pnpm exec nx show projects --affected --exclude @opencrvs/create-countryconfig --json)
+          fi
+          PACKAGES=$(echo "$PROJECTS" | jq -c 'map("packages/" + ltrimstr("@opencrvs/"))')
+          echo "Selected packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
       - name: Prepare coverage explanation
@@ -66,9 +109,63 @@ jobs:
           message-id: test-coverage-explanation
           message: ${{ env.COVERAGE_EXPLANATION }}
 
+  build-deps:
+    name: Warm nx cache
+    # Develop pushes only, and the ONLY writer of the nx cache. GitHub
+    # cache entries cannot be rewritten, so a job that restored and then
+    # saved would republish every old entry alongside its new ones and
+    # grow without bound. This job deliberately does not restore: what it
+    # publishes is exactly one run's fresh output, so it stays flat and
+    # every other job is free to restore.
+    #
+    # It runs in parallel with the jobs that consume the *previous*
+    # push's entry rather than blocking them, so a develop push still
+    # rebuilds whatever changed in that push.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared dependencies
+        run: |
+          pnpm exec nx run-many -t build \
+            -p @opencrvs/commons @opencrvs/components @opencrvs/events @opencrvs/toolkit
+          pnpm exec nx run-many -t build:types -p @opencrvs/events
+
+      # https://github.com/bojanbass/nx-aws/pull/376#issuecomment-1710695419
+      # Nx stamps the machine id that produced each entry into
+      # `<hash>/source` and, on a cache hit, refuses any entry whose
+      # stamp is not the current machine's. Removing the source files before
+      # publishing avoids that problem and allows any machine to restore.
+      - name: Drop machine markers before publishing
+        run: find .nx/cache -mindepth 2 -maxdepth 2 -name source -type f -delete
+
+      - name: Save Nx cache
+        uses: actions/cache/save@v4
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+
   test:
     name: Test
     needs: setup
+    # an empty matrix is a workflow error, so guard against it
+    if: needs.setup.outputs.matrix != '[]'
     runs-on: ubuntu-26.04
     permissions:
       pull-requests: write
@@ -102,6 +199,13 @@ jobs:
             else
               echo "skip-lint=false" >> $GITHUB_OUTPUT
             fi
+
+            if ! grep -q "\"test:compilation\":" "${{ matrix.package }}/package.json"; then
+              echo "Typecheck script not found in ${{ matrix.package }}"
+              echo "skip-compilation=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip-compilation=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Setup pnpm
@@ -123,41 +227,35 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
 
-      - name: Extract dependencies for ${{ matrix.package }}
+      # Nx computation cache. Written by exactly one job (build-deps,
+      # develop pushes only) so restoring here can never feed back into
+      # what gets published.
+      #
+      # There are no explicit dependency-build steps: every target below
+      # declares `dependsOn: ["^build"]` in nx.json, so nx builds each
+      # package's dependencies from the project graph — cache hits when
+      # their inputs match the last develop run.
+      - name: Restore Nx cache
         if: steps.check-scripts.outputs.skip != 'true'
-        id: extract-dependencies
-        run: |
-          DEPENDENCIES=$(pnpm -r --filter "{${{ matrix.package }}}..." exec pwd | grep "^/" | sed "s|^$PWD/||" | tr '\n' ' ')
-          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
-          echo "Found dependencies: $DEPENDENCIES"
+        uses: actions/cache/restore@v5
+        id: nx-cache
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
-      - name: Build common package
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
-        run: cd packages/commons && pnpm build
-
-      - name: Build components
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
-        run: |
-          cd packages/components && pnpm build
-
-      - name: Build events router types
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
-        run: cd packages/events && pnpm build:types
-
-      # testland consumes the workspace toolkit at runtime; build.sh needs
-      # commons + events types built first (steps above).
-      - name: Build toolkit
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/toolkit')
-        run: cd packages/toolkit && pnpm build
+      - name: Typecheck
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-compilation != 'true'
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test:compilation
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
-        run: cd ${{ matrix.package }} && pnpm lint
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):lint
 
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: cd ${{ matrix.package }} && pnpm test
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test
 
       - name: Generate test coverage summary
         if: github.event_name == 'pull_request'
@@ -194,8 +292,52 @@ jobs:
           message-id: ${{ matrix.package }}-test-coverage
           message: ${{ env.PR_COMMENT_BODY }}
 
+  countryconfig-template:
+    name: Test countryconfig-template
+    # Excluded from the workspace and from nx (see .nxignore), so it never
+    # shows up in the matrix above and gets its own job. It installs in
+    # isolation and resolves @opencrvs/toolkit from npm, so none of the
+    # workspace build/cache machinery applies.
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: packages/countryconfig-template
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Runs dependency installation
+        run: pnpm install --no-frozen-lockfile --ignore-workspace
+
+      # Disabled: this package has never been typechecked in CI and does
+      # not currently compile — 9 pre-existing errors in its own src/
+      # (missing hapi-sentry types, hapi handler signature variance in
+      # index.ts, unknown-typed catch bindings). Fix those, then flip the
+      # `if` to remove the skip.
+      - name: Typecheck
+        if: false
+        run: pnpm test:compilation
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run Unit Test
+        run: pnpm test
+
   prepare-client-tests:
     name: Prepare client tests
+    needs: setup
+    if: contains(needs.setup.outputs.matrix, 'packages/client')
     runs-on: ubuntu-26.04
     permissions:
       contents: read
@@ -215,12 +357,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build common package
-        run: cd packages/commons && pnpm build
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        id: nx-cache
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
-      - name: Build components
-        run: |
-          cd packages/components && pnpm build
+      - name: Build common package and components
+        run: pnpm exec nx run-many -t build -p @opencrvs/commons @opencrvs/components
 
       # Build Storybook once here (with --webpack-stats-json so that
       # `preview-stats.json` is emitted). The artifact is reused by
@@ -245,6 +391,7 @@ jobs:
             .
             !**/.git
             !**/node_modules
+            !.nx
 
   lint-client:
     name: Lint client
@@ -270,14 +417,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build events router types
-        run: cd packages/events && pnpm build:types
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
+      - name: Build events router types
+        run: pnpm exec nx run-many -t build:types -p @opencrvs/events
+
+      # --excludeTaskDependencies: commons/components build outputs come
+      # prebuilt in the artifact, events types were built above
       - name: Compile
-        run: cd packages/client && pnpm test:compilation
+        run: pnpm exec nx run-many -t test:compilation -p @opencrvs/client --excludeTaskDependencies
 
       - name: Run linting
-        run: cd packages/client && pnpm lint
+        run: pnpm exec nx run @opencrvs/client:lint --excludeTaskDependencies
 
   chromatic:
     name: Run chromatic visual tests
@@ -411,8 +567,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # --excludeTaskDependencies: dependency build outputs come prebuilt
+      # in the artifact; without it each shard would rebuild them (the
+      # artifact excludes .nx, so nothing is cached here)
       - name: Run Unit Test
-        run: cd packages/client && pnpm test --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+        run: pnpm exec nx run @opencrvs/client:test --excludeTaskDependencies -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip
@@ -485,8 +644,9 @@ jobs:
 
   build-toolkit:
     name: Build toolkit
+    needs: setup
     runs-on: ubuntu-26.04
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && contains(needs.setup.outputs.matrix, 'packages/toolkit')
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -506,14 +666,50 @@ jobs:
           max_attempts: 3
           command: pnpm install --frozen-lockfile
 
-      - name: Build commons
-        run: pnpm build
-        working-directory: packages/commons
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
-      - name: Build events
-        run: pnpm build
-        working-directory: packages/events
+      # nx resolves the `^build` dependency of the build target, so
+      # commons and events are built first (cache hits when warm)
+      - name: Build toolkit and dependencies
+        run: pnpm exec nx run @opencrvs/toolkit:build
 
-      - name: Build toolkit
-        run: pnpm build
-        working-directory: packages/toolkit
+  required-checks:
+    name: Required checks
+    # The single context branch protection requires from this workflow.
+    #
+    # Per-job names cannot be required directly any more: `nx affected`
+    # makes the `test` matrix dynamic, and a matrix job that is skipped is
+    # skipped before its matrix expands. Either way the check runs for
+    # unselected entries are never created, so a required context named
+    # after one of them waits for a status that will never be reported and
+    # blocks the PR forever. A skipped *non-matrix* job does report, as
+    # "success" — which is exactly why this job tolerates `skipped` below
+    # and fails only on real failures.
+    needs:
+      - setup
+      - test
+      - countryconfig-template
+      - prepare-client-tests
+      - lint-client
+      - test-storybook
+      - test-client
+      - lint-knip
+      - build-toolkit
+    # `always()`, or a skipped dependency would skip this job too and take
+    # the gate down with it
+    if: always()
+    runs-on: ubuntu-26.04
+    permissions: {}
+    steps:
+      # For a matrix dependency, `result` is the aggregate: `failure` if
+      # any entry failed.
+      - name: Fail unless every dependency succeeded or was skipped
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more required jobs failed or were cancelled."
+          exit 1

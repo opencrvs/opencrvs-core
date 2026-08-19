@@ -40,7 +40,6 @@ exports[`getAvailableActionsForEvent() should return the correct actions for "CR
   "DECLARE",
   "NOTIFY",
   "DELETE",
-  "CUSTOM",
 ]
 `;
 

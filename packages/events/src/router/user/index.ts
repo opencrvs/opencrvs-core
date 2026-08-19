@@ -52,7 +52,7 @@ import {
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import {
-  queryUserAuditLog,
+  queryClientAuditLog,
   writeAuditLog
 } from '@events/storage/postgres/events/auditLog'
 import {
@@ -295,8 +295,8 @@ const auditRouter = router({
     )
     .use(userCanReadUserAudit)
     .query(async ({ input }) => {
-      const { results, total } = await queryUserAuditLog({
-        subjectId: input.userId,
+      const { results, total } = await queryClientAuditLog({
+        clientId: input.userId,
         skip: input.skip,
         count: input.count,
         timeStart: input.timeStart,

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
 import {
@@ -32,8 +33,17 @@ describe('canAccessEventWithScope()', () => {
   const officeUuid = generateUuid(rng)
   const createdById = generateUuid(rng)
 
-  const notifiedEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+  const notifiedEvent = {
     type: 'birth',
+    id: generateUuid(rng),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: generateUuid(rng),
+    status: 'NOTIFIED' as const,
+    trackingId: generateUuid(rng),
+    declaration: {},
+    flags: [],
+    potentialDuplicates: [],
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       NOTIFIED: {
@@ -45,10 +55,19 @@ describe('canAccessEventWithScope()', () => {
       DECLARED: undefined,
       REGISTERED: undefined
     }
-  }
+  } satisfies EventIndexWithAdministrativeHierarchy
 
-  const declaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+  const declaredEvent = {
+    id: generateUuid(rng),
     type: 'birth',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: generateUuid(rng),
+    status: 'DECLARED' as const,
+    trackingId: generateUuid(rng),
+    declaration: {},
+    flags: [],
+    potentialDuplicates: [],
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       NOTIFIED: undefined,
@@ -60,9 +79,9 @@ describe('canAccessEventWithScope()', () => {
       },
       REGISTERED: undefined
     }
-  }
+  } satisfies EventIndexWithAdministrativeHierarchy
 
-  const registeredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+  const registeredEvent = {
     ...declaredEvent,
     legalStatuses: {
       NOTIFIED: undefined,
@@ -80,7 +99,7 @@ describe('canAccessEventWithScope()', () => {
         createdAtLocation: [provinceUuid, districtUuid, officeUuid]
       }
     }
-  }
+  } satisfies EventIndexWithAdministrativeHierarchy
 
   const systemContext = {
     type: 'system',
@@ -285,6 +304,153 @@ describe('canAccessEventWithScope()', () => {
     )
   })
 
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should not access a sealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access an unsealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+  })
+
   test('should not access event if user does not meet any of the scope options', () => {
     // Negative test cases to ensure we don't accidentally remove checks.
     const userFromAnotherOfficeContext = {
@@ -326,7 +492,7 @@ describe('canAccessEventWithScope()', () => {
   describe('User without an administrative area', () => {
     // The event is in a different administrative area than the user's office,
     // so access can only be granted by the "no administrative area" branch.
-    const eventInAnotherArea: Partial<EventIndexWithAdministrativeHierarchy> = {
+    const eventInAnotherArea = {
       ...registeredEvent,
       placeOfEvent: [generateUuid(rng)],
       legalStatuses: {
@@ -350,7 +516,7 @@ describe('canAccessEventWithScope()', () => {
           createdAtLocation: [generateUuid(rng)]
         }
       }
-    }
+    } satisfies EventIndexWithAdministrativeHierarchy
 
     const adminAreaOptions = [
       { placeOfEvent: 'administrativeArea' },

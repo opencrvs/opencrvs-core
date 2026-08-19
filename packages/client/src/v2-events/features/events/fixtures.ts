@@ -186,7 +186,6 @@ const archiveAction: ActionDocument = {
   status: ActionStatus.Accepted,
   declaration: {},
   type: ActionType.ARCHIVE,
-  content: { reason: 'Archived for testing' },
   createdBy: localRegistrarId,
   createdByRole: 'LOCAL_REGISTRAR',
   createdByUserType: 'user',

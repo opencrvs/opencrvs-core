@@ -17,7 +17,7 @@ import {
   getOrThrow,
   isActionEnabled,
   isActionVisible,
-  filterActionsByFlags,
+  getAvailableActionsForEvent,
   isValidIcon,
   getAcceptedScopesByType,
   getAssignmentStatus,
@@ -73,13 +73,17 @@ export function useCustomActionConfigs(event: EventIndex): {
   }
 
   const customActionConfigs = useMemo(() => {
+    // The event's status and flags decide whether custom actions are available
+    // at all. The backend enforces the same list, so skipping this check would
+    // offer actions that fail with a 409.
+    if (!getAvailableActionsForEvent(event).includes(ActionType.CUSTOM)) {
+      return []
+    }
+
     return eventConfiguration.actions
       .filter(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
-      )
-      .filter(
-        (action) => filterActionsByFlags([action.type], event.flags).length > 0
       )
       .filter(({ customActionType }) =>
         canAccessEventWithScopes(customActionType)

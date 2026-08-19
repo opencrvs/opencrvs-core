@@ -23,67 +23,23 @@ import {
 } from '../../helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '../../constants'
-import { fillDate } from './helpers'
+import { fillDate, generateBirthInputs } from './helpers'
 import { ensureAssignedToUser, selectAction } from '../../utils'
 import { openRecordByTitle } from '../print-certificate/birth/helpers'
 
 test.describe.serial('8. Validate declaration review page', () => {
   let page: Page
 
-  const declaration = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      gender: 'Male',
-      birthDate: getRandomDate(0, 200)
-    },
-    attendantAtBirth: 'Physician',
-    birthType: 'Single',
-    weightAtBirth: 2.4,
-    placeOfBirth: 'Health Institution',
-    birthLocation: 'Klow Village Hospital',
-    informantType: 'Mother',
-    informantEmail: faker.internet.email(),
-    mother: {
-      name: {
-        firstNames: faker.person.firstName('female'),
-        familyName: faker.person.lastName('female')
-      },
-      birthDate: getRandomDate(20, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: {
-        country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Irundu',
-        village: 'Xhosa'
-      }
-    },
-    father: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      birthDate: getRandomDate(22, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: 'Same as mother'
-    }
-  }
+  const declaration = generateBirthInputs({
+    includeOptionalFields: true,
+    placeOfBirth: 'Other'
+  })
 
   const comment = faker.lorem.sentence()
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await login(page, CREDENTIALS.COMMUNITY_LEADER)
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -94,7 +50,7 @@ test.describe.serial('8. Validate declaration review page', () => {
     await page.close()
   })
 
-  test.describe('8.1 Hospital Official actions', async () => {
+  test.describe('8.1 Community leader actions', async () => {
     test.describe('8.1.0 Fill up birth registration form', async () => {
       test('8.1.0.1 Fill child details', async () => {
         await page.locator('#firstname').fill(declaration.child.name.firstNames)
@@ -114,10 +70,6 @@ test.describe.serial('8. Validate declaration review page', () => {
             exact: true
           })
           .click()
-        await page
-          .locator('#child____birthLocation')
-          .fill(declaration.birthLocation.slice(0, 3))
-        await page.getByText(declaration.birthLocation).click()
 
         await page.locator('#child____attendantAtBirth').click()
         await page
@@ -200,6 +152,11 @@ test.describe.serial('8. Validate declaration review page', () => {
 
         await fillDate(page, declaration.father.birthDate)
 
+        await page.locator('#father____nationality').click()
+        await page
+          .getByText(declaration.father.nationality, { exact: true })
+          .click()
+
         await page.locator('#father____idType').click()
         await page
           .getByText(declaration.father.identifier.type, { exact: true })
@@ -266,10 +223,11 @@ test.describe.serial('8. Validate declaration review page', () => {
           'child.placeOfBirth',
           declaration.placeOfBirth
         )
+
         await expectRowValueWithChangeButton(
           page,
-          'child.birthLocation',
-          declaration.birthLocation
+          'child.birthLocation.other',
+          `${declaration.birthLocation.country}${declaration.birthLocation.province}${declaration.birthLocation.district}${declaration.birthLocation.village}`
         )
 
         /*
@@ -481,7 +439,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change child's name
          */
-        await expect(page.getByTestId('row-value-child.name')).toContainText(
+        await expect(page.getByTestId('child.name-value')).toContainText(
           declaration.child.name.firstNames +
             ' ' +
             declaration.child.name.familyName
@@ -501,7 +459,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change child's gender
          */
-        await expect(page.getByTestId('row-value-child.gender')).toContainText(
+        await expect(page.getByTestId('child.gender-value')).toContainText(
           declaration.child.gender
         )
       })
@@ -522,7 +480,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change child's birthday
          */
-        await expect(page.getByTestId('row-value-child.dob')).toContainText(
+        await expect(page.getByTestId('child.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.child.birthDate)
         )
       })
@@ -543,7 +501,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change attendant at birth
          */
         await expect(
-          page.getByTestId('row-value-child.attendantAtBirth')
+          page.getByTestId('child.attendantAtBirth-value')
         ).toContainText(declaration.attendantAtBirth)
       })
 
@@ -564,7 +522,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change type of birth
          */
         await expect(
-          page.getByTestId('row-value-child.birthType')
+          page.getByTestId('child.birthType-value')
         ).toContainText(declaration.birthType)
       })
 
@@ -582,7 +540,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change weight at birth
          */
         await expect(
-          page.getByTestId('row-value-child.weightAtBirth')
+          page.getByTestId('child.weightAtBirth-value')
         ).toContainText(declaration.weightAtBirth.toString())
       })
 
@@ -603,7 +561,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change informant type
          */
         await expect(
-          page.getByTestId('row-value-informant.relation')
+          page.getByTestId('informant.relation-value')
         ).toContainText(declaration.informantType)
       })
 
@@ -626,7 +584,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change registration email
          */
         await expect(
-          page.getByTestId('row-value-informant.email')
+          page.getByTestId('informant.email-value')
         ).toContainText(declaration.informantEmail)
       })
 
@@ -645,7 +603,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change mother's name
          */
-        await expect(page.getByTestId('row-value-mother.name')).toContainText(
+        await expect(page.getByTestId('mother.name-value')).toContainText(
           declaration.mother.name.firstNames
         )
       })
@@ -666,7 +624,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change mother's birthday
          */
-        await expect(page.getByTestId('row-value-mother.dob')).toContainText(
+        await expect(page.getByTestId('mother.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.mother.birthDate)
         )
       })
@@ -688,7 +646,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change mother's nationality
          */
         await expect(
-          page.getByTestId('row-value-mother.nationality')
+          page.getByTestId('mother.nationality-value')
         ).toContainText(declaration.mother.nationality)
       })
 
@@ -713,11 +671,11 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change mother's ID type
          */
-        await expect(page.getByTestId('row-value-mother.idType')).toContainText(
+        await expect(page.getByTestId('mother.idType-value')).toContainText(
           declaration.mother.identifier.type
         )
         await expect(
-          page.getByTestId('row-value-mother.passport')
+          page.getByTestId('mother.passport-value')
         ).toContainText(declaration.mother.identifier.id)
       })
 
@@ -741,10 +699,10 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change mother's address
          */
         await expect(
-          page.getByTestId('row-value-mother.address')
+          page.getByTestId('mother.address-value')
         ).toContainText(declaration.mother.address.district)
         await expect(
-          page.getByTestId('row-value-mother.address')
+          page.getByTestId('mother.address-value')
         ).toContainText(declaration.mother.address.province)
       })
 
@@ -763,7 +721,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change father's name
          */
-        await expect(page.getByTestId('row-value-father.name')).toContainText(
+        await expect(page.getByTestId('father.name-value')).toContainText(
           declaration.father.name.firstNames
         )
       })
@@ -780,7 +738,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change father's birthday
          */
-        await expect(page.getByTestId('row-value-father.dob')).toContainText(
+        await expect(page.getByTestId('father.dob-value')).toContainText(
           formatDateObjectTo_dMMMMyyyy(declaration.father.birthDate)
         )
       })
@@ -802,7 +760,7 @@ test.describe.serial('8. Validate declaration review page', () => {
          * Expected result: should change father's nationality
          */
         await expect(
-          page.getByTestId('row-value-father.nationality')
+          page.getByTestId('father.nationality-value')
         ).toContainText(declaration.father.nationality)
       })
 
@@ -827,11 +785,11 @@ test.describe.serial('8. Validate declaration review page', () => {
         /*
          * Expected result: should change father's ID type and ID number
          */
-        await expect(page.getByTestId('row-value-father.idType')).toContainText(
+        await expect(page.getByTestId('father.idType-value')).toContainText(
           declaration.father.identifier.type
         )
         await expect(
-          page.getByTestId('row-value-father.passport')
+          page.getByTestId('father.passport-value')
         ).toContainText(declaration.father.identifier.id)
       })
     })
@@ -940,8 +898,8 @@ test.describe.serial('8. Validate declaration review page', () => {
       await expectRowValue(page, 'child.placeOfBirth', declaration.placeOfBirth)
       await expectRowValue(
         page,
-        'child.birthLocation',
-        declaration.birthLocation
+        'child.birthLocation.other',
+        `${declaration.birthLocation.country}${declaration.birthLocation.province}${declaration.birthLocation.district}${declaration.birthLocation.village}`
       )
 
       /*

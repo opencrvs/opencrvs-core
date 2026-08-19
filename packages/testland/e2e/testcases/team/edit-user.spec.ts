@@ -50,7 +50,7 @@ test("Can update newly created user's location and role", async ({
   await test.step('Go to user details page', async () => {
     await login(page, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
     await page.getByRole('button', { name: 'Central' }).click()
-    await page.getByRole('button', { name: 'Ibombo' }).click()
+    await page.getByRole('button', { name: 'Ibombo', exact: true }).click()
     await page.getByRole('button', { name: 'Quanza' }).click()
     await page.getByRole('button', { name: 'Quanza Village Office' }).click()
     await page.getByRole('button', { name: fullName }).click()
@@ -91,10 +91,10 @@ test("Can update newly created user's location and role", async ({
   })
 
   await test.step('Verify user details', async () => {
-    await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+    await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Ezhi District Hospital, Ezhi, Central, Farajaland'
     )
-    await expect(page.getByTestId('row-value-role')).toHaveText(
+    await expect(page.getByTestId('role-value')).toHaveText(
       'Hospital Official'
     )
   })

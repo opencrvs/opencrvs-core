@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { main as addExplicitCorrectionFlags } from './add-explicit-correction-flags'
+import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
+import { main as enableTelemetry } from './enable-telemetry'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -16,4 +18,6 @@ import { main as addExplicitCorrectionFlags } from './add-explicit-correction-fl
  */
 export async function runUpgrade(dockerSwarm: boolean) {
   await addExplicitCorrectionFlags()
+  await addRecoveryLinkNotifications()
+  await enableTelemetry()
 }

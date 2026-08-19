@@ -589,6 +589,8 @@ duplicates.content.registeredBy,Registered by label for duplicates comparison,Re
 duplicates.content.subtitle,Duplicates content subtitle message,"This record was flagged as a potential duplicate of: {trackingIds}. Please review these by clicking on each tracking ID in the tab section to view a side-by-side comparison below, and confirm if this record is a duplicate",Cet enregistrement a été signalé comme un doublon potentiel de : {trackingIds}. Veuillez les examiner en cliquant sur chaque identifiant de suivi dans la section des onglets pour afficher une comparaison côte à côte ci-dessous et confirmer si cet enregistrement est un doublon
 duplicates.content.title,Duplicates content title message,Is {name} ({trackingId}) a duplicate?,Est-ce que {name} ({trackingId}) est un doublon?
 duplicates.review.header,Review page header for duplicates declarations,Potential {event} duplicate review,Potentiel {event} examen de doublon
+duplicates.reviewUnavailable.description,Body of the banner shown when the user cannot access every record matched as a potential duplicate,"It is flagged against a record registered outside your jurisdiction, which you are not permitted to view. The review must be completed by someone with access to both records.","Il est signalé par rapport à un enregistrement enregistré en dehors de votre juridiction, que vous n'êtes pas autorisé à consulter. L'examen doit être effectué par une personne ayant accès aux deux enregistrements."
+duplicates.reviewUnavailable.title,Title of the banner shown when the user cannot access every record matched as a potential duplicate,You cannot review this record for duplicates,Vous ne pouvez pas examiner cet enregistrement pour les doublons
 duplicates.warning,The warning message shown when a declaration has potential duplicates,Potential duplicate of record {trackingId},Duplicata potentiel de l'enregistrement {trackingId}
 editPageBanner.declaredMessage,The message for the edit page banner,You are editing a record declared by {name} ({role} at {location}),Vous modifiez un dossier déclaré par {name} ({role} à {location})
 editPageBanner.notifiedMessage,The message for the edit page banner,You are editing a record notified by {name} ({role} at {location}),Vous modifiez un dossier déclaré par {name} ({role} à {location})
@@ -986,6 +988,7 @@ flags.builtin.edit-in-progress.label,Flag label for edit in progress,Edit in pro
 flags.builtin.incomplete.label,Label for flag,Incomplete,Incomplet
 flags.builtin.potential-duplicate.label,Label for flag,Potential duplicate,Doublon potentiel
 flags.builtin.rejected.label,Label for flag,Rejected,Rejeté
+flags.builtin.sealed.label,Label for flag,Sealed,Scellé
 form.birth.child.title,Form section title for Child,Child's details,information de l'enfant
 form.field.dateRangepicker.checkbox.dateLabel,,{rangeStart} to {rangeEnd},{rangeStart} à {rangeEnd}
 form.field.helpertext.nid,Helper text for nid input field,The National ID can only be numeric and must be 10 digits long,Le numéro d'identification national doit être uniquement numérique et comporter 10 chiffres
@@ -1599,3 +1602,4 @@ workqueues.pendingValidation.title,Title of pending validation workqueue,Pending
 workqueues.potentialDuplicate.title,Title of potential duplicate workqueue,Potential duplicate,Duplicata potentiel
 workqueues.recent.title,Title of recent workqueue,Recent,Récent
 workqueues.requiresApproval.title,Title of pending approval workqueue,Pending approval,En attente d'approbation
+event.summary.redacted,Accessible name for a value the user is not permitted to see,Hidden,

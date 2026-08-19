@@ -13,6 +13,7 @@ import fc from 'fast-check'
 import {
   ActionTypes,
   EventDocument,
+  InherentFlags,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
@@ -23,8 +24,10 @@ import {
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
+  createEvent,
   createTestClient,
   setupScopeTestFixture,
+  setupTestCase,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import {
@@ -200,3 +203,49 @@ test('Check notifiedIn and notifiedBy scopes against event.get', async () => {
     { numRuns: 20 }
   )
 }, 120000)
+
+test('Check flags scope option against event.get', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const { type } = generator.event.create()
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({ type: 'record.notify', options: { event: [type] } })
+  ])
+
+  const event = await createEvent(client, generator, [])
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(event.id)
+  )
+
+  // The NOTIFY action adds the `incomplete` flag to the event.
+  const clientRestrictedByFlags = createTestClient(user, [
+    encodeScope({
+      type: 'record.read',
+      options: { flags: { noneOf: [InherentFlags.INCOMPLETE] } }
+    })
+  ])
+
+  await expect(
+    clientRestrictedByFlags.event.get({ eventId: event.id })
+  ).rejects.toBeInstanceOf(EventNotFoundError)
+
+  const clientMatchingFlags = createTestClient(user, [
+    encodeScope({
+      type: 'record.read',
+      options: { flags: { anyOf: [InherentFlags.INCOMPLETE] } }
+    })
+  ])
+
+  await expect(
+    clientMatchingFlags.event.get({ eventId: event.id })
+  ).resolves.toMatchObject({ id: event.id })
+
+  const clientWithoutFlagsRestriction = createTestClient(user, [
+    encodeScope({ type: 'record.read' })
+  ])
+
+  await expect(
+    clientWithoutFlagsRestriction.event.get({ eventId: event.id })
+  ).resolves.toMatchObject({ id: event.id })
+})
