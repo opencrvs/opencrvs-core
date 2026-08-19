@@ -161,7 +161,9 @@ function SidebarComponent({
       )
     : undefined
 
-  const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
+  const avatar = (
+    <Avatar aria-hidden name={name} size="lg" src={userDetails?.avatar} />
+  )
 
   const runningVer = String(localStorage.getItem('running-version'))
 
