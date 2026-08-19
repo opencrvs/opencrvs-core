@@ -83,6 +83,10 @@ const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
 
+const LinkLeftAligned = styled(Link)`
+  text-align: left;
+`
+
 interface IBaseProp {
   userId: string
   userName: string | null | undefined
@@ -267,9 +271,12 @@ function UserAuditHistoryComponent(props: Props) {
     return orderBy(
       results.map((entry) => ({
         actionDescription: (
-          <Link font="bold14" onClick={() => toggleActionDetails(entry)}>
+          <LinkLeftAligned
+            font="bold14"
+            onClick={() => toggleActionDetails(entry)}
+          >
             {getActionMessage(entry)}
-          </Link>
+          </LinkLeftAligned>
         ),
         actionDescriptionString: getActionMessage(entry),
         trackingId: (() => {
