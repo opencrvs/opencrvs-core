@@ -13,6 +13,7 @@
     "./events": "./dist/events/index.js",
     "./telemetry": "./dist/telemetry/index.js",
     "./scopes": "./dist/scopes/index.js",
+    "./authentication": "./dist/authentication/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
     "./notification": "./dist/notification/index.js"

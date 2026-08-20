@@ -31,7 +31,13 @@ import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
-import { ClientLocation, todayISO, User, UUID } from '@opencrvs/commons/client'
+import {
+  ClientLocation,
+  isSelectableAtAnchor,
+  todayISO,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -588,7 +594,10 @@ function UserListComponent({ userDetails }: UserListProps) {
 
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          locationFilter={(location) => canAccessOffice(location)}
+          locationFilter={(location) =>
+            canAccessOffice(location) &&
+            isSelectableAtAnchor(location.versions, todayISO())
+          }
         />
       )
     }
