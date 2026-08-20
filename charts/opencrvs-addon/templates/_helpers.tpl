@@ -56,34 +56,34 @@ Parameters:
 */}}
 {{- define "probes-helper" -}}
 {{- if .probes.enabled }}
-{{- $global := .probes }}
+{{- $probes := .probes }}
 {{- $port := .service.container_port }}
 livenessProbe:
   failureThreshold: 5
   httpGet:
-    path: {{ $global.liveness.path }}
+    path: {{ $probes.liveness.path }}
     port: {{ $port }}
     scheme: HTTP
-  periodSeconds: {{ $global.liveness.periodSeconds }}
+  periodSeconds: {{ $probes.liveness.periodSeconds }}
   successThreshold: 1
-  timeoutSeconds: {{ $global.liveness.timeoutSeconds }}
+  timeoutSeconds: {{ $probes.liveness.timeoutSeconds }}
 readinessProbe:
   failureThreshold: 5
   httpGet:
-    path: {{ $global.readiness.path }}
+    path: {{ $probes.readiness.path }}
     port: {{ $port }}
     scheme: HTTP
-  periodSeconds: {{ $global.readiness.periodSeconds }}
+  periodSeconds: {{ $probes.readiness.periodSeconds }}
   successThreshold: 1
-  timeoutSeconds: {{ $global.readiness.timeoutSeconds }}
+  timeoutSeconds: {{ $probes.readiness.timeoutSeconds }}
 startupProbe:
   failureThreshold: 30
   httpGet:
-    path: {{ $global.startup.path }}
+    path: {{ $probes.startup.path }}
     port: {{ $port }}
     scheme: HTTP
-  periodSeconds: {{ $global.startup.periodSeconds }}
+  periodSeconds: {{ $probes.startup.periodSeconds }}
   successThreshold: 1
-  timeoutSeconds: {{ $global.startup.timeoutSeconds }}
+  timeoutSeconds: {{ $probes.startup.timeoutSeconds }}
 {{- end }}
 {{- end }}
