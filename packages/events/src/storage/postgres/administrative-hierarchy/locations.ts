@@ -212,7 +212,6 @@ export async function setLocations(locations: SetLocationRow[]) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
-  clearAdministrativeHierarchyCache()
 }
 
 /** The fully resolved values of a location create request. */
@@ -253,8 +252,6 @@ export async function createLocation(location: CreateLocationRow) {
       versions: buildInitialVersions(location)
     })
     .execute()
-
-  clearAdministrativeHierarchyCache()
 }
 
 /**

@@ -62,24 +62,6 @@ test('bulk-setting administrative areas invalidates the leaf-level cache', async
   expect(after.map((row) => row.id)).not.toContain(seededParent.id)
 })
 
-test('creating a location also invalidates the leaf-level cache, even though locations never appear in it', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
-
-  const before = await getLeafLevelAdministrativeAreaIds()
-
-  await client.locations.create({
-    name: 'New Office',
-    externalId: 'leaf-cache-location-create-pcode',
-    administrativeAreaId: null,
-    locationType: 'CRVS_OFFICE'
-  })
-
-  const after = await getLeafLevelAdministrativeAreaIds()
-
-  expect(after).not.toBe(before)
-})
-
 test('updating or withdrawing an administrative area version does not invalidate the leaf-level cache', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
@@ -115,9 +97,11 @@ test('updating or withdrawing an administrative area version does not invalidate
   expect(afterWithdraw).toBe(beforeUpdate)
 })
 
-test('updating or withdrawing a location version does not invalidate the leaf-level cache', async () => {
+test('creating, updating or withdrawing a location version never invalidates the leaf-level cache', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
+
+  const before = await getLeafLevelAdministrativeAreaIds()
 
   const created = await client.locations.create({
     name: 'Stable Office',
@@ -129,6 +113,7 @@ test('updating or withdrawing a location version does not invalidate the leaf-le
   })
 
   const beforeUpdate = await getLeafLevelAdministrativeAreaIds()
+  expect(beforeUpdate).toBe(before)
 
   const updated = await client.locations.update({
     id: created.id,
