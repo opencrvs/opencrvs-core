@@ -15,16 +15,14 @@ import { joinUrl } from '@opencrvs/commons'
 import { env } from './environment'
 import { raise } from './utils'
 import { formatUnwrittenFailure } from './seed-failure'
-import { SeedData } from './validate-seed-data'
+import { SeedData } from './seed-data'
 
 const ApplicationConfigSchema = z.object({
   PHONE_NUMBER_PATTERN: z.string()
 })
 
-type ApplicationSeedData = Pick<SeedData, 'PHONE_NUMBER_PATTERN'>
-
 export async function getApplicationConfig(): Promise<{
-  seedData: ApplicationSeedData
+  seedData: Pick<SeedData, 'PHONE_NUMBER_PATTERN'>
 }> {
   const url = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/application')
   const res = await fetch(url, {

@@ -23,11 +23,11 @@ import {
   formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
+import { validateSeedData } from './validate-seed-data'
 import {
   formatValidationReport,
-  formatValidationSummary,
-  validateSeedData
-} from './validate-seed-data'
+  formatValidationSummary
+} from './validation-report'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL(
@@ -119,7 +119,7 @@ async function main() {
   const problems = validateSeedData(seedData)
 
   if (problems.length > 0) {
-    raise(formatValidationReport(problems, seedData))
+    raise(formatValidationReport(problems))
   }
 
   // eslint-disable-next-line no-console
@@ -166,7 +166,7 @@ async function write(
 main().catch((error: unknown) => {
   raise(
     error instanceof PartialSeedError
-      ? error.report
+      ? error.message
       : formatUnwrittenFailure(describeError(error))
   )
 })

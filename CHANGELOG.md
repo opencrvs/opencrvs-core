@@ -128,11 +128,13 @@ Validated up front: duplicate email, mobile and username within the seed-data; e
 Problems identify an initial user by its position in the seed-data and its username, and a validation failure always ends with `nothing was seeded`:
 
 ```
-4 problems found in 55 initial users; nothing was seeded.
+4 problems found; nothing was seeded.
   initial user 44 (k.mweene): email "k.mweene@x.com" duplicates initial user 12 — emails must be unique
 ```
 
 Duplicate usernames are a hard error rather than a rename. The service renumbers colliding usernames when it creates a user, which is right for self-service creation but wrong at seed time.
+
+Seed-data is held to a stricter shape, so mistakes surface here rather than part-way through a write. An initial user's username must satisfy the same rule the service applies when it creates one, and a username, password or name that is present but empty is a problem rather than something the database objects to later. A location version's `effectiveFrom` must be a plain date. Unrecognised keys on a location, a location version or an initial user are reported instead of being dropped in silence — a misspelled `verisons` previously cost a location its whole history without a word.
 
 Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing initial user and states that the database holds incomplete seed-data:
 

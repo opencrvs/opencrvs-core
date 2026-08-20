@@ -17,14 +17,17 @@ import { getUUID, LocationVersion } from '@opencrvs/commons'
 import { createInitialisationClient } from './initialisation-client'
 import { formatUnwrittenFailure } from './seed-failure'
 
-const RawLocationVersionSchema = z.object({
-  effectiveFrom: z.string().optional(),
+/** Strict, here and below: every optional field is one a typo can silently
+ * drop — an unrecognised `verisons` would cost a location its whole history
+ * without a word. */
+const RawLocationVersionSchema = z.strictObject({
+  effectiveFrom: z.iso.date().optional(),
   name: z.string(),
   externalId: z.string().optional(),
   status: z.enum(['active', 'inactive'])
 })
 
-const RawLocationSchema = z.object({
+const RawLocationSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   partOf: z.string(),
@@ -43,7 +46,7 @@ const CountryConfigLocationResponse = z.object({
 
 /**
  * Builds a seedable `versions` history from the country config's raw version
- * rows: assigns each element a fresh `versionId` and defaults an empty
+ * rows: assigns each element a fresh `versionId` and defaults an absent
  * `effectiveFrom` to the beginning-of-time sentinel, since the `set`
  * mutation's schema requires every element to carry both, unlike the raw
  * wire format.

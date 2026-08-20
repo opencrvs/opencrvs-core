@@ -88,15 +88,9 @@ export function describeInitialUserFailure(
     : `${message} — ${field} "${value}" is already in use`
 }
 
-/** The type is the phase marker: only the writing part of the entry point
- * raises it, so an error reaching the top-level handler without it came from
- * before the first write. */
 export class PartialSeedError extends Error {
-  public readonly report: string
-
   constructor(report: string) {
     super(report)
     this.name = 'PartialSeedError'
-    this.report = report
   }
 }

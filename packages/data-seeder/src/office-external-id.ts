@@ -12,7 +12,7 @@
 /** The external id an initial user's `primaryOfficeId` refers to: its last
  * underscore-separated segment. Shared so that pre-flight validation and the
  * write path cannot resolve an office differently. */
-export function officeExternalId(primaryOfficeId: string): string {
+export function getOfficeExternalId(primaryOfficeId: string): string {
   const segments = primaryOfficeId.split('_')
   return segments[segments.length - 1]
 }

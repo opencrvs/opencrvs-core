@@ -8,58 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EncodedScope, hasScope } from '@opencrvs/commons'
-import { officeExternalId } from './office-external-id'
+import { hasScope } from '@opencrvs/commons'
+import { getOfficeExternalId } from './office-external-id'
 import {
-  InitialUserRef,
-  NOTHING_WAS_SEEDED,
-  Offending,
-  SeedSubject,
-  renderOffending,
-  renderSubject
-} from './seed-report'
-
-/** Every field is optional, including those the country config's schema
- * requires: an entry that did not parse still arrives here and may be missing
- * anything, so a check reads only what is there. */
-export interface SeedDataUser {
-  username?: string
-  email?: string
-  mobile?: string
-  /** A compound reference, not the office's own id. */
-  primaryOfficeId?: string
-  role?: string
-  malformed?: string
-}
-
-export interface SeedDataRole {
-  id?: string
-  scopes: EncodedScope[]
-  malformed?: string
-}
-
-export interface SeedDataLocation {
-  id: string
-  name: string
-  /** `Location/<id>`, or `Location/0` at the root of the hierarchy. */
-  partOf: string
-}
-
-export interface SeedData {
-  users: SeedDataUser[]
-  roles: SeedDataRole[]
-  PHONE_NUMBER_PATTERN: string
-  malformedUserList?: string
-  malformedRoleList?: string
-  administrativeAreas: SeedDataLocation[]
-  locations: SeedDataLocation[]
-}
-
-export type SeedDataProblem = SeedSubject &
-  Offending & {
-    problem: string
-    rule: string
-  }
+  SeedData,
+  SeedDataLocation,
+  SeedDataProblem,
+  SeedDataRole,
+  SeedDataUser
+} from './seed-data'
+import { InitialUserRef } from './seed-report'
 
 /** `normalise` mirrors how the write path compares the field, so both agree on
  * what a duplicate is: emails and usernames are lowercased on write, mobile
@@ -146,7 +104,7 @@ function unknownOffices({ users, locations }: SeedData): SeedDataProblem[] {
       return
     }
 
-    const externalId = officeExternalId(user.primaryOfficeId)
+    const externalId = getOfficeExternalId(user.primaryOfficeId)
 
     if (declaredOffices.has(externalId)) {
       return
@@ -192,26 +150,26 @@ function unparentedNodes(
 }
 
 function unparsedLists({
-  malformedUserList,
-  malformedRoleList
+  userListError,
+  roleListError
 }: SeedData): SeedDataProblem[] {
   const problems: SeedDataProblem[] = []
 
-  if (malformedUserList !== undefined) {
+  if (userListError !== undefined) {
     problems.push({
       about: 'subject',
       subject: `the country config's initial users`,
       problem: 'do not parse',
-      rule: malformedUserList
+      rule: userListError
     })
   }
 
-  if (malformedRoleList !== undefined) {
+  if (roleListError !== undefined) {
     problems.push({
       about: 'subject',
       subject: `the country config's roles`,
       problem: 'do not parse',
-      rule: malformedRoleList
+      rule: roleListError
     })
   }
 
@@ -281,9 +239,9 @@ function declaredRoleIds(roles: SeedDataRole[]): Map<string, SeedDataRole> {
 function unknownRoles({
   users,
   roles,
-  malformedRoleList
+  roleListError
 }: SeedData): SeedDataProblem[] {
-  if (malformedRoleList !== undefined) {
+  if (roleListError !== undefined) {
     return []
   }
 
@@ -373,13 +331,13 @@ const CONFIGURE_SCOPE = 'config.update-all'
 function missingConfigurationAdministrator({
   users,
   roles,
-  malformedRoleList
+  roleListError
 }: SeedData): SeedDataProblem[] {
   const named = users.flatMap((user) =>
     user.role === undefined ? [] : [user.role]
   )
 
-  if (malformedRoleList !== undefined || named.length === 0) {
+  if (roleListError !== undefined || named.length === 0) {
     return []
   }
 
@@ -447,16 +405,21 @@ function brokenHierarchy({
   ]
 }
 
-/** Every problem with a set of seed-data, in seed-data order. An empty list means
- * it is safe to write. */
+/** Every problem with a set of seed-data, in seed-data order. An empty list
+ * means it is safe to write. Grouped by what each check reports a problem
+ * about, which is the order the report prints them in. */
 export function validateSeedData(seedData: SeedData): SeedDataProblem[] {
   const problems = [
+    // the seed-data as a whole
     ...unparsedLists(seedData),
     ...invalidPhoneNumberPattern(seedData),
+    ...missingConfigurationAdministrator(seedData),
+    // locations
     ...brokenHierarchy(seedData),
+    // roles
     ...unparsedRoles(seedData),
     ...duplicateRoleIds(seedData),
-    ...missingConfigurationAdministrator(seedData),
+    // initial users
     ...unparsedUsers(seedData),
     ...UNIQUE_USER_FIELDS.flatMap((uniqueField) =>
       duplicatesOf(seedData.users, uniqueField)
@@ -473,47 +436,4 @@ export function validateSeedData(seedData: SeedData): SeedDataProblem[] {
 /** Problems about something other than an initial user sort to the front. */
 function positionOf(problem: SeedDataProblem) {
   return problem.about === 'initialUser' ? problem.user.position : 0
-}
-
-function pluralise(count: number, singular: string, plural: string) {
-  return `${count} ${count === 1 ? singular : plural}`
-}
-
-function renderProblem(problem: SeedDataProblem) {
-  return (
-    `  ${renderSubject(problem)}${renderOffending(problem)}` +
-    `${problem.problem} — ${problem.rule}`
-  )
-}
-
-/** The header ends `nothing was seeded` because validation runs before the
- * first write, so there is nothing for the operator to clear. */
-export function formatValidationReport(
-  problems: SeedDataProblem[],
-  seedData: SeedData
-): string {
-  const header =
-    `${pluralise(problems.length, 'problem', 'problems')} found in ` +
-    `${pluralise(seedData.users.length, 'initial user', 'initial users')}; ` +
-    `${NOTHING_WAS_SEEDED}`
-
-  return [header, ...problems.map(renderProblem)].join('\n')
-}
-
-export function formatValidationSummary({
-  users,
-  administrativeAreas,
-  locations
-}: SeedData): string {
-  return (
-    `Seed-data validated: ` +
-    `${pluralise(users.length, 'initial user', 'initial users')}, ` +
-    `${pluralise(
-      administrativeAreas.length,
-      'administrative area',
-      'administrative areas'
-    )}, ` +
-    `${pluralise(locations.length, 'location', 'locations')}. ` +
-    `No problems found.`
-  )
 }

@@ -15,7 +15,7 @@ import { raise } from './utils'
 
 import { CreateUserInputInternal } from '@opencrvs/commons'
 import { createInitialisationClient } from './initialisation-client'
-import { officeExternalId } from './office-external-id'
+import { getOfficeExternalId } from './office-external-id'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import {
   CREATING_INITIAL_USERS,
@@ -24,27 +24,26 @@ import {
   formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
-import { SeedData, SeedDataUser } from './validate-seed-data'
+import { SeedData, SeedDataUser } from './seed-data'
 
-const WithoutContact = z.object({
-  primaryOfficeId: z.string(),
-  givenNames: z.string(),
-  familyName: z.string(),
-  role: z.string(),
-  username: z.string(),
-  password: z.string()
-})
-
-const UserRecordSchema = WithoutContact.extend({
-  mobile: z.string(),
-  email: z.string().email().optional()
-})
-  .or(
-    WithoutContact.extend({
-      email: z.string().email(),
-      mobile: z.string().optional()
-    })
-  )
+/** `username` and `email` are the server's own rules, so seed-data that would
+ * be rejected on write is rejected here instead. The rest are the country
+ * config's to define, and only have to be present. */
+const UserRecordSchema = z
+  .strictObject({
+    primaryOfficeId: z.string().min(1),
+    givenNames: z.string().min(1),
+    familyName: z.string().min(1),
+    role: z.string().min(1),
+    username: CreateUserInputInternal.shape.username,
+    password: z.string().min(1),
+    mobile: z.string().optional(),
+    email: CreateUserInputInternal.shape.email
+  })
+  .refine((user) => Boolean(user.mobile) || Boolean(user.email), {
+    message: 'must provide at least one of email or mobile',
+    path: []
+  })
   .transform(({ familyName, givenNames, ...user }) => ({
     ...user,
     firstname: givenNames,
@@ -52,8 +51,6 @@ const UserRecordSchema = WithoutContact.extend({
   }))
 
 export type SeedUsers = z.output<typeof UserRecordSchema>[]
-
-type UserSeedData = Pick<SeedData, 'users' | 'malformedUserList'>
 
 /** Named one by one rather than spread, so that renaming a field on the schema
  * without telling the validator is a compile error rather than a check that
@@ -97,9 +94,10 @@ function parseRecords(records: unknown[]): {
   return { users, seedData }
 }
 
-export async function getUsers(
-  token: string
-): Promise<{ users: SeedUsers; seedData: UserSeedData }> {
+export async function getUsers(token: string): Promise<{
+  users: SeedUsers
+  seedData: Pick<SeedData, 'users' | 'userListError'>
+}> {
   const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
@@ -120,7 +118,7 @@ export async function getUsers(
     users: records.users,
     seedData: {
       users: records.seedData,
-      malformedUserList: userList.success
+      userListError: userList.success
         ? undefined
         : describeParseFailure(userList.error)
     }
@@ -170,7 +168,7 @@ export async function seedUsers(token: string, users: SeedUsers) {
         continue
       }
 
-      const externalId = officeExternalId(officeIdentifier)
+      const externalId = getOfficeExternalId(officeIdentifier)
 
       const client = createInitialisationClient(token)
 

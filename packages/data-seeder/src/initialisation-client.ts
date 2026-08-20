@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/** Lives here rather than in `./index`, which runs the seed at import time:
- * importing a seeding module for this factory would otherwise authenticate,
- * seed and deactivate the superuser. */
+/** Lives here rather than in `./index`, as otherwise importing it would re-run seeding */
 import superjson from 'superjson'
 import { createTRPCClient, httpLink } from '@trpc/client'
 import { env } from './environment'

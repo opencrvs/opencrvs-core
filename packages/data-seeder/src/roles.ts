@@ -12,8 +12,7 @@ import {
   decodeScope,
   EncodedScope,
   EventConfig,
-  joinUrl,
-  parseConfigurableScope
+  joinUrl
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { z } from 'zod'
@@ -21,24 +20,21 @@ import { env } from './environment'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import { formatUnwrittenFailure } from './seed-failure'
 import { raise } from './utils'
-import { SeedData, SeedDataRole } from './validate-seed-data'
-
-type RoleSeedData = Pick<SeedData, 'roles' | 'malformedRoleList'>
+import { SeedData, SeedDataRole } from './seed-data'
 
 const RoleRecordSchema = (eventIds: string[]) =>
   z.object({
-    id: z.string(),
+    id: z.string().min(1),
     label: z.object({
-      defaultMessage: z.string(),
+      defaultMessage: z.string().min(1),
       description: z.string(),
-      id: z.string()
+      id: z.string().min(1)
     }),
     scopes: z.array(
       EncodedScope.superRefine((scope, ctx) => {
-        const parsedConfigurableScope = parseConfigurableScope(scope)
-        const parsedV2Scopes = decodeScope(scope)
+        const parsedScope = decodeScope(scope)
 
-        if (!parsedConfigurableScope && !parsedV2Scopes) {
+        if (!parsedScope) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Invalid scope: "${scope}"`
@@ -46,24 +42,22 @@ const RoleRecordSchema = (eventIds: string[]) =>
           return
         }
 
-        if (parsedV2Scopes?.type) {
-          if (!('options' in parsedV2Scopes)) {
-            return
-          }
+        if (!('options' in parsedScope)) {
+          return
+        }
 
-          const options = parsedV2Scopes.options
+        const options = parsedScope.options
 
-          if (options && 'event' in options && Array.isArray(options.event)) {
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
+        if (options && 'event' in options && Array.isArray(options.event)) {
+          const invalidEventIds = options.event.filter(
+            (id) => !eventIds.includes(id)
+          )
 
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
-            }
+          if (invalidEventIds.length > 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+            })
           }
         }
       })
@@ -88,7 +82,7 @@ function parseRoles(roles: unknown[], eventIds: string[]): SeedDataRole[] {
 
 export async function getRoles(
   token: string
-): Promise<{ seedData: RoleSeedData }> {
+): Promise<{ seedData: Pick<SeedData, 'roles' | 'roleListError'> }> {
   const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
   const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
@@ -121,7 +115,7 @@ export async function getRoles(
   return {
     seedData: {
       roles: roleList.success ? parseRoles(roleList.data, eventIds) : [],
-      malformedRoleList: roleList.success
+      roleListError: roleList.success
         ? undefined
         : describeParseFailure(roleList.error)
     }

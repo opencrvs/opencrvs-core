@@ -35,7 +35,7 @@ import {
   formatUnwrittenFailure
 } from './seed-failure'
 import { NOTHING_WAS_SEEDED, REMEDY } from './seed-report'
-import { formatValidationReport } from './validate-seed-data'
+import { formatValidationReport } from './validation-report'
 
 function failure(overrides: Partial<SeedFailure> = {}): SeedFailure {
   return {
@@ -47,14 +47,6 @@ function failure(overrides: Partial<SeedFailure> = {}): SeedFailure {
     reason: 'DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use',
     ...overrides
   }
-}
-
-const NO_SEED_DATA = {
-  users: [],
-  roles: [],
-  administrativeAreas: [],
-  locations: [],
-  PHONE_NUMBER_PATTERN: '^0[0-9]{10}$'
 }
 
 const fetchFailure = formatUnwrittenFailure(
@@ -82,7 +74,7 @@ const droppedConnection = formatSeedFailure({
 describe('the closing sentence, by phase', () => {
   it.each([
     ['a seed-data fetch failure', fetchFailure],
-    ['a validation report', formatValidationReport([], NO_SEED_DATA)]
+    ['a validation report', formatValidationReport([])]
   ])('%s says nothing was seeded, and names no remedy', (_, report) => {
     expect(report).toContain(NOTHING_WAS_SEEDED)
     expect(report).not.toContain(REMEDY)
