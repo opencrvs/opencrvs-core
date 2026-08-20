@@ -56,17 +56,23 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       })
     : getCurrentEventState(event, eventConfiguration)
 
+  // NOTE: Summary is build to expect all fields, including secured ones.
+  // In cases where title is secured, we do not show it. This is to keep it consistent with the rest of the application, since they depend on event.search for their data.
   const eventWithoutSecuredFields = dropSecuredDeclarationFields(
     eventConfiguration,
     eventWithDrafts,
     validatorContext
   )
+
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventWithoutSecuredFields)
+
   const { getUsers } = useUsers()
 
   const assignedToUser = getUsers.useQueryById(
-    eventWithoutSecuredFields.assignedTo || '',
+    eventWithDrafts.assignedTo || '',
     {
-      enabled: !!eventWithoutSecuredFields.assignedTo
+      enabled: !!eventWithDrafts.assignedTo
     }
   )
 
@@ -75,15 +81,13 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     : null
 
   const { flags, ...flattenedEventIndex } = {
-    ...flattenEventIndex(eventWithoutSecuredFields),
+    ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status and flags are taken from the eventIndex
     'event.status': status,
     'event.assignedTo': assignedTo,
     flags: eventIndex.flags
   }
-  const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventWithoutSecuredFields)
 
   return (
     <Content

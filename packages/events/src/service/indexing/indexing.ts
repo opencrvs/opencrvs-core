@@ -543,7 +543,7 @@ export async function findRecordsByQuery({
       return dropSecuredDeclarationFields(
         eventConfig,
         eventIndexWithoutLocationHierarchy,
-        // @TODO: This is not a full context. It will require fetching every EventDocument.
+        // @TODO: This is not a full context. It will require fetching every EventDocument. https://github.com/opencrvs/opencrvs-core/issues/13530
         validatorContext
       )
     })
