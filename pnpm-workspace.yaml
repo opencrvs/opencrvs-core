@@ -7,10 +7,14 @@ packages:
   # - 'packages/countryconfig-template' Intentionally removed. Lerna reads pnpm-workspace.yaml but does not recognize negation. Hence explicit inclusion for all packages.
   - 'packages/data-seeder'
   - 'packages/documents'
+  - 'packages/esignet-mock'
   - 'packages/events'
   - 'packages/gateway'
   - 'packages/login'
   - 'packages/migration'
+  - 'packages/mosip'
+  - 'packages/mosip-api'
+  - 'packages/mosip-mock'
   - 'packages/testland'
   - 'packages/toolkit'
   - 'packages/toolkit/create-countryconfig'
@@ -65,5 +69,9 @@ patchedDependencies:
 # native accelerators) is deliberately left blocked.
 onlyBuiltDependencies:
   - '@swc/core'
+  # mosip-api stores record-specific tokens in SQLite (packages/mosip-api/src/database.ts).
+  # better-sqlite3 is a native module and needs its install script to fetch or
+  # compile the binding, so it has to be allowed through explicitly.
+  - better-sqlite3
   - esbuild
   - nx

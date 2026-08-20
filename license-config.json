@@ -73,7 +73,14 @@
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
-    "packages/api-docs/public-key.pem"
+    ".nx",
+    "packages/api-docs/public-key.pem",
+    "packages/mosip/.npmignore",
+    "packages/mosip-api/docs/example-certs",
+    "packages/mosip-api/certs",
+    "packages/mosip-mock/src/mock-only-private-key.pem",
+    "packages/esignet-mock/src/dev-secrets",
+    "packages/esignet-mock/src/mock-authorizer/index.html"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
@@ -86,7 +93,7 @@
       "prepend": "<!--",
       "append": "-->"
     },
-    "ts|tsx|js|css": {
+    "ts|tsx|js|mjs|css": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {
