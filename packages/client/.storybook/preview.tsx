@@ -34,7 +34,8 @@ import {
   addUserToQueryData,
   setEventData,
   addLocalEventConfig,
-  setDraftData
+  setDraftData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   ActionType,
@@ -57,6 +58,7 @@ import {
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
+import id from 'zod/v4/locales/id.cjs'
 
 WebFont.load({
   google: {
@@ -329,6 +331,7 @@ const preview: Preview = {
 
       offlineEvents.forEach((event) => {
         setEventData(event.id, event)
+        updateLocalEventIndex(event.id, event)
       })
 
       if (options.parameters?.offline?.drafts) {
