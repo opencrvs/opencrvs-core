@@ -15,6 +15,7 @@ import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Accordion,
   Button,
@@ -131,17 +132,17 @@ const Card = styled.div`
   }
 `
 
-const FormData = styled.div`
-  padding-top: 24px;
+const FormData = styled.div<{ $padded?: boolean }>`
+  ${({ $padded }) => ($padded === false ? '' : 'padding-top: 24px;')}
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
+    ${({ $padded }) => ($padded === false ? '' : 'padding: 24px;')}
   }
 `
 
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
+const ReviewContainter = styled.div<{ $padded?: boolean }>`
+  padding: ${({ $padded }) => ($padded === false ? '0' : '0px 32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
   }
@@ -222,6 +223,52 @@ function ReviewHeader({ title }: { title: string }) {
 }
 
 /**
+ * A declaration review draws its own card with the country logo. A screen that
+ * is not a review — the Record tab — passes `contentTitle` and gets the
+ * design-system Content instead, so its heading matches every other tab.
+ */
+function CardOrContent({
+  contentTitle,
+  reviewTitle,
+  actions,
+  children
+}: {
+  contentTitle?: string
+  reviewTitle: string
+  actions?: React.ReactElement[]
+  children: React.ReactNode
+}) {
+  if (contentTitle === undefined) {
+    return (
+      <Card>
+        <ReviewHeader title={reviewTitle} />
+        {children}
+      </Card>
+    )
+  }
+
+  /*
+   * Content hides its whole top bar below lg unless told otherwise, and that
+   * bar carries the header actions as well as the title. A screen that puts a
+   * control up there needs it at every width.
+   */
+  return (
+    <Content
+      /*
+       * On a narrow screen the selected tab names the page, so the card's own
+       * title stays hidden — but a control in the header has to stay reachable.
+       */
+      showActionsOnMobile
+      size={ContentSize.LARGE}
+      title={contentTitle}
+      topActionButtons={actions}
+    >
+      {children}
+    </Content>
+  )
+}
+
+/**
  *  Renders review of form data, with the ability to edit the data.
  */
 function FormReview({
@@ -231,9 +278,11 @@ function FormReview({
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
+  paddedBody = true,
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
+  showValidationErrors = true,
   validatorContext,
   anchor
 }: {
@@ -242,11 +291,21 @@ function FormReview({
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
+  /** False when the container already pads the body, as Content does. */
+  paddedBody?: boolean
   validatorContext: ValidatorContext
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
+  /**
+   * Whether a field that fails validation reports it in place of its value.
+   *
+   * Off for a superseded version: there is nothing there to act on, and it
+   * would be judged against what validation says today rather than what it
+   * said when the version was captured.
+   */
+  showValidationErrors?: boolean
   /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
   anchor: PlainDate
 }) {
@@ -257,8 +316,12 @@ function FormReview({
   )
 
   return (
-    <FormData>
+    <FormData $padded={paddedBody}>
+<<<<<<< HEAD
       <ReviewContainter>
+=======
+      <ReviewContainter $padded={paddedBody}>
+>>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
         {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) =>
@@ -300,7 +363,7 @@ function FormReview({
               ).flatMap(([, errs]) => errs)
 
               const errorDisplay =
-                errors.length > 0 ? (
+                showValidationErrors && errors.length > 0 ? (
                   <ValidationError key={field.id}>
                     {intl.formatMessage(errors[0].message)}
                   </ValidationError>
@@ -391,7 +454,11 @@ function FormReview({
                             label={intl.formatMessage(label)}
                           />
                         ) : (
+<<<<<<< HEAD
+                          <ListReview.Row
+=======
                           <List.Item
+>>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
                             actions={
                               !shouldHideEditLink && (
                                 <Link
@@ -436,6 +503,7 @@ function FormReview({
 function ReviewComponent({
   formConfig,
   previousFormValues,
+  showValidationErrors,
   form,
   validatorContext,
   annotation,
@@ -449,15 +517,25 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
-  anchor
+  anchor,
+  content
 }: {
   children?: React.ReactNode
+  /**
+   * Renders the left column as a design-system Content instead of the review
+   * card, for a screen that is not a declaration review — the Record tab —
+   * which needs a plain title and a header-action slot rather than the
+   * country logo.
+   */
+  content?: { title: string; actions?: React.ReactElement[] }
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
+  /** See FormReview. Defaults to on, which is what every action flow needs. */
+  showValidationErrors?: boolean
   onEdit: ({
     pageId,
     fieldId,
@@ -507,19 +585,24 @@ function ReviewComponent({
     <Row>
       <LeftColumn>
         {banner}
-        <Card>
-          <ReviewHeader title={title} />
+        <CardOrContent
+          actions={content?.actions}
+          contentTitle={content?.title}
+          reviewTitle={title}
+        >
           <FormReview
             anchor={anchor}
             form={form}
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
+            paddedBody={content === undefined}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            showValidationErrors={showValidationErrors}
             treatMissingValuesAsCleared={treatMissingValuesAsCleared}
             validatorContext={validatorContext}
             onEdit={onEdit}
@@ -527,8 +610,8 @@ function ReviewComponent({
 
           {/* edit annotation fields  */}
           {hasAnnotationFieldsToShow && onAnnotationChange && (
-            <FormData>
-              <ReviewContainter>
+            <FormData $padded={content === undefined}>
+              <ReviewContainter $padded={content === undefined}>
                 <DeclarationDataContainer>
                   <Accordion
                     expand={true}
@@ -560,8 +643,8 @@ function ReviewComponent({
           {hasAnnotationFieldsToShow &&
             readonlyMode &&
             displayedAnnotationFields.length > 0 && (
-              <FormData>
-                <ReviewContainter>
+              <FormData $padded={content === undefined}>
+                <ReviewContainter $padded={content === undefined}>
                   <DeclarationDataContainer>
                     <Accordion
                       expand={true}
@@ -595,7 +678,7 @@ function ReviewComponent({
                 </ReviewContainter>
               </FormData>
             )}
-        </Card>
+        </CardOrContent>
         {children}
       </LeftColumn>
       {pageIdsWithFile.length > 0 && (

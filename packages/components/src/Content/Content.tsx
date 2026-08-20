@@ -104,7 +104,7 @@ const TopFilterBar = styled.div`
   flex-wrap: wrap;
   gap: 8px;
 `
-const TopBar = styled.div<{ keepShowing?: boolean }>`
+const TopBar = styled.div<{ keepShowing?: boolean; keepActions?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -112,9 +112,8 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
   min-height: 64px;
   padding: 12px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ keepShowing }) => {
-      return !keepShowing ? 'display:none;' : 'padding:16px;'
-    }}
+    ${({ keepShowing, keepActions }) =>
+      !keepShowing && !keepActions ? 'display:none;' : 'padding:16px;'}
   }
 `
 const BottomActionBar = styled.div<{
@@ -134,13 +133,19 @@ const BackButtonContainer = styled.div`
     display: none;
   }
 `
-const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
+const TitleContainer = styled.div<{
+  titleColor?: keyof typeof colors
+  $hideOnMobile?: boolean
+}>`
   display: flex;
   gap: 16px;
   align-items: center;
   width: 0;
   flex: 1;
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    ${({ $hideOnMobile }) => $hideOnMobile && 'display: none;'}
+  }
 `
 
 const Title = styled.div`
@@ -177,6 +182,12 @@ interface IProps {
   title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
+  /**
+   * Keeps the header actions on a narrow screen without bringing the title
+   * back with them. Use where something in the header is a control rather
+   * than decoration, and the screen names itself some other way.
+   */
+  showActionsOnMobile?: boolean
   noPadding?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
@@ -194,6 +205,7 @@ export const UnstyledContent = ({
   title,
   titleColor,
   showTitleOnMobile,
+  showActionsOnMobile,
   topActionButtons,
   tabBarContent,
   filterContent,
@@ -208,8 +220,14 @@ export const UnstyledContent = ({
   <Container size={size} className={className}>
     <Header>
       {(icon || title || topActionButtons) && (
-        <TopBar keepShowing={showTitleOnMobile}>
-          <TitleContainer titleColor={titleColor}>
+        <TopBar
+          keepActions={showActionsOnMobile}
+          keepShowing={showTitleOnMobile}
+        >
+          <TitleContainer
+            $hideOnMobile={!showTitleOnMobile}
+            titleColor={titleColor}
+          >
             {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
             {title && <Title id={`content-name`}>{title}</Title>}
           </TitleContainer>
