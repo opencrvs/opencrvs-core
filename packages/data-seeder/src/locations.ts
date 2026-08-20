@@ -16,6 +16,7 @@ import { fromZodError } from 'zod-validation-error'
 import { getUUID, LocationVersion } from '@opencrvs/commons'
 import { createInitialisationClient } from './initialisation-client'
 import { formatUnwrittenFailure } from './seed-failure'
+import { Read, validatedContents } from './read'
 
 /** Strict, here and below: every optional field is one a typo can silently
  * drop — an unrecognised `verisons` would cost a location its whole history
@@ -44,9 +45,67 @@ const CountryConfigLocationResponse = z.object({
   administrativeAreas: z.array(RawAdministrativeAreaSchema)
 })
 
+/** One node of the hierarchy that parsed: an administrative area or a
+ * location. The ids here are the country config's own, which is what an office
+ * reference and a node's `partOf` are written in terms of. */
+export interface ParsedPlace {
+  id: string
+  name: string
+  /** `Location/<id>`, or `Location/0` at the root of the hierarchy. */
+  partOf: string
+}
+
+/** Which half of the hierarchy a node belongs to. Only locations are offices,
+ * and only areas are ever parents. */
+export type PlaceKind = 'administrativeArea' | 'location'
+
+export interface PlaceRef {
+  place: PlaceKind
+  id: string
+  name: string
+}
+
+export type LocationProblem =
+  | { kind: 'hierarchyUnparsed'; message: string }
+  | { kind: 'unparentedNode'; node: PlaceRef; partOf: string }
+
+/** What the write path sends. The ids here are freshly minted, and the
+ * country config's own ids survive as `externalId`. */
+export interface LocationPayload {
+  administrativeAreas: {
+    id: string
+    name: string
+    parentId: string | null
+    externalId: string
+    versions?: LocationVersion[]
+  }[]
+  locations: {
+    id: string
+    name: string
+    administrativeAreaId: string | null
+    locationType: string
+    externalId: string
+    versions?: LocationVersion[]
+  }[]
+}
+
+/**
+ * `payload` is kept alongside the parsed nodes because minting the ids discards
+ * the `partOf` the checks need, and states a parent as an id the checks have no
+ * way to resolve.
+ */
+export type LocationRead = Read<
+  {
+    administrativeAreas: ParsedPlace[]
+    locations: ParsedPlace[]
+    payload: LocationPayload
+  },
+  LocationProblem
+>
+
 /**
  * Builds a seedable `versions` history from the country config's raw version
- * rows: assigns each element a fresh `versionId` and defaults an absent
+ * entries: assigns each element a fresh `versionId` and defaults an absent
  * `effectiveFrom` to the beginning-of-time sentinel, since the `set`
  * mutation's schema requires every element to carry both, unlike the raw
  * wire format.
@@ -67,32 +126,10 @@ function buildSeededVersions(
   }))
 }
 
-/** The administrative hierarchy, fetched and parsed but neither written nor
- * structurally checked here; the entry point validates the whole set of
- * seed-data first. Returns the parsed seed-data alongside the rows to write,
- * because the transform below discards the `partOf` the validator needs. */
-export async function getLocations() {
-  const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
-  if (!res.ok) {
-    raise(formatUnwrittenFailure(`Expected to get the locations from ${url}`))
-  }
-
-  const parsedResponse = CountryConfigLocationResponse.safeParse(
-    await res.json()
-  )
-  if (!parsedResponse.success) {
-    raise(
-      formatUnwrittenFailure(
-        fromZodError(parsedResponse.error, {
-          prefix: `Error validating locations data returned from ${url}`
-        }).message
-      )
-    )
-  }
-
-  const { administrativeAreas, locations } = parsedResponse.data
-
+function buildPayload({
+  administrativeAreas,
+  locations
+}: z.output<typeof CountryConfigLocationResponse>): LocationPayload {
   const administrativeHierarchyIdMap = new Map(
     administrativeAreas.map(({ id }) => [id, getUUID()])
   )
@@ -100,9 +137,6 @@ export async function getLocations() {
   const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
 
   return {
-    // For the validator: the ids here are the country config's own, which is
-    // what an office reference and a node's `partOf` are written in terms of.
-    seedData: parsedResponse.data,
     administrativeAreas: administrativeAreas.map((a) => ({
       id: administrativeHierarchyIdMap.get(a.id)!,
       name: a.name,
@@ -123,11 +157,107 @@ export async function getLocations() {
   }
 }
 
-export type SeedLocations = Awaited<ReturnType<typeof getLocations>>
+export const ROOT_ADMINISTRATIVE_AREA_ID = '0'
+
+/** One check covers both halves of the hierarchy: areas nest inside areas and
+ * locations hang off them, so only areas are ever parents. */
+function unparentedNodes(
+  nodes: ParsedPlace[],
+  place: PlaceKind,
+  declaredAreas: Set<string>
+): LocationProblem[] {
+  return nodes
+    .filter(({ partOf }) => {
+      const parentId = partOf.split('/')[1]
+      return (
+        parentId !== ROOT_ADMINISTRATIVE_AREA_ID && !declaredAreas.has(parentId)
+      )
+    })
+    .map(({ id, name, partOf }) => ({
+      kind: 'unparentedNode' as const,
+      node: { place, id, name },
+      partOf
+    }))
+}
+
+function brokenHierarchy(
+  administrativeAreas: ParsedPlace[],
+  locations: ParsedPlace[]
+): LocationProblem[] {
+  const declaredAreas = new Set(administrativeAreas.map(({ id }) => id))
+
+  return [
+    ...unparentedNodes(
+      administrativeAreas,
+      'administrativeArea',
+      declaredAreas
+    ),
+    ...unparentedNodes(locations, 'location', declaredAreas)
+  ]
+}
+
+export function parseLocations(document: unknown): LocationRead {
+  const parsed = CountryConfigLocationResponse.safeParse(document)
+
+  if (!parsed.success) {
+    return {
+      readable: false,
+      problem: {
+        kind: 'hierarchyUnparsed',
+        message: fromZodError(parsed.error, { prefix: null }).message
+      }
+    }
+  }
+
+  const { administrativeAreas, locations } = parsed.data
+
+  return {
+    readable: true,
+    administrativeAreas,
+    locations,
+    payload: buildPayload(parsed.data),
+    problems: brokenHierarchy(administrativeAreas, locations)
+  }
+}
+
+export async function readLocations(): Promise<LocationRead> {
+  const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
+  const res = await fetch(url)
+
+  if (!res.ok) {
+    raise(formatUnwrittenFailure(`Expected to get the locations from ${url}`))
+  }
+
+  return parseLocations(await res.json())
+}
+
+export function parsedPlaces(read: LocationRead): {
+  administrativeAreas: ParsedPlace[]
+  locations: ParsedPlace[]
+} {
+  return read.readable
+    ? {
+        administrativeAreas: read.administrativeAreas,
+        locations: read.locations
+      }
+    : { administrativeAreas: [], locations: [] }
+}
+
+/**
+ * The offices the seed-data declares
+ */
+export function getDeclaredOffices(read: LocationRead): Set<string> {
+  return new Set(parsedPlaces(read).locations.map(({ id }) => id))
+}
+
+/** The payload to write, which only exists once validation has passed. */
+export function toLocationPayload(read: LocationRead): LocationPayload {
+  return validatedContents(read, 'The hierarchy').payload
+}
 
 export async function seedLocations(
   token: string,
-  { administrativeAreas, locations }: SeedLocations
+  { administrativeAreas, locations }: LocationPayload
 ) {
   const client = createInitialisationClient(token)
 

@@ -10,10 +10,15 @@
  */
 import { env } from './environment'
 import fetch from 'node-fetch'
-import { getApplicationConfig } from './application-config'
-import { SeedLocations, getLocations, seedLocations } from './locations'
-import { getRoles } from './roles'
-import { SeedUsers, getUsers, seedUsers } from './users'
+import { readApplicationConfig } from './application-config'
+import {
+  LocationPayload,
+  toLocationPayload,
+  readLocations,
+  seedLocations
+} from './locations'
+import { readRoles } from './roles'
+import { UserPayload, readUsers, seedUsers, toUserPayloads } from './users'
 import { raise } from './utils'
 import { createInitialisationClient } from './initialisation-client'
 import {
@@ -23,6 +28,7 @@ import {
   formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
+import { SeedSources } from './seed-data'
 import { validateSeedData } from './validate-seed-data'
 import {
   formatValidationReport,
@@ -101,41 +107,42 @@ async function deactivateSuperuser(token: string) {
 
 /** Fetch all of the seed-data, validate all of it, and only then write any of
  * it: validation precedes the first write — the hierarchy included — so that
- * rejected seed-data leaves the database untouched. */
+ * rejected seed-data leaves the database untouched.
+ */
 async function main() {
   const token = await getToken()
 
-  const locations = await getLocations()
-  const users = await getUsers(token)
-  const roles = await getRoles(token)
-  const applicationConfig = await getApplicationConfig()
-  const seedData = {
-    ...users.seedData,
-    ...roles.seedData,
-    ...locations.seedData,
-    ...applicationConfig.seedData
+  const sources: SeedSources = {
+    users: await readUsers(token),
+    roles: await readRoles(token),
+    locations: await readLocations(),
+    applicationConfig: await readApplicationConfig()
   }
 
-  const problems = validateSeedData(seedData)
+  const problems = validateSeedData(sources)
 
   if (problems.length > 0) {
     raise(formatValidationReport(problems))
   }
 
   // eslint-disable-next-line no-console
-  console.log(formatValidationSummary(seedData))
+  console.log(formatValidationSummary(sources))
 
-  await write(token, locations, users.users)
+  await write(
+    token,
+    toLocationPayload(sources.locations),
+    toUserPayloads(sources.users)
+  )
 }
 
 /** Everything that writes, and nothing that does not. Every error leaving here
  * is a `PartialSeedError`, which is what lets the handler below pick between
- * the two failure reports without tracking state. Keep it that way: a write
- * moved above this call would be reported as though it never happened. */
+ * the two failure reports without tracking state.
+ */
 async function write(
   token: string,
-  locations: SeedLocations,
-  users: SeedUsers
+  locations: LocationPayload,
+  users: UserPayload[]
 ) {
   try {
     // eslint-disable-next-line no-console

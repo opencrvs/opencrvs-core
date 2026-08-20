@@ -8,6 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/**
+ * Everything about the country config's initial users: reading them off the
+ * wire as `unknown`, the problems that need nothing but the users themselves
+ * to find, and writing them. Problems that need another part of the seed-data
+ * to answer are found in `validate-seed-data.ts`, and every problem here is
+ * reported as data — how it reads is `validation-report.ts`'s to decide.
+ */
 import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
@@ -24,7 +32,8 @@ import {
   formatSeedFailure,
   formatUnwrittenFailure
 } from './seed-failure'
-import { SeedData, SeedDataUser } from './seed-data'
+import { InitialUserRef } from './seed-report'
+import { Read, validatedContents } from './read'
 
 /** `username` and `email` are the server's own rules, so seed-data that would
  * be rejected on write is rejected here instead. The rest are the country
@@ -50,54 +59,165 @@ const UserRecordSchema = z
     surname: familyName
   }))
 
-export type SeedUsers = z.output<typeof UserRecordSchema>[]
+/** What the write path sends for one initial user. Carries the password. */
+export type UserPayload = z.output<typeof UserRecordSchema>
+
+/**
+ * One initial user that parsed. `position` travels with it because a problem
+ * another module finds still has to name it, and a report names an initial
+ * user by where it sits in the seed-data.
+ */
+export interface ParsedUser {
+  position: number
+  username: string
+  email?: string
+  mobile?: string
+  /** A compound reference, not the office's own id. */
+  primaryOfficeId: string
+  role: string
+  payload: UserPayload
+}
+
+/**
+ * What a check sees: an initial user without its payload, so no check can put
+ * a password in a report. A `ParsedUser[]` satisfies this, so the narrowing
+ * costs the caller nothing.
+ */
+export type CheckedUser = Omit<ParsedUser, 'payload'>
+
+export const UNIQUE_USER_FIELDS = ['email', 'mobile', 'username'] as const
+
+export type UniqueUserField = (typeof UNIQUE_USER_FIELDS)[number]
+
+export type UserProblem =
+  | { kind: 'userListUnparsed'; message: string }
+  | { kind: 'userUnparsed'; user: InitialUserRef; message: string }
+  | {
+      kind: 'duplicateUserField'
+      user: InitialUserRef
+      field: UniqueUserField
+      value: string
+      /** The position of the initial user that claimed the value first. */
+      firstSeenAt: number
+    }
+
+export type UserRead = Read<{ users: ParsedUser[] }, UserProblem>
+
+/** How a report names one initial user. Positions are 1-based. */
+export function identifyUser({
+  position,
+  username
+}: CheckedUser): InitialUserRef {
+  return { position, username }
+}
 
 /** Named one by one rather than spread, so that renaming a field on the schema
- * without telling the validator is a compile error rather than a check that
- * silently stops finding anything. Also keeps the password out of seed-data. */
-function readParsed(user: SeedUsers[number]): SeedDataUser {
+ * without telling the checks is a compile error rather than a check that
+ * silently stops finding anything. Also keeps the password out of the entity's
+ * checked half. */
+function toParsed(user: UserPayload, position: number): ParsedUser {
   return {
+    position,
     username: user.username,
     email: user.email,
     mobile: user.mobile,
     primaryOfficeId: user.primaryOfficeId,
-    role: user.role
+    role: user.role,
+    payload: user
   }
 }
 
-/** A record that did not parse keeps its place in `seedData`, so the records
- * after it keep the positions the report will name them by, and is left out of
- * `users`, which is what would be written. */
-function parseRecords(records: unknown[]): {
-  users: SeedUsers
-  seedData: SeedDataUser[]
-} {
-  const users: SeedUsers = []
-  const seedData: SeedDataUser[] = []
+/** `normalise` mirrors how the write path compares the field, so both agree on
+ * what a duplicate is: emails and usernames are lowercased on write, mobile
+ * numbers are stored verbatim. */
+const NORMALISE: Record<UniqueUserField, (value: string) => string> = {
+  email: (value) => value.toLowerCase(),
+  mobile: (value) => value,
+  username: (value) => value.toLowerCase()
+}
 
-  for (const record of records) {
-    const parsed = UserRecordSchema.safeParse(record)
+function duplicatesOf(
+  users: CheckedUser[],
+  field: UniqueUserField
+): UserProblem[] {
+  const problems: UserProblem[] = []
+  const firstSeenAt = new Map<string, number>()
+  const normalise = NORMALISE[field]
 
-    if (parsed.success) {
-      users.push(parsed.data)
-      seedData.push(readParsed(parsed.data))
+  for (const user of users) {
+    const value = user[field]
+
+    if (value === undefined) {
       continue
     }
 
-    seedData.push({
-      username: readString(record, 'username'),
-      role: readString(record, 'role'),
-      malformed: describeParseFailure(parsed.error)
+    const key = normalise(value)
+    const original = firstSeenAt.get(key)
+
+    if (original === undefined) {
+      firstSeenAt.set(key, user.position)
+      continue
+    }
+
+    problems.push({
+      kind: 'duplicateUserField',
+      user: identifyUser(user),
+      field,
+      value,
+      firstSeenAt: original
     })
   }
 
-  return { users, seedData }
+  return problems
 }
 
-export async function getUsers(token: string): Promise<{
-  users: SeedUsers
-  seedData: Pick<SeedData, 'users' | 'userListError'>
-}> {
+/** Field by field rather than user by user, so that one initial user with
+ * three duplicated fields reads as three problems. */
+function duplicateUserFields(users: CheckedUser[]): UserProblem[] {
+  return UNIQUE_USER_FIELDS.flatMap((field) => duplicatesOf(users, field))
+}
+
+export function parseUsers(document: unknown): UserRead {
+  const list = ListSchema.safeParse(document)
+
+  if (!list.success) {
+    return {
+      readable: false,
+      problem: {
+        kind: 'userListUnparsed',
+        message: describeParseFailure(list.error)
+      }
+    }
+  }
+
+  const users: ParsedUser[] = []
+  const problems: UserProblem[] = []
+
+  list.data.forEach((record, index) => {
+    const position = index + 1
+    const parsed = UserRecordSchema.safeParse(record)
+
+    if (parsed.success) {
+      users.push(toParsed(parsed.data, position))
+      return
+    }
+
+    problems.push({
+      kind: 'userUnparsed',
+      // Nothing else about an entry that did not parse can be trusted.
+      user: { position, username: readString(record, 'username') },
+      message: describeParseFailure(parsed.error)
+    })
+  })
+
+  return {
+    readable: true,
+    users,
+    problems: [...problems, ...duplicateUserFields(users)]
+  }
+}
+
+export async function readUsers(token: string): Promise<UserRead> {
   const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
@@ -111,18 +231,20 @@ export async function getUsers(token: string): Promise<{
     raise(formatUnwrittenFailure(`Expected to get the users from ${url}`))
   }
 
-  const userList = ListSchema.safeParse(await res.json())
-  const records = parseRecords(userList.success ? userList.data : [])
+  return parseUsers(await res.json())
+}
 
-  return {
-    users: records.users,
-    seedData: {
-      users: records.seedData,
-      userListError: userList.success
-        ? undefined
-        : describeParseFailure(userList.error)
-    }
-  }
+/** The initial users a check may read. Empty where the list did not parse,
+ * which stands every check that reads them down. */
+export function getParsedUsers(read: UserRead): CheckedUser[] {
+  return read.readable ? read.users : []
+}
+
+/** The payloads to write, which only exist once validation has passed. */
+export function toUserPayloads(read: UserRead): UserPayload[] {
+  return validatedContents(read, 'The initial users').users.map(
+    ({ payload }) => payload
+  )
 }
 
 async function userAlreadyExists(
@@ -149,7 +271,7 @@ async function createUser(token: string, userPayload: CreateUserInputInternal) {
 /** Validation has already passed, so a failure here lands with earlier users
  * in the database. Each entry is attempted inside a handler because this is
  * the one place that knows which initial user it is. */
-export async function seedUsers(token: string, users: SeedUsers) {
+export async function seedUsers(token: string, users: UserPayload[]) {
   for (const [index, userMetadata] of users.entries()) {
     const {
       firstname,
@@ -202,7 +324,7 @@ export async function seedUsers(token: string, users: SeedUsers) {
           headline: CREATING_INITIAL_USERS,
           subject: {
             about: 'initialUser',
-            // 1-based, matching how the validator identifies an initial user.
+            // 1-based, matching how a problem identifies an initial user.
             user: { position: index + 1, username }
           },
           reason: describeInitialUserFailure(error, user)

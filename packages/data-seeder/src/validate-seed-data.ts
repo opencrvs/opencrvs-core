@@ -9,349 +9,73 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { hasScope } from '@opencrvs/commons'
+import { getPhoneNumberPattern } from './application-config'
+import { getDeclaredOffices } from './locations'
 import { getOfficeExternalId } from './office-external-id'
-import {
-  SeedData,
-  SeedDataLocation,
-  SeedDataProblem,
-  SeedDataRole,
-  SeedDataUser
-} from './seed-data'
-import { InitialUserRef } from './seed-report'
-
-/** `normalise` mirrors how the write path compares the field, so both agree on
- * what a duplicate is: emails and usernames are lowercased on write, mobile
- * numbers are stored verbatim. */
-interface UniqueUserField {
-  field: string
-  rule: string
-  read: (user: SeedDataUser) => string | undefined
-  normalise: (value: string) => string
-}
-
-const lowercased = (value: string) => value.toLowerCase()
-const verbatim = (value: string) => value
-
-const UNIQUE_USER_FIELDS: UniqueUserField[] = [
-  {
-    field: 'email',
-    rule: 'emails must be unique',
-    read: (user) => user.email,
-    normalise: lowercased
-  },
-  {
-    field: 'mobile',
-    rule: 'mobile numbers must be unique',
-    read: (user) => user.mobile,
-    normalise: verbatim
-  },
-  {
-    field: 'username',
-    rule: 'usernames must be unique',
-    read: (user) => user.username,
-    normalise: lowercased
-  }
-]
-
-function identifyUser(user: SeedDataUser, index: number): InitialUserRef {
-  return { position: index + 1, username: user.username }
-}
-
-function duplicatesOf(
-  users: SeedDataUser[],
-  { field, rule, read, normalise }: UniqueUserField
-): SeedDataProblem[] {
-  const problems: SeedDataProblem[] = []
-  const firstSeenAt = new Map<string, number>()
-
-  users.forEach((user, index) => {
-    const value = read(user)
-
-    if (value === undefined) {
-      return
-    }
-
-    const key = normalise(value)
-    const original = firstSeenAt.get(key)
-
-    if (original === undefined) {
-      firstSeenAt.set(key, index + 1)
-      return
-    }
-
-    problems.push({
-      about: 'initialUser',
-      user: identifyUser(user, index),
-      field,
-      value,
-      problem: `duplicates initial user ${original}`,
-      rule
-    })
-  })
-
-  return problems
-}
-
-/** Offices are resolved against the seed-data, not the database, which has not
- * been seeded yet. Only locations are offices — administrative areas are
- * written to a different table from the one the write path looks in. */
-function unknownOffices({ users, locations }: SeedData): SeedDataProblem[] {
-  const declaredOffices = new Set(locations.map(({ id }) => id))
-  const problems: SeedDataProblem[] = []
-
-  users.forEach((user, index) => {
-    if (user.primaryOfficeId === undefined) {
-      return
-    }
-
-    const externalId = getOfficeExternalId(user.primaryOfficeId)
-
-    if (declaredOffices.has(externalId)) {
-      return
-    }
-
-    problems.push({
-      about: 'initialUser',
-      user: identifyUser(user, index),
-      field: 'primaryOfficeId',
-      value: user.primaryOfficeId,
-      problem: `resolves to office "${externalId}", which the seed-data does not declare`,
-      rule: `an initial user's primary office must be a location the seed-data declares`
-    })
-  })
-
-  return problems
-}
-
-const ROOT_ADMINISTRATIVE_AREA_ID = '0'
-
-/** One check covers both halves of the hierarchy: areas nest inside areas and
- * locations hang off them, so only areas are ever parents. */
-function unparentedNodes(
-  nodes: SeedDataLocation[],
-  kind: string,
-  declaredAreas: Set<string>
-): SeedDataProblem[] {
-  return nodes
-    .filter(({ partOf }) => {
-      const parentId = partOf.split('/')[1]
-      return (
-        parentId !== ROOT_ADMINISTRATIVE_AREA_ID && !declaredAreas.has(parentId)
-      )
-    })
-    .map(({ id, name, partOf }) => ({
-      about: 'subject',
-      subject: `${kind} "${name}" (id ${id})`,
-      field: 'partOf',
-      value: partOf,
-      problem: 'names no declared administrative area',
-      rule: `partOf must name an administrative area the seed-data declares, or the root "${ROOT_ADMINISTRATIVE_AREA_ID}"`
-    }))
-}
-
-function unparsedLists({
-  userListError,
-  roleListError
-}: SeedData): SeedDataProblem[] {
-  const problems: SeedDataProblem[] = []
-
-  if (userListError !== undefined) {
-    problems.push({
-      about: 'subject',
-      subject: `the country config's initial users`,
-      problem: 'do not parse',
-      rule: userListError
-    })
-  }
-
-  if (roleListError !== undefined) {
-    problems.push({
-      about: 'subject',
-      subject: `the country config's roles`,
-      problem: 'do not parse',
-      rule: roleListError
-    })
-  }
-
-  return problems
-}
-
-/** No `initialUser`: a role lives in the country config's roles rather than in
- * the employees spreadsheet. */
-function unparsedRoles({ roles }: SeedData): SeedDataProblem[] {
-  return roles.flatMap((role, index) =>
-    role.malformed === undefined
-      ? []
-      : [
-          {
-            about: 'subject',
-            subject:
-              role.id === undefined ? `role ${index + 1}` : `role "${role.id}"`,
-            problem: 'does not parse',
-            rule: role.malformed
-          }
-        ]
-  )
-}
-
-function duplicateRoleIds({ roles }: SeedData): SeedDataProblem[] {
-  const seen = new Set<string>()
-  const reported = new Set<string>()
-  const problems: SeedDataProblem[] = []
-
-  for (const { id } of roles) {
-    if (id === undefined) {
-      continue
-    }
-
-    if (!seen.has(id)) {
-      seen.add(id)
-      continue
-    }
-
-    if (reported.has(id)) {
-      continue
-    }
-
-    reported.add(id)
-    problems.push({
-      about: 'subject',
-      subject: `the country config's roles`,
-      field: 'id',
-      value: id,
-      problem: 'is declared more than once',
-      rule: 'role ids must be unique'
-    })
-  }
-
-  return problems
-}
-
-/** Includes roles that did not parse: such a role exists and is named. */
-function declaredRoleIds(roles: SeedDataRole[]): Map<string, SeedDataRole> {
-  return new Map(
-    roles.flatMap((role) => (role.id === undefined ? [] : [[role.id, role]]))
-  )
-}
-
-/** Stands down when the role list did not parse: every user would be
- * reported, and none of it would be news. */
-function unknownRoles({
-  users,
-  roles,
-  roleListError
-}: SeedData): SeedDataProblem[] {
-  if (roleListError !== undefined) {
-    return []
-  }
-
-  const declared = declaredRoleIds(roles)
-
-  return users.flatMap((user, index) =>
-    user.role === undefined || declared.has(user.role)
-      ? []
-      : [
-          {
-            about: 'initialUser',
-            user: identifyUser(user, index),
-            field: 'role',
-            value: user.role,
-            problem: 'names no role the country config declares',
-            rule: `an initial user's role must be one of the roles the country config declares`
-          }
-        ]
-  )
-}
-
-function compilePattern(pattern: string): RegExp | undefined {
-  try {
-    return new RegExp(pattern)
-  } catch {
-    return undefined
-  }
-}
-
-/** The service that creates a user compiles this same pattern and, where it
- * will not compile, logs and carries on — so a typo silently costs a country
- * every mobile number check. Here it is a problem. */
-function invalidPhoneNumberPattern({
-  PHONE_NUMBER_PATTERN
-}: SeedData): SeedDataProblem[] {
-  if (compilePattern(PHONE_NUMBER_PATTERN) !== undefined) {
-    return []
-  }
-
-  return [
-    {
-      about: 'subject',
-      subject: `the country config's application configuration`,
-      field: 'PHONE_NUMBER_PATTERN',
-      value: PHONE_NUMBER_PATTERN,
-      problem: 'is not a valid regular expression',
-      rule: 'a configured phone number pattern must be a valid regular expression'
-    }
-  ]
-}
-
-/** Stands down when the pattern will not compile: every number fails against
- * an unreadable pattern, which the check above already reports. */
-function misformattedMobileNumbers({
-  users,
-  PHONE_NUMBER_PATTERN
-}: SeedData): SeedDataProblem[] {
-  const pattern = compilePattern(PHONE_NUMBER_PATTERN)
-
-  if (pattern === undefined) {
-    return []
-  }
-
-  return users.flatMap((user, index) =>
-    user.mobile === undefined || pattern.test(user.mobile)
-      ? []
-      : [
-          {
-            about: 'initialUser',
-            user: identifyUser(user, index),
-            field: 'mobile',
-            value: user.mobile,
-            problem: `does not match the configured pattern ${PHONE_NUMBER_PATTERN}`,
-            rule: `an initial user's mobile number must match the country config's PHONE_NUMBER_PATTERN`
-          }
-        ]
-  )
-}
+import { problemsOf } from './read'
+import { DeclaredRole, getDeclaredRoles } from './roles'
+import { CrossCuttingProblem, SeedProblem, SeedSources } from './seed-data'
+import { CheckedUser, identifyUser, getParsedUsers } from './users'
 
 /** Without a holder of this scope, the seeded system cannot be administered. */
 const CONFIGURE_SCOPE = 'config.update-all'
 
-/** Stands down where the answer cannot be known: the role list did not parse,
- * no initial user names a role, or a named role did not parse and its scopes might
- * have been the ones in question. An undeclared role grants nothing, so it
- * does not stand the check down. */
-function missingConfigurationAdministrator({
-  users,
-  roles,
-  roleListError
-}: SeedData): SeedDataProblem[] {
-  const named = users.flatMap((user) =>
-    user.role === undefined ? [] : [user.role]
-  )
+/** Offices are resolved against the seed-data, not the database, which has not
+ * been seeded yet. */
+function unknownOffices(
+  users: CheckedUser[],
+  offices: Set<string>
+): CrossCuttingProblem[] {
+  return users.flatMap((user) => {
+    const externalId = getOfficeExternalId(user.primaryOfficeId)
 
-  if (roleListError !== undefined || named.length === 0) {
+    return offices.has(externalId)
+      ? []
+      : [
+          {
+            kind: 'unknownOffice' as const,
+            user: identifyUser(user),
+            primaryOfficeId: user.primaryOfficeId,
+            externalId
+          }
+        ]
+  })
+}
+
+function unknownRoles(
+  users: CheckedUser[],
+  declared: Map<string, DeclaredRole>
+): CrossCuttingProblem[] {
+  return users.flatMap((user) =>
+    declared.has(user.role)
+      ? []
+      : [{ kind: 'unknownRole' as const, user: identifyUser(user), role: user.role }]
+  )
+}
+
+/**
+ * Stands down where the answer cannot be known: a named role did not parse and
+ * its scopes might have been the ones in question. An undeclared role grants
+ * nothing, so it does not stand the check down.
+ */
+function missingConfigurationAdministrator(
+  users: CheckedUser[],
+  declared: Map<string, DeclaredRole>
+): CrossCuttingProblem[] {
+  if (users.length === 0) {
     return []
   }
 
-  const declared = declaredRoleIds(roles)
   let unreadable = false
 
-  for (const id of named) {
-    const role = declared.get(id)
+  for (const user of users) {
+    const role = declared.get(user.role)
 
     if (role === undefined) {
       continue
     }
 
-    if (role.malformed !== undefined) {
+    if (role.scopes === undefined) {
       unreadable = true
       continue
     }
@@ -363,77 +87,69 @@ function missingConfigurationAdministrator({
 
   return unreadable
     ? []
-    : [
-        {
-          about: 'subject',
-          subject: 'the initial users',
-          problem: 'include nobody who could configure the system',
-          rule: `at least one initial user must carry a role with the "${CONFIGURE_SCOPE}" scope`
-        }
-      ]
+    : [{ kind: 'noConfigurationAdministrator', scope: CONFIGURE_SCOPE }]
 }
 
-/** The schema's own message is the rule. */
-function unparsedUsers({ users }: SeedData): SeedDataProblem[] {
-  return users.flatMap((user, index) =>
-    user.malformed === undefined
+function misformattedMobileNumbers(
+  users: CheckedUser[],
+  pattern: { source: string; expression: RegExp }
+): CrossCuttingProblem[] {
+  return users.flatMap((user) =>
+    user.mobile === undefined || pattern.expression.test(user.mobile)
       ? []
       : [
           {
-            about: 'initialUser',
-            user: identifyUser(user, index),
-            problem: 'does not parse',
-            rule: user.malformed
+            kind: 'mobileDoesNotMatchPattern' as const,
+            user: identifyUser(user),
+            mobile: user.mobile,
+            pattern: pattern.source
           }
         ]
   )
 }
 
-function brokenHierarchy({
-  administrativeAreas,
-  locations
-}: SeedData): SeedDataProblem[] {
-  const declaredAreas = new Set(administrativeAreas.map(({ id }) => id))
+/**
+ * Every problem with a set of seed-data. An empty list means it is safe to
+ * write.
+ *
+ * Each module's own problems come as it found them. The cross-cutting checks
+ * then run over what parsed — an entry that did not is absent from it, so one
+ * unreadable initial user costs the report only itself rather than every check
+ * that would have read it.
+ *
+ * Ordering is not decided here: `formatValidationReport` sorts, so the order
+ * these are gathered in is free to follow the gates instead of the report.
+ */
+export function validateSeedData(sources: SeedSources): SeedProblem[] {
+  const { users, roles, locations, applicationConfig } = sources
 
-  return [
-    ...unparentedNodes(
-      administrativeAreas,
-      'administrative area',
-      declaredAreas
-    ),
-    ...unparentedNodes(locations, 'location', declaredAreas)
-  ]
-}
-
-/** Every problem with a set of seed-data, in seed-data order. An empty list
- * means it is safe to write. Grouped by what each check reports a problem
- * about, which is the order the report prints them in. */
-export function validateSeedData(seedData: SeedData): SeedDataProblem[] {
-  const problems = [
-    // the seed-data as a whole
-    ...unparsedLists(seedData),
-    ...invalidPhoneNumberPattern(seedData),
-    ...missingConfigurationAdministrator(seedData),
-    // locations
-    ...brokenHierarchy(seedData),
-    // roles
-    ...unparsedRoles(seedData),
-    ...duplicateRoleIds(seedData),
-    // initial users
-    ...unparsedUsers(seedData),
-    ...UNIQUE_USER_FIELDS.flatMap((uniqueField) =>
-      duplicatesOf(seedData.users, uniqueField)
-    ),
-    ...unknownOffices(seedData),
-    ...unknownRoles(seedData),
-    ...misformattedMobileNumbers(seedData)
+  const problems: SeedProblem[] = [
+    ...problemsOf(users),
+    ...problemsOf(roles),
+    ...problemsOf(locations),
+    ...problemsOf(applicationConfig)
   ]
 
-  // Stable, so two problems with one initial user keep their checked order.
-  return problems.sort((a, b) => positionOf(a) - positionOf(b))
-}
+  const initialUsers = getParsedUsers(users)
 
-/** Problems about something other than an initial user sort to the front. */
-function positionOf(problem: SeedDataProblem) {
-  return problem.about === 'initialUser' ? problem.user.position : 0
+  if (locations.readable) {
+    problems.push(...unknownOffices(initialUsers, getDeclaredOffices(locations)))
+  }
+
+  if (roles.readable) {
+    const declared = getDeclaredRoles(roles)
+
+    problems.push(
+      ...unknownRoles(initialUsers, declared),
+      ...missingConfigurationAdministrator(initialUsers, declared)
+    )
+  }
+
+  const pattern = getPhoneNumberPattern(applicationConfig)
+
+  if (pattern !== undefined) {
+    problems.push(...misformattedMobileNumbers(initialUsers, pattern))
+  }
+
+  return problems
 }

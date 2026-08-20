@@ -8,43 +8,79 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * These tests assert what an operator sees: which problems a given set of
- * seed-data produces, and how the report reads. They deliberately say nothing
- * about how the validator is organised internally or the order it runs its
- * checks in — the report's line order is a promise to the operator, the
- * checks' execution order is not.
- */
 import { describe, expect, it } from 'vitest'
-import { encodeScope } from '@opencrvs/commons'
+import { encodeScope, EncodedScope } from '@opencrvs/commons'
 import {
-  SeedData,
-  SeedDataLocation,
-  SeedDataRole,
-  SeedDataUser
-} from './seed-data'
+  ApplicationConfigRead,
+  parseApplicationConfig
+} from './application-config'
+import { LocationPayload, LocationRead, ParsedPlace } from './locations'
+import { ParsedRole, RoleProblem, RoleRead } from './roles'
+import { SeedProblem, SeedSources } from './seed-data'
+import { CheckedUser, ParsedUser, UserProblem, UserRead } from './users'
 import { validateSeedData } from './validate-seed-data'
 import {
   formatValidationReport,
   formatValidationSummary
 } from './validation-report'
 
-function user(overrides: Partial<SeedDataUser> = {}): SeedDataUser {
+const OFFICE = 'HPGiE9Jjh2r'
+const AREA = 'ibombo'
+
+/**
+ * The default is a set of seed-data with nothing wrong with it, so that a test
+ * states the one thing it is about and everything else stays quiet. That is
+ * why the default role carries the scope that lets someone configure the
+ * system, and why the default initial user's office and role are ones the
+ * defaults below declare.
+ */
+function user(overrides: Partial<Omit<CheckedUser, 'position'>> = {}) {
   return {
     username: 'a.user',
-    email: undefined,
-    mobile: undefined,
+    primaryOfficeId: `${AREA}_${OFFICE}`,
+    role: 'LOCAL_REGISTRAR',
     ...overrides
   }
 }
 
-/** A role the country config declares, carrying no scopes unless asked for. */
-function role(overrides: Partial<SeedDataRole> = {}): SeedDataRole {
+/** No cross-cutting check reads the payload — it cannot, it is not given one —
+ * so it carries nothing a test has to state. */
+function withPayload(
+  user: Omit<CheckedUser, 'position'>,
+  index: number
+): ParsedUser {
   return {
-    id: 'LOCAL_REGISTRAR',
-    scopes: [],
-    ...overrides
+    ...user,
+    position: index + 1,
+    payload: {
+      ...user,
+      password: 'password',
+      firstname: 'A',
+      surname: 'User'
+    }
+  }
+}
+
+/** Positions follow the list, which is where a real one gets them too. */
+function initialUsers(
+  users: Omit<CheckedUser, 'position'>[] = [],
+  problems: UserProblem[] = []
+): UserRead {
+  return { readable: true, users: users.map(withPayload), problems }
+}
+
+function role(overrides: Partial<Omit<ParsedRole, 'position'>> = {}) {
+  return { id: 'LOCAL_REGISTRAR', scopes: [] as EncodedScope[], ...overrides }
+}
+
+function roles(
+  declared: Omit<ParsedRole, 'position'>[],
+  problems: RoleProblem[] = []
+): RoleRead {
+  return {
+    readable: true,
+    roles: declared.map((role, index) => ({ ...role, position: index + 1 })),
+    problems
   }
 }
 
@@ -55,140 +91,62 @@ function role(overrides: Partial<SeedDataRole> = {}): SeedDataRole {
 const CONFIGURE = [encodeScope({ type: 'config.update-all' })]
 
 /** A node of the hierarchy: an administrative area or a location. */
-function place(overrides: Partial<SeedDataLocation> = {}): SeedDataLocation {
+function place(overrides: Partial<ParsedPlace> = {}): ParsedPlace {
+  return { id: 'a-place', name: 'A Place', partOf: 'Location/0', ...overrides }
+}
+
+/** No cross-cutting check reads the payload, so it carries nothing a test has
+ * to state. Whether the hierarchy holds together is `locations.test.ts`. */
+const NO_PAYLOAD: LocationPayload = { administrativeAreas: [], locations: [] }
+
+function hierarchy(
+  administrativeAreas: ParsedPlace[],
+  locations: ParsedPlace[]
+): LocationRead {
   return {
-    id: 'a-place',
-    name: 'A Place',
-    partOf: 'Location/0',
-    ...overrides
+    readable: true,
+    administrativeAreas,
+    locations,
+    payload: NO_PAYLOAD,
+    problems: []
   }
+}
+
+/** Built through the module, so that a fixture cannot state a pattern without
+ * the problems that come with it. */
+function applicationConfig(PHONE_NUMBER_PATTERN = '.*'): ApplicationConfigRead {
+  return parseApplicationConfig({ PHONE_NUMBER_PATTERN })
 }
 
 /** A whole set of seed-data, with only the part a test exercises filled in. */
-function seedData(overrides: Partial<SeedData> = {}): SeedData {
+function seedData(overrides: Partial<SeedSources> = {}): SeedSources {
   return {
-    users: [],
-    roles: [],
-    administrativeAreas: [],
-    locations: [],
-    PHONE_NUMBER_PATTERN: '.*',
+    users: initialUsers(),
+    roles: roles([role({ scopes: CONFIGURE })]),
+    locations: hierarchy(
+      [place({ id: AREA, name: 'Ibombo' })],
+      [place({ id: OFFICE, name: 'Ibombo District Office', partOf: `Location/${AREA}` })]
+    ),
+    applicationConfig: applicationConfig(),
     ...overrides
   }
 }
 
-/** The report an operator would see, as a list of its lines. */
-function report(overrides: Partial<SeedData> = {}) {
-  const data = seedData(overrides)
-  return formatValidationReport(validateSeedData(data)).split('\n')
+/** The problem lines an operator would see. */
+function problems(overrides: Partial<SeedSources> = {}) {
+  return formatValidationReport(validateSeedData(seedData(overrides)))
+    .split('\n')
+    .slice(1)
 }
-
-/**
- * The problem lines alone. Every test that is not about the header would
- * otherwise re-assert the same sentence, which pins them all to one wording;
- * the header has its own block below.
- */
-function problems(overrides: Partial<SeedData> = {}) {
-  return report(overrides).slice(1)
-}
-
-describe('the report header', () => {
-  it('counts the problems, and says nothing was seeded', () => {
-    expect(
-      report({
-        users: [
-          user({ username: 'one', email: 'dup@x.com', mobile: '+2601' }),
-          user({ username: 'two', email: 'dup@x.com', mobile: '+2601' }),
-          user({ username: 'three' })
-        ]
-      })[0]
-    ).toBe('2 problems found; nothing was seeded.')
-  })
-
-  it('uses the singular for a lone problem', () => {
-    expect(report({ users: [user({ malformed: 'Invalid input' })] })[0]).toBe(
-      '1 problem found; nothing was seeded.'
-    )
-  })
-})
-
-describe('duplicate emails within the seed-data', () => {
-  it('reports the second of two initial users sharing an email', () => {
-    expect(
-      problems({
-        users: [
-          user({ username: 'k.mweene', email: 'k.mweene@x.com' }),
-          user({ username: 'f.katongo', email: 'f.katongo@x.com' }),
-          user({ username: 'e.mweene', email: 'k.mweene@x.com' })
-        ]
-      })
-    ).toEqual([
-      '  initial user 3 (e.mweene): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique'
-    ])
-  })
-
-  it('reports two spellings of one address, since emails are lowercased on write', () => {
-    expect(
-      problems({
-        users: [
-          user({ username: 'one', email: 'K.Mweene@X.com' }),
-          user({ username: 'two', email: 'k.mweene@x.com' })
-        ]
-      })
-    ).toEqual([
-      '  initial user 2 (two): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique'
-    ])
-  })
-})
-
-describe('duplicate mobile numbers within the seed-data', () => {
-  it('reports the second of two initial users sharing a mobile number', () => {
-    expect(
-      problems({
-        users: [
-          user({ username: 'k.mweene', mobile: '+260911111111' }),
-          user({ username: 'f.katongo', mobile: '+260911111111' })
-        ]
-      })
-    ).toEqual([
-      '  initial user 2 (f.katongo): mobile "+260911111111" duplicates initial user 1 — mobile numbers must be unique'
-    ])
-  })
-})
-
-describe('duplicate usernames within the seed-data', () => {
-  it('reports a shared username as a problem rather than letting it be renumbered', () => {
-    expect(
-      problems({
-        users: [
-          user({ username: 'k.mweene', email: 'one@x.com' }),
-          user({ username: 'k.mweene', email: 'two@x.com' })
-        ]
-      })
-    ).toEqual([
-      '  initial user 2 (k.mweene): username "k.mweene" duplicates initial user 1 — usernames must be unique'
-    ])
-  })
-})
 
 describe("an initial user's primary office", () => {
-  const administrativeAreas = [place({ id: 'ibombo', name: 'Ibombo' })]
-  const locations = [
-    place({
-      id: 'HPGiE9Jjh2r',
-      name: 'Ibombo District Office',
-      partOf: 'Location/ibombo'
-    })
-  ]
-
   it('is reported by initial user, naming the office, when the seed-data does not declare it', () => {
     expect(
       problems({
-        users: [
-          user({ username: 'k.mweene', primaryOfficeId: 'ibombo_HPGiE9Jjh2r' }),
+        users: initialUsers([
+          user({ username: 'k.mweene' }),
           user({ username: 'f.katongo', primaryOfficeId: 'atlantis_ATL1' })
-        ],
-        administrativeAreas,
-        locations
+        ])
       })
     ).toEqual([
       '  initial user 2 (f.katongo): primaryOfficeId "atlantis_ATL1" resolves to office "ATL1", which the seed-data does not declare — an initial user\'s primary office must be a location the seed-data declares'
@@ -198,124 +156,39 @@ describe("an initial user's primary office", () => {
   it('may not be an administrative area, since only locations are offices', () => {
     expect(
       validateSeedData(
-        seedData({
-          users: [user({ primaryOfficeId: 'ibombo' })],
-          administrativeAreas,
-          locations
-        })
+        seedData({ users: initialUsers([user({ primaryOfficeId: AREA })]) })
       )
     ).toHaveLength(1)
   })
-})
 
-describe('the administrative hierarchy', () => {
-  it('reports a location that is not part of a declared administrative area', () => {
-    expect(
-      problems({
-        users: [user()],
-        administrativeAreas: [place({ id: 'ibombo', name: 'Ibombo' })],
-        locations: [
-          place({
-            id: 'HPGiE9Jjh2r',
-            name: 'Ibombo District Office',
-            partOf: 'Location/atlantis'
-          })
-        ]
-      })
-    ).toEqual([
-      '  location "Ibombo District Office" (id HPGiE9Jjh2r): partOf "Location/atlantis" names no declared administrative area — partOf must name an administrative area the seed-data declares, or the root "0"'
-    ])
-  })
-
-  it('reports a location that is part of another location rather than of an area', () => {
+  it('is not reported when the hierarchy could not be read at all', () => {
+    // Every initial user would be reported, and none of it would be news.
     expect(
       validateSeedData(
         seedData({
-          administrativeAreas: [place({ id: 'ibombo', name: 'Ibombo' })],
-          locations: [
-            place({ id: 'office', name: 'Office', partOf: 'Location/ibombo' }),
-            place({ id: 'annex', name: 'Annex', partOf: 'Location/office' })
-          ]
+          users: initialUsers([user()]),
+          locations: {
+            readable: false,
+            problem: { kind: 'hierarchyUnparsed', message: 'Invalid input' }
+          }
         })
-      )
-    ).toHaveLength(1)
-  })
-})
-
-describe('an initial user entry that did not parse', () => {
-  it('is named by its position alone when it carries no usable username', () => {
-    expect(
-      problems({
-        users: [
-          user({
-            username: undefined,
-            malformed: 'Invalid input: expected string, received number'
-          })
-        ]
-      })
-    ).toEqual([
-      '  initial user 1: does not parse — Invalid input: expected string, received number'
-    ])
-  })
-})
-
-describe('a seed-data document that did not parse at all', () => {
-  it('reports the initial users the country config served', () => {
-    expect(
-      problems({
-        userListError: 'Invalid input: expected array, received object'
-      })
-    ).toEqual([
-      "  the country config's initial users: do not parse — Invalid input: expected array, received object"
-    ])
-  })
-})
-
-describe('a role that did not parse', () => {
-  it('is reported by its id, as the text of the schema message', () => {
-    expect(
-      problems({
-        roles: [
-          role({
-            id: 'LOCAL_REGISTRAR',
-            malformed: 'Invalid scope: "recorddeclare" at "scopes[0]"'
-          })
-        ]
-      })
-    ).toEqual([
-      '  role "LOCAL_REGISTRAR": does not parse — Invalid scope: "recorddeclare" at "scopes[0]"'
-    ])
-  })
-})
-
-describe('duplicate role ids', () => {
-  it('reports the id the country config declares more than once', () => {
-    expect(
-      problems({
-        roles: [
-          role({ id: 'LOCAL_REGISTRAR' }),
-          role({ id: 'NATIONAL_SYSTEM_ADMIN' }),
-          role({ id: 'LOCAL_REGISTRAR' })
-        ]
-      })
-    ).toEqual([
-      '  the country config\'s roles: id "LOCAL_REGISTRAR" is declared more than once — role ids must be unique'
-    ])
+      ).filter(({ kind }) => kind === 'unknownOffice')
+    ).toEqual([])
   })
 })
 
 describe("an initial user's role", () => {
-  const roles = [
+  const declared = roles([
     role({ id: 'LOCAL_REGISTRAR' }),
     role({ id: 'NATIONAL_SYSTEM_ADMIN', scopes: CONFIGURE })
-  ]
+  ])
 
   it('is no problem when the country config declares it', () => {
     expect(
       validateSeedData(
         seedData({
-          users: [user({ role: 'NATIONAL_SYSTEM_ADMIN' })],
-          roles
+          users: initialUsers([user({ role: 'NATIONAL_SYSTEM_ADMIN' })]),
+          roles: declared
         })
       )
     ).toEqual([])
@@ -324,28 +197,47 @@ describe("an initial user's role", () => {
   it('is reported by initial user, naming the role, when no declared role matches', () => {
     expect(
       problems({
-        users: [
+        users: initialUsers([
           user({ username: 'k.mweene', role: 'NATIONAL_SYSTEM_ADMIN' }),
           user({ username: 'f.katongo', role: 'LOCAL_REGISTRARR' })
-        ],
-        roles
+        ]),
+        roles: declared
       })
     ).toEqual([
       '  initial user 2 (f.katongo): role "LOCAL_REGISTRARR" names no role the country config declares — an initial user\'s role must be one of the roles the country config declares'
     ])
   })
 
-  it('is not reported when the role list itself did not parse', () => {
-    // Every user would otherwise be reported, and none of it would be news:
-    // the roles are unreadable, which the report already says.
+  it('is no problem when the declared role did not parse: it is still declared', () => {
     expect(
-      problems({
-        users: [user({ username: 'k.mweene', role: 'LOCAL_REGISTRAR' })],
-        roleListError: 'Invalid input: expected array, received object'
-      })
-    ).toEqual([
-      "  the country config's roles: do not parse — Invalid input: expected array, received object"
-    ])
+      validateSeedData(
+        seedData({
+          users: initialUsers([user({ role: 'SOCIAL_WORKER' })]),
+          roles: roles([role({ scopes: CONFIGURE })], [
+            {
+              kind: 'roleUnparsed',
+              role: { position: 2, id: 'SOCIAL_WORKER' },
+              message: 'Invalid scope: "nonsense"'
+            }
+          ])
+        })
+      ).filter(({ kind }) => kind === 'unknownRole')
+    ).toEqual([])
+  })
+
+  it('is not reported when the role list itself could not be read', () => {
+    // Every initial user would be reported, and none of it would be news.
+    expect(
+      validateSeedData(
+        seedData({
+          users: initialUsers([user()]),
+          roles: {
+            readable: false,
+            problem: { kind: 'roleListUnparsed', message: 'Invalid input' }
+          }
+        })
+      ).filter(({ kind }) => kind === 'unknownRole')
+    ).toEqual([])
   })
 })
 
@@ -353,21 +245,51 @@ describe('the ability to configure the seeded system', () => {
   it('is reported when no initial user carries a role that has the scope', () => {
     expect(
       problems({
-        users: [user({ username: 'k.mweene', role: 'LOCAL_REGISTRAR' })],
-        roles: [
+        users: initialUsers([user({ username: 'k.mweene' })]),
+        roles: roles([
           role({ id: 'LOCAL_REGISTRAR' }),
           role({ id: 'NATIONAL_SYSTEM_ADMIN', scopes: CONFIGURE })
-        ]
+        ])
       })
     ).toEqual([
       '  the initial users: include nobody who could configure the system — at least one initial user must carry a role with the "config.update-all" scope'
     ])
   })
 
-  it('stands down when no initial user names a role to check', () => {
+  it('stands down when there is no initial user to check', () => {
     expect(
-      validateSeedData(seedData({ users: [user({ username: 'k.mweene' })] }))
+      validateSeedData(seedData({ roles: roles([role()]) }))
     ).toEqual([])
+  })
+
+  it('stands down when a role an initial user names did not parse', () => {
+    // Its scopes might have been the ones in question.
+    expect(
+      validateSeedData(
+        seedData({
+          users: initialUsers([user({ role: 'SOCIAL_WORKER' })]),
+          roles: roles([role()], [
+            {
+              kind: 'roleUnparsed',
+              role: { position: 2, id: 'SOCIAL_WORKER' },
+              message: 'Invalid scope: "nonsense"'
+            }
+          ])
+        })
+      ).filter(({ kind }) => kind === 'noConfigurationAdministrator')
+    ).toEqual([])
+  })
+
+  it('is still reported when an initial user names a role nobody declares', () => {
+    // An undeclared role grants nothing, so it does not stand the check down.
+    expect(
+      validateSeedData(
+        seedData({
+          users: initialUsers([user({ role: 'CHAIRMAN' })]),
+          roles: roles([role()])
+        })
+      ).filter(({ kind }) => kind === 'noConfigurationAdministrator')
+    ).toHaveLength(1)
   })
 })
 
@@ -379,109 +301,145 @@ describe("an initial user's mobile number", () => {
   it('is reported by initial user, naming the number and the pattern, when it does not match', () => {
     expect(
       problems({
-        users: [
+        users: initialUsers([
           user({ username: 'k.mweene', mobile: '0733333333' }),
           user({ username: 'f.katongo', mobile: '+260733333333' })
-        ],
-        PHONE_NUMBER_PATTERN
+        ]),
+        applicationConfig: applicationConfig(PHONE_NUMBER_PATTERN)
       })
     ).toEqual([
       '  initial user 2 (f.katongo): mobile "+260733333333" does not match the configured pattern ^0(7|9)[0-9]{8}$ — an initial user\'s mobile number must match the country config\'s PHONE_NUMBER_PATTERN'
     ])
   })
-})
 
-describe('a configured phone number pattern that is not a regular expression', () => {
-  const PHONE_NUMBER_PATTERN = '^0(7|9)[0-9{8}$'
-
-  it('is reported as a problem of the country config rather than of any initial user', () => {
-    expect(
-      problems({
-        users: [user({ username: 'k.mweene', mobile: '0733333333' })],
-        PHONE_NUMBER_PATTERN
-      })
-    ).toEqual([
-      '  the country config\'s application configuration: PHONE_NUMBER_PATTERN "^0(7|9)[0-9{8}$" is not a valid regular expression — a configured phone number pattern must be a valid regular expression'
-    ])
-  })
-
-  it('does not also report every mobile number as malformed against it', () => {
+  it('is not checked against a pattern that is not a regular expression', () => {
     // Every number fails a pattern that cannot be read, and fifty-five
-    // invented problems would bury the one real one.
+    // invented problems would bury the one real one. That the pattern itself
+    // is a problem is `application-config.test.ts`.
     expect(
-      problems({
-        users: [
-          user({ username: 'one', mobile: '0733333333' }),
-          user({ username: 'two', mobile: 'nonsense' }),
-          user({ username: 'three', mobile: '+260733333333' })
-        ],
-        PHONE_NUMBER_PATTERN
-      })
-    ).toEqual([
-      '  the country config\'s application configuration: PHONE_NUMBER_PATTERN "^0(7|9)[0-9{8}$" is not a valid regular expression — a configured phone number pattern must be a valid regular expression'
-    ])
+      validateSeedData(
+        seedData({
+          users: initialUsers([
+            user({ username: 'one', mobile: '0733333333' }),
+            user({ username: 'two', mobile: 'nonsense' })
+          ]),
+          applicationConfig: applicationConfig('^0(7|9)[0-9{8}$')
+        })
+      ).filter(({ kind }) => kind === 'mobileDoesNotMatchPattern')
+    ).toEqual([])
+  })
+
+  it('is not checked when the application configuration could not be read', () => {
+    expect(
+      validateSeedData(
+        seedData({
+          users: initialUsers([user({ mobile: 'nonsense' })]),
+          applicationConfig: {
+            readable: false,
+            problem: {
+              kind: 'applicationConfigUnparsed',
+              message: 'Invalid input'
+            }
+          }
+        })
+      ).filter(({ kind }) => kind === 'mobileDoesNotMatchPattern')
+    ).toEqual([])
   })
 })
 
-describe('a set of seed-data with several problems', () => {
-  const users = [
-    user({ username: 'k.mweene', email: 'k.mweene@x.com', mobile: '+2601' }),
-    user({ username: 'f.katongo', email: 'f.katongo@x.com', mobile: '+2601' }),
-    user({ username: 'e.mweene', email: 'k.mweene@x.com', mobile: '+2603' }),
-    user({ username: 'f.katongo', email: 'k.mweene@x.com', mobile: '+2601' })
+describe('the report', () => {
+  /**
+   * One problem of every kind, in an order no report would print them in: what
+   * the report promises an operator is that it names each problem the same way
+   * every time, and prints them in seed-data order regardless of the order the
+   * checks found them.
+   */
+  const everyKind: SeedProblem[] = [
+    {
+      kind: 'userUnparsed',
+      user: { position: 4, username: 'd.dube' },
+      message: 'Invalid input'
+    },
+    {
+      kind: 'mobileDoesNotMatchPattern',
+      user: { position: 3, username: 'b.mutesi' },
+      mobile: '07',
+      pattern: '^\\+260[0-9]{9}$'
+    },
+    {
+      kind: 'unknownRole',
+      user: { position: 2, username: 'k.mweene' },
+      role: 'CHAIRMAN'
+    },
+    {
+      kind: 'unknownOffice',
+      user: { position: 2, username: 'k.mweene' },
+      primaryOfficeId: 'ibombo_nowhere',
+      externalId: 'nowhere'
+    },
+    {
+      kind: 'duplicateUserField',
+      user: { position: 2, username: 'k.mweene' },
+      field: 'email',
+      value: 'k.mweene@x.com',
+      firstSeenAt: 1
+    },
+    {
+      kind: 'duplicateUserField',
+      user: { position: 2, username: 'k.mweene' },
+      field: 'mobile',
+      value: '+260911111111',
+      firstSeenAt: 1
+    },
+    {
+      kind: 'duplicateUserField',
+      user: { position: 2, username: 'k.mweene' },
+      field: 'username',
+      value: 'k.mweene',
+      firstSeenAt: 1
+    },
+    { kind: 'duplicateRoleId', id: 'LOCAL_REGISTRAR' },
+    {
+      kind: 'roleUnparsed',
+      role: { position: 3, id: 'SOCIAL_WORKER' },
+      message: 'Invalid scope: "nonsense"'
+    },
+    {
+      kind: 'unparentedNode',
+      node: { place: 'administrativeArea', id: AREA, name: 'Ibombo' },
+      partOf: 'Location/central'
+    },
+    { kind: 'noConfigurationAdministrator', scope: 'config.update-all' },
+    { kind: 'invalidPhoneNumberPattern', pattern: '^0(7|9)[0-9{8}$' },
+    { kind: 'hierarchyUnparsed', message: 'Invalid input' },
+    { kind: 'applicationConfigUnparsed', message: 'Invalid input' },
+    { kind: 'roleListUnparsed', message: 'Invalid input' },
+    { kind: 'userListUnparsed', message: 'Invalid input' }
   ]
 
-  it('reports every problem in one run rather than stopping at the first', () => {
-    expect(problems({ users })).toEqual([
-      '  initial user 2 (f.katongo): mobile "+2601" duplicates initial user 1 — mobile numbers must be unique',
-      '  initial user 3 (e.mweene): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique',
-      '  initial user 4 (f.katongo): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique',
-      '  initial user 4 (f.katongo): mobile "+2601" duplicates initial user 1 — mobile numbers must be unique',
-      '  initial user 4 (f.katongo): username "f.katongo" duplicates initial user 2 — usernames must be unique'
-    ])
-  })
-})
-
-describe('seed-data with problems of every kind', () => {
-  const seedDataWithEveryProblem = seedData({
-    PHONE_NUMBER_PATTERN: '^\\+260[0-9]{9}$',
-    users: [
-      user({
-        username: 'k.mweene',
-        email: 'k.mweene@x.com',
-        mobile: '+260911111111',
-        primaryOfficeId: 'ibombo_HPGiE9Jjh2r',
-        role: 'LOCAL_REGISTRAR'
-      }),
-      user({
-        username: 'k.mweene',
-        email: 'k.mweene@x.com',
-        mobile: '+260911111111',
-        primaryOfficeId: 'ibombo_nowhere',
-        role: 'CHAIRMAN'
-      }),
-      user({
-        username: 'b.mutesi',
-        mobile: '07',
-        primaryOfficeId: 'ibombo_HPGiE9Jjh2r',
-        role: 'LOCAL_REGISTRAR'
-      }),
-      user({ username: 'd.dube', malformed: 'Invalid input' })
-    ],
-    roles: [
-      role({ id: 'LOCAL_REGISTRAR' }),
-      role({ id: 'LOCAL_REGISTRAR' }),
-      role({ id: 'SOCIAL_WORKER', malformed: 'Invalid scope: "nonsense"' })
-    ],
-    administrativeAreas: [place({ id: 'ibombo', partOf: 'Location/central' })],
-    locations: [place({ id: 'HPGiE9Jjh2r', partOf: 'Location/ibombo' })]
+  it('counts the problems, and says nothing was seeded', () => {
+    expect(formatValidationReport(everyKind).split('\n')[0]).toBe(
+      '16 problems found; nothing was seeded.'
+    )
   })
 
-  it('reports all of them in one report, in seed-data order', () => {
-    expect(report(seedDataWithEveryProblem)).toEqual([
-      '11 problems found; nothing was seeded.',
+  it('uses the singular for a lone problem', () => {
+    expect(
+      formatValidationReport([
+        { kind: 'duplicateRoleId', id: 'LOCAL_REGISTRAR' }
+      ]).split('\n')[0]
+    ).toBe('1 problem found; nothing was seeded.')
+  })
+
+  it('names every kind of problem, in seed-data order', () => {
+    expect(formatValidationReport(everyKind).split('\n').slice(1)).toEqual([
+      "  the country config's initial users: do not parse — Invalid input",
+      "  the country config's roles: do not parse — Invalid input",
+      "  the country config's application configuration: does not parse — Invalid input",
+      '  the country config\'s application configuration: PHONE_NUMBER_PATTERN "^0(7|9)[0-9{8}$" is not a valid regular expression — a configured phone number pattern must be a valid regular expression',
       '  the initial users: include nobody who could configure the system — at least one initial user must carry a role with the "config.update-all" scope',
-      '  administrative area "A Place" (id ibombo): partOf "Location/central" names no declared administrative area — partOf must name an administrative area the seed-data declares, or the root "0"',
+      "  the country config's administrative hierarchy: does not parse — Invalid input",
+      '  administrative area "Ibombo" (id ibombo): partOf "Location/central" names no declared administrative area — partOf must name an administrative area the seed-data declares, or the root "0"',
       '  role "SOCIAL_WORKER": does not parse — Invalid scope: "nonsense"',
       `  the country config's roles: id "LOCAL_REGISTRAR" is declared more than once — role ids must be unique`,
       '  initial user 2 (k.mweene): email "k.mweene@x.com" duplicates initial user 1 — emails must be unique',
@@ -493,39 +451,64 @@ describe('seed-data with problems of every kind', () => {
       '  initial user 4 (d.dube): does not parse — Invalid input'
     ])
   })
+
+  it('names an initial user by position alone when it carries no usable username', () => {
+    expect(
+      formatValidationReport([
+        {
+          kind: 'userUnparsed',
+          user: { position: 1 },
+          message: 'Invalid input: expected string, received number'
+        }
+      ]).split('\n')[1]
+    ).toBe(
+      '  initial user 1: does not parse — Invalid input: expected string, received number'
+    )
+  })
+
+  it('names a role by position when it carries no usable id', () => {
+    expect(
+      formatValidationReport([
+        {
+          kind: 'roleUnparsed',
+          role: { position: 2 },
+          message: 'Invalid input'
+        }
+      ]).split('\n')[1]
+    ).toBe('  role 2: does not parse — Invalid input')
+  })
 })
 
 describe('valid seed-data', () => {
-  const users = [
-    user({
-      username: 'k.mweene',
-      email: 'k.mweene@x.com',
-      mobile: '+260911111111',
-      primaryOfficeId: 'ibombo_HPGiE9Jjh2r',
-      role: 'LOCAL_REGISTRAR'
-    }),
-    user({
-      username: 'f.katongo',
-      email: 'f.katongo@x.com',
-      mobile: '+260922222222',
-      primaryOfficeId: 'ibombo_HPGiE9Jjh2r',
-      role: 'LOCAL_REGISTRAR'
-    })
-  ]
-  const roles = [role({ scopes: CONFIGURE })]
-  const administrativeAreas = [
-    place({ id: 'central', name: 'Central' }),
-    place({ id: 'ibombo', name: 'Ibombo', partOf: 'Location/central' }),
-    place({ id: 'isamba', name: 'Isamba', partOf: 'Location/central' })
-  ]
-  const locations = [
-    place({
-      id: 'HPGiE9Jjh2r',
-      name: 'Ibombo District Office',
-      partOf: 'Location/ibombo'
-    })
-  ]
-  const valid = seedData({ users, roles, administrativeAreas, locations })
+  const valid = seedData({
+    users: initialUsers([
+      user({
+        username: 'k.mweene',
+        email: 'k.mweene@x.com',
+        mobile: '+260911111111'
+      }),
+      user({
+        username: 'f.katongo',
+        email: 'f.katongo@x.com',
+        mobile: '+260922222222'
+      })
+    ]),
+    roles: roles([role({ scopes: CONFIGURE })]),
+    locations: hierarchy(
+      [
+        place({ id: 'central', name: 'Central' }),
+        place({ id: AREA, name: 'Ibombo', partOf: 'Location/central' }),
+        place({ id: 'isamba', name: 'Isamba', partOf: 'Location/central' })
+      ],
+      [
+        place({
+          id: OFFICE,
+          name: 'Ibombo District Office',
+          partOf: `Location/${AREA}`
+        })
+      ]
+    )
+  })
 
   it('produces no problems', () => {
     expect(validateSeedData(valid)).toEqual([])

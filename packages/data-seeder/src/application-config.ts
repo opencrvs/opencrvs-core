@@ -15,15 +15,62 @@ import { joinUrl } from '@opencrvs/commons'
 import { env } from './environment'
 import { raise } from './utils'
 import { formatUnwrittenFailure } from './seed-failure'
-import { SeedData } from './seed-data'
+import { Read } from './read'
 
 const ApplicationConfigSchema = z.object({
   PHONE_NUMBER_PATTERN: z.string()
 })
 
-export async function getApplicationConfig(): Promise<{
-  seedData: Pick<SeedData, 'PHONE_NUMBER_PATTERN'>
-}> {
+export type ApplicationConfigProblem =
+  | { kind: 'applicationConfigUnparsed'; message: string }
+  | { kind: 'invalidPhoneNumberPattern'; pattern: string }
+
+export type ApplicationConfigRead = Read<
+  { PHONE_NUMBER_PATTERN: string },
+  ApplicationConfigProblem
+>
+
+function compile(pattern: string): RegExp | undefined {
+  try {
+    return new RegExp(pattern)
+  } catch {
+    return undefined
+  }
+}
+
+export function parseApplicationConfig(
+  document: unknown
+): ApplicationConfigRead {
+  const parsed = ApplicationConfigSchema.safeParse(document)
+
+  if (!parsed.success) {
+    return {
+      readable: false,
+      problem: {
+        kind: 'applicationConfigUnparsed',
+        message: fromZodError(parsed.error, { prefix: null }).message
+      }
+    }
+  }
+
+  const { PHONE_NUMBER_PATTERN } = parsed.data
+
+  return {
+    readable: true,
+    PHONE_NUMBER_PATTERN,
+    problems:
+      compile(PHONE_NUMBER_PATTERN) === undefined
+        ? [
+            {
+              kind: 'invalidPhoneNumberPattern',
+              pattern: PHONE_NUMBER_PATTERN
+            }
+          ]
+        : []
+  }
+}
+
+export async function readApplicationConfig(): Promise<ApplicationConfigRead> {
   const url = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/application')
   const res = await fetch(url, {
     headers: { 'Content-Type': 'application/json' }
@@ -37,19 +84,19 @@ export async function getApplicationConfig(): Promise<{
     )
   }
 
-  const parsed = ApplicationConfigSchema.safeParse(await res.json())
+  return parseApplicationConfig(await res.json())
+}
 
-  if (!parsed.success) {
-    raise(
-      formatUnwrittenFailure(
-        fromZodError(parsed.error, {
-          prefix: `Error validating the application config returned from ${url}`
-        }).message
-      )
-    )
+export function getPhoneNumberPattern(
+  read: ApplicationConfigRead
+): { source: string; expression: RegExp } | undefined {
+  if (!read.readable) {
+    return undefined
   }
 
-  return {
-    seedData: { PHONE_NUMBER_PATTERN: parsed.data.PHONE_NUMBER_PATTERN }
-  }
+  const expression = compile(read.PHONE_NUMBER_PATTERN)
+
+  return expression === undefined
+    ? undefined
+    : { source: read.PHONE_NUMBER_PATTERN, expression }
 }
