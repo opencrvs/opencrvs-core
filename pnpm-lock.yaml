@@ -1304,9 +1304,6 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(zod@4.4.3)
     devDependencies:
-      '@electric-sql/pglite':
-        specifier: ^0.4.4
-        version: 0.4.4
       '@eslint/compat':
         specifier: ^1.2.7
         version: 1.2.7(eslint@9.23.0)
