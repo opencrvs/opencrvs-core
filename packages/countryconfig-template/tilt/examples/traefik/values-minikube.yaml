@@ -1,0 +1,12 @@
+# Minikube-only overrides, layered on top of values.yaml (see tilt/common.tilt,
+# which passes both --values files to helm when the active context is minikube).
+#
+# minikube doesn't expose LoadBalancer services to the host on its own, so we
+# switch to NodePort here, pinned to what
+# `minikube start --ports=80:30080` publishes onto the host.
+service:
+  type: NodePort
+
+ports:
+  web:
+    nodePort: 30080
