@@ -15,7 +15,7 @@ import {
   triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getAnonymousToken } from '@events/service/auth'
+import { getServiceToken } from '@events/service/auth'
 import { getClient } from '@events/storage/postgres/events'
 import {
   getNextProcessableAnnouncement,
@@ -70,10 +70,10 @@ export async function processNextAnnouncement() {
   )
 
   try {
-    // No user is involved in a background broadcast, so authenticate with an
-    // anonymous token (audience includes opencrvs:countryconfig-user) rather
+    // No user is involved in a background broadcast, so authenticate with the
+    // service token (audience includes opencrvs:countryconfig-user) rather
     // than a user token. This lets country config require auth on the route.
-    const token = await getAnonymousToken()
+    const token = await getServiceToken()
 
     const res = await triggerUserEventNotification({
       event: TriggerEvent.ALL_USER_NOTIFICATION,
