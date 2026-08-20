@@ -597,8 +597,12 @@ test('invalidates the leaf-level administrative area cache', async () => {
 
   const before = await getLeafLevelAdministrativeAreaIds()
 
-  const parentId = generateUuid()
-  const areaId = generateUuid()
+  // generateUuid() with no argument draws from a constant rng, so a second
+  // call without one would collide with the first — use an advancing PRNG
+  // for distinct ids instead.
+  const uuid = uuidFactory(90007)
+  const parentId = uuid()
+  const areaId = uuid()
 
   await client.administrativeAreas.set([
     { id: parentId, parentId: null, name: 'Parent Area', externalId: null },
