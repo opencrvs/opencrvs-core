@@ -235,33 +235,3 @@ export async function setAdministrativeAreas(
   const db = getClient()
   await setAdministrativeAreasInTrx(db, administrativeAreas)
 }
-
-/**
- * A leaf administrative level is defined as an administrative area which does not have any other administrative areas as children.
- * Administrative areas that have locations as children are still considered leaf levels.
- *
- * @returns List of leaf level administrative area ids.
- */
-let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
-
-export async function getLeafLevelAdministrativeAreaIds() {
-  if (!leafLevelAdministrativeAreaIdsCache) {
-    const db = getClient()
-
-    leafLevelAdministrativeAreaIdsCache = db
-      .selectFrom('administrativeAreas as a1')
-      .select(['a1.id'])
-      .where(({ not, exists, selectFrom }) =>
-        not(
-          exists(
-            selectFrom('administrativeAreas as a2')
-              .select('a2.id')
-              .whereRef('a2.parentId', '=', 'a1.id')
-          )
-        )
-      )
-      .execute()
-  }
-
-  return leafLevelAdministrativeAreaIdsCache
-}
