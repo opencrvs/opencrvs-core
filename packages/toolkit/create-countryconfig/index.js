@@ -37,6 +37,20 @@ function tagExists(repoUrl, tag) {
   }
 }
 
+function branchExists(repoUrl, branch) {
+  try {
+    execSync(
+      'git ls-remote --exit-code --heads ' + repoUrl + ' refs/heads/' + branch,
+      {
+        stdio: 'pipe'
+      }
+    )
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
 /**
  * Release tags (e.g. "v2.1.0"), highest first. Delegates the version-aware
  * ordering to git itself rather than hand-parsing semver, then filters down
@@ -74,9 +88,15 @@ function getLatestCommonReleaseTag() {
 
 /**
  * A prerelease-shaped own version (e.g. "2.1.0-rc.f5ea803", what npm resolves
- * `@next` to - a build published from every push to develop) never has a
- * matching release tag, so scaffold straight from develop for both
- * repositories instead of wasting a tag lookup that can only fail.
+ * `@next` to - a build published from every push to a branch) never has a
+ * matching release tag, so it's resolved as a branch instead. Its base
+ * version (stripped of the "-rc.<sha>" suffix) tells apart two different
+ * situations: an RC for a version already being stabilized on its own
+ * "release/X.Y.Z" branch (e.g. "2.0.1-rc.*" while a patch release is in
+ * progress) versus an RC for a version that hasn't been branched off yet and
+ * only exists on develop (e.g. "2.1.0-rc.*" while that release branch hasn't
+ * been cut). Scaffold from the release branch when it exists in both
+ * repositories, otherwise fall back to develop.
  *
  * Otherwise, the own "X.Y.Z" version - whether resolved via npm's `latest`
  * dist-tag (bare invocation) or an explicit `@X.Y.Z` pin - scaffolds from the
@@ -89,6 +109,13 @@ function getLatestCommonReleaseTag() {
  */
 function resolveRef() {
   if (version.includes('-')) {
+    const releaseBranch = 'release/' + version.split('-')[0]
+    if (
+      branchExists(COUNTRYCONFIG_REPO_URL, releaseBranch) &&
+      branchExists(INFRASTRUCTURE_REPO_URL, releaseBranch)
+    ) {
+      return releaseBranch
+    }
     return 'develop'
   }
 
