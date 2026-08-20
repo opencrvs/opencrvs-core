@@ -8,13 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { eventQueryDataGenerator, EventState } from '@opencrvs/commons/events'
+import { eventQueryDataGenerator } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import {
-  decodeEventIndex,
-  encodeEventIndex,
-  removeSecuredFields
-} from './utils'
+import { decodeEventIndex, encodeEventIndex } from './utils'
 
 describe('EventIndex utils', () => {
   const eventConfig = tennisClubMembershipEvent
@@ -44,33 +40,6 @@ describe('EventIndex utils', () => {
   test('decodes EventIndex', () => {
     const decodedEventIndex = decodeEventIndex(eventConfig, encodedEventIndex)
     expect(decodedEventIndex.declaration).toEqual({
-      'applicant.name': {
-        firstname: 'John',
-        surname: 'Doe'
-      },
-      'applicant.dob': '1990-01-01'
-    })
-  })
-
-  test('removes secured data while keeping the others', () => {
-    const eventIndexWithSecuredData = eventQueryDataGenerator({
-      declaration: {
-        'applicant.name': {
-          firstname: 'John',
-          surname: 'Doe'
-        },
-        'applicant.dob': '1990-01-01',
-        'applicant.address': {
-          addressType: 'DOMESTIC',
-          country: 'GB',
-          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
-          streetLevelDetails: {}
-        }
-      } satisfies EventState
-    })
-    expect(
-      removeSecuredFields(eventConfig, eventIndexWithSecuredData).declaration
-    ).toEqual({
       'applicant.name': {
         firstname: 'John',
         surname: 'Doe'

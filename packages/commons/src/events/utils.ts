@@ -42,6 +42,7 @@ import {
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   isConditionMet,
+  isFieldSecured,
   isFieldVisible,
   ValidatorContext
 } from '../conditionals/validate'
@@ -63,6 +64,7 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+import { EventIndex } from './EventIndex'
 
 /* eslint-disable max-lines */
 
@@ -930,4 +932,39 @@ export function aggregateActionAnnotations(event: EventDocument): EventState {
 
     return deepMerge(ann, sortedAction.annotation)
   }, {} as EventState)
+}
+
+/**
+ * 2.1. onwards secured fields have accepted conditionals.
+ * Secured fields are not present in EventIndex payload.
+ * When we derive @see EventIndex from @see EventDocument, we will have all the fields present.
+ *
+ * To keep the views consistent, and not to change if event.get gets triggered, we need to clean out the secured fields.
+ *
+ * @returns EventIndex without values that evaluate to secured: true.
+ */
+export function dropSecuredDeclarationFields(
+  eventConfig: EventConfig,
+  eventIndex: EventIndex,
+  validatorContext: ValidatorContext
+): EventIndex {
+  const declarationFields = getDeclarationFields(eventConfig)
+  const securedFieldIds = new Set(
+    declarationFields
+      .filter((declarationField) =>
+        isFieldSecured(declarationField, eventIndex, validatorContext)
+      )
+      .map((declarationField) => declarationField.id)
+  )
+
+  const declaration = Object.fromEntries(
+    Object.entries(eventIndex.declaration).filter(
+      ([fieldId]) => !securedFieldIds.has(fieldId)
+    )
+  )
+
+  return {
+    ...eventIndex,
+    declaration
+  }
 }

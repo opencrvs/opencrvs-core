@@ -10,14 +10,14 @@
  */
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
-  deepDropNulls
+  deepDropNulls,
+  dropSecuredDeclarationFields
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { EventIcon } from '@client/v2-events/components/EventIcon'
@@ -27,6 +27,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
@@ -39,6 +40,7 @@ import { useEventOverviewInfo } from './components/useEventOverviewInfo'
  */
 function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
@@ -54,13 +56,17 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       })
     : getCurrentEventState(event, eventConfiguration)
 
+  const eventWithoutSecuredFields = dropSecuredDeclarationFields(
+    eventConfiguration,
+    eventWithDrafts,
+    validatorContext
+  )
   const { getUsers } = useUsers()
-  const intl = useIntl()
 
   const assignedToUser = getUsers.useQueryById(
-    eventWithDrafts.assignedTo || '',
+    eventWithoutSecuredFields.assignedTo || '',
     {
-      enabled: !!eventWithDrafts.assignedTo
+      enabled: !!eventWithoutSecuredFields.assignedTo
     }
   )
 
@@ -69,7 +75,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     : null
 
   const { flags, ...flattenedEventIndex } = {
-    ...flattenEventIndex(eventWithDrafts),
+    ...flattenEventIndex(eventWithoutSecuredFields),
     // drafts should not affect the status of the event
     // so the status and flags are taken from the eventIndex
     'event.status': status,
@@ -77,7 +83,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     flags: eventIndex.flags
   }
   const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
+  const { title } = getEventTitle(eventConfiguration, eventWithoutSecuredFields)
 
   return (
     <Content
