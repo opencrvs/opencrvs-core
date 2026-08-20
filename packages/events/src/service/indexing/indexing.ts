@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- index lifecycle lives here alongside the mappings it writes */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -268,6 +269,16 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
   )
 }
 
+/** Shared by index creation and updates, so the two cannot drift apart. */
+function declarationMapping(
+  formFields: FieldConfig[]
+): estypes.MappingProperty {
+  return {
+    type: 'object',
+    properties: formFieldsToDataMapping(formFields)
+  }
+}
+
 export async function createIndex(
   indexName: string,
   formFields: FieldConfig[],
@@ -293,10 +304,7 @@ export async function createIndex(
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
           updatedByUserRole: { type: 'keyword' },
-          declaration: {
-            type: 'object',
-            properties: formFieldsToDataMapping(formFields)
-          },
+          declaration: declarationMapping(formFields),
           trackingId: { type: 'keyword' },
           legalStatuses: {
             type: 'object',
@@ -350,28 +358,72 @@ export async function createIndex(
   }
 }
 
+/**
+ * Mappings are only written when an index is created, so a field added to an
+ * event afterwards would be mapped by whatever Elasticsearch infers on first
+ * write — searchable, but not as configured. Pushing the configured mapping
+ * fixes that without a reindex: Elasticsearch merges new fields into an
+ * existing mapping. A changed field *type* is not a legal merge, so it is
+ * logged and left for a reindex rather than failing the rest of the setup.
+ */
+async function syncIndexMappings(
+  indexName: string,
+  eventConfiguration: EventConfig
+) {
+  const esClient = getOrCreateClient()
+
+  try {
+    await esClient.indices.putMapping({
+      index: indexName,
+      properties: {
+        declaration: declarationMapping(
+          getDeclarationFields(eventConfiguration)
+        )
+      }
+    })
+  } catch (error) {
+    logger.error(
+      `Failed to update mappings for index ${indexName}. If a field type changed, a reindex is required. ${String(
+        error
+      )}`
+    )
+  }
+}
+
 export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
 
-  const isAlreadyWriteAlias = await esClient.indices.existsAlias({
-    name: indexName
-  })
-  if (isAlreadyWriteAlias) {
-    logger.info(
-      `Write alias ${indexName} already exists — index setup already complete`
-    )
-    return
+  // Alias membership is the common case, and covers an index reachable through
+  // its own write alias, which is how a reindexed event is set up.
+  const isSearchable =
+    (await esClient.indices.existsAlias({
+      name: getEventAliasName(),
+      index: indexName
+    })) || (await esClient.indices.existsAlias({ name: indexName }))
+
+  if (!isSearchable) {
+    if (!(await esClient.indices.exists({ index: indexName }))) {
+      logger.info(`Creating index ${indexName}`)
+      await createIndex(indexName, getDeclarationFields(eventConfiguration))
+
+      return
+    }
+
+    logger.info(`Adding existing index ${indexName} to the search alias`)
+    await ensureAlias(indexName)
   }
 
-  const hasConcreteIndex = await esClient.indices.exists({ index: indexName })
+  await syncIndexMappings(indexName, eventConfiguration)
+}
 
-  if (!hasConcreteIndex) {
-    logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
-  } else {
-    logger.info(`Index ${indexName} already exists as a concrete index.`)
-    await ensureAlias(indexName)
+/**
+ * Run at startup and on every configuration refetch, so an event configured
+ * after startup can be indexed without restarting the service.
+ */
+export async function ensureIndicesExist(configurations: EventConfig[]) {
+  for (const configuration of configurations) {
+    await ensureIndexExists(configuration)
   }
 }
 

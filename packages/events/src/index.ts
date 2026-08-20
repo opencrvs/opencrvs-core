@@ -14,9 +14,12 @@ import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
 import { getAnonymousToken } from './service/auth'
-import { getInMemoryEventConfigurations } from './service/config/config'
+import {
+  getInMemoryEventConfigurations,
+  onEventConfigurationsLoaded
+} from './service/config/config'
 import { triggerSystemReady } from './service/config/systemReady'
-import { ensureIndexExists } from './service/indexing/indexing'
+import { ensureIndicesExist } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
 
@@ -34,10 +37,11 @@ export async function main() {
     const configurations = await getInMemoryEventConfigurations(
       `Bearer ${anonymousToken}`
     )
-    for (const configuration of configurations) {
-      logger.info(`Loaded event configuration: ${configuration.id}`)
-      await ensureIndexExists(configuration)
-    }
+    await ensureIndicesExist(configurations)
+
+    // Repeats the setup above on every later refetch, so an event configured
+    // after startup can be indexed without restarting the service.
+    onEventConfigurationsLoaded(ensureIndicesExist)
   } catch (error) {
     if (error instanceof Error) {
       logger.error(error.message)

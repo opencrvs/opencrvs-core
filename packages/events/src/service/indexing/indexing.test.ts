@@ -22,6 +22,7 @@ import {
   EventIndex,
   EventState,
   field,
+  FieldConfig,
   FieldConditional,
   FieldType,
   generateActionDeclarationInput,
@@ -30,7 +31,9 @@ import {
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
-  UUID
+  UUID,
+  generateEventConfig,
+  generateTranslationConfig
 } from '@opencrvs/commons/events'
 import { encodeScope } from '@opencrvs/commons'
 import {
@@ -41,6 +44,7 @@ import {
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import {
+  getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
@@ -50,6 +54,8 @@ import {
   buildElasticQueryFromSearchPayload,
   withJurisdictionFilters
 } from './query'
+import { ensureIndexExists, ensureIndicesExist } from './indexing'
+import { encodeFieldId } from './utils'
 
 test('records are not indexed when they are created', async () => {
   const { user, generator } = await setupTestCase()
@@ -1539,4 +1545,88 @@ describe('placeOfEvent location hierarchy handling', () => {
       expectedLocationHierarchy
     )
   })
+})
+
+const EVENT_ID = 'book-club-membership'
+const ADDED_FIELD_ID = 'applicant.nickname'
+
+const originalFields: FieldConfig[] = [
+  {
+    id: 'applicant.email',
+    type: FieldType.EMAIL,
+    label: generateTranslationConfig('Email')
+  }
+]
+
+const addedField: FieldConfig = {
+  id: ADDED_FIELD_ID,
+  type: FieldType.TEXT,
+  label: generateTranslationConfig('Nickname')
+}
+
+async function getDeclarationFieldMappings(indexName: string) {
+  const mappings = await getOrCreateClient().indices.getMapping({
+    index: indexName
+  })
+  const declaration =
+    Object.values(mappings)[0].mappings.properties?.declaration
+
+  return declaration && 'properties' in declaration
+    ? declaration.properties
+    : undefined
+}
+
+test('mappings for a field added to a deployed event are applied without a reindex', async () => {
+  const indexName = getEventIndexName(EVENT_ID)
+
+  await ensureIndexExists(
+    generateEventConfig({ id: EVENT_ID, fields: originalFields })
+  )
+
+  const beforeFieldWasAdded = await getDeclarationFieldMappings(indexName)
+  expect(beforeFieldWasAdded).toBeDefined()
+  expect(beforeFieldWasAdded).not.toHaveProperty(encodeFieldId(ADDED_FIELD_ID))
+
+  await ensureIndexExists(
+    generateEventConfig({
+      id: EVENT_ID,
+      fields: [...originalFields, addedField]
+    })
+  )
+
+  const afterFieldWasAdded = await getDeclarationFieldMappings(indexName)
+  expect(afterFieldWasAdded?.[encodeFieldId(ADDED_FIELD_ID)]).toEqual({
+    type: 'keyword'
+  })
+})
+
+test('an event configured after startup gets a searchable index', async () => {
+  const existingEvent = generateEventConfig({
+    id: 'tennis-club-membership',
+    fields: originalFields
+  })
+  const addedEvent = generateEventConfig({
+    id: EVENT_ID,
+    fields: originalFields
+  })
+  const addedEventIndexName = getEventIndexName(addedEvent.id)
+  const esClient = getOrCreateClient()
+
+  await ensureIndicesExist([existingEvent])
+
+  expect(await esClient.indices.exists({ index: addedEventIndexName })).toBe(
+    false
+  )
+
+  await ensureIndicesExist([existingEvent, addedEvent])
+
+  expect(await esClient.indices.exists({ index: addedEventIndexName })).toBe(
+    true
+  )
+  expect(
+    await esClient.indices.existsAlias({
+      name: getEventAliasName(),
+      index: addedEventIndexName
+    })
+  ).toBe(true)
 })

@@ -31,7 +31,8 @@ import { env } from '@events/environment'
  */
 function createTtlConfigCache<T>(
   label: string,
-  fetcher: (token: TokenWithBearer) => Promise<T>
+  fetcher: (token: TokenWithBearer) => Promise<T>,
+  afterFetch?: (value: T) => Promise<void>
 ) {
   let value: T | null = null
   let fetchedAt = 0
@@ -40,7 +41,9 @@ function createTtlConfigCache<T>(
   return async function getCached(token: TokenWithBearer): Promise<T> {
     // In development always fetch, so config changes are picked up immediately.
     if (!env.isProduction) {
-      return fetcher(token)
+      const fetched = await fetcher(token)
+      await afterFetch?.(fetched)
+      return fetched
     }
 
     if (
@@ -55,10 +58,19 @@ function createTtlConfigCache<T>(
     if (!inFlight) {
       logger.info(`Refetching ${label} from countryconfig`)
       inFlight = fetcher(token)
-        .then((fetched) => {
+        .then(async (fetched) => {
+          // Before the value is served, so search indices are in place by the
+          // time the service uses the configuration.
+          await afterFetch?.(fetched)
           value = fetched
           fetchedAt = Date.now()
           return fetched
+        })
+        .catch((error: unknown) => {
+          // Bounds retries to one per TTL. Left expired, a failed attempt would
+          // turn every subsequent request into another refetch.
+          fetchedAt = Date.now()
+          throw error
         })
         .finally(() => {
           inFlight = null
@@ -83,13 +95,30 @@ function createTtlConfigCache<T>(
   }
 }
 
+/**
+ * Countryconfig tags the configuration with an entity tag, so an unchanged
+ * configuration costs a 304 instead of retransmitting and reparsing ~150kB on
+ * every refetch. Countryconfig versions without the tag answer 200 as before.
+ */
+let lastFetchedEventConfigurations: {
+  etag: string
+  configurations: EventConfig[]
+} | null = null
+
 export async function getEventConfigurations(token: TokenWithBearer) {
   const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token
+      Authorization: token,
+      ...(lastFetchedEventConfigurations && {
+        'If-None-Match': lastFetchedEventConfigurations.etag
+      })
     }
   })
+
+  if (res.status === 304 && lastFetchedEventConfigurations) {
+    return lastFetchedEventConfigurations.configurations
+  }
 
   if (!res.ok) {
     throw new Error(
@@ -97,7 +126,27 @@ export async function getEventConfigurations(token: TokenWithBearer) {
     )
   }
 
-  return array(EventConfig).parse(await res.json())
+  const configurations = array(EventConfig).parse(await res.json())
+  const etag = res.headers.get('etag')
+  lastFetchedEventConfigurations = etag ? { etag, configurations } : null
+
+  return configurations
+}
+
+let eventConfigurationsLoadedListener:
+  | ((configurations: EventConfig[]) => Promise<void>)
+  | null = null
+
+/**
+ * Registers the handler run on each fetch of event configurations, to set up
+ * search indices for events configured after startup. Registered rather than
+ * passed to `createTtlConfigCache` directly: importing indexing here would
+ * close a require cycle through the tRPC context.
+ */
+export function onEventConfigurationsLoaded(
+  listener: (configurations: EventConfig[]) => Promise<void>
+) {
+  eventConfigurationsLoadedListener = listener
 }
 
 /**
@@ -106,7 +155,8 @@ export async function getEventConfigurations(token: TokenWithBearer) {
  */
 export const getInMemoryEventConfigurations = createTtlConfigCache(
   'event configurations',
-  getEventConfigurations
+  getEventConfigurations,
+  async (configurations) => eventConfigurationsLoadedListener?.(configurations)
 )
 
 async function findEventConfigurationById({
