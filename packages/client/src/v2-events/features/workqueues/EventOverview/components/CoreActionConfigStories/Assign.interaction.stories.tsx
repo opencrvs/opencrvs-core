@@ -26,7 +26,10 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { setEventData } from '@client/v2-events/features/events/useEvents/api'
+import {
+  setEventData,
+  updateLocalEventIndex
+} from '@client/v2-events/features/events/useEvents/api'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
 
@@ -169,6 +172,7 @@ export const assignLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> = {
   },
   beforeEach: () => {
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -220,6 +224,7 @@ export const assignIsHiddenWhenConditionalIsNotMet: StoryObj<
   },
   beforeEach: () => {
     setEventData(lockedEventDocument.id, lockedEventDocument)
+    updateLocalEventIndex(lockedEventDocument.id, lockedEventDocument)
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

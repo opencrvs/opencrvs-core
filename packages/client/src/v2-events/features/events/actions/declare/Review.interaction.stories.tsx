@@ -31,7 +31,11 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { eventConfigWithPrintButton } from '../edit/Review.interaction.stories'
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
+import {
+  setEventData,
+  addLocalEventConfig,
+  updateLocalEventIndex
+} from '../../useEvents/api'
 import { ActionDocument } from '../../../../../../../commons/build/dist/common/client'
 import { ReviewIndex } from './Review'
 
@@ -531,6 +535,7 @@ export const ChangeFieldInReview: Story = {
      */
     addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {
@@ -651,6 +656,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
      */
     addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {
@@ -737,6 +743,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
      */
     addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {

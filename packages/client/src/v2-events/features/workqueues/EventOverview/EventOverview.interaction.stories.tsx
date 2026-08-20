@@ -22,12 +22,12 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventWithArchiveAndUnarchive
 } from '../../events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
-import { testDataGenerator } from '@client/tests/test-data-generators'
 
 const generator = testDataGenerator()
 
@@ -171,8 +171,7 @@ export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
           tRPCMsw.user.list.query(() => {
             return [generator.user.localRegistrar().summary]
           }),
-          tRPCMsw.user.get.query((q) => {
-            console.log('jeesus')
+          tRPCMsw.user.get.query(() => {
             return generator.user.localRegistrar().v2
           })
         ]

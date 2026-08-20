@@ -96,6 +96,17 @@ export const NoReviewButtonInOutbox: Story = {
               setTimeout(resolve, OUTBOX_FREEZE_TIME)
             )
             return getDeclareEventDocument(noReviewButtonEvent.id)
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(
+                  noReviewButtonEvent,
+                  tennisClubMembershipEvent
+                )
+              ]
+            }
           })
         ]
       }
@@ -161,6 +172,17 @@ export const SuccessfulMutation: Story = {
               setTimeout(resolve, OUTBOX_FREEZE_TIME)
             )
             return getDeclareEventDocument(successfulMutationEvent.id)
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(
+                  getDeclareEventDocument(successfulMutationEvent.id),
+                  tennisClubMembershipEvent
+                )
+              ]
+            }
           })
         ]
       }
@@ -252,6 +274,17 @@ export const FailedMutation: Story = {
             throw new TRPCError({
               code: 'INTERNAL_SERVER_ERROR'
             })
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(
+                  failedMutationEvent,
+                  tennisClubMembershipEvent
+                )
+              ]
+            }
           })
         ]
       }
@@ -338,6 +371,17 @@ export const FailedMutationConflict: Story = {
             throw new TRPCError({
               code: 'CONFLICT'
             })
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(
+                  failedMutationConflictEvent,
+                  tennisClubMembershipEvent
+                )
+              ]
+            }
           })
         ]
       }
