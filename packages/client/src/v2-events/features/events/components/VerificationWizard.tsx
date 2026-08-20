@@ -12,7 +12,14 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { Dialog, Text, Frame, Stack, Content, Button } from '@opencrvs/components'
+import {
+  Dialog,
+  Text,
+  Frame,
+  Stack,
+  Content,
+  Button
+} from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormWizardProps, messages as formWizardMessages } from './FormWizard'
 
