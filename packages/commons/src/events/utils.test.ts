@@ -48,7 +48,7 @@ import {
   eventQueryDataGenerator,
   generateActionDocument,
   generateTranslationConfig,
-  getTestValidatorContext
+  generateTestValidatorContext
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
 
@@ -1180,7 +1180,7 @@ describe('getActionAnnotationFields() with dialog form', () => {
         dropSecuredDeclarationFields(
           tennisClubMembershipEvent,
           eventIndexWithSecuredData,
-          getTestValidatorContext()
+          generateTestValidatorContext()
         ).declaration
       ).toEqual({
         'applicant.name': {

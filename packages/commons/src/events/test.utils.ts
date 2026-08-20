@@ -1315,6 +1315,10 @@ export function getLeafAdministrativeAreaIds(
   return result
 }
 
+/**
+ *
+ * @returns TokenPayload. Useful for building test setup for ValidatorContext
+ */
 function generateUserTokenPayload({
   role,
   scope
@@ -1323,9 +1327,10 @@ function generateUserTokenPayload({
   scope?: EncodedScope[]
 }): ITokenPayload {
   return {
+    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
     sub: generateUuid(),
-    algorithm: 'dad',
-    exp: '12312030213012',
+    algorithm: 'RS256',
+    exp: '1787221786',
     role: role ?? TestUserRole.enum.FIELD_AGENT,
     scope: scope ?? [
       encodeScope({
@@ -1336,7 +1341,7 @@ function generateUserTokenPayload({
   }
 }
 
-export function getTestValidatorContext(
+export function generateTestValidatorContext(
   userRole?: TestUserRole,
   eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
 ): ValidatorContext {

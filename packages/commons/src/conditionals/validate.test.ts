@@ -19,7 +19,7 @@ import { tennisClubMembershipEvent } from '../fixtures'
 import {
   eventQueryDataGenerator,
   generateEventDocument,
-  getTestValidatorContext
+  generateTestValidatorContext
 } from '../events/test.utils'
 import {
   errorMessages,
@@ -409,7 +409,11 @@ describe('isFieldSecured', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
     expect(
-      isFieldSecured({ secured: true }, eventIndex, getTestValidatorContext())
+      isFieldSecured(
+        { secured: true },
+        eventIndex,
+        generateTestValidatorContext()
+      )
     ).toBe(true)
   })
 
@@ -417,13 +421,17 @@ describe('isFieldSecured', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
     expect(
-      isFieldSecured({ secured: false }, eventIndex, getTestValidatorContext())
+      isFieldSecured(
+        { secured: false },
+        eventIndex,
+        generateTestValidatorContext()
+      )
     ).toBe(false)
     expect(
       isFieldSecured(
         { secured: undefined },
         eventIndex,
-        getTestValidatorContext()
+        generateTestValidatorContext()
       )
     ).toBe(false)
   })
@@ -435,14 +443,14 @@ describe('isFieldSecured', () => {
       isFieldSecured(
         securedField,
         eventQueryDataGenerator({ flags: ['sealed'] }),
-        getTestValidatorContext()
+        generateTestValidatorContext()
       )
     ).toBe(true)
     expect(
       isFieldSecured(
         securedField,
         eventQueryDataGenerator({ flags: [] }),
-        getTestValidatorContext()
+        generateTestValidatorContext()
       )
     ).toBe(false)
   })
