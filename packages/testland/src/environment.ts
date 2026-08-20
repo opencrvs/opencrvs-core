@@ -84,7 +84,7 @@ export const env = cleanEnv(process.env, {
     desc: 'Environment name (e.g. "production", "staging") reported as the telemetry environment.'
   }),
   ORGANISATION: str({
-    default: '',
+    default: 'OpenCRVS',
     desc: 'Organisation running this instance, reported with telemetry. Empty by default.'
   })
 })

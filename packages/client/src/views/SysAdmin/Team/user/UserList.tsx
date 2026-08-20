@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AvatarSmall } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { LoadingIndicator } from '@client/components/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -31,7 +31,13 @@ import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
-import { ClientLocation, todayISO, User, UUID } from '@opencrvs/commons/client'
+import {
+  ClientLocation,
+  isSelectableAtAnchor,
+  todayISO,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -508,6 +514,10 @@ function UserListComponent({ userDetails }: UserListProps) {
           'data-testid': user.id,
           start: (
             <Link
+              aria-label={intl.formatMessage({
+                id: 'user.avatar',
+                defaultMessage: 'User avatar'
+              })}
               onClick={() =>
                 navigate(
                   ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
@@ -517,7 +527,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               }
               disabled={!canReadUser(userForPermissions)}
             >
-              <AvatarSmall name={name} avatar={avatar || undefined} />
+              <Avatar aria-hidden name={name} size="sm" src={avatar} />
             </Link>
           ),
           label: (
@@ -584,7 +594,10 @@ function UserListComponent({ userDetails }: UserListProps) {
 
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          locationFilter={(location) => canAccessOffice(location)}
+          locationFilter={(location) =>
+            canAccessOffice(location) &&
+            isSelectableAtAnchor(location.versions, todayISO())
+          }
         />
       )
     }

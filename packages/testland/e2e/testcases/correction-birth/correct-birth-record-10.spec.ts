@@ -393,9 +393,7 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          page
-            .getByTestId('child.attendantAtBirth-value')
-            .getByRole('deletion')
+          page.getByTestId('child.attendantAtBirth-value').getByRole('deletion')
         ).toHaveText('-')
 
         await expect(
@@ -640,16 +638,11 @@ test.describe('10. Correct record', () => {
       test('10.1.6.3 Approve correction', async () => {
         await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
-        await waitForCorrectionAction(
-          page,
-          'approve',
-          async () => {
-            await page
-              .getByRole('button', { name: 'Confirm', exact: true })
-              .click()
-          },
-          { waitForUnassign: true, eventId }
-        )
+        await waitForCorrectionAction(page, 'approve', async () => {
+          await page
+            .getByRole('button', { name: 'Confirm', exact: true })
+            .click()
+        })
 
         await expectInUrl(page, `/events/${eventId}`)
       })

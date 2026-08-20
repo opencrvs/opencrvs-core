@@ -151,14 +151,9 @@ test('Cleared field values are removed after correcting a registered birth recor
 
     await page.getByRole('button', { name: 'Correct' }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
   })
 
   await test.step('Record no longer shows the previously entered weight or address details', async () => {
@@ -168,9 +163,9 @@ test('Cleared field values are removed after correcting a registered birth recor
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await switchEventTab(page, 'Record')
 
-    await expect(
-      page.getByTestId('child.weightAtBirth-value')
-    ).not.toHaveText(weightValueBefore)
+    await expect(page.getByTestId('child.weightAtBirth-value')).not.toHaveText(
+      weightValueBefore
+    )
 
     const birthLocation = page.getByTestId(
       'child.birthLocation.privateHome-value'

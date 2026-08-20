@@ -27,6 +27,7 @@
     "start": "pnpm setup-analytics && pnpm setup-reference-data &&  cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --watch src --exec tsx src/index.ts",
     "start:prod": "tsx src/index.ts",
     "metabase": "bash assets/metabase/run-dev.sh",
+    "extract:translations": "tsx ../toolkit/src/cli.ts check-translations",
     "sort-translations": "cross-env NODE_ENV=development tsx src/sort-translations.ts"
   },
   "devDependencies": {
@@ -135,6 +136,9 @@
     "zod": "^4.2.1"
   },
   "lint-staged": {
+    "src/**/*.{ts,graphql}": [
+      "sh -c 'pnpm extract:translations'"
+    ],
     "{src,e2e}/**/*.{ts,graphql}": [
       "eslint --fix",
       "prettier --write",

@@ -404,9 +404,7 @@ test.describe.serial('Correct record - 4', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page
-            .getByTestId('father.idType-value')
-            .getByRole('deletion')
+          await page.getByTestId('father.idType-value').getByRole('deletion')
         ).toHaveText('National ID')
 
         await expect(
@@ -700,9 +698,7 @@ test.describe.serial('Correct record - 4', () => {
       await expectInUrl(page, 'review')
 
       await expect(
-        await page
-          .getByTestId('child.placeOfBirth-value')
-          .getByRole('deletion')
+        await page.getByTestId('child.placeOfBirth-value').getByRole('deletion')
       ).toHaveText('Residential address')
 
       await expect(
@@ -881,14 +877,9 @@ test.describe.serial('Correct record - 4', () => {
 
     await page.getByRole('button', { name: 'Correct record' }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
 
     await expectInUrl(page, `events/${eventId}`)
 
@@ -930,8 +921,7 @@ test.describe.serial('Correct record - 4', () => {
     const date = await correctionRequestedRow.locator('span').nth(1).innerText()
 
     const requester = await correctionRequestedRow
-      .locator('span')
-      .nth(2)
+      .getByTestId('user-name')
       .innerText()
 
     /*

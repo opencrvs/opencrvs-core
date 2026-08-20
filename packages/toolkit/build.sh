@@ -13,7 +13,8 @@ set -e
 
 rm -rf dist
 
-npx tsc --build
+# tsconfig.build.json excludes the test files, which dist publishes otherwise.
+npx tsc --build tsconfig.build.json
 
 # Build common events
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
@@ -33,6 +34,10 @@ cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/commons/conditiona
 # Build common scopes
 npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
 cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
+
+# Build common authentication
+npx esbuild src/authentication/index.ts --bundle --format=cjs --outdir=./dist/authentication --allow-overwrite --packages=external
+cp -r ../commons/build/dist/common/authentication.d.ts ./dist/authentication/index.d.ts
 
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external

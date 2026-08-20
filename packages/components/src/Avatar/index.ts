@@ -8,27 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-module.exports = {
-  root: true,
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
-  extends: [
-    'eslint:recommended',
-    'plugin:prettier/recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'prettier'
-  ],
-  rules: {
-    'no-console': 'warn',
-    'no-unused-vars': 'warn',
-    'no-undef': 'warn'
-  },
-  globals: {
-    NodeJS: true,
-    fhir: true
-  },
-  env: {
-    node: true
-  }
-}
+export * from './Avatar'

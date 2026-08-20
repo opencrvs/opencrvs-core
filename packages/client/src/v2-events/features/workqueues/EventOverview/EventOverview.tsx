@@ -88,7 +88,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
           name={''}
         />
       )}
-      size={ContentSize.LARGE}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
     >
@@ -150,7 +150,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
           name={''}
         />
       )}
-      size={ContentSize.LARGE}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
     >

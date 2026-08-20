@@ -10,6 +10,12 @@
  */
 import pkgUp from 'pkg-up'
 
+/*
+ * `require` rather than `import`: elastic-apm-node is only loaded in
+ * production, and the package name is read from whichever package.json pkg-up
+ * finds at runtime, which no import statement can express.
+ */
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
 function init() {
   if (process.env.NODE_ENV === 'production') {
     const path = pkgUp.sync()
