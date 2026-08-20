@@ -58,7 +58,6 @@ import {
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
-import id from 'zod/v4/locales/id.cjs'
 
 WebFont.load({
   google: {
