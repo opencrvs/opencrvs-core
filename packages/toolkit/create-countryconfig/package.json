@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/create-countryconfig",
-  "version": "2.1.0",
+  "version": "1.2.4",
   "description": "Scaffold a new OpenCRVS country configuration",
   "bin": {
     "create-countryconfig": "./index.js"
