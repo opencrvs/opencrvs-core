@@ -25,7 +25,7 @@ import { ReqRefDefaults, ServerRoute } from '@hapi/hapi'
  * reset links and notification emails/SMS to arbitrary recipients.
  *
  * `all-user-notification` is dispatched by the background announcement worker,
- * which has no acting user; it forwards an anonymous token (whose audience
+ * which has no acting user; it forwards a service token (whose audience
  * includes `opencrvs:countryconfig-user`) so this route can be authenticated
  * too.
  */

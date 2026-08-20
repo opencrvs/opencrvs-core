@@ -64,16 +64,19 @@ test.describe.serial('1. Settings Page', () => {
       await expect(page.locator('#btnChangePassword').first()).toBeEnabled()
 
       await expect(
-        page.getByTestId('profile-image-value').locator('img')
+        page
+          .getByTestId('profile-image-value')
+          .getByRole('img', { name: 'Kennedy Mweene' })
       ).toBeVisible()
     })
 
     test('1.1.3 Change avatar', async () => {
       await page.getByTestId('change-avatar').first().click()
-      const initialAvatarSrc = await page
-        .getByTestId('profile-image-value')
-        .locator('img')
-        .getAttribute('src')
+
+      // Until a photo is uploaded the avatar renders initials, not an image.
+      await expect(
+        page.getByTestId('profile-image-value').locator('img')
+      ).toHaveCount(0)
 
       const attachmentPath = path.join(__dirname, '../test-data/image.png')
 
@@ -93,13 +96,8 @@ test.describe.serial('1. Settings Page', () => {
 
       await page.getByText('Profile image successfully updated')
 
-      const newAvatar = await page
-        .getByTestId('profile-image-value')
-        .locator('img')
-      await expect(newAvatar).not.toHaveAttribute(
-        'src',
-        initialAvatarSrc as string
-      )
+      const newAvatar = page.getByTestId('profile-image-value').locator('img')
+      await expect(newAvatar).toBeVisible()
 
       const profileSettingsImageSrc = await page.locator(
         '[popovertarget="ProfileMenu-Dropdown-Content"] img'

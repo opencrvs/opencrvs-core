@@ -176,7 +176,7 @@ describe('runDailyTelemetry', () => {
     expect(result.status).toBe('sent')
     expect(receivedBody?.reported_at).toBe(reportedAt)
     expect(receivedBody?.metrics['events.total']).toBeDefined()
-    // the worker fetched an anonymous token (msw handler) and sent it as bearer
-    expect(receivedAuth).toBe('Bearer anon-token')
+    // the worker fetched a service token (msw handler) and sent it as bearer
+    expect(receivedAuth).toBe('Bearer service-token')
   })
 })
