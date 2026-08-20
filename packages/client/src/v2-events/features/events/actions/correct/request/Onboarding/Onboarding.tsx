@@ -19,6 +19,7 @@ import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -89,6 +90,34 @@ export function Onboarding() {
     return null
   }
 
+  const pagesValidatorContext = {
+    ...validatorContext,
+    baseFormState: eventIndex.declaration
+  }
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+        { eventId, pageId: nextPageId },
+        { backTo }
+      )
+    )
+
+  /*
+   * Inside the onboarding form the header's back action means "previous form
+   * page", resolved against the visible pages so conditionally hidden pages are
+   * skipped. There is no previous page on the first page, so there it keeps
+   * falling back to leaving the flow.
+   */
+  const onBack =
+    getFormBackAction({
+      formPages,
+      formData: annotation,
+      validatorContext: pagesValidatorContext,
+      pageId: currentPageId,
+      onNavigateToPage: onPageChange
+    }) ?? (() => navigate(-1))
+
   const title = intl.formatMessage(messages.title)
 
   return (
@@ -100,7 +129,7 @@ export function Onboarding() {
               aria-label="Go back"
               size="medium"
               type="icon"
-              onClick={() => navigate(-1)}
+              onClick={onBack}
             >
               <Icon name="ArrowLeft" />
             </Button>
@@ -120,7 +149,7 @@ export function Onboarding() {
               aria-label="Go back"
               size="medium"
               type="icon"
-              onClick={() => navigate(-1)}
+              onClick={onBack}
             >
               <Icon name="ArrowLeft" />
             </Button>
@@ -152,21 +181,8 @@ export function Onboarding() {
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        validatorContext={{
-          ...validatorContext,
-          baseFormState: eventIndex.declaration
-        }}
-        onPageChange={(nextPageId: string) => {
-          return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
-              {
-                eventId,
-                pageId: nextPageId
-              },
-              { backTo }
-            )
-          )
-        }}
+        validatorContext={pagesValidatorContext}
+        onPageChange={onPageChange}
         onSubmit={() => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
