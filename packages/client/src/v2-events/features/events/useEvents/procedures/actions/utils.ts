@@ -33,8 +33,7 @@ import { createTemporaryId } from '@client/v2-events/utils'
  */
 export function updateEventOptimistically<T extends ActionInput>(
   actionType: ActionType,
-  status: ActionStatus = ActionStatus.Accepted,
-  onlyUpdateLocalEventIndex: boolean = false
+  status: ActionStatus = ActionStatus.Accepted
 ) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
@@ -73,10 +72,7 @@ export function updateEventOptimistically<T extends ActionInput>(
       actions: [...localEvent.actions, optimisticAction]
     }
 
-    if (onlyUpdateLocalEventIndex) {
-    } else {
-      setEventData(optimisticEvent.id, optimisticEvent)
-    }
+    setEventData(optimisticEvent.id, optimisticEvent)
 
     return optimisticAction
   }
