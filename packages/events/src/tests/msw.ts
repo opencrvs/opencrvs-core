@@ -138,8 +138,8 @@ const handlers = [
       access_token: 'some-token'
     })
   ),
-  http.get(`${env.AUTH_URL}/internal/anonymous-token`, () =>
-    HttpResponse.json({ token: 'anon-token' })
+  http.get(`${env.AUTH_URL}/internal/service-token`, () =>
+    HttpResponse.json({ token: 'service-token' })
   )
 ]
 
