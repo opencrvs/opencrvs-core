@@ -51,7 +51,6 @@
     "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.0",
     "@eslint/compat": "^1.2.7",
     "@eslint/eslintrc": "^3.3.1",
     "@testcontainers/elasticsearch": "^10.15.0",

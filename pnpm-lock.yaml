@@ -1304,9 +1304,6 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(zod@4.4.3)
     devDependencies:
-      '@electric-sql/pglite':
-        specifier: ^0.5.0
-        version: 0.5.4
       '@eslint/compat':
         specifier: ^1.2.7
         version: 1.2.7(eslint@9.23.0)
@@ -29096,7 +29093,7 @@ snapshots:
   extract-pg-schema@5.8.1(@electric-sql/pglite@0.5.4):
     dependencies:
       knex: 3.1.0(pg@8.17.2)
-      knex-pglite: 0.12.1(@electric-sql/pglite@0.5.4)(knex@3.1.0(pg@8.22.0))
+      knex-pglite: 0.12.1(@electric-sql/pglite@0.5.4)(knex@3.1.0(pg@8.17.2))
       pg: 8.17.2
       pg-query-emscripten: 5.1.0
       ramda: 0.31.3
@@ -31043,7 +31040,7 @@ snapshots:
       jest-environment-jsdom: 26.6.2
       jest-environment-node: 26.6.2
       jest-get-type: 26.3.0
-      jest-jasmine2: 26.6.3
+      jest-jasmine2: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-regex-util: 26.0.0
       jest-resolve: 26.6.2
       jest-util: 26.6.2
@@ -31417,7 +31414,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  jest-jasmine2@26.6.3:
+  jest-jasmine2@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/traverse': 7.29.8
       '@jest/environment': 26.6.2
@@ -31438,7 +31435,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-junit@16.0.0:
     dependencies:
@@ -32312,7 +32313,7 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knex-pglite@0.12.1(@electric-sql/pglite@0.5.4)(knex@3.1.0(pg@8.22.0)):
+  knex-pglite@0.12.1(@electric-sql/pglite@0.5.4)(knex@3.1.0(pg@8.17.2)):
     dependencies:
       '@electric-sql/pglite': 0.5.4
       knex: 3.1.0(pg@8.17.2)
