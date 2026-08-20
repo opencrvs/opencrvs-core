@@ -210,7 +210,6 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 }
 
 export function setEventData(id: string, data: EventDocument) {
-  // updateLocalEventIndex(id, data)
   queryClient.setQueryData(
     trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
     data

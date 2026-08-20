@@ -24,6 +24,9 @@ import { birthEvent } from './index'
  * (`record.search` without a `flags.noneOf=[sealed]` restriction). Anything
  * left unsecured is therefore readable by them - see
  * https://github.com/opencrvs/opencrvs-core/issues/13289.
+ *
+ * @todo: Update tests as part of https://github.com/opencrvs/opencrvs-core/issues/13530
+ *
  */
 describe('sealed birth records', () => {
   const declarationFields = birthEvent.declaration.pages
@@ -37,7 +40,7 @@ describe('sealed birth records', () => {
     })
 
     const unsecured = declarationFields
-      .filter((field) => !isFieldSecured(field, sealedEvent))
+      .filter((field) => !isFieldSecured(field, sealedEvent, {}))
       .map(({ id }) => id)
 
     expect(unsecured).toEqual([])
@@ -50,7 +53,7 @@ describe('sealed birth records', () => {
     })
 
     const readable = declarationFields
-      .filter((field) => !isFieldSecured(field, unsealedEvent))
+      .filter((field) => !isFieldSecured(field, unsealedEvent, {}))
       .map(({ id }) => id)
 
     // Fields the search results and workqueues are built from stay readable

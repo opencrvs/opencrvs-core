@@ -74,7 +74,6 @@ export function updateEventOptimistically<T extends ActionInput>(
     }
 
     if (onlyUpdateLocalEventIndex) {
-      // updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
     } else {
       setEventData(optimisticEvent.id, optimisticEvent)
     }
