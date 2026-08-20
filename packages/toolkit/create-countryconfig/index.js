@@ -37,11 +37,60 @@ function tagExists(repoUrl, tag) {
   }
 }
 
+/**
+ * Release tags (e.g. "v2.1.0"), highest first. Delegates the version-aware
+ * ordering to git itself rather than hand-parsing semver, then filters down
+ * to strict "vX.Y.Z" tags - `--sort=-version:refname` alone still leaves in
+ * non-release refs (e.g. "vtesting", "v2.0.0-beta") and peeled annotated-tag
+ * lines ("refs/tags/v2.0.0^{}").
+ */
+function listReleaseTags(repoUrl) {
+  const output = execSync(
+    'git ls-remote --tags --sort=-version:refname ' + repoUrl,
+    { encoding: 'utf-8' }
+  )
+
+  return output
+    .split('\n')
+    .map((line) => line.split('\t')[1])
+    .filter(Boolean)
+    .map((ref) => ref.replace('refs/tags/', ''))
+    .filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag))
+}
+
+/**
+ * The highest release tag present in *both* repositories - used as the
+ * fallback when the version-specific tag can't be found in one or both, so
+ * scaffolding still lands on a real, matched release rather than develop.
+ */
+function getLatestCommonReleaseTag() {
+  const infrastructureTags = new Set(listReleaseTags(INFRASTRUCTURE_REPO_URL))
+  return (
+    listReleaseTags(COUNTRYCONFIG_REPO_URL).find((tag) =>
+      infrastructureTags.has(tag)
+    ) || null
+  )
+}
+
+/**
+ * A prerelease-shaped own version (e.g. "2.1.0-rc.f5ea803", what npm resolves
+ * `@next` to - a build published from every push to develop) never has a
+ * matching release tag, so scaffold straight from develop for both
+ * repositories instead of wasting a tag lookup that can only fail.
+ *
+ * Otherwise, the own "X.Y.Z" version - whether resolved via npm's `latest`
+ * dist-tag (bare invocation) or an explicit `@X.Y.Z` pin - scaffolds from the
+ * matching "vX.Y.Z" tag when it exists in both repositories. If it doesn't
+ * (e.g. `latest` lagging behind the repos, or a pin that predates one repo's
+ * tagging), fall back to the highest release tag common to both, rather than
+ * a mismatched pairing of one tagged repo at that version and another repo
+ * at a different release. Exits with an error if no matching release tag
+ * exists in both repositories.
+ */
 function resolveRef() {
-  console.log('version: ' + version)
-  /* if (version.includes('-')) {
+  if (version.includes('-')) {
     return 'develop'
-  } */
+  }
 
   const tag = 'v' + version
   if (
@@ -51,13 +100,24 @@ function resolveRef() {
     return tag
   }
 
-  console.warn(
-    '\nWarning: tag "' +
-      tag +
-      '" was not found in both the country config and infrastructure ' +
-      'repositories; falling back to develop for both.'
+  const latestCommonTag = getLatestCommonReleaseTag()
+  if (latestCommonTag) {
+    console.warn(
+      '\nWarning: tag "' +
+        tag +
+        '" was not found in both repositories; falling back to the latest ' +
+        'available release, ' +
+        latestCommonTag +
+        '.'
+    )
+    return latestCommonTag
+  }
+
+  console.error(
+    '\nError: no matching release tag was found in both the country config and ' +
+      'infrastructure repositories.'
   )
-  return 'develop'
+  process.exit(1)
 }
 
 function cloneRepository(repoUrl, ref, targetDir) {
