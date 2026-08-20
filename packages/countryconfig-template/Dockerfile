@@ -5,8 +5,9 @@ RUN corepack enable pnpm
 WORKDIR /usr/src/app
 ENV NPM_CONFIG_LOGLEVEL=warn
 
-# Install dependencies
-COPY package.json pnpm-lock.yaml ./
+# Install dependencies. .pnpmfile.cjs too: the lockfile records its checksum,
+# so a frozen install without it fails on ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
+COPY package.json pnpm-lock.yaml .pnpmfile.cjs ./
 
 RUN pnpm install --frozen-lockfile
 

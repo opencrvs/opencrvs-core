@@ -936,7 +936,7 @@ export const birthEvent = defineConfig({
         defaultMessage: 'Reinstate registration',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.birth.action.revoke-registration.label'
+        id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
       supportingCopy: {

@@ -10,6 +10,7 @@
  */
 /* eslint-disable no-console */
 import { runUpgrade } from './migrations/v2.1'
+import { check, writeMissing } from './translations/check'
 import {
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,
@@ -180,10 +181,78 @@ async function handleUpgrade() {
   }
 }
 
+const CHECK_TRANSLATIONS_USAGE = `
+Usage: opencrvs check-translations [options]
+
+Check that every message this country config declares has a row in
+src/translations/countryconfig.csv.
+
+Options:
+  --write       Add the missing rows, filling in English only
+  --outdated    List rows nothing in the source declares any more
+  -h, --help    Show this help
+`
+
 function handleCheckTranslations() {
-  console.log('Checking translations...')
-  console.warn('This command is not implemented yet!')
-  process.exit(1)
+  const checkArgs = args.slice(1)
+
+  if (checkArgs.includes('--help') || checkArgs.includes('-h')) {
+    console.log(CHECK_TRANSLATIONS_USAGE)
+    return
+  }
+
+  /*
+   * Only options are inspected. This runs from lint-staged, which appends the
+   * staged filenames to the command, and the check always covers the whole
+   * package rather than a file list.
+   */
+  const unknownFlags = checkArgs.filter(
+    (arg) => arg.startsWith('-') && !['--write', '--outdated'].includes(arg)
+  )
+
+  if (unknownFlags.length > 0) {
+    console.error(`Unknown option: ${unknownFlags.join(', ')}\n`)
+    console.log(CHECK_TRANSLATIONS_USAGE)
+    process.exit(1)
+  }
+
+  const cwd = process.cwd()
+  const { missing, outdated, dynamicIds } = check(cwd)
+
+  for (const file of dynamicIds) {
+    console.warn(
+      `Warning: ${file} declares a message whose id is built at runtime. Ids have to be hardcoded to be checked.`
+    )
+  }
+
+  if (checkArgs.includes('--outdated')) {
+    console.log(
+      `${outdated.length} row(s) in countryconfig.csv are not declared in src:\n`
+    )
+    console.log(outdated.join('\n'))
+    return
+  }
+
+  if (missing.length === 0) {
+    console.log('Every message declared in src has a translation row.')
+    return
+  }
+
+  console.error(
+    `${missing.length} message(s) declared in src have no row in src/translations/countryconfig.csv:\n`
+  )
+  console.error(missing.map(({ id }) => `  ${id}`).join('\n'))
+
+  if (!checkArgs.includes('--write')) {
+    console.error(
+      '\nRun `pnpm extract:translations --write` to add them with their English copy.'
+    )
+    process.exit(1)
+  }
+
+  const added = writeMissing(cwd, missing)
+  console.log(`\nAdded ${added.length} row(s) to countryconfig.csv.`)
+  console.log('The languages other than English are still yours to write.')
 }
 
 async function handleVerifyEndpoints() {

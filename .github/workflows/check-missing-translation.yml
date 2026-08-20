@@ -19,53 +19,8 @@ jobs:
     runs-on: ubuntu-26.04
 
     steps:
-      - name: Create directory for core and countryconfig
-        run: |
-          mkdir -m 777 -p $HOME/core
-          mkdir -m 777 -p $HOME/countryconfig
-
-      - name: Clone countryconfig and check if there any branch exists with the same name like current branch
-        id: set_branch
-        run: |
-          cd $HOME/countryconfig
-          git clone https://github.com/opencrvs/opencrvs-countryconfig.git
-          cd opencrvs-countryconfig
-          if git show-ref --verify --quiet "refs/remotes/origin/${{ github.head_ref }}"; then
-            working_branch=${{ github.head_ref }}
-          elif git show-ref --verify --quiet "refs/remotes/origin/${{ github.base_ref }}"; then
-            working_branch=${{ github.base_ref }}
-          else
-            working_branch='develop'
-          fi
-
-          echo "Using branch $working_branch from countryconfig"
-          echo "working_branch=$working_branch" >> $GITHUB_OUTPUT
-          git checkout $working_branch
-
-          # Sync countryconfig with base branch, so we get both the newest changes from the base branch and the changes from working branch
-          echo "Syncing countryconfig branch '$working_branch' with base branch"
-
-          # Unfortunately the merge requires user.name and email to be set here
-          git config --local user.name "OpenCRVS Bot"
-          git config --local user.email "bot@opencrvs.org"
-
-          if git merge origin/${{ github.base_ref }} --no-commit --no-ff; then
-            echo "Successfully synced countryconfig branch '$working_branch' with base branch '${{ github.base_ref }}'"
-          else
-            if git diff --name-only --diff-filter=U | grep -q "src/translations/client.csv"; then
-              echo "Found merge conflicts in src/translations/client.csv, aborting merge"
-              git merge --abort
-            else
-              echo "No conflicts in translations file, continuing"
-            fi
-          fi
-          echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
-
       - name: Checkout core repository
         uses: actions/checkout@v6
-        with:
-          repository: opencrvs/opencrvs-core
-          ref: ${{ github.head_ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -75,19 +30,70 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Install dependencies and check for missing translations
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the country config template's own dependencies
+        # It is deliberately outside core's workspace, so it installs the way a
+        # country config repo does. Installing it frozen also catches its
+        # package.json and pnpm-lock.yaml drifting apart.
+        run: pnpm install --ignore-workspace --frozen-lockfile
+        working-directory: packages/countryconfig-template
+
+      - name: Check for missing translations
+        # chalk colours its output whenever GITHUB_ACTIONS is set, TTY or not.
+        # The missing rows are lifted out of this output and into the job
+        # summary for a reviewer to paste straight into the CSV, and ANSI
+        # escapes would be pasted along with them.
+        env:
+          FORCE_COLOR: '0'
         run: |
-          export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
-          pnpm install --frozen-lockfile
-          cd ./packages/client
-          CI=true pnpm extract:translations 2>&1 | tee output.txt
-          if grep -q "Missing translations" output.txt; then
-             awk '/You are missing the following content keys from your country configuration package:/ {flag=1; next} /Add them to this file and run again:/ {flag=0} flag' output.txt > missing_translations.txt
-             sed -i '/^$/d' missing_translations.txt
-             echo "### Summary Of Missing Translation" >> $GITHUB_STEP_SUMMARY
-             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-             cat missing_translations.txt >> $GITHUB_STEP_SUMMARY
-             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-             echo "Create a pull request to the \`opencrvs/countryconfig\` repository with a branch name ${{ github.head_ref }} and add the translations to \`src/translations/client.csv\`. After pushing the changes, you can run this pipeline again." >> $GITHUB_STEP_SUMMARY
-             exit 1
-          fi
+          set -o pipefail
+
+          status=0
+
+          for package in client login; do
+            cd "$GITHUB_WORKSPACE/packages/$package"
+
+            output="$RUNNER_TEMP/$package-translations.txt"
+
+            if CI=true pnpm extract:translations 2>&1 | tee "$output"; then
+              continue
+            fi
+
+            status=1
+
+            echo "### Missing translations in \`$package\`" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            awk '/You are missing the following content keys from your country configuration package:/ {flag=1; next} /Add them to this file and run again:/ {flag=0} flag && NF' "$output" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`pnpm extract:translations --write\` in \`packages/$package\` to add these to both country configs, then write the copy for the languages other than English." >> $GITHUB_STEP_SUMMARY
+          done
+
+          exit $status
+
+      - name: Check for missing country config translations
+        env:
+          FORCE_COLOR: '0'
+        run: |
+          set -o pipefail
+
+          status=0
+
+          for config in testland countryconfig-template; do
+            output="$RUNNER_TEMP/$config-countryconfig-translations.txt"
+
+            if pnpm --dir "packages/$config" run extract:translations 2>&1 | tee "$output"; then
+              continue
+            fi
+
+            status=1
+
+            echo "### Missing translations in \`packages/$config\`" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            awk '/have no row in src\/translations\/countryconfig.csv:/ {flag=1; next} /^Run / {flag=0} flag && NF' "$output" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`pnpm extract:translations --write\` in \`packages/$config\` to add them with their English copy, then write the copy for the languages other than English." >> $GITHUB_STEP_SUMMARY
+          done
+
+          exit $status
