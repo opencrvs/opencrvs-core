@@ -4,9 +4,9 @@
 # https://github.com/opencrvs/infrastructure/blob/develop/Tiltfile
 
 # OpenCRVS core images tag:
-core_images_tag = os.getenv("OPENCRVS_CORE_IMAGE_TAG", "v2.1.0")
+core_images_tag = os.getenv("OPENCRVS_CORE_IMAGE_TAG", "v1.2.4")
 
-core_ref = os.getenv("OPENCRVS_CORE_REF", "release/2.1.0")
+core_ref = os.getenv("OPENCRVS_CORE_REF", "release/1.2.4")
 
 # Build countryconfig image in local registry (use any name and tag you want)
 countryconfig_image_name="opencrvs/ocrvs-countryconfig"
