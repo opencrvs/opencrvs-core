@@ -1299,7 +1299,7 @@ export function getLeafAdministrativeAreaIds(
 ): Array<{ id: UUID }> {
   const nonLeafAdministrativeAreaIds = new Set<string>()
 
-  for (const [id, location] of administrativeAreas) {
+  for (const [, location] of administrativeAreas) {
     if (location.parentId) {
       nonLeafAdministrativeAreaIds.add(location.parentId)
     }
