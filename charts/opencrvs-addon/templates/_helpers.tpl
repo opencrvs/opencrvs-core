@@ -2,28 +2,41 @@
 
 render-env-vars
 ---
-This is a helper template that dynamically generates environment variables
-and secret references for the container. Env vars come from `.env` (plain
-key/value); secret-backed env vars come from `.secrets`, keyed by the
-Secret's name, each value a "KEY" or "KEY:ENV_VAR_NAME" string (the latter
-lets the env var name differ from the key in the Secret).
+Same idea as the render-env-vars in charts/opencrvs-services, minus the
+per-service overlay (this chart deploys a single container, so there's no
+service name to key by). Env vars come from `.env` (plain key/value);
+secret-backed env vars come from `.secrets`, keyed by the Secret's name,
+each value a "KEY" or "KEY:ENV_VAR_NAME" string (the latter lets the env
+var name differ from the key in the Secret). Merging through one map
+(rather than emitting each source as its own loop) means a key defined in
+both `.env` and `.secrets` only ever produces a single `- name:` entry.
 
 Parameters:
 - .: The top-level Values object for the Helm chart.
 */}}
 {{- define "render-env-vars" -}}
-  {{- range $k, $v := .env }}
-            - name: {{ $k }}
-              value: {{ $v | quote }}
-  {{- end -}}
-  {{- range $secret_name, $secret_values := .secrets -}}
+  {{- $env := .env | default dict }}
+
+  {{- $secrets := dict }}
+  {{- range $secret_name, $secret_values := (.secrets | default dict) }}
     {{- range $secret_value := $secret_values }}
       {{- $secret := split ":" $secret_value }}
-            - name: {{ $secret._1 | default $secret._0 }}
+      {{- $envName := $secret._1 | default $secret._0 }}
+      {{- $_ := set $secrets $envName (dict "secret" $secret_name "key" $secret._0) }}
+    {{- end }}
+  {{- end }}
+
+  {{- $result := mergeOverwrite (deepCopy $env) $secrets }}
+
+  {{- range $k, $v := $result }}
+            - name: {{ $k }}
+    {{- if and (kindIs "map" $v) (hasKey $v "secret") }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: {{ $secret._0 | quote}}
+                  name: {{ $v.secret }}
+                  key: {{ $v.key | quote }}
+    {{- else }}
+              value: {{ $v | quote }}
     {{- end }}
   {{- end }}
 {{- end }}
