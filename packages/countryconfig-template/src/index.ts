@@ -8,9 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/*
+ * `require` rather than `import`, and in this order, on purpose: import
+ * statements are hoisted, so app-module-path has to register the module alias
+ * and dotenv has to populate process.env before anything that depends on
+ * either is resolved or evaluated. './monitoring' is imported for its side
+ * effect, which has to happen before the application starts.
+ */
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-unassigned-import */
 require('app-module-path').addPath(require('path').join(__dirname))
 require('dotenv').config()
 import './monitoring'
+/* eslint-enable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-unassigned-import */
 
 import path from 'path'
 import * as Hapi from '@hapi/hapi'
@@ -267,8 +276,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    // eslint-disable-next-line no-unused-vars
-    handler: (request: any, h: any) => {
+    handler: () => {
       // Perform any health checks and return true or false for success prop
       return {
         success: true

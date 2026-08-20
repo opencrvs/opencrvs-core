@@ -57,7 +57,8 @@ export function logTelemetryStartupStatus() {
 
   // Matches the handler's `domain` stamping: a wildcard/empty DOMAIN is not
   // reported.
-  const domain = env.DOMAIN && env.DOMAIN !== '*' ? env.DOMAIN : '(not reported)'
+  const domain =
+    env.DOMAIN && env.DOMAIN !== '*' ? env.DOMAIN : '(not reported)'
 
   logger.info(
     'Telemetry is enabled — anonymous, aggregate usage metrics will be ' +
