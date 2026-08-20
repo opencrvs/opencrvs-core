@@ -94,6 +94,8 @@ jobs:
 
           git checkout -b "release/${{ inputs.version }}"
 
+          VERSION="${{ inputs.version }}"
+
           # Bump all workspace package.json files and the root in one command.
           npx lerna exec 'npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version'
           npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
@@ -104,11 +106,11 @@ jobs:
           # TODO: yq is not relaiable for this case, check if we can use ruamel.yaml (python) library
           sed -i.bak -E '
           /^platform:/,/^[^[:space:]]/ {
-            s/^([[:space:]]*tag:[[:space:]]*).*/\1'"$VERSION"'/
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
           }
           /^countryconfig:/,/^[^[:space:]]/ {
             /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
-              s/^([[:space:]]*tag:[[:space:]]*).*/\1'"$VERSION"'/
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
             }
           }
           ' charts/opencrvs-services/values.yaml

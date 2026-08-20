@@ -44,6 +44,14 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 
 [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
 
+#### The MOSIP integration now ships with core
+
+The MOSIP integration used to be released from its own `opencrvs/mosip` repository, on its own schedule. It now lives in core as `packages/mosip-api`, `packages/mosip`, `packages/mosip-mock` and `packages/esignet-mock`, and is released with every core release. This removes a circular release dependency: the integration was pinned to an `@opencrvs/toolkit` release candidate published by core, while core's reference country config depended on `@opencrvs/mosip` from npm.
+
+**The `opencrvs/mosip` repository is archived.** Open issues and pull requests should move to `opencrvs/opencrvs-core`.
+
+For the integration's own release history prior to this move, see [`packages/mosip-api/CHANGELOG.md`](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/mosip-api/CHANGELOG.md).
+
 ### Improvements
 
 - User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
@@ -57,6 +65,7 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 - Keep filebeat index for 30 days by default [#13005](https://github.com/opencrvs/opencrvs-core/issues/13005)
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
 - Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
+- `pnpm dev` now runs the MOSIP stack alongside the rest of core, so local registrations exercise the same MOSIP path as a real deployment. The testland `NO_MOSIP` escape hatch is gone — it only ever short-circuited local development, and production already defaulted to `false`.
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
 
