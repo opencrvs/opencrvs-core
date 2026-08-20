@@ -17,6 +17,11 @@ WORKDIR /app/packages/toolkit
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
+COPY --chown=node:node packages/mosip /app/packages/mosip
+WORKDIR /app/packages/mosip
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+
 WORKDIR /app/packages/testland
 COPY --chown=node:node packages/testland/*.json /app/packages/testland/
 
