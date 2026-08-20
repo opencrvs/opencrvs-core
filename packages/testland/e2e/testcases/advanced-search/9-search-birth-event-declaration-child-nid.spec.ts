@@ -12,16 +12,16 @@ import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { aggregateActionDeclarations } from '@opencrvs/toolkit/events'
 import { omit } from 'lodash'
-import { getToken, login } from '../../helpers'
+import { getToken, login } from '@e2e/support/helpers'
 import {
   getDeclaration,
   createDeclaration,
   type Declaration
-} from '../test-data/birth-declaration'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { assertTexts, ensureAssignedToUser, type } from '../../utils'
-import { formatV2ChildName } from '../birth/helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/test-data/birth-declaration'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { assertTexts, ensureAssignedToUser, type } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 /*
  * Female identity from mock-identities.json (Sahara Wendy Moyo, NID: 1234567899).

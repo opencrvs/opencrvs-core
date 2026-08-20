@@ -10,15 +10,18 @@
  */
 import { test, type Page } from '@playwright/test'
 
-import { login, getToken, formatName } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
+import { login, getToken, formatName } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
 
 import {
   selectCertificationType,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
-import { expectInUrl, selectAction } from '../../utils'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { expectInUrl, selectAction } from '@e2e/support/utils'
 import { ActionType } from '@opencrvs/toolkit/events'
 
 test.describe.skip('Navigating in and out of action', () => {

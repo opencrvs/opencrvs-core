@@ -25,12 +25,12 @@ import {
   getRandomDate,
   expectRowValue,
   switchEventTab
-} from '../../../../helpers'
-import { CREDENTIALS } from '../../../../constants'
-import { openBirthDeclaration, fillDate } from '../../../birth/helpers'
-import { navigateToWorkqueue, selectLocationOption } from '../../../../utils'
-import { openRecordByTitle } from '../../../print-certificate/birth/helpers'
-import { trackAndDeleteCreatedEvents } from '../../../test-data/eventDeletion'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { openBirthDeclaration, fillDate } from '@e2e/support/birth/helpers'
+import { navigateToWorkqueue, selectLocationOption } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
 
 /**
  * react-select options render as plain divs with no `option` role, and the

@@ -16,8 +16,8 @@ import {
   login,
   triggerDeclarationAction,
   switchEventTab
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 
 const ANNOTATION_COMMENT = 'Test annotation comment'

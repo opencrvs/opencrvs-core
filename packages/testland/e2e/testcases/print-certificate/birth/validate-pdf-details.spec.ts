@@ -12,17 +12,17 @@ import { test, type Page, expect } from '@playwright/test'
 import {
   Declaration,
   createDeclaration
-} from '../../test-data/birth-declaration'
-import { login, getToken } from '../../../helpers'
-import { CREDENTIALS } from '../../../constants'
+} from '@e2e/support/test-data/birth-declaration'
+import { login, getToken } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
   selectRequesterType,
   selectCertificationType
-} from './helpers'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { formatV2ChildName } from '../../birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe
   .serial("Validate 'Birth Certificate Certified Copy' PDF details", () => {

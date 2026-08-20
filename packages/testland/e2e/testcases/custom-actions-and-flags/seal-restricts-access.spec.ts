@@ -16,12 +16,15 @@ import {
   searchFromSearchBar,
   uploadImage,
   waitForActionResponses
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser, selectAction } from '../../utils'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { formatV2ChildName } from '../birth/helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 /**
  * Sealed records all display the same generic REDACTED_RECORD_TITLE, so if

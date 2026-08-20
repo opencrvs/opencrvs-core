@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Page, expect, test } from '@playwright/test'
-import { goToSection, login } from '../../helpers'
-import { openBirthDeclaration } from '../birth/helpers'
+import { goToSection, login } from '@e2e/support/helpers'
+import { openBirthDeclaration } from '@e2e/support/birth/helpers'
 
 async function authenticateInformantWithESignet(page: Page) {
   await page.locator('#informant____verify').click()

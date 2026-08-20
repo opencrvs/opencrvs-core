@@ -21,28 +21,32 @@ import {
   triggerDeclarationAction,
   switchEventTab,
   validateActionMenuButton
-} from '../../helpers'
-import { ensureAssignedToUser, expectInUrl, selectAction } from '../../utils'
+} from '@e2e/support/helpers'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction
+} from '@e2e/support/utils'
 import {
   getAdministrativeAreas,
   getIdByName,
   formatV2ChildName,
   REQUIRED_VALIDATION_ERROR
-} from '../birth/helpers'
-import { getDeclaration } from '../test-data/birth-declaration'
+} from '@e2e/support/birth/helpers'
+import { getDeclaration } from '@e2e/support/test-data/birth-declaration'
 import {
   openRecordByTitle,
   printAndExpectPopup,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 import {
   createIntegrationContext,
   EVENT_TYPE,
   fetchClientAPI,
   NON_EXISTING_UUID
-} from './helpers'
+} from '@e2e/support/events-rest-api/helpers'
 
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe('POST /api/events/events/{eventId}/notify', () => {
   let clientToken: string

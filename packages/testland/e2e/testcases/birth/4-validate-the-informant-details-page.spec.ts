@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, Page } from '@playwright/test'
-import { goToSection, login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { trackAndDeleteCreatedEvents } from '../test-data/eventDeletion'
+import { goToSection, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
 
 test.describe('4. Validate the informants details pages', () => {
   let page: Page

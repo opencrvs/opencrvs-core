@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, type Page, expect } from '@playwright/test'
-import { login, logout } from '../../helpers'
-import { CREDENTIALS, LOGIN_URL } from '../../constants'
-import { setMobileViewport } from '../../mobile-helpers'
+import { login, logout } from '@e2e/support/helpers'
+import { CREDENTIALS, LOGIN_URL } from '@e2e/support/constants'
+import { setMobileViewport } from '@e2e/support/mobile-helpers'
 
 test.describe('Desktop', () => {
   let page: Page

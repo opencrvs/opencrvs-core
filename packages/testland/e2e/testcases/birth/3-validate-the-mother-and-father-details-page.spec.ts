@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { goToSection, login } from '../../helpers'
-import { REQUIRED_VALIDATION_ERROR } from './helpers'
-import { trackAndDeleteCreatedEvents } from '../test-data/eventDeletion'
+import { goToSection, login } from '@e2e/support/helpers'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
 
 test.describe('3. Validate the mothers and fathers details pages', () => {
   trackAndDeleteCreatedEvents()
@@ -121,7 +121,10 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
 
   test.describe.serial('3.2 Validate the "National ID" field', async () => {
     test.beforeEach(async ({ page }) => {
-      await page.locator('#mother____idType').getByText('Select', { exact: true }).click()
+      await page
+        .locator('#mother____idType')
+        .getByText('Select', { exact: true })
+        .click()
       await page.getByText('National ID', { exact: true }).click()
     })
 
@@ -185,7 +188,10 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
       await page.getByTestId('text__mother____nid').fill('1234567890')
       await page.getByRole('button', { name: 'Continue' }).click()
 
-      await page.locator('#father____idType').getByText('Select', { exact: true }).click()
+      await page
+        .locator('#father____idType')
+        .getByText('Select', { exact: true })
+        .click()
       await page.getByText('National ID', { exact: true }).click()
       await page.getByTestId('text__father____nid').fill('1234567890')
       await page.getByRole('heading', { name: 'Birth' }).click()
