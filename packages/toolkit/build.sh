@@ -13,7 +13,8 @@ set -e
 
 rm -rf dist
 
-npx tsc --build
+# tsconfig.build.json excludes the test files, which dist publishes otherwise.
+npx tsc --build tsconfig.build.json
 
 # Build common events
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external

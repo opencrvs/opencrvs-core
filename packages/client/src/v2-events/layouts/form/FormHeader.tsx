@@ -40,6 +40,11 @@ export const messages = defineMessages({
     id: 'buttons.deleteDeclaration',
     defaultMessage: 'Delete declaration',
     description: 'The label for the delete declaration button'
+  },
+  back: {
+    id: 'buttons.back',
+    defaultMessage: 'Back',
+    description: 'The label for the back button'
   }
 })
 
@@ -47,14 +52,14 @@ export function FormHeader({
   label,
   onSaveAndExit,
   route,
-  appbarIcon,
-  actionComponent
+  actionComponent,
+  backAction
 }: {
   label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
-  appbarIcon?: React.ReactNode
   actionComponent?: React.ReactNode
+  backAction?: () => void
 }) {
   const intl = useIntl()
   const { modal, exit, closeActionView, deleteDeclaration } =
@@ -156,13 +161,25 @@ export function FormHeader({
     )
   }
 
+  const leftSlot = backAction ? (
+    <Button
+      aria-label={intl.formatMessage(messages.back)}
+      data-testid="back-button"
+      size="small"
+      type="icon"
+      onClick={backAction}
+    >
+      <Icon name="ArrowLeft" />
+    </Button>
+  ) : null
+
   return (
     <>
       <AppBar
-        desktopLeft={appbarIcon}
+        desktopLeft={leftSlot}
         desktopRight={getActionComponent()}
         desktopTitle={label}
-        mobileLeft={appbarIcon}
+        mobileLeft={leftSlot}
         mobileRight={
           <>
             {onSaveAndExit ? (
