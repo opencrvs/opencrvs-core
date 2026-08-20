@@ -145,7 +145,7 @@ async function loginAsProvisionedUser(page: Page, username: string) {
   await page.goto(CLIENT_URL)
 }
 
-test.describe.serial('Jurisdiction & routing under location versioning', () => {
+test.describe('Jurisdiction & routing under location versioning', () => {
   let systemAdminToken: string
   let ibomboAreaId: string
   let openPages: Page[] = []
@@ -218,6 +218,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
   test('Inactivating an office keeps its Notified/Declared records reachable and processable to the same administrative area', async ({
     browser
   }) => {
+    test.setTimeout(180_000) // full office+user provisioning cycle plus first-login ceremony
     const officeName = `E2E Inactivate Office ${uuidv4()}`
     const office = await createOffice(
       systemAdminToken,
@@ -280,6 +281,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
   test('Transfer (inactivate-old + create-new) keeps old records under the old entity and routes new records to the new entity', async ({
     browser
   }) => {
+    test.setTimeout(180_000)
     const oldOfficeName = `E2E Transfer Old Office ${uuidv4()}`
     const oldOffice = await createOffice(
       systemAdminToken,
@@ -412,7 +414,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
     await adminPage.locator('#sub-page-header-munu-button-dropdownMenu').click()
     await adminPage.getByText('Edit details').click()
     await expect(
-      adminPage.getByTestId('row-value-primaryOfficeId')
+      adminPage.getByTestId('primaryOfficeId-value')
     ).toContainText(officeName)
 
     // The user themselves can still log in — no forced lockout as a

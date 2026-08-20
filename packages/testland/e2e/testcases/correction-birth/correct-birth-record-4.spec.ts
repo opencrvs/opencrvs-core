@@ -235,7 +235,7 @@ test.describe.serial('Correct record - 4', () => {
       await page.getByTestId('change-button-father.name').click()
       await page.getByLabel("Father's details are not available").check()
       await page.getByRole('button', { name: 'Go to review' }).click()
-      await expect(page.getByTestId('row-value-father.reason')).toHaveText(
+      await expect(page.getByTestId('father.reason-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
       await expect(
@@ -280,14 +280,14 @@ test.describe.serial('Correct record - 4', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page.getByTestId('row-value-father.name').getByRole('deletion')
+          await page.getByTestId('father.name-value').getByRole('deletion')
         ).toHaveText(
           `${declaration['father.name']?.firstname} ${declaration['father.name']?.surname}`
         )
 
         await expect(
           await page
-            .getByTestId('row-value-father.name')
+            .getByTestId('father.name-value')
             .getByText(
               `${updatedFatherDetails.firstNames} ${updatedFatherDetails.familyName}`
             )
@@ -325,12 +325,12 @@ test.describe.serial('Correct record - 4', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page.getByTestId('row-value-father.dob').getByRole('deletion')
+          await page.getByTestId('father.dob-value').getByRole('deletion')
         ).toHaveText(formatDateTo_dMMMMyyyy(declaration['father.dob']!))
 
         await expect(
           await page
-            .getByTestId('row-value-father.dob')
+            .getByTestId('father.dob-value')
             .getByText(formatDateTo_dMMMMyyyy(updatedFatherDetails.birthDate))
         ).toBeVisible()
       })
@@ -365,13 +365,13 @@ test.describe.serial('Correct record - 4', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-father.nationality')
+            .getByTestId('father.nationality-value')
             .getByRole('deletion')
         ).toHaveText('Farajaland')
 
         await expect(
           await page
-            .getByTestId('row-value-father.nationality')
+            .getByTestId('father.nationality-value')
             .getByText(updatedFatherDetails.nationality)
         ).toBeVisible()
       })
@@ -404,14 +404,12 @@ test.describe.serial('Correct record - 4', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page
-            .getByTestId('row-value-father.idType')
-            .getByRole('deletion')
+          await page.getByTestId('father.idType-value').getByRole('deletion')
         ).toHaveText('National ID')
 
         await expect(
           await page
-            .getByTestId('row-value-father.idType')
+            .getByTestId('father.idType-value')
             .getByText(updatedFatherDetails.idType)
         ).toBeVisible()
       })
@@ -447,7 +445,7 @@ test.describe.serial('Correct record - 4', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-father.passport')
+            .getByTestId('father.passport-value')
             .getByText(updatedFatherDetails.passport)
         ).toBeVisible()
       })
@@ -535,49 +533,49 @@ test.describe.serial('Correct record - 4', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.country)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.province)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.district)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.town)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.residentialArea)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.street)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.number)
         ).toBeVisible()
 
         await expect(
           await page
-            .getByTestId('row-value-father.address')
+            .getByTestId('father.address-value')
             .getByText(updatedFatherDetails.address.zipCode)
         ).toBeVisible()
       })
@@ -611,13 +609,13 @@ test.describe.serial('Correct record - 4', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-father.maritalStatus')
+            .getByTestId('father.maritalStatus-value')
             .getByRole('deletion')
         ).toHaveText('Single')
 
         await expect(
           await page
-            .getByTestId('row-value-father.maritalStatus')
+            .getByTestId('father.maritalStatus-value')
             .getByText(updatedFatherDetails.maritalStatus)
         ).toBeVisible()
       })
@@ -653,13 +651,13 @@ test.describe.serial('Correct record - 4', () => {
 
         await expect(
           await page
-            .getByTestId('row-value-father.educationalAttainment')
+            .getByTestId('father.educationalAttainment-value')
             .getByRole('deletion')
         ).toHaveText('No schooling')
 
         await expect(
           await page
-            .getByTestId('row-value-father.educationalAttainment')
+            .getByTestId('father.educationalAttainment-value')
             .getByText(updatedFatherDetails.educationLevel)
         ).toBeVisible()
       })
@@ -700,20 +698,18 @@ test.describe.serial('Correct record - 4', () => {
       await expectInUrl(page, 'review')
 
       await expect(
-        await page
-          .getByTestId('row-value-child.placeOfBirth')
-          .getByRole('deletion')
+        await page.getByTestId('child.placeOfBirth-value').getByRole('deletion')
       ).toHaveText('Residential address')
 
       await expect(
         await page
-          .getByTestId('row-value-child.placeOfBirth')
+          .getByTestId('child.placeOfBirth-value')
           .getByText(updatedChildDetails.placeOfBirth)
       ).toBeVisible()
 
       await expect(
         await page
-          .getByTestId('row-value-child.birthLocation')
+          .getByTestId('child.birthLocation-value')
           .getByText(updatedChildDetails.birthFacility)
       ).toBeVisible()
     })
@@ -881,14 +877,9 @@ test.describe.serial('Correct record - 4', () => {
 
     await page.getByRole('button', { name: 'Correct record' }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
 
     await expectInUrl(page, `events/${eventId}`)
 
@@ -930,8 +921,7 @@ test.describe.serial('Correct record - 4', () => {
     const date = await correctionRequestedRow.locator('span').nth(1).innerText()
 
     const requester = await correctionRequestedRow
-      .locator('span')
-      .nth(2)
+      .getByTestId('user-name')
       .innerText()
 
     /*

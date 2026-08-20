@@ -13,11 +13,12 @@ import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
-import { getAnonymousToken } from './service/auth'
+import { getServiceToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
+import { startTelemetryWorker } from './workers/telemetryWorker'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -29,9 +30,9 @@ appModulePath.addPath(path.join(__dirname, '../'))
 export async function main() {
   try {
     await ensureConnection()
-    const anonymousToken = await getAnonymousToken()
+    const serviceToken = await getServiceToken()
     const configurations = await getInMemoryEventConfigurations(
-      `Bearer ${anonymousToken}`
+      `Bearer ${serviceToken}`
     )
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
@@ -49,6 +50,7 @@ export async function main() {
     return
   }
   startAnnouncementWorker()
+  startTelemetryWorker()
   server().listen(5555)
 }
 

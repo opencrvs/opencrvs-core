@@ -100,7 +100,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
        */
       await expect(
         page
-          .locator('[data-testid="row-value-mother.name"]')
+          .locator('[data-testid="mother.name-value"]')
           .getByText(REQUIRED_VALIDATION_ERROR)
       ).toBeVisible()
     })

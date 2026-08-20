@@ -14,6 +14,7 @@ import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { getAdministrativeHierarchyByIdCte } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { getViolatedConstraint } from '@events/storage/postgres/unique-violation'
 import { NewUsers, UsersUpdate } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
@@ -21,6 +22,48 @@ import { NewUserCredentials } from './schema/app/UserCredentials'
 export interface SecurityQuestion {
   questionKey: string
   answerHash: string
+}
+
+/**
+ * The field each unique constraint on the user tables protects. Only the name
+ * of the tripped constraint says which value was the duplicate, so the map is
+ * keyed by it. Constraints absent here — the primary keys, `users_legacy_id_key`
+ * — are none of a caller's business and stay unmapped.
+ */
+const UNIQUE_CONSTRAINT_FIELDS: Record<string, string> = {
+  users_email_key: 'email',
+  users_mobile_key: 'mobile',
+  user_credentials_username_key: 'username'
+}
+
+/**
+ * Runs a write against the user tables, turning a unique violation on one of
+ * the constraints above into a conflict naming the offending field. Anything
+ * else is rethrown untouched.
+ *
+ * Every write here that can trip one of those constraints goes through this,
+ * so the translation holds whichever caller raced. The application-level
+ * duplicate checks are broader, but they run outside the writing transaction,
+ * so a duplicate landing between check and write reaches the constraint —
+ * where, unmapped, it would surface as an internal server error whose cause
+ * production masks entirely.
+ */
+async function withUserConflicts<T>(write: () => Promise<T>): Promise<T> {
+  try {
+    return await write()
+  } catch (error) {
+    const constraint = getViolatedConstraint(error)
+    const field = constraint && UNIQUE_CONSTRAINT_FIELDS[constraint]
+
+    if (!field) {
+      throw error
+    }
+
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `A user with the same ${field} already exists`
+    })
+  }
 }
 
 /**
@@ -212,11 +255,13 @@ export async function createUserWithCredentials(
     user.email = user.email.toLowerCase()
   }
   const db = getClient()
-  return db.transaction().execute(async (trx) => {
-    const userId = await createUserInTrx(user, trx)
-    await createUserCredentialInTrx({ ...cred, userId }, trx)
-    return userId
-  })
+  return withUserConflicts(async () =>
+    db.transaction().execute(async (trx) => {
+      const userId = await createUserInTrx(user, trx)
+      await createUserCredentialInTrx({ ...cred, userId }, trx)
+      return userId
+    })
+  )
 }
 
 const sortColumn = {
@@ -256,24 +301,24 @@ function buildSearchUsersBaseQuery(
       'locations.administrativeAreaId'
     ])
 
+  /*
+   * Emails and usernames are lowercase in storage, so lowercasing the input
+   * keeps matching case-insensitive. Mobile numbers are stored verbatim.
+   */
   if (input.username) {
     query = query.where(
       'userCredentials.username',
-      'ilike',
-      `%${input.username.toLowerCase()}%`
+      '=',
+      input.username.toLowerCase()
     )
   }
 
   if (input.mobile) {
-    query = query.where('users.mobile', 'ilike', `%${input.mobile}%`)
+    query = query.where('users.mobile', '=', input.mobile)
   }
 
   if (input.email) {
-    query = query.where(
-      'users.email',
-      'ilike',
-      `%${input.email.toLowerCase()}%`
-    )
+    query = query.where('users.email', '=', input.email.toLowerCase())
   }
 
   if (input.status) {
@@ -320,8 +365,14 @@ export async function searchAllUsersWithInput(
     .execute()
 }
 
-export async function isUsernameTaken(username: string) {
-  const db = getClient()
+/**
+ * Callers that go on to write the username in a transaction must pass that
+ * transaction, so the check sees the writes it has already made. Reading
+ * through the pooled client instead would answer from a second connection,
+ * blind to them.
+ */
+export async function isUsernameTaken(username: string, trx?: Kysely<Schema>) {
+  const db = trx ?? getClient()
 
   const query = db
     .selectFrom('userCredentials')
@@ -341,7 +392,9 @@ export async function updateUserByIdInTrx(
     fields.email = fields.email.toLowerCase()
   }
 
-  return trx.updateTable('users').set(fields).where('id', '=', userId).execute()
+  return withUserConflicts(async () =>
+    trx.updateTable('users').set(fields).where('id', '=', userId).execute()
+  )
 }
 
 export async function updateUserById(userId: UUID, fields: UsersUpdate) {
@@ -355,11 +408,13 @@ export async function updateUsernameByIdInTrx(
   userId: UUID,
   username: string
 ) {
-  return trx
-    .updateTable('userCredentials')
-    .set({ username })
-    .where('userId', '=', userId)
-    .execute()
+  return withUserConflicts(async () =>
+    trx
+      .updateTable('userCredentials')
+      .set({ username })
+      .where('userId', '=', userId)
+      .execute()
+  )
 }
 
 export async function updateUsernameById(userId: UUID, username: string) {

@@ -15,6 +15,7 @@ spec:
         app: elasticsearch-on-deploy
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       containers:
         - name: elasticsearch-on-deploy
           command: ["/scripts/setup.sh"]

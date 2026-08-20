@@ -17,15 +17,13 @@ import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
 import { ImageLoader } from '@client/views/Settings/ImageLoader'
 import {
   DynamicHeightLinkButton,
-  LabelContainer,
-  TopAlignedListViewItemSimplified,
-  ValueContainer
+  SettingsRow
 } from '@client/views/Settings/items/components'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 
-export function ProfileImage() {
+export function useProfileImage(): SettingsRow {
   const intl = useIntl()
   const [showChangeAvatar, setShowChangeAvatar] = React.useState(false)
   const [imageUploading, setImageUploading] = React.useState(false)
@@ -62,59 +60,56 @@ export function ProfileImage() {
     setImage(image)
   }
 
-  return (
-    <>
-      <TopAlignedListViewItemSimplified
-        label={
-          <LabelContainer>
-            {intl.formatMessage(userMessages.profileImage)}
-          </LabelContainer>
-        }
-        value={
-          <ValueContainer>
-            <Avatar avatar={userDetails?.avatar} name={englishName} />
-          </ValueContainer>
-        }
-        actions={
-          <ImageLoader
-            onImageLoaded={handleImageLoaded}
-            onLoadingStarted={toggleAvatarChangeModal}
-            onError={(imageLoadingError) =>
-              setImageLoadingError(imageLoadingError)
-            }
-          >
-            <DynamicHeightLinkButton data-testid="change-avatar">
-              {intl.formatMessage(buttonMessages.change)}
-            </DynamicHeightLinkButton>
-          </ImageLoader>
-        }
-      />
-      <AvatarChangeModal
-        cancelAvatarChangeModal={toggleAvatarChangeModal}
-        showChangeAvatar={showChangeAvatar}
-        imgSrc={image}
-        onImgSrcChanged={(image) => setImage(image)}
-        error={imageLoadingError}
-        onErrorChanged={(imageLoadingError) =>
-          setImageLoadingError(imageLoadingError)
-        }
-        onConfirmAvatarChange={handleConfirmAvatarChange}
-        onAvatarChanged={changeAvatar}
-      />
-      {showSuccessNotification && (
-        <Toast
-          type={imageUploading ? 'loading' : 'success'}
-          onClose={
-            imageUploading ? undefined : () => toggleSuccessNotification()
+  return {
+    id: 'profile-image',
+    item: {
+      label: intl.formatMessage(userMessages.profileImage),
+      value: (
+        <Avatar name={englishName} size="lg" src={userDetails?.avatar} />
+      ),
+      actions: (
+        <ImageLoader
+          onImageLoaded={handleImageLoaded}
+          onLoadingStarted={toggleAvatarChangeModal}
+          onError={(imageLoadingError) =>
+            setImageLoadingError(imageLoadingError)
           }
         >
-          <FormattedMessage
-            {...(imageUploading
-              ? userMessages.avatarUpdating
-              : userMessages.avatarUpdated)}
-          />
-        </Toast>
-      )}
-    </>
-  )
+          <DynamicHeightLinkButton data-testid="change-avatar">
+            {intl.formatMessage(buttonMessages.change)}
+          </DynamicHeightLinkButton>
+        </ImageLoader>
+      )
+    },
+    overlay: (
+      <>
+        <AvatarChangeModal
+          cancelAvatarChangeModal={toggleAvatarChangeModal}
+          showChangeAvatar={showChangeAvatar}
+          imgSrc={image}
+          onImgSrcChanged={(image) => setImage(image)}
+          error={imageLoadingError}
+          onErrorChanged={(imageLoadingError) =>
+            setImageLoadingError(imageLoadingError)
+          }
+          onConfirmAvatarChange={handleConfirmAvatarChange}
+          onAvatarChanged={changeAvatar}
+        />
+        {showSuccessNotification && (
+          <Toast
+            type={imageUploading ? 'loading' : 'success'}
+            onClose={
+              imageUploading ? undefined : () => toggleSuccessNotification()
+            }
+          >
+            <FormattedMessage
+              {...(imageUploading
+                ? userMessages.avatarUpdating
+                : userMessages.avatarUpdated)}
+            />
+          </Toast>
+        )}
+      </>
+    )
+  }
 }

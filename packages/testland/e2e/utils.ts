@@ -11,7 +11,7 @@
 import { Locator, Page, expect } from '@playwright/test'
 import { CLIENT_URL } from './constants'
 import { isMobile } from './mobile-helpers'
-import { UnassignWait, waitForActionResponses } from './helpers'
+import { waitForActionResponses } from './helpers'
 
 // tRPC route fragments fired when confirming a correction action. The same
 // approve endpoint backs both "approve a request" and "make a direct correction".
@@ -22,27 +22,20 @@ const CORRECTION_ACTION_URL = {
 
 /**
  * Waits for the API responses a correction action fires. The `confirmAction`
- * callback should contain the interaction that fires the action. By default,
- * this **does not** wait for the auto-unassign to settle, `opts` can be used
- * to wait for that as well.
+ * callback should contain the interaction that fires the action.
  *
  * @param actionType selects the endpoint to wait for ('approve' backs both
  *   approving a request and making a direct correction).
  * @param confirmAction fires the action (e.g. clicks the "Confirm" button).
- * @param opts when `{ waitForUnassign: true, eventId }`, also wait for the
- *   auto-unassign to settle (via the search-cache refetch). Set when the flow
- *   re-assigns the record right after.
  */
 export async function waitForCorrectionAction(
   page: Page,
   actionType: keyof typeof CORRECTION_ACTION_URL,
-  confirmAction: () => Promise<void>,
-  opts: UnassignWait = {}
+  confirmAction: () => Promise<void>
 ) {
   const urls: string[] = [CORRECTION_ACTION_URL[actionType]]
-  const eventId = opts.waitForUnassign ? opts.eventId : undefined
 
-  await waitForActionResponses(page, urls, confirmAction, eventId)
+  await waitForActionResponses(page, urls, confirmAction)
 }
 
 type Workqueue =
@@ -147,10 +140,11 @@ export async function ensureAssignedToUser(
 ) {
   const userFullName = usernameToFullNameMap[username]
 
-  const assignedTo = page.getByTestId('assignedTo-value').locator('span')
+  /* A value renders as bare text; only a placeholder or bar adds an element. */
+  const assignedTo = page.getByTestId('assignedTo-value')
 
   // Wait for the value to actually render before deciding
-  await assignedTo.first().waitFor({ state: 'visible' })
+  await assignedTo.waitFor({ state: 'visible' })
 
   if (await assignedTo.filter({ hasText: userFullName }).isVisible()) {
     return
@@ -178,9 +172,7 @@ export async function ensureAssignedToUser(
   // Wait for the assignment API call to complete and the UI to update.
   await assignResponse
 
-  await expect(
-    page.getByTestId('assignedTo-value').locator('span')
-  ).toContainText(userFullName)
+  await expect(assignedTo).toContainText(userFullName)
 }
 
 export async function expectInUrl(page: Page, assertionString: string) {
@@ -190,7 +182,10 @@ export async function expectInUrl(page: Page, assertionString: string) {
 }
 
 export async function selectLocationOption(page: Page, locationName: string) {
-  await page.locator('[id^="locationOption"]').getByText(locationName).click()
+  await page
+    .locator('[id^="locationOption"]')
+    .getByText(locationName, { exact: true })
+    .click()
 }
 
 export async function type(page: Page, locator: string, text: string) {

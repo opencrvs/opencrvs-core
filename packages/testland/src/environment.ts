@@ -73,5 +73,23 @@ export const env = cleanEnv(process.env, {
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `reference_data.icd10`. See `/infrastructure/postgres/setup-reference-data.sh` for how the default database is set up for your country.'
+  }),
+  TELEMETRY_ENABLED: bool({
+    // Telemetry is enabled for deployed Testland; local development stays off.
+    devDefault: false,
+    default: true,
+    desc: 'When true, usage telemetry received from the events service is forwarded to the OpenCRVS status service.'
+  }),
+  COUNTRY_CODE: str({
+    default: 'FAR',
+    desc: 'ISO-style country code of this instance, reported with telemetry.'
+  }),
+  ENVIRONMENT_NAME: str({
+    default: 'development',
+    desc: 'Environment name (e.g. "production", "staging") reported as the telemetry environment.'
+  }),
+  ORGANISATION: str({
+    default: 'OpenCRVS',
+    desc: 'Organisation running this instance, reported with telemetry. Empty by default.'
   })
 })

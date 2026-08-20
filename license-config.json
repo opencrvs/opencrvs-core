@@ -55,6 +55,14 @@
     "packages/client/dev-dist",
     "packages/toolkit/.npmignore",
     "packages/toolkit/tsconfig.tsbuildinfo",
+    ".nx/**",
+    ".swc/**",
+    "**/.swc/**",
+    "**/.tsc-tests/**",
+    ".playwright-cli/**",
+    "**/playwright-report/**",
+    "**/*.webm",
+    "packages/toolkit/tsconfig.build.tsbuildinfo",
     "packages/toolkit/create-countryconfig/index.js",
     "packages/toolkit/src/environment/templates/**",
     "packages/commons/src/events/EventConfig.mermaid",
@@ -69,7 +77,7 @@
   ],
   "license": "license-header.txt",
   "licenseFormats": {
-    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1|prettierignore": {
       "eachLine": {
         "prepend": "# "
       }

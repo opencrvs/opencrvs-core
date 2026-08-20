@@ -13,7 +13,7 @@ import { env } from './environment'
 
 export default defineClientConfig({
   // Country code in uppercase ALPHA-3 format
-  COUNTRY: 'FAR',
+  COUNTRY: env.COUNTRY_CODE,
   LANGUAGES: ['en', 'fr'],
   SENTRY: env.SENTRY_DSN ?? '',
   REGISTER_BACKGROUND: { backgroundColor: '36304E' },

@@ -29,6 +29,8 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
+import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
+import { useDuplicatesAvailable } from '../../events/actions/dedup/useDuplicatesAvailable'
 import { EventSummary } from './components/EventSummary'
 import { useEventOverviewInfo } from './components/useEventOverviewInfo'
 
@@ -86,7 +88,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
           name={''}
         />
       )}
-      size={ContentSize.LARGE}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
     >
@@ -148,7 +150,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
           name={''}
         />
       )}
-      size={ContentSize.LARGE}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
     >
@@ -166,16 +168,26 @@ function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { eventIndex, fullEvent, shouldShowFullOverview } =
     useEventOverviewInfo(params.eventId)
+  const areDuplicatesAvailable = useDuplicatesAvailable(eventIndex)
+  const isDownloaded = fullEvent !== undefined
+  /*
+   * Until the record is downloaded the matches have not been fetched either, so
+   * their absence says nothing about whether the user may review them.
+   */
+  const canNotReviewDuplicate = isDownloaded && !areDuplicatesAvailable
 
   return (
     <>
-      {eventIndex.potentialDuplicates.length > 0 && (
-        <DuplicateWarning
-          duplicateTrackingIds={eventIndex.potentialDuplicates.map(
-            ({ trackingId }) => trackingId
-          )}
-        />
-      )}
+      {eventIndex.potentialDuplicates.length > 0 &&
+        (canNotReviewDuplicate ? (
+          <DuplicateReviewUnavailable />
+        ) : (
+          <DuplicateWarning
+            duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+              ({ trackingId }) => trackingId
+            )}
+          />
+        ))}
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (

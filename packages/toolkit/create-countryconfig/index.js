@@ -13,6 +13,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const readline = require('readline/promises')
 const degit = require('degit').default
 
 const INFRASTRUCTURE_REPOSITORY = 'opencrvs/infrastructure'
@@ -64,6 +65,166 @@ function ensureTargetDirectoryDoesNotExist(directoryName) {
   }
 }
 
+/**
+ * Asks whether to enable telemetry. Defaults to yes, and answers yes without
+ * prompting when not attached to a terminal (e.g. non-interactive scaffolding).
+ */
+async function promptEnableTelemetry() {
+  if (!process.stdin.isTTY) {
+    return true
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  try {
+    const answer = (
+      await rl.question(
+        '\nEnable anonymous usage telemetry to help improve OpenCRVS? Only ' +
+          'aggregate metrics are shared — no personal or protected data. [Y/n] '
+      )
+    )
+      .trim()
+      .toLowerCase()
+    return answer === '' || answer === 'y' || answer === 'yes'
+  } finally {
+    rl.close()
+  }
+}
+
+/**
+ * Prompts for a single line of input, re-asking until `validate` accepts the
+ * trimmed answer. `validate` returns an error message string when the answer is
+ * invalid, or a falsy value when it is accepted. Exits when not attached to a
+ * terminal, since a mandatory value cannot be gathered non-interactively.
+ */
+async function promptRequired(question, validate) {
+  if (!process.stdin.isTTY) {
+    console.error(
+      '\nError: interactive input is required to set the organisation name and country code.'
+    )
+    process.exit(1)
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  try {
+    while (true) {
+      const answer = (await rl.question(question)).trim()
+      const error = validate(answer)
+      if (!error) {
+        return answer
+      }
+      console.error(error)
+    }
+  } finally {
+    rl.close()
+  }
+}
+
+/**
+ * Prompts for the organisation name reported with telemetry. Mandatory.
+ */
+function promptOrganisation() {
+  return promptRequired('\nOrganisation running this instance: ', (answer) =>
+    answer === '' ? 'Please enter an organisation name.' : undefined
+  )
+}
+
+/**
+ * Prompts for the alpha-3 ISO country code reported with telemetry, re-asking
+ * until a valid three-letter code is given. Mandatory.
+ */
+async function promptCountryCode() {
+  const answer = await promptRequired(
+    '\nAlpha-3 ISO country code of this instance (e.g. "GBR"): ',
+    (value) =>
+      /^[A-Za-z]{3}$/.test(value)
+        ? undefined
+        : 'Please enter a three-letter alpha-3 ISO country code (e.g. "GBR").'
+  )
+  return answer.toUpperCase()
+}
+
+/**
+ * Flips the `TELEMETRY_ENABLED` env var default in the cloned country config's
+ * environment to `true`. The template ships it defaulting to `false`.
+ */
+function enableTelemetryInEnvironment(targetPath) {
+  const environmentPath = path.join(targetPath, 'src', 'environment.ts')
+  if (!fs.existsSync(environmentPath)) {
+    console.warn(
+      '\nWarning: could not find src/environment.ts; telemetry default not changed.'
+    )
+    return
+  }
+
+  const original = fs.readFileSync(environmentPath, 'utf-8')
+  const updated = original.replace(
+    /(TELEMETRY_ENABLED:\s*bool\(\{[\s\S]*?default:\s*)false/,
+    '$1true'
+  )
+
+  if (updated === original) {
+    console.warn(
+      '\nWarning: could not update the TELEMETRY_ENABLED default in src/environment.ts.'
+    )
+    return
+  }
+
+  fs.writeFileSync(environmentPath, updated)
+  console.log('\nTelemetry enabled (TELEMETRY_ENABLED now defaults to true).')
+}
+
+/**
+ * Replaces the string `default` of an envalid `str({ ... })` field in the
+ * cloned country config's environment. Returns the updated source, or the
+ * original source (with a warning) when the field could not be located.
+ */
+function setEnvironmentStringDefault(source, key, value) {
+  const pattern = new RegExp(
+    `(${key}:\\s*str\\(\\{[\\s\\S]*?default:\\s*)'[^']*'`
+  )
+  // Escape for a single-quoted TS string literal, and use a function replacer
+  // so `$` in the value is not treated as a replacement pattern.
+  const literal = "'" + value.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'"
+  const updated = source.replace(pattern, (_, prefix) => prefix + literal)
+
+  if (updated === source) {
+    console.warn(
+      `\nWarning: could not update the ${key} default in src/environment.ts.`
+    )
+  }
+
+  return updated
+}
+
+/**
+ * Writes the given organisation name and alpha-3 country code as the defaults
+ * for the `ORGANISATION` and `COUNTRY_CODE` env vars in the cloned country
+ * config's environment.
+ */
+function setTelemetryIdentityInEnvironment(
+  targetPath,
+  { organisation, countryCode }
+) {
+  const environmentPath = path.join(targetPath, 'src', 'environment.ts')
+  if (!fs.existsSync(environmentPath)) {
+    console.warn(
+      '\nWarning: could not find src/environment.ts; organisation and country code defaults not changed.'
+    )
+    return
+  }
+
+  let source = fs.readFileSync(environmentPath, 'utf-8')
+  source = setEnvironmentStringDefault(source, 'ORGANISATION', organisation)
+  source = setEnvironmentStringDefault(source, 'COUNTRY_CODE', countryCode)
+  fs.writeFileSync(environmentPath, source)
+}
+
 function updatePackageJsonName(targetPath, newName) {
   console.log('\nUpdating package.json with project name: ' + newName + '\n')
 
@@ -110,12 +271,16 @@ async function main() {
   ensureTargetDirectoryDoesNotExist(countryconfigDirName)
   ensureTargetDirectoryDoesNotExist(infrastructureDirName)
 
+  // Gather all answers up front so the operator isn't interrupted mid-clone.
+  const organisation = await promptOrganisation()
+  const countryCode = await promptCountryCode()
+  const telemetryEnabled = await promptEnableTelemetry()
+
   try {
     await cloneRepository(
       {
         repository: CORE_REPOSITORY,
-        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH,
-        branch: 'ocrvs-13179' // @todo: remove this hardcoded branch once the countryconfig-template is merged into main
+        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH
       },
       countryconfigTargetPath
     )
@@ -134,6 +299,15 @@ async function main() {
   } catch (err) {
     console.error('Failed to clone the infrastructure repository:', err.message)
     process.exit(1)
+  }
+
+  setTelemetryIdentityInEnvironment(countryconfigTargetPath, {
+    organisation,
+    countryCode
+  })
+
+  if (telemetryEnabled) {
+    enableTelemetryInEnvironment(countryconfigTargetPath)
   }
 
   console.log('\nDone! Your project has been set up in two directories:\n')
