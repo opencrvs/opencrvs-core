@@ -25,7 +25,8 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import {
   addLocalEventConfig,
-  setEventData
+  setEventData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
@@ -100,6 +101,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
        */
       addLocalEventConfig(tennisClubMembershipEvent)
       setEventData(createdEventDocument.id, createdEventDocument)
+      updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement)
