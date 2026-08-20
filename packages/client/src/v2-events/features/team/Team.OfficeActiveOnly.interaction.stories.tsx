@@ -94,10 +94,10 @@ export const OfficePickerExcludesInactiveOffice: Story = {
     await step('An active office is still searchable', async () => {
       const searchInput = await canvas.findByTestId('locationSearchInput')
 
-      fireEvent.change(searchInput, {
+      await fireEvent.change(searchInput, {
         target: { value: 'Ibombo District Office' }
       })
-      await waitFor(() =>
+      await waitFor(async () =>
         expect(
           canvas.queryByTestId(`locationOption${IBOMBO_DISTRICT_OFFICE_ID}`)
         ).not.toBeNull()
@@ -106,10 +106,10 @@ export const OfficePickerExcludesInactiveOffice: Story = {
 
     await step('The inactive office is excluded from search', async () => {
       const searchInput = canvas.getByTestId('locationSearchInput')
-      fireEvent.change(searchInput, {
+      await fireEvent.change(searchInput, {
         target: { value: INACTIVE_OFFICE_NAME }
       })
-      await waitFor(() =>
+      await waitFor(async () =>
         expect(
           canvas.queryByTestId(`locationOption${INACTIVE_OFFICE_ID}`)
         ).toBeNull()
