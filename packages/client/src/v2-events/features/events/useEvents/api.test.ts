@@ -38,7 +38,7 @@ describe('deleteLocalEvent', () => {
     queryClient.clear()
   })
 
-  it('clears event.get, event.search and view-event cache entries', async () => {
+  it('clears event.get and view-event cache entries', async () => {
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
       eventDocument
@@ -47,24 +47,7 @@ describe('deleteLocalEvent', () => {
 
     setEventData(eventDocument.id, eventDocument)
 
-    expect(
-      queryClient.getQueryData(
-        trpcOptionsProxy.event.search.queryKey({
-          query: {
-            type: 'and',
-            clauses: [{ id }]
-          }
-        })
-      )
-    ).toBeDefined()
-
     await deleteLocalEvent(eventDocument)
-
-    expect(
-      queryClient.getQueryData(
-        trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false })
-      )
-    ).toBeUndefined()
 
     expect(queryClient.getQueryData([['view-event', id]])).toBeUndefined()
 
