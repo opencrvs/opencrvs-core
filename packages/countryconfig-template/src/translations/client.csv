@@ -574,6 +574,7 @@ editPageBanner.notifiedMessage,The message for the edit page banner,You are edit
 email.label.confirmation,Confirmation email address message,A verification code has been sent to {email},Un code de vérification a été envoyé à {email}
 error.code,Error code,401,401
 error.occurred,The error message that displays if we want the user to try the action again,An error occurred. Please try again.,Une erreur s'est produite. Veuillez réessayer.
+error.officeInactive,Error message shown when a user's assigned office is inactive,Your assigned office has been made inactive. Please contact your administrator to be reassigned,Votre bureau assigné a été désactivé. Veuillez contacter votre administrateur pour être réaffecté.
 error.page.load.failed,Error message when page failed to load,"Sorry, we couldn't load the content for this page","Désolé, nous n'avons pas pu charger le contenu de cette page."
 error.passwordSubmissionError,Error message when password verification fails,Sorry that password did not work,Désolé que le mot de passe n'ait pas fonctionné
 error.pdf,PDF load Error,Failed to load PDF,Échec du chargement du PDF
