@@ -8,20 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { defineConfig } from 'vitest/config'
 
-export function raise(...params: Parameters<typeof console.error>): never {
-  // eslint-disable-next-line no-console
-  console.error(...params)
-  process.exit(1)
-}
-
-export async function delay(timeInMilliseconds: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeInMilliseconds)
-  })
-}
-
-export function getOfficeExternalId(primaryOfficeId: string): string {
-  const segments = primaryOfficeId.split('_')
-  return segments[segments.length - 1]
-}
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts']
+  }
+})
