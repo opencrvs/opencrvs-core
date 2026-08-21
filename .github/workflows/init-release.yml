@@ -72,6 +72,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Nx needs node_modules to compute the project graph; without an
+      # install, `npx lerna` falls back to fetching an unpinned latest
+      # lerna/nx from the registry, which can fail to parse this repo's
+      # pnpm-lock.yaml.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Check if release branch already exists
         id: check_branch
         run: |
@@ -115,6 +131,14 @@ jobs:
           }
           ' charts/opencrvs-services/values.yaml
           rm charts/opencrvs-services/values.yaml.bak
+
+          # Point the countryconfig-template Tiltfile's local-dev defaults at
+          # this release, so `tilt up` picks up the right core images and
+          # Helm charts out of the box without anyone needing to export
+          # OPENCRVS_CORE_IMAGE_TAG / OPENCRVS_CORE_REF by hand.
+          sed -i.bak -E 's#(core_images_tag = os\.getenv\("OPENCRVS_CORE_IMAGE_TAG", ")[^"]*(")#\1v${{ inputs.version }}\2#' packages/countryconfig-template/Tiltfile
+          sed -i.bak -E 's#(core_ref = os\.getenv\("OPENCRVS_CORE_REF", ")[^"]*(")#\1release/${{ inputs.version }}\2#' packages/countryconfig-template/Tiltfile
+          rm packages/countryconfig-template/Tiltfile.bak
 
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
