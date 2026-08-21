@@ -33,7 +33,10 @@ import {
   UserName,
   fetchJSON,
   joinUrl,
-  Roles
+  Roles,
+  InactiveOfficeError,
+  isSelectableAtAnchor,
+  Location
 } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
@@ -124,6 +127,7 @@ export interface IAuthentication {
   status: string
   email?: string
   role: string
+  primaryOfficeId: string
 }
 
 export interface ISystemAuthentication {
@@ -153,7 +157,26 @@ export async function authenticate(
     role: body.role,
     status: body.status,
     mobile: body.mobile,
-    email: body.email
+    email: body.email,
+    primaryOfficeId: body.primaryOfficeId
+  }
+}
+
+/**
+ * Throws {@link InactiveOfficeError} if the given office is inactive.
+ */
+function isOfficeActiveToday(location: Pick<Location, 'versions'>) {
+  const today = new Date().toISOString().slice(0, 10)
+  return isSelectableAtAnchor(location.versions, today)
+}
+
+export async function assertOfficeIsActive(officeId: string) {
+  const location = await internalClient.locations.getById.query(
+    officeId as UUID
+  )
+
+  if (!isOfficeActiveToday(location)) {
+    throw new InactiveOfficeError()
   }
 }
 

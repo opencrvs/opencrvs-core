@@ -75,7 +75,8 @@ export const internalUserRouter = serviceRouter({
         mobile: z.string().optional(),
         email: z.string().optional(),
         status: z.string(),
-        role: z.string()
+        role: z.string(),
+        primaryOfficeId: z.string()
       })
     )
     .mutation(async ({ input }) => {
@@ -99,7 +100,8 @@ export const internalUserRouter = serviceRouter({
         mobile: user.mobile ?? undefined,
         email: user.email ?? undefined,
         status: user.status,
-        role: user.role
+        role: user.role,
+        primaryOfficeId: user.officeId
       }
     }),
   verifySecurityAnswer: internalProcedure

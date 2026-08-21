@@ -204,7 +204,8 @@ describe('authenticate handler receives a request', () => {
         role: 'NATIONAL_SYSTEM_ADMIN',
         name: { firstname: '', surname: '' },
         mobile: undefined,
-        email: undefined
+        email: undefined,
+        primaryOfficeId: '1'
       })
       const res = await server.server.inject({
         method: 'POST',
@@ -231,8 +232,12 @@ describe('authenticate handler receives a request', () => {
         role: 'NATIONAL_SYSTEM_ADMIN',
         name: { firstname: '', surname: '' },
         mobile: '+345345343',
-        email: undefined
+        email: undefined,
+        primaryOfficeId: '1'
       })
+      jest
+        .spyOn(reloadedAuthService, 'assertOfficeIsActive')
+        .mockResolvedValue(undefined)
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
       fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
@@ -270,8 +275,12 @@ describe('authenticate handler receives a request', () => {
         role: 'NATIONAL_SYSTEM_ADMIN',
         name: { firstname: '', surname: '' },
         mobile: '+345345343',
-        email: 'user@example.com'
+        email: 'user@example.com',
+        primaryOfficeId: '1'
       })
+      jest
+        .spyOn(reloadedAuthService, 'assertOfficeIsActive')
+        .mockResolvedValue(undefined)
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
       fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
@@ -309,8 +318,12 @@ describe('authenticate handler receives a request', () => {
         role: 'NATIONAL_SYSTEM_ADMIN',
         name: { firstname: '', surname: '' },
         mobile: '+345345343',
-        email: undefined
+        email: undefined,
+        primaryOfficeId: '1'
       })
+      jest
+        .spyOn(reloadedAuthService, 'assertOfficeIsActive')
+        .mockResolvedValue(undefined)
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
       fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
