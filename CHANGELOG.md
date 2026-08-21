@@ -52,6 +52,15 @@ The MOSIP integration used to be released from its own `opencrvs/mosip` reposito
 
 For the integration's own release history prior to this move, see [`packages/mosip-api/CHANGELOG.md`](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/mosip-api/CHANGELOG.md).
 
+#### Backup/restore host moved out of the SSH secret into a plain variable
+
+`BACKUP_HOST` / `PGBACKREST_REPO1_HOST` for the minio and postgres backup/restore charts used to be read from the `host` key of the backup-server SSH credentials secret. Since a hostname isn't sensitive, it's now read from `.Values.backup.host` / `.Values.restore.host` instead, populated from the `BACKUP_HOST` / `RESTORE_HOST` GitHub environment variables.
+
+- **Restore fails if `RESTORE_HOST` is not defined.** Environments that had restore configured before this change carried the host inside the SSH secret; on upgrade, if `RESTORE_HOST` isn't set the restore job has no host to connect to.
+- **Operators must run `yarn environment:init` for every environment that uses backup or restore (e.g. staging)** before deploying this change, so `BACKUP_HOST`/`RESTORE_HOST` get populated as GitHub environment variables.
+
+[#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
+
 ### Improvements
 
 - User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
