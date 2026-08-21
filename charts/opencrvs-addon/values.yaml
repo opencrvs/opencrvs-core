@@ -1,0 +1,69 @@
+app_name: dummy-service
+hostname: dummy-service.opencrvs.localhost
+
+service:
+  enabled: true
+  port: 80
+  container_port: 80
+
+allowed_hosts: '0.0.0.0'
+
+ingress:
+  enabled: true
+  ssl_enabled: false
+  tls_resolver: null 
+
+imagePullSecrets: []
+
+# Label selector for the node to pin this pod to, same idea as
+# charts/dependencies. Only applies when persistence.storage_type is
+# host_path, since hostPath data only exists on the node it was written to
+# and the pod must keep landing on that same node.
+node_selector: {}
+
+image:
+  name: ghcr.io/opencrvs/opencrvs-farajaland-demo-portals
+  tag: latest
+
+resources:
+  requests:
+    memory: '512Mi'
+    cpu: '250m'
+  limits:
+    memory: '512Mi'
+    cpu: '1'
+
+# Kubernetes HTTP probes configuration, same shape as charts/opencrvs-services.
+# Disabled by default since not every app served by this chart exposes an
+# HTTP health endpoint at the configured path.
+probes:
+  enabled: false
+  liveness:
+    path: /
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readiness:
+    path: /
+    periodSeconds: 10
+    timeoutSeconds: 5
+  startup:
+    path: /
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+# Enable to keep mountPath's data across pod restarts/rescheduling, e.g. an
+# app that falls back to an embedded, file-based database when no external
+# database is configured.
+persistence:
+  enabled: false
+  mountPath: /data
+  # storage_type: pvc | host_path
+  storage_type: pvc
+  # Path to persistent data on the node (used when storage_type is host_path).
+  host_data_path: null
+  pvc:
+    # Use an existing PVC instead of creating one.
+    existing_claim: null
+    storage_class: null
+    access_mode: ReadWriteOnce
+    storage_size: 1Gi
