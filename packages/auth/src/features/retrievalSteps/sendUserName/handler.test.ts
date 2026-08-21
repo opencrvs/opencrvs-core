@@ -71,8 +71,19 @@ describe('username reminder', () => {
           nonce: '12345'
         }
       })
+      /*
+       * The Authorization header is asserted explicitly: `/sendUserName` is
+       * itself unauthenticated, so there is no incoming token to forward. If
+       * this handler stops minting one, country config rejects the trigger
+       * with a 401 and the user silently never receives their username.
+       */
       expect(triggerUserEventNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ event: 'username-reminder' })
+        expect.objectContaining({
+          event: 'username-reminder',
+          authHeader: {
+            Authorization: expect.stringMatching(/^Bearer \S+$/)
+          }
+        })
       )
     })
   })

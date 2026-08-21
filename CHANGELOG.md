@@ -2,6 +2,15 @@
 
 ## 2.0.1 Release Candidate
 
+### Security fixes
+
+- Every `/triggers/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
+
+  **Deployment notes:**
+
+  - Country configurations must remove `auth: false` from every route in `src/config/routes/userNotificationRoutes.ts`. Until they do, the endpoints stay open — the core change alone does not close them. The routes then inherit the default `jwt` strategy, which accepts tokens with the `opencrvs:countryconfig-user` audience; every core caller now sends one.
+  - Run `npx @opencrvs/toolkit verify-endpoints` against a locally-running country config to confirm the required public endpoints still respond and the secured ones reject unauthenticated requests. It exits non-zero if any check fails.
+
 ### Improvements
 
 - Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
