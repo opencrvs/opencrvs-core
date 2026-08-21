@@ -13,6 +13,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const { execSync } = require('child_process')
 const readline = require('readline/promises')
 const degit = require('degit').default
 
@@ -21,11 +22,138 @@ const CORE_REPOSITORY = 'opencrvs/opencrvs-core'
 const COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH =
   'packages/countryconfig-template'
 
+const CORE_REPO_URL = 'https://github.com/' + CORE_REPOSITORY + '.git'
+const INFRASTRUCTURE_REPO_URL =
+  'https://github.com/' + INFRASTRUCTURE_REPOSITORY + '.git'
+
+const { version } = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8')
+)
+
 function joinValues(values, separator) {
   return values
     .filter((value) => !!value)
     .join(separator)
     .trim()
+}
+
+function tagExists(repoUrl, tag) {
+  try {
+    execSync(
+      'git ls-remote --exit-code --tags ' + repoUrl + ' refs/tags/' + tag,
+      { stdio: 'pipe' }
+    )
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+function branchExists(repoUrl, branch) {
+  try {
+    execSync(
+      'git ls-remote --exit-code --heads ' + repoUrl + ' refs/heads/' + branch,
+      { stdio: 'pipe' }
+    )
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+/**
+ * Release tags (e.g. "v2.1.0"), highest first. Delegates the version-aware
+ * ordering to git itself rather than hand-parsing semver, then filters down
+ * to strict "vX.Y.Z" tags - `--sort=-version:refname` alone still leaves in
+ * non-release refs (e.g. "vtesting", "v2.0.0-beta") and peeled annotated-tag
+ * lines ("refs/tags/v2.0.0^{}").
+ */
+function listReleaseTags(repoUrl) {
+  const output = execSync(
+    'git ls-remote --tags --sort=-version:refname ' + repoUrl,
+    { encoding: 'utf-8' }
+  )
+
+  return output
+    .split('\n')
+    .map((line) => line.split('\t')[1])
+    .filter(Boolean)
+    .map((ref) => ref.replace('refs/tags/', ''))
+    .filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag))
+}
+
+/**
+ * The highest release tag present in *both* repositories - used as the
+ * fallback when the version-specific tag can't be found in one or both, so
+ * scaffolding still lands on a real, matched release rather than develop.
+ */
+function getLatestCommonReleaseTag() {
+  const infrastructureTags = new Set(listReleaseTags(INFRASTRUCTURE_REPO_URL))
+  return (
+    listReleaseTags(CORE_REPO_URL).find((tag) => infrastructureTags.has(tag)) ||
+    null
+  )
+}
+
+/**
+ * A prerelease-shaped own version (e.g. "2.1.0-rc.f5ea803", what npm resolves
+ * `@next` to - a build published from every push to a branch) never has a
+ * matching release tag, so it's resolved as a branch instead. Its base
+ * version (stripped of the "-rc.<sha>" suffix) tells apart two different
+ * situations: an RC for a version already being stabilized on its own
+ * "release/X.Y.Z" branch (e.g. "2.0.1-rc.*" while a patch release is in
+ * progress) versus an RC for a version that hasn't been branched off yet and
+ * only exists on develop (e.g. "2.1.0-rc.*" while that release branch hasn't
+ * been cut). Scaffold from the release branch when it exists in both
+ * repositories, otherwise fall back to develop.
+ *
+ * Otherwise, the own "X.Y.Z" version - whether resolved via npm's `latest`
+ * dist-tag (bare invocation) or an explicit `@X.Y.Z` pin - scaffolds from the
+ * matching "vX.Y.Z" tag when it exists in both repositories. If it doesn't
+ * (e.g. `latest` lagging behind the repos, or a pin that predates one repo's
+ * tagging), fall back to the highest release tag common to both, rather than
+ * a mismatched pairing of one tagged repo at that version and another repo
+ * at a different release. Exits with an error if no matching release tag
+ * exists in both repositories.
+ */
+function resolveRef() {
+  if (version.includes('-')) {
+    const releaseBranch = 'release/' + version.split('-')[0]
+    if (
+      branchExists(CORE_REPO_URL, releaseBranch) &&
+      branchExists(INFRASTRUCTURE_REPO_URL, releaseBranch)
+    ) {
+      return releaseBranch
+    }
+    return 'develop'
+  }
+
+  const tag = 'v' + version
+  if (
+    tagExists(CORE_REPO_URL, tag) &&
+    tagExists(INFRASTRUCTURE_REPO_URL, tag)
+  ) {
+    return tag
+  }
+
+  const latestCommonTag = getLatestCommonReleaseTag()
+  if (latestCommonTag) {
+    console.warn(
+      '\nWarning: tag "' +
+        tag +
+        '" was not found in both repositories; falling back to the latest ' +
+        'available release, ' +
+        latestCommonTag +
+        '.'
+    )
+    return latestCommonTag
+  }
+
+  console.error(
+    '\nError: no matching release tag was found in both the core and ' +
+      'infrastructure repositories.'
+  )
+  process.exit(1)
 }
 
 /**
@@ -271,6 +399,8 @@ async function main() {
   ensureTargetDirectoryDoesNotExist(countryconfigDirName)
   ensureTargetDirectoryDoesNotExist(infrastructureDirName)
 
+  const ref = resolveRef()
+
   // Gather all answers up front so the operator isn't interrupted mid-clone.
   const organisation = await promptOrganisation()
   const countryCode = await promptCountryCode()
@@ -280,7 +410,8 @@ async function main() {
     await cloneRepository(
       {
         repository: CORE_REPOSITORY,
-        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH
+        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH,
+        branch: ref
       },
       countryconfigTargetPath
     )
@@ -293,7 +424,7 @@ async function main() {
 
   try {
     await cloneRepository(
-      { repository: INFRASTRUCTURE_REPOSITORY },
+      { repository: INFRASTRUCTURE_REPOSITORY, branch: ref },
       infrastructureTargetPath
     )
   } catch (err) {
