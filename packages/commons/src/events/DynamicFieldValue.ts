@@ -12,6 +12,7 @@ import * as z from 'zod/v4'
 import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
 import {
+  AddressAdvancedSearchFieldValue,
   AddressFieldUpdateValue,
   AddressFieldValue
 } from './CompositeFieldValue'
@@ -61,13 +62,28 @@ export type DynamicNameValue = ReturnType<typeof getDynamicNameValue>
  *    in the configuration (a common data integrity issue).
  */
 export function getDynamicAddressFieldValue(field: AddressField) {
-  const schema = field.required ? AddressFieldValue : AddressFieldUpdateValue
+  /*
+   * In advanced search the leaf administrative area is version-pinned, so the
+   * value takes a different shape. `listHistoricalNames` is the flag search
+   * sets; a declaration never sets it. The plain shape stays accepted either
+   * way, since a partly filled address carries no pin yet.
+   */
+  const searchSchema = field.configuration?.listHistoricalNames
+    ? AddressAdvancedSearchFieldValue.or(AddressFieldUpdateValue)
+    : undefined
+  const schema =
+    searchSchema ??
+    (field.required ? AddressFieldValue : AddressFieldUpdateValue)
   const configIds =
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 
   // @todo - show required validation errors for street level fields like state/street
   return (
-    schema as z.ZodType<AddressFieldValue | AddressFieldUpdateValue>
+    schema as z.ZodType<
+      | AddressFieldValue
+      | AddressFieldUpdateValue
+      | AddressAdvancedSearchFieldValue
+    >
   ).refine((arg) => {
     if (!arg) {
       return true

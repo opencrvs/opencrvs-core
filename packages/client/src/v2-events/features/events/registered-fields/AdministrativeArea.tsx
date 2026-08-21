@@ -14,10 +14,11 @@ import {
   AdministrativeAreaField,
   ClientLocation,
   getAdministrativeAreaHierarchy,
+  isLocationSelection,
   isSelectableAtAnchor,
   JurisdictionFilter,
+  LocationSelection,
   resolveJurisdictionReference,
-  resolveVersion,
   todayISO,
   UUID,
   PlainDate
@@ -36,7 +37,9 @@ import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/us
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   buildHistoricalLocationNameOptions,
-  resolveLocationName
+  resolveLocationName,
+  resolveLocationValue,
+  toLocationId
 } from '@client/v2-events/utils'
 import { LocationSearch } from './LocationSearch'
 
@@ -134,9 +137,9 @@ interface AdministrativeAreaInputProps
   > {
   configuration: AdministrativeAreaField['configuration']
   eventType?: string
-  partOf: string | null
-  onChange: (val: string | null) => void
-  value?: string | null
+  partOf: string | LocationSelection | null
+  onChange: (val: string | LocationSelection | null) => void
+  value?: string | LocationSelection | null
   anchor: PlainDate
 }
 
@@ -161,22 +164,26 @@ function AdministrativeAreaInput({
   // used to resolve `anchor` (event date vs today) — the two are orthogonal.
   const excludeInactive = Boolean(configuration.activeOnly)
 
-  const administrativeAreas = useAvailableAdministrativeAreas(
-    partOf,
-    jurisdictionFilter,
-    excludeInactive,
-    anchor
-  )
-
   // Only for fields anchored to the event's date, not advanced search's
   // `activeOnly` filter.
   const { getAdministrativeAreas: getAdministrativeAreasForStaleCheck } =
     useAdministrativeAreas()
   const allAdministrativeAreas =
     getAdministrativeAreasForStaleCheck.useSuspenseQuery()
+
+  // A parent picked under one of its historical names is version-pinned;
+  // children are still nested under the area itself.
+  const partOfId = useMemo(() => toLocationId(partOf) ?? null, [partOf])
+
+  const administrativeAreas = useAvailableAdministrativeAreas(
+    partOfId,
+    jurisdictionFilter,
+    excludeInactive,
+    anchor
+  )
   useClearStaleSelectionOnAnchorChange({
     enabled: Boolean(configuration.anchorToDateOfEvent),
-    value,
+    value: toLocationId(value),
     anchor,
     entities: allAdministrativeAreas,
     onClear: () => onChange(null)
@@ -191,14 +198,20 @@ function AdministrativeAreaInput({
         ? buildHistoricalLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
             label: resolveLocationName(o, anchor),
-            value: o.id
+            value: o.id,
+            selection: undefined
           })),
     [administrativeAreas, configuration.listHistoricalNames, anchor]
   )
 
+  // Historical-name rows are identified by the version they pin, so a pinned
+  // value matches on the version rather than the area — that is what keeps the
+  // two rows of a renamed area apart.
+  const selectedValue = isLocationSelection(value) ? value.versionId : value
+
   const selectedLocation = useMemo(
-    () => options.find((o) => o.value === value) ?? null,
-    [options, value]
+    () => options.find((o) => o.value === selectedValue) ?? null,
+    [options, selectedValue]
   )
 
   /** If there is only one option and its selected, lets disable the input. */
@@ -212,7 +225,8 @@ function AdministrativeAreaInput({
       options={options}
       value={selectedLocation}
       onChange={(opt) => {
-        onChange(opt?.value ?? null)
+        const picked = options.find((o) => o.value === opt?.value)
+        onChange(picked?.selection ?? picked?.value ?? null)
       }}
     />
   )
@@ -228,30 +242,28 @@ function AdministrativeAreaOutput({
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const administrativeAreaId = UUID.safeParse(value?.toString()).data
+  // A search value is version-pinned — echo back the name that was actually
+  // selected, not whatever the area is called today.
+  const selection = resolveLocationValue(value, administrativeAreas, anchor)
 
-  const resolved =
-    administrativeAreaId &&
-    resolveVersion(
-      administrativeAreas.get(administrativeAreaId)?.versions ?? [],
-      anchor
-    )
-
-  return resolved ? resolved.name : ''
+  return selection ? selection.version.name : ''
 }
 
 function stringify(
   value: string,
   context: { locations: Map<UUID, ClientLocation>; anchor: PlainDate }
 ) {
-  const locationId = UUID.safeParse(value).data
-  const location = locationId && context.locations.get(locationId)
+  const selection = resolveLocationValue(
+    value,
+    context.locations,
+    context.anchor
+  )
 
-  if (!location) {
+  if (!selection) {
     return EMPTY_TOKEN
   }
 
-  return resolveVersion(location.versions, context.anchor).name
+  return selection.version.name
 }
 
 function isAdministrativeAreaEmpty(value: Stringifiable) {

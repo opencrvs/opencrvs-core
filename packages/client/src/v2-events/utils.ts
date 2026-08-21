@@ -33,7 +33,12 @@ import {
   EncodedScope,
   getAdministrativeAreaHierarchy,
   resolveVersion,
-  ZodDate
+  findSelectedVersion,
+  isLocationSelection,
+  LocationSelection,
+  toNamedVersions,
+  ZodDate,
+  VersionedEntity
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
@@ -45,22 +50,64 @@ export function getUsersFullName(name: UserOrSystem['name']) {
 }
 
 /**
- * Builds advanced-search filter options for a set of locations: one row per
- * distinct name the location has ever carried (across all its versions), so a
- * record saved under an outdated name stays findable. Rows are in version order
- * and every row resolves to the same location id. Ordinary forms list a single
- * current-name option instead of calling this.
+ * Builds advanced-search filter options: one row per distinct name a location or
+ * administrative area has ever carried, each pinned to its version
+ * (@see LocationSelection). Both selectors call this.
+ *
+ * `value` is the version id rather than the selection object, so the select can
+ * compare options as plain strings. Ordinary forms list a single current-name
+ * option instead of calling this.
  */
-export function buildHistoricalLocationNameOptions<
-  T extends { id: UUID; versions: LocationVersion[] }
->(items: T[]): { value: UUID; label: string }[] {
-  return items.flatMap((item) => {
-    const distinctNames = [
-      ...new Set(item.versions.map((version) => version.name))
-    ]
+export function buildHistoricalLocationNameOptions<T extends VersionedEntity>(
+  items: T[]
+): { value: UUID; label: string; selection: LocationSelection }[] {
+  return items.flatMap((item) =>
+    toNamedVersions(item).map(({ name, selection }) => ({
+      value: selection.versionId,
+      label: name,
+      selection
+    }))
+  )
+}
 
-    return distinctNames.map((name) => ({ value: item.id, label: name }))
-  })
+/**
+ * The entity a location or administrative-area field value names, and the
+ * version to display for it:
+ * the pinned one for a search value, the one in effect at `anchor` for a
+ * declaration's bare id. Undefined when the value names neither.
+ */
+export function resolveLocationValue<T extends VersionedEntity>(
+  value: unknown,
+  entities: Map<UUID, T>,
+  anchor: PlainDate
+): { entity: T; version: LocationVersion } | undefined {
+  if (isLocationSelection(value)) {
+    return findSelectedVersion(value, entities)
+  }
+
+  const id = UUID.safeParse(value?.toString()).data
+  const entity = id && entities.get(id)
+
+  return entity
+    ? { entity, version: resolveVersion(entity.versions, anchor) }
+    : undefined
+}
+
+/**
+ * Narrows a pinned location or administrative-area value to the plain id
+ */
+export function toLocationId(value: string | LocationSelection): string
+export function toLocationId(
+  value: string | LocationSelection | null | undefined
+): string | undefined
+export function toLocationId(
+  value: string | LocationSelection | null | undefined
+): string | undefined {
+  if (isLocationSelection(value)) {
+    return value.locationId
+  }
+
+  return value ?? undefined
 }
 
 /** Utility to get all keys from union */

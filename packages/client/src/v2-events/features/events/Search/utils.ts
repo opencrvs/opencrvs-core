@@ -25,6 +25,8 @@ import {
   EventState,
   FieldType,
   QueryExpression,
+  FieldValue,
+  isLocationSelection,
   NameFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
@@ -323,6 +325,34 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
  *
  * @returns {Record<string, Condition>} A mapping of transformed field keys to their respective query conditions.
  */
+/**
+ * Strips the pinned version. The version is
+ * display-only and must never reach a query term.
+ */
+function toQueryableValue(value: FieldValue | undefined) {
+  if (isLocationSelection(value)) {
+    return value.locationId
+  }
+
+  if (
+    value &&
+    typeof value === 'object' &&
+    'administrativeArea' in value &&
+    Array.isArray(value.administrativeArea)
+  ) {
+    // An address search value keeps the whole picked chain; the events service
+    // indexes only the leaf, which is the last link.
+    const chain = value.administrativeArea.filter(isLocationSelection)
+
+    return {
+      ...value,
+      administrativeArea: chain[chain.length - 1]?.locationId
+    }
+  }
+
+  return value
+}
+
 function buildSearchQueryFields(
   searchConfigurations: {
     fieldId: string
@@ -333,7 +363,7 @@ function buildSearchQueryFields(
 ): Record<string, Condition> {
   return searchConfigurations.reduce(
     (result: Record<string, Condition>, config) => {
-      const value = searchInput[config.fieldId]
+      const value = toQueryableValue(searchInput[config.fieldId])
       const fieldId = config.fieldId
 
       const searchType = config.searchType
@@ -360,7 +390,7 @@ function buildSearchQueryFields(
       }
 
       if (config.fieldConfig.type === FieldType.NAME) {
-        const parsedName = NameFieldValue.safeParse(searchInput[config.fieldId])
+        const parsedName = NameFieldValue.safeParse(value)
 
         if (parsedName.success) {
           if (Name.stringify(parsedName.data) === '') {
@@ -378,14 +408,11 @@ function buildSearchQueryFields(
 
       if (
         config.fieldConfig.type === FieldType.ADDRESS &&
-        AddressFieldValue.safeParse(searchInput[config.fieldId]).success
+        AddressFieldValue.safeParse(value).success
       ) {
         return {
           ...result,
-          [fieldId]: buildSearchClause(
-            JSON.stringify(searchInput[config.fieldId]),
-            searchType
-          )
+          [fieldId]: buildSearchClause(JSON.stringify(value), searchType)
         }
       }
 

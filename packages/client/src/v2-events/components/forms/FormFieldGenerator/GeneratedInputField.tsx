@@ -17,6 +17,7 @@ import { get, omit } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import { useField, useFormikContext } from 'formik'
 import {
+  isLocationSelection,
   EventState,
   FieldConfig,
   FieldValue,
@@ -760,7 +761,13 @@ export const GeneratedInputField = <T extends FieldConfig>(
           anchor={resolveLocationAnchor(field.config.configuration)}
           configuration={field.config.configuration}
           eventType={eventConfig?.id}
-          partOf={typeof partOf === 'string' ? partOf : null}
+          // A parent picked under one of its historical names is a pinned
+          // selection rather than a plain id; both have to reach the child
+          partOf={
+            typeof partOf === 'string' || isLocationSelection(partOf)
+              ? partOf
+              : null
+          }
           value={field.value}
         />
       </InputField>

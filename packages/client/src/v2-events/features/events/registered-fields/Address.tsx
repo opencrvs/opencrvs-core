@@ -14,6 +14,10 @@ import { useSelector } from 'react-redux'
 import {
   EventState,
   AddressFieldUpdateValue,
+  AddressAdvancedSearchFieldValue,
+  isLocationSelection,
+  LocationSelection,
+  AdministrativeAreaSelectionChain,
   and,
   ConditionalType,
   Country as CountryField,
@@ -43,7 +47,7 @@ import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { getOfflineData } from '@client/offline/selectors'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import { getAdminLevelHierarchy, toLocationId } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
@@ -51,13 +55,16 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 type AddressFieldValue = NonNullable<AddressFieldUpdateValue>
 
+/** A plain address in a declaration, a version-pinned one in advanced search. */
+type AddressInputValue = AddressFieldValue | AddressAdvancedSearchFieldValue
+
 interface Props {
   id: string
   name: string
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
-  onChange: (newValue: AddressFieldValue) => void
+  onChange: (newValue: AddressInputValue) => void
   touched: IndexMap<FormState<boolean>> | undefined
-  value?: AddressFieldValue
+  value?: AddressInputValue
   config: AddressField
   disabled?: boolean
   validatorContext: ValidatorContext
@@ -320,10 +327,33 @@ function getLeafAdministrativeLevel(
   return undefined
 }
 
-function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
+function getAdministrativeAreaSelectionFromAddress(value?: AddressInputValue) {
   return value?.addressType === AddressType.DOMESTIC
     ? value.administrativeArea || undefined
     : undefined
+}
+
+/**
+ * The pinned chain a search address carries, root first. Empty for a
+ * declaration address, which holds a bare id.
+ */
+function getPinnedAdministrativeAreas(
+  value?: AddressInputValue
+): LocationSelection[] {
+  const selection = getAdministrativeAreaSelectionFromAddress(value)
+
+  return Array.isArray(selection) ? selection : []
+}
+
+// The single area an address resolves to: the deepest level picked.
+function getAdministrativeAreaIdFromAddress(value?: AddressInputValue) {
+  const selection = getAdministrativeAreaSelectionFromAddress(value)
+
+  if (Array.isArray(selection)) {
+    return selection[selection.length - 1]?.locationId
+  }
+
+  return toLocationId(selection)
 }
 
 /**
@@ -352,7 +382,7 @@ function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
  * // }
  */
 function transformParentValueToNestedValue(
-  value: AddressFieldValue,
+  value: AddressInputValue,
   adminLevelIds: string[],
   administrativeAreas: Map<UUID, ClientAdministrativeArea>
 ): EventState {
@@ -362,11 +392,24 @@ function transformParentValueToNestedValue(
     adminLevelIds
   )
 
+  // The hierarchy is rebuilt from the leaf, so it comes back as plain ids. Put
+  // each level's pin back on it, or every dropdown above the leaf would show its
+  // area's current name instead of the name that was picked.
+  const pinned = getPinnedAdministrativeAreas(value)
+  const pinnedAdminHierarchy = pinned.length
+    ? Object.fromEntries(
+        Object.entries(fullAdminHierarchy).map(([level, id]) => [
+          level,
+          pinned.find((selection) => selection.locationId === id) ?? id
+        ])
+      )
+    : fullAdminHierarchy
+
   const { country, streetLevelDetails } = value
 
   return {
     country,
-    ...fullAdminHierarchy,
+    ...pinnedAdminHierarchy,
     ...streetLevelDetails
   }
 }
@@ -401,19 +444,45 @@ function transformParentValueToNestedValue(
 function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
-): AddressFieldValue {
+): AddressInputValue {
   const addressLines = extractAddressLines(nestedValue, adminLevelIds)
-  const leafAdminLevelValue = getLeafAdministrativeLevel(
-    nestedValue,
-    adminLevelIds
-  )
+
+  /*
+   * A declaration keeps only the deepest level and derives the rest from it. An
+   * advanced-search address keeps the whole picked chain instead, because each
+   * level carries the pin recording which of its names was clicked and that
+   * cannot be recovered from the leaf alone.
+   */
+  const pickedLevels = adminLevelIds
+    .map((level) => nestedValue[level])
+    .filter(Boolean)
+  const pinnedLevels = pickedLevels.filter(isLocationSelection)
+
   const country = nestedValue.country as string
   const defaultCountry = window.config.COUNTRY || 'FAR'
   if (country === defaultCountry) {
+    // Every picked level pinned means this is a search value. A partly pinned
+    // chain cannot be represented, so it falls back to the declaration shape.
+    if (
+      pinnedLevels.length > 0 &&
+      pinnedLevels.length === pickedLevels.length
+    ) {
+      return {
+        country,
+        addressType: AddressType.DOMESTIC,
+        administrativeArea:
+          AdministrativeAreaSelectionChain.parse(pinnedLevels),
+        streetLevelDetails: addressLines
+      }
+    }
+
     return {
       country,
       addressType: AddressType.DOMESTIC,
-      administrativeArea: leafAdminLevelValue,
+      administrativeArea: getLeafAdministrativeLevel(
+        nestedValue,
+        adminLevelIds
+      ),
       streetLevelDetails: addressLines
     }
   }

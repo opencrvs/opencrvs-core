@@ -69,6 +69,7 @@ import {
   FieldValue,
   FieldUpdateValueSchema,
   NumberFieldValue,
+  LocationFieldValue,
   NonEmptyTextValue,
   TextValue,
   DataFieldValue,
@@ -162,14 +163,12 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.DIVIDER:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.LOCATION:
     case FieldType.SELECT:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
     case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
-    case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.PHONE:
@@ -180,6 +179,19 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ALPHA_HIDDEN:
     case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
+      break
+    case FieldType.LOCATION:
+    case FieldType.ADMINISTRATIVE_AREA:
+      /*
+       * Advanced search lists every name a location has carried and stores the
+       * pick as an object, so it can show that name back. `listHistoricalNames`
+       * is the flag it sets; a declaration never sets it and keeps a bare id.
+       */
+      if (field.configuration?.listHistoricalNames) {
+        schema = LocationFieldValue
+      } else {
+        schema = field.required ? NonEmptyTextValue : TextValue
+      }
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue

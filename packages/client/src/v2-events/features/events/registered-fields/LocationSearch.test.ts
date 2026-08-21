@@ -11,6 +11,7 @@
 import {
   ClientLocation,
   JurisdictionFilter,
+  PlainDate,
   resolveVersion,
   todayISO,
   LocationVersion,
@@ -20,7 +21,11 @@ import {
   V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 
-import { buildHistoricalLocationNameOptions } from '@client/v2-events/utils'
+import {
+  buildHistoricalLocationNameOptions,
+  resolveLocationValue,
+  toLocationId
+} from '@client/v2-events/utils'
 import { filterLocationsByJurisdiction } from './LocationSearch'
 
 function nameOf(location: ClientLocation) {
@@ -227,6 +232,10 @@ describe('filterLocationsByJurisdiction', () => {
     })
   })
 })
+// Generates version ids for testing
+function versionIdOf(id: string, index: number) {
+  return `${id.slice(0, 24)}${String(index).padStart(12, '0')}` as UUID
+}
 
 /**
  * Builds a location-like item with one version per supplied name. `name` (the
@@ -234,7 +243,7 @@ describe('filterLocationsByJurisdiction', () => {
  */
 function makeVersionedItem(id: string, names: string[]) {
   const versions: LocationVersion[] = names.map((name, index) => ({
-    versionId: `${id}-v${index}` as UUID,
+    versionId: versionIdOf(id, index),
     effectiveFrom: `2020-01-${String(index + 1).padStart(2, '0')}`,
     name,
     externalId: null,
@@ -249,39 +258,127 @@ function makeVersionedItem(id: string, names: string[]) {
 }
 
 describe('buildHistoricalLocationNameOptions', () => {
-  it('lists a renamed location once per distinct historical name, in version order', () => {
-    const id = '11111111-1111-1111-1111-111111111111'
+  it('lists a renamed location once per name, each pinned to its own version', () => {
+    const id = '11111111-1111-4111-8111-111111111111'
     const items = [makeVersionedItem(id, ['Office A', 'Office Z'])]
 
     const options = buildHistoricalLocationNameOptions(items)
 
-    // Both rows resolve to the same location id.
+    // Both rows point at the same location, but each pins the version whose
+    // name it shows — that is what keeps them apart once one is picked.
     expect(options).toEqual([
-      { value: id, label: 'Office A' },
-      { value: id, label: 'Office Z' }
+      {
+        value: versionIdOf(id, 0),
+        label: 'Office A',
+        selection: { locationId: id, versionId: versionIdOf(id, 0) }
+      },
+      {
+        value: versionIdOf(id, 1),
+        label: 'Office Z',
+        selection: { locationId: id, versionId: versionIdOf(id, 1) }
+      }
     ])
   })
 
-  it('does not duplicate a name that repeats across versions', () => {
-    const id = '22222222-2222-2222-2222-222222222222'
+  it('does not repeat a name carried by more than one version', () => {
+    const id = '22222222-2222-4222-8222-222222222222'
+    // A status change that leaves the name alone must not show up as a second,
+    // identical row.
+    const items = [
+      makeVersionedItem(id, ['Alaminos', 'Alaminos', 'Alaminos City'])
+    ]
+
+    const options = buildHistoricalLocationNameOptions(items)
+
+    expect(options.map((o) => o.label)).toEqual(['Alaminos', 'Alaminos City'])
+    // The surviving row is pinned to the version that first carried the name.
+    expect(options[0].selection).toEqual({
+      locationId: id,
+      versionId: versionIdOf(id, 0)
+    })
+  })
+
+  it('does not repeat a name reinstated after a rename', () => {
+    const id = '22222222-2222-4222-8222-222222222222'
     const items = [
       makeVersionedItem(id, ['Alaminos', 'Alaminos City', 'Alaminos'])
     ]
 
     const options = buildHistoricalLocationNameOptions(items)
 
-    expect(options).toEqual([
-      { value: id, label: 'Alaminos' },
-      { value: id, label: 'Alaminos City' }
+    // Two rows, not three. A reinstated name is still one name: a second row
+    // would be indistinguishable in the dropdown and would search the same
+    // records, since the name picked never narrows results.
+    expect(options.map((o) => [o.label, o.selection.versionId])).toEqual([
+      ['Alaminos', versionIdOf(id, 0)],
+      ['Alaminos City', versionIdOf(id, 1)]
     ])
   })
 
   it('yields a single row for a never-renamed location', () => {
-    const id = '33333333-3333-3333-3333-333333333333'
+    const id = '33333333-3333-4333-8333-333333333333'
     const items = [makeVersionedItem(id, ['Ibombo District Office'])]
 
     const options = buildHistoricalLocationNameOptions(items)
 
-    expect(options).toEqual([{ value: id, label: 'Ibombo District Office' }])
+    expect(options).toEqual([
+      {
+        value: versionIdOf(id, 0),
+        label: 'Ibombo District Office',
+        selection: { locationId: id, versionId: versionIdOf(id, 0) }
+      }
+    ])
+  })
+})
+
+describe('resolveLocationValue', () => {
+  const id = '44444444-4444-4444-8444-444444444444'
+  const renamed = makeVersionedItem(id, ['Old Name', 'New Name'])
+  const entities = new Map([[renamed.id, renamed]])
+
+  it('resolves a pinned selection to the name that version carried', () => {
+    const [oldNameOption] = buildHistoricalLocationNameOptions([renamed])
+
+    expect(
+      resolveLocationValue(oldNameOption.selection, entities, todayISO())
+        ?.version.name
+    ).toBe('Old Name')
+  })
+
+  it('resolves a bare location id at the anchor, as declarations do', () => {
+    expect(resolveLocationValue(id, entities, todayISO())?.version.name).toBe(
+      'New Name'
+    )
+    expect(
+      resolveLocationValue(id, entities, PlainDate.parse('2020-01-01'))?.version
+        .name
+    ).toBe('Old Name')
+  })
+
+  it('returns undefined for an id that names neither', () => {
+    expect(
+      resolveLocationValue(
+        '55555555-5555-4555-8555-555555555555',
+        entities,
+        todayISO()
+      )
+    ).toBeUndefined()
+  })
+})
+
+describe('toLocationId', () => {
+  const id = '66666666-6666-4666-8666-666666666666'
+  const renamed = makeVersionedItem(id, ['Old Name', 'New Name'])
+
+  it('narrows a pinned selection back to the location it names', () => {
+    const [oldNameOption] = buildHistoricalLocationNameOptions([renamed])
+
+    expect(toLocationId(oldNameOption.selection)).toBe(id)
+  })
+
+  it('passes a bare id and an absent value through untouched', () => {
+    expect(toLocationId(id)).toBe(id)
+    expect(toLocationId(undefined)).toBeUndefined()
+    expect(toLocationId(null)).toBeUndefined()
   })
 })

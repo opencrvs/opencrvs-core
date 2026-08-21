@@ -14,6 +14,7 @@
 import { UUID } from '../uuid'
 import * as z from 'zod/v4'
 import { PlainDate } from './PlainDate'
+import { LocationSelection } from './LocationSelection'
 import { EventIndex } from './EventIndex'
 import {
   ActionCreationMetadata,
@@ -235,6 +236,51 @@ export function resolveVersion<T extends { effectiveFrom: string }>(
   }
 
   return resolved
+}
+export type VersionedEntity = {
+  id: UUID
+  versions: LocationVersion[]
+}
+
+/**
+ * The distinct names a location or administrative area has carried, in the order
+ * they first appeared, each pinned to the version that first carried it.
+ *
+ * One entry per name, not per version
+ */
+export function toNamedVersions(
+  entity: VersionedEntity
+): { name: string; selection: LocationSelection }[] {
+  const seen = new Set<string>()
+
+  return entity.versions.flatMap((version) => {
+    if (seen.has(version.name)) {
+      return []
+    }
+    seen.add(version.name)
+
+    return [
+      {
+        name: version.name,
+        selection: { locationId: entity.id, versionId: version.versionId }
+      }
+    ]
+  })
+}
+
+/**
+ * The version a {@link LocationSelection} pinned.
+ */
+export function findSelectedVersion<T extends VersionedEntity>(
+  selection: LocationSelection,
+  entities: Map<UUID, T>
+): { entity: T; version: LocationVersion } | undefined {
+  const entity = entities.get(selection.locationId)
+  const version = entity?.versions.find(
+    (candidate) => candidate.versionId === selection.versionId
+  )
+
+  return entity && version ? { entity, version } : undefined
 }
 
 /**

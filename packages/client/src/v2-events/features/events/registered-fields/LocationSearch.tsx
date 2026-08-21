@@ -21,6 +21,8 @@ import {
   isSelectableAtAnchor,
   resolveJurisdictionReference,
   resolveVersion,
+  isLocationSelection,
+  LocationSelection,
   PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
@@ -30,7 +32,9 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
   buildHistoricalLocationNameOptions,
-  getAdminLevelHierarchy
+  getAdminLevelHierarchy,
+  resolveLocationValue,
+  toLocationId
 } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -138,9 +142,9 @@ function LocationSearchInput({
   anchor,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
-  onChange: (val: string | undefined) => void
+  onChange: (val: string | LocationSelection | undefined) => void
   locationTypes?: string[]
-  value?: string
+  value?: string | LocationSelection
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
   id: string
@@ -162,7 +166,7 @@ function LocationSearchInput({
   const allLocations = getLocationsForStaleCheck.useSuspenseQuery()
   useClearStaleSelectionOnAnchorChange({
     enabled: anchorToDateOfEvent,
-    value,
+    value: toLocationId(value),
     anchor,
     entities: allLocations,
     onClear: () => onChange(undefined)
@@ -191,13 +195,17 @@ function LocationSearchInput({
         ? buildHistoricalLocationNameOptions(selectableLocations)
         : selectableLocations.map((l) => ({
             value: l.id,
-            label: resolveVersion(l.versions, anchor).name
+            label: resolveVersion(l.versions, anchor).name,
+            selection: undefined
           })),
     [selectableLocations, props.configuration?.listHistoricalNames, anchor]
   )
 
+  // Historical-name rows are identified by the version they pin, so a value
+  // that carries a selection matches on the version rather than the location
+  const selectedValue = isLocationSelection(value) ? value.versionId : value
   const selectedOption =
-    options.find((option) => option.value === value) ?? null
+    options.find((option) => option.value === selectedValue) ?? null
 
   return (
     <SearchableSelect
@@ -207,7 +215,8 @@ function LocationSearchInput({
       options={options}
       value={selectedOption}
       onChange={(opt) => {
-        onChange(opt?.value ?? undefined)
+        const picked = options.find((option) => option.value === opt?.value)
+        onChange(picked?.selection ?? picked?.value)
       }}
     />
   )
@@ -246,17 +255,17 @@ function toCertificateVariables(
     description: 'Country name'
   })
 
-  const locationId = UUID.safeParse(value.toString()).data
-  const locationEntity = locationId
-    ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
-    : undefined
-  const resolvedLocation = locationEntity
-    ? resolveVersion(locationEntity.versions, anchor)
-    : undefined
+  // A search value is version-pinned — echo back the name that was actually
+  // selected, not whatever the location is called today.
+  const selection =
+    resolveLocationValue(value, locations, anchor) ??
+    resolveLocationValue(value, administrativeAreas, anchor)
+  const resolvedLocation = selection?.version
 
-  const parentAdministrativeAreaId = locationId
-    ? (locations.get(locationId)?.administrativeAreaId ??
-      administrativeAreas.get(locationId)?.parentId)
+  const selectedId = selection?.entity.id
+  const parentAdministrativeAreaId = selectedId
+    ? (locations.get(selectedId)?.administrativeAreaId ??
+      administrativeAreas.get(selectedId)?.parentId)
     : undefined
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
