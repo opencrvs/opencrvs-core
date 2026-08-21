@@ -111,14 +111,15 @@ export function useLocations() {
       }
     },
     getLocation: {
-      useQuery: (id: string) => {
-        const { queryFn, ...options } =
+      useQuery: (id: string, options?: { refetchInterval?: number }) => {
+        const { queryFn, ...rest } =
           trpcOptionsProxy.locations.get.queryOptions({ id })
         // The queryFn override above returns a `ClientLocation` (flattened
         // `name`/`status`/`externalId` stripped), but tRPC still infers the
         // server `Location` type here. Cast so callers can't read a location's
         // current name without going through the anchored resolution utilities.
         return useQuery({
+          ...rest,
           ...options,
           queryKey: trpc.locations.get.queryKey({ id })
         }) as unknown as UseQueryResult<ClientLocation>
