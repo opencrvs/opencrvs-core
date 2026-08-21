@@ -126,7 +126,8 @@ function OfficeStatusWatcher({ officeId }: { officeId: string }) {
       redirection: {
         label: intl.formatMessage(buttonMessages.backToLogin),
         path: buildLoginUrl(intl.locale)
-      }
+      },
+      variant: 'notice'
     })
   }
 

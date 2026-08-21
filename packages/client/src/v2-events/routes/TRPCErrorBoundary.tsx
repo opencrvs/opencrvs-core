@@ -39,6 +39,61 @@ const ErrorMessage = styled.div`
   text-align: center;
 `
 
+const NoticeContainer = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 64px;
+  gap: 12px;
+  width: 442px;
+  min-width: 320px;
+  height: 246px;
+  background: #ffffff;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  box-shadow:
+    0px 4px 8px -2px rgba(0, 0, 0, 0.1),
+    0px 1px 2px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  margin-top: -80px;
+`
+
+const NoticeTextGroup = styled.div`
+  width: 314px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const NoticeTitle = styled.h1`
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 130%;
+  text-align: center;
+  color: #222222;
+  margin: 0;
+`
+
+const NoticeMessage = styled.div`
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  text-align: center;
+  color: #525252;
+  margin: 0;
+`
+
+const NoticeButton = styled(Button)`
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 130%;
+  padding: 12px 16px;
+`
+
 const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
@@ -48,14 +103,18 @@ const StructuredError = z.object({
   redirection: z.object({
     label: z.string(),
     path: z.string()
-  })
+  }),
+  title: z.string().optional(),
+  variant: z.enum(['notice']).optional()
 })
 
 export const throwStructuredError = ({
   message,
-  redirection
+  redirection,
+  title,
+  variant
 }: z.infer<typeof StructuredError>) => {
-  const error = JSON.stringify({ message, redirection })
+  const error = JSON.stringify({ message, redirection, title, variant })
   throw new Error(error)
 }
 
@@ -161,6 +220,8 @@ class ErrorBoundary extends Component<Props, State> {
       let message = error.message
       let buttonLabel = intl.formatMessage(buttonMessages.goToHomepage)
       let buttonPath = '/'
+      let title: string | undefined
+      let variant: 'notice' | undefined
 
       if (error instanceof TRPCClientError) {
         if (
@@ -182,6 +243,8 @@ class ErrorBoundary extends Component<Props, State> {
         message = structuredMessage.message
         buttonLabel = structuredMessage.redirection.label
         buttonPath = structuredMessage.redirection.path
+        title = structuredMessage.title
+        variant = structuredMessage.variant
       } else {
         message = structuredMessage
       }
@@ -190,6 +253,62 @@ class ErrorBoundary extends Component<Props, State> {
        * TODO: Improve the error message design once the probable errors are defined
        * and the design/ux is ready.
        */
+      let content
+      if (httpCode === 401) {
+        content = (
+          <>
+            <ErrorTitle>
+              {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
+            </ErrorTitle>
+            <ErrorMessage>
+              {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+            </ErrorMessage>
+            <Button
+              id="GoToLoginPage"
+              size="large"
+              type="tertiary"
+              onClick={() => redirectToAuthentication(true)}
+            >
+              {intl.formatMessage(buttonMessages.login)}
+            </Button>
+          </>
+        )
+      } else if (variant === 'notice') {
+        content = (
+          <>
+            <NoticeTextGroup>
+              <NoticeTitle>{title}</NoticeTitle>
+              <NoticeMessage>{message}</NoticeMessage>
+            </NoticeTextGroup>
+            <NoticeButton
+              id="BackToLogin"
+              size="medium"
+              type="tertiary"
+              onClick={() => (window.location.href = buttonPath)}
+            >
+              {buttonLabel}
+            </NoticeButton>
+          </>
+        )
+      } else {
+        content = (
+          <>
+            <ErrorTitle onClick={this.onTitleClick}>
+              {intl.formatMessage(errorMessages.errorTitle)}
+            </ErrorTitle>
+            <ErrorMessage>{message}</ErrorMessage>
+            <Button
+              id="GoToHomepage"
+              size="large"
+              type="tertiary"
+              onClick={() => (window.location.href = buttonPath)}
+            >
+              {buttonLabel}
+            </Button>
+          </>
+        )
+      }
+
       return (
         <Sentry.ErrorBoundary
           showDialog={!development}
@@ -199,41 +318,11 @@ class ErrorBoundary extends Component<Props, State> {
           }}
         >
           <PageWrapper>
-            <ErrorContainer>
-              {httpCode === 401 ? (
-                <>
-                  <ErrorTitle>
-                    {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
-                  </ErrorTitle>
-                  <ErrorMessage>
-                    {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-                  </ErrorMessage>
-                  <Button
-                    id="GoToLoginPage"
-                    size="large"
-                    type="tertiary"
-                    onClick={() => redirectToAuthentication(true)}
-                  >
-                    {intl.formatMessage(buttonMessages.login)}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <ErrorTitle onClick={this.onTitleClick}>
-                    {intl.formatMessage(errorMessages.errorTitle)}
-                  </ErrorTitle>
-                  <ErrorMessage>{message}</ErrorMessage>
-                  <Button
-                    id="GoToHomepage"
-                    size="large"
-                    type="tertiary"
-                    onClick={() => (window.location.href = buttonPath)}
-                  >
-                    {buttonLabel}
-                  </Button>
-                </>
-              )}
-            </ErrorContainer>
+            {variant === 'notice' ? (
+              <NoticeContainer>{content}</NoticeContainer>
+            ) : (
+              <ErrorContainer>{content}</ErrorContainer>
+            )}
           </PageWrapper>
         </Sentry.ErrorBoundary>
       )
