@@ -87,6 +87,10 @@ postgres:
     # Requested persistent storage size
     storage_size: '10Gi'
 
+  # pgBackRest version (major.minor.hotfix). Single source of truth for both
+  # backup/restore scripts
+  pgbackrest_version: 2.59.0
+
   # Backup section
   backup:
     # Enable/Disable backup
