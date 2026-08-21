@@ -31,3 +31,21 @@ Usage: {{ include "mosip.image" (dict "root" . "service" .Values.mosip_api) }}
 {{- $http_scheme := include "http-scheme" . }}
 {{- printf "%s://%s.%s" $http_scheme $service_name .Values.hostname }}
 {{- end }}
+
+{{/*
+strategy-helper
+---
+Renders the Deployment's `.spec.strategy` block for one of the three MOSIP
+services. Global default lives under `strategy:`, overridable per-service
+under <service>.strategy (e.g. mosip_api.strategy.type).
+
+Usage: {{ include "strategy-helper" (dict "service" .Values.mosip_api "Values" .Values) }}
+*/}}
+{{- define "strategy-helper" -}}
+{{- $service := .service }}
+{{- $global := .Values.strategy | default dict }}
+{{- $service_strategy := $service.strategy | default dict }}
+{{- $type := $service_strategy.type | default $global.type | default "RollingUpdate" }}
+strategy:
+  type: {{ $type }}
+{{- end }}

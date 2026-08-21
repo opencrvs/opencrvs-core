@@ -37,6 +37,7 @@ metadata:
   name: login
 spec:
   replicas: {{ .Values.login.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "login" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: login
