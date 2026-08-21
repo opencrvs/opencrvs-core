@@ -14,7 +14,6 @@ import {
   AdministrativeAreaField,
   ClientLocation,
   getAdministrativeAreaHierarchy,
-  isLocationSelection,
   isSelectableAtAnchor,
   JurisdictionFilter,
   LocationSelection,
@@ -37,6 +36,8 @@ import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/us
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   buildHistoricalLocationNameOptions,
+  findLocationOption,
+  LocationOption,
   resolveLocationName,
   resolveLocationValue,
   toLocationId
@@ -192,7 +193,7 @@ function AdministrativeAreaInput({
   // When the field config opts in (advanced search sets this), list every
   // historical name so records saved under an outdated name stay findable.
   // Otherwise show a single current-name option, resolved at the field's anchor.
-  const options = useMemo(
+  const options: LocationOption[] = useMemo(
     () =>
       configuration.listHistoricalNames
         ? buildHistoricalLocationNameOptions(administrativeAreas)
@@ -204,14 +205,9 @@ function AdministrativeAreaInput({
     [administrativeAreas, configuration.listHistoricalNames, anchor]
   )
 
-  // Historical-name rows are identified by the version they pin, so a pinned
-  // value matches on the version rather than the area — that is what keeps the
-  // two rows of a renamed area apart.
-  const selectedValue = isLocationSelection(value) ? value.versionId : value
-
   const selectedLocation = useMemo(
-    () => options.find((o) => o.value === selectedValue) ?? null,
-    [options, selectedValue]
+    () => findLocationOption(options, value),
+    [options, value]
   )
 
   /** If there is only one option and its selected, lets disable the input. */

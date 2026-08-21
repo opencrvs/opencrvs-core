@@ -21,7 +21,6 @@ import {
   isSelectableAtAnchor,
   resolveJurisdictionReference,
   resolveVersion,
-  isLocationSelection,
   LocationSelection,
   PlainDate
 } from '@opencrvs/commons/client'
@@ -32,7 +31,9 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
   buildHistoricalLocationNameOptions,
+  findLocationOption,
   getAdminLevelHierarchy,
+  LocationOption,
   resolveLocationValue,
   toLocationId
 } from '@client/v2-events/utils'
@@ -189,7 +190,7 @@ function LocationSearchInput({
   // When the field config opts in (advanced search sets this), list every
   // historical name so records saved under an outdated name stay findable.
   // Otherwise show a single current-name option, resolved at the field's anchor.
-  const options = useMemo(
+  const options: LocationOption[] = useMemo(
     () =>
       props.configuration?.listHistoricalNames
         ? buildHistoricalLocationNameOptions(selectableLocations)
@@ -201,11 +202,7 @@ function LocationSearchInput({
     [selectableLocations, props.configuration?.listHistoricalNames, anchor]
   )
 
-  // Historical-name rows are identified by the version they pin, so a value
-  // that carries a selection matches on the version rather than the location
-  const selectedValue = isLocationSelection(value) ? value.versionId : value
-  const selectedOption =
-    options.find((option) => option.value === selectedValue) ?? null
+  const selectedOption = findLocationOption(options, value)
 
   return (
     <SearchableSelect

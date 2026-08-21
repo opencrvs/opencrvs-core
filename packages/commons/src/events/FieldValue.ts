@@ -76,6 +76,11 @@ export type AutocompleteUpdateValue = z.infer<typeof AutocompleteUpdateValue>
  */
 export const LocationFieldValue = z.union([TextValue, LocationSelection])
 
+export const NonEmptyLocationFieldValue = z.union([
+  NonEmptyTextValue,
+  LocationSelection
+])
+
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 export type TimeValue = z.infer<typeof TimeValue>
 

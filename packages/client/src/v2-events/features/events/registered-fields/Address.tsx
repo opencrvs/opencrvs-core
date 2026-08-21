@@ -320,8 +320,9 @@ function getLeafAdministrativeLevel(
   // Start from the last key and move backwards
   for (let i = keys.length - 1; i >= 0; i--) {
     const key = keys[i] as keyof AddressFieldValue
-    if (val[key]) {
-      return val[key] as string
+    const level = val[key]
+    if (level) {
+      return toLocationId(level as string | LocationSelection)
     }
   }
   return undefined

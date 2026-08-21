@@ -18,7 +18,9 @@ import {
   PlainDate,
   FieldConfig,
   FieldType,
-  AdministrativeAreas
+  AdministrativeAreas,
+  AddressType,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   getMetadataFieldConfigs,
@@ -669,5 +671,121 @@ describe('withSearchLocationBehaviour', () => {
     const result = withSearchLocationBehaviour(field)
 
     expect(result).toEqual(field)
+  })
+})
+
+describe('buildSearchQuery with version-pinned locations', () => {
+  const label = {
+    id: 'field.label',
+    defaultMessage: 'Field',
+    description: 'Field label'
+  }
+
+  const OFFICE_ID = UUID.parse('11111111-1111-4111-8111-111111111111')
+  const OFFICE_VERSION_ID = UUID.parse('11111111-1111-4111-8111-1111111111aa')
+  const PROVINCE_ID = UUID.parse('22222222-2222-4222-8222-222222222222')
+  const PROVINCE_VERSION_ID = UUID.parse('22222222-2222-4222-8222-2222222222aa')
+  const DISTRICT_ID = UUID.parse('33333333-3333-4333-8333-333333333333')
+  const DISTRICT_VERSION_ID = UUID.parse('33333333-3333-4333-8333-3333333333aa')
+
+  const locationField = {
+    id: 'applicant.office',
+    type: FieldType.LOCATION,
+    label,
+    configuration: { listHistoricalNames: true }
+  } as FieldConfig
+
+  const addressField = {
+    id: 'applicant.address',
+    type: FieldType.ADDRESS,
+    label,
+    configuration: { listHistoricalNames: true }
+  } as FieldConfig
+
+  const searchConfigs = [
+    {
+      fieldId: 'applicant.office',
+      fieldType: 'field',
+      label,
+      config: { type: 'exact' }
+    },
+    {
+      fieldId: 'applicant.address',
+      fieldType: 'field',
+      label,
+      config: { type: 'exact' }
+    }
+  ] as unknown as AdvancedSearchField[]
+
+  it('queries a pinned location by its id, never by the version', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.office': {
+          locationId: OFFICE_ID,
+          versionId: OFFICE_VERSION_ID
+        }
+      },
+      [locationField],
+      searchConfigs
+    )
+
+    expect(result).toEqual({
+      'applicant.office': { type: 'exact', term: OFFICE_ID }
+    })
+    expect(JSON.stringify(result)).not.toContain(OFFICE_VERSION_ID)
+  })
+
+  it('queries a pinned address by the leaf area id, never by the chain', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: [
+            { locationId: PROVINCE_ID, versionId: PROVINCE_VERSION_ID },
+            { locationId: DISTRICT_ID, versionId: DISTRICT_VERSION_ID }
+          ],
+          streetLevelDetails: {}
+        }
+      },
+      [addressField],
+      searchConfigs
+    )
+
+    expect(result).toEqual({
+      'applicant.address': {
+        type: 'exact',
+        term: JSON.stringify({
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: DISTRICT_ID,
+          streetLevelDetails: {}
+        })
+      }
+    })
+    expect(JSON.stringify(result)).not.toContain(PROVINCE_VERSION_ID)
+    expect(JSON.stringify(result)).not.toContain(DISTRICT_VERSION_ID)
+  })
+
+  it('omits an address whose administrative area is not a plain id', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          // A single pin where the leaf id belongs. It cannot be turned into a
+          // term, and must not reach the query stringified as "[object Object]".
+          administrativeArea: {
+            locationId: DISTRICT_ID,
+            versionId: DISTRICT_VERSION_ID
+          },
+          streetLevelDetails: {}
+        }
+      },
+      [addressField],
+      searchConfigs
+    )
+
+    expect(result).toEqual({})
   })
 })

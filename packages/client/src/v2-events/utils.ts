@@ -48,6 +48,11 @@ export function getUsersFullName(name: UserOrSystem['name']) {
 
   return joinValues([name.firstname, name.surname])
 }
+export interface LocationOption {
+  value: UUID
+  label: string
+  selection?: LocationSelection
+}
 
 /**
  * Builds advanced-search filter options: one row per distinct name a location or
@@ -60,13 +65,36 @@ export function getUsersFullName(name: UserOrSystem['name']) {
  */
 export function buildHistoricalLocationNameOptions<T extends VersionedEntity>(
   items: T[]
-): { value: UUID; label: string; selection: LocationSelection }[] {
+): LocationOption[] {
   return items.flatMap((item) =>
     toNamedVersions(item).map(({ name, selection }) => ({
       value: selection.versionId,
       label: name,
       selection
     }))
+  )
+}
+
+/**
+ * The option a location or administrative-area field value is currently on.
+ * A pinned value identifies its row by version.
+ */
+export function findLocationOption(
+  options: LocationOption[],
+  value: string | LocationSelection | null | undefined
+): LocationOption | null {
+  if (!value) {
+    return null
+  }
+
+  const [versionId, locationId] = isLocationSelection(value)
+    ? [value.versionId, value.locationId]
+    : [value, value]
+
+  return (
+    options.find((option) => option.value === versionId) ??
+    options.find((option) => option.selection?.locationId === locationId) ??
+    null
   )
 }
 
@@ -82,7 +110,20 @@ export function resolveLocationValue<T extends VersionedEntity>(
   anchor: PlainDate
 ): { entity: T; version: LocationVersion } | undefined {
   if (isLocationSelection(value)) {
-    return findSelectedVersion(value, entities)
+    const pinned = findSelectedVersion(value, entities)
+
+    if (pinned) {
+      return pinned
+    }
+
+    const pinnedEntity = entities.get(value.locationId)
+
+    return pinnedEntity
+      ? {
+          entity: pinnedEntity,
+          version: resolveVersion(pinnedEntity.versions, anchor)
+        }
+      : undefined
   }
 
   const id = UUID.safeParse(value?.toString()).data

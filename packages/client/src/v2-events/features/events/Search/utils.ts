@@ -406,10 +406,11 @@ function buildSearchQueryFields(
         }
       }
 
-      if (
-        config.fieldConfig.type === FieldType.ADDRESS &&
-        AddressFieldValue.safeParse(value).success
-      ) {
+      if (config.fieldConfig.type === FieldType.ADDRESS) {
+        if (!AddressFieldValue.safeParse(value).success) {
+          return result
+        }
+
         return {
           ...result,
           [fieldId]: buildSearchClause(JSON.stringify(value), searchType)

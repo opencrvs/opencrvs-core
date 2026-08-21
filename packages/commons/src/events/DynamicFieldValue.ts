@@ -68,12 +68,12 @@ export function getDynamicAddressFieldValue(field: AddressField) {
    * sets; a declaration never sets it. The plain shape stays accepted either
    * way, since a partly filled address carries no pin yet.
    */
-  const searchSchema = field.configuration?.listHistoricalNames
-    ? AddressAdvancedSearchFieldValue.or(AddressFieldUpdateValue)
-    : undefined
-  const schema =
-    searchSchema ??
-    (field.required ? AddressFieldValue : AddressFieldUpdateValue)
+  const plainSchema = field.required
+    ? AddressFieldValue
+    : AddressFieldUpdateValue
+  const schema = field.configuration?.listHistoricalNames
+    ? AddressAdvancedSearchFieldValue.or(plainSchema)
+    : plainSchema
   const configIds =
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 

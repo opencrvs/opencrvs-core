@@ -70,6 +70,7 @@ import {
   FieldUpdateValueSchema,
   NumberFieldValue,
   LocationFieldValue,
+  NonEmptyLocationFieldValue,
   NonEmptyTextValue,
   TextValue,
   DataFieldValue,
@@ -188,7 +189,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
        * is the flag it sets; a declaration never sets it and keeps a bare id.
        */
       if (field.configuration?.listHistoricalNames) {
-        schema = LocationFieldValue
+        schema = field.required
+          ? NonEmptyLocationFieldValue
+          : LocationFieldValue
       } else {
         schema = field.required ? NonEmptyTextValue : TextValue
       }
@@ -268,7 +271,7 @@ type FieldTypeValueMap = {
   [FieldType.DIVIDER]: z.infer<typeof TextValue>
   [FieldType.BULLET_LIST]: z.infer<typeof TextValue>
   [FieldType.PAGE_HEADER]: z.infer<typeof TextValue>
-  [FieldType.LOCATION]: z.infer<typeof TextValue>
+  [FieldType.LOCATION]: z.infer<typeof LocationFieldValue>
   [FieldType.SELECT]: z.infer<typeof TextValue>
   [FieldType.COUNTRY]: z.infer<typeof TextValue>
   [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
@@ -276,7 +279,7 @@ type FieldTypeValueMap = {
   [FieldType.HEADING]: z.infer<typeof TextValue>
   [FieldType.AUTOCOMPLETE]: z.infer<typeof AutocompleteValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
-  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
+  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof LocationFieldValue>
   [FieldType.FACILITY]: z.infer<typeof TextValue>
   [FieldType.OFFICE]: z.infer<typeof TextValue>
   [FieldType.PHONE]: z.infer<typeof TextValue>

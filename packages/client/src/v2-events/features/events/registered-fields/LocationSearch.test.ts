@@ -23,6 +23,7 @@ import {
 
 import {
   buildHistoricalLocationNameOptions,
+  findLocationOption,
   resolveLocationValue,
   toLocationId
 } from '@client/v2-events/utils'
@@ -309,7 +310,7 @@ describe('buildHistoricalLocationNameOptions', () => {
     // Two rows, not three. A reinstated name is still one name: a second row
     // would be indistinguishable in the dropdown and would search the same
     // records, since the name picked never narrows results.
-    expect(options.map((o) => [o.label, o.selection.versionId])).toEqual([
+    expect(options.map((o) => [o.label, o.selection?.versionId])).toEqual([
       ['Alaminos', versionIdOf(id, 0)],
       ['Alaminos City', versionIdOf(id, 1)]
     ])
@@ -355,6 +356,18 @@ describe('resolveLocationValue', () => {
     ).toBe('Old Name')
   })
 
+  it('falls back to the anchored version when the pinned one is gone', () => {
+    // Locations re-imported since the search link was saved: the version id it
+    // carries no longer exists, but the location does.
+    expect(
+      resolveLocationValue(
+        { locationId: renamed.id, versionId: versionIdOf(id, 9) },
+        entities,
+        todayISO()
+      )?.version.name
+    ).toBe('New Name')
+  })
+
   it('returns undefined for an id that names neither', () => {
     expect(
       resolveLocationValue(
@@ -380,5 +393,50 @@ describe('toLocationId', () => {
     expect(toLocationId(id)).toBe(id)
     expect(toLocationId(undefined)).toBeUndefined()
     expect(toLocationId(null)).toBeUndefined()
+  })
+})
+
+describe('findLocationOption', () => {
+  const id = '77777777-7777-4777-8777-777777777777'
+  const renamed = makeVersionedItem(id, ['Old Name', 'New Name'])
+  const options = buildHistoricalLocationNameOptions([renamed])
+
+  it('matches a pinned value on the version it pins', () => {
+    expect(findLocationOption(options, options[0].selection)?.label).toBe(
+      'Old Name'
+    )
+    expect(findLocationOption(options, options[1].selection)?.label).toBe(
+      'New Name'
+    )
+  })
+
+  it('matches a bare id on the location instead of the version', () => {
+    // Every row's value is a version id here, so without this fallback a
+    // declaration default value or a search link saved before historical names
+    // were listed would leave the selector empty while still filtering by it.
+    expect(findLocationOption(options, id)?.label).toBe('Old Name')
+  })
+
+  it('matches a bare id against rows that carry no pin', () => {
+    const currentNameOnly = [{ value: renamed.id, label: 'New Name' }]
+
+    expect(findLocationOption(currentNameOnly, id)?.label).toBe('New Name')
+  })
+
+  it('falls back to the location when the pinned version is gone', () => {
+    expect(
+      findLocationOption(options, {
+        locationId: renamed.id,
+        versionId: versionIdOf(id, 9)
+      })?.label
+    ).toBe('Old Name')
+  })
+
+  it('returns null for an absent value or an unknown id', () => {
+    expect(findLocationOption(options, undefined)).toBeNull()
+    expect(findLocationOption(options, null)).toBeNull()
+    expect(
+      findLocationOption(options, '88888888-8888-4888-8888-888888888888')
+    ).toBeNull()
   })
 })
