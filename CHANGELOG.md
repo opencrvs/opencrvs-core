@@ -52,6 +52,15 @@ The MOSIP integration used to be released from its own `opencrvs/mosip` reposito
 
 For the integration's own release history prior to this move, see [`packages/mosip-api/CHANGELOG.md`](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/mosip-api/CHANGELOG.md).
 
+#### Backup/restore host moved out of the SSH secret into a plain variable
+
+`BACKUP_HOST` / `PGBACKREST_REPO1_HOST` for the minio and postgres backup/restore charts used to be read from the `host` key of the backup-server SSH credentials secret. Since a hostname isn't sensitive, it's now read from `.Values.backup.host` / `.Values.restore.host` instead, populated from the `BACKUP_HOST` / `RESTORE_HOST` GitHub environment variables.
+
+- **Restore fails if `RESTORE_HOST` is not defined.** Environments that had restore configured before this change carried the host inside the SSH secret; on upgrade, if `RESTORE_HOST` isn't set the restore job has no host to connect to.
+- **Operators must run `yarn environment:init` for every environment that uses backup or restore (e.g. staging)** before deploying this change, so `BACKUP_HOST`/`RESTORE_HOST` get populated as GitHub environment variables.
+
+[#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
+
 ### Improvements
 
 - User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
@@ -118,6 +127,35 @@ Enable it on the countryconfig service with `TELEMETRY_ENABLED=true`, and identi
 - **New country configs** — `create-countryconfig` asks for your organisation, ISO alpha-3 country code, and whether to enable telemetry, then writes them as the env defaults.
 - **Existing country configs** — `opencrvs upgrade` wires telemetry into a v2.0 config (the `/trigger/telemetry` handler, its route, and the new env vars). It asks whether to enable it and, if so, requires your country code and organisation.
 - **Toolkit** — `@opencrvs/toolkit/telemetry` exposes `sendTelemetry(report)`, which owns the status service URL and payload schema so upgrades stay type-safe.
+
+#### Pre-flight validation for the data seed job
+
+The data seed job now validates the whole of the seed-data before it writes anything, and reports every problem it finds in one pass instead of stopping at the first bad record.
+
+Validated up front: duplicate email, mobile and username within the seed-data; every mobile number against the country config's configured phone pattern (a pattern that is not a usable expression is itself reported); every user's primary office against the location seed-data the job has already fetched, which is both earlier and more accurate than a database lookup; and the location hierarchy's parent-existence and location-to-administrative-area checks. The five checks that already existed and each aborted the run on its own — user and role schema parse failures, an unknown role, duplicate role ids, and the requirement that at least one initial user carry the `config.update-all` scope — are folded into the same report, so a typo'd role name and a duplicate email now read alike.
+
+Problems identify an initial user by its position in the seed-data and its username, and a validation failure always ends with `nothing was seeded`:
+
+```
+4 problems found; nothing was seeded.
+  initial user 44 (k.mweene): email "k.mweene@x.com" duplicates initial user 12 — emails must be unique
+```
+
+Duplicate usernames are a hard error rather than a rename. The service renumbers colliding usernames when it creates a user, which is right for self-service creation but wrong at seed time.
+
+Seed-data is held to a stricter shape, so mistakes surface here rather than part-way through a write. An initial user's username must satisfy the same rule the service applies when it creates one, and a username, password or name that is present but empty is a problem rather than something the database objects to later. A location version's `effectiveFrom` must be a plain date. Unrecognised keys on a location, a location version or an initial user are reported instead of being dropped in silence — a misspelled `verisons` previously cost a location its whole history without a word.
+
+Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing initial user and states that the database holds incomplete seed-data:
+
+```
+Seeding failed while creating initial users.
+
+  initial user 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
+
+The database now holds incomplete seed-data. Clear the database before you seed again.
+```
+
+Re-running after a partial failure requires clearing the data first. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 
 ### Bug fixes
 

@@ -10,26 +10,30 @@
  */
 import { env } from './environment'
 import fetch from 'node-fetch'
-import { seedLocations } from './locations'
-import superjson from 'superjson'
-import { seedUsers } from './users'
+import { readApplicationConfig } from './application-config'
+import {
+  LocationPayload,
+  toLocationPayload,
+  readLocations,
+  seedLocations
+} from './locations'
+import { readRoles } from './roles'
+import { UserPayload, readUsers, seedUsers, toUserPayloads } from './users'
 import { raise } from './utils'
-import { createTRPCClient, httpLink } from '@trpc/client'
-import { InitialisationRouter } from '@opencrvs/events/src/router'
-
-export const createInitialisationClient = (token: string) => {
-  return createTRPCClient<InitialisationRouter>({
-    links: [
-      httpLink({
-        url: new URL('events/initialisation/', env.GATEWAY_HOST).href,
-        transformer: superjson,
-        async headers() {
-          return { authorization: `Bearer ${token}` }
-        }
-      })
-    ]
-  })
-}
+import { createInitialisationClient } from './initialisation-client'
+import {
+  AFTER_WRITING_BEGAN,
+  PartialSeedError,
+  describeError,
+  formatSeedFailure,
+  formatUnwrittenFailure
+} from './seed-failure'
+import { SeedSources } from './seed-data'
+import { validateSeedData } from './validate-seed-data'
+import {
+  formatValidationReport,
+  formatValidationSummary
+} from './validation-report'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL(
@@ -56,6 +60,9 @@ async function getToken(): Promise<string> {
   return body.token
 }
 
+/** Runs after writing has begun, so it throws rather than calling `raise()`:
+ * `write()` below turns anything leaving it into a `PartialSeedError` carrying
+ * the clear-the-database remedy. */
 async function triggerSystemReady(token: string) {
   // eslint-disable-next-line no-console
   console.log('Triggering system ready')
@@ -64,35 +71,33 @@ async function triggerSystemReady(token: string) {
     env.COUNTRY_CONFIG_HOST
   ).toString()
 
-  try {
-    const res = await fetch(systemReadyUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    // 501, 404, and 2xx responses are acceptable
-    if (
-      res.status === 501 ||
-      res.status === 404 ||
-      (res.status >= 200 && res.status < 300)
-    ) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `System ready trigger responded with acceptable status: ${res.status} ${res.statusText}`
-      )
-      return
+  const res = await fetch(systemReadyUrl, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
     }
-
-    raise(
-      `System ready trigger failed with unexpected status: ${res.status}`,
-      res.status,
-      res.statusText
+  }).catch((error: unknown) => {
+    throw new Error(
+      `System ready trigger failed with error: ${describeError(error)}`
     )
-  } catch (err) {
-    raise(`System ready trigger failed with error: ${err}`)
+  })
+
+  // 501, 404, and 2xx responses are acceptable
+  if (
+    res.status === 501 ||
+    res.status === 404 ||
+    (res.status >= 200 && res.status < 300)
+  ) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `System ready trigger responded with acceptable status: ${res.status} ${res.statusText}`
+    )
+    return
   }
+
+  throw new Error(
+    `System ready trigger failed with unexpected status: ${res.status} ${res.statusText}`
+  )
 }
 
 async function deactivateSuperuser(token: string) {
@@ -100,19 +105,75 @@ async function deactivateSuperuser(token: string) {
   await client.complete.mutate()
 }
 
+/** Fetch all of the seed-data, validate all of it, and only then write any of
+ * it: validation precedes the first write — the hierarchy included — so that
+ * rejected seed-data leaves the database untouched.
+ */
 async function main() {
   const token = await getToken()
 
-  // eslint-disable-next-line no-console
-  console.log('Seeding locations')
-  await seedLocations(token)
+  const sources: SeedSources = {
+    users: await readUsers(token),
+    roles: await readRoles(token),
+    locations: await readLocations(),
+    applicationConfig: await readApplicationConfig()
+  }
+
+  const problems = validateSeedData(sources)
+
+  if (problems.length > 0) {
+    raise(formatValidationReport(problems))
+  }
 
   // eslint-disable-next-line no-console
-  console.log('Seeding users')
-  await seedUsers(token)
+  console.log(formatValidationSummary(sources))
 
-  await triggerSystemReady(token)
-  await deactivateSuperuser(token)
+  await write(
+    token,
+    toLocationPayload(sources.locations),
+    toUserPayloads(sources.users)
+  )
 }
 
-main()
+/** Every error leaving here is a `PartialSeedError`, which is
+ * what lets the handler below pick between the two failure
+ * reports without tracking state.
+ */
+async function write(
+  token: string,
+  locations: LocationPayload,
+  users: UserPayload[]
+) {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('Seeding locations')
+    await seedLocations(token, locations)
+
+    // eslint-disable-next-line no-console
+    console.log('Seeding users')
+    await seedUsers(token, users)
+
+    await triggerSystemReady(token)
+    await deactivateSuperuser(token)
+  } catch (error) {
+    // `seedUsers` knows which record failed, so its report stands.
+    throw error instanceof PartialSeedError
+      ? error
+      : new PartialSeedError(
+          formatSeedFailure({
+            headline: AFTER_WRITING_BEGAN,
+            reason: describeError(error)
+          })
+        )
+  }
+}
+
+/** A failure found rather than thrown before the first write never reaches
+ * here: the fetch and validation paths call `raise()` themselves. */
+main().catch((error: unknown) => {
+  raise(
+    error instanceof PartialSeedError
+      ? error.message
+      : formatUnwrittenFailure(describeError(error))
+  )
+})
