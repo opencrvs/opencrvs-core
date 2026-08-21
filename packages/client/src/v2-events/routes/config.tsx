@@ -121,9 +121,10 @@ function OfficeStatusWatcher({ officeId }: { officeId: string }) {
 
   if (office && !isSelectableAtAnchor(office.versions, todayISO())) {
     throwStructuredError({
-      message: intl.formatMessage(errorMessages.officeInactive),
+      title: intl.formatMessage(errorMessages.officeInactive),
+      message: intl.formatMessage(errorMessages.officeInactiveDescription),
       redirection: {
-        label: intl.formatMessage(buttonMessages.login),
+        label: intl.formatMessage(buttonMessages.backToLogin),
         path: buildLoginUrl(intl.locale)
       }
     })

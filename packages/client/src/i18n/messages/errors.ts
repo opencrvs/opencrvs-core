@@ -68,10 +68,13 @@ export const errorMessages = defineMessages({
     id: 'error.passwordSubmissionError'
   },
   officeInactive: {
-    defaultMessage:
-      'Your assigned office has been made inactive. Please contact your administrator to be reassigned',
-    description:
-      "Error message shown when a user's assigned office is inactive",
+    defaultMessage: 'Your assigned office has been made inactive',
+    description: "Title shown when a user's assigned office is inactive",
     id: 'error.officeInactive'
+  },
+  officeInactiveDescription: {
+    defaultMessage: 'Please contact your administrator to be reassigned',
+    description: "Description shown when a user's assigned office is inactive",
+    id: 'error.officeInactiveDescription'
   }
 })
