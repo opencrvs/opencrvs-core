@@ -38,6 +38,7 @@ metadata:
   name: gateway
 spec:
   replicas: {{ .Values.gateway.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "gateway" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: gateway
