@@ -223,7 +223,12 @@ export const buildFastify = async () => {
 
   app.register(formbody)
   app.register(cors, {
-    origin: [env.CLIENT_APP_URL],
+    /*
+     * A browser's `Origin` header is a bare origin, never trailing-slashed,
+     * while CLIENT_APP_URL is a URL and is conventionally written with the
+     * slash across this repository. Compare origins, not spellings.
+     */
+    origin: [env.CLIENT_APP_URL.replace(/\/$/, '')],
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
   })
@@ -306,13 +311,13 @@ async function run() {
 
   await app.ready()
   await app.listen({
-    port: env.PORT,
+    port: env.MOSIP_API_PORT,
     host: env.HOST,
     listenTextResolver: () =>
-      `OpenCRVS-MOSIP interoperability API running at http://${env.HOST}:${env.PORT}`
+      `OpenCRVS-MOSIP interoperability API running at http://${env.HOST}:${env.MOSIP_API_PORT}`
   })
   app.log.info(
-    `Swagger UI running at http://${env.HOST}:${env.PORT}/documentation`
+    `Swagger UI running at http://${env.HOST}:${env.MOSIP_API_PORT}/documentation`
   )
 
   const { topic } = await initWebSub()

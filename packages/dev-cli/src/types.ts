@@ -29,10 +29,17 @@
  * | clientStorybook | 6006 | packages/client/package.json `storybook`             |
  * | apiDocs         | 3003 | packages/api-docs/package.json `start`               |
  * | metabase        | 4444 | packages/testland/assets/metabase/run-dev.sh `MB_JETTY_PORT` |
+ * | mosipApi        | 2024 | packages/mosip-api/src/constants.ts `MOSIP_API_PORT`  |
+ * | mosipMock       | 20240 | packages/mosip-mock/src/constants.ts `MOSIP_MOCK_PORT` |
+ * | esignetMock     | 20260 | packages/esignet-mock/src/constants.ts `ESIGNET_MOCK_PORT` |
  *
  * `storybook`, `clientStorybook`, `apiDocs` and `metabase` are not part of the
  * `pnpm dev` sweep — they are launched by hand — but they are slot-shifted all
  * the same so two worktrees can each run one without a port collision.
+ *
+ * `mosipMock` and `esignetMock` are dev-only stand-ins for an external MOSIP
+ * stack. They *are* in the sweep, so they must be slot-shifted, but see
+ * `PORT_STRIDES`: their bases are too high for the default stride.
  *
  * Dependency ports (Postgres 5432, Elasticsearch 9200, Redis 6379, MinIO
  * 3535/3536) are deliberately absent: dependencies are a machine-wide
@@ -49,12 +56,36 @@ export const BASE_PORTS = {
   storybook: 6060,
   clientStorybook: 6006,
   apiDocs: 3003,
-  metabase: 4444
+  metabase: 4444,
+  mosipApi: 2024,
+  mosipMock: 20240,
+  esignetMock: 20260
 } as const
 
 export type ServiceName = keyof typeof BASE_PORTS
 
 export type ServicePorts = Record<ServiceName, number>
+
+/**
+ * Per-service overrides of the default `PORT_STRIDE`, for services whose base
+ * port is too high to survive it.
+ *
+ * The mocks sit at `20240` and `20260`. Shifting them by the default 10000 a
+ * slot would put slot 5 at `70240`, past the 16-bit port range, and capping the
+ * whole scheme at slot 4 to accommodate two dev-only mocks would cost every
+ * developer an environment. A 100-port stride keeps them in range for every
+ * slot and still gives each environment its own pair.
+ *
+ * Both blocks — `20240`-`20740` and `20260`-`20760` — sit in the gap between
+ * the default stride's slot-1 band (tops out at `19050`) and its slot-2 band
+ * (starts at `23003`), so they cannot collide with anything else at any slot.
+ * `portsForSlot` is exhaustively checked against that claim in
+ * `resolver.test.ts`; nothing here relies on it holding by inspection.
+ */
+export const PORT_STRIDES = {
+  mosipMock: 100,
+  esignetMock: 100
+} as const satisfies Partial<Record<ServiceName, number>>
 
 /**
  * Peer addresses each service uses to reach the others. Slot 0 reproduces the
@@ -70,6 +101,9 @@ export interface ServiceUrls {
   countryConfigInternal: string
   events: string
   documents: string
+  mosipApi: string
+  mosipMock: string
+  esignetMock: string
 }
 
 /** One environment as recorded in the machine-level registry. */
@@ -109,6 +143,13 @@ export interface EnvironmentDescriptor {
   esReindexingStatusIndex: string
   /** MinIO bucket for uploaded documents. */
   bucket: string
+  /**
+   * SQLite file `packages/mosip-api` keeps its record-only tokens in, relative
+   * to the worktree root. The one piece of an environment's data that lives in
+   * the checkout rather than in a shared datastore, so it is destroyed with the
+   * worktree and not by `env:destroy`.
+   */
+  mosipDatabaseFile: string
   /** Redis logical DB index; always equal to `slot`. */
   redisDb: number
   ports: ServicePorts
