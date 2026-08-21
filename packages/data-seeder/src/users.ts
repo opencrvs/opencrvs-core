@@ -8,98 +8,205 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
-import { raise } from './utils'
+import { getOfficeExternalId, raise } from './utils'
 
+import { CreateUserInputInternal } from '@opencrvs/commons'
+import { createInitialisationClient } from './initialisation-client'
+import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import {
-  decodeScope,
-  EventConfig,
-  hasScope,
-  joinUrl,
-  parseConfigurableScope,
-  EncodedScope,
-  CreateUserInputInternal
-} from '@opencrvs/commons'
-import { fromZodError } from 'zod-validation-error'
-import { createInitialisationClient } from './index'
+  CREATING_INITIAL_USERS,
+  PartialSeedError,
+  describeInitialUserFailure,
+  formatSeedFailure,
+  formatUnwrittenFailure
+} from './seed-failure'
+import { InitialUserRef } from './seed-report'
+import { Read, validatedContents } from './read'
 
-const RoleSchema = (eventIds: string[]) =>
-  z.array(
-    z.object({
-      id: z.string(),
-      label: z.object({
-        defaultMessage: z.string(),
-        description: z.string(),
-        id: z.string()
-      }),
-      scopes: z.array(
-        EncodedScope.superRefine((scope, ctx) => {
-          const parsedConfigurableScope = parseConfigurableScope(scope)
-          const parsedV2Scopes = decodeScope(scope)
-
-          if (!parsedConfigurableScope && !parsedV2Scopes) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Invalid scope: "${scope}"`
-            })
-            return
-          }
-
-          if (parsedV2Scopes?.type) {
-            if (!('options' in parsedV2Scopes)) {
-              return
-            }
-
-            const options = parsedV2Scopes.options
-
-            if (options && 'event' in options && Array.isArray(options.event)) {
-              const invalidEventIds = options.event.filter(
-                (id) => !eventIds.includes(id)
-              )
-
-              if (invalidEventIds.length > 0) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-                })
-              }
-            }
-          }
-        })
-      )
-    })
-  )
-
-const WithoutContact = z.object({
-  primaryOfficeId: z.string(),
-  givenNames: z.string(),
-  familyName: z.string(),
-  role: z.string(),
-  username: z.string(),
-  password: z.string()
-})
-
-const UserSchema = z.array(
-  WithoutContact.extend({
-    mobile: z.string(),
-    email: z.string().email().optional()
+const UserRecordSchema = z
+  .strictObject({
+    primaryOfficeId: z.string().min(1),
+    givenNames: z.string().min(1),
+    familyName: z.string().min(1),
+    role: z.string().min(1),
+    username: CreateUserInputInternal.shape.username,
+    password: z.string().min(1),
+    mobile: z.string().optional(),
+    email: CreateUserInputInternal.shape.email
   })
-    .or(
-      WithoutContact.extend({
-        email: z.string().email(),
-        mobile: z.string().optional()
-      })
-    )
-    .transform(({ familyName, givenNames, ...user }) => ({
-      ...user,
-      firstname: givenNames,
-      surname: familyName
-    }))
-)
+  .refine((user) => Boolean(user.mobile) || Boolean(user.email), {
+    message: 'must provide at least one of email or mobile',
+    path: []
+  })
+  .transform(({ familyName, givenNames, ...user }) => ({
+    ...user,
+    firstname: givenNames,
+    surname: familyName
+  }))
 
-async function getUsers(token: string) {
+/** What the write path sends for one initial user. Carries the password. */
+export type UserPayload = z.output<typeof UserRecordSchema>
+
+/**
+ * One initial user that parsed. `position` travels with it because a problem
+ * another module finds still has to name it, and a report names an initial
+ * user by where it sits in the seed-data.
+ */
+export interface ParsedUser {
+  position: number
+  username: string
+  email?: string
+  mobile?: string
+  /** A compound reference, not the office's own id. */
+  primaryOfficeId: string
+  role: string
+  payload: UserPayload
+}
+
+/**
+ * What a check sees: an initial user without its payload, so no check can put
+ * a password in a report. A `ParsedUser[]` satisfies this, so the narrowing
+ * costs the caller nothing.
+ */
+export type CheckedUser = Omit<ParsedUser, 'payload'>
+
+const UNIQUE_USER_FIELDS = ['email', 'mobile', 'username'] as const
+
+export type UniqueUserField = (typeof UNIQUE_USER_FIELDS)[number]
+
+export type UserProblem =
+  | { kind: 'userListUnparsed'; message: string }
+  | { kind: 'userUnparsed'; user: InitialUserRef; message: string }
+  | {
+      kind: 'duplicateUserField'
+      user: InitialUserRef
+      field: UniqueUserField
+      value: string
+      /** The position of the initial user that claimed the value first. */
+      firstSeenAt: number
+    }
+
+export type UserRead = Read<{ users: ParsedUser[] }, UserProblem>
+
+/** How a report names one initial user. Positions are 1-based. */
+export function identifyUser({
+  position,
+  username
+}: CheckedUser): InitialUserRef {
+  return { position, username }
+}
+
+/** Named one by one rather than spread, so that renaming a field on the schema
+ * without telling the checks is a compile error rather than a check that
+ * silently stops finding anything. Also keeps the password out of the entity's
+ * checked half. */
+function toParsed(user: UserPayload, position: number): ParsedUser {
+  return {
+    position,
+    username: user.username,
+    email: user.email,
+    mobile: user.mobile,
+    primaryOfficeId: user.primaryOfficeId,
+    role: user.role,
+    payload: user
+  }
+}
+
+/** `normalise` mirrors how the write path compares the field, so both agree on
+ * what a duplicate is: emails and usernames are lowercased on write, mobile
+ * numbers are stored verbatim. */
+const NORMALISE: Record<UniqueUserField, (value: string) => string> = {
+  email: (value) => value.toLowerCase(),
+  mobile: (value) => value,
+  username: (value) => value.toLowerCase()
+}
+
+function duplicatesOf(
+  users: CheckedUser[],
+  field: UniqueUserField
+): UserProblem[] {
+  const problems: UserProblem[] = []
+  const firstSeenAt = new Map<string, number>()
+  const normalise = NORMALISE[field]
+
+  for (const user of users) {
+    const value = user[field]
+
+    if (value === undefined) {
+      continue
+    }
+
+    const key = normalise(value)
+    const original = firstSeenAt.get(key)
+
+    if (original === undefined) {
+      firstSeenAt.set(key, user.position)
+      continue
+    }
+
+    problems.push({
+      kind: 'duplicateUserField',
+      user: identifyUser(user),
+      field,
+      value,
+      firstSeenAt: original
+    })
+  }
+
+  return problems
+}
+
+/** Field by field rather than user by user, so that one initial user with
+ * three duplicated fields reads as three problems. */
+function duplicateUserFields(users: CheckedUser[]): UserProblem[] {
+  return UNIQUE_USER_FIELDS.flatMap((field) => duplicatesOf(users, field))
+}
+
+export function parseUsers(document: unknown): UserRead {
+  const list = ListSchema.safeParse(document)
+
+  if (!list.success) {
+    return {
+      readable: false,
+      problem: {
+        kind: 'userListUnparsed',
+        message: describeParseFailure(list.error)
+      }
+    }
+  }
+
+  const users: ParsedUser[] = []
+  const problems: UserProblem[] = []
+
+  list.data.forEach((record, index) => {
+    const position = index + 1
+    const parsed = UserRecordSchema.safeParse(record)
+
+    if (parsed.success) {
+      users.push(toParsed(parsed.data, position))
+      return
+    }
+
+    problems.push({
+      kind: 'userUnparsed',
+      // Nothing else about an entry that did not parse can be trusted.
+      user: { position, username: readString(record, 'username') },
+      message: describeParseFailure(parsed.error)
+    })
+  })
+
+  return {
+    readable: true,
+    users,
+    problems: [...problems, ...duplicateUserFields(users)]
+  }
+}
+
+export async function readUsers(token: string): Promise<UserRead> {
   const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
@@ -110,88 +217,23 @@ async function getUsers(token: string) {
   })
 
   if (!res.ok) {
-    raise(`Expected to get the users from ${url}`)
+    raise(formatUnwrittenFailure(`Expected to get the users from ${url}`))
   }
 
-  const parsedUsers = UserSchema.safeParse(await res.json())
+  return parseUsers(await res.json())
+}
 
-  if (!parsedUsers.success) {
-    raise(
-      fromZodError(parsedUsers.error, {
-        prefix: `Error validating users metadata returned from ${url}`
-      })
-    )
-  }
+/** The initial users a check may read. Empty where the list did not parse,
+ * which stands every check that reads them down. */
+export function getParsedUsers(read: UserRead): CheckedUser[] {
+  return read.readable ? read.users : []
+}
 
-  const userRoles = parsedUsers.data.map((user) => user.role)
-
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
-
-  const [rolesResponse, eventsResponse] = await Promise.all([
-    fetch(rolesUrl),
-    fetch(eventsUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-  ])
-
-  if (!rolesResponse.ok) {
-    raise(`Error fetching roles: ${rolesResponse.status}`)
-  }
-
-  if (!eventsResponse.ok) {
-    raise(`Error fetching events: ${eventsResponse.status}`)
-  }
-
-  const eventsConfig = (await eventsResponse.json()) as EventConfig[]
-  const eventIds = eventsConfig.map((event) => event.id)
-  const rolesRes = await rolesResponse.json()
-  const parsedRoles = RoleSchema(eventIds).safeParse(rolesRes)
-
-  if (!parsedRoles.success) {
-    raise(
-      `Validation failed for roles returned from ${rolesUrl}:\n${parsedRoles.error.toString()}`
-    )
-  }
-
-  const allRoles = parsedRoles.data
-  let isConfigUpdateAllScopeAvailable = false
-
-  for (const userRole of userRoles) {
-    const currRole = allRoles.find((role) => role.id === userRole)
-    if (!currRole) {
-      raise(`Role with id ${userRole} is not found in roles.ts file`)
-    }
-
-    if (hasScope(currRole.scopes, 'config.update-all')) {
-      isConfigUpdateAllScopeAvailable = true
-    }
-  }
-
-  const seen = new Set<string>()
-  const duplicates: string[] = []
-
-  for (const role of allRoles) {
-    if (seen.has(role.id)) {
-      duplicates.push(role.id)
-    } else {
-      seen.add(role.id)
-    }
-  }
-
-  if (duplicates.length > 0) {
-    raise(`Duplicate role ids found: ${duplicates.join(', ')}`)
-  }
-
-  if (!isConfigUpdateAllScopeAvailable) {
-    raise(
-      `At least one user with 'type=config.update-all' scope must be created`
-    )
-  }
-  return parsedUsers.data
+/** The payloads to write, which only exist once validation has passed. */
+export function toUserPayloads(read: UserRead): UserPayload[] {
+  return validatedContents(read, 'The initial users').users.map(
+    ({ payload }) => payload
+  )
 }
 
 async function userAlreadyExists(
@@ -215,10 +257,11 @@ async function createUser(token: string, userPayload: CreateUserInputInternal) {
   return client.users.create.mutate(userPayload)
 }
 
-export async function seedUsers(token: string) {
-  const rawUsers = await getUsers(token)
-
-  for (const userMetadata of rawUsers) {
+/** Validation has already passed, so a failure here lands with earlier users
+ * in the database. Each entry is attempted inside a handler because this is
+ * the one place that knows which initial user it is. */
+export async function seedUsers(token: string, users: UserPayload[]) {
+  for (const [index, userMetadata] of users.entries()) {
     const {
       firstname,
       surname,
@@ -227,33 +270,55 @@ export async function seedUsers(token: string) {
       ...user
     } = userMetadata
 
-    if (await userAlreadyExists(token, username)) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `User with the username "${username}" already exists. Skipping user "${username}"`
+    try {
+      if (await userAlreadyExists(token, username)) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `User with the username "${username}" already exists. Skipping user "${username}"`
+        )
+        continue
+      }
+
+      const externalId = getOfficeExternalId(officeIdentifier)
+
+      const client = createInitialisationClient(token)
+
+      const [primaryOffice] = await client.locations.list.query({
+        externalId
+      })
+
+      if (!primaryOffice) {
+        // Validation proved this office is declared, so a miss here is a bug
+        // in the seeder, not something an operator can act on.
+        throw new Error(
+          `Office "${externalId}" passed validation but is not in the database`
+        )
+      }
+
+      const userPayload = {
+        ...user,
+        name: {
+          firstname,
+          surname
+        },
+        ...(env.ACTIVATE_USERS && { status: 'active' as const }),
+        primaryOfficeId: primaryOffice.id,
+        username
+      }
+
+      await createUser(token, userPayload)
+    } catch (error) {
+      throw new PartialSeedError(
+        formatSeedFailure({
+          headline: CREATING_INITIAL_USERS,
+          subject: {
+            about: 'initialUser',
+            // 1-based, matching how a problem identifies an initial user.
+            user: { position: index + 1, username }
+          },
+          reason: describeInitialUserFailure(error, user)
+        })
       )
-      continue
     }
-
-    const externalId = officeIdentifier.split('_').at(-1)
-
-    const client = createInitialisationClient(token)
-
-    const [primaryOffice] = await client.locations.list.query({
-      externalId
-    })
-
-    const userPayload = {
-      ...user,
-      name: {
-        firstname,
-        surname
-      },
-      ...(env.ACTIVATE_USERS && { status: 'active' as const }),
-      primaryOfficeId: primaryOffice.id,
-      username
-    }
-
-    await createUser(token, userPayload)
   }
 }

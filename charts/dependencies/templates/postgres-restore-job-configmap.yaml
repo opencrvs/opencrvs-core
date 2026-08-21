@@ -28,7 +28,7 @@ data:
             for utility in pgbackrest ssh; do
               command -v "$utility" >/dev/null 2>&1 || missing="$missing $utility"
             done
-            if [ -n "$missing" ] && { ! apt update || ! apt install -y pgbackrest openssh-client; }; then
+            if [ -n "$missing" ] && { ! apt update || ! apt install -y pgbackrest={{ .Values.postgres.pgbackrest_version }}* openssh-client; }; then
               echo "[ERROR] Missing utilities:$missing" >&2
               echo "[ERROR] Automatic installation failed. Ensure the container can access its package repositories, or include the required packages in the base image for air-gapped deployments." >&2
               exit 1
@@ -63,10 +63,7 @@ data:
                 name: {{ default .Values.postgres.restore.server_secret .Values.restore.backup_server_secret }}
                 key: user
           - name: PGBACKREST_REPO1_HOST
-            valueFrom:
-              secretKeyRef:
-                name: {{ default .Values.postgres.restore.server_secret .Values.restore.backup_server_secret }}
-                key: host
+            value: {{ default .Values.restore.host .Values.postgres.restore.host }}
           - name: PGBACKREST_REPO1_TYPE
             value: posix
           - name: PGBACKREST_REPO1_CIPHER_TYPE
