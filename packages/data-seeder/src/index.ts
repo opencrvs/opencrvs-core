@@ -135,9 +135,9 @@ async function main() {
   )
 }
 
-/** Everything that writes, and nothing that does not. Every error leaving here
- * is a `PartialSeedError`, which is what lets the handler below pick between
- * the two failure reports without tracking state.
+/** Every error leaving here is a `PartialSeedError`, which is
+ * what lets the handler below pick between the two failure
+ * reports without tracking state.
  */
 async function write(
   token: string,

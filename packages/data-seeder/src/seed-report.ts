@@ -9,16 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/**
- * How a report names one initial user: by its position in the seed-data, and
- * by its username when it has one.
- *
- * `position` is 1-based and is deliberately not a line number — seed-data
- * arrives as parsed objects over HTTP with no row provenance, and the job
- * cannot know the country config serves users from a file at all. Not called a
- * record either: in this domain a record is a submitted vital-event record,
- * which this is not.
- */
 export interface InitialUserRef {
   position: number
   /** Absent when the entry did not parse; it may be missing anything. */

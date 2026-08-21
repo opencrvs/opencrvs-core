@@ -11,7 +11,7 @@
 import { hasScope } from '@opencrvs/commons'
 import { getPhoneNumberPattern } from './application-config'
 import { getDeclaredOffices } from './locations'
-import { getOfficeExternalId } from './office-external-id'
+import { getOfficeExternalId } from './utils'
 import { problemsOf } from './read'
 import { DeclaredRole, getDeclaredRoles } from './roles'
 import { CrossCuttingProblem, SeedProblem, SeedSources } from './seed-data'

@@ -8,23 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * Two kinds of assertion here, and the difference is deliberate.
- *
- * The invariant — which of the two closing sentences an operator gets — is
- * asserted by phase, over every renderer of both phases. Confusing the two
- * sends an operator either to destroy a clean database or to re-run against a
- * dirty one, so it is checked in both directions and does not depend on any
- * other wording.
- *
- * The prose is held in snapshots. They are goldens: they exist so a change to
- * what an operator reads shows up in review as a diff, not so that any
- * particular sentence is load-bearing. Update them freely.
- *
- * The seed loop itself is not tested here, by an explicit decision recorded in
- * the plan: there are no mocked-transport tests of the job's orchestration.
- */
 import { describe, expect, it } from 'vitest'
 import {
   AFTER_WRITING_BEGAN,

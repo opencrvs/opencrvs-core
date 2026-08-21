@@ -9,21 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/**
- * Everything about the country config's initial users: reading them off the
- * wire as `unknown`, the problems that need nothing but the users themselves
- * to find, and writing them. Problems that need another part of the seed-data
- * to answer are found in `validate-seed-data.ts`, and every problem here is
- * reported as data — how it reads is `validation-report.ts`'s to decide.
- */
 import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
-import { raise } from './utils'
+import { getOfficeExternalId, raise } from './utils'
 
 import { CreateUserInputInternal } from '@opencrvs/commons'
 import { createInitialisationClient } from './initialisation-client'
-import { getOfficeExternalId } from './office-external-id'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import {
   CREATING_INITIAL_USERS,
@@ -35,9 +27,6 @@ import {
 import { InitialUserRef } from './seed-report'
 import { Read, validatedContents } from './read'
 
-/** `username` and `email` are the server's own rules, so seed-data that would
- * be rejected on write is rejected here instead. The rest are the country
- * config's to define, and only have to be present. */
 const UserRecordSchema = z
   .strictObject({
     primaryOfficeId: z.string().min(1),
@@ -85,7 +74,7 @@ export interface ParsedUser {
  */
 export type CheckedUser = Omit<ParsedUser, 'payload'>
 
-export const UNIQUE_USER_FIELDS = ['email', 'mobile', 'username'] as const
+const UNIQUE_USER_FIELDS = ['email', 'mobile', 'username'] as const
 
 export type UniqueUserField = (typeof UNIQUE_USER_FIELDS)[number]
 

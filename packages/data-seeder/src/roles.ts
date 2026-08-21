@@ -8,14 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * Everything about the country config's roles: reading them off the wire as
- * `unknown`, and the problems that need nothing but the roles themselves to
- * find. Nothing here writes — the seeder reads roles so that it can tell
- * whether the initial users are seedable, and the country config keeps serving
- * them afterwards.
- */
 import {
   decodeScope,
   EncodedScope,
@@ -80,7 +72,7 @@ export interface ParsedRole {
 
 /** How a report names one role: by its id where it has a readable one, and by
  * its position otherwise. */
-export interface RoleRef {
+interface RoleRef {
   position: number
   id?: string
 }

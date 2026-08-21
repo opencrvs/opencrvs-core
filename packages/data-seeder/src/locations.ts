@@ -59,7 +59,7 @@ export interface ParsedPlace {
  * and only areas are ever parents. */
 export type PlaceKind = 'administrativeArea' | 'location'
 
-export interface PlaceRef {
+interface PlaceRef {
   place: PlaceKind
   id: string
   name: string

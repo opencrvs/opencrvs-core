@@ -15,8 +15,6 @@ import { fromZodError } from 'zod-validation-error'
  * element does not take the whole document down with it. */
 export const ListSchema = z.array(z.unknown())
 
-/** As text, not as the error: a `ZodError` reaching `console.error` prints as
- * a stack trace, where the report needs one line. */
 export function describeParseFailure(error: z.ZodError): string {
   return fromZodError(error, { prefix: null }).message
 }
