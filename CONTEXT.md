@@ -49,10 +49,13 @@ An isolated run of OpenCRVS on a developer machine — its own set of host node 
 _Avoid_: instance; stack, or an environment's stack, as a name for one of these. "Stack" stays correct for a set of services generically ("the dev stack", "start the stack") — it is wrong only when it stands in for one environment.
 
 **Name**:
-The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket.
+The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket, mosip-api SQLite file.
 
 **Slot**:
-A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * 10000`) and the Redis logical DB index. Slot 0 is the primary worktree and matches historical single-environment ports.
+A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * stride`) and the Redis logical DB index. Slot 0 is the primary worktree and matches historical single-environment ports.
+
+**Stride**:
+The port distance between two adjacent slots: `10000` for every service except the MOSIP mocks, whose bases are too high to survive it and which use `100` instead. See `PORT_STRIDES` in `packages/dev-cli/src/types.ts`.
 
 **Primary worktree**:
 The main (non-linked) git checkout. Always maps to slot 0, preserving the original `pnpm dev` behaviour and data.

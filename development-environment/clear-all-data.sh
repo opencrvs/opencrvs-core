@@ -14,8 +14,8 @@ print_usage_and_exit () {
     echo 'Usage: pnpm db:clear:all [--env <name>]'
     echo
     echo "Clears the data of ONE OpenCRVS environment: its Postgres database,"
-    echo "its Elasticsearch indices, and its MinIO bucket. Every other"
-    echo "environment on this machine is left untouched."
+    echo "its Elasticsearch indices, its MinIO bucket and its mosip-api token"
+    echo "store. Every other environment on this machine is left untouched."
     echo
     echo "With no --env, the environment is the one this git worktree owns —"
     echo "in an ordinary checkout that is the default 'events' / 'ocrvs' data."
@@ -101,6 +101,20 @@ if docker inspect "$MINIO_CONTAINER" >/dev/null 2>&1; then
   echo "**** Removed minio data from bucket $MINIO_BUCKET ****"
 else
   echo "MinIO container $MINIO_CONTAINER is not running; skipped its bucket."
+fi
+
+##########################################
+# Clear the mosip-api SQLite token store #
+##########################################
+
+# The one piece of this environment's data that lives in the checkout rather
+# than in a shared datastore: `packages/mosip-api` keeps a record-only token per
+# MOSIP transaction here. `SQLITE_DATABASE_PATH` is per-environment (see
+# packages/dev-cli/src/env-contract.ts), so this removes only ours. mosip-api
+# recreates the file and its schema on next start.
+if [ -n "${SQLITE_DATABASE_PATH:-}" ] && [ -f "$SQLITE_DATABASE_PATH" ]; then
+  rm -f "$SQLITE_DATABASE_PATH"
+  echo "**** Removed the mosip-api token store $SQLITE_DATABASE_PATH ****"
 fi
 
 ####################

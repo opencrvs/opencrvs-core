@@ -52,6 +52,11 @@ describe('toEnvironmentVariables', () => {
       CLIENT_STORYBOOK_PORT: '6006',
       API_DOCS_PORT: '3003',
       METABASE_PORT: '4444',
+      MOSIP_API_PORT: '2024',
+      MOSIP_MOCK_PORT: '20240',
+      ESIGNET_MOCK_PORT: '20260',
+
+      SQLITE_DATABASE_PATH: '/home/dev/opencrvs-core/data/sqlite/mosip-api.db',
 
       CLIENT_APP_URL: 'http://localhost:3000/',
       LOGIN_URL: 'http://localhost:3020/',
@@ -60,7 +65,29 @@ describe('toEnvironmentVariables', () => {
       EVENTS_URL: 'http://localhost:5555/',
       COUNTRY_CONFIG_URL: 'http://localhost:3040',
       COUNTRY_CONFIG_URL_INTERNAL: 'http://localhost:3040/',
-      DOCUMENTS_URL: 'http://localhost:9050'
+      DOCUMENTS_URL: 'http://localhost:9050',
+
+      OPENCRVS_GATEWAY_URL: 'http://localhost:7070',
+      OPENCRVS_AUTH_URL: 'http://localhost:4040',
+      MOSIP_WEBSUB_CALLBACK_URL: 'http://localhost:2024/websub/callback',
+      MOSIP_API_USERINFO_URL:
+        'http://localhost:2024/esignet/get-oidp-user-info',
+      MOSIP_INTEROP_URL: 'http://localhost:2024',
+      ISSUER_URL: 'http://localhost:20240',
+      MOSIP_AUTH_URL:
+        'http://localhost:20240/v1/authmanager/authenticate/clientidsecretkey',
+      MOSIP_WEBSUB_HUB_URL: 'http://localhost:20240/websub/hub',
+      MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST:
+        'http://localhost:20240/.well-known/public-key.json',
+      IDA_AUTH_DOMAIN_URI: 'http://localhost:20240',
+      IDA_AUTH_URL: 'http://localhost:20240/idauthentication/v1/auth',
+      MOSIP_CREATE_PACKET_URL:
+        'http://localhost:20240/commons/v1/packetmanager/createPacket',
+      MOSIP_PROCESS_PACKET_URL:
+        'http://localhost:20240/registrationprocessor/v1/workflowmanager/workflowinstance',
+      ESIGNET_USERINFO_URL: 'http://localhost:20260/oidc/userinfo',
+      ESIGNET_TOKEN_URL: 'http://localhost:20260/oauth/token',
+      ESIGNET_REDIRECT_URL: 'http://localhost:20260/authorize'
     })
   })
 
@@ -109,6 +136,76 @@ describe('toEnvironmentVariables', () => {
     expect(vars.CLIENT_STORYBOOK_PORT).toBe('16006')
     expect(vars.API_DOCS_PORT).toBe('13003')
     expect(vars.METABASE_PORT).toBe('14444')
+  })
+
+  describe('the MOSIP integration', () => {
+    const featureA = resolveEnvironment({
+      name: 'feature-a',
+      worktreePath: '/home/dev/wt/feature-a',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry: {
+        opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }
+      }
+    })
+
+    it('gives each of the three MOSIP services its own port, named so none of them binds the gateway', () => {
+      const vars = toEnvironmentVariables(featureA)
+
+      expect(vars.MOSIP_API_PORT).toBe('12024')
+      // The mocks ride the 100-port stride, not the default 10000.
+      expect(vars.MOSIP_MOCK_PORT).toBe('20340')
+      expect(vars.ESIGNET_MOCK_PORT).toBe('20360')
+
+      for (const key of [
+        'MOSIP_API_PORT',
+        'MOSIP_MOCK_PORT',
+        'ESIGNET_MOCK_PORT'
+      ]) {
+        expect(vars[key]).not.toBe(vars.PORT)
+      }
+    })
+
+    it('points every composed MOSIP endpoint at this environment, path intact', () => {
+      const vars = toEnvironmentVariables(featureA)
+
+      expect(vars.MOSIP_WEBSUB_CALLBACK_URL).toBe(
+        'http://localhost:12024/websub/callback'
+      )
+      expect(vars.MOSIP_INTEROP_URL).toBe('http://localhost:12024')
+      expect(vars.MOSIP_AUTH_URL).toBe(
+        'http://localhost:20340/v1/authmanager/authenticate/clientidsecretkey'
+      )
+      expect(vars.ISSUER_URL).toBe('http://localhost:20340')
+      expect(vars.ESIGNET_TOKEN_URL).toBe('http://localhost:20360/oauth/token')
+      expect(vars.ESIGNET_REDIRECT_URL).toBe('http://localhost:20360/authorize')
+    })
+
+    it('hands mosip-api and mosip-mock one and the same callback URL', () => {
+      // Read by both ends; two spellings would silently split the pair.
+      expect(toEnvironmentVariables(featureA).MOSIP_WEBSUB_CALLBACK_URL).toBe(
+        'http://localhost:12024/websub/callback'
+      )
+    })
+
+    it('addresses core under the names mosip-api reads for it', () => {
+      const vars = toEnvironmentVariables(featureA)
+
+      expect(vars.OPENCRVS_GATEWAY_URL).toBe(vars.GATEWAY_URL)
+      expect(vars.OPENCRVS_AUTH_URL).toBe(vars.AUTH_URL)
+    })
+
+    it('gives the SQLite token store an absolute, per-environment path', () => {
+      const vars = toEnvironmentVariables(featureA)
+
+      // Absolute because lerna runs each start script from its own package dir.
+      expect(vars.SQLITE_DATABASE_PATH).toBe(
+        '/home/dev/wt/feature-a/data/sqlite/mosip-api-feature_a.db'
+      )
+      expect(vars.SQLITE_DATABASE_PATH).not.toBe(
+        toEnvironmentVariables(primary).SQLITE_DATABASE_PATH
+      )
+    })
   })
 
   describe('EVENTS_MIGRATOR_URL', () => {

@@ -9,15 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { describe, expect, it } from 'vitest'
-import { RegistrySnapshot } from './types'
+import { RegistrySnapshot, ServiceName } from './types'
 import {
+  BASE_PORTS,
   LEGACY_BUCKET,
   LEGACY_DB_NAME,
   LEGACY_ES_PREFIX,
   LEGACY_ES_REINDEXING_STATUS_INDEX,
+  LEGACY_MOSIP_DATABASE_FILE,
   MAX_SLOT,
   PORT_STRIDE,
   SlotAllocationError,
+  portsForSlot,
+  strideFor,
   bucketNameForEnvironment,
   deriveEnvironmentName,
   hasExplicitName,
@@ -42,6 +46,9 @@ const AT = '2026-01-01T00:00:00.000Z'
  * - clientStorybook 6006   packages/client/package.json (`storybook`)
  * - apiDocs 3003           packages/api-docs/package.json (`start`)
  * - metabase 4444          packages/testland/assets/metabase/run-dev.sh
+ * - mosipApi 2024          packages/mosip-api/src/constants.ts
+ * - mosipMock 20240        packages/mosip-mock/src/constants.ts
+ * - esignetMock 20260      packages/esignet-mock/src/constants.ts
  */
 const TODAYS_PORTS = {
   client: 3000,
@@ -54,7 +61,10 @@ const TODAYS_PORTS = {
   storybook: 6060,
   clientStorybook: 6006,
   apiDocs: 3003,
-  metabase: 4444
+  metabase: 4444,
+  mosipApi: 2024,
+  mosipMock: 20240,
+  esignetMock: 20260
 }
 
 function entry(slot: number, worktreePath: string) {
@@ -174,13 +184,18 @@ describe('resolveEnvironment: linked worktrees', () => {
       storybook: 16060,
       clientStorybook: 16006,
       apiDocs: 13003,
-      metabase: 14444
+      metabase: 14444,
+      mosipApi: 12024,
+      // The MOSIP mocks ride a 100-port stride; their bases are too high for
+      // the default one to survive to slot 5. See PORT_STRIDES.
+      mosipMock: 20340,
+      esignetMock: 20360
     })
 
     for (const [service, port] of Object.entries(descriptor.ports)) {
       expect(port).toBe(
         TODAYS_PORTS[service as keyof typeof TODAYS_PORTS] +
-          descriptor.slot * PORT_STRIDE
+          descriptor.slot * strideFor(service as ServiceName)
       )
     }
   })
@@ -474,7 +489,10 @@ describe('resolveEnvironment: derived identifiers', () => {
       countryConfig: 'http://localhost:13040',
       countryConfigInternal: 'http://localhost:13040/',
       events: 'http://localhost:15555/',
-      documents: 'http://localhost:19050'
+      documents: 'http://localhost:19050',
+      mosipApi: 'http://localhost:12024',
+      mosipMock: 'http://localhost:20340',
+      esignetMock: 'http://localhost:20360'
     })
   })
 })
@@ -522,6 +540,113 @@ describe('resolveEnvironment: slot ceiling', () => {
     })
 
     expect(descriptor.slot).toBe(3)
+  })
+})
+
+/**
+ * The port map's safety properties, checked exhaustively rather than argued
+ * for in a comment.
+ *
+ * These matter across slots, not within one: every allocatable slot may be
+ * running at the same moment on one machine, so a port belonging to slot 1
+ * colliding with a port belonging to slot 4 is exactly as broken as two
+ * services colliding inside one slot. The check is therefore over every
+ * (service, slot) pair at once.
+ */
+describe('portsForSlot: the whole allocatable port map', () => {
+  const services = Object.keys(BASE_PORTS) as ServiceName[]
+
+  const everyAllocation = () => {
+    const allocations: Array<{
+      service: ServiceName
+      slot: number
+      port: number
+    }> = []
+
+    for (let slot = 0; slot <= MAX_SLOT; slot++) {
+      const ports = portsForSlot(slot)
+      for (const service of services) {
+        allocations.push({ service, slot, port: ports[service] })
+      }
+    }
+
+    return allocations
+  }
+
+  it('reproduces every base port exactly at slot 0', () => {
+    expect(portsForSlot(0)).toEqual(BASE_PORTS)
+  })
+
+  it('never allocates the same port twice, at any pair of slots', () => {
+    const seen = new Map<number, string>()
+    const collisions: string[] = []
+
+    for (const { service, slot, port } of everyAllocation()) {
+      const owner = `${service}@${slot}`
+      const previous = seen.get(port)
+
+      if (previous !== undefined) {
+        collisions.push(`${port}: ${previous} and ${owner}`)
+      } else {
+        seen.set(port, owner)
+      }
+    }
+
+    expect(collisions).toEqual([])
+  })
+
+  it('stays inside the 16-bit port range for every allocatable slot', () => {
+    const overflowing = everyAllocation()
+      .filter(({ port }) => port > 65535)
+      .map(({ service, slot, port }) => `${service}@${slot} = ${port}`)
+
+    expect(overflowing).toEqual([])
+  })
+
+  it('never lands on a port the shared dependency singleton owns', () => {
+    // Postgres, Elasticsearch, Redis, MinIO and its console. Fixed, never
+    // slot-shifted, because the dependencies are machine-wide (ADR-0003).
+    const dependencyPorts = [5432, 9200, 6379, 3535, 3536]
+
+    const clashes = everyAllocation()
+      .filter(({ port }) => dependencyPorts.includes(port))
+      .map(({ service, slot, port }) => `${service}@${slot} = ${port}`)
+
+    expect(clashes).toEqual([])
+  })
+
+  it('gives every service its own port block, so slots stay independent', () => {
+    // Two services sharing a base would collide at every slot at once; the
+    // collision check above would catch it, this says why it happened.
+    expect(new Set(Object.values(BASE_PORTS)).size).toBe(services.length)
+  })
+})
+
+describe('the mosip-api SQLite file', () => {
+  it('leaves the default environment on the path mosip-api already defaults to', () => {
+    const descriptor = resolveEnvironment({
+      name: 'opencrvs-core',
+      worktreePath: '/home/dev/opencrvs-core',
+      isPrimaryWorktree: true,
+      isDefaultEnvironment: true,
+      registry: {}
+    })
+
+    expect(descriptor.mosipDatabaseFile).toBe(LEGACY_MOSIP_DATABASE_FILE)
+  })
+
+  it('names the file after the environment, in the one directory dev.sh creates', () => {
+    const descriptor = resolveEnvironment({
+      name: 'feature-a',
+      worktreePath: '/home/dev/wt/feature-a',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry: {}
+    })
+
+    expect(descriptor.mosipDatabaseFile).toBe(
+      'data/sqlite/mosip-api-feature_a.db'
+    )
   })
 })
 

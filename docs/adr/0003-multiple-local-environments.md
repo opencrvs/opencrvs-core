@@ -34,15 +34,29 @@ environment `name`.
   scheme at slot 5 (`9050 + 6*10000` overflows the 16-bit port range), giving
   **6 concurrent environments (slots 0–5)**.
 
+**Correction (found while rebasing onto the MOSIP integration):** one stride no
+longer fits every service. `packages/mosip-mock` and `packages/esignet-mock`
+base at `20240` and `20260`, where a 10000-port stride overflows at slot 5. The
+choice was between lowering the ceiling to slot 4 for everyone — paying an
+environment for two dev-only mocks — and giving those two a stride of their
+own. They get a 100-port stride (`PORT_STRIDES` in
+`packages/dev-cli/src/types.ts`), which lands both blocks in the empty gap
+between the default stride's slot-1 and slot-2 bands. The ceiling and the count
+above are unchanged. The gap argument is not left to inspection:
+`resolver.test.ts` walks every (service, slot) pair and asserts that no two
+share a port, none exceeds 65535, and none collides with the dependency
+singleton.
+
 ### Per-environment isolation (all injected as env vars by `dev.sh`)
 
-| Dependency    | Isolation knob                      | Value                                                        |
-| ------------- | ----------------------------------- | ------------------------------------------------------------ |
-| Postgres      | one database, shared schemas within | `events_<name>` via `EVENTS_POSTGRES_URL` + `TARGET_DB`      |
-| Elasticsearch | index prefix                        | `ES_INDEX_PREFIX=events_<name>`                              |
-| Elasticsearch | reindexing-status index             | `ES_REINDEXING_STATUS_INDEX=events_<name>_reindexing_status` |
-| MinIO         | bucket                              | `MINIO_BUCKET=<name>--ocrvs`                                 |
-| Redis         | logical DB index                    | `REDIS_DB=<slot>` (0–15)                                     |
+| Dependency    | Isolation knob                      | Value                                                             |
+| ------------- | ----------------------------------- | ----------------------------------------------------------------- |
+| Postgres      | one database, shared schemas within | `events_<name>` via `EVENTS_POSTGRES_URL` + `TARGET_DB`           |
+| Elasticsearch | index prefix                        | `ES_INDEX_PREFIX=events_<name>`                                   |
+| Elasticsearch | reindexing-status index             | `ES_REINDEXING_STATUS_INDEX=events_<name>_reindexing_status`      |
+| MinIO         | bucket                              | `MINIO_BUCKET=<name>--ocrvs`                                      |
+| Redis         | logical DB index                    | `REDIS_DB=<slot>` (0–15)                                          |
+| SQLite        | one file per environment            | `SQLITE_DATABASE_PATH=<worktree>/data/sqlite/mosip-api-<name>.db` |
 
 - Elasticsearch isolation is **almost** just the index prefix: `packages/events`
   derives every index name it uses from `ES_INDEX_PREFIX`, and that's the only
@@ -157,6 +171,29 @@ than failing. They are made env-aware the same way, by sourcing
   for a workflow that is inherently one-window-one-target.
 - `pnpm open` — was two fixed tabs (components storybook on `6060`, login on
   `3020`); becomes the calling environment's client and nothing else.
+
+**Correction (found while rebasing onto the MOSIP integration):** the MOSIP
+integration added three services to the `pnpm dev` sweep — `mosip-api`, plus the
+`mosip-mock` and `esignet-mock` stand-ins for an external MOSIP deployment — and
+they needed three kinds of work these tables did not cover:
+
+- **A named port knob each.** All three read the bare `PORT`, and the contract's
+  `PORT` is the gateway's compatibility alias (see below), so under `pnpm dev`
+  all three would have tried to bind the gateway's port — in *every*
+  environment, slot 0 included. They now read `MOSIP_API_PORT`,
+  `MOSIP_MOCK_PORT` and `ESIGNET_MOCK_PORT`. The alias stays the gateway's
+  alone; anything else wanting a port from this contract asks for it by name.
+- **Composed endpoints, not just origins.** Unlike the core services, these
+  packages (and `packages/testland`) read whole endpoints — `.../websub/hub`,
+  `.../oauth/token` — from single env vars, so slot-shifting the ports is not
+  enough on its own. The paths are composed in `env-contract.ts` alongside them,
+  which is also what lets a real MOSIP deployment be pointed at by overriding
+  the same variables.
+- **A per-environment SQLite file.** `mosip-api` keeps a record-only token per
+  MOSIP transaction in SQLite. It is the only piece of an environment's data
+  that lives in the checkout rather than in a shared datastore, so it is cleared
+  by `pnpm db:clear:all` and dies with the worktree — `pnpm env:destroy`, which
+  cleans the shared datastores, does not touch it.
 
 **Correction (found during implementation):** the contract grew three keys this
 ADR did not anticipate, for services that are addressed but not started by
