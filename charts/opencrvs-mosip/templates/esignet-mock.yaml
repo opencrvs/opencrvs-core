@@ -44,6 +44,7 @@ metadata:
   name: esignet-mock
 spec:
   replicas: 1
+  {{- include "strategy-helper" (dict "service_name" "esignet_mock" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: esignet-mock

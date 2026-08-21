@@ -5,6 +5,8 @@ metadata:
   name: {{ .Values.app_name }}
 spec:
   replicas: 1
+  strategy:
+    type: {{ .Values.strategy.type | default "Recreate" }}
   selector:
     matchLabels:
       app: {{ .Values.app_name }}

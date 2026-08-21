@@ -37,6 +37,7 @@ metadata:
   name: events
 spec:
   replicas: {{ .Values.events.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "events" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: events

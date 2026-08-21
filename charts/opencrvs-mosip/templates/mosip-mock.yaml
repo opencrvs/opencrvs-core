@@ -18,6 +18,7 @@ metadata:
   name: mosip-mock
 spec:
   replicas: 1
+  {{- include "strategy-helper" (dict "service_name" "mosip_mock" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: mosip-mock
