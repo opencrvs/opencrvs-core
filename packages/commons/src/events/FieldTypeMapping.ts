@@ -170,8 +170,6 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.PARAGRAPH:
     case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
     case FieldType.VERIFICATION_STATUS:
@@ -183,6 +181,8 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
       break
     case FieldType.LOCATION:
     case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
       /*
        * Advanced search lists every name a location has carried and stores the
        * pick as an object, so it can show that name back. `listHistoricalNames`
@@ -280,8 +280,8 @@ type FieldTypeValueMap = {
   [FieldType.AUTOCOMPLETE]: z.infer<typeof AutocompleteValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
   [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof LocationFieldValue>
-  [FieldType.FACILITY]: z.infer<typeof TextValue>
-  [FieldType.OFFICE]: z.infer<typeof TextValue>
+  [FieldType.FACILITY]: z.infer<typeof LocationFieldValue>
+  [FieldType.OFFICE]: z.infer<typeof LocationFieldValue>
   [FieldType.PHONE]: z.infer<typeof TextValue>
   [FieldType.LINK_BUTTON]: z.infer<typeof TextValue>
   [FieldType.VERIFICATION_STATUS]: z.infer<typeof TextValue>
