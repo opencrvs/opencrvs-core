@@ -62,6 +62,7 @@ metadata:
   name: countryconfig
 spec:
   replicas: {{ .Values.countryconfig.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: countryconfig

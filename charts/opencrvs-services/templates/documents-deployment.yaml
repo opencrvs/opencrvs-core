@@ -8,6 +8,7 @@ metadata:
   name: documents
 spec:
   replicas: {{ .Values.documents.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "documents" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: documents
