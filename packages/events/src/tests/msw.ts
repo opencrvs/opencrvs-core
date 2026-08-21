@@ -65,6 +65,9 @@ const tennisClubMembershipEventWithCustomAction = {
   ])
 }
 
+/** Token the mocked auth service hands out for anonymous (userless) callers. */
+export const ANONYMOUS_TOKEN = 'anonymous-token'
+
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
     `${env.DOCUMENTS_URL}/presigned-urls`,
@@ -134,6 +137,13 @@ const handlers = [
     HttpResponse.json({
       access_token: 'some-token'
     })
+  ),
+  // The announcement worker fetches this before dispatching a broadcast, since
+  // no user is involved. Without a handler the call escapes to a real auth
+  // service, so the test only passes on machines where one happens to be
+  // running.
+  http.get(`${env.AUTH_URL}/internal/anonymous-token`, () =>
+    HttpResponse.json({ token: ANONYMOUS_TOKEN })
   )
 ]
 
