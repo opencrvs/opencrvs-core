@@ -49,6 +49,14 @@ export type LocationTypeV1 = z.infer<typeof LocationTypeV1>
 export const LocationStatus = z.enum(['active', 'inactive'])
 export type LocationStatus = z.infer<typeof LocationStatus>
 
+/** Thrown when a user's assigned office is inactive and must not be allowed to authenticate. */
+export class InactiveOfficeError extends Error {
+  constructor(message = 'Assigned office is inactive') {
+    super(message)
+    this.name = 'InactiveOfficeError'
+  }
+}
+
 /**
  * A single element of the `versions` history of a location or administrative
  * area. Versions are sorted ascending by `effectiveFrom` ('0001-01-01' is used

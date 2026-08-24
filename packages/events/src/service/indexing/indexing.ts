@@ -32,15 +32,18 @@ import {
   SelectDateRangeField
 } from '@opencrvs/commons/events'
 import {
+  dropSecuredDeclarationFields,
   EventIndexWithAdministrativeHierarchy,
   logger,
-  RecordScopeV2
+  RecordScopeV2,
+  TokenWithBearer
 } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import { TrpcUserContext } from '../../context'
 import {
   decodeEventIndex,
@@ -51,7 +54,6 @@ import {
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   AGE_DOB_QUERY_KEY,
-  removeSecuredFields,
   IndexedAgeFieldValue,
   resolveRecordActionScopeToIds,
   valueFromTotal,
@@ -482,18 +484,22 @@ export async function findRecordsByQuery({
   search,
   eventConfigs,
   user,
-  acceptedScopes
+  acceptedScopes,
+  token
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
   user: TrpcUserContext
   acceptedScopes: RecordScopeV2[]
+  token: TokenWithBearer
 }) {
   const esClient = getOrCreateClient()
   const { query, limit, offset } = search
   const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
+
+  const validatorContext = await getValidatorContext({ token })
 
   const esQuery = withFlagsFilter({
     query: withJurisdictionFilters({
@@ -534,9 +540,11 @@ export async function findRecordsByQuery({
       const eventIndexWithoutLocationHierarchy =
         getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
 
-      return removeSecuredFields(
+      return dropSecuredDeclarationFields(
         eventConfig,
-        eventIndexWithoutLocationHierarchy
+        eventIndexWithoutLocationHierarchy,
+        // @TODO: This is not a full context. It will require fetching every EventDocument. https://github.com/opencrvs/opencrvs-core/issues/13530
+        validatorContext
       )
     })
 

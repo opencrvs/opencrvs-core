@@ -17,8 +17,7 @@ import {
 } from '@opencrvs/commons/client'
 import {
   findLocalEventConfig,
-  setEventData,
-  updateLocalEventIndex
+  setEventData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -28,13 +27,11 @@ import { createTemporaryId } from '@client/v2-events/utils'
  *
  * @param actionType - The type of action being performed
  * @param status - Optional status override for the action (defaults to ActionStatus.Accepted)
- * @param onlyUpdateLocalEventIndex - Whether to update the local event index instead of the full event data (defaults to false)
  * @returns A function that performs the optimistic update and returns the created optimistic action
  */
 export function updateEventOptimistically<T extends ActionInput>(
   actionType: ActionType,
-  status: ActionStatus = ActionStatus.Accepted,
-  onlyUpdateLocalEventIndex: boolean = false
+  status: ActionStatus = ActionStatus.Accepted
 ) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
@@ -73,11 +70,7 @@ export function updateEventOptimistically<T extends ActionInput>(
       actions: [...localEvent.actions, optimisticAction]
     }
 
-    if (onlyUpdateLocalEventIndex) {
-      updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
-    } else {
-      setEventData(optimisticEvent.id, optimisticEvent)
-    }
+    setEventData(optimisticEvent.id, optimisticEvent)
 
     return optimisticAction
   }
