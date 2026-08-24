@@ -50,7 +50,7 @@ const NoticeContainer = styled.div`
   width: 442px;
   min-width: 320px;
   height: 246px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   box-shadow:
     0px 4px 8px -2px rgba(0, 0, 0, 0.1),
@@ -67,30 +67,18 @@ const NoticeTextGroup = styled.div`
 `
 
 const NoticeTitle = styled.h1`
-  font-family: 'Noto Sans', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 130%;
+  ${({ theme }) => theme.fonts.h4};
   text-align: center;
-  color: #222222;
-  margin: 0;
+  color: ${({ theme }) => theme.colors.copy};
 `
 
 const NoticeMessage = styled.div`
-  font-family: 'Noto Sans', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 150%;
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
-  color: #525252;
-  margin: 0;
+  color: ${({ theme }) => theme.colors.supportingCopy};
 `
 
 const NoticeButton = styled(Button)`
-  font-family: 'Noto Sans', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 130%;
   padding: 12px 16px;
 `
 
