@@ -24,6 +24,11 @@ async function select<Value = string>(options: any): Promise<Value> {
   return inquirer.select(options)
 }
 
+async function input(options: any): Promise<string> {
+  const inquirer = await import('@inquirer/prompts')
+  return inquirer.input(options)
+}
+
 import {
   Secret,
   Variable,
@@ -572,6 +577,9 @@ ALL_QUESTIONS.push(
     'ENVIRONMENT',
     existingValues
   )?.value
+  let restoreHost =
+    findExistingValue('RESTORE_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues)
+      ?.value || ''
   let restoreType =
     findExistingValue(
       'RESTORE_ENVIRONMENT_MODE',
@@ -655,6 +663,10 @@ ALL_QUESTIONS.push(
           value: 'differential'
         }
       ]
+    })
+    restoreHost = await input({
+      message: 'What is the host/IP address of the restore backup server?',
+      default: restoreHost
     })
   } else {
     log(kleur.bold().green('✔'), kleur.bold().yellow('Restore is disabled'))
@@ -1015,6 +1027,22 @@ ALL_QUESTIONS.push(
         existingValues
       ),
       scope: 'ENVIRONMENT' as const
+    },
+    {
+      type: 'VARIABLE' as const,
+      name: 'RESTORE_HOST',
+      value: answerOrExisting(
+        restoreHost,
+        findExistingValue('RESTORE_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues),
+        (val) => val || ''
+      ),
+      didExist: findExistingValue(
+        'RESTORE_HOST',
+        'VARIABLE',
+        'ENVIRONMENT',
+        existingValues
+      ),
+      scope: 'ENVIRONMENT' as const
     }
   ]
 
@@ -1330,12 +1358,14 @@ ALL_QUESTIONS.push(
     // Hardcode like this blocks us from being generic:
     // https://github.com/opencrvs/opencrvs-core/issues/11171
     two_fa_enabled: environment !== 'production' ? false : true,
-    backup_enabled: configureBackup ? true : false,
+    traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',
     restore_type: restoreType,
-    traefik_mode: traefikConfOption,
-    backup_type: backupType
+    restore_host: restoreHost || '',
+    backup_enabled: configureBackup ? true : false,
+    backup_type: backupType,
+    backup_host: backupHost || ''
   })
   let addon_message =
     kubeWorkerNodes.length > 0 || configureBackup

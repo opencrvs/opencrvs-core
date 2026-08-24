@@ -16,7 +16,10 @@ import {
   UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
-import { setLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
+import {
+  getLeafLevelAdministrativeAreaIds,
+  setLocations
+} from '@events/storage/postgres/administrative-hierarchy/locations'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -383,4 +386,21 @@ test('creates a future-dated location whose fields resolve to the only version',
     .execute()
 
   expect(rows).toHaveLength(1)
+})
+
+test('does not invalidate the leaf-level administrative area cache', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const before = await getLeafLevelAdministrativeAreaIds()
+
+  await client.locations.create({
+    name: 'Cache Stable Office',
+    externalId: 'location-cache-create-pcode',
+    administrativeAreaId: null,
+    locationType: 'CRVS_OFFICE'
+  })
+
+  const after = await getLeafLevelAdministrativeAreaIds()
+  expect(after).toBe(before)
 })

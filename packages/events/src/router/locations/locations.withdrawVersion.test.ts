@@ -16,6 +16,7 @@ import {
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { getLeafLevelAdministrativeAreaIds } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -264,4 +265,33 @@ test('a second withdrawal of the same version is rejected', async () => {
 
   const auditEntries = await getWithdrawAuditEntries()
   expect(auditEntries).toHaveLength(1)
+})
+
+test('does not invalidate the leaf-level administrative area cache', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Cache Stable Withdraw Office',
+    externalId: 'location-cache-withdraw-pcode'
+  })
+
+  const updated = await client.locations.update({
+    id: created.id,
+    name: 'Pending Rename',
+    externalId: 'location-cache-withdraw-pcode',
+    status: 'active',
+    effectiveFrom: '2099-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  const before = await getLeafLevelAdministrativeAreaIds()
+
+  await client.locations.withdrawVersion({
+    id: created.id,
+    versionId: updated.versions[1].versionId
+  })
+
+  const after = await getLeafLevelAdministrativeAreaIds()
+  expect(after).toBe(before)
 })

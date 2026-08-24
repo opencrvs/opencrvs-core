@@ -21,7 +21,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^4.1.12"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@opencrvs/toolkit": "workspace:*",
