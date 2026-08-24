@@ -21,7 +21,6 @@ import {
   isSelectableAtAnchor,
   resolveJurisdictionReference,
   resolveVersion,
-  LocationSelection,
   PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
@@ -143,9 +142,9 @@ function LocationSearchInput({
   anchor,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
-  onChange: (val: string | LocationSelection | undefined) => void
+  onChange: (val: string | undefined) => void
   locationTypes?: string[]
-  value?: string | LocationSelection
+  value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
   id: string
@@ -196,8 +195,7 @@ function LocationSearchInput({
         ? buildHistoricalLocationNameOptions(selectableLocations)
         : selectableLocations.map((l) => ({
             value: l.id,
-            label: resolveVersion(l.versions, anchor).name,
-            selection: undefined
+            label: resolveVersion(l.versions, anchor).name
           })),
     [selectableLocations, props.configuration?.listHistoricalNames, anchor]
   )
@@ -212,8 +210,7 @@ function LocationSearchInput({
       options={options}
       value={selectedOption}
       onChange={(opt) => {
-        const picked = options.find((option) => option.value === opt?.value)
-        onChange(picked?.selection ?? picked?.value)
+        onChange(opt?.value ?? undefined)
       }}
     />
   )

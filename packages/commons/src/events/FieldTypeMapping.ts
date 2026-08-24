@@ -69,8 +69,6 @@ import {
   FieldValue,
   FieldUpdateValueSchema,
   NumberFieldValue,
-  LocationFieldValue,
-  NonEmptyLocationFieldValue,
   NonEmptyTextValue,
   TextValue,
   DataFieldValue,
@@ -164,12 +162,16 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.DIVIDER:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
+    case FieldType.LOCATION:
     case FieldType.SELECT:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
     case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
     case FieldType.VERIFICATION_STATUS:
@@ -178,23 +180,6 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ALPHA_HIDDEN:
     case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
-      break
-    case FieldType.LOCATION:
-    case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
-      /*
-       * Advanced search lists every name a location has carried and stores the
-       * pick as an object, so it can show that name back. `listHistoricalNames`
-       * is the flag it sets; a declaration never sets it and keeps a bare id.
-       */
-      if (field.configuration?.listHistoricalNames) {
-        schema = field.required
-          ? NonEmptyLocationFieldValue
-          : LocationFieldValue
-      } else {
-        schema = field.required ? NonEmptyTextValue : TextValue
-      }
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue
@@ -271,7 +256,7 @@ type FieldTypeValueMap = {
   [FieldType.DIVIDER]: z.infer<typeof TextValue>
   [FieldType.BULLET_LIST]: z.infer<typeof TextValue>
   [FieldType.PAGE_HEADER]: z.infer<typeof TextValue>
-  [FieldType.LOCATION]: z.infer<typeof LocationFieldValue>
+  [FieldType.LOCATION]: z.infer<typeof TextValue>
   [FieldType.SELECT]: z.infer<typeof TextValue>
   [FieldType.COUNTRY]: z.infer<typeof TextValue>
   [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
@@ -279,9 +264,9 @@ type FieldTypeValueMap = {
   [FieldType.HEADING]: z.infer<typeof TextValue>
   [FieldType.AUTOCOMPLETE]: z.infer<typeof AutocompleteValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
-  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof LocationFieldValue>
-  [FieldType.FACILITY]: z.infer<typeof LocationFieldValue>
-  [FieldType.OFFICE]: z.infer<typeof LocationFieldValue>
+  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
+  [FieldType.FACILITY]: z.infer<typeof TextValue>
+  [FieldType.OFFICE]: z.infer<typeof TextValue>
   [FieldType.PHONE]: z.infer<typeof TextValue>
   [FieldType.LINK_BUTTON]: z.infer<typeof TextValue>
   [FieldType.VERIFICATION_STATUS]: z.infer<typeof TextValue>

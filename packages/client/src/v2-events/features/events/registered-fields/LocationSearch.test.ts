@@ -12,6 +12,7 @@ import {
   ClientLocation,
   JurisdictionFilter,
   PlainDate,
+  toVersionedLocation,
   resolveVersion,
   todayISO,
   LocationVersion,
@@ -238,6 +239,11 @@ function versionIdOf(id: string, index: number) {
   return `${id.slice(0, 24)}${String(index).padStart(12, '0')}` as UUID
 }
 
+/** The pin a dropdown row would carry for the version at `index`. */
+function pinOf(id: string, index: number) {
+  return toVersionedLocation(id as UUID, versionIdOf(id, index))
+}
+
 /**
  * Builds a location-like item with one version per supplied name. `name` (the
  * server-resolved current name) is set to the last version's name.
@@ -268,16 +274,8 @@ describe('buildHistoricalLocationNameOptions', () => {
     // Both rows point at the same location, but each pins the version whose
     // name it shows — that is what keeps them apart once one is picked.
     expect(options).toEqual([
-      {
-        value: versionIdOf(id, 0),
-        label: 'Office A',
-        selection: { locationId: id, versionId: versionIdOf(id, 0) }
-      },
-      {
-        value: versionIdOf(id, 1),
-        label: 'Office Z',
-        selection: { locationId: id, versionId: versionIdOf(id, 1) }
-      }
+      { value: pinOf(id, 0), label: 'Office A' },
+      { value: pinOf(id, 1), label: 'Office Z' }
     ])
   })
 
@@ -293,10 +291,7 @@ describe('buildHistoricalLocationNameOptions', () => {
 
     expect(options.map((o) => o.label)).toEqual(['Alaminos', 'Alaminos City'])
     // The surviving row is pinned to the version that first carried the name.
-    expect(options[0].selection).toEqual({
-      locationId: id,
-      versionId: versionIdOf(id, 0)
-    })
+    expect(options[0].value).toBe(pinOf(id, 0))
   })
 
   it('does not repeat a name reinstated after a rename', () => {
@@ -310,9 +305,9 @@ describe('buildHistoricalLocationNameOptions', () => {
     // Two rows, not three. A reinstated name is still one name: a second row
     // would be indistinguishable in the dropdown and would search the same
     // records, since the name picked never narrows results.
-    expect(options.map((o) => [o.label, o.selection?.versionId])).toEqual([
-      ['Alaminos', versionIdOf(id, 0)],
-      ['Alaminos City', versionIdOf(id, 1)]
+    expect(options.map((o) => [o.label, o.value])).toEqual([
+      ['Alaminos', pinOf(id, 0)],
+      ['Alaminos City', pinOf(id, 1)]
     ])
   })
 
@@ -323,11 +318,7 @@ describe('buildHistoricalLocationNameOptions', () => {
     const options = buildHistoricalLocationNameOptions(items)
 
     expect(options).toEqual([
-      {
-        value: versionIdOf(id, 0),
-        label: 'Ibombo District Office',
-        selection: { locationId: id, versionId: versionIdOf(id, 0) }
-      }
+      { value: pinOf(id, 0), label: 'Ibombo District Office' }
     ])
   })
 })
@@ -341,8 +332,8 @@ describe('resolveLocationValue', () => {
     const [oldNameOption] = buildHistoricalLocationNameOptions([renamed])
 
     expect(
-      resolveLocationValue(oldNameOption.selection, entities, todayISO())
-        ?.version.name
+      resolveLocationValue(oldNameOption.value, entities, todayISO())?.version
+        .name
     ).toBe('Old Name')
   })
 
@@ -360,11 +351,7 @@ describe('resolveLocationValue', () => {
     // Locations re-imported since the search link was saved: the version id it
     // carries no longer exists, but the location does.
     expect(
-      resolveLocationValue(
-        { locationId: renamed.id, versionId: versionIdOf(id, 9) },
-        entities,
-        todayISO()
-      )?.version.name
+      resolveLocationValue(pinOf(id, 9), entities, todayISO())?.version.name
     ).toBe('New Name')
   })
 
@@ -386,7 +373,7 @@ describe('toLocationId', () => {
   it('narrows a pinned selection back to the location it names', () => {
     const [oldNameOption] = buildHistoricalLocationNameOptions([renamed])
 
-    expect(toLocationId(oldNameOption.selection)).toBe(id)
+    expect(toLocationId(oldNameOption.value)).toBe(id)
   })
 
   it('passes a bare id and an absent value through untouched', () => {
@@ -402,10 +389,10 @@ describe('findLocationOption', () => {
   const options = buildHistoricalLocationNameOptions([renamed])
 
   it('matches a pinned value on the version it pins', () => {
-    expect(findLocationOption(options, options[0].selection)?.label).toBe(
+    expect(findLocationOption(options, options[0].value)?.label).toBe(
       'Old Name'
     )
-    expect(findLocationOption(options, options[1].selection)?.label).toBe(
+    expect(findLocationOption(options, options[1].value)?.label).toBe(
       'New Name'
     )
   })
@@ -424,12 +411,7 @@ describe('findLocationOption', () => {
   })
 
   it('falls back to the location when the pinned version is gone', () => {
-    expect(
-      findLocationOption(options, {
-        locationId: renamed.id,
-        versionId: versionIdOf(id, 9)
-      })?.label
-    ).toBe('Old Name')
+    expect(findLocationOption(options, pinOf(id, 9))?.label).toBe('Old Name')
   })
 
   it('returns null for an absent value or an unknown id', () => {

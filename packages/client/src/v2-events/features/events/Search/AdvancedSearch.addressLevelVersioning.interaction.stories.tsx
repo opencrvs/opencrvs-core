@@ -20,7 +20,7 @@ import {
   EventConfig,
   field,
   footballClubMembershipEvent,
-  AdministrativeAreaSelectionChain,
+  toAdministrativeAreaPath,
   tennisClubMembershipEvent,
   TestUserRole,
   toNamedVersions,
@@ -204,11 +204,11 @@ const storyParams = {
 }
 
 /** The old-name pin of each level, root first — one full chain of picks. */
-const OLD_NAME_CHAIN: AdministrativeAreaSelectionChain = [
+const OLD_NAME_CHAIN = toAdministrativeAreaPath([
   toNamedVersions(RENAMED_PROVINCE)[0].selection,
   toNamedVersions(RENAMED_DISTRICT)[0].selection,
   toNamedVersions(RENAMED_VILLAGE)[0].selection
-]
+])
 
 async function openAddressAdminChain(
   canvasElement: HTMLElement,

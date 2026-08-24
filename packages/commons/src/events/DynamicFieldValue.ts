@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
 import {
-  AddressAdvancedSearchFieldValue,
+  VersionedAddressFieldValue,
   AddressFieldUpdateValue,
   AddressFieldValue
 } from './CompositeFieldValue'
@@ -72,7 +72,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
     ? AddressFieldValue
     : AddressFieldUpdateValue
   const schema = field.configuration?.listHistoricalNames
-    ? AddressAdvancedSearchFieldValue.or(plainSchema)
+    ? VersionedAddressFieldValue.or(plainSchema)
     : plainSchema
   const configIds =
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
@@ -80,9 +80,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
   // @todo - show required validation errors for street level fields like state/street
   return (
     schema as z.ZodType<
-      | AddressFieldValue
-      | AddressFieldUpdateValue
-      | AddressAdvancedSearchFieldValue
+      AddressFieldValue | AddressFieldUpdateValue | VersionedAddressFieldValue
     >
   ).refine((arg) => {
     if (!arg) {

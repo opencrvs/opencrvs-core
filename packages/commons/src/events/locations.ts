@@ -14,7 +14,11 @@
 import { UUID } from '../uuid'
 import * as z from 'zod/v4'
 import { PlainDate } from './PlainDate'
-import { LocationSelection } from './LocationSelection'
+import {
+  parseVersionedLocation,
+  toVersionedLocation,
+  VersionedLocation
+} from './VersionedLocation'
 import { EventIndex } from './EventIndex'
 import {
   ActionCreationMetadata,
@@ -250,7 +254,7 @@ export type VersionedEntity = {
  */
 export function toNamedVersions(
   entity: VersionedEntity
-): { name: string; selection: LocationSelection }[] {
+): { name: string; selection: VersionedLocation }[] {
   const seen = new Set<string>()
 
   return entity.versions.flatMap((version) => {
@@ -262,22 +266,30 @@ export function toNamedVersions(
     return [
       {
         name: version.name,
-        selection: { locationId: entity.id, versionId: version.versionId }
+        selection: toVersionedLocation(entity.id, version.versionId)
       }
     ]
   })
 }
 
 /**
- * The version a {@link LocationSelection} pinned.
+ * The version a {@link VersionedLocation} pinned. Undefined when the value is
+ * not a pin, or when the location or version it names is unknown.
  */
 export function findSelectedVersion<T extends VersionedEntity>(
-  selection: LocationSelection,
+  pin: unknown,
   entities: Map<UUID, T>
 ): { entity: T; version: LocationVersion } | undefined {
-  const entity = entities.get(selection.locationId)
+  // Regex Check, not schema validate
+  const parsed = parseVersionedLocation(pin)
+
+  if (!parsed) {
+    return undefined
+  }
+
+  const entity = entities.get(parsed.locationId)
   const version = entity?.versions.find(
-    (candidate) => candidate.versionId === selection.versionId
+    (candidate) => candidate.versionId === parsed.versionId
   )
 
   return entity && version ? { entity, version } : undefined

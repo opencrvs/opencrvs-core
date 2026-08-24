@@ -14,10 +14,11 @@ import { useSelector } from 'react-redux'
 import {
   EventState,
   AddressFieldUpdateValue,
-  AddressAdvancedSearchFieldValue,
-  isLocationSelection,
-  LocationSelection,
-  AdministrativeAreaSelectionChain,
+  isVersionedLocation,
+  parseAdministrativeAreaPath,
+  toAdministrativeAreaPath,
+  VersionedAddressFieldValue,
+  VersionedLocation,
   and,
   ConditionalType,
   Country as CountryField,
@@ -56,7 +57,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 type AddressFieldValue = NonNullable<AddressFieldUpdateValue>
 
 /** A plain address in a declaration, a version-pinned one in advanced search. */
-type AddressInputValue = AddressFieldValue | AddressAdvancedSearchFieldValue
+type AddressInputValue = AddressFieldValue | VersionedAddressFieldValue
 
 interface Props {
   id: string
@@ -322,7 +323,7 @@ function getLeafAdministrativeLevel(
     const key = keys[i] as keyof AddressFieldValue
     const level = val[key]
     if (level) {
-      return toLocationId(level as string | LocationSelection)
+      return toLocationId(level as string)
     }
   }
   return undefined
@@ -340,21 +341,20 @@ function getAdministrativeAreaSelectionFromAddress(value?: AddressInputValue) {
  */
 function getPinnedAdministrativeAreas(
   value?: AddressInputValue
-): LocationSelection[] {
-  const selection = getAdministrativeAreaSelectionFromAddress(value)
-
-  return Array.isArray(selection) ? selection : []
+): VersionedLocation[] {
+  return parseAdministrativeAreaPath(
+    getAdministrativeAreaSelectionFromAddress(value)
+  )
 }
 
 // The single area an address resolves to: the deepest level picked.
 function getAdministrativeAreaIdFromAddress(value?: AddressInputValue) {
   const selection = getAdministrativeAreaSelectionFromAddress(value)
+  const chain = parseAdministrativeAreaPath(selection)
 
-  if (Array.isArray(selection)) {
-    return selection[selection.length - 1]?.locationId
-  }
-
-  return toLocationId(selection)
+  return chain.length
+    ? toLocationId(chain[chain.length - 1])
+    : toLocationId(selection)
 }
 
 /**
@@ -401,7 +401,7 @@ function transformParentValueToNestedValue(
     ? Object.fromEntries(
         Object.entries(fullAdminHierarchy).map(([level, id]) => [
           level,
-          pinned.find((selection) => selection.locationId === id) ?? id
+          pinned.find((pin) => toLocationId(pin) === id) ?? id
         ])
       )
     : fullAdminHierarchy
@@ -457,22 +457,23 @@ function transformNestedValueToParentValue(
   const pickedLevels = adminLevelIds
     .map((level) => nestedValue[level])
     .filter(Boolean)
-  const pinnedLevels = pickedLevels.filter(isLocationSelection)
+  const pinnedLevels = pickedLevels.filter(isVersionedLocation)
+  // Every picked level pinned means this is an advanced search value.
+  // A partly pinned chain cannot be represented,
+  // so it falls back to the declaration shape.
+  const path =
+    pinnedLevels.length === pickedLevels.length
+      ? toAdministrativeAreaPath(pinnedLevels)
+      : undefined
 
   const country = nestedValue.country as string
   const defaultCountry = window.config.COUNTRY || 'FAR'
   if (country === defaultCountry) {
-    // Every picked level pinned means this is a search value. A partly pinned
-    // chain cannot be represented, so it falls back to the declaration shape.
-    if (
-      pinnedLevels.length > 0 &&
-      pinnedLevels.length === pickedLevels.length
-    ) {
+    if (path) {
       return {
         country,
         addressType: AddressType.DOMESTIC,
-        administrativeArea:
-          AdministrativeAreaSelectionChain.parse(pinnedLevels),
+        administrativeArea: path,
         streetLevelDetails: addressLines
       }
     }

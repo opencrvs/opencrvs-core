@@ -21,7 +21,7 @@ import {
   field,
   footballClubMembershipEvent,
   Location,
-  LocationSelection,
+  VersionedLocation,
   tennisClubMembershipEvent,
   toNamedVersions,
   TestUserRole,
@@ -393,7 +393,7 @@ const searchMswConfig = {
   }
 }
 
-function searchResultPath(birthLocation: LocationSelection) {
+function searchResultPath(birthLocation: VersionedLocation) {
   return `${ROUTES.V2.SEARCH_RESULT.buildPath({
     eventType: ChildOnboardingEvent.id
   })}?${serializeSearchParams({

@@ -26,7 +26,8 @@ import {
   FieldType,
   QueryExpression,
   FieldValue,
-  isLocationSelection,
+  isVersionedLocation,
+  parseAdministrativeAreaPath,
   NameFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
@@ -41,6 +42,7 @@ import {
   user
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
+import { toLocationId } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -325,29 +327,29 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
  *
  * @returns {Record<string, Condition>} A mapping of transformed field keys to their respective query conditions.
  */
+
 /**
  * Strips the pinned version. The version is
  * display-only and must never reach a query term.
  */
 function toQueryableValue(value: FieldValue | undefined) {
-  if (isLocationSelection(value)) {
-    return value.locationId
+  if (isVersionedLocation(value)) {
+    return toLocationId(value)
   }
 
   if (
     value &&
     typeof value === 'object' &&
     'administrativeArea' in value &&
-    Array.isArray(value.administrativeArea)
+    typeof value.administrativeArea === 'string'
   ) {
     // An address search value keeps the whole picked chain; the events service
     // indexes only the leaf, which is the last link.
-    const chain = value.administrativeArea.filter(isLocationSelection)
+    const chain = parseAdministrativeAreaPath(value.administrativeArea)
 
-    return {
-      ...value,
-      administrativeArea: chain[chain.length - 1]?.locationId
-    }
+    return chain.length
+      ? { ...value, administrativeArea: toLocationId(chain[chain.length - 1]) }
+      : value
   }
 
   return value

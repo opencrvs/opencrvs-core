@@ -57,7 +57,7 @@ export * from '../conditionals/validate'
 export * from './field'
 export * from './Flag'
 export * from './event'
-export * from './LocationSelection'
+export * from './VersionedLocation'
 export * from './locations'
 export * from './locationPayloads'
 

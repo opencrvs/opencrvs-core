@@ -20,7 +20,9 @@ import {
   FieldType,
   AdministrativeAreas,
   AddressType,
-  UUID
+  UUID,
+  toAdministrativeAreaPath,
+  toVersionedLocation
 } from '@opencrvs/commons/client'
 import {
   getMetadataFieldConfigs,
@@ -720,10 +722,7 @@ describe('buildSearchQuery with version-pinned locations', () => {
   it('queries a pinned location by its id, never by the version', () => {
     const result = buildSearchQuery(
       {
-        'applicant.office': {
-          locationId: OFFICE_ID,
-          versionId: OFFICE_VERSION_ID
-        }
+        'applicant.office': toVersionedLocation(OFFICE_ID, OFFICE_VERSION_ID)
       },
       [locationField],
       searchConfigs
@@ -741,10 +740,10 @@ describe('buildSearchQuery with version-pinned locations', () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: [
-            { locationId: PROVINCE_ID, versionId: PROVINCE_VERSION_ID },
-            { locationId: DISTRICT_ID, versionId: DISTRICT_VERSION_ID }
-          ],
+          administrativeArea: toAdministrativeAreaPath([
+            toVersionedLocation(PROVINCE_ID, PROVINCE_VERSION_ID),
+            toVersionedLocation(DISTRICT_ID, DISTRICT_VERSION_ID)
+          ]),
           streetLevelDetails: {}
         }
       },
@@ -767,18 +766,15 @@ describe('buildSearchQuery with version-pinned locations', () => {
     expect(JSON.stringify(result)).not.toContain(DISTRICT_VERSION_ID)
   })
 
-  it('omits an address whose administrative area is not a plain id', () => {
+  it('narrows a single-link chain to that link', () => {
     const result = buildSearchQuery(
       {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          // A single pin where the leaf id belongs. It cannot be turned into a
-          // term, and must not reach the query stringified as "[object Object]".
-          administrativeArea: {
-            locationId: DISTRICT_ID,
-            versionId: DISTRICT_VERSION_ID
-          },
+          administrativeArea: toAdministrativeAreaPath([
+            toVersionedLocation(DISTRICT_ID, DISTRICT_VERSION_ID)
+          ]),
           streetLevelDetails: {}
         }
       },
@@ -786,6 +782,16 @@ describe('buildSearchQuery with version-pinned locations', () => {
       searchConfigs
     )
 
-    expect(result).toEqual({})
+    expect(result).toEqual({
+      'applicant.address': {
+        type: 'exact',
+        term: JSON.stringify({
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: DISTRICT_ID,
+          streetLevelDetails: {}
+        })
+      }
+    })
   })
 })

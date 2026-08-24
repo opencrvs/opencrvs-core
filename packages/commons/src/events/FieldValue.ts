@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import {
   AddressFieldUpdateValue,
   AddressFieldValue,
-  AddressAdvancedSearchFieldValue,
+  VersionedAddressFieldValue,
   CustomFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -28,10 +28,6 @@ import {
   QueryParamReaderFieldValue
 } from './CompositeFieldValue'
 import { PlainDate, plainDateToLocalDate, toPlainDate } from './PlainDate'
-import {
-  LocationSelection,
-  AdministrativeAreaSelectionChain
-} from './LocationSelection'
 export { PlainDate, plainDateToLocalDate, toPlainDate }
 /**
  * FieldValues defined in this file are primitive field values.
@@ -68,18 +64,6 @@ export const AutocompleteValue = z.object({
 export type AutocompleteValue = z.infer<typeof AutocompleteValue>
 export const AutocompleteUpdateValue = AutocompleteValue.optional().nullable()
 export type AutocompleteUpdateValue = z.infer<typeof AutocompleteUpdateValue>
-
-/**
- * What a location or administrative-area field holds: the bare id a declaration
- * stores, or the version-pinned selection advanced search stores so it can show
- * the name that was picked (@see LocationSelection).
- */
-export const LocationFieldValue = z.union([TextValue, LocationSelection])
-
-export const NonEmptyLocationFieldValue = z.union([
-  NonEmptyTextValue,
-  LocationSelection
-])
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 export type TimeValue = z.infer<typeof TimeValue>
@@ -130,9 +114,7 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 // because otherwise the DataFieldValue would need to refer to itself.
 const LeafFieldValues = z.union([
   AddressFieldValue,
-  AddressAdvancedSearchFieldValue,
-  LocationSelection,
-  AdministrativeAreaSelectionChain,
+  VersionedAddressFieldValue,
   TextValue,
   PlainDate,
   AgeValue,
@@ -185,9 +167,7 @@ export const FieldValue: z.ZodType<FieldValue> = z.union([
 // Example: if both TextValue and PlainDate succeed for "2050-01-01",
 // we choose "TextValue" because it's higher priority here.
 const PRIORITY_ORDER = [
-  'LocationSelection',
-  'AdministrativeAreaSelectionChain',
-  'AddressAdvancedSearchFieldValue',
+  'VersionedAddressFieldValue',
   'NameFieldUpdateValue',
   'DateRangeFieldValue',
   'PlainDate',
@@ -255,9 +235,7 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
 }
 
 export type FieldUpdateValue =
-  | z.infer<typeof LocationSelection>
-  | z.infer<typeof AdministrativeAreaSelectionChain>
-  | z.infer<typeof AddressAdvancedSearchFieldValue>
+  | z.infer<typeof VersionedAddressFieldValue>
   | z.infer<typeof TextValue>
   | PlainDate
   | z.infer<typeof TimeValue>
@@ -282,9 +260,7 @@ export type FieldUpdateValue =
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
 export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
-  LocationSelection.describe('LocationSelection'),
-  AdministrativeAreaSelectionChain.describe('AdministrativeAreaSelectionChain'),
-  AddressAdvancedSearchFieldValue.describe('AddressAdvancedSearchFieldValue'),
+  VersionedAddressFieldValue.describe('VersionedAddressFieldValue'),
   TextValue.describe('TextValue'),
   PlainDate.describe('PlainDate'),
   TimeValue.describe('TimeValue'),
@@ -328,7 +304,6 @@ export type FieldValueSchema =
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
 export type FieldUpdateValueSchema =
-  | typeof LocationFieldValue
   | typeof PlainDate
   | typeof DateRangeFieldValue
   | typeof AgeValue

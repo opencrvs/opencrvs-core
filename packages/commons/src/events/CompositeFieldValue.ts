@@ -10,7 +10,7 @@
  */
 import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
-import { AdministrativeAreaSelectionChain } from './LocationSelection'
+import { AdministrativeAreaPath } from './VersionedLocation'
 
 /**
  * Composite field value consists of multiple field values.
@@ -90,29 +90,28 @@ export type AddressFieldValue = z.infer<typeof AddressFieldValue>
 
 /**
  * An address as advanced search holds it: `administrativeArea` is the chain of
- * levels picked, root first, each pinned to the name that was clicked. The last
- * element is the leaf and the only one the search uses; the ancestors are kept
- * so every dropdown and every part of the criteria pill shows the name it was
- * picked under.
+ * levels picked, root first, each pinned to the name that was clicked
+ * (@see AdministrativeAreaPath). The last link is the leaf and the only one the
+ * search uses; the ancestors are kept so every dropdown and every part of the
+ * criteria pill shows the name it was picked under.
  *
  * Only the client-side search value takes this shape. Declarations keep a bare
  * `administrativeArea` uuid, and the query is narrowed back to a plain
  * {@link AddressFieldValue} before it leaves the client, so stored records and
  * their index are unaffected.
  */
-export const DomesticAddressAdvancedSearchFieldValue =
-  BaseAddressFieldValue.extend({
-    addressType: z.literal(AddressType.DOMESTIC),
-    administrativeArea: AdministrativeAreaSelectionChain
-  })
+export const DomesticVersionedAddressFieldValue = BaseAddressFieldValue.extend({
+  addressType: z.literal(AddressType.DOMESTIC),
+  administrativeArea: AdministrativeAreaPath
+})
 
-export const AddressAdvancedSearchFieldValue = z.discriminatedUnion(
-  'addressType',
-  [DomesticAddressAdvancedSearchFieldValue, InternationalAddressFieldValue]
-)
+export const VersionedAddressFieldValue = z.discriminatedUnion('addressType', [
+  DomesticVersionedAddressFieldValue,
+  InternationalAddressFieldValue
+])
 
-export type AddressAdvancedSearchFieldValue = z.infer<
-  typeof AddressAdvancedSearchFieldValue
+export type VersionedAddressFieldValue = z.infer<
+  typeof VersionedAddressFieldValue
 >
 
 const DomesticAddressUpdateFieldValue = BaseAddressFieldUpdateValue.extend({

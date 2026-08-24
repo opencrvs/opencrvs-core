@@ -16,7 +16,6 @@ import {
   getAdministrativeAreaHierarchy,
   isSelectableAtAnchor,
   JurisdictionFilter,
-  LocationSelection,
   resolveJurisdictionReference,
   todayISO,
   UUID,
@@ -138,9 +137,9 @@ interface AdministrativeAreaInputProps
   > {
   configuration: AdministrativeAreaField['configuration']
   eventType?: string
-  partOf: string | LocationSelection | null
-  onChange: (val: string | LocationSelection | null) => void
-  value?: string | LocationSelection | null
+  partOf: string | null
+  onChange: (val: string | null) => void
+  value?: string | null
   anchor: PlainDate
 }
 
@@ -199,8 +198,7 @@ function AdministrativeAreaInput({
         ? buildHistoricalLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
             label: resolveLocationName(o, anchor),
-            value: o.id,
-            selection: undefined
+            value: o.id
           })),
     [administrativeAreas, configuration.listHistoricalNames, anchor]
   )
@@ -221,8 +219,7 @@ function AdministrativeAreaInput({
       options={options}
       value={selectedLocation}
       onChange={(opt) => {
-        const picked = options.find((o) => o.value === opt?.value)
-        onChange(picked?.selection ?? picked?.value ?? null)
+        onChange(opt?.value ?? null)
       }}
     />
   )

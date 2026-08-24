@@ -34,8 +34,7 @@ import {
   getAdministrativeAreaHierarchy,
   resolveVersion,
   findSelectedVersion,
-  isLocationSelection,
-  LocationSelection,
+  parseVersionedLocation,
   toNamedVersions,
   ZodDate,
   VersionedEntity
@@ -49,30 +48,41 @@ export function getUsersFullName(name: UserOrSystem['name']) {
   return joinValues([name.firstname, name.surname])
 }
 export interface LocationOption {
-  value: UUID
+  value: string
   label: string
-  selection?: LocationSelection
 }
 
 /**
  * Builds advanced-search filter options: one row per distinct name a location or
- * administrative area has ever carried, each pinned to its version
- * (@see LocationSelection). Both selectors call this.
+ * administrative area has ever carried, each pinned to the version that carried
+ * it (@see VersionedLocation). Both selectors call this.
  *
- * `value` is the version id rather than the selection object, so the select can
- * compare options as plain strings. Ordinary forms list a single current-name
- * option instead of calling this.
+ * Ordinary forms list a single current-name option instead of calling this.
  */
 export function buildHistoricalLocationNameOptions<T extends VersionedEntity>(
   items: T[]
 ): LocationOption[] {
   return items.flatMap((item) =>
     toNamedVersions(item).map(({ name, selection }) => ({
-      value: selection.versionId,
-      label: name,
-      selection
+      value: selection,
+      label: name
     }))
   )
+}
+
+/**
+ * Narrows a value to the plain id every non-display surface expects
+ */
+export function toLocationId(value: string): string
+export function toLocationId(value: unknown): string | undefined
+export function toLocationId(value: unknown): string | undefined {
+  const parsed = parseVersionedLocation(value)
+
+  if (parsed) {
+    return parsed.locationId
+  }
+
+  return typeof value === 'string' ? value : undefined
 }
 
 /**
@@ -81,19 +91,17 @@ export function buildHistoricalLocationNameOptions<T extends VersionedEntity>(
  */
 export function findLocationOption(
   options: LocationOption[],
-  value: string | LocationSelection | null | undefined
+  value: string | null | undefined
 ): LocationOption | null {
   if (!value) {
     return null
   }
 
-  const [versionId, locationId] = isLocationSelection(value)
-    ? [value.versionId, value.locationId]
-    : [value, value]
+  const locationId = toLocationId(value)
 
   return (
-    options.find((option) => option.value === versionId) ??
-    options.find((option) => option.selection?.locationId === locationId) ??
+    options.find((option) => option.value === value) ??
+    options.find((option) => toLocationId(option.value) === locationId) ??
     null
   )
 }
@@ -109,46 +117,18 @@ export function resolveLocationValue<T extends VersionedEntity>(
   entities: Map<UUID, T>,
   anchor: PlainDate
 ): { entity: T; version: LocationVersion } | undefined {
-  if (isLocationSelection(value)) {
-    const pinned = findSelectedVersion(value, entities)
+  const pinned = findSelectedVersion(value, entities)
 
-    if (pinned) {
-      return pinned
-    }
-
-    const pinnedEntity = entities.get(value.locationId)
-
-    return pinnedEntity
-      ? {
-          entity: pinnedEntity,
-          version: resolveVersion(pinnedEntity.versions, anchor)
-        }
-      : undefined
+  if (pinned) {
+    return pinned
   }
 
-  const id = UUID.safeParse(value?.toString()).data
+  const id = UUID.safeParse(toLocationId(value)).data
   const entity = id && entities.get(id)
 
   return entity
     ? { entity, version: resolveVersion(entity.versions, anchor) }
     : undefined
-}
-
-/**
- * Narrows a pinned location or administrative-area value to the plain id
- */
-export function toLocationId(value: string | LocationSelection): string
-export function toLocationId(
-  value: string | LocationSelection | null | undefined
-): string | undefined
-export function toLocationId(
-  value: string | LocationSelection | null | undefined
-): string | undefined {
-  if (isLocationSelection(value)) {
-    return value.locationId
-  }
-
-  return value ?? undefined
 }
 
 /** Utility to get all keys from union */
