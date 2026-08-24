@@ -24,7 +24,8 @@ import {
   getCurrentEventState,
   generateActionDocument,
   getUUID,
-  EventDocument
+  EventDocument,
+  ActionInput
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -705,7 +706,9 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
                 ...currentDocument.actions,
                 generateActionDocument({
                   configuration: tennisClubMembershipEvent,
-                  declarationOverrides: action.declaration as any,
+                  declarationOverrides: {
+                    ...(ActionInput.safeParse(action).data?.declaration ?? {})
+                  },
                   action: ActionType.DECLARE
                 }),
                 generateActionDocument({

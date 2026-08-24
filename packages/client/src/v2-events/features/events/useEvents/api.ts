@@ -298,10 +298,6 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export function updateLocalEvent(data: EventDocument) {
-  setEventData(data.id, data)
-}
-
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
 
@@ -311,7 +307,7 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
 }
 
 export async function onMarkNotDuplicate(data: EventDocument) {
-  updateLocalEvent(data)
+  setEventData(data.id, data)
   await refetchSearchQuery(data.id)
 }
 
