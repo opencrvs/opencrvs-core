@@ -52,6 +52,7 @@ docker_build(
     './src',
     './package.json',
     './pnpm-lock.yaml',
+    './.pnpmfile.cjs',
     './tsconfig.json',
     './Dockerfile'
   ],
