@@ -23,7 +23,8 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
-  getUUID
+  getUUID,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -130,13 +131,21 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
         drafts: declarationTrpcMsw.drafts.handlers,
         events: [
           tRPCMsw.event.search.query((input) => {
+            const declared = {
+              ...declarationTrpcMsw.eventDocument,
+              actions: [
+                ...declarationTrpcMsw.eventDocument.actions,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DECLARE
+                })
+              ]
+            }
+
             return {
               total: 1,
               results: [
-                getCurrentEventState(
-                  declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
-                )
+                getCurrentEventState(declared, tennisClubMembershipEvent)
               ]
             }
           }),
@@ -276,6 +285,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     await step('Confirm action triggers scope based actions', async () => {
       const searchResult =
         await within(canvasElement).findByTestId('search-result')
+
       await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
@@ -646,6 +656,8 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
   globals: { viewport: { value: 'mobile' } }
 }
 
+let currentDocument: EventDocument = eventDocument
+
 export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
   beforeEach: () => {
     // Clear any toast left over from a previous story so this test only
@@ -654,15 +666,16 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
+    currentDocument = eventDocument
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(createdEventDocument.id, createdEventDocument)
-    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
+    setEventData(currentDocument.id, currentDocument)
+    updateLocalEventIndex(currentDocument.id, currentDocument)
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: currentDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -683,14 +696,18 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
-            return eventDocument
+            return currentDocument
           }),
           tRPCMsw.event.actions.declare.request.mutation((action) => {
-            return {
-              ...eventDocument,
+            currentDocument = {
+              ...currentDocument,
               actions: [
-                ...eventDocument.actions,
-                action,
+                ...currentDocument.actions,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  declarationOverrides: action.declaration as any,
+                  action: ActionType.DECLARE
+                }),
                 generateActionDocument({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DUPLICATE_DETECTED,
@@ -701,6 +718,16 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
                   }
                 })
               ] as ActionDocument[]
+            }
+
+            return currentDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(currentDocument, tennisClubMembershipEvent)
+              ],
+              total: 1
             }
           })
         ]
