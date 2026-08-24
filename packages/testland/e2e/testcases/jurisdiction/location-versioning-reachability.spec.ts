@@ -12,16 +12,22 @@ import { test, expect, type Browser, type Page } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { faker } from '@faker-js/faker'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
+import { createClient } from '@opencrvs/toolkit/api'
 import {
   getToken,
   getAuthTokens,
   createPIN,
   login,
   loginWithNewUser,
-  continueForm,
+  ensureLoginPageReady,
   NEW_USER_PASSWORD
 } from '../../helpers'
-import { CREDENTIALS, CLIENT_URL } from '../../constants'
+import {
+  CREDENTIALS,
+  CLIENT_URL,
+  LOGIN_URL,
+  GATEWAY_HOST
+} from '../../constants'
 import {
   createDeclaration,
   getDeclaration
@@ -35,22 +41,18 @@ import {
 import { fetchClientAPI } from '../events-rest-api/helpers'
 
 /**
- * Verifies that jurisdiction/routing predicates keep resolving correctly as
- * locations are renamed, inactivated, or transferred.
+ * Verifies jurisdiction/routing predicates as locations are renamed,
+ * inactivated, or transferred.
  *
- * These specs create their own throwaway offices/users via the location
- * write API rather than mutating seeded Farajaland offices, because
- * renaming/inactivating a shared office (e.g. Ibombo District Office) would
- * be observed by every other spec running in parallel against the same
- * credentials.
+ * Uses throwaway offices/users via the location write API instead of
+ * mutating seeded Farajaland offices, since those are shared across
+ * parallel specs.
  *
- * Not covered here yet, because the underlying behaviour isn't merged:
- * - form selector anchoring / search — whether an inactivated office
- *   disappears from *selectors* while staying filterable in advanced search.
- * - the error overlay for users in inactive offices — the "no
- *   auto-reassignment" check below only asserts today's behaviour (user
- *   keeps their office, can still log in); once that behaviour ships, the
- *   login step here may need an accompanying overlay assertion.
+ * Login is blocked for a user whose office is inactive, so tests needing an
+ * authenticated session for such a user log in *before* inactivating.
+ *
+ * Not covered here: selector anchoring/search for inactive offices, and the
+ * client's polled "office went inactive" overlay for already-logged-in users.
  */
 
 async function createOffice(
@@ -97,45 +99,36 @@ async function putLocationVersion(
   return response.json()
 }
 
+// `role` is the API role id (e.g. 'REGISTRATION_AGENT'), not the display label.
 async function provisionUserInOffice(
-  adminPage: Page,
-  officeName: string,
+  systemAdminToken: string,
+  officeId: string,
   role: string
 ) {
-  const firstName = faker.person.firstName('female')
+  const firstname = faker.person.firstName('female')
   const surname = faker.person.lastName('female')
-  const username = `${firstName[0]}.${surname}`.toLowerCase()
-  const fullname = `${firstName} ${surname}`
+  const username = `${firstname[0]}.${surname}`.toLowerCase()
+  const fullname = `${firstname} ${surname}`
 
-  await adminPage.getByRole('button', { name: 'Team' }).click()
-  await adminPage
-    .getByRole('button', { name: /Office/ })
-    .first()
-    .click()
-  await adminPage.getByTestId('locationSearchInput').fill(officeName)
-  await adminPage.getByText(new RegExp(officeName)).first().click()
-
-  await adminPage.click('#add-user')
-  await expect(adminPage.getByText('User details')).toBeVisible()
-
-  await adminPage.locator('#surname').fill(surname)
-  await adminPage.locator('#firstname').fill(firstName)
-  await adminPage.locator('#phoneNumber').fill('07' + faker.string.numeric(8))
-  await adminPage.locator('#email').fill(faker.internet.email().toLowerCase())
-  await adminPage.locator('#fullHonorificName').fill(fullname)
-  await adminPage.locator('#role').click()
-  await adminPage.getByText(role, { exact: true }).click()
-  await adminPage.locator('#device').fill(faker.phone.imei())
-  await continueForm(adminPage)
-
-  await adminPage.getByRole('button', { name: 'Create user' }).click()
-  await expect(adminPage.getByText('New user created')).toBeVisible()
+  const client = createClient(
+    GATEWAY_HOST + '/events',
+    `Bearer ${systemAdminToken}`
+  )
+  await client.user.create.mutate({
+    name: { firstname, surname },
+    role,
+    primaryOfficeId: officeId,
+    mobile: '07' + faker.string.numeric(8),
+    email: faker.internet.email().toLowerCase(),
+    fullHonorificName: fullname,
+    device: faker.phone.imei(),
+    data: {}
+  })
 
   return { username, fullname }
 }
 
-// A provisioned user's password is NEW_USER_PASSWORD after loginWithNewUser,
-// not the default TEST_USER_PASSWORD that `login()` assumes.
+// Password is NEW_USER_PASSWORD post-loginWithNewUser, not `login()`'s default.
 async function loginAsProvisionedUser(page: Page, username: string) {
   const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
   expect(refreshToken).toBeDefined()
@@ -176,12 +169,10 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       officeName
     )
 
-    const adminPage = await newPage(browser)
-    await login(adminPage, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
     const { username } = await provisionUserInOffice(
-      adminPage,
-      officeName,
-      'Registration Officer'
+      systemAdminToken,
+      office.id,
+      'REGISTRATION_AGENT'
     )
 
     const userPage = await newPage(browser)
@@ -204,8 +195,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       lastVersionId: office.versions[0].versionId
     })
 
-    // A different registrar in the same administrative area (Ibombo) should
-    // still resolve and see the record after the rename.
+    // A different Ibombo registrar should still resolve the record post-rename.
     const registrarPage = await newPage(browser)
     await login(registrarPage, CREDENTIALS.REGISTRAR)
     await assertRecordInWorkqueue({
@@ -226,12 +216,10 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       officeName
     )
 
-    const adminPage = await newPage(browser)
-    await login(adminPage, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
     const { username } = await provisionUserInOffice(
-      adminPage,
-      officeName,
-      'Registration Officer'
+      systemAdminToken,
+      office.id,
+      'REGISTRATION_AGENT'
     )
 
     const userPage = await newPage(browser)
@@ -246,6 +234,15 @@ test.describe('Jurisdiction & routing under location versioning', () => {
     const childName = formatV2ChildName(declaration as any)
     expect(eventId).toBeTruthy()
 
+    // Log in before inactivating — fresh logins for an inactive office are
+    // blocked. Waiting for "Recent" also confirms the client's office-status
+    // check cached "active" before inactivation, avoiding a race.
+    const ownUserPage = await newPage(browser)
+    await loginAsProvisionedUser(ownUserPage, username)
+    await expect(
+      ownUserPage.getByRole('button', { name: 'Recent' })
+    ).toBeVisible({ timeout: 30_000 })
+
     await putLocationVersion(systemAdminToken, office.id, {
       name: office.name,
       externalId: office.externalId,
@@ -254,21 +251,16 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       lastVersionId: office.versions[0].versionId
     })
 
-    // The declaring user's own office is now inactive: they should still be
-    // able to log in (no lockout) and still see/open their own record. A
-    // Registration Officer's own DECLARE auto-validates, so the record moves
-    // on to the registrar's queue and only remains in "Recent" for them.
-    const ownUserPage = await newPage(browser)
-    await loginAsProvisionedUser(ownUserPage, username)
+    // Their session should still see the record. A Registration Officer's
+    // own DECLARE auto-validates, so it moves to the registrar's queue and
+    // only remains in "Recent" here.
     await assertRecordInWorkqueue({
       page: ownUserPage,
       name: childName,
       workqueues: [{ title: 'Recent', exists: true }]
     })
 
-    // A different office in the SAME administrative area (Ibombo) should
-    // also still see the record — office closure does not hide records from
-    // the wider jurisdiction.
+    // Office closure shouldn't hide the record from the wider jurisdiction.
     const registrarPage = await newPage(browser)
     await login(registrarPage, CREDENTIALS.REGISTRAR)
     await assertRecordInWorkqueue({
@@ -289,12 +281,10 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       oldOfficeName
     )
 
-    const oldAdminPage = await newPage(browser)
-    await login(oldAdminPage, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
     const oldUser = await provisionUserInOffice(
-      oldAdminPage,
-      oldOfficeName,
-      'Registration Officer'
+      systemAdminToken,
+      oldOffice.id,
+      'REGISTRATION_AGENT'
     )
 
     const oldUserPage = await newPage(browser)
@@ -306,8 +296,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
     const oldChildName = formatV2ChildName(oldDeclaration as any)
     expect(oldEventId).toBeTruthy()
 
-    // Transfer recipe: inactivate the old entity, create a successor under
-    // the new parent — the two calls are independent and idempotent-retryable.
+    // Transfer recipe: inactivate the old entity, create a successor separately.
     await putLocationVersion(systemAdminToken, oldOffice.id, {
       name: oldOffice.name,
       externalId: oldOffice.externalId,
@@ -316,19 +305,14 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       lastVersionId: oldOffice.versions[0].versionId
     })
 
-    // The "successor" side doesn't need a freshly provisioned office/user —
-    // only the old entity has to be a throwaway we can safely inactivate.
-    // The existing seeded Pualula credential is a different administrative
-    // area than Ibombo, which is all this needs to demonstrate.
+    // The successor side reuses the seeded Pualula credential — only the old
+    // entity needs to be a throwaway we can safely inactivate.
     const newUserToken = await getToken(
       CREDENTIALS.REGISTRATION_OFFICER_PUALULA
     )
 
-    // record.search's placeOfEvent:'administrativeArea' scope means a Pualula
-    // officer can only ever see records whose place of birth is also within
-    // Pualula — getDeclaration()'s default place of birth ("Klow") is in
-    // Ibombo, so it must be overridden here or the record is invisible to
-    // this officer and any Pualula registrar, regardless of createdAtLocation.
+    // record.search scopes by placeOfEvent — default place of birth ("Klow")
+    // is in Ibombo, so it must be overridden or the record is invisible here.
     const pualulaAreas = await getAdministrativeAreas(newUserToken)
     const oyaVillageId = getIdByName(pualulaAreas, 'Oya')
     const newDeclarationData = await getDeclaration({
@@ -352,7 +336,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
     const newChildName = formatV2ChildName(newDeclaration as any)
     expect(newEventId).toBeTruthy()
 
-    // Old record: still reachable to a registrar in the old (Ibombo) area.
+    // Old record still reachable to an Ibombo registrar.
     const ibomboRegistrarPage = await newPage(browser)
     await login(ibomboRegistrarPage, CREDENTIALS.REGISTRAR)
     await assertRecordInWorkqueue({
@@ -361,8 +345,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       workqueues: [{ title: 'Pending registration', exists: true }]
     })
 
-    // New record: reachable to a registrar in the new (Pualula) area, and
-    // NOT reachable to the old (Ibombo) area's registrar.
+    // New record reachable to a Pualula registrar, not to the old Ibombo one.
     const pualulaRegistrarPage = await newPage(browser)
     await login(pualulaRegistrarPage, CREDENTIALS.REGISTRAR_PUALULA)
     await assertRecordInWorkqueue({
@@ -377,11 +360,9 @@ test.describe('Jurisdiction & routing under location versioning', () => {
     })
   })
 
-  test('User is not auto-reassigned when their office is inactivated', async ({
+  test('User is not auto-reassigned but is locked out from login when their office is inactivated', async ({
     browser
   }) => {
-    // Provisions a user AND runs them through the full first-login ceremony
-    // (password + security questions + PIN) — several fresh PWA bootstraps.
     test.setTimeout(180_000)
 
     const officeName = `E2E No-Reassign Office ${uuidv4()}`
@@ -391,13 +372,23 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       officeName
     )
 
+    const { username, fullname } = await provisionUserInOffice(
+      systemAdminToken,
+      office.id,
+      'REGISTRATION_AGENT'
+    )
+
+    // The office picker excludes inactive offices from search, so select it
+    // before inactivating (see Team.OfficeActiveOnly.interaction.stories.tsx).
     const adminPage = await newPage(browser)
     await login(adminPage, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
-    const { username, fullname } = await provisionUserInOffice(
-      adminPage,
-      officeName,
-      'Registration Officer'
-    )
+    await adminPage.getByRole('button', { name: 'Team' }).click()
+    await adminPage
+      .getByRole('button', { name: /Office/ })
+      .first()
+      .click()
+    await adminPage.getByTestId('locationSearchInput').fill(officeName)
+    await adminPage.getByText(new RegExp(officeName)).first().click()
 
     await putLocationVersion(systemAdminToken, office.id, {
       name: office.name,
@@ -413,31 +404,29 @@ test.describe('Jurisdiction & routing under location versioning', () => {
     await adminPage.getByRole('button', { name: fullname }).click()
     await adminPage.locator('#sub-page-header-munu-button-dropdownMenu').click()
     await adminPage.getByText('Edit details').click()
-    await expect(
-      adminPage.getByTestId('primaryOfficeId-value')
-    ).toContainText(officeName)
+    await expect(adminPage.getByTestId('primaryOfficeId-value')).toContainText(
+      officeName
+    )
 
-    // The user themselves can still log in — no forced lockout as a
-    // side-effect of their office becoming inactive. A brand-new account is
-    // still 'pending' until it completes the first-login ceremony, so that
-    // has to happen once before a normal refreshToken-based login will work.
+    // The office check runs before user status, so even a still-'pending'
+    // account is locked out at first login rather than reaching the ceremony.
     const firstLoginPage = await newPage(browser)
-    await loginWithNewUser(firstLoginPage, username)
-
-    const ownUserPage = await newPage(browser)
-    await loginAsProvisionedUser(ownUserPage, username)
-    // Default 5s isn't always enough for the PWA's own bootstrap after login.
+    await firstLoginPage.goto(LOGIN_URL)
+    await ensureLoginPageReady(firstLoginPage)
+    await firstLoginPage.fill('#username', username)
+    await firstLoginPage.fill('#password', 'test')
+    await firstLoginPage.click('#login-mobile-submit')
     await expect(
-      ownUserPage.getByRole('button', { name: 'Recent' })
-    ).toBeVisible({ timeout: 30_000 })
+      firstLoginPage.getByText(
+        'Your assigned office has been made inactive. Please contact your administrator to be reassigned'
+      )
+    ).toBeVisible()
   })
 
   test('Inactivating an office keeps its Notified records reachable to the same administrative area', async ({
     browser
   }) => {
-    // A full office+user provisioning cycle plus the first-login ceremony —
-    // same weight class as the other provisioning-heavy tests in this file.
-    test.setTimeout(180_000)
+    test.setTimeout(180_000) // office+user provisioning plus first-login ceremony
 
     const officeName = `E2E Notify Office ${uuidv4()}`
     const office = await createOffice(
@@ -446,17 +435,12 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       officeName
     )
 
-    // Community Leader has record.notify but not record.declare — its own
-    // workqueue scope is only ['assigned-to-you', 'recent'], so unlike the
-    // Registration Officer tests, there is no bucket for it to review its own
-    // notification in; the reachability check below has to come from a
-    // registrar instead.
-    const adminPage = await newPage(browser)
-    await login(adminPage, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
+    // Community Leader lacks record.declare, so it has no bucket to review
+    // its own notification in — the reachability check comes from a registrar.
     const { username } = await provisionUserInOffice(
-      adminPage,
-      officeName,
-      'Community Leader'
+      systemAdminToken,
+      office.id,
+      'COMMUNITY_LEADER'
     )
 
     const firstLoginPage = await newPage(browser)
@@ -471,6 +455,13 @@ test.describe('Jurisdiction & routing under location versioning', () => {
     const childName = formatV2ChildName(declaration as any)
     expect(eventId).toBeTruthy()
 
+    // Log in before inactivating (see the earlier test for why).
+    const ownUserPage = await newPage(browser)
+    await loginAsProvisionedUser(ownUserPage, username)
+    await expect(
+      ownUserPage.getByRole('button', { name: 'Recent' })
+    ).toBeVisible({ timeout: 30_000 })
+
     await putLocationVersion(systemAdminToken, office.id, {
       name: office.name,
       externalId: office.externalId,
@@ -479,19 +470,13 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       lastVersionId: office.versions[0].versionId
     })
 
-    // The notifying user's own view: "Recent" is the only bucket in their
-    // scope, and has no location dependency, so this only confirms no
-    // lockout — the real reachability check is the registrar below.
-    const ownUserPage = await newPage(browser)
-    await loginAsProvisionedUser(ownUserPage, username)
-    // Default 5s isn't always enough for the PWA's own bootstrap after login.
+    // Re-confirms the notifier's own session still works post-inactivation;
+    // the real reachability check is the registrar below.
     await expect(
       ownUserPage.getByRole('button', { name: 'Recent' })
     ).toBeVisible({ timeout: 30_000 })
 
-    // A registrar in the same administrative area (Ibombo) — a different
-    // office entirely — should still see the notification in the
-    // "Notifications" workqueue despite the notifying office being inactive.
+    // An Ibombo registrar (different office) should still see the notification.
     const registrarPage = await newPage(browser)
     await login(registrarPage, CREDENTIALS.REGISTRAR)
     await assertRecordInWorkqueue({

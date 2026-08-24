@@ -156,6 +156,7 @@ export async function getUserCredentialsByUsername(username: string) {
       'users.email',
       'users.role',
       'users.status',
+      'users.officeId',
       'userCredentials.salt',
       'userCredentials.passwordHash'
     ])
