@@ -21,7 +21,6 @@ mosip_mock:
     SMTP_PASSWORD: ''
     SMTP_SECURE: true
     MOSIP_WEBSUB_TOPIC: CREDENTIAL_ISSUED
-    # Signs the mock WebSub callbacks. Must match mosip_api's MOSIP_WEBSUB_SECRET.
     MOSIP_WEBSUB_SECRET: mosip-websub-secret
 
 esignet_mock:
