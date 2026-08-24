@@ -173,7 +173,7 @@ function AdministrativeAreaInput({
 
   // A parent picked under one of its historical names is version-pinned;
   // children are still nested under the area itself.
-  const partOfId = useMemo(() => toLocationId(partOf) ?? null, [partOf])
+  const partOfId = toLocationId(partOf) ?? null
 
   const administrativeAreas = useAvailableAdministrativeAreas(
     partOfId,
