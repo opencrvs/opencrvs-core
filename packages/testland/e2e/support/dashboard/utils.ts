@@ -12,22 +12,26 @@ import { expect, Page, type FrameLocator } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { AddressType } from '@opencrvs/toolkit/events'
 
-import { dateToIsoDateString, getToken, randomPastDate } from '../../helpers'
+import {
+  dateToIsoDateString,
+  getToken,
+  randomPastDate
+} from '@e2e/support/helpers'
 import {
   getAdministrativeAreas,
   getIdByName,
   getLocations
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import {
   createDeclaration,
   type CreateDeclarationResponse
-} from '../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import {
   CREDENTIALS,
   METABASE_EMAIL,
   METABASE_PASSWORD,
   METABASE_URL
-} from '../../constants'
+} from '@e2e/support/constants'
 
 /*
  * A broken Metabase card renders a warning icon and an error message

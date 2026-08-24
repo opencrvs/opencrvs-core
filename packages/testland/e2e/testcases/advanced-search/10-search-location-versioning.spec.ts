@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { login } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { formatV2ChildName } from '../birth/helpers'
-import { assertTexts, selectLocationOption } from '../../utils'
+import { login } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { assertTexts, selectLocationOption } from '@e2e/support/utils'
 import {
   registerDeclarationsThenDeactivateOffice,
   createBirthRegisteredWithInactiveFacility,
   createDeathRegisteredWithInactiveFacility,
   createBirthNotifiedInactiveAddress
-} from './location-versioning-declarations'
+} from '@e2e/support/advanced-search/location-versioning-declarations'
 
 function formatDeceasedName(declaration: {
   'deceased.name': { firstname: string; surname: string }

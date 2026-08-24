@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { LOGIN_URL } from '../../constants'
-import { ensureLoginPageReady } from '../../helpers'
+import { LOGIN_URL } from '@e2e/support/constants'
+import { ensureLoginPageReady } from '@e2e/support/helpers'
 
 test.describe('5. Validate language change', () => {
   test.beforeEach(async ({ page }) => {

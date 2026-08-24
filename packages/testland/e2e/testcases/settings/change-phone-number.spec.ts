@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   createPIN,
   getToken,
@@ -18,10 +18,10 @@ import {
   loginWithNewUser,
   NEW_USER_PASSWORD,
   waitForAuthenticatedLanding
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getLocations } from '../birth/helpers'
+import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
 
 test('Phone number changed from settings is stored as entered', async ({
   browser

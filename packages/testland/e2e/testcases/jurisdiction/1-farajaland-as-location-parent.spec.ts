@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, type Page } from '@playwright/test'
-import { getToken, login, searchFromSearchBar } from '../../helpers'
-import { trackAndDeleteCreatedEvents } from '../test-data/eventDeletion'
-import { CREDENTIALS } from '../../constants'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   getDeclaration,
   getPlaceOfBirth
-} from '../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { formatV2ChildName } from '../birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe.serial('1.Farajaland as location parent', () => {
   trackAndDeleteCreatedEvents()

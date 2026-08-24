@@ -11,13 +11,13 @@
 import { expect, test } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { omit } from 'lodash'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { getToken } from '../../helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { getToken } from '@e2e/support/helpers'
 import {
   createDeclaration,
   getDeclaration,
   type Declaration
-} from '../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 
 async function getEventById(eventId: string, token: string) {
   const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)

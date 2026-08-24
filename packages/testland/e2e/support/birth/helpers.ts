@@ -10,9 +10,9 @@
  */
 import { expect, type Page } from '@playwright/test'
 import { omit, merge } from 'lodash'
-import { formatName, getRandomDate, joinValuesWith } from '../../helpers'
+import { formatName, getRandomDate, joinValuesWith } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { GATEWAY_HOST } from '../../constants'
+import { GATEWAY_HOST } from '@e2e/support/constants'
 import { createClient } from '@opencrvs/toolkit/api'
 
 export const REQUIRED_VALIDATION_ERROR = 'Required'

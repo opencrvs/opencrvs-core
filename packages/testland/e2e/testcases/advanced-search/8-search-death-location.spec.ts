@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { login } from '../../helpers'
-import { assertTexts, selectLocationOption } from '../../utils'
-import { CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { assertTexts, selectLocationOption } from '@e2e/support/utils'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe("Advanced Search 8 - Death - Deceased's place of death", () => {
   test.beforeEach(async ({ page }) => {

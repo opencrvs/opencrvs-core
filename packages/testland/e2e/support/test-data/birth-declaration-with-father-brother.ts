@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
-import { GATEWAY_HOST } from '../../constants'
+import { GATEWAY_HOST } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import {
   getLocations,
   getIdByName,
   getAdministrativeAreas
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import {
   ActionDocument,
@@ -24,31 +24,6 @@ import {
   AddressType
 } from '@opencrvs/toolkit/events'
 import { getSignatureFile, uploadFile } from './utils'
-import { subYears, format } from 'date-fns'
-
-type InformantRelation = 'MOTHER' | 'BROTHER'
-
-function getInformantDetails(informantRelation: InformantRelation) {
-  if (informantRelation === 'MOTHER') {
-    return {
-      'informant.relation': informantRelation,
-      'informant.email': 'mothers@email.com'
-    }
-  }
-
-  return {
-    'informant.relation': informantRelation,
-    'informant.email': 'brothers@email.com',
-    'informant.name': {
-      firstname: faker.person.firstName(),
-      surname: faker.person.lastName()
-    },
-    'informant.dob': '2008-09-12',
-    'informant.nationality': 'FAR',
-    'informant.idType': 'NATIONAL_ID',
-    'informant.nid': faker.string.numeric(10)
-  }
-}
 
 async function getPlaceOfBirth(
   type: 'PRIVATE_HOME' | 'HEALTH_FACILITY',
@@ -67,6 +42,7 @@ async function getPlaceOfBirth(
 
   if (type === 'PRIVATE_HOME') {
     const administrativeAreas = await getAdministrativeAreas(token)
+
     const village = getIdByName(administrativeAreas, 'Klow')
 
     return {
@@ -74,8 +50,7 @@ async function getPlaceOfBirth(
       'child.birthLocation.privateHome': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: village,
-        streetLevelDetails: { town: 'Dhaka' }
+        administrativeArea: village
       },
       'child.birthLocationId': village
     }
@@ -84,49 +59,64 @@ async function getPlaceOfBirth(
   throw new Error('Invalid place of birth type')
 }
 
+function generateCustomPhoneNumber() {
+  // Starts with 0
+  // Second digit is 7 or 9
+  // Followed by 8 digits (0-9)
+  const secondDigit = Math.random() < 0.5 ? '7' : '9'
+  let rest = ''
+  for (let i = 0; i < 8; i++) {
+    rest += Math.floor(Math.random() * 10)
+  }
+  return `0${secondDigit}${rest}`
+}
+
 async function getDeclaration({
-  informantRelation = 'MOTHER',
   partialDeclaration = {},
   placeOfBirthType = 'PRIVATE_HOME',
   token
 }: {
-  informantRelation?: InformantRelation
-  partialDeclaration?: any
+  partialDeclaration?: Record<string, any>
   placeOfBirthType?: 'PRIVATE_HOME' | 'HEALTH_FACILITY'
   token: string
 }) {
   const administrativeAreas = await getAdministrativeAreas(token)
-  const province = getIdByName(administrativeAreas, 'Central')
   const district = getIdByName(administrativeAreas, 'Ibombo')
   const village = getIdByName(administrativeAreas, 'Klow')
 
-  if (!province || !district || !village) {
-    throw new Error('Province, district or village not found')
+  if (!district || !village) {
+    throw new Error('District or village not found')
   }
 
   const mockDeclaration = {
-    'father.detailsNotAvailable': true,
-    // Add default reason if: (a) user didn’t specify 'father.detailsNotAvailable', or (b) specified it but forgot the reason
-    ...(!('father.detailsNotAvailable' in partialDeclaration) ||
-    (partialDeclaration['father.detailsNotAvailable'] === true &&
-      !('father.reason' in partialDeclaration))
-      ? { 'father.reason': 'Father is missing.' }
-      : {}),
     'mother.name': {
       firstname: faker.person.firstName(),
       surname: faker.person.lastName()
     },
     'mother.dob': '1995-09-12',
-    'mother.dobUnknown': false,
     'mother.nationality': 'FAR',
     'mother.idType': 'NATIONAL_ID',
-    'mother.educationalAttainment': 'NO_SCHOOLING',
-    'mother.maritalStatus': 'MARRIED',
     'mother.nid': faker.string.numeric(10),
     'mother.address': {
       country: 'FAR',
+      addressType: AddressType.DOMESTIC,
       administrativeArea: village,
-      addressType: AddressType.DOMESTIC
+      streetLevelDetails: { town: 'Dhaka' }
+    },
+    'father.name': {
+      firstname: faker.person.firstName(),
+      surname: faker.person.lastName()
+    },
+    'father.dob': '1995-09-12',
+    'father.nationality': 'FAR',
+    'father.idType': 'NATIONAL_ID',
+    'father.nid': faker.string.numeric(10),
+    'father.addressSameAs': 'NO',
+    'father.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: village,
+      streetLevelDetails: { town: 'Dhaka' }
     },
     'child.name': {
       firstname: faker.person.firstName(),
@@ -137,37 +127,26 @@ async function getDeclaration({
       .toISOString()
       .split('T')[0], // yesterday
     ...(await getPlaceOfBirth(placeOfBirthType, token)),
-    ...getInformantDetails(informantRelation)
+    'informant.relation': 'BROTHER',
+    'informant.email': 'brothers@email.com',
+    'informant.name': {
+      firstname: faker.person.firstName(),
+      surname: faker.person.lastName()
+    },
+    'informant.dob': '2008-09-12',
+    'informant.nationality': 'FAR',
+    'informant.idType': 'NATIONAL_ID',
+    'informant.phoneNo': generateCustomPhoneNumber(),
+    'informant.nid': faker.string.numeric(10),
+    'informant.address': {
+      country: 'FAR',
+      administrativeArea: village,
+      addressType: AddressType.DOMESTIC
+    }
   }
-
   // 💡 Merge overriden fields
   return {
     ...mockDeclaration,
-    ...('father.detailsNotAvailable' in partialDeclaration &&
-      !partialDeclaration['father.detailsNotAvailable'] && {
-        'father.detailsNotAvailable': false,
-        'father.name': {
-          firstname: faker.person.firstName('male'),
-          surname: faker.person.lastName('male')
-        },
-        'father.dob': format(subYears(new Date(), 30), 'yyyy-MM-dd'),
-        'father.idType': 'NATIONAL_ID',
-        'father.nid': faker.string.numeric(10),
-        'father.nationality': 'FAR',
-        'father.maritalStatus': 'SINGLE',
-        'father.educationalAttainment': 'NONE',
-        'father.occupation': 'Unemployed',
-        ...(partialDeclaration['father.addressSameAs'] === 'NO' && {
-          'father.address': {
-            country: 'FAR',
-            addressType: 'DOMESTIC' as const,
-            province,
-            district,
-            village,
-            urbanOrRural: 'URBAN' as const
-          }
-        })
-      }),
     ...partialDeclaration
   }
 }
@@ -176,9 +155,8 @@ export type Declaration = Awaited<ReturnType<typeof getDeclaration>>
 
 export interface CreateDeclarationResponse {
   eventId: string
+  trackingId: string
   declaration: Declaration
-  trackingId?: string
-  registrationNumber?: string
 }
 
 export async function createDeclaration(
@@ -199,21 +177,22 @@ export async function createDeclaration(
     type: 'birth',
     transactionId: uuidv4()
   })
-
   const eventId = createResponse.id as string
+  const trackingId = createResponse.trackingId
 
-  const filename = await uploadFile(getSignatureFile(), token)
+  const file = await uploadFile(getSignatureFile(), token)
 
   const annotation = {
     'review.comment': 'My comment',
-    'review.signature': filename
+    'review.signature': file
   }
+
   const declareRes = await client.event.actions.declare.request.mutate({
     eventId: eventId,
     transactionId: uuidv4(),
     declaration,
     annotation,
-    keepAssignment: action !== ActionType.DECLARE
+    keepAssignment: true
   })
 
   if (action === ActionType.DECLARE) {
@@ -227,8 +206,8 @@ export async function createDeclaration(
 
     return {
       eventId,
-      declaration: declareAction?.declaration as Declaration,
-      trackingId: declareRes?.trackingId as string
+      trackingId,
+      declaration: declareAction?.declaration as Declaration
     }
   }
 
@@ -240,22 +219,16 @@ export async function createDeclaration(
   })
 
   const registerAction = registerRes.actions.find(
-    (action: ActionDocument) =>
-      action.type === 'REGISTER' && action.status === 'Accepted'
+    (action: ActionDocument) => action.type === 'REGISTER'
   )
-
-  const registerRequestAction = registerRes.actions.find(
-    (action: ActionDocument) =>
-      action.type === 'REGISTER' && action.status === 'Requested'
-  )
-
-  const trackingId = registerRes?.trackingId as string
-  const registrationNumber = registerAction?.registrationNumber as string
 
   return {
     eventId,
-    declaration: registerRequestAction?.declaration as Declaration,
     trackingId,
-    registrationNumber
+    declaration: registerAction?.declaration as Declaration
   }
+}
+
+export const getChildNameFromRecord = (record: CreateDeclarationResponse) => {
+  return `${record.declaration['child.name'].firstname} ${record.declaration['child.name'].surname}`
 }

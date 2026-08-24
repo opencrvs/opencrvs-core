@@ -21,24 +21,24 @@ import {
   loginWithNewUser,
   ensureLoginPageReady,
   NEW_USER_PASSWORD
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import {
   CREDENTIALS,
   CLIENT_URL,
   LOGIN_URL,
   GATEWAY_HOST
-} from '../../constants'
+} from '@e2e/support/constants'
 import {
   createDeclaration,
   getDeclaration
-} from '../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import {
   getAdministrativeAreas,
   getIdByName,
   formatV2ChildName,
   assertRecordInWorkqueue
-} from '../birth/helpers'
-import { fetchClientAPI } from '../events-rest-api/helpers'
+} from '@e2e/support/birth/helpers'
+import { fetchClientAPI } from '@e2e/support/events-rest-api/helpers'
 
 /**
  * Verifies jurisdiction/routing predicates as locations are renamed,
