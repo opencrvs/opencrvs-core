@@ -70,7 +70,6 @@ helm_resource(
 traefik_deps = [
   'client',
   'countryconfig',
-  'events',
   'gateway',
   'login',
   'minio'
@@ -114,8 +113,7 @@ tilt_label = '1.OpenCRVS'
 opensrvs_predeploy_jobs = [
   'postgres-on-deploy',
   'data-migration',
-  'data-migration-analytics',
-  'data-migration-legacy',
+  'data-migration-analytics'
 ]
 
 opensrvs_services = [
