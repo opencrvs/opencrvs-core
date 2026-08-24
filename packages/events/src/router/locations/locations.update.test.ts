@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import {
   encodeScope,
   generateUuid,
@@ -20,6 +21,7 @@ import {
   UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { getLeafLevelAdministrativeAreaIds } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -594,4 +596,28 @@ test('rejects a client-supplied versionId that already names an existing version
 
   const row = await getVersionsFromDb(created.id)
   expect(row.versions).toHaveLength(1)
+})
+
+test('does not invalidate the leaf-level administrative area cache', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Cache Stable Office',
+    externalId: 'location-cache-update-pcode'
+  })
+
+  const before = await getLeafLevelAdministrativeAreaIds()
+
+  await client.locations.update({
+    id: created.id,
+    name: 'Cache Stable Office Renamed',
+    externalId: 'location-cache-update-pcode',
+    status: 'active',
+    effectiveFrom: '2099-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  const after = await getLeafLevelAdministrativeAreaIds()
+  expect(after).toBe(before)
 })

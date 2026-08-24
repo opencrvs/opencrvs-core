@@ -6,23 +6,16 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+#
+# Minikube-only overrides, layered on top of values.yaml (see tilt/common.tilt,
+# which passes both --values files to helm when the active context is minikube).
+#
+# minikube doesn't expose LoadBalancer services to the host on its own, so we
+# switch to NodePort here, pinned to what
+# `minikube start --ports=80:30080` publishes onto the host.
+service:
+  type: NodePort
 
-hostname: opencrvs.localhost
-
-ingress:
-  ssl_enabled: false
-
-redis:
-  auth_mode: acl
-
-minio:
-  use_default_credentials: false
-
-elasticsearch:
-  use_default_credentials: false
-
-mongodb:
-  use_default_credentials: false
-
-postgres:
-  use_default_credentials: false
+ports:
+  web:
+    nodePort: 30080
