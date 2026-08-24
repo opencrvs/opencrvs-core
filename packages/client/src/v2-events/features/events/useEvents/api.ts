@@ -310,6 +310,11 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
   return refetchAllSearchQueries()
 }
 
+export async function onMarkNotDuplicate(data: EventDocument) {
+  updateLocalEvent(data)
+  await refetchSearchQuery(data.id)
+}
+
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
   await invalidateWorkqueues()
   await refetchSearchQuery(updatedEvent.id)

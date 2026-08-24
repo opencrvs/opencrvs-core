@@ -60,6 +60,7 @@ function useActionGuard(
   configuration: EventConfig
 ) {
   const eventState = getCurrentEventState(event, configuration)
+
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()

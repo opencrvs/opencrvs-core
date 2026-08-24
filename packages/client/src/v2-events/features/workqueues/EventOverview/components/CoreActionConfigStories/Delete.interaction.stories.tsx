@@ -212,6 +212,7 @@ export const deleteLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
