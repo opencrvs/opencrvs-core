@@ -157,8 +157,9 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: packages/mosip
 
-      # main, exports and typings all point into build/, so the package is
-      # unusable unless tsc has run.
+      # Built through the workspace graph so @opencrvs/toolkit is built first:
+      # mosip's sources import types from it, and the toolkit build above is
+      # skipped when its version is already on npm.
       - name: Build mosip country-config helpers
         if: steps.check-mosip-version.outputs.version-exists == 'false'
         run: pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/mosip
