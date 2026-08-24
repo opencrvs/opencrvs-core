@@ -34,7 +34,8 @@ import {
   addUserToQueryData,
   setEventData,
   addLocalEventConfig,
-  setDraftData
+  setDraftData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   ActionType,
@@ -329,6 +330,7 @@ const preview: Preview = {
 
       offlineEvents.forEach((event) => {
         setEventData(event.id, event)
+        updateLocalEventIndex(event.id, event)
       })
 
       if (options.parameters?.offline?.drafts) {
