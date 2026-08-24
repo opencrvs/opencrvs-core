@@ -159,9 +159,9 @@ jobs:
 
       # main, exports and typings all point into build/, so the package is
       # unusable unless tsc has run.
-      - name: Build mosip
+      - name: Build mosip country-config helpers
         if: steps.check-mosip-version.outputs.version-exists == 'false'
-        run: pnpm build
+        run: pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/mosip
         working-directory: packages/mosip
 
       - name: Update mosip package.json version
