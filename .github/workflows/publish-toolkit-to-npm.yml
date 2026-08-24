@@ -162,7 +162,7 @@ jobs:
       # skipped when its version is already on npm.
       - name: Build mosip country-config helpers
         if: steps.check-mosip-version.outputs.version-exists == 'false'
-        run: pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/mosip
+        run: pnpm exec nx run @opencrvs/mosip:build
         working-directory: packages/mosip
 
       - name: Update mosip package.json version
