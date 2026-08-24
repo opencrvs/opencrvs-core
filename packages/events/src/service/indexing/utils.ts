@@ -23,7 +23,6 @@ import {
   FieldValue,
   getDeclarationFieldById,
   isAgeFieldType,
-  isFieldSecured,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
@@ -356,21 +355,6 @@ export function decodeEventIndex(
         )
       }),
       {}
-    )
-  }
-}
-
-export function removeSecuredFields(
-  eventConfig: EventConfig,
-  event: EventIndex
-): EventIndex {
-  return {
-    ...event,
-    declaration: Object.fromEntries(
-      Object.entries(event.declaration).filter(
-        ([fieldId]) =>
-          !isFieldSecured(getDeclarationFieldById(eventConfig, fieldId), event)
-      )
     )
   }
 }

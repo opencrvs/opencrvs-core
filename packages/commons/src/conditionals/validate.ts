@@ -479,7 +479,7 @@ export function areConditionsMet(
 export function isFieldSecured(
   field: Pick<FieldConfig, 'secured'>,
   event: EventIndex,
-  context: ValidatorContext = {}
+  context: ValidatorContext
 ): boolean {
   if (typeof field.secured !== 'object' || field.secured === null) {
     return Boolean(field.secured)

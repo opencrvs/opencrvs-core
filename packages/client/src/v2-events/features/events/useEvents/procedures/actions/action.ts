@@ -34,7 +34,7 @@ import {
   findLocalEventIndex,
   onAssign,
   deleteLocalEvent,
-  updateLocalEvent
+  onMarkNotDuplicate
 } from '@client/v2-events/features/events/useEvents/api'
 import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
@@ -76,11 +76,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   retryDelay,
   onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
-  onMutate: updateEventOptimistically(
-    ActionType.DECLARE,
-    ActionStatus.Accepted,
-    true
-  ),
   meta: { actionType: ActionType.DECLARE }
 })
 
@@ -238,7 +233,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   retry: retryUnlessConflict,
   retryDelay,
   onMutate: updateEventOptimistically(ActionType.MARK_AS_NOT_DUPLICATE),
-  onSuccess: updateLocalEvent,
+  onSuccess: onMarkNotDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
 })
