@@ -17817,23 +17817,7 @@ components:
                             type: string
                             const: DOMESTIC
                           administrativeArea:
-                            minItems: 1
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                locationId:
-                                  type: string
-                                  format: uuid
-                                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                versionId:
-                                  type: string
-                                  format: uuid
-                                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                              required:
-                                - locationId
-                                - versionId
-                              additionalProperties: false
+                            type: string
                         required:
                           - country
                           - addressType
@@ -17857,37 +17841,6 @@ components:
                           - addressType
                         additionalProperties: false
                     type: object
-                  - type: object
-                    properties:
-                      locationId:
-                        type: string
-                        format: uuid
-                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                      versionId:
-                        type: string
-                        format: uuid
-                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                    required:
-                      - locationId
-                      - versionId
-                    additionalProperties: false
-                  - minItems: 1
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        locationId:
-                          type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                        versionId:
-                          type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                      required:
-                        - locationId
-                        - versionId
-                      additionalProperties: false
                   - type: string
                   - type: string
                     format: date
@@ -18170,23 +18123,7 @@ components:
                                       type: string
                                       const: DOMESTIC
                                     administrativeArea:
-                                      minItems: 1
-                                      type: array
-                                      items:
-                                        type: object
-                                        properties:
-                                          locationId:
-                                            type: string
-                                            format: uuid
-                                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                          versionId:
-                                            type: string
-                                            format: uuid
-                                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                        required:
-                                          - locationId
-                                          - versionId
-                                        additionalProperties: false
+                                      type: string
                                   required:
                                     - country
                                     - addressType
@@ -18210,37 +18147,6 @@ components:
                                     - addressType
                                   additionalProperties: false
                               type: object
-                            - type: object
-                              properties:
-                                locationId:
-                                  type: string
-                                  format: uuid
-                                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                versionId:
-                                  type: string
-                                  format: uuid
-                                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                              required:
-                                - locationId
-                                - versionId
-                              additionalProperties: false
-                            - minItems: 1
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  locationId:
-                                    type: string
-                                    format: uuid
-                                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                  versionId:
-                                    type: string
-                                    format: uuid
-                                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                required:
-                                  - locationId
-                                  - versionId
-                                additionalProperties: false
                             - type: string
                             - type: string
                               format: date
@@ -18525,23 +18431,7 @@ components:
                               type: string
                               const: DOMESTIC
                             administrativeArea:
-                              minItems: 1
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  locationId:
-                                    type: string
-                                    format: uuid
-                                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                  versionId:
-                                    type: string
-                                    format: uuid
-                                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                required:
-                                  - locationId
-                                  - versionId
-                                additionalProperties: false
+                              type: string
                           required:
                             - country
                             - addressType
@@ -18565,37 +18455,6 @@ components:
                             - addressType
                           additionalProperties: false
                       type: object
-                    - type: object
-                      properties:
-                        locationId:
-                          type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                        versionId:
-                          type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                      required:
-                        - locationId
-                        - versionId
-                      additionalProperties: false
-                    - minItems: 1
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          locationId:
-                            type: string
-                            format: uuid
-                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                          versionId:
-                            type: string
-                            format: uuid
-                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                        required:
-                          - locationId
-                          - versionId
-                        additionalProperties: false
                     - type: string
                     - type: string
                       format: date
