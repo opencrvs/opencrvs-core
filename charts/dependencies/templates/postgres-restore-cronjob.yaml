@@ -65,10 +65,7 @@ spec:
                       name: {{ .Values.restore.backup_server_secret }}
                       key: user
                 - name: BACKUP_HOST
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ .Values.restore.backup_server_secret }}
-                      key: host
+                  value: {{ default .Values.restore.host .Values.postgres.restore.host }}
                 - name: BACKUP_REMOTE_DIR
                   value: {{ default .Values.restore.backup_server_dir .Values.postgres.restore.server_dir }}
               {{- include "render-env-vars" (dict "service_name" "restore" "Values" .Values) | nindent 4 }}

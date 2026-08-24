@@ -24,6 +24,34 @@ secret_settings(disable_scrub=True)
 print("🚀 Deploying traefik...")
 namespace_create('traefik')
 traefik_tilt_label = '5.Traefik'
+
+# Which local Kubernetes you're running Tilt against:
+#   "orbstack" (default) - OrbStack/Docker Desktop expose LoadBalancer
+#                          services on localhost automatically.
+#   "minikube"           - minikube doesn't expose LoadBalancer/NodePort
+#                          services to the host on its own (EXTERNAL-IP stays
+#                          <pending> without a separate `minikube tunnel` /
+#                          `minikube service` process), so we deploy Traefik
+#                          with a NodePort values file instead
+
+current_k8s_context = k8s_context()
+detected_local_k8s = "minikube" if "minikube" in current_k8s_context else "orbstack"
+local_k8s = os.getenv("LOCAL_K8S", detected_local_k8s)
+print("☸️  Kubernetes context: {} (local_k8s={})".format(current_k8s_context, local_k8s))
+
+# values-minikube.yaml only contains what differs from values.yaml (NodePort
+# instead of LoadBalancer, a pinned port). Helm merges multiple --values files
+# in order, so on minikube we layer both instead of duplicating the file.
+traefik_values_files = ["values.yaml"]
+if local_k8s == "minikube":
+  traefik_values_files.append("values-minikube.yaml")
+
+override_values_file = os.getenv("TRAEFIK_VALUES_FILE", "")
+if override_values_file:
+  traefik_values_files = [override_values_file]
+
+print("🔀 Using traefik values file(s): {}".format(", ".join(traefik_values_files)))
+
 # Install Traefik GW
 helm_repo('traefik-repo', 'https://traefik.github.io/charts', labels=[traefik_tilt_label])
 helm_resource(
@@ -33,25 +61,24 @@ helm_resource(
     resource_deps=['traefik-repo'],
     flags=[
         '--version=39.0.0',
-        '--values=./examples/traefik/values.yaml',
         '--create-namespace',
-    ],
+    ] + ['--values=./examples/traefik/{}'.format(f) for f in traefik_values_files],
 )
-
 # OpenCRVS application has traefik CRDs IngressRoute
 # and Middleware, so we need to add traefik as dependency
 # to all workloads that use them
 traefik_deps = [
   'client',
   'countryconfig',
-  'events',
   'gateway',
   'login',
   'minio'
 ]
+
 k8s_resource("traefik", labels=[traefik_tilt_label])
+
 # Add labels to traefik resources
-traefik_ingress_objects = ["{}-route:ingressroute".format(dep) for dep in traefik_deps]
+traefik_ingress_objects = ["{}-route:ingressroute".format(dep) for dep in traefik_deps] + ['internal-routes:ingressroute']
 traefik_middleware_objects = ["sts-and-basic-response-headers:middleware", "enable-compression:middleware", "block-internal-routes:middleware"]
 k8s_resource(
   objects=traefik_ingress_objects,
@@ -71,14 +98,9 @@ k8s_resource(
 tilt_label = '4.Dependencies'
 dependencies = [
   'elasticsearch',
-  'mongodb',
   'minio',
   'redis',
   'postgres',
-  # 'postgres-on-deploy',
-  # FIXME: both resources are present only if security is enabled
-  # 'elasticsearch-on-deploy',
-  # 'mongo-on-deploy',
 ]
 
 for workload in dependencies:
@@ -90,12 +112,8 @@ tilt_label = '1.OpenCRVS'
 
 opensrvs_predeploy_jobs = [
   'postgres-on-deploy',
-  # FIXME: works only if security is enabled
-  # 'mongo-on-deploy',
-  # 'elasticsearch-on-deploy',
   'data-migration',
-  'data-migration-analytics',
-  'data-migration-legacy',
+  'data-migration-analytics'
 ]
 
 opensrvs_services = [
@@ -105,7 +123,7 @@ opensrvs_services = [
   'documents',
   'events',
   'gateway',
-  'login'
+  'login',
 ]
 
 opensrvs_postdeploy_jobs = [

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import {
   SetAdministrativeAreaPayload,
@@ -26,6 +27,7 @@ import {
   UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { getLeafLevelAdministrativeAreaIds } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { payloadGenerator } from '@events/tests/generators'
 
 const administrativeAreaPayload: SetAdministrativeAreaPayload[] = [
@@ -587,4 +589,35 @@ test('rejects a non-ascending supplied history', async () => {
       }
     ])
   ).rejects.toThrow()
+})
+
+test('invalidates the leaf-level administrative area cache', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const before = await getLeafLevelAdministrativeAreaIds()
+
+  // generateUuid() with no argument draws from a constant rng, so a second
+  // call without one would collide with the first — use an advancing PRNG
+  // for distinct ids instead.
+  const uuid = uuidFactory(90007)
+  const parentId = uuid()
+  const areaId = uuid()
+
+  await client.administrativeAreas.set([
+    { id: parentId, parentId: null, name: 'Parent Area', externalId: null },
+    {
+      id: areaId,
+      parentId,
+      name: 'New Leaf Area',
+      externalId: 'leaf-cache-set-pcode'
+    }
+  ])
+
+  const after = await getLeafLevelAdministrativeAreaIds()
+
+  expect(after).not.toBe(before)
+  expect(after.map((row) => row.id)).toContain(areaId)
+  // parentId now has a child, so it must have dropped out of the leaf set.
+  expect(after.map((row) => row.id)).not.toContain(parentId)
 })

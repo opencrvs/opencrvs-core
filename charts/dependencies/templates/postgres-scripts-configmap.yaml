@@ -5,7 +5,7 @@ data:
 {{ .Files.Get "files/common/backup-functions.sh" | indent 8 }}
 {{- range $path, $file := .Files.Glob "files/postgres/*" }}
     {{ base $path }}: |
-{{ toString $file | indent 8 }}
+{{ tpl (toString $file) $ | indent 8 }}
 {{- end }}
 kind: ConfigMap
 metadata:

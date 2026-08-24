@@ -35,7 +35,7 @@
     "pino": "^7.0.0",
     "tsconfig-paths": "^4.2.0",
     "uuid": "^3.2.1",
-    "zod": "^4.2"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@swc-contrib/mut-cjs-exports": "^14.15.0",

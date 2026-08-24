@@ -20,6 +20,7 @@ import {
   UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { getLeafLevelAdministrativeAreaIds } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -384,4 +385,28 @@ test('rejects a recode to an actively held externalId but allows a brand-new cod
 
   expect(updated.externalId).toBe('area-brand-new-pcode')
   expect(updated.versions).toHaveLength(2)
+})
+
+test('does not invalidate the leaf-level administrative area cache', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createArea(client, {
+    name: 'Cache Stable District',
+    externalId: 'area-cache-update-pcode'
+  })
+
+  const before = await getLeafLevelAdministrativeAreaIds()
+
+  await client.administrativeAreas.update({
+    id: created.id,
+    name: 'Cache Stable District Renamed',
+    externalId: 'area-cache-update-pcode',
+    status: 'active',
+    effectiveFrom: '2099-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  const after = await getLeafLevelAdministrativeAreaIds()
+  expect(after).toBe(before)
 })

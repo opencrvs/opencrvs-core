@@ -58,7 +58,7 @@
     "qs": "6.15.2",
     "uuid": "^9.0.0",
     "yaml": "^2.7.1",
-    "zod": "^4.2.1",
+    "zod": "^4.4.3",
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
