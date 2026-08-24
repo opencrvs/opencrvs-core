@@ -221,14 +221,14 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          await page.getByTestId('row-value-child.name').getByRole('deletion')
+          await page.getByTestId('child.name-value').getByRole('deletion')
         ).toHaveText(
           `${declaration['child.name'].firstname} ${declaration['child.name'].surname}`
         )
 
         await expect(
           page
-            .getByTestId('row-value-child.name')
+            .getByTestId('child.name-value')
             .getByText(
               `${updatedChildDetails.firstNames} ${updatedChildDetails.familyName}`
             )
@@ -264,12 +264,12 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          page.getByTestId('row-value-child.gender').getByRole('deletion')
+          page.getByTestId('child.gender-value').getByRole('deletion')
         ).toHaveText(declaration['child.gender'], { ignoreCase: true })
 
         await expect(
           page
-            .getByTestId('row-value-child.gender')
+            .getByTestId('child.gender-value')
             .getByText(updatedChildDetails.gender)
         ).toBeVisible()
       })
@@ -305,12 +305,12 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          page.getByTestId('row-value-child.dob').getByRole('deletion')
+          page.getByTestId('child.dob-value').getByRole('deletion')
         ).toHaveText(formatDateTo_dMMMMyyyy(declaration['child.dob']))
 
         await expect(
           page
-            .getByTestId('row-value-child.dob')
+            .getByTestId('child.dob-value')
             .getByText(formatDateTo_dMMMMyyyy(updatedChildDetails.birthDate))
         ).toBeVisible()
       })
@@ -352,14 +352,14 @@ test.describe('10. Correct record', () => {
 
         await expect(
           page
-            .getByTestId('row-value-child.birthLocation')
+            .getByTestId('child.birthLocation-value')
             .getByRole('deletion')
             .getByText(childBirthLocationName!)
         ).toBeVisible()
 
         await expect(
           page
-            .getByTestId('row-value-child.birthLocation')
+            .getByTestId('child.birthLocation-value')
             .getByText(updatedChildDetails.birthLocation)
         ).toBeVisible()
       })
@@ -393,14 +393,12 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          page
-            .getByTestId('row-value-child.attendantAtBirth')
-            .getByRole('deletion')
+          page.getByTestId('child.attendantAtBirth-value').getByRole('deletion')
         ).toHaveText('-')
 
         await expect(
           page
-            .getByTestId('row-value-child.attendantAtBirth')
+            .getByTestId('child.attendantAtBirth-value')
             .getByText(updatedChildDetails.attendantAtBirth)
         ).toBeVisible()
       })
@@ -434,12 +432,12 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          page.getByTestId('row-value-child.birthType').getByRole('deletion')
+          page.getByTestId('child.birthType-value').getByRole('deletion')
         ).toHaveText('-')
 
         await expect(
           page
-            .getByTestId('row-value-child.birthType')
+            .getByTestId('child.birthType-value')
             .getByText(updatedChildDetails.typeOfBirth)
         ).toBeVisible()
       })
@@ -496,12 +494,12 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
 
         await expect(
-          page.getByTestId('row-value-child.birthType').getByRole('deletion')
+          page.getByTestId('child.birthType-value').getByRole('deletion')
         ).toHaveText('-')
 
         await expect(
           page
-            .getByTestId('row-value-child.weightAtBirth')
+            .getByTestId('child.weightAtBirth-value')
             .getByText(updatedChildDetails.weightAtBirth)
         ).toBeVisible()
       })
@@ -640,16 +638,11 @@ test.describe('10. Correct record', () => {
       test('10.1.6.3 Approve correction', async () => {
         await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
-        await waitForCorrectionAction(
-          page,
-          'approve',
-          async () => {
-            await page
-              .getByRole('button', { name: 'Confirm', exact: true })
-              .click()
-          },
-          { waitForUnassign: true, eventId }
-        )
+        await waitForCorrectionAction(page, 'approve', async () => {
+          await page
+            .getByRole('button', { name: 'Confirm', exact: true })
+            .click()
+        })
 
         await expectInUrl(page, `/events/${eventId}`)
       })

@@ -225,6 +225,89 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
 }
 `;
 
+exports[`User notification - Email > password-reset-link 1`] = `
+{
+  "from": "",
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      body {
+        font-family: 'Noto Sans', sans-serif;
+        color: #222;
+        padding: 16px 24px;
+      }
+
+      h1 {
+        font-size: 21px;
+        margin-top: 32px;
+        margin-bottom: 36px;
+        font-weight: 700;
+      }
+
+      p {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.8;
+        margin-bottom: 24px;
+      }
+
+      i {
+        color: #666;
+        font-weight: 400;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <img
+      src="http://localhost:3040/content/country-logo"
+      alt="country_logo"
+      style="max-height: 88px; max-width: 100%"
+    />
+    <h1>Reset your password</h1>
+    <p>Hello John,</p>
+    <p>
+      Someone asked to reset the password for your Farajaland CRS
+      account.
+    </p>
+
+    <div style="margin-top: 32px; margin-bottom: 32px">
+      <a href="http://localhost:3020/recover?token=recovery-token-password">Reset your password</a>
+    </div>
+    <br />
+    <p>
+      This link expires in 1 hour and can only be used once. If you did not
+      request this, you can ignore this email.
+    </p>
+    <br />
+    <p>
+      Best regards, <br />
+      Farajaland CRS Team
+    </p>
+  </body>
+</html>
+",
+  "subject": "Reset your password",
+  "to": "john.doe@gmail.com",
+}
+`;
+
 exports[`User notification - Email > resend-invite 1`] = `
 {
   "from": "",
@@ -688,6 +771,89 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
 </html>
 ",
   "subject": "Account username reminder",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > username-reminder-link 1`] = `
+{
+  "from": "",
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      body {
+        font-family: 'Noto Sans', sans-serif;
+        color: #222;
+        padding: 16px 24px;
+      }
+
+      h1 {
+        font-size: 21px;
+        margin-top: 32px;
+        margin-bottom: 36px;
+        font-weight: 700;
+      }
+
+      p {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.8;
+        margin-bottom: 24px;
+      }
+
+      i {
+        color: #666;
+        font-weight: 400;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <img
+      src="http://localhost:3040/content/country-logo"
+      alt="country_logo"
+      style="max-height: 88px; max-width: 100%"
+    />
+    <h1>Retrieve your username</h1>
+    <p>Hello John,</p>
+    <p>
+      Someone asked for a reminder of the username on your
+      Farajaland CRS account.
+    </p>
+
+    <div style="margin-top: 32px; margin-bottom: 32px">
+      <a href="http://localhost:3020/recover?token=recovery-token-username">Retrieve your username</a>
+    </div>
+    <br />
+    <p>
+      This link expires in 1 hour and can only be used once. If you did not
+      request this, you can ignore this email.
+    </p>
+    <br />
+    <p>
+      Best regards, <br />
+      Farajaland CRS Team
+    </p>
+  </body>
+</html>
+",
+  "subject": "Retrieve your username",
   "to": "john.doe@gmail.com",
 }
 `;

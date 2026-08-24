@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { Recipient, TriggerEvent } from '@opencrvs/toolkit/notification'
-import { UUID, DocumentPath } from '@opencrvs/toolkit/events'
-import { TriggerEventPayloadPair } from './handler'
 import {
+  UUID,
+  DocumentPath,
   Action,
   ActionStatus,
   ActionType,
   CreatedAction,
   EventDocument
 } from '@opencrvs/toolkit/events'
+import { TriggerEventPayloadPair } from './handler'
 import { Event } from '@countryconfig/events/utils'
 
 const recipient: Recipient = {
@@ -81,6 +81,20 @@ export const userNotificationTestData: TriggerEventPayloadPair[] = [
         id: 'admin',
         role: 'NATIONAL_SYSTEM_ADMIN'
       }
+    }
+  },
+  {
+    event: TriggerEvent.PASSWORD_RESET_LINK,
+    payload: {
+      recipient,
+      token: 'recovery-token-password'
+    }
+  },
+  {
+    event: TriggerEvent.USERNAME_REMINDER_LINK,
+    payload: {
+      recipient,
+      token: 'recovery-token-username'
     }
   },
   {

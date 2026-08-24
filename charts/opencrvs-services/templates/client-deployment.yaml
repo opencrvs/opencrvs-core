@@ -50,6 +50,7 @@ spec:
         service_name: opencrvs_client
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.client) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "client" "Values" .Values) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.client) }}
           imagePullPolicy: {{ .Values.client.image.pullPolicy | default .Values.platform.imagePullPolicy }}
@@ -96,6 +97,8 @@ spec:
             name: {{ $config_name }}
       {{- end }}
       {{- end }}
+
+{{- include "service-account-helper" (dict "service_name" "client" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "client" "Values" .Values) }}
 

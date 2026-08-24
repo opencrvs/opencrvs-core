@@ -225,6 +225,50 @@ test('Throws error when creating user with existing mobile', async () => {
   )
 })
 
+test('Does not report a username as taken when it is only a prefix of an existing one', async () => {
+  await systemInitialisationTestSetup()
+
+  const client = createInitialisationTestClient()
+  const eventsDb = getClient()
+
+  await client.locations.set(locationPayload)
+  const location = await eventsDb
+    .selectFrom('locations')
+    .selectAll()
+    .executeTakeFirstOrThrow()
+
+  await expect(
+    client.users.create({
+      email: 'j.campbell2@opencrvs.org',
+      role: 'admin',
+      name: { firstname: 'Jane', surname: 'Campbell' },
+      primaryOfficeId: location.id,
+      username: 'j.campbell2'
+    })
+  ).resolves.toBeDefined()
+
+  // The seed job skips an initial user whose username this search reports as
+  // already existing.
+  const existing = await client.users.search({
+    username: 'j.campbell',
+    count: 1,
+    skip: 0,
+    sortOrder: 'asc'
+  })
+
+  expect(existing).toEqual([])
+
+  await expect(
+    client.users.create({
+      email: 'j.campbell@opencrvs.org',
+      role: 'admin',
+      name: { firstname: 'John', surname: 'Campbell' },
+      primaryOfficeId: location.id,
+      username: 'j.campbell'
+    })
+  ).resolves.toBeDefined()
+})
+
 test('Creates user with active status when status is provided', async () => {
   await systemInitialisationTestSetup()
   const client = createInitialisationTestClient()

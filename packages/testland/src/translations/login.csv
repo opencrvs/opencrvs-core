@@ -1,17 +1,15 @@
 id,description,en,fr
+buttons.backToLogin,"Label used to leave a screen that is waiting on an emailed link, where logging in is not yet possible",Back to login,Retour à la connexion
 buttons.confirm,Label used for confirm button,Confirm,Confirmer
 buttons.continue,Label used for continue button,Continue,Continuer
 buttons.login,The title that appears in step one of the form,Login,Se connecter
 constants.emailAddress,Label used for email address input field,Email address,Adresse e-mail
 constants.phoneNumber,Label used for phone number input field,Phone number,Numéro de téléphone
 constants.skipToMainContent,Label for a keyboard accessibility link which skips to the main content,Skip to main content,Passer au contenu principal
-error.errorEmailAddressNotFound,Error message for email address not found,Email address not found.,Adresse e-mail introuvable.
-error.errorPhoneNumberNotFound,Error message for phone number not found,Phone number not found,Numéro de téléphone mobile non trouvé.
 error.networkError,The error that appears when there is no internet connection,Unable to connect to server,Impossible de se connecter au serveur
 error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
 label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
 login.clearForm,,Clear form,Effacer le formulaire
-login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.codeSubmissionError,The error that appears when the user entered sms code is unauthorised,Incorrect verification code. Please try again,"Désolé, ce code n'a pas fonctionné."
 login.fieldMissing,The error if user doesn't fill all the field,Enter your username and password,Nom d'utilisateur/mot de passe requis
 login.forbiddenCredentialError,The error that appears when the user entered details are forbidden,User is currently deactivated,L'utilisateur est actuellement désactivé.
@@ -28,6 +26,7 @@ login.passwordLabel,The label that appears on the password input,Password,Mot de
 login.resend,Text for button that resends SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer le {notificationMethod, select, sms {SMS} email {Email} other {}}"
 login.resentEMAIL,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {email},Nous venons de vous envoyer un autre code à {email}.
 login.resentSMS,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {number},Nous venons de vous envoyer un autre code à {number}.
+login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.stepOneInstruction,The instruction that appears in step one of the form,Please enter your username and password.,Veuillez entrer votre nom d'utilisateur et votre mot de passe.
 login.stepOneText,The instruction that appears in step one of the login form,Login to Farajaland CRVS,Connectez-vous à Farajaland CRVS
 login.stepTwoInstruction.email,The instruction that appears in step two of the form that lets users know that code has been sent to email,An authentication code has been sent to {email}. This code will be valid for 10 minutes,Un code d'authentification a été envoyé à {email}. Ce code sera valable 10 minutes
@@ -54,22 +53,21 @@ password.validation.msg,Password validation message,Password must have:,"Le mot 
 reloadmodal.body,Body of reload modal,There’s a new version of {app_name} available. Please update to continue.,Une nouvelle version de {app_name} est disponible. Veuillez effectuer la mise à jour pour continuer.
 reloadmodal.button.update,Label of update button,Update,Mise à jour
 reloadmodal.title,Title when update is available,Update available,Mise à jour disponible
-resend.sms,Text for button that resend SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer un {notificationMethod, select, sms {SMS} email {Email} other {}}"
 resetCredentials.emailAddressConfirmation.form.body.header,Form body header used in the body of email address confirmation step,Enter your email address,Entrez votre adresse email
 resetCredentials.forgottenItem.form.body.header,Body header for forgotten item form,Select an option,Qu'avez-vous oublié ?
 resetCredentials.forgottenItem.form.title,Title used for forgotten item form,Can't login,Impossible de se connecter
 resetCredentials.form.title,Title used reset credentials forms,"{forgottenItem, select, username {Username reminder} password {Password reset} other {}}","{forgottenItem, select, username {Demande de rappel de nom d'utilisateur} password {Réinitialisation du mot de passe} other {}}"
 resetCredentials.label.field.answer,Label used for answer input field,Answer,Réponse
-resetCredentials.label.field.verificationCode,Label used for verification code input field,Verification code (6 digits),Code de vérification (6 chiffres)
 resetCredentials.option.password,Option used for password,Password reset,Mon mot de passe
 resetCredentials.option.username,Option used for username,Username reminder,Mon nom d'utilisateur
 resetCredentials.phoneNumberConfirmation.form.body.header,Form body header used in the body of phone number confirmation step,Enter your phone number,Quel est votre numéro de téléphone ?
 resetCredentials.phoneNumberConfirmation.form.body.subheader,,,C'est le numéro associé à votre compte.
-resetCredentials.recoveryCodeEntry.codeResent.form.body.header,The title that appears in step two of the form after resend button click,Authentication code resent,Envoi du code de vérification
-resetCredentials.recoveryCodeEntry.codeResent.form.body.subheader,The message that appears when the resend button is clicked.,Resent another code to {number}.,Nous venons de vous renvoyer un autre code à {number}.
-resetCredentials.recoveryCodeEntry.form.body.header,Form body header used for recovery code entry step,Enter 6-digit authetication code,Entrez le code de récupération à 6 chiffres
-resetCredentials.recoveryCodeEntry.form.body.subheader,Form body subheader used for recovery code entry step in mobile flow,An authentication code was sent to your phone number. Didn't receive it? {link},Le code de récupération a été envoyé à votre numéro de téléphone. Veuillez entrer le code. Vous ne l'avez pas reçu ?
-resetCredentials.recoveryCodeEntry.form.body.subheader.email,Form body subheader used for recovery code entry step in email flow,The recovery code was sent to your email. Please enter the code. Didn't receive it? {link},Le code de récupération a été envoyé à votre adresse e-mail. Veuillez entrer le code. Vous ne l'avez pas reçu ?
+resetCredentials.recoveryInstructionsSent.body,"Body message for the recovery instructions sent page. Must not assert delivery, since the account may not exist.","If we found an account, you'll receive instructions for {forgottenItem, select, username {retrieving your username} other {resetting your password}}. The link expires in 1 hour.","Si nous trouvons un compte correspondant, vous recevrez les instructions pour {forgottenItem, select, username {récupérer votre nom d'utilisateur} other {réinitialiser votre mot de passe}}. Le lien expire dans 1 heure."
+resetCredentials.recoveryInstructionsSent.title.email,Title for the recovery instructions sent page when notifications are delivered by email,Check your email,Vérifiez votre e-mail
+resetCredentials.recoveryInstructionsSent.title.phone,Title for the recovery instructions sent page when notifications are delivered by SMS,Check your phone,Vérifiez votre téléphone
+resetCredentials.recoveryLinkLanding.expired.body,"Body shown when a recovery link is invalid, expired, or already used. Must not reveal whether the underlying account exists.",This link is no longer valid. Request a new one to continue.,Ce lien n'est plus valide. Veuillez en demander un nouveau pour continuer.
+resetCredentials.recoveryLinkLanding.expired.link,Link back to the forgotten item form shown on an expired/invalid recovery link,Start again,Recommencer
+resetCredentials.recoveryLinkLanding.expired.title,"Title shown when a recovery link is invalid, expired, or already used",This link has expired,Ce lien a expiré
 resetCredentials.securityQuestion.form.body.subheader,Form body subheader used for security question step,This is one of the security questions you choose when setting up your account,Il s'agit d'une des questions de sécurité que vous choisissez lors de la création de votre compte
 resetCredentials.success.page.subtitle.email,Subtitle for success page for email,"{forgottenItem, select, username {Check your email for a reminder of your username} password {You can now login with your new password} other {}}","{forgottenItem, select, username {Vérifiez votre e-mail pour vous rappeler votre nom d'utilisateur.} password {Vous pouvez maintenant vous connecter avec votre nouveau mot de passe} other {}}"
 resetCredentials.success.page.subtitle.phone,Subtitle for success page for phone,"{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password} other {}}","{forgottenItem, select, username {Vérifiez votre téléphone pour vous rappeler votre nom d'utilisateur.} password {Vous pouvez maintenant vous connecter avec votre nouveau mot de passe} other {}}"

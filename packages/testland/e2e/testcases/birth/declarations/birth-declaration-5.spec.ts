@@ -318,7 +318,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Child's First Name
        * - Child's Family Name
        */
-      await expect(page.getByTestId('row-value-child.name')).toHaveText(
+      await expect(page.getByTestId('child.name-value')).toHaveText(
         declaration.child.name.firstNames +
           ' ' +
           declaration.child.name.familyName
@@ -328,7 +328,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Child's Gender
        */
-      await expect(page.getByTestId('row-value-child.gender')).toHaveText(
+      await expect(page.getByTestId('child.gender-value')).toHaveText(
         declaration.child.gender
       )
 
@@ -336,7 +336,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Child's date of birth
        */
-      await expect(page.getByTestId('row-value-child.dob')).toHaveText(
+      await expect(page.getByTestId('child.dob-value')).toHaveText(
         formatDateObjectTo_dMMMMyyyy(declaration.child.birthDate)
       )
 
@@ -345,13 +345,13 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
-      await expect(page.getByTestId('row-value-child.placeOfBirth')).toHaveText(
+      await expect(page.getByTestId('child.placeOfBirth-value')).toHaveText(
         declaration.placeOfBirth
       )
       await validateAddress(
         page,
         declaration.birthLocation,
-        'row-value-child.birthLocation.other'
+        'child.birthLocation.other-value'
       )
 
       /*
@@ -359,14 +359,14 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Child's Attendant at birth
        */
       await expect(
-        page.getByTestId('row-value-child.attendantAtBirth')
+        page.getByTestId('child.attendantAtBirth-value')
       ).toHaveText(declaration.attendantAtBirth)
 
       /*
        * Expected result: should include
        * - Child's Birth type
        */
-      await expect(page.getByTestId('row-value-child.birthType')).toHaveText(
+      await expect(page.getByTestId('child.birthType-value')).toHaveText(
         declaration.birthType
       )
 
@@ -374,7 +374,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Informant's relation to child
        */
-      await expect(page.getByTestId('row-value-informant.relation')).toHaveText(
+      await expect(page.getByTestId('informant.relation-value')).toHaveText(
         declaration.informantType
       )
 
@@ -382,7 +382,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Informant's Email
        */
-      await expect(page.getByTestId('row-value-informant.email')).toHaveText(
+      await expect(page.getByTestId('informant.email-value')).toHaveText(
         declaration.informantEmail
       )
       /*
@@ -390,7 +390,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Informant's First Name
        * - Informant's Family Name
        */
-      await expect(page.getByTestId('row-value-informant.name')).toHaveText(
+      await expect(page.getByTestId('informant.name-value')).toHaveText(
         declaration.informant.name.firstNames +
           ' ' +
           declaration.informant.name.familyName
@@ -400,7 +400,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Informant's date of birth
        */
-      await expect(page.getByTestId('row-value-informant.age')).toHaveText(
+      await expect(page.getByTestId('informant.age-value')).toHaveText(
         declaration.informant.age.toString()
       )
 
@@ -409,7 +409,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Informant's Nationality
        */
       await expect(
-        page.getByTestId('row-value-informant.nationality')
+        page.getByTestId('informant.nationality-value')
       ).toContainText(declaration.informant.nationality)
 
       /*
@@ -419,7 +419,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
       await validateAddress(
         page,
         declaration.informant.address,
-        'row-value-informant.address'
+        'informant.address-value'
       )
 
       /*
@@ -428,9 +428,9 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Informant's Id
        */
       await expect(
-        page.getByTestId('row-value-informant.idType')
+        page.getByTestId('informant.idType-value')
       ).toContainText(declaration.informant.identifier.type)
-      await expect(page.getByTestId('row-value-informant.brn')).toContainText(
+      await expect(page.getByTestId('informant.brn-value')).toContainText(
         declaration.informant.identifier.id
       )
 
@@ -439,7 +439,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Mother's First Name
        * - Mother's Family Name
        */
-      await expect(page.getByTestId('row-value-mother.name')).toHaveText(
+      await expect(page.getByTestId('mother.name-value')).toHaveText(
         declaration.mother.name.firstNames +
           ' ' +
           declaration.mother.name.familyName
@@ -449,7 +449,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Mother's date of birth
        */
-      await expect(page.getByTestId('row-value-mother.age')).toContainText(
+      await expect(page.getByTestId('mother.age-value')).toContainText(
         declaration.mother.age.toString()
       )
 
@@ -457,7 +457,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * Expected result: should include
        * - Mother's Nationality
        */
-      await expect(page.getByTestId('row-value-mother.nationality')).toHaveText(
+      await expect(page.getByTestId('mother.nationality-value')).toHaveText(
         declaration.mother.nationality
       )
 
@@ -466,7 +466,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Mother's Marital status
        */
       await expect(
-        page.getByTestId('row-value-mother.maritalStatus')
+        page.getByTestId('mother.maritalStatus-value')
       ).toHaveText(declaration.mother.maritalStatus)
 
       /*
@@ -474,14 +474,14 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Mother's level of education
        */
       await expect(
-        page.getByTestId('row-value-mother.educationalAttainment')
+        page.getByTestId('mother.educationalAttainment-value')
       ).toHaveText(declaration.mother.levelOfEducation)
 
       /*
        * Expected result: should include
        * - Mother's Type of Id
        */
-      await expect(page.getByTestId('row-value-mother.idType')).toHaveText(
+      await expect(page.getByTestId('mother.idType-value')).toHaveText(
         declaration.mother.identifier.type
       )
 
@@ -492,7 +492,7 @@ test.describe.serial('5. Birth declaration case - 5', () => {
       await validateAddress(
         page,
         declaration.mother.address,
-        'row-value-mother.address'
+        'mother.address-value'
       )
 
       /*
@@ -501,9 +501,9 @@ test.describe.serial('5. Birth declaration case - 5', () => {
        * - Reason of why father's details not available
        */
       await expect(
-        page.getByTestId('row-value-father.detailsNotAvailable')
+        page.getByTestId('father.detailsNotAvailable-value')
       ).toHaveText('Yes')
-      await expect(page.getByTestId('row-value-father.reason')).toHaveText(
+      await expect(page.getByTestId('father.reason-value')).toHaveText(
         declaration.father.reason
       )
     })

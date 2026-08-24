@@ -1,0 +1,35 @@
+{
+  "name": "@opencrvs/mosip",
+  "version": "2.0.1",
+  "description": "Helpers for wiring an OpenCRVS country configuration to the MOSIP integration API",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opencrvs/opencrvs-core.git"
+  },
+  "license": "MPL-2.0",
+  "main": "./build/index.js",
+  "exports": {
+    ".": "./build/index.js",
+    "./api": "./build/api.js"
+  },
+  "typings": "build/index.d.ts",
+  "engines": {
+    "node": "22.x.x"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test:compilation": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@opencrvs/toolkit": "workspace:*",
+    "@types/hapi__hapi": "^20.0.0",
+    "@types/node-fetch": "^2.6.11",
+    "node-fetch": "2.6.7"
+  },
+  "peerDependencies": {
+    "node-fetch": "2.6.7"
+  }
+}

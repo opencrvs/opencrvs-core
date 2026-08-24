@@ -29,11 +29,11 @@ test.describe('Desktop', () => {
 
     await logout(page)
 
-    const url = new URL(page.url())
-
     await page.waitForURL((url) => {
       return url.origin === LOGIN_URL
     })
+
+    const url = new URL(page.url())
 
     const redirectTo = url.searchParams.get('redirectTo')
     expect(redirectTo).toBe(null)

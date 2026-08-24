@@ -211,7 +211,7 @@ test.describe.serial('Birth correction flow - Mobile', () => {
       ).toBeVisible()
 
       await expect(
-        page.getByTestId('row-value-child.name').getByRole('deletion')
+        page.getByTestId('child.name-value').getByRole('deletion')
       ).toHaveText(
         `${declaration['child.name'].firstname} ${declaration['child.name'].surname}`,
         { ignoreCase: true }

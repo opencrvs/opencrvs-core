@@ -147,6 +147,14 @@ jobs:
             -p @opencrvs/commons @opencrvs/components @opencrvs/events @opencrvs/toolkit
           pnpm exec nx run-many -t build:types -p @opencrvs/events
 
+      # https://github.com/bojanbass/nx-aws/pull/376#issuecomment-1710695419
+      # Nx stamps the machine id that produced each entry into
+      # `<hash>/source` and, on a cache hit, refuses any entry whose
+      # stamp is not the current machine's. Removing the source files before
+      # publishing avoids that problem and allows any machine to restore.
+      - name: Drop machine markers before publishing
+        run: find .nx/cache -mindepth 2 -maxdepth 2 -name source -type f -delete
+
       - name: Save Nx cache
         uses: actions/cache/save@v4
         with:

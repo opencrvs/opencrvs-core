@@ -297,13 +297,13 @@ test.describe.serial('Change informant on review', () => {
     test('Go back to review, expect to see validation errors for father information', async () => {
       await page.getByRole('button', { name: 'Go to review' }).click()
 
-      await expect(page.getByTestId('row-value-father.name')).toContainText(
+      await expect(page.getByTestId('father.name-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
-      await expect(page.getByTestId('row-value-father.dob')).toContainText(
+      await expect(page.getByTestId('father.dob-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
-      await expect(page.getByTestId('row-value-father.idType')).toContainText(
+      await expect(page.getByTestId('father.idType-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -350,7 +350,7 @@ test.describe.serial('Change informant on review', () => {
     test('Assert record form', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_VILLAGE)
       await switchEventTab(page, 'Record')
-      await expect(page.getByTestId('row-value-father.name')).toHaveText(
+      await expect(page.getByTestId('father.name-value')).toHaveText(
         declaration.father.name.firstNames +
           ' ' +
           declaration.father.name.familyName

@@ -79,12 +79,12 @@ test('Cleared field values are removed after correcting a registered birth recor
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await switchEventTab(page, 'Record')
 
-    const weight = page.getByTestId('row-value-child.weightAtBirth')
+    const weight = page.getByTestId('child.weightAtBirth-value')
     await expect(weight).toContainText(weightAtBirth.toString())
     weightValueBefore = (await weight.innerText()).trim()
 
     const birthLocation = page.getByTestId(
-      'row-value-child.birthLocation.privateHome'
+      'child.birthLocation.privateHome-value'
     )
     await expect(birthLocation).toContainText(town)
     await expect(birthLocation).toContainText(residentialArea)
@@ -139,7 +139,7 @@ test('Cleared field values are removed after correcting a registered birth recor
   })
 
   await test.step('Correction review shows the cleared weight as deleted', async () => {
-    const weightRow = page.getByTestId('row-value-child.weightAtBirth')
+    const weightRow = page.getByTestId('child.weightAtBirth-value')
     await expect(weightRow.locator('del')).toContainText(
       weightAtBirth.toString()
     )
@@ -151,14 +151,9 @@ test('Cleared field values are removed after correcting a registered birth recor
 
     await page.getByRole('button', { name: 'Correct' }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
   })
 
   await test.step('Record no longer shows the previously entered weight or address details', async () => {
@@ -168,12 +163,12 @@ test('Cleared field values are removed after correcting a registered birth recor
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await switchEventTab(page, 'Record')
 
-    await expect(
-      page.getByTestId('row-value-child.weightAtBirth')
-    ).not.toHaveText(weightValueBefore)
+    await expect(page.getByTestId('child.weightAtBirth-value')).not.toHaveText(
+      weightValueBefore
+    )
 
     const birthLocation = page.getByTestId(
-      'row-value-child.birthLocation.privateHome'
+      'child.birthLocation.privateHome-value'
     )
     await expect(birthLocation).not.toContainText(town)
     await expect(birthLocation).not.toContainText(residentialArea)

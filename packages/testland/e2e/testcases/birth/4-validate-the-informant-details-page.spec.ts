@@ -39,7 +39,7 @@ test.describe('4. Validate the informants details pages', () => {
 
     test('4.1.2 Navigate to review page and check for error', async () => {
       await goToSection(page, 'review')
-      await expect(page.getByTestId('row-value-informant.phoneNo')).toHaveText(
+      await expect(page.getByTestId('informant.phoneNo-value')).toHaveText(
         'Must be a valid 10 digit number that starts with 0(7|9)'
       )
     })
@@ -55,7 +55,7 @@ test.describe('4. Validate the informants details pages', () => {
 
     test('4.1.4 Navigate to review page and check that error does not appear', async () => {
       await page.getByRole('button', { name: 'Go to review' }).click()
-      await expect(page.getByTestId('row-value-informant.phoneNo')).toBeEmpty()
+      await expect(page.getByTestId('informant.phoneNo-value')).toBeEmpty()
     })
   })
 })

@@ -25,7 +25,6 @@ packages/gateway/src/graphql/schema.d.ts
 packages/gateway/src/graphql/schema.graphql
 
 # But, keep the .gitignore so the folder is created
-!.secrets/.gitignore
 .idea
 .idea/*
 .vim

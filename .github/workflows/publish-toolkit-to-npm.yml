@@ -139,3 +139,58 @@ jobs:
         if: steps.check-create-version.outputs.version-exists == 'false'
         run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit/create-countryconfig
+
+      - name: Check if mosip version exists on npm
+        id: check-mosip-version
+        run: |
+          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
+          if npm view @opencrvs/mosip@$TOOLKIT_VERSION > /dev/null 2>&1; then
+            echo "Version $TOOLKIT_VERSION already exists on npm."
+            echo "version-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $TOOLKIT_VERSION does not exist on npm."
+            echo "version-exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install mosip dependencies
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: pnpm install --frozen-lockfile
+        working-directory: packages/mosip
+
+      # main, exports and typings all point into build/, so the package is
+      # unusable unless tsc has run.
+      - name: Build mosip
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: pnpm build
+        working-directory: packages/mosip
+
+      - name: Update mosip package.json version
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: |
+          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
+          jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+        working-directory: packages/mosip
+
+      # The workspace link to @opencrvs/toolkit is a devDependency used only for
+      # types, so it does not appear in the published manifest. Packing verifies
+      # the build output is actually present and requirable before publishing.
+      - name: Smoke test packed mosip in clean project
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: |
+          TARBALL_NAME=$(npm pack --silent)
+          TMP_DIR=$(mktemp -d)
+          npm init -y --prefix "$TMP_DIR" > /dev/null
+          npm install --prefix "$TMP_DIR" --omit=dev "$PWD/$TARBALL_NAME"
+          TMP_DIR="$TMP_DIR" node - <<'NODE'
+          const { createRequire } = require('node:module')
+          const requireFromTmp = createRequire(process.env.TMP_DIR + '/package.json')
+
+          requireFromTmp('@opencrvs/mosip')
+          requireFromTmp('@opencrvs/mosip/api')
+          NODE
+        working-directory: packages/mosip
+
+      - name: Publish mosip to npm
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        working-directory: packages/mosip

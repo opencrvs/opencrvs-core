@@ -8,9 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/*
+ * `require` rather than `import`, and in this order, on purpose: import
+ * statements are hoisted, so app-module-path has to register the module alias
+ * and dotenv has to populate process.env before anything that depends on
+ * either is resolved or evaluated. './monitoring' is imported for its side
+ * effect, which has to happen before the application starts.
+ */
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-unassigned-import */
 require('app-module-path').addPath(require('path').join(__dirname))
 require('dotenv').config()
 import './monitoring'
+/* eslint-enable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-unassigned-import */
 
 import path from 'path'
 import * as Hapi from '@hapi/hapi'
@@ -42,6 +51,11 @@ import clientConfigProd from './client-config.prod'
 import loginConfig from './login-config'
 import loginConfigProd from './login-config.prod'
 import { emailHandler, emailSchema } from './api/notification/handler'
+import {
+  telemetryHandler,
+  telemetrySchema,
+  logTelemetryStartupStatus
+} from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { locationsHandler } from './data-seeding/locations/handler'
@@ -262,8 +276,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    // eslint-disable-next-line no-unused-vars
-    handler: (request: any, h: any) => {
+    handler: () => {
       // Perform any health checks and return true or false for success prop
       return {
         success: true
@@ -558,6 +571,24 @@ export async function createServer() {
   server.route(getUserNotificationRoutes())
 
   server.route({
+    method: 'POST',
+    path: '/trigger/telemetry',
+    handler: telemetryHandler,
+    options: {
+      // Authenticated with the default JWT strategy: the events worker sends an
+      // OpenCRVS bearer token (audience includes opencrvs:countryconfig-user),
+      // which is verified against the auth public key fetched on startup — so we
+      // know the report came from a legitimate core service.
+      tags: ['api', 'triggers'],
+      validate: {
+        payload: telemetrySchema
+      },
+      description:
+        'Receives a usage report from the events service and forwards it to the status service when telemetry is enabled'
+    }
+  })
+
+  server.route({
     method: 'GET',
     path: '/triggers/system/ready',
     handler: (_request, h) => {
@@ -659,6 +690,8 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    logTelemetryStartupStatus()
   }
 
   return { server, start, stop }

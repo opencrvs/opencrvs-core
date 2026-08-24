@@ -74,6 +74,7 @@ spec:
         service_name: opencrvs_countryconfig
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "countryconfig" "Values" .Values) | nindent 6 }}
       containers:
         - name: countryconfig
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
@@ -93,6 +94,11 @@ spec:
               value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
             - name: DOMAIN
               value: {{ .Values.hostname | quote }}
+            # Forward the events service's usage telemetry to the status service.
+            # The reported domain comes from DOMAIN (above) and the environment
+            # label from OPENCRVS_ENVIRONMENT.
+            - name: TELEMETRY_ENABLED
+              value: "true"
             - name: SUBDOMAIN_SEPARATOR
               value: {{ .Values.subdomain_separator | quote }}
             - name: GATEWAY_URL
@@ -124,6 +130,8 @@ spec:
                 path: public-key.pem
             name: {{ .Release.Name }}-cert-tls
           name: public-key
+
+{{- include "service-account-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 

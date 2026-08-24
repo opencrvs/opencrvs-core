@@ -30,6 +30,7 @@ vi.mock('nodemailer', () => {
 })
 
 import { createServer } from '../../index'
+import { TriggerEvent } from '@opencrvs/toolkit/notification'
 
 import { userNotificationTestData } from './testData'
 
@@ -47,10 +48,70 @@ describe('User notification - Email', () => {
       await server.server.inject({
         method: 'POST',
         url: `/triggers/user/${event}`,
-        payload
+        payload,
+        auth: { strategy: 'jwt', credentials: {} }
       })
       expect(sendMailMock).toHaveBeenCalledTimes(1)
       expect(sendMailMock.mock.calls[0][0]).toMatchSnapshot()
     })
+  )
+})
+
+describe('User notification - Email - recovery link URL escaping', () => {
+  let server: any
+
+  // Real base64 output: contains '+', '/' and '=' — all characters
+  // Handlebars HTML-escapes when a double-stash `{{recoveryURL}}` is used.
+  const hostileToken = '+OeRSRPHXAPMLXZXvWXyFQ=='
+
+  const recipient = {
+    name: {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    email: 'john.doe@gmail.com',
+    mobile: '+15551234567'
+  }
+
+  beforeEach(async () => {
+    vi.resetModules()
+    sendMailMock.mockClear()
+    server = await createServer()
+  })
+
+  it.each([
+    TriggerEvent.PASSWORD_RESET_LINK,
+    TriggerEvent.USERNAME_REMINDER_LINK
+  ])(
+    '%s renders a recovery link whose token round-trips through the URL intact',
+    async (event) => {
+      await server.server.inject({
+        method: 'POST',
+        url: `/triggers/user/${event}`,
+        payload: {
+          recipient,
+          token: hostileToken
+        },
+        auth: { strategy: 'jwt', credentials: {} }
+      })
+
+      expect(sendMailMock).toHaveBeenCalledTimes(1)
+      const html = sendMailMock.mock.calls[0][0].html as string
+
+      const hrefMatch = html.match(/<a\s+href="([^"]*)"/)
+      expect(hrefMatch).not.toBeNull()
+      const href = hrefMatch![1]
+
+      // The literal string reaching the browser must not contain
+      // HTML-entity-encoded characters — those are not decoded by a URL
+      // parser and corrupt the query string (e.g. '#x3D;' starts a
+      // fragment, truncating everything after it).
+      expect(href).toContain('?token=')
+      expect(href).not.toContain('&#x3D;')
+      expect(href).not.toContain('&amp;')
+
+      const url = new URL(href)
+      expect(url.searchParams.get('token')).toBe(hostileToken)
+    }
   )
 })

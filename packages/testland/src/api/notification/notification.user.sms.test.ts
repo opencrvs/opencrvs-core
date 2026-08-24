@@ -44,6 +44,7 @@ vi.mock('node-fetch', () => {
 import fetch from 'node-fetch'
 import { userNotificationTestData } from './testData'
 import { createServer } from '../../index'
+import { TriggerEvent } from '@opencrvs/toolkit/notification'
 
 describe('User notification - sms', () => {
   let server: any
@@ -59,10 +60,68 @@ describe('User notification - sms', () => {
         .inject({
           method: 'POST',
           url: `/triggers/user/${event}`,
-          payload
+          payload,
+          auth: { strategy: 'jwt', credentials: {} }
         })
         .catch(() => {})
       expect((fetch as any).mock.calls[1][1].body).toMatchSnapshot()
     })
+  )
+})
+
+describe('User notification - sms - recovery link URL escaping', () => {
+  let server: any
+
+  // Real base64 output: contains '+', '/' and '=' — all characters
+  // Handlebars HTML-escapes when a double-stash `{{recoveryURL}}` is used.
+  // SMS is plain text with no HTML parser to rescue it, so the escaped
+  // string reaches the recipient's phone verbatim.
+  const hostileToken = '+OeRSRPHXAPMLXZXvWXyFQ=='
+
+  const recipient = {
+    name: {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    email: 'john.doe@gmail.com',
+    mobile: '+15551234567'
+  }
+
+  beforeEach(async () => {
+    ;(fetch as any).mockClear()
+    server = await createServer()
+  })
+
+  it.each([
+    TriggerEvent.PASSWORD_RESET_LINK,
+    TriggerEvent.USERNAME_REMINDER_LINK
+  ])(
+    '%s renders an sms body whose token round-trips through the URL intact',
+    async (event) => {
+      await server.server
+        .inject({
+          method: 'POST',
+          url: `/triggers/user/${event}`,
+          payload: {
+            recipient,
+            token: hostileToken
+          },
+          auth: { strategy: 'jwt', credentials: {} }
+        })
+        .catch(() => {})
+
+      const requestBody = JSON.parse((fetch as any).mock.calls[1][1].body)
+      const smsBody = requestBody.messages[0].text as string
+
+      expect(smsBody).toContain('?token=')
+      expect(smsBody).not.toContain('&#x3D;')
+      expect(smsBody).not.toContain('&amp;')
+
+      const urlMatch = smsBody.match(/https?:\/\/\S+/)
+      expect(urlMatch).not.toBeNull()
+
+      const url = new URL(urlMatch![0])
+      expect(url.searchParams.get('token')).toBe(hostileToken)
+    }
   )
 })

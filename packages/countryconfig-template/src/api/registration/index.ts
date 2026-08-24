@@ -24,8 +24,6 @@ export interface ActionConfirmationRequest extends Hapi.Request {
   payload: EventDocument
 }
 
-/* eslint-disable no-unused-vars */
-
 /**
  * Handler for event registration confirmation.
  *

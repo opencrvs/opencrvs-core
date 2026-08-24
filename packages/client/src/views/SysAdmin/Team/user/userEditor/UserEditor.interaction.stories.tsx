@@ -1621,7 +1621,7 @@ export const CorrectUserDataLoadedAfterSwitchingUsers: StoryObj<
       async () => {
         await canvas.findByText(
           `${userB.name.firstname} ${userB.name.surname}`,
-          { selector: '[data-testid="row-value-name"]', exact: false }
+          { selector: '[data-testid="name-value"]', exact: false }
         )
       }
     )
@@ -1666,7 +1666,7 @@ export const CorrectUserDataLoadedAfterSwitchingUsers: StoryObj<
       async () => {
         await expect(
           canvas.findByText(`${userA.name.firstname} ${userA.name.surname}`, {
-            selector: '[data-testid="row-value-name"]',
+            selector: '[data-testid="name-value"]',
             exact: false
           })
         ).resolves.toBeInTheDocument()

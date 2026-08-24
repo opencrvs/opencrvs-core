@@ -24,20 +24,7 @@ import {
 } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/administrative-hierarchy/locations'
 import * as administrativeAreasRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
-
-/**
- * Narrows an unknown error to a postgres unique-violation (SQLSTATE 23505).
- * Kysely rethrows the raw `pg` DatabaseError, which carries the SQLSTATE in
- * its `code` property.
- */
-export function isUniqueViolation(error: unknown) {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code: unknown }).code === '23505'
-  )
-}
+import { isUniqueViolation } from '@events/storage/postgres/unique-violation'
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.

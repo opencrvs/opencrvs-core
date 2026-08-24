@@ -76,26 +76,23 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
     if (notificationMethod === 'sms' && (!phone || error)) {
       setError(true)
       setTouched(true)
-      setErrorMessage(
-        !phone
-          ? intl.formatMessage(validationMessages.phoneNumberFormat)
-          : intl.formatMessage(messages.errorPhoneNumberNotFound)
-      )
+      // Do not let callers know if an account with the provided phone
+      // number does not exist
+      setErrorMessage(intl.formatMessage(validationMessages.phoneNumberFormat))
       return
     }
     if (notificationMethod === 'email' && (!email || error)) {
       setError(true)
       setTouched(true)
-      setErrorMessage(
-        !email
-          ? intl.formatMessage(validationMessages.emailAddressFormat)
-          : intl.formatMessage(messages.errorEmailAddressNotFound)
-      )
+      setErrorMessage(intl.formatMessage(validationMessages.emailAddressFormat))
       return
     }
 
+    // /verifyUser answers 200 empty either way, so the navigation is in
+    // `finally` on purpose: no route, message or timing may distinguish a known
+    // address from an unknown one. A failure must not surface to the user here.
     try {
-      const { nonce, securityQuestionKey } = await authApi.verifyUser({
+      await authApi.verifyUser({
         mobile:
           notificationMethod === 'sms'
             ? convertToMSISDN(phone, window.config.COUNTRY)
@@ -103,34 +100,11 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
         email: notificationMethod === 'email' ? email : undefined,
         retrieveFlow: forgottenItem
       })
-
-      if (securityQuestionKey) {
-        return navigate(routes.SECURITY_QUESTION, {
-          state: {
-            nonce,
-            securityQuestionKey,
-            forgottenItem
-          }
-        })
-      }
-
-      navigate(routes.RECOVERY_CODE_ENTRY, {
-        state: {
-          nonce,
-          mobile: phone,
-          email,
-          forgottenItem
-        }
-      })
-    } catch (err) {
-      setError(true)
-      setErrorMessage(
-        intl.formatMessage(
-          notificationMethod === 'sms'
-            ? messages.errorPhoneNumberNotFound
-            : messages.errorEmailAddressNotFound
-        )
-      )
+    } catch {
+      // Swallowed, not rethrown: an unhandled rejection here would be one more
+      // thing that behaves differently depending on the address entered.
+    } finally {
+      navigate(routes.RECOVERY_LINK_SENT, { state: { forgottenItem } })
     }
   }
 

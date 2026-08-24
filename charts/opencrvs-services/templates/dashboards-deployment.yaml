@@ -48,6 +48,7 @@ spec:
         app: dashboards
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.dashboards) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "dashboards" "Values" .Values) | nindent 6 }}
       initContainers:
         - name: copy-assets
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
@@ -127,11 +128,13 @@ spec:
       volumes:
         - name: assets
           emptyDir: {}
+
+{{- include "service-account-helper" (dict "service_name" "dashboards" "Values" .Values) }}
+
 {{- include "service-helper" (dict "service_name" "dashboards" "Values" .Values) }}
 
 {{- include "hpa-helper" (dict "service_name" "dashboards" "Values" .Values) }}
 
 {{- include "pdb-helper" (dict "service_name" "dashboards" "Values" .Values) }}
-
 
 {{- end }}

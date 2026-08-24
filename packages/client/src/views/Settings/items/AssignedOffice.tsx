@@ -13,18 +13,16 @@ import { messages as userSetupMessages } from '@client/i18n/messages/views/userS
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   DynamicHeightLinkButton,
-  LabelContainer,
-  ValueContainer
+  SettingsRow
 } from '@client/views/Settings/items/components'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { todayISO, UUID } from '@opencrvs/commons/client'
 import { resolveLocationName } from '@client/v2-events/utils'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-export function AssignedOffice() {
+export function useAssignedOffice(): SettingsRow {
   const intl = useIntl()
   const userDetails = useSelector(getUserDetails)
   const { getLocations } = useLocations()
@@ -38,19 +36,16 @@ export function AssignedOffice() {
     todayISO()
   )
 
-  return (
-    <ListViewItemSimplified
-      label={
-        <LabelContainer>
-          {intl.formatMessage(userSetupMessages.assignedOffice)}
-        </LabelContainer>
-      }
-      value={<ValueContainer>{officeName}</ValueContainer>}
-      actions={
+  return {
+    id: 'assigned-office',
+    item: {
+      label: intl.formatMessage(userSetupMessages.assignedOffice),
+      value: officeName,
+      actions: (
         <DynamicHeightLinkButton disabled>
           {intl.formatMessage(buttonMessages.change)}
         </DynamicHeightLinkButton>
-      }
-    />
-  )
+      )
+    }
+  }
 }

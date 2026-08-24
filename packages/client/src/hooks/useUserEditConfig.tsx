@@ -113,6 +113,7 @@ export function useUserEditConfig(
                   type: FieldType.LOCATION,
                   required: true,
                   configuration: {
+                    activeOnly: true,
                     allowedLocations: user.jurisdiction(
                       user
                         .scope(isNewUser ? 'user.create' : 'user.edit')

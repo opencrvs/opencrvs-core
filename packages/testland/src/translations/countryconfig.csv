@@ -1,0 +1,734 @@
+id,description,en,fr
+applicant.http-fetch.label,Fetch applicant information,Fetch applicant information,Récupérer les informations du demandeur
+birth.search.criteria.label.prefix.child,Child prefix,Child's,De l'enfant
+birth.search.criteria.label.prefix.father,Father prefix,Father's,Du père
+birth.search.criteria.label.prefix.informant,Informant prefix,Informant's,Du déclarant
+birth.search.criteria.label.prefix.mother,Mother prefix,Mother's,De la mère
+certificates.birth.certificate,Birth Certificate,Birth Certificate,Acte de naissance
+certificates.birth.certificate.copy,Birth Certificate Certified Copy,Birth Certificate Certified Copy,Copie certifiée conforme de l'acte de naissance
+certificates.birth.registration.receipt,Birth Registration Receipt,Birth Registration Receipt,Reçu d'enregistrement de naissance
+certificates.death.certificate,Death Certificate,Death Certificate,Certificat de décès
+certificates.death.certificate.copy,Death Certificate Certified Copy,Death Certificate Certified Copy,Copie certifiée conforme du certificat de décès
+certificates.marriage.certificate,Marriage Certificate,Marriage Certificate,Acte de mariage
+certificates.marriage.certificate.copy,Marriage Certificate Certified Copy,Marriage Certificate Certified Copy,Copie certifiée conforme de l'acte de mariage
+certificates.tennis-club-membership.certificate.alpha,The label for a tennis club membership certificate for alpha print button testing,Tennis Club Membership Certificate Alpha,Certificat d'adhésion au club de tennis Alpha
+certificates.tennis-club-membership.certificate.certified-copy,The label for a tennis-club-membership certificate,Tennis Club Membership Certificate certified copy,Copie certifiée du certificat d'adhésion au club de tennis
+certificates.tennis-club-membership.certificate.copy,The label for a tennis-club-membership certificate,Tennis Club Membership Certificate copy,Copie du certificat d'adhésion au club de tennis
+certificates.tennis-club-membership.certificate.multipage,The label for a tennis club membership certificate,Tennis Club Membership Certificate Multipage,Certificat d'adhésion au club de tennis multipage
+correction.corrector.identity.instruction,The title for the corrector form,Please verify the identity of the person making this request,Please verify the identity of the person making this request
+correction.corrector.identity.verified,Label for verified option in corrector identity check page,I have verified their identity,I have verified their identity
+correction.corrector.identity.verified.label,The title for the corrector form,@todo,@todo
+correction.corrector.paragraph.title,The title for the corrector form,"For all record corrections at a minimum an affidavit must be provided. For material errors and omissions eg. in paternity cases, a court order must also be provided.","Pour toutes les corrections de dossiers, il faut au moins fournir un affidavit. Pour les erreurs matérielles et les omissions, par exemple dans les cas de paternité, une décision de justice doit également être fournie."
+correction.requester.relationshop.intro.label,The title for the corrector form,Note: In the case that the child is now of legal age (18) then only they should be able to request a change to their birth record.,"Note : Si l'enfant a atteint l'âge légal (18 ans), il est le seul à pouvoir demander une modification de son acte de naissance."
+correction.supportingDocuments.attest.label,Label for attestation of supporting documents,Attest,Attestation
+correction.supportingDocuments.notNeeded.label,Label for indicating supporting documents are not needed,Not Needed,Non nécessaire
+dashboard.completenessTitle,Completeness title,Completeness Dashboard,Tableau de bord de complétude
+dashboard.registrationsTitle,Registrations title,Registrations Dashboard,Tableau de bord des enregistrements
+dashboard.registryTitle,Registry title,Registry,Registre
+death.search.criteria.label.prefix.deceased,Deceased prefix,Deceased's,Du défunt
+death.search.criteria.label.prefix.informant,Informant prefix,Informant's,De l'informateur
+error.child.weightAtBirth.invalidNumberRange,This is the error message for invalid number range,Must be within 0 and 6,Doit être compris entre 0 et 6
+error.invalidInput,Error message when generic field is invalid,Invalid input,Entrée invalide
+error.invalidName,This is the error message for invalid name,"Input contains invalid characters. Please use only letters (a-z, A-Z), numbers (0-9), hyphens (-) and apostrophes(')","L'entrée contient des caractères non valides. Veuillez n'utiliser que des lettres (a-z, A-Z), des chiffres (0-9), des traits d'union (-) et des apostrophes (')"
+error.invalidNationalId,This is the error message for an invalid national ID,The national ID can only be numeric and must be 10 digits long,La pièce d'identité nationale ne peut être que numérique et doit comporter 10 chiffres
+event.action.declare.form.section.person.field.age.error,Error message for invalid age,Age must be between 12 and 120,L'auteur doit avoir entre 12 et 120 ans
+event.adoption.action.Read.label,This is shown as the action name anywhere the user can trigger the action from,Read,Lire
+event.adoption.action.archive.label,This is shown as the action name anywhere the user can trigger the action from,Archive,Archiver
+event.adoption.action.declare.form.label,This is what this form is referred as in the system,Adoption declaration form,Formulaire de déclaration d'adoption
+event.adoption.action.declare.form.review.comment.label,Label for the comment field in the review section,Comment,Commentaire
+event.adoption.action.declare.form.review.signature.label,Label for the signature field in the review section,Signature of applicant,Signature du demandeur
+event.adoption.action.declare.form.review.title,Title of the form to show in review page,"{child.name.firstname, select, __EMPTY__ {Adoption declaration} other {{child.name.surname, select, __EMPTY__ {Adoption declaration for {child.name.firstname}} other {Adoption declaration for {child.name.firstname} {child.name.surname}}}}}","{child.name.firstname, select, __EMPTY__ {Déclaration d'adoption} other {{child.name.surname, select, __EMPTY__ {Déclaration d'adoption pour {child.name.firstname}} other {Déclaration d'adoption pour {child.name.firstname} {child.name.surname}}}}}"
+event.adoption.action.declare.form.section.adoptionOrder.field.date.label,This is the label for the field,Date of adoption order,Date de la décision d'adoption
+event.adoption.action.declare.form.section.adoptionOrder.field.issuingAuthority.label,This is the label for the field,Court / issuing authority,Tribunal / autorité émettrice
+event.adoption.action.declare.form.section.adoptionOrder.field.newFirstName.label,This is the label for the field,Child's new first name(s) (post-adoption),Nouveau(x) prénom(s) de l'enfant (après adoption)
+event.adoption.action.declare.form.section.adoptionOrder.field.newLastName.label,This is the label for the field,Child's new last name (post-adoption),Nouveau nom de famille de l'enfant (après adoption)
+event.adoption.action.declare.form.section.adoptionOrder.field.reference.label,This is the label for the field,Adoption court order reference,Référence de la décision de justice d'adoption
+event.adoption.action.declare.form.section.adoptiveParent.field.idNumber.label,This is the label for the field,Adoptive parent's ID number,Numéro de pièce d'identité du parent adoptif
+event.adoption.action.declare.form.section.adoptiveParent.field.name.label,This is the label for the field,Adoptive parent's name,Nom du parent adoptif
+event.adoption.action.declare.form.section.child.field.brn.helperText,This is the helper text for the field,Search for the child's original birth record by its Birth Registration Number (BRN). This record will be sealed once the adoption is registered.,Recherchez l'acte de naissance d'origine de l'enfant par son numéro d'enregistrement de naissance. Cet enregistrement sera scellé une fois l'adoption enregistrée.
+event.adoption.action.declare.form.section.child.field.brn.indicators.clearModal.description,Description for the clear confirmation modal,This will remove the link to the original birth record.,Cela supprimera le lien vers l'acte de naissance d'origine.
+event.adoption.action.declare.form.section.child.field.brn.indicators.clearModal.title,Title for the clear confirmation modal,Clear birth record?,Effacer l'enregistrement de naissance ?
+event.adoption.action.declare.form.section.child.field.brn.indicators.noResultsError,Text to display when no results are found,No birth record found with this BRN,Aucun enregistrement de naissance trouvé avec ce numéro d'enregistrement
+event.adoption.action.declare.form.section.child.field.brn.indicators.ok,OK button text,Birth record found,Enregistrement de naissance trouvé
+event.adoption.action.declare.form.section.child.field.brn.label,This is the label for the field,Original birth record BRN,Numéro d'enregistrement de l'acte de naissance d'origine
+event.adoption.action.declare.form.section.child.field.brn.validation.invalid,Error message for invalid value,Invalid value: Must be alpha-numeric and 12 characters long,Valeur invalide : doit être alphanumérique et comporter 12 caractères
+event.adoption.action.declare.form.section.child.field.dob.error,This is the error message for invalid date,Must be a valid Birthdate,Doit être une date de naissance valide
+event.adoption.action.declare.form.section.child.field.dob.label,This is the label for the field,Child's date of birth,Date de naissance de l'enfant
+event.adoption.action.declare.form.section.child.field.name.label,This is the label for the field,Child's name at birth,Nom de l'enfant à la naissance
+event.adoption.action.declare.form.section.documents.field.courtOrderCopy.label,This is the label for the field,Supporting document — court order copy,Document justificatif — copie de la décision de justice
+event.adoption.action.declare.label,This is shown as the action name anywhere the user can trigger the action from,Declare,Déclarer
+event.adoption.action.edit.declare.copy,Confirmation text for the declare with edits action,Are you sure you want to edit this declaration? By confirming you are redeclaring this event and override past changes.,"Voulez-vous vraiment modifier cette déclaration ? En confirmant, vous redéclarez cet événement et remplacez les modifications antérieures."
+event.adoption.action.edit.notify.copy,Confirmation text for the notify with edits action,Are you sure you want to notify this event with these edits?,Voulez-vous vraiment notifier cet événement avec ces modifications ?
+event.adoption.action.edit.register.copy,Confirmation text for the register with edits action,You are about to register this adoption with your edits. Please ensure all details are correct before proceeding.,Vous êtes sur le point d'enregistrer cette adoption avec vos modifications. Veuillez vérifier que toutes les informations sont correctes avant de continuer.
+event.adoption.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
+event.adoption.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
+event.adoption.action.register.label,This is shown as the action name anywhere the user can trigger the action from,Register,Enregistrer
+event.adoption.action.register.supportingCopy,Confirmation text for the register action,Registering this adoption will create an official civil registration record and seal the original birth record.,Enregistrer cette adoption créera un enregistrement officiel d'état civil et scellera l'acte de naissance d'origine.
+event.adoption.action.reject.label,This is shown as the action name anywhere the user can trigger the action from,Reject,Rejeter
+event.adoption.action.unarchive.label,This is shown as the action name anywhere the user can trigger the action from,Unarchive,Désarchiver
+event.adoption.fallbackTitle,This is a fallback title if actual title resolves to empty string,No name provided,Aucun nom fourni
+event.adoption.flag.validated,Flag label for validated,Validated,Validé
+event.adoption.label,This is what this event is referred as in the system,Adoption,Adoption
+event.adoption.summary.child.brn.empty,This is shown when there is no linked birth record,No original birth record BRN,Aucun numéro d'enregistrement de l'acte de naissance d'origine
+event.adoption.summary.child.dob.empty,This is shown when there is no child information,No date of birth,Aucune date de naissance
+event.adoption.summary.event.registeredAt.empty,This is shown when there is no registration date,No registration date,Aucune date d'enregistrement
+event.adoption.summary.event.registeredAt.label,This is the label for the registration date,Registration date,Date d'enregistrement
+event.adoption.summary.event.registeredAt.value,This is the registration date value,"{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}","{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}"
+event.adoption.title,This is the title of the summary,{child.name.firstname} {child.name.surname},{child.name.firstname} {child.name.surname}
+event.birth.action.Read.label,This is shown as the action name anywhere the user can trigger the action from,Read,Lire
+event.birth.action.approve-correction.label,This is shown as the action name anywhere the user can trigger the action from,Approve correction,Approuver la correction
+event.birth.action.approve.audit-history-label,The label to show in audit history for the approve action,Approved,Approuvé
+event.birth.action.approve.confirmationText,This is the confirmation text for the approve action,Approving this declaration confirms it as legally accepted and eligible for registration.,L'approbation de cette déclaration confirme qu'elle est légalement acceptée et éligible à l'enregistrement.
+event.birth.action.approve.label,This is shown as the action name anywhere the user can trigger the action from,Approve,Approuver
+event.birth.action.certificate.form.cancel,This is the label for the verification cancellation button,Identity does not match,L'identité ne correspond pas
+event.birth.action.certificate.form.cancel.confirmation.body,This is the body for the verification cancellation modal,"Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector","Sachez que si vous continuez, vous serez responsable de la délivrance d'un certificat sans le justificatif d'identité requis de la part de la personne qui le retire"
+event.birth.action.certificate.form.cancel.confirmation.title,This is the title for the verification cancellation modal,Print without proof of ID?,Imprimer sans justificatif d'identité ?
+event.birth.action.certificate.form.label,This is what this form is referred as in the system,Birth certificate collector,Personne retirant le certificat de naissance
+event.birth.action.certificate.form.section.collectPayment.createCredential.label,Label for the field that creates the verifiable credential,Create verifiable credential,Créer une attestation vérifiable
+event.birth.action.certificate.form.section.collectPayment.data.label,Title for the data section,Payment details,Détails du paiement
+event.birth.action.certificate.form.section.collectPayment.fee.label,Title for the data entry,Fee,Frais
+event.birth.action.certificate.form.section.collectPayment.service.label,Title for the data entry,Service,Service
+event.birth.action.certificate.form.section.collectPayment.service.label.afterLateRegistrationTarget,Birth registration after 365 days of date of birth,Birth registration after 365 days of date of birth,Enregistrement de naissance après 365 jours de la date de naissance
+event.birth.action.certificate.form.section.collectPayment.service.label.beforeRegistrationTarget,Birth registration before 30 days of date of birth,Birth registration before 30 days of date of birth,Enregistrement de naissance avant 30 jours de la date de naissance
+event.birth.action.certificate.form.section.collectPayment.service.label.inBetweenRegistrationTargets,Birth registration after 30 days but before 365 days of date of birth,Birth registration after 30 days but before 365 days of date of birth,Enregistrement de naissance après 30 jours mais avant 365 jours de la date de naissance
+event.birth.action.certificate.form.section.collectPayment.verifiableCredentialUrl.label,This field stores the verifiable credential URL returned from the issuer after creation,Verifiable credential URL,URL de l'attestation vérifiable
+event.birth.action.certificate.form.section.requester.father.label,This is the label for the field,Print and issue to Father,Imprimer et remettre au père
+event.birth.action.certificate.form.section.requester.label,This is the label for the field,Requester,Demandeur
+event.birth.action.certificate.form.section.requester.mother.label,This is the label for the field,Print and issue to Mother,Imprimer et remettre à la mère
+event.birth.action.certificate.form.section.requester.other.label,This is the label for the field,Print and issue to someone else,Imprimer et remettre à une autre personne
+event.birth.action.certificate.form.section.requester.printInAdvance.label,This is the label for the print-in-advance of issuance field,Print in advance of issuance,Imprimer avant la délivrance
+event.birth.action.certificate.form.section.verifyIdentity.data.label,Label for identity verification data block,Identity details,Détails de l'identité
+event.birth.action.certificate.form.section.who.title,This is the title of the section,Certify record,Certifier l'enregistrement
+event.birth.action.certificate.form.verify,This is the label for the verification button,Verified,Vérifié
+event.birth.action.correction.documents.supportingDocs.affidavit.label,Label for the affidavit option,Affidavit,Déclaration sous serment
+event.birth.action.correction.documents.supportingDocs.courtDocument.label,Label for the court document option,Court Document,Document judiciaire
+event.birth.action.correction.documents.supportingDocs.label,Label for the supporting documents field,Supporting documents,Documents justificatifs
+event.birth.action.correction.documents.supportingDocs.other.label,Label for the other option,Other,Autre
+event.birth.action.correction.fees.amount.label,Label for the amount field,Fee total,Total des frais
+event.birth.action.correction.fees.amount.prefix,Prefix for the amount field,$,$
+event.birth.action.correction.form.cancel,This is the label for the verification cancellation button,Identity does not match,L'identité ne correspond pas
+event.birth.action.correction.form.cancel.confirmation.body,This is the body for the verification cancellation modal,"Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification","Sachez que si vous continuez, vous serez responsable de la modification de cet enregistrement sans le justificatif d'identité requis"
+event.birth.action.correction.form.cancel.confirmation.title,This is the title for the verification cancellation modal,Correct without proof of ID?,Corriger sans justificatif d'identité ?
+event.birth.action.correction.form.label,This is the label for the birth correction form,Correct record,Corriger l'enregistrement
+event.birth.action.correction.form.requester.type.anotherAgent,This is the label for the correction requester field,Another registration agent or field agent,Un autre agent d'enregistrement ou agent de terrain
+event.birth.action.correction.form.requester.type.child,This is the label for the correction requester field,Child,Enfant
+event.birth.action.correction.form.requester.type.court,This is the label for the correction requester field,Court,Tribunal
+event.birth.action.correction.form.requester.type.legalGuardian,This is the label for the correction requester field,Legal Guardian,Tuteur légal
+event.birth.action.correction.form.requester.type.me,This is the label for the correction requester field,Me,Moi
+event.birth.action.correction.form.requester.type.someoneElse,This is the label for the correction requester field,Someone else,Une autre personne
+event.birth.action.correction.form.section.details.divider.label,This is the title of the section,,
+event.birth.action.correction.form.section.details.title,This is the title of the section,Correction details,Détails de la correction
+event.birth.action.correction.form.section.fees.title,This is the title of the section,Collect fees,Percevoir les frais
+event.birth.action.correction.form.section.reason.title,This is the title of the section,Reason for correction,Motif de la correction
+event.birth.action.correction.form.section.requester.brn.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+event.birth.action.correction.form.section.requester.father.label,This is the label for the field,Father,Père
+event.birth.action.correction.form.section.requester.idType.label,This is the label for the field,Type of ID,Type de pièce d'identité
+event.birth.action.correction.form.section.requester.identity.verify.title,This is the title of the section,Verify their identity,Vérifier l'identité
+event.birth.action.correction.form.section.requester.label,This is the label for the field,Requester,Demandeur
+event.birth.action.correction.form.section.requester.mother.label,This is the label for the field,Mother,Mère
+event.birth.action.correction.form.section.requester.name.label,This is the label for the field,Name,Nom
+event.birth.action.correction.form.section.requester.nid.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+event.birth.action.correction.form.section.requester.passport.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+event.birth.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to child,Lien avec l'enfant
+event.birth.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Grandmother,ex. grand-mère
+event.birth.action.correction.form.section.supporting-documents.title,This is the title of the section,Upload supporting documents,Téléverser les documents justificatifs
+event.birth.action.correction.form.section.verifyIdentity.data.label,Title for the data section,,
+event.birth.action.correction.form.verify,This is the label for the verification button,Verified,Vérifié
+event.birth.action.correction.reason.option.clericalError.label,Label for the clerical error option,Myself or an agent made a mistake (Clerical error),Moi-même ou un agent avons fait une erreur (erreur d'écriture)
+event.birth.action.correction.reason.option.judicialOrder.label,Label for the judicial order option,Requested to do so by the court (Judicial order),Demandé par le tribunal (décision judiciaire)
+event.birth.action.correction.reason.option.materialError.label,Label for the material error option,Informant provided incorrect information (Material error),L'informateur a fourni une information incorrecte (erreur matérielle)
+event.birth.action.correction.reason.option.materialOmission.label,Label for the material omission option,Informant did not provide this information (Material omission),L'informateur n'a pas fourni cette information (omission matérielle)
+event.birth.action.correction.reason.option.other.label,Label for the other option,Other,Autre
+event.birth.action.correction.reason.other.label,Label for the reason,Specify reason,Précisez le motif
+event.birth.action.declare.declare.copy,Confirmation text for the declare action,"You are about to formally declare this birth event. Once declared, the record will enter the verification and approval process.","Vous êtes sur le point de déclarer officiellement cette naissance. Une fois déclaré, l'enregistrement entrera dans la procédure de vérification et d'approbation."
+event.birth.action.declare.field.comments.label,This is the label for the additional comments field on the declare action dialog,Additional comments,Commentaires supplémentaires
+event.birth.action.declare.form.label,This is what this form is referred as in the system,Birth decalration form,Birth decalration form
+event.birth.action.declare.form.nid.unique,This is the error message for non-unique ID Number,National id must be unique,La pièce d'identité nationale doit être unique
+event.birth.action.declare.form.review.comment.label,Label for the comment field in the review section,Comment,Commentaire
+event.birth.action.declare.form.review.print.label,Print button's label,Print certificate in advance of registration,Imprimer le certificat avant l'enregistrement
+event.birth.action.declare.form.review.signature.label,Label for the signature field in the review section,Signature of informant,Signature de l'informateur
+event.birth.action.declare.form.review.title,Title of the form to show in review page,"{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth declaration} other {Birth declaration for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}","{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Déclaration de naissance} other {Déclaration de naissance pour {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Déclaration de naissance pour {child.name.firstname}} other {Déclaration de naissance pour {child.name.firstname} {child.name.surname}}}}}"
+event.birth.action.declare.form.section.child.field.attendantAtBirth.label,This is the label for the field,Attendant at birth,Accoucheur(se)
+event.birth.action.declare.form.section.child.field.birthDuration.error,This is the error message for invalid duration,Number and unit required,Nombre et unité obligatoires
+event.birth.action.declare.form.section.child.field.birthDuration.placeholder,This is the placeholder for the field,Interval,Intervalle
+event.birth.action.declare.form.section.child.field.birthLocation.label,This is the label for the field,Location of birth,Lieu de naissance
+event.birth.action.declare.form.section.child.field.birthType.label,This is the label for the field,Type of birth,Type d'accouchement
+event.birth.action.declare.form.section.child.field.dob.error,This is the error message for invalid date,Must be a valid birth date,Doit être une date de naissance valide
+event.birth.action.declare.form.section.child.field.dob.label,This is the label for the field,Date of birth,Date de naissance
+event.birth.action.declare.form.section.child.field.gender.label,This is the label for the field,Sex,Sexe
+event.birth.action.declare.form.section.child.field.name.label,This is the label for the field,Child's name,Nom de l'enfant
+event.birth.action.declare.form.section.child.field.nid.label,Label for national ID field for child,National ID,Pièce d'identité nationale
+event.birth.action.declare.form.section.child.field.placeOfBirth.label,This is the label for the field,Place of delivery,Lieu de l'accouchement
+event.birth.action.declare.form.section.child.field.reason.label,This is the label for the field,Reason for delayed registration,Motif de l'enregistrement tardif
+event.birth.action.declare.form.section.child.field.weightAtBirth.label,This is the label for the field,Weight at birth,Poids à la naissance
+event.birth.action.declare.form.section.child.field.weightAtBirth.postfix,This is the postfix for the weight field,Kilograms (kg),Kilograms (kg)
+event.birth.action.declare.form.section.documents.field.proofOfBirth.label,This is the label for the field,Proof of birth,Preuve de naissance
+event.birth.action.declare.form.section.documents.field.proofOfFather.label,This is the label for the field,Proof of father's ID,Identité du père
+event.birth.action.declare.form.section.documents.field.proofOfInformant.label,This is the label for the field,Proof of informant's ID,Justificatif d'identité de l'informateur
+event.birth.action.declare.form.section.documents.field.proofOfMother.label,This is the label for the field,Proof of mother's ID,Identité de la mère
+event.birth.action.declare.form.section.documents.field.proofOther.label,This is the label for the field,Other,Autre
+event.birth.action.declare.form.section.father.field.address.addressSameAs.label,This is the label for the field,Same as mother's usual place of residence?,Identique au lieu de résidence habituel de la mère?
+event.birth.action.declare.form.section.father.field.age.label,This is the label for the field,Age of father (at the time of event),Âge du père (au moment de l'événement)
+event.birth.action.declare.form.section.father.field.detailsNotAvailable.label,This is the label for the field,Father's details are not available,Les informations sur le père ne sont pas disponibles
+event.birth.action.declare.form.section.father.field.name.label,This is the label for the field,Father's name,Nom du père
+event.birth.action.declare.form.section.father.field.reason.label,This is the label for the field,Reason,Raison
+event.birth.action.declare.form.section.informant.field.age.label,This is the label for the field,Age of informant (at the time of event),Âge de l'informateur (au moment de l'événement)
+event.birth.action.declare.form.section.informant.field.email.label,This is the label for the field,Email,E-mail
+event.birth.action.declare.form.section.informant.field.name.label,This is the label for the field,Informant's name,Nom du déclarant
+event.birth.action.declare.form.section.informant.field.other.relation.label,This is the label for the field,Relationship to child,Relation avec l'enfant
+event.birth.action.declare.form.section.informant.field.phoneNo.error,The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11,Must be a valid 10 digit number that starts with 0(7|9),Doit être un nombre valide de  {num} chiffres qui commence par  {start}
+event.birth.action.declare.form.section.informant.field.phoneNo.label,This is the label for the field,Phone number,Numéro de téléphone
+event.birth.action.declare.form.section.informant.field.relation.label,This is the label for the field,Relationship to child,Relation avec l'enfant
+event.birth.action.declare.form.section.mother.field.age.label,This is the label for the field,Age of mother (at the time of event),Âge de la mère (au moment de l'événement)
+event.birth.action.declare.form.section.mother.field.detailsNotAvailable.label,This is the label for the field,Mother's details are not available,Les informations sur la mère ne sont pas disponibles
+event.birth.action.declare.form.section.mother.field.name.label,This is the label for the field,Mother's name,Nom de la mère
+event.birth.action.declare.form.section.mother.field.previousBirths.label,This is the label for the field,No. of previous births,Nombre de naissances antérieures
+event.birth.action.declare.form.section.mother.field.reason.label,This is the label for the field,Reason,Raison
+event.birth.action.declare.form.section.person.dob.afterChild,This is the error message for a birth date after child's birth date,Birth date must be 18 years before child's birth date,La date de naissance doit être antérieure de 18 ans à celle de l'enfant
+event.birth.action.declare.form.section.person.field.address.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+event.birth.action.declare.form.section.person.field.addressHelper.label,This is the label for the field,Usual place of residence,Adresse du domicile
+event.birth.action.declare.form.section.person.field.age.checkbox.label,This is the label for the field,Exact date of birth unknown,Date de naissance exacte inconnue
+event.birth.action.declare.form.section.person.field.age.postfix,This is the postfix for age field,years,years
+event.birth.action.declare.form.section.person.field.brn.label,This is the label for the field,ID Number,Numéro d'identification
+event.birth.action.declare.form.section.person.field.dob.error,This is the error message for invalid date,Must be a valid birth date,Doit être une date de naissance valide
+event.birth.action.declare.form.section.person.field.dob.label,This is the label for the field,Date of birth,Date de naissance
+event.birth.action.declare.form.section.person.field.educationalAttainment.label,This is the label for the field,Level of education,Niveau d'éducation
+event.birth.action.declare.form.section.person.field.idType.label,This is the label for the field,Type of ID,Type d'identification
+event.birth.action.declare.form.section.person.field.maritalStatus.label,This is the label for the field,Marital Status,Marital Status
+event.birth.action.declare.form.section.person.field.nationality.label,This is the label for the field,Nationality,Nationalité
+event.birth.action.declare.form.section.person.field.nid.label,This is the label for the field,ID Number,Numéro d'identification
+event.birth.action.declare.form.section.person.field.occupation.label,This is the label for the field,Occupation,Profession
+event.birth.action.declare.form.section.person.field.passport.label,This is the label for the field,ID Number,Numéro d'identification
+event.birth.action.declare.notify.copy,Confirmation text for the notify action,You are about to formally notify the relevant Registration Office that a new birth event has occurred. Please confirm that the information provided is accurate before proceeding.,Vous êtes sur le point de notifier officiellement au bureau d'enregistrement compétent qu'une nouvelle naissance a eu lieu. Veuillez confirmer que les informations fournies sont exactes avant de continuer.
+event.birth.action.declare.register.copy,Confirmation text for the register action,"<strong>WARNING!</strong>: By clicking ""Register"", you confirm that you have reviewed the record alongside supporting documentation in the Record tab. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process.","<strong>AVERTISSEMENT !</strong> : en cliquant sur « Enregistrer », vous confirmez avoir examiné l'enregistrement ainsi que les documents justificatifs dans l'onglet Enregistrement. L'enregistrement sera ensuite <strong>légalement enregistré</strong> via la boîte d'envoi. Toute modification ultérieure ne pourra se faire que par une procédure de correction légale."
+event.birth.action.detect-duplicate.label,This is shown as the action name anywhere the user can trigger the action from,Detect duplicate,Détecter les doublons
+event.birth.action.edit.declare.copy,Description for `Declare with edits` in edit action menu,You are about to redeclare this birth event with your edits. This will permanently update the declaration.,Vous êtes sur le point de redéclarer cet événement avec vos modifications. Cela mettra à jour définitivement la déclaration.
+event.birth.action.edit.notify.copy,Description for `Notify with edits` in edit action menu,Are you sure you want to notify this event with these edits?,Êtes-vous sûr de vouloir notifier cet événement avec ces modifications ?
+event.birth.action.edit.register.copy,Description for `Register with edits` in edit action menu,"You are about to register this birth event with your edits. Please ensure all details are correct before proceeding.<br></br><br></br><strong>WARNING!</strong>: By continuing, you confirm that you have reviewed the record alongside supporting documentation. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process.","Vous êtes sur le point d’enregistrer cet événement de naissance avec vos modifications. Veuillez vous assurer que toutes les informations sont correctes avant de continuer.<br></br><br></br><strong>ATTENTION !</strong> : En continuant, vous confirmez avoir examiné l’enregistrement ainsi que les documents justificatifs. L’enregistrement sera officiellement enregistré via la boîte d’envoi. Toute modification ultérieure ne pourra être effectuée que par le biais d’une procédure légale de correction."
+event.birth.action.escalate.audit-history-label,The label to show in audit history for the escalate action,Escalated,Transmis
+event.birth.action.escalate.label,This is shown when the escalate action can be triggered from the action from,Escalate,Transmettre
+event.birth.action.escalate.supportingCopy,This is the confirmation text for the escalate action,Escalating this declaration will forward it to the chosen authority for further review and decision.,Transmettre cette déclaration l'enverra à l'autorité choisie pour examen et décision.
+event.birth.action.form.section.alienNumberDetails.label,Field for entering Alien Number details,Alien Number,Numéro d'étranger
+event.birth.action.form.section.brn.label,Field for entering Birth Registration Number,Birth Registration Number,Numéro d'enregistrement de naissance
+event.birth.action.form.section.collector.other.field.name.label,This is the label for the name field of OTHER collector,Collector's name,Nom du collecteur
+event.birth.action.form.section.drivingLicenseDetails.label,Field for entering Driving License details,Drivers License,Permis de conduire
+event.birth.action.form.section.idNumberOther.label,"Field for entering ID Number if ""Other"" is selected",ID Number,Numéro de pièce d'identité
+event.birth.action.form.section.idType.alienNumber.label,Option for selecting Alien Number as the ID type,Alien Number,Numéro d'étranger
+event.birth.action.form.section.idType.brn.label,Option for selecting Birth Registration Number as the ID type,Birth Registration Number,Numéro d'enregistrement de naissance
+event.birth.action.form.section.idType.drivingLicense.label,Option for selecting Driving License as the ID type,Drivers License,Permis de conduire
+event.birth.action.form.section.idType.label,This is the label for selecting the type of ID,Type of ID,Type de pièce d'identité
+event.birth.action.form.section.idType.nid.label,Option for selecting National ID as the ID type,National ID,Pièce d'identité nationale
+event.birth.action.form.section.idType.noId.label,Option for selecting No ID as the ID type,No ID available,Aucune pièce d'identité disponible
+event.birth.action.form.section.idType.other.label,Option for selecting Other as the ID type,Other,Autre
+event.birth.action.form.section.idType.passport.label,Option for selecting Passport as the ID type,Passport,Passeport
+event.birth.action.form.section.idType.refugeeNumber.label,Option for selecting Refugee Number as the ID type,Refugee Number,Numéro de réfugié
+event.birth.action.form.section.idTypeOther.label,"Field for entering ID type if ""Other"" is selected",Other type of ID,Autre type de pièce d'identité
+event.birth.action.form.section.nid.label,Field for entering ID Number,National ID,Pièce d'identité nationale
+event.birth.action.form.section.passportDetails.label,Field for entering Passport details,Passport,Passeport
+event.birth.action.form.section.refugeeNumberDetails.label,Field for entering Refugee Number details,Refugee Number,Numéro de réfugié
+event.birth.action.form.section.relationshipToChild.label,This is the label for the relationship to child field,Relationship to child,Lien avec l'enfant
+event.birth.action.form.section.signedAffidavit.fileName,This is the label for the file name,Signed Affidavit,Déclaration sous serment signée
+event.birth.action.form.section.signedAffidavit.label,This is the label for uploading a signed affidavit,Signed Affidavit (Optional),Déclaration sous serment signée (facultatif)
+event.birth.action.issue-certified-copy.label,This is shown as the action name anywhere the user can trigger the action from,Issue certified copy,Délivrer une copie certifiée
+event.birth.action.issue-certified-copy.supportingCopy,This is the confirmation text for the issue certified copy action,Issuing a certified copy confirms that an official document is being released.,Délivrer une copie certifiée confirme qu'un document officiel est remis.
+event.birth.action.issue-vc.audit-history-label,Audit history label for issued verifiable credential,Verifiable Credential issued,Attestation vérifiable délivrée
+event.birth.action.issue-vc.label,Label for issue verifiable credential action,Issue a verifiable credential,Délivrer une attestation vérifiable
+event.birth.action.issued.audit-history-label,The label to show in audit history for the issued action,Issued,Émis
+event.birth.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
+event.birth.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
+event.birth.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
+event.birth.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
+event.birth.action.provincial-registrar-feedback.label,This is shown when the provincial registrar feedback can be triggered from the action from,Provincial registrar feedback,Retour du registraire provincial
+event.birth.action.provincial-registrar-feedback.supportingCopy,This is the confirmation text for the provincial registrar feedback action,Your feedback will be recorded and shared with relevant officers to guide further action on this declaration.,Votre commentaire sera consigné et communiqué aux agents concernés pour orienter la suite du traitement de cette déclaration.
+event.birth.action.register.field.book-number.label,This is the label for the register book number field on the register action dialog,Register book number,Numéro du registre
+event.birth.action.register.field.comments.label,This is the label for the additional comments field on the register action dialog,Additional comments,Commentaires supplémentaires
+event.birth.action.register.field.documents-verified.label,This is the label for the supporting documents verification field on the register action dialog,Supporting documents reviewed?,Documents justificatifs examinés ?
+event.birth.action.register.field.documents-verified.option.not-applicable.label,Option label for supporting documents reviewed: not applicable,Not applicable,Sans objet
+event.birth.action.register.field.documents-verified.option.yes.label,Option label for supporting documents reviewed: yes,Yes,Oui
+event.birth.action.register.field.page-number.label,This is the label for the register page number field on the register action dialog,Register page number,Numéro de page du registre
+event.birth.action.register.supportingCopy,The description for registration action when form is complete,"Registering this birth event will create an official civil registration record. Please ensure all details are correct before proceeding.<br></br><br></br><strong>WARNING!</strong>: By clicking 'Register', you confirm that you have reviewed the record alongside supporting documentation in the Record tab. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process.","L’enregistrement de cet événement de naissance créera un registre officiel d’état civil. Veuillez vous assurer que toutes les informations sont correctes avant de continuer.<br></br><br></br><strong>ATTENTION</strong> ! En cliquant sur « S’inscrire », vous confirmez avoir examiné l'enregistrement ainsi que les documents justificatifs dans l'onglet « Enregistrement ». L'enregistrement sera ensuite officiellement enregistré via la boîte d'envoi. Toute modification ultérieure ne pourra être effectuée que par le biais d'une procédure légale de correction."
+event.birth.action.registrar-feedback.audit-history-label,The label to show in audit history for the registrar feedback sent action,Escalation feedback,Commentaire de transmission
+event.birth.action.registrar-general-feedback.label,This is shown when the registrar general feedback can be triggered from the action from,Registrar general feedback,Retour du registraire général
+event.birth.action.registrar-general-feedback.supportingCopy,Confirmation text for registrar general feedback action,Your feedback will be officially recorded and may influence the final decision on the declaration.,Votre retour sera officiellement enregistré et pourra influencer la décision finale concernant la déclaration.
+event.birth.action.reinstate-registration.audit-history-label,The label to show in audit history for the reinstate registration action,Registration reinstated,Enregistrement rétabli
+event.birth.action.reinstate-registration.label,This is shown as the action name anywhere the user can trigger the action from,Reinstate registration,Rétablir l'enregistrement
+event.birth.action.revoke-registration.audit-history-label,The label to show in audit history for the revoke registration action,Revoked,Révoqué
+event.birth.action.revoke-registration.label,This is shown as the action name anywhere the user can trigger the action from,Revoke registration,Révoqué l'enregistrement
+event.birth.action.revoke-registration.supportingCopy,This is the confirmation text for the reinstate revoke registration action,This will restore a previously revoked registration to active status.,Cela rétablira à l'état actif un enregistrement précédemment révoqué.
+event.birth.custom.action.approve.field.collector.label,Label for collector field,Collector,le collectionneur
+event.birth.custom.action.approve.field.notes.label,This is the label for the field for a custom action,Comments,Commentaires
+event.birth.custom.action.escalate.field.escalate-to.label,This is the label for escalate to field,Escalate to,Transmettre à
+event.birth.custom.action.escalate.field.escalate-to.option.officer-in-charge.label,Option label for provincial registrar in escalate to field,My state provincial registrar,L'officier d'état civil de ma province
+event.birth.custom.action.escalate.field.escalate-to.option.registrar-general.label,Option label for registrar general in escalate to field,Registrar General,Directeur général de l'état civil
+event.birth.custom.action.issue-vc.field.accepted-vc-offer.error,Validation message for citizen acceptance checkbox,Please confirm that the citizen has accepted the verifiable credential offer,Veuillez confirmer que le citoyen a accepté l’offre d’attestation vérifiable
+event.birth.custom.action.issue-vc.field.accepted-vc-offer.label,Checkbox label to confirm citizen acceptance of VC offer,I confirm the verifiable credential has been accepted.,Je confirme que l'attestation vérifiable a été acceptée.
+event.birth.custom.action.issue-vc.field.get-credential-offer.label,Label for HTTP call to get VC offer,Get Credential Offer,Obtenir l’offre d’attestation vérifiable
+event.birth.custom.action.issue-vc.field.qr-code.configuration.alt,Alt text for VC QR image,QR Code,Code QR
+event.birth.custom.action.issue-vc.field.qr-code.configuration.text,Explanation text for VC QR code,Scan the QR code below with your digital wallet to receive your Verifiable Credential.,Scannez le code QR ci-dessous avec votre portefeuille numérique pour recevoir votre attestation vérifiable.
+event.birth.custom.action.issue-vc.field.request-credential-offer-button.configuration.text,Text for VC offer generation button,Generate,Générer
+event.birth.custom.action.issue-vc.field.request-credential-offer-button.label,Label for VC offer generation button section,Verifiable credential offer,Offre d’attestation vérifiable
+event.birth.custom.action.issue-vc.field.requester.label,Label for requester selection in VC action,Requester,Demandeur
+event.birth.custom.action.issue-vc.field.requester.option.father,Requester option father in VC action,Father,Père
+event.birth.custom.action.issue-vc.field.requester.option.mother,Requester option mother in VC action,Mother,Mère
+event.birth.custom.action.issue-vc.field.supporting-copy,Supporting copy shown before issuing verifiable credential,Select the requester you would like to issue this verifiable credential to.,Sélectionnez le demandeur à qui vous souhaitez délivrer cette attestation vérifiable.
+event.birth.custom.action.revoke-registration.field.reason.label,This is the label for the reason field for revoke registration action,Reason,Raison
+event.birth.custom.action.seal.audit-history-label,The label to show in audit history for the seal action,Unsealed,Descellé
+event.birth.custom.action.seal.field.courtOrderCopy.label,This is the label for the supporting document field,Supporting document — court order copy,Document justificatif — copie de la décision de justice
+event.birth.custom.action.seal.field.courtOrderReference.label,This is the label for the court order reference field,Court order reference,Référence de la décision de justice
+event.birth.custom.action.seal.field.reason.label,This is the label for the seal reason field,Seal reason / legal basis,Motif du scellement / base légale
+event.birth.custom.action.seal.field.reason.option.adoption.label,Option label for adoption as the seal reason,Adoption,Adoption
+event.birth.custom.action.seal.field.reason.option.courtOrder.label,Option label for court order as the seal reason,Court order,Décision de justice
+event.birth.custom.action.seal.field.reason.option.other.label,Option label for other seal reasons,Other,Autre
+event.birth.custom.action.seal.field.requestingParty.label,This is the label for the requesting party field,Requesting party,Partie requérante
+event.birth.custom.action.seal.label,This is shown as the action name anywhere the user can trigger the action from,Seal,Sceller
+event.birth.custom.action.unseal.label,This is shown as the action name anywhere the user can trigger the action from,Unseal,Desceller
+event.birth.custom.action.validate-declaration.audit-history-label,The label to show in audit history for the validate action,Validated,Validé
+event.birth.custom.action.validate-declaration.field.comments.label,This is the label for the comments field for the validate declaration action,Comments,Commentaires
+event.birth.custom.action.validate-declaration.label,This is shown as the action name anywhere the user can trigger the action from,Validate,Valider
+event.birth.custom.action.validate-declaration.supportingCopy,This is the supporting copy for the Validate declaration -action,Validating this declaration confirms it meets all requirements and is eligible for registration.,La validation de cette déclaration confirme qu'elle répond à toutes les exigences et est éligible à l'enregistrement.
+event.birth.flag.approval-required-for-late-registration,Flag label for approval required for late registration,Approval required for late registration,Approbation requise pour un enregistrement tardif
+event.birth.flag.certified-copy-printed-in-advance-of-issuance,Flag label for certified copy printed in advance of issuance,Certified copy printed in advance of issuance,Copie certifiée imprimée avant la délivrance
+event.birth.flag.corrected-record,Flag label for corrected record,Corrected record,Enregistrement corrigé
+event.birth.flag.escalated-to-provincial-registrar,Flag label for escalated to provincial registrar,Escalated to Provincial Registrar,Transmis à l'officier d'état civil provincial
+event.birth.flag.escalated-to-registrar-general,Flag label for escalated to registrar general,Escalated to Registrar General,Transmis au directeur général de l'état civil
+event.birth.flag.pending-first-certificate-issuance,Pending first certificate issuance,Pending first certificate issuance,En attente de la délivrance d'une copie certifiée conforme
+event.birth.flag.revoked,Flag label for revoked,Revoked,Révoqué
+event.birth.flag.sealed,Flag label for sealed,Sealed,Scellé
+event.birth.flag.validated,Flag label for validated,Validated,Validé
+event.birth.flag.vc-issued,Flag label for verifiable credential issued,Verifiable Credential issued,Attestation vérifiable délivrée
+event.birth.label,This is what this event is referred as in the system,Birth,Naissance
+event.birth.summary.banner.sealed.description,Description of the banner shown when a record is sealed,Request to unseal to view this record,Demander le descellement pour consulter cet enregistrement
+event.birth.summary.banner.sealed.title,Heading of the info box shown when a record is sealed,Record is protected,L'enregistrement est protégé
+event.birth.summary.child.dob.empty,Label for date of birth not available,No date of birth,Pas de date de naissance
+event.birth.summary.child.placeOfBirth.empty,Label for place of birth not available,No place of birth,Pas de lieu de naissance
+event.birth.summary.child.placeOfBirth.label,Label for place of birth,Place of birth,Lieu de naissance
+event.birth.summary.event.registeredAt.empty,This is shown when there is no registration date,No registration date,Aucune date d'enregistrement
+event.birth.summary.event.registeredAt.label,This is the label for the registration date,Registration date,Date d'enregistrement
+event.birth.summary.event.registeredAt.value,This is the registration date value,"{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}","{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}"
+event.birth.summary.informant.contact.empty,This is shown when there is no informant information,No contact details provided,Pas de coordonnées fournies
+event.birth.summary.informant.contact.label,This is the label for the informant information,Contact,Contact
+event.birth.summary.informant.contact.value,This is the contact value of the informant,{informant.phoneNo} {informant.email},{informant.phoneNo} {informant.email}
+event.birth.title,This is the title of the summary,{child.name.firstname} {child.name.surname},{child.name.firstname} {child.name.surname}
+event.death.action.Read.label,This is shown as the action name anywhere the user can trigger the action from,Read,Lire
+event.death.action.archive.label,This is shown as the action name anywhere the user can trigger the action from,Archive,Archiver
+event.death.action.certificate.form.cancel,This is the label for the verification cancellation button,Identity does not match,L'identité ne correspond pas
+event.death.action.certificate.form.cancel.confirmation.body,This is the body for the verification cancellation modal,"Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector","Veuillez noter que si vous continuez, vous serez responsable de la délivrance d'un certificat sans la preuve d'identité nécessaire du collecteur."
+event.death.action.certificate.form.cancel.confirmation.title,This is the title for the verification cancellation modal,Print without proof of ID?,Imprimer sans preuve d'identité ?
+event.death.action.certificate.form.label,This is what this form is referred as in the system,Death certificate collector,Collecteur de certificat de décès
+event.death.action.certificate.form.section.collectPayment.data.label,Title for the data section,Payment details,Détails du paiement
+event.death.action.certificate.form.section.collectPayment.fee.label,Title for the data entry,Fee,Frais
+event.death.action.certificate.form.section.collectPayment.service.label,Title for the data entry,Service,Service
+event.death.action.certificate.form.section.collectPayment.service.label.afterRegistrationTarget,Death registration after 45 days of date of death message,Death registration after 45 days of date of death,Enregistrement du décès après 45 jours de la date du décès
+event.death.action.certificate.form.section.collectPayment.service.label.beforeRegistrationTarget,Death registration before 45 days of date of death message,Death registration before 45 days of date of death,Enregistrement du décès avant 45 jours de la date du décès
+event.death.action.certificate.form.section.requester.label,This is the label for the field,Requester,Demandeur
+event.death.action.certificate.form.section.requester.other.label,This is the label for the field,Print and issue to someone else,Imprimer et délivrer à quelqu'un d'autre
+event.death.action.certificate.form.section.requester.spouse.label,This is the label for the field,Print and issue to Spouse,Imprimer et délivrer au conjoint
+event.death.action.certificate.form.section.verifyIdentity.data.label,Label for identity verification data block,Identity details,Détails de l'identité
+event.death.action.certificate.form.section.who.title,This is the title of the section,Certify record,Certifier l'enregistrement
+event.death.action.certificate.form.verify,This is the label for the verification button,Verified,Vérifié
+event.death.action.collect-certificate.label,This is shown as the action name anywhere the user can trigger the action from,Print,Imprimer
+event.death.action.correction.documents.supportingDocs.affidavit.label,Label for the affidavit option,Affidavit,Affidavit
+event.death.action.correction.documents.supportingDocs.courtDocument.label,Label for the court document option,Court Document,Document judiciaire
+event.death.action.correction.documents.supportingDocs.label,Label for the supporting documents field,Supporting documents,Documents justificatifs
+event.death.action.correction.documents.supportingDocs.other.label,Label for the other option,Other,Autre
+event.death.action.correction.fees.amount.label,Label for the amount field,Fee total,Frais totaux
+event.death.action.correction.fees.amount.prefix,Prefix for the amount field,$,€
+event.death.action.correction.form.cancel,This is the label for the verification cancellation button,Identity does not match,L'identité ne correspond pas
+event.death.action.correction.form.cancel.confirmation.body,This is the body for the verification cancellation modal,"Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification","Veuillez noter que si vous continuez, vous serez responsable d'apporter une modification à cet enregistrement sans la preuve d'identification nécessaire."
+event.death.action.correction.form.cancel.confirmation.title,This is the title for the verification cancellation modal,Correct without proof of ID?,Correction sans preuve d'identité ?
+event.death.action.correction.form.label,This is the label for the death correction form,Correct record,Corriger le dossier
+event.death.action.correction.form.section.details.divider.label,This is the title of the section,,
+event.death.action.correction.form.section.details.title,This is the title of the section,Correction details,Détails de la correction
+event.death.action.correction.form.section.fees.title,This is the title of the section,Collect fees,Collecter les frais
+event.death.action.correction.form.section.reason.title,This is the title of the section,Reason for correction,Raison de la correction
+event.death.action.correction.form.section.requester.brn.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.correction.form.section.requester.idType.label,This is the label for the field,Type of ID,Type d'identité
+event.death.action.correction.form.section.requester.identity.verify.title,This is the title of the section,Verify their identity,Vérifier l'identité
+event.death.action.correction.form.section.requester.label,This is the label for the field,Requester,Demandeur
+event.death.action.correction.form.section.requester.name.label,This is the label for the field,Name,Nom
+event.death.action.correction.form.section.requester.nid.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.correction.form.section.requester.passport.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to child,Relation avec l'enfant
+event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Grandmother,ex. Grand-mère
+event.death.action.correction.form.section.supporting-documents.title,This is the title of the section,Upload supporting documents,Télécharger les documents justificatifs
+event.death.action.correction.form.section.verifyIdentity.data.label,Title for the data section,,
+event.death.action.correction.form.verify,This is the label for the verification button,Verified,Vérifié
+event.death.action.correction.reason.option.clericalError.label,Label for the clerical error option,Myself or an agent made a mistake (Clerical error),Une erreur a été commise par moi-même ou un agent (Erreur administrative)
+event.death.action.correction.reason.option.judicialOrder.label,Label for the judicial order option,Requested to do so by the court (Judicial order),Demandé par le tribunal (Ordonnance judiciaire)
+event.death.action.correction.reason.option.materialError.label,Label for the material error option,Informant provided incorrect information (Material error),L'informateur a fourni des informations incorrectes (Erreur matérielle)
+event.death.action.correction.reason.option.materialOmission.label,Label for the material omission option,Informant did not provide this information (Material omission),L'informateur n'a pas fourni cette information (Omission matérielle)
+event.death.action.correction.reason.option.other.label,Label for the other option,Other,Autre
+event.death.action.correction.reason.other.label,Label for the reason,Specify reason,Préciser la raison
+event.death.action.declare.declare.copy,Confirmation text for the declare action,"You are about to formally declare this death event. Once declared, the record will enter the verification and approval process.","Vous êtes sur le point de déclarer officiellement cet événement de décès. Une fois déclaré, le dossier entrera dans le processus de vérification et d'approbation."
+event.death.action.declare.field.comments.label,This is the label for the additional comments field on the declare action dialog,Additional comments,Commentaires supplémentaires
+event.death.action.declare.form.label,This is what this form is referred as in the system,Death declaration form,Formulaire de déclaration de décès
+event.death.action.declare.form.nid.unique,This is the error message for non-unique ID Number,National id must be unique,L'identifiant national doit être unique
+event.death.action.declare.form.review.comment.label,Label for the comment field in the review section,Comment,Commentaire
+event.death.action.declare.form.review.signature.label,Label for the signature field in the review section,Signature of informant,Signature de l'informateur
+event.death.action.declare.form.review.title,Title of the form to show in review page,"{deceased.name.firstname, select, __EMPTY__ {{deceased.name.surname, select, __EMPTY__ {Death declaration} other {Death declaration for {deceased.name.surname}}}} other {{deceased.name.surname, select, __EMPTY__ {Death declaration for {deceased.name.firstname}} other {Death declaration for {deceased.name.firstname} {deceased.name.surname}}}}}","{deceased.name.firstname, select, __EMPTY__ {{deceased.name.surname, select, __EMPTY__ {Déclaration de décès} other {Déclaration de décès de {deceased.name.surname}}}} other {{deceased.name.surname, select, __EMPTY__ {Déclaration de décès de {deceased.name.firstname}} other {Déclaration de décès de {deceased.name.firstname} {deceased.name.surname}}}}}"
+event.death.action.declare.form.section.deceased.field.address.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+event.death.action.declare.form.section.deceased.field.age.error,Error message for invalid age,Age must be between 0 and 120,L'auteur doit avoir entre 0 et 120 ans
+event.death.action.declare.form.section.deceased.field.age.label,This is the label for the field,Age of deceased (at the time of event),Âge du défunt (au moment de l'événement)
+event.death.action.declare.form.section.deceased.field.deathLocation.label,This is the label for the field,Health Institution,Établissement de santé
+event.death.action.declare.form.section.deceased.field.deathLocationOther.label,This is the label for the field,Death location address,Adresse du lieu de décès
+event.death.action.declare.form.section.deceased.field.dob.error,This is the error message for invalid date,Must be a valid Birthdate,Doit être une date de naissance valide
+event.death.action.declare.form.section.deceased.field.dob.error.laterThanDeath,This is the error message for date of birth later than date of death,Date of birth must be before the date of death,La date de naissance doit être antérieure à la date de décès
+event.death.action.declare.form.section.deceased.field.dob.label,This is the label for the field,Date of birth,Date de naissance
+event.death.action.declare.form.section.deceased.field.gender.label,This is the label for the field,Sex,Sexe
+event.death.action.declare.form.section.deceased.field.name.label,This is the label for the field,Deceased's name,Nom du défunt
+event.death.action.declare.form.section.deceased.field.numberOfDependants.label,This is the label for the field,No. of dependants,Nombre de personnes à charge
+event.death.action.declare.form.section.deceased.field.placeOfDeath.label,This is the label for the field,Place of death,Lieu du décès
+event.death.action.declare.form.section.documents.field.proofOfCauseOfDeath.label,This is the label for the field,Proof of cause of death,Preuve de la cause du décès
+event.death.action.declare.form.section.documents.field.proofOfDeath.label,This is the label for the field,Proof of death of deceased,Preuve du décès du défunt
+event.death.action.declare.form.section.documents.field.proofOfDeceased.label,This is the label for the field,Proof of deceased's ID,Preuve de l'identité du défunt
+event.death.action.declare.form.section.documents.field.proofOfInformant.label,This is the label for the field,Proof of informant's ID,Preuve de l'identité de l'informateur
+event.death.action.declare.form.section.event.field.addressHelper.label,This is the label for the field,Place of death,Lieu du décès
+event.death.action.declare.form.section.event.field.causeOfDeath.label,This is the label for the field,Cause of death has been established,La cause du décès a été établie
+event.death.action.declare.form.section.event.field.date.error,This is the error message for invalid date,Must be a valid date,Doit être une date valide
+event.death.action.declare.form.section.event.field.date.error.beforeBirth,This is the error message for date of death before date of birth,Date of death must be after the deceased's birth date,La date du décès doit être postérieure à la date de naissance du défunt
+event.death.action.declare.form.section.event.field.date.label,This is the label for the field,Date of death,Date du décès
+event.death.action.declare.form.section.event.field.description.label,Description of cause of death by lay person or verbal autopsy,Description,Description
+event.death.action.declare.form.section.event.field.manner.label,This is the label for the field,Manner of death,Mode de décès
+event.death.action.declare.form.section.event.field.reason.label,This is the label for the field,Reason for late registration,Raison de l'inscription tardive
+event.death.action.declare.form.section.event.field.sourceCauseDeath.label,This is the label for the field,Source of cause of death,Source de la cause du décès
+event.death.action.declare.form.section.informant.field.address.addressSameAs.label,This is the label for the field,Same as deceased's usual place of residence?,Identique au lieu de résidence habituel du défunt ?
+event.death.action.declare.form.section.informant.field.address.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+event.death.action.declare.form.section.informant.field.addressHelper.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+event.death.action.declare.form.section.informant.field.age.checkbox.label,This is the label for the field,Exact date of birth unknown,Date exacte de naissance inconnue
+event.death.action.declare.form.section.informant.field.age.label,This is the label for the field,Age of informant (at the time of event),Âge de l'informateur (au moment de l'événement)
+event.death.action.declare.form.section.informant.field.age.postfix,This is the postfix for age field,years,ans
+event.death.action.declare.form.section.informant.field.brn.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.declare.form.section.informant.field.dob.error,This is the error message for invalid date,Must be a valid Birthdate,Doit être une date de naissance valide
+event.death.action.declare.form.section.informant.field.dob.label,This is the label for the field,Date of birth,Date de naissance
+event.death.action.declare.form.section.informant.field.email.label,This is the label for the field,Email,Email
+event.death.action.declare.form.section.informant.field.idType.label,This is the label for the field,Type of ID,Type d'identité
+event.death.action.declare.form.section.informant.field.name.label,This is the label for the field,Informant's name,Nom de l'informateur
+event.death.action.declare.form.section.informant.field.nationality.label,This is the label for the field,Nationality,Nationalité
+event.death.action.declare.form.section.informant.field.nid.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.declare.form.section.informant.field.other.relation.label,This is the label for the field,Relationship to deceased,Relation avec le défunt
+event.death.action.declare.form.section.informant.field.passport.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.declare.form.section.informant.field.phoneNo.error,The error message that appears on phone numbers where the first two characters must be 07 or 09 and length must be 10,Must be a valid 10 digit number that starts with 0(7|9),Doit être un nombre valide de 10 chiffres qui commence par 0(7|9)
+event.death.action.declare.form.section.informant.field.phoneNo.label,This is the label for the field,Phone number,Numéro de téléphone
+event.death.action.declare.form.section.informant.field.relation.label,This is the label for the field,Informant type,Type d'informateur
+event.death.action.declare.form.section.spouse.field.address.addressSameAs.label,This is the label for the field,Same as deceased's usual place of residence?,Identique au lieu de résidence habituel du défunt ?
+event.death.action.declare.form.section.spouse.field.address.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+event.death.action.declare.form.section.spouse.field.addressHelper.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+event.death.action.declare.form.section.spouse.field.age.checkbox.label,This is the label for the field,Exact date of birth unknown,Date exacte de naissance inconnue
+event.death.action.declare.form.section.spouse.field.age.label,This is the label for the field,Age of spouse (at the time of event),Âge du conjoint (au moment de l'événement)
+event.death.action.declare.form.section.spouse.field.age.postfix,This is the postfix for age field,years,ans
+event.death.action.declare.form.section.spouse.field.brn.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.declare.form.section.spouse.field.detailsNotAvailable.label,This is the label for the field,Spouse's details are not available,Les informations du conjoint ne sont pas disponibles
+event.death.action.declare.form.section.spouse.field.dob.error,This is the error message for invalid date,Must be a valid Birthdate,Doit être une date de naissance valide
+event.death.action.declare.form.section.spouse.field.dob.label,This is the label for the field,Date of birth,Date de naissance
+event.death.action.declare.form.section.spouse.field.idType.label,This is the label for the field,Type of ID,Type d'identité
+event.death.action.declare.form.section.spouse.field.name.label,This is the label for the field,Spouse's name,Nom du conjoint
+event.death.action.declare.form.section.spouse.field.nationality.label,This is the label for the field,Nationality,Nationalité
+event.death.action.declare.form.section.spouse.field.nid.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.declare.form.section.spouse.field.passport.label,This is the label for the field,ID Number,Numéro d'identité
+event.death.action.declare.form.section.spouse.field.reason.label,This is the label for the field,Reason,Raison
+event.death.action.declare.label,This is shown as the action name anywhere the user can trigger the action from,Declare,Déclarer
+event.death.action.declare.notify.copy,Confirmation text for the notify action,You are about to formally notify the relevant Registration Office that a death event has occurred. Please confirm that the information provided is accurate before proceeding.,Vous êtes sur le point de notifier officiellement le bureau d'enregistrement concerné qu'un événement de décès s'est produit. Veuillez confirmer que les informations fournies sont exactes avant de continuer.
+event.death.action.declare.other.condition.error,This is the label for the field,Must not contain semicolon(s),Ne doit pas contenir de point-virgule
+event.death.action.declare.register.copy,Confirmation text for the register action,"<strong>WARNING!</strong>: By clicking ""Register"", you confirm that you have reviewed the record alongside supporting documentation in the Record tab. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process.","<strong>ATTENTION</strong> ! En cliquant sur « Enregistrer », vous confirmez avoir examiné le dossier ainsi que les documents justificatifs dans l'onglet « Enregistrement ». Le dossier sera ensuite <strong>légalement enregistré</strong> via la boîte d'envoi. Toute modification ultérieure ne pourra être effectuée que par le biais d'une procédure légale de correction."
+event.death.action.detect-duplicate.label,This is shown as the action name anywhere the user can trigger the action from,Detect duplicate,Détecter les doublons
+event.death.action.edit.declare.copy,Description for `Declare with edits` in edit action menu,You are about to redeclare this death event with your edits. This will permanently update the declaration.,Vous êtes sur le point de redéclarer cet événement avec vos modifications. Cela mettra à jour définitivement la déclaration.
+event.death.action.edit.notify.copy,Description for `Notify with edits` in edit action menu,Are you sure you want to notify this event with these edits?,Êtes-vous sûr de vouloir notifier cet événement avec ces modifications ?
+event.death.action.edit.register.copy,Description for `Register with edits` in edit action menu,"You are about to register this death event with your edits. Please ensure all details are correct before proceeding.<br></br><br></br><strong>WARNING!</strong>: By continuing, you confirm that you have reviewed the record alongside supporting documentation. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process.","Vous êtes sur le point d’enregistrer cet événement de décès avec vos modifications. Veuillez vous assurer que toutes les informations sont correctes avant de continuer.<br></br><br></br><strong>ATTENTION !</strong> : En continuant, vous confirmez avoir examiné l’enregistrement ainsi que les documents justificatifs. L’enregistrement sera officiellement enregistré via la boîte d’envoi. Toute modification ultérieure ne pourra être effectuée que par le biais d’une procédure légale de correction."
+event.death.action.form.section.alienNumberDetails.label,Field for entering Alien Number details,Alien Number,Numéro d'étranger
+event.death.action.form.section.brn.label,Field for entering Birth Registration Number,Birth Registration Number,Numéro d'enregistrement de naissance
+event.death.action.form.section.collector.other.field.name.label,This is the label for the name field of OTHER collector,Collector's name,Nom du collecteur
+event.death.action.form.section.drivingLicenseDetails.label,Field for entering Driving License details,Drivers License,Permis de conduire
+event.death.action.form.section.idNumberOther.label,Field for entering ID Number if Other is selected,ID Number,Numéro d'identité
+event.death.action.form.section.idType.alienNumber.label,Option for selecting Alien Number as the ID type,Alien Number,Numéro d'étranger
+event.death.action.form.section.idType.brn.label,Option for selecting Birth Registration Number as the ID type,Birth Registration Number,Numéro d'enregistrement de naissance
+event.death.action.form.section.idType.drivingLicense.label,Option for selecting Driving License as the ID type,Drivers License,Permis de conduire
+event.death.action.form.section.idType.label,This is the label for selecting the type of ID,Type of ID,Type d'identité
+event.death.action.form.section.idType.nid.label,Option for selecting National ID as the ID type,National ID,Carte nationale d'identité
+event.death.action.form.section.idType.noId.label,Option for selecting No ID as the ID type,No ID available,Aucune identité disponible
+event.death.action.form.section.idType.other.label,Option for selecting Other as the ID type,Other,Autre
+event.death.action.form.section.idType.passport.label,Option for selecting Passport as the ID type,Passport,Passeport
+event.death.action.form.section.idType.refugeeNumber.label,Option for selecting Refugee Number as the ID type,Refugee Number,Numéro de réfugié
+event.death.action.form.section.idTypeOther.label,Field for entering ID type if Other is selected,Other type of ID,Autre type d'identité
+event.death.action.form.section.nid.label,Field for entering ID Number,National ID,Carte nationale d'identité
+event.death.action.form.section.passportDetails.label,Field for entering Passport details,Passport,Passeport
+event.death.action.form.section.refugeeNumberDetails.label,Field for entering Refugee Number details,Refugee Number,Numéro de réfugié
+event.death.action.form.section.relationshipToDeceased.label,This is the label for the relationship to deceased field,Relationship to deceased,Relation avec le défunt
+event.death.action.form.section.signedAffidavit.fileName,This is the label for the file name,Signed Affidavit,Déclaration signée
+event.death.action.form.section.signedAffidavit.label,This is the label for uploading a signed affidavit,Signed Affidavit (Optional),Déclaration signée (Optionnel)
+event.death.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
+event.death.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
+event.death.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
+event.death.action.register.field.comments.label,This is the label for the additional comments field on the register action dialog,Additional comments,Commentaires supplémentaires
+event.death.action.register.label,This is shown as the action name anywhere the user can trigger the action from,Register,Enregistrer
+event.death.action.register.supportingCopy,The description for registration action when form is complete,Registering this death event will create an official civil registration record. Please ensure all details are correct before proceeding.,L'enregistrement de cet événement de décès créera un dossier officiel d'état civil. Veuillez vous assurer que tous les détails sont corrects avant de continuer.
+event.death.action.reject.label,This is shown as the action name anywhere the user can trigger the action from,Reject,Rejeter
+event.death.action.request-correction.label,This is shown as the action name anywhere the user can trigger the action from,Correct record,Corriger l'enregistrement
+event.death.custom.action.attest.audit-history-label,Audit history label for the attest action,Attested,Attesté
+event.death.custom.action.attest.field.comments.label,Label for the comments field on the attest action,Additional comments,Commentaires supplémentaires
+event.death.custom.action.attest.label,This is shown as the action name anywhere the user can trigger the action from,Attest,Attester
+event.death.custom.action.attest.supportingCopy,Supporting copy for the attest action,"Attesting confirms this death was reported at your health facility. Once attested, the notification proceeds to the registration office.","En attestant, vous confirmez que ce décès a été signalé dans votre établissement de santé. Une fois attesté, la notification est transmise au bureau d'enregistrement."
+event.death.custom.action.validate-declaration.audit-history-label,The label to show in audit history for the validate action,Validated,Validé
+event.death.custom.action.validate-declaration.field.comments.label,This is the label for the comments field for the validate declaration action,Comments,Commentaires
+event.death.custom.action.validate-declaration.label,This is shown as the action name anywhere the user can trigger the action from,Validate,Valider
+event.death.custom.action.validate-declaration.supportingCopy,This is the supporting copy for the Validate declaration -action,Approving this declaration confirms it as legally accepted and eligible for registration.,Approuver cette déclaration la confirme comme légalement acceptée et éligible à l'enregistrement.
+event.death.flag.attestation-required,Flag label for attestation required,Attestation required,Attestation requise
+event.death.label,This is what this event is referred as in the system,Death,Décès
+event.death.summary.eventDetails.date.empty,This is shown when there is no date of death information,No date of death,Aucune date de décès
+event.death.summary.eventDetails.deathLocation.empty,This is shown when there is no death location information,No place of death,Aucun lieu de décès
+event.death.summary.eventDetails.deathLocation.label,Label for place of death,Place of death,Lieu de décès
+event.death.summary.eventDetails.placeOfDeath.empty,This is shown when there is no place of death information,No place of death,Aucun lieu de décès
+event.death.summary.eventDetails.placeOfDeath.label,Label for place of death,Place of death,Lieu de décès
+event.death.summary.informant.contact.empty,This is shown when there is no informant information,No contact details provided,Aucun contact fourni
+event.death.summary.informant.contact.label,This is the label for the informant information,Contact,Contact
+event.death.summary.informant.contact.value,This is the contact value of the informant,{informant.phoneNo} {informant.email},{informant.phoneNo} {informant.email}
+event.death.title,This is the title of the summary,{deceased.name.firstname} {deceased.name.surname},{deceased.name.firstname} {deceased.name.surname}
+event.tennis-club-membership.action.certificate.form.cancel,This is the label for the verification cancellation button,Identity does not match,L'identité ne correspond pas
+event.tennis-club-membership.action.certificate.form.cancel.confirmation.body,This is the body for the verification cancellation modal,"Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector","Sachez que si vous continuez, vous serez responsable de la délivrance d'un certificat sans le justificatif d'identité requis de la part de la personne qui le retire"
+event.tennis-club-membership.action.certificate.form.cancel.confirmation.title,This is the title for the verification cancellation modal,Print without proof of ID?,Imprimer sans justificatif d'identité ?
+event.tennis-club-membership.action.certificate.form.label,This is what this form is referred as in the system,Tennis club membership certificate collector,Tennis club membership certificate collector
+event.tennis-club-membership.action.certificate.form.section.collectPayment.data.label,Title for the data section,Payment details,Détails du paiement
+event.tennis-club-membership.action.certificate.form.section.collectPayment.fee.label,Title for the data entry,Fee,Frais
+event.tennis-club-membership.action.certificate.form.section.collectPayment.service.label,Title for the data entry,Service,Service
+event.tennis-club-membership.action.certificate.form.section.requester.informant.label,This is the label for the field,Print and issue Informant,Print and issue Informant
+event.tennis-club-membership.action.certificate.form.section.requester.label,This is the label for the field,Requester,Requester
+event.tennis-club-membership.action.certificate.form.section.requester.other.label,This is the label for the field,Print and issue someone else,Print and issue someone else
+event.tennis-club-membership.action.certificate.form.section.requester.printInAdvance.label,This is the label for the field,Print in advance,Imprimer à l'avance pour les signatures et la collecte
+event.tennis-club-membership.action.certificate.form.section.verifyIdentity.data.label,Title for the data section,Applicant details,Informations sur le demandeur
+event.tennis-club-membership.action.certificate.form.section.verifyIdentity.data.subtitle,Subtitle for the data section,Please verify the applicants identity,Veuillez vérifier l'identité du demandeur
+event.tennis-club-membership.action.certificate.form.section.who.title,This is the title of the section,Print certified copy,Imprimer une copie certifiée
+event.tennis-club-membership.action.certificate.form.verify,This is the label for the verification button,Verified,Vérifié
+event.tennis-club-membership.action.collect-certificate.label,This is shown as the action name anywhere the user can trigger the action from,Print certificate,Imprimer le certificat
+event.tennis-club-membership.action.declare.form.label,This is what this form is referred as in the system,Tennis club membership application,Tennis club membership application
+event.tennis-club-membership.action.declare.form.review.print-record.label,Print,Print declaration for hospital clerk,Imprimer la déclaration pour l'agent hospitalier
+event.tennis-club-membership.action.declare.form.review.print.button.label,Print button's label,Print declaration summary by hospital clerk,Imprimer le récapitulatif de la déclaration par l'agent hospitalier
+event.tennis-club-membership.action.declare.form.review.print.label,Print,Print declaration,Imprimer la déclaration
+event.tennis-club-membership.action.declare.form.review.title,Title of the form to show in review page,"{applicant.name.firstname, select, __EMPTY__{{applicant.name.surname, select, __EMPTY__{Member declaration} other{Member declaration for {applicant.name.surname}}}} other{{applicant.name.surname, select, __EMPTY__{Member declaration for {applicant.name.firstname}} other{Member declaration for {applicant.name.firstname} {applicant.name.surname}}}}}","{applicant.name.firstname, select, __EMPTY__ {{applicant.name.surname, select, __EMPTY__ {Déclaration des membres} other {Déclaration des membres pour {applicant.name.surname}}}} other {{applicant.name.surname, select, __EMPTY__ {Déclaration des membres pour {applicant.name.firstname}} other {Déclaration des membres pour {applicant.name.firstname} {applicant.name.surname}}}}}"
+event.tennis-club-membership.action.declare.form.section.recommender.device,This is the label for the field,Recommender's device,Appareil du recommandant
+event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label,This is the label for the field,Recommender's first name,Recommender's first name
+event.tennis-club-membership.action.declare.form.section.recommender.field.id.label,This is the label for the field,Recommender's membership ID,Recommender's membership ID
+event.tennis-club-membership.action.declare.form.section.recommender.field.none.label,This is the label for the field,No recommender,No recommender
+event.tennis-club-membership.action.declare.form.section.recommender.field.search.label,This is the label for the field,Registration Number of recommender,Numéro d'enregistrement du recommandant
+event.tennis-club-membership.action.declare.form.section.recommender.role,This is the label for the field,Recommender role,Rôle du recommandant
+event.tennis-club-membership.action.declare.form.section.recommender.title,This is the title of the section,Who is recommending the applicant?,Who is recommending the applicant?
+event.tennis-club-membership.action.declare.form.section.recommender2.fullHonorificName,This is the label for the field,Recommender full honorific name,Nom honorifique complet du recommandant
+event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label,This is the label for the field,Senior pass ID,Numéro de carte senior
+event.tennis-club-membership.action.declare.form.section.senior-pass.title,This is the title of the section,Assign senior pass for applicant,Attribuer une carte senior au demandeur
+event.tennis-club-membership.action.declare.form.section.who.field.address.country.label,This is the label for the field,Country,Pays
+event.tennis-club-membership.action.declare.form.section.who.field.address.district.label,This is the label for the field,District,District
+event.tennis-club-membership.action.declare.form.section.who.field.address.label,This is the label for the field,Applicant's address,Adresse du demandeur
+event.tennis-club-membership.action.declare.form.section.who.field.address.province.label,This is the label for the field,Province,Province
+event.tennis-club-membership.action.declare.form.section.who.field.dob.error,This is the error message for invalid date,Must be a valid birth date,Doit être une date de naissance valide
+event.tennis-club-membership.action.declare.form.section.who.field.dob.label,This is the label for the field,Applicant's date of birth,Applicant's date of birth
+event.tennis-club-membership.action.declare.form.section.who.field.idImage.label,This is the label for the field,Image of Applicant's ID,Image de la pièce d'identité du demandeur
+event.tennis-club-membership.action.declare.form.section.who.field.idImage.option.back.label,Option to upload back side of ID,Upload back side of ID,Téléverser le verso de la pièce d'identité
+event.tennis-club-membership.action.declare.form.section.who.field.idImage.option.front.label,Option to upload front side of ID,Upload front side of ID,Téléverser le recto de la pièce d'identité
+event.tennis-club-membership.action.declare.form.section.who.field.image.label,This is the label for the field,Applicant's profile picture,Applicant's profile picture
+event.tennis-club-membership.action.declare.form.section.who.field.isRecommendedByFieldAgent.label,This is the label for the field,Field shown when field agent is submitting application.,Champ affiché lorsqu'un agent de terrain soumet la demande.
+event.tennis-club-membership.action.declare.form.section.who.field.name.label,This is the title for the name field,Name of applicant,Nom du demandeur
+event.tennis-club-membership.action.declare.form.section.who.field.tob.label,This is the label for the time of birth field,Applicant's time of birth,Heure de naissance du demandeur
+event.tennis-club-membership.action.declare.form.section.who.title,This is the title of the section,Who is applying for the membership?,Who is applying for the membership?
+event.tennis-club-membership.action.declare.label,This is shown as the action name anywhere the user can trigger the action from,Send an application,Send an application
+event.tennis-club-membership.action.form.section.alienNumberDetails.label,Field for entering Alien Number details,Alien Number Details,Alien Number Details
+event.tennis-club-membership.action.form.section.drivingLicenseDetails.label,Field for entering Driving License details,Driving License Details,Driving License Details
+event.tennis-club-membership.action.form.section.firstName.label,This is the label for the first name field,First Name,First Name
+event.tennis-club-membership.action.form.section.idType.alienNumber.label,Option for selecting Alien Number as the ID type,Alien Number,Numéro de l'étranger
+event.tennis-club-membership.action.form.section.idType.drivingLicense.label,Option for selecting Driving License as the ID type,Driving License,Driving License
+event.tennis-club-membership.action.form.section.idType.eSignet.label,Option for selecting e-Signet as the ID type,e-Signet,e-Signet
+event.tennis-club-membership.action.form.section.idType.label,This is the label for selecting the type of ID,Select Type of ID,Select Type of ID
+event.tennis-club-membership.action.form.section.idType.noId.label,Option for selecting No ID as the ID type,No ID,No ID
+event.tennis-club-membership.action.form.section.idType.other.label,Option for selecting Other as the ID type,Other,Autre
+event.tennis-club-membership.action.form.section.idType.passport.label,Option for selecting Passport as the ID type,Passport,Passeport
+event.tennis-club-membership.action.form.section.idType.refugeeNumber.label,Option for selecting Refugee Number as the ID type,Refugee Number,Numéro du réfugié
+event.tennis-club-membership.action.form.section.idTypeOther.label,Field for entering ID type if Other is selected,Other ID Type (if applicable),Other ID Type (if applicable)
+event.tennis-club-membership.action.form.section.lastName.label,This is the label for the last name field,Last Name,Last Name
+event.tennis-club-membership.action.form.section.passportDetails.label,Field for entering Passport details,Passport Details,Passport Details
+event.tennis-club-membership.action.form.section.refugeeNumberDetails.label,Field for entering Refugee Number details,Refugee Number Details,Refugee Number Details
+event.tennis-club-membership.action.form.section.relationshipToMember.label,This is the label for the relationship to member field,Relationship to Member,Relationship to Member
+event.tennis-club-membership.action.form.section.signedAffidavit.label,This is the label for uploading a signed affidavit,Signed Affidavit (Optional),Signed Affidavit (Optional)
+event.tennis-club-membership.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
+event.tennis-club-membership.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
+event.tennis-club-membership.action.read.label,Title of the review page,Read,Lire
+event.tennis-club-membership.action.register.label,This is shown as the action name anywhere the user can trigger the action from,Register,Enregistrer
+event.tennis-club-membership.action.request-correction.label,This is shown as the action name anywhere the user can trigger the action from,Request correction,Demander une correction
+event.tennis-club-membership.action.requestCorrection.form.section.corrector,This is the title of the section,Correction requester,Qui demande une modification de ce dossier ?
+event.tennis-club-membership.action.requestCorrection.form.section.verify,This is the title of the section,Verify their identity,Vérifier leur identité
+event.tennis-club-membership.action.requestCorrection.label,This is shown as the action name anywhere the user can trigger the action from,Request correction,Request correction
+event.tennis-club-membership.fallbackTitle,This is a fallback title if actual title resolves to empty string,No name provided,Aucun nom fourni
+event.tennis-club-membership.label,This is what this event is referred as in the system,Tennis club membership application,Tennis club membership application
+event.tennis-club-membership.search.applicants,Applicant details search field section title,Applicant's details,Détails du demandeur
+event.tennis-club-membership.search.recommender,Recommender details search field section title,Recommender's details,Détails du référent
+event.tennis-club-membership.search.recommender.id,Recommender id search field title,Recommender's Id,Identifiant du recommandant
+event.tennis-club-membership.summary.field.applicant.firstname.empty,Shown when the applicant's first name is missing in summary,Applicant's first name missing,Applicant's first name missing
+event.tennis-club-membership.summary.field.applicant.firstname.label,Label for the applicant's first name field,Applicant's First Name,Applicant's First Name
+event.tennis-club-membership.summary.field.recommender.firstname.empty,Shown when the recommender first name is missing in summary,Recommender's first name missing,Recommender's first name missing
+event.tennis-club-membership.summary.field.recommender.firstname.label,Label for the recommender's first name field,Recommender's First Name,Recommender's First Name
+event.tennis-club-membership.summary.field.recommender.id.empty,Shown when the recommender id is missing in summary,Recommender's id missing,Recommender's id missing
+event.tennis-club-membership.summary.field.recommender.id.label,Label for the recommender's ID field,Recommender's ID,Recommender's ID
+event.tennis-club-membership.title,This is the title of the summary,{applicant.name.firstname} {applicant.name.surname},{applicant.name.firstname} {applicant.name.surname}
+event.tennis-club.registrationDuration.label,This is the label for the field,Registration duration,Durée de l'enregistrement
+event.tennis-club.registrationDuration.placeholder,This is the placeholder for the field,Time Unit,Unité de temps
+field.address.addressLine1.label,This is the label for the field,Address Line 1,Adresse Ligne 1
+field.address.addressLine2.label,This is the label for the field,Address Line 2,Adresse Ligne 2
+field.address.addressLine3.label,This is the label for the field,Address Line 3,Adresse Ligne 3
+field.address.cityOrTown.label,This is the label for the field,City / Town,Ville / Commune
+field.address.district2.label,This is the label for the field,District,District
+field.address.district2.label.required,District2 required message,District is required,Le district est obligatoire
+field.address.number.label,Label for address number,Number,Numéro
+field.address.postcodeOrZip.label,This is the label for the field,Postcode / Zip,Code postal / Zip
+field.address.residentialArea.label,Label for residential area in address,Residential Area,Zone de résidence
+field.address.state.label,This is the label for the field,State,État
+field.address.state.label.required,State required message,State is required,L'état est obligatoire
+field.address.street.label,Label for street in address,Street,Rue
+field.address.town.label,Label for town in address,Town,Ville
+field.address.village.label,Label for village in address,Village,Village
+form.adoption.adoptionOrder.title,Form section title for the adoption order,Adoption order details,Détails de la décision d'adoption
+form.adoption.adoptiveFather.title,Form section title for adoptive parent 2 details,Adoptive parent 2 details,Informations sur le parent adoptif 2
+form.adoption.adoptiveMother.title,Form section title for adoptive parent 1 details,Adoptive parent 1 details,Informations sur le parent adoptif 1
+form.adoption.child.title,Form section title for the adopted child,Adopted child's details,Informations sur l'enfant adopté
+form.birth.child.title,Form section title for Child,Child's details,information de l'enfant
+form.death.causeOfDeathDetails.title,Form section title for event details,Cause of death details,Détails de la cause du décès
+form.death.deceased.title,Form section title for Deceased,Deceased's details,Informations sur le défunt
+form.death.eventDetails.title,Form section title for event details,Event details,Détails de l'événement
+form.fetch-loader.label,This is the label for the fetch individual information loader,Fetching the person's data from E-Signet,Récupération des données de la personne depuis E-Signet
+form.field.label.No,Label for form field radio option No,No,Non
+form.field.label.Yes,Label for form field radio option Yes,Yes,Ouio
+form.field.label.additionalComments,This is the label for additional comments field,Additional comments,Commentaires supplémentaires
+form.field.label.assignedResponsibilityProof,,Proof of assigned responsibility,Preuve de l'attribution de la responsabilité
+form.field.label.attendantAtBirthLayperson,Label for layperson attendant,Layperson,personne lamda
+form.field.label.attendantAtBirthMidwife,Label for midwife attendant,Midwife,Sage-femme
+form.field.label.attendantAtBirthNone,Label for no attendant,None,Aucun
+form.field.label.attendantAtBirthNurse,Label for nurse attendant,Nurse,Infirmière
+form.field.label.attendantAtBirthOtherParamedicalPersonnel,Label for other paramedical personnel,Other paramedical personnel,Autre personnel paramédical
+form.field.label.attendantAtBirthPhysician,Label for physician attendant,Physician,Médecin
+form.field.label.attendantAtBirthTraditionalBirthAttendant,Label for traditional birth attendant,Traditional birth attendant,Accoucheur(se) Traditionnel(le)
+form.field.label.birthTypeHigherMultipleDelivery,Label for higher multiple delivery birth,Higher multiple delivery,Accouchement multiple supérieur
+form.field.label.birthTypeQuadruplet,Label for quadruplet birth,Quadruplet,Quadruplet
+form.field.label.birthTypeSingle,Label for single birth,Single,Célibataire
+form.field.label.birthTypeTriplet,Label for triplet birth,Triplet,Triplet
+form.field.label.birthTypeTwin,Label for twin birth,Twin,Jumeau
+form.field.label.courtOrderCopy.fileName,This is the label for the file name,Adoption court order,Décision de justice d'adoption
+form.field.label.docTypeCopyOfBurialReceipt,,Certified copy of burial receipt,Copie certifiée du reçu d'enterrement
+form.field.label.docTypeCoronersReport,,Coroner's report,Rapport du médecin légiste
+form.field.label.docTypeHospitalDeathCertificate,,Hospital certificate of death,Certificat de décès émis par l'hôpital
+form.field.label.docTypeLetterOfDeath,,Attested letter of death,Lettre de décès attestée
+form.field.label.docTypeOther,,Other,Autre
+form.field.label.docTypePoliceCertificate,,Police certificate of death,Certificat de décès de la police
+form.field.label.educationAttainmentISCED1,Option for form field: ISCED1 education,Primary,Primaire
+form.field.label.educationAttainmentISCED4,Option for form field: ISCED4 education,Secondary,Secondaire
+form.field.label.educationAttainmentISCED5,Option for form field: ISCED5 education,Tertiary,Tertiaire
+form.field.label.educationAttainmentNone,Option for form field: no education,No schooling,Pas de scolarité
+form.field.label.empty,empty string, , 
+form.field.label.iDTypeBirthCertificate,Option for form field: Type of ID,Birth Certificate,Certificat de naissance
+form.field.label.iDTypeNone,Option for form field: Type of ID,None,Aucun
+form.field.label.informantRelation.contactPoint,,Contact Point,point de contact
+form.field.label.layReported,,Lay reported,Rapport anonyme
+form.field.label.legalGuardianProof,,Proof of legal guardianship,Preuve de la tutelle légale
+form.field.label.mannerOfDeathAccident,,Accident,Accident
+form.field.label.mannerOfDeathHomicide,,Homicide,Homicide
+form.field.label.mannerOfDeathNatural,,Natural causes,Cause naturelle
+form.field.label.mannerOfDeathSuicide,,Suicide,Suicide
+form.field.label.mannerOfDeathUndetermined,,Manner undetermined,Manière indéterminée
+form.field.label.maritalStatusDivorced,Option for form field: Marital status,Divorced,Divorcé(e)
+form.field.label.maritalStatusMarried,Option for form field: Marital status,Married,Marié(e)
+form.field.label.maritalStatusNotStated,Option for form field: Marital status,Not stated,Non déclaré
+form.field.label.maritalStatusSeparated,Option for form field: Marital status,Separated,Séparé(e)
+form.field.label.maritalStatusSingle,Option for form field: Marital status,Single,Célibataire
+form.field.label.maritalStatusWidowed,Option for form field: Marital status,Widowed,Veuf(ve)
+form.field.label.medicallyCertified,,Medically Certified Cause of Death,Cause officielle du décès
+form.field.label.otherInstitution,Select item for Other location,Other,Autre
+form.field.label.padding.60px,60px padding for layout,"<div style=""height:60px""></div>","<div style=""height:60px""></div>"
+form.field.label.physician,,Physician,Médecin
+form.field.label.placeOfDeathSameAsPrimary,,Deceased's usual place of residence,Lieu de résidence habituel du défunt
+form.field.label.proofOfBirth.fileName,The following documents are required,The following documents are required,Les documents suivants sont requis
+form.field.label.reason,This is the label for reason field,Reason,Raison
+form.field.label.reasonNotApplying,,Reason,Motif de la mère
+form.field.label.verbalAutopsy,,Verbal autopsy,Autopsie verbale
+form.field.label.verbalAutopsyReport,,Verbal autopsy report,Rapport d'autopsie verbal
+form.query-params.label,This is the label for the query param reader field - usually this is hidden,Query param reader,Lecteur de paramètre de requête
+form.section.father.title,Form section title for fathers details,Father's details,Information du père
+form.section.informant.title,Form section title for informants details,Informant's details,Coordonnées de l'informateur
+form.section.information.adoption.bullet1,Form information for adoption,I am going to help you make a declaration of adoption.,Je vais vous aider à établir une déclaration d'adoption.
+form.section.information.adoption.bullet2,Form information for adoption,"The adopted child's National ID is used to locate the original birth record, which will be sealed once the adoption is registered.","La pièce d'identité nationale de l'enfant adopté sert à retrouver l'acte de naissance d'origine, qui sera scellé une fois l'adoption enregistrée."
+form.section.information.adoption.bulletList.label,Label for the adoption information bullet list,Adoption Information,Informations sur l'adoption
+form.section.information.birth.bullet1,Form information for birth,I am going to help you make a declaration of birth.,Je vais vous aider à faire une déclaration de naissance.
+form.section.information.birth.bullet2,Form information for birth,As the legal Informant it is important that all the information provided by you is accurate.,"En tant qu'informateur légal, il est important que toutes les informations que vous fournissez soient exactes."
+form.section.information.birth.bullet3.sms,Form information for birth,Once the declaration is processed you will receive an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.,Once the declaration is processed you will receive an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.
+form.section.information.birth.bullet4,Form information for birth,"Make sure you collect the certificate. A birth certificate is critical for this child, especially to make their life easy later on. It will help to access health services, school examinations and government benefits.",Attendez un SMS vous indiquant quand vous devez vous rendre au bureau pour retirer le certificat - Prenez votre carte d'identité avec vous.
+form.section.information.birth.bulletList.label,Label for the birth information bullet list,Birth Information,Birth Information
+form.section.information.death.bullet1,,I am going to help you make a declaration of death.,Je vais vous aider à faire une déclaration de décès.
+form.section.information.death.bullet2,,As the legal Informant it is important that all the information provided by you is accurate.,"En tant qu'informateur légal, il est important que toutes les informations que vous fournissez soient exactes."
+form.section.information.death.bullet3,,Once the declaration is processed you will receive an email to tell you when to visit the office to collect the certificate - Take your ID with you.,"Une fois la déclaration traitée, vous recevrez un courriel vous indiquant quand vous rendre au bureau pour retirer le certificat - Munissez-vous d'une pièce d'identité."
+form.section.information.death.bullet4,,Make sure you collect the certificate. A death certificate is critical to support with inheritance claims and to resolve the affairs of the deceased e.g. closing bank accounts and setting loans.,"Veillez à récupérer le certificat. Le certificat de décès est essentiel pour les demandes d'héritage et pour régler les affaires de la personne décédée, par exemple la fermeture des comptes bancaires et la mise en place des prêts."
+form.section.information.death.bulletList.label,Label for the death information bullet list,Death Information,Informations sur le décès
+form.section.spouse.title,Form section title for spouse details,Spouse details,Informations sur le conjoint
+recommender1.heading.label,This is the label for the field,Recommender 1,Recommandant 1
+recommender2.heading.label,This is the label for the field,Recommender 2,Recommandant 2
+recommender3.heading.label,This is the label for the field,Recommender 3,Recommandant 3
+recommender4.heading.label,This is the label for the field,Recommender 4,Recommandant 4
+recommender5.heading.label,This is the label for the field,Recommender 5,Recommandant 5
+recordAudit.archive.confirmation.body,Confirmation body for archiving a declaration,Archiving will remove this declaration from active processing while retaining it for record purposes. Archived declarations cannot be modified unless reinstated.,L'archivage retirera cette déclaration du traitement actif tout en la conservant à des fins d'enregistrement. Les déclarations archivées ne peuvent pas être modifiées sauf si elles sont réintégrées.
+recordAudit.unarchive.confirmation.body,Confirmation body for unarchiving a declaration,This record will become active again and will be able to progress through registration.,Cet enregistrement redeviendra actif et pourra poursuivre la procédure d'enregistrement.
+register.eventInfo.adoption.title,Event information title for the adoption,Introduce the adoption registration process to the applicant,Présenter la procédure d'enregistrement de l'adoption au demandeur
+register.eventInfo.birth.title,Event information title for the birth,Introduce the birth registration process to the informant,Présenter la procédure d'enregistrement des naissances à l'informateur
+register.eventInfo.death.title,,Introduce the death registration process to the informant,Présenter la procédure d'enregistrement des décès à l'informateur
+rejectModal.description,The description for reject modal,Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.,Le rejet de cette déclaration la renverra au déclarant pour mise à jour. Veuillez vous assurer qu'une raison valable pour le rejet a été enregistrée.
+signature.upload.modal.title,Title for the signature upload modal,Upload Signature,Télécharger la signature
+tennis-club-membership.searchField.helperText,This is the helper text for the field,You can search tennis records created on Farajaland since beginning of 2023,Vous pouvez rechercher les enregistrements de tennis créés sur Farajaland depuis le début de 2023
+tennis-club-membership.searchField.indicators.clearModal.description,Description for the clear confirmation modal,This will remove the details of the current recommender.,Cela supprimera les informations du recommandant actuel.
+tennis-club-membership.searchField.indicators.clearModal.title,Title for the clear confirmation modal,Clear recommender?,Effacer le recommandant ?
+tennis-club-membership.searchField.indicators.ok,OK button text,Recommender found,Recommandant trouvé
+tennis-club-membership.searchField.validation.invalid,Error message for invalid value,Invalid value: Must be alpha-numeric and 12 characters long,Valeur invalide : doit être alphanumérique et comporter 12 caractères
+unit.days,Days,Days,Jours
+unit.hours,Hours,Hours,Heures
+unit.minutes,Minutes,Minutes,Minutes
+unit.months,Months,Months,Mois
+unit.weeks,Weeks,Weeks,Semaines
+unit.years,Years,Years,Années
+userRole.administrator,Name for user role Administrator,Administrator,Administrateur
+userRole.communityLeader,Name for user role Community Leader,Community Leader,Leader communautaire
+userRole.embassyOffical,Name for the user role Embassy Official,Embassy Official,Officiel d'ambassade
+userRole.healthAdministrator,Name for user role Health Administrator,Health Administrator,Administrateur de santé
+userRole.hospitalClerk,Name for user role Hospital Clerk,Hospital Official,Officiel de l'hôpital
+userRole.localRegistrar,Name for user role Registrar,Registrar,Registraire
+userRole.localSystemAdmin,Name for user role Local System Admin,Local System Admin,Administrateur système local
+userRole.nationalAdministrator,Name for user role National Administrator,National Administrator,Administrateur national
+userRole.operationsManager,Name for user role Operations Manager,Operations Manager,Responsable des opérations
+userRole.provincialRegistrar,Name for user role Provincial Registrar,Provincial Registrar,Registraire provincial
+userRole.registrarGeneral, Name for user role Registrar General,Registrar General,Registraire général
+userRole.registrationAgent,Name for user role Registration Agent,Registration Agent,Agent d'enregistrement
+userRole.registrationOfficer,Name for user role Registration Officer,Registration Officer,Agent d'enregistrement
+v2.event.death.action.declare.form.section.deceased.field.addressHelper.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
+v2.event.death.action.declare.form.section.deceased.field.age.checkbox.label,This is the label for the field,Exact date of birth unknown,Date de naissance exacte inconnue
+v2.event.death.action.declare.form.section.deceased.field.age.postfix,This is the postfix for age field,years,ans
+v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.clearModal.description,Description for the clear confirmation modal,This will remove the linked birth record.,Cela supprimera l'acte de naissance associé.
+v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.clearModal.title,Title for the clear confirmation modal,Clear birth record?,Effacer l'acte de naissance ?
+v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.indicators.ok,Indicator shown when a matching birth record is found,Birth record found,Acte de naissance trouvé
+v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.label,Label for the deceased birth record BRN search field,Search birth record by BRN,Rechercher l'acte de naissance par BRN
+v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.validation.invalid,Error message for invalid BRN search value,Invalid value: Must be alpha-numeric and 12 characters long,Valeur invalide : doit être alphanumérique et comporter 12 caractères
+v2.event.death.action.declare.form.section.deceased.field.maritalStatus.label,This is the label for the field,Marital Status,Situation matrimoniale
+v2.event.death.action.declare.form.section.person.field.brn.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+v2.event.death.action.declare.form.section.person.field.idType.label,This is the label for the field,Type of ID,Type de pièce d'identité
+v2.event.death.action.declare.form.section.person.field.nationality.label,This is the label for the field,Nationality,Nationalité
+v2.event.death.action.declare.form.section.person.field.nid.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+v2.event.death.action.declare.form.section.person.field.passport.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+verified.status.description,Description text of the status,"{value, select, authenticated {This identity has been successfully authenticated with the Farajaland’s National ID System. To make edits, please remove the authentication first.} verified {This identity data has been successfully verified with the Farajaland’s National ID System. Please note that their identity has not been authenticated using the individual's biometrics. To make edits, please remove the verification first.} pending {Identity pending verification with Farajaland’s National ID system} failed {The identity data does not match an entry in Farajaland’s National ID System} other {Invalid value}}","{value, select, authenticated {Cette identité a été authentifiée avec succès auprès du système national d'identité du Farajaland. Pour modifier, veuillez d'abord retirer l'authentification.} verified {Ces données d'identité ont été vérifiées avec succès auprès du système national d'identité du Farajaland. Veuillez noter que l'identité n'a pas été authentifiée à l'aide des données biométriques de la personne. Pour modifier, veuillez d'abord retirer la vérification.} pending {Identité en attente de vérification auprès du système national d'identité du Farajaland} failed {Les données d'identité ne correspondent à aucune entrée du système national d'identité du Farajaland} other {Valeur invalide}}"
+verified.status.text,Status text shown on the pill on both form declaration and review page,"{value, select, authenticated {ID Authenticated} verified {ID Verified} failed {Unverified ID} pending {Pending verification} other {Invalid value}}","{value, select, authenticated {Identité authentifiée} verified {Identité vérifiée} failed {Identité non vérifiée} pending {Vérification en attente} other {Valeur invalide}}"
+verify.label,The title for the E-Signet verification button,Authenticate with National ID system,S'authentifier auprès du système national d'identité
+workqueues.assignedToYou.title,Title of assigned to you workqueue,Assigned to you,Attribué à vous
+workqueues.correctionRequested.title,Title of correction requested workqueue,Pending corrections,Corrections en attente
+workqueues.escalated.title,Title of escalated workqueue,Escalated,Transmis
+workqueues.inExternalValidation.title,Title of pending external validation workqueue,Pending external validation,En attente de validation externe
+workqueues.notifications.emptyMessage,Empty message for notifications workqueue,No notifications,Aucune notification
+workqueues.notifications.title,Title of notifications workqueue,Notifications,Notifications
+workqueues.pendingAttestation.title,Title of pending attestation workqueue,Pending attestation,En attente d'attestation
+workqueues.pendingCertification.emptyMessage,Empty message for pending certification workqueue,No pending certification records,Aucun dossier de certification en attente
+workqueues.pendingCertification.title,Title of pending certification workqueue,Pending certification,Certification en attente
+workqueues.pendingFeedback.title,Title of pending feedback workqueue,Pending feedback,En attente de commentaires
+workqueues.pendingIssuance.title,Title of pending issuance workqueue,Pending issuance,En attente d'émission
+workqueues.pendingRegistration.title,Title of pending registration workqueue,Pending registration,Inscription en attente
+workqueues.pendingUpdates.title,Title of pending updates workqueue,Pending updates,Mises à jour en attente
+workqueues.pendingValidation.title,Title of pending validation workqueue,Pending validation,En attente de validation
+workqueues.potentialDuplicate.title,Title of potential duplicate workqueue,Potential duplicate,Duplicata potentiel
+workqueues.recent.emptyMessage,Empty message for recent workqueue,No recent records,Aucun enregistrement récent
+workqueues.recent.title,Title of recent workqueue,Recent,Récent
+workqueues.requiresApproval.title,Title of pending approval workqueue,Pending approval,En attente d'approbation

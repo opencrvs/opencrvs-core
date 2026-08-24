@@ -19,6 +19,7 @@ spec:
         service_name: opencrvs_auth
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.auth) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "auth" "Values" .Values) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.auth) }}
           imagePullPolicy: {{ .Values.auth.image.pullPolicy | default .Values.platform.imagePullPolicy }}
@@ -79,6 +80,8 @@ spec:
         - secret:
             secretName: {{ .Release.Name }}-key-tls
           name: private-key
+
+{{- include "service-account-helper" (dict "service_name" "auth" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "auth" "Values" .Values) }}
 

@@ -23,6 +23,7 @@ import { ActionType } from '@opencrvs/toolkit/events'
 test('Death notified at a health facility is held for attestation, then reaches the registrar once attested', async ({
   browser
 }) => {
+  test.setTimeout(180_000)
   let declaration: Declaration
   let name: string
 

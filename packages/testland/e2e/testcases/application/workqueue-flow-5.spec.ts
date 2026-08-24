@@ -349,9 +349,7 @@ test.describe.serial('5. Workqueue flow - 5', () => {
       await page.getByText('Pending updates').click()
       await openRecordByTitle(page, childName)
 
-      await expect(
-        page.getByTestId('status-value').locator('span')
-      ).toContainText('Declared')
+      await expect(page.getByTestId('status-value')).toContainText('Declared')
 
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
       await selectAction(page, 'Edit')

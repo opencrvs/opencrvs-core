@@ -60,7 +60,8 @@ describe('User notification - sms', () => {
         .inject({
           method: 'POST',
           url: `/triggers/user/${event}`,
-          payload
+          payload,
+          auth: { strategy: 'jwt', credentials: {} }
         })
         .catch(() => {})
       expect((fetch as any).mock.calls[1][1].body).toMatchSnapshot()

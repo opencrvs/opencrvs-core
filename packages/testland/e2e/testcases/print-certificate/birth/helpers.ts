@@ -80,6 +80,29 @@ export async function openRecordByTitle(page: Page, title: string) {
   })
 }
 
+export async function clickWorkqueueActionByTitle(
+  page: Page,
+  title: string,
+  action: string
+) {
+  await expect(async () => {
+    await getRowByTitle(page, title)
+      .getByRole('button', { name: action })
+      .click()
+    try {
+      // target the event review title to make sure this is the right one.
+      expect(await page.locator('#header_subject').textContent()).toMatch(title)
+    } catch (error) {
+      await page.goBack()
+      // This triggers toPass retry loop if the updated happened and we picked wrong one.
+      throw error
+    }
+  }).toPass({
+    timeout: 60_000,
+    intervals: [...Array(5).fill(1_000), ...Array(5).fill(2_000), 5_000]
+  })
+}
+
 export async function printAndExpectPopup(page: Page) {
   await page.getByRole('button', { name: 'Yes, print certificate' }).click()
   const popupPromise = page.waitForEvent('popup')

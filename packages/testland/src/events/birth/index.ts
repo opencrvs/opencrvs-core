@@ -722,7 +722,18 @@ export const birthEvent = defineConfig({
                 description:
                   'Option label for provincial registrar in escalate to field'
               },
-              value: 'PROVINCIAL_REGISTRAR'
+              value: 'PROVINCIAL_REGISTRAR',
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: not(
+                    or(
+                      user.hasRole('EMBASSY_OFFICIAL'),
+                      user.hasRole('PROVINCIAL_REGISTRAR')
+                    )
+                  )
+                }
+              ]
             },
             {
               label: {
@@ -925,7 +936,7 @@ export const birthEvent = defineConfig({
         defaultMessage: 'Reinstate registration',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.birth.action.revoke-registration.label'
+        id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
       supportingCopy: {

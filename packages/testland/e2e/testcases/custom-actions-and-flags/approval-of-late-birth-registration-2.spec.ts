@@ -192,10 +192,7 @@ test.describe
     })
 
     test('Declare with edits', async () => {
-      await triggerDeclarationAction(page, 'Declare with edits', {
-        waitForUnassign: true,
-        eventId: getEventIdFromUrl(page)
-      })
+      await triggerDeclarationAction(page, 'Declare with edits')
     })
 
     test('Go to record', async () => {

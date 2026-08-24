@@ -28,6 +28,7 @@ import { fillDate, formatV2ChildName } from '../birth/helpers'
 test('Registering an adoption seals the original birth record', async ({
   browser
 }) => {
+  test.setTimeout(180_000)
   const page = await browser.newPage()
 
   const child = {

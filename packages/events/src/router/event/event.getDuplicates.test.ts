@@ -18,6 +18,7 @@ import {
   generateActionDuplicateDeclarationInput,
   EventDocument,
   generateUuid,
+  InherentFlags,
   UUID,
   encodeScope
 } from '@opencrvs/commons'
@@ -313,4 +314,131 @@ test('Returns multiple duplicates when found', async () => {
   await expect(
     client.event.getDuplicates({ eventId: event1.id })
   ).resolves.toHaveLength(0)
+})
+
+/**
+ * Sets up two events with identical declarations, so the second is flagged as a
+ * potential duplicate of the first.
+ *
+ * The returned client holds a `record.review-duplicates` scope limited to events
+ * carrying the `potential-duplicate` flag. The subject (`duplicateEvent`) carries
+ * it, its match (`matchedEvent`) does not — so the scope grants access to the
+ * event being reviewed while denying the record matched against it.
+ *
+ * An inherent flag stands in for the real-world case (a `sealed` record), because
+ * `sealed` is set by a country-config action rather than by core.
+ */
+async function setupInaccessibleMatch() {
+  const tennisClubMembershipWithDedupCheckConfig =
+    tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+    })
+  )
+
+  const { user, generator, eventsDb } = await setupTestCase(
+    undefined,
+    tennisClubMembershipWithDedupCheckConfig
+  )
+
+  const client = createTestClient(user, [
+    /*
+     * Access is granted if *any* held scope allows it, so the unrestricted
+     * `record.review-duplicates` scope in the defaults has to go — otherwise it
+     * grants what the flag-limited scope below denies.
+     */
+    ...TEST_USER_DEFAULT_SCOPES.filter(
+      (scope) => !scope.startsWith('type=record.review-duplicates')
+    ),
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership'],
+        flags: { anyOf: [InherentFlags.POTENTIAL_DUPLICATE] }
+      }
+    })
+  ])
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    createPrng(73)
+  )
+
+  const matchedEvent = await client.event.create(generator.event.create())
+  const matchedEventPayload = generator.event.actions.declare(matchedEvent.id, {
+    declaration
+  })
+  await client.event.actions.declare.request(matchedEventPayload)
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration: matchedEventPayload.declaration
+    })
+  )
+
+  await client.event.actions.assignment.assign({
+    type: ActionType.ASSIGN,
+    eventId: duplicateEvent.id,
+    assignedTo: user.id,
+    transactionId: generateUuid()
+  })
+
+  return { client, generator, eventsDb, duplicateEvent, matchedEvent }
+}
+
+test('Refuses to return duplicates the review scope has no access to, without auditing them as read', async () => {
+  const { client, eventsDb, duplicateEvent, matchedEvent } =
+    await setupInaccessibleMatch()
+
+  const matchedEventActionsBefore = await getEventActions(
+    eventsDb,
+    matchedEvent.id
+  )
+
+  await expect(
+    client.event.getDuplicates({ eventId: duplicateEvent.id })
+  ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+
+  const matchedEventActionsAfter = await getEventActions(
+    eventsDb,
+    matchedEvent.id
+  )
+
+  // A refused record must not be audited as read.
+  expect(matchedEventActionsAfter).toHaveLength(
+    matchedEventActionsBefore.length
+  )
+  expect(
+    matchedEventActionsAfter.some(
+      (action) => action.actionType === ActionType.READ
+    )
+  ).toBe(false)
+})
+
+test('Refuses to mark as duplicate when the review scope has no access to the match', async () => {
+  const { client, generator, duplicateEvent } = await setupInaccessibleMatch()
+
+  await expect(
+    client.event.actions.duplicate.markAsDuplicate(
+      generator.event.actions.duplicate.markAsDuplicate(duplicateEvent.id, {
+        keepAssignment: true
+      })
+    )
+  ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+})
+
+test('Refuses to mark as not duplicate when the review scope has no access to the match', async () => {
+  const { client, generator, duplicateEvent } = await setupInaccessibleMatch()
+
+  await expect(
+    client.event.actions.duplicate.markNotDuplicate(
+      generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id, {
+        keepAssignment: true
+      })
+    )
+  ).rejects.toMatchObject({ code: 'FORBIDDEN' })
 })

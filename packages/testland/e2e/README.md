@@ -12,6 +12,10 @@
 
 [See how to write a test that is not flaky](./HOW-TO-WRITE-A-TEST.md)
 
+## How E2E CI sharding works
+
+[See how CI shards are planned and run](./SHARDING.md)
+
 ## How to debug E2E tests on CI
 
 1. Go to E2E repository https://github.com/opencrvs/e2e

@@ -70,11 +70,11 @@ test('Cleared field values are removed after editing and re-notifying a declarat
     await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
     await switchEventTab(page, 'Record')
 
-    const dob = page.getByTestId('row-value-child.dob')
+    const dob = page.getByTestId('child.dob-value')
     await expect(dob).toContainText(childDob.yyyy)
     dobValueBefore = (await dob.innerText()).trim()
 
-    const name = page.getByTestId('row-value-child.name')
+    const name = page.getByTestId('child.name-value')
     await expect(name).toContainText(childName.familyName)
     nameValueBefore = (await name.innerText()).trim()
   })
@@ -100,7 +100,7 @@ test('Cleared field values are removed after editing and re-notifying a declarat
   })
 
   await test.step('Review page during edit shows the cleared weight as deleted', async () => {
-    const weightRow = page.getByTestId('row-value-child.weightAtBirth')
+    const weightRow = page.getByTestId('child.weightAtBirth-value')
 
     // The previous value is shown as deleted
     await expect(weightRow.locator('del')).toContainText(childWeight)
@@ -121,14 +121,14 @@ test('Cleared field values are removed after editing and re-notifying a declarat
 
     // The cleared values must not persist: neither the date of birth nor the
     // name row may still display the value entered before the edit.
-    await expect(page.getByTestId('row-value-child.dob')).not.toHaveText(
+    await expect(page.getByTestId('child.dob-value')).not.toHaveText(
       dobValueBefore
     )
-    await expect(page.getByTestId('row-value-child.name')).not.toHaveText(
+    await expect(page.getByTestId('child.name-value')).not.toHaveText(
       nameValueBefore
     )
     await expect(
-      page.getByTestId('row-value-child.weightAtBirth')
+      page.getByTestId('child.weightAtBirth-value')
     ).not.toContainText(childWeight)
   })
 })

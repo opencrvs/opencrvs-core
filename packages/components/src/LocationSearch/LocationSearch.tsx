@@ -243,6 +243,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
             return (
               <DropDownItem
                 id={`locationOption${item.id}`}
+                data-testid={`locationOption${item.id}`}
                 key={item.id}
                 onClick={() => this.dropDownItemSelect(item)}
               >

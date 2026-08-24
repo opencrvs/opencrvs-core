@@ -47,12 +47,7 @@ test('Email and phone changed from settings are reflected in user details', asyn
   })
 
   await test.step('New email is shown on the settings page', async () => {
-    await expect(
-      page
-        .locator('[data-testid="list-view-value"]')
-        .filter({ hasText: newEmail })
-        .first()
-    ).toBeVisible()
+    await expect(page.getByTestId('email-address-value')).toHaveText(newEmail)
   })
 
   await test.step('Change phone number', async () => {
@@ -67,12 +62,9 @@ test('Email and phone changed from settings are reflected in user details', asyn
   })
 
   await test.step('New phone number is shown on the settings page', async () => {
-    await expect(
-      page
-        .locator('[data-testid="list-view-value"]')
-        .filter({ hasText: newPhoneNumber })
-        .first()
-    ).toBeVisible()
+    await expect(page.getByTestId('phone-number-value')).toHaveText(
+      newPhoneNumber
+    )
   })
 
   await test.step('Both updates are reflected in user details viewed by national system admin', async () => {
@@ -97,8 +89,8 @@ test('Email and phone changed from settings are reflected in user details', asyn
     await adminPage.getByText('Edit details').click()
     await expect(adminPage.getByText('Confirm details')).toBeVisible()
 
-    await expect(adminPage.getByTestId('row-value-email')).toHaveText(newEmail)
-    await expect(adminPage.getByTestId('row-value-phoneNumber')).toHaveText(
+    await expect(adminPage.getByTestId('email-value')).toHaveText(newEmail)
+    await expect(adminPage.getByTestId('phoneNumber-value')).toHaveText(
       newPhoneNumber
     )
 

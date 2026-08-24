@@ -11,9 +11,6 @@
 
 import { env } from '@gateway/environment'
 
-export const AVATAR_API =
-  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
-
 export const NATIVE_LANGUAGE = (() => {
   const languages = env.LANGUAGES.split(',')
   return languages.find((language) => language !== 'en')

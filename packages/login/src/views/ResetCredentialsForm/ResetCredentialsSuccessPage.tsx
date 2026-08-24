@@ -13,15 +13,16 @@ import { storage } from '@login/storage'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Box } from '@opencrvs/components/lib/Box'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { LogoContainer } from '@login/views/ResetCredentialsForm/Commons'
+import {
+  Container,
+  LogoContainer
+} from '@login/views/ResetCredentialsForm/Commons'
 import React, { useEffect } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 import { selectCountryLogo } from '@login/login/selectors'
@@ -29,13 +30,6 @@ import { IStoreState } from '@login/store'
 import { constantsMessages } from '@login/i18n/messages/constants'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
-
-const Container = styled(Box)`
-  position: relative;
-  height: auto;
-  margin: auto;
-  width: min(330px, 90%);
-`
 
 type Props = IntlShapeProps & { logo: string | undefined }
 

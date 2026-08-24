@@ -41,7 +41,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
-import { resolveLocationName } from '@client/v2-events/utils';
+import { resolveLocationName } from '@client/v2-events/utils'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
@@ -61,6 +61,10 @@ const LargeGreyedInfo = styled.div`
 
 const TableDiv = styled.div`
   overflow: auto;
+`
+
+const LinkLeftAligned = styled(Link)`
+  text-align: left;
 `
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
@@ -147,7 +151,7 @@ function User({ action }: { action: ActionDocument }) {
   const canViewUser = !!user && canReadUser(user)
 
   return canViewUser ? (
-    <Link
+    <LinkLeftAligned
       font="bold14"
       id="profile-link"
       onClick={() =>
@@ -159,7 +163,7 @@ function User({ action }: { action: ActionDocument }) {
       }
     >
       <UserAvatar avatar={user.avatar} names={name} />
-    </Link>
+    </LinkLeftAligned>
   ) : (
     <UserAvatar avatar={user?.avatar} names={name} />
   )
@@ -243,7 +247,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
   }
 
   return hasAccessToOffice ? (
-    <Link
+    <LinkLeftAligned
       font="bold14"
       onClick={() => {
         navigate({
@@ -255,7 +259,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
       }}
     >
       {locationName}
-    </Link>
+    </LinkLeftAligned>
   ) : (
     locationName
   )
@@ -380,12 +384,12 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
       return {
         action: (
-          <Link
+          <LinkLeftAligned
             font="bold14"
             onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
           >
             {title}
-          </Link>
+          </LinkLeftAligned>
         ),
         date: format(
           new Date(action.createdAt),

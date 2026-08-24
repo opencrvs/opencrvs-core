@@ -74,28 +74,26 @@ test.describe.serial('Submit and verify incomplete birth declaration', () => {
       await expect(page.locator('#content-name')).toContainText(
         formatName(declaration.child.name)
       )
-      await expect(
-        page.getByTestId('status-value').locator('span')
-      ).toContainText('Notified')
-      await expect(
-        page.getByTestId('event-value').locator('span')
-      ).toContainText('Birth')
-      await expect(
-        page.getByTestId('child.dob-value').locator('span')
-      ).toBeHidden()
-      await expect(
-        page.getByTestId('registrationNumber-value').locator('span')
-      ).toContainText('No registration number')
-      await expect(
-        page.getByTestId('informant.contact-value').locator('span')
-      ).toBeHidden()
-      await expect(
-        page.getByTestId('assignedTo-value').locator('span')
-      ).toContainText('Not assigned')
+      await expect(page.getByTestId('status-value')).toContainText('Notified')
+      await expect(page.getByTestId('event-value')).toContainText('Birth')
+      // Secured fields this user may not see: the row stays, the value does not.
+      await expect(page.getByTestId('child.dob-value')).toHaveAttribute(
+        'data-testclass',
+        'redacted'
+      )
+      await expect(page.getByTestId('registrationNumber-value')).toContainText(
+        'No registration number'
+      )
+      await expect(page.getByTestId('informant.contact-value')).toHaveAttribute(
+        'data-testclass',
+        'redacted'
+      )
+      await expect(page.getByTestId('assignedTo-value')).toContainText(
+        'Not assigned'
+      )
 
-      await expect(
-        page.getByTestId('child.birthLocation-value').locator('span')
-      ).toBeHidden()
+      // Not on the summary at all for a notified record — no row, not a redacted one.
+      await expect(page.getByTestId('child.birthLocation-value')).toBeHidden()
     })
   })
 })

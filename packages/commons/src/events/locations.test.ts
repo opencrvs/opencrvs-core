@@ -478,6 +478,32 @@ describe('canAccessEventWithScope()', () => {
       ).toBe(false)
     })
 
+    test('should not access a sealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access an unsealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
     test('should access event without a "noneOf" flag it does not carry', () => {
       expect(
         canAccessEventWithScope(

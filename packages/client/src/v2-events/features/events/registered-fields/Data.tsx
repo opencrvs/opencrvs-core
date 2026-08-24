@@ -28,7 +28,7 @@ import {
   todayISO,
   PlainDate
 } from '@opencrvs/commons/client'
-import { Summary } from '@opencrvs/components/lib/Summary'
+import { List } from '@opencrvs/components/lib/List'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
@@ -206,9 +206,9 @@ function DataInput({
     <Container>
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
-      <Summary>
+      <List>
         {fields.map(({ config, value }) => (
-          <Summary.Row
+          <List.Item
             key={config.id}
             label={intl.formatMessage(config.label)}
             // Behavior-preserving: today's name. Anchoring this live form-entry
@@ -217,7 +217,7 @@ function DataInput({
             value={<Output anchor={todayISO()} field={config} value={value} />}
           />
         ))}
-      </Summary>
+      </List>
     </Container>
   )
 }

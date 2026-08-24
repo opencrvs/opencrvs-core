@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as elasticsearch from '@elastic/elasticsearch'
+import { TRPCError } from '@trpc/server'
 import { get } from 'lodash'
 import { DateTime } from 'luxon'
 import {
@@ -23,7 +24,13 @@ import {
   extractPotentialDuplicatesFromActions,
   EventDocument
 } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import {
+  getAcceptedScopesFromToken,
+  getCurrentEventState,
+  getEventConfigById,
+  logger,
+  userCanAccessEventWithScopes
+} from '@opencrvs/commons'
 import {
   getOrCreateClient,
   getEventIndexName
@@ -35,10 +42,13 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  getEventIndexWithAdministrativeHierarchy,
   nameQueryKey
 } from '@events/service/indexing/utils'
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
+import { getEventById } from '../events/events'
+import { getInMemoryEventConfigurations } from '../config/config'
 
 /**
  * If the value referenced in a query is missing, the query resolves to null
@@ -251,6 +261,55 @@ export async function searchForDuplicates(
       event: decodeEventIndex(eventConfig, hit._source)
     }
   })
+}
+
+/**
+ * Ensures the user's duplicate review scopes grant access to every record that
+ * has been matched as a potential duplicate of `event`.
+ */
+export async function assertCanReviewDuplicatesOf(
+  event: EventDocument,
+  ctx: TrpcContext
+) {
+  const duplicateEventIds = extractPotentialDuplicatesFromActions(
+    event.actions
+  ).map(({ id }) => id)
+
+  if (duplicateEventIds.length === 0) {
+    return
+  }
+
+  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+    'record.review-duplicates'
+  ])
+  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
+  const access = await Promise.all(
+    duplicateEventIds.map(async (duplicateEventId) => {
+      const duplicate = await getEventById(duplicateEventId)
+      const eventConfig = getEventConfigById(eventConfigs, duplicate.type)
+
+      const eventIndexWithLocationHierarchy =
+        await getEventIndexWithAdministrativeHierarchy(
+          eventConfig,
+          getCurrentEventState(duplicate, eventConfig)
+        )
+
+      return userCanAccessEventWithScopes(
+        eventIndexWithLocationHierarchy,
+        acceptedScopes,
+        ctx.user
+      )
+    })
+  )
+
+  if (access.some((canAccess) => !canAccess)) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message:
+        'You do not have access to every record matched as a potential duplicate'
+    })
+  }
 }
 
 /**

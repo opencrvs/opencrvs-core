@@ -13,7 +13,7 @@ metadata:
 apiVersion: v1
 data:
   filebeat-rollover-policy.json: |
-{{ .Files.Get "files/beats/filebeat-rollover-policy.json" | indent 4 }}
+{{ tpl (.Files.Get "files/beats/filebeat-rollover-policy.json") . | indent 4 }}
 kind: ConfigMap
 metadata:
   labels:

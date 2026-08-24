@@ -91,10 +91,10 @@ test("Can update newly created user's location and role", async ({
   })
 
   await test.step('Verify user details', async () => {
-    await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+    await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Ezhi District Hospital, Ezhi, Central, Farajaland'
     )
-    await expect(page.getByTestId('row-value-role')).toHaveText(
+    await expect(page.getByTestId('role-value')).toHaveText(
       'Hospital Official'
     )
   })

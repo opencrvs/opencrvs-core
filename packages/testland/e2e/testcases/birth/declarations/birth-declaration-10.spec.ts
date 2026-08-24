@@ -94,7 +94,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Child's First Name
        * - Child's Family Name
        */
-      await expect(page.getByTestId('row-value-child.name')).toContainText(
+      await expect(page.getByTestId('child.name-value')).toContainText(
         declaration.child.name.firstNames +
           ' ' +
           declaration.child.name.familyName
@@ -104,7 +104,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Child's Gender
        */
-      await expect(page.getByTestId('row-value-child.gender')).toContainText(
+      await expect(page.getByTestId('child.gender-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -112,7 +112,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Child's date of birth
        */
-      await expect(page.getByTestId('row-value-child.dob')).toContainText(
+      await expect(page.getByTestId('child.dob-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -122,7 +122,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Child's Place of birth details
        */
       await expect(
-        page.getByTestId('row-value-child.placeOfBirth')
+        page.getByTestId('child.placeOfBirth-value')
       ).toContainText(REQUIRED_VALIDATION_ERROR)
 
       /*
@@ -130,14 +130,14 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Informant's relation to child
        */
       await expect(
-        page.getByTestId('row-value-informant.relation')
+        page.getByTestId('informant.relation-value')
       ).toContainText(declaration.informantType)
 
       /*
        * Expected result: should require
        * - Informant's Email
        */
-      await expect(page.getByTestId('row-value-informant.email')).toContainText(
+      await expect(page.getByTestId('informant.email-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -145,7 +145,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Reason of why mother's details not available
        */
-      await expect(page.getByTestId('row-value-mother.reason')).toContainText(
+      await expect(page.getByTestId('mother.reason-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -154,7 +154,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Father's First Name
        * - Father's Family Name
        */
-      await expect(page.getByTestId('row-value-father.name')).toContainText(
+      await expect(page.getByTestId('father.name-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -162,7 +162,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Father's date of birth
        */
-      await expect(page.getByTestId('row-value-father.dob')).toContainText(
+      await expect(page.getByTestId('father.dob-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -170,7 +170,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Father's Type of Id
        */
-      await expect(page.getByTestId('row-value-father.idType')).toContainText(
+      await expect(page.getByTestId('father.idType-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
     })
@@ -218,7 +218,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * * should require
        * - Child's Family Name
        */
-      await expect(page.getByTestId('row-value-child.name')).toContainText(
+      await expect(page.getByTestId('child.name-value')).toContainText(
         declaration.child.name.firstNames
       )
 
@@ -226,7 +226,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Child's Gender
        */
-      await expect(page.getByTestId('row-value-child.gender')).toContainText(
+      await expect(page.getByTestId('child.gender-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -234,7 +234,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Child's date of birth
        */
-      await expect(page.getByTestId('row-value-child.dob')).toContainText(
+      await expect(page.getByTestId('child.dob-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -244,7 +244,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Child's Place of birth details
        */
       await expect(
-        page.getByTestId('row-value-child.placeOfBirth')
+        page.getByTestId('child.placeOfBirth-value')
       ).toContainText(REQUIRED_VALIDATION_ERROR)
 
       /*
@@ -252,14 +252,14 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Informant's relation to child
        */
       await expect(
-        page.getByTestId('row-value-informant.relation')
+        page.getByTestId('informant.relation-value')
       ).toContainText(declaration.informantType)
 
       /*
        * Expected result: should require
        * - Informant's Email
        */
-      await expect(page.getByTestId('row-value-informant.email')).toContainText(
+      await expect(page.getByTestId('informant.email-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -267,7 +267,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Reason of why mother's details not available
        */
-      await expect(page.getByTestId('row-value-mother.reason')).toContainText(
+      await expect(page.getByTestId('mother.reason-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -276,7 +276,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Father's First Name
        * - Father's Family Name
        */
-      await expect(page.getByTestId('row-value-father.name')).toContainText(
+      await expect(page.getByTestId('father.name-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -284,7 +284,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Father's date of birth
        */
-      await expect(page.getByTestId('row-value-father.dob')).toContainText(
+      await expect(page.getByTestId('father.dob-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -292,7 +292,7 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * Expected result: should require
        * - Father's Type of Id
        */
-      await expect(page.getByTestId('row-value-father.idType')).toContainText(
+      await expect(page.getByTestId('father.idType-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
     })

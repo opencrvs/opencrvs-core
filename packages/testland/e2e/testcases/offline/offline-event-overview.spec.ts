@@ -55,7 +55,7 @@ test.describe.serial('Can view non-downloaded event online', () => {
 
   test('Verify that user can see details on "Record"-tab', async () => {
     await page.getByRole('button', { name: 'Record', exact: true }).click()
-    await expect(page.getByTestId('row-value-child.name')).toHaveText(childName)
+    await expect(page.getByTestId('child.name-value')).toHaveText(childName)
   })
 })
 
@@ -101,7 +101,7 @@ test.describe.serial('Can partially view non-downloaded event offline', () => {
   test('Verify user sees offline message on "Record"-tab', async () => {
     await page.getByRole('button', { name: 'Record', exact: true }).click()
     await expect(page.getByTestId('record-offline-message')).toBeVisible()
-    await expect(page.getByTestId('row-value-child.name')).not.toBeVisible()
+    await expect(page.getByTestId('child.name-value')).not.toBeVisible()
   })
 })
 
@@ -158,7 +158,7 @@ test.describe.serial('Can view downloaded event offline', () => {
 
   test('Verify that user can see details on "Record"-tab', async () => {
     await page.getByRole('button', { name: 'Record', exact: true }).click()
-    await expect(page.getByTestId('row-value-child.name')).toHaveText(childName)
+    await expect(page.getByTestId('child.name-value')).toHaveText(childName)
   })
 })
 

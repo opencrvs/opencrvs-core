@@ -26,5 +26,21 @@ export const env = cleanEnv(process.env, {
     devDefault:
       'postgres://events_analytics:analytics_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `analytics.events`. See `/infrastructure/postgres/setup-analytics.sh` for how the default database is set up for your country.'
+  }),
+  TELEMETRY_ENABLED: bool({
+    default: false,
+    desc: 'When true, usage telemetry received from the events service is forwarded to the OpenCRVS status service.'
+  }),
+  COUNTRY_CODE: str({
+    default: 'FAR',
+    desc: 'ISO-style country code of this instance, reported with telemetry.'
+  }),
+  ENVIRONMENT_NAME: str({
+    default: 'development',
+    desc: 'Environment name (e.g. "production", "staging") reported as the telemetry environment.'
+  }),
+  ORGANISATION: str({
+    default: '',
+    desc: 'Organisation running this instance, reported with telemetry. Empty by default.'
   })
 })

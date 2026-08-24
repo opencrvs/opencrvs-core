@@ -528,8 +528,8 @@ const annotationConditionalTextField: FieldConfig = {
 
 /**
  * During record creation the annotation fields (e.g. signature, comment) are shown
- * as editable inputs via FormFieldGenerator. The readonly ListReview section is not
- * shown because there are no previously submitted annotation values to display.
+ * as editable inputs via FormFieldGenerator. The readonly list of annotations is
+ * not shown because there are no previously submitted annotation values to display.
  *
  * Requires reactRouter with /event/:eventId so SignatureField.Input can upload files.
  */
@@ -558,7 +558,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
   }
 }
 
-export const ReadonlyAnnotationListReview: Story = {
+export const ReadonlyAnnotationList: Story = {
   args: {
     readonlyMode: true,
     reviewFields: [annotationTextField],

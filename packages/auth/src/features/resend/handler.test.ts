@@ -46,8 +46,7 @@ describe('resend handler receives a request', () => {
         url: '/resendAuthenticationCode',
         payload: {
           nonce: '12345',
-          notificationEvent: 'authenticationCodeNotification',
-          retrievalFlow: true
+          notificationEvent: 'authenticationCodeNotification'
         }
       })
 

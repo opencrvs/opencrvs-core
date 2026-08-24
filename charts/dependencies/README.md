@@ -427,12 +427,19 @@ Following keys can be defined for filebeat and metricbeat
 
 - `custom_config_configmap`: Configmap name for custom configuration file
 - `custom_ilm_configmap`: Configmap name for custom index lifecycle management policies (ILM)
+- `monitoring.logs.retention_days`: Number of days to retain logs indexed by filebeat
+- `monitoring.metrics.retention_days`: Number of days to retain metrics indexed by metricbeat
 
 By providing custom configuration file you will be able to adjust ILM policies, logs and metrics to monitor and other settings critical for your environment.
 
 Configuration example for filebeat:
 
 ```yaml
+monitoring:
+  logs:
+    retention_days: 30
+  metrics:
+    retention_days: 30
 filebeat:
   custom_config_configmap: filebeat-custom-config
   custom_ilm_configmap: filebeat-ilm-custom-policy

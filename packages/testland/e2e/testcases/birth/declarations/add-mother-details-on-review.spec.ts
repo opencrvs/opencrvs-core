@@ -320,15 +320,15 @@ test.describe.serial('Add mother details on review', () => {
     test('Assert record form', async () => {
       await switchEventTab(page, 'Record')
 
-      await expect(page.getByTestId('row-value-mother.name')).toHaveText(
+      await expect(page.getByTestId('mother.name-value')).toHaveText(
         declaration.mother.name.firstNames +
           ' ' +
           declaration.mother.name.familyName
       )
-      await expect(page.getByTestId('row-value-mother.age')).toHaveText(
+      await expect(page.getByTestId('mother.age-value')).toHaveText(
         declaration.mother.age.toString()
       )
-      await expect(page.getByTestId('row-value-mother.idType')).toHaveText(
+      await expect(page.getByTestId('mother.idType-value')).toHaveText(
         'None'
       )
     })

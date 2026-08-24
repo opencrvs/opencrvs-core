@@ -24,7 +24,8 @@ import {
   UUID,
   TestUserRole,
   generateActionDocument,
-  ActionDocument
+  ActionDocument,
+  EventDocumentOnlyLastAction
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -129,10 +130,10 @@ const unassignAction = {
   type: 'UNASSIGN'
 } satisfies ActionDocument
 
-const unassignedEvent = {
+const unassignedEvent = EventDocumentOnlyLastAction.parse({
   ...duplicateEvent,
-  actions: duplicateEvent.actions.concat(unassignAction)
-}
+  actions: [unassignAction]
+})
 
 export const HideEventHistoryAfterUnassign: Story = {
   parameters: {

@@ -1,0 +1,24 @@
+{
+  "name": "@opencrvs/mosip-mock",
+  "version": "2.0.1",
+  "license": "MPL-2.0",
+  "engines": {
+    "node": "22.x.x"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development tsx watch src/index.ts",
+    "start:prod": "NODE_ENV=production tsx src/index.ts",
+    "test:compilation": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fastify/formbody": "^8.0.1",
+    "@types/node": "^22.4.1",
+    "@types/nodemailer": "^6.4.17",
+    "canonicalize": "^2.1.0",
+    "envalid": "^8.0.0",
+    "fastify": "^5.0.0",
+    "jose": "^6.0.10",
+    "nodemailer": "^8.0.0",
+    "tsx": "^4.19.2"
+  }
+}

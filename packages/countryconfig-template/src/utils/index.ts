@@ -10,8 +10,7 @@
  */
 
 import csv2json from 'csv2json'
-import { createReadStream } from 'fs'
-import fs from 'fs'
+import fs, { createReadStream } from 'fs'
 import { build } from 'esbuild'
 import { memoize } from 'lodash'
 import { join } from 'path'

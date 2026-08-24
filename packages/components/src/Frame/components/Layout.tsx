@@ -59,10 +59,9 @@ export const LayoutCentered = styled.div`
 export const LayoutForm = styled.section`
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr;
   margin: 24px auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    grid-template-columns: 1fr;
     max-width: 100%;
     gap: 0;
     margin: 0;

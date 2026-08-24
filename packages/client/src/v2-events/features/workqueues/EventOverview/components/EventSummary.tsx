@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Summary } from '@opencrvs/components/lib/Summary'
+import { List } from '@opencrvs/components/lib/List'
 import {
   EventConfig,
   getDeclarationFields,
@@ -30,6 +30,12 @@ import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 import { InfoBox } from './InfoBox'
 
 const messages = {
+  /** Names the bar shown in place of a value the reader may not see. */
+  redacted: {
+    id: 'event.summary.redacted',
+    defaultMessage: 'Hidden',
+    description: 'Accessible name for a value the user is not permitted to see'
+  },
   assignedTo: {
     label: {
       id: 'event.summary.assignedTo.label',
@@ -227,8 +233,8 @@ export function EventSummary({
           type={banner.type}
         />
       ))}
-      <Summary id="summary">
-        <Summary.Row
+      <List id="summary" redactedLabel={intl.formatMessage(messages.redacted)}>
+        <List.Item
           key="assignedTo"
           data-testid="assignedTo"
           label={intl.formatMessage(messages.assignedTo.label)}
@@ -237,26 +243,26 @@ export function EventSummary({
           )}
           value={intl.formatMessage(messages.assignedTo.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
           value={intl.formatMessage(messages.status.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="flags"
           data-testid="flags"
           label={intl.formatMessage(messages.flags.label)}
           placeholder={intl.formatMessage(messages.flags.placeholder)}
           value={flagLabels}
         />
-        <Summary.Row
+        <List.Item
           key="event"
           data-testid="event"
           label={intl.formatMessage(messages.event.label)}
           value={intl.formatMessage(eventLabelMessage)}
         />
-        <Summary.Row
+        <List.Item
           key="tracking-id"
           data-testid="tracking-id"
           label={intl.formatMessage(messages.trackingId.label)}
@@ -265,7 +271,7 @@ export function EventSummary({
           )}
           value={intl.formatMessage(messages.trackingId.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="registrationNumber"
           data-testid="registrationNumber"
           label={intl.formatMessage(messages.registrationNumber.label)}
@@ -277,19 +283,19 @@ export function EventSummary({
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
           .map((field) => (
-            <Summary.Row
+            <List.Item
               key={field.id}
               data-testid={field.id}
               label={intl.formatMessage(field.label)}
-              locked={field.secured && hideSecuredFields}
               placeholder={
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
+              redacted={field.secured && hideSecuredFields}
               value={field.value}
             />
           ))}
-      </Summary>
+      </List>
     </>
   )
 }

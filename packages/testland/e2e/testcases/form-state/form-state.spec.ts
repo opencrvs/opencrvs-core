@@ -79,7 +79,7 @@ test.describe('Form state', () => {
       await goToSection(page, 'review')
 
       // Child name fields should be empty
-      await expect(page.getByTestId('row-value-child.name')).toHaveText(
+      await expect(page.getByTestId('child.name-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
       // Comment should be empty and sign button should be visible
@@ -140,11 +140,11 @@ test.describe('Form state', () => {
 
       await selectAction(page, 'Update')
 
-      await expect(page.getByTestId('row-value-child.name')).not.toHaveText(
+      await expect(page.getByTestId('child.name-value')).not.toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
 
-      await expect(page.getByTestId('row-value-informant.email')).toHaveText(
+      await expect(page.getByTestId('informant.email-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
       // Comment should be empty and sign button should be visible

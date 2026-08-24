@@ -96,7 +96,7 @@ test.describe
       await childButton.click()
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await switchEventTab(page, 'Record')
-      await expect(page.getByTestId('row-value-mother.occupation')).toHaveText(
+      await expect(page.getByTestId('mother.occupation-value')).toHaveText(
         'House Wife'
       )
 

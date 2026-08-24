@@ -16,7 +16,8 @@ import { unauthorized } from '@hapi/boom'
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
-  deleteRetrievalStepInformation
+  deleteRetrievalStepInformation,
+  RETRIEVAL_FLOW_USER_NAME
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { triggerUserEventNotification } from '@opencrvs/commons'
 import { env } from '@auth/environment'
@@ -37,7 +38,16 @@ export default async function sendUserNameHandler(
     throw unauthorized()
   })
 
-  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  /*
+   * Two conditions, one rejection, deliberately. A record that never got past
+   * the security question and a record belonging to the password-reset flow
+   * both have to be refused here, and they have to be refused the same way:
+   * whoever is calling must not be able to tell which of the two they hit.
+   */
+  if (
+    retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED ||
+    retrievalStepInformation.retrieveFlow !== RETRIEVAL_FLOW_USER_NAME
+  ) {
     return h.response().code(401)
   }
 

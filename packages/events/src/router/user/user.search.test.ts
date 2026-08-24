@@ -100,20 +100,34 @@ test('filters by status', async () => {
   expect(deactivated).toHaveLength(users.length - active.length)
 })
 
-test('filters by email (case-insensitive partial match)', async () => {
+test('filters by email (exact match, case-insensitive)', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
 
+  // The seeder gives every user the email `user-${id}@test.example`
   const results = await client.user.search({
     ...defaultSearch,
-    email: user.id.toUpperCase()
+    email: `USER-${user.id}@TEST.EXAMPLE`
   })
 
   expect(results).toHaveLength(1)
   expect(results[0].id).toBe(user.id)
 })
 
-test('filters by username (case-insensitive partial match)', async () => {
+test('does not match an email that merely contains the search term', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  // A substring of the seeded `user-${id}@test.example`
+  const results = await client.user.search({
+    ...defaultSearch,
+    email: `${user.id}@test.example`
+  })
+
+  expect(results).toEqual([])
+})
+
+test('filters by username (exact match, case-insensitive)', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
 
@@ -121,14 +135,43 @@ test('filters by username (case-insensitive partial match)', async () => {
 
   const results = await client.user.search({
     ...defaultSearch,
-    username: 'U.NIQUEUSE'
+    username: 'U.NIQUEUSER'
   })
 
   expect(results).toHaveLength(1)
   expect(results[0].id).toBe(user.id)
 })
 
-test('filters by mobile (partial match)', async () => {
+test('does not match a username the search term is only a prefix of', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  await updateUsernameById(user.id, `j.campbell2`)
+
+  const results = await client.user.search({
+    ...defaultSearch,
+    username: 'j.campbell'
+  })
+
+  expect(results).toEqual([])
+})
+
+test('filters by mobile (exact match)', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  await updateUserById(user.id, { mobile: '+447911123456' })
+
+  const results = await client.user.search({
+    ...defaultSearch,
+    mobile: '+447911123456'
+  })
+
+  expect(results).toHaveLength(1)
+  expect(results[0].id).toBe(user.id)
+})
+
+test('does not match a mobile that merely contains the search term', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
 
@@ -139,8 +182,7 @@ test('filters by mobile (partial match)', async () => {
     mobile: '7911123'
   })
 
-  expect(results).toHaveLength(1)
-  expect(results[0].id).toBe(user.id)
+  expect(results).toEqual([])
 })
 
 test('respects count and skip for pagination', async () => {

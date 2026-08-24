@@ -216,7 +216,6 @@ export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.reject',
   'record.archive',
   'record.unarchive',
-  'record.review-duplicates',
   'record.register'
 ])
 
@@ -225,7 +224,8 @@ export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.read',
   'record.request-correction',
   'record.correct',
-  'record.unassign-others'
+  'record.unassign-others',
+  'record.review-duplicates'
 ])
 
 const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({

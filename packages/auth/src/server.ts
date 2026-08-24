@@ -42,13 +42,12 @@ import invalidateTokenHandler, {
   reqInvalidateTokenSchema
 } from '@auth/features/invalidateToken/handler'
 import verifyUserHandler, {
-  requestSchema as reqVerifyUserSchema,
-  responseSchema as resVerifyUserSchema
+  requestSchema as reqVerifyUserSchema
 } from '@auth/features/retrievalSteps/verifyUser/handler'
-import verifyNumberHandler, {
-  requestSchema as reqVerifyNumberSchema,
-  responseSchema as resVerifyNumberSchema
-} from '@auth/features/retrievalSteps/verifyNumber/handler'
+import verifyRecoveryTokenHandler, {
+  requestSchema as reqVerifyRecoveryTokenSchema,
+  responseSchema as resVerifyRecoveryTokenSchema
+} from '@auth/features/retrievalSteps/verifyRecoveryToken/handler'
 import verifySecurityQuestionHandler, {
   verifySecurityQuestionSchema,
   verifySecurityQuestionResSchema
@@ -62,7 +61,7 @@ import sendUserNameHandler, {
 import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
-import anonymousTokenHandler from './features/anonymousToken/handler'
+import serviceTokenHandler from './features/serviceToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
@@ -123,15 +122,15 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' http://localhost:4040/internal/anonymous-token
+  // curl -H 'Content-Type: application/json' http://localhost:4040/internal/service-token
   server.route({
     method: 'GET',
-    path: '/internal/anonymous-token',
-    handler: anonymousTokenHandler,
+    path: '/internal/service-token',
+    handler: serviceTokenHandler,
     options: {
       tags: ['api', 'deprecated'],
       description: `
-      Deprecated: Authenticate an anonymous user.
+      Deprecated: Authenticate as the OpenCRVS service user.
       This is still used by events service to fetch events configuration from country config on startup
       when there is no user interaction involved.`,
       notes:
@@ -306,29 +305,30 @@ export async function createServer() {
         payload: reqVerifyUserSchema
       },
       response: {
-        schema: resVerifyUserSchema
+        schema: false
       }
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
-
+  // curl -H 'Content-Type: application/json' -d '{ "token": "" }' http://localhost:4040/verifyRecoveryToken
   server.route({
     method: 'POST',
-    path: '/verifyNumber',
-    handler: verifyNumberHandler,
+    path: '/verifyRecoveryToken',
+    handler: verifyRecoveryTokenHandler,
     options: {
       tags: ['api'],
       description:
         'Second step of password or username retrieval steps.' +
-        'Check if provided verification code is valid or not.',
+        'Exchanges the token from an emailed/texted recovery link for a nonce.',
       notes:
-        'Verifies code for given nonce and returns a random security question for that user.',
+        'Verifies the recovery token, rotates it to a fresh single-use nonce, ' +
+        'and returns a random security question for that user. ' +
+        'Not to be confused with /verifyToken, which checks the invalid-token blocklist.',
       validate: {
-        payload: reqVerifyNumberSchema
+        payload: reqVerifyRecoveryTokenSchema
       },
       response: {
-        schema: resVerifyNumberSchema
+        schema: resVerifyRecoveryTokenSchema
       }
     }
   })

@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getUUID } from '@opencrvs/commons'
+import { EventDocumentOnlyLastAction, getUUID } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -67,7 +67,10 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { cleanupUnreferencedFiles } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { getDuplicateEvents } from '../../service/deduplication/deduplication'
+import {
+  assertCanReviewDuplicatesOf,
+  getDuplicateEvents
+} from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
@@ -248,6 +251,8 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
 
+      await assertCanReviewDuplicatesOf(event, ctx)
+
       return getDuplicateEvents(event, ctx)
     }),
   delete: userOnlyProcedure
@@ -339,11 +344,13 @@ export const eventRouter = router({
     assignment: router({
       assign: userOnlyProcedure
         .input(AssignActionInput)
+        .output(EventDocumentOnlyLastAction)
         .use(middleware.canAccessEventWithScopes(['record.read']))
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
+
           await writeAuditLog({
             clientId: user.id,
             clientType: user.type,
@@ -360,6 +367,7 @@ export const eventRouter = router({
         }),
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
+        .output(EventDocumentOnlyLastAction)
         .use(middleware.validateAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
@@ -397,6 +405,9 @@ export const eventRouter = router({
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
@@ -430,6 +441,9 @@ export const eventRouter = router({
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type

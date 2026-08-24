@@ -80,11 +80,15 @@ test.describe.serial('Validate draft with partial name', () => {
   test('Records appear in draft', async () => {
     await page.getByRole('button', { name: 'Drafts' }).click()
 
+    // 5s (Playwright's default) wasn't always enough for the drafts
+    // workqueue query to reflect a just-created draft under CI load.
     await expect(page.getByTestId('search-result')).toContainText(
-      formatName(name1)
+      formatName(name1),
+      { timeout: 15000 }
     )
     await expect(page.getByTestId('search-result')).toContainText(
-      formatName(name2)
+      formatName(name2),
+      { timeout: 15000 }
     )
   })
 

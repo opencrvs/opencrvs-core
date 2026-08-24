@@ -18,9 +18,9 @@ import {
   completeSystemInitialisation as completeSystemInitialisationQuery
 } from '@events/storage/postgres/system-initialisation'
 
-export async function getAnonymousToken() {
+export async function getServiceToken() {
   const res = await fetch(
-    new URL('/internal/anonymous-token', env.AUTH_URL).toString()
+    new URL('/internal/service-token', env.AUTH_URL).toString()
   )
   const { token } = await res.json()
   return token as string

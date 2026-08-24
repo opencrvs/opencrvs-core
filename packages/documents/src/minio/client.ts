@@ -26,34 +26,29 @@ export const minioClient = new Minio.Client({
   secretKey: MINIO_SECRET_KEY
 })
 
-export async function defaultMinioBucketExists() {
-  return minioClient.bucketExists(MINIO_BUCKET)
-}
-
-export async function createDefaultMinioBucket() {
-  const policy = `
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-            "Action": [
-                "s3:GetObject"
-            ],
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-                "*"
-                ]
-            },
-            "Resource": [
-                "arn:aws:s3:::${MINIO_BUCKET}/*"
-            ],
-            "Sid": ""
-            }
-        ]
-    }
-    `
+export async function ensureDefaultMinioBucket() {
+  if (await minioClient.bucketExists(MINIO_BUCKET)) {
+    return
+  }
 
   await minioClient.makeBucket(MINIO_BUCKET, MINIO_BUCKET_REGION)
-  return minioClient.setBucketPolicy(MINIO_BUCKET, policy)
+}
+
+/**
+ * The bucket must not give anonymous access. Users get documents only through
+ * presigned URLs. An empty policy removes the policy from the bucket. Minio
+ * then refuses requests that have no signature, but presigned requests continue
+ * to work.
+ *
+ * This function runs at each start, and not only when the bucket is new.
+ * Before, the code created the bucket with a public-read policy, and a
+ * migration made the bucket private. That migration was lost when the
+ * migrations were made flat for 2.0. New installations stayed readable by all
+ * persons. A check at each start keeps the rule in one place. It also repairs
+ * the installations that have no private policy.
+ *
+ * @see https://github.com/opencrvs/opencrvs-core/issues/13436
+ */
+export async function ensureDefaultMinioBucketIsPrivate() {
+  return minioClient.setBucketPolicy(MINIO_BUCKET, '')
 }

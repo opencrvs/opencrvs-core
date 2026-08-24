@@ -67,6 +67,18 @@ export const TriggerVariable = {
     firstname: z.string(),
     temporaryPassword: z.string()
   }),
+  [TriggerEvent.PASSWORD_RESET_LINK]: z.object({
+    firstname: z.string(),
+    applicationName: z.string(),
+    countryLogo: z.string(),
+    recoveryURL: z.string()
+  }),
+  [TriggerEvent.USERNAME_REMINDER_LINK]: z.object({
+    firstname: z.string(),
+    applicationName: z.string(),
+    countryLogo: z.string(),
+    recoveryURL: z.string()
+  }),
   [TriggerEvent.RESEND_INVITE]: z.object({
     firstname: z.string(),
     username: z.string(),
@@ -199,6 +211,20 @@ const templates = {
     subject: 'Account password reset invitation',
     template: readOtherTemplate<TriggerVariable['reset-password-by-admin']>(
       'password-reset-by-system-admin'
+    )
+  },
+  [TriggerEvent.PASSWORD_RESET_LINK]: {
+    type: 'password-reset-link',
+    subject: 'Reset your password',
+    template: readOtherTemplate<TriggerVariable['password-reset-link']>(
+      'password-reset-link'
+    )
+  },
+  [TriggerEvent.USERNAME_REMINDER_LINK]: {
+    type: 'username-reminder-link',
+    subject: 'Retrieve your username',
+    template: readOtherTemplate<TriggerVariable['username-reminder-link']>(
+      'username-reminder-link'
     )
   },
   [TriggerEvent.RESEND_INVITE]: {

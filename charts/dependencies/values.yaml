@@ -83,6 +83,10 @@ postgres:
     # Requested persistent storage size
     storage_size: '10Gi'
 
+  # pgBackRest version (major.minor.hotfix). Single source of truth for both
+  # backup/restore scripts
+  pgbackrest_version: 2.59.0
+
   # Backup section
   backup:
     # Enable/Disable backup
@@ -101,6 +105,9 @@ postgres:
     #
     # Both dump and differential flows can reuse this Secret.
     server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
 
     # Secret holding the pgBackRest repository encryption passphrase.
     # Encryption is always enabled; cipher type is fixed in templates
@@ -131,6 +138,10 @@ postgres:
     # schedule: "0 3 * * *"   # daily at 03:00
     # encryption_secret: restore-encryption-secret
     # server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
+
 
 # Elasticsearch Configuration
 elasticsearch:
@@ -176,6 +187,10 @@ elasticsearch:
 # - elastic-apm
 monitoring:
   enabled: false
+  logs:
+    retention_days: 30
+  metrics:
+    retention_days: 30
 
 apm_server:
   image:
@@ -286,6 +301,9 @@ minio:
     # Name of the Kubernetes secret containing backup server SSH credentials.
     # server_secret: backup-server-ssh-credentials
 
+    # Host:
+    # host: backup server hostname or IP
+
     # Cron schedule to run backup job (format: "MIN HOUR DAY MONTH WEEKDAY").
     # schedule: "0 1 * * *"
 
@@ -304,6 +322,9 @@ minio:
 
     # Name of the Kubernetes secret containing backup server SSH credentials.
     # server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
 
     # Cron schedule for restore job.
     # schedule: "0 3 * * *"
@@ -347,6 +368,10 @@ backup:
   # - host, hostname / IP of backup server
   # - ssh_key, ssh key for passwordless connection
   backup_server_secret: backup-server-ssh-credentials
+
+  # Host:
+  # host: backup server hostname or IP
+
   backup_server_dir: /home/backup/demo
   backup_encryption_secret: backup-encryption-secret
 
@@ -366,6 +391,10 @@ restore:
   # - host, hostname / IP of backup server
   # - ssh_key, ssh key for passwordless connection
   backup_server_secret: backup-server-ssh-credentials
+
+  # Host:
+  # host: backup server hostname or IP
+
   # backup_server_dir: /home/backup/demo
   backup_encryption_secret: restore-encryption-secret
 

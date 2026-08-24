@@ -229,7 +229,7 @@ describe('rateLimitedRoute enforcement', () => {
 
     // Same nonce on a different route uses a different counter.
     await expect(
-      handler(...makeArgs({ nonce: 'abc' }, '/auth/verifyNumber'))
+      handler(...makeArgs({ nonce: 'abc' }, '/auth/verifyRecoveryToken'))
     ).resolves.toBe('OK')
   })
 })
@@ -294,7 +294,11 @@ describe('bypassratelimit scope', () => {
 
     for (let i = 0; i < 5; i++) {
       const result = handler(
-        ...makeArgs({ username: 'carol' }, '/auth/some-route', `Bearer ${valid}`)
+        ...makeArgs(
+          { username: 'carol' },
+          '/auth/some-route',
+          `Bearer ${valid}`
+        )
       )
       expect(await result).toBe('OK')
     }

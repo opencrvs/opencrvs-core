@@ -278,17 +278,6 @@ describe('2.0 scopes', () => {
         }
       },
       {
-        type: 'record.review-duplicates',
-        options: {
-          event: ['birth', 'death'],
-          placeOfEvent: 'location',
-          notifiedIn: 'administrativeArea',
-          notifiedBy: 'user',
-          declaredIn: 'administrativeArea',
-          declaredBy: 'user'
-        }
-      },
-      {
         type: 'record.register',
         options: {
           event: ['birth', 'death'],
@@ -374,6 +363,19 @@ describe('2.0 scopes', () => {
       },
       {
         type: 'record.unassign-others',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.review-duplicates',
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',

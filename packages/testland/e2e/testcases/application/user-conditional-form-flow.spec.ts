@@ -110,7 +110,7 @@ test.describe.serial('1. User conditional form flow', () => {
         .isVisible()
 
       await expect(
-        page.getByTestId('row-value-applicant.isRecommendedByFieldAgent')
+        page.getByTestId('applicant.isRecommendedByFieldAgent-value')
       ).toHaveText('Yes')
     })
 
