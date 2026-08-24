@@ -7,6 +7,7 @@
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first tsx src/index.ts",
     "test:compilation": "tsc --noEmit",
+    "test": "vitest run",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
@@ -15,7 +16,8 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
     "prettier": "3.5.3",
-    "tsx": "^4.15.7"
+    "tsx": "^4.15.7",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "@opencrvs/commons": "workspace:*",
@@ -28,7 +30,7 @@
     "jwt-decode": "^3.0.0",
     "node-fetch": "^2.6.1",
     "uuid": "^3.3.2",
-    "zod": "^4.2.1",
+    "zod": "^4.4.3",
     "zod-validation-error": "^5.0.0"
   },
   "lint-staged": {

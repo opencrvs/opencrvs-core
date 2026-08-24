@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/commons/events'
 import { getOrThrow, flattenEntries } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
-import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/administrative-areas'
+import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/locations'
 
 type ValidationError = {
   message: string
