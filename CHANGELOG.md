@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.1 Release Candidate
+## 2.0.1 Release
 
 ### Security fixes
 
@@ -16,10 +16,14 @@
 - Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
 - Added `createdIn` as a config parameter to filter records by the office or administrative area they were created in. Unlike `declaredIn` it is populated before the record is declared, and it is never reassigned by a later declaration [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
 - Expose `POST /locations` and `POST /administrative-areas` REST endpoints to create or update a single location or administrative area, for correcting individual data-seeding errors. Bulk seeding is unaffected and still uses the existing `locations.set`/`administrativeAreas.set` tRPC mutations. [#13336](https://github.com/opencrvs/opencrvs-core/pull/13336)
+- The MOSIP charts now pass `OPENCRVS_AUTH_URL` to mosip-api and pin the mosip-api, mosip-mock and esignet-mock images to `2.0.1`. Implementations running the MOSIP integration should redeploy the `opencrvs-mosip` chart. [#13362](https://github.com/opencrvs/opencrvs-core/pull/13362)
 - Make the Deployment rollout strategy configurable, and default it to `Recreate`, for OpenCRVS services [#11994](https://github.com/opencrvs/opencrvs-core/issues/11994)
 
 ### Bug fixes
 
+- Fields guarded by a custom conditional are now saved when declaring, editing or registering a record. Previously they were stored as empty because the event was missing from the validator context. [#13167](https://github.com/opencrvs/opencrvs-core/issues/13167)
+- Location fields restricted with `allowedLocations` now enable every dropdown for users whose scope grants `placeOfEvent: 'all'`, instead of behaving as if it were `administrativeArea`. [#13209](https://github.com/opencrvs/opencrvs-core/issues/13209)
+- Declarations created offline with supporting documents no longer stay stuck in the Outbox after reconnecting, where the upload failed with "File not found". [#13303](https://github.com/opencrvs/opencrvs-core/issues/13303)
 - Re-enable ARM-based images in the Tiltfile so local developers can run OpenCRVS on Apple silicon. [#13285](https://github.com/opencrvs/opencrvs-core/pull/13285)
 
 ## 1.9.16
