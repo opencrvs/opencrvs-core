@@ -57,7 +57,14 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "bcrypt"
+      "@swc/core",
+      "bcrypt",
+      "better-sqlite3",
+      "cpu-features",
+      "esbuild",
+      "nx",
+      "ssh2",
+      "unrs-resolver"
     ]
   }
 }
