@@ -312,8 +312,10 @@ export async function onMarkNotDuplicate(data: EventDocument) {
 }
 
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
-  await invalidateWorkqueues()
-  await refetchSearchQuery(updatedEvent.id)
+  await Promise.all([
+    invalidateWorkqueues(),
+    refetchSearchQuery(updatedEvent.id)
+  ])
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
   const localEvent = findLocalEventDocument(updatedEvent.id)
