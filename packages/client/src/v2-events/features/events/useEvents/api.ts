@@ -286,24 +286,22 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
-  await queryClient.resetQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    })
-  })
-
-  await removeCachedFiles(updatedEvent)
+  await Promise.all([
+    queryClient.resetQueries({
+      queryKey: trpcOptionsProxy.event.search.queryKey({
+        query: {
+          type: 'and',
+          clauses: [{ id }]
+        }
+      })
+    }),
+    removeCachedFiles(updatedEvent)
+  ])
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
-
-  await invalidateWorkqueues()
-
-  return refetchAllSearchQueries()
+  await Promise.all([invalidateWorkqueues(), refetchAllSearchQueries()])
 }
 
 export async function onMarkNotDuplicate(data: EventDocument) {
@@ -345,7 +343,8 @@ export async function cleanUpOnUnassign(
   await deleteEventData(updatedEvent)
   // Assuming unassign needs to be done online, we'll just refetch the query.
   // NOTE: local event cannot be used to recreate EventIndex cache. Record might be sealed, which causes inconsistencies in UI.
-  await refetchSearchQuery(updatedEvent.id)
-
-  await invalidateWorkqueues()
+  await Promise.all([
+    refetchSearchQuery(updatedEvent.id),
+    invalidateWorkqueues()
+  ])
 }
