@@ -26,12 +26,14 @@ import {
   FieldType,
   QueryExpression,
   FieldValue,
-  isVersionedLocation,
-  parseAdministrativeAreaPath,
   NameFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   AddressFieldValue,
+  AddressField,
+  AddressType,
+  FieldGroup,
+  FieldGroupValue,
   timePeriodToDateRange,
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
@@ -42,13 +44,16 @@ import {
   user
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
-import { toLocationId } from '@client/v2-events/utils'
+import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
+import { AdminStructureItem } from '@client/utils/referenceApi'
+import { generateAddressFields } from '@client/v2-events/features/events/registered-fields/Address'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   IntlErrors,
   getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { toLocationId } from '@client/v2-events/utils'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
 export function getAdvancedSearchFieldErrors(
@@ -329,30 +334,92 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
  */
 
 /**
- * Strips the pinned version. The version is
- * display-only and must never reach a query term.
+ * Folds an address search group back into the {@link AddressFieldValue} shape
+ * the events service indexes: the deepest level picked becomes
+ * `administrativeArea`, and every entry that is not a level becomes a street
+ * detail.
+ *
+ * Version pins are stripped here — the version is display-only and must never
+ * reach a query term.
+ */
+export function toAddressQueryValue(
+  value: FieldValue | undefined,
+  group: FieldGroup
+): AddressFieldValue | undefined {
+  /*
+   * Parsed rather than narrowed: a field value is a union, and narrowing it to a
+   * record keeps every object-shaped member of that union. This runs once while
+   * a query is built, not per keystroke, so the parse is affordable here.
+   */
+  const parsed = FieldGroupValue.safeParse(value)
+
+  if (!parsed.success) {
+    return undefined
+  }
+
+  const entries = parsed.data
+  const country =
+    typeof entries.country === 'string' ? entries.country : undefined
+
+  if (!country) {
+    return undefined
+  }
+
+  const adminLevelIds = group.fields
+    .filter((subfield) => subfield.type === FieldType.ADMINISTRATIVE_AREA)
+    .map((subfield) => subfield.id)
+
+  const streetLevelDetails = Object.entries(entries).reduce<
+    Record<string, string>
+  >(
+    (details, [key, entry]) =>
+      key === 'country' ||
+      adminLevelIds.includes(key) ||
+      typeof entry !== 'string' ||
+      !entry
+        ? details
+        : { ...details, [key]: entry },
+    {}
+  )
+
+  if (country !== (window.config.COUNTRY || 'FAR')) {
+    return {
+      country,
+      addressType: AddressType.INTERNATIONAL,
+      streetLevelDetails
+    }
+  }
+
+  const leaf = adminLevelIds
+    .map((level) => entries[level])
+    .filter((level) => typeof level === 'string' && level.length > 0)
+    .pop()
+
+  if (typeof leaf !== 'string') {
+    return undefined
+  }
+
+  return {
+    country,
+    addressType: AddressType.DOMESTIC,
+    administrativeArea: toLocationId(leaf),
+    streetLevelDetails
+  }
+}
+
+/**
+ * Strips the version off a pinned location. The version is display-only and
+ * must never reach a query term.
  */
 function toQueryableValue(value: FieldValue | undefined) {
-  if (isVersionedLocation(value)) {
-    return toLocationId(value)
-  }
+  return isVersionedLocation(value) ? toLocationId(value) : value
+}
 
-  if (
-    value &&
-    typeof value === 'object' &&
-    'administrativeArea' in value &&
-    typeof value.administrativeArea === 'string'
-  ) {
-    // An address search value keeps the whole picked chain; the events service
-    // indexes only the leaf, which is the last link.
-    const chain = parseAdministrativeAreaPath(value.administrativeArea)
-
-    return chain.length
-      ? { ...value, administrativeArea: toLocationId(chain[chain.length - 1]) }
-      : value
-  }
-
-  return value
+function isAddressSearchGroup(
+  field: FieldConfig,
+  addressFieldIds: Set<string>
+): field is FieldGroup {
+  return field.type === FieldType.FIELD_GROUP && addressFieldIds.has(field.id)
 }
 
 function buildSearchQueryFields(
@@ -361,7 +428,8 @@ function buildSearchQueryFields(
     searchType: keyof typeof MatchType
     fieldConfig: FieldConfig
   }[],
-  searchInput: EventState // values from UI or query string
+  searchInput: EventState, // values from UI or query string
+  addressFieldIds: Set<string>
 ): Record<string, Condition> {
   return searchConfigurations.reduce(
     (result: Record<string, Condition>, config) => {
@@ -416,6 +484,19 @@ function buildSearchQueryFields(
         return {
           ...result,
           [fieldId]: buildSearchClause(JSON.stringify(value), searchType)
+        }
+      }
+
+      if (isAddressSearchGroup(config.fieldConfig, addressFieldIds)) {
+        const address = toAddressQueryValue(value, config.fieldConfig)
+
+        if (!address || !AddressFieldValue.safeParse(address).success) {
+          return result
+        }
+
+        return {
+          ...result,
+          [fieldId]: buildSearchClause(JSON.stringify(address), searchType)
         }
       }
 
@@ -575,22 +656,56 @@ function generateSearchFieldConfig(
 }
 
 /**
+ * The country, admin levels and street fields an address filter is made of,
+ * flattened into a FIELD_GROUP under the address field's own id.
+ *
+ * A declaration keeps only the leaf id; a filter needs every level to remember
+ * the name it was picked under. {@link toAddressQueryValue} reverses it.
+ */
+function toAddressSearchGroup(
+  field: AddressField,
+  adminStructure: AdminStructureItem[]
+): FieldGroup {
+  const { countryField, domesticFields, streetAddressFields } =
+    generateAddressFields(
+      {
+        ...field,
+        configuration: {
+          ...field.configuration,
+          activeOnly: true,
+          anchorToDateOfEvent: false
+        }
+      },
+      adminStructure
+    )
+
+  return {
+    id: field.id,
+    type: FieldType.FIELD_GROUP,
+    label: field.label,
+    conditionals: field.conditionals,
+    required: false,
+    fields: [countryField, ...domesticFields, ...streetAddressFields]
+  }
+}
+
+/**
  * Stamps advanced-search behaviour onto a resolved location/admin-area field
  * so the (presentational) selectors know to list every historical name and,
  * for admin structures, offer only currently-active areas. This is where the
  * search view "amends" the field config rather than the country configuring it.
  */
-export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
+export function withSearchLocationBehaviour(
+  field: FieldConfig,
+  adminStructure: AdminStructureItem[]
+): FieldConfig {
   if (field.type === FieldType.LOCATION) {
-    // Offices / health facilities: list historical names, keep inactive ones
-    // — override activeOnly regardless of what the declaration field (which
-    // anchors capture to exclude inactive locations) set it to. There's no
-    // event being captured in a search form, so never anchor to one either.
+    // Offices / health facilities: keep inactive ones listed, so a record filed
+    // at a since-closed facility stays findable.
     return {
       ...field,
       configuration: {
         ...field.configuration,
-        listHistoricalNames: true,
         activeOnly: false,
         anchorToDateOfEvent: false
       }
@@ -602,7 +717,6 @@ export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
       ...field,
       configuration: {
         ...field.configuration,
-        listHistoricalNames: true,
         activeOnly:
           field.configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE,
         anchorToDateOfEvent: false
@@ -611,23 +725,15 @@ export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
   }
 
   if (field.type === FieldType.ADDRESS) {
-    // Address admin structures: list historical names, exclude inactive areas.
-    return {
-      ...field,
-      configuration: {
-        ...field.configuration,
-        listHistoricalNames: true,
-        activeOnly: true,
-        anchorToDateOfEvent: false
-      }
-    }
+    return toAddressSearchGroup(field, adminStructure)
   }
 
   return field
 }
 
 export function resolveAdvancedSearchConfig(
-  eventConfig: EventConfig
+  eventConfig: EventConfig,
+  adminStructure: AdminStructureItem[]
 ): AdvancedSearchConfigWithFieldsResolved[] {
   const declarationFieldsMap = getAllUniqueFields(eventConfig).reduce(
     (acc, field) => {
@@ -654,7 +760,7 @@ export function resolveAdvancedSearchConfig(
             field
           )
         }
-        return withSearchLocationBehaviour(resolved)
+        return withSearchLocationBehaviour(resolved, adminStructure)
       })
     }
   })
@@ -665,7 +771,8 @@ export function resolveAdvancedSearchConfig(
  */
 export function getSearchParamsFieldConfigs(
   eventConfig: EventConfig,
-  searchParams: SearchQueryParams
+  searchParams: SearchQueryParams,
+  adminStructure: AdminStructureItem[]
 ): FieldConfig[] {
   // Flatten all advanced search fields across all sections
   const allSearchFields = eventConfig.advancedSearch.flatMap(
@@ -685,9 +792,11 @@ export function getSearchParamsFieldConfigs(
     ...metadataFieldConfigs,
     ...declarationFieldConfigs,
     ...searchOnlyFieldConfigs
-  ].filter((field) => {
-    return Object.keys(searchParams).some((key) => key === field.id)
-  })
+  ]
+    .filter((field) => {
+      return Object.keys(searchParams).some((key) => key === field.id)
+    })
+    .map((field) => withSearchLocationBehaviour(field, adminStructure))
 
   return searchFieldConfigs
 }
@@ -698,11 +807,13 @@ export function getSearchParamsFieldConfigs(
  */
 export function parseFieldSearchParams(
   eventConfig: EventConfig,
-  searchParams: SearchQueryParams
+  searchParams: SearchQueryParams,
+  adminStructure: AdminStructureItem[]
 ) {
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
-    searchParams
+    searchParams,
+    adminStructure
   )
 
   // filter out any unrelated search parameters
@@ -737,8 +848,15 @@ export function parseFieldSearchParams(
 export function buildSearchQuery(
   formValues: EventState,
   resolvedFieldConfigs: FieldConfig[],
-  searchFieldConfigs: AdvancedSearchField[]
+  searchFieldConfigs: AdvancedSearchField[],
+  eventConfig: EventConfig
 ): QueryInputType {
+  const addressFieldIds = new Set(
+    getAllUniqueFields(eventConfig)
+      .filter((field) => field.type === FieldType.ADDRESS)
+      .map((field) => field.id)
+  )
+
   const fieldsMap = searchFieldConfigs.reduce(
     (acc, config) => {
       acc[config.fieldId] = config
@@ -754,7 +872,7 @@ export function buildSearchQuery(
   }))
 
   // Generate the final query condition object from the filtered keys and raw input
-  return buildSearchQueryFields(searchConfigs, formValues)
+  return buildSearchQueryFields(searchConfigs, formValues, addressFieldIds)
 }
 
 const searchFieldTypeMapping = {

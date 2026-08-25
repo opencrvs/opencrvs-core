@@ -140,6 +140,7 @@ function LocationSearchInput({
   id,
   eventType,
   anchor,
+  searchMode = false,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -150,6 +151,7 @@ function LocationSearchInput({
   id: string
   eventType?: string
   anchor: PlainDate
+  searchMode?: boolean
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
@@ -186,18 +188,18 @@ function LocationSearchInput({
     [locations, anchor, activeOnly]
   )
 
-  // When the field config opts in (advanced search sets this), list every
-  // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option, resolved at the field's anchor.
+  // Advanced search lists every historical name, so a record filed under a
+  // since-changed name stays findable. A declaration form shows a single
+  // current-name option, resolved at the field's anchor.
   const options: LocationOption[] = useMemo(
     () =>
-      props.configuration?.listHistoricalNames
+      searchMode
         ? buildHistoricalLocationNameOptions(selectableLocations)
         : selectableLocations.map((l) => ({
             value: l.id,
             label: resolveVersion(l.versions, anchor).name
           })),
-    [selectableLocations, props.configuration?.listHistoricalNames, anchor]
+    [selectableLocations, searchMode, anchor]
   )
 
   const selectedOption = findLocationOption(options, value)

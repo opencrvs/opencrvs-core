@@ -53,6 +53,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   /** form id */
   id: string
   readonlyMode?: boolean
+  searchMode?: boolean
   className?: string
   attachmentPath?: string
   /** Which fields are generated */
@@ -82,6 +83,7 @@ export const FormFieldGenerator = forwardRef<
       formValues,
       className,
       eventConfig,
+      searchMode,
       attachmentPath = '',
       readonlyMode,
       id,
@@ -189,7 +191,7 @@ export const FormFieldGenerator = forwardRef<
                 validatorContext
               ),
               // this is caught in CI but editor flags as unnecessary condition
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+               
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )
@@ -211,6 +213,7 @@ export const FormFieldGenerator = forwardRef<
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
               }}
               readonlyMode={readonlyMode}
+              searchMode={searchMode}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}

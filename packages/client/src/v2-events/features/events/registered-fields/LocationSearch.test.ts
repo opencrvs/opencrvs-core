@@ -12,7 +12,6 @@ import {
   ClientLocation,
   JurisdictionFilter,
   PlainDate,
-  toVersionedLocation,
   resolveVersion,
   todayISO,
   LocationVersion,
@@ -21,6 +20,7 @@ import {
   V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
   V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
+import { toVersionedLocation } from '@client/v2-events/VersionedLocation'
 
 import {
   buildHistoricalLocationNameOptions,

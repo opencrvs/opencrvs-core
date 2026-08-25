@@ -23,6 +23,7 @@ import {
   SearchQueryParams
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import { TabSearch } from './TabSearch'
 import {
   checkScopeForEventSearch,
@@ -60,6 +61,7 @@ export function AdvancedSearch() {
       event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
   )
 
+  const adminStructure = useAdminStructure()
   const [formValuesByTabId, setFormValuesByTabId] = useState<
     Record<string, EventState>
   >(() => {
@@ -69,7 +71,11 @@ export function AdvancedSearch() {
     )
     for (const event of advancedSearchEvents) {
       if (currentEvent && currentEvent.id === event.id) {
-        const parsedParams = parseFieldSearchParams(event, searchParams)
+        const parsedParams = parseFieldSearchParams(
+          event,
+          searchParams,
+          adminStructure
+        )
         initialState[event.id] = parsedParams
       } else {
         initialState[event.id] = {}

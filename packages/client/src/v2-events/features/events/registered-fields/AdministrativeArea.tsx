@@ -141,6 +141,7 @@ interface AdministrativeAreaInputProps
   onChange: (val: string | null) => void
   value?: string | null
   anchor: PlainDate
+  searchMode?: boolean
 }
 
 function AdministrativeAreaInput({
@@ -150,6 +151,7 @@ function AdministrativeAreaInput({
   partOf,
   onChange,
   anchor,
+  searchMode = false,
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
@@ -189,18 +191,18 @@ function AdministrativeAreaInput({
     onClear: () => onChange(null)
   })
 
-  // When the field config opts in (advanced search sets this), list every
-  // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option, resolved at the field's anchor.
+  // Advanced search lists every historical name, so a record filed under a
+  // since-changed name stays findable. A declaration form shows a single
+  // current-name option, resolved at the field's anchor.
   const options: LocationOption[] = useMemo(
     () =>
-      configuration.listHistoricalNames
+      searchMode
         ? buildHistoricalLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
             label: resolveLocationName(o, anchor),
             value: o.id
           })),
-    [administrativeAreas, configuration.listHistoricalNames, anchor]
+    [administrativeAreas, searchMode, anchor]
   )
 
   const selectedLocation = useMemo(

@@ -21,9 +21,7 @@ import {
   field,
   footballClubMembershipEvent,
   Location,
-  VersionedLocation,
   tennisClubMembershipEvent,
-  toNamedVersions,
   TestUserRole,
   UUID,
   user,
@@ -311,6 +309,21 @@ export const RenamedAndInactiveFacilitiesStayFilterable: Story = {
   }
 }
 
+/**
+ * The address filter renders as a FIELD_GROUP under the address field's own id
+ * (@see withSearchLocationBehaviour), so every level is addressed through the
+ * group rather than by its bare level id.
+ */
+const ADDRESS_GROUP = 'child.birthLocation.privateHome'.replaceAll('.', '____')
+
+/**
+ * An attribute selector, not `#id` — the group prefix and the level are joined
+ * by a dot, which a CSS id selector would read as a class.
+ */
+function levelSelector(level: string, suffix: string) {
+  return `[id="searchable-select-${ADDRESS_GROUP}.${level}"] ${suffix}`
+}
+
 async function openAddressProvinceDropdown(
   canvasElement: HTMLElement,
   canvas: ReturnType<typeof within>
@@ -327,18 +340,20 @@ async function openAddressProvinceDropdown(
 
   // Admin-structure dropdowns only appear once the domestic country (the
   // configured home country, Bangladesh in storybook) is selected.
-  const country = await canvas.findByTestId('location__country')
+  const country = await canvas.findByTestId(
+    `location__${ADDRESS_GROUP}.country`
+  )
   await selectEvent.select(country, 'Bangladesh')
 
   // The province dropdown only appears once the domestic country is applied.
   // It has no associated label or testid, so wait for its input by id.
   await waitFor(() => {
-    if (!canvasElement.querySelector('#searchable-select-province input')) {
+    if (!canvasElement.querySelector(levelSelector('province', 'input'))) {
       throw new Error('Province input not rendered yet')
     }
   })
   const provinceInput = canvasElement.querySelector(
-    '#searchable-select-province input'
+    levelSelector('province', 'input')
   )
 
   if (!provinceInput) {

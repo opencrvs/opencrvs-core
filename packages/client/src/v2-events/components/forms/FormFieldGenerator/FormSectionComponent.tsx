@@ -54,6 +54,7 @@ type AllProps = {
   ocrvsFullForm: EventState
   className?: string
   readonlyMode?: boolean
+  searchMode?: boolean
   attachmentPath: string
   /**
    * Update the form values in the non-formik state.
@@ -219,6 +220,7 @@ export function FormSectionComponent({
   onTouchedChange,
   className,
   readonlyMode,
+  searchMode,
   eventConfig,
   setValues,
   setTouched,
@@ -503,6 +505,7 @@ export function FormSectionComponent({
               name={formikFieldId}
               ocrvsFullForm={ocrvsFullForm}
               readonlyMode={readonlyMode}
+              searchMode={searchMode}
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
               onBlur={handleBlur}
