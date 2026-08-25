@@ -144,12 +144,15 @@ export function check(cwd: string): CheckResult {
 /**
  * Adds a row per missing message, filling in only English — the rest is copy
  * somebody has to write. Returns the ids added.
+ *
+ * Creates countryconfig.csv if it doesn't exist yet.
  */
 export function writeMissing(cwd: string, missing: Message[]) {
-  const file = readCsvFile(path.join(cwd, OWN_FILE))
-
-  if (!file) {
-    throw new Error(`${OWN_FILE} not found in ${cwd}`)
+  const file = readCsvFile(path.join(cwd, OWN_FILE)) ?? {
+    header: 'id,description,en',
+    body: [],
+    newline: '\n',
+    trailingNewline: true
   }
 
   const columns = file.header.split(',')

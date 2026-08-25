@@ -15,10 +15,10 @@ import {
   goToSection,
   login,
   triggerDeclarationAction
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { navigateToWorkqueue } from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { navigateToWorkqueue } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Hospital Official notifies a death — attestation-required flag is set', async ({
   browser

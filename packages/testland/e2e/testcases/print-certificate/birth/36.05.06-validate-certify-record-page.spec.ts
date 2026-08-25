@@ -9,24 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { CREDENTIALS } from '../../../constants'
-import { login, getToken } from '../../../helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { login, getToken } from '@e2e/support/helpers'
 import {
   createDeclaration,
   Declaration
-} from '../../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import {
   selectRequesterType,
   selectCertificationType,
   navigateToCertificatePrintAction,
   printAndExpectPopup,
   openRecordByTitle
-} from './helpers'
-import { ensureAssignedToUser, type, expectInUrl } from '../../../utils'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { ensureAssignedToUser, type, expectInUrl } from '@e2e/support/utils'
 import {
   REQUIRED_VALIDATION_ERROR,
   formatV2ChildName
-} from '../../birth/helpers'
+} from '@e2e/support/birth/helpers'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 async function selectIdType(page: Page, idType: string) {
   await page.locator('#collector____OTHER____idType').click()
@@ -130,7 +131,7 @@ test.describe.serial('Validate collect payment page', () => {
   test('5.7 Should be able to add file and navigate to the payment page', async () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
     const path = require('path')
-    const attachmentPath = path.resolve(__dirname, './528KB-random.png')
+    const attachmentPath = path.join(ASSETS_DIR, '528KB-random.png')
     const inputFile = await page.locator(
       'input[name="collector____OTHER____signedAffidavit"][type="file"]'
     )

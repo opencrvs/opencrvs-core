@@ -15,11 +15,11 @@ import {
   createIntegrationContext,
   createRegisteredEvent,
   fetchClientAPI
-} from './helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { login } from '../../helpers'
+} from '@e2e/support/events-rest-api/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { login } from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
-import { selectAction, type } from '../../utils'
+import { selectAction, type } from '@e2e/support/utils'
 
 test.describe
   .serial('POST /api/events/events/{eventId}/correction/request', () => {

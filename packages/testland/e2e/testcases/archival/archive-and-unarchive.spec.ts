@@ -17,17 +17,23 @@ import {
   logout,
   triggerDeclarationAction,
   searchFromSearchBar
-} from '../../helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { assertRecordInWorkqueue, formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import {
+  assertRecordInWorkqueue,
+  formatV2ChildName
+} from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   navigateToWorkqueue,
   selectAction
-} from '../../utils'
+} from '@e2e/support/utils'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Basic Archival flow', async ({ page }) => {
   let declaration: Declaration

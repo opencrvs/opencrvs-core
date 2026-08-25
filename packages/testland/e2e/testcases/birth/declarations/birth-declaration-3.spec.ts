@@ -22,11 +22,11 @@ import {
   uploadImage,
   uploadImageToSection,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { fillDate, validateAddress } from '../helpers'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { fillDate, validateAddress } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('3. Birth declaration case - 3', () => {
   let page: Page
@@ -529,9 +529,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Child's Attendant at birth
        */
-      await expect(
-        page.getByTestId('child.attendantAtBirth-value')
-      ).toHaveText(declaration.attendantAtBirth)
+      await expect(page.getByTestId('child.attendantAtBirth-value')).toHaveText(
+        declaration.attendantAtBirth
+      )
 
       /*
        * Expected result: should include
@@ -578,9 +578,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Informant's Nationality
        */
-      await expect(
-        page.getByTestId('informant.nationality-value')
-      ).toHaveText(declaration.informant.nationality)
+      await expect(page.getByTestId('informant.nationality-value')).toHaveText(
+        declaration.informant.nationality
+      )
 
       /*
        * Expected result: should include
@@ -623,9 +623,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Mother's Marital status
        */
-      await expect(
-        page.getByTestId('mother.maritalStatus-value')
-      ).toHaveText(declaration.mother.maritalStatus)
+      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
+        declaration.mother.maritalStatus
+      )
 
       /*
        * Expected result: should include
@@ -702,9 +702,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Father's Marital status
        */
-      await expect(
-        page.getByTestId('father.maritalStatus-value')
-      ).toHaveText(declaration.father.maritalStatus)
+      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
+        declaration.father.maritalStatus
+      )
 
       /*
        * Expected result: should include
@@ -816,9 +816,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Child's Attendant at birth
        */
-      await expect(
-        page.getByTestId('child.attendantAtBirth-value')
-      ).toHaveText(declaration.attendantAtBirth)
+      await expect(page.getByTestId('child.attendantAtBirth-value')).toHaveText(
+        declaration.attendantAtBirth
+      )
 
       /*
        * Expected result: should include
@@ -866,9 +866,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Informant's Nationality
        */
-      await expect(
-        page.getByTestId('informant.nationality-value')
-      ).toHaveText(declaration.informant.nationality)
+      await expect(page.getByTestId('informant.nationality-value')).toHaveText(
+        declaration.informant.nationality
+      )
 
       /*
        * Expected result: should include
@@ -911,9 +911,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Mother's Marital status
        */
-      await expect(
-        page.getByTestId('mother.maritalStatus-value')
-      ).toHaveText(declaration.mother.maritalStatus)
+      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
+        declaration.mother.maritalStatus
+      )
 
       /*
        * Expected result: should include
@@ -990,9 +990,9 @@ test.describe.serial('3. Birth declaration case - 3', () => {
        * Expected result: should include
        * - Father's Marital status
        */
-      await expect(
-        page.getByTestId('father.maritalStatus-value')
-      ).toHaveText(declaration.father.maritalStatus)
+      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
+        declaration.father.maritalStatus
+      )
 
       /*
        * Expected result: should include

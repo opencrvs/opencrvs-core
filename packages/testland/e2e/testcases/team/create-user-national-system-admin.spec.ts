@@ -10,9 +10,10 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import path from 'path'
-import { continueForm, login, loginWithNewUser } from '../../helpers'
+import { continueForm, login, loginWithNewUser } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 test.describe.serial('1. Create user -1', () => {
   let page: Page
@@ -22,7 +23,7 @@ test.describe.serial('1. Create user -1', () => {
     email: faker.internet.email(),
     role: 'Registrar'
   }
-  const signaturePath = path.resolve(__dirname, '../../assets/sign1.png')
+  const signaturePath = path.join(ASSETS_DIR, 'sign1.png')
   const username = `${userinfo.firstName[0]}.${userinfo.surname}`.toLowerCase()
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()

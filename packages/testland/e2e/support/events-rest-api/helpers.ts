@@ -10,10 +10,10 @@
  */
 import { format } from 'date-fns'
 import { createClient } from '@opencrvs/toolkit/api'
-import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { getClientToken, getToken } from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration'
-import { getLocations } from '../birth/helpers'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { getClientToken, getToken } from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
+import { getLocations } from '@e2e/support/birth/helpers'
 
 export const EVENT_TYPE = 'birth'
 export const NON_EXISTING_UUID = 'b3ca0644-ffc4-461f-afe0-5fb84bedfcfd'

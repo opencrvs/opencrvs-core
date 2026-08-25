@@ -9,15 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { getToken, login, validateActionMenuButton } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { getToken, login, validateActionMenuButton } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   ensureAssignedToUser,
   navigateToWorkqueue,
   selectAction
-} from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
-import { createDeclaration, Declaration } from '../test-data/death-declaration'
+} from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/death-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 
 test('Death notified at a health facility is held for attestation, then reaches the registrar once attested', async ({

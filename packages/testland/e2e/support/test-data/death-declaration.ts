@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
-import { GATEWAY_HOST } from '../../constants'
+import { GATEWAY_HOST } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import {
   getLocations,
   getIdByName,
   getAdministrativeAreas
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import {
   ActionDocument,
