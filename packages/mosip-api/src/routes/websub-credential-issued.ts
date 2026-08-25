@@ -16,6 +16,7 @@ import * as opencrvs from '../opencrvs-api'
 import { decryptMosipCredential } from '../websub/crypto'
 import { env } from '../constants'
 import { getBirthIdentifier } from '../websub/verify-vc'
+import { verifyHubSignatureOrThrow } from '../websub/verify-hub-signature'
 import { ActionType } from '@opencrvs/toolkit/events'
 
 export const CredentialIssuedSchema = z.object({
@@ -48,6 +49,31 @@ type CredentialIssuedRequest = FastifyRequest<{
   Body: z.infer<typeof CredentialIssuedSchema>
 }>
 
+/**
+ * Authenticates the delivery before the body is validated, so nothing
+ * downstream ever sees an unauthenticated payload. The route is deliberately
+ * exempt from JWT auth (see the `onRequest` hook in `index.ts`) — this is what
+ * establishes that the request came from MOSIP.
+ */
+export const credentialIssuedPreValidation = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    verifyHubSignatureOrThrow(
+      request.headers['x-hub-signature'],
+      request.rawBody
+    )
+  } catch (error) {
+    request.log.error(
+      { event: 'websub.credential-issued.unauthenticated', err: error },
+      'Rejected WebSub callback with an invalid X-Hub-Signature'
+    )
+
+    return reply.code(401).send({ error: 'Invalid X-Hub-Signature' })
+  }
+}
+
 export const credentialIssuedHandler = async (
   request: CredentialIssuedRequest,
   reply: FastifyReply
@@ -56,11 +82,6 @@ export const credentialIssuedHandler = async (
     const verifiableCredential = decryptMosipCredential(
       request.body.event.data.credential
     )
-
-    // commented out for now, as there is an issue when verifying the VC, likely due to canonicalization differences
-    // await verifyCredentialOrThrow(verifiableCredential, {
-    //   allowList: MOSIP_VERIFIABLE_CREDENTIAL_ALLOWED_URLS,
-    // });
 
     const transactionId = verifiableCredential.credentialSubject.id
       .split('/')

@@ -52,11 +52,19 @@ const sendVerifiableCredential = async (
     }
   })
 
+  // A real WebSub hub signs the delivery with the `hub.secret` given at
+  // subscription time, and mosip-api rejects callbacks that are not signed.
+  const signature = crypto
+    .createHmac('sha256', env.MOSIP_WEBSUB_SECRET)
+    .update(body)
+    .digest('hex')
+
   const response = await fetch(env.MOSIP_WEBSUB_CALLBACK_URL, {
     method: 'POST',
     body,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Hub-Signature': `sha256=${signature}`
     }
   })
 
