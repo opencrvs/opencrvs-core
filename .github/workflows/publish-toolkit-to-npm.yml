@@ -11,13 +11,29 @@ name: Publish toolkit to NPM registry
 on:
   workflow_dispatch:
     inputs:
-      branch_name:
-        description: Branch to publish from
-        default: develop
-        required: true
+      dist_tag:
+        description: >-
+          Optional npm dist-tag override, e.g. "beta" to bless a build for
+          external testing. Leave empty to derive the tag. Only one tag is ever
+          applied per publish, so this replaces the derived tag rather than
+          adding a second pointer to the same version.
+        default: ''
+        required: false
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*' # Matches v1.2.3, v1.2.3-beta, v1.2.3-rc.1
+      # Releases only. Deliberately no trailing "*": GitHub filter patterns must
+      # match the whole ref name, "+" means "one or more of the preceding
+      # character" and "." is a literal, so this matches v2.1.0 and v2.10.0 but
+      # not v2.1.0-beta or v2.1.0-rc.1.
+      #
+      # Prerelease git tags are therefore inert markers that publish nothing.
+      # That is intended: it removes the old bug where any tag matching the glob
+      # was published as `latest`, so cutting a v2.1.0-beta tag pointed every
+      # bare `npm install @opencrvs/toolkit` at a prerelease. Release candidates
+      # now come from workflow_dispatch only, where the derivation below can
+      # tell an rc toward a new minor (`next`) from an rc toward a patch of an
+      # already-released minor (`vX.Y-next`).
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 permissions:
   id-token: write
@@ -43,9 +59,15 @@ jobs:
       - name: Update npm for OIDC trusted publishing
         run: npm install -g npm@11
 
-      - name: Check if version exists on npm
+      - name: Check version and derive npm dist-tag
         id: check-version
+        env:
+          # Read through the environment rather than interpolating the input
+          # straight into the script body.
+          DIST_TAG_INPUT: ${{ inputs.dist_tag }}
         run: |
+          set -euo pipefail
+
           PACKAGE_VERSION=$(node -p "require('../../package.json').version")
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             TAG_NAME="$GITHUB_REF_NAME"
@@ -56,19 +78,126 @@ jobs:
               echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
               exit 1
             fi
-            echo "npm-tag=latest" >> $GITHUB_OUTPUT
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
-            echo "npm-tag=next" >> $GITHUB_OUTPUT
           fi
-          if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
-          echo "Version $TOOLKIT_VERSION already exists on npm."
-          echo "version-exists=true" >> $GITHUB_OUTPUT
+
+          # --- npm dist-tag derivation ---------------------------------------
+          #
+          # Exactly one dist-tag is applied, via `npm publish --tag`. This is a
+          # hard constraint, not a preference: `npm dist-tag add` does not accept
+          # an OIDC trusted-publishing credential - only `npm publish` does
+          # (npm/cli#8547, still open). This repo publishes purely over OIDC and
+          # holds no NPM_TOKEN, so there is no second call available with which
+          # to hang a further pointer on a version. Whatever is chosen here is
+          # the only tag the published version will ever carry.
+          #
+          # The scheme is one rule: an unprefixed tag names the leading line, a
+          # "vX.Y-" prefixed tag names a line that is no longer the leading one.
+          #
+          #   latest       newest release of the highest released minor; this is
+          #                what a bare `npm install` resolves to
+          #   vX.Y-latest  newest release of a superseded minor (a hotfix)
+          #   next         release candidates toward the next, unreleased minor
+          #   vX.Y-next    release candidates toward the next patch of a minor
+          #                that has already been released
+          #   beta         explicit only, via the dist_tag input; never derived
+          #
+          # The tag is computed once and used for all three packages, with
+          # @opencrvs/toolkit as the reference for npm state. They publish in
+          # lockstep at a single version, and consistency across them matters
+          # more than per-package precision: toolkit on `latest` while
+          # @opencrvs/mosip sat on `v2.1-latest` for the same release would be
+          # worse than either choice applied uniformly.
+
+          if ! [[ "$TOOLKIT_VERSION" =~ ^([0-9]+)\.([0-9]+)\. ]]; then
+            echo "❌ Cannot derive a dist-tag: '$TOOLKIT_VERSION' has no leading X.Y"
+            exit 1
+          fi
+          VERSION_MAJOR="${BASH_REMATCH[1]}"
+          VERSION_MINOR="${BASH_REMATCH[2]}"
+          VERSION_LINE="$VERSION_MAJOR.$VERSION_MINOR"
+
+          # `npm view` exits nonzero when the package does not exist at all, and
+          # prints a bare JSON string instead of an array when it has exactly one
+          # version; normalise both away. "Released" excludes anything carrying a
+          # prerelease or build suffix, so rcs never influence the derivation.
+          PUBLISHED_VERSIONS="$(npm view @opencrvs/toolkit versions --json 2>/dev/null || true)"
+          RELEASED_VERSIONS="$(
+            printf '%s' "${PUBLISHED_VERSIONS:-[]}" |
+              jq -c 'if type == "array" then . else [.] end
+                     | map(select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$")))'
+          )"
+
+          # Highest released minor, compared as a [major, minor] pair so the
+          # comparison is numeric and 2.10 sorts above 2.9. Empty when nothing
+          # has ever been released, i.e. the first-ever publish.
+          HIGHEST_RELEASED_LINE="$(
+            printf '%s' "$RELEASED_VERSIONS" |
+              jq -r 'map(capture("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)\\.")
+                         | [(.major | tonumber), (.minor | tonumber)])
+                     | if length == 0 then "" else (max | "\(.[0]).\(.[1])") end'
+          )"
+
+          # Has this X.Y line had a release yet? Matching on the "X.Y." prefix is
+          # exact enough: "2.10.0" does not start with "2.1.".
+          LINE_HAS_RELEASE="$(
+            printf '%s' "$RELEASED_VERSIONS" |
+              jq -r --arg line "$VERSION_LINE." 'any(.[]; startswith($line)) | tostring'
+          )"
+
+          echo "Released versions on npm: $RELEASED_VERSIONS"
+          echo "Highest released minor: ${HIGHEST_RELEASED_LINE:-<none>}"
+
+          if [ -n "$DIST_TAG_INPUT" ]; then
+            # Explicit override, e.g. blessing a build as `beta`. It replaces the
+            # derived tag; it cannot be an addition to it, see above.
+            NPM_TAG="$DIST_TAG_INPUT"
+            echo "Dist-tag overridden by workflow input"
+          elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            # A release. It leads its line unless some higher minor has already
+            # been released, in which case this is a hotfix on a superseded line
+            # and must not drag `latest` backwards.
+            if [ -z "$HIGHEST_RELEASED_LINE" ]; then
+              NPM_TAG=latest
             else
-          echo "Version $TOOLKIT_VERSION does not exist on npm."
-          echo "version-exists=false" >> $GITHUB_OUTPUT
+              HIGHEST_MAJOR="${HIGHEST_RELEASED_LINE%%.*}"
+              HIGHEST_MINOR="${HIGHEST_RELEASED_LINE##*.}"
+              if [ "$VERSION_MAJOR" -gt "$HIGHEST_MAJOR" ] ||
+                 { [ "$VERSION_MAJOR" -eq "$HIGHEST_MAJOR" ] && [ "$VERSION_MINOR" -ge "$HIGHEST_MINOR" ]; }; then
+                NPM_TAG=latest
+              else
+                NPM_TAG="v$VERSION_LINE-latest"
+              fi
             fi
-          echo "toolkit-version=$TOOLKIT_VERSION" >> $GITHUB_OUTPUT
+          else
+            # A release candidate. `next` belongs to the minor that has not been
+            # released yet. Once X.Y has a release, further rcs on that line are
+            # patch candidates and take vX.Y-next, so dispatching from a
+            # release/2.0.2 branch can no longer clobber `next` - which is how
+            # `next` previously ended up pointing at a 2.0.1-rc build.
+            if [ "$LINE_HAS_RELEASE" = "true" ]; then
+              NPM_TAG="v$VERSION_LINE-next"
+            else
+              NPM_TAG=next
+            fi
+          fi
+
+          echo "Publishing $TOOLKIT_VERSION under dist-tag '$NPM_TAG'"
+
+          if npm view "@opencrvs/toolkit@$TOOLKIT_VERSION" > /dev/null 2>&1; then
+            echo "Version $TOOLKIT_VERSION already exists on npm."
+            VERSION_EXISTS=true
+          else
+            echo "Version $TOOLKIT_VERSION does not exist on npm."
+            VERSION_EXISTS=false
+          fi
+
+          {
+            echo "npm-tag=$NPM_TAG"
+            echo "toolkit-version=$TOOLKIT_VERSION"
+            echo "version-exists=$VERSION_EXISTS"
+          } >> "$GITHUB_OUTPUT"
         working-directory: packages/toolkit
 
       - name: Install dependencies
@@ -113,14 +242,14 @@ jobs:
 
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public --tag "${{ steps.check-version.outputs.npm-tag }}"
         working-directory: packages/toolkit
 
       - name: Check if create-countryconfig version exists on npm
         id: check-create-version
         run: |
           TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
-          if npm view @opencrvs/create-countryconfig@$TOOLKIT_VERSION > /dev/null 2>&1; then
+          if npm view "@opencrvs/create-countryconfig@$TOOLKIT_VERSION" > /dev/null 2>&1; then
             echo "Version $TOOLKIT_VERSION already exists on npm."
             echo "version-exists=true" >> $GITHUB_OUTPUT
           else
@@ -137,14 +266,14 @@ jobs:
 
       - name: Publish create-countryconfig to npm
         if: steps.check-create-version.outputs.version-exists == 'false'
-        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public --tag "${{ steps.check-version.outputs.npm-tag }}"
         working-directory: packages/toolkit/create-countryconfig
 
       - name: Check if mosip version exists on npm
         id: check-mosip-version
         run: |
           TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
-          if npm view @opencrvs/mosip@$TOOLKIT_VERSION > /dev/null 2>&1; then
+          if npm view "@opencrvs/mosip@$TOOLKIT_VERSION" > /dev/null 2>&1; then
             echo "Version $TOOLKIT_VERSION already exists on npm."
             echo "version-exists=true" >> $GITHUB_OUTPUT
           else
@@ -193,5 +322,5 @@ jobs:
 
       - name: Publish mosip to npm
         if: steps.check-mosip-version.outputs.version-exists == 'false'
-        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public --tag "${{ steps.check-version.outputs.npm-tag }}"
         working-directory: packages/mosip
