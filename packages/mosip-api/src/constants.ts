@@ -68,11 +68,6 @@ export const env = cleanEnv(process.env, {
     example: 'https://your-domain.com/websub/callback',
     desc: 'The OpenCRVS side URL MOSIP sends WebSub updates to, `hub.callback`'
   }),
-  MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST: str({
-    devDefault: 'http://localhost:20240/.well-known/public-key.json',
-    example: 'https://your-domain.com/.well-known/public-key.json',
-    desc: 'Comma-separated list of verifiable credential allowlist URLs. Used to verify the authenticity of the verifiable credential.'
-  }),
   MOSIP_VERIFIABLE_CREDENTIAL_NATIONAL_ID_KEY: str({
     default: 'UIN',
     desc: 'The key used to fill NATIONAL_ID field in OpenCRVS'
@@ -149,9 +144,3 @@ export const env = cleanEnv(process.env, {
 
 /** OpenCRVS public key endpoint, served by the auth service. Used to verify JWT authenticity. */
 export const OPENCRVS_PUBLIC_KEY_URL = `${env.OPENCRVS_AUTH_URL}/.well-known`
-
-/**
- * @knipignore Feeds the verifiable-credential allowlist check in routes/websub-credential-issued.ts, which is currently commented out pending a canonicalization fix. Kept so re-enabling that check needs no new plumbing.
- */
-export const MOSIP_VERIFIABLE_CREDENTIAL_ALLOWED_URLS =
-  env.MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST.split(',')

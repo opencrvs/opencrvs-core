@@ -27,6 +27,7 @@ import { OIDPUserInfoHandler } from './routes/oidp-user-info'
 import { initSqlite } from './database'
 import {
   credentialIssuedHandler,
+  credentialIssuedPreValidation,
   CredentialIssuedSchema
 } from './routes/websub-credential-issued'
 import { initWebSub } from './websub/subscribe'
@@ -36,6 +37,13 @@ import {
 } from './routes/debug-sqlite'
 import { verifyHandler, VerifySchema } from './routes/verify'
 import { MosipInteropPayloadSchema } from '@opencrvs/mosip/api'
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    /** Set by the JSON parser below; needed to verify the WebSub HMAC. */
+    rawBody?: Buffer
+  }
+}
 
 const loggerRedactPaths = [
   'req.headers.authorization',
@@ -157,6 +165,7 @@ const initRoutes = (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({
     method: 'POST',
     url: '/websub/callback', // see constants.ts `${env.MOSIP_WEBSUB_CALLBACK_URL}`
+    preValidation: credentialIssuedPreValidation,
     handler: credentialIssuedHandler,
     schema: {
       body: CredentialIssuedSchema
@@ -187,6 +196,31 @@ export const buildFastify = async () => {
   app.setValidatorCompiler(validatorCompiler)
   app.setSerializerCompiler(serializerCompiler)
   publicKeyLogger = app.log
+
+  /*
+   * Retains the exact request bytes so the WebSub HMAC can be recomputed over
+   * them — MOSIP signs the body verbatim, so a re-serialization would not
+   * match. Replaces Fastify's built-in JSON parser, keeping its empty-body and
+   * 400-on-malformed behaviour.
+   */
+  app.addContentTypeParser(
+    'application/json',
+    { parseAs: 'buffer' },
+    (request, body, done) => {
+      const buffer = body as Buffer
+      request.rawBody = buffer
+
+      if (buffer.length === 0) return done(null, undefined)
+
+      try {
+        done(null, JSON.parse(buffer.toString('utf8')))
+      } catch (err) {
+        ;(err as FastifyError).statusCode = 400
+        done(err as Error)
+      }
+    }
+  )
+
   app.register(formbody)
   app.register(cors, {
     origin: [env.CLIENT_APP_URL],
