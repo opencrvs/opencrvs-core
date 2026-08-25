@@ -13,27 +13,35 @@ on:
     inputs:
       dist_tag:
         description: >-
-          Optional npm dist-tag override, e.g. "beta" to bless a build for
-          external testing. Leave empty to derive the tag. Only one tag is ever
-          applied per publish, so this replaces the derived tag rather than
+          Optional npm dist-tag override. Leave empty to derive the tag from npm
+          state, which is the normal case. Its use is the release the derivation
+          refuses to name - one that is neither the newest release overall nor
+          the newest on its own line - not blessing a beta: a beta gets its own
+          version from a prerelease git tag, e.g. v2.1.0-beta. Only one tag is
+          ever applied per publish, so this replaces the derived tag rather than
           adding a second pointer to the same version.
         default: ''
         required: false
   push:
     tags:
-      # Releases only. Deliberately no trailing "*": GitHub filter patterns must
-      # match the whole ref name, "+" means "one or more of the preceding
-      # character" and "." is a literal, so this matches v2.1.0 and v2.10.0 but
-      # not v2.1.0-beta or v2.1.0-rc.1.
+      # Releases and prereleases: v2.1.0, v2.10.0, v2.1.0-beta, v2.1.0-rc.1.
+      # GitHub filter patterns must match the whole ref name, so the trailing
+      # "*" is what admits the prerelease suffix ("+" means "one or more of the
+      # preceding character" and "." is a literal).
       #
-      # Prerelease git tags are therefore inert markers that publish nothing.
-      # That is intended: it removes the old bug where any tag matching the glob
-      # was published as `latest`, so cutting a v2.1.0-beta tag pointed every
-      # bare `npm install @opencrvs/toolkit` at a prerelease. Release candidates
-      # now come from workflow_dispatch only, where the derivation below can
-      # tell an rc toward a new minor (`next`) from an rc toward a patch of an
-      # already-released minor (`vX.Y-next`).
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      # Prereleases are published from a git tag because only one dist-tag can
+      # be applied per publish - see the derivation step for why that is not
+      # negotiable. Blessing a release candidate as `beta` would consume the
+      # only tag that build can carry, so `beta` and `next` could never coexist.
+      # Giving a beta a version of its own instead - 2.1.0-beta, taken from the
+      # tag name - lets the beta version hold `beta` while release candidates
+      # carry on holding `next`. A git tag also pins an exact commit, where an
+      # rc scaffolds from a branch tip that keeps moving.
+      #
+      # The old bug where a prerelease tag published as `latest` is fixed in the
+      # derivation rather than here: a prerelease takes its dist-tag from its
+      # own prerelease identifier and cannot reach `latest`.
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 permissions:
   id-token: write
@@ -101,7 +109,11 @@ jobs:
           #   next         release candidates toward the next, unreleased minor
           #   vX.Y-next    release candidates toward the next patch of a minor
           #                that has already been released
-          #   beta         explicit only, via the dist_tag input; never derived
+          #   beta, rc,    a prerelease git tag takes its dist-tag from its own
+          #   alpha, ...   prerelease identifier: v2.1.0-beta publishes version
+          #                2.1.0-beta under `beta`. Not part of the leading-line
+          #                rule and deliberately outside it - a prerelease is
+          #                never allowed to resolve to any of the four tags above
           #
           # The tag is computed once and used for all three packages, with
           # @opencrvs/toolkit as the reference for npm state. They publish in
@@ -110,18 +122,35 @@ jobs:
           # @opencrvs/mosip sat on `v2.1-latest` for the same release would be
           # worse than either choice applied uniformly.
 
-          if ! [[ "$TOOLKIT_VERSION" =~ ^([0-9]+)\.([0-9]+)\. ]]; then
-            echo "❌ Cannot derive a dist-tag: '$TOOLKIT_VERSION' has no leading X.Y"
+          # Parse the version once, strictly. Every rule below is written in
+          # terms of these fields, so a version that does not parse has to stop
+          # the publish rather than fall through to a default - falling through
+          # to `latest` is the bug this whole scheme exists to prevent. Build
+          # metadata ("+sha") is refused for the same reason: no tag in the
+          # vocabulary describes it.
+          if ! [[ "$TOOLKIT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z.-]+))?$ ]]; then
+            echo "❌ Cannot derive a dist-tag: '$TOOLKIT_VERSION' is not X.Y.Z or X.Y.Z-prerelease"
             exit 1
           fi
           VERSION_MAJOR="${BASH_REMATCH[1]}"
           VERSION_MINOR="${BASH_REMATCH[2]}"
+          VERSION_PRERELEASE="${BASH_REMATCH[5]}"
           VERSION_LINE="$VERSION_MAJOR.$VERSION_MINOR"
+
+          # Numeric comparison of two X.Y.Z releases. jq does the ordering: each
+          # version becomes [major, minor, patch] and arrays compare
+          # element-wise, so 2.10.0 > 2.9.9 and 2.1.10 > 2.1.9 - both of which a
+          # string comparison gets backwards.
+          version_ge() {
+            [ "$(jq -n --arg a "$1" --arg b "$2" \
+                   '($a | split(".") | map(tonumber)) >= ($b | split(".") | map(tonumber))')" = true ]
+          }
 
           # `npm view` exits nonzero when the package does not exist at all, and
           # prints a bare JSON string instead of an array when it has exactly one
           # version; normalise both away. "Released" excludes anything carrying a
-          # prerelease or build suffix, so rcs never influence the derivation.
+          # prerelease or build suffix, so neither a dispatched rc nor a
+          # published 2.1.0-beta can influence which line counts as released.
           PUBLISHED_VERSIONS="$(npm view @opencrvs/toolkit versions --json 2>/dev/null || true)"
           RELEASED_VERSIONS="$(
             printf '%s' "${PUBLISHED_VERSIONS:-[]}" |
@@ -129,62 +158,34 @@ jobs:
                      | map(select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$")))'
           )"
 
-          # Highest released minor, compared as a [major, minor] pair so the
-          # comparison is numeric and 2.10 sorts above 2.9. Empty when nothing
-          # has ever been released, i.e. the first-ever publish.
-          HIGHEST_RELEASED_LINE="$(
+          # Two reference points, both needed: `latest` is about the highest
+          # release overall, `vX.Y-latest` about the highest release on this
+          # X.Y line. Either can be empty - the first-ever publish, and the
+          # first release of a new line - which is not a failure, it is the
+          # answer "nothing to be behind".
+          HIGHEST_RELEASED="$(
             printf '%s' "$RELEASED_VERSIONS" |
-              jq -r 'map(capture("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)\\.")
-                         | [(.major | tonumber), (.minor | tonumber)])
-                     | if length == 0 then "" else (max | "\(.[0]).\(.[1])") end'
+              jq -r 'map(split(".") | map(tonumber))
+                     | if length == 0 then "" else (max | map(tostring) | join(".")) end'
           )"
-
-          # Has this X.Y line had a release yet? Matching on the "X.Y." prefix is
-          # exact enough: "2.10.0" does not start with "2.1.".
-          LINE_HAS_RELEASE="$(
+          HIGHEST_ON_LINE="$(
             printf '%s' "$RELEASED_VERSIONS" |
-              jq -r --arg line "$VERSION_LINE." 'any(.[]; startswith($line)) | tostring'
+              jq -r --argjson line "[$VERSION_MAJOR, $VERSION_MINOR]" \
+                 'map(split(".") | map(tonumber))
+                  | map(select(.[0:2] == $line))
+                  | if length == 0 then "" else (max | map(tostring) | join(".")) end'
           )"
 
           echo "Released versions on npm: $RELEASED_VERSIONS"
-          echo "Highest released minor: ${HIGHEST_RELEASED_LINE:-<none>}"
+          echo "Highest release: ${HIGHEST_RELEASED:-<none>}"
+          echo "Highest release on $VERSION_LINE: ${HIGHEST_ON_LINE:-<none>}"
 
-          if [ -n "$DIST_TAG_INPUT" ]; then
-            # Explicit override, e.g. blessing a build as `beta`. It replaces the
-            # derived tag; it cannot be an addition to it, see above.
-            NPM_TAG="$DIST_TAG_INPUT"
-            echo "Dist-tag overridden by workflow input"
-          elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            # A release. It leads its line unless some higher minor has already
-            # been released, in which case this is a hotfix on a superseded line
-            # and must not drag `latest` backwards.
-            if [ -z "$HIGHEST_RELEASED_LINE" ]; then
-              NPM_TAG=latest
-            else
-              HIGHEST_MAJOR="${HIGHEST_RELEASED_LINE%%.*}"
-              HIGHEST_MINOR="${HIGHEST_RELEASED_LINE##*.}"
-              if [ "$VERSION_MAJOR" -gt "$HIGHEST_MAJOR" ] ||
-                 { [ "$VERSION_MAJOR" -eq "$HIGHEST_MAJOR" ] && [ "$VERSION_MINOR" -ge "$HIGHEST_MINOR" ]; }; then
-                NPM_TAG=latest
-              else
-                NPM_TAG="v$VERSION_LINE-latest"
-              fi
-            fi
-          else
-            # A release candidate. `next` belongs to the minor that has not been
-            # released yet. Once X.Y has a release, further rcs on that line are
-            # patch candidates and take vX.Y-next, so dispatching from a
-            # release/2.0.2 branch can no longer clobber `next` - which is how
-            # `next` previously ended up pointing at a 2.0.1-rc build.
-            if [ "$LINE_HAS_RELEASE" = "true" ]; then
-              NPM_TAG="v$VERSION_LINE-next"
-            else
-              NPM_TAG=next
-            fi
-          fi
-
-          echo "Publishing $TOOLKIT_VERSION under dist-tag '$NPM_TAG'"
-
+          # Existence is settled before the derivation runs, not after it. The
+          # release branch below refuses to name a tag for an ambiguous version,
+          # and this workflow is meant to be safely re-runnable: a version that
+          # is already on npm publishes nothing, so it must skip rather than trip
+          # over that refusal. Equality is the everyday case of this - a version
+          # equal to the highest release is, by definition, already published.
           if npm view "@opencrvs/toolkit@$TOOLKIT_VERSION" > /dev/null 2>&1; then
             echo "Version $TOOLKIT_VERSION already exists on npm."
             VERSION_EXISTS=true
@@ -192,6 +193,75 @@ jobs:
             echo "Version $TOOLKIT_VERSION does not exist on npm."
             VERSION_EXISTS=false
           fi
+
+          if [ -n "$DIST_TAG_INPUT" ]; then
+            # Explicit override, and the escape hatch for the refusal below. It
+            # replaces the derived tag; it cannot be an addition to it, see above.
+            NPM_TAG="$DIST_TAG_INPUT"
+            echo "Dist-tag overridden by workflow input"
+          elif [ "$GITHUB_REF_TYPE" = "tag" ] && [ -n "$VERSION_PRERELEASE" ]; then
+            # A prerelease git tag: v2.1.0-beta, v2.1.0-rc.1, v2.1.0-alpha.2. The
+            # dist-tag is the first dot-separated identifier of the prerelease
+            # suffix, so those give `beta`, `rc` and `alpha`. Parsed rather than
+            # string-matched on "beta", which would leave every other suffix
+            # undefined and would also match v2.1.0-notbeta.
+            #
+            # This branch sits ahead of the release branch and is the only one a
+            # prerelease git tag can reach, so a prerelease cannot be handed
+            # `latest` - the original bug - or `next`. Neither can it spell a
+            # "vX.Y-" tag: one identifier contains no ".", by definition. Only
+            # the two bare words are reachable at all, and they are refused
+            # rather than published. An identifier npm itself will not accept as
+            # a tag, such as the "1" of v2.1.0-1.2, is refused downstream by
+            # `npm publish` ("Tag name must not be a valid SemVer range").
+            NPM_TAG="${VERSION_PRERELEASE%%.*}"
+            if [ -z "$NPM_TAG" ] || [ "$NPM_TAG" = latest ] || [ "$NPM_TAG" = next ]; then
+              echo "❌ Prerelease '$TOOLKIT_VERSION' derives the dist-tag '$NPM_TAG', which collides with the derived tag vocabulary and would point real consumers at a prerelease. Rename the git tag, e.g. v$VERSION_LINE.0-beta."
+              exit 1
+            fi
+          elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            # A release. `latest` belongs to the version that leads everything,
+            # `vX.Y-latest` to one that leads its own line but not the package -
+            # a hotfix on a superseded line. Both comparisons are on full
+            # versions: comparing lines only, as this once did, lets a backport
+            # tagged v2.1.2 satisfy "2.1 >= 2.1" while 2.1.5 is out and drag
+            # `latest` backwards.
+            if [ -z "$HIGHEST_RELEASED" ] || version_ge "$TOOLKIT_VERSION" "$HIGHEST_RELEASED"; then
+              NPM_TAG=latest
+            elif [ -z "$HIGHEST_ON_LINE" ] || version_ge "$TOOLKIT_VERSION" "$HIGHEST_ON_LINE"; then
+              NPM_TAG="v$VERSION_LINE-latest"
+            elif [ "$VERSION_EXISTS" = true ]; then
+              # Behind on its own line, but already on npm: a re-run. Nothing
+              # will be published and the tag goes unused, so it is left empty
+              # rather than guessed. npm refuses an empty --tag outright, so a
+              # sibling package that somehow lags at this version fails loudly
+              # instead of quietly dragging a shared pointer to an older patch.
+              NPM_TAG=""
+              echo "⚠️ $TOOLKIT_VERSION is behind $HIGHEST_ON_LINE on its own line, and is already published; deriving no dist-tag."
+            else
+              # Neither the newest release nor the newest on its own line. No tag
+              # in the vocabulary is true of it, and mislabelling is worse than
+              # stopping: `latest` would move backwards, and "v$VERSION_LINE-latest"
+              # would point the line at an older patch than it already has.
+              echo "❌ Refusing to publish $TOOLKIT_VERSION: it is neither newer than the highest release ($HIGHEST_RELEASED) nor the newest on its own line ($HIGHEST_ON_LINE), so no dist-tag describes it."
+              echo "   If this is deliberate, re-run from workflow_dispatch with an explicit dist_tag."
+              exit 1
+            fi
+          else
+            # A release candidate from workflow_dispatch. `next` belongs to the
+            # minor that has not been released yet. Once X.Y has a release,
+            # further rcs on that line are patch candidates and take vX.Y-next,
+            # so dispatching from a release/2.0.2 branch can no longer clobber
+            # `next` - which is how `next` previously ended up pointing at a
+            # 2.0.1-rc build.
+            if [ -n "$HIGHEST_ON_LINE" ]; then
+              NPM_TAG="v$VERSION_LINE-next"
+            else
+              NPM_TAG=next
+            fi
+          fi
+
+          echo "Publishing $TOOLKIT_VERSION under dist-tag '$NPM_TAG'"
 
           {
             echo "npm-tag=$NPM_TAG"
