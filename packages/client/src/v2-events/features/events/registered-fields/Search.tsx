@@ -193,10 +193,6 @@ const StyledInput = styled(TextInput)`
   width: 100%;
 `
 
-const SearchButton = styled(Button)`
-  height: 48px;
-`
-
 function Postfix({
   configuration,
   isLoading = false,
@@ -443,6 +439,12 @@ function SearchInput({
                 setHttpState(null)
                 setInputState(e.target.value)
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && valid && isOnline) {
+                  e.preventDefault()
+                  setButtonPressed(buttonPressed + 1)
+                }
+              }}
             />
           </SearchWrapper>
 
@@ -464,19 +466,6 @@ function SearchInput({
             trigger={{ mode: 'onChange', value: buttonPressed }}
             onChange={onHTTPChange}
           />
-          {isEditable && (
-            <SearchButton
-              disabled={!valid || !isOnline}
-              size="large"
-              type="secondary"
-              onClick={() => setButtonPressed(buttonPressed + 1)}
-            >
-              {intl.formatMessage(
-                configuration.indicators?.confirmButton ||
-                  defaultIndicators.confirmButton
-              )}
-            </SearchButton>
-          )}
         </SearchInputWrapper>
         {message && (
           <Stack alignItems="normal" direction="row" gap={4}>
