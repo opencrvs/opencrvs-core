@@ -37,6 +37,7 @@ metadata:
   name: dashboards
 spec:
   replicas: {{ .Values.dashboards.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "dashboards" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: dashboards

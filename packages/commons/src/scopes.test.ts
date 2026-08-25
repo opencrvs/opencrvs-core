@@ -423,6 +423,36 @@ describe('2.0 scopes', () => {
     ])
   })
 
+  it('Keeps the createdIn option for every record scope category', () => {
+    const oneScopePerCategory = [
+      ScopesWithPlaceEventOptions.options[0], // record.create
+      ScopesWithDeclaredOptions.options[0], // record.edit
+      ScopesWithFullOptions.options[0] // record.search
+    ]
+
+    const encoded = oneScopePerCategory.map((type) =>
+      encodeScope({
+        type,
+        options: { event: ['birth'], createdIn: 'location' as const }
+      })
+    )
+
+    expect(encoded.map(decodeScope)).toEqual([
+      {
+        type: 'record.create',
+        options: { event: ['birth'], createdIn: 'location' }
+      },
+      {
+        type: 'record.edit',
+        options: { event: ['birth'], createdIn: 'location' }
+      },
+      {
+        type: 'record.search',
+        options: { event: ['birth'], createdIn: 'location' }
+      }
+    ])
+  })
+
   it('Supports templates option for record.print-certified-copies', () => {
     const scopeWithTemplates = encodeScope({
       type: 'record.print-certified-copies',

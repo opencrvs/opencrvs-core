@@ -75,6 +75,7 @@
     ".claude",
     ".nx",
     "packages/api-docs/public-key.pem",
+    ".codex/config.toml",
     "packages/mosip/.npmignore",
     "packages/mosip-api/docs/example-certs",
     "packages/mosip-api/certs",

@@ -115,7 +115,8 @@ const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
     placeOfEvent: JurisdictionFilter.optional(),
-    createdBy: UserFilter.optional()
+    createdBy: UserFilter.optional(),
+    createdIn: JurisdictionFilter.optional()
   })
   .describe('Options applicable to all record scopes.')
 
@@ -182,7 +183,8 @@ const ResolvedScopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
     placeOfEvent: UUID.nullish(),
-    createdBy: z.string().optional()
+    createdBy: z.string().optional(),
+    createdIn: UUID.nullish()
   })
   .describe(
     'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'

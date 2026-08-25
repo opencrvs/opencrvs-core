@@ -16,6 +16,7 @@ import {
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { getServiceToken } from '@events/service/auth'
+import { getAnonymousToken } from '@events/service/auth'
 import { getClient } from '@events/storage/postgres/events'
 import {
   getNextProcessableAnnouncement,

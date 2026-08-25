@@ -11,8 +11,10 @@
 
 import fc from 'fast-check'
 import {
+  JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
+  UUID,
   createPrng,
   encodeScope
 } from '@opencrvs/commons'
@@ -74,6 +76,90 @@ test('createdBy scope filter for record.search', async () => {
 
       // 2. no createdBy filter: every event is returned, regardless of creator.
       if (createdBy === undefined) {
+        expect(results.length).toBe(users.length)
+      }
+    }),
+    { numRuns: 100 }
+  )
+}, 120000)
+
+test('createdIn scope filter for record.search', async () => {
+  const rng = createPrng(58392015)
+  const generator = payloadGenerator(rng)
+
+  const { users, isUnderAdministrativeArea } = await setupHierarchyWithUsers()
+
+  // Each user creates and notifies one event, so every office holds two events.
+  for (const user of users) {
+    const testClient = createTestClient(user, TEST_USER_DEFAULT_SCOPES)
+    const event = await testClient.event.create(generator.event.create())
+    await testClient.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
+  }
+
+  const jurisdictionOptions = fc.option(
+    fc.constantFrom(...JurisdictionFilter.options),
+    { nil: undefined }
+  )
+
+  const combinations = fc.record({
+    user: fc.constantFrom(...users),
+    createdIn: jurisdictionOptions
+  })
+
+  await fc.assert(
+    fc.asyncProperty(combinations, async ({ user, createdIn }) => {
+      const searchScope = encodeScope({
+        type: 'record.search',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP],
+          createdIn
+        }
+      })
+
+      const testClient = createTestClient(user, [searchScope])
+      const { results } = await testClient.event.search({
+        query: {
+          type: 'and',
+          clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+        }
+      })
+
+      // 1. createdIn=location: every event created at the user's own office,
+      //    including their colleague's.
+      if (createdIn === JurisdictionFilter.enum.location) {
+        const usersAtSameOffice = users.filter(
+          (other) => other.primaryOfficeId === user.primaryOfficeId
+        )
+
+        expect(results.length).toBe(usersAtSameOffice.length)
+        expect(results.some((r) => r.createdBy !== user.id)).toBe(true)
+
+        for (const r of results) {
+          expect(r.createdAtLocation).toBe(user.primaryOfficeId)
+        }
+      }
+
+      // 2. createdIn=administrativeArea: everything under the user's area.
+      if (createdIn === JurisdictionFilter.enum.administrativeArea) {
+        expect(results.length).toBeGreaterThan(0)
+
+        for (const r of results) {
+          expect(
+            isUnderAdministrativeArea(
+              UUID.parse(r.createdAtLocation),
+              user.administrativeAreaId ?? null
+            )
+          ).toBe(true)
+        }
+      }
+
+      // 3. no createdIn filter (or 'all'): every event is returned.
+      if (
+        createdIn === undefined ||
+        createdIn === JurisdictionFilter.enum.all
+      ) {
         expect(results.length).toBe(users.length)
       }
     }),

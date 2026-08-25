@@ -422,6 +422,28 @@ export function canAccessEventWithScope(
     return false
   }
 
+  if (
+    opts?.createdIn === JurisdictionFilter.enum.location &&
+    !matchesJurisdictionFilter(
+      event.createdAtLocation,
+      JurisdictionFilter.enum.location,
+      user
+    )
+  ) {
+    return false
+  }
+
+  if (
+    opts?.createdIn === JurisdictionFilter.enum.administrativeArea &&
+    !matchesJurisdictionFilter(
+      event.createdAtLocation,
+      JurisdictionFilter.enum.administrativeArea,
+      user
+    )
+  ) {
+    return false
+  }
+
   if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
 

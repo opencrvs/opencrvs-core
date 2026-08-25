@@ -394,6 +394,11 @@ export function withJurisdictionFilters({
               term: { createdBy: value }
             })
             break
+          case 'createdIn':
+            must.push({
+              term: { createdAtLocation: value }
+            })
+            break
           case 'declaredIn':
             must.push({
               term: {

@@ -727,6 +727,7 @@ function eventMatchesScope({
   notifiedBy,
   notifiedIn,
   createdBy,
+  createdIn,
   declaredBy,
   registeredBy,
   declaredIn,
@@ -740,6 +741,7 @@ function eventMatchesScope({
     | CreatedUser
   placeOfEvent?: JurisdictionFilter
   createdBy?: UserFilter
+  createdIn?: JurisdictionFilter
   notifiedBy?: UserFilter
   notifiedIn?: JurisdictionFilter
   declaredBy?: UserFilter
@@ -785,6 +787,27 @@ function eventMatchesScope({
 
   if (createdBy === UserFilter.enum.user) {
     if (eventIndex.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.location) {
+    if (eventIndex.createdAtLocation !== user.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.administrativeArea) {
+    if (!eventIndex.createdAtLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.createdAtLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
       return false
     }
   }
@@ -1129,6 +1152,7 @@ export function assertScopeResult(
     notifiedBy,
     notifiedIn,
     createdBy,
+    createdIn,
     declaredBy,
     declaredIn,
     registeredBy,
@@ -1144,6 +1168,7 @@ export function assertScopeResult(
     notifiedBy?: UserFilter
     notifiedIn?: JurisdictionFilter
     createdBy?: UserFilter
+    createdIn?: JurisdictionFilter
     declaredBy?: UserFilter
     registeredBy?: UserFilter
     declaredIn?: JurisdictionFilter
@@ -1163,6 +1188,7 @@ export function assertScopeResult(
     notifiedBy,
     notifiedIn,
     createdBy,
+    createdIn,
     declaredBy,
     registeredBy,
     declaredIn,

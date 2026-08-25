@@ -68,6 +68,7 @@ describe('canAccessEventWithScope()', () => {
     flags: [],
     potentialDuplicates: [],
     createdBy: createdById,
+    createdAtLocation: [provinceUuid, districtUuid, officeUuid],
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       NOTIFIED: undefined,
@@ -116,6 +117,7 @@ describe('canAccessEventWithScope()', () => {
 
   const locationOptions = [
     { placeOfEvent: 'location' },
+    { createdIn: 'location' },
     { declaredIn: 'location' },
     { registeredIn: 'location' }
   ] satisfies RecordScopeV2['options'][]
@@ -340,6 +342,378 @@ describe('canAccessEventWithScope()', () => {
           userContext
         )
       ).toBe(false)
+    })
+
+    describe('createdIn', () => {
+      const undeclaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+        type: 'birth',
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid],
+        placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+        legalStatuses: {
+          DECLARED: undefined,
+          REGISTERED: undefined
+        }
+      }
+
+      const colleagueAtSameOffice = {
+        type: 'user',
+        id: generateUuid(rng),
+        primaryOfficeId: officeUuid,
+        administrativeAreaId: districtUuid,
+        role: TestUserRole.enum.FIELD_AGENT
+      } satisfies UserContext
+
+      test.each([
+        { createdIn: 'location' },
+        { createdIn: 'administrativeArea' }
+      ] satisfies RecordScopeV2['options'][])(
+        'grants access to an event that has not been declared yet with scope %j',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(true)
+        }
+      )
+
+      test.each([
+        { declaredIn: 'location' },
+        { declaredIn: 'administrativeArea' },
+        { declaredBy: 'user' }
+      ] satisfies RecordScopeV2['options'][])(
+        'declared-based scope %j does not match an event that has not been declared yet',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(false)
+        }
+      )
+
+      test('grants access to a colleague at the same office, unlike createdBy', () => {
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdBy: 'user' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(false)
+      })
+
+      test('is not reassigned when another office declares the event', () => {
+        const declaredByAnotherOffice: Partial<EventIndexWithAdministrativeHierarchy> =
+          {
+            ...undeclaredEvent,
+            legalStatuses: {
+              DECLARED: {
+                acceptedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                createdBy: generateUuid(rng),
+                createdAtLocation: [generateUuid(rng)]
+              },
+              REGISTERED: undefined
+            }
+          }
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            userContext
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { declaredIn: 'location' } },
+            userContext
+          )
+        ).toBe(false)
+      })
+    })
+  })
+
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+  })
+
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should not access a sealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access an unsealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
     })
   })
 
@@ -625,6 +999,8 @@ describe('canAccessEventWithScope()', () => {
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
       { createdBy: 'user' },
+      { createdIn: 'location' },
+      { createdIn: 'administrativeArea' },
       { notifiedIn: 'location' },
       { notifiedIn: 'administrativeArea' },
       { notifiedBy: 'user' },
@@ -655,6 +1031,7 @@ describe('canAccessEventWithScope()', () => {
     // so access can only be granted by the "no administrative area" branch.
     const eventInAnotherArea = {
       ...registeredEvent,
+      createdAtLocation: [generateUuid(rng)],
       placeOfEvent: [generateUuid(rng)],
       legalStatuses: {
         NOTIFIED: {
@@ -681,6 +1058,7 @@ describe('canAccessEventWithScope()', () => {
 
     const adminAreaOptions = [
       { placeOfEvent: 'administrativeArea' },
+      { createdIn: 'administrativeArea' },
       { notifiedIn: 'administrativeArea' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'administrativeArea' }
