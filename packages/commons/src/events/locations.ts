@@ -14,11 +14,6 @@
 import { UUID } from '../uuid'
 import * as z from 'zod/v4'
 import { PlainDate } from './PlainDate'
-import {
-  parseVersionedLocation,
-  toVersionedLocation,
-  VersionedLocation
-} from './VersionedLocation'
 import { EventIndex } from './EventIndex'
 import {
   ActionCreationMetadata,
@@ -240,59 +235,6 @@ export function resolveVersion<T extends { effectiveFrom: string }>(
   }
 
   return resolved
-}
-export type VersionedEntity = {
-  id: UUID
-  versions: LocationVersion[]
-}
-
-/**
- * The distinct names a location or administrative area has carried, in the order
- * they first appeared, each pinned to the version that first carried it.
- *
- * One entry per name, not per version
- */
-export function toNamedVersions(
-  entity: VersionedEntity
-): { name: string; selection: VersionedLocation }[] {
-  const seen = new Set<string>()
-
-  return entity.versions.flatMap((version) => {
-    if (seen.has(version.name)) {
-      return []
-    }
-    seen.add(version.name)
-
-    return [
-      {
-        name: version.name,
-        selection: toVersionedLocation(entity.id, version.versionId)
-      }
-    ]
-  })
-}
-
-/**
- * The version a {@link VersionedLocation} pinned. Undefined when the value is
- * not a pin, or when the location or version it names is unknown.
- */
-export function findSelectedVersion<T extends VersionedEntity>(
-  pin: unknown,
-  entities: Map<UUID, T>
-): { entity: T; version: LocationVersion } | undefined {
-  // Regex Check, not schema validate
-  const parsed = parseVersionedLocation(pin)
-
-  if (!parsed) {
-    return undefined
-  }
-
-  const entity = entities.get(parsed.locationId)
-  const version = entity?.versions.find(
-    (candidate) => candidate.versionId === parsed.versionId
-  )
-
-  return entity && version ? { entity, version } : undefined
 }
 
 /**

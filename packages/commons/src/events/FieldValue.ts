@@ -12,7 +12,6 @@ import * as z from 'zod/v4'
 import {
   AddressFieldUpdateValue,
   AddressFieldValue,
-  VersionedAddressFieldValue,
   CustomFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -114,7 +113,6 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 // because otherwise the DataFieldValue would need to refer to itself.
 const LeafFieldValues = z.union([
   AddressFieldValue,
-  VersionedAddressFieldValue,
   TextValue,
   PlainDate,
   AgeValue,
@@ -167,7 +165,6 @@ export const FieldValue: z.ZodType<FieldValue> = z.union([
 // Example: if both TextValue and PlainDate succeed for "2050-01-01",
 // we choose "TextValue" because it's higher priority here.
 const PRIORITY_ORDER = [
-  'VersionedAddressFieldValue',
   'NameFieldUpdateValue',
   'DateRangeFieldValue',
   'PlainDate',
@@ -235,7 +232,6 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
 }
 
 export type FieldUpdateValue =
-  | z.infer<typeof VersionedAddressFieldValue>
   | z.infer<typeof TextValue>
   | PlainDate
   | z.infer<typeof TimeValue>
@@ -260,7 +256,6 @@ export type FieldUpdateValue =
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
 export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
-  VersionedAddressFieldValue.describe('VersionedAddressFieldValue'),
   TextValue.describe('TextValue'),
   PlainDate.describe('PlainDate'),
   TimeValue.describe('TimeValue'),
