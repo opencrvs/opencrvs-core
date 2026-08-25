@@ -19,6 +19,7 @@ import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
 import { startTelemetryWorker } from './workers/telemetryWorker'
+import { startSaturationWorker } from './workers/saturationWorker'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -51,6 +52,7 @@ export async function main() {
   }
   startAnnouncementWorker()
   startTelemetryWorker()
+  startSaturationWorker()
   server().listen(5555)
 }
 
