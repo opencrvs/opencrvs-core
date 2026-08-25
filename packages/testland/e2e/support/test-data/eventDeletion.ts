@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test } from '@playwright/test'
-import { getToken } from '../../helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { getToken } from '@e2e/support/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import { createClient } from '@opencrvs/toolkit/api'
 
 async function deleteEvent(token: string, eventId: string) {

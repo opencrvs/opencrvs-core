@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Page, expect } from '@playwright/test'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { formatV2ChildName } from '../../birth/helpers'
-import { CREDENTIALS } from '../../../constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 export async function selectCertificationType(page: Page, type: string) {
   await page.locator('#certificateTemplateId svg').click()

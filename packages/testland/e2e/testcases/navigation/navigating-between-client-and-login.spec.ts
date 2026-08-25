@@ -14,8 +14,8 @@ import {
   CREDENTIALS,
   LOGIN_URL,
   TEST_USER_PASSWORD
-} from '../../constants'
-import { createPIN, ensureLoginPageReady, logout } from '../../helpers'
+} from '@e2e/support/constants'
+import { createPIN, ensureLoginPageReady, logout } from '@e2e/support/helpers'
 
 test('Navigating between client and login', async ({ page }) => {
   await test.step('Go to client unauthenticated', async () => {

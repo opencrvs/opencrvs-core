@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, Page } from '@playwright/test'
-import { goToSection, login } from '../../helpers'
-import { REQUIRED_VALIDATION_ERROR } from './helpers'
-import { trackAndDeleteCreatedEvents } from '../test-data/eventDeletion'
+import { goToSection, login } from '@e2e/support/helpers'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
 
 const loginAndBeginBirthDeclaration = async ({ page }: { page: Page }) => {
   await login(page)

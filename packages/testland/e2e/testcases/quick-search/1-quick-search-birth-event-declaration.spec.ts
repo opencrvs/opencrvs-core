@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { getToken, login } from '../../helpers'
+import { getToken, login } from '@e2e/support/helpers'
 import {
   createDeclaration,
   getChildNameFromRecord
-} from '../test-data/birth-declaration-with-father-brother'
-import { CREDENTIALS } from '../../constants'
+} from '@e2e/support/test-data/birth-declaration-with-father-brother'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
-import { ensureAssignedToUser } from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
-import { formatV2ChildName } from '../birth/helpers'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe
   .serial("Quick Search - Birth Event Declaration - Child's details", () => {

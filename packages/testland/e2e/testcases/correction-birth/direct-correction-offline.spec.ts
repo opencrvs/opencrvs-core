@@ -9,16 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { auditRecord, getToken, goBackToReview, login } from '../../helpers'
+import {
+  auditRecord,
+  getToken,
+  goBackToReview,
+  login
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration as createDeclarationV2,
   Declaration as DeclarationV2
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import { format, subDays, subYears } from 'date-fns'
-import { CREDENTIALS } from '../../constants'
-import { formatV2ChildName } from '../birth/helpers'
-import { ensureAssignedToUser, expectInUrl, selectAction } from '../../utils'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction
+} from '@e2e/support/utils'
 
 test.describe.serial('Direct correction offline', () => {
   let declaration: DeclarationV2

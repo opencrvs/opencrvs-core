@@ -15,12 +15,12 @@ import {
   login,
   searchFromSearchBar,
   switchEventTab
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser, selectAction } from '../../utils'
-import { createDeclaration } from '../test-data/birth-declaration-with-father-brother'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Escalation of birth registration by Registrar', () => {
   let page: Page
