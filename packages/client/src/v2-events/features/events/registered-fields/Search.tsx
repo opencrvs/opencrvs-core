@@ -166,6 +166,7 @@ const SearchInputWrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
   display: flex;
+  align-items: center;
   width: 100%;
   gap: 8px;
 `
@@ -175,7 +176,7 @@ const SearchWrapper = styled.div`
   display: flex;
   width: 100%;
   z-index: 1;
-  align-items: stretch;
+  align-items: center;
 `
 
 const StyledIcon = styled(Icon)`
@@ -190,6 +191,10 @@ const StyledIcon = styled(Icon)`
 const StyledInput = styled(TextInput)`
   padding-left: 24px;
   width: 100%;
+`
+
+const SearchButton = styled(Button)`
+  height: 48px;
 `
 
 function Postfix({
@@ -460,7 +465,7 @@ function SearchInput({
             onChange={onHTTPChange}
           />
           {isEditable && (
-            <Button
+            <SearchButton
               disabled={!valid || !isOnline}
               size="large"
               type="secondary"
@@ -470,7 +475,7 @@ function SearchInput({
                 configuration.indicators?.confirmButton ||
                   defaultIndicators.confirmButton
               )}
-            </Button>
+            </SearchButton>
           )}
         </SearchInputWrapper>
         {message && (
