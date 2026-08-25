@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, type Page, expect } from '@playwright/test'
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe('Side menu navigation', () => {
   let page: Page

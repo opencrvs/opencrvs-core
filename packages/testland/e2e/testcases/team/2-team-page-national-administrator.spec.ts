@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   continueForm,
   continueUntilReview,
   drawSignature,
   login
-} from '../../helpers'
-import { expectInUrl } from '../../utils'
+} from '@e2e/support/helpers'
+import { expectInUrl } from '@e2e/support/utils'
 
 test('Basic UI check', async ({ browser }) => {
   const page = await browser.newPage()

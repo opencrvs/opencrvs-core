@@ -10,9 +10,9 @@
  */
 import { test, expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { getToken, login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration } from '../test-data/birth-declaration-with-mother-father'
+import { getToken, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-mother-father'
 
 test("BRN search on deceased's details finds and fills from a registered birth record", async ({
   page

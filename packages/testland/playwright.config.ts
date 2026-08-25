@@ -21,8 +21,7 @@ const insecureOrigins = subdomains.map(
 const ignoreHTTPSErrors = process.env.CI ? true : false
 
 const optInSuites = [
-  { envVar: 'DASHBOARD_E2E', pattern: /testcases\/dashboard\// },
-  { envVar: 'REGRESSION_E2E', pattern: /testcases\/qa-testrail-testcases\// }
+  { envVar: 'DASHBOARD_E2E', pattern: /testcases\/dashboard\// }
 ]
 /**
  * Read environment variables from file.
@@ -67,7 +66,6 @@ export default defineConfig({
    * Opt-in suites: excluded by default, only collected when their env var is
    * set to 'true'.
    * DASHBOARD_E2E is set by farajaland's deploy-and-e2e workflow.
-   * REGRESSION_E2E is set by the PR flag: "Run regression e2e".
    */
   testIgnore: optInSuites
     .filter(({ envVar }) => process.env[envVar] !== 'true')

@@ -21,6 +21,7 @@ login.manager.registerAppDescription,,"Manage declarations, registrations and ce
 login.manager.registerAppTitle,,OpenCRVS,Page d'accueil OpenCRVS
 login.mobileLabel,,Mobile number,Numéro de téléphone mobile
 login.mobilePlaceholder,,07123456789,7123456789
+login.officeInactiveError,The error that appears when the user's assigned office is inactive,Your assigned office has been made inactive. Please contact your administrator to be reassigned,Votre bureau assigné a été désactivé. Veuillez contacter votre administrateur pour être réaffecté.
 login.optionalLabel,Optional label,Optional,Optionel
 login.passwordLabel,The label that appears on the password input,Password,Mot de passe
 login.resend,Text for button that resends SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer le {notificationMethod, select, sms {SMS} email {Email} other {}}"

@@ -25,7 +25,7 @@ import { isMobile } from './mobile-helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { UUID } from 'crypto'
 import { faker } from '@faker-js/faker'
-import { openRecordByTitle } from './testcases/print-certificate/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 export async function createPIN(page: Page) {
   await page.click('#pin-input')

@@ -18,7 +18,8 @@ import { ActionType } from '../events/ActionType'
 import { tennisClubMembershipEvent } from '../fixtures'
 import {
   eventQueryDataGenerator,
-  generateEventDocument
+  generateEventDocument,
+  generateTestValidatorContext
 } from '../events/test.utils'
 import {
   errorMessages,
@@ -407,14 +408,32 @@ describe('isFieldSecured', () => {
   it('returns true for a field secured with a plain boolean', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
-    expect(isFieldSecured({ secured: true }, eventIndex)).toBe(true)
+    expect(
+      isFieldSecured(
+        { secured: true },
+        eventIndex,
+        generateTestValidatorContext()
+      )
+    ).toBe(true)
   })
 
   it('returns false for a field not secured (boolean or unset)', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
-    expect(isFieldSecured({ secured: false }, eventIndex)).toBe(false)
-    expect(isFieldSecured({ secured: undefined }, eventIndex)).toBe(false)
+    expect(
+      isFieldSecured(
+        { secured: false },
+        eventIndex,
+        generateTestValidatorContext()
+      )
+    ).toBe(false)
+    expect(
+      isFieldSecured(
+        { secured: undefined },
+        eventIndex,
+        generateTestValidatorContext()
+      )
+    ).toBe(false)
   })
 
   it("resolves a conditional secured value against the event, e.g. flag('sealed')", () => {
@@ -423,11 +442,16 @@ describe('isFieldSecured', () => {
     expect(
       isFieldSecured(
         securedField,
-        eventQueryDataGenerator({ flags: ['sealed'] })
+        eventQueryDataGenerator({ flags: ['sealed'] }),
+        generateTestValidatorContext()
       )
     ).toBe(true)
     expect(
-      isFieldSecured(securedField, eventQueryDataGenerator({ flags: [] }))
+      isFieldSecured(
+        securedField,
+        eventQueryDataGenerator({ flags: [] }),
+        generateTestValidatorContext()
+      )
     ).toBe(false)
   })
 })

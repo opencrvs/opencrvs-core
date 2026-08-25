@@ -495,7 +495,8 @@ export const eventRouter = router({
         search: input,
         eventConfigs,
         user: ctx.user,
-        acceptedScopes: ctx.acceptedScopes
+        acceptedScopes: ctx.acceptedScopes,
+        token: ctx.token
       })
 
       if (ctx.user.type === 'system') {

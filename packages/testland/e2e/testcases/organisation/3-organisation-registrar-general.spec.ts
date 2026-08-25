@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { verifyMembersClickable } from '../birth/helpers'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { verifyMembersClickable } from '@e2e/support/birth/helpers'
 test.describe.serial('3. Organisation Page', () => {
   let page: Page
 

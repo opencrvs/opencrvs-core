@@ -16,6 +16,7 @@ export const ERROR_CODE_INVALID_CREDENTIALS = 401
 export const ERROR_CODE_FORBIDDEN_CREDENTIALS = 403
 export const ERROR_CODE_PHONE_NUMBER_VALIDATE = 503
 export const ERROR_CODE_RATE_LIMIT = 429
+export const ERROR_CODE_OFFICE_INACTIVE = 423
 
 export interface ITokenPayload {
   subject: string

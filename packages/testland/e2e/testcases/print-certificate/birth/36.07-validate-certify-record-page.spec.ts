@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { CREDENTIALS } from '../../../constants'
-import { getToken, login } from '../../../helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { getToken, login } from '@e2e/support/helpers'
 import {
   createDeclaration,
   getDeclaration,
   Declaration
-} from '../../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import {
   navigateToCertificatePrintAction,
   selectCertificationType,
   selectRequesterType
-} from './helpers'
-import { expectInUrl } from '../../../utils'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
 
 test.describe.serial('7.0 Validate "Certify record" page', () => {
   let eventId: string

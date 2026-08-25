@@ -19,18 +19,18 @@ import {
   goToSection,
   login,
   triggerDeclarationAction
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser, selectAction } from '../../utils'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import {
   assertRecordInWorkqueue,
   fillDate,
   generateBirthInputs
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import {
   getRowByTitle,
   openRecordByTitle
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 // HO Notifies => RO Validates => Registrar Registers => Registrar Prints
 test.describe.serial('1. Workqueue flow - 1', () => {

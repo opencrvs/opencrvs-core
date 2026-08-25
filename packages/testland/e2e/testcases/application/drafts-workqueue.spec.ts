@@ -10,13 +10,17 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { formatName, login, triggerDeclarationAction } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import {
+  formatName,
+  login,
+  triggerDeclarationAction
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import {
   clickWorkqueueActionByTitle,
   getRowByTitle
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('1: Validate my draft tab', () => {
   let page: Page
