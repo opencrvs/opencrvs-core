@@ -66,5 +66,15 @@ export const errorMessages = defineMessages({
     defaultMessage: 'The password you entered was incorrect',
     description: 'Error message when password verification fails',
     id: 'error.passwordSubmissionError'
+  },
+  officeInactive: {
+    defaultMessage: 'Your assigned office has been made inactive',
+    description: "Title shown when a user's assigned office is inactive",
+    id: 'error.officeInactive'
+  },
+  officeInactiveDescription: {
+    defaultMessage: 'Please contact your administrator to be reassigned',
+    description: "Description shown when a user's assigned office is inactive",
+    id: 'error.officeInactiveDescription'
   }
 })
