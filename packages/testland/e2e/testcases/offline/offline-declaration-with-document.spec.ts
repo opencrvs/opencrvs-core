@@ -18,12 +18,12 @@ import {
   goToSection,
   login,
   uploadImage
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
-} from '../../mock-network-conditions'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
+} from '@e2e/support/mock-network-conditions'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 
 /*
  * A declaration created offline is stored locally under a temporary id (`tmp-<uuid>`),

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { login } from '../../helpers'
+import { login } from '@e2e/support/helpers'
 
 test.describe.serial('Death form - date validations', () => {
   let page: Page

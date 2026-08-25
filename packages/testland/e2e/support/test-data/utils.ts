@@ -9,12 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
-import { GATEWAY_HOST } from '../../constants'
+import { GATEWAY_HOST } from '@e2e/support/constants'
 import fs from 'fs'
 import path from 'path'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 export function getSignatureFile() {
-  const buffer = fs.readFileSync(path.join(__dirname, 'signature.png'))
+  const buffer = fs.readFileSync(path.join(ASSETS_DIR, 'signature.png'))
   // Uint8Array copy: Buffer is not a BlobPart under newer @types/node
   // (Buffer<ArrayBufferLike> vs ArrayBufferView<ArrayBuffer>)
   return new File([new Uint8Array(buffer)], `signature-${Date.now()}.png`, {

@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { CREDENTIALS, LOGIN_URL, TEST_USER_PASSWORD } from '../../constants'
-import { ensureLoginPageReady } from '../../helpers'
+import {
+  CREDENTIALS,
+  LOGIN_URL,
+  TEST_USER_PASSWORD
+} from '@e2e/support/constants'
+import { ensureLoginPageReady } from '@e2e/support/helpers'
 
 test.describe('1. Login with valid information', () => {
   test.beforeEach(async ({ page }) => {

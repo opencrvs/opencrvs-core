@@ -10,8 +10,8 @@
  */
 import { expect, test } from '@playwright/test'
 
-import { login } from '../../helpers'
-import { mockNetworkConditions } from '../../mock-network-conditions'
+import { login } from '@e2e/support/helpers'
+import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 
 test('Can Change Workqueue offline', async ({ page }) => {
   await login(page)

@@ -15,20 +15,23 @@ import {
   getToken,
   triggerDeclarationAction,
   formatName
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { Declaration, createDeclaration } from '../test-data/birth-declaration'
-import { formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  Declaration,
+  createDeclaration
+} from '@e2e/support/test-data/birth-declaration'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
   navigateToWorkqueue,
   selectAction
-} from '../../utils'
+} from '@e2e/support/utils'
 import {
   getRowByTitle,
   openRecordByTitle
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 import { faker } from '@faker-js/faker'
 import { ActionType } from '@opencrvs/toolkit/events'
 

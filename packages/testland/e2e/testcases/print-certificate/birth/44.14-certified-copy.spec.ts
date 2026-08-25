@@ -13,16 +13,16 @@ import { expect, test, type Page } from '@playwright/test'
 import {
   Declaration,
   createDeclaration
-} from '../../test-data/birth-declaration'
-import { getToken, login } from '../../../helpers'
-import { CREDENTIALS } from '../../../constants'
+} from '@e2e/support/test-data/birth-declaration'
+import { getToken, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
   selectRequesterType
-} from './helpers'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { formatV2ChildName } from '../../birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe.serial('44.14.0 Validate "Certified copy" option', () => {
   let declaration: Declaration

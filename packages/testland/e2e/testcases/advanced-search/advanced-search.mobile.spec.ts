@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, Page, test } from '@playwright/test'
-import { getToken, login } from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration-with-father-brother'
-import { CREDENTIALS } from '../../constants'
+import { getToken, login } from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getAdministrativeAreas } from '../birth/helpers'
-import { expectInUrl } from '../../utils'
-import { setMobileViewport } from '../../mobile-helpers'
+import { getIdByName, getAdministrativeAreas } from '@e2e/support/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
+import { setMobileViewport } from '@e2e/support/mobile-helpers'
 
 test.describe.serial('Advanced Search - Mobile', () => {
   let page: Page

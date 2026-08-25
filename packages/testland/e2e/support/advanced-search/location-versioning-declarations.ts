@@ -13,24 +13,24 @@ import { Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   getAuthTokens,
   getClientToken,
   getToken,
   loginWithNewUser,
   NEW_USER_PASSWORD
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import {
   getIdByName,
   getLocations,
   getAdministrativeAreas
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import {
   createDeclaration as createBirthDeclaration,
   getDeclaration as getBirthDeclaration
-} from '../test-data/birth-declaration'
-import { createDeclaration as createDeathDeclaration } from '../test-data/death-declaration'
+} from '@e2e/support/test-data/birth-declaration'
+import { createDeclaration as createDeathDeclaration } from '@e2e/support/test-data/death-declaration'
 
 function getUserIdFromToken(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
