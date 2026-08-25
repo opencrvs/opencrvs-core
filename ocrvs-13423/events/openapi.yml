@@ -3293,8 +3293,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3572,8 +3570,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -4249,11 +4245,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option. Propagated to the embedded admin-area
-                selectors.
-              type: boolean
             activeOnly:
               description: Offer only admin areas that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9398,10 +9389,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9887,10 +9874,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -17802,45 +17785,6 @@ components:
                           - addressType
                         additionalProperties: false
                     type: object
-                  - oneOf:
-                      - type: object
-                        properties:
-                          country:
-                            type: string
-                          streetLevelDetails:
-                            type: object
-                            propertyNames:
-                              type: string
-                            additionalProperties:
-                              type: string
-                          addressType:
-                            type: string
-                            const: DOMESTIC
-                          administrativeArea:
-                            type: string
-                        required:
-                          - country
-                          - addressType
-                          - administrativeArea
-                        additionalProperties: false
-                      - type: object
-                        properties:
-                          country:
-                            type: string
-                          streetLevelDetails:
-                            type: object
-                            propertyNames:
-                              type: string
-                            additionalProperties:
-                              type: string
-                          addressType:
-                            type: string
-                            const: INTERNATIONAL
-                        required:
-                          - country
-                          - addressType
-                        additionalProperties: false
-                    type: object
                   - type: string
                   - type: string
                     format: date
@@ -18085,45 +18029,6 @@ components:
                                       type: string
                                       format: uuid
                                       pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                                  required:
-                                    - country
-                                    - addressType
-                                    - administrativeArea
-                                  additionalProperties: false
-                                - type: object
-                                  properties:
-                                    country:
-                                      type: string
-                                    streetLevelDetails:
-                                      type: object
-                                      propertyNames:
-                                        type: string
-                                      additionalProperties:
-                                        type: string
-                                    addressType:
-                                      type: string
-                                      const: INTERNATIONAL
-                                  required:
-                                    - country
-                                    - addressType
-                                  additionalProperties: false
-                              type: object
-                            - oneOf:
-                                - type: object
-                                  properties:
-                                    country:
-                                      type: string
-                                    streetLevelDetails:
-                                      type: object
-                                      propertyNames:
-                                        type: string
-                                      additionalProperties:
-                                        type: string
-                                    addressType:
-                                      type: string
-                                      const: DOMESTIC
-                                    administrativeArea:
-                                      type: string
                                   required:
                                     - country
                                     - addressType
@@ -18393,45 +18298,6 @@ components:
                               type: string
                               format: uuid
                               pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                          required:
-                            - country
-                            - addressType
-                            - administrativeArea
-                          additionalProperties: false
-                        - type: object
-                          properties:
-                            country:
-                              type: string
-                            streetLevelDetails:
-                              type: object
-                              propertyNames:
-                                type: string
-                              additionalProperties:
-                                type: string
-                            addressType:
-                              type: string
-                              const: INTERNATIONAL
-                          required:
-                            - country
-                            - addressType
-                          additionalProperties: false
-                      type: object
-                    - oneOf:
-                        - type: object
-                          properties:
-                            country:
-                              type: string
-                            streetLevelDetails:
-                              type: object
-                              propertyNames:
-                                type: string
-                              additionalProperties:
-                                type: string
-                            addressType:
-                              type: string
-                              const: DOMESTIC
-                            administrativeArea:
-                              type: string
                           required:
                             - country
                             - addressType

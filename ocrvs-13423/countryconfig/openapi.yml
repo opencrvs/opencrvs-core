@@ -3068,8 +3068,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3347,8 +3345,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -4024,11 +4020,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option. Propagated to the embedded admin-area
-                selectors.
-              type: boolean
             activeOnly:
               description: Offer only admin areas that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9173,10 +9164,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9662,10 +9649,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
