@@ -9,7 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as bcrypt from 'bcryptjs'
+/*
+ * The native binding rather than `bcryptjs`, because bcrypt is deliberately
+ * expensive and this service runs on one JS thread. `bcryptjs` computes on that
+ * thread, so every login delayed every other in-flight request: profiling an
+ * e2e run put 18% of all CPU time in its `_encipher`. The native version hands
+ * the work to the libuv threadpool, which both frees the loop and lets hashes
+ * run in parallel.
+ *
+ * Output is byte-identical to `bcryptjs` for a given salt, so stored hashes
+ * keep verifying — worth re-checking if this is ever swapped again, since
+ * verifyPasswordById compares hash strings rather than calling compare().
+ */
+import * as bcrypt from 'bcrypt'
+
+const SALT_ROUNDS = 10
+/*
+ * `bcryptjs` minted '$2a$' salts and the native default is '$2b$'. Both
+ * implementations agree on either prefix, so this is only to keep newly stored
+ * salts in the same shape as the existing ones.
+ */
+const SALT_VERSION = 'a'
 
 interface SaltedHash {
   hash: string
@@ -17,42 +37,20 @@ interface SaltedHash {
 }
 
 export async function compare(password: string, hash: string) {
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, hash, (err, res) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(res)
-      }
-    })
-  })
+  return bcrypt.compare(password, hash)
 }
 
 export async function generateHash(
   content: string,
   salt: string
 ): Promise<string> {
-  return new Promise((resolve, reject) => {
-    bcrypt.hash(content, salt, (err, hash) => {
-      if (err) {
-        return reject(err)
-      }
-      resolve(hash)
-    })
-  })
+  return bcrypt.hash(content, salt)
 }
 
 export async function generateSaltedHash(
   password: string
 ): Promise<SaltedHash> {
-  const salt = await new Promise<string>((resolve, reject) => {
-    bcrypt.genSalt(10, (err, generatedSalt) => {
-      if (err) {
-        return reject(err)
-      }
-      resolve(generatedSalt)
-    })
-  })
+  const salt = await bcrypt.genSalt(SALT_ROUNDS, SALT_VERSION)
 
   return {
     hash: await generateHash(password, salt),

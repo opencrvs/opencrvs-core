@@ -13,7 +13,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
-import { genSaltSync, hashSync } from 'bcryptjs'
+import { genSaltSync, hashSync } from 'bcrypt'
 import {
   ActionStatus,
   ActionType,

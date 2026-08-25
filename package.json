@@ -54,5 +54,10 @@
   "dependencies": {
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt"
+    ]
   }
 }
