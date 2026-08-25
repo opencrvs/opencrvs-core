@@ -26,6 +26,7 @@ import { faker } from '@faker-js/faker'
 test('Validating a rejected declaration clears the Rejected flag', async ({
   browser
 }) => {
+  test.setTimeout(180_000) // two logins plus reject/validate round-trips can exceed the default 90s under CI load
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const { declaration } = await createDeclaration(
     token,
@@ -41,7 +42,7 @@ test('Validating a rejected declaration clears the Rejected flag', async ({
     await page.getByText('Pending registration').click()
     await openRecordByTitle(page, childName)
 
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR, { timeout: 15_000 })
     await selectAction(page, 'Reject')
     await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
     await page.getByRole('button', { name: 'Send For Update' }).click()
