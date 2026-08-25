@@ -62,6 +62,25 @@ describe('integrations', () => {
       expect(rows[0].secretHash).toBeTruthy()
       expect(rows[0].salt).toBeTruthy()
       expect(rows[0].shaSecret).toBeTruthy()
+      expect(rows[0].createdBy).toBe(user.id)
+    })
+
+    test('records no creator when the caller is a system client', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+
+      const result = await client.integrations.create({
+        name: 'System Created Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      const rows = await db
+        .selectFrom('systemClients')
+        .selectAll()
+        .where('id', '=', result.clientId as UUID)
+        .execute()
+
+      expect(rows).toHaveLength(1)
       // A system caller — the startup bootstrap token — has no users(id)
       // behind it, and created_by is a foreign key into users
       expect(rows[0].createdBy).toBeNull()

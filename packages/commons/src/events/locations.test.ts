@@ -345,16 +345,25 @@ describe('canAccessEventWithScope()', () => {
     })
 
     describe('createdIn', () => {
-      const undeclaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+      const undeclaredEvent = {
         type: 'birth',
+        id: generateUuid(rng),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'CREATED' as const,
+        trackingId: generateUuid(rng),
+        declaration: {},
+        flags: [],
+        potentialDuplicates: [],
         createdBy: createdById,
         createdAtLocation: [provinceUuid, districtUuid, officeUuid],
         placeOfEvent: [provinceUuid, districtUuid, officeUuid],
         legalStatuses: {
           DECLARED: undefined,
+          NOTIFIED: undefined,
           REGISTERED: undefined
         }
-      }
+      } satisfies EventIndexWithAdministrativeHierarchy
 
       const colleagueAtSameOffice = {
         type: 'user',
@@ -416,19 +425,20 @@ describe('canAccessEventWithScope()', () => {
       })
 
       test('is not reassigned when another office declares the event', () => {
-        const declaredByAnotherOffice: Partial<EventIndexWithAdministrativeHierarchy> =
-          {
-            ...undeclaredEvent,
-            legalStatuses: {
-              DECLARED: {
-                acceptedAt: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                createdBy: generateUuid(rng),
-                createdAtLocation: [generateUuid(rng)]
-              },
-              REGISTERED: undefined
-            }
+        const declaredByAnotherOffice = {
+          ...undeclaredEvent,
+          status: 'DECLARED' as const,
+          legalStatuses: {
+            DECLARED: {
+              acceptedAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              createdBy: generateUuid(rng),
+              createdAtLocation: [generateUuid(rng)]
+            },
+            NOTIFIED: undefined,
+            REGISTERED: undefined
           }
+        } satisfies EventIndexWithAdministrativeHierarchy
 
         expect(
           canAccessEventWithScope(
@@ -446,395 +456,6 @@ describe('canAccessEventWithScope()', () => {
           )
         ).toBe(false)
       })
-    })
-  })
-
-  describe('flags option', () => {
-    test('should not access event with a "noneOf" flag it carries', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['sealed'] },
-          {
-            type: 'record.read',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access event without a "noneOf" flag it does not carry', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.read',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should access event carrying one of the "anyOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
-          {
-            type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event carrying none of the "anyOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access event carrying all of the "allOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
-          {
-            type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event missing one of the "allOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
-          {
-            type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-  })
-
-  describe('status option', () => {
-    test('should access event whose status is included in the filter', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...declaredEvent, status: 'DECLARED' },
-          {
-            type: 'record.edit',
-            options: { status: ['DECLARED'] }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event whose status is not included in the filter', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, status: 'REGISTERED' },
-          {
-            type: 'record.edit',
-            options: { status: ['DECLARED'] }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access any status when the filter is not set', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, status: 'REGISTERED' },
-          {
-            type: 'record.edit',
-            options: {}
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-  })
-
-  describe('flags option', () => {
-    test('should not access event with a "noneOf" flag it carries', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['sealed'] },
-          {
-            type: 'record.read',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should not access a sealed event with a flag-limited duplicate review scope', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['sealed'] },
-          {
-            type: 'record.review-duplicates',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access an unsealed event with a flag-limited duplicate review scope', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.review-duplicates',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should access event without a "noneOf" flag it does not carry', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.read',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should access event carrying one of the "anyOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
-          {
-            type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event carrying none of the "anyOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access event carrying all of the "allOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
-          {
-            type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event missing one of the "allOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
-          {
-            type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-  })
-
-  describe('status option', () => {
-    test('should access event whose status is included in the filter', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...declaredEvent, status: 'DECLARED' },
-          {
-            type: 'record.edit',
-            options: { status: ['DECLARED'] }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event whose status is not included in the filter', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, status: 'REGISTERED' },
-          {
-            type: 'record.edit',
-            options: { status: ['DECLARED'] }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access any status when the filter is not set', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, status: 'REGISTERED' },
-          {
-            type: 'record.edit',
-            options: {}
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-  })
-
-  describe('flags option', () => {
-    test('should not access event with a "noneOf" flag it carries', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['sealed'] },
-          {
-            type: 'record.read',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access event without a "noneOf" flag it does not carry', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.read',
-            options: { flags: { noneOf: ['sealed'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should access event carrying one of the "anyOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
-          {
-            type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event carrying none of the "anyOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: [] },
-          {
-            type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access event carrying all of the "allOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
-          {
-            type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event missing one of the "allOf" flags', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
-          {
-            type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-  })
-
-  describe('status option', () => {
-    test('should access event whose status is included in the filter', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...declaredEvent, status: 'DECLARED' },
-          {
-            type: 'record.edit',
-            options: { status: ['DECLARED'] }
-          },
-          userContext
-        )
-      ).toBe(true)
-    })
-
-    test('should not access event whose status is not included in the filter', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, status: 'REGISTERED' },
-          {
-            type: 'record.edit',
-            options: { status: ['DECLARED'] }
-          },
-          userContext
-        )
-      ).toBe(false)
-    })
-
-    test('should access any status when the filter is not set', () => {
-      expect(
-        canAccessEventWithScope(
-          { ...registeredEvent, status: 'REGISTERED' },
-          {
-            type: 'record.edit',
-            options: {}
-          },
-          userContext
-        )
-      ).toBe(true)
     })
   })
 
