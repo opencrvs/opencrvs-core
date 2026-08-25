@@ -795,12 +795,6 @@ const AdministrativeAreaField = BaseField.extend({
       partOf: FieldReference.optional().describe('Parent location'),
       type: AdministrativeAreas,
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z
-        .boolean()
-        .optional()
-        .describe(
-          'List every historical name a location has had as a separate, selectable option.'
-        ),
       activeOnly: z
         .boolean()
         .optional()
@@ -834,12 +828,6 @@ const LocationInput = BaseField.extend({
         .optional()
         .describe('Types of the locations that are available for selection.'),
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z
-        .boolean()
-        .optional()
-        .describe(
-          'List every historical name a location has had as a separate, selectable option.'
-        ),
       activeOnly: z
         .boolean()
         .optional()
@@ -899,7 +887,6 @@ const Facility = BaseField.extend({
   configuration: z
     .object({
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z.boolean().optional(),
       activeOnly: z.boolean().optional(),
       anchorToDateOfEvent: z.boolean().optional()
     })
@@ -917,7 +904,6 @@ const Office = BaseField.extend({
   configuration: z
     .object({
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z.boolean().optional(),
       activeOnly: z.boolean().optional(),
       anchorToDateOfEvent: z.boolean().optional()
     })
@@ -971,12 +957,6 @@ const Address = BaseField.extend({
         )
         .optional(),
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z
-        .boolean()
-        .optional()
-        .describe(
-          'List every historical name a location has had as a separate, selectable option. Propagated to the embedded admin-area selectors.'
-        ),
       activeOnly: z
         .boolean()
         .optional()
