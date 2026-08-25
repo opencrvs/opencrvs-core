@@ -37,10 +37,6 @@ import {
 } from '@events/tests/generators'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
-import {
-  payloadGenerator,
-  setupHierarchyWithUsers
-} from '@events/tests/generators'
 import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.get', async () => {

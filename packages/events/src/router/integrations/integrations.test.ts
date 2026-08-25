@@ -9,10 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID, encodeScope } from '@opencrvs/commons'
+import { UUID, encodeScope, getUUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
+const SYSTEM_ID = getUUID()
 const scope = encodeScope({ type: 'integration.create' })
 
 describe('integrations', () => {

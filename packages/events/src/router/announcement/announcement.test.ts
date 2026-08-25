@@ -24,7 +24,7 @@ import {
   processNextAnnouncement
 } from '@events/workers/announcementWorker'
 import { env } from '@events/environment'
-import { ANONYMOUS_TOKEN, mswServer } from '@events/tests/msw'
+import { mswServer } from '@events/tests/msw'
 
 const scope = encodeScope({ type: 'config.update-all' })
 
@@ -495,7 +495,7 @@ describe('processNextAnnouncement', () => {
      * of its own. Asserted explicitly: if it stops doing so, country config
      * rejects the dispatch with a 401 and no announcement is ever delivered.
      */
-    expect(capturedAuth).toEqual([`Bearer ${ANONYMOUS_TOKEN}`])
+    expect(capturedAuth).toEqual([`Bearer service-token`])
   })
 
   test('sends recipients in chunks of BCC_CHUNK_SIZE and updates progress after each', async () => {
