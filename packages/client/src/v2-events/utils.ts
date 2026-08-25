@@ -33,12 +33,14 @@ import {
   EncodedScope,
   getAdministrativeAreaHierarchy,
   resolveVersion,
+  ZodDate
+} from '@opencrvs/commons/client'
+import {
   findSelectedVersion,
   parseVersionedLocation,
   toNamedVersions,
-  ZodDate,
   VersionedEntity
-} from '@opencrvs/commons/client'
+} from '@client/v2-events/VersionedLocation'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
   if (typeof name === 'string') {

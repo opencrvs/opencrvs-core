@@ -29,6 +29,7 @@ import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS
 } from '@opencrvs/commons/client'
+import { toNamedVersions } from '@client/v2-events/VersionedLocation'
 import * as selectEvent from '@client/v2-events/select-event'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
