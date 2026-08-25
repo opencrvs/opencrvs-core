@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import path from 'path'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 test.describe.serial('1. Settings Page', () => {
   let page: Page
@@ -78,7 +79,7 @@ test.describe.serial('1. Settings Page', () => {
         page.getByTestId('profile-image-value').locator('img')
       ).toHaveCount(0)
 
-      const attachmentPath = path.join(__dirname, '../test-data/image.png')
+      const attachmentPath = path.join(ASSETS_DIR, 'image.png')
 
       await page
         .locator('#image_file_uploader_field')

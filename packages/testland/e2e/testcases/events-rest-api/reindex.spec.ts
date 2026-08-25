@@ -15,8 +15,8 @@ import {
   CREDENTIALS,
   GATEWAY_HOST,
   TEST_USER_PASSWORD
-} from '../../constants'
-import { getToken } from '../../helpers'
+} from '@e2e/support/constants'
+import { getToken } from '@e2e/support/helpers'
 
 const EVENTS_URL = `${GATEWAY_HOST}/events/events`
 

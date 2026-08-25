@@ -10,6 +10,7 @@
     "packages/countryconfig-template/.tiltignore",
     "packages/countryconfig-template/Tiltfile",
     "packages/countryconfig-template/.husky",
+    "packages/countryconfig-template/tilt/examples/traefik/values-minikube.yaml",
     ".husky",
     "**/*.ipynb",
     "**/.wireit",

@@ -12,7 +12,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { faker } from '@faker-js/faker'
-import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   createPIN,
   drawSignature,
@@ -24,15 +24,15 @@ import {
   NEW_USER_PASSWORD,
   searchFromSearchBar,
   waitForAuthenticatedLanding
-} from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration'
+} from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
 import {
   fillChildDetails,
   formatV2ChildName,
   getIdByName,
   getLocations,
   openBirthDeclaration
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 
 const createDraft = async (page: Page) => {
   await page.goto(CLIENT_URL)
@@ -369,9 +369,7 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Isamba District Office, Isamba, Central, Farajaland'
     )
-    await expect(page.getByTestId('role-value')).toHaveText(
-      'Hospital Official'
-    )
+    await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
 
     await page.getByRole('button', { name: 'Confirm' }).click()
     await page.getByTestId('confirm_office_change').click()

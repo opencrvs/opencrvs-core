@@ -19,11 +19,14 @@ import {
   searchFromSearchBar,
   triggerDeclarationAction,
   uploadImage
-} from '../../helpers'
-import { ensureAssignedToUser } from '../../utils'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { fillDate, formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/helpers'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { fillDate, formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test('Registering an adoption seals the original birth record', async ({
   browser

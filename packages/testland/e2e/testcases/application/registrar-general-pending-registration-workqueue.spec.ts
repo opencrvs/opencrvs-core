@@ -10,11 +10,11 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 
-import { formatV2ChildName } from '../birth/helpers'
-import { createDeclaration } from '../test-data/birth-declaration'
-import { getToken, login } from '../../helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
+import { getToken, login } from '@e2e/support/helpers'
 import { ActionType } from '@opencrvs/toolkit/events'
 
 test.describe

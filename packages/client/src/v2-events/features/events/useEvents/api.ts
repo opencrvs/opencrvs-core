@@ -210,11 +210,11 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 }
 
 export function setEventData(id: string, data: EventDocument) {
-  updateLocalEventIndex(id, data)
   queryClient.setQueryData(
     trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
     data
   )
+
   updateDraftsWithEvent(id, data)
 }
 
@@ -298,16 +298,17 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export function updateLocalEvent(data: EventDocument) {
-  setEventData(data.id, data)
-}
-
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
 
   await invalidateWorkqueues()
 
   return refetchAllSearchQueries()
+}
+
+export async function onMarkNotDuplicate(data: EventDocument) {
+  setEventData(data.id, data)
+  await refetchSearchQuery(data.id)
 }
 
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {

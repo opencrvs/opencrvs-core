@@ -11,8 +11,8 @@
 import { expect, test, type Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 async function openDeathDeclaration(page: Page) {
   await page.click('#header-new-event')

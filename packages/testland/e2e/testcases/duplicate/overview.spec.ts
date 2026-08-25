@@ -14,14 +14,14 @@ import {
   login,
   searchFromSearchBar,
   switchEventTab
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration } from '../test-data/birth-declaration-with-mother-father'
-import { formatV2ChildName } from '../birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-mother-father'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { ensureAssignedToUser, selectAction } from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Duplicate overview', async ({ page }) => {
   const details = {

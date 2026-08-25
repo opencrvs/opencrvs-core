@@ -23,6 +23,10 @@ import {
   ActionUpdate
 } from './ActionDocument'
 import {
+  getEventValidatorContext,
+  ValidatorContext
+} from '../conditionals/validate'
+import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
@@ -59,7 +63,8 @@ import { ActionConfig } from './ActionConfig'
 import {
   LocationVersion,
   SetLocationPayload,
-  SetAdministrativeAreaPayload
+  SetAdministrativeAreaPayload,
+  ClientAdministrativeArea
 } from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
@@ -71,10 +76,16 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { FieldValue, PlainDate } from './FieldValue'
-import { TokenUserType } from '../authentication'
+import {
+  EncodedScope,
+  encodeScope,
+  ITokenPayload,
+  TokenUserType
+} from '../authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
+import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -1272,4 +1283,83 @@ export const generateEventConfig = ({
       }
     ]
   })
+}
+
+/**
+ * Get the leaf administrative area IDs from a list of administrative areas.
+ *
+ * A leaf administrative area is defined as an administrative area that does not have any children in the provided list.
+ * AdministrativeArea  might have a CRVS_OFFICE as children, but is still considered to be a leaf administrative area.
+ *
+ * @param administrativeAreas - The list of administrative areas to search.
+ * @returns The list of leaf administrative area IDs.
+ */
+export function getLeafAdministrativeAreaIds(
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+): Array<{ id: UUID }> {
+  const nonLeafAdministrativeAreaIds = new Set<string>()
+
+  for (const [, location] of administrativeAreas) {
+    if (location.parentId) {
+      nonLeafAdministrativeAreaIds.add(location.parentId)
+    }
+  }
+
+  const result: { id: UUID }[] = []
+  for (const [id] of administrativeAreas) {
+    if (!nonLeafAdministrativeAreaIds.has(id)) {
+      result.push({ id })
+    }
+  }
+
+  return result
+}
+
+/**
+ *
+ * @returns TokenPayload. Useful for building test setup for ValidatorContext
+ */
+function generateUserTokenPayload({
+  role,
+  scope
+}: {
+  role?: TestUserRole
+  scope?: EncodedScope[]
+}): ITokenPayload {
+  return {
+    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
+    sub: generateUuid(),
+    algorithm: 'RS256',
+    exp: '1787221786',
+    role: role ?? TestUserRole.enum.FIELD_AGENT,
+    scope: scope ?? [
+      encodeScope({
+        type: 'record.read'
+      })
+    ],
+    userType: TokenUserType.enum.user
+  }
+}
+
+export function generateTestValidatorContext(
+  userRole?: TestUserRole,
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): ValidatorContext {
+  const user = generateUserTokenPayload({ role: userRole })
+
+  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
+    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+  )
+
+  if (!eventWithConfig) {
+    return { user, leafAdminStructureLocationIds }
+  }
+
+  const { event, eventConfig } = eventWithConfig
+
+  return {
+    user,
+    leafAdminStructureLocationIds,
+    event: getEventValidatorContext(event, eventConfig)
+  }
 }

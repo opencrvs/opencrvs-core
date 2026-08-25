@@ -10,21 +10,24 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login, getToken, triggerDeclarationAction } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
+import { login, getToken, triggerDeclarationAction } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { formatV2ChildName } from '../birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
   navigateToWorkqueue,
   selectAction
-} from '../../utils'
+} from '@e2e/support/utils'
 import {
   getRowByTitle,
   openRecordByTitle
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 import { faker } from '@faker-js/faker'
 
 test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {

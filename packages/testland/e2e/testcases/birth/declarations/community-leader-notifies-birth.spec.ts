@@ -15,10 +15,10 @@ import {
   goToSection,
   login,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Community leader notifies birth', async ({ page }) => {
   const childName = {

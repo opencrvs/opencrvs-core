@@ -10,8 +10,8 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { formatName, login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { formatName, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 
 test.describe.serial('Validate draft with partial name', () => {

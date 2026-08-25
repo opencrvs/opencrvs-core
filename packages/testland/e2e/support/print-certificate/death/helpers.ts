@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Page } from '@playwright/test'
-import { Declaration } from '../../test-data/death-declaration'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { CREDENTIALS } from '../../../constants'
-import { openRecordByTitle } from '../birth/helpers'
+import { Declaration } from '@e2e/support/test-data/death-declaration'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 export async function selectCertificationType(page: Page, type: string) {
   await page.locator('#certificateTemplateId svg').click()
