@@ -22,7 +22,7 @@ import { verifyHubSignatureOrThrow } from './verify-hub-signature'
  * behaviour that verification depends on.
  */
 
-const BODY = Buffer.from(
+const rawBody = Buffer.from(
   JSON.stringify({
     publisher: 'CREDENTIAL_SERVICE',
     topic: 'CREDENTIAL_ISSUED'
@@ -34,42 +34,43 @@ const sign = (body: Buffer, secret = env.MOSIP_WEBSUB_SECRET) =>
 
 test('X-Hub-Signature', async () => {
   await it('accepts a signature produced with the hub secret', () => {
-    assert.doesNotThrow(() => verifyHubSignatureOrThrow(sign(BODY), BODY))
+    assert.doesNotThrow(() => verifyHubSignatureOrThrow(sign(rawBody), rawBody))
   })
 
   await it('rejects a signature produced with a different secret', () => {
     assert.throws(
-      () => verifyHubSignatureOrThrow(sign(BODY, 'not-the-hub-secret'), BODY),
+      () =>
+        verifyHubSignatureOrThrow(sign(rawBody, 'not-the-hub-secret'), rawBody),
       /does not match/
     )
   })
 
   // The point of the whole exercise: the body cannot be altered in transit.
   await it('rejects a body that does not match the signature', () => {
-    const tampered = Buffer.concat([BODY, Buffer.from(' ')])
+    const tampered = Buffer.concat([rawBody, Buffer.from(' ')])
     assert.throws(
-      () => verifyHubSignatureOrThrow(sign(BODY), tampered),
+      () => verifyHubSignatureOrThrow(sign(rawBody), tampered),
       /does not match/
     )
   })
 
   await it('rejects a missing header', () => {
     assert.throws(
-      () => verifyHubSignatureOrThrow(undefined, BODY),
+      () => verifyHubSignatureOrThrow(undefined, rawBody),
       /Missing X-Hub-Signature/
     )
   })
 
   await it('rejects a truncated signature rather than comparing short', () => {
     assert.throws(
-      () => verifyHubSignatureOrThrow(sign(BODY).slice(0, 30), BODY),
+      () => verifyHubSignatureOrThrow(sign(rawBody).slice(0, 30), rawBody),
       /does not match/
     )
   })
 
   await it('rejects an unknown digest method', () => {
     assert.throws(
-      () => verifyHubSignatureOrThrow('md5=deadbeef', BODY),
+      () => verifyHubSignatureOrThrow('md5=deadbeef', rawBody),
       /Unsupported X-Hub-Signature format/
     )
   })
@@ -77,7 +78,7 @@ test('X-Hub-Signature', async () => {
   // A body that was parsed but never retained must fail closed, not pass.
   await it('refuses to pass when the raw body was not captured', () => {
     assert.throws(
-      () => verifyHubSignatureOrThrow(sign(BODY), undefined),
+      () => verifyHubSignatureOrThrow(sign(rawBody), undefined),
       /without the raw body/
     )
   })
