@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- WebSub callbacks are now authenticated with the hub's `X-Hub-Signature` HMAC, and rejected with a 401 if it is missing or does not match. Previously nothing established that a callback came from MOSIP: the route is exempt from JWT auth, and successfully decrypting the credential only proves the sender had OpenCRVS's public certificate, which is not a secret. ([#12842](https://github.com/opencrvs/opencrvs-core/issues/12842))
+
+  - **`MOSIP_WEBSUB_SECRET` must match the `hub.secret` the subscription was created with.** It was already sent when subscribing but never checked. If it drifts, every callback is rejected — look for `websub.credential-issued.unauthenticated` in the logs.
+
+  - This replaces the credential's `RsaSignature2018` `proof` as the source check, and the proof verification code is removed along with the `canonicalize` dependency. The proof was verifying MOSIP's issuer signature, but the HMAC covers the entire delivery rather than only the subset of credential fields that survive RDF canonicalization, and both the hub and the issuer are MOSIP infrastructure. `MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST` is no longer used and can be removed from country configurations.
+
 ## 2.0.0
 
 - Support biographic updates to MOSIP via `updateBiographics`. ([#152](https://github.com/opencrvs/mosip/pull/152))
