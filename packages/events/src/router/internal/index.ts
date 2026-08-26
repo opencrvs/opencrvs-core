@@ -11,7 +11,12 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { UserName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
+import {
+  UserName,
+  UserAuditRecordInput,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons'
 import { internalProcedure, serviceRouter } from '@events/router/trpc'
 import {
   getUserCredentialsByUsername,
@@ -38,6 +43,16 @@ const VerifyUserOutput = z.object({
   name: UserName,
   securityQuestionKey: z.string(),
   scope: z.array(z.string())
+})
+
+/**
+ * Audit entries written through this router are authored by a trusted service,
+ * so the acting client is supplied explicitly rather than derived from a token.
+ */
+const InternalUserAuditRecordInput = z.object({
+  clientId: z.string(),
+  clientType: TokenUserType,
+  entry: UserAuditRecordInput
 })
 
 /**
@@ -153,12 +168,12 @@ export const internalUserRouter = serviceRouter({
     }),
   audit: {
     record: internalProcedure
-      .input(UserAuditRecordInput)
+      .input(InternalUserAuditRecordInput)
       .mutation(async ({ input }) => {
         await writeAuditLog({
-          ...input,
-          clientId: input.requestData.subjectId,
-          clientType: 'system'
+          ...input.entry,
+          clientId: input.clientId,
+          clientType: input.clientType
         })
       })
   },

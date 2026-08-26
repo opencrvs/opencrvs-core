@@ -43,8 +43,7 @@ import * as F from 'fp-ts'
 import {
   EncodedScope,
   encodeScope,
-  TokenUserType,
-  TokenWithBearer
+  TokenUserType
 } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
@@ -419,13 +418,20 @@ export function getPublicKey() {
   return publicCert
 }
 
+/**
+ * Audit entries are written through the internal router only. There is no
+ * client-facing audit write endpoint, so a caller cannot forge entries about
+ * other users or about operations they never performed.
+ */
 export async function recordUserAuditEvent(
-  tokenWithBearer: TokenWithBearer,
-  input: UserAuditLog
+  userId: string,
+  entry: UserAuditLog
 ): Promise<void> {
   try {
-    await eventsClient.user.audit.record.mutate(input, {
-      context: { headers: { Authorization: tokenWithBearer } }
+    await internalClient.user.audit.record.mutate({
+      clientId: userId,
+      clientType: 'user',
+      entry
     })
   } catch (err) {
     logger.error('Failed to record user audit event', err)
@@ -433,10 +439,14 @@ export async function recordUserAuditEvent(
 }
 
 export async function recordAnonymousUserAuditEvent(
-  input: UserAuditLog
+  entry: UserAuditLog
 ): Promise<void> {
   try {
-    await internalClient.user.audit.record.mutate(input)
+    await internalClient.user.audit.record.mutate({
+      clientId: entry.requestData.subjectId,
+      clientType: 'system',
+      entry
+    })
   } catch (err) {
     logger.error('Failed to record anonymous user audit event', err)
   }
