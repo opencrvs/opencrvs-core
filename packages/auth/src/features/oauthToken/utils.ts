@@ -11,8 +11,9 @@
 import * as Hapi from '@hapi/hapi'
 
 /**
- * Retrieves a parameter from either the request payload or query string.
- * Prioritizes payload over query for POST requests with form data.
+ * Retrieves a parameter from the request payload. The query string is not
+ * consulted: RFC 6749 §2.3.1 requires token endpoint parameters to be sent in
+ * the body, and credentials in a URL leak into logs (CWE-598).
  */
 export const getParam = (req: Hapi.Request, key: string) =>
-  (req.payload as any)?.[key] || req.query[key]
+  (req.payload as any)?.[key]

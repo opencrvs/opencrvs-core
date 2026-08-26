@@ -28,40 +28,59 @@ describe('authenticate handler receives a request', () => {
     )
   })
 
+  const formEncodedRequest = (payload: string) => ({
+    method: 'POST' as const,
+    url: '/token',
+    payload,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+
   describe('events service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
       jest
         .spyOn(authService, 'authenticateSystem')
         .mockRejectedValue(new Error('Invalid credentials'))
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
-      })
+      const res = await server.server.inject(
+        formEncodedRequest(
+          'client_id=123&client_secret=456&grant_type=client_credentials'
+        )
+      )
 
       expect(res.statusCode).toBe(401)
     })
   })
   describe('events service says credentials are valid', () => {
     it('returns a token to the client', async () => {
+      const res = await server.server.inject(
+        formEncodedRequest(
+          'client_id=123&client_secret=456&grant_type=client_credentials'
+        )
+      )
+
+      expect(JSON.parse(res.payload).access_token).toBe('789')
+    })
+    it('returns a token when using a JSON payload', async () => {
       const res = await server.server.inject({
         method: 'POST',
-        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
+        url: '/token',
+        payload: {
+          client_id: '123',
+          client_secret: '456',
+          grant_type: 'client_credentials'
+        }
       })
 
       expect(JSON.parse(res.payload).access_token).toBe('789')
     })
   })
-  describe('form-encoded payload support', () => {
-    it('returns a token when using form-encoded payload', async () => {
+  describe('credentials are passed in the query string', () => {
+    it('does not authenticate the client', async () => {
       const res = await server.server.inject({
         method: 'POST',
-        url: '/token',
-        payload:
-          'client_id=123&client_secret=456&grant_type=client_credentials',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
       })
 
-      expect(JSON.parse(res.payload).access_token).toBe('789')
+      expect(res.statusCode).toBe(400)
     })
   })
 })

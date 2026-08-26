@@ -17,6 +17,21 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### `POST /auth/token` no longer accepts parameters in the query string
+
+The token endpoint used to read every parameter from the request body _or_ the URL, and the gateway forwarded the raw query string on to the auth service. That let a client send `POST /auth/token?grant_type=client_credentials&client_id=...&client_secret=...`, putting its secret into gateway and proxy access logs, Sentry breadcrumbs, and any intermediary along the way (CWE-598). Parameters are now read only from the form-encoded (or JSON) request body, as RFC 6749 §2.3.1 requires, and the gateway no longer forwards the query string at all. A request that still passes credentials in the URL fails as if they were missing.
+
+**Integrations that authenticate via the URL must move their parameters into the request body.** This affects both supported grants — `client_credentials` (`client_id`, `client_secret`) and `urn:opencrvs:oauth:grant-type:token-exchange` (`subject_token`, `subject_token_type`, `requested_token_type`, `event_id`, `action_id`).
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Existing client IDs and secrets keep working — only how they are transmitted changes. Operators should also treat any secret previously sent in a URL as exposed and rotate it, since it may still be sitting in retained logs.
+
 #### `validUntil` removed from location APIs
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.

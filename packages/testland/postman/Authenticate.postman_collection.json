@@ -29,29 +29,29 @@
       ],
       "request": {
         "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
+        "header": [],
         "url": {
-          "raw": "{{auth}}/token?client_id={{client_id}}&client_secret={{client_secret}}&grant_type=client_credentials",
+          "raw": "{{auth}}/token",
           "host": ["{{auth}}"],
-          "path": ["token"],
-          "query": [
+          "path": ["token"]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
             {
               "key": "client_id",
-              "value": "{{client_id}}"
+              "value": "{{client_id}}",
+              "type": "text"
             },
             {
               "key": "client_secret",
-              "value": "{{client_secret}}"
+              "value": "{{client_secret}}",
+              "type": "text"
             },
             {
               "key": "grant_type",
-              "value": "client_credentials"
+              "value": "client_credentials",
+              "type": "text"
             }
           ]
         }

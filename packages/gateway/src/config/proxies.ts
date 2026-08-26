@@ -35,9 +35,10 @@ export const authProxy = {
   token: {
     method: 'POST',
     path: '/auth/token',
-    handler: (req, h) =>
+    // The query string is not forwarded: credentials in a URL leak into logs.
+    handler: (_, h) =>
       h.proxy({
-        uri: AUTH_URL + `/token${req.url.search}`
+        uri: AUTH_URL + '/token'
       }),
     options: {
       auth: false,

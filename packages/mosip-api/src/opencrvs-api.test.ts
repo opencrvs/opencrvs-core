@@ -33,34 +33,28 @@ test('direct authentication with OpenCRVS', async (t) => {
   await t.test(
     'obtains a confirmation token via client_credentials and token exchange',
     async () => {
-      const requests: URL[] = []
+      const requests: URLSearchParams[] = []
       const mswServer = setupServer(
-        http.post(`${AUTH_URL}/token`, ({ request }) => {
-          const url = new URL(request.url)
-          requests.push(url)
+        http.post(`${AUTH_URL}/token`, async ({ request }) => {
+          const params = new URLSearchParams(await request.text())
+          requests.push(params)
 
-          if (url.searchParams.get('grant_type') === 'client_credentials') {
+          if (params.get('grant_type') === 'client_credentials') {
+            assert.strictEqual(params.get('client_id'), 'test-client-id')
             assert.strictEqual(
-              url.searchParams.get('client_id'),
-              'test-client-id'
-            )
-            assert.strictEqual(
-              url.searchParams.get('client_secret'),
+              params.get('client_secret'),
               'test-client-secret'
             )
             return HttpResponse.json({ access_token: 'system-token' })
           }
 
           assert.strictEqual(
-            url.searchParams.get('grant_type'),
+            params.get('grant_type'),
             'urn:opencrvs:oauth:grant-type:token-exchange'
           )
-          assert.strictEqual(
-            url.searchParams.get('subject_token'),
-            'system-token'
-          )
-          assert.strictEqual(url.searchParams.get('event_id'), EVENT_ID)
-          assert.strictEqual(url.searchParams.get('action_id'), ACTION_ID)
+          assert.strictEqual(params.get('subject_token'), 'system-token')
+          assert.strictEqual(params.get('event_id'), EVENT_ID)
+          assert.strictEqual(params.get('action_id'), ACTION_ID)
           return HttpResponse.json({ access_token: 'confirmation-token' })
         })
       )
