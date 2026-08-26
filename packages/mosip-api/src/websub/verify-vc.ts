@@ -8,9 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { flattenedVerify, importSPKI } from 'jose'
 import { z } from 'zod'
-import canonicalize from 'canonicalize'
 import { env } from '../constants'
 
 const BirthSubject = z.looseObject({
@@ -70,40 +68,4 @@ export const isBirthSubject = (
   subject: z.infer<typeof BirthSubject> | z.infer<typeof DeathSubject>
 ): subject is z.infer<typeof BirthSubject> => {
   return env.MOSIP_VERIFIABLE_CREDENTIAL_NATIONAL_ID_KEY in subject
-}
-
-export const verifyCredentialOrThrow = async (
-  credential: z.infer<typeof MOSIPVerifiableCredential>,
-  { allowList }: { allowList: string[] }
-) => {
-  const { jws, verificationMethod } = credential.proof
-  const { proof, ...payload } = credential
-
-  if (!allowList.includes(verificationMethod)) {
-    throw new Error('❌ Verification method not allowed')
-  }
-
-  const res = await fetch(verificationMethod)
-  /*
-   * Response.json() is typed as unknown, and this key is what the credential's
-   * signature is checked against, so the shape is validated rather than cast.
-   */
-  const { publicKeyPem } = z
-    .object({ publicKeyPem: z.string() })
-    .parse(await res.json())
-  const key = await importSPKI(publicKeyPem, 'PS256')
-
-  const [encodedHeader, , encodedSignature] = jws.split('.')
-
-  const canonicalPayload = canonicalize(payload)
-  const payloadBytes = new TextEncoder().encode(canonicalPayload)
-
-  await flattenedVerify(
-    {
-      protected: encodedHeader,
-      payload: payloadBytes,
-      signature: encodedSignature
-    },
-    key
-  )
 }
