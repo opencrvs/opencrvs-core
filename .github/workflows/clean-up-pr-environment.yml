@@ -23,3 +23,12 @@ jobs:
         run: |
           echo "Branch: ${{ github.event.pull_request.head.ref }}"
           echo "Labels: ${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+
+  on-else:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show PR info regardless
+        run: |
+          echo "Branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Labels: ${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+          echo "PR ${{github.event.pull_request }}"
