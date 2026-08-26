@@ -35,34 +35,41 @@ export async function createPIN(page: Page) {
 }
 
 /**
- * Waits for the client to land on either the PIN screen or its loading
- * spinner after a refresh-token handoff. If the refresh token exchange
- * fails, the client instead redirects to the separate login app — detecting
- * that directly surfaces a clear failure immediately, rather than waiting out
- * the full timeout for a selector that was never going to appear.
+ * Waits for url change after "client login" url. User is directed to client app page with different url,
+ * or if retrieving token fails, the client redirects to the separate login app — detecting
+ * that directly surfaces a clear failure immediately
  */
 export async function waitForAuthenticatedLanding(
   page: Page,
+  refreshToken: string,
   timeout?: number
 ) {
   const selectorOptions = timeout !== undefined ? { timeout } : {}
+  const clientLoginUrl = `${CLIENT_URL}?refreshToken=${refreshToken}`
 
-  const spinnerOrPin = page.waitForSelector('#pin-input, #appSpinner', {
-    state: 'visible',
-    ...selectorOptions
-  })
+  await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
+
+  const redirectedToApp = page.waitForURL(
+    (url) =>
+      url.href !== clientLoginUrl && url.origin !== new URL(LOGIN_URL).origin,
+    selectorOptions
+  )
+
   const redirectedToLogin = page
-    .waitForURL((url) => url.origin === LOGIN_URL, selectorOptions)
+    .waitForURL(
+      (url) => url.origin === new URL(LOGIN_URL).origin,
+      selectorOptions
+    )
     .then(() => {
       throw new Error(
-        'Redirected to the login page instead of the PIN/spinner screen — the refresh token exchange likely failed'
+        'Redirected to the login page instead of the client — the refresh token exchange likely failed'
       )
     })
 
   try {
-    await Promise.race([spinnerOrPin, redirectedToLogin])
+    await Promise.race([redirectedToApp, redirectedToLogin])
   } finally {
-    spinnerOrPin.catch(() => {})
+    redirectedToApp.catch(() => {})
     redirectedToLogin.catch(() => {})
   }
 }
@@ -103,9 +110,7 @@ export async function login(
   expect(refreshToken).toBeDefined()
 
   // Hand off only the refresh token; the client mints the access token from it.
-  await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-
-  await waitForAuthenticatedLanding(page)
+  await waitForAuthenticatedLanding(page, refreshToken)
 
   if (!skipPin) {
     await createPIN(page)
