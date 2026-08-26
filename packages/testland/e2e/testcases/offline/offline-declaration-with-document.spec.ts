@@ -93,7 +93,15 @@ test('Birth declaration made offline with a supporting document syncs after reco
    */
   await page.click('#header-new-event')
   await page.getByLabel('Birth').click()
+
+  const eventCreateResponse = page.waitForResponse(
+    (res) => res.url().includes('event.create') && res.ok()
+  )
+
   await page.getByRole('button', { name: 'Continue' }).click()
+
+  await eventCreateResponse
+
   await page.getByRole('button', { name: 'Continue' }).click()
   await expect(page.locator('#firstname')).toBeVisible()
   await page.goto(CLIENT_URL)

@@ -43,7 +43,6 @@ export const env = cleanEnv(process.env, {
   }),
   LANGUAGES: str({ devDefault: 'bn,en' }),
   COUNTRY: str({ devDefault: 'FAR' }),
-  CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }) // 10 minutes
 })
