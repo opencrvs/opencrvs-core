@@ -56,7 +56,12 @@ const InternalUserAuditRecordInput = z.object({
 })
 
 /**
- * Intermediary route for having an endpoint to test with. Will be removed once we merge the user management changes.
+ * Service-to-service routes, reachable only with an internal service token
+ * (see `internalProcedure`). These are not exposed to clients: they exist so
+ * the auth service can read and write user state it does not own.
+ *
+ * `ping` is a no-op kept for `server.test.ts`, which uses it to assert the
+ * internal token boundary at the HTTP layer.
  */
 export const internalUserRouter = serviceRouter({
   ping: internalProcedure
