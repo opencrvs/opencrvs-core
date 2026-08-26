@@ -47,7 +47,7 @@ export async function waitForAuthenticatedLanding(
   const selectorOptions = timeout !== undefined ? { timeout } : {}
   const clientLoginUrl = `${CLIENT_URL}?refreshToken=${refreshToken}`
 
-  await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
+  await page.goto(clientLoginUrl)
 
   const redirectedToApp = page.waitForURL(
     (url) =>
