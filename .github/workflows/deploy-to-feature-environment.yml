@@ -42,7 +42,7 @@ jobs:
         id: validate
         uses: ./.github/actions/validate-branch
         with:
-          pattern: '^[a-z][a-z0-9\/\-]{1,44}$'
+          pattern: '^[a-z][a-z0-9\/\-]{1,60}$'
 
       - name: Check for e2e labels
         id: set_skip_flag

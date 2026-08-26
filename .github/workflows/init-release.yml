@@ -188,7 +188,7 @@ jobs:
       #       - z=0 (base is develop): carries only the two bump commits, clean diff.
       #       - z>0 (base is a prior release branch): also backports any patch fixes.
       #     Note: dots are stripped from the version (e.g. 1.9.14 → 1914) so the
-      #     branch name passes the '^[a-z][a-z0-9\/\-]{1,44}$' validation in core.
+      #     branch name passes the '^[a-z][a-z0-9\/\-]{1,60}$' validation in core.
       # Each PR is checked individually — one may already exist while the other
       # does not, so both are always evaluated.
       - name: Create Pull Requests
