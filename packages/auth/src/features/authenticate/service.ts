@@ -418,11 +418,6 @@ export function getPublicKey() {
   return publicCert
 }
 
-/**
- * Audit entries are written through the internal router only. There is no
- * client-facing audit write endpoint, so a caller cannot forge entries about
- * other users or about operations they never performed.
- */
 export async function recordUserAuditEvent(
   userId: string,
   entry: UserAuditLog
