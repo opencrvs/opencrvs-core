@@ -13,9 +13,11 @@ import { TRPCError } from '@trpc/server'
 import { createPrng, encodeScope, generateUuid } from '@opencrvs/commons'
 import {
   createInitialisationTestClient,
+  createSystemTestClient,
   createTestClient,
   setupTestCase,
-  systemInitialisationTestSetup
+  systemInitialisationTestSetup,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import {
   updateUserById,
@@ -503,4 +505,58 @@ test('internal service: filters by primaryOfficeId without scope', async () => {
 
   expect(results.some((u) => u.id === primaryUser.id)).toBe(true)
   expect(results.some((u) => u.id === secondaryUser.id)).toBe(false)
+})
+
+test('location scope: throws FORBIDDEN for a system client, which has no office to scope by', async () => {
+  await setupTestCase()
+  const client = createSystemTestClient(TEST_SYSTEM_ID, [
+    encodeScope({ type: 'user.search', options: { accessLevel: 'location' } })
+  ])
+
+  await expect(client.user.search(defaultSearch)).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+})
+
+/*
+ * A null administrativeAreaId is not missing data — it is how a country-level
+ * office is encoded, and it widens the search on purpose. `searchUsersRoute`
+ * has to agree with `matchesJurisdictionFilter` and `canAccessUserWithScope`
+ * in commons, both of which grant when the caller has no administrative area.
+ */
+test('administrativeArea scope: a country-level office searches nationally', async () => {
+  const { users, seed, generator } = await setupTestCase()
+
+  const rng = createPrng(99999)
+  const countryLevelOfficeId = generateUuid(rng)
+
+  await seed.locations([
+    {
+      name: 'National HQ',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      id: countryLevelOfficeId,
+      externalId: 'search-country-level-office-001'
+    }
+  ])
+
+  const countryLevelUser = await seed.user(
+    generator.user.create({
+      primaryOfficeId: countryLevelOfficeId,
+      administrativeAreaId: null
+    })
+  )
+
+  const client = createTestClient(countryLevelUser, [
+    encodeScope({
+      type: 'user.search',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  const returnedIds = results.map((u) => u.id)
+  expect(returnedIds).toContain(users[0].id)
+  expect(returnedIds).toContain(users[1].id)
 })

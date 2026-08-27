@@ -259,6 +259,19 @@ export function searchUsersRoute(
       }
 
       if (accessLevel === JurisdictionFilter.enum.location) {
+        /*
+         * A missing `primaryOfficeId` is not the country-level widening that a
+         * null `administrativeAreaId` is. Only system clients lack one — their
+         * context is parsed with `primaryOfficeId: undefined` — and at this
+         * access level `matchesJurisdictionFilter` denies them rather than
+         * granting, since the office comparison never matches. With no office
+         * to scope by the search below would drop its only predicate and
+         * return the whole national directory, so fail closed instead.
+         */
+        if (!ctx.user.primaryOfficeId) {
+          throw new TRPCError({ code: 'FORBIDDEN' })
+        }
+
         return searchUsers({
           ...input,
           primaryOfficeId: ctx.user.primaryOfficeId
