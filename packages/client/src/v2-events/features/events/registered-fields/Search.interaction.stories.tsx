@@ -202,7 +202,7 @@ export const InvalidValue_NoRecordsFound: Story = {
       expect(canvas.queryByTestId('search-input-error')).not.toBeInTheDocument()
     )
     await userEvent.type(searchInput, '{Enter}')
-    await expect(canvas.getByText('Validating...')).toBeInTheDocument()
+    await expect(await canvas.findByText('Validating...')).toBeInTheDocument()
 
     await waitFor(
       async () =>
