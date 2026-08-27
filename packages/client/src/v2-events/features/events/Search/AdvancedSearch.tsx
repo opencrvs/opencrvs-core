@@ -52,9 +52,18 @@ export function AdvancedSearch() {
   const allEvents = useEventConfigurations()
   const location = useLocation()
 
-  const searchParams = SearchQueryParams.parse(
-    deserializeSearchParams(location.search)
-  )
+  /*
+   * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
+   * union of every field-value shape, and some members are objects whose keys
+   * are all optional. Those match any object and strip it to `{}`. An address
+   * filter is held as a FIELD_GROUP value, so it would not survive.
+   *
+   * Safe to skip: `parseFieldSearchParams` below keeps only the keys that name
+   * a field of the event being searched.
+   */
+  const searchParams = deserializeSearchParams(
+    location.search
+  ) as SearchQueryParams
 
   const advancedSearchEvents = allEvents.filter(
     (event) =>

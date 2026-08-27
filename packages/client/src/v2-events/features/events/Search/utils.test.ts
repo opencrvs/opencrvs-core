@@ -736,6 +736,68 @@ describe('withSearchLocationBehaviour', () => {
     })
   })
 
+  it("carries an address field's scope-based default down to each level", () => {
+    const field = {
+      id: 'applicant.address',
+      type: FieldType.ADDRESS,
+      label,
+      configuration: {},
+      defaultValue: {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: { $userField: 'administrativeAreaId' }
+      }
+    } as FieldConfig
+
+    const group = withSearchLocationBehaviour(
+      field,
+      ADMIN_STRUCTURE
+    ) as FieldGroup
+
+    /*
+     * An ADDRESS holds one administrative area, and the form fills the chain
+     * above it. A group has a field per level, so the default is restated as
+     * one `$location` lookup per level against the same user attribute.
+     */
+    expect(
+      group.fields.map((subfield) => [
+        subfield.id,
+        (subfield as { defaultValue?: unknown }).defaultValue
+      ])
+    ).toEqual([
+      ['country', 'FAR'],
+      [
+        'province',
+        { $userField: 'administrativeAreaId', $location: 'province' }
+      ],
+      [
+        'district',
+        { $userField: 'administrativeAreaId', $location: 'district' }
+      ]
+    ])
+  })
+
+  it('leaves a group without defaults when the address has none', () => {
+    const field = {
+      id: 'applicant.address',
+      type: FieldType.ADDRESS,
+      label,
+      configuration: {}
+    } as FieldConfig
+
+    const group = withSearchLocationBehaviour(
+      field,
+      ADMIN_STRUCTURE
+    ) as FieldGroup
+
+    expect(
+      group.fields.every(
+        (subfield) =>
+          (subfield as { defaultValue?: unknown }).defaultValue === undefined
+      )
+    ).toBe(true)
+  })
+
   it('leaves non-location fields untouched', () => {
     const field = {
       id: 'field',

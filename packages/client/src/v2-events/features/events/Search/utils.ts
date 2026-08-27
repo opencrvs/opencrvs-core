@@ -31,6 +31,8 @@ import {
   SelectDateRangeValue,
   AddressFieldValue,
   AddressField,
+  AdministrativeAreaField,
+  Country as CountryField,
   AddressType,
   FieldGroup,
   FieldGroupValue,
@@ -656,6 +658,37 @@ function generateSearchFieldConfig(
 }
 
 /**
+ * Gives address group fields a default value from the whole address field.
+ * This ensures a search form still opens pre-filled with the user's own area.
+ */
+function withAddressDefault<T extends CountryField | AdministrativeAreaField>(
+  subfield: T,
+  addressDefault: AddressField['defaultValue']
+): T {
+  if (!addressDefault || !('country' in addressDefault)) {
+    return subfield
+  }
+
+  if (subfield.type === FieldType.COUNTRY) {
+    return { ...subfield, defaultValue: addressDefault.country }
+  }
+
+  const area =
+    'administrativeArea' in addressDefault
+      ? addressDefault.administrativeArea
+      : undefined
+
+  if (!area || typeof area === 'string') {
+    return subfield
+  }
+
+  return {
+    ...subfield,
+    defaultValue: { ...area, $location: subfield.id }
+  }
+}
+
+/**
  * The country, admin levels and street fields an address filter is made of,
  * flattened into a FIELD_GROUP under the address field's own id.
  *
@@ -687,7 +720,13 @@ function toAddressSearchGroup(
     conditionals: field.conditionals,
     required: false,
     configuration: { separator: ', ', hideEmptyFields: true },
-    fields: [countryField, ...domesticFields, ...streetAddressFields]
+    fields: [
+      withAddressDefault(countryField, field.defaultValue),
+      ...domesticFields.map((level) =>
+        withAddressDefault(level, field.defaultValue)
+      ),
+      ...streetAddressFields
+    ]
   }
 }
 

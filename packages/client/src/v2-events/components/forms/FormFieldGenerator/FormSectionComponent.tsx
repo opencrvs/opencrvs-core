@@ -235,8 +235,24 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
+  /*
+   * A field that listens to a parent field is reset to its own default value
+   * whenever that parent changes, and the parent can sit on another page — so
+   * the whole declaration is searched for listeners, not just this page.
+   *
+   * That brings a hazard: one field id can name two different configurations.
+   * Advanced search renders an address as a group of one field per level, so
+   * `child.birthLocation.privateHome` is a FIELD_GROUP here while the
+   * declaration still calls it an ADDRESS. Whichever config is found first
+   * decides the shape a reset writes — a record of levels, or a single address
+   * object. Dropping the declaration's copy of any id this page renders leaves
+   * the page's own version to answer.
+   */
+  const pageFieldIds = new Set(pageFields.map((field) => field.id))
   const fullFormFields = eventConfig
-    ? findAllFields(eventConfig).concat(pageFields)
+    ? findAllFields(eventConfig)
+        .filter((field) => !pageFieldIds.has(field.id))
+        .concat(pageFields)
     : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
