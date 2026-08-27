@@ -89,5 +89,43 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
     }
   }
 }
+// Manually add the certificate rendering endpoint. It is served outside tRPC
+// (see router/event/certificate/handler.ts) so it can return raw PDF bytes, and
+// therefore is not picked up by trpc-to-openapi's generator.
+;(openApiDocument.paths || {})['/events/{eventId}/certificate'] = {
+  get: {
+    summary: 'Render a record certificate as a PDF',
+    tags: ['Events'],
+    security: [{ bearerAuth: ['record.read'] }],
+    parameters: [
+      {
+        name: 'eventId',
+        in: 'path',
+        required: true,
+        schema: { type: 'string', format: 'uuid' },
+        description: 'The event (record) id to render a certificate for'
+      },
+      {
+        name: 'templateId',
+        in: 'query',
+        required: false,
+        schema: { type: 'string' },
+        description:
+          'Certificate template id. Defaults to the event type’s default template.'
+      }
+    ],
+    responses: {
+      '200': {
+        description:
+          'The rendered certificate PDF. Requires authentication and the record.read scope.',
+        content: {
+          'application/pdf': {
+            schema: { type: 'string', format: 'binary' }
+          }
+        }
+      }
+    }
+  }
+}
 // eslint-disable-next-line no-console
 console.log(yaml.stringify(openApiDocument))

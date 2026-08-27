@@ -286,6 +286,67 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
 }
 
 /**
+ * Determines whether a user may access an event given the required scope types,
+ * throwing a `TRPCError` (or `EventNotFoundError`) if not. Extracted from
+ * `canAccessEventWithScopes` so the same check can be reused outside tRPC — e.g.
+ * by the raw certificate HTTP handler, which needs identical access control but
+ * returns a binary response rather than a tRPC/JSON one.
+ *
+ * @returns the resolved event type and the caller's accepted scopes.
+ */
+export async function assertUserCanAccessEvent({
+  token,
+  user,
+  eventId,
+  scopes,
+  customActionType
+}: {
+  token: TrpcContext['token']
+  user: TrpcContext['user']
+  eventId: UUID
+  scopes: RecordScopeTypeV2[]
+  customActionType?: string
+}): Promise<{
+  eventType: string
+  acceptedScopes: ReturnType<typeof getAcceptedScopesFromToken>
+}> {
+  const { eventId: grantedEventId } = getTokenPayload(token)
+  const eventConfigs = await getInMemoryEventConfigurations(token)
+  const acceptedScopes = getAcceptedScopesFromToken(token, scopes)
+
+  if (acceptedScopes.length === 0) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  if (grantedEventId && grantedEventId !== eventId) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Token does not grant access to this event'
+    })
+  }
+
+  const event = await getEventById(eventId)
+  const eventConfig = getEventConfigById(eventConfigs, event.type)
+
+  const eventIndex = getCurrentEventState(event, eventConfig)
+  const eventIndexWithLocationHierarchy =
+    await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
+
+  const hasAccess = userCanAccessEventWithScopes(
+    eventIndexWithLocationHierarchy,
+    acceptedScopes,
+    user,
+    customActionType
+  )
+
+  if (!hasAccess) {
+    throw new EventNotFoundError(eventId)
+  }
+
+  return { eventType: event.type, acceptedScopes }
+}
+
+/**
  * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
  *
  */
@@ -297,14 +358,6 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     TrpcContext & { eventId: UUID; eventType: string },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
-    const { eventId: grantedEventId } = getTokenPayload(ctx.token)
-    const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
-
-    if (acceptedScopes.length === 0) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
-    }
-
     // Since determining access requires knowing the event type, we need to parse the input before we can check access.
     // default .input(...) throws 400, which is something that we want to return only if the user should have access.
     const rawInput = await getRawInput()
@@ -314,37 +367,20 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
       throw new TRPCError({ code: 'BAD_REQUEST' })
     }
 
-    if (grantedEventId && grantedEventId !== input.eventId) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Token does not grant access to this event'
-      })
-    }
-
-    const event = await getEventById(input.eventId)
-    const eventConfig = getEventConfigById(eventConfigs, event.type)
-
-    const eventIndex = getCurrentEventState(event, eventConfig)
-    const eventIndexWithLocationHierarchy =
-      await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
-
-    const hasAccess = userCanAccessEventWithScopes(
-      eventIndexWithLocationHierarchy,
-      acceptedScopes,
-      ctx.user,
-      input.customActionType
-    )
-
-    if (!hasAccess) {
-      throw new EventNotFoundError(input.eventId)
-    }
+    const { eventType, acceptedScopes } = await assertUserCanAccessEvent({
+      token: ctx.token,
+      user: ctx.user,
+      eventId: input.eventId,
+      scopes,
+      customActionType: input.customActionType
+    })
 
     return next({
       ctx: {
         ...ctx,
         acceptedScopes,
         eventId: input.eventId,
-        eventType: event.type
+        eventType
       }
     })
   }
