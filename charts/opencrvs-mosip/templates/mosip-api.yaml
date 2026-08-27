@@ -98,8 +98,6 @@ spec:
               value: http://mosip-mock.{{ .Release.Namespace }}.svc.cluster.local:20240/commons/v1/packetmanager/createPacket
             - name: MOSIP_PROCESS_PACKET_URL
               value: http://mosip-mock.{{ .Release.Namespace }}.svc.cluster.local:20240/registrationprocessor/v1/workflowmanager/workflowinstance
-            - name: MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST
-              value: http://mosip-mock.{{ .Release.Namespace }}.svc.cluster.local:20240/.well-known/public-key.json
             - name: MOSIP_AUTH_URL
               value: http://mosip-mock.{{ .Release.Namespace }}.svc.cluster.local:20240/v1/authmanager/authenticate/clientidsecretkey
             - name: IDA_AUTH_DOMAIN_URI

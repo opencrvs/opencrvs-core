@@ -53,6 +53,10 @@ import {
 } from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
+import {
+  dashboardProxyPageHandler,
+  primaryOfficeHandler
+} from '@countryconfig/api/dashboards/registrations-proxy'
 import { locationsHandler } from './data-seeding/locations/handler'
 import { certificateHandler } from './api/certificates/handler'
 import { rolesHandler } from './data-seeding/roles/handler'
@@ -376,6 +380,33 @@ export async function createServer() {
       auth: false,
       tags: ['api'],
       description: 'Serves map geojson'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/dashboards/registrations-proxy',
+    handler: dashboardProxyPageHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'dashboards'],
+      description:
+        'Proxy page for the registrations dashboard: resolves the logged-in user primary office and redirects to Metabase scoped to that office'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/dashboards/primary-office',
+    handler: primaryOfficeHandler,
+    options: {
+      // The user's own access token is read from the Authorization header and
+      // forwarded to the events service; the default countryconfig JWT strategy
+      // would reject it (wrong audience), so auth is handled by that forward.
+      auth: false,
+      tags: ['api', 'dashboards'],
+      description:
+        "Returns the primary office id of the user the request is authenticated as"
     }
   })
 

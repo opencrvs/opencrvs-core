@@ -25,7 +25,13 @@ export default defineClientConfig({
         defaultMessage: 'Registrations Dashboard',
         description: 'Menu item for registrations dashboard'
       },
-      url: `https://metabase.${env.DOMAIN}/public/dashboard/03be04d6-bde0-4fa7-9141-21cea2a7518b#bordered=false&titled=false&refresh=300`
+      // Served by testland's hapi: waits for the logged-in user's access token,
+      // resolves their primary office and scopes the Metabase dashboard to it
+      // via the `location` query parameter. See registrations-proxy.ts.
+      url: `${env.COUNTRY_CONFIG_URL}/dashboards/registrations-proxy?target=${encodeURIComponent(
+        `https://metabase.${env.DOMAIN}/public/dashboard/03be04d6-bde0-4fa7-9141-21cea2a7518b#bordered=false&titled=false&refresh=300`
+      )}`,
+      context: { auth: 'REQUEST_AUTH_TOKEN' }
     },
     {
       id: 'completeness',

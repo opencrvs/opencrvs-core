@@ -22,6 +22,7 @@ import {
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  getDeclarationFields,
   isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
@@ -200,7 +201,7 @@ export function getEventIndexWithoutLocationHierarchy(
   }
 
   const fieldConfigs = Object.fromEntries(
-    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
 
   // Process declaration fields
@@ -301,7 +302,7 @@ export async function getEventIndexWithAdministrativeHierarchy(
   }
 
   const fieldConfigs = Object.fromEntries(
-    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
 
   // Process declaration fields
