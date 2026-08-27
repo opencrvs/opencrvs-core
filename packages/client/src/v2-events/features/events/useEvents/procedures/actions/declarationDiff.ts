@@ -15,6 +15,7 @@ import {
   EventConfig,
   EventState,
   FieldConfig,
+  getDeclaration,
   omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -155,7 +156,7 @@ export function getCleanedDeclarationDiff({
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
+      getDeclaration(eventConfiguration),
       declarationDiff,
       validatorContext,
       true
@@ -172,7 +173,7 @@ export function getCleanedDeclarationDiff({
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclarationWithHiddenFieldsWithNullValues =
     omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
+      getDeclaration(eventConfiguration),
       merged,
       validatorContext,
       true

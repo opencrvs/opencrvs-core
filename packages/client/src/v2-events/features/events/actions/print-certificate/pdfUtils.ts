@@ -34,6 +34,7 @@ import {
   UUID,
   ClientAdministrativeArea,
   getActionAnnotationFields,
+  getDeclarationFields,
   FieldUpdateValue,
   FieldConfig,
   UserOrSystemSummary,
@@ -292,7 +293,7 @@ export function compileSvg({
     recordAnchor,
     adminLevels
   )
-  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+  const fieldConfigs = getDeclarationFields(config)
   const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
   for (const helperName of Object.keys(customHelpers)) {

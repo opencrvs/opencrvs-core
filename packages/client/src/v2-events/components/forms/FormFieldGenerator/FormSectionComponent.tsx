@@ -32,6 +32,7 @@ import {
   isFieldVisible,
   findAllFields,
   flattenFieldReference,
+  getDeclaration,
   omitHiddenPaginatedFields,
   HiddenFieldTypes
 } from '@opencrvs/commons/client'
@@ -167,12 +168,12 @@ function applyVisibilityTransitions({
   resetFieldIds: Set<string>
 }): void {
   const prevCleaned = omitHiddenPaginatedFields(
-    eventConfig.declaration,
+    getDeclaration(eventConfig),
     prevForm,
     validatorContext
   )
   const currentCleaned = omitHiddenPaginatedFields(
-    eventConfig.declaration,
+    getDeclaration(eventConfig),
     currentForm,
     validatorContext
   )

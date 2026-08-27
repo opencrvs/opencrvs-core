@@ -19,6 +19,8 @@ import {
   FieldConfig,
   FieldType,
   FieldTypesToHideInReview,
+  getDeclaration,
+  getDeclarationPages,
   isFieldDisplayedOnReview,
   isPageVisible,
   PlainDate,
@@ -197,113 +199,113 @@ export function DuplicateComparison({
     FieldType.FILE_WITH_OPTIONS
   ]
 
-  const comparisonData: ComparisonDeclaration[] =
-    eventConfiguration.declaration.pages
-      .filter(
-        (page) =>
-          isPageVisible(
-            page,
-            originalDeclaration,
-            validatorContextOfOriginalEvent
-          ) ||
-          isPageVisible(
-            page,
-            potentialDuplicateDeclaration,
-            validatorContextOfPotentialDuplicateEvent
-          )
-      )
-      .map((page) => ({
-        title: intl.formatMessage(page.title),
-        data: page.fields
-          .filter(
-            (field) =>
-              isFieldDisplayedOnReview(
-                field,
-                originalDeclaration,
-                validatorContextOfOriginalEvent
-              ) ||
-              isFieldDisplayedOnReview(
-                field,
-                potentialDuplicateDeclaration,
-                validatorContextOfPotentialDuplicateEvent
-              )
-          )
-          .filter(
-            ({ type }) =>
-              !hideFieldTypes.some((typeToHide) => type === typeToHide)
-          )
-          // Group fields by label.id, preserving form order. Multiple fields
-          // can share the same label (e.g. "child.birthLocation" /
-          // "child.birthLocation.privateHome" / "child.birthLocation.other"
-          // all map to "Location of birth"). We render one row per unique
-          // label and pick the active field per side separately below.
-          .reduce<Array<{ labelId: string; fields: FieldConfig[] }>>(
-            (acc, field) => {
-              const existing = acc.find((g) => g.labelId === field.label.id)
-
-              // If the field already exists, add it to the existing group
-              if (existing) {
-                existing.fields.push(field)
-              } else {
-                // If the field does not exist, create a new group for it
-                acc.push({ labelId: field.label.id, fields: [field] })
-              }
-              return acc
-            },
-            []
-          )
-          .map(({ fields }) => {
-            // Each side may have a different field "active" — e.g. when one
-            // record uses HEALTH_FACILITY and the other was corrected to
-            // PRIVATE_HOME, the LOCATION field is active on one side and the
-            // ADDRESS field on the other. Pick the field whose conditional
-            // is satisfied per declaration so the comparison row shows the
-            // value the user actually entered, not a stale field config.
-            const pickFieldForReview = (
-              declaration: EventState,
-              ctx: ValidatorContext
-            ): FieldConfig =>
-              fields.find((f) =>
-                isFieldDisplayedOnReview(f, declaration, ctx)
-              ) ?? fields[0]
-
-            const leftField = pickFieldForReview(
+  const comparisonData: ComparisonDeclaration[] = getDeclarationPages(
+    eventConfiguration
+  )
+    .filter(
+      (page) =>
+        isPageVisible(
+          page,
+          originalDeclaration,
+          validatorContextOfOriginalEvent
+        ) ||
+        isPageVisible(
+          page,
+          potentialDuplicateDeclaration,
+          validatorContextOfPotentialDuplicateEvent
+        )
+    )
+    .map((page) => ({
+      title: intl.formatMessage(page.title),
+      data: page.fields
+        .filter(
+          (field) =>
+            isFieldDisplayedOnReview(
+              field,
               originalDeclaration,
               validatorContextOfOriginalEvent
-            )
-            const rightField = pickFieldForReview(
+            ) ||
+            isFieldDisplayedOnReview(
+              field,
               potentialDuplicateDeclaration,
               validatorContextOfPotentialDuplicateEvent
             )
+        )
+        .filter(
+          ({ type }) =>
+            !hideFieldTypes.some((typeToHide) => type === typeToHide)
+        )
+        // Group fields by label.id, preserving form order. Multiple fields
+        // can share the same label (e.g. "child.birthLocation" /
+        // "child.birthLocation.privateHome" / "child.birthLocation.other"
+        // all map to "Location of birth"). We render one row per unique
+        // label and pick the active field per side separately below.
+        .reduce<Array<{ labelId: string; fields: FieldConfig[] }>>(
+          (acc, field) => {
+            const existing = acc.find((g) => g.labelId === field.label.id)
 
-            return {
-              label: intl.formatMessage(fields[0].label),
-              rightValue: (
-                <Output
-                  anchor={potentialDuplicateAnchor}
-                  displayEmptyAsDash={true}
-                  eventConfig={eventConfiguration}
-                  field={rightField}
-                  formConfig={eventConfiguration.declaration}
-                  previousForm={potentialDuplicateDeclaration}
-                  value={potentialDuplicateDeclaration[rightField.id]}
-                />
-              ),
-              leftValue: (
-                <Output
-                  anchor={originalAnchor}
-                  displayEmptyAsDash={true}
-                  eventConfig={eventConfiguration}
-                  field={leftField}
-                  formConfig={eventConfiguration.declaration}
-                  previousForm={originalDeclaration}
-                  value={originalDeclaration[leftField.id]}
-                />
-              )
+            // If the field already exists, add it to the existing group
+            if (existing) {
+              existing.fields.push(field)
+            } else {
+              // If the field does not exist, create a new group for it
+              acc.push({ labelId: field.label.id, fields: [field] })
             }
-          })
-      }))
-      .filter(({ data }) => data.length > 0)
+            return acc
+          },
+          []
+        )
+        .map(({ fields }) => {
+          // Each side may have a different field "active" — e.g. when one
+          // record uses HEALTH_FACILITY and the other was corrected to
+          // PRIVATE_HOME, the LOCATION field is active on one side and the
+          // ADDRESS field on the other. Pick the field whose conditional
+          // is satisfied per declaration so the comparison row shows the
+          // value the user actually entered, not a stale field config.
+          const pickFieldForReview = (
+            declaration: EventState,
+            ctx: ValidatorContext
+          ): FieldConfig =>
+            fields.find((f) => isFieldDisplayedOnReview(f, declaration, ctx)) ??
+            fields[0]
+
+          const leftField = pickFieldForReview(
+            originalDeclaration,
+            validatorContextOfOriginalEvent
+          )
+          const rightField = pickFieldForReview(
+            potentialDuplicateDeclaration,
+            validatorContextOfPotentialDuplicateEvent
+          )
+
+          return {
+            label: intl.formatMessage(fields[0].label),
+            rightValue: (
+              <Output
+                anchor={potentialDuplicateAnchor}
+                displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
+                field={rightField}
+                formConfig={getDeclaration(eventConfiguration)}
+                previousForm={potentialDuplicateDeclaration}
+                value={potentialDuplicateDeclaration[rightField.id]}
+              />
+            ),
+            leftValue: (
+              <Output
+                anchor={originalAnchor}
+                displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
+                field={leftField}
+                formConfig={getDeclaration(eventConfiguration)}
+                previousForm={originalDeclaration}
+                value={originalDeclaration[leftField.id]}
+              />
+            )
+          }
+        })
+    }))
+    .filter(({ data }) => data.length > 0)
 
   const declarationDetailsComparison: ComparisonDeclaration = {
     title: intl.formatMessage(duplicateMessages.duplicateDeclarationDetails),
@@ -448,13 +450,13 @@ export function DuplicateComparison({
               <DocumentViewer
                 comparisonView={true}
                 form={originalDeclaration}
-                formConfig={eventConfiguration.declaration}
+                formConfig={getDeclaration(eventConfiguration)}
                 showInMobile={false}
               />
               <MobileOnly>
                 <SupportingDocumentList
                   declaration={originalDeclaration}
-                  declarationConfig={eventConfiguration.declaration}
+                  declarationConfig={getDeclaration(eventConfiguration)}
                 />
               </MobileOnly>
             </div>
@@ -465,13 +467,13 @@ export function DuplicateComparison({
               <DocumentViewer
                 comparisonView={true}
                 form={potentialDuplicateDeclaration}
-                formConfig={eventConfiguration.declaration}
+                formConfig={getDeclaration(eventConfiguration)}
                 showInMobile={false}
               />
               <MobileOnly>
                 <SupportingDocumentList
                   declaration={potentialDuplicateDeclaration}
-                  declarationConfig={eventConfiguration.declaration}
+                  declarationConfig={getDeclaration(eventConfiguration)}
                 />
               </MobileOnly>
             </div>
