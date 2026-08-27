@@ -15,10 +15,12 @@ import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
 import {
+  ConditionalType,
   defineConditional,
   field,
   FieldType,
-  FieldConfig
+  FieldConfig,
+  never
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {
@@ -180,6 +182,11 @@ export const InvalidValue_NoRecordsFound: Story = {
     await userEvent.type(surname, 'surname')
 
     const searchInput = await canvas.findByTestId('search-input')
+
+    await expect(searchInput).toHaveAttribute(
+      'placeholder',
+      'Enter birth registration number'
+    )
 
     await userEvent.type(searchInput, '456988542')
 
@@ -437,6 +444,49 @@ export const HttpError: Story = {
       <StyledFormFieldGenerator
         {...args}
         fields={searchFields}
+        id="my-form"
+        validatorContext={{}}
+      />
+    )
+  }
+}
+
+const disabledSearchFields: FieldConfig[] = [
+  {
+    ...searchFields[0],
+    conditionals: [
+      {
+        type: ConditionalType.ENABLE,
+        conditional: never()
+      }
+    ]
+  }
+]
+
+export const DisabledByConditional: Story = {
+  name: 'Disabled via ENABLE conditional',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const searchInput = await canvas.findByTestId('search-input')
+
+    await expect(searchInput).toBeDisabled()
+    await expect(searchInput).toHaveAttribute(
+      'placeholder',
+      'Enter birth registration number'
+    )
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={disabledSearchFields}
         id="my-form"
         validatorContext={{}}
       />
