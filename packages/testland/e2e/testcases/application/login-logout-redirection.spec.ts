@@ -76,7 +76,7 @@ test.describe('Mobile', () => {
     const lang = url.searchParams.get('lang')
     expect(lang).toBe('en')
 
-    await await login(page, CREDENTIALS.REGISTRAR, true)
+    await login(page, CREDENTIALS.REGISTRAR, true)
 
     // Crashed previously due bad redirect value.
     await expect(

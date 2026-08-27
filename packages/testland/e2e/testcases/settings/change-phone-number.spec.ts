@@ -68,8 +68,7 @@ test('Phone number changed from settings is stored as entered', async ({
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await waitForAuthenticatedLanding(page)
+    await waitForAuthenticatedLanding(page, refreshToken)
     await createPIN(page)
     await page.goto(CLIENT_URL)
   })

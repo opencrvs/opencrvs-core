@@ -100,7 +100,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              approved_words="${ES_INDEX_PREFIX:-events}_ ${ELASTICSEARCH_INDEX_NAME:-ocrvs}"
+              approved_words="${ES_INDEX_PREFIX:-events}_ ${ELASTICSEARCH_INDEX_NAME:-ocrvs} ${ES_REINDEXING_STATUS_INDEX:-reindexing_status}"
               indices=$(curl -sS -XGET http://$ELASTICSEARCH_HOST/_cat/indices?h=index)
               echo "Running elasticsearch cleanup script..."
               echo "--------------------------"
