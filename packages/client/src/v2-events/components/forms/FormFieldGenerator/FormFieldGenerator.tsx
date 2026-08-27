@@ -190,6 +190,8 @@ export const FormFieldGenerator = forwardRef<
                 },
                 validatorContext
               ),
+              // this is caught in CI but editor flags as unnecessary condition
+               
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )
