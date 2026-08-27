@@ -250,7 +250,8 @@ export const deathEvent = defineConfig({
       flags: [
         {
           id: 'attestation-required',
-          operation: 'add'
+          operation: 'add',
+          conditional: user.hasRole('HOSPITAL_CLERK')
         }
       ]
     },
