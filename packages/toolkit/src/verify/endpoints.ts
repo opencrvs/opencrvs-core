@@ -262,7 +262,7 @@ function securedDetail(status: CheckStatus): string {
   if (status === 'error') {
     return `${describeStatus(status)} — request failed`
   }
-  return `${describeStatus(status)} — INSECURE: processed without a token`
+  return `${describeStatus(status)} — INSECURE: ensure this endpoint requires authentication!`
 }
 
 export async function runVerifyEndpoints(

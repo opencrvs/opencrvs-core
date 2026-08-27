@@ -367,7 +367,8 @@ export const userRouter = router({
       return user
     }),
   list: userOnlyProcedure
-    .input(z.array(z.string()))
+    // Limit to prevent user enumeration with arbitrarily large IN (...) queries
+    .input(z.array(z.string()).max(100))
     .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
