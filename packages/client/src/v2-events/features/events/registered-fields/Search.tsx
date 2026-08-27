@@ -284,7 +284,6 @@ function SearchInput({
   )
   const isOnline = useOnlineStatus()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null) // pending enter-key search timer
-  const lastSearchedValueRef = useRef<string | null>(null) // last value we actually searched for
   const httpStateRef = useRef(httpState) // lets the debounced timeout read the latest loading state
 
   useEffect(() => {
@@ -306,7 +305,6 @@ function SearchInput({
     if (confirm) {
       setInputState('')
       setHttpState(null)
-      lastSearchedValueRef.current = null
       onChange({
         loading: false,
         error: {
@@ -468,15 +466,10 @@ function SearchInput({
                   if (debounceRef.current) {
                     clearTimeout(debounceRef.current) // reset wait on every new enter press
                   }
-                  const valueToSearch = inputState
                   debounceRef.current = setTimeout(() => {
                     if (httpStateRef.current?.loading) {
                       return // a search is already running, skip
                     }
-                    if (valueToSearch === lastSearchedValueRef.current) {
-                      return // same value as last search, skip
-                    }
-                    lastSearchedValueRef.current = valueToSearch
                     setButtonPressed((prev) => prev + 1) // triggers the actual search
                   }, 200)
                 }
