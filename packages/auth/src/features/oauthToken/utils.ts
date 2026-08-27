@@ -11,9 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 
 /**
- * Retrieves a parameter from the request payload. The query string is not
- * consulted: RFC 6749 §2.3.1 requires token endpoint parameters to be sent in
- * the body, and credentials in a URL leak into logs (CWE-598).
+ * Retrieves a parameter from the request payload.
  */
 export const getParam = (req: Hapi.Request, key: string) =>
   (req.payload as any)?.[key]
