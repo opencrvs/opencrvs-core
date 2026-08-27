@@ -67,7 +67,7 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'opencrvs',
-              repo: 'e2e'
+              repo: 'e2e',
               workflow_id: 'set-keep-namespace-label-to-false.yml',
               ref: 'develop',
               inputs: {
