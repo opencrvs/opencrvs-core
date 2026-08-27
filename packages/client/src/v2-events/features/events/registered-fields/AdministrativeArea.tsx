@@ -166,13 +166,6 @@ function AdministrativeAreaInput({
   // used to resolve `anchor` (event date vs today) — the two are orthogonal.
   const excludeInactive = Boolean(configuration.activeOnly)
 
-  // Only for fields anchored to the event's date, not advanced search's
-  // `activeOnly` filter.
-  const { getAdministrativeAreas: getAdministrativeAreasForStaleCheck } =
-    useAdministrativeAreas()
-  const allAdministrativeAreas =
-    getAdministrativeAreasForStaleCheck.useSuspenseQuery()
-
   // A parent picked under one of its historical names is version-pinned;
   // children are still nested under the area itself.
   const partOfId = toLocationId(partOf) ?? null
@@ -183,6 +176,14 @@ function AdministrativeAreaInput({
     excludeInactive,
     anchor
   )
+
+  // Only for fields anchored to the event's date, not advanced search's
+  // `activeOnly` filter.
+  const { getAdministrativeAreas: getAdministrativeAreasForStaleCheck } =
+    useAdministrativeAreas()
+  const allAdministrativeAreas =
+    getAdministrativeAreasForStaleCheck.useSuspenseQuery()
+
   useClearStaleSelectionOnAnchorChange({
     enabled: Boolean(configuration.anchorToDateOfEvent),
     value: toLocationId(value),
