@@ -36,7 +36,6 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         id: get-pr-by-trigger
         run: |
-          echo '${{ toJSON(github.event.pull_request) }}' | jq .
           echo "BRANCH_NAME=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
 
       - name: Slugify the branch name for k8s
