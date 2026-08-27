@@ -63,11 +63,15 @@ Toolkit "re-exports" common definitions (e.g. events, conditionals) and make the
 2. `yarn build:all`
 3. `npm publish`
 
-#### Through version control
+#### Through the publish workflow
 
-1. Update version number in `package.json`
-2. Create a pull request
-3. Once merged, github action will get triggered.
+Publishing is manual — nothing is triggered by a merge or by pushing a tag. Dispatch [Publish toolkit to NPM registry](https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml) with:
+
+1. `ref` — the branch or tag to build and publish from
+2. `version` — the npm version to publish as. Leave it empty for a snapshot of `ref`, `<root package.json version>-rc.<sha>`, published under `next` (or `vX.Y-next` when that line already has a release)
+3. Then approve the run in the `npm-publish` environment
+
+`@opencrvs/toolkit`, `@opencrvs/create-countryconfig` and `@opencrvs/mosip` are all published from the one run, at the same version and dist-tag. The dist-tag is derived from `version`; the scheme is documented in the workflow itself. Release publishing is part of a longer sequence — see `release-steps.md`.
 
 #### Gotchas, good to know
 
