@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, fireEvent, userEvent, within } from 'storybook/test'
 import React from 'react'
-import * as selectEvent from 'react-select-event'
 import {
   FieldType,
   FieldConfig,
@@ -115,8 +114,10 @@ export const ClearableSelect: Story = {
     )
 
     await step('A new option can be selected after clearing', async () => {
-      const select = await canvas.findByTestId('select__tennis____surface')
-      await selectEvent.select(select, 'grass')
+      await userEvent.click(
+        await canvas.findByTestId('select__tennis____surface')
+      )
+      await userEvent.click(await canvas.findByText('grass'))
 
       await expect(
         await canvas.findByTestId('select-value-output')

@@ -20,7 +20,6 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
-  ActionDocument,
   ActionStatus,
   ActionType,
   isActionConfigType,
@@ -298,12 +297,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const history = extractHistoryActions(fullEvent)
 
-  const historyWithClientSpecificActions = expandWithClientSpecificActions(
-    fullEvent,
-    validatorContext,
-    eventConfiguration
-  )
-
   // Rejected action confirmations (e.g. an external ID system such as MOSIP
   // rejecting a deferred registration) are excluded from the regular history
   // extraction. Surface rejected registrations so the record does not appear
@@ -315,10 +308,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       Boolean(a.originalActionId)
   )
 
-  const visibleHistoryWithClientSpecificActions = [
-    ...historyWithClientSpecificActions,
-    ...rejectedRegistrations
-  ]
+  const visibleHistory = [...history, ...rejectedRegistrations]
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     .filter(({ type }) => type !== ActionType.CREATE)
 
