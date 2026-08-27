@@ -109,6 +109,11 @@ export async function selectAction(
     .click()
 }
 
+/** Assumes events/:eventId pattern */
+function getEventIdFromUrl(url: string): string | undefined {
+  return new URL(url).pathname.match(/\/events\/([^/]+)/)?.[1]
+}
+
 const usernameToFullNameMap = {
   'k.cwalya': 'Kalusha Cwalya',
   'h.habazoka': 'Hakainde Habazoka',
@@ -150,6 +155,8 @@ export async function ensureAssignedToUser(
     return
   }
 
+  const eventId = getEventIdFromUrl(page.url())
+
   await page.getByRole('button', { name: 'Action', exact: true }).click()
 
   const assignAction = page
@@ -160,17 +167,15 @@ export async function ensureAssignedToUser(
   await assignAction.waitFor({ state: 'visible' })
   await assignAction.click()
 
-  // Setup the listener before clicking.
-  const assignResponse = page.waitForResponse(
-    (res) =>
-      res.url().includes('event.actions.assignment.assign') &&
-      res.status() === 200
+  await waitForActionResponses(
+    page,
+    ['event.actions.assignment.assign'],
+    async () =>
+      await page.getByRole('button', { name: 'Assign', exact: true }).click(),
+    eventId
   )
-  // Wait for the assign modal to appear
-  await page.getByRole('button', { name: 'Assign', exact: true }).click()
 
   // Wait for the assignment API call to complete and the UI to update.
-  await assignResponse
 
   await expect(assignedTo).toContainText(userFullName)
 }
