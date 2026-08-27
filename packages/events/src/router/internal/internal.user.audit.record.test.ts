@@ -13,13 +13,65 @@ import { TRPCError } from '@trpc/server'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import {
+  createInternalServiceToken,
   createInternalTestClient,
   createTestToken,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 
 const caller = createInternalTestClient()
+
+const auditRecordPayload = {
+  clientId: getUUID(),
+  clientType: TokenUserType.enum.user,
+  entry: {
+    operation: 'user.logged_in' as const,
+    requestData: { subjectId: getUUID() }
+  }
+}
+
+test('Returns 403 when accessed with user app token', async () => {
+  const { user } = await setupTestCase()
+
+  const appToken = createTestToken({
+    userId: user.id,
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.user
+  })
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.audit.record(auditRecordPayload)
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with system app token', async () => {
+  const appToken = createTestToken({
+    userId: TEST_SYSTEM_ID,
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.system
+  })
+
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.audit.record(auditRecordPayload)
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  const internalToken = createInternalServiceToken({
+    subject: 'invalid-subject'
+  })
+
+  const client = createInternalTestClient(internalToken)
+
+  await expect(
+    client.user.audit.record(auditRecordPayload)
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
 
 test('records an audit entry on behalf of a system client', async () => {
   const systemId = getUUID()
@@ -105,26 +157,4 @@ test('stores responseSummary as null', async () => {
     .execute()
 
   expect(log.responseSummary).toBeNull()
-})
-
-test('rejects callers without an internal service token', async () => {
-  const { user } = await setupTestCase()
-  const unauthorised = createInternalTestClient(
-    createTestToken({
-      userId: user.id,
-      scopes: TEST_USER_DEFAULT_SCOPES,
-      userType: TokenUserType.enum.user
-    })
-  )
-
-  await expect(
-    unauthorised.user.audit.record({
-      clientId: user.id,
-      clientType: TokenUserType.enum.user,
-      entry: {
-        operation: 'user.password_reset',
-        requestData: { subjectId: getUUID() }
-      }
-    })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
