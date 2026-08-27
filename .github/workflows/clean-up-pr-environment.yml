@@ -56,6 +56,18 @@ jobs:
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
 
+      - name: Remove keep e2e label
+        if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, '🔒 Keep e2e') }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: '🔒 Keep e2e',
+            });
+
   trigger-cleanup:
     needs: [get-k8s-stack-name-from-branch]
     runs-on: ubuntu-26.04
