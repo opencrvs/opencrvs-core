@@ -25,6 +25,8 @@ import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   FieldValue,
   FileFieldValue,
+  getDeclaration,
+  getDeclarationPages,
   TokenUserType,
   UUID,
   CreateUserInput,
@@ -199,7 +201,7 @@ const EditUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
-  const formConfig = eventConfig.declaration
+  const formConfig = getDeclaration(eventConfig)
 
   const { canEditUser, canAddOfficeUsers } = usePermissions()
 
@@ -265,7 +267,7 @@ const EditUserComponent = () => {
     )
   }
 
-  const currentPageId = pageId || eventConfig.declaration.pages[0].id
+  const currentPageId = pageId || getDeclarationPages(eventConfig)[0].id
 
   const onPageChange = (nextPageId: string) =>
     navigate(
@@ -376,7 +378,7 @@ const ReviewUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
-  const formConfig = eventConfig.declaration
+  const formConfig = getDeclaration(eventConfig)
 
   const alreadyInitialized =
     useUserFormState.getState().userId === userId &&
@@ -734,7 +736,9 @@ function FormLayout({
           onClose={onClose ? () => onClose() : undefined}
         />
       }
-      skipToContentText={intl.formatMessage(constantsMessages.skipToMainContent)}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
         {children}

@@ -141,6 +141,20 @@ test.describe.serial('Can view downloaded event offline', () => {
 
     await page.getByRole('button', { name: 'Assign', exact: true }).click()
 
+    const getResponse = page.waitForResponse(
+      (res) => res.url().includes('event.get') && res.ok()
+    )
+
+    const assignResponse = page.waitForResponse(
+      (res) => res.url().includes('event.actions.assignment.assign') && res.ok()
+    )
+
+    const searchResponse = page.waitForResponse(
+      (res) => res.url().includes('event.search') && res.ok()
+    )
+
+    await Promise.all([getResponse, assignResponse, searchResponse])
+
     await expect(row.getByLabel('User avatar')).toBeVisible({ timeout: 20000 })
   })
 
