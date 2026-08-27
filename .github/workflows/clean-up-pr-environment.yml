@@ -1,0 +1,48 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Clean up environment on PR close
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - develop
+  workflow_dispatch:
+    inputs:
+      pull-request-id:
+        description: 'Pull request id'
+        required: true
+        default: ''
+jobs:
+  get-pull-request:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Get PR details from workflow dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: get-pr-by-id
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pull-request-id }}
+          PR_DATA=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/opencrvs/opencrvs-core/pulls/$PR_NUMBER)
+          echo "$PR_DATA" | jq .
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Get PR details from event
+        if: ${{ github.event_name == 'pull_request' }}
+        id: get-pr-by-trigger
+        run: |
+          echo '${{ toJSON(github.event.pull_request) }}' | jq .
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
