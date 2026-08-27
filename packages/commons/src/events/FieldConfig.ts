@@ -1051,10 +1051,27 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+const FieldGroupConfiguration = z.object({
+  separator: z
+    .string()
+    .optional()
+    .describe(
+      'Joins the subfield values when the group is rendered as output, e.g. ", ". Defaults to one subfield per line.'
+    ),
+  hideEmptyFields: z
+    .boolean()
+    .default(false)
+    .optional()
+    .describe(
+      'Leaves subfields without a value out of the output. Pair it with a separator so the separator does not double up around the gaps.'
+    )
+})
+
 const FieldGroup = BaseField.extend({
   type: z.literal(FieldType.FIELD_GROUP),
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  fields: z.lazy(() => z.array(FieldConfig))
+  fields: z.lazy(() => z.array(FieldConfig)),
+  configuration: FieldGroupConfiguration.optional()
 }).meta({
   description: 'A group of fields that are displayed together',
   id: 'FieldGroup'
@@ -1064,10 +1081,12 @@ const FieldGroup = BaseField.extend({
 type FieldGroupInput = z.input<typeof BaseField> & {
   type: typeof FieldType.FIELD_GROUP
   fields: FieldConfigInput[]
+  configuration?: z.input<typeof FieldGroupConfiguration>
 }
 export type FieldGroup = BaseField & {
   type: typeof FieldType.FIELD_GROUP
   fields: FieldConfig[]
+  configuration?: z.infer<typeof FieldGroupConfiguration>
 }
 
 // This is an alpha version of the print button and it is not recommended for use and will change in the future

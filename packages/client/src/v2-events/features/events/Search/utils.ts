@@ -686,6 +686,7 @@ function toAddressSearchGroup(
     hideLabel: true,
     conditionals: field.conditionals,
     required: false,
+    configuration: { separator: ', ', hideEmptyFields: true },
     fields: [countryField, ...domesticFields, ...streetAddressFields]
   }
 }

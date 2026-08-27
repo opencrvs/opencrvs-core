@@ -126,19 +126,14 @@ export function ValueOutput({
       return null
     }
 
-    /*
-     * A criteria pill should show comma separated inline values
-     * (same as Address.Output)
-     */
     const groupValue = field.value
-    const subfields =
-      searchMode === true
-        ? field.config.fields.filter((subfield) =>
-            Boolean(groupValue[subfield.id])
-          )
-        : field.config.fields
+    const { separator, hideEmptyFields } = field.config.configuration ?? {}
 
-    const separator = searchMode === true ? ', ' : <br />
+    const subfields = hideEmptyFields
+      ? field.config.fields.filter((subfield) =>
+          Boolean(groupValue[subfield.id])
+        )
+      : field.config.fields
 
     return (
       <>
@@ -151,7 +146,7 @@ export function ValueOutput({
               searchMode={searchMode}
               value={groupValue[subfield.id]}
             />
-            {idx < subfields.length - 1 ? separator : undefined}
+            {idx < subfields.length - 1 ? (separator ?? <br />) : undefined}
           </React.Fragment>
         ))}
       </>
