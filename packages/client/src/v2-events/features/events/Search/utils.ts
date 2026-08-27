@@ -683,6 +683,7 @@ function toAddressSearchGroup(
     id: field.id,
     type: FieldType.FIELD_GROUP,
     label: field.label,
+    hideLabel: true,
     conditionals: field.conditionals,
     required: false,
     fields: [countryField, ...domesticFields, ...streetAddressFields]
