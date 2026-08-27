@@ -72,8 +72,10 @@ export async function tokenExchangeHandler(
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId },
     sub as UUID,
-    userType as 'user' | 'system',
-    extraScopes
+    extraScopes,
+    // Carry the subject's user type over so integrations confirming an action
+    // are resolved (and audited) as the system client, not as a user
+    userType
   )
 
   return oauthResponse.success(h, recordToken)

@@ -40,8 +40,8 @@ function NumberWithUnitInput({
   options,
   ...props
 }: NumberWithUnitInputProps) {
-  const handleUnitChange = (code: string) => {
-    onChange({ ...value, unit: code })
+  const handleUnitChange = (code: string | null) => {
+    onChange({ ...value, unit: code ?? undefined })
   }
 
   const handleNumericValueChange = (newVal: number | undefined) => {

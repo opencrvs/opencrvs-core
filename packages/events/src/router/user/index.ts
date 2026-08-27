@@ -672,7 +672,15 @@ export const userRouter = router({
         )
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      // Ensure the user is activating their own account
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: "Not allowed to activate another user's account"
+        })
+      }
+
       return activateUser(input)
     }),
   sendUsernameReminder: userAndSystemProcedure

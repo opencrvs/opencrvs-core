@@ -44,6 +44,7 @@ metadata:
   name: mosip-api
 spec:
   replicas: 1
+  {{- include "strategy-helper" (dict "service_name" "mosip_api" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: mosip-api
@@ -86,6 +87,8 @@ spec:
               value: http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070
             - name: OPENCRVS_PUBLIC_KEY_URL
               value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040/.well-known
+            - name: OPENCRVS_AUTH_URL
+              value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040
           {{- include "render-env-vars" (dict "service_name" "mosip_api" "Values" .Values) }}
           volumeMounts:
             - name: keystore

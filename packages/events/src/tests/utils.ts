@@ -709,6 +709,8 @@ function eventMatchesScope({
   eventIndex,
   user,
   placeOfEvent,
+  createdBy,
+  createdIn,
   declaredBy,
   registeredBy,
   declaredIn,
@@ -721,6 +723,8 @@ function eventMatchesScope({
     | { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
     | CreatedUser
   placeOfEvent?: JurisdictionFilter
+  createdBy?: UserFilter
+  createdIn?: JurisdictionFilter
   declaredBy?: UserFilter
   registeredBy?: UserFilter
   declaredIn?: JurisdictionFilter
@@ -731,6 +735,33 @@ function eventMatchesScope({
     adminAreaId: UUID | null
   ) => boolean
 }): boolean {
+  if (createdBy === UserFilter.enum.user) {
+    if (eventIndex.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.location) {
+    if (eventIndex.createdAtLocation !== user.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.administrativeArea) {
+    if (!eventIndex.createdAtLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.createdAtLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
   if (declaredBy === UserFilter.enum.user) {
     if (eventIndex.legalStatuses.DECLARED?.createdBy !== user.id) {
       return false
@@ -1058,6 +1089,8 @@ export function assertScopeResult(
     event,
     placeOfEvent,
     isUnderAdministrativeArea,
+    createdBy,
+    createdIn,
     declaredBy,
     declaredIn,
     registeredBy,
@@ -1070,6 +1103,8 @@ export function assertScopeResult(
       locationId: UUID,
       adminAreaId: UUID | null
     ) => boolean
+    createdBy?: UserFilter
+    createdIn?: JurisdictionFilter
     declaredBy?: UserFilter
     registeredBy?: UserFilter
     declaredIn?: JurisdictionFilter
@@ -1086,6 +1121,8 @@ export function assertScopeResult(
   const isAccessibleWithScope = eventMatchesScope({
     eventIndex,
     user,
+    createdBy,
+    createdIn,
     declaredBy,
     registeredBy,
     declaredIn,

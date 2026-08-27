@@ -474,6 +474,9 @@ export function resolveRecordActionScopeToIds(
     options: {
       event: options?.event,
       placeOfEvent: getLocationIdsFromScopeOptions(options?.placeOfEvent, user),
+      createdBy:
+        options?.createdBy === UserFilter.enum.user ? user.id : undefined,
+      createdIn: getLocationIdsFromScopeOptions(options?.createdIn, user),
       declaredIn: getLocationIdsFromScopeOptions(options?.declaredIn, user),
       declaredBy:
         options?.declaredBy === UserFilter.enum.user ? user.id : undefined,

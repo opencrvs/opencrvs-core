@@ -62,6 +62,7 @@ metadata:
   name: countryconfig
 spec:
   replicas: {{ .Values.countryconfig.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: countryconfig
@@ -97,6 +98,8 @@ spec:
               value: "http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070"
             - name: AUTH_URL
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
+            - name: EVENTS_URL
+              value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
           {{- if eq .Values.mongodb.auth_mode "disabled" }}
             - name: MONGO_URL
               value: mongodb://{{ .Values.mongodb.host }}/user-mgnt

@@ -31,9 +31,9 @@ import {
   FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
-  findLocalEventDocument,
-  findLocalEventIndex
-} from '@client/v2-events/features/events/useEvents/api'
+  getCreatedEvent,
+  resolveTemporaryIdInPath
+} from '@client/v2-events/features/events/useEvents/temporary-id'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
 import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
@@ -48,24 +48,11 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       return canonicalMutationFn({ ...params, eventId })
     }
 
-    const localVersion =
-      findLocalEventIndex(eventId) || findLocalEventDocument(eventId)
-
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      throw new Error(
-        'Event that has not been stored yet cannot be actioned on'
-      )
-    }
+    const localVersion = getCreatedEvent(eventId)
 
     const replaceTemporaryIdInDocumentPath = (
       fieldValue: FileFieldValue | FileFieldValueWithOption
-    ) => {
-      const path = fieldValue.path
-        .split('/')
-        .map((chunk) => (chunk === eventId ? localVersion.id : chunk))
-        .join('/')
-      return { ...fieldValue, path }
-    }
+    ) => ({ ...fieldValue, path: resolveTemporaryIdInPath(fieldValue.path) })
 
     const replaceTemporaryIdInObject = (obj: object) => {
       return Object.fromEntries(

@@ -20,3 +20,11 @@ imagePullSecrets: []
 image:
   name: ghcr.io/opencrvs/opencrvs-farajaland-demo-portals
   tag: latest
+
+# Deployment rollout strategy.
+# - Recreate: terminate the existing pod before creating its replacement.
+#   Guarantees the old pod is gone before the new one starts; causes a
+#   brief outage since this chart runs a single replica.
+# - RollingUpdate: Kubernetes' default gradual pod swap.
+strategy:
+  type: Recreate

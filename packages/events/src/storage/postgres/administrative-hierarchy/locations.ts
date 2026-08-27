@@ -212,7 +212,9 @@ export function getAdministrativeHierarchyByIdCte(
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
 
-export function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
+export async function getAdministrativeHierarchyById(
+  id: string
+): Promise<UUID[]> {
   const cached = administrativeHierarchyByIdCache.get(id)
   if (cached) {
     return cached

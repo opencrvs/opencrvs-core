@@ -116,7 +116,7 @@ export async function setAdministrativeAreas(
  */
 let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
-export function getLeafLevelAdministrativeAreaIds() {
+export async function getLeafLevelAdministrativeAreaIds() {
   if (!leafLevelAdministrativeAreaIdsCache) {
     const db = getClient()
 

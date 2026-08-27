@@ -174,7 +174,7 @@ function useEditActions(event: EventDocument) {
   const events = useEvents()
   const formConfig = getDeclaration(eventConfiguration)
   const declaration = useEventFormData((state) => state.getFormValues())
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)

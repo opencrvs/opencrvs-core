@@ -29,6 +29,7 @@ import {
   AddressField,
   AdministrativeAreaField,
   TextField,
+  EventConfig,
   ValidatorContext,
   IndexMap,
   FormState,
@@ -59,6 +60,7 @@ interface Props {
   config: AddressField
   disabled?: boolean
   validatorContext: ValidatorContext
+  eventConfig?: EventConfig
 }
 
 const DEFAULT_COUNTRY_FIELD = {

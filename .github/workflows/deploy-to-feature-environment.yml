@@ -223,22 +223,22 @@ jobs:
           HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headRefOid' | cut -c1-7)
           echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
 
-      - name: Check if branch exists in opencrvs-farajaland repo
+      - name: Check if branch exists in opencrvs-testland repo
         run: |
-          FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
+          TESTLAND_REPO=https://github.com/opencrvs/opencrvs-testland
           BASE_BRANCH="${{ github.base_ref || 'develop' }}"
 
-          if git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
-            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
-            echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-farajaland repo: $COMMIT_HASH"
-          elif git ls-remote $FARAJALAND_REPO refs/heads/$BASE_BRANCH | grep -q "$BASE_BRANCH"; then
-            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/$BASE_BRANCH | cut -c1-7)
-            echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo. Will use commit hash: '$COMMIT_HASH' from base branch: '$BASE_BRANCH'"
+          if git ls-remote $TESTLAND_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
+            COMMIT_HASH=$(git ls-remote $TESTLAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
+            echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-testland repo: $COMMIT_HASH"
+          elif git ls-remote $TESTLAND_REPO refs/heads/$BASE_BRANCH | grep -q "$BASE_BRANCH"; then
+            COMMIT_HASH=$(git ls-remote $TESTLAND_REPO refs/heads/$BASE_BRANCH | cut -c1-7)
+            echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-testland repo. Will use commit hash: '$COMMIT_HASH' from base branch: '$BASE_BRANCH'"
           else
-            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/develop | cut -c1-7)
-            echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo. Will use commit hash: '$COMMIT_HASH' from 'develop' branch"
+            COMMIT_HASH=$(git ls-remote $TESTLAND_REPO refs/heads/develop | cut -c1-7)
+            echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-testland repo. Will use commit hash: '$COMMIT_HASH' from 'develop' branch"
           fi
-          echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+          echo "TESTLAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
       - name: Parse the stack name
         id: generate_stack
         run: |
@@ -249,7 +249,7 @@ jobs:
           echo """
           PR Branch: ${{ env.BRANCH_NAME }}
           PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}
-          Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}
+          Testland Commit Hash: ${{ env.TESTLAND_COMMIT_HASH }}
           Keep e2e: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}
           E2E Branch: ${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}
           Stack: ${{ steps.generate_stack.outputs.stack }}
@@ -279,7 +279,7 @@ jobs:
 
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
-                'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
+                'countryconfig-image-tag': '${{ env.TESTLAND_COMMIT_HASH }}',
                 'core-branch': '${{ env.BRANCH_NAME }}',
                 stack: '${{ steps.generate_stack.outputs.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',

@@ -15,6 +15,7 @@ import { env } from './environment'
 import { server } from './server'
 import { getAnonymousToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
+import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
@@ -50,6 +51,7 @@ export async function main() {
   }
   startAnnouncementWorker()
   server().listen(5555)
+  void triggerSystemReady()
 }
 
 // Execute when the file is run directly e.g. (ts-node -r tsconfig-paths/register src/index.ts)

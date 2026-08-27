@@ -230,6 +230,17 @@ pdb:
   enabled: true
   minAvailable: 50%
 
+# Deployment rollout strategy, applied to all services below unless
+# overridden per-service under <service>.strategy (e.g. auth.strategy).
+# - Recreate: terminate all existing pods before creating replacements.
+#   Guarantees old pods are gone before new ones start; causes a brief
+#   outage for that service during rollout.
+# - RollingUpdate: swap pods gradually. Optionally set maxSurge and/or
+#   maxUnavailable (globally here, or per-service) to tune it; Kubernetes'
+#   own defaults (25%/25%) apply if neither is set.
+strategy:
+  type: Recreate
+
 # Resources allocated to OpenCRVS microservices (Kubernetes PODs):
 resources:
   memoryRequest: '128Mi'

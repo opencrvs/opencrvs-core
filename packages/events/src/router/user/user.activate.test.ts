@@ -56,9 +56,46 @@ describe('user.activate', () => {
     )
   })
 
-  test('returns NOT_FOUND when user does not exist', async () => {
+  test('cannot activate another user (account takeover)', async () => {
+    const { users, eventsDb } = await setupTestCase()
+    const attacker = users[0]
+    const victim = users[1]
+
+    // Put the victim in the invited-but-not-activated state
+    await eventsDb
+      .updateTable('users')
+      .where('id', '=', victim.id)
+      .set({ status: 'pending' })
+      .execute()
+
+    // A different authenticated user must not be able to set the victim's credentials and take over the account.
+    const attackerClient = createTestClient(attacker)
+    await expect(
+      attackerClient.user.activate({
+        userId: victim.id,
+        password: 'attacker_password',
+        securityQNAs: [
+          { questionKey: 'HOME_TOWN', answer: 'attacker' },
+          { questionKey: 'FIRST_SCHOOL', answer: 'attacker' },
+          { questionKey: 'FAVORITE_COLOR', answer: 'attacker' }
+        ]
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN', name: 'TRPCError' })
+
+    // The victim remains pending — not taken over.
+    const dbVictim = await eventsDb
+      .selectFrom('users')
+      .select('status')
+      .where('id', '=', victim.id)
+      .executeTakeFirstOrThrow()
+    expect(dbVictim.status).toBe('pending')
+  })
+
+  test('rejects a non-owned user id before checking existence (no leak)', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
+    // A random id that isn't the caller's own is rejected by the ownership
+    // check, so activate never reveals whether that id exists.
     await expect(
       client.user.activate({
         userId: getUUID(),
@@ -69,7 +106,7 @@ describe('user.activate', () => {
           { questionKey: 'FAVORITE_COLOR', answer: 'test' }
         ]
       })
-    ).rejects.toMatchObject({ code: 'NOT_FOUND', name: 'TRPCError' })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN', name: 'TRPCError' })
   })
 
   test('returns CONFLICT when user is already active', async () => {

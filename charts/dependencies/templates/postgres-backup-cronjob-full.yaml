@@ -30,7 +30,7 @@ spec:
                 - -c
                 - |
                   kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
-                    pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" backup --type=full
+                    su postgres -c 'pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" backup --type=full'
           restartPolicy: OnFailure
 {{- end }}
 {{- end }}

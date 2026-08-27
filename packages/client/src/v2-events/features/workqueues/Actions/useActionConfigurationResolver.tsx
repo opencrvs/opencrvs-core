@@ -48,7 +48,6 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const drafts = getAllRemoteDrafts()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
-  const validatorContext = useValidatorContext()
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
 
@@ -57,6 +56,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const validatorContext = useValidatorContext(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveAction = useCallback(
@@ -122,7 +122,6 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const validatorContext = useValidatorContext()
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
   const events = useEvents()
@@ -130,6 +129,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const validatorContext = useValidatorContext(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveConditionals = useCallback(

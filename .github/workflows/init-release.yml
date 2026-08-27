@@ -24,7 +24,7 @@
 #           A dedicated branch is used so that conflict-resolution commits
 #           stay off the release branch.
 #   5. Triggers the same init-release workflow in opencrvs-countryconfig and
-#      opencrvs-farajaland so all three repos move in lockstep.
+#      opencrvs-testland so all three repos move in lockstep.
 #   6. Creates a draft GitHub release and immediately deletes the backing tag
 #      (the tag will be re-created by the publish workflow after the PR merges).
 name: Release - Start a new release
@@ -219,14 +219,14 @@ jobs:
                 version: '${{ inputs.version }}'
               }
             })
-      - name: Trigger workflow in opencrvs-farajaland
+      - name: Trigger workflow in opencrvs-testland
         uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.FARAJALAND_WORKFLOW_TOKEN }}
+          github-token: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
-              repo: 'opencrvs-farajaland',
+              repo: 'opencrvs-testland',
               workflow_id: 'init-release.yml',
               ref: '${{ github.ref_name }}',
               inputs: {

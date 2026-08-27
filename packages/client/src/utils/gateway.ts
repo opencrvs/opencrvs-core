@@ -1907,7 +1907,7 @@ export type System = {
   settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
   status: SystemStatus
-  type: SystemType
+  type?: Maybe<SystemType>
 }
 
 type SystemInput = {

@@ -18,9 +18,13 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { triggerUserEventNotification } from '@opencrvs/commons'
+import { triggerUserEventNotification, TokenUserType } from '@opencrvs/commons'
 import { env } from '@auth/environment'
-import { recordAnonymousUserAuditEvent } from '@auth/features/authenticate/service'
+import { JWT_ISSUER } from '@auth/constants'
+import {
+  createToken,
+  recordAnonymousUserAuditEvent
+} from '@auth/features/authenticate/service'
 
 interface IPayload {
   nonce: string
@@ -52,7 +56,23 @@ export default async function sendUserNameHandler(
       username: retrievalStepInformation.username
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-    authHeader: { Authorization: request.headers.authorization as string }
+    /*
+     * Username retrieval is a pre-authentication flow: the caller proves
+     * itself with the nonce, not a token, so there is no incoming
+     * Authorization header to forward. Mint a short-lived system token
+     * instead — the same way the 2FA and password-reset code notifications do
+     * — so country config can require auth on `/triggers/user/*`.
+     */
+    authHeader: {
+      Authorization: `Bearer ${await createToken(
+        'auth',
+        [],
+        ['opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        undefined,
+        TokenUserType.enum.system
+      )}`
+    }
   })
 
   await recordAnonymousUserAuditEvent({

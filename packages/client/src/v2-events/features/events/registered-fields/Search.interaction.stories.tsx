@@ -12,10 +12,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test'
 import { http, HttpResponse } from 'msw'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import {
   defineConditional,
+  EventState,
   field,
   FieldType,
   FieldConfig
@@ -146,6 +147,60 @@ const searchFields: FieldConfig[] = [
   }
 ]
 
+const searchResult = {
+  id: 'd65a1ecd-b26a-4520-b51c-bfdd43785471',
+  type: 'birth',
+  status: 'REGISTERED',
+  legalStatuses: {
+    DECLARED: {
+      createdAt: '2025-09-10T07:08:48.495Z',
+      createdBy: '68c122bc28f080e722d4927c',
+      createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+      createdByUserType: 'user',
+      acceptedAt: '2025-09-10T07:08:48.959Z',
+      createdByRole: 'LOCAL_REGISTRAR'
+    },
+    REGISTERED: {
+      createdAt: '2025-09-10T07:08:51.963Z',
+      createdBy: '68c122bc28f080e722d4927c',
+      createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+      createdByUserType: 'user',
+      acceptedAt: '2025-09-10T07:08:52.195Z',
+      createdByRole: 'LOCAL_REGISTRAR',
+      registrationNumber: 'I3G2AIUXF4SU'
+    }
+  },
+  createdAt: '2025-09-10T07:08:47.987Z',
+  dateOfEvent: '2025-09-09',
+  createdBy: '68c122bc28f080e722d4927c',
+  createdByUserType: 'user',
+  updatedByUserRole: 'LOCAL_REGISTRAR',
+  createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+  updatedAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+  updatedAt: '2025-09-10T07:08:52.195Z',
+  updatedBy: '68c122bc28f080e722d4927c',
+  trackingId: 'TFY9FK',
+  potentialDuplicates: [],
+  flags: ['pending-certification'],
+  declaration: {
+    'child.name': {
+      surname: 'Dietrich',
+      firstname: 'Royal'
+    },
+    'child.gender': 'female',
+    'informant.relation': 'MOTHER',
+    'mother.name': {
+      surname: 'Schaden',
+      firstname: 'Jayce'
+    },
+    'mother.nationality': 'FAR',
+    'mother.idType': 'NATIONAL_ID',
+    'mother.nid': '6097821229',
+    'father.detailsNotAvailable': true,
+    'father.reason': 'Father is missing.'
+  }
+}
+
 export const InvalidValue_NoRecordsFound: Story = {
   name: 'Invalid value - No records found',
   parameters: {
@@ -234,61 +289,7 @@ export const SearchWithRegistrationNumber: Story = {
           http.post('/api/events/events/search', async () => {
             await new Promise((resolve) => setTimeout(resolve, 1000 * 2))
             return HttpResponse.json({
-              results: [
-                {
-                  id: 'd65a1ecd-b26a-4520-b51c-bfdd43785471',
-                  type: 'birth',
-                  status: 'REGISTERED',
-                  legalStatuses: {
-                    DECLARED: {
-                      createdAt: '2025-09-10T07:08:48.495Z',
-                      createdBy: '68c122bc28f080e722d4927c',
-                      createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                      createdByUserType: 'user',
-                      acceptedAt: '2025-09-10T07:08:48.959Z',
-                      createdByRole: 'LOCAL_REGISTRAR'
-                    },
-                    REGISTERED: {
-                      createdAt: '2025-09-10T07:08:51.963Z',
-                      createdBy: '68c122bc28f080e722d4927c',
-                      createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                      createdByUserType: 'user',
-                      acceptedAt: '2025-09-10T07:08:52.195Z',
-                      createdByRole: 'LOCAL_REGISTRAR',
-                      registrationNumber: 'I3G2AIUXF4SU'
-                    }
-                  },
-                  createdAt: '2025-09-10T07:08:47.987Z',
-                  dateOfEvent: '2025-09-09',
-                  createdBy: '68c122bc28f080e722d4927c',
-                  createdByUserType: 'user',
-                  updatedByUserRole: 'LOCAL_REGISTRAR',
-                  createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                  updatedAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                  updatedAt: '2025-09-10T07:08:52.195Z',
-                  updatedBy: '68c122bc28f080e722d4927c',
-                  trackingId: 'TFY9FK',
-                  potentialDuplicates: [],
-                  flags: ['pending-certification'],
-                  declaration: {
-                    'child.name': {
-                      surname: 'Dietrich',
-                      firstname: 'Royal'
-                    },
-                    'child.gender': 'female',
-                    'informant.relation': 'MOTHER',
-                    'mother.name': {
-                      surname: 'Schaden',
-                      firstname: 'Jayce'
-                    },
-                    'mother.nationality': 'FAR',
-                    'mother.idType': 'NATIONAL_ID',
-                    'mother.nid': '6097821229',
-                    'father.detailsNotAvailable': true,
-                    'father.reason': 'Father is missing.'
-                  }
-                }
-              ],
+              results: [searchResult],
               total: 1
             })
           })
@@ -362,6 +363,86 @@ export const SearchWithRegistrationNumber: Story = {
         id="my-form"
         validatorContext={{}}
       />
+    )
+  }
+}
+
+export const ExternalValueReset: Story = {
+  name: 'Resetting the value outside the field clears the search',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    msw: {
+      handlers: {
+        nidApi: [
+          http.post('/api/events/events/search', () => {
+            return HttpResponse.json({
+              results: [searchResult],
+              total: 1
+            })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await userEvent.type(
+      await canvas.findByTestId('search-input'),
+      '6097821229'
+    )
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /Confirm/i })
+    )
+
+    await waitFor(
+      async () =>
+        expect(canvas.getByText('Found 1 results')).toBeInTheDocument(),
+      { timeout: 3000 }
+    )
+    await expect(await canvas.findByTestId('search-input')).toBeDisabled()
+
+    // The page level "Clear" resets the field value in the form, without going
+    // through the field's own clear. The term and the results must follow, or
+    // the input stays disabled with no way to search again.
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Reset form values' })
+    )
+
+    await waitFor(async () =>
+      expect(await canvas.findByTestId('search-input')).toHaveValue('')
+    )
+    await expect(await canvas.findByTestId('search-input')).toBeEnabled()
+    await expect(canvas.queryByText('Found 1 results')).not.toBeInTheDocument()
+  },
+  render: function Component(args) {
+    const [formValues, setFormValues] = useState<EventState>({})
+
+    return (
+      <>
+        <StyledFormFieldGenerator
+          {...args}
+          fields={searchFields}
+          formValues={formValues}
+          id="my-form"
+          validatorContext={{}}
+          onFormChange={setFormValues}
+        />
+        <button
+          onClick={() =>
+            setFormValues((values) => ({
+              ...values,
+              'child.brn-search': null,
+              'child.name': null
+            }))
+          }
+        >
+          {'Reset form values'}
+        </button>
+      </>
     )
   }
 }
