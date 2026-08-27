@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as z from 'zod'
 import styled from 'styled-components'
@@ -283,6 +283,21 @@ function SearchInput({
     value ?? null
   )
   const isOnline = useOnlineStatus()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null) // pending enter-key search timer
+  const lastSearchedValueRef = useRef<string | null>(null) // last value we actually searched for
+  const httpStateRef = useRef(httpState) // lets the debounced timeout read the latest loading state
+
+  useEffect(() => {
+    httpStateRef.current = httpState
+  }, [httpState])
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current) // cancel pending search on unmount
+      }
+    }
+  }, [])
 
   const clearData = async () => {
     const confirm = await openModal<boolean>((close) => (
@@ -291,6 +306,7 @@ function SearchInput({
     if (confirm) {
       setInputState('')
       setHttpState(null)
+      lastSearchedValueRef.current = null
       onChange({
         loading: false,
         error: {
@@ -393,6 +409,7 @@ function SearchInput({
 
   const isEditable =
     !disabled &&
+    !httpState?.loading && // disable field while a search is in flight
     (!httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0))
 
   return (
@@ -448,7 +465,20 @@ function SearchInput({
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && valid && isOnline) {
                   e.preventDefault()
-                  setButtonPressed(buttonPressed + 1)
+                  if (debounceRef.current) {
+                    clearTimeout(debounceRef.current) // reset wait on every new enter press
+                  }
+                  const valueToSearch = inputState
+                  debounceRef.current = setTimeout(() => {
+                    if (httpStateRef.current?.loading) {
+                      return // a search is already running, skip
+                    }
+                    if (valueToSearch === lastSearchedValueRef.current) {
+                      return // same value as last search, skip
+                    }
+                    lastSearchedValueRef.current = valueToSearch
+                    setButtonPressed((prev) => prev + 1) // triggers the actual search
+                  }, 200)
                 }
               }}
             />
