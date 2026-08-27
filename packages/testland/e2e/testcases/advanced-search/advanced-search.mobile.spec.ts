@@ -81,13 +81,25 @@ test.describe.serial('Advanced Search - Mobile', () => {
     await page.locator('#child____placeOfBirth').click()
     await page.getByText('Residential address', { exact: true }).click()
 
-    page.locator('#country').getByText('Farajaland')
-    page.locator('#province').getByText('Central')
-    page.locator('#district').getByText('Ibombo')
-    page.locator('#village').getByText('Klow')
+    page
+      .locator('[id="child____birthLocation____privateHome.country"]')
+      .getByText('Farajaland')
+    page
+      .locator('[id="child____birthLocation____privateHome.province"]')
+      .getByText('Central')
+    page
+      .locator('[id="child____birthLocation____privateHome.district"]')
+      .getByText('Ibombo')
+    page
+      .locator('[id="child____birthLocation____privateHome.village"]')
+      .getByText('Klow')
 
-    await page.locator('#town').fill('Dhaka')
-    await page.locator('#town').blur()
+    await page
+      .locator('[id="child____birthLocation____privateHome.town"]')
+      .fill('Dhaka')
+    await page
+      .locator('[id="child____birthLocation____privateHome.town"]')
+      .blur()
   })
 
   test('Search', async () => {
