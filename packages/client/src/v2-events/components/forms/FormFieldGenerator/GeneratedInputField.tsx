@@ -932,9 +932,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Search.Input
           key={name}
           configuration={field.config.configuration}
+          disabled={inputProps.disabled}
           form={ocrvsFullForm}
           helperText={fieldDefinition.helperText}
           label={inputLabel}
+          placeholder={inputProps.placeholder}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />

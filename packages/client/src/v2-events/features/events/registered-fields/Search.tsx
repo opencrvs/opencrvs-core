@@ -262,12 +262,16 @@ function SearchInput({
   configuration,
   label,
   helperText,
-  value
+  value,
+  disabled,
+  placeholder
 }: Omit<HttpInputProps, 'configuration' | 'trigger'> & {
   configuration: SearchField['configuration']
   value: HttpFieldValue | null | undefined
   label?: string
   helperText?: TranslationConfig
+  disabled?: boolean
+  placeholder?: string
 }) {
   const intl = useIntl()
 
@@ -388,7 +392,8 @@ function SearchInput({
   const { message, color = 'grey600' } = getMessages()
 
   const isEditable =
-    !httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0)
+    !disabled &&
+    (!httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0))
 
   return (
     <StyledContainer>
@@ -426,6 +431,7 @@ function SearchInput({
               data-testid="search-input"
               id="search"
               isDisabled={!isEditable}
+              placeholder={placeholder}
               postfix={
                 <Postfix
                   clearData={async () => clearData()}
