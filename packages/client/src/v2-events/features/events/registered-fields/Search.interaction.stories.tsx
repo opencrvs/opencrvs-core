@@ -194,9 +194,7 @@ export const InvalidValue_NoRecordsFound: Story = {
     await waitFor(async () =>
       expect(canvas.queryByTestId('search-input-error')).not.toBeInTheDocument()
     )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
-    )
+    await userEvent.type(searchInput, '{Enter}')
     await expect(canvas.getByText('Validating...')).toBeInTheDocument()
 
     await waitFor(
@@ -308,10 +306,7 @@ export const SearchWithRegistrationNumber: Story = {
 
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
@@ -386,10 +381,7 @@ export const TimeOut: Story = {
     const canvas = within(canvasElement)
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
@@ -408,6 +400,7 @@ export const TimeOut: Story = {
     )
   }
 }
+
 export const HttpError: Story = {
   parameters: {
     chromatic: {
@@ -428,10 +421,7 @@ export const HttpError: Story = {
     const canvas = within(canvasElement)
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
