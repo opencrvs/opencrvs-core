@@ -59,7 +59,8 @@ export const SearchResultIndex = () => {
      * filter is held as a FIELD_GROUP value, so it would not survive.
      *
      * Safe to skip: the filter below drops any key that is not a known field,
-     * and each value is validated against that field's own schema.
+     * and every value that reaches a query is checked by the branch that
+     * consumes it.
      */
     const searchParams = deserializeSearchParams(location.search)
 
