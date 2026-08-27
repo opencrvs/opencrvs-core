@@ -6,15 +6,10 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-#
-# Publishing is manual. A release tag no longer triggers it: the release
-# sequence publishes first, then pins the published version into
-# packages/countryconfig-template and tags that commit, so the tag cannot be
-# the trigger. See release-steps.md.
-#
+
 name: Publish toolkit to NPM registry
 run-name: >-
-  Publish ${{ inputs.version || 'a snapshot' }} from ${{ inputs.ref }}
+  Publish ${{ inputs.version || 'a release candidate' }} from ${{ inputs.ref }}
 on:
   workflow_dispatch:
     inputs:
@@ -23,17 +18,13 @@ on:
         required: true
       version:
         description: >-
-          npm version to publish as. Leave empty for a snapshot of `ref`,
-          published under `next` (or `vX.Y-next` when that line already has a
-          release). Hints: 2.1.0 gives `latest` (or `v2.1-latest` when 2.1 has
-          been superseded), 2.2.0-beta.1 gives `beta`, 2.1.0-rc.3 gives `rc`.
+          npm version to publish as. Empty derives from package.json version
+          and tags as `next` or `vX.Y-next`. Hints: 2.1.0 gives `latest`
+          or `v2.1-latest`, 2.2.0-beta.1 gives `beta`, 2.1.0-rc.3 gives `rc`.
         default: ''
         required: false
       dist_tag:
-        description: >-
-          Optional npm dist-tag override. Only one tag is ever applied per
-          publish, so this replaces the derived tag rather than adding a second
-          pointer to the same version.
+        description: Optional npm dist-tag override.
         default: ''
         required: false
 
@@ -41,8 +32,6 @@ permissions:
   contents: read
 
 jobs:
-  # Resolves what would be published and stops there. The job summary it
-  # writes is what the npm-publish environment reviewer reads before approving.
   plan:
     runs-on: ubuntu-26.04
     outputs:
@@ -71,10 +60,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The approval can sit for hours, so the commit is resolved once here
-          # and the publish job checks out that sha rather than `ref` - a branch
-          # tip that moved in between would otherwise be built under a version
-          # naming the commit this job saw.
+          # The approval is async, so the commit is resolved once here and the
+          # publish job checks out that sha rather than `ref` - a branch
+          # tip that might have moved in between.
           RESOLVED_SHA="$(git rev-parse HEAD)"
 
           if [ -n "$VERSION_INPUT" ]; then
@@ -96,19 +84,19 @@ jobs:
           #
           #   vX.Y-latest  newest release of a superseded minor (a hotfix)
           #
-          #   next         snapshots toward the next, unreleased minor
+          #   next         release candidate toward the next, unreleased minor
           #
-          #   vX.Y-next    snapshots toward the next patch of a minor that has
-          #                already been released
+          #   vX.Y-next    release candidate toward the next patch of a minor that
+          #                has already been released
           #
-          #   beta, rc,    a `version` input carrying a prerelease suffix takes
-          #   alpha, ...   its dist-tag from that suffix's first identifier, so
+          #   beta, alpha  a `version` input carrying a prerelease suffix takes
+          #                its dist-tag from that suffix's first identifier, so
           #                2.1.0-beta publishes under `beta`. Not part of the
           #                leading-line rule and deliberately outside it - a
           #                prerelease is never allowed to resolve to any of the
           #                four tags above
           #
-          # A snapshot - no `version` input - is the only thing that reaches
+          # An rc - no `version` input - is the only thing that reaches
           # `next` or `vX.Y-next`, which is why both stay forbidden as a
           # prerelease identifier below.
           #
@@ -228,8 +216,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   # Gated on the npm-publish environment: a reviewer approves the plan above
-  # before anything reaches npm. `id-token: write` lives here rather than at
-  # workflow level so only this job can mint an OIDC publishing token.
+  # before anything reaches npm.
   publish:
     needs: plan
     runs-on: ubuntu-26.04
