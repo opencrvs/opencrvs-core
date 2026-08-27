@@ -342,7 +342,7 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
  * Version pins are stripped here — the version is display-only and must never
  * reach a query term.
  */
-export function toAddressQueryValue(
+function toAddressQueryValue(
   value: FieldValue | undefined,
   group: FieldGroup
 ): AddressFieldValue | undefined {
