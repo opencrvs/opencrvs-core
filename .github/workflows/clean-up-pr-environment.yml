@@ -15,34 +15,73 @@ on:
       - develop
   workflow_dispatch:
     inputs:
-      pull-request-id:
-        description: 'Pull request id'
+      branch-name:
+        description: 'Branch name'
         required: true
         default: ''
+
 jobs:
-  get-pull-request:
+  get-k8s-stack-name-from-branch:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-26.04
+    outputs:
+      stack: ${{ steps.slugify-branch-name.outputs.stack }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Get PR details from workflow dispatch
+      - name: Get branch name from manual input
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: get-pr-by-id
         run: |
-          PR_NUMBER=${{ github.event.inputs.pull-request-id }}
-          PR_DATA=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/opencrvs/opencrvs-core/pulls/$PR_NUMBER)
-          echo "$PR_DATA" | jq .
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          echo "BRANCH_NAME=${{ github.event.inputs.branch-name }}" >> $GITHUB_ENV
 
-      - name: Get PR details from event
+      - name: Get branch name from event
         if: ${{ github.event_name == 'pull_request' }}
         id: get-pr-by-trigger
         run: |
-          echo '${{ toJSON(github.event.pull_request) }}' | jq .
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          echo "BRANCH_NAME=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+
+      - name: Slugify the branch name for k8s
+        id: slugify-branch-name
+        uses: actions/github-script@v8
+        with:
+          script: |
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substr(0, 30)
+                .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
+            }
+            core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
+
+      - name: Remove keep e2e label
+        if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, '🔒 Keep e2e') }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: '🔒 Keep e2e',
+            });
+
+  trigger-cleanup:
+    needs: [get-k8s-stack-name-from-branch]
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Trigger namespace cleanup workflow in e2e
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'opencrvs',
+              repo: 'e2e',
+              workflow_id: 'set-keep-namespace-label-to-false.yml',
+              ref: 'develop',
+              inputs: {
+                stack: '${{ needs.get-k8s-stack-name-from-branch.outputs.stack }}',
+              },
+            });
