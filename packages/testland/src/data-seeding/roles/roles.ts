@@ -319,9 +319,17 @@ export const roles: Role[] = [
   },
   {
     /**
-     * Exercises the `createdBy` scope option: this agent only ever sees records
-     * they created themselves, even after another user re-declares the record
-     * with edits. See https://github.com/opencrvs/opencrvs-core/issues/13287
+     * A test-only role, not part of any real country configuration — the same
+     * intent as QA_HOSPITAL_CLERK above.
+     *
+     * It exists to exercise the `createdBy` scope filter added in
+     * opencrvs-core#13288: `record.search` and `record.read` carry
+     * `createdBy: 'user'`, so this agent only ever sees records it created
+     * itself. The case worth verifying is that it keeps access after another
+     * user re-declares the record with edits, which overwrites
+     * `legalStatuses.DECLARED.createdBy`.
+     *
+     * See https://github.com/opencrvs/opencrvs-core/issues/13287
      */
     id: 'FIELD_AGENT',
     label: {
