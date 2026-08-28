@@ -48,7 +48,10 @@ import {
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { generateAddressFields } from '@client/v2-events/features/events/registered-fields/Address'
+import {
+  generateAddressFields,
+  resolveAddressType
+} from '@client/v2-events/features/events/registered-fields/Address'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -346,7 +349,8 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
  */
 function toAddressQueryValue(
   value: FieldValue | undefined,
-  group: FieldGroup
+  group: FieldGroup,
+  addressField: AddressField | undefined
 ): AddressFieldValue | undefined {
   /*
    * Parsed rather than narrowed: a field value is a union, and narrowing it to a
@@ -371,18 +375,15 @@ function toAddressQueryValue(
     .filter((subfield) => subfield.type === FieldType.ADMINISTRATIVE_AREA)
     .map((subfield) => subfield.id)
 
-  const streetLevelDetails = Object.entries(entries).reduce<
-    Record<string, string>
-  >(
-    (details, [key, entry]) =>
-      key === 'country' ||
-      adminLevelIds.includes(key) ||
-      typeof entry !== 'string' ||
-      !entry
-        ? details
-        : { ...details, [key]: entry },
-    {}
-  )
+  const streetLevelDetails = (
+    addressField?.configuration?.streetAddressForm ?? []
+  ).reduce<Record<string, string>>((details, streetField) => {
+    const entry = entries[streetField.id]
+
+    return typeof entry === 'string' && entry
+      ? { ...details, [streetField.id]: entry }
+      : details
+  }, {})
 
   if (country !== (window.config.COUNTRY || 'FAR')) {
     return {
@@ -419,9 +420,9 @@ function toQueryableValue(value: FieldValue | undefined) {
 
 function isAddressSearchGroup(
   field: FieldConfig,
-  addressFieldIds: Set<string>
+  addressFields: Map<string, AddressField>
 ): field is FieldGroup {
-  return field.type === FieldType.FIELD_GROUP && addressFieldIds.has(field.id)
+  return field.type === FieldType.FIELD_GROUP && addressFields.has(field.id)
 }
 
 function buildSearchQueryFields(
@@ -431,7 +432,7 @@ function buildSearchQueryFields(
     fieldConfig: FieldConfig
   }[],
   searchInput: EventState, // values from UI or query string
-  addressFieldIds: Set<string>
+  addressFields: Map<string, AddressField>
 ): Record<string, Condition> {
   return searchConfigurations.reduce(
     (result: Record<string, Condition>, config) => {
@@ -489,8 +490,12 @@ function buildSearchQueryFields(
         }
       }
 
-      if (isAddressSearchGroup(config.fieldConfig, addressFieldIds)) {
-        const address = toAddressQueryValue(value, config.fieldConfig)
+      if (isAddressSearchGroup(config.fieldConfig, addressFields)) {
+        const address = toAddressQueryValue(
+          value,
+          config.fieldConfig,
+          addressFields.get(config.fieldId)
+        )
 
         if (!address || !AddressFieldValue.safeParse(address).success) {
           return result
@@ -686,6 +691,82 @@ function withAddressDefault<T extends CountryField | AdministrativeAreaField>(
     ...subfield,
     defaultValue: { ...area, $location: subfield.id }
   }
+}
+
+/**
+ * The key an address group carries for a value nobody enters.
+ */
+const DERIVED_ADDRESS_TYPE = 'addressType'
+
+function addressGroupsWithCountry(fields: FieldConfig[]) {
+  return fields.flatMap((field) => {
+    if (field.type !== FieldType.FIELD_GROUP) {
+      return []
+    }
+
+    const countrySubfield = field.fields.find(
+      (subfield) => subfield.type === FieldType.COUNTRY
+    )
+
+    return countrySubfield
+      ? [{ id: field.id, countryId: countrySubfield.id }]
+      : []
+  })
+}
+
+/**
+ * Adds each address group's `addressType` to the values the form renders from.
+ *`
+ * Worked out on the way into the form and never kept: the country can change
+ * while the form is open, so a stored answer would go stale. {@link
+ * withoutDerivedValues} takes it back off on the way out.
+ */
+export function withDerivedValues(
+  values: EventState,
+  fields: FieldConfig[]
+): EventState {
+  return addressGroupsWithCountry(fields).reduce((withDerived, group) => {
+    const groupValue = withDerived[group.id]
+
+    if (!groupValue || typeof groupValue !== 'object') {
+      return withDerived
+    }
+
+    const country = (groupValue as Record<string, unknown>)[group.countryId]
+
+    if (typeof country !== 'string') {
+      return withDerived
+    }
+
+    return {
+      ...withDerived,
+      [group.id]: {
+        ...groupValue,
+        [DERIVED_ADDRESS_TYPE]: resolveAddressType(country)
+      }
+    }
+  }, values)
+}
+
+/** Reverses {@link withDerivedValues}, so a search is built from what was entered. */
+export function withoutDerivedValues(
+  values: EventState,
+  fields: FieldConfig[]
+): EventState {
+  return addressGroupsWithCountry(fields).reduce((entered, group) => {
+    const groupValue = entered[group.id]
+
+    if (!groupValue || typeof groupValue !== 'object') {
+      return entered
+    }
+
+    const { [DERIVED_ADDRESS_TYPE]: _derived, ...rest } = groupValue as Record<
+      string,
+      unknown
+    >
+
+    return { ...entered, [group.id]: rest as EventState[string] }
+  }, values)
 }
 
 /**
@@ -892,10 +973,10 @@ export function buildSearchQuery(
   searchFieldConfigs: AdvancedSearchField[],
   eventConfig: EventConfig
 ): QueryInputType {
-  const addressFieldIds = new Set(
+  const addressFields = new Map(
     getAllUniqueFields(eventConfig)
       .filter((field) => field.type === FieldType.ADDRESS)
-      .map((field) => field.id)
+      .map((field) => [field.id, field])
   )
 
   const fieldsMap = searchFieldConfigs.reduce(
@@ -913,7 +994,7 @@ export function buildSearchQuery(
   }))
 
   // Generate the final query condition object from the filtered keys and raw input
-  return buildSearchQueryFields(searchConfigs, formValues, addressFieldIds)
+  return buildSearchQueryFields(searchConfigs, formValues, addressFields)
 }
 
 const searchFieldTypeMapping = {

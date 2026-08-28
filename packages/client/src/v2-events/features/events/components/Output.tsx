@@ -129,11 +129,13 @@ export function ValueOutput({
     const groupValue = field.value
     const { separator, hideEmptyFields } = field.config.configuration ?? {}
 
+    const visibleFields = field.config.fields.filter(
+      (subfield) => subfield.type !== FieldType.ALPHA_HIDDEN
+    )
+
     const subfields = hideEmptyFields
-      ? field.config.fields.filter((subfield) =>
-          Boolean(groupValue[subfield.id])
-        )
-      : field.config.fields
+      ? visibleFields.filter((subfield) => Boolean(groupValue[subfield.id]))
+      : visibleFields
 
     return (
       <>

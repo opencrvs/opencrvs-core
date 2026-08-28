@@ -397,6 +397,17 @@ function transformParentValueToNestedValue(
  * //   streetLevelDetails: { addressLine1: '42 Main St' }
  * // }
  */
+
+export function getDefaultCountry() {
+  return window.config.COUNTRY || 'FAR'
+}
+
+export function resolveAddressType(country: string) {
+  return country === getDefaultCountry()
+    ? AddressType.DOMESTIC
+    : AddressType.INTERNATIONAL
+}
+
 function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
@@ -407,8 +418,8 @@ function transformNestedValueToParentValue(
     adminLevelIds
   )
   const country = nestedValue.country as string
-  const defaultCountry = window.config.COUNTRY || 'FAR'
-  if (country === defaultCountry) {
+
+  if (resolveAddressType(country) === AddressType.DOMESTIC) {
     return {
       country,
       addressType: AddressType.DOMESTIC,
@@ -416,6 +427,7 @@ function transformNestedValueToParentValue(
       streetLevelDetails: addressLines
     }
   }
+
   return {
     country,
     addressType: AddressType.INTERNATIONAL,

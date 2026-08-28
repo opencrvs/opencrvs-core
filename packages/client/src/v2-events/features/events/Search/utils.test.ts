@@ -760,10 +760,12 @@ describe('withSearchLocationBehaviour', () => {
      * one `$location` lookup per level against the same user attribute.
      */
     expect(
-      group.fields.map((subfield) => [
-        subfield.id,
-        (subfield as { defaultValue?: unknown }).defaultValue
-      ])
+      group.fields
+        .filter((subfield) => subfield.type !== FieldType.ALPHA_HIDDEN)
+        .map((subfield) => [
+          subfield.id,
+          (subfield as { defaultValue?: unknown }).defaultValue
+        ])
     ).toEqual([
       ['country', 'FAR'],
       [
@@ -791,10 +793,12 @@ describe('withSearchLocationBehaviour', () => {
     ) as FieldGroup
 
     expect(
-      group.fields.every(
-        (subfield) =>
-          (subfield as { defaultValue?: unknown }).defaultValue === undefined
-      )
+      group.fields
+        .filter((subfield) => subfield.type !== FieldType.ALPHA_HIDDEN)
+        .every(
+          (subfield) =>
+            (subfield as { defaultValue?: unknown }).defaultValue === undefined
+        )
     ).toBe(true)
   })
 
@@ -835,7 +839,9 @@ describe('buildSearchQuery with version-pinned locations', () => {
     id: 'applicant.address',
     type: FieldType.ADDRESS,
     label,
-    configuration: {}
+    configuration: {
+      streetAddressForm: [{ id: 'addressLine1', type: FieldType.TEXT, label }]
+    }
   } as FieldConfig
 
   // The search form renders the address filter as a group, one entry per level.

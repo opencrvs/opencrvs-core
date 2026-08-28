@@ -17,7 +17,6 @@ import { get, omit } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import { useField, useFormikContext } from 'formik'
 import {
-  AddressType,
   EventState,
   FieldConfig,
   FieldValue,
@@ -323,30 +322,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
      */
     const groupValue: Record<string, FieldValue> = field.value ?? {}
 
-    /*
-     * A group holding a country has no `addressType` of its own — the address
-     * input synthesises that value for its nested form, so a group does the
-     * same. Without it every `isDomesticAddress()` guard in a country's street
-     * configuration resolves false and the street fields never appear.
-     */
-    const countrySubfield = field.config.fields.find(
-      (subfield) => subfield.type === FieldType.COUNTRY
-    )
-    const groupCountry = countrySubfield && groupValue[countrySubfield.id]
-    const derivedAddressType =
-      typeof groupCountry === 'string'
-        ? {
-            addressType:
-              groupCountry === (window.config.COUNTRY || 'FAR')
-                ? AddressType.DOMESTIC
-                : AddressType.INTERNATIONAL
-          }
-        : {}
-
     const groupScope = {
       ...ocrvsFullForm,
-      ...groupValue,
-      ...derivedAddressType
+      ...groupValue
     }
 
     return (
