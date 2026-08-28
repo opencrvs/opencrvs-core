@@ -167,13 +167,16 @@ export async function getToken(
 }
 
 export async function getClientToken(client_id: string, client_secret: string) {
-  const authUrl = `${GATEWAY_HOST}/auth/token?client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials`
-
-  const authResponse = await fetch(authUrl, {
+  const authResponse = await fetch(`${GATEWAY_HOST}/auth/token`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({
+      client_id,
+      client_secret,
+      grant_type: 'client_credentials'
+    })
   })
 
   const authBody = await authResponse.json()
