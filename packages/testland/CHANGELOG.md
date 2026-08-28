@@ -5,6 +5,7 @@
 ### New features
 
 - Added a `FIELD_AGENT` role that exercises the `createdBy` scope option: the agent only ever sees records they created themselves, even after another user re-declares the record with edits. [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+- The tennis club membership recommender page sets `showClearButton: true`, so the Clear button is exercised by a shipped form. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
 
 ### Breaking changes
 
