@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as z from 'zod'
 import styled from 'styled-components'
@@ -34,6 +34,7 @@ import {
 } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { useDebounce } from '@client/v2-events/hooks/useDebounce'
 import { makeFormFieldIdsFormikCompatible } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { Http, Props as HttpInputProps } from './Http'
 
@@ -283,20 +284,7 @@ function SearchInput({
     value ?? null
   )
   const isOnline = useOnlineStatus()
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null) // pending enter-key search timer
-  const httpStateRef = useRef(httpState) // lets the debounced timeout read the latest loading state
-
-  useEffect(() => {
-    httpStateRef.current = httpState
-  }, [httpState])
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current) // cancel pending search on unmount
-      }
-    }
-  }, [])
+  const debouncedButtonPressed = useDebounce(buttonPressed, 200) // settles 200ms after the last enter press
 
   const clearData = async () => {
     const confirm = await openModal<boolean>((close) => (
@@ -461,17 +449,14 @@ function SearchInput({
                 setInputState(e.target.value)
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && valid && isOnline) {
+                if (
+                  e.key === 'Enter' &&
+                  valid &&
+                  isOnline &&
+                  !httpState?.loading // a search is already running, skip
+                ) {
                   e.preventDefault()
-                  if (debounceRef.current) {
-                    clearTimeout(debounceRef.current) // reset wait on every new enter press
-                  }
-                  debounceRef.current = setTimeout(() => {
-                    if (httpStateRef.current?.loading) {
-                      return // a search is already running, skip
-                    }
-                    setButtonPressed((prev) => prev + 1) // triggers the actual search
-                  }, 200)
+                  setButtonPressed((prev) => prev + 1)
                 }
               }}
             />
@@ -492,7 +477,7 @@ function SearchInput({
               }
             }}
             form={form}
-            trigger={{ mode: 'onChange', value: buttonPressed }}
+            trigger={{ mode: 'onChange', value: debouncedButtonPressed }}
             onChange={onHTTPChange}
           />
         </SearchInputWrapper>
