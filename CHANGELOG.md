@@ -65,6 +65,26 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 [#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
 
+### Deprecations
+
+#### `POST /auth/token` parameters in the query string
+
+The token endpoint reads its parameters from the request body _or_ the URL. Sending them in the URL puts the client secret into gateway and proxy access logs, Sentry breadcrumbs, and every intermediary on the way (CWE-598). RFC 6749 §2.3.1 requires them in the body, and **a future release will read them only from there** — so integrations still authenticating via the URL should move now. This affects both grants: `client_credentials` (`client_id`, `client_secret`) and `urn:opencrvs:oauth:grant-type:token-exchange` (`subject_token`, `subject_token_type`, `requested_token_type`, `event_id`, `action_id`).
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Client IDs and secrets themselves keep working — only how they are transmitted changes.
+
+Until the removal, behaviour depends on the environment, so the change surfaces in development rather than in production:
+
+- **Production (`NODE_ENV=production`) keeps working**, but each such request logs an error naming the parameters, so operators can find the callers left to migrate. **Rotate any secret sent this way** — it may still be in retained logs.
+- **Every other deployment rejects the request** with `400 invalid_request` naming the parameters to move, so integrations testing against dev or staging fail immediately.
+
 ### Improvements
 
 - User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
