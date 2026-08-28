@@ -26,7 +26,8 @@
 #   5. Triggers the same init-release workflow in the infrastructure repo and
 #      creates the matching release branch in the e2e repo.
 #   6. Creates a draft GitHub release and immediately deletes the backing tag
-#      (the tag will be re-created by the publish workflow after the PR merges).
+#      (the release tag is created by hand later in the release sequence, see
+#      release-steps.md).
 name: Release - Start a new release
 on:
   workflow_dispatch:
