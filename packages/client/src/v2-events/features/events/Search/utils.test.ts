@@ -18,8 +18,14 @@ import {
   PlainDate,
   FieldConfig,
   FieldType,
-  AdministrativeAreas
+  AdministrativeAreas,
+  AddressType,
+  UUID,
+  FieldGroup,
+  AdministrativeAreaField
 } from '@opencrvs/commons/client'
+import { toVersionedLocation } from '@client/v2-events/VersionedLocation'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
   getMetadataFieldConfigs,
   buildSearchQuery,
@@ -32,10 +38,25 @@ import {
   withSearchLocationBehaviour
 } from './utils'
 
+/** Farajaland's default admin levels, as the offline config supplies them. */
+const ADMIN_STRUCTURE = [
+  {
+    id: 'province',
+    label: { id: 'province', defaultMessage: 'Province', description: 'p' }
+  },
+  {
+    id: 'district',
+    label: { id: 'district', defaultMessage: 'District', description: 'd' }
+  }
+] as AdminStructureItem[]
+
 describe('getAdvancedSearchFieldErrors', () => {
   it('should return no errors for empty values', () => {
     const mockFormValues = { 'applicant.dob': '3' }
-    const sections = resolveAdvancedSearchConfig(tennisClubMembershipEvent)
+    const sections = resolveAdvancedSearchConfig(
+      tennisClubMembershipEvent,
+      ADMIN_STRUCTURE
+    )
     const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {})
     expect(errors).toEqual({
       'applicant.name': [],
@@ -72,15 +93,21 @@ describe('getDefaultSearchFields', () => {
 })
 
 describe('buildDataCondition', () => {
-  const fields = resolveAdvancedSearchConfig(tennisClubMembershipEvent).flatMap(
-    (section) => section.fields
-  )
+  const fields = resolveAdvancedSearchConfig(
+    tennisClubMembershipEvent,
+    ADMIN_STRUCTURE
+  ).flatMap((section) => section.fields)
   const searchConfigs = tennisClubMembershipEvent.advancedSearch.flatMap(
     (section) => section.fields
   )
   it('should return anyOf condition for status=ALL', () => {
     const state = { 'event.status': 'ALL' }
-    const result = buildSearchQuery(state, fields, searchConfigs)
+    const result = buildSearchQuery(
+      state,
+      fields,
+      searchConfigs,
+      tennisClubMembershipEvent
+    )
     //@ts-ignore
     expect(result['event.status']).toEqual({
       type: 'anyOf',
@@ -98,7 +125,12 @@ describe('buildDataCondition', () => {
     const state = {
       'event.legalStatuses.REGISTERED.createdAtLocation': 'ABC123'
     }
-    const result = buildSearchQuery(state, fields, searchConfigs)
+    const result = buildSearchQuery(
+      state,
+      fields,
+      searchConfigs,
+      tennisClubMembershipEvent
+    )
     expect(
       //@ts-ignore
       result['event.legalStatuses.REGISTERED.createdAtLocation']
@@ -115,7 +147,12 @@ describe('buildDataCondition', () => {
         end: PlainDate.parse('1996-12-31')
       }
     }
-    const result = buildSearchQuery(state, fields, searchConfigs)
+    const result = buildSearchQuery(
+      state,
+      fields,
+      searchConfigs,
+      tennisClubMembershipEvent
+    )
     expect(
       //@ts-ignore
       result['applicant.dob']
@@ -130,7 +167,12 @@ describe('buildDataCondition', () => {
     const state = {
       'applicant.dob': '1996-01-01'
     }
-    const result = buildSearchQuery(state, fields, searchConfigs)
+    const result = buildSearchQuery(
+      state,
+      fields,
+      searchConfigs,
+      tennisClubMembershipEvent
+    )
     expect(
       //@ts-ignore
       result['applicant.dob']
@@ -573,7 +615,7 @@ describe('withSearchLocationBehaviour', () => {
   const configOf = (field: FieldConfig) =>
     (field as { configuration?: Record<string, unknown> }).configuration
 
-  it('lists historical names for a location (office/health) field, without excluding inactive', () => {
+  it('keeps inactive locations listed for a location (office/health) field', () => {
     const field = {
       id: 'field',
       type: FieldType.LOCATION,
@@ -581,11 +623,10 @@ describe('withSearchLocationBehaviour', () => {
       configuration: { locationTypes: ['HEALTH_FACILITY'] }
     } as FieldConfig
 
-    const result = withSearchLocationBehaviour(field)
+    const result = withSearchLocationBehaviour(field, ADMIN_STRUCTURE)
 
     expect(configOf(result)).toMatchObject({
       locationTypes: ['HEALTH_FACILITY'],
-      listHistoricalNames: true,
       activeOnly: false,
       anchorToDateOfEvent: false
     })
@@ -603,7 +644,7 @@ describe('withSearchLocationBehaviour', () => {
       }
     } as FieldConfig
 
-    const result = withSearchLocationBehaviour(field)
+    const result = withSearchLocationBehaviour(field, ADMIN_STRUCTURE)
 
     expect(configOf(result)).toMatchObject({
       activeOnly: false,
@@ -611,7 +652,7 @@ describe('withSearchLocationBehaviour', () => {
     })
   })
 
-  it('lists historical names and excludes inactive for an admin-structure field', () => {
+  it('excludes inactive areas for an admin-structure field', () => {
     const field = {
       id: 'field',
       type: FieldType.ADMINISTRATIVE_AREA,
@@ -619,15 +660,12 @@ describe('withSearchLocationBehaviour', () => {
       configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
     } as FieldConfig
 
-    const result = withSearchLocationBehaviour(field)
+    const result = withSearchLocationBehaviour(field, ADMIN_STRUCTURE)
 
-    expect(configOf(result)).toMatchObject({
-      listHistoricalNames: true,
-      activeOnly: true
-    })
+    expect(configOf(result)).toMatchObject({ activeOnly: true })
   })
 
-  it('lists historical names but keeps inactive for a non-admin-structure admin-area field', () => {
+  it('keeps inactive listed for a non-admin-structure admin-area field', () => {
     const field = {
       id: 'field',
       type: FieldType.ADMINISTRATIVE_AREA,
@@ -635,28 +673,139 @@ describe('withSearchLocationBehaviour', () => {
       configuration: { type: AdministrativeAreas.enum.HEALTH_FACILITY }
     } as FieldConfig
 
-    const result = withSearchLocationBehaviour(field)
+    const result = withSearchLocationBehaviour(field, ADMIN_STRUCTURE)
 
-    expect(configOf(result)).toMatchObject({
-      listHistoricalNames: true,
-      activeOnly: false
-    })
+    expect(configOf(result)).toMatchObject({ activeOnly: false })
   })
 
-  it('lists historical names and excludes inactive for an address field', () => {
+  it('flattens an address field into a group with one field per level', () => {
     const field = {
-      id: 'field',
+      id: 'applicant.address',
       type: FieldType.ADDRESS,
       label,
       configuration: {}
     } as FieldConfig
 
-    const result = withSearchLocationBehaviour(field)
+    const result = withSearchLocationBehaviour(field, ADMIN_STRUCTURE)
 
-    expect(configOf(result)).toMatchObject({
-      listHistoricalNames: true,
-      activeOnly: true
+    expect(result.type).toBe(FieldType.FIELD_GROUP)
+    expect(result.id).toBe('applicant.address')
+
+    const group = result as FieldGroup
+
+    /*
+     * `addressType` is not a level and not an input: it is the hidden field
+     * that works the value out from the country.
+     */
+    expect(group.fields.map((subfield) => subfield.id)).toEqual([
+      'country',
+      'addressType',
+      'province',
+      'district'
+    ])
+    expect(
+      group.fields
+        .filter((subfield) => subfield.type === FieldType.ADMINISTRATIVE_AREA)
+        .map((subfield) => configOf(subfield))
+    ).toEqual([
+      expect.objectContaining({ activeOnly: true }),
+      expect.objectContaining({ activeOnly: true })
+    ])
+  })
+
+  it("keeps an address group's level references as bare sibling ids", () => {
+    const field = {
+      id: 'applicant.address',
+      type: FieldType.ADDRESS,
+      label,
+      configuration: {}
+    } as FieldConfig
+
+    const group = withSearchLocationBehaviour(
+      field,
+      ADMIN_STRUCTURE
+    ) as FieldGroup
+    const district = group.fields.find(
+      (subfield) => subfield.id === 'district'
+    ) as AdministrativeAreaField
+
+    /*
+     * The group supplies its own values as the scope its subfields resolve
+     * against (@see GeneratedInputField's FIELD_GROUP branch), so a level refers
+     * to its parent exactly as it does in a declaration form. That also keeps a
+     * country's own street-field conditionals, which are written against bare
+     * ids, working unchanged.
+     */
+    expect(district.configuration.partOf).toMatchObject({
+      $$field: 'province',
+      $$subfield: []
     })
+  })
+
+  it("carries an address field's scope-based default down to each level", () => {
+    const field = {
+      id: 'applicant.address',
+      type: FieldType.ADDRESS,
+      label,
+      configuration: {},
+      defaultValue: {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: { $userField: 'administrativeAreaId' }
+      }
+    } as FieldConfig
+
+    const group = withSearchLocationBehaviour(
+      field,
+      ADMIN_STRUCTURE
+    ) as FieldGroup
+
+    /*
+     * An ADDRESS holds one administrative area, and the form fills the chain
+     * above it. A group has a field per level, so the default is restated as
+     * one `$location` lookup per level against the same user attribute.
+     */
+    expect(
+      group.fields
+        .filter((subfield) => subfield.type !== FieldType.ALPHA_HIDDEN)
+        .map((subfield) => [
+          subfield.id,
+          (subfield as { defaultValue?: unknown }).defaultValue
+        ])
+    ).toEqual([
+      ['country', 'FAR'],
+      [
+        'province',
+        { $userField: 'administrativeAreaId', $location: 'province' }
+      ],
+      [
+        'district',
+        { $userField: 'administrativeAreaId', $location: 'district' }
+      ]
+    ])
+  })
+
+  it('leaves a group without defaults when the address has none', () => {
+    const field = {
+      id: 'applicant.address',
+      type: FieldType.ADDRESS,
+      label,
+      configuration: {}
+    } as FieldConfig
+
+    const group = withSearchLocationBehaviour(
+      field,
+      ADMIN_STRUCTURE
+    ) as FieldGroup
+
+    expect(
+      group.fields
+        .filter((subfield) => subfield.type !== FieldType.ALPHA_HIDDEN)
+        .every(
+          (subfield) =>
+            (subfield as { defaultValue?: unknown }).defaultValue === undefined
+        )
+    ).toBe(true)
   })
 
   it('leaves non-location fields untouched', () => {
@@ -666,8 +815,201 @@ describe('withSearchLocationBehaviour', () => {
       label
     } as FieldConfig
 
-    const result = withSearchLocationBehaviour(field)
+    const result = withSearchLocationBehaviour(field, ADMIN_STRUCTURE)
 
     expect(result).toEqual(field)
+  })
+})
+
+describe('buildSearchQuery with version-pinned locations', () => {
+  const label = {
+    id: 'field.label',
+    defaultMessage: 'Field',
+    description: 'Field label'
+  }
+
+  const OFFICE_ID = UUID.parse('11111111-1111-4111-8111-111111111111')
+  const OFFICE_VERSION_ID = UUID.parse('11111111-1111-4111-8111-1111111111aa')
+  const PROVINCE_ID = UUID.parse('22222222-2222-4222-8222-222222222222')
+  const PROVINCE_VERSION_ID = UUID.parse('22222222-2222-4222-8222-2222222222aa')
+  const DISTRICT_ID = UUID.parse('33333333-3333-4333-8333-333333333333')
+  const DISTRICT_VERSION_ID = UUID.parse('33333333-3333-4333-8333-3333333333aa')
+
+  const locationField = {
+    id: 'applicant.office',
+    type: FieldType.LOCATION,
+    label
+  } as FieldConfig
+
+  const addressField = {
+    id: 'applicant.address',
+    type: FieldType.ADDRESS,
+    label,
+    configuration: {
+      streetAddressForm: [{ id: 'addressLine1', type: FieldType.TEXT, label }]
+    }
+  } as FieldConfig
+
+  // The search form renders the address filter as a group, one entry per level.
+  const addressGroup = withSearchLocationBehaviour(
+    addressField,
+    ADMIN_STRUCTURE
+  )
+
+  const eventConfig = {
+    ...tennisClubMembershipEvent,
+    declaration: {
+      ...tennisClubMembershipEvent.declaration,
+      pages: [
+        {
+          ...tennisClubMembershipEvent.declaration.pages[0],
+          fields: [locationField, addressField]
+        }
+      ]
+    }
+  } as typeof tennisClubMembershipEvent
+
+  const searchConfigs = [
+    {
+      fieldId: 'applicant.office',
+      fieldType: 'field',
+      label,
+      config: { type: 'exact' }
+    },
+    {
+      fieldId: 'applicant.address',
+      fieldType: 'field',
+      label,
+      config: { type: 'exact' }
+    }
+  ] as unknown as AdvancedSearchField[]
+
+  it('queries a pinned location by its id, never by the version', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.office': toVersionedLocation(OFFICE_ID, OFFICE_VERSION_ID)
+      },
+      [locationField],
+      searchConfigs,
+      eventConfig
+    )
+
+    expect(result).toEqual({
+      'applicant.office': { type: 'exact', term: OFFICE_ID }
+    })
+    expect(JSON.stringify(result)).not.toContain(OFFICE_VERSION_ID)
+  })
+
+  // The app's own country, as the test environment configures it — an address
+  // in it is domestic, and only a domestic address carries admin levels.
+  const HOME_COUNTRY = window.config.COUNTRY
+
+  it('folds a pinned address group into the leaf area id, never the versions', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.address': {
+          country: HOME_COUNTRY,
+          province: toVersionedLocation(PROVINCE_ID, PROVINCE_VERSION_ID),
+          district: toVersionedLocation(DISTRICT_ID, DISTRICT_VERSION_ID)
+        }
+      },
+      [addressGroup],
+      searchConfigs,
+      eventConfig
+    )
+
+    expect(result).toEqual({
+      'applicant.address': {
+        type: 'exact',
+        term: JSON.stringify({
+          country: HOME_COUNTRY,
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: DISTRICT_ID,
+          streetLevelDetails: {}
+        })
+      }
+    })
+    expect(JSON.stringify(result)).not.toContain(PROVINCE_VERSION_ID)
+    expect(JSON.stringify(result)).not.toContain(DISTRICT_VERSION_ID)
+  })
+
+  it('takes the deepest level filled in as the leaf', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.address': {
+          country: HOME_COUNTRY,
+          province: toVersionedLocation(PROVINCE_ID, PROVINCE_VERSION_ID)
+        }
+      },
+      [addressGroup],
+      searchConfigs,
+      eventConfig
+    )
+
+    expect(result).toEqual({
+      'applicant.address': {
+        type: 'exact',
+        term: JSON.stringify({
+          country: HOME_COUNTRY,
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: PROVINCE_ID,
+          streetLevelDetails: {}
+        })
+      }
+    })
+  })
+
+  it('queries an unpinned address group exactly as a declaration address would', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.address': {
+          country: HOME_COUNTRY,
+          province: PROVINCE_ID,
+          district: DISTRICT_ID
+        }
+      },
+      [addressGroup],
+      searchConfigs,
+      eventConfig
+    )
+
+    expect(result).toEqual({
+      'applicant.address': {
+        type: 'exact',
+        term: JSON.stringify({
+          country: HOME_COUNTRY,
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: DISTRICT_ID,
+          streetLevelDetails: {}
+        })
+      }
+    })
+  })
+
+  it('keeps a foreign address international, dropping admin levels but not street details', () => {
+    const result = buildSearchQuery(
+      {
+        'applicant.address': {
+          country: 'NZL',
+          // An admin level is meaningless abroad, a street detail is not.
+          province: PROVINCE_ID,
+          addressLine1: '12 Cuba Street'
+        }
+      },
+      [addressGroup],
+      searchConfigs,
+      eventConfig
+    )
+
+    expect(result).toEqual({
+      'applicant.address': {
+        type: 'exact',
+        term: JSON.stringify({
+          country: 'NZL',
+          addressType: AddressType.INTERNATIONAL,
+          streetLevelDetails: { addressLine1: '12 Cuba Street' }
+        })
+      }
+    })
   })
 })

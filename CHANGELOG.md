@@ -61,6 +61,26 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 [#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
 
+### Deprecations
+
+#### `POST /auth/token` parameters in the query string
+
+The token endpoint reads its parameters from the request body _or_ the URL. Sending them in the URL puts the client secret into gateway and proxy access logs, Sentry breadcrumbs, and every intermediary on the way (CWE-598). RFC 6749 §2.3.1 requires them in the body, and **a future release will read them only from there** — so integrations still authenticating via the URL should move now. This affects both grants: `client_credentials` (`client_id`, `client_secret`) and `urn:opencrvs:oauth:grant-type:token-exchange` (`subject_token`, `subject_token_type`, `requested_token_type`, `event_id`, `action_id`).
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Client IDs and secrets themselves keep working — only how they are transmitted changes.
+
+Until the removal, behaviour depends on the environment, so the change surfaces in development rather than in production:
+
+- **Production (`NODE_ENV=production`) keeps working**, but each such request logs an error naming the parameters, so operators can find the callers left to migrate. **Rotate any secret sent this way** — it may still be in retained logs.
+- **Every other deployment rejects the request** with `400 invalid_request` naming the parameters to move, so integrations testing against dev or staging fail immediately.
+
 ### Improvements
 
 - User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
@@ -92,6 +112,10 @@ Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.rea
 
 Added a `status` scope option for record scopes (`record.edit`, `record.reject`, `record.archive`, `record.search`, etc.) — e.g. `{ type: 'record.edit', options: { status: ['DECLARED'] } }` restricts the scope to records currently in one of the given `EventStatus` values.
 
+#### Flag-based scope filtering
+
+Added a `flags` scope option for record scopes (`record.search`, `record.read`, `record.request-correction`, `record.correct`, `record.unassign-others`, `record.review-duplicates`, `record.custom-action`, `record.print-certified-copies`) — e.g. `{ type: 'record.search', options: { flags: { noneOf: ['REJECTED'] } } }` restricts the scope to records whose current flags satisfy the given `anyOf`/`noneOf`/`allOf` condition.
+
 #### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
 
 `getActionConfig()` used to alias `APPROVE_CORRECTION` and `REJECT_CORRECTION` to whatever was configured on `REQUEST_CORRECTION` (label, flags, conditionals). Each now resolves to its own independent config. If your country config relies on `REQUEST_CORRECTION`'s `conditionals` or `flags` also applying to approve/reject, add explicit `APPROVE_CORRECTION`/`REJECT_CORRECTION` entries with the same values.
@@ -100,17 +124,25 @@ Added a `status` scope option for record scopes (`record.edit`, `record.reject`,
 
 `DELETE`, `ASSIGN`, `UNASSIGN`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, and `DUPLICATE_DETECTED` can now be configured in `ActionConfig`, supporting `label`, `icon`, and `conditionals` (and `flags`, except on `ASSIGN`/`UNASSIGN`, which are meta actions excluded from flag resolution). See [ACTIONS.md](/ACTIONS.md).
 
+#### `UNARCHIVE` core action
+
+Added `ActionType.UNARCHIVE`, a new core action that restores an `ARCHIVED` record to its pre-archive status, guarded by a new `record.unarchive` scope. See "`ARCHIVE` no longer clears the `INCOMPLETE` flag" above for its flag-handling behavior. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
+
 #### Configurable form fields on core action confirmation dialogs
 
 The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)
 
-#### `listHistoricalNames` / `activeOnly` location field config options
+#### `activeOnly` location field config option
 
-`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept two optional booleans: `listHistoricalNames` lists every name a location has ever had (across its `versions[]`) as a separate, selectable option — so records saved under an outdated name stay findable — and `activeOnly` offers only currently-active locations, excluding inactivated ones. Advanced search sets these itself for its location/address filters (offices and health institutions list all names and keep inactive entries; address filters list all names but drop inactive admin structures), so no country configuration is required for that behaviour; they are documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `activeOnly`, which offers only currently-active locations, excluding inactivated ones. Advanced search sets it itself for its address filters, so no country configuration is required for that behaviour; it is documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
 
 #### `anchorToDateOfEvent` location field config option
 
 `LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves the field's displayed/selectable versions against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). It does not by itself exclude inactive versions — combine with `activeOnly` for that; when both are set, `activeOnly`'s active/inactive check is evaluated at the event-date anchor rather than today, so a location that has since become inactive can still be selected for a historical record, and one not yet active as at the event's date is excluded even if it's active today. A selection is automatically cleared if the date-of-event later changes such that it resolves to a different version than before. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
+
+#### `separator` / `hideEmptyFields` field group config options
+
+`FIELD_GROUP` field configs accept an optional `configuration` object with two settings that control how the group renders as output (record review, audit history, search criteria pills). `separator` joins the subfield values into a single line — e.g. `', '` — instead of the default one-per-line. `hideEmptyFields` leaves subfields without a value out of that output; pair it with a separator so the separator does not double up around the gaps. A group that sets neither renders exactly as before: one subfield per line, blanks included. [#13423](https://github.com/opencrvs/opencrvs-core/issues/13423)
 
 #### Integration audit log retrieval
 

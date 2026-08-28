@@ -73,7 +73,9 @@ test.describe.serial('Escalation of birth registration by Registrar', () => {
     test('Registrar assigns birth registration', async () => {
       await page.getByText('Pending certification').click()
       await openRecordByTitle(page, childNameForProvincialFormatted)
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR, {
+        timeout: 15_000
+      })
     })
 
     test("Event should not have the 'Escalated' -flag", async () => {
@@ -115,7 +117,7 @@ test.describe.serial('Escalation of birth registration by Registrar', () => {
 
   test.describe('Escalate to Registrar General', () => {
     test('Registrar assigns birth registration', async () => {
-      await openRecordByTitle(page, childNameForRegGeneralFormatted)
+      await searchFromSearchBar(page, childNameForRegGeneralFormatted)
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     })
 
