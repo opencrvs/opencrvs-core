@@ -398,16 +398,6 @@ function transformParentValueToNestedValue(
  * // }
  */
 
-export function getDefaultCountry() {
-  return window.config.COUNTRY || 'FAR'
-}
-
-export function resolveAddressType(country: string) {
-  return country === getDefaultCountry()
-    ? AddressType.DOMESTIC
-    : AddressType.INTERNATIONAL
-}
-
 function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
@@ -419,7 +409,7 @@ function transformNestedValueToParentValue(
   )
   const country = nestedValue.country as string
 
-  if (resolveAddressType(country) === AddressType.DOMESTIC) {
+  if (country === window.config.COUNTRY || 'FAR') {
     return {
       country,
       addressType: AddressType.DOMESTIC,
