@@ -270,18 +270,24 @@ export function FormSectionComponent({
     const firstNonFalsyValue = resolveSyncedFieldValue(
       listenerField,
       (syncRef) => {
-        if (isCodeToEvaluate(syncRef)) {
-          const fieldValue = get(fieldValues, syncRef.$$field)
-          return runClientFunction(
-            syncRef.$$code,
-            fieldValue,
-            clientFunctionContext
-          )
-        }
-        return get(
+        /*
+         * One path for both kinds of reference: a computed one reads the same
+         * value a plain one would, then passes it through its function. Reading
+         * it any other way misses references that name a subfield, or a field
+         * whose id has dots in it.
+         */
+        const referenced = get(
           fieldValues,
           flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
         )
+
+        return isCodeToEvaluate(syncRef)
+          ? (runClientFunction(
+              syncRef.$$code,
+              referenced,
+              clientFunctionContext
+            ) as FieldValue | undefined)
+          : referenced
       }
     )
 

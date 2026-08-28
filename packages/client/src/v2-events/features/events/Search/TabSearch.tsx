@@ -39,9 +39,7 @@ import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
-  serializeSearchParams,
-  withDerivedValues,
-  withoutDerivedValues
+  serializeSearchParams
 } from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
 
@@ -206,14 +204,6 @@ export function TabSearch({
 
   const fields = sections.flatMap((section) => section.fields)
 
-  /*
-   * Values the form needs but nobody enters
-   * e.g. an address group's `addressType`.
-   * Added on the way in and taken off again before a search is built,
-   * so they never reach the query or the url.
-   */
-  const renderedValues = withDerivedValues(fieldValues ?? {}, fields)
-
   const handleSearch = () => {
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
@@ -238,9 +228,7 @@ export function TabSearch({
       {} as Record<string, unknown>
     )
 
-    const queryString = serializeSearchParams(
-      withoutDerivedValues(updatedValues as EventState, fields)
-    )
+    const queryString = serializeSearchParams(updatedValues)
 
     const searchPath = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: currentEvent.id
@@ -278,7 +266,7 @@ export function TabSearch({
         <SearchSectionForm
           key={section.title.id}
           eventConfig={currentEvent}
-          fieldValues={renderedValues}
+          fieldValues={fieldValues}
           handleFieldChange={handleFieldChange}
           section={section}
           validatorContext={validatorContext}

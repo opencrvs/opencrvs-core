@@ -692,8 +692,14 @@ describe('withSearchLocationBehaviour', () => {
     expect(result.id).toBe('applicant.address')
 
     const group = result as FieldGroup
+
+    /*
+     * `addressType` is not a level and not an input: it is the hidden field
+     * that works the value out from the country.
+     */
     expect(group.fields.map((subfield) => subfield.id)).toEqual([
       'country',
+      'addressType',
       'province',
       'district'
     ])

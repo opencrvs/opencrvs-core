@@ -34,6 +34,8 @@ import {
   AdministrativeAreaField,
   Country as CountryField,
   AddressType,
+  field as fieldHelper,
+  HiddenField,
   FieldGroup,
   FieldGroupValue,
   timePeriodToDateRange,
@@ -48,10 +50,7 @@ import {
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import {
-  generateAddressFields,
-  resolveAddressType
-} from '@client/v2-events/features/events/registered-fields/Address'
+import { generateAddressFields } from '@client/v2-events/features/events/registered-fields/Address'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -694,79 +693,40 @@ function withAddressDefault<T extends CountryField | AdministrativeAreaField>(
 }
 
 /**
- * The key an address group carries for a value nobody enters.
+ * The `addressType` an address group carries, as a hidden field.
+ *
+ * Nobody types an address type and no input renders one: it follows from the
+ * country, and exists only because an address field works it out when it stores
+ * its value. A group stores one value per field and works out nothing, yet a
+ * country's street fields are guarded on it (`isDomesticAddress()`), so the
+ * group has to produce it.
+ *
+ * `value` rather than `defaultValue`, and referenced by its full path rather
+ * than a bare id, so that changing the country reaches it: a listener is
+ * registered under the path its parent is named by, and the referenced value is
+ * resolved again every time that parent changes.
  */
-const DERIVED_ADDRESS_TYPE = 'addressType'
+function addressTypeField(
+  groupId: string,
+  countryFieldId: string
+): HiddenField {
+  const country = fieldHelper(groupId).get(countryFieldId)
 
-function addressGroupsWithCountry(fields: FieldConfig[]) {
-  return fields.flatMap((field) => {
-    if (field.type !== FieldType.FIELD_GROUP) {
-      return []
-    }
-
-    const countrySubfield = field.fields.find(
-      (subfield) => subfield.type === FieldType.COUNTRY
+  return {
+    id: 'addressType',
+    type: FieldType.ALPHA_HIDDEN,
+    label: {
+      id: 'messages.emptyString',
+      defaultMessage: '',
+      description: 'empty string'
+    },
+    parent: country,
+    value: country.customClientEvaluation((countryValue) =>
+      countryValue === (window.config.COUNTRY || 'FAR')
+        ? 'DOMESTIC'
+        : 'INTERNATIONAL'
     )
-
-    return countrySubfield
-      ? [{ id: field.id, countryId: countrySubfield.id }]
-      : []
-  })
-}
-
-/**
- * Adds each address group's `addressType` to the values the form renders from.
- *`
- * Worked out on the way into the form and never kept: the country can change
- * while the form is open, so a stored answer would go stale. {@link
- * withoutDerivedValues} takes it back off on the way out.
- */
-export function withDerivedValues(
-  values: EventState,
-  fields: FieldConfig[]
-): EventState {
-  return addressGroupsWithCountry(fields).reduce((withDerived, group) => {
-    const groupValue = withDerived[group.id]
-
-    if (!groupValue || typeof groupValue !== 'object') {
-      return withDerived
-    }
-
-    const country = (groupValue as Record<string, unknown>)[group.countryId]
-
-    if (typeof country !== 'string') {
-      return withDerived
-    }
-
-    return {
-      ...withDerived,
-      [group.id]: {
-        ...groupValue,
-        [DERIVED_ADDRESS_TYPE]: resolveAddressType(country)
-      }
-    }
-  }, values)
-}
-
-/** Reverses {@link withDerivedValues}, so a search is built from what was entered. */
-export function withoutDerivedValues(
-  values: EventState,
-  fields: FieldConfig[]
-): EventState {
-  return addressGroupsWithCountry(fields).reduce((entered, group) => {
-    const groupValue = entered[group.id]
-
-    if (!groupValue || typeof groupValue !== 'object') {
-      return entered
-    }
-
-    const { [DERIVED_ADDRESS_TYPE]: _derived, ...rest } = groupValue as Record<
-      string,
-      unknown
-    >
-
-    return { ...entered, [group.id]: rest as EventState[string] }
-  }, values)
+  }
 }
 
 /**
@@ -803,6 +763,7 @@ function toAddressSearchGroup(
     configuration: { separator: ', ', hideEmptyFields: true },
     fields: [
       withAddressDefault(countryField, field.defaultValue),
+      addressTypeField(field.id, countryField.id),
       ...domesticFields.map((level) =>
         withAddressDefault(level, field.defaultValue)
       ),
