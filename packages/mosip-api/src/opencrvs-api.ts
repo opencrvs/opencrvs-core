@@ -69,8 +69,12 @@ export const getConfirmationToken = async (
     grant_type: 'client_credentials'
   })
   const clientCredentialsResponse = await fetch(
-    `${env.OPENCRVS_AUTH_URL}/token?${clientCredentialsParams}`,
-    { method: 'POST' }
+    `${env.OPENCRVS_AUTH_URL}/token`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: clientCredentialsParams
+    }
   )
   if (!clientCredentialsResponse.ok) {
     throw new OpenCRVSError(
@@ -88,10 +92,11 @@ export const getConfirmationToken = async (
     event_id: eventId,
     action_id: actionId
   })
-  const tokenExchangeResponse = await fetch(
-    `${env.OPENCRVS_AUTH_URL}/token?${tokenExchangeParams}`,
-    { method: 'POST' }
-  )
+  const tokenExchangeResponse = await fetch(`${env.OPENCRVS_AUTH_URL}/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: tokenExchangeParams
+  })
   if (!tokenExchangeResponse.ok) {
     throw new OpenCRVSError(
       `Token exchange failed: ${tokenExchangeResponse.status} ${await tokenExchangeResponse.text()}`
