@@ -49,7 +49,8 @@ import { emailHandler, emailSchema } from './api/notification/handler'
 import {
   telemetryHandler,
   telemetrySchema,
-  logTelemetryStartupStatus
+  logTelemetryStartupStatus,
+  TELEMETRY_DISABLED_NOTICE
 } from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
@@ -406,7 +407,7 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'dashboards'],
       description:
-        "Returns the primary office id of the user the request is authenticated as"
+        'Returns the primary office id of the user the request is authenticated as'
     }
   })
 
@@ -885,6 +886,10 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    if (!env.TELEMETRY_ENABLED) {
+      logger.info(TELEMETRY_DISABLED_NOTICE)
+    }
 
     logTelemetryStartupStatus()
   }
