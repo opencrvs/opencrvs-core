@@ -92,6 +92,10 @@ Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.rea
 
 Added a `status` scope option for record scopes (`record.edit`, `record.reject`, `record.archive`, `record.search`, etc.) — e.g. `{ type: 'record.edit', options: { status: ['DECLARED'] } }` restricts the scope to records currently in one of the given `EventStatus` values.
 
+#### Flag-based scope filtering
+
+Added a `flags` scope option for record scopes (`record.search`, `record.read`, `record.request-correction`, `record.correct`, `record.unassign-others`, `record.review-duplicates`, `record.custom-action`, `record.print-certified-copies`) — e.g. `{ type: 'record.search', options: { flags: { noneOf: ['REJECTED'] } } }` restricts the scope to records whose current flags satisfy the given `anyOf`/`noneOf`/`allOf` condition.
+
 #### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
 
 `getActionConfig()` used to alias `APPROVE_CORRECTION` and `REJECT_CORRECTION` to whatever was configured on `REQUEST_CORRECTION` (label, flags, conditionals). Each now resolves to its own independent config. If your country config relies on `REQUEST_CORRECTION`'s `conditionals` or `flags` also applying to approve/reject, add explicit `APPROVE_CORRECTION`/`REJECT_CORRECTION` entries with the same values.
@@ -99,6 +103,10 @@ Added a `status` scope option for record scopes (`record.edit`, `record.reject`,
 #### All core actions are independently configurable
 
 `DELETE`, `ASSIGN`, `UNASSIGN`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, and `DUPLICATE_DETECTED` can now be configured in `ActionConfig`, supporting `label`, `icon`, and `conditionals` (and `flags`, except on `ASSIGN`/`UNASSIGN`, which are meta actions excluded from flag resolution). See [ACTIONS.md](/ACTIONS.md).
+
+#### `UNARCHIVE` core action
+
+Added `ActionType.UNARCHIVE`, a new core action that restores an `ARCHIVED` record to its pre-archive status, guarded by a new `record.unarchive` scope. See "`ARCHIVE` no longer clears the `INCOMPLETE` flag" above for its flag-handling behavior. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
 
 #### Configurable form fields on core action confirmation dialogs
 
