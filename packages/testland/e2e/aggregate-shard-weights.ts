@@ -10,10 +10,9 @@
  */
 
 /**
- * Sums per-test durations from a set of downloaded CTRF report.json files
- * (one per shard, from playwright-ctrf-json-reporter) into per-spec-file
- * totals, keyed the same way as shard-weights.json (path relative to
- * e2e/testcases). Prints the aggregated {file: totalMs} map to stdout.
+ * Averages per-test durations from downloaded CTRF report.json files into
+ * per-spec-file weights, keyed the same way as shard-weights.json (path
+ * relative to e2e/testcases). Prints {file: averageMs} to stdout.
  *
  * Usage: npx tsx e2e/aggregate-shard-weights.ts <reports-dir>
  */
@@ -64,10 +63,14 @@ function main() {
   }
 
   const totals: Record<string, number> = {}
+  const occurrences: Record<string, number> = {}
   const reportFiles = findJsonFiles(reportsDir)
 
   for (const file of reportFiles) {
     const report: CtrfReport = JSON.parse(fs.readFileSync(file, 'utf8'))
+
+    // Sum within this report first, so a multi-test file is one per-run total.
+    const perReportTotals: Record<string, number> = {}
     for (const test of report.results?.tests ?? []) {
       // Playwright's CTRF reporter always sets both fields - this guards
       // against a malformed/truncated report.json, not expected data.
@@ -75,7 +78,12 @@ function main() {
         continue
       }
       const key = relativeToTestcases(test.filePath)
-      totals[key] = (totals[key] ?? 0) + test.duration
+      perReportTotals[key] = (perReportTotals[key] ?? 0) + test.duration
+    }
+
+    for (const [key, total] of Object.entries(perReportTotals)) {
+      totals[key] = (totals[key] ?? 0) + total
+      occurrences[key] = (occurrences[key] ?? 0) + 1
     }
   }
 
@@ -85,7 +93,7 @@ function main() {
 
   const sorted: Record<string, number> = {}
   for (const key of Object.keys(totals).sort()) {
-    sorted[key] = totals[key]
+    sorted[key] = Math.round(totals[key] / occurrences[key])
   }
 
   process.stdout.write(JSON.stringify(sorted))
