@@ -409,7 +409,7 @@ function transformNestedValueToParentValue(
   )
   const country = nestedValue.country as string
 
-  if (country === window.config.COUNTRY || 'FAR') {
+  if (country === window.config.COUNTRY) {
     return {
       country,
       addressType: AddressType.DOMESTIC,
