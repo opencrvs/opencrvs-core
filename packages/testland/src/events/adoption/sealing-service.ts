@@ -130,10 +130,11 @@ export async function getAdoptionSealingToken(): Promise<string | undefined> {
     grant_type: 'client_credentials'
   })
 
-  const response = await fetch(
-    new URL(`auth/token?${params}`, GATEWAY_URL).toString(),
-    { method: 'POST' }
-  )
+  const response = await fetch(new URL('auth/token', GATEWAY_URL).toString(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params
+  })
 
   if (!response.ok) {
     throw new Error(
