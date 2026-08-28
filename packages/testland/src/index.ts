@@ -406,7 +406,7 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'dashboards'],
       description:
-        "Returns the primary office id of the user the request is authenticated as"
+        'Returns the primary office id of the user the request is authenticated as'
     }
   })
 
@@ -885,6 +885,10 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    if (!env.TELEMETRY_ENABLED) {
+      logger.info(TELEMETRY_DISABLED_NOTICE)
+    }
 
     logTelemetryStartupStatus()
   }
