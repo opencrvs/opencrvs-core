@@ -26,6 +26,7 @@ vi.mock('../../constants', () => ({
 }))
 
 const CONFIGURED_ID = '5f10f0e9-dafa-48d6-b5e6-551809efa0ab'
+const CONFIGURED_SECRET = '7514fe5f-6401-429b-8ac3-1f1c3dc40359'
 
 const mockFetch = vi.mocked(fetch)
 const mockLogger = vi.mocked(logger)
@@ -58,23 +59,14 @@ function warnings() {
   return mockLogger.warn.mock.calls.map(([message]) => String(message))
 }
 
-function statusCodeOf(response: unknown) {
-  return (response as { statusCode: number }).statusCode
-}
-
 /*
- * The handler answers one question: did every configured integration end up
- * registered. Assert the class of the response rather than an exact code, so
- * these stay true regardless of what the caller does about it.
+ * The exact code is the contract: events retries this trigger on a failing
+ * status and treats 2xx as done, so 503-rather-than-200 is the whole point of
+ * reporting an incomplete run.
  */
-function expectReportedComplete(response: unknown) {
-  expect(statusCodeOf(response)).toBeGreaterThanOrEqual(200)
-  expect(statusCodeOf(response)).toBeLessThan(300)
-}
-
-function expectReportedIncomplete(response: unknown) {
-  expect(statusCodeOf(response)).toBeGreaterThanOrEqual(500)
-  expect(statusCodeOf(response)).toBeLessThan(600)
+async function runHandler() {
+  const response = await systemReadyHandler(request, h)
+  return (response as unknown as { statusCode: number }).statusCode
 }
 
 describe('systemReadyHandler', () => {
@@ -86,18 +78,18 @@ describe('systemReadyHandler', () => {
     mockFetch.mockResolvedValueOnce(jsonResponse([]))
     mockFetch.mockResolvedValueOnce(jsonResponse({ clientId: CONFIGURED_ID }))
 
-    const response = await systemReadyHandler(request, h)
+    const status = await runHandler()
 
     const [, options] = registrationCalls()[0]
     expect(JSON.parse(String(options?.body))).toMatchObject({
       name: 'MOSIP',
       credentials: {
         clientId: CONFIGURED_ID,
-        clientSecret: '7514fe5f-6401-429b-8ac3-1f1c3dc40359'
+        clientSecret: CONFIGURED_SECRET
       }
     })
     expect(warnings()).toEqual([])
-    expectReportedComplete(response)
+    expect(status).toBe(200)
   })
 
   // A restart must never clobber a secret a National System Admin rotated
@@ -106,11 +98,11 @@ describe('systemReadyHandler', () => {
       jsonResponse([{ id: CONFIGURED_ID, name: 'MOSIP' }])
     )
 
-    const response = await systemReadyHandler(request, h)
+    const status = await runHandler()
 
     expect(registrationCalls()).toHaveLength(0)
     expect(warnings()).toEqual([])
-    expectReportedComplete(response)
+    expect(status).toBe(200)
   })
 
   // The failure this warning exists for: the integration was registered with a
@@ -122,7 +114,7 @@ describe('systemReadyHandler', () => {
       ])
     )
 
-    const response = await systemReadyHandler(request, h)
+    const status = await runHandler()
 
     // Still must not re-register, or it would invalidate credentials in use
     expect(registrationCalls()).toHaveLength(0)
@@ -134,36 +126,36 @@ describe('systemReadyHandler', () => {
 
     // The name is taken and only an operator can resolve the mismatch, so
     // registration is as complete as it can get
-    expectReportedComplete(response)
+    expect(status).toBe(200)
   })
 
   it('reports incomplete when listing integrations fails', async () => {
     mockFetch.mockResolvedValueOnce(jsonResponse({ error: 'nope' }, 500))
 
-    const response = await systemReadyHandler(request, h)
+    const status = await runHandler()
 
     expect(registrationCalls()).toHaveLength(0)
     expect(warnings()[0]).toContain('listing integrations failed')
-    expectReportedIncomplete(response)
+    expect(status).toBe(503)
   })
 
   it('reports incomplete when registering an integration is refused', async () => {
     mockFetch.mockResolvedValueOnce(jsonResponse([]))
     mockFetch.mockResolvedValueOnce(jsonResponse({ error: 'nope' }, 500))
 
-    const response = await systemReadyHandler(request, h)
+    const status = await runHandler()
 
     expect(warnings()[0]).toContain('failed')
-    expectReportedIncomplete(response)
+    expect(status).toBe(503)
   })
 
   it('reports incomplete when registering an integration throws', async () => {
     mockFetch.mockResolvedValueOnce(jsonResponse([]))
     mockFetch.mockRejectedValueOnce(new Error('ECONNREFUSED'))
 
-    const response = await systemReadyHandler(request, h)
+    const status = await runHandler()
 
     expect(warnings()[0]).toContain('threw')
-    expectReportedIncomplete(response)
+    expect(status).toBe(503)
   })
 })

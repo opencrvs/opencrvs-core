@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { bool, cleanEnv, makeValidator, port, str, url } from 'envalid'
-
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+import { z } from 'zod'
 
 /**
  * A UUID, or an empty string when the variable is left unconfigured. Used for
- * seeded integration credentials: events validates the client id it returns as
- * a UUID, so a malformed seed must fail fast at startup rather than surface as
- * a runtime 500 during integration registration.
+ * seeded integration credentials: events types the client id it accepts as a
+ * UUID, so a malformed seed is rejected there with a 400 — 30 seconds later,
+ * buried inside the startup retry loop. Failing at boot instead names the
+ * offending variable.
+ *
+ * `z.uuid()` rather than a local pattern so this is exactly as strict as the
+ * check it front-runs; a hand-rolled regex accepts version and variant nibbles
+ * that events rejects, which is precisely the case worth catching.
  */
-const uuidOrEmpty = makeValidator<string>((value) => {
-  if (value === '' || UUID_REGEX.test(value)) {
-    return value
-  }
-  throw new Error('Expected a UUID')
-})
+const uuidOrEmpty = makeValidator<string>((value) =>
+  value === '' ? value : z.uuid().parse(value)
+)
 
 export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),

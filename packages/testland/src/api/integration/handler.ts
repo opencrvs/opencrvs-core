@@ -25,9 +25,8 @@ interface IntegrationConfig {
    * Optional pre-shared credentials. When both are set, events seeds the
    * integration with exactly these values so the integrating system (e.g.
    * mosip-api) can authenticate immediately using the same client id/secret it
-   * carries in its own env — no manual "Refresh secret" step required. When
-   * omitted, events generates credentials and an NSA reveals them via the
-   * Integrations page.
+   * carries in its own env — no manual "Refresh secret" step required. When omitted, events
+   * generates credentials and an NSA reveals them via the Integrations page.
    *
    * Both must be given together; events rejects a half-seeded pair.
    */
@@ -43,9 +42,8 @@ interface IntegrationConfig {
  * clobber a secret a National System Admin has rotated.
  *
  * Set clientId/clientSecret to seed the credentials the integrating system
- * already holds. Leave them unset to have events generate credentials, which
- * an NSA then retrieves via the Integrations UI (Configurations →
- * Integrations → Reveal keys → Refresh secret).
+ * already holds. See `IntegrationConfig` above for what happens when they are
+ * omitted.
  */
 const INTEGRATIONS: IntegrationConfig[] = [
   {
@@ -53,15 +51,29 @@ const INTEGRATIONS: IntegrationConfig[] = [
     scopes: [
       { type: 'record.register', options: { event: ['birth', 'death'] } }
     ],
-    clientId: MOSIP_INTEGRATION_CLIENT_ID || undefined,
-    clientSecret: MOSIP_INTEGRATION_CLIENT_SECRET || undefined
+    clientId: MOSIP_INTEGRATION_CLIENT_ID,
+    clientSecret: MOSIP_INTEGRATION_CLIENT_SECRET
   }
 ]
 
-async function listIntegrationsByName(bearerToken: string) {
-  const res = await fetch(new URL('/integrations', EVENTS_URL).toString(), {
+const INTEGRATIONS_URL = new URL('/integrations', EVENTS_URL).toString()
+
+/**
+ * Bound every call to events. The caller aborts its own request after 5s and
+ * retries, and Hapi does not cancel a handler when its client goes away — so an
+ * unbounded fetch here outlives the request it belongs to, and each retry
+ * stacks another registration run that has already read a now-stale list of
+ * existing integrations. Kept under the caller's budget so this handler answers
+ * for itself instead of being abandoned mid-flight.
+ */
+const REQUEST_TIMEOUT_MS = 2000
+
+/** Client id of every currently registered integration, keyed by name. */
+async function listClientIdsByName(bearerToken: string) {
+  const res = await fetch(INTEGRATIONS_URL, {
     method: 'GET',
-    headers: { Authorization: bearerToken }
+    headers: { Authorization: bearerToken },
+    timeout: REQUEST_TIMEOUT_MS
   })
 
   if (!res.ok) {
@@ -70,15 +82,88 @@ async function listIntegrationsByName(bearerToken: string) {
 
   const integrations = (await res.json()) as { id: string; name: string }[]
 
-  return new Map(
-    integrations.map((integration) => [integration.name, integration])
-  )
+  return new Map(integrations.map(({ name, id }) => [name, id]))
+}
+
+/** False only when the integration did not end up registered. */
+async function ensureRegistered(
+  integration: IntegrationConfig,
+  registeredClientId: string | undefined,
+  bearerToken: string
+) {
+  const { name, clientId, clientSecret } = integration
+
+  if (registeredClientId !== undefined) {
+    // Skipping by name means a changed clientId is silently ignored, and the
+    // integrating system then authenticates with a client id that does not
+    // exist — a 401 with nothing in these logs to explain it. Say so instead.
+    if (clientId && clientId !== registeredClientId) {
+      logger.warn(
+        `Integration "${name}" is registered as client id ${registeredClientId}, but ${clientId} is configured. The configured credentials are NOT in use and authentication with them will fail. Delete the existing integration to re-seed it, or point the integrating system at the registered client id.`
+      )
+    } else {
+      logger.info(`Integration "${name}" already registered, skipping`)
+    }
+
+    return true
+  }
+
+  // Half a pair is almost always a missed env var. Without this the integration
+  // is registered with generated credentials and the integrating system
+  // silently fails to authenticate as itself.
+  if (Boolean(clientId) !== Boolean(clientSecret)) {
+    logger.warn(
+      `Integration "${name}" has only one of clientId/clientSecret configured. Both are required to seed credentials, so events will generate them instead.`
+    )
+  }
+
+  const credentials =
+    clientId && clientSecret ? { clientId, clientSecret } : undefined
+
+  try {
+    const res = await fetch(INTEGRATIONS_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: bearerToken
+      },
+      body: JSON.stringify({
+        name,
+        scopes: integration.scopes.map(encodeScope),
+        credentials
+      }),
+      timeout: REQUEST_TIMEOUT_MS
+    })
+
+    if (!res.ok) {
+      logger.warn(
+        `Registering integration "${name}" failed: ${res.status} ${await res.text()}`
+      )
+      return false
+    }
+
+    logger.info(
+      credentials
+        ? `Integration "${name}" registered successfully with pre-shared credentials`
+        : `Integration "${name}" registered successfully with generated credentials. A National System Admin must reveal them via Configurations → Integrations.`
+    )
+
+    return true
+  } catch (error) {
+    logger.warn(
+      `Registering integration "${name}" threw: ${error instanceof Error ? error.message : error}`
+    )
+    return false
+  }
 }
 
 export async function systemReadyHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  // Unreachable while INTEGRATIONS is non-empty, kept so this file stays a
+  // one-entry diff against packages/countryconfig-template, where the list
+  // ships empty and events need not be reachable at all.
   if (INTEGRATIONS.length === 0) {
     return h.response().code(200)
   }
@@ -88,26 +173,21 @@ export async function systemReadyHandler(
   if (typeof bearerToken !== 'string') {
     // The route inherits the default jwt strategy, so an authenticated request
     // always carries exactly one Authorization header — Hapi types it as the
-    // wider header union. Answer 503 rather than calling events without the
-    // bootstrap token, which could not succeed: events retries on a failing
-    // status, so a transient oddity here is not permanent.
+    // wider header union.
     logger.warn(
       'Skipping integration registration, request carries no bearer token'
     )
     return h.response().code(503)
   }
 
-  let existing: Map<string, { id: string; name: string }>
+  let registeredClientIds: Map<string, string>
 
   try {
-    existing = await listIntegrationsByName(bearerToken)
+    registeredClientIds = await listClientIdsByName(bearerToken)
   } catch (error) {
     // Without the existing list we cannot tell a first registration from a
     // restart, and creating blindly would duplicate the integration and
-    // invalidate the credentials already in use. Answer 503 rather than 200:
-    // events retries the trigger on a failing status, and reporting success
-    // here would consume the only attempt that will ever be made, leaving the
-    // integration unregistered until events happens to restart.
+    // invalidate the credentials already in use.
     logger.warn(
       `Skipping integration registration, listing integrations failed: ${
         error instanceof Error ? error.message : error
@@ -121,83 +201,20 @@ export async function systemReadyHandler(
   let anyFailed = false
 
   for (const integration of INTEGRATIONS) {
-    const alreadyRegistered = existing.get(integration.name)
+    const registered = await ensureRegistered(
+      integration,
+      registeredClientIds.get(integration.name),
+      bearerToken
+    )
 
-    if (alreadyRegistered) {
-      // Registration is skipped by name so a restart never clobbers a secret a
-      // National System Admin has rotated. That also means a changed clientId
-      // is silently ignored, and the integrating system then authenticates
-      // with a client id that does not exist — a 401 with nothing in these
-      // logs to explain it. Say so instead.
-      if (
-        integration.clientId &&
-        integration.clientId !== alreadyRegistered.id
-      ) {
-        logger.warn(
-          `Integration "${integration.name}" is registered as client id ${alreadyRegistered.id}, but ${integration.clientId} is configured. The configured credentials are NOT in use and authentication with them will fail. Delete the existing integration to re-seed it, or point the integrating system at the registered client id.`
-        )
-      } else {
-        logger.info(
-          `Integration "${integration.name}" already registered, skipping`
-        )
-      }
-
-      continue
-    }
-
-    const credentials =
-      integration.clientId && integration.clientSecret
-        ? {
-            clientId: integration.clientId,
-            clientSecret: integration.clientSecret
-          }
-        : undefined
-
-    // Half a pair is almost always a missed env var. Without this the
-    // integration is registered with generated credentials and the
-    // integrating system silently fails to authenticate as itself.
-    if (!credentials && (integration.clientId || integration.clientSecret)) {
-      logger.warn(
-        `Integration "${integration.name}" has only one of clientId/clientSecret configured. Both are required to seed credentials, so events will generate them instead.`
-      )
-    }
-
-    try {
-      const res = await fetch(new URL('/integrations', EVENTS_URL).toString(), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: bearerToken
-        },
-        body: JSON.stringify({
-          name: integration.name,
-          scopes: integration.scopes.map(encodeScope),
-          credentials
-        })
-      })
-
-      if (!res.ok) {
-        anyFailed = true
-        logger.warn(
-          `Registering integration "${integration.name}" failed: ${res.status} ${await res.text()}`
-        )
-      } else {
-        logger.info(
-          credentials
-            ? `Integration "${integration.name}" registered successfully with pre-shared credentials`
-            : `Integration "${integration.name}" registered successfully with generated credentials. A National System Admin must reveal them via Configurations → Integrations.`
-        )
-      }
-    } catch (error) {
+    if (!registered) {
       anyFailed = true
-      logger.warn(
-        `Registering integration "${integration.name}" threw: ${error instanceof Error ? error.message : error}`
-      )
     }
   }
 
-  // 503 asks events to retry. Answering 200 with an integration unregistered
-  // spends the only attempt events makes, and the symptom surfaces far away:
-  // the integrating system authenticates as a client that does not exist.
+  // A failing status is what makes events try again — it retries this trigger
+  // with backoff, and treats 2xx as done. Answering 200 with an integration
+  // unregistered ends that loop early, and the symptom surfaces far away: the
+  // integrating system authenticates as a client that does not exist.
   return h.response().code(anyFailed ? 503 : 200)
 }

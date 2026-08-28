@@ -2,14 +2,9 @@
 
 ## 2.1.0 Release Candidate
 
-### New features
-
-- Added a `FIELD_AGENT` role that exercises the `createdBy` scope option: the agent only ever sees records they created themselves, even after another user re-declares the record with edits. [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
-- The tennis club membership recommender page sets `showClearButton: true`, so the Clear button is exercised by a shipped form. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
-
 ### Breaking changes
 
-- Add `EVENTS_URL=http://events:5555/` to the `countryconfig` service. It has no production default, so the service will not start without it, whether or not any integrations are configured. Startup integration registration (`INTEGRATIONS` in `src/api/integration/handler.ts`) calls the events service, which owns integration clients; names that already exist are skipped, so restarts never invalidate credentials a National System Admin has rotated. Set `MOSIP_INTEGRATION_CLIENT_ID` and `MOSIP_INTEGRATION_CLIENT_SECRET` (both, or neither) to seed the credentials `mosip-api` already holds; leave them empty to have events generate credentials for an NSA to reveal. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
+- Add `EVENTS_URL=http://events:5555/` to the `countryconfig` service. It has no production default, so the service will not start without it. Read by `src/api/integration/handler.ts`, which registers the MOSIP integration on startup. Set `MOSIP_INTEGRATION_CLIENT_ID` and `MOSIP_INTEGRATION_CLIENT_SECRET` together to seed the credentials `mosip-api` already holds; leave both empty to have events generate them. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 - Removed InfluxDB from deployment infrastructure and data-generator references.
 - The employee seeder seeds `<ENVIRONMENT_NAME>-employees.csv` from `src/data-seeding/employees/source/` when that file exists, otherwise `default-employees.csv`. It uses the `ENVIRONMENT_NAME` env var (also the telemetry environment label); add per-environment files such as `production-employees.csv` to seed different users per environment — no code change needed. The previous `EMPLOYEES_CSV` env var and the `OPENCRVS_ENVIRONMENT`-based `prod-employees.csv` selection have been removed [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
 
