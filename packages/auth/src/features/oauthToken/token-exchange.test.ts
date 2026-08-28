@@ -21,16 +21,18 @@ const ACTION_ID = '22222222-2222-2222-2222-222222222222'
 const decodeTokenPayload = (token: string) =>
   JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString())
 
-const exchangeUrl = (subjectToken: string) =>
-  '/token?' +
-  new URLSearchParams({
+const exchangeRequest = (subjectToken: string) => ({
+  method: 'POST' as const,
+  url: '/token',
+  payload: {
     grant_type: 'urn:opencrvs:oauth:grant-type:token-exchange',
     subject_token: subjectToken,
     subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
     requested_token_type: 'urn:opencrvs:oauth:token-type:single_record_token',
     event_id: EVENT_ID,
     action_id: ACTION_ID
-  }).toString()
+  }
+})
 
 describe('token exchange for action confirmation', () => {
   let server: AuthServer
@@ -49,10 +51,7 @@ describe('token exchange for action confirmation', () => {
       TokenUserType.enum.user
     )
 
-    const res = await server.server.inject({
-      method: 'POST',
-      url: exchangeUrl(subjectToken)
-    })
+    const res = await server.server.inject(exchangeRequest(subjectToken))
 
     expect(res.statusCode).toBe(200)
 
@@ -82,10 +81,7 @@ describe('token exchange for action confirmation', () => {
       TokenUserType.enum.system
     )
 
-    const res = await server.server.inject({
-      method: 'POST',
-      url: exchangeUrl(subjectToken)
-    })
+    const res = await server.server.inject(exchangeRequest(subjectToken))
 
     expect(res.statusCode).toBe(200)
 
@@ -107,10 +103,7 @@ describe('token exchange for action confirmation', () => {
       }
     )
 
-    const res = await server.server.inject({
-      method: 'POST',
-      url: exchangeUrl(subjectToken)
-    })
+    const res = await server.server.inject(exchangeRequest(subjectToken))
 
     expect(res.statusCode).toBe(200)
 
@@ -119,10 +112,7 @@ describe('token exchange for action confirmation', () => {
   })
 
   it('rejects an invalid subject token', async () => {
-    const res = await server.server.inject({
-      method: 'POST',
-      url: exchangeUrl('not-a-token')
-    })
+    const res = await server.server.inject(exchangeRequest('not-a-token'))
 
     expect(res.statusCode).toBe(401)
   })
