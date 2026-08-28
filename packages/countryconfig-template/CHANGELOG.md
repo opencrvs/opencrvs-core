@@ -4,6 +4,7 @@
 
 ### Breaking changes
 
+- Add `EVENTS_URL=http://events:5555/` to the `countryconfig` service. It has no production default, so the service will not start without it, whether or not any integrations are configured. Startup integration registration (`INTEGRATIONS` in `src/api/integration/handler.ts`) calls the events service, which owns integration clients; names that already exist are skipped, so restarts never invalidate credentials a National System Admin has rotated. The list ships empty, so an unmodified configuration is unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 - Removed InfluxDB from deployment infrastructure (service, backup/restore, provisioning).
 - The employee seeder seeds `<ENVIRONMENT_NAME>-employees.csv` from `src/data-seeding/employees/source/` when that file exists, otherwise `default-employees.csv`. It uses the `ENVIRONMENT_NAME` env var (also the telemetry environment label); add per-environment files such as `production-employees.csv` to seed different users per environment — no code change needed. The previous `EMPLOYEES_CSV` env var and the `OPENCRVS_ENVIRONMENT`-based `prod-employees.csv` selection have been removed [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
 
