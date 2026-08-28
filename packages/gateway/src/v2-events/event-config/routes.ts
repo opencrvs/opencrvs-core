@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from '@gateway/environment'
+import { badRequest } from '@hapi/boom'
 import { ServerRoute } from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 
@@ -19,9 +20,15 @@ export const trpcProxy = [
     handler: (req, h) => {
       logger.info(`Proxying request to ${req.params.path}`)
 
+      const uri = new URL(req.params.path, env.EVENTS_URL)
+
+      if (uri.origin !== new URL(env.EVENTS_URL).origin) {
+        // Prevent open redirect / SSRF attacks by ensuring the proxied URL is within the expected origin
+        throw badRequest('Invalid path')
+      }
+
       return h.proxy({
-        uri:
-          new URL(req.params.path, env.EVENTS_URL).toString() + req.url.search,
+        uri: uri.toString() + req.url.search,
         passThrough: true
       })
     },
