@@ -66,6 +66,13 @@ const ModalBody = styled.div`
   background: ${({ theme }) => theme.colors.white};
   padding: 8px 0;
 `
+const LocationLabel = styled.span`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 220px;
+`
+
 const StyledLocationSearch = styled(LocationSearch)`
   flex-direction: column;
   width: 100%;
@@ -155,11 +162,17 @@ export function LocationPicker({
         disabled={disabled}
         type="secondary"
       >
-        <span>
+        <LocationLabel
+          title={
+            (selectedSearchedLocation &&
+              selectedSearchedLocation.displayLabel) ||
+            ''
+          }
+        >
           {(selectedSearchedLocation &&
             selectedSearchedLocation.displayLabel) ||
             ''}
-        </span>
+        </LocationLabel>
         <MapPin color={disabled ? colors.grey200 : undefined} />
       </PickerButton>
       {modalVisible && (
