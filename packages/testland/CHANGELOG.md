@@ -2,6 +2,10 @@
 
 ## 2.1.0 Release Candidate
 
+### New features
+
+- Added a `FIELD_AGENT` role that exercises the `createdBy` scope option: the agent only ever sees records they created themselves, even after another user re-declares the record with edits. [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+
 ### Breaking changes
 
 - Add `EVENTS_URL=http://events:5555/` to the `countryconfig` service. It has no production default, so the service will not start without it, whether or not any integrations are configured. Startup integration registration (`INTEGRATIONS` in `src/api/integration/handler.ts`) calls the events service, which owns integration clients; names that already exist are skipped, so restarts never invalidate credentials a National System Admin has rotated. Set `MOSIP_INTEGRATION_CLIENT_ID` and `MOSIP_INTEGRATION_CLIENT_SECRET` (both, or neither) to seed the credentials `mosip-api` already holds; leave them empty to have events generate credentials for an NSA to reveal. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
