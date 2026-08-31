@@ -1215,6 +1215,15 @@ ALL_QUESTIONS.push(
     process.exit(0)
   }
 
+  log(
+    kleur
+      .bold()
+      .red(
+        "⚠️  COPY THESE NOW INTO A PASSWORD MANAGER — YOU WON'T SEE THEM AGAIN"
+      )
+  )
+  log('')
+
   const saveChanges = await confirm({
     message: 'Do you want to continue?',
     default: true
