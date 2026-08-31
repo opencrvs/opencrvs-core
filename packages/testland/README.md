@@ -173,7 +173,7 @@ Changes to dependency or image build files trigger a full rebuild instead, for e
 
 ```
 package.json
-yarn.lock
+pnpm-lock.yaml
 Dockerfile
 ```
 

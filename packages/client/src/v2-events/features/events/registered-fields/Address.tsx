@@ -186,7 +186,7 @@ function withDisabledConditional<T extends FieldConfig>(field: T): T {
  * const fields = generateAddressFields(addressConfig, adminStructure, true)
  * // All fields in fields.domesticFields have { type: 'ENABLE', conditional: not(alwaysTrue()) }
  */
-function generateAddressFields(
+export function generateAddressFields(
   addressConfig: AddressField,
   adminStructure: AdminStructureItem[],
   disabled?: boolean
@@ -253,9 +253,8 @@ function generateAddressFields(
     const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
       allowedLocations: addressConfig.configuration?.allowedLocations,
-      // Propagate advanced-search and event-date-anchoring behaviour to the
-      // embedded admin-area selectors.
-      listHistoricalNames: addressConfig.configuration?.listHistoricalNames,
+      // Propagate event-date-anchoring behaviour to the embedded admin-area
+      // selectors.
       activeOnly: addressConfig.configuration?.activeOnly,
       anchorToDateOfEvent: addressConfig.configuration?.anchorToDateOfEvent
     }
@@ -398,6 +397,7 @@ function transformParentValueToNestedValue(
  * //   streetLevelDetails: { addressLine1: '42 Main St' }
  * // }
  */
+
 function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
@@ -408,8 +408,8 @@ function transformNestedValueToParentValue(
     adminLevelIds
   )
   const country = nestedValue.country as string
-  const defaultCountry = window.config.COUNTRY || 'FAR'
-  if (country === defaultCountry) {
+
+  if (country === window.config.COUNTRY) {
     return {
       country,
       addressType: AddressType.DOMESTIC,
@@ -417,6 +417,7 @@ function transformNestedValueToParentValue(
       streetLevelDetails: addressLines
     }
   }
+
   return {
     country,
     addressType: AddressType.INTERNATIONAL,
