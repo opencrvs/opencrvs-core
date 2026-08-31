@@ -24,4 +24,4 @@ Shard count (`--shards=N` in the `plan` job) and `max-parallel` are independent 
 
 ## Keeping shard-weights.json fresh
 
-A separate workflow, [`refresh-shard-weights.yml`](https://github.com/opencrvs/e2e/blob/develop/.github/workflows/refresh-shard-weights.yml), runs on a biweekly cron (and can be triggered manually). It downloads ctrf reports from the latest successful e2e run on `develop`, runs `aggregate-shard-weights.ts` to sum per-file durations, regenerates `shard-weights.json`, opens a PR against core, and pings Slack for review — no auto-commits, no cache, a human always merges it.
+A separate workflow, [`refresh-shard-weights.yml`](https://github.com/opencrvs/e2e/blob/develop/.github/workflows/refresh-shard-weights.yml), runs on a biweekly cron (and can be triggered manually). It downloads ctrf reports from the last 10 successful e2e runs on `develop`, runs `aggregate-shard-weights.ts` to average per-file durations across them, regenerates `shard-weights.json`, opens a PR against core, and pings Slack for review — no auto-commits, no cache, a human always merges it.
