@@ -132,13 +132,17 @@ Added `ActionType.UNARCHIVE`, a new core action that restores an `ARCHIVED` reco
 
 The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)
 
-#### `listHistoricalNames` / `activeOnly` location field config options
+#### `activeOnly` location field config option
 
-`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept two optional booleans: `listHistoricalNames` lists every name a location has ever had (across its `versions[]`) as a separate, selectable option — so records saved under an outdated name stay findable — and `activeOnly` offers only currently-active locations, excluding inactivated ones. Advanced search sets these itself for its location/address filters (offices and health institutions list all names and keep inactive entries; address filters list all names but drop inactive admin structures), so no country configuration is required for that behaviour; they are documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `activeOnly`, which offers only currently-active locations, excluding inactivated ones. Advanced search sets it itself for its address filters, so no country configuration is required for that behaviour; it is documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
 
 #### `anchorToDateOfEvent` location field config option
 
 `LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves the field's displayed/selectable versions against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). It does not by itself exclude inactive versions — combine with `activeOnly` for that; when both are set, `activeOnly`'s active/inactive check is evaluated at the event-date anchor rather than today, so a location that has since become inactive can still be selected for a historical record, and one not yet active as at the event's date is excluded even if it's active today. A selection is automatically cleared if the date-of-event later changes such that it resolves to a different version than before. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
+
+#### `separator` / `hideEmptyFields` field group config options
+
+`FIELD_GROUP` field configs accept an optional `configuration` object with two settings that control how the group renders as output (record review, audit history, search criteria pills). `separator` joins the subfield values into a single line — e.g. `', '` — instead of the default one-per-line. `hideEmptyFields` leaves subfields without a value out of that output; pair it with a separator so the separator does not double up around the gaps. A group that sets neither renders exactly as before: one subfield per line, blanks included. [#13423](https://github.com/opencrvs/opencrvs-core/issues/13423)
 
 #### Integration audit log retrieval
 
