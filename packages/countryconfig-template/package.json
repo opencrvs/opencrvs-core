@@ -27,7 +27,7 @@
     "port-forward": "bash assets/port-forward.sh",
     "environment:init": "tsx assets/environments/setup-environment.ts",
     "environment:upgrade": "pnpm environment:init",
-    "extract:translations": "opencrvs check-translations",
+    "extract:translations": "tsx src/check-translations.ts",
     "sort-translations": "cross-env NODE_ENV=development tsx src/sort-translations.ts"
   },
   "devDependencies": {
@@ -58,6 +58,7 @@
     "pino-pretty": "^11.0.0",
     "prettier": "^3.4.2",
     "react-intl": "^6.4.3",
+    "ts-morph": "^27.0.2",
     "vite": "^8.1.5",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^4.1.10"
