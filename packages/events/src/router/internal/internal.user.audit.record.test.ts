@@ -12,6 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
+import { createSystemClient } from '@events/storage/postgres/events/system-clients'
 import {
   createInternalServiceToken,
   createInternalTestClient,
@@ -25,7 +26,6 @@ const caller = createInternalTestClient()
 
 const auditRecordPayload = {
   clientId: getUUID(),
-  clientType: TokenUserType.enum.user,
   entry: {
     operation: 'user.logged_in' as const,
     requestData: { subjectId: getUUID() }
@@ -73,13 +73,21 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
-test('records an audit entry on behalf of a system client', async () => {
-  const systemId = getUUID()
+test('derives clientType system from a system client id', async () => {
+  const { user } = await setupTestCase()
   const subjectId = getUUID()
+  const systemId = getUUID()
+  await createSystemClient({
+    id: systemId,
+    name: 'Test System Client',
+    createdBy: user.id,
+    secretHash: 'hash',
+    salt: 'salt',
+    shaSecret: 'shaSecret'
+  })
 
   await caller.user.audit.record({
     clientId: systemId,
-    clientType: TokenUserType.enum.system,
     entry: {
       operation: 'user.deactivate',
       requestData: {
@@ -105,13 +113,12 @@ test('records an audit entry on behalf of a system client', async () => {
   })
 })
 
-test('records an audit entry on behalf of a user', async () => {
+test('derives clientType user from a user id', async () => {
   const { user } = await setupTestCase()
   const subjectId = getUUID()
 
   await caller.user.audit.record({
     clientId: user.id,
-    clientType: TokenUserType.enum.user,
     entry: {
       operation: 'user.reactivate',
       requestData: {
@@ -137,15 +144,32 @@ test('records an audit entry on behalf of a user', async () => {
   })
 })
 
+test('refuses to attribute an entry to a client that does not exist', async () => {
+  const { user } = await setupTestCase()
+
+  await expect(
+    caller.user.audit.record({
+      clientId: getUUID(),
+      entry: {
+        operation: 'user.logged_in',
+        requestData: { subjectId: user.id }
+      }
+    })
+  ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+
+  const db = getClient()
+  const logs = await db.selectFrom('auditLog').selectAll().execute()
+  expect(logs).toHaveLength(0)
+})
+
 test('stores responseSummary as null', async () => {
-  const systemId = getUUID()
+  const { user } = await setupTestCase()
 
   await caller.user.audit.record({
-    clientId: systemId,
-    clientType: TokenUserType.enum.system,
+    clientId: user.id,
     entry: {
       operation: 'user.logged_in',
-      requestData: { subjectId: getUUID() }
+      requestData: { subjectId: user.id }
     }
   })
 
@@ -153,7 +177,7 @@ test('stores responseSummary as null', async () => {
   const [log] = await db
     .selectFrom('auditLog')
     .selectAll()
-    .where('clientId', '=', systemId)
+    .where('clientId', '=', user.id)
     .execute()
 
   expect(log.responseSummary).toBeNull()

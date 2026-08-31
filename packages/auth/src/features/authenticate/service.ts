@@ -423,11 +423,7 @@ export async function recordUserAuditEvent(
   entry: UserAuditLog
 ): Promise<void> {
   try {
-    await internalClient.user.audit.record.mutate({
-      clientId: userId,
-      clientType: 'user',
-      entry
-    })
+    await internalClient.user.audit.record.mutate({ clientId: userId, entry })
   } catch (err) {
     logger.error('Failed to record user audit event', err)
   }
@@ -439,7 +435,6 @@ export async function recordAnonymousUserAuditEvent(
   try {
     await internalClient.user.audit.record.mutate({
       clientId: entry.requestData.subjectId,
-      clientType: 'system',
       entry
     })
   } catch (err) {

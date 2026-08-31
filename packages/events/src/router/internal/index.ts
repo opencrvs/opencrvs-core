@@ -15,7 +15,8 @@ import {
   UserName,
   UserAuditRecordInput,
   TokenUserType,
-  UUID
+  UUID,
+  logger
 } from '@opencrvs/commons'
 import { internalProcedure, serviceRouter } from '@events/router/trpc'
 import {
@@ -23,6 +24,7 @@ import {
   getUserRoleAndStatus,
   updatePasswordHash
 } from '@events/storage/postgres/events/users'
+import { systemClientExists } from '@events/storage/postgres/events/system-clients'
 import { generateHash } from '@events/service/auth/hash'
 import {
   checkSecurityQuestionMatch,
@@ -50,10 +52,28 @@ const VerifyUserOutput = z.object({
  * so the acting client is supplied explicitly rather than derived from a token.
  */
 const InternalUserAuditRecordInput = z.object({
-  clientId: z.string(),
-  clientType: TokenUserType,
+  clientId: UUID,
   entry: UserAuditRecordInput
 })
+
+async function resolveClientType(clientId: UUID): Promise<TokenUserType> {
+  if (await getUserRoleAndStatus(clientId)) {
+    return TokenUserType.enum.user
+  }
+
+  if (await systemClientExists(clientId)) {
+    return TokenUserType.enum.system
+  }
+
+  logger.warn(
+    `Refused an audit entry for unknown client ${clientId}: the entry was not recorded`
+  )
+
+  throw new TRPCError({
+    code: 'BAD_REQUEST',
+    message: 'Audit entry names a client that does not exist'
+  })
+}
 
 /**
  * Service-to-service routes, reachable only with an internal service token
@@ -169,7 +189,7 @@ export const internalUserRouter = serviceRouter({
         await writeAuditLog({
           ...input.entry,
           clientId: input.clientId,
-          clientType: input.clientType
+          clientType: await resolveClientType(input.clientId)
         })
       })
   },
