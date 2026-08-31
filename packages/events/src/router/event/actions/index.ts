@@ -196,7 +196,7 @@ const AsyncActionInput = BaseActionInput.pick({
   actionId: UUID
 })
 
-export type AsyncActionInput = z.infer<typeof AsyncActionInput>
+type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
   declaration: true,
