@@ -46,7 +46,7 @@ test("BRN search on deceased's details finds and fills from a registered birth r
     // The birth may take a moment to be indexed for search; retry the search
     // until the matching record is found.
     await expect(async () => {
-      await page.getByRole('button', { name: 'Search', exact: true }).click()
+      await page.locator('#search').press('Enter')
       await expect(page.getByTestId('search-input-error')).toHaveText(
         'Birth record found',
         { timeout: 5000 }
