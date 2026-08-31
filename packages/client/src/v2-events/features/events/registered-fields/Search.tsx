@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as z from 'zod'
 import styled from 'styled-components'
@@ -285,6 +285,20 @@ function SearchInput({
   )
   const isOnline = useOnlineStatus()
   const debouncedButtonPressed = useDebounce(buttonPressed, 200) // settles 200ms after the last enter press
+
+  // The search term and the response live in local state, so a value reset made
+  // outside this component (e.g. the page level "Clear") would otherwise leave
+  // the term visible and the input disabled, with no way to search again.
+  const previousValueRef = useRef(value)
+  useEffect(() => {
+    const previousValue = previousValueRef.current
+    previousValueRef.current = value
+
+    if (previousValue !== value && !value) {
+      setInputState('')
+      setHttpState(null)
+    }
+  }, [value])
 
   const clearData = async () => {
     const confirm = await openModal<boolean>((close) => (

@@ -103,8 +103,8 @@ export const roles: Role[] = [
     scopes: [
       ...defineScopes([
         { type: 'organisation.read-locations', options: { accessLevel: 'administrativeArea' } },
-        { type: 'user.create', options: { accessLevel: 'administrativeArea', role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'PROVINCIAL_REGISTRAR'] } },
-        { type: 'user.edit', options: { accessLevel: 'administrativeArea', role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'PROVINCIAL_REGISTRAR'] } },
+        { type: 'user.create', options: { accessLevel: 'administrativeArea', role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'PROVINCIAL_REGISTRAR', 'FIELD_AGENT'] } },
+        { type: 'user.edit', options: { accessLevel: 'administrativeArea', role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'PROVINCIAL_REGISTRAR', 'FIELD_AGENT'] } },
         { type: 'user.read', options: { accessLevel: 'administrativeArea' } },
         { type: 'user.search', options: { accessLevel: 'administrativeArea' } }
       ])
@@ -124,11 +124,15 @@ export const roles: Role[] = [
         { type: 'organisation.read-locations' },
         {
           type: 'user.create',
-          options: { role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR', 'LOCAL_SYSTEM_ADMIN', 'NATIONAL_SYSTEM_ADMIN', 'PERFORMANCE_MANAGER', 'PROVINCIAL_REGISTRAR', 'EMBASSY_OFFICIAL'] }
+          options: {
+            role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR', 'LOCAL_SYSTEM_ADMIN', 'NATIONAL_SYSTEM_ADMIN', 'PERFORMANCE_MANAGER', 'PROVINCIAL_REGISTRAR', 'EMBASSY_OFFICIAL', 'FIELD_AGENT']
+          }
         },
         {
           type: 'user.edit',
-          options: { role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR', 'LOCAL_SYSTEM_ADMIN', 'NATIONAL_SYSTEM_ADMIN', 'PERFORMANCE_MANAGER', 'PROVINCIAL_REGISTRAR', 'EMBASSY_OFFICIAL'] }
+          options: {
+            role: ['HOSPITAL_CLERK', 'HEALTH_ADMINISTRATOR', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR', 'LOCAL_SYSTEM_ADMIN', 'NATIONAL_SYSTEM_ADMIN', 'PERFORMANCE_MANAGER', 'PROVINCIAL_REGISTRAR', 'EMBASSY_OFFICIAL', 'FIELD_AGENT']
+          }
         },
         { type: 'user.read' },
         { type: 'user.search' },
@@ -311,6 +315,35 @@ export const roles: Role[] = [
       { type: 'record.declare', options: { placeOfEvent: 'location' } },
       { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
+    ])
+  },
+  {
+    /**
+     * A test-only role, not part of any real country configuration — the same
+     * intent as QA_HOSPITAL_CLERK above.
+     *
+     * It exists to exercise the `createdBy` scope filter added in
+     * opencrvs-core#13288: `record.search` and `record.read` carry
+     * `createdBy: 'user'`, so this agent only ever sees records it created
+     * itself. The case worth verifying is that it keeps access after another
+     * user re-declares the record with edits, which overwrites
+     * `legalStatuses.DECLARED.createdBy`.
+     *
+     * See https://github.com/opencrvs/opencrvs-core/issues/13287
+     */
+    id: 'FIELD_AGENT',
+    label: {
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
+    },
+    scopes: defineScopes([
+      { type: 'user.read-only-my-audit' },
+      { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-validation'] } },
+      { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.search', options: { placeOfEvent: 'administrativeArea', createdBy: 'user' } },
+      { type: 'record.read', options: { placeOfEvent: 'administrativeArea', createdBy: 'user' } }
     ])
   }
 ]

@@ -26,6 +26,26 @@ export async function getServiceToken() {
   return token as string
 }
 
+/**
+ * Callers retry on failure, so this must fail rather than stall. Auth and
+ * events start concurrently, and without a timeout a peer that accepts the
+ * connection but never answers parks the caller on its first attempt forever —
+ * silently, since nothing is logged until an attempt settles.
+ */
+export async function getIntegrationCreatorToken(timeoutMs: number) {
+  const res = await fetch(
+    new URL('/internal/integration-creator-token', env.AUTH_URL).toString(),
+    { method: 'POST', timeout: timeoutMs }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch integration creator token: ${res.status} ${res.statusText}`
+    )
+  }
+  const { token } = await res.json()
+  return token as string
+}
+
 export async function getActionConfirmationToken(
   { eventId, actionId }: { eventId: UUID; actionId: UUID },
   token: string
