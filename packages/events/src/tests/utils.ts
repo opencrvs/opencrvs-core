@@ -745,6 +745,8 @@ function eventMatchesScope({
   placeOfEvent,
   notifiedBy,
   notifiedIn,
+  createdBy,
+  createdIn,
   declaredBy,
   registeredBy,
   declaredIn,
@@ -757,6 +759,8 @@ function eventMatchesScope({
     | { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
     | CreatedUser
   placeOfEvent?: JurisdictionFilter
+  createdBy?: UserFilter
+  createdIn?: JurisdictionFilter
   notifiedBy?: UserFilter
   notifiedIn?: JurisdictionFilter
   declaredBy?: UserFilter
@@ -793,6 +797,33 @@ function eventMatchesScope({
     if (
       !isUnderAdministrativeArea(
         UUID.parse(notifiedLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (createdBy === UserFilter.enum.user) {
+    if (eventIndex.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.location) {
+    if (eventIndex.createdAtLocation !== user.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.administrativeArea) {
+    if (!eventIndex.createdAtLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.createdAtLocation),
         user.administrativeAreaId || null
       )
     ) {
@@ -1139,6 +1170,8 @@ export function assertScopeResult(
     isUnderAdministrativeArea,
     notifiedBy,
     notifiedIn,
+    createdBy,
+    createdIn,
     declaredBy,
     declaredIn,
     registeredBy,
@@ -1153,6 +1186,8 @@ export function assertScopeResult(
     ) => boolean
     notifiedBy?: UserFilter
     notifiedIn?: JurisdictionFilter
+    createdBy?: UserFilter
+    createdIn?: JurisdictionFilter
     declaredBy?: UserFilter
     registeredBy?: UserFilter
     declaredIn?: JurisdictionFilter
@@ -1171,6 +1206,8 @@ export function assertScopeResult(
     user,
     notifiedBy,
     notifiedIn,
+    createdBy,
+    createdIn,
     declaredBy,
     registeredBy,
     declaredIn,

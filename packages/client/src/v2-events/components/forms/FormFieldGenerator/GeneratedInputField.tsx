@@ -154,8 +154,13 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   name: string
   fieldDefinition: T
   eventConfig?: EventConfig
-  /** non-native onChange. Updates Formik state by updating the value and its dependencies */
-  onFieldValueChange: (name: string, value: FieldValue | undefined) => void
+  /** non-native onChange. Updates Formik state by updating the value and its dependencies.
+   * `null` explicitly clears the value when the declaration is submitted (PATCH semantics),
+   * whereas `undefined` keeps the previously persisted value untouched. */
+  onFieldValueChange: (
+    name: string,
+    value: FieldValue | null | undefined
+  ) => void
   /** Optional callback that is called whenever any field value changes.
    * This is useful for cases where the parent component needs to know about
    * changes in the form state.
@@ -291,11 +296,15 @@ export const GeneratedInputField = <T extends FieldConfig>(
   /**
    * Combines the field definition with the current value and input field props
    * USED FOR: rendering the correct input field based on the FieldConfig guards
+   *
+   * A null value marks a field explicitly cleared by the user (kept in the
+   * form state so the value gets removed on submit). Input components only
+   * handle missing values as undefined, so normalize before rendering.
    */
   const field = {
     inputFieldProps,
     config: fieldDefinition,
-    value: input.value
+    value: input.value ?? undefined
   }
   if (isFieldGroupFieldType(field)) {
     const groupTouched =

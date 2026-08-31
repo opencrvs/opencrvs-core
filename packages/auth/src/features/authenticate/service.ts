@@ -299,16 +299,27 @@ export async function generateAndSendVerificationCode(
   )
 }
 
-const tokenPayload = t.type({
-  sub: t.string,
-  scope: t.array(t.string),
-  // @TODO: Does role need to be here?
-  // role: t.string,
-  iat: t.number,
-  exp: t.number,
-  aud: t.array(t.string),
-  userType: t.string
-})
+/**
+ * NOTE: this schema uses io-ts (`t`), not Zod as used elsewhere in the codebase.
+ * In io-ts, `t.type` fields are all required and `t.partial` fields are all
+ * optional, so a mix of required + optional fields is expressed by intersecting
+ * the two. Here `userType` is optional (via `t.partial`) — legacy tokens minted
+ * before the claim existed omit it and are treated as `user` downstream.
+ */
+const tokenPayload = t.intersection([
+  t.type({
+    sub: t.string,
+    scope: t.array(t.string),
+    // @TODO: Does role need to be here?
+    // role: t.string,
+    iat: t.number,
+    exp: t.number,
+    aud: t.array(t.string)
+  }),
+  t.partial({
+    userType: t.union([t.literal('user'), t.literal('system')])
+  })
+])
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
   scope: EncodedScope[]
