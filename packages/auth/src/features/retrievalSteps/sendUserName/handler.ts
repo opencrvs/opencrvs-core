@@ -19,9 +19,13 @@ import {
   deleteRetrievalStepInformation,
   RETRIEVAL_FLOW_USER_NAME
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { triggerUserEventNotification } from '@opencrvs/commons'
+import { triggerUserEventNotification, TokenUserType } from '@opencrvs/commons'
 import { env } from '@auth/environment'
-import { recordAnonymousUserAuditEvent } from '@auth/features/authenticate/service'
+import {
+  createToken,
+  recordAnonymousUserAuditEvent
+} from '@auth/features/authenticate/service'
+import { JWT_ISSUER } from '@auth/constants'
 
 interface IPayload {
   nonce: string
@@ -62,7 +66,16 @@ export default async function sendUserNameHandler(
       username: retrievalStepInformation.username
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-    authHeader: { Authorization: request.headers.authorization as string }
+    authHeader: {
+      Authorization: `Bearer ${await createToken(
+        'auth',
+        [],
+        ['opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        undefined,
+        TokenUserType.enum.system
+      )}`
+    }
   })
 
   await recordAnonymousUserAuditEvent({
