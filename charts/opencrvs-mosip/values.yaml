@@ -21,7 +21,6 @@ mosip_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/mosip-mock
-    tag: 2.0.1
   env:
     FOO: bar
     SENDER_EMAIL_ADDRESS: 'test@opencrvs.org'
@@ -38,7 +37,6 @@ esignet_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/esignet-mock
-    tag: 2.0.1
   env:
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
 
@@ -47,7 +45,6 @@ mosip_api:
   host_data_path: /data/sqlite
   image:
     repository: ghcr.io/opencrvs/mosip-api
-    tag: 2.0.1
   env:
     LOCALE: en
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
