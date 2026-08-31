@@ -23,13 +23,15 @@ const formEncodedRequest = (payload: string) => ({
 
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
+  let authenticateSystem: jest.SpyInstance
 
   beforeEach(async () => {
     server = await createServer()
     jest
       .spyOn(authService, 'createToken')
       .mockReturnValue(Promise.resolve('789'))
-    jest.spyOn(authService, 'authenticateSystem').mockReturnValue(
+    authenticateSystem = jest.spyOn(authService, 'authenticateSystem')
+    authenticateSystem.mockReturnValue(
       Promise.resolve({
         systemId: '1',
         status: 'active',
@@ -88,7 +90,7 @@ describe('authenticate handler receives a request', () => {
       })
 
       expect(JSON.parse(res.payload).access_token).toBe('789')
-      expect(authService.authenticateSystem).toHaveBeenCalledWith('123', '456')
+      expect(authenticateSystem).toHaveBeenCalledWith('123', '456')
     })
   })
 })
