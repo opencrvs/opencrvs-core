@@ -287,7 +287,8 @@ function EventHistorySkeleton() {
  */
 function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const validatorContext = useValidatorContext()
+
+  const validatorContext = useValidatorContext(fullEvent)
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
