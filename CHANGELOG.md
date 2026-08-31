@@ -17,6 +17,21 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### Registration confirmation no longer uses OAuth token exchange
+
+The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
+
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now requires the **same scope as the action being confirmed** — e.g. `record.register` for a registration — checked with the same event-access rules as requesting the action. There is no separate confirmation scope.
+
+Integrations that confirm registrations (e.g. MOSIP) must therefore:
+
+- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time;
+- **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
+
+`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.register`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
+
 #### `validUntil` removed from location APIs
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.

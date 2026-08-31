@@ -16,10 +16,10 @@ test('SQLite', async () => {
   await it('inserts and removes transactions', () => {
     const { database } = db.initSqlite(':memory:')
 
-    db.insertTransaction('1', 'token1', 'registrationNumber1')
-    db.insertTransaction('2', 'token2', 'registrationNumber2')
-    db.insertTransaction('3', 'token3', 'registrationNumber3')
-    db.insertTransaction('4', 'token4', 'registrationNumber4')
+    db.insertTransaction('1', 'event1', 'registrationNumber1')
+    db.insertTransaction('2', 'event2', 'registrationNumber2')
+    db.insertTransaction('3', 'event3', 'registrationNumber3')
+    db.insertTransaction('4', 'event4', 'registrationNumber4')
 
     assert.strictEqual(
       database.prepare('SELECT * FROM transactions').all().length,
@@ -43,8 +43,8 @@ test('SQLite', async () => {
     db.initSqlite(':memory:')
 
     assert.throws(() => {
-      db.insertTransaction('2', 'token2', 'registrationNumber1')
-      db.insertTransaction('1', 'token1', 'registrationNumber1')
+      db.insertTransaction('2', 'event2', 'registrationNumber1')
+      db.insertTransaction('1', 'event1', 'registrationNumber1')
     })
 
     db.exit()

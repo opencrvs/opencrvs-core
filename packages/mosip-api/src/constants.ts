@@ -18,7 +18,7 @@ export const env = cleanEnv(process.env, {
   SQLITE_DATABASE_PATH: str({
     devDefault: join(__dirname, '../../../data/sqlite/mosip-api.db'),
     example: '/data/sqlite/mosip-api.db', // A good production default, but needs a Docker volume
-    desc: 'Path to the SQLite database used to store a OpenCRVS record-only token with the MOSIP transaction ID. Note that you need to add a volume to the Docker container to persist the data.'
+    desc: 'Path to the SQLite database used to correlate the MOSIP transaction ID with the OpenCRVS event it registers. Note that you need to add a volume to the Docker container to persist the data.'
   }),
   CLIENT_APP_URL: url({
     devDefault: 'http://localhost:3000',

@@ -275,16 +275,33 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
-function createTokenExchangeTestToken(
+function createActionConfirmationTestToken(
   userId: string,
   eventId: string,
   actionId: string
 ): TokenWithBearer {
   const token = jwt.sign(
     {
+      // Confirming an action now requires the scope of the action itself
+      // (e.g. `record.register` for a register confirmation), so the caller
+      // carries the full set of action scopes rather than dedicated
+      // confirm/reject ones. `record.custom-action` is added explicitly because
+      // it is not part of the default set and confirming a custom action needs
+      // it (see `getDefaultActionProcedures`).
       scope: [
-        encodeScope({ type: 'record.confirm-registration' }),
-        encodeScope({ type: 'record.reject-registration' })
+        ...TEST_USER_DEFAULT_SCOPES,
+        encodeScope({
+          type: 'record.custom-action',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ],
+            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
+          }
+        })
       ],
       sub: userId,
       userType: TokenUserType.enum.user,
@@ -372,7 +389,9 @@ export function createInitialisationTestClient(
 }
 
 /**
- * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
+ * Simulates the confirmation caller (e.g. countryconfig / an integration)
+ * hitting the action `accept`/`reject` endpoints. Confirming requires the
+ * action's own scope (e.g. `record.register`), which this client carries.
  */
 export function createCountryConfigClient(
   user: CreatedUser,
@@ -380,7 +399,7 @@ export function createCountryConfigClient(
   actionId: string
 ) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createTokenExchangeTestToken(user.id, eventId, actionId)
+  const token = createActionConfirmationTestToken(user.id, eventId, actionId)
 
   const caller = createCaller({
     user: {

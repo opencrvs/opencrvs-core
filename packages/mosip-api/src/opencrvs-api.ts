@@ -11,8 +11,10 @@
 import { env, OPENCRVS_PUBLIC_KEY_URL } from './constants'
 import { createClient } from '@opencrvs/toolkit/api'
 import crypto from 'node:crypto'
+import { decode } from 'jsonwebtoken'
 import type { FastifyBaseLogger } from 'fastify'
 import { EventDocument, getPendingAction } from '@opencrvs/toolkit/events'
+import { EncodedScope, hasScope } from '@opencrvs/toolkit/scopes'
 
 export class OpenCRVSError extends Error {
   constructor(message: string) {
@@ -47,65 +49,64 @@ export const getPublicKey = async (
   }
 }
 
-export const isDirectAuthConfigured = () =>
-  Boolean(env.OPENCRVS_CLIENT_ID && env.OPENCRVS_CLIENT_SECRET)
-
 /**
- * Obtains a fresh record-specific confirmation token using this integration's
- * own client credentials (client_credentials grant followed by an OAuth 2.0
- * token exchange scoped to the event & action being confirmed).
- *
- * Compared to using the token stored at registration time, a fresh token
- * survives OpenCRVS redeployments and attributes the confirmation to this
- * integration in the record's audit trail.
+ * Obtains a token for this integration's own OpenCRVS system client via the
+ * client_credentials grant. Registration confirmations authenticate with this
+ * token, so they are audited as this integration and survive OpenCRVS
+ * redeployments (there is no per-record token stored at registration time).
  */
-export const getConfirmationToken = async (
-  eventId: string,
-  actionId: string
-): Promise<string> => {
+export const getSystemToken = async (): Promise<string> => {
   const clientCredentialsParams = new URLSearchParams({
     client_id: env.OPENCRVS_CLIENT_ID,
     client_secret: env.OPENCRVS_CLIENT_SECRET,
     grant_type: 'client_credentials'
   })
-  const clientCredentialsResponse = await fetch(
-    `${env.OPENCRVS_AUTH_URL}/token`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: clientCredentialsParams
-    }
-  )
-  if (!clientCredentialsResponse.ok) {
-    throw new OpenCRVSError(
-      `client_credentials authentication failed: ${clientCredentialsResponse.status} ${await clientCredentialsResponse.text()}`
-    )
-  }
-  const { access_token: systemToken } =
-    (await clientCredentialsResponse.json()) as { access_token: string }
-
-  const tokenExchangeParams = new URLSearchParams({
-    grant_type: 'urn:opencrvs:oauth:grant-type:token-exchange',
-    subject_token: systemToken,
-    subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
-    requested_token_type: 'urn:opencrvs:oauth:token-type:single_record_token',
-    event_id: eventId,
-    action_id: actionId
-  })
-  const tokenExchangeResponse = await fetch(`${env.OPENCRVS_AUTH_URL}/token`, {
+  const response = await fetch(`${env.OPENCRVS_AUTH_URL}/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: tokenExchangeParams
+    body: clientCredentialsParams
   })
-  if (!tokenExchangeResponse.ok) {
+  if (!response.ok) {
     throw new OpenCRVSError(
-      `Token exchange failed: ${tokenExchangeResponse.status} ${await tokenExchangeResponse.text()}`
+      `client_credentials authentication failed: ${response.status} ${await response.text()}`
     )
   }
-  const { access_token: confirmationToken } =
-    (await tokenExchangeResponse.json()) as { access_token: string }
+  const { access_token: systemToken } = (await response.json()) as {
+    access_token: string
+  }
 
-  return confirmationToken
+  return systemToken
+}
+
+/**
+ * Fails fast on startup unless this integration's system client can authenticate
+ * and holds `record.register` — the scope its registration confirmations require
+ * ([[opencrvs-api]] `confirmRegistration`). Without it every confirmation would
+ * fail asynchronously, long after the record was sent to MOSIP.
+ */
+export const assertCanConfirmRegistrations = async (
+  logger: FastifyBaseLogger
+): Promise<void> => {
+  let scope: string[]
+  try {
+    const token = await getSystemToken()
+    const payload = decode(token) as { scope?: string[] } | null
+    scope = payload?.scope ?? []
+  } catch (error) {
+    logger.error(
+      { event: 'opencrvs.system-client.auth.failed', err: error },
+      'Could not authenticate the OpenCRVS system client. Set OPENCRVS_CLIENT_ID and OPENCRVS_CLIENT_SECRET to valid credentials.'
+    )
+    process.exit(1)
+  }
+
+  if (!hasScope(scope as EncodedScope[], 'record.register')) {
+    logger.error(
+      { event: 'opencrvs.system-client.scope.missing', scope },
+      "The OpenCRVS system client is missing the 'record.register' scope required to confirm registrations. Grant it on the OpenCRVS Integrations page."
+    )
+    process.exit(1)
+  }
 }
 
 export const confirmRegistration = (
@@ -177,6 +178,7 @@ export const findEventActionType = async (
   }
 
   return {
+    actionId: action.id,
     actionType: action.type,
     eventType: event.type,
     requestId:

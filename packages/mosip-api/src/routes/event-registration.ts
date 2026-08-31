@@ -26,6 +26,7 @@ export const registrationEventHandler = async (
   const body = MosipInteropPayloadSchema.parse(request.body)
 
   const {
+    eventId,
     trackingId,
     requestFields,
     schemaJson,
@@ -33,8 +34,6 @@ export const registrationEventHandler = async (
     metaInfo,
     notification
   } = body
-
-  const token = request.headers.authorization!.split(' ')[1]
 
   request.log.info({ trackingId }, 'Received record from OpenCRVS')
 
@@ -45,7 +44,7 @@ export const registrationEventHandler = async (
 
     request.log.info({ transactionId }, 'Event ID')
 
-    insertTransaction(transactionId, token, birthCertificateNumber)
+    insertTransaction(transactionId, eventId, birthCertificateNumber)
 
     await mosip.postBirthRecord({
       event: { id: transactionId, trackingId },
@@ -64,7 +63,7 @@ export const registrationEventHandler = async (
 
     request.log.info({ transactionId }, 'Event ID')
 
-    insertTransaction(transactionId, token, deathCertificateNumber)
+    insertTransaction(transactionId, eventId, deathCertificateNumber)
 
     await mosip.postDeathRecord({
       event: { id: transactionId, trackingId },

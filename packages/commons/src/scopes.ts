@@ -78,11 +78,7 @@ const PlainScopeType = z.enum([
   // Performance dashboard
   'performance.read',
   'performance.read-dashboards',
-  'performance.vital-statistics-export',
-
-  // Scopes used exclusively by countryconfig integration token
-  'record.confirm-registration',
-  'record.reject-registration'
+  'performance.vital-statistics-export'
 ])
 
 const scopeByEvent = z
