@@ -109,7 +109,7 @@ const actionDefaults = {
 
 /**
  * The registration fills in the registration number - the field which is only
- * shown once the record has been registered - alongside a plain field.
+ * shown once the record has been registered - and a later edit corrects it.
  */
 const registeredEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
@@ -145,8 +145,17 @@ const registeredEvent: EventDocument = {
         ...actionDefaults,
         declaration: {
           'applicant.dob': '1999-12-12',
-          [GATED_FIELD_ID]: '2025-1'
+          [GATED_FIELD_ID]: '2025-0'
         }
+      }
+    }),
+
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.EDIT,
+      defaults: {
+        ...actionDefaults,
+        declaration: { [GATED_FIELD_ID]: '2025-1' }
       }
     }),
     generateActionDocument({
@@ -224,12 +233,11 @@ export const ShowsEventDependentFieldInUpdateDetails: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    await step(
-      'open the details of the update made on registration',
-      async () => {
-        await userEvent.click(await canvas.findByText('Updated'))
-      }
-    )
+    await step('open the details of the edit', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Edited' })
+      )
+    })
 
     await step('registration number is part of the update', async () => {
       const dialog = within(await canvas.findByRole('dialog'))
