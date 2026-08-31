@@ -3050,6 +3050,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
+                                - createdIn
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -3327,6 +3329,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
+                                - createdIn
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -4015,6 +4019,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9159,6 +9165,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9644,6 +9652,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -14435,6 +14445,10 @@ components:
               description: If true, all required fields must be filled before continuing to
                 the next page
               type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
+              type: boolean
             fields:
               type: array
               items:
@@ -14467,6 +14481,10 @@ components:
               default: false
               description: If true, all required fields must be filled before continuing to
                 the next page
+              type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
               type: boolean
             fields:
               type: array
@@ -14834,6 +14852,11 @@ components:
                 description: If true, all required fields must be filled before continuing to
                   the next page
                 type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
+                type: boolean
               fields:
                 type: array
                 items:
@@ -15156,6 +15179,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
+                                  - createdIn
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
@@ -15471,6 +15496,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
+                                  - createdIn
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
