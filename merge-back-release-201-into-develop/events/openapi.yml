@@ -3310,8 +3310,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3591,8 +3589,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3794,6 +3790,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        configuration:
+          type: object
+          properties:
+            separator:
+              description: Joins the subfield values when the group is rendered as output,
+                e.g. ", ". Defaults to one subfield per line.
+              type: string
+            hideEmptyFields:
+              description: Leaves subfields without a value out of the output. Pair it with a
+                separator so the separator does not double up around the gaps.
+              default: false
+              type: boolean
+          additionalProperties: false
       required:
         - id
         - label
@@ -4270,11 +4279,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option. Propagated to the embedded admin-area
-                selectors.
-              type: boolean
             activeOnly:
               description: Offer only admin areas that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9421,10 +9425,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9912,10 +9912,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
