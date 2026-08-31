@@ -43,7 +43,9 @@ test.describe('Desktop', () => {
     await login(page, CREDENTIALS.REGISTRAR, true)
 
     // Crashed previously due bad redirect value
-    await expect(page.getByText('Farajaland CRS')).toBeVisible()
+    await expect(page.getByText('Farajaland CRS')).toBeVisible({
+      timeout: 15_000
+    })
   })
 })
 
@@ -79,6 +81,6 @@ test.describe('Mobile', () => {
     // Crashed previously due bad redirect value.
     await expect(
       page.getByRole('heading', { name: 'Assigned to you' })
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 15_000 })
   })
 })

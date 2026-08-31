@@ -15,10 +15,12 @@ import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
 import {
+  ConditionalType,
   defineConditional,
   field,
   FieldType,
-  FieldConfig
+  FieldConfig,
+  never
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {
@@ -181,6 +183,11 @@ export const InvalidValue_NoRecordsFound: Story = {
 
     const searchInput = await canvas.findByTestId('search-input')
 
+    await expect(searchInput).toHaveAttribute(
+      'placeholder',
+      'Enter birth registration number'
+    )
+
     await userEvent.type(searchInput, '456988542')
 
     searchInput.blur()
@@ -194,10 +201,8 @@ export const InvalidValue_NoRecordsFound: Story = {
     await waitFor(async () =>
       expect(canvas.queryByTestId('search-input-error')).not.toBeInTheDocument()
     )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
-    )
-    await expect(canvas.getByText('Validating...')).toBeInTheDocument()
+    await userEvent.type(searchInput, '{Enter}')
+    await expect(await canvas.findByText('Validating...')).toBeInTheDocument()
 
     await waitFor(
       async () =>
@@ -308,10 +313,7 @@ export const SearchWithRegistrationNumber: Story = {
 
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
@@ -386,10 +388,7 @@ export const TimeOut: Story = {
     const canvas = within(canvasElement)
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
@@ -408,6 +407,7 @@ export const TimeOut: Story = {
     )
   }
 }
+
 export const HttpError: Story = {
   parameters: {
     chromatic: {
@@ -428,10 +428,7 @@ export const HttpError: Story = {
     const canvas = within(canvasElement)
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
@@ -447,6 +444,49 @@ export const HttpError: Story = {
       <StyledFormFieldGenerator
         {...args}
         fields={searchFields}
+        id="my-form"
+        validatorContext={{}}
+      />
+    )
+  }
+}
+
+const disabledSearchFields: FieldConfig[] = [
+  {
+    ...searchFields[0],
+    conditionals: [
+      {
+        type: ConditionalType.ENABLE,
+        conditional: never()
+      }
+    ]
+  }
+]
+
+export const DisabledByConditional: Story = {
+  name: 'Disabled via ENABLE conditional',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const searchInput = await canvas.findByTestId('search-input')
+
+    await expect(searchInput).toBeDisabled()
+    await expect(searchInput).toHaveAttribute(
+      'placeholder',
+      'Enter birth registration number'
+    )
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={disabledSearchFields}
         id="my-form"
         validatorContext={{}}
       />

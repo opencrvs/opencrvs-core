@@ -34,6 +34,7 @@ import {
 } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { useDebounce } from '@client/v2-events/hooks/useDebounce'
 import { makeFormFieldIdsFormikCompatible } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { Http, Props as HttpInputProps } from './Http'
 
@@ -166,6 +167,7 @@ const SearchInputWrapper = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
   display: flex;
+  align-items: center;
   width: 100%;
   gap: 8px;
 `
@@ -175,7 +177,7 @@ const SearchWrapper = styled.div`
   display: flex;
   width: 100%;
   z-index: 1;
-  align-items: stretch;
+  align-items: center;
 `
 
 const StyledIcon = styled(Icon)`
@@ -261,12 +263,16 @@ function SearchInput({
   configuration,
   label,
   helperText,
-  value
+  value,
+  disabled,
+  placeholder
 }: Omit<HttpInputProps, 'configuration' | 'trigger'> & {
   configuration: SearchField['configuration']
   value: HttpFieldValue | null | undefined
   label?: string
   helperText?: TranslationConfig
+  disabled?: boolean
+  placeholder?: string
 }) {
   const intl = useIntl()
 
@@ -278,6 +284,7 @@ function SearchInput({
     value ?? null
   )
   const isOnline = useOnlineStatus()
+  const debouncedButtonPressed = useDebounce(buttonPressed, 200) // settles 200ms after the last enter press
 
   const clearData = async () => {
     const confirm = await openModal<boolean>((close) => (
@@ -387,7 +394,9 @@ function SearchInput({
   const { message, color = 'grey600' } = getMessages()
 
   const isEditable =
-    !httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0)
+    !disabled &&
+    !httpState?.loading && // disable field while a search is in flight
+    (!httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0))
 
   return (
     <StyledContainer>
@@ -425,6 +434,7 @@ function SearchInput({
               data-testid="search-input"
               id="search"
               isDisabled={!isEditable}
+              placeholder={placeholder}
               postfix={
                 <Postfix
                   clearData={async () => clearData()}
@@ -437,6 +447,17 @@ function SearchInput({
               onChange={(e) => {
                 setHttpState(null)
                 setInputState(e.target.value)
+              }}
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  valid &&
+                  isOnline &&
+                  !httpState?.loading // a search is already running, skip
+                ) {
+                  e.preventDefault()
+                  setButtonPressed((prev) => prev + 1)
+                }
               }}
             />
           </SearchWrapper>
@@ -456,22 +477,9 @@ function SearchInput({
               }
             }}
             form={form}
-            trigger={{ mode: 'onChange', value: buttonPressed }}
+            trigger={{ mode: 'onChange', value: debouncedButtonPressed }}
             onChange={onHTTPChange}
           />
-          {isEditable && (
-            <Button
-              disabled={!valid || !isOnline}
-              size="large"
-              type="secondary"
-              onClick={() => setButtonPressed(buttonPressed + 1)}
-            >
-              {intl.formatMessage(
-                configuration.indicators?.confirmButton ||
-                  defaultIndicators.confirmButton
-              )}
-            </Button>
-          )}
         </SearchInputWrapper>
         {message && (
           <Stack alignItems="normal" direction="row" gap={4}>

@@ -29,7 +29,13 @@
       ],
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{auth}}/token",
           "host": ["{{auth}}"],

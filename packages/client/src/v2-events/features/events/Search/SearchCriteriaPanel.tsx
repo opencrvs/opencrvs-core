@@ -24,6 +24,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ValueOutput } from '@client/v2-events/features/events/components/Output'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import { getSearchParamsFieldConfigs, serializeSearchParams } from './utils'
 
 const messagesToDefine = {
@@ -116,9 +117,11 @@ export function SearchCriteriaPanel({
   const navigate = useNavigate()
   const intl = useIntl()
 
+  const adminStructure = useAdminStructure()
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
-    formValues
+    formValues,
+    adminStructure
   )
   return (
     <>

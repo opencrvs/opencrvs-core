@@ -138,10 +138,12 @@ const usernameToFullNameMap = {
  * Ensures that the record is assigned to the user and it is reflected in the event summary.
  *
  * @param username name of the user record is assigned. Used for assertion after assignment. Checking absence of something will burn the whole timeout in CI.
+ * @param options.timeout overrides the default expect timeout for the final assignment assertion.
  */
 export async function ensureAssignedToUser(
   page: Page,
-  username: keyof typeof usernameToFullNameMap
+  username: keyof typeof usernameToFullNameMap,
+  options?: { timeout?: number }
 ) {
   const userFullName = usernameToFullNameMap[username]
 
@@ -177,7 +179,9 @@ export async function ensureAssignedToUser(
 
   // Wait for the assignment API call to complete and the UI to update.
 
-  await expect(assignedTo).toContainText(userFullName)
+  await expect(assignedTo).toContainText(userFullName, {
+    timeout: options?.timeout
+  })
 }
 
 export async function expectInUrl(page: Page, assertionString: string) {

@@ -36,6 +36,8 @@ test('direct authentication with OpenCRVS', async (t) => {
       const requests: URLSearchParams[] = []
       const mswServer = setupServer(
         http.post(`${AUTH_URL}/token`, async ({ request }) => {
+          // Parameters belong in the body — the query string leaks the secret.
+          assert.strictEqual(new URL(request.url).search, '')
           const params = new URLSearchParams(await request.text())
           requests.push(params)
 
