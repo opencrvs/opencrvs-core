@@ -394,10 +394,7 @@ export const ExternalValueReset: Story = {
 
     await userEvent.type(
       await canvas.findByTestId('search-input'),
-      '6097821229'
-    )
-    await userEvent.click(
-      await canvas.findByRole('button', { name: /Confirm/i })
+      '6097821229{Enter}'
     )
 
     await waitFor(
