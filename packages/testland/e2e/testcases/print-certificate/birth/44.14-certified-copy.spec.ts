@@ -53,7 +53,9 @@ test.describe.serial('44.14.0 Validate "Certified copy" option', () => {
   })
 
   test('44.14.1 "Certified Copy" is not available in certificate types', async () => {
-    await page.locator('#certificateTemplateId svg').click()
+    await page
+      .locator('#certificateTemplateId .react-select__dropdown-indicator')
+      .click()
     await expect(
       page.getByText('Birth Certificate', { exact: true })
     ).toHaveCount(2) // One as a selected option, another in dropdown
@@ -83,7 +85,9 @@ test.describe.serial('44.14.0 Validate "Certified copy" option', () => {
     await openRecordByTitle(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Print')
-    await page.locator('#certificateTemplateId svg').click()
+    await page
+      .locator('#certificateTemplateId .react-select__dropdown-indicator')
+      .click()
     await expect(
       page.getByText('Birth Certificate Certified Copy', { exact: true })
     ).toBeVisible()
