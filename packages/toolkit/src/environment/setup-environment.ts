@@ -10,7 +10,6 @@
  */
 
 import { Octokit } from '@octokit/core'
-import dotenv from 'dotenv'
 import kleur from 'kleur'
 import prompts, { PromptObject } from 'prompts'
 
@@ -48,7 +47,7 @@ import {
 } from './github'
 
 import { derivedVariables } from './derived-variables'
-import { generateLongPassword, findExistingValue, storeSecrets } from './utils'
+import { generateLongPassword, findExistingValue } from './utils'
 
 import { error, info, log, success, warn } from './logger'
 import { generateInventory, copyChartsValues } from './templates'
@@ -165,7 +164,6 @@ function getAnswers(existingValues: (Secret | Variable)[]): Answers {
 }
 
 async function promptAndStoreAnswer(
-  environment: string,
   questions: Array<QuestionDescriptor<any>>,
   existingValues: Array<Secret | Variable>
 ) {
@@ -265,8 +263,6 @@ async function promptAndStoreAnswer(
 
   ALL_ANSWERS.push(result)
 
-  storeSecrets(environment, getAnswers(existingValues))
-
   const existingValuesForQuestions = questions
     // Only variables can have previous values we can use
     .filter((question) => question.valueType === 'VARIABLE')
@@ -308,11 +304,7 @@ ALL_QUESTIONS.push(
     }
   )
 
-  const { githubToken } = await promptAndStoreAnswer(
-    '',
-    githubTokenQuestion,
-    []
-  )
+  const { githubToken } = await promptAndStoreAnswer(githubTokenQuestion, [])
 
   const octokit = new Octokit({
     auth: githubToken
@@ -376,10 +368,6 @@ ALL_QUESTIONS.push(
   if (!environment) {
     process.exit(1)
   }
-  // Read users .env file based on the environment name they gave above, e.g. .env.production
-  dotenv.config({
-    path: `${process.cwd()}/.env.${environment}`
-  })
 
   await createEnvironment(
     octokit,
@@ -448,20 +436,15 @@ ALL_QUESTIONS.push(
           'WARNING! You are setting up a production environment.\n Make sure you have read the deployment guide carefully before proceeding.\n'
         )
     )
-    await promptAndStoreAnswer(
-      environment,
-      githubOtherQuestions,
-      existingValues
-    )
+    await promptAndStoreAnswer(githubOtherQuestions, existingValues)
   }
 
   log('\n', kleur.bold().underline('Docker Hub'))
-  await promptAndStoreAnswer(environment, dockerhubQuestions, existingValues)
+  await promptAndStoreAnswer(dockerhubQuestions, existingValues)
 
   log('\n', kleur.bold().underline('Kubernetes & Runtime'))
 
   const infrastructure = await promptAndStoreAnswer(
-    environment,
     infrastructureQuestions,
     existingValues
   )
@@ -531,7 +514,7 @@ ALL_QUESTIONS.push(
       kleur.bold().green('✔'),
       kleur.bold().yellow(' Disk encryption is enabled')
     )
-    await promptAndStoreAnswer(environment, diskQuestions, existingValues)
+    await promptAndStoreAnswer(diskQuestions, existingValues)
   } else {
     if (!enableEncryption && !encryption_key_defined && environment_exists) {
       log(
@@ -604,7 +587,6 @@ ALL_QUESTIONS.push(
   let backupHostPublicKey = ''
   if (configureBackup) {
     const backupAnswers = await promptAndStoreAnswer(
-      environment,
       backupQuestions,
       existingValues
     )
@@ -673,11 +655,7 @@ ALL_QUESTIONS.push(
   }
 
   log('\n', kleur.bold().underline('Monitoring'))
-  await promptAndStoreAnswer(
-    environment,
-    databaseAndMonitoringQuestions,
-    existingValues
-  )
+  await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
   const sentryDSNExists = findExistingValue(
     'SENTRY_DSN',
     'SECRET',
@@ -687,7 +665,7 @@ ALL_QUESTIONS.push(
 
   log('\n', kleur.bold().underline('Sentry'))
   if (sentryDSNExists) {
-    await promptAndStoreAnswer(environment, sentryQuestions, existingValues)
+    await promptAndStoreAnswer(sentryQuestions, existingValues)
   } else {
     const { useSentry } = await prompts([
       {
@@ -699,19 +677,15 @@ ALL_QUESTIONS.push(
     ])
 
     if (useSentry) {
-      await promptAndStoreAnswer(environment, sentryQuestions, existingValues)
+      await promptAndStoreAnswer(sentryQuestions, existingValues)
     }
   }
 
   log('\n', kleur.bold().underline('METABASE ADMIN'))
-  await promptAndStoreAnswer(
-    environment,
-    metabaseAdminQuestions,
-    existingValues
-  )
+  await promptAndStoreAnswer(metabaseAdminQuestions, existingValues)
 
   log('\n', kleur.bold().underline('SMTP'))
-  await promptAndStoreAnswer(environment, emailQuestions, existingValues)
+  await promptAndStoreAnswer(emailQuestions, existingValues)
 
   const allAnswers = ALL_ANSWERS.reduce((acc, answer) => {
     return { ...acc, ...answer }
@@ -1033,7 +1007,12 @@ ALL_QUESTIONS.push(
       name: 'RESTORE_HOST',
       value: answerOrExisting(
         restoreHost,
-        findExistingValue('RESTORE_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues),
+        findExistingValue(
+          'RESTORE_HOST',
+          'VARIABLE',
+          'ENVIRONMENT',
+          existingValues
+        ),
         (val) => val || ''
       ),
       didExist: findExistingValue(
@@ -1098,8 +1077,6 @@ ALL_QUESTIONS.push(
         (variable.type !== 'VARIABLE' ||
           variable.value !== variable.didExist?.value)
     )
-
-  storeSecrets(environment, updates)
 
   /*
    * List out all updates to the variables and confirm with the user
@@ -1405,6 +1382,10 @@ ${addon_message}
 ${kleur.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')}
 ${kleur.yellow('Please KINDLY read hints above')}
     `)
-  log('\nAll variables stored in', kleur.cyan(`.env.${environment}`))
-  log(kleur.bold().yellow('DO NOT COMMIT THIS FILE TO GIT!'))
+  log(
+    '\nAll secrets and variables were printed above.',
+    kleur
+      .bold()
+      .yellow('Store them in a password manager — they are not saved to disk.')
+  )
 })()
