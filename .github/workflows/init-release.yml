@@ -120,20 +120,22 @@ jobs:
                 exit 1
               fi
 
-              # Its next unreleased patch: newest published tag + 1, or .0 if
-              # the channel has none. Pre-release tags (v2.1.0-beta) don't count.
+              # Its next unreleased patch: newest published tag + 1. Every
+              # channel between this one and master's has shipped, so a channel
+              # with no tag means the tags are out of step with master.
+              # Pre-release tags (v2.1.0-beta) don't count as published.
               latest_published=$(git ls-remote --tags --refs origin "refs/tags/v$next_channel.*" \
                 | sed -n 's#.*refs/tags/v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$#\1#p' \
                 | sort -t. -k3,3n | tail -n1)
 
-              if [ -n "$latest_published" ]; then
-                IFS='.' read -r nx ny nz <<< "$latest_published"
-                target_branch="release/$nx.$ny.$((nz + 1))"
-                echo "$version is on an older channel -> next channel up is $next_channel (newest published $latest_published) -> merging into $target_branch"
-              else
-                target_branch="release/$next_channel.0"
-                echo "$version is on an older channel -> next channel up is $next_channel (never published) -> merging into $target_branch"
+              if [ -z "$latest_published" ]; then
+                echo "::error::Channel $next_channel has no published release, so there is nothing for $version to merge up into. Tag that channel's release, or re-run with the target_branch input set explicitly."
+                exit 1
               fi
+
+              IFS='.' read -r nx ny nz <<< "$latest_published"
+              target_branch="release/$nx.$ny.$((nz + 1))"
+              echo "$version is on an older channel -> next channel up is $next_channel (newest published $latest_published) -> merging into $target_branch"
             fi
           fi
 
