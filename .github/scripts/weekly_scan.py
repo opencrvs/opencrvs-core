@@ -92,39 +92,90 @@ RULE_PREFIX = TOOL_NAME + "/"
 # Files worth reviewing. Kept deliberately broad on the source side and narrow
 # on the noise side (see EXCLUDE_*).
 INCLUDE_EXT = {
-    ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
-    ".json", ".yml", ".yaml",
-    ".graphql", ".gql", ".sh", ".bash", ".py",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".json",
+    ".yml",
+    ".yaml",
+    ".graphql",
+    ".gql",
+    ".sh",
+    ".bash",
+    ".py",
 }
 INCLUDE_NAMES = {
-    "Dockerfile", "docker-compose.yml", "docker-compose.yaml", ".env.example",
+    "Dockerfile",
+    "docker-compose.yml",
+    "docker-compose.yaml",
+    ".env.example",
 }
 
 EXCLUDE_DIRS = {
-    "node_modules", ".git", ".yarn", ".pnpm", ".pnpm-store", ".claude",
-    "dist", "build", "lib", "out", ".next", ".turbo", ".nx",
-    "coverage", "vendor", "__snapshots__", "generated", "__generated__",
+    "node_modules",
+    ".git",
+    ".yarn",
+    ".pnpm",
+    ".pnpm-store",
+    ".claude",
+    "dist",
+    "build",
+    "lib",
+    "out",
+    ".next",
+    ".turbo",
+    ".nx",
+    "coverage",
+    "vendor",
+    "__snapshots__",
+    "generated",
+    "__generated__",
 }
 # Lockfiles, minified/generated, type decls, tests, stories, snapshots, maps.
 EXCLUDE_GLOBS = [
-    "*.lock", "yarn.lock", "package-lock.json", "pnpm-lock.yaml", "bun.lockb",
-    "*.min.js", "*.min.css", "*.map", "*.d.ts",
-    "*.test.ts", "*.test.tsx", "*.test.js", "*.test.jsx",
-    "*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx",
-    "*.stories.ts", "*.stories.tsx", "*.story.ts", "*.story.tsx",
+    "*.lock",
+    "yarn.lock",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "bun.lockb",
+    "*.min.js",
+    "*.min.css",
+    "*.map",
+    "*.d.ts",
+    "*.test.ts",
+    "*.test.tsx",
+    "*.test.js",
+    "*.test.jsx",
+    "*.spec.ts",
+    "*.spec.tsx",
+    "*.spec.js",
+    "*.spec.jsx",
+    "*.stories.ts",
+    "*.stories.tsx",
+    "*.story.ts",
+    "*.story.tsx",
     "*.snap",
 ]
 
 # Security-sensitive areas float to the top so they are scanned first and never
 # starved if a later batch's API call fails. Ordered by weight.
 SENSITIVE_HINTS = [
-    "auth", "gateway", "events", "user-mgnt", "login",
-    "webhooks", "notification", "config", "fhir", "search",
-    "documents", "metrics", "middleware", "token", "session",
+    "auth",
+    "gateway",
+    "events",
+    "user-mgnt",
+    "login",
+    "config",
+    "middleware",
+    "token",
+    "session",
 ]
 
-CHARS_PER_BATCH = 120_000   # ~ token budget per Anthropic call
-MAX_FILE_CHARS = 60_000     # truncate very large single files
+CHARS_PER_BATCH = 120_000  # ~ token budget per Anthropic call
+MAX_FILE_CHARS = 60_000  # truncate very large single files
 BINARY_SNIFF_BYTES = 8_192
 
 SEC_SEVERITY = {"critical": "9.5", "high": "8.0", "medium": "5.0", "low": "2.0"}
@@ -132,8 +183,12 @@ SEV_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
 
 def sarif_level(sev):
-    return {"critical": "error", "high": "error",
-            "medium": "warning", "low": "note"}.get(sev, "note")
+    return {
+        "critical": "error",
+        "high": "error",
+        "medium": "warning",
+        "low": "note",
+    }.get(sev, "note")
 
 
 # ----------------------------------------------------------------------------
@@ -193,6 +248,7 @@ Return [] if you find nothing. Return ONLY the JSON array.
 # ----------------------------------------------------------------------------
 # File selection
 # ----------------------------------------------------------------------------
+
 
 def is_excluded(rel: Path) -> bool:
     if set(rel.parts) & EXCLUDE_DIRS:
@@ -264,6 +320,7 @@ def read_text(path: Path) -> str:
 # Batching
 # ----------------------------------------------------------------------------
 
+
 def make_batches(root: Path, files):
     batch, size = [], 0
     for rel in files:
@@ -287,6 +344,7 @@ def render_batch(batch) -> str:
 # ----------------------------------------------------------------------------
 # Claude call
 # ----------------------------------------------------------------------------
+
 
 def create_message(client: Anthropic, **kwargs):
     """
@@ -332,15 +390,17 @@ def scan_batch(client: Anthropic, batch):
         model=MODEL,
         max_tokens=MAX_TOKENS,
         system=SYSTEM_PROMPT,
-        messages=[{
-            "role": "user",
-            "content": (
-                "Review the following files and report vulnerabilities as a JSON "
-                "array following the schema in your instructions. The files are "
-                "delimited by '===== FILE: <path> =====' headers; use those exact "
-                "paths in the \"file\" field.\n\n" + content
-            ),
-        }],
+        messages=[
+            {
+                "role": "user",
+                "content": (
+                    "Review the following files and report vulnerabilities as a JSON "
+                    "array following the schema in your instructions. The files are "
+                    "delimited by '===== FILE: <path> =====' headers; use those exact "
+                    'paths in the "file" field.\n\n' + content
+                ),
+            }
+        ],
     )
     text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
     return parse_json_array(text)
@@ -349,6 +409,7 @@ def scan_batch(client: Anthropic, batch):
 # ----------------------------------------------------------------------------
 # Fingerprint / dedupe -- stable identity so rewording does not churn alerts
 # ----------------------------------------------------------------------------
+
 
 def normalize_title(t: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()
@@ -387,14 +448,16 @@ def dedupe(findings):
             continue
         seen.add(fp)
         out.append(f)
-    out.sort(key=lambda f: (SEV_ORDER.get(f.get("severity", "low"), 9),
-                            f.get("file", "")))
+    out.sort(
+        key=lambda f: (SEV_ORDER.get(f.get("severity", "low"), 9), f.get("file", ""))
+    )
     return out
 
 
 # ----------------------------------------------------------------------------
 # Markdown report (run artifact)
 # ----------------------------------------------------------------------------
+
 
 def write_markdown(findings, path: Path):
     lines = [
@@ -420,8 +483,9 @@ def write_markdown(findings, path: Path):
         for f in group:
             loc = f"{f['file']}:{f.get('line') or '?'}"
             lines.append(f"### {f.get('title', '(untitled)')} -- `{loc}`")
-            lines.append(f"- CWE: {f.get('cwe') or 'n/a'} - "
-                         f"confidence: {f.get('confidence')}")
+            lines.append(
+                f"- CWE: {f.get('cwe') or 'n/a'} - confidence: {f.get('confidence')}"
+            )
             lines.append(f"- {(f.get('explanation') or '').strip()}")
             lines.append(f"- **Fix:** {(f.get('fix') or '').strip()}\n")
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -430,6 +494,7 @@ def write_markdown(findings, path: Path):
 # ----------------------------------------------------------------------------
 # GitHub code-scanning carry-forward
 # ----------------------------------------------------------------------------
+
 
 class CarryForwardError(Exception):
     pass
@@ -446,8 +511,11 @@ def _gh_get(path, params):
     try:
         with urllib.request.urlopen(req) as resp:
             raw = resp.read().decode()
-            return resp.status, (json.loads(raw) if raw else None), \
-                resp.headers.get("Link", "")
+            return (
+                resp.status,
+                (json.loads(raw) if raw else None),
+                resp.headers.get("Link", ""),
+            )
     except urllib.error.HTTPError as e:
         detail = e.read().decode(errors="replace")
         return e.code, {"_error": detail}, ""
@@ -466,19 +534,24 @@ def fetch_open_alerts():
         params_base["ref"] = GH_REF
     while True:
         params = dict(params_base, page=str(page))
-        status, data, link = _gh_get(
-            f"/repos/{REPO}/code-scanning/alerts", params)
+        status, data, link = _gh_get(f"/repos/{REPO}/code-scanning/alerts", params)
         if status == 404:
-            print("No prior code-scanning alerts for this tool (404) -- "
-                  "treating as the enabling run.")
+            print(
+                "No prior code-scanning alerts for this tool (404) -- "
+                "treating as the enabling run."
+            )
             return []
-        if status == 403 and isinstance(data, dict) and \
-                "no analysis" in json.dumps(data).lower():
+        if (
+            status == 403
+            and isinstance(data, dict)
+            and "no analysis" in json.dumps(data).lower()
+        ):
             return []
         if status >= 400:
             raise CarryForwardError(
                 f"GET code-scanning/alerts -> {status}: "
-                f"{data.get('_error') if isinstance(data, dict) else data}")
+                f"{data.get('_error') if isinstance(data, dict) else data}"
+            )
         if not data:
             break
         alerts.extend(data)
@@ -491,6 +564,7 @@ def fetch_open_alerts():
 # ----------------------------------------------------------------------------
 # SARIF assembly
 # ----------------------------------------------------------------------------
+
 
 def _safe_name(text, fallback):
     """A readable PascalCase rule name (not the raw fingerprint)."""
@@ -508,8 +582,7 @@ def rule_from_finding(f, rid):
         "shortDescription": {"text": (f.get("title") or "Security finding")[:120]},
         "fullDescription": {"text": (f.get("explanation") or "Security finding")[:900]},
         "defaultConfiguration": {"level": sarif_level(sev)},
-        "properties": {"security-severity": SEC_SEVERITY.get(sev, "2.0"),
-                       "tags": tags},
+        "properties": {"security-severity": SEC_SEVERITY.get(sev, "2.0"), "tags": tags},
     }
 
 
@@ -522,12 +595,14 @@ def result_from_finding(f, rid, fp):
         "level": sarif_level(f.get("severity", "low")),
         "message": {"text": text or "Security finding"},
         "partialFingerprints": {"claudeFingerprint": fp},
-        "locations": [{
-            "physicalLocation": {
-                "artifactLocation": {"uri": f.get("file", "")},
-                "region": {"startLine": max(1, int(f.get("line") or 1))},
+        "locations": [
+            {
+                "physicalLocation": {
+                    "artifactLocation": {"uri": f.get("file", "")},
+                    "region": {"startLine": max(1, int(f.get("line") or 1))},
+                }
             }
-        }],
+        ],
         "properties": {"confidence": f.get("confidence")},
     }
 
@@ -537,13 +612,18 @@ def rule_from_alert(a, rid):
     props = {}
     if r.get("security_severity_level"):
         props["security-severity"] = {
-            "critical": "9.5", "high": "8.0",
-            "medium": "5.0", "low": "2.0"}.get(r["security_severity_level"], "2.0")
+            "critical": "9.5",
+            "high": "8.0",
+            "medium": "5.0",
+            "low": "2.0",
+        }.get(r["security_severity_level"], "2.0")
     props["tags"] = r.get("tags") or ["security"]
     return {
         "id": rid,
         "name": _safe_name(r.get("name") or r.get("description"), "SecurityFinding"),
-        "shortDescription": {"text": (r.get("description") or "Security finding")[:120]},
+        "shortDescription": {
+            "text": (r.get("description") or "Security finding")[:120]
+        },
         "defaultConfiguration": {"level": r.get("severity") or "warning"},
         "properties": props,
     }
@@ -552,19 +632,24 @@ def rule_from_alert(a, rid):
 def result_from_alert(a, rid, fp):
     inst = a.get("most_recent_instance", {}) or {}
     loc = inst.get("location", {}) or {}
-    msg = (inst.get("message", {}) or {}).get("text") \
-        or (a.get("rule", {}) or {}).get("description") or "Security finding"
+    msg = (
+        (inst.get("message", {}) or {}).get("text")
+        or (a.get("rule", {}) or {}).get("description")
+        or "Security finding"
+    )
     return {
         "ruleId": rid,
         "level": (a.get("rule", {}) or {}).get("severity") or "warning",
         "message": {"text": msg},
         "partialFingerprints": {"claudeFingerprint": fp},
-        "locations": [{
-            "physicalLocation": {
-                "artifactLocation": {"uri": loc.get("path", "")},
-                "region": {"startLine": loc.get("start_line") or 1},
+        "locations": [
+            {
+                "physicalLocation": {
+                    "artifactLocation": {"uri": loc.get("path", "")},
+                    "region": {"startLine": loc.get("start_line") or 1},
+                }
             }
-        }],
+        ],
     }
 
 
@@ -582,10 +667,10 @@ def build_sarif(findings, alerts):
     for a in alerts:
         rid = (a.get("rule", {}) or {}).get("id", "") or ""
         if not rid.startswith(RULE_PREFIX):
-            continue                      # never touch other tools' alerts
+            continue  # never touch other tools' alerts
         fp = fp_from_rule_id(rid)
         if fp in fresh_fps:
-            continue                      # already present from this run
+            continue  # already present from this run
         rules.setdefault(rid, rule_from_alert(a, rid))
         results.append(result_from_alert(a, rid, fp))
         carried += 1
@@ -593,14 +678,18 @@ def build_sarif(findings, alerts):
     sarif = {
         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
         "version": "2.1.0",
-        "runs": [{
-            "tool": {"driver": {
-                "name": TOOL_NAME,
-                "informationUri": "https://www.anthropic.com",
-                "rules": list(rules.values()),
-            }},
-            "results": results,
-        }],
+        "runs": [
+            {
+                "tool": {
+                    "driver": {
+                        "name": TOOL_NAME,
+                        "informationUri": "https://www.anthropic.com",
+                        "rules": list(rules.values()),
+                    }
+                },
+                "results": results,
+            }
+        ],
     }
     return sarif, len(fresh_fps), carried
 
@@ -608,6 +697,7 @@ def build_sarif(findings, alerts):
 # ----------------------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------------------
+
 
 def main():
     if not os.environ.get("ANTHROPIC_API_KEY"):
@@ -637,9 +727,11 @@ def main():
     # BEFORE producing SARIF. Uploading an empty "0 findings" analysis would let
     # GitHub auto-resolve every carried-forward alert.
     if batches_total > 0 and batches_failed == batches_total:
-        print(f"ABORT: all {batches_total} batch API calls failed; refusing to "
-              "produce SARIF (an empty analysis would auto-resolve open alerts).",
-              file=sys.stderr)
+        print(
+            f"ABORT: all {batches_total} batch API calls failed; refusing to "
+            "produce SARIF (an empty analysis would auto-resolve open alerts).",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     findings = dedupe(all_findings)
@@ -648,12 +740,16 @@ def main():
     counts = {}
     for f in findings:
         counts[f["severity"]] = counts.get(f["severity"], 0) + 1
-    print(f"Scan complete. {len(findings)} fresh findings: {counts} "
-          f"({batches_failed}/{batches_total} batches failed)")
+    print(
+        f"Scan complete. {len(findings)} fresh findings: {counts} "
+        f"({batches_failed}/{batches_total} batches failed)"
+    )
 
     if not (REPO and GH_TOKEN):
-        print("No GITHUB_TOKEN/GITHUB_REPOSITORY -- writing SARIF with fresh "
-              "findings only (no carry-forward; local/dev mode).")
+        print(
+            "No GITHUB_TOKEN/GITHUB_REPOSITORY -- writing SARIF with fresh "
+            "findings only (no carry-forward; local/dev mode)."
+        )
         sarif, fresh, carried = build_sarif(findings, [])
         (OUT_DIR / "results.sarif").write_text(json.dumps(sarif, indent=2))
         return
@@ -663,16 +759,20 @@ def main():
     try:
         alerts = fetch_open_alerts()
     except CarryForwardError as e:
-        print(f"ABORT: could not fetch existing open alerts, so refusing to "
-              f"upload (a partial SARIF would auto-resolve them): {e}",
-              file=sys.stderr)
+        print(
+            f"ABORT: could not fetch existing open alerts, so refusing to "
+            f"upload (a partial SARIF would auto-resolve them): {e}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     sarif, fresh, carried = build_sarif(findings, alerts)
     (OUT_DIR / "results.sarif").write_text(json.dumps(sarif, indent=2))
-    print(f"SARIF: {fresh} fresh + {carried} carried-forward "
-          f"= {len(sarif['runs'][0]['results'])} results. "
-          "Alerts are removed only when a human dismisses them.")
+    print(
+        f"SARIF: {fresh} fresh + {carried} carried-forward "
+        f"= {len(sarif['runs'][0]['results'])} results. "
+        "Alerts are removed only when a human dismisses them."
+    )
 
 
 if __name__ == "__main__":
