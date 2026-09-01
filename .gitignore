@@ -24,6 +24,7 @@ CLAUDE.md
 .wireit/*
 .wireit
 .nx
+__pycache__
 
 # gitignore graphql schema due to it often being accidentally edited
 packages/gateway/src/graphql/schema.d.ts

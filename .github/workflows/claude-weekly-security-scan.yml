@@ -1,20 +1,36 @@
 name: claude-weekly-security-scan
 
+# Weekly LLM-based security scan. Claude reviews the whole codebase for security
+# vulnerabilities and reports them into the Security tab (Code scanning) via SARIF.
+#
+# This layer is ADVISORY: it complements CodeQL, Trivy and Dependabot (which run
+# separately) and does not replace them. It catches contextual issues -- broken
+# authorization, PII exposure, unsafe query construction -- that pattern-based
+# tools miss, at the cost of being non-deterministic. See
+# .github/scripts/weekly_scan.py for the alert-lifecycle policy: a finding stays
+# "open" until a human dismisses it, even once genuinely fixed.
+
 on:
   schedule:
-    - cron: '0 6 * * 1' # Mondays 06:00 UTC (only fires from the default branch)
+    # Mondays 06:00 UTC. NOTE: scheduled workflows only ever run from the
+    # workflow file on the DEFAULT branch -- a cron on a feature branch never
+    # fires. Merge to the default branch to activate the schedule.
+    - cron: '0 6 * * 1'
   workflow_dispatch:
-  # push:                    # uncomment while developing on a feature branch
-  #   branches: [security-scan]
+  # While iterating on the scanner before merge, uncomment this and push to the
+  # dev branch to exercise the full pipeline (schedule can't run off-default).
+  # push:
+  #   branches: [fix-security-scan-pipeline]
 
-# Least privilege. security-events:write lets the scan READ existing code-scanning
-# alerts (for carry-forward) and UPLOAD the SARIF. It never dismisses alerts.
+# Least privilege. security-events:write is required BOTH to READ this tool's
+# existing open alerts (carry-forward) and to UPLOAD the SARIF. contents:read is
+# enough to check out the code. The job never dismisses alerts.
 permissions:
   contents: read
   security-events: write
 
 concurrency:
-  group: weekly-security-scan
+  group: claude-weekly-security-scan
   cancel-in-progress: false
 
 jobs:
@@ -23,15 +39,17 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v7.0.0
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: '3.12'
 
-      - name: Install deps
-        run: pip install anthropic
+      - name: Install dependencies
+        # --upgrade is deliberate: older anthropic SDKs reject `temperature=`,
+        # which the scanner relies on for run-to-run stability. Pin the floor.
+        run: python -m pip install --upgrade 'anthropic>=0.40'
 
       - name: Run Claude security scan
         env:
@@ -43,20 +61,24 @@ jobs:
           MODEL: claude-opus-4-8
           OUT_DIR: scan-out
           TOOL_NAME: claude-security
-        run: python .github/scripts/security-scan.py
+        run: python .github/scripts/weekly_scan.py
 
       - name: Upload SARIF to the Security tab
-        # Only runs if the scan step succeeded, so an aborted carry-forward
-        # (which exits non-zero) never results in a thin upload.
-        uses: github/codeql-action/upload-sarif@v3
+        # Runs ONLY if the scan step succeeded. An aborted run (failed
+        # carry-forward fetch, or all batches failing) exits non-zero and never
+        # reaches here, so a thin SARIF can never auto-resolve open alerts.
+        uses: github/codeql-action/upload-sarif@f09c1c0a94de965c15400f5634aa42fac8fb8f88 # v3.27.5
         with:
           sarif_file: scan-out/results.sarif
-          category: claude-security-scan # keep this stable; it scopes the analysis
+          # Keep this category STABLE: it scopes the analysis so each run
+          # replaces the previous one for this tool on this ref.
+          category: claude-security-scan
 
-      - name: Upload report artifact
+      - name: Upload markdown report artifact
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: security-scan-report
           path: scan-out/report.md
           retention-days: 90
+          if-no-files-found: ignore
