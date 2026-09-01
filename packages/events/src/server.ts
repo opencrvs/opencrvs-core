@@ -19,6 +19,10 @@ import { createContext, createServiceContext } from './context'
 import { handleHealthCheckResponse } from './service/health'
 import { internalRouter } from './router/internalRouter'
 import { initialisationRouter } from './router/initialisation'
+import {
+  handleCertificateRequest,
+  matchCertificateRequest
+} from './router/event/certificate/handler'
 
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
@@ -141,6 +145,15 @@ export function server() {
     ) {
       req.url = '/attachments.upload'
       void trpcServer(req, res)
+      return
+    }
+
+    // Certificate rendering returns raw PDF bytes, so it is served outside tRPC
+    // (which would JSON-wrap the response). Must be checked before the tRPC/REST
+    // dispatch below, which would otherwise 404 this path.
+    const certificateEventId = matchCertificateRequest(req)
+    if (certificateEventId) {
+      void handleCertificateRequest(req, res, certificateEventId)
       return
     }
 

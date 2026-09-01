@@ -407,7 +407,7 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'dashboards'],
       description:
-        "Returns the primary office id of the user the request is authenticated as"
+        'Returns the primary office id of the user the request is authenticated as'
     }
   })
 
