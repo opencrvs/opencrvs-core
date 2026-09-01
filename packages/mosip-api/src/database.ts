@@ -44,6 +44,8 @@ const tableColumns = (name: string): string[] =>
   ).map((column) => column.name)
 
 /**
+ * NOTE! If you notice this file after 2.1 is out, please remove this migration code
+ *
  * Migrates the legacy `transactions` table (which stored the exchanged
  * confirmation `token`) to the current schema. The OpenCRVS `eventId` is
  * recovered from the token payload so in-flight transactions survive the

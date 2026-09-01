@@ -103,7 +103,23 @@ export const assertCanConfirmRegistrations = async (
   if (!hasScope(scope as EncodedScope[], 'record.register')) {
     logger.error(
       { event: 'opencrvs.system-client.scope.missing', scope },
-      "The OpenCRVS system client is missing the 'record.register' scope required to confirm registrations. Grant it on the OpenCRVS Integrations page."
+      "The OpenCRVS system client is missing the 'record.register' scope required to confirm registrations."
+    )
+    process.exit(1)
+  }
+
+  if (!hasScope(scope as EncodedScope[], 'record.read')) {
+    logger.error(
+      { event: 'opencrvs.system-client.scope.missing', scope },
+      "The OpenCRVS system client is missing the 'record.read' scope required to confirm registrations."
+    )
+    process.exit(1)
+  }
+
+  if (!hasScope(scope as EncodedScope[], 'record.correct')) {
+    logger.error(
+      { event: 'opencrvs.system-client.scope.missing', scope },
+      "The OpenCRVS system client is missing the 'record.correct' scope required to confirm registrations."
     )
     process.exit(1)
   }
