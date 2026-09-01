@@ -25,16 +25,17 @@
 #        - current or newer channel -> a release PR to master, plus a merge-back
 #          PR to develop
 #        - older channel            -> NO release PR to master. The version
-#          ships from its own release branch and climbs the chain through a
-#          single merge-back PR into the next unreleased patch of master's
-#          channel. Initialising 1.9.17 while master is on 2.0.1 opens
-#          merge-back/release-1917-into-202 -> release/2.0.2. That branch is
-#          cut from master and initialised (version bump + CHANGELOG section)
-#          if it does not exist yet.
+#          ships from its own release branch and climbs one channel at a time
+#          through a merge-back PR into the next unreleased patch of the next
+#          channel up -- the channel above this release's own, not master's.
+#          Initialising 1.9.17 while 2.0.1 is the newest published 2.0 opens
+#          merge-back/release-1917-into-202 -> release/2.0.2.
 #      Once a newer major/minor is published, master and develop have moved on,
-#      so an older channel's hotfix must travel up the chain
-#      (1.9.17 -> release/2.0.2 -> master) rather than being merged straight
-#      into master or develop.
+#      so an older channel's hotfix must travel up the chain one channel at a
+#      time (1.9.17 -> release/2.0.2 -> ... -> master) rather than being merged
+#      straight into master or develop. The target branch must already exist:
+#      this workflow never cuts the next channel's release branch, because that
+#      release has its own version bump and CHANGELOG to write.
 #   3. Creates a release branch (release/<version>) from the base branch.
 #   4. Bumps every package.json via lerna and prepends a CHANGELOG section,
 #      then pushes both commits to the release branch.
@@ -137,12 +138,48 @@ jobs:
               echo "$version is on the current (or a newer) channel -> targeting master"
               target_branch="master"
             else
-              # Older channel: merge upwards into the next unreleased patch of
-              # master's channel, so the fix reaches master through that channel
-              # rather than skipping it. develop gets it the same way.
-              target_branch="release/$mx.$my.$((mz + 1))"
-              echo "$version is on an older channel than master ($master_version) -> merging into $target_branch"
+              # Older channel: climb one channel at a time. The target sits on
+              # the next channel above *this release's* channel, not master's --
+              # a 1.9 hotfix cut while master is on 2.1 travels 1.9 -> 2.0 ->
+              # 2.1 -> master, one merge-back per channel.
+              release_versions=$(git ls-remote --heads origin 'refs/heads/release/*' \
+                | sed -n 's#.*refs/heads/release/\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$#\1#p')
+
+              next_channel=$(echo "$release_versions" \
+                | awk -F. -v cx="$x" -v cy="$y" '($1>cx)||($1==cx&&$2>cy){print $1"."$2}' \
+                | sort -t. -k1,1n -k2,2n -u | head -n1)
+
+              if [ -z "$next_channel" ]; then
+                echo "::error::$version is on an older channel than master ($master_version), but no release/* branch exists on a newer channel to merge into. Start the next channel's release first, or re-run with the target_branch input set explicitly."
+                exit 1
+              fi
+
+              # Within that channel the target is its next unreleased patch: one
+              # above the newest published tag, or .0 if the channel has never
+              # been published. Pre-release tags (v2.1.0-beta) are ignored.
+              latest_published=$(git ls-remote --tags --refs origin "refs/tags/v$next_channel.*" \
+                | sed -n 's#.*refs/tags/v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$#\1#p' \
+                | sort -t. -k3,3n | tail -n1)
+
+              if [ -n "$latest_published" ]; then
+                IFS='.' read -r nx ny nz <<< "$latest_published"
+                target_branch="release/$nx.$ny.$((nz + 1))"
+                echo "$version is on an older channel -> next channel up is $next_channel (newest published $latest_published) -> merging into $target_branch"
+              else
+                target_branch="release/$next_channel.0"
+                echo "$version is on an older channel -> next channel up is $next_channel (never published) -> merging into $target_branch"
+              fi
             fi
+          fi
+
+          # The target must already exist. This workflow never cuts the next
+          # channel's release branch: that release writes its own version bump
+          # and CHANGELOG, and a placeholder here would make its own
+          # init-release run skip them. Fail now, before anything is created.
+          if [ "$target_branch" != "master" ] \
+            && ! git ls-remote --exit-code --heads origin "$target_branch" > /dev/null 2>&1; then
+            echo "::error::$target_branch does not exist. Initialise ${target_branch#release/} first, or re-run with the target_branch input set explicitly."
+            exit 1
           fi
 
           if [ "$target_branch" = "master" ]; then
@@ -165,57 +202,6 @@ jobs:
           echo "release_pr=$release_pr" >> $GITHUB_OUTPUT
           echo "merge_back_target=$merge_back_target" >> $GITHUB_OUTPUT
           echo "mergeback_branch=$mergeback_branch" >> $GITHUB_OUTPUT
-
-      # An older-channel release merges into the next unreleased patch of
-      # master's channel, which may not have been initialised yet. Cut it from
-      # master and initialise it exactly as this workflow would have — same
-      # version bump, same CHANGELOG section — so the merge-back PR has
-      # somewhere to land and a later init-release run for that version finds a
-      # branch it does not have to fix up by hand.
-      - name: Ensure the target release branch exists
-        if: steps.get_target_branch.outputs.release_pr == 'false'
-        run: |
-          TARGET_BRANCH="${{ steps.get_target_branch.outputs.target_branch }}"
-          TARGET_VERSION="${TARGET_BRANCH#release/}"
-          BASE_BRANCH="${{ steps.get_base_branch.outputs.base_branch }}"
-
-          if git ls-remote --exit-code --heads origin "$TARGET_BRANCH" > /dev/null 2>&1; then
-            echo "$TARGET_BRANCH already exists."
-            exit 0
-          fi
-
-          echo "$TARGET_BRANCH does not exist yet — cutting it from master and initialising it as $TARGET_VERSION."
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git fetch --no-tags --quiet origin master
-          git checkout -b "$TARGET_BRANCH" origin/master
-
-          # The same bump the release branch itself would get, so a later
-          # init-release run for $TARGET_VERSION finds exactly the branch it
-          # would have created.
-          npx lerna exec "yarn version --new-version $TARGET_VERSION --no-git-tag-version"
-          yarn version --new-version "$TARGET_VERSION" --no-git-tag-version
-          git add .
-          git commit -m "chore: update version to $TARGET_VERSION"
-
-          sed -i '1,2d' CHANGELOG.md
-          cp CHANGELOG.md COPY_CHANGELOG.md
-          {
-            echo "# Changelog"
-            echo ""
-            echo "## $TARGET_VERSION Release Candidate"
-            echo ""
-            cat COPY_CHANGELOG.md
-          } > CHANGELOG.md
-          rm COPY_CHANGELOG.md
-          git add CHANGELOG.md
-          git commit -m "docs: update changelog for $TARGET_VERSION release candidate"
-
-          git push origin "$TARGET_BRANCH"
-
-          # Put the checkout back where the steps below expect it.
-          git checkout "$BASE_BRANCH"
 
       - name: Check if release branch already exists
         id: check_branch
