@@ -43,7 +43,7 @@ jobs:
           MODEL: claude-opus-4-8
           OUT_DIR: scan-out
           TOOL_NAME: claude-security
-        run: python .github/scripts/security-scan.py
+        run: python .github/scripts/weekly_scan.py
 
       - name: Upload SARIF to the Security tab
         # Only runs if the scan step succeeded, so an aborted carry-forward
