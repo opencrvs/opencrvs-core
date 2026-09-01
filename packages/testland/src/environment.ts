@@ -58,10 +58,12 @@ export const env = cleanEnv(process.env, {
   }),
   MOSIP_INTEGRATION_CLIENT_ID: uuidOrEmpty({
     default: '',
+    devDefault: '23953953-51aa-42ca-b443-2426a7d21c61',
     desc: "OpenCRVS system client ID to seed for the MOSIP integration on startup. Must be a UUID and match the mosip-api's OPENCRVS_CLIENT_ID. Leave empty to have events generate credentials instead (NSA reveals them via the Integrations page)."
   }),
   MOSIP_INTEGRATION_CLIENT_SECRET: str({
     default: '',
+    devDefault: '7ce63d9f-5014-4f68-a0e3-8f681d23d508',
     desc: "OpenCRVS system client secret to seed for the MOSIP integration on startup. Must match the mosip-api's OPENCRVS_CLIENT_SECRET. Leave empty to have events generate the secret instead."
   }),
   FORWARD_ACTIONS_TO: str({

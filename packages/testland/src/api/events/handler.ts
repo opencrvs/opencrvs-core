@@ -184,6 +184,7 @@ export async function onBirthCorrectionActionHandler(
   try {
     if (!childHasNid) {
       await mosipInteropClient.register({
+        eventId: event.id,
         trackingId: event.trackingId,
         requestFields: {
           birthCertificateNumber,
