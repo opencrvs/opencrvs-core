@@ -166,13 +166,6 @@ jobs:
           echo "merge_back_target=$merge_back_target" >> $GITHUB_OUTPUT
           echo "mergeback_branch=$mergeback_branch" >> $GITHUB_OUTPUT
 
-      # Set once for the job: the branch-creation step is skipped on a re-run,
-      # but the merge-back step below still needs an author.
-      - name: Configure the git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Check if release branch already exists
         id: check_branch
         run: |
@@ -188,6 +181,9 @@ jobs:
       - name: Create release branch and update version numbers and CHANGELOG
         if: steps.check_branch.outputs.exists == 'false'
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git checkout -b "release/${{ inputs.version }}"
 
           # Bump all workspace package.json files and the root in one command.
@@ -213,16 +209,13 @@ jobs:
 
           git push origin "release/${{ inputs.version }}"
 
-      # A separate branch keeps conflict-resolution commits off the release
-      # branch.
-      #   current channel: cut from release/<version>, PR'd into develop.
-      #   older channel:   cut from the target with release/<version> merged in,
-      #                    so the PR diff is only what this channel adds.
+      # A copy of release/<version>. The dedicated branch means the commits that
+      # resolve conflicts with the target stay off the release branch — whoever
+      # merges the PR merges the target into this branch first, the same ritual
+      # as a merge-back to develop.
       - name: Create merge-back branch
-        id: merge_back
         run: |
           MERGEBACK_BRANCH="${{ steps.get_target_branch.outputs.mergeback_branch }}"
-          MERGE_BACK_TARGET="${{ steps.get_target_branch.outputs.merge_back_target }}"
           RELEASE_BRANCH="release/${{ inputs.version }}"
 
           if git ls-remote --exit-code --heads origin "$MERGEBACK_BRANCH" > /dev/null 2>&1; then
@@ -230,34 +223,8 @@ jobs:
             exit 0
           fi
 
-          if [ "$MERGE_BACK_TARGET" = "develop" ]; then
-            git fetch origin "$RELEASE_BRANCH"
-            git checkout -b "$MERGEBACK_BRANCH" "origin/$RELEASE_BRANCH"
-          else
-            git fetch origin "$RELEASE_BRANCH" "$MERGE_BACK_TARGET"
-            git checkout -b "$MERGEBACK_BRANCH" "origin/$MERGE_BACK_TARGET"
-            if ! git merge --no-edit "origin/$RELEASE_BRANCH"; then
-              # Both channels bumped the version fields and the CHANGELOG away
-              # from the same ancestor, so those always conflict and always
-              # resolve one way: the target keeps its own numbers. Any other
-              # conflict is real and needs a human. Keep this list in step with
-              # the bump step above.
-              CONFLICTS=$(git diff --name-only --diff-filter=U)
-              UNEXPECTED=$(echo "$CONFLICTS" | grep -Ev '(^|/)package\.json$|^CHANGELOG\.md$' || true)
-              if [ -n "$UNEXPECTED" ]; then
-                git merge --abort
-                echo "::error::$RELEASE_BRANCH does not merge cleanly into $MERGE_BACK_TARGET (${UNEXPECTED//$'\n'/ }). Create $MERGEBACK_BRANCH from $MERGE_BACK_TARGET by hand, merge $RELEASE_BRANCH into it, push it, then re-run this workflow."
-                exit 1
-              fi
-              git checkout --ours -- $CONFLICTS
-              git add -- $CONFLICTS
-              git commit --no-edit
-              RESOLVED="${CONFLICTS//$'\n'/ }"
-              echo "Kept $MERGE_BACK_TARGET's copy of: $RESOLVED"
-              echo "auto_resolved=$RESOLVED" >> $GITHUB_OUTPUT
-            fi
-          fi
-
+          git fetch origin "$RELEASE_BRANCH"
+          git checkout -b "$MERGEBACK_BRANCH" "origin/$RELEASE_BRANCH"
           git push origin "$MERGEBACK_BRANCH"
 
       # PR 1  release/<version> -> master, current channel only. Merging it
@@ -271,7 +238,6 @@ jobs:
           PR_BRANCH="release/${{ inputs.version }}"
           MERGEBACK_BRANCH="${{ steps.get_target_branch.outputs.mergeback_branch }}"
           MERGE_BACK_TARGET="${{ steps.get_target_branch.outputs.merge_back_target }}"
-          AUTO_RESOLVED="${{ steps.merge_back.outputs.auto_resolved }}"
 
           # base, head, title, body. Leaves an already-open PR alone, so a
           # re-run can open just the missing one.
@@ -304,13 +270,7 @@ jobs:
 
           ---
 
-          > **Note:** \`${{ inputs.version }}\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$MERGE_BACK_TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release."
-
-            if [ -n "$AUTO_RESOLVED" ]; then
-              MERGEBACK_BODY="${MERGEBACK_BODY}
-
-          > The merge kept \`$MERGE_BACK_TARGET\`'s copy of: $AUTO_RESOLVED — the version bump and changelog entry belong to \`${{ inputs.version }}\`'s own channel. Check that nothing else in those files needed to come across."
-            fi
+          > **Note:** \`${{ inputs.version }}\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$MERGE_BACK_TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release. Resolve conflicts by merging \`$MERGE_BACK_TARGET\` into this branch."
           fi
 
           create_pr "$MERGE_BACK_TARGET" "$MERGEBACK_BRANCH" "$MERGEBACK_TITLE" "$MERGEBACK_BODY"
