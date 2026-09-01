@@ -282,12 +282,6 @@ function createActionConfirmationTestToken(
 ): TokenWithBearer {
   const token = jwt.sign(
     {
-      // Confirming an action now requires the scope of the action itself
-      // (e.g. `record.register` for a register confirmation), so the caller
-      // carries the full set of action scopes rather than dedicated
-      // confirm/reject ones. `record.custom-action` is added explicitly because
-      // it is not part of the default set and confirming a custom action needs
-      // it (see `getDefaultActionProcedures`).
       scope: [
         ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
