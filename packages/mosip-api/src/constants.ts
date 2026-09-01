@@ -34,10 +34,12 @@ export const env = cleanEnv(process.env, {
   }),
   OPENCRVS_CLIENT_ID: str({
     default: '',
+    devDefault: '23953953-51aa-42ca-b443-2426a7d21c61',
     desc: "Client ID of this integration's OpenCRVS system client. A National System Admin obtains it from the OpenCRVS Integrations page (Reveal keys). When set together with OPENCRVS_CLIENT_SECRET, registration confirmations authenticate with a freshly issued token instead of the one stored at registration time, so they survive OpenCRVS redeployments and are audited as this integration."
   }),
   OPENCRVS_CLIENT_SECRET: str({
     default: '',
+    devDefault: '7ce63d9f-5014-4f68-a0e3-8f681d23d508',
     desc: "Client secret of this integration's OpenCRVS system client. A National System Admin obtains it from the OpenCRVS Integrations page (Refresh secret)."
   }),
 
