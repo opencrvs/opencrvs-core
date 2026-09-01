@@ -26,6 +26,7 @@ spec:
   tls:
     secretName: {{ .Values.ingress.tls_secret_name }}
   {{- end }}
+
 ---
 apiVersion: v1
 kind: Service
@@ -40,6 +41,7 @@ spec:
       name: http
   selector:
     app: kibana
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -150,4 +152,6 @@ spec:
           configMap:
             name: elasticsearch-scripts
             defaultMode: 0755
+
+{{ include "network-policy-rules" (dict "service_name" "kibana"  "Values" .Values) }}
 {{- end }}

@@ -125,4 +125,6 @@ spec:
           configMap:
             name: {{ .Values.elastalert.custom_rules_configmap }}
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "elastalert" "Values" .Values) }}
 {{- end }}

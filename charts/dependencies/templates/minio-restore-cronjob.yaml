@@ -90,6 +90,9 @@ kind: Job
 {{- end }}
 metadata:
   name: minio-restore
+  labels:
+    app: backup-runner
+    job-type: restore
 spec:
   {{ if .Values.restore.cronjob }}
   schedule: {{ default .Values.restore.schedule .Values.minio.restore.schedule }}
@@ -100,6 +103,10 @@ spec:
     spec:
   {{- end }}
       template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: restore
         spec:
           {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
           serviceAccountName: backup-runner

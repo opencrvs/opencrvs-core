@@ -34,6 +34,7 @@ kind: Deployment
 metadata:
   labels:
     app: login
+    service_name: login
   name: login
 spec:
   replicas: {{ .Values.login.replicas | default 1 }}
@@ -45,6 +46,7 @@ spec:
     metadata:
       labels:
         app: login
+        service_name: login
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.login) | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "login" "Values" .Values) | nindent 6 }}
@@ -94,6 +96,8 @@ spec:
       {{- end }}
 
 {{- include "service-account-helper" (dict "service_name" "login" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "login" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "login" "Values" .Values) }}
 
