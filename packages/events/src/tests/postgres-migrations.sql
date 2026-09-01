@@ -341,7 +341,7 @@ CREATE TABLE app.system_clients (
     legacy_id text,
     name text NOT NULL,
     scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
-    created_by uuid NOT NULL,
+    created_by uuid,
     secret_hash text NOT NULL,
     salt text NOT NULL,
     sha_secret text NOT NULL,

@@ -14,7 +14,9 @@ import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 
 export async function selectCertificationType(page: Page, type: string) {
-  await page.locator('#certificateTemplateId svg').click()
+  await page
+    .locator('#certificateTemplateId .react-select__dropdown-indicator')
+    .click()
   await page
     .locator('.react-select__menu')
     .getByText(type, { exact: true })

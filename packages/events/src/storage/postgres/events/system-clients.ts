@@ -81,6 +81,18 @@ export async function getSystemClientById(id: UUID, trx?: Kysely<Schema>) {
     .executeTakeFirstOrThrow()
 }
 
+/** Existence check for callers that must not treat a missing row as an error. */
+export async function systemClientExists(id: UUID, trx?: Kysely<Schema>) {
+  const db = trx ?? getClient()
+  const row = await db
+    .selectFrom('systemClients')
+    .select('id')
+    .where('id', '=', id)
+    .executeTakeFirst()
+
+  return row !== undefined
+}
+
 export async function updateSystemClientStatus(
   id: UUID,
   status: 'active' | 'disabled',

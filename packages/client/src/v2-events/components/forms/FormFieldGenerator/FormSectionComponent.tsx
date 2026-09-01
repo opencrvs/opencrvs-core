@@ -327,7 +327,7 @@ export function FormSectionComponent({
 
   const onFieldValueChange = (
     formikFieldId: string,
-    value: FieldValue | undefined
+    value: FieldValue | null | undefined
   ) => {
     const updatedFormikPageForm = cloneDeep(formikPageForm)
 

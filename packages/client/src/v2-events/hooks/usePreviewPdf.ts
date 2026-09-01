@@ -67,7 +67,15 @@ export function usePreviewPdf(pdfUrl: string) {
           throw new Error(`Failed to load pdfjsLib`)
         }
       }
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      /*
+       * isEvalSupported: false stops pdf.js compiling PostScript functions and font
+       * programs with new Function, which the Content-Security-Policy would otherwise
+       * have to permit. See #13246.
+       */
+      const pdf = await pdfjsLib.getDocument({
+        data: arrayBuffer,
+        isEvalSupported: false
+      }).promise
       if (cancelled) {
         return
       }

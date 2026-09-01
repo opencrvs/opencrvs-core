@@ -687,6 +687,7 @@ unit.years,Years,Years,Années
 userRole.administrator,Name for user role Administrator,Administrator,Administrateur
 userRole.communityLeader,Name for user role Community Leader,Community Leader,Leader communautaire
 userRole.embassyOffical,Name for the user role Embassy Official,Embassy Official,Officiel d'ambassade
+userRole.fieldAgent,Name for user role Field Agent,Field Agent,Agent de terrain
 userRole.healthAdministrator,Name for user role Health Administrator,Health Administrator,Administrateur de santé
 userRole.hospitalClerk,Name for user role Hospital Clerk,Hospital Official,Officiel de l'hôpital
 userRole.localRegistrar,Name for user role Registrar,Registrar,Registraire
