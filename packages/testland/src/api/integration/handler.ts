@@ -49,7 +49,8 @@ const INTEGRATIONS: IntegrationConfig[] = [
   {
     name: 'MOSIP',
     scopes: [
-      { type: 'record.register', options: { event: ['birth', 'death'] } }
+      { type: 'record.register', options: { event: ['birth', 'death'] } },
+      { type: 'record.read', options: { event: ['birth', 'death'] } }
     ],
     clientId: MOSIP_INTEGRATION_CLIENT_ID,
     clientSecret: MOSIP_INTEGRATION_CLIENT_SECRET
