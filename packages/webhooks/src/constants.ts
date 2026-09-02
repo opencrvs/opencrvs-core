@@ -20,7 +20,6 @@ export const PORT = env.PORT
 export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 
-export const SENTRY_DSN = env.SENTRY_DSN
 export const PRODUCTION = env.isProd
 export const QA_ENV = env.QA_ENV
 

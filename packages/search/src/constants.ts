@@ -18,7 +18,6 @@ export const FHIR_URL = env.FHIR_URL
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
 export const MATCH_SCORE_THRESHOLD = env.MATCH_SCORE_THRESHOLD
-export const SENTRY_DSN = process.env.SENTRY_DSN
 export const OPENCRVS_INDEX_NAME = env.OPENCRVS_INDEX_NAME
 export const DEFAULT_TIMEOUT = 600000
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'

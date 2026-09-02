@@ -59,24 +59,13 @@ describe('login Content-Security-Policy', () => {
   })
 
   /*
-   * The login app compiles no JavaScript at runtime. If this fails, something new in the
-   * bundle calls eval() or new Function — find and remove it rather than reinstating
-   * 'unsafe-eval', because this is the policy the audit was run against.
+   * Login loads only its own bundle and login-config.js, proxied same-origin via
+   * /api/countryconfig/: no wildcard (ANSSI flagged it as over-broad), no third-party
+   * host since the Sentry dialog was removed (#13460). Asserted whole, so 'unsafe-eval'
+   * or 'unsafe-inline' also fails here — login compiles no JavaScript at runtime.
    */
-  it('does not allow eval or inline scripts', () => {
-    expect(directives['script-src']).not.toContain("'unsafe-eval'")
-    expect(directives['script-src']).not.toContain("'unsafe-inline'")
-  })
-
-  /*
-   * The only scripts login loads are its own bundle and login-config.js, which is proxied
-   * same-origin via /api/countryconfig/. Nothing needs the deploy-time *.<domain> wildcard,
-   * which the ANSSI report flagged as an over-broad source.
-   */
-  it('loads scripts from no wildcard origin', () => {
-    expect(directives['script-src']).not.toContain(
-      '{{CONTENT_SECURITY_POLICY_WILDCARD}}'
-    )
+  it('loads scripts from this origin only', () => {
+    expect(directives['script-src']).toEqual(["'self'"])
   })
 })
 

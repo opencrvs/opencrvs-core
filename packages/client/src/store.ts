@@ -38,8 +38,6 @@ import {
   IAdvancedSearchParamState
 } from '@client/search/advancedSearch/reducer'
 import { IUserFormState, userFormReducer } from '@client/user/userReducer'
-import * as Sentry from '@sentry/react'
-import createSentryMiddleware from 'redux-sentry-middleware'
 import { submissionMiddleware } from './declarations/submissionMiddleware'
 import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
@@ -81,8 +79,6 @@ export const createStore = (): { store: AppStore } => {
     applyMiddleware(submissionMiddleware),
     install(config),
     applyMiddleware(persistenceMiddleware),
-    // @ts-ignore types are not correct for this module yet
-    applyMiddleware(createSentryMiddleware(Sentry)),
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

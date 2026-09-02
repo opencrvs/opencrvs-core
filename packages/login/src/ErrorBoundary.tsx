@@ -8,22 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { ReactNode } from 'react'
+import React, { Component, ReactNode } from 'react'
 import styled from 'styled-components'
-import * as Sentry from '@sentry/react'
 
 const ErrorMessage = styled.h1`
   text-align: center;
 `
-const development = ['127.0.0.1', 'localhost'].includes(
-  window.location.hostname
-)
 
-export const ErrorBoundary = ({ children }: { children: ReactNode }) => (
-  <Sentry.ErrorBoundary
-    showDialog={!development}
-    fallback={<ErrorMessage>Something went wrong...</ErrorMessage>}
-  >
-    {children}
-  </Sentry.ErrorBoundary>
-)
+interface State {
+  hasError: boolean
+}
+
+/*
+ * React has no built-in error boundary. React itself logs the error and
+ * component stack when a boundary handles an error, so this only needs to swap
+ * in the fallback.
+ */
+export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
+  state: State = { hasError: false }
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorMessage>Something went wrong...</ErrorMessage>
+    }
+
+    return this.props.children
+  }
+}

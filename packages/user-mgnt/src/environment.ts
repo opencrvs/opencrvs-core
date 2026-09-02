@@ -19,7 +19,6 @@ export const env = cleanEnv(process.env, {
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  SENTRY_DSN: str({ default: undefined }),
   QA_ENV: bool({ default: false }),
   RECORD_SEARCH_QUOTA: num({ default: 2000 }),
 

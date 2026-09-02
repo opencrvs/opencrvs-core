@@ -436,20 +436,6 @@ export async function createServer() {
   })
 
   await server.register(getPlugins())
-  server.ext({
-    type: 'onRequest',
-    method(
-      request: Hapi.Request & {
-        sentryScope?: {
-          setExtra: (key: string, value: unknown) => void
-        }
-      },
-      h
-    ) {
-      request.sentryScope?.setExtra('payload', request.payload)
-      return h.continue
-    }
-  })
 
   async function stop() {
     await server.stop()
