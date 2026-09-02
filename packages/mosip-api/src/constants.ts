@@ -18,7 +18,7 @@ export const env = cleanEnv(process.env, {
   SQLITE_DATABASE_PATH: str({
     devDefault: join(__dirname, '../../../data/sqlite/mosip-api.db'),
     example: '/data/sqlite/mosip-api.db', // A good production default, but needs a Docker volume
-    desc: 'Path to the SQLite database used to store a OpenCRVS record-only token with the MOSIP transaction ID. Note that you need to add a volume to the Docker container to persist the data.'
+    desc: 'Path to the SQLite database used to correlate the MOSIP transaction ID with the OpenCRVS event it registers. Note that you need to add a volume to the Docker container to persist the data.'
   }),
   CLIENT_APP_URL: url({
     devDefault: 'http://localhost:3000',
@@ -34,10 +34,12 @@ export const env = cleanEnv(process.env, {
   }),
   OPENCRVS_CLIENT_ID: str({
     default: '',
+    devDefault: '23953953-51aa-42ca-b443-2426a7d21c61',
     desc: "Client ID of this integration's OpenCRVS system client. A National System Admin obtains it from the OpenCRVS Integrations page (Reveal keys). When set together with OPENCRVS_CLIENT_SECRET, registration confirmations authenticate with a freshly issued token instead of the one stored at registration time, so they survive OpenCRVS redeployments and are audited as this integration."
   }),
   OPENCRVS_CLIENT_SECRET: str({
     default: '',
+    devDefault: '7ce63d9f-5014-4f68-a0e3-8f681d23d508',
     desc: "Client secret of this integration's OpenCRVS system client. A National System Admin obtains it from the OpenCRVS Integrations page (Refresh secret)."
   }),
 

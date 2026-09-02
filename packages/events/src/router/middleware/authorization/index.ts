@@ -46,7 +46,6 @@ import {
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
-import { AsyncActionInput } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
@@ -236,49 +235,6 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   )
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return next()
-}
-
-/**
- * Checks that the token has been exchanged for the specific `eventId` and `actionId` in the input.
- *
- * Registrars token can be exchanged in auth into a more specific token with `eventId` and `actionId`.
- * This is useful when tokens need to be exposed outside of core of OpenCRVS, e.g. countryconfig or external systems.
- */
-export const requireActionConfirmationAuthorization: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  AsyncActionInput
-> = async ({ next, ctx, input }) => {
-  const { token } = ctx
-  const { eventId, actionId } = getTokenPayload(token)
-
-  const hasConfirmAndRejectScope =
-    hasScope(token, 'record.confirm-registration') &&
-    hasScope(token, 'record.reject-registration')
-
-  if (!hasConfirmAndRejectScope) {
-    throw new TRPCError({
-      code: 'FORBIDDEN',
-      message: 'Missing required scopes for action confirmation'
-    })
-  }
-
-  const isActionConfirmationToken = eventId && actionId
-
-  if (!isActionConfirmationToken) {
-    throw new TRPCError({
-      code: 'FORBIDDEN',
-      message: 'Missing required claims for action confirmation'
-    })
-  }
-
-  if (eventId !== input.eventId || actionId !== input.actionId) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
