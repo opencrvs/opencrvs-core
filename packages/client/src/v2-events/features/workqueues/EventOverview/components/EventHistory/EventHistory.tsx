@@ -25,7 +25,9 @@ import {
   isActionConfigType,
   EventDocument,
   getActionConfig,
+  isSelectableAtAnchor,
   TokenUserType,
+  todayISO,
   toPlainDate
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -230,6 +232,9 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     ? resolveLocationName(location, toPlainDate(action.createdAt))
     : undefined
 
+  const isOfficeActiveToday =
+    !!location && isSelectableAtAnchor(location.versions, todayISO())
+
   const hasAccessToOffice =
     !!user &&
     canAccessOffice({
@@ -251,7 +256,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     return null
   }
 
-  return hasAccessToOffice ? (
+  return hasAccessToOffice && isOfficeActiveToday ? (
     <LinkLeftAligned
       font="bold14"
       onClick={() => {
