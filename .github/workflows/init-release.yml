@@ -166,6 +166,13 @@ jobs:
           echo "merge_back_target=$merge_back_target" >> $GITHUB_OUTPUT
           echo "mergeback_branch=$mergeback_branch" >> $GITHUB_OUTPUT
 
+      # Both the branch-creation step and the merge-back's merge commit need an
+      # author, and the first of the two is skipped on a re-run.
+      - name: Configure the git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Check if release branch already exists
         id: check_branch
         run: |
@@ -181,9 +188,6 @@ jobs:
       - name: Create release branch and update version numbers and CHANGELOG
         if: steps.check_branch.outputs.exists == 'false'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git checkout -b "release/${{ inputs.version }}"
 
           # Bump all workspace package.json files and the root in one command.
@@ -209,23 +213,73 @@ jobs:
 
           git push origin "release/${{ inputs.version }}"
 
-      # A copy of release/<version>. The dedicated branch means the commits that
-      # resolve conflicts with the target stay off the release branch — whoever
-      # merges the PR merges the target into this branch first, the same ritual
-      # as a merge-back to develop.
+      # A dedicated branch keeps conflict-resolution commits off the release
+      # branch.
+      #   current channel: a copy of release/<version>, PR'd into develop.
+      #   older channel:   cut from the target with release/<version> merged in,
+      #                    so the PR diff is only what this channel adds.
+      # A merge that needs a human never fails the release: the branch is left
+      # uncreated, its PR is skipped, and the job summary says what to do.
       - name: Create merge-back branch
+        id: merge_back
         run: |
           MERGEBACK_BRANCH="${{ steps.get_target_branch.outputs.mergeback_branch }}"
+          MERGE_BACK_TARGET="${{ steps.get_target_branch.outputs.merge_back_target }}"
           RELEASE_BRANCH="release/${{ inputs.version }}"
 
           if git ls-remote --exit-code --heads origin "$MERGEBACK_BRANCH" > /dev/null 2>&1; then
             echo "Branch $MERGEBACK_BRANCH already exists, skipping."
+            echo "created=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          git fetch origin "$RELEASE_BRANCH"
-          git checkout -b "$MERGEBACK_BRANCH" "origin/$RELEASE_BRANCH"
+          if [ "$MERGE_BACK_TARGET" = "develop" ]; then
+            git fetch origin "$RELEASE_BRANCH"
+            git checkout -b "$MERGEBACK_BRANCH" "origin/$RELEASE_BRANCH"
+          else
+            git fetch origin "$RELEASE_BRANCH" "$MERGE_BACK_TARGET"
+            git checkout -b "$MERGEBACK_BRANCH" "origin/$MERGE_BACK_TARGET"
+            if ! git merge --no-edit "origin/$RELEASE_BRANCH"; then
+              # Both channels bumped the version fields and the CHANGELOG away
+              # from the same ancestor, so those always conflict and always
+              # resolve one way: the target keeps its own numbers. Keep this
+              # list in step with the bump step above. Anything else needs a
+              # human, so hand the merge over rather than failing the release.
+              CONFLICTS=$(git diff --name-only --diff-filter=U)
+              UNEXPECTED=$(echo "$CONFLICTS" | grep -Ev '(^|/)package\.json$|^CHANGELOG\.md$' || true)
+              if [ -n "$UNEXPECTED" ]; then
+                git merge --abort
+                echo "::warning::$RELEASE_BRANCH does not merge cleanly into $MERGE_BACK_TARGET; its merge-back branch and PR were skipped."
+                {
+                  echo "### Merge ${{ inputs.version }} into $MERGE_BACK_TARGET by hand"
+                  echo ""
+                  echo "\`$RELEASE_BRANCH\` conflicts with \`$MERGE_BACK_TARGET\` in: ${UNEXPECTED//$'\n'/, }"
+                  echo ""
+                  echo "Create \`$MERGEBACK_BRANCH\` from \`$MERGE_BACK_TARGET\`, merge \`$RELEASE_BRANCH\` into it, resolve, push, then re-run this workflow to open the PR."
+                } >> "$GITHUB_STEP_SUMMARY"
+                echo "created=false" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+              # Keep the target's copy of each. A file the target deleted has no
+              # "ours" side — 2.x dropped several 1.9 packages — so there the
+              # deletion stands instead.
+              while IFS= read -r file; do
+                if git ls-files --unmerged -- "$file" | awk '{print $3}' | grep -qx 2; then
+                  git checkout --ours -- "$file"
+                  git add -- "$file"
+                else
+                  git rm -q -f -- "$file"
+                fi
+              done <<< "$CONFLICTS"
+              git commit --no-edit
+              RESOLVED="${CONFLICTS//$'\n'/ }"
+              echo "Kept $MERGE_BACK_TARGET's copy of: $RESOLVED"
+              echo "auto_resolved=$RESOLVED" >> $GITHUB_OUTPUT
+            fi
+          fi
+
           git push origin "$MERGEBACK_BRANCH"
+          echo "created=true" >> $GITHUB_OUTPUT
 
       # PR 1  release/<version> -> master, current channel only. Merging it
       #       ships the release and triggers the publish workflow. An older
@@ -238,6 +292,8 @@ jobs:
           PR_BRANCH="release/${{ inputs.version }}"
           MERGEBACK_BRANCH="${{ steps.get_target_branch.outputs.mergeback_branch }}"
           MERGE_BACK_TARGET="${{ steps.get_target_branch.outputs.merge_back_target }}"
+          MERGEBACK_CREATED="${{ steps.merge_back.outputs.created }}"
+          AUTO_RESOLVED="${{ steps.merge_back.outputs.auto_resolved }}"
 
           # base, head, title, body. Leaves an already-open PR alone, so a
           # re-run can open just the missing one.
@@ -270,10 +326,20 @@ jobs:
 
           ---
 
-          > **Note:** \`${{ inputs.version }}\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$MERGE_BACK_TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release. Resolve conflicts by merging \`$MERGE_BACK_TARGET\` into this branch."
+          > **Note:** \`${{ inputs.version }}\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$MERGE_BACK_TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release."
+
+            if [ -n "$AUTO_RESOLVED" ]; then
+              MERGEBACK_BODY="${MERGEBACK_BODY}
+
+          > The merge kept \`$MERGE_BACK_TARGET\`'s copy of: $AUTO_RESOLVED — the version bump and changelog entry belong to \`${{ inputs.version }}\`'s own channel. Check that nothing else in those files needed to come across."
+            fi
           fi
 
-          create_pr "$MERGE_BACK_TARGET" "$MERGEBACK_BRANCH" "$MERGEBACK_TITLE" "$MERGEBACK_BODY"
+          if [ "$MERGEBACK_CREATED" = "true" ]; then
+            create_pr "$MERGE_BACK_TARGET" "$MERGEBACK_BRANCH" "$MERGEBACK_TITLE" "$MERGEBACK_BODY"
+          else
+            echo "No merge-back branch to open a PR from — see the job summary."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
