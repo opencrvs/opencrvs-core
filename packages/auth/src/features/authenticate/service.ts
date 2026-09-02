@@ -40,11 +40,7 @@ import {
 } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import {
-  EncodedScope,
-  encodeScope,
-  TokenUserType
-} from '@opencrvs/commons/authentication'
+import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -247,51 +243,6 @@ export async function createRefreshToken(
 ): Promise<string> {
   const { familyId, jti } = await createFamily(userId)
   return signRefreshToken(userId, userType, familyId, jti)
-}
-
-type ActionConfirmationInput = {
-  eventId: UUID
-  actionId: UUID
-}
-
-type LegacyRecordValidationInput = {
-  recordId: UUID
-}
-
-export async function createTokenForActionConfirmation(
-  input: ActionConfirmationInput | LegacyRecordValidationInput,
-  userId: UUID,
-  extraScopes: string[] = [],
-  userType: TokenUserType = TokenUserType.enum.user
-) {
-  return sign(
-    {
-      scope: [
-        encodeScope({ type: 'record.confirm-registration' }),
-        encodeScope({ type: 'record.reject-registration' }),
-        ...extraScopes
-      ],
-      eventId: 'eventId' in input ? input.eventId : undefined,
-      actionId: 'actionId' in input ? input.actionId : undefined,
-      recordId: 'recordId' in input ? input.recordId : undefined,
-      userType
-    },
-    cert,
-    {
-      subject: userId,
-      algorithm: 'RS256',
-      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
-      audience: [
-        'opencrvs:gateway-user',
-        'opencrvs:events-user',
-        'opencrvs:user-mgnt-user',
-        'opencrvs:auth-user',
-        'opencrvs:countryconfig-user',
-        'opencrvs:documents-user'
-      ],
-      issuer: JWT_ISSUER
-    }
-  )
 }
 
 export async function storeUserInformation(

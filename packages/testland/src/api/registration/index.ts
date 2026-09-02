@@ -189,6 +189,7 @@ export async function onMosipBirthRegisterHandler(
     const informantPsut = getInformantPsut(declaration, birthInformantSection)
 
     await mosipInteropClient.register({
+      eventId: event.id,
       trackingId: event.trackingId,
       requestFields: {
         birthCertificateNumber: registrationNumber,
@@ -259,6 +260,7 @@ export async function onMosipDeathRegisterHandler(
     const informantPsut = getInformantPsut(declaration, deathInformantSection)
 
     await mosipInteropClient.register({
+      eventId: event.id,
       trackingId: event.trackingId,
       requestFields: {
         deathCertificateNumber: registrationNumber,

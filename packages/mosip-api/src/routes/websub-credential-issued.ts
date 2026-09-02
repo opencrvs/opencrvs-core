@@ -11,7 +11,6 @@
 import { z } from 'zod'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { getTransactionAndDiscard } from '../database'
-import { decode } from 'jsonwebtoken'
 import * as opencrvs from '../opencrvs-api'
 import { decryptMosipCredential } from '../websub/crypto'
 import { env } from '../constants'
@@ -39,11 +38,6 @@ export const CredentialIssuedSchema = z.object({
     })
   })
 })
-
-export interface TokenPayload {
-  eventId: string
-  actionId: string
-}
 
 type CredentialIssuedRequest = FastifyRequest<{
   Body: z.infer<typeof CredentialIssuedSchema>
@@ -87,18 +81,14 @@ export const credentialIssuedHandler = async (
       .split('/')
       .pop()!
 
-    const { token, registrationNumber } =
+    const { eventId, registrationNumber } =
       getTransactionAndDiscard(transactionId)
-    const { eventId, actionId } = decode(token) as TokenPayload
 
-    // With client credentials configured, confirm with a freshly issued token:
+    // Confirm with a token issued for this integration's own system client:
     // it survives OpenCRVS redeployments that happened while the credential was
     // pending, and the confirmation is audited as this integration rather than
-    // the registrar. The stored token remains as a fallback for deployments
-    // that have not been issued client credentials yet.
-    const confirmationToken = opencrvs.isDirectAuthConfigured()
-      ? await opencrvs.getConfirmationToken(eventId, actionId)
-      : token
+    // the registrar.
+    const token = await opencrvs.getSystemToken()
 
     const actionInfo = await opencrvs.findEventActionType(eventId, { token })
 
@@ -126,7 +116,7 @@ export const credentialIssuedHandler = async (
         .status(200)
     }
 
-    const { actionType, eventType, requestId } = actionInfo
+    const { actionId, actionType, eventType, requestId } = actionInfo
 
     if (actionType === ActionType.REGISTER && eventType === 'birth') {
       await opencrvs.confirmRegistration(
@@ -136,7 +126,7 @@ export const credentialIssuedHandler = async (
           registrationNumber,
           nationalId: getBirthIdentifier(verifiableCredential.credentialSubject)
         },
-        { token: confirmationToken, logger: request.log }
+        { token, logger: request.log }
       )
     }
 
@@ -147,7 +137,7 @@ export const credentialIssuedHandler = async (
           actionId,
           registrationNumber
         },
-        { token: confirmationToken, logger: request.log }
+        { token, logger: request.log }
       )
     }
 
