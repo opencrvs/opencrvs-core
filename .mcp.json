@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "testrail": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@uarlouski/testrail-mcp-server"],
+      "env": {
+        "TESTRAIL_INSTANCE_URL": "https://ocrvs.testrail.io",
+        "TESTRAIL_USERNAME": "amy@opencrvs.org",
+        "TESTRAIL_API_KEY": "${TESTRAIL_API_KEY}"
+      }
+    }
+  }
+}
