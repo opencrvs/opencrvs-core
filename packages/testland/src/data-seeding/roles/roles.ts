@@ -236,7 +236,7 @@ export const roles: Role[] = [
       { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation', 'pending-updates'] } },
       { type: 'record.create', options: { placeOfEvent: 'location' } },
-      { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { status: ['NOTIFIED'] } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
       { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
@@ -286,15 +286,15 @@ export const roles: Role[] = [
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'escalated', 'pending-updates', 'pending-certification', 'potential-duplicate'] } },
-      { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
-      { type: 'record.create', options: { placeOfEvent: 'location' } },
-      { type: 'record.read', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
-      { type: 'record.declare', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { placeOfEvent: 'location' } },
-      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE'], placeOfEvent: 'location' } },
-      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY'], placeOfEvent: 'location' } },
-      { type: 'record.print-certified-copies', options: { placeOfEvent: 'location' } },
-      { type: 'record.correct', options: { placeOfEvent: 'location' } }
+      { type: 'record.search', options: { placeOfEvent: 'all', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.create', options: { placeOfEvent: 'all' } },
+      { type: 'record.read', options: { placeOfEvent: 'all', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.declare', options: { placeOfEvent: 'all' } },
+      { type: 'record.edit', options: { placeOfEvent: 'all' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE'], placeOfEvent: 'all' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY'], placeOfEvent: 'all' } },
+      { type: 'record.print-certified-copies', options: { placeOfEvent: 'all' } },
+      { type: 'record.correct', options: { placeOfEvent: 'all' } }
     ])
   },
   {
@@ -309,7 +309,7 @@ export const roles: Role[] = [
       { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation', 'pending-updates'] } },
       { type: 'record.create', options: { placeOfEvent: 'location' } },
-      { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { status: ['NOTIFIED'] } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
       { type: 'record.declare', options: { placeOfEvent: 'location' } },
