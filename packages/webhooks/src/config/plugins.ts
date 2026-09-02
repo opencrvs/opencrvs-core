@@ -10,10 +10,8 @@
  */
 import { ServerRegisterPluginObject } from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
-import { SENTRY_DSN } from '@webhooks/constants'
 import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
-import * as Sentry from 'hapi-sentry'
 
 type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
@@ -31,20 +29,5 @@ export default function getPlugins() {
     })
   }
 
-  if (SENTRY_DSN) {
-    plugins.push({
-      plugin: Sentry,
-      options: {
-        client: {
-          environment: process.env.DOMAIN,
-          dsn: SENTRY_DSN,
-          initialScope: {
-            tags: { service: 'webhooks' }
-          }
-        },
-        catchLogErrors: true
-      }
-    })
-  }
   return plugins
 }

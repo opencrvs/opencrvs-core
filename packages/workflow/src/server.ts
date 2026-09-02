@@ -53,14 +53,6 @@ export async function createServer() {
   const routes = getRoutes()
   server.route(routes)
 
-  server.ext({
-    type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
-      request.sentryScope?.setExtra('payload', request.payload)
-      return h.continue
-    }
-  })
-
   server.ext('onPreResponse', (request, h) => {
     if (request.response instanceof Boom) {
       logger.error(request.response)

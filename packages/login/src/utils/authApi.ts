@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import * as Sentry from '@sentry/react'
 
 interface ICodeVerifyData {
   nonce: string
@@ -29,7 +28,6 @@ export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
-  SENTRY: string
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
@@ -106,7 +104,6 @@ export function request<T>(options: AxiosRequestConfig) {
       // Something else happened while setting up the request
       // eslint-disable-next-line no-console
       console.error('Error Message:', error.message)
-      Sentry.captureException(error)
     }
 
     throw error

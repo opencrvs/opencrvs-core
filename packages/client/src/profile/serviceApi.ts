@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { getToken } from '@client/utils/authUtils'
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import * as Sentry from '@sentry/react'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface ISendVerifyCodeData {
@@ -46,19 +45,7 @@ function request<T>(options: AxiosRequestConfig) {
     return response.data
   }
 
-  const onError = (error: AxiosError) => {
-    if (error.response) {
-      // Request was made but server responded with something
-      // other than 2xx
-    } else {
-      // Something else happened while setting up the request
-      Sentry.captureException(error)
-    }
-
-    throw error
-  }
-
-  return client(options).then(onSuccess).catch(onError)
+  return client(options).then(onSuccess)
 }
 
 const sendVerifyCode = (data: ISendVerifyCodeData) => {
