@@ -12,7 +12,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { faker } from '@faker-js/faker'
-import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   createPIN,
   drawSignature,
@@ -24,15 +24,15 @@ import {
   NEW_USER_PASSWORD,
   searchFromSearchBar,
   waitForAuthenticatedLanding
-} from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration'
+} from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
 import {
   fillChildDetails,
   formatV2ChildName,
   getIdByName,
   getLocations,
   openBirthDeclaration
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 
 const createDraft = async (page: Page) => {
   await page.goto(CLIENT_URL)
@@ -136,8 +136,7 @@ test('Scope changes after office change - user loses access when the office chan
       NEW_USER_PASSWORD
     )
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await waitForAuthenticatedLanding(page, 60_000)
+    await waitForAuthenticatedLanding(page, refreshToken)
     await createPIN(page)
     await page.goto(CLIENT_URL)
 
@@ -214,16 +213,15 @@ test('Scope changes after office change - user loses access when the office chan
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
     )
+
+    await logout(page)
   })
 
   await test.step('User can no longer find the record or drafts after the office change', async () => {
-    await logout(page)
-
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await waitForAuthenticatedLanding(page, 60_000)
+    await waitForAuthenticatedLanding(page, refreshToken)
 
     await searchFromSearchBar(page, trackingId, false)
     await expect(
@@ -295,8 +293,8 @@ test('Scope changes after office and role changes', async ({ browser }) => {
       NEW_USER_PASSWORD
     )
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await waitForAuthenticatedLanding(page, 60_000)
+    await waitForAuthenticatedLanding(page, refreshToken)
+
     await createPIN(page)
     await page.goto(CLIENT_URL)
 
@@ -335,10 +333,11 @@ test('Scope changes after office and role changes', async ({ browser }) => {
         page.getByRole('button', { name: draftName, exact: true })
       ).toBeVisible()
     }
+
+    await logout(page)
   })
 
   await test.step('Administrator moves the user to Isamba District Office and Hospital Official', async () => {
-    await logout(page)
     await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
 
     await page.getByRole('button', { name: 'Organisation' }).click()
@@ -369,9 +368,7 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Isamba District Office, Isamba, Central, Farajaland'
     )
-    await expect(page.getByTestId('role-value')).toHaveText(
-      'Hospital Official'
-    )
+    await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
 
     await page.getByRole('button', { name: 'Confirm' }).click()
     await page.getByTestId('confirm_office_change').click()
@@ -382,16 +379,15 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(
       page.getByText('Hospital Official', { exact: true })
     ).toBeVisible()
+
+    await logout(page)
   })
 
   await test.step('User can no longer find the record or drafts after the office and role change', async () => {
-    await logout(page)
-
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await waitForAuthenticatedLanding(page, 60_000)
+    await waitForAuthenticatedLanding(page, refreshToken)
 
     await searchFromSearchBar(page, trackingId, false)
     await expect(

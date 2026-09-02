@@ -43,7 +43,6 @@ import {
   Stack,
   Toast
 } from '@opencrvs/components'
-import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -368,10 +367,7 @@ export function Review() {
   )
 
   return (
-    <FormLayout
-      appbarIcon={<Print />}
-      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
-    >
+    <FormLayout route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}>
       <Frame.LayoutCentered>
         <Stack direction="column">
           <Box>

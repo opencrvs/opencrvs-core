@@ -16,7 +16,6 @@ import {
   Dialog,
   Text,
   Frame,
-  Icon,
   Stack,
   Content,
   Button
@@ -39,11 +38,9 @@ const messages = defineMessages({
 
 export const VerificationWizard = ({
   children,
-  currentPage,
   onSubmit,
   pageTitle,
   onNextPage,
-  onPreviousPage,
   showReviewButton,
   pageConfig
 }: FormWizardProps & {
@@ -91,14 +88,6 @@ export const VerificationWizard = ({
 
   return (
     <Frame.LayoutForm>
-      <Frame.SectionFormBackAction>
-        {currentPage > 0 && (
-          <Button size="small" type="tertiary" onClick={onPreviousPage}>
-            <Icon name="ArrowLeft" size="medium" />
-            {intl.formatMessage(formWizardMessages.back)}
-          </Button>
-        )}
-      </Frame.SectionFormBackAction>
       <Frame.Section>
         <Content showTitleOnMobile={true} title={pageTitle}>
           <Stack alignItems="stretch" direction="column" gap={16}>

@@ -8,6 +8,8 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 name: Publish images from any branch or tag
 run-name: Publish images from ${{ inputs.branch_tag_name || github.ref_name }}
+env:
+  CONTAINER_REGISTRY: ghcr.io/opencrvs
 on:
   push:
     branches:
@@ -102,9 +104,22 @@ jobs:
         id: get-services
         run: |
           # Exclude countryconfig-template from the list of services to build, since it is not a deployable service.
-          services=$(find packages -name Dockerfile | cut -f2 -d\/ | grep -v '^countryconfig-template$')
-          services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")' | tr -d '\n')
-          # Set the list of service names as an output variable
+          services_json=$(
+            find packages -name Dockerfile |
+              cut -f2 -d/ |
+              grep -v '^countryconfig-template$' |
+              jq -R -s -c '
+                split("\n")[:-1] |
+                map(. as $service |
+                  if ["mosip-api", "mosip-mock", "esignet-mock"] | index($service) then
+                    $service
+                  else
+                    "ocrvs-" + $service
+                  end
+                )
+              '
+          )
+          # Set the list of service image names as an output variable.
           echo "services=$services_json" >> $GITHUB_OUTPUT
           echo "services=$services_json"
       - name: Log in to GitHub Container Registry
@@ -124,9 +139,9 @@ jobs:
             push: true
             context: .
             tags: |
-              ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}${{ steps.arch_label.outputs.arch }}
-              ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
-            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.CONTAINER_REGISTRY }}/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.CONTAINER_REGISTRY }}/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+            cache-from: type=registry,ref=${{ env.CONTAINER_REGISTRY }}/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
             cache-to: type=inline
 
     outputs:
@@ -146,18 +161,18 @@ jobs:
           password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
       - name: Create and push multi-arch manifest
         env:
-          BUILD_ARM: ${{ inputs.build_arm == true }}
+          BUILD_ARM: ${{ inputs.build_arm == true || startsWith(github.ref, 'refs/tags/') }}
         run: |
-          REPO="ghcr.io/opencrvs/ocrvs-base"
+          REPO="$CONTAINER_REGISTRY/ocrvs-base"
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             if [[ "$BUILD_ARM" == "true" ]]; then
               MANIFEST_LIST="$REPO:$TAG-amd64 $REPO:$TAG-arm64"
             else
               MANIFEST_LIST="$REPO:$TAG-amd64"
             fi
-            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
-            docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG $MANIFEST_LIST
-            docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
+            echo "[🔁 pushing ] $REPO:$TAG"
+            docker manifest create $REPO:$TAG $MANIFEST_LIST
+            docker manifest push $REPO:$TAG
           done
   build:
     needs: [base, merge-manifest]
@@ -197,13 +212,19 @@ jobs:
             echo "arch=-amd64" >> $GITHUB_OUTPUT
           fi
 
+      - name: Set package name
+        id: package
+        run: |
+          service="${{ matrix.service }}"
+          echo "name=${service#ocrvs-}" >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: Wandalen/wretry.action@v3.8.0
         with:
           attempt_limit: 3
           action: docker/build-push-action@v7
           with: |
-            file: packages/${{ matrix.service }}/Dockerfile
+            file: packages/${{ steps.package.outputs.name }}/Dockerfile
             build-args: |
               VERSION=${{ needs.base.outputs.version }}
               BRANCH=${{ needs.base.outputs.branch }}
@@ -211,9 +232,9 @@ jobs:
             push: true
             context: .
             tags: |
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
-            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.CONTAINER_REGISTRY }}/${{ matrix.service }}:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.CONTAINER_REGISTRY }}/${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+            cache-from: type=registry,ref=${{ env.CONTAINER_REGISTRY }}/${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
             cache-to: type=inline
 
   merge-services-manifest:
@@ -234,25 +255,25 @@ jobs:
 
       - name: Create and push multi-arch manifest
         env:
-          BUILD_ARM: ${{ inputs.build_arm == true }}
+          BUILD_ARM: ${{ inputs.build_arm == true || startsWith(github.ref, 'refs/tags/') }}
         run: |
-          REPO_PREFIX="ghcr.io/opencrvs/ocrvs"
+          REPO="$CONTAINER_REGISTRY/${{ matrix.service }}"
 
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             # Create manifest list based on whether ARM build exists
             if [[ "$BUILD_ARM" == "true" ]]; then
-              MANIFEST_LIST="${REPO_PREFIX}-${{ matrix.service }}:$TAG-amd64 ${REPO_PREFIX}-${{ matrix.service }}:$TAG-arm64"
+              MANIFEST_LIST="$REPO:$TAG-amd64 $REPO:$TAG-arm64"
             else
-              MANIFEST_LIST="${REPO_PREFIX}-${{ matrix.service }}:$TAG-amd64"
+              MANIFEST_LIST="$REPO:$TAG-amd64"
             fi
-            echo "[🔁 pushing ] ${REPO_PREFIX}-${{ matrix.service }}:$TAG"
-            docker manifest create ${REPO_PREFIX}-${{ matrix.service }}:$TAG $MANIFEST_LIST
-            docker manifest push ${REPO_PREFIX}-${{ matrix.service }}:$TAG
+            echo "[🔁 pushing ] $REPO:$TAG"
+            docker manifest create $REPO:$TAG $MANIFEST_LIST
+            docker manifest push $REPO:$TAG
           done
 
   # The service matrix above only builds packages/<service>/Dockerfile, so the
   # testland companion assets image (postgres/metabase/reindex assets) needs its
-  # own step. Published as ghcr.io/opencrvs/ocrvs-testland:<tag>-assets to match
+  # own step. Published as ocrvs-testland:<tag>-assets to match
   # the chart's `{{ opencrvs.image countryconfig }}-assets` reference. Context is
   # packages/testland because Dockerfile.assets COPYs testland-relative paths.
   testland-assets:
@@ -303,9 +324,9 @@ jobs:
             push: true
             context: packages/testland
             tags: |
-              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}-assets
-              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
-            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
+              ${{ env.CONTAINER_REGISTRY }}/ocrvs-testland:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}-assets
+              ${{ env.CONTAINER_REGISTRY }}/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
+            cache-from: type=registry,ref=${{ env.CONTAINER_REGISTRY }}/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
             cache-to: type=inline
 
   countryconfig-template-build-test:
@@ -357,7 +378,7 @@ jobs:
         env:
           BUILD_ARM: ${{ inputs.build_arm == true }}
         run: |
-          REPO="ghcr.io/opencrvs/ocrvs-testland"
+          REPO="$CONTAINER_REGISTRY/ocrvs-testland"
 
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             if [[ "$BUILD_ARM" == "true" ]]; then
@@ -388,7 +409,7 @@ jobs:
       - name: Gather Trivy output from base branch image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
+          image-ref: '${{ env.CONTAINER_REGISTRY }}/${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
           format: 'sarif'
@@ -397,7 +418,7 @@ jobs:
       - name: Gather Trivy output from newly build image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: '${{ env.CONTAINER_REGISTRY }}/${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
           format: 'sarif'
@@ -429,7 +450,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: '${{ env.CONTAINER_REGISTRY }}/${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
 

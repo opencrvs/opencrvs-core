@@ -30,7 +30,11 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
   buildHistoricalLocationNameOptions,
-  getAdminLevelHierarchy
+  findLocationOption,
+  getAdminLevelHierarchy,
+  LocationOption,
+  resolveLocationValue,
+  toLocationId
 } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -136,6 +140,7 @@ function LocationSearchInput({
   id,
   eventType,
   anchor,
+  searchMode = false,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -146,6 +151,7 @@ function LocationSearchInput({
   id: string
   eventType?: string
   anchor: PlainDate
+  searchMode?: boolean
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
@@ -162,7 +168,7 @@ function LocationSearchInput({
   const allLocations = getLocationsForStaleCheck.useSuspenseQuery()
   useClearStaleSelectionOnAnchorChange({
     enabled: anchorToDateOfEvent,
-    value,
+    value: toLocationId(value),
     anchor,
     entities: allLocations,
     onClear: () => onChange(undefined)
@@ -182,22 +188,21 @@ function LocationSearchInput({
     [locations, anchor, activeOnly]
   )
 
-  // When the field config opts in (advanced search sets this), list every
-  // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option, resolved at the field's anchor.
-  const options = useMemo(
+  // Advanced search lists every historical name, so a record filed under a
+  // since-changed name stays findable. A declaration form shows a single
+  // current-name option, resolved at the field's anchor.
+  const options: LocationOption[] = useMemo(
     () =>
-      props.configuration?.listHistoricalNames
+      searchMode
         ? buildHistoricalLocationNameOptions(selectableLocations)
         : selectableLocations.map((l) => ({
             value: l.id,
             label: resolveVersion(l.versions, anchor).name
           })),
-    [selectableLocations, props.configuration?.listHistoricalNames, anchor]
+    [selectableLocations, searchMode, anchor]
   )
 
-  const selectedOption =
-    options.find((option) => option.value === value) ?? null
+  const selectedOption = findLocationOption(options, value)
 
   return (
     <SearchableSelect
@@ -246,17 +251,17 @@ function toCertificateVariables(
     description: 'Country name'
   })
 
-  const locationId = UUID.safeParse(value.toString()).data
-  const locationEntity = locationId
-    ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
-    : undefined
-  const resolvedLocation = locationEntity
-    ? resolveVersion(locationEntity.versions, anchor)
-    : undefined
+  // A search value is version-pinned — echo back the name that was actually
+  // selected, not whatever the location is called today.
+  const selection =
+    resolveLocationValue(value, locations, anchor) ??
+    resolveLocationValue(value, administrativeAreas, anchor)
+  const resolvedLocation = selection?.version
 
-  const parentAdministrativeAreaId = locationId
-    ? (locations.get(locationId)?.administrativeAreaId ??
-      administrativeAreas.get(locationId)?.parentId)
+  const selectedId = selection?.entity.id
+  const parentAdministrativeAreaId = selectedId
+    ? (locations.get(selectedId)?.administrativeAreaId ??
+      administrativeAreas.get(selectedId)?.parentId)
     : undefined
 
   const adminLevelHierarchy = getAdminLevelHierarchy(

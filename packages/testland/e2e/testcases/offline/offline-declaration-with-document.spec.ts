@@ -18,12 +18,12 @@ import {
   goToSection,
   login,
   uploadImage
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
-} from '../../mock-network-conditions'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
+} from '@e2e/support/mock-network-conditions'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 
 /*
  * A declaration created offline is stored locally under a temporary id (`tmp-<uuid>`),
@@ -93,7 +93,15 @@ test('Birth declaration made offline with a supporting document syncs after reco
    */
   await page.click('#header-new-event')
   await page.getByLabel('Birth').click()
+
+  const eventCreateResponse = page.waitForResponse(
+    (res) => res.url().includes('event.create') && res.ok()
+  )
+
   await page.getByRole('button', { name: 'Continue' }).click()
+
+  await eventCreateResponse
+
   await page.getByRole('button', { name: 'Continue' }).click()
   await expect(page.locator('#firstname')).toBeVisible()
   await page.goto(CLIENT_URL)

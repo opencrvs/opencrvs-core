@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { getToken, login } from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration-with-father-brother'
-import { CREDENTIALS } from '../../constants'
+import { getToken, login } from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getAdministrativeAreas } from '../birth/helpers'
-import { assertTexts, selectLocationOption, type } from '../../utils'
+import { getIdByName, getAdministrativeAreas } from '@e2e/support/birth/helpers'
+import { assertTexts, selectLocationOption, type } from '@e2e/support/utils'
 
 test.describe
   .serial("Advanced Search - Birth Event Declaration - Child's details", () => {
@@ -209,14 +209,30 @@ test.describe
       ).toBeVisible()
       await page.getByText('Residential address', { exact: true }).click()
 
-      page.locator('#country').getByText('Farajaland')
-      page.locator('#searchable-select-province').getByText('Central')
-      page.locator('#searchable-select-district').getByText('Ibombo')
+      page
+        .locator('[id="child____birthLocation____privateHome.country"]')
+        .getByText('Farajaland')
+      page
+        .locator(
+          '[id="searchable-select-child____birthLocation____privateHome.province"]'
+        )
+        .getByText('Central')
+      page
+        .locator(
+          '[id="searchable-select-child____birthLocation____privateHome.district"]'
+        )
+        .getByText('Ibombo')
 
-      await page.locator('#village').fill('Klo')
+      await page
+        .locator('[id="child____birthLocation____privateHome.village"]')
+        .fill('Klo')
       await page.getByText('Klow', { exact: true }).click()
-      await page.locator('#town').fill('Dhaka')
-      await page.locator('#town').blur()
+      await page
+        .locator('[id="child____birthLocation____privateHome.town"]')
+        .fill('Dhaka')
+      await page
+        .locator('[id="child____birthLocation____privateHome.town"]')
+        .blur()
     })
 
     test('3.2.2 - Validate search and show results', async () => {
@@ -272,14 +288,22 @@ test.describe
       expect(page.url()).toContain(`child.placeOfBirth=PRIVATE_HOME`)
       expect(page.url()).toContain(`eventType=birth`)
 
-      await expect(page.locator('#country')).toHaveText('Farajaland')
-      await expect(page.locator('#searchable-select-province')).toHaveText(
-        'Central'
-      )
-      await expect(page.locator('#searchable-select-district')).toHaveText(
-        'Ibombo'
-      )
-      await expect(page.locator('#town')).toHaveValue('Dhaka')
+      await expect(
+        page.locator('[id="child____birthLocation____privateHome.country"]')
+      ).toHaveText('Farajaland')
+      await expect(
+        page.locator(
+          '[id="searchable-select-child____birthLocation____privateHome.province"]'
+        )
+      ).toHaveText('Central')
+      await expect(
+        page.locator(
+          '[id="searchable-select-child____birthLocation____privateHome.district"]'
+        )
+      ).toHaveText('Ibombo')
+      await expect(
+        page.locator('[id="child____birthLocation____privateHome.town"]')
+      ).toHaveValue('Dhaka')
     })
   })
 })

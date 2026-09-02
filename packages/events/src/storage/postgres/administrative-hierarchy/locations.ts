@@ -27,12 +27,42 @@ import Schema from '../events/schema/Database'
 // "bind message has ... parameter formats but 0 parameters"
 const INSERT_MAX_CHUNK_SIZE = 1000
 
-// Process-level cache for administrative hierarchies. Invalidated whenever
+// Process-level caches for administrative hierarchies. Invalidated whenever
 // locations or administrative areas are written.
 const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
+let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
 export function clearAdministrativeHierarchyCache() {
   administrativeHierarchyByIdCache.clear()
+  leafLevelAdministrativeAreaIdsCache = null
+}
+
+/**
+ * A leaf administrative level is defined as an administrative area which does not have any other administrative areas as children.
+ * Administrative areas that have locations as children are still considered leaf levels.
+ *
+ * @returns List of leaf level administrative area ids.
+ */
+export async function getLeafLevelAdministrativeAreaIds() {
+  if (!leafLevelAdministrativeAreaIdsCache) {
+    const db = getClient()
+
+    leafLevelAdministrativeAreaIdsCache = db
+      .selectFrom('administrativeAreas as a1')
+      .select(['a1.id'])
+      .where(({ not, exists, selectFrom }) =>
+        not(
+          exists(
+            selectFrom('administrativeAreas as a2')
+              .select('a2.id')
+              .whereRef('a2.parentId', '=', 'a1.id')
+          )
+        )
+      )
+      .execute()
+  }
+
+  return leafLevelAdministrativeAreaIdsCache
 }
 
 /**
@@ -182,7 +212,6 @@ export async function setLocations(locations: SetLocationRow[]) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
-  clearAdministrativeHierarchyCache()
 }
 
 /** The fully resolved values of a location create request. */
@@ -223,8 +252,6 @@ export async function createLocation(location: CreateLocationRow) {
       versions: buildInitialVersions(location)
     })
     .execute()
-
-  clearAdministrativeHierarchyCache()
 }
 
 /**

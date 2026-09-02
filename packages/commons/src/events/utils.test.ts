@@ -13,11 +13,17 @@
 
 import { UUID } from '../uuid'
 import { cloneDeep, difference } from 'lodash'
-import { Action, ActionDocument, ActionStatus } from './ActionDocument'
+import {
+  Action,
+  ActionDocument,
+  ActionStatus,
+  EventState
+} from './ActionDocument'
 import { EventDocument } from './EventDocument'
 import { EventConfig } from './EventConfig'
 import { ActionType } from './ActionType'
 import {
+  dropSecuredDeclarationFields,
   findLastAssignmentAction,
   getActionAnnotationFields,
   getActionConfig,
@@ -38,7 +44,12 @@ import {
   fieldConfigsToActionPayload,
   tennisClubMembershipEvent
 } from '../client'
-import { generateActionDocument, generateTranslationConfig } from './test.utils'
+import {
+  eventQueryDataGenerator,
+  generateActionDocument,
+  generateTranslationConfig,
+  generateTestValidatorContext
+} from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
 
 const commonAction = {
@@ -1146,5 +1157,38 @@ describe('getActionAnnotationFields() with dialog form', () => {
     })
 
     expect(fields).toEqual([...declareAction.review.fields, dialogField])
+  })
+
+  describe('dropSecuredDeclarationFields', () => {
+    test('removes secured data while keeping the others', () => {
+      const eventIndexWithSecuredData = eventQueryDataGenerator({
+        declaration: {
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'applicant.dob': '1990-01-01',
+          'applicant.address': {
+            addressType: 'DOMESTIC',
+            country: 'GB',
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {}
+          }
+        } satisfies EventState
+      })
+      expect(
+        dropSecuredDeclarationFields(
+          tennisClubMembershipEvent,
+          eventIndexWithSecuredData,
+          generateTestValidatorContext()
+        ).declaration
+      ).toEqual({
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'applicant.dob': '1990-01-01'
+      })
+    })
   })
 })

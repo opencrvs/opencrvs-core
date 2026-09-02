@@ -15,27 +15,27 @@ import {
   login,
   logout,
   uploadImageToSection
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration,
   Declaration,
   getPlaceOfBirth
-} from '../test-data/birth-declaration'
-import { CREDENTIALS } from '../../constants'
+} from '@e2e/support/test-data/birth-declaration'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   formatV2ChildName,
   getAdministrativeAreas,
   getIdByName
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 import { AddressType } from '@opencrvs/toolkit/events'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Correct record - Change ages', () => {
   let declaration: Declaration

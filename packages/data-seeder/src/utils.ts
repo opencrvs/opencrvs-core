@@ -20,3 +20,8 @@ export async function delay(timeInMilliseconds: number) {
     setTimeout(resolve, timeInMilliseconds)
   })
 }
+
+export function getOfficeExternalId(primaryOfficeId: string): string {
+  const segments = primaryOfficeId.split('_')
+  return segments[segments.length - 1]
+}

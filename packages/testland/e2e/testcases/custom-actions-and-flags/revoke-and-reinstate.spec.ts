@@ -9,11 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { getToken, login, searchFromSearchBar } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser, selectAction } from '../../utils'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { formatV2ChildName } from '../birth/helpers'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test('Revoke and reinstate record', async ({ browser }) => {
   const page = await browser.newPage()

@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { createIntegrationContext, EVENT_TYPE, fetchClientAPI } from './helpers'
+import {
+  createIntegrationContext,
+  EVENT_TYPE,
+  fetchClientAPI
+} from '@e2e/support/events-rest-api/helpers'
 
 test.describe('POST /api/events/events/search', () => {
   let clientToken: string

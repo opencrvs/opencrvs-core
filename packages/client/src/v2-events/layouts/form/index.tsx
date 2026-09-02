@@ -13,7 +13,6 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { Frame } from '@opencrvs/components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
@@ -28,14 +27,14 @@ export function FormLayout({
   route,
   children,
   onSaveAndExit,
-  appbarIcon = <DeclarationIcon />,
-  actionComponent
+  actionComponent,
+  backAction
 }: {
   route: AllowedRouteWithEventId
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
-  appbarIcon?: React.ReactNode
   actionComponent?: React.ReactNode
+  backAction?: () => void
 }) {
   const intl = useIntl()
   const { eventId } = useTypedParams(route)
@@ -50,7 +49,7 @@ export function FormLayout({
       header={
         <FormHeader
           actionComponent={actionComponent}
-          appbarIcon={appbarIcon}
+          backAction={backAction}
           label={intl.formatMessage(configuration.label)}
           route={route}
           onSaveAndExit={onSaveAndExit}

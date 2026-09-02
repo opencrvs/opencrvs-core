@@ -4,6 +4,7 @@
 
 ### Breaking changes
 
+- Add `EVENTS_URL=http://events:5555/` to the `countryconfig` service. It has no production default, so the service will not start without it. Read by `src/api/integration/handler.ts`, which registers the MOSIP integration on startup. Set `MOSIP_INTEGRATION_CLIENT_ID` and `MOSIP_INTEGRATION_CLIENT_SECRET` together to seed the credentials `mosip-api` already holds; leave both empty to have events generate them. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 - Removed InfluxDB from deployment infrastructure and data-generator references.
 - The employee seeder seeds `<ENVIRONMENT_NAME>-employees.csv` from `src/data-seeding/employees/source/` when that file exists, otherwise `default-employees.csv`. It uses the `ENVIRONMENT_NAME` env var (also the telemetry environment label); add per-environment files such as `production-employees.csv` to seed different users per environment — no code change needed. The previous `EMPLOYEES_CSV` env var and the `OPENCRVS_ENVIRONMENT`-based `prod-employees.csv` selection have been removed [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
 

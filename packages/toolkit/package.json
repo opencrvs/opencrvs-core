@@ -13,13 +13,16 @@
     "./events": "./dist/events/index.js",
     "./telemetry": "./dist/telemetry/index.js",
     "./scopes": "./dist/scopes/index.js",
+    "./authentication": "./dist/authentication/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
     "./notification": "./dist/notification/index.js"
   },
   "scripts": {
     "build": "./build.sh",
-    "build:all": "pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/toolkit"
+    "build:all": "pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/toolkit",
+    "test": "vitest run",
+    "test:compilation": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -48,7 +51,7 @@
     "superjson": "1.9.0-0",
     "ts-morph": "^27.0.2",
     "uuid": "^9.0.0",
-    "zod": "^4.2.1",
+    "zod": "^4.4.3",
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
@@ -60,7 +63,8 @@
     "@types/prompts": "^2.4.9",
     "@types/ssh2": "^1.15.5",
     "@types/uuid": "^9.0.3",
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.24.0",
+    "vitest": "^4.1.10"
   },
   "moduleNameMapper": {
     "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",

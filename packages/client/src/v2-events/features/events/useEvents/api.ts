@@ -210,11 +210,11 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 }
 
 export function setEventData(id: string, data: EventDocument) {
-  updateLocalEventIndex(id, data)
   queryClient.setQueryData(
     trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
     data
   )
+
   updateDraftsWithEvent(id, data)
 }
 
@@ -286,33 +286,34 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
-  await queryClient.resetQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    })
-  })
-
-  await removeCachedFiles(updatedEvent)
-}
-
-export function updateLocalEvent(data: EventDocument) {
-  setEventData(data.id, data)
+  await Promise.all([
+    queryClient.resetQueries({
+      queryKey: trpcOptionsProxy.event.search.queryKey({
+        query: {
+          type: 'and',
+          clauses: [{ id }]
+        }
+      })
+    }),
+    removeCachedFiles(updatedEvent)
+  ])
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
+  await Promise.all([invalidateWorkqueues(), refetchAllSearchQueries()])
+}
 
-  await invalidateWorkqueues()
-
-  return refetchAllSearchQueries()
+export async function onMarkNotDuplicate(data: EventDocument) {
+  setEventData(data.id, data)
+  await refetchSearchQuery(data.id)
 }
 
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
-  await invalidateWorkqueues()
-  await refetchSearchQuery(updatedEvent.id)
+  await Promise.all([
+    invalidateWorkqueues(),
+    refetchSearchQuery(updatedEvent.id)
+  ])
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
   const localEvent = findLocalEventDocument(updatedEvent.id)
@@ -342,7 +343,8 @@ export async function cleanUpOnUnassign(
   await deleteEventData(updatedEvent)
   // Assuming unassign needs to be done online, we'll just refetch the query.
   // NOTE: local event cannot be used to recreate EventIndex cache. Record might be sealed, which causes inconsistencies in UI.
-  await refetchSearchQuery(updatedEvent.id)
-
-  await invalidateWorkqueues()
+  await Promise.all([
+    refetchSearchQuery(updatedEvent.id),
+    invalidateWorkqueues()
+  ])
 }

@@ -15,12 +15,12 @@ import {
   login,
   switchEventTab,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { fillDate } from '../helpers'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { fillDate } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Cleared field values are removed after editing and re-notifying a declaration', async ({
   page

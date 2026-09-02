@@ -132,14 +132,14 @@ const handlers = [
     HttpResponse.json({ status: 'forwarded' }, { status: 202 })
   ),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
-  // query params such as `subject_token`, `subject_token_type` omitted for simplicity
+  // body params such as `subject_token`, `subject_token_type` omitted for simplicity
   http.post(`${env.AUTH_URL}/token`, () =>
     HttpResponse.json({
       access_token: 'some-token'
     })
   ),
-  http.get(`${env.AUTH_URL}/internal/anonymous-token`, () =>
-    HttpResponse.json({ token: 'anon-token' })
+  http.get(`${env.AUTH_URL}/internal/service-token`, () =>
+    HttpResponse.json({ token: 'service-token' })
   )
 ]
 

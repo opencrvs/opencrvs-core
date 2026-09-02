@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { login } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { formatV2ChildName } from '../birth/helpers'
-import { assertTexts, selectLocationOption } from '../../utils'
+import { login } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { assertTexts, selectLocationOption } from '@e2e/support/utils'
 import {
   registerDeclarationsThenDeactivateOffice,
   createBirthRegisteredWithInactiveFacility,
   createDeathRegisteredWithInactiveFacility,
   createBirthNotifiedInactiveAddress
-} from './location-versioning-declarations'
+} from '@e2e/support/advanced-search/location-versioning-declarations'
 
 function formatDeceasedName(declaration: {
   'deceased.name': { firstname: string; surname: string }
@@ -259,17 +259,23 @@ test.describe
 
     // Province/district only auto-fill to the searching user's own
     // jurisdiction — Registrar General has none, so both start empty here.
-    await page.locator('#province').fill('Central')
+    await page
+      .locator('[id="child____birthLocation____other.province"]')
+      .fill('Central')
     await selectLocationOption(page, 'Central')
 
     // Exact match: "Ibombo" is also a substring of "Ibombo-north (old)".
-    await page.locator('#district').fill('Ibombo')
+    await page
+      .locator('[id="child____birthLocation____other.district"]')
+      .fill('Ibombo')
     await page
       .locator('[id^="locationOption"]')
       .getByText('Ibombo', { exact: true })
       .click()
 
-    await page.locator('#village').fill(areaName)
+    await page
+      .locator('[id="child____birthLocation____other.village"]')
+      .fill(areaName)
 
     // Unlike office/facility filters, the address admin-area filter only
     // ever offers currently-active areas — the option never appears here.

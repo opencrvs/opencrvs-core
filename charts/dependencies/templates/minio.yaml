@@ -157,14 +157,11 @@ spec:
                 {{- end }}
                   key: user
             - name: BACKUP_HOST
-              valueFrom:
-                secretKeyRef:
-                {{- if (eq (include "minio.backup_enabled" .) "true") }}
-                  name: {{ default .Values.backup.backup_server_secret .Values.minio.backup.server_secret}}
-                {{- else }}
-                  name: {{ default .Values.restore.backup_server_secret .Values.minio.restore.server_secret}}
-                {{- end }}
-                  key: host
+              {{- if (eq (include "minio.backup_enabled" .) "true") }}
+              value: {{ default .Values.backup.host .Values.minio.backup.host }}
+              {{- else }}
+              value: {{ default .Values.restore.host .Values.minio.restore.host }}
+              {{- end }}
             - name: BACKUP_REMOTE_DIR
               {{- if (eq (include "minio.backup_enabled" .) "true") }}
               value: {{ default .Values.backup.backup_server_dir .Values.minio.backup.server_dir }}

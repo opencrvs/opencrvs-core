@@ -10,6 +10,7 @@
  */
 import { main as addExplicitCorrectionFlags } from './add-explicit-correction-flags'
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
+import { main as addTranslations } from './add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
 
 /**
@@ -19,5 +20,6 @@ import { main as enableTelemetry } from './enable-telemetry'
 export async function runUpgrade(dockerSwarm: boolean) {
   await addExplicitCorrectionFlags()
   await addRecoveryLinkNotifications()
+  await addTranslations()
   await enableTelemetry()
 }

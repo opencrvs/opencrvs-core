@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "tsconfig.build.tsbuildinfo"
+  },
+  // `references` is not inherited through `extends`, so it is repeated here.
+  // Without it the commons sources resolve through `paths` instead of the built
+  // project, and every one of them trips the rootDir check.
+  "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
+  "exclude": ["**/node_modules/**", "dist", "**/*.test.ts"]
+}

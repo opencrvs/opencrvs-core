@@ -10,13 +10,13 @@
  */
 import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
-import { getToken } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { getToken } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createIntegrationContext,
   fetchClientAPI,
   NON_EXISTING_UUID
-} from './helpers'
+} from '@e2e/support/events-rest-api/helpers'
 
 test.describe('GET /api/events/locations', () => {
   let clientToken: string

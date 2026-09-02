@@ -11,7 +11,7 @@
 
 import { logger, joinUrl } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getAnonymousToken } from '@events/service/auth'
+import { getServiceToken } from '@events/service/auth'
 import { collectTelemetryMetrics, TelemetryMetrics } from './metrics'
 
 /** Metrics map size limits enforced by the telemetry ingest endpoint. */
@@ -124,7 +124,7 @@ export async function runDailyTelemetry(
 ): Promise<TelemetrySendResult> {
   let authorization: string
   try {
-    authorization = `Bearer ${await getAnonymousToken()}`
+    authorization = `Bearer ${await getServiceToken()}`
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     logger.error(

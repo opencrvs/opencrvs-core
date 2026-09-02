@@ -25,6 +25,8 @@ import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   FieldValue,
   FileFieldValue,
+  getDeclaration,
+  getDeclarationPages,
   TokenUserType,
   UUID,
   CreateUserInput,
@@ -36,6 +38,7 @@ import {
   Spinner,
   Toast,
   Button,
+  Icon,
   Dialog,
   Text
 } from '@opencrvs/components'
@@ -59,6 +62,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import toast from 'react-hot-toast'
 import { showToast } from '@client/v2-events/features/events/useToastAndRedirect'
 import { messages as notificationMessages } from '@client/i18n/messages/views/notifications'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 import { useUserFormState } from './useUserFormState'
 
@@ -197,7 +201,7 @@ const EditUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
-  const formConfig = eventConfig.declaration
+  const formConfig = getDeclaration(eventConfig)
 
   const { canEditUser, canAddOfficeUsers } = usePermissions()
 
@@ -263,8 +267,27 @@ const EditUserComponent = () => {
     )
   }
 
+  const currentPageId = pageId || getDeclarationPages(eventConfig)[0].id
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+        { pageId: nextPageId, userId: userId },
+        searchParams
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages: formConfig.pages,
+    formData: formState as Record<string, FieldValue>,
+    validatorContext: {},
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
     <FormLayout
+      backAction={backAction}
       onClose={handleClose}
       isUnauthorized={isUnauthorized}
       userId={userId}
@@ -276,20 +299,10 @@ const EditUserComponent = () => {
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
-        pageId={pageId || eventConfig.declaration.pages[0].id}
+        pageId={currentPageId}
         setFormData={setUserForm}
         validatorContext={{}}
-        onPageChange={(nextPageId: string) =>
-          navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-              {
-                pageId: nextPageId,
-                userId: userId
-              },
-              searchParams
-            )
-          )
-        }
+        onPageChange={onPageChange}
         onSubmit={() => {
           navigate(
             ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
@@ -365,7 +378,7 @@ const ReviewUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
-  const formConfig = eventConfig.declaration
+  const formConfig = getDeclaration(eventConfig)
 
   const alreadyInitialized =
     useUserFormState.getState().userId === userId &&
@@ -677,7 +690,8 @@ function FormLayout({
   title,
   actionComponent,
   isUnauthorized,
-  userId
+  userId,
+  backAction
 }: {
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
@@ -686,6 +700,7 @@ function FormLayout({
   actionComponent?: React.ReactNode
   isUnauthorized?: boolean
   userId?: string
+  backAction?: () => void
 }) {
   const intl = useIntl()
   const unauthorizedHandledRef = React.useRef(false)
@@ -715,6 +730,7 @@ function FormLayout({
       header={
         <FormHeader
           actionComponent={actionComponent}
+          backAction={backAction}
           label={title}
           onSaveAndExit={onSaveAndExit}
           onClose={onClose ? () => onClose() : undefined}
@@ -733,13 +749,17 @@ function FormLayout({
 
 function FormHeader({
   label,
-  onClose
+  onClose,
+  backAction
 }: {
   label: string
   onSaveAndExit?: () => void
   onClose?: () => void
   actionComponent?: React.ReactNode
+  backAction?: () => void
 }) {
+  const intl = useIntl()
+
   const getHeaderRight = () => {
     return (
       <CircleButton
@@ -753,10 +773,24 @@ function FormHeader({
     )
   }
 
+  const leftSlot = backAction ? (
+    <Button
+      aria-label={intl.formatMessage(buttonMessages.back)}
+      data-testid="back-button"
+      size="small"
+      type="icon"
+      onClick={backAction}
+    >
+      <Icon name="ArrowLeft" />
+    </Button>
+  ) : null
+
   return (
     <>
       <AppBar
+        desktopLeft={leftSlot}
         desktopTitle={label}
+        mobileLeft={leftSlot}
         mobileTitle={label}
         desktopRight={getHeaderRight()}
         mobileRight={getHeaderRight()}

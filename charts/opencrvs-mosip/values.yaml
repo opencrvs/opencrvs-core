@@ -1,11 +1,26 @@
 hostname: opencrvs.localhost
 ingress:
   ssl_enabled: false
+
+storage_type: host_path
+
+platform:
+  tag: 'v2.1.0'
+
+# Deployment rollout strategy, applied to all three MOSIP mock/test services
+# below unless overridden per-service under <service>.strategy (e.g.
+# mosip_api.strategy.type).
+# - Recreate: terminate the existing pod before creating its replacement.
+#   Guarantees the old pod is gone before the new one starts; causes a
+#   brief outage since these run a single replica.
+# - RollingUpdate: Kubernetes' default gradual pod swap.
+strategy:
+  type: Recreate
+
 mosip_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/mosip-mock
-    tag: 2.0.0
   env:
     FOO: bar
     SENDER_EMAIL_ADDRESS: 'test@opencrvs.org'
@@ -16,20 +31,20 @@ mosip_mock:
     SMTP_PASSWORD: ''
     SMTP_SECURE: true
     MOSIP_WEBSUB_TOPIC: CREDENTIAL_ISSUED
+    MOSIP_WEBSUB_SECRET: mosip-websub-secret
 
 esignet_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/esignet-mock
-    tag: 2.0.0
   env:
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
 
 mosip_api:
   enabled: true
+  host_data_path: /data/sqlite
   image:
     repository: ghcr.io/opencrvs/mosip-api
-    tag: 2.0.0
   env:
     LOCALE: en
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
@@ -42,7 +57,7 @@ mosip_api:
     PARTNER_MISP_LK: crvs-partner
     SIGN_P12_FILE_PATH: /certs/keystore.p12
     SIGN_P12_FILE_PASSWORD: mosip123
-    SQLITE_DATABASE_PATH: /mosip-api.db
+    SQLITE_DATABASE_PATH: /data/sqlite/mosip-api.db
     MOSIP_AUTH_CLIENT_APP_ID: admin
     MOSIP_PACKET_AUTH_CLIENT_ID: mosip-regproc-client
     MOSIP_PACKET_AUTH_CLIENT_SECRET: abcdeABCDE123456

@@ -16,23 +16,26 @@ import {
   goBackToReview,
   login,
   uploadImageToSection
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration as createDeclarationV2,
   Declaration as DeclarationV2
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import { format, subDays, subYears } from 'date-fns'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { IdType } from '@countryconfig/events/utils'
 import { random } from 'lodash'
-import { formatV2ChildName, REQUIRED_VALIDATION_ERROR } from '../birth/helpers'
+import {
+  formatV2ChildName,
+  REQUIRED_VALIDATION_ERROR
+} from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 
 test.describe.serial('Correct record - 4', () => {
   let declaration: DeclarationV2
@@ -921,8 +924,7 @@ test.describe.serial('Correct record - 4', () => {
     const date = await correctionRequestedRow.locator('span').nth(1).innerText()
 
     const requester = await correctionRequestedRow
-      .locator('span')
-      .nth(2)
+      .getByTestId('user-name')
       .innerText()
 
     /*

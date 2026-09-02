@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { getToken } from '../../helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { getToken } from '@e2e/support/helpers'
 
 /*
  * The storage bucket must not give anonymous read access. Users get documents

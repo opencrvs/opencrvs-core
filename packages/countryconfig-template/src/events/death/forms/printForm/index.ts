@@ -20,10 +20,12 @@ import {
 } from '@opencrvs/toolkit/events'
 
 import { printCertificateCollectors } from './collectors'
-import { printCertificateCollectorOther } from './collector-other'
+import {
+  printCertificateCollectorOther,
+  CollectorType
+} from './collector-other'
 import { printCertificateCollectorIdentityVerify } from './collector-identity-verify'
 
-import { CollectorType } from './collector-other'
 import { DEATH_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 
 export const DEATH_CERTIFICATE_COLLECTOR_FORM = defineActionForm({

@@ -17,8 +17,8 @@
     "e2e": "NODE_OPTIONS=--dns-result-order=ipv4first pnpm playwright test --ui",
     "e2e-dev": "NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first pnpm playwright test --ui",
     "precommit": "lint-staged",
-    "test": "NO_MOSIP=false vitest run --exclude e2e --silent --passWithNoTests",
-    "test:watch": "NO_MOSIP=false vitest",
+    "test": "vitest run --exclude e2e --silent --passWithNoTests",
+    "test:watch": "vitest",
     "test:compilation": "tsc --noEmit --resolveJsonModule",
     "lint": "eslint -c eslint.config.js",
     "setup-analytics": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e ANALYTICS_POSTGRES_USER=events_analytics -e ANALYTICS_POSTGRES_PASSWORD=analytics_password postgres bash -s < ./assets/postgres/setup-analytics.sh",
@@ -27,6 +27,7 @@
     "start": "pnpm setup-analytics && pnpm setup-reference-data &&  cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --watch src --exec tsx src/index.ts",
     "start:prod": "tsx src/index.ts",
     "metabase": "bash assets/metabase/run-dev.sh",
+    "extract:translations": "tsx ../toolkit/src/cli.ts check-translations",
     "sort-translations": "cross-env NODE_ENV=development tsx src/sort-translations.ts"
   },
   "devDependencies": {
@@ -65,7 +66,7 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
-    "@opencrvs/mosip": "2.0.0",
+    "@opencrvs/mosip": "workspace:*",
     "@faker-js/faker": "^9.3.0",
     "@hapi/boom": "^9.1.1",
     "@hapi/h2o2": "^9.1.0",
@@ -132,9 +133,12 @@
     "uuid": "^11.1.0",
     "whatwg-fetch": "^3.0.0",
     "yargs": "^17.7.2",
-    "zod": "^4.2.1"
+    "zod": "^4.4.3"
   },
   "lint-staged": {
+    "src/**/*.{ts,graphql}": [
+      "sh -c 'pnpm extract:translations'"
+    ],
     "{src,e2e}/**/*.{ts,graphql}": [
       "eslint --fix",
       "prettier --write",

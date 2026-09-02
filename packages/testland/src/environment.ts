@@ -8,7 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { bool, cleanEnv, port, str, url } from 'envalid'
+import { bool, cleanEnv, makeValidator, port, str, url } from 'envalid'
+import { z } from 'zod'
+
+/**
+ * A UUID, or an empty string when the variable is left unconfigured. Used for
+ * seeded integration credentials: events types the client id it accepts as a
+ * UUID, so a malformed seed is rejected there with a 400 — 30 seconds later,
+ * buried inside the startup retry loop. Failing at boot instead names the
+ * offending variable.
+ *
+ * `z.uuid()` rather than a local pattern so this is exactly as strict as the
+ * check it front-runs; a hand-rolled regex accepts version and variant nibbles
+ * that events rejects, which is precisely the case worth catching.
+ */
+const uuidOrEmpty = makeValidator<string>((value) =>
+  value === '' ? value : z.uuid().parse(value)
+)
 
 export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
@@ -28,6 +44,7 @@ export const env = cleanEnv(process.env, {
   MOSIP_API_USERINFO_URL: url({
     devDefault: 'http://localhost:2024/esignet/get-oidp-user-info'
   }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   ANALYTICS_DATABASE_URL: url({
     default: undefined,
     devDefault:
@@ -38,6 +55,16 @@ export const env = cleanEnv(process.env, {
     default: 'http://mosip-api:2024',
     devDefault: 'http://localhost:2024',
     desc: 'URL for MOSIP interoperability API'
+  }),
+  MOSIP_INTEGRATION_CLIENT_ID: uuidOrEmpty({
+    default: '',
+    devDefault: '23953953-51aa-42ca-b443-2426a7d21c61',
+    desc: "OpenCRVS system client ID to seed for the MOSIP integration on startup. Must be a UUID and match the mosip-api's OPENCRVS_CLIENT_ID. Leave empty to have events generate credentials instead (NSA reveals them via the Integrations page)."
+  }),
+  MOSIP_INTEGRATION_CLIENT_SECRET: str({
+    default: '',
+    devDefault: '7ce63d9f-5014-4f68-a0e3-8f681d23d508',
+    desc: "OpenCRVS system client secret to seed for the MOSIP integration on startup. Must match the mosip-api's OPENCRVS_CLIENT_SECRET. Leave empty to have events generate the secret instead."
   }),
   FORWARD_ACTIONS_TO: str({
     default: '',
@@ -64,11 +91,6 @@ export const env = cleanEnv(process.env, {
     devDefault: 'http://localhost:3040/_demo-issuer/raw/jwt/sign',
     desc: 'URL for signing raw JWTs for verifiable credentials issuance'
   }),
-  NO_MOSIP: bool({
-    devDefault: true,
-    default: false,
-    desc: 'Used in local development to disable MOSIP registration dependency'
-  }),
   REFERENCE_DATA_DATABASE_URL: url({
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
@@ -89,7 +111,7 @@ export const env = cleanEnv(process.env, {
     desc: 'Environment name (e.g. "production", "staging") reported as the telemetry environment.'
   }),
   ORGANISATION: str({
-    default: '',
+    default: 'OpenCRVS',
     desc: 'Organisation running this instance, reported with telemetry. Empty by default.'
   })
 })

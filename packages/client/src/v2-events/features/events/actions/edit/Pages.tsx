@@ -17,6 +17,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -64,10 +65,26 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.EDIT.PAGES.buildPath(
+        { eventId, pageId: nextPageId },
+        searchParams
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages: declarationPages,
+    formData: formValues,
+    validatorContext,
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
     <>
       <EditPageBanner />
-      <FormLayout route={ROUTES.V2.EVENTS.EDIT}>
+      <FormLayout backAction={backAction} route={ROUTES.V2.EVENTS.EDIT}>
         {modal}
         <PagesComponent
           attachmentPath={`events/${eventId}/`}
@@ -77,14 +94,7 @@ export function Pages() {
           pageId={currentPageId}
           setFormData={(data) => setFormValues(data)}
           validatorContext={validatorContext}
-          onPageChange={(nextPageId: string) =>
-            navigate(
-              ROUTES.V2.EVENTS.EDIT.PAGES.buildPath(
-                { eventId, pageId: nextPageId },
-                searchParams
-              )
-            )
-          }
+          onPageChange={onPageChange}
           onSubmit={() =>
             navigate(
               ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(

@@ -195,6 +195,17 @@ service_account:
   annotations: {}
   automount_service_account_token: true
 
+# Deployment rollout strategy, applied to all services below unless
+# overridden per-service under <service>.strategy (e.g. auth.strategy).
+# - Recreate: terminate all existing pods before creating replacements.
+#   Guarantees old pods are gone before new ones start; causes a brief
+#   outage for that service during rollout.
+# - RollingUpdate: swap pods gradually. Optionally set maxSurge and/or
+#   maxUnavailable (globally here, or per-service) to tune it; Kubernetes'
+#   own defaults (25%/25%) apply if neither is set.
+strategy:
+  type: Recreate
+
 # Resources allocated to OpenCRVS microservices (Kubernetes PODs):
 resources:
   memoryRequest: '128Mi'
@@ -340,7 +351,6 @@ gateway:
   env:
     CHECK_INVALID_TOKEN: 'true'
     CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'
-    CONFIG_TOKEN_EXPIRY_SECONDS: '604800'
     COUNTRY: FAR
     DISABLE_RATE_LIMIT: 'false'
     LANGUAGES: 'en,fr'
@@ -405,9 +415,9 @@ deployment_jobs:
   service_account:
     name: deployment-jobs
     annotations:
-      "helm.sh/hook": pre-install,pre-upgrade
-      "helm.sh/hook-weight": "-10"
-      "helm.sh/hook-delete-policy": before-hook-creation
+      'helm.sh/hook': pre-install,pre-upgrade
+      'helm.sh/hook-weight': '-10'
+      'helm.sh/hook-delete-policy': before-hook-creation
 
 # data_migration: Job to migrate datastores while deployment
 data_migration:

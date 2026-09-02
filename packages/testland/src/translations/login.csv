@@ -10,7 +10,6 @@ error.networkError,The error that appears when there is no internet connection,U
 error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
 label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
 login.clearForm,,Clear form,Effacer le formulaire
-login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.codeSubmissionError,The error that appears when the user entered sms code is unauthorised,Incorrect verification code. Please try again,"Désolé, ce code n'a pas fonctionné."
 login.fieldMissing,The error if user doesn't fill all the field,Enter your username and password,Nom d'utilisateur/mot de passe requis
 login.forbiddenCredentialError,The error that appears when the user entered details are forbidden,User is currently deactivated,L'utilisateur est actuellement désactivé.
@@ -22,11 +21,13 @@ login.manager.registerAppDescription,,"Manage declarations, registrations and ce
 login.manager.registerAppTitle,,OpenCRVS,Page d'accueil OpenCRVS
 login.mobileLabel,,Mobile number,Numéro de téléphone mobile
 login.mobilePlaceholder,,07123456789,7123456789
+login.officeInactiveError,The error that appears when the user's assigned office is inactive,Your assigned office has been made inactive. Please contact your administrator to be reassigned,Votre bureau assigné a été désactivé. Veuillez contacter votre administrateur pour être réaffecté.
 login.optionalLabel,Optional label,Optional,Optionel
 login.passwordLabel,The label that appears on the password input,Password,Mot de passe
 login.resend,Text for button that resends SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer le {notificationMethod, select, sms {SMS} email {Email} other {}}"
 login.resentEMAIL,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {email},Nous venons de vous envoyer un autre code à {email}.
 login.resentSMS,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {number},Nous venons de vous envoyer un autre code à {number}.
+login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.stepOneInstruction,The instruction that appears in step one of the form,Please enter your username and password.,Veuillez entrer votre nom d'utilisateur et votre mot de passe.
 login.stepOneText,The instruction that appears in step one of the login form,Login to Farajaland CRVS,Connectez-vous à Farajaland CRVS
 login.stepTwoInstruction.email,The instruction that appears in step two of the form that lets users know that code has been sent to email,An authentication code has been sent to {email}. This code will be valid for 10 minutes,Un code d'authentification a été envoyé à {email}. Ce code sera valable 10 minutes

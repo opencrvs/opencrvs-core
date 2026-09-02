@@ -27,8 +27,8 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
     <tspan x="240.727" y="647.312">&#x2028;</tspan>
-    <tspan x="81" y="660.112">{{$lookup $metadata 'createdAtLocation.name'}}</tspan>
-    <tspan x="81" y="672.912">{{$join ", " ($lookup $metadata 'createdAtLocation.district') ($lookup $metadata 'createdAtLocation.province') ($lookup $metadata 'createdAtLocation.country')}}</tspan>
+    <tspan x="81" y="660.112">{{$lookup $metadata 'updatedAtLocation.name'}}</tspan>
+    <tspan x="81" y="672.912">{{$join ", " ($lookup $metadata 'updatedAtLocation.district') ($lookup $metadata 'updatedAtLocation.province') ($lookup $metadata 'updatedAtLocation.country')}}</tspan>
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
     <tspan x="81" y="647.312">Place of certification / Lieu de certification</tspan>

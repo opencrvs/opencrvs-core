@@ -18,7 +18,7 @@ import {
   joinValuesWith,
   login,
   triggerDeclarationAction
-} from '../../helpers'
+} from '@e2e/support/helpers'
 
 test.describe.serial('Death event summary', () => {
   let page: Page

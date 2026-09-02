@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { loginWithNewUser, continueForm, login } from '../../helpers'
+import { loginWithNewUser, continueForm, login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe.serial('1. Create and update user -1', () => {
   let page: Page
@@ -114,16 +114,12 @@ test.describe.serial('1. Create and update user -1', () => {
       await expect(page.getByTestId('phoneNumber-value')).toHaveText(
         userinfo.phone
       )
-      await expect(page.getByTestId('email-value')).toHaveText(
-        userinfo.email
-      )
+      await expect(page.getByTestId('email-value')).toHaveText(userinfo.email)
       await expect(page.getByTestId('fullHonorificName-value')).toHaveText(
         fullname
       )
       await expect(page.getByTestId('role-value')).toHaveText(userinfo.role)
-      await expect(page.getByTestId('device-value')).toHaveText(
-        userinfo.device
-      )
+      await expect(page.getByTestId('device-value')).toHaveText(userinfo.device)
     })
 
     test('1.1.4 Update user details', async () => {
@@ -150,9 +146,7 @@ test.describe.serial('1. Create and update user -1', () => {
       await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
         'Zimbi Village Office, Zimbi, Isamba, Central, Farajaland'
       )
-      await expect(page.getByTestId('name-value')).toHaveText(
-        updatedFullname
-      )
+      await expect(page.getByTestId('name-value')).toHaveText(updatedFullname)
       await expect(page.getByTestId('phoneNumber-value')).toHaveText(
         updatedUserInfo.phone
       )

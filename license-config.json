@@ -10,6 +10,7 @@
     "packages/countryconfig-template/.tiltignore",
     "packages/countryconfig-template/Tiltfile",
     "packages/countryconfig-template/.husky",
+    "packages/countryconfig-template/tilt/examples/traefik/values-minikube.yaml",
     ".husky",
     "**/*.ipynb",
     "**/.wireit",
@@ -55,6 +56,14 @@
     "packages/client/dev-dist",
     "packages/toolkit/.npmignore",
     "packages/toolkit/tsconfig.tsbuildinfo",
+    ".nx/**",
+    ".swc/**",
+    "**/.swc/**",
+    "**/.tsc-tests/**",
+    ".playwright-cli/**",
+    "**/playwright-report/**",
+    "**/*.webm",
+    "packages/toolkit/tsconfig.build.tsbuildinfo",
     "packages/toolkit/create-countryconfig/index.js",
     "packages/toolkit/src/environment/templates/**",
     "packages/commons/src/events/EventConfig.mermaid",
@@ -65,11 +74,19 @@
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
-    "packages/api-docs/public-key.pem"
+    ".nx",
+    "packages/api-docs/public-key.pem",
+    ".codex/config.toml",
+    "packages/mosip/.npmignore",
+    "packages/mosip-api/docs/example-certs",
+    "packages/mosip-api/certs",
+    "packages/mosip-mock/src/mock-only-private-key.pem",
+    "packages/esignet-mock/src/dev-secrets",
+    "packages/esignet-mock/src/mock-authorizer/index.html"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
-    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1|prettierignore": {
       "eachLine": {
         "prepend": "# "
       }
@@ -78,7 +95,7 @@
       "prepend": "<!--",
       "append": "-->"
     },
-    "ts|tsx|js|css": {
+    "ts|tsx|js|mjs|css": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {

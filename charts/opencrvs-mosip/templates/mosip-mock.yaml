@@ -18,6 +18,7 @@ metadata:
   name: mosip-mock
 spec:
   replicas: 1
+  {{- include "strategy-helper" (dict "service_name" "mosip_mock" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: mosip-mock
@@ -28,7 +29,7 @@ spec:
     spec:
       containers:
         - name: mosip-mock
-          image: {{ .Values.mosip_mock.image.repository }}:{{ .Values.mosip_mock.image.tag }}
+          image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_mock) }}
           env:
             - name: MOSIP_WEBSUB_CALLBACK_URL
               value: http://mosip-api.{{ .Release.Namespace }}.svc.cluster.local:2024/websub/callback

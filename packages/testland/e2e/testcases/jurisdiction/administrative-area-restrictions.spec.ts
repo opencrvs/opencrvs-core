@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { getToken, login, searchFromSearchBar } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration,
   getDeclaration
-} from '../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import {
   formatV2ChildName,
   getAdministrativeAreas,
   getIdByName
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
-import { ensureAssignedToUser } from '../../utils'
+import { ensureAssignedToUser } from '@e2e/support/utils'
 
 test('Record declared in one administrative area should not appear for users in another administrative area', async ({
   browser

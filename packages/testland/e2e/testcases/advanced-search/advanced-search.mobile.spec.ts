@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, Page, test } from '@playwright/test'
-import { getToken, login } from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration-with-father-brother'
-import { CREDENTIALS } from '../../constants'
+import { getToken, login } from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getAdministrativeAreas } from '../birth/helpers'
-import { expectInUrl } from '../../utils'
-import { setMobileViewport } from '../../mobile-helpers'
+import { getIdByName, getAdministrativeAreas } from '@e2e/support/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
+import { setMobileViewport } from '@e2e/support/mobile-helpers'
 
 test.describe.serial('Advanced Search - Mobile', () => {
   let page: Page
@@ -81,13 +81,25 @@ test.describe.serial('Advanced Search - Mobile', () => {
     await page.locator('#child____placeOfBirth').click()
     await page.getByText('Residential address', { exact: true }).click()
 
-    page.locator('#country').getByText('Farajaland')
-    page.locator('#province').getByText('Central')
-    page.locator('#district').getByText('Ibombo')
-    page.locator('#village').getByText('Klow')
+    page
+      .locator('[id="child____birthLocation____privateHome.country"]')
+      .getByText('Farajaland')
+    page
+      .locator('[id="child____birthLocation____privateHome.province"]')
+      .getByText('Central')
+    page
+      .locator('[id="child____birthLocation____privateHome.district"]')
+      .getByText('Ibombo')
+    page
+      .locator('[id="child____birthLocation____privateHome.village"]')
+      .getByText('Klow')
 
-    await page.locator('#town').fill('Dhaka')
-    await page.locator('#town').blur()
+    await page
+      .locator('[id="child____birthLocation____privateHome.town"]')
+      .fill('Dhaka')
+    await page
+      .locator('[id="child____birthLocation____privateHome.town"]')
+      .blur()
   })
 
   test('Search', async () => {

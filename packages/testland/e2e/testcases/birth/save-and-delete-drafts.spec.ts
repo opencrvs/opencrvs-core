@@ -14,11 +14,14 @@ import {
   login,
   logout,
   triggerDeclarationAction
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { fillChildDetails, openBirthDeclaration } from './helpers'
-import { selectAction } from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  fillChildDetails,
+  openBirthDeclaration
+} from '@e2e/support/birth/helpers'
+import { selectAction } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 /**
  * Skipping tests until the outbox workqueue is implemented.

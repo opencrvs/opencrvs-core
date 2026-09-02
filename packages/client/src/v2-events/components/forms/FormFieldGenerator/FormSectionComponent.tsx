@@ -32,6 +32,7 @@ import {
   isFieldVisible,
   findAllFields,
   flattenFieldReference,
+  getDeclaration,
   omitHiddenPaginatedFields,
   HiddenFieldTypes
 } from '@opencrvs/commons/client'
@@ -54,6 +55,7 @@ type AllProps = {
   ocrvsFullForm: EventState
   className?: string
   readonlyMode?: boolean
+  searchMode?: boolean
   attachmentPath: string
   /**
    * Update the form values in the non-formik state.
@@ -167,12 +169,12 @@ function applyVisibilityTransitions({
   resetFieldIds: Set<string>
 }): void {
   const prevCleaned = omitHiddenPaginatedFields(
-    eventConfig.declaration,
+    getDeclaration(eventConfig),
     prevForm,
     validatorContext
   )
   const currentCleaned = omitHiddenPaginatedFields(
-    eventConfig.declaration,
+    getDeclaration(eventConfig),
     currentForm,
     validatorContext
   )
@@ -219,6 +221,7 @@ export function FormSectionComponent({
   onTouchedChange,
   className,
   readonlyMode,
+  searchMode,
   eventConfig,
   setValues,
   setTouched,
@@ -232,8 +235,24 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
+  /*
+   * A field that listens to a parent field is reset to its own default value
+   * whenever that parent changes, and the parent can sit on another page — so
+   * the whole declaration is searched for listeners, not just this page.
+   *
+   * That brings a hazard: one field id can name two different configurations.
+   * Advanced search renders an address as a group of one field per level, so
+   * `child.birthLocation.privateHome` is a FIELD_GROUP here while the
+   * declaration still calls it an ADDRESS. Whichever config is found first
+   * decides the shape a reset writes — a record of levels, or a single address
+   * object. Dropping the declaration's copy of any id this page renders leaves
+   * the page's own version to answer.
+   */
+  const pageFieldIds = new Set(pageFields.map((field) => field.id))
   const fullFormFields = eventConfig
-    ? findAllFields(eventConfig).concat(pageFields)
+    ? findAllFields(eventConfig)
+        .filter((field) => !pageFieldIds.has(field.id))
+        .concat(pageFields)
     : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
@@ -251,18 +270,24 @@ export function FormSectionComponent({
     const firstNonFalsyValue = resolveSyncedFieldValue(
       listenerField,
       (syncRef) => {
-        if (isCodeToEvaluate(syncRef)) {
-          const fieldValue = get(fieldValues, syncRef.$$field)
-          return runClientFunction(
-            syncRef.$$code,
-            fieldValue,
-            clientFunctionContext
-          )
-        }
-        return get(
+        /*
+         * One path for both kinds of reference: a computed one reads the same
+         * value a plain one would, then passes it through its function. Reading
+         * it any other way misses references that name a subfield, or a field
+         * whose id has dots in it.
+         */
+        const referenced = get(
           fieldValues,
           flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
         )
+
+        return isCodeToEvaluate(syncRef)
+          ? (runClientFunction(
+              syncRef.$$code,
+              referenced,
+              clientFunctionContext
+            ) as FieldValue | undefined)
+          : referenced
       }
     )
 
@@ -302,7 +327,7 @@ export function FormSectionComponent({
 
   const onFieldValueChange = (
     formikFieldId: string,
-    value: FieldValue | undefined
+    value: FieldValue | null | undefined
   ) => {
     const updatedFormikPageForm = cloneDeep(formikPageForm)
 
@@ -503,6 +528,7 @@ export function FormSectionComponent({
               name={formikFieldId}
               ocrvsFullForm={ocrvsFullForm}
               readonlyMode={readonlyMode}
+              searchMode={searchMode}
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
               onBlur={handleBlur}

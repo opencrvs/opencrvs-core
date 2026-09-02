@@ -6,29 +6,232 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-#
+
 name: Publish toolkit to NPM registry
+run-name: >-
+  Publish ${{ inputs.version || 'a release candidate' }} from ${{ inputs.ref }}
 on:
   workflow_dispatch:
     inputs:
-      branch_name:
-        description: Branch to publish from
-        default: develop
+      ref:
+        description: 'Branch or tag to build and publish from'
         required: true
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*' # Matches v1.2.3, v1.2.3-beta, v1.2.3-rc.1
+      version:
+        description: >-
+          npm version to publish as. Empty derives from package.json version
+          and tags as `next` or `vX.Y-next`. Hints: 2.1.0 gives `latest`
+          or `v2.1-latest`, 2.2.0-beta.1 gives `beta`, 2.1.0-rc.3 gives `rc`.
+        default: ''
+        required: false
+      dist_tag:
+        description: Optional npm dist-tag override.
+        default: ''
+        required: false
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
-  publish:
+  plan:
     runs-on: ubuntu-26.04
+    outputs:
+      sha: ${{ steps.check-version.outputs.sha }}
+      toolkit-version: ${{ steps.check-version.outputs.toolkit-version }}
+      npm-tag: ${{ steps.check-version.outputs.npm-tag }}
+      version-exists: ${{ steps.check-version.outputs.version-exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          package-manager-cache: false
+
+      - name: Check version and derive npm dist-tag
+        id: check-version
+        env:
+          REF_INPUT: ${{ inputs.ref }}
+          VERSION_INPUT: ${{ inputs.version }}
+          DIST_TAG_INPUT: ${{ inputs.dist_tag }}
+        run: |
+          set -euo pipefail
+
+          # The approval is async, so the commit is resolved once here and the
+          # publish job checks out that sha rather than `ref` - a branch
+          # tip that might have moved in between.
+          RESOLVED_SHA="$(git rev-parse HEAD)"
+
+          if [ -n "$VERSION_INPUT" ]; then
+            TOOLKIT_VERSION="$VERSION_INPUT"
+          else
+            TOOLKIT_VERSION="$(jq -r .version package.json)-rc.$(git rev-parse --short=7 HEAD)"
+          fi
+
+          # --- npm dist-tag derivation ---------------------------------------
+          #
+          # `npm publish --tag` can only apply one dist-tag to a version and
+          # `npm dist-tag add` does not accept an OIDC trusted-publishing credential
+          # (npm/cli#8547).
+          #
+          # Scheme:
+          #
+          #   latest       newest release of the highest released minor; this is
+          #                what a bare `npm install` resolves to
+          #
+          #   vX.Y-latest  newest release of a superseded minor (a hotfix)
+          #
+          #   next         release candidate toward the next, unreleased minor
+          #
+          #   vX.Y-next    release candidate toward the next patch of a minor that
+          #                has already been released
+          #
+          #   beta, alpha  a `version` input carrying a prerelease suffix takes
+          #                its dist-tag from that suffix's first identifier, so
+          #                2.1.0-beta publishes under `beta`. Not part of the
+          #                leading-line rule and deliberately outside it - a
+          #                prerelease is never allowed to resolve to any of the
+          #                four tags above
+          #
+          # An rc - no `version` input - is the only thing that reaches
+          # `next` or `vX.Y-next`, which is why both stay forbidden as a
+          # prerelease identifier below.
+          #
+          # The tag is computed once and used for all three packages, with
+          # @opencrvs/toolkit as the reference for npm state.
+
+          if ! [[ "$TOOLKIT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z.-]+))?$ ]]; then
+            echo "❌ Cannot derive a dist-tag: '$TOOLKIT_VERSION' is not X.Y.Z or X.Y.Z-prerelease"
+            exit 1
+          fi
+          VERSION_MAJOR="${BASH_REMATCH[1]}"
+          VERSION_MINOR="${BASH_REMATCH[2]}"
+          VERSION_PATCH="${BASH_REMATCH[3]}"
+          VERSION_PRERELEASE="${BASH_REMATCH[5]}"
+          VERSION_LINE="$VERSION_MAJOR.$VERSION_MINOR"
+
+          # Numeric comparison of two X.Y.Z releases.
+          version_ge() {
+            [ "$(jq -n --arg a "$1" --arg b "$2" \
+                   '($a | split(".") | map(tonumber)) >= ($b | split(".") | map(tonumber))')" = true ]
+          }
+
+          # `npm view` exits nonzero when the package does not exist at all, and
+          # prints a bare JSON string instead of an array when it has exactly one
+          # version.
+          PUBLISHED_VERSIONS="$(npm view @opencrvs/toolkit versions --json 2>/dev/null || true)"
+
+          #"Released" excludes anything carrying a prerelease or build suffix
+          RELEASED_VERSIONS="$(
+            printf '%s' "${PUBLISHED_VERSIONS:-[]}" |
+              jq -c 'if type == "array" then . else [.] end
+                     | map(select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$")))'
+          )"
+
+          # Two reference points, both needed: `latest` is about the highest
+          # release overall, `vX.Y-latest` about the highest release on this
+          # X.Y line.
+          HIGHEST_RELEASED="$(
+            printf '%s' "$RELEASED_VERSIONS" |
+              jq -r 'map(split(".") | map(tonumber))
+                     | if length == 0 then "" else (max | map(tostring) | join(".")) end'
+          )"
+          HIGHEST_ON_LINE="$(
+            printf '%s' "$RELEASED_VERSIONS" |
+              jq -r --argjson line "[$VERSION_MAJOR, $VERSION_MINOR]" \
+                 'map(split(".") | map(tonumber))
+                  | map(select(.[0:2] == $line))
+                  | if length == 0 then "" else (max | map(tostring) | join(".")) end'
+          )"
+
+          echo "Released versions on npm: $RELEASED_VERSIONS"
+          echo "Highest release: ${HIGHEST_RELEASED:-<none>}"
+          echo "Highest release on $VERSION_LINE: ${HIGHEST_ON_LINE:-<none>}"
+
+          if npm view "@opencrvs/toolkit@$TOOLKIT_VERSION" > /dev/null 2>&1; then
+            echo "Version $TOOLKIT_VERSION already exists on npm."
+            VERSION_EXISTS=true
+          else
+            echo "Version $TOOLKIT_VERSION does not exist on npm."
+            VERSION_EXISTS=false
+          fi
+
+          if [ -n "$DIST_TAG_INPUT" ]; then
+            NPM_TAG="$DIST_TAG_INPUT"
+            echo "Dist-tag overridden by workflow input"
+          elif [ -n "$VERSION_INPUT" ] && [ -n "$VERSION_PRERELEASE" ]; then
+            # An explicit prerelease version: 2.1.0-beta, 2.1.0-rc.1,
+            # 2.1.0-alpha.2. The dist-tag is the first dot-separated identifier
+            # of the prerelease suffix, so those give `beta`, `rc` and `alpha`.
+            NPM_TAG="${VERSION_PRERELEASE%%.*}"
+            if [ -z "$NPM_TAG" ] || [ "$NPM_TAG" = latest ] || [ "$NPM_TAG" = next ]; then
+              echo "❌ Prerelease '$TOOLKIT_VERSION' derives the dist-tag '$NPM_TAG', which collides with the derived tag vocabulary and would point real consumers at a prerelease. Use a different prerelease identifier, e.g. $VERSION_LINE.$VERSION_PATCH-beta."
+              exit 1
+            fi
+          elif [ -n "$VERSION_INPUT" ]; then
+            if [ -z "$HIGHEST_RELEASED" ] || version_ge "$TOOLKIT_VERSION" "$HIGHEST_RELEASED"; then
+              NPM_TAG=latest
+            elif [ -z "$HIGHEST_ON_LINE" ] || version_ge "$TOOLKIT_VERSION" "$HIGHEST_ON_LINE"; then
+              NPM_TAG="v$VERSION_LINE-latest"
+            elif [ "$VERSION_EXISTS" = true ]; then
+              NPM_TAG=""
+              echo "⚠️ $TOOLKIT_VERSION is behind $HIGHEST_ON_LINE on its own line, and is already published; deriving no dist-tag."
+            else
+              echo "❌ Refusing to publish $TOOLKIT_VERSION: it is neither newer than the highest release ($HIGHEST_RELEASED) nor the newest on its own line ($HIGHEST_ON_LINE), so no dist-tag describes it."
+              echo "   If this is deliberate, re-run with an explicit dist_tag."
+              exit 1
+            fi
+          else
+            if [ -n "$HIGHEST_ON_LINE" ]; then
+              NPM_TAG="v$VERSION_LINE-next"
+            else
+              NPM_TAG=next
+            fi
+          fi
+
+          echo "Publishing $TOOLKIT_VERSION under dist-tag '$NPM_TAG'"
+
+          {
+            echo "### Publish plan"
+            echo
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| ref | \`$REF_INPUT\` |"
+            echo "| commit | \`$RESOLVED_SHA\` |"
+            echo "| version | \`$TOOLKIT_VERSION\` |"
+            echo "| dist-tag | \`${NPM_TAG:-<none>}\` |"
+            echo "| already on npm | $VERSION_EXISTS |"
+            echo "| highest release | ${HIGHEST_RELEASED:-<none>} |"
+            echo "| highest on $VERSION_LINE | ${HIGHEST_ON_LINE:-<none>} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "sha=$RESOLVED_SHA"
+            echo "npm-tag=$NPM_TAG"
+            echo "toolkit-version=$TOOLKIT_VERSION"
+            echo "version-exists=$VERSION_EXISTS"
+          } >> "$GITHUB_OUTPUT"
+
+  # Gated on the npm-publish environment: a reviewer approves the plan above
+  # before anything reaches npm.
+  publish:
+    needs: plan
+    runs-on: ubuntu-26.04
+    environment: npm-publish
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      TOOLKIT_VERSION: ${{ needs.plan.outputs.toolkit-version }}
+      NPM_TAG: ${{ needs.plan.outputs.npm-tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -43,54 +246,25 @@ jobs:
       - name: Update npm for OIDC trusted publishing
         run: npm install -g npm@11
 
-      - name: Check if version exists on npm
-        id: check-version
-        run: |
-          PACKAGE_VERSION=$(node -p "require('../../package.json').version")
-          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            TAG_NAME="$GITHUB_REF_NAME"
-            if [[ "$TAG_NAME" =~ ([0-9]+)\.([0-9]+)\.([0-9]+)([-+][A-Za-z0-9.-]+)?$ ]]; then
-              TOOLKIT_VERSION="${BASH_REMATCH[0]}"
-              echo "✅ Using semantic version: $TOOLKIT_VERSION"
-            else
-              echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
-              exit 1
-            fi
-            echo "npm-tag=latest" >> $GITHUB_OUTPUT
-          else
-            TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
-            echo "npm-tag=next" >> $GITHUB_OUTPUT
-          fi
-          if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
-          echo "Version $TOOLKIT_VERSION already exists on npm."
-          echo "version-exists=true" >> $GITHUB_OUTPUT
-            else
-          echo "Version $TOOLKIT_VERSION does not exist on npm."
-          echo "version-exists=false" >> $GITHUB_OUTPUT
-            fi
-          echo "toolkit-version=$TOOLKIT_VERSION" >> $GITHUB_OUTPUT
-        working-directory: packages/toolkit
-
       - name: Install dependencies
-        if: steps.check-version.outputs.version-exists == 'false'
+        if: needs.plan.outputs.version-exists == 'false'
         run: pnpm install --frozen-lockfile
         working-directory: packages/toolkit
 
       - name: Build
-        if: steps.check-version.outputs.version-exists == 'false'
+        if: needs.plan.outputs.version-exists == 'false'
         run: pnpm build:all
         working-directory: packages/toolkit
 
       - name: Update package.json version
-        if: steps.check-version.outputs.version-exists == 'false'
+        if: needs.plan.outputs.version-exists == 'false'
         run: |
-          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
           jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
         working-directory: packages/toolkit
 
       # Pack the toolkit to verify it can be ran before publishing. Fixes issues where the package is published but is not runnable due to missing dependencies.
       - name: Pack toolkit
-        if: steps.check-version.outputs.version-exists == 'false'
+        if: needs.plan.outputs.version-exists == 'false'
         id: pack-toolkit
         run: |
           TARBALL_NAME=$(npm pack --silent)
@@ -98,11 +272,13 @@ jobs:
         working-directory: packages/toolkit
 
       - name: Smoke test packed toolkit in clean project
-        if: steps.check-version.outputs.version-exists == 'false'
+        if: needs.plan.outputs.version-exists == 'false'
+        env:
+          TARBALL_PATH: ${{ steps.pack-toolkit.outputs.tarball-path }}
         run: |
           TMP_DIR=$(mktemp -d)
           npm init -y --prefix "$TMP_DIR" > /dev/null
-          npm install --prefix "$TMP_DIR" --omit=dev "${{ steps.pack-toolkit.outputs.tarball-path }}"
+          npm install --prefix "$TMP_DIR" --omit=dev "$TARBALL_PATH"
           TMP_DIR="$TMP_DIR" node - <<'NODE'
           const { createRequire } = require('node:module')
           const requireFromTmp = createRequire(process.env.TMP_DIR + '/package.json')
@@ -112,15 +288,14 @@ jobs:
           NODE
 
       - name: Publish to npm
-        if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        if: needs.plan.outputs.version-exists == 'false'
+        run: npm publish --provenance --access public --tag "$NPM_TAG"
         working-directory: packages/toolkit
 
       - name: Check if create-countryconfig version exists on npm
         id: check-create-version
         run: |
-          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
-          if npm view @opencrvs/create-countryconfig@$TOOLKIT_VERSION > /dev/null 2>&1; then
+          if npm view "@opencrvs/create-countryconfig@$TOOLKIT_VERSION" > /dev/null 2>&1; then
             echo "Version $TOOLKIT_VERSION already exists on npm."
             echo "version-exists=true" >> $GITHUB_OUTPUT
           else
@@ -131,11 +306,64 @@ jobs:
       - name: Update create-countryconfig package.json version
         if: steps.check-create-version.outputs.version-exists == 'false'
         run: |
-          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
           jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
         working-directory: packages/toolkit/create-countryconfig
 
       - name: Publish create-countryconfig to npm
         if: steps.check-create-version.outputs.version-exists == 'false'
-        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public --tag "$NPM_TAG"
         working-directory: packages/toolkit/create-countryconfig
+
+      - name: Check if mosip version exists on npm
+        id: check-mosip-version
+        run: |
+          if npm view "@opencrvs/mosip@$TOOLKIT_VERSION" > /dev/null 2>&1; then
+            echo "Version $TOOLKIT_VERSION already exists on npm."
+            echo "version-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $TOOLKIT_VERSION does not exist on npm."
+            echo "version-exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install mosip dependencies
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: pnpm install --frozen-lockfile
+        working-directory: packages/mosip
+
+      # Built through the workspace graph so @opencrvs/toolkit is built first:
+      # mosip's sources import types from it, and the toolkit build above is
+      # skipped when its version is already on npm.
+      - name: Build mosip country-config helpers
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: pnpm exec nx run @opencrvs/mosip:build
+        working-directory: packages/mosip
+
+      - name: Update mosip package.json version
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: |
+          jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+        working-directory: packages/mosip
+
+      # The workspace link to @opencrvs/toolkit is a devDependency used only for
+      # types, so it does not appear in the published manifest. Packing verifies
+      # the build output is actually present and requirable before publishing.
+      - name: Smoke test packed mosip in clean project
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: |
+          TARBALL_NAME=$(npm pack --silent)
+          TMP_DIR=$(mktemp -d)
+          npm init -y --prefix "$TMP_DIR" > /dev/null
+          npm install --prefix "$TMP_DIR" --omit=dev "$PWD/$TARBALL_NAME"
+          TMP_DIR="$TMP_DIR" node - <<'NODE'
+          const { createRequire } = require('node:module')
+          const requireFromTmp = createRequire(process.env.TMP_DIR + '/package.json')
+
+          requireFromTmp('@opencrvs/mosip')
+          requireFromTmp('@opencrvs/mosip/api')
+          NODE
+        working-directory: packages/mosip
+
+      - name: Publish mosip to npm
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: npm publish --provenance --access public --tag "$NPM_TAG"
+        working-directory: packages/mosip

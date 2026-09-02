@@ -17,8 +17,10 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
+  ActionStatus,
   ActionType,
   isActionConfigType,
   EventDocument,
@@ -41,7 +43,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
-import { resolveLocationName } from '@client/v2-events/utils';
+import { resolveLocationName } from '@client/v2-events/utils'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
@@ -49,7 +51,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
+    '{status, select, Requested {Waiting for external validation} Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -61,6 +63,10 @@ const LargeGreyedInfo = styled.div`
 
 const TableDiv = styled.div`
   overflow: auto;
+`
+
+const LinkLeftAligned = styled(Link)`
+  text-align: left;
 `
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
@@ -147,7 +153,7 @@ function User({ action }: { action: ActionDocument }) {
   const canViewUser = !!user && canReadUser(user)
 
   return canViewUser ? (
-    <Link
+    <LinkLeftAligned
       font="bold14"
       id="profile-link"
       onClick={() =>
@@ -159,7 +165,7 @@ function User({ action }: { action: ActionDocument }) {
       }
     >
       <UserAvatar avatar={user.avatar} names={name} />
-    </Link>
+    </LinkLeftAligned>
   ) : (
     <UserAvatar avatar={user?.avatar} names={name} />
   )
@@ -183,7 +189,9 @@ function Integration({ action }: { action: ActionDocument }) {
       <div>
         <Box />
       </div>
-      {name}
+      <Text color="primary" element="span" variant="bold14">
+        {name}
+      </Text>
     </SystemName>
   )
 }
@@ -238,12 +246,13 @@ function ActionLocation({ action }: { action: ActionDocument }) {
         : undefined
   })
 
-  if (type === 'system') {
+  // Integrations have no office by design
+  if (type === 'system' || type === 'integration') {
     return null
   }
 
   return hasAccessToOffice ? (
-    <Link
+    <LinkLeftAligned
       font="bold14"
       onClick={() => {
         navigate({
@@ -255,7 +264,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
       }}
     >
       {locationName}
-    </Link>
+    </LinkLeftAligned>
   ) : (
     locationName
   )
@@ -278,7 +287,8 @@ function EventHistorySkeleton() {
  */
 function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const validatorContext = useValidatorContext()
+
+  const validatorContext = useValidatorContext(fullEvent)
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
@@ -288,9 +298,20 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const history = extractHistoryActions(fullEvent)
 
-  const visibleHistory = history.filter(
-    ({ type }) => type !== ActionType.CREATE
+  // Rejected action confirmations (e.g. an external ID system such as MOSIP
+  // rejecting a deferred registration) are excluded from the regular history
+  // extraction. Surface rejected registrations so the record does not appear
+  // to be waiting for external validation forever.
+  const rejectedRegistrations = fullEvent.actions.filter(
+    (a): a is ActionDocument =>
+      a.type === ActionType.REGISTER &&
+      a.status === ActionStatus.Rejected &&
+      Boolean(a.originalActionId)
   )
+
+  const visibleHistory = [...history, ...rejectedRegistrations]
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (
     action: ActionDocument,
@@ -375,24 +396,28 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(history, action),
-              status: action.status
+              status: action.status,
+              // Lets countries configure different wording for actions
+              // performed by an integration, e.g. "Registered and UIN created"
+              userType: action.createdByUserType
             })
 
       return {
         action: (
-          <Link
+          <LinkLeftAligned
             font="bold14"
             onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
           >
             {title}
-          </Link>
+          </LinkLeftAligned>
         ),
         date: format(
           new Date(action.createdAt),
           intl.formatMessage(messages.timeFormat)
         ),
         user: <ActionCreator action={action} />,
-        role,
+        // Integrations have no role, and the table cell type takes no undefined
+        role: role ?? '',
         location: <ActionLocation action={action} />
       }
     })

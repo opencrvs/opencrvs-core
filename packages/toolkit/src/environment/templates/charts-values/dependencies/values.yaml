@@ -69,6 +69,7 @@ backup:
   schedule: "0 1 * * *"
   backup_server_secret: backup-server-ssh-credentials
   backup_server_dir: /home/backup/{{env}}
+  host: {{backup_host}}
 
 
 # Restore configuration
@@ -78,3 +79,4 @@ restore:
   backup_server_secret: backup-server-ssh-credentials
   backup_server_dir: /home/backup/{{restore_environment_name}}
   backup_encryption_secret: restore-encryption-secret
+  host: {{restore_host}}

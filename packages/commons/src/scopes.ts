@@ -78,11 +78,7 @@ const PlainScopeType = z.enum([
   // Performance dashboard
   'performance.read',
   'performance.read-dashboards',
-  'performance.vital-statistics-export',
-
-  // Scopes used exclusively by countryconfig integration token
-  'record.confirm-registration',
-  'record.reject-registration'
+  'performance.vital-statistics-export'
 ])
 
 const scopeByEvent = z
@@ -114,7 +110,9 @@ const userRole = z
 const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: JurisdictionFilter.optional()
+    placeOfEvent: JurisdictionFilter.optional(),
+    createdBy: UserFilter.optional(),
+    createdIn: JurisdictionFilter.optional()
   })
   .describe('Options applicable to all record scopes.')
 
@@ -180,7 +178,9 @@ export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
 const ResolvedScopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: UUID.nullish()
+    placeOfEvent: UUID.nullish(),
+    createdBy: z.string().optional(),
+    createdIn: UUID.nullish()
   })
   .describe(
     'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'

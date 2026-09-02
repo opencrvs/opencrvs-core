@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Read(**/.secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa)",
+      "Read(**/id_ed25519)",
+      "Read(**/wireguard/**)",
+      "Read(**/wg*.conf)",
+      "Read(**/openvpn/**)",
+      "Read(**/*.ovpn)",
+      "Read(**/vnc/**)",
+      "Bash(sudo:*)",
+      "Bash(ssh:*)",
+      "Bash(git push:*)",
+      "Bash(git push --force:*)",
+      "Bash(docker push:*)",
+      "Bash(kubectl:*)",
+      "Bash(rm -rf /:*)"
+    ],
+    "ask": [
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "WebFetch",
+      "Bash(docker:*)",
+      "Bash(git commit:*)"
+    ],
+    "allow": [
+      "Bash(yarn test:*)",
+      "Bash(yarn lint:*)",
+      "Bash(yarn build:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(yarn typecheck:*)",
+      "Bash(yarn workspace:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Edit(packages/**)"
+    ]
+  },
+  "includeCoAuthoredBy": true,
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && git diff --name-only | xargs -r pnpm exec prettier --write --ignore-unknown 2>/dev/null; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/check-changed-packages.sh\"",
+            "timeout": 300,
+            "statusMessage": "Running TypeScript compilation and lint checks for changed packages..."
+          }
+        ]
+      }
+    ]
+  }
+}

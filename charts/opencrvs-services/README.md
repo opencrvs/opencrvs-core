@@ -392,6 +392,21 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Controls <code>automountServiceAccountToken</code> on generated ServiceAccounts and workload Pod specs. Can be overridden per workload.</td>
         </tr>
         <tr>
+            <td>strategy.type</td>
+            <td>Recreate</td>
+            <td>Deployment rollout strategy. <code>Recreate</code> terminates all existing PODs before creating replacement ones, guaranteeing old PODs are gone before new ones start (at the cost of a brief outage). <code>RollingUpdate</code> swaps PODs gradually instead. Configuration is available per service as well, add <code>&ltservice_name&gt.strategy.&ltkey&gt</code></td>
+        </tr>
+        <tr>
+            <td>strategy.maxSurge</td>
+            <td>{}</td>
+            <td>Only used when <code>strategy.type</code> is <code>RollingUpdate</code>. Maximum number/percentage of PODs that can be created above the desired replica count during the rollout.</td>
+        </tr>
+        <tr>
+            <td>strategy.maxUnavailable</td>
+            <td>{}</td>
+            <td>Only used when <code>strategy.type</code> is <code>RollingUpdate</code>. Maximum number/percentage of PODs that can be unavailable during the rollout.</td>
+        </tr>
+        <tr>
             <td>resources</td>
             <td>{}</td>
             <td>Resources allocated to OpenCRVS microservices (Kubernetes PODs). Properties in this section could be defined per microservice as well.</td>

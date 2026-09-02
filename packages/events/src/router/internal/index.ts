@@ -11,13 +11,20 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { UserName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
+import {
+  UserName,
+  UserAuditRecordInput,
+  TokenUserType,
+  UUID,
+  logger
+} from '@opencrvs/commons'
 import { internalProcedure, serviceRouter } from '@events/router/trpc'
 import {
   getUserCredentialsByUsername,
   getUserRoleAndStatus,
   updatePasswordHash
 } from '@events/storage/postgres/events/users'
+import { systemClientExists } from '@events/storage/postgres/events/system-clients'
 import { generateHash } from '@events/service/auth/hash'
 import {
   checkSecurityQuestionMatch,
@@ -41,15 +48,39 @@ const VerifyUserOutput = z.object({
 })
 
 /**
- * Intermediary route for having an endpoint to test with. Will be removed once we merge the user management changes.
+ * Audit entries written through this router are authored by a trusted service,
+ * so the acting client is supplied explicitly rather than derived from a token.
+ */
+const InternalUserAuditRecordInput = z.object({
+  clientId: UUID,
+  entry: UserAuditRecordInput
+})
+
+async function resolveClientType(clientId: UUID): Promise<TokenUserType> {
+  if (await getUserRoleAndStatus(clientId)) {
+    return TokenUserType.enum.user
+  }
+
+  if (await systemClientExists(clientId)) {
+    return TokenUserType.enum.system
+  }
+
+  logger.warn(
+    `Refused an audit entry for unknown client ${clientId}: the entry was not recorded`
+  )
+
+  throw new TRPCError({
+    code: 'BAD_REQUEST',
+    message: 'Audit entry names a client that does not exist'
+  })
+}
+
+/**
+ * Service-to-service routes, reachable only with an internal service token
+ * (see `internalProcedure`). These are not exposed to clients: they exist so
+ * the auth service can read and write user state it does not own.
  */
 export const internalUserRouter = serviceRouter({
-  ping: internalProcedure
-    .input(z.string())
-    .output(z.string())
-    .query(({ input }) => {
-      return `pong: ${input}`
-    }),
   getById: internalProcedure
     .input(UUID)
     .output(z.object({ id: z.string(), role: z.string(), status: z.string() }))
@@ -75,7 +106,8 @@ export const internalUserRouter = serviceRouter({
         mobile: z.string().optional(),
         email: z.string().optional(),
         status: z.string(),
-        role: z.string()
+        role: z.string(),
+        primaryOfficeId: z.string()
       })
     )
     .mutation(async ({ input }) => {
@@ -99,7 +131,8 @@ export const internalUserRouter = serviceRouter({
         mobile: user.mobile ?? undefined,
         email: user.email ?? undefined,
         status: user.status,
-        role: user.role
+        role: user.role,
+        primaryOfficeId: user.officeId
       }
     }),
   verifySecurityAnswer: internalProcedure
@@ -151,12 +184,12 @@ export const internalUserRouter = serviceRouter({
     }),
   audit: {
     record: internalProcedure
-      .input(UserAuditRecordInput)
+      .input(InternalUserAuditRecordInput)
       .mutation(async ({ input }) => {
         await writeAuditLog({
-          ...input,
-          clientId: input.requestData.subjectId,
-          clientType: 'system'
+          ...input.entry,
+          clientId: input.clientId,
+          clientType: await resolveClientType(input.clientId)
         })
       })
   },

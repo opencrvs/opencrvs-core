@@ -12,16 +12,16 @@ import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { aggregateActionDeclarations } from '@opencrvs/toolkit/events'
 import { omit } from 'lodash'
-import { getToken, login } from '../../helpers'
+import { getToken, login } from '@e2e/support/helpers'
 import {
   getDeclaration,
   createDeclaration,
   type Declaration
-} from '../test-data/birth-declaration'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { assertTexts, ensureAssignedToUser, type } from '../../utils'
-import { formatV2ChildName } from '../birth/helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/test-data/birth-declaration'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { assertTexts, ensureAssignedToUser, type } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 /*
  * Female identity from mock-identities.json (Sahara Wendy Moyo, NID: 1234567899).
@@ -33,63 +33,435 @@ import { openRecordByTitle } from '../print-certificate/birth/helpers'
 const AVAILABLE_IDENTITIES = [
   {
     firstName: 'Jenny',
+    middleName: 'Debra',
     familyName: 'Doe',
     birthDate: '2002-02-01',
+    gender: 'female',
     nid: '1234567891'
   },
   {
     firstName: 'Monica',
+    middleName: 'Michelle',
     familyName: 'Geller',
     birthDate: '2005-02-25',
+    gender: 'female',
     nid: '1234567894'
   },
   {
     firstName: 'Phoebe',
+    middleName: 'Seni',
     familyName: 'Buffay',
     birthDate: '2002-02-24',
+    gender: 'female',
     nid: '1234567896'
   },
   {
     firstName: 'Saida',
+    middleName: 'Lyla',
     familyName: 'Sharma',
     birthDate: '1997-12-24',
+    gender: 'female',
     nid: '1234567898'
   },
   {
-    firstName: 'Sahara',
-    familyName: 'Moyo',
-    birthDate: '1994-10-02',
-    nid: '1234567899'
+    firstName: 'Prabodha',
+    middleName: 'Weerasinghe',
+    familyName: 'Perera',
+    birthDate: '1993-06-18',
+    gender: 'female',
+    nid: '1234567925'
   },
   {
     firstName: 'Tharushi',
+    middleName: 'Nimasha',
     familyName: 'Perera',
     birthDate: '1998-05-21',
+    gender: 'female',
     nid: '1234567926'
   },
   {
+    firstName: 'Dilani',
+    middleName: 'Madushika',
+    familyName: 'Perera',
+    birthDate: '1991-05-15',
+    gender: 'female',
+    nid: '1234567927'
+  },
+  {
+    firstName: 'Tharushi',
+    middleName: 'Nimasha',
+    familyName: 'Perera',
+    birthDate: '1999-01-23',
+    gender: 'female',
+    nid: '1234567928'
+  },
+  {
+    firstName: 'Nimali',
+    middleName: 'Rajapaksha',
+    familyName: 'Perera',
+    birthDate: '1991-06-11',
+    gender: 'female',
+    nid: '1234567929'
+  },
+  {
+    firstName: 'Prabodha',
+    middleName: 'Weerasinghe',
+    familyName: 'Perera',
+    birthDate: '1992-03-23',
+    gender: 'female',
+    nid: '1234567930'
+  },
+  {
     firstName: 'Nadeesha',
+    middleName: 'Lakmali',
     familyName: 'Perera',
     birthDate: '1991-10-19',
+    gender: 'female',
     nid: '1234567931'
   },
   {
+    firstName: 'Prabodha',
+    middleName: 'Weerasinghe',
+    familyName: 'Perera',
+    birthDate: '1991-07-04',
+    gender: 'female',
+    nid: '1234567932'
+  },
+  {
+    firstName: 'Udari',
+    middleName: 'Manike',
+    familyName: 'Perera',
+    birthDate: '1992-01-08',
+    gender: 'female',
+    nid: '1234567933'
+  },
+  {
+    firstName: 'Ishara',
+    middleName: 'Sandamini',
+    familyName: 'Perera',
+    birthDate: '1999-09-01',
+    gender: 'female',
+    nid: '1234567934'
+  },
+  {
+    firstName: 'Dilani',
+    middleName: 'Madushika',
+    familyName: 'Perera',
+    birthDate: '1994-09-03',
+    gender: 'female',
+    nid: '1234567935'
+  },
+  {
+    firstName: 'Imesha',
+    middleName: 'Senali',
+    familyName: 'Perera',
+    birthDate: '1990-08-02',
+    gender: 'female',
+    nid: '1234567936'
+  },
+  {
     firstName: 'Kanchana',
+    middleName: 'Dilani',
     familyName: 'Perera',
     birthDate: '1998-09-13',
+    gender: 'female',
     nid: '1234567937'
   },
   {
+    firstName: 'Nimesha',
+    middleName: 'Madubhashini',
+    familyName: 'Perera',
+    birthDate: '1995-08-02',
+    gender: 'female',
+    nid: '1234567938'
+  },
+  {
+    firstName: 'Sulochana',
+    middleName: 'Hansika',
+    familyName: 'Perera',
+    birthDate: '1993-12-04',
+    gender: 'female',
+    nid: '1234567939'
+  },
+  {
+    firstName: 'Chamodi',
+    middleName: 'Hansani',
+    familyName: 'Perera',
+    birthDate: '1991-03-19',
+    gender: 'female',
+    nid: '1234567940'
+  },
+  {
+    firstName: 'Prabodha',
+    middleName: 'Weerasinghe',
+    familyName: 'Perera',
+    birthDate: '2000-06-07',
+    gender: 'female',
+    nid: '1234567941'
+  },
+  {
+    firstName: 'Ayesha',
+    middleName: 'Thilakarathna',
+    familyName: 'Perera',
+    birthDate: '1991-06-26',
+    gender: 'female',
+    nid: '1234567942'
+  },
+  {
+    firstName: 'Nimali',
+    middleName: 'Rajapaksha',
+    familyName: 'Perera',
+    birthDate: '1991-02-26',
+    gender: 'female',
+    nid: '1234567943'
+  },
+  {
+    firstName: 'Harshani',
+    middleName: 'Dinithi',
+    familyName: 'Perera',
+    birthDate: '1991-04-05',
+    gender: 'female',
+    nid: '1234567944'
+  },
+  {
+    firstName: 'Sulochana',
+    middleName: 'Hansika',
+    familyName: 'Perera',
+    birthDate: '2000-08-10',
+    gender: 'female',
+    nid: '1234567945'
+  },
+  {
+    firstName: 'Sanduni',
+    middleName: 'Fernando',
+    familyName: 'Perera',
+    birthDate: '1990-12-02',
+    gender: 'female',
+    nid: '1234567946'
+  },
+  {
+    firstName: 'Udari',
+    middleName: 'Manike',
+    familyName: 'Perera',
+    birthDate: '1994-10-19',
+    gender: 'female',
+    nid: '1234567947'
+  },
+  {
+    firstName: 'Shanika',
+    middleName: 'Dilrukshi',
+    familyName: 'Perera',
+    birthDate: '1992-12-26',
+    gender: 'female',
+    nid: '1234567948'
+  },
+  {
+    firstName: 'Chamodi',
+    middleName: 'Hansani',
+    familyName: 'Perera',
+    birthDate: '1997-11-09',
+    gender: 'female',
+    nid: '1234567949'
+  },
+  {
+    firstName: 'Dinuli',
+    middleName: 'Wickramasinghe',
+    familyName: 'Senanayake',
+    birthDate: '1995-11-25',
+    gender: 'female',
+    nid: '1234567975'
+  },
+  {
+    firstName: 'Thanuri',
+    middleName: 'Madushika',
+    familyName: 'Senanayake',
+    birthDate: '1991-08-15',
+    gender: 'female',
+    nid: '1234567976'
+  },
+  {
+    firstName: 'Disni',
+    middleName: 'Ranasinghe',
+    familyName: 'Senanayake',
+    birthDate: '2000-12-02',
+    gender: 'female',
+    nid: '1234567977'
+  },
+  {
+    firstName: 'Minoli',
+    middleName: 'Perera',
+    familyName: 'Senanayake',
+    birthDate: '1996-08-16',
+    gender: 'female',
+    nid: '1234567978'
+  },
+  {
+    firstName: 'Oshadi',
+    middleName: 'Gunarathna',
+    familyName: 'Senanayake',
+    birthDate: '1990-07-20',
+    gender: 'female',
+    nid: '1234567979'
+  },
+  {
     firstName: 'Amaya',
+    middleName: 'Sooriyabandara',
     familyName: 'Senanayake',
     birthDate: '1998-10-06',
+    gender: 'female',
     nid: '1234567980'
   },
   {
+    firstName: 'Chalani',
+    middleName: 'Gunawardena',
+    familyName: 'Senanayake',
+    birthDate: '1999-03-25',
+    gender: 'female',
+    nid: '1234567981'
+  },
+  {
+    firstName: 'Rukshani',
+    middleName: 'Abeyratne',
+    familyName: 'Senanayake',
+    birthDate: '1999-03-19',
+    gender: 'female',
+    nid: '1234567982'
+  },
+  {
+    firstName: 'Samadhi',
+    middleName: 'Manoratne',
+    familyName: 'Senanayake',
+    birthDate: '1995-07-24',
+    gender: 'female',
+    nid: '1234567983'
+  },
+  {
+    firstName: 'Rashmi',
+    middleName: 'Tharushika',
+    familyName: 'Senanayake',
+    birthDate: '1999-04-20',
+    gender: 'female',
+    nid: '1234567984'
+  },
+  {
+    firstName: 'Kavisha',
+    middleName: 'Rathnayake',
+    familyName: 'Senanayake',
+    birthDate: '1996-07-07',
+    gender: 'female',
+    nid: '1234567985'
+  },
+  {
+    firstName: 'Hansani',
+    middleName: 'Silva',
+    familyName: 'Senanayake',
+    birthDate: '1991-08-11',
+    gender: 'female',
+    nid: '1234567986'
+  },
+  {
+    firstName: 'Ruwani',
+    middleName: 'Jayasinghe',
+    familyName: 'Senanayake',
+    birthDate: '1999-07-10',
+    gender: 'female',
+    nid: '1234567987'
+  },
+  {
+    firstName: 'Kaushalya',
+    middleName: 'Weerasooriya',
+    familyName: 'Senanayake',
+    birthDate: '2000-01-31',
+    gender: 'female',
+    nid: '1234567988'
+  },
+  {
+    firstName: 'Purnima',
+    middleName: 'Senaviratne',
+    familyName: 'Senanayake',
+    birthDate: '1995-01-19',
+    gender: 'female',
+    nid: '1234567989'
+  },
+  {
     firstName: 'Vishmi',
+    middleName: 'Rajapaksha',
     familyName: 'Senanayake',
     birthDate: '1994-08-23',
+    gender: 'female',
     nid: '1234567990'
+  },
+  {
+    firstName: 'Nuwangi',
+    middleName: 'Hettiarachchi',
+    familyName: 'Senanayake',
+    birthDate: '1995-06-12',
+    gender: 'female',
+    nid: '1234567991'
+  },
+  {
+    firstName: 'Chamari',
+    middleName: 'Priyangika',
+    familyName: 'Senanayake',
+    birthDate: '1998-08-03',
+    gender: 'female',
+    nid: '1234567992'
+  },
+  {
+    firstName: 'Imasha',
+    middleName: 'Thilini',
+    familyName: 'Senanayake',
+    birthDate: '1993-03-28',
+    gender: 'female',
+    nid: '1234567993'
+  },
+  {
+    firstName: 'Tharuka',
+    middleName: 'Madushani',
+    familyName: 'Senanayake',
+    birthDate: '1998-12-24',
+    gender: 'female',
+    nid: '1234567994'
+  },
+  {
+    firstName: 'Kalani',
+    middleName: 'Perera',
+    familyName: 'Senanayake',
+    birthDate: '1996-04-10',
+    gender: 'female',
+    nid: '1234567995'
+  },
+  {
+    firstName: 'Nimesha',
+    middleName: 'Dilhani',
+    familyName: 'Senanayake',
+    birthDate: '2000-06-07',
+    gender: 'female',
+    nid: '1234567996'
+  },
+  {
+    firstName: 'Isurika',
+    middleName: 'Sathsarani',
+    familyName: 'Senanayake',
+    birthDate: '2000-05-26',
+    gender: 'female',
+    nid: '1234567997'
+  },
+  {
+    firstName: 'Udani',
+    middleName: 'Dilrukshi',
+    familyName: 'Senanayake',
+    birthDate: '1994-09-08',
+    gender: 'female',
+    nid: '1234567998'
+  },
+  {
+    firstName: 'Sachini',
+    middleName: 'Madhushika',
+    familyName: 'Senanayake',
+    birthDate: '1994-08-03',
+    gender: 'female',
+    nid: '1234567999'
   }
 ]
 

@@ -22,8 +22,8 @@ import {
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  getDeclarationFields,
   isAgeFieldType,
-  isFieldSecured,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
@@ -201,7 +201,7 @@ export function getEventIndexWithoutLocationHierarchy(
   }
 
   const fieldConfigs = Object.fromEntries(
-    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
 
   // Process declaration fields
@@ -302,7 +302,7 @@ export async function getEventIndexWithAdministrativeHierarchy(
   }
 
   const fieldConfigs = Object.fromEntries(
-    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
 
   // Process declaration fields
@@ -356,21 +356,6 @@ export function decodeEventIndex(
         )
       }),
       {}
-    )
-  }
-}
-
-export function removeSecuredFields(
-  eventConfig: EventConfig,
-  event: EventIndex
-): EventIndex {
-  return {
-    ...event,
-    declaration: Object.fromEntries(
-      Object.entries(event.declaration).filter(
-        ([fieldId]) =>
-          !isFieldSecured(getDeclarationFieldById(eventConfig, fieldId), event)
-      )
     )
   }
 }
@@ -491,6 +476,9 @@ export function resolveRecordActionScopeToIds(
       notifiedIn: getLocationIdsFromScopeOptions(options?.notifiedIn, user),
       notifiedBy:
         options?.notifiedBy === UserFilter.enum.user ? user.id : undefined,
+      createdBy:
+        options?.createdBy === UserFilter.enum.user ? user.id : undefined,
+      createdIn: getLocationIdsFromScopeOptions(options?.createdIn, user),
       declaredIn: getLocationIdsFromScopeOptions(options?.declaredIn, user),
       declaredBy:
         options?.declaredBy === UserFilter.enum.user ? user.id : undefined,

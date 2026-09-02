@@ -15,8 +15,8 @@ import { TriggerEvent, TriggerPayload } from './UserNotifications'
 
 /*
  * Every event carries an Authorization header. Interactive flows forward the
- * acting user's token; the background announcement worker fetches an anonymous
- * token first (see getAnonymousToken in the events service). This lets country
+ * acting user's token; the background announcement worker fetches a service
+ * token first (see getServiceToken in the events service). This lets country
  * configs require authentication on all `/triggers/user/*` routes.
  */
 export async function triggerUserEventNotification<T extends TriggerEvent>({

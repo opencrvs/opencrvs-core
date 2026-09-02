@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { AvatarSmall } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { buttonMessages } from '@client/i18n/messages'
@@ -46,7 +46,7 @@ import styled from 'styled-components'
 import { UserAuditHistory } from './UserAuditHistory'
 import { UserActivationModal } from '../SysAdmin/Team/user/UserActivationModal'
 
-const UserAvatar = styled(AvatarSmall)`
+const UserAvatar = styled(Avatar)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -203,7 +203,14 @@ export const UserAudit = () => {
       ) : (
         <Content
           title={userName}
-          icon={() => <UserAvatar name={userName} avatar={user.avatar} />}
+          icon={() => (
+            <UserAvatar
+              aria-hidden
+              name={userName}
+              size="md"
+              src={user.avatar}
+            />
+          )}
           showTitleOnMobile
           topActionButtons={
             userDetails && scope

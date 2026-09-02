@@ -1,7 +1,8 @@
 apiVersion: v2
 name: opencrvs-mosip
 description: |
-  OpenCRVS API for MOSIP https://github.com/opencrvs/mosip/tree/main
+  OpenCRVS API for MOSIP, built from packages/mosip-api, packages/mosip-mock and
+  packages/esignet-mock in https://github.com/opencrvs/opencrvs-core
 type: application
 version: v2.1.0
 appVersion: 'v2.1.0'

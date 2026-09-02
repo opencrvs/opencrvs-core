@@ -11,6 +11,7 @@
 
 import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
+import { expect, waitFor, within } from 'storybook/test'
 import { UserAuditHistory } from './UserAuditHistory'
 import { TestUserRole } from '@opencrvs/commons/client'
 
@@ -39,5 +40,34 @@ export const WithRecordReadScope: Story = {}
 export const WithoutRecordReadScope: Story = {
   parameters: {
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+  }
+}
+
+/**
+ * Regression test for: audit action labels wrap onto several lines in the narrow
+ * action column, so their text must stay left aligned instead of inheriting the
+ * alignment of the surrounding table cell.
+ */
+export const ActionLinksAreLeftAligned: Story = {
+  tags: ['link-alignment-regression'],
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for the audit list to load', async () => {
+      await canvas.findByText('Logged out')
+    })
+
+    await step('Audit action link renders its text left aligned', async () => {
+      const actionLink = await canvas.findByRole('button', {
+        name: 'Logged out'
+      })
+
+      await waitFor(() =>
+        expect(getComputedStyle(actionLink).textAlign).toBe('left')
+      )
+    })
   }
 }
