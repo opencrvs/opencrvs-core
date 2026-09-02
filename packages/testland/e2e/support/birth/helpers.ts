@@ -59,6 +59,27 @@ export async function openBirthDeclaration(page: Page) {
   return page
 }
 
+/**
+ * Selects Health Institution as place of birth and picks the first available
+ * facility. `PRIVATE_HOME`/`OTHER` are hidden for HOSPITAL_CLERK - a hospital
+ * official only notifies births that happened at their own facility, so this
+ * is the only place-of-birth option available to them.
+ */
+export async function selectHealthInstitution(page: Page) {
+  await page.locator('#child____placeOfBirth').click()
+  await page.getByText('Health Institution', { exact: true }).click()
+
+  await page.locator('#child____birthLocation').click()
+  const dropdown = page.locator(
+    '#searchable-select-child____birthLocation .react-select__menu'
+  )
+  const option = dropdown.locator('[role="list"] > li').first()
+  const facilityName = await option.textContent()
+  await option.click()
+
+  return facilityName
+}
+
 export const formatV2ChildName = (obj: {
   'child.name': { firstname: string; surname: string }
   [key: string]: any
