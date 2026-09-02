@@ -3281,8 +3281,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.confirm-registration
-                                - record.reject-registration
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3560,8 +3558,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.confirm-registration
-                                - record.reject-registration
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -4250,8 +4246,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9396,8 +9390,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9883,8 +9875,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -15062,8 +15052,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.confirm-registration
-                                  - record.reject-registration
                                   - workqueue
                                   - dashboard.view
                               $option:
@@ -15379,8 +15367,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.confirm-registration
-                                  - record.reject-registration
                                   - workqueue
                                   - dashboard.view
                               $option:
