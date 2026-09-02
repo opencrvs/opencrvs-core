@@ -286,7 +286,7 @@ export const roles: Role[] = [
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'escalated', 'pending-updates', 'pending-certification', 'potential-duplicate'] } },
-      { type: 'record.search', options: { placeOfEvent: 'all', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.search', options: { createdBy: 'user', flags: { noneOf: ['sealed'] } } },
       { type: 'record.create', options: { placeOfEvent: 'all' } },
       { type: 'record.read', options: { placeOfEvent: 'all', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'all' } },

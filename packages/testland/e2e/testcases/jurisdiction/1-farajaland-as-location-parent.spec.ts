@@ -61,7 +61,7 @@ test.describe.serial('1.Farajaland as location parent', () => {
   test('1.1.1 Embassy official in another administrative area should not find the declaration', async () => {
     await login(page, CREDENTIALS.EMBASSY_OFFICIAL)
 
-    await searchFromSearchBar(page, name, true)
+    await searchFromSearchBar(page, name, false)
   })
 
   test('1.1.2 Registrar general within the same administrative area should find the declaration', async () => {
