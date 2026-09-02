@@ -38,10 +38,6 @@ const ErrorMessage = styled.div`
 
 type IFullProps = React.PropsWithChildren<IntlShapeProps>
 
-const development = ['127.0.0.1', 'localhost'].includes(
-  window.location.hostname
-)
-
 const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
   const [authError, setAuthError] = useState(false)
 
@@ -55,7 +51,6 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
 
   return (
     <Sentry.ErrorBoundary
-      showDialog={!development}
       onError={onError}
       fallback={
         <PageWrapper>

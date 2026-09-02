@@ -60,17 +60,17 @@ describe('client Content-Security-Policy', () => {
     expect(directives['img-src']).not.toContain('http:')
   })
 
-  it('does not allow inline scripts', () => {
-    expect(directives['script-src']).not.toContain("'unsafe-inline'")
-  })
-
   /*
-   * Unlike the login app, the client cannot drop 'unsafe-eval' yet: legacy v1 form
-   * conditionals, the v2-events serialised-function compiler, AJV's runtime schema
-   * compilation and Handlebars all compile JavaScript in the browser. This asserts the
-   * exception stays a known, single exception — see the comment in nginx.conf and #13246.
+   * Asserted whole, so any new source fails here. 'unsafe-eval' is a known exception —
+   * the client compiles JavaScript at runtime (see nginx.conf and #13246) — and the
+   * wildcard loads handlebars.js from the country config. No third-party host belongs
+   * here; the Sentry dialog was the only one that ever did, and it is gone (#13460).
    */
-  it("still requires 'unsafe-eval', and nothing weaker would do", () => {
-    expect(directives['script-src']).toContain("'unsafe-eval'")
+  it('loads scripts only from itself, the country config and eval', () => {
+    expect(directives['script-src']).toEqual([
+      "'self'",
+      "'unsafe-eval'",
+      '{{CONTENT_SECURITY_POLICY_WILDCARD}}'
+    ])
   })
 })

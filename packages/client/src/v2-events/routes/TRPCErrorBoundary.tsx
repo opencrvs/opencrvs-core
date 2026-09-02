@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { Component } from 'react'
-import * as Sentry from '@sentry/react'
 import { z } from 'zod'
 import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
@@ -40,10 +39,6 @@ const ErrorMessage = styled.div`
   margin-bottom: 32px;
   text-align: center;
 `
-
-const development = ['127.0.0.1', 'localhost'].includes(
-  window.location.hostname
-)
 
 const StructuredError = z.object({
   message: z.string(),
@@ -139,47 +134,39 @@ class ErrorBoundary extends Component<Props, State> {
        * and the design/ux is ready.
        */
       return (
-        <Sentry.ErrorBoundary
-          showDialog={!development}
-          onError={(err) => {
-            // eslint-disable-next-line no-console
-            console.log('Sentry.ErrorBoundary: ', err)
-          }}
-        >
-          <PageWrapper>
-            <ErrorContainer>
-              {httpCode === 401 ? (
-                <>
-                  <ErrorTitle>
-                    {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
-                  </ErrorTitle>
-                  <ErrorMessage>
-                    {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-                  </ErrorMessage>
-                  <TertiaryButton
-                    id="GoToLoginPage"
-                    onClick={() => redirectToAuthentication(true)}
-                  >
-                    {intl.formatMessage(buttonMessages.login)}
-                  </TertiaryButton>
-                </>
-              ) : (
-                <>
-                  <ErrorTitle>
-                    {intl.formatMessage(errorMessages.errorTitle)}
-                  </ErrorTitle>
-                  <ErrorMessage>{message}</ErrorMessage>
-                  <TertiaryButton
-                    id="GoToHomepage"
-                    onClick={() => (window.location.href = buttonPath)}
-                  >
-                    {buttonLabel}
-                  </TertiaryButton>
-                </>
-              )}
-            </ErrorContainer>
-          </PageWrapper>
-        </Sentry.ErrorBoundary>
+        <PageWrapper>
+          <ErrorContainer>
+            {httpCode === 401 ? (
+              <>
+                <ErrorTitle>
+                  {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
+                </ErrorTitle>
+                <ErrorMessage>
+                  {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+                </ErrorMessage>
+                <TertiaryButton
+                  id="GoToLoginPage"
+                  onClick={() => redirectToAuthentication(true)}
+                >
+                  {intl.formatMessage(buttonMessages.login)}
+                </TertiaryButton>
+              </>
+            ) : (
+              <>
+                <ErrorTitle>
+                  {intl.formatMessage(errorMessages.errorTitle)}
+                </ErrorTitle>
+                <ErrorMessage>{message}</ErrorMessage>
+                <TertiaryButton
+                  id="GoToHomepage"
+                  onClick={() => (window.location.href = buttonPath)}
+                >
+                  {buttonLabel}
+                </TertiaryButton>
+              </>
+            )}
+          </ErrorContainer>
+        </PageWrapper>
       )
     }
 

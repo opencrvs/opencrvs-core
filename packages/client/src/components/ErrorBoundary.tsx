@@ -15,13 +15,9 @@ import * as Sentry from '@sentry/react'
 const ErrorMessage = styled.h1`
   text-align: center;
 `
-const development = ['127.0.0.1', 'localhost'].includes(
-  window.location.hostname
-)
 
 export const ErrorBoundary = ({ children }: { children: ReactNode }) => (
   <Sentry.ErrorBoundary
-    showDialog={!development}
     fallback={<ErrorMessage>Something went wrong...</ErrorMessage>}
   >
     {children}

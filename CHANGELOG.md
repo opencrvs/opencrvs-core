@@ -2,6 +2,10 @@
 
 ## 1.9.17 Release Candidate
 
+### Improvements
+
+- Removed the Sentry user-feedback dialog from the client and login apps, along with the `https://sentry.io/api/embed/error-page/` origin it required in `script-src`. `script-src` now names no third-party host, and the login app loads scripts from `'self'` only. Error reporting to Sentry is unchanged — users now see the app's own error page instead of the "report a problem" form. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
 ## 1.9.16
 
 ### New features
