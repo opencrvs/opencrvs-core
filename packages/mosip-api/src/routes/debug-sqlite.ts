@@ -11,8 +11,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { getAllTransactions, getTransactionAndDiscard } from '../database'
 import { EncodedScope, hasScope } from '@opencrvs/toolkit/scopes'
-import { TokenPayload } from './websub-credential-issued'
-import { decode } from 'jsonwebtoken'
 
 interface AuthenticatedUser {
   scope: string[]
@@ -34,13 +32,13 @@ const isAllowedToSearch = (scope: string[]) =>
   hasScope(scope as EncodedScope[], 'record.search')
 
 /**
- * Allow deleting transactions for users that have `record.reject-registration` scope.
+ * Allow deleting transactions for users that have `record.register` scope.
  *
  * Rationale:
  * - This should be accompanied with a `client.event.actions.register.reject` call via Postman which requires this scope.
  */
 const isAllowedToDelete = (scope: string[]) =>
-  hasScope(scope as EncodedScope[], 'record.reject-registration')
+  hasScope(scope as EncodedScope[], 'record.register')
 
 export const getAllTransactionsHandler = async (
   request: FastifyRequest,
@@ -56,15 +54,10 @@ export const getAllTransactionsHandler = async (
 
   const transactions = getAllTransactions()
 
-  return transactions.map(({ token, ...rest }) => {
-    const { eventId, actionId } = decode(token) as TokenPayload
-
-    return {
-      eventId,
-      actionId,
-      ...rest
-    }
-  })
+  return transactions.map(({ event_id: eventId, ...rest }) => ({
+    eventId,
+    ...rest
+  }))
 }
 
 export type DeleteTransactionRequest = FastifyRequest<{

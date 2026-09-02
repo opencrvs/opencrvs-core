@@ -26,7 +26,7 @@ const { privateKey, publicKey } = generateKeyPairSync('rsa', {
 })
 
 const createJwtPayload = () => ({
-  scope: ['record.confirm-registration', 'record.reject-registration'],
+  scope: ['record.register'],
   iat: Math.floor(Date.now() / 1000),
   exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
   aud: ['opencrvs:auth-user'],
@@ -90,6 +90,7 @@ test('validates JWTs', async (t) => {
         Authorization: `Bearer ${INVALID_JWT}`
       },
       body: JSON.stringify({
+        eventId: '11111111-1111-1111-1111-111111111111',
         trackingId: 'tracking-id-1',
         notification: {
           recipientFullName: 'Jane Doe',
@@ -120,6 +121,7 @@ test('validates JWTs', async (t) => {
           Authorization: `Bearer ${createValidJwt()}`
         },
         body: JSON.stringify({
+          eventId: '22222222-2222-2222-2222-222222222222',
           trackingId: 'tracking-id-default-schema',
           notification: {
             recipientFullName: 'Jane Doe',
@@ -155,6 +157,7 @@ test('validates JWTs', async (t) => {
         Authorization: `Bearer ${createValidJwt()}`
       },
       body: JSON.stringify({
+        eventId: '33333333-3333-3333-3333-333333333333',
         trackingId: 'tracking-id-custom-schema',
         notification: {
           recipientFullName: 'Jane Doe',

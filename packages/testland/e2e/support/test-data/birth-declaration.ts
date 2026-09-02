@@ -252,6 +252,31 @@ export async function createDeclaration(
     }
   }
 
+  // Mirror the UI "not a duplicate" flow: if declare flagged a potential
+  // duplicate, dismiss it so the record can continue to register.
+  const duplicateDetected = declareRes.actions.find(
+    (action) =>
+      action.type === ActionType.DUPLICATE_DETECTED &&
+      action.status === ActionStatus.Accepted
+  )
+  if (duplicateDetected) {
+    await client.event.actions.assignment.assign.mutate({
+      eventId,
+      type: 'ASSIGN',
+      assignedTo: duplicateDetected.createdBy,
+      transactionId: uuidv4(),
+      declaration: {},
+      annotation: {},
+      keepAssignment: true
+    })
+    await client.event.actions.duplicate.markNotDuplicate.mutate({
+      eventId,
+      transactionId: uuidv4(),
+      declaration: {},
+      keepAssignment: true
+    })
+  }
+
   const registerRes = await client.event.actions.register.request.mutate({
     eventId,
     transactionId: uuidv4(),

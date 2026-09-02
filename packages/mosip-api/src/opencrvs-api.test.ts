@@ -20,57 +20,34 @@ process.env.OPENCRVS_CLIENT_SECRET = 'test-client-secret'
 
 const AUTH_URL = 'http://localhost:4040' // devDefault of OPENCRVS_AUTH_URL
 
-const EVENT_ID = '11111111-1111-1111-1111-111111111111'
-const ACTION_ID = '22222222-2222-2222-2222-222222222222'
-
-test('direct authentication with OpenCRVS', async (t) => {
+test('system client authentication with OpenCRVS', async (t) => {
   const opencrvs = await import('./opencrvs-api')
 
-  await t.test('is configured when client credentials are set', () => {
-    assert.strictEqual(opencrvs.isDirectAuthConfigured(), true)
-  })
+  await t.test('obtains a token via the client_credentials grant', async () => {
+    const requests: URLSearchParams[] = []
+    const mswServer = setupServer(
+      http.post(`${AUTH_URL}/token`, async ({ request }) => {
+        // Parameters belong in the body — the query string leaks the secret.
+        assert.strictEqual(new URL(request.url).search, '')
+        const params = new URLSearchParams(await request.text())
+        requests.push(params)
 
-  await t.test(
-    'obtains a confirmation token via client_credentials and token exchange',
-    async () => {
-      const requests: URLSearchParams[] = []
-      const mswServer = setupServer(
-        http.post(`${AUTH_URL}/token`, async ({ request }) => {
-          // Parameters belong in the body — the query string leaks the secret.
-          assert.strictEqual(new URL(request.url).search, '')
-          const params = new URLSearchParams(await request.text())
-          requests.push(params)
+        assert.strictEqual(params.get('grant_type'), 'client_credentials')
+        assert.strictEqual(params.get('client_id'), 'test-client-id')
+        assert.strictEqual(params.get('client_secret'), 'test-client-secret')
+        return HttpResponse.json({ access_token: 'system-token' })
+      })
+    )
+    mswServer.listen()
 
-          if (params.get('grant_type') === 'client_credentials') {
-            assert.strictEqual(params.get('client_id'), 'test-client-id')
-            assert.strictEqual(
-              params.get('client_secret'),
-              'test-client-secret'
-            )
-            return HttpResponse.json({ access_token: 'system-token' })
-          }
-
-          assert.strictEqual(
-            params.get('grant_type'),
-            'urn:opencrvs:oauth:grant-type:token-exchange'
-          )
-          assert.strictEqual(params.get('subject_token'), 'system-token')
-          assert.strictEqual(params.get('event_id'), EVENT_ID)
-          assert.strictEqual(params.get('action_id'), ACTION_ID)
-          return HttpResponse.json({ access_token: 'confirmation-token' })
-        })
-      )
-      mswServer.listen()
-
-      try {
-        const token = await opencrvs.getConfirmationToken(EVENT_ID, ACTION_ID)
-        assert.strictEqual(token, 'confirmation-token')
-        assert.strictEqual(requests.length, 2)
-      } finally {
-        mswServer.close()
-      }
+    try {
+      const token = await opencrvs.getSystemToken()
+      assert.strictEqual(token, 'system-token')
+      assert.strictEqual(requests.length, 1)
+    } finally {
+      mswServer.close()
     }
-  )
+  })
 
   await t.test('throws when authentication is rejected', async () => {
     const mswServer = setupServer(
@@ -81,10 +58,7 @@ test('direct authentication with OpenCRVS', async (t) => {
     mswServer.listen()
 
     try {
-      await assert.rejects(
-        opencrvs.getConfirmationToken(EVENT_ID, ACTION_ID),
-        opencrvs.OpenCRVSError
-      )
+      await assert.rejects(opencrvs.getSystemToken(), opencrvs.OpenCRVSError)
     } finally {
       mswServer.close()
     }
