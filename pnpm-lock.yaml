@@ -2444,6 +2444,9 @@ importers:
       object-hash:
         specifier: ^3.0.0
         version: 3.0.0
+      pino:
+        specifier: ^7.0.0
+        version: 7.11.0
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -22068,7 +22071,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -22076,11 +22079,7 @@ snapshots:
       jest-runner: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-runtime: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -30034,7 +30033,7 @@ snapshots:
   extract-pg-schema@5.8.1(@electric-sql/pglite@0.4.4):
     dependencies:
       knex: 3.1.0(pg@8.17.2)
-      knex-pglite: 0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.17.2))
+      knex-pglite: 0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.22.0))
       pg: 8.17.2
       pg-query-emscripten: 5.1.0
       ramda: 0.31.3
@@ -31831,7 +31830,7 @@ snapshots:
       jest-util: 30.4.1
       p-limit: 3.1.0
 
-  jest-circus@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
+  jest-circus@26.6.0:
     dependencies:
       '@babel/traverse': 7.29.8
       '@jest/environment': 26.6.2
@@ -31855,11 +31854,7 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-circus@29.7.0(babel-plugin-macros@3.1.0):
     dependencies:
@@ -32022,7 +32017,7 @@ snapshots:
   jest-config@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/core': 7.29.7
-      '@jest/test-sequencer': 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.29.7)
       chalk: 4.1.2
@@ -32032,7 +32027,7 @@ snapshots:
       jest-environment-jsdom: 26.6.2
       jest-environment-node: 26.6.2
       jest-get-type: 26.3.0
-      jest-jasmine2: 26.6.3
+      jest-jasmine2: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-regex-util: 26.0.0
       jest-resolve: 26.6.2
       jest-util: 26.6.2
@@ -32439,7 +32434,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  jest-jasmine2@26.6.3:
+  jest-jasmine2@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/traverse': 7.29.8
       '@jest/environment': 26.6.2
@@ -32460,7 +32455,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-junit@16.0.0:
     dependencies:
@@ -33358,7 +33357,7 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knex-pglite@0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.17.2)):
+  knex-pglite@0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.22.0)):
     dependencies:
       '@electric-sql/pglite': 0.4.4
       knex: 3.1.0(pg@8.17.2)
@@ -36598,7 +36597,7 @@ snapshots:
       html-webpack-plugin: 4.5.0(webpack@4.44.2)
       identity-obj-proxy: 3.0.0
       jest: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
-      jest-circus: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
+      jest-circus: 26.6.0
       jest-resolve: 26.6.0
       jest-watch-typeahead: 0.6.1(jest@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)))
       mini-css-extract-plugin: 0.11.3(webpack@4.44.2)
