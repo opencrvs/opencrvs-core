@@ -868,7 +868,7 @@ describe('Request and confirmation flow', () => {
             actionId: originalActionId,
             registrationNumber: MOCK_REGISTRATION_NUMBER
           })
-        ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+        ).rejects.toMatchObject({ code: 'FORBIDDEN' })
       })
     })
 
@@ -1215,7 +1215,7 @@ describe('Request and confirmation flow', () => {
             transactionId: getUUID(),
             actionId: originalActionId
           })
-        ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+        ).rejects.toMatchObject({ code: 'FORBIDDEN' })
       })
     })
   })
@@ -1302,9 +1302,7 @@ describe('Register action - hidden field nullification', () => {
   describe('Invalid keys scenarios', () => {
     test('rejects hidden field with non-null value during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const declaredDocument = await client.event.get({ eventId: event.id })
       const declaredCurrentEventState = getCurrentEventState(
@@ -1355,9 +1353,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('rejects multiple hidden fields with non-null values during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const declaredDocument = await client.event.get({ eventId: event.id })
       const declaredCurrentEventState = getCurrentEventState(
@@ -1413,9 +1409,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('rejects non-existent field during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1447,9 +1441,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('rejects hidden field from conditional page during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1487,12 +1479,13 @@ describe('Register action - hidden field nullification', () => {
         ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
           type: 'record.search',
-          options: { event: ['tennis-club-membership'], placeOfEvent: 'administrativeArea' }
+          options: {
+            event: ['tennis-club-membership'],
+            placeOfEvent: 'administrativeArea'
+          }
         })
       ])
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1572,9 +1565,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('accepts multiple hidden fields with null values during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1617,9 +1608,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('accepts visible field with any value during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1720,12 +1709,13 @@ describe('Register action - hidden field nullification', () => {
         ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
           type: 'record.search',
-          options: { event: ['tennis-club-membership'], placeOfEvent: 'administrativeArea' }
+          options: {
+            event: ['tennis-club-membership'],
+            placeOfEvent: 'administrativeArea'
+          }
         })
       ])
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1805,9 +1795,7 @@ describe('Register action - hidden field nullification', () => {
   describe('Edge cases', () => {
     test('accepts null for hidden field on hidden page during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1847,9 +1835,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('mixed valid and invalid keys returns only invalid keys in error during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {

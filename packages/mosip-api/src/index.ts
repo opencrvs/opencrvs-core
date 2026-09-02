@@ -22,7 +22,7 @@ import { OIDPUserInfoSchema, OIDPQuerySchema } from './esignet-api'
 import formbody from '@fastify/formbody'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
-import { getPublicKey } from './opencrvs-api'
+import { getPublicKey, assertCanConfirmRegistrations } from './opencrvs-api'
 import { OIDPUserInfoHandler } from './routes/oidp-user-info'
 import { initSqlite } from './database'
 import {
@@ -109,7 +109,7 @@ const initRoutes = (app: FastifyInstance) => {
       tags: ['Operations (Prod Debug)'],
       summary: 'Discard a pending transaction',
       description:
-        'Deletes a stored transaction so a stuck registration can be unblocked. Intended for production support workflows and requires record.reject-registration scope.'
+        'Deletes a stored transaction so a stuck registration can be unblocked. Intended for production support workflows and requires record.register scope.'
     }
   })
 
@@ -297,12 +297,17 @@ export const buildFastify = async () => {
 async function run() {
   const app = await buildFastify()
 
+  // Fail fast unless this integration can authenticate and confirm
+  // registrations — otherwise every confirmation would fail asynchronously,
+  // long after the record was already sent to MOSIP.
+  await assertCanConfirmRegistrations(app.log)
+
   const { wasCreated, wasConnected, database } = initSqlite(
     env.SQLITE_DATABASE_PATH
   )
 
-  if (wasCreated) app.log.info('SQLite token storage created')
-  if (wasConnected) app.log.info('SQLite token storage connected')
+  if (wasCreated) app.log.info('SQLite transaction storage created')
+  if (wasConnected) app.log.info('SQLite transaction storage connected')
 
   await app.ready()
   await app.listen({
