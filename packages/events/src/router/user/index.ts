@@ -20,6 +20,8 @@ import {
   JurisdictionFilter,
   UserOrSystemSummary,
   logger,
+  maskEmail,
+  maskSms,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -160,7 +162,7 @@ export async function handleCreateUser(
     })
     if (existingWithMobile.length > 0) {
       logger.error(
-        `Phone number ${input.mobile} is already in use by another user`
+        `Phone number ${maskSms(input.mobile)} is already in use by another user`
       )
       throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
     }
@@ -175,7 +177,9 @@ export async function handleCreateUser(
       sortBy: 'createdAt'
     })
     if (existingWithEmail.length > 0) {
-      logger.error(`Email ${input.email} is already in use by another user`)
+      logger.error(
+        `Email ${maskEmail(input.email)} is already in use by another user`
+      )
       throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
     }
   }
@@ -332,7 +336,7 @@ export const userRouter = router({
           existingWithMobile[0].id !== input.id
         ) {
           logger.error(
-            `Phone number ${input.mobile} is already in use by another user`
+            `Phone number ${maskSms(input.mobile)} is already in use by another user`
           )
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
         }
@@ -349,7 +353,9 @@ export const userRouter = router({
           existingWithEmail.length > 0 &&
           existingWithEmail[0].id !== input.id
         ) {
-          logger.error(`Email ${input.email} is already in use by another user`)
+          logger.error(
+            `Email ${maskEmail(input.email)} is already in use by another user`
+          )
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
@@ -533,7 +539,7 @@ export const userRouter = router({
         userWithDuplicateNumber[0].id !== input.userId
       ) {
         logger.error(
-          `Phone number ${input.phoneNumber} is already in use by another user`
+          `Phone number ${maskSms(input.phoneNumber)} is already in use by another user`
         )
         throw new TRPCError({
           code: 'CONFLICT',
@@ -597,7 +603,9 @@ export const userRouter = router({
         userWithDuplicateEmail.length > 0 &&
         userWithDuplicateEmail[0].id !== input.userId
       ) {
-        logger.error(`Email ${input.email} is already in use by another user`)
+        logger.error(
+          `Email ${maskEmail(input.email)} is already in use by another user`
+        )
         throw new TRPCError({
           code: 'CONFLICT',
           message: 'Email is already in use'
