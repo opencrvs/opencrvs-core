@@ -24,11 +24,11 @@ spec:
             - -c
             - |
               kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
-                  pgbackrest --stanza="$PGBACKREST_STANZA" info > /tmp/pgbackrest_info 2>&1
+                  su postgres -c "pgbackrest --stanza=$PGBACKREST_STANZA info" > /tmp/pgbackrest_info 2>&1
               if grep -q "missing stanza path" /tmp/pgbackrest_info; then
                 echo "Stanza '$PGBACKREST_STANZA' does not exist. Initializing..."
                 kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
-                  pgbackrest --stanza="$PGBACKREST_STANZA" stanza-create
+                  su postgres -c "pgbackrest --stanza=$PGBACKREST_STANZA stanza-create"
                 echo "Stanza '$PGBACKREST_STANZA' created."
               else
                 echo "Stanza '$PGBACKREST_STANZA' already exists."
