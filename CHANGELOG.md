@@ -80,6 +80,14 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 [#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
 
+#### The system-ready trigger moved to `/trigger/system/ready`
+
+Events calls the country config on startup so it can register its integrations. That endpoint was `GET /triggers/system/ready`; it is now `GET /trigger/system/ready`, matching the singular `/trigger/...` prefix of the other country config triggers.
+
+**Country configs that implement the trigger must rename their route.** A country config still serving the old path answers 404, which events treats as "not implemented" — it logs and moves on, so integrations declared by the country config silently never get registered.
+
+[#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
+
 ### Deprecations
 
 #### `POST /auth/token` parameters in the query string
