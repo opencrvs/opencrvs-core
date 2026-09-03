@@ -21,7 +21,6 @@ CLAUDE.local.md
 !.claude/hooks/
 !.claude/skills/
 .claude-working/
-CLAUDE.md
 .DS_Store
 .env*
 *.log
