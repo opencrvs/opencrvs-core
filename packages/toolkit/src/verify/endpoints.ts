@@ -98,7 +98,7 @@ const SECURED_ENDPOINTS: readonly EndpointCheck[] = [
     })
   ),
   { method: 'POST', path: '/trigger/telemetry' },
-  { method: 'GET', path: '/triggers/system/ready' },
+  { method: 'GET', path: '/trigger/system/ready' },
   {
     method: 'GET',
     path: `/certificates/${PROBE_SEGMENT}`,
