@@ -20,7 +20,7 @@ npx tsc --build tsconfig.build.json
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
 
 # Build telemetry client (self-contained; .d.ts comes from tsc --build above)
-npx esbuild src/telemetry/index.ts --bundle --format=cjs --outdir=./dist/telemetry --allow-overwrite --packages=external
+npx esbuild src/telemetry/index.ts --bundle --platform=node --format=cjs --outdir=./dist/telemetry --allow-overwrite --packages=external
 mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 mkdir -p ./dist/commons/events/state
@@ -49,7 +49,7 @@ npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/ev
 cp -r ../commons/build/dist/common/events/deduplication.d.ts ./dist/events/deduplication.d.ts
 
 # Build common notifications
-npx esbuild src/notification/index.ts --bundle --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
+npx esbuild src/notification/index.ts --bundle --platform=node --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
 mkdir -p ./dist/commons/notification
 cp -r ../commons/build/dist/common/notification/*.d.ts ./dist/commons/notification
 
@@ -59,7 +59,7 @@ mkdir -p ./dist/commons/application-config
 cp -r ../commons/build/dist/common/application-config.d.ts ./dist/commons/application-config/index.d.ts
 
 # Build migration CLI
-npx esbuild src/migrations/v2.1/index.ts --bundle --format=cjs --outdir=./dist/migrations/v2.1 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+npx esbuild src/migrations/v2.1/index.ts --bundle --platform=node --format=cjs --outdir=./dist/migrations/v2.1 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 chmod +x ./dist/migrations/v2.1/index.js
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -71,7 +71,7 @@ else
 fi
 
 # Build CLI
-npx esbuild src/cli.ts --bundle --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+npx esbuild src/cli.ts --bundle --platform=node --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 cp -R src/environment/templates dist/templates
 chmod +x ./dist/cli.js
 

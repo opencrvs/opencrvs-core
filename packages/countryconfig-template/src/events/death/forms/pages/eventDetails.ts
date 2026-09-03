@@ -385,6 +385,22 @@ export const eventDetails = defineFormPage({
       }
     },
     {
+      id: 'eventDetails.deathLocationResidence',
+      type: FieldType.ALPHA_HIDDEN,
+      required: false,
+      label: placeOfDeathMessageDescriptors.DECEASED_USUAL_RESIDENCE,
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: field('eventDetails.placeOfDeath').isEqualTo(
+            PlaceOfDeath.DECEASED_USUAL_RESIDENCE
+          )
+        }
+      ],
+      parent: [field('eventDetails.placeOfDeath'), field('deceased.address')],
+      value: field('deceased.address').get('administrativeArea')
+    },
+    {
       id: 'eventDetails.deathLocationId',
       type: FieldType.ALPHA_HIDDEN,
       required: false,
@@ -402,7 +418,7 @@ export const eventDetails = defineFormPage({
       value: [
         field('eventDetails.deathLocation'),
         field('eventDetails.deathLocationOther').get('administrativeArea'),
-        field('deceased.address').get('administrativeArea')
+        field('eventDetails.deathLocationResidence')
       ]
     }
   ]
