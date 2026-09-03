@@ -15,7 +15,8 @@ import {
   DocumentPath,
   EventDocumentOnlyLastAction,
   FilePathPrefix,
-  getUUID
+  getUUID,
+  UUID
 } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
@@ -42,6 +43,7 @@ import {
   EventIdParam,
   EventIdParamWithWaitFor
 } from '@events/router/middleware'
+import { MiddlewareOptions } from '@events/router/middleware/utils'
 import {
   userOnlyProcedure,
   router,
@@ -336,32 +338,40 @@ export const eventRouter = router({
   }),
   file: router({
     getPresignedUrl: userAndSystemProcedure
-      .input(EventIdParam.extend({ filePath: DocumentPath }))
+      // eventId lives inside events/{eventId}/... paths already — a separate
+      // field would be redundant, and meaningless for users/ or bare-uuid paths
+      .input(z.object({ filePath: DocumentPath }))
       .output(z.object({ presignedURL: z.string() }))
-      .use(middleware.canAccessEventWithScopes(['record.read']))
       .query(async ({ input, ctx }) => {
         const { filePath } = input
         const [firstSegment, secondSegment] = filePath.split('/')
 
         /*
-         * Documents service cannot tell which record a file belongs to, so the
-         * record-read check happens here. A file path only proves it belongs to
-         * the authorized event when it is namespaced under that event's id.
-         * `users/{userId}/...` (avatars, signatures) and bare `{uuid}.{ext}`
-         * (pre-2.0 legacy uploads) carry no record binding to check.
+         * Record ownership isn't known to documents-service, so it's checked
+         * here instead. `events/{eventId}/...` is record-bound; `users/{userId}/...`
+         * and bare `{uuid}.{ext}` (pre-2.0 legacy) aren't.
          */
-        if (
-          firstSegment === FilePathPrefix.Events &&
-          secondSegment !== ctx.eventId
-        ) {
-          throw new TRPCError({
-            code: 'FORBIDDEN',
-            message: 'File does not belong to the authorized event'
-          })
-        }
+        if (firstSegment === FilePathPrefix.Events) {
+          const eventId = UUID.safeParse(secondSegment).data
 
-        if (
-          firstSegment !== FilePathPrefix.Events &&
+          if (!eventId) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `Invalid event id in file path: ${filePath}`
+            })
+          }
+
+          /*
+           * No eventId input exists here for .use() to parse — it comes from
+           * the path above. The middleware is invoked directly instead, with
+           * just the fields it reads: ctx, getRawInput, next.
+           */
+          await middleware.canAccessEventWithScopes(['record.read'])({
+            ctx,
+            getRawInput: () => ({ eventId }),
+            next: (opts: unknown) => opts
+          } as unknown as MiddlewareOptions)
+        } else if (
           firstSegment !== FilePathPrefix.Users &&
           filePath.includes('/')
         ) {
