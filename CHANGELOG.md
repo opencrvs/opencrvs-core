@@ -80,11 +80,18 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 [#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
 
-#### The system-ready trigger moved to `/trigger/system/ready`
+#### Country config triggers are all served under `/trigger`
 
-Events calls the country config on startup so it can register its integrations. That endpoint was `GET /triggers/system/ready`; it is now `GET /trigger/system/ready`, matching the singular `/trigger/...` prefix of the other country config triggers.
+The user-notification and system-ready triggers were served under `/triggers/`, while the event action and telemetry triggers used `/trigger/`. All of them now use the singular prefix:
 
-**Country configs that implement the trigger must rename their route.** A country config still serving the old path answers 404, which events treats as "not implemented" — it logs and moves on, so integrations declared by the country config silently never get registered.
+| Before | After |
+| --- | --- |
+| `POST /triggers/user/{event}` | `POST /trigger/user/{event}` |
+| `GET /triggers/system/ready` | `GET /trigger/system/ready` |
+
+`POST /trigger/events/{event}/actions/{action}` and `POST /trigger/telemetry` are unchanged.
+
+**Country configs must rename these routes.** `opencrvs upgrade` does it for you: the `rename-trigger-paths` codemod rewrites the `path` of every matching Hapi route under `src/`, then lists every `/triggers/` reference it could not rewrite — a path built at runtime, a route config it did not recognise — for you to rename by hand.
 
 [#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
 
@@ -231,7 +238,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 
 ### Security fixes
 
-- Every `/triggers/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
+- Every `/trigger/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
 
   **Deployment notes:**
 

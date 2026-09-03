@@ -64,7 +64,7 @@ test('sendResetPasswordInvite calls triggerUserEventNotification with reset-pass
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/:event`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/:event`,
       async ({ request, params }) => {
         capturedEvent = params.event as string
         capturedBody = await request.json()
