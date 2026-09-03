@@ -10,7 +10,13 @@
  */
 
 import * as z from 'zod/v4'
-import { EventDocumentOnlyLastAction, getUUID } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import {
+  DocumentPath,
+  EventDocumentOnlyLastAction,
+  FilePathPrefix,
+  getUUID
+} from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -65,7 +71,7 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles } from '@events/service/files'
+import { cleanupUnreferencedFiles, presignFile } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -326,6 +332,46 @@ export const eventRouter = router({
         await cleanupUnreferencedFiles(event, ctx.token)
 
         return currentDraft
+      })
+  }),
+  file: router({
+    getPresignedUrl: userAndSystemProcedure
+      .input(EventIdParam.extend({ filePath: DocumentPath }))
+      .output(z.object({ presignedURL: z.string() }))
+      .use(middleware.canAccessEventWithScopes(['record.read']))
+      .query(async ({ input, ctx }) => {
+        const { filePath } = input
+        const [firstSegment, secondSegment] = filePath.split('/')
+
+        /*
+         * Documents service cannot tell which record a file belongs to, so the
+         * record-read check happens here. A file path only proves it belongs to
+         * the authorized event when it is namespaced under that event's id.
+         * `users/{userId}/...` (avatars, signatures) and bare `{uuid}.{ext}`
+         * (pre-2.0 legacy uploads) carry no record binding to check.
+         */
+        if (
+          firstSegment === FilePathPrefix.Events &&
+          secondSegment !== ctx.eventId
+        ) {
+          throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'File does not belong to the authorized event'
+          })
+        }
+
+        if (
+          firstSegment !== FilePathPrefix.Events &&
+          firstSegment !== FilePathPrefix.Users &&
+          filePath.includes('/')
+        ) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Unrecognized file path: ${filePath}`
+          })
+        }
+
+        return presignFile(filePath, ctx.token)
       })
   }),
   actions: router({
