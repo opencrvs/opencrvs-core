@@ -1313,7 +1313,7 @@ export const birthEvent = defineConfig({
       auditHistoryLabel: {
         defaultMessage: 'Unsealed',
         description: 'The label to show in audit history for the seal action',
-        id: 'event.birth.custom.action.seal.audit-history-label'
+        id: 'event.birth.custom.action.unseal.audit-history-label'
       },
       form: [
         {
