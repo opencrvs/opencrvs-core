@@ -49,7 +49,8 @@ import { emailHandler, emailSchema } from './api/notification/handler'
 import {
   telemetryHandler,
   telemetrySchema,
-  logTelemetryStartupStatus
+  logTelemetryStartupStatus,
+  TELEMETRY_DISABLED_NOTICE
 } from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
@@ -63,6 +64,7 @@ import { rolesHandler } from './data-seeding/roles/handler'
 import { usersHandler } from './data-seeding/employees/handler'
 import { applicationConfigHandler } from './api/application/handler'
 import { handlebarsHandler } from './certificate/handlebars/handler'
+import { systemReadyHandler } from './api/integration/handler'
 import { fontsHandler } from './api/fonts/handler'
 import {
   getEventsHandler,
@@ -406,7 +408,7 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'dashboards'],
       description:
-        "Returns the primary office id of the user the request is authenticated as"
+        'Returns the primary office id of the user the request is authenticated as'
     }
   })
 
@@ -719,14 +721,11 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/triggers/system/ready',
-    handler: (_request, h) => {
-      // Not implemented by default
-      // You can use this endpoint to for instance set up integration clients
-      return h.response().code(501)
-    },
+    handler: systemReadyHandler,
     options: {
-      tags: ['api', 'triggers'],
-      description: 'System ready endpoint'
+      tags: ['api', 'integration'],
+      description:
+        'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
     }
   })
 
@@ -885,6 +884,10 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    if (!env.TELEMETRY_ENABLED) {
+      logger.info(TELEMETRY_DISABLED_NOTICE)
+    }
 
     logTelemetryStartupStatus()
   }

@@ -39,8 +39,8 @@ importers:
         specifier: ^6.0.3
         version: 6.0.5
       '@opencrvs/toolkit':
-        specifier: 2.1.0-rc.f5ea803
-        version: 2.1.0-rc.f5ea803(@types/node@18.19.130)(typescript@7.0.2)
+        specifier: 2.1.0-rc.7737766
+        version: 2.1.0-rc.7737766(@types/node@18.19.130)(typescript@7.0.2)
       '@types/chalk':
         specifier: ^2.2.0
         version: 2.2.4
@@ -1001,8 +1001,8 @@ packages:
   '@octokit/types@9.3.2':
     resolution: {integrity: sha512-D4iHGTdAnEEVsB8fl95m1hiz7D5YiRdQ9b/OEb3BYRVwbLsGHcRVPz+u+BgRLNk0Q0/4iZCBqDN96j2XNxfXrA==}
 
-  '@opencrvs/toolkit@2.1.0-rc.f5ea803':
-    resolution: {integrity: sha512-F/6QoRcf68UC+f3j72ud9fVwG0INJb0lklEmAjQ9jUFcBUGV6bri2hd0AsgzZQsVYAHmI6XTnLij9lPVwYSIuw==}
+  '@opencrvs/toolkit@2.1.0-rc.7737766':
+    resolution: {integrity: sha512-02iJwcjtjYkLY14JplCcbCASYDN1nOqDmv4AM7QuEj84Oon7EHfpzvtFgDzWe6saSPqHznyGfJVbT7CmHZH8Pw==}
     hasBin: true
 
   '@opentelemetry/api@1.9.1':
@@ -2434,7 +2434,6 @@ packages:
   glob@11.1.0:
     resolution: {integrity: sha512-vuNwKSaKiqm7g0THUBu2x7ckSs3XJLXE+2ssL7/MfTGPLLcrJQ/4Uq1CjPTtO5cCIiRxqvN6Twy1qOwhL0Xjcw==}
     engines: {node: 20 || >=22}
-    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globals@14.0.0:
@@ -5065,7 +5064,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 18.1.1
 
-  '@opencrvs/toolkit@2.1.0-rc.f5ea803(@types/node@18.19.130)(typescript@7.0.2)':
+  '@opencrvs/toolkit@2.1.0-rc.7737766(@types/node@18.19.130)(typescript@7.0.2)':
     dependencies:
       '@inquirer/prompts': 8.5.2(@types/node@18.19.130)
       '@octokit/core': 4.2.1

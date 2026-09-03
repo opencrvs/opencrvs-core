@@ -263,6 +263,7 @@ export function SearchableSelect<T = string>({
   touched,
   disabled,
   placeholder,
+  isClearable = true,
   ['data-testid']: dataTestId
 }: SearchableSelectProps<T>) {
   const intl = useIntl()
@@ -288,6 +289,7 @@ export function SearchableSelect<T = string>({
       id={`searchable-select-${id}`}
       innerProps={{ 'data-testid': dataTestId }}
       inputId={id}
+      isClearable={isClearable}
       isDisabled={disabled}
       loadOptions={loadOptions}
       placeholder={placeholder ?? intl.formatMessage(formMessages.select)}

@@ -9,10 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID, encodeScope } from '@opencrvs/commons'
+import { UUID, encodeScope, getUUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
+const SYSTEM_ID = getUUID()
 const scope = encodeScope({ type: 'integration.create' })
 
 describe('integrations', () => {
@@ -57,6 +62,28 @@ describe('integrations', () => {
       expect(rows[0].secretHash).toBeTruthy()
       expect(rows[0].salt).toBeTruthy()
       expect(rows[0].shaSecret).toBeTruthy()
+      expect(rows[0].createdBy).toBe(user.id)
+    })
+
+    test('records no creator when the caller is a system client', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+
+      const result = await client.integrations.create({
+        name: 'System Created Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      const rows = await db
+        .selectFrom('systemClients')
+        .selectAll()
+        .where('id', '=', result.clientId as UUID)
+        .execute()
+
+      expect(rows).toHaveLength(1)
+      // A system caller — the startup bootstrap token — has no users(id)
+      // behind it, and created_by is a foreign key into users
+      expect(rows[0].createdBy).toBeNull()
     })
 
     test('writes an audit log entry', async () => {
@@ -87,6 +114,72 @@ describe('integrations', () => {
       // Credentials must not be in audit log
       expect(logs[0].responseSummary).not.toHaveProperty('shaSecret')
       expect(logs[0].responseSummary).not.toHaveProperty('clientSecret')
+    })
+
+    test('seeds pre-shared credentials so the integrating system can authenticate with the pair it already holds', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+      const clientId = getUUID()
+      const clientSecret = 'pre-shared-secret'
+
+      const result = await client.integrations.create({
+        name: 'Pre-shared Integration',
+        scopes: [encodeScope({ type: 'record.import' })],
+        credentials: { clientId, clientSecret }
+      })
+
+      expect(result.clientId).toBe(clientId)
+      expect(result.clientSecret).toBe(clientSecret)
+
+      const authenticated = await client.integrations.authenticate({
+        client_id: clientId,
+        client_secret: clientSecret
+      })
+
+      expect(authenticated.id).toBe(clientId)
+      expect(authenticated.status).toBe('active')
+    })
+
+    test('keeps pre-shared credentials out of the audit log', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+      const clientId = getUUID()
+
+      await client.integrations.create({
+        name: 'Pre-shared Audit Integration',
+        scopes: [encodeScope({ type: 'record.import' })],
+        credentials: { clientId, clientSecret: 'pre-shared-secret' }
+      })
+
+      const db = getClient()
+      const logs = await db
+        .selectFrom('auditLog')
+        .selectAll()
+        .where('clientId', '=', SYSTEM_ID)
+        .where('operation', '=', 'integrations.create')
+        .execute()
+
+      expect(logs).toHaveLength(1)
+      // The client id is not secret and is recorded in responseSummary; the
+      // secret must never appear, whether generated or supplied by the caller
+      expect(JSON.stringify(logs[0])).not.toContain('pre-shared-secret')
+    })
+
+    test('rejects a pre-shared client id that is already taken', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+      const clientId = getUUID()
+
+      await client.integrations.create({
+        name: 'First Claim',
+        scopes: [encodeScope({ type: 'record.import' })],
+        credentials: { clientId, clientSecret: 'pre-shared-secret' }
+      })
+
+      await expect(
+        client.integrations.create({
+          name: 'Second Claim',
+          scopes: [encodeScope({ type: 'record.import' })],
+          credentials: { clientId, clientSecret: 'another-secret' }
+        })
+      ).rejects.toThrow(/already exists/)
     })
   })
 

@@ -119,6 +119,7 @@ export function EventHistoryDialog({
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
+
   const comments = prepareComments(action)
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)

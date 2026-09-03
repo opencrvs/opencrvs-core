@@ -67,7 +67,7 @@
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@hapi/inert": "^6.0.3",
-    "@opencrvs/toolkit": "2.1.0-rc.f5ea803",
+    "@opencrvs/toolkit": "2.1.0-rc.7737766",
     "@types/chalk": "^2.2.0",
     "@types/csv2json": "^1.4.0",
     "@types/fhir": "^0.0.30",
