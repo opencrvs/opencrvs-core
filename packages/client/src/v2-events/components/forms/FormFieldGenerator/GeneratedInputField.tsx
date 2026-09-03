@@ -80,7 +80,6 @@ import {
   isImageViewFieldType,
   isAutocompleteFieldType,
   isUserRoleFieldType,
-  PrefixedFilePath,
   todayISO
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -180,15 +179,6 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
   attachmentPath: AttachmentPath
-}
-
-function hasAttachmentPath(path: AttachmentPath): path is PrefixedFilePath {
-  if (path === '') {
-    // eslint-disable-next-line no-console
-    console.warn('File field rendered without an attachment path')
-    return false
-  }
-  return true
 }
 
 function resolveOptions(
@@ -639,10 +629,6 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isFileFieldType(field)) {
-    if (!hasAttachmentPath(attachmentPath)) {
-      return null
-    }
-
     const uploadedFileNameLabel = field.config.configuration.fileName
       ? intl.formatMessage(field.config.configuration.fileName)
       : intl.formatMessage(field.config.label)
@@ -772,10 +758,6 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isSignatureFieldType(field)) {
-    if (!hasAttachmentPath(attachmentPath)) {
-      return null
-    }
-
     return (
       <InputField {...inputFieldProps}>
         <SignatureField.Input
@@ -871,10 +853,6 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isFileFieldWithOptionType(field)) {
-    if (!hasAttachmentPath(attachmentPath)) {
-      return null
-    }
-
     const resolvedOptions = resolveOptions(
       field.config.options,
       ocrvsFullForm,

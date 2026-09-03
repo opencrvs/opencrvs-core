@@ -14,12 +14,12 @@ import { v4 as uuid } from 'uuid'
 import {
   DocumentPath,
   FullDocumentPath,
-  joinValues,
-  PrefixedFilePath
+  joinValues
 } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
+import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
 import { queryClient, trpcClient } from '@client/v2-events/trpc'
 
@@ -156,7 +156,7 @@ interface Options {
 }
 
 export function useFileUpload(
-  path: PrefixedFilePath,
+  path: AttachmentPath,
   uniqueIdentifier: string,
   options: Options = {}
 ) {

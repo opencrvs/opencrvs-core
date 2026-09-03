@@ -16,10 +16,10 @@ import {
   MimeType,
   File as FileConfig,
   SignatureField as SignatureFieldConfig,
-  DocumentPath,
-  PrefixedFilePath
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
 import { useImageProcessing } from '@client/utils/imageUtils'
@@ -50,7 +50,7 @@ function FileInput({
   name: string
   description?: string
   error?: string
-  filePath: PrefixedFilePath
+  filePath: AttachmentPath
   label: string
   touched?: boolean
   disabled?: boolean
