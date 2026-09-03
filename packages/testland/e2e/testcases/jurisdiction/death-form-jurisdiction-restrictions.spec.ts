@@ -87,7 +87,7 @@ test.describe('Death form - place of death jurisdiction restrictions', () => {
     await expect(page.getByText('Other', { exact: true })).toBeVisible()
   })
 
-  test('Community Leader should not be able to choose Health Institution as place of death', async () => {
+  test('Community Leader should only be able to choose Other as place of death', async () => {
     await login(page, CREDENTIALS.COMMUNITY_LEADER)
     await openDeathDeclaration(page)
 
@@ -98,12 +98,27 @@ test.describe('Death form - place of death jurisdiction restrictions', () => {
     ).toBeHidden()
     await expect(
       page.getByText("Deceased's usual place of residence", { exact: true })
-    ).toBeVisible()
+    ).toBeHidden()
     await expect(page.getByText('Other', { exact: true })).toBeVisible()
   })
 
-  test('Registrar should be able to choose all place of death options', async () => {
+  test('Registrar should not be able to choose the deceased usual place of residence', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
+    await openDeathDeclaration(page)
+
+    await page.locator('#eventDetails____placeOfDeath').click()
+
+    await expect(
+      page.getByText('Health Institution', { exact: true })
+    ).toBeVisible()
+    await expect(
+      page.getByText("Deceased's usual place of residence", { exact: true })
+    ).toBeHidden()
+    await expect(page.getByText('Other', { exact: true })).toBeVisible()
+  })
+
+  test('Registrar General should be able to choose all place of death options', async () => {
+    await login(page, CREDENTIALS.REGISTRAR_GENERAL)
     await openDeathDeclaration(page)
 
     await page.locator('#eventDetails____placeOfDeath').click()

@@ -26,9 +26,12 @@ import {
 import { getSignatureFile, uploadFile } from './utils'
 import { omitBy } from 'lodash'
 
+type PlaceOfDeathType = 'DECEASED_USUAL_RESIDENCE' | 'OTHER' | 'HEALTH_FACILITY'
+
 async function getPlaceOfDeath(
-  type: 'DECEASED_USUAL_RESIDENCE' | 'HEALTH_FACILITY',
-  token: string
+  type: PlaceOfDeathType,
+  token: string,
+  village: string
 ) {
   if (type === 'HEALTH_FACILITY') {
     const locations = await getLocations('HEALTH_FACILITY', token)
@@ -41,12 +44,14 @@ async function getPlaceOfDeath(
   }
 
   if (type === 'DECEASED_USUAL_RESIDENCE') {
-    const administrativeAreas = await getAdministrativeAreas(token)
-
-    const village = getIdByName(administrativeAreas, 'Klow')
-
     return {
-      'deceased.address': {
+      'eventDetails.deathLocationId': village
+    }
+  }
+
+  if (type === 'OTHER') {
+    return {
+      'eventDetails.deathLocationOther': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         administrativeArea: village
@@ -55,20 +60,23 @@ async function getPlaceOfDeath(
     }
   }
 
-  throw new Error('Invalid place of birth type')
+  throw new Error('Invalid place of death type')
 }
 
 async function getDeclaration({
   partialDeclaration = {},
-  placeOfDeathType: placeOfDeathType = 'DECEASED_USUAL_RESIDENCE',
+  placeOfDeathType: placeOfDeathType = 'OTHER',
   token
 }: {
   partialDeclaration?:
     | ((_: Record<string, any>) => Record<string, any>)
     | Record<string, any>
-  placeOfDeathType?: 'DECEASED_USUAL_RESIDENCE' | 'HEALTH_FACILITY'
+  placeOfDeathType?: PlaceOfDeathType
   token: string
 }) {
+  const administrativeAreas = await getAdministrativeAreas(token)
+  const village = getIdByName(administrativeAreas, 'Klow')
+
   const mockDeclaration = {
     'spouse.dob': '1975-02-18',
     'spouse.age': undefined,
@@ -95,12 +103,17 @@ async function getDeclaration({
     'deceased.nationality': 'FAR',
     'spouse.addressSameAs': 'YES',
     'deceased.maritalStatus': 'MARRIED',
+    'deceased.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: village
+    },
     'eventDetails.placeOfDeath': placeOfDeathType,
     'eventDetails.mannerOfDeath': 'MANNER_NATURAL',
     'deceased.numberOfDependants': 3,
     'eventDetails.sourceCauseDeath': 'PHYSICIAN',
     'eventDetails.causeOfDeathEstablished': true,
-    ...(await getPlaceOfDeath(placeOfDeathType, token))
+    ...(await getPlaceOfDeath(placeOfDeathType, token, village))
   }
 
   const overrides =
@@ -129,7 +142,7 @@ export async function createDeclaration(
   token: string,
   dec?: ((_: ActionUpdate) => Partial<ActionUpdate>) | Partial<ActionUpdate>,
   action: ActionType = ActionType.REGISTER,
-  placeOfDeathType?: 'DECEASED_USUAL_RESIDENCE' | 'HEALTH_FACILITY',
+  placeOfDeathType?: PlaceOfDeathType,
   /**
    * Only honored for a system/integration token — the server resolves it
    * from the user's own `primaryOfficeId` for a normal user token, ignoring
