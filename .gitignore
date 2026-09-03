@@ -12,10 +12,15 @@ build
 
 # misc
 CLAUDE.local.md
+# Shared agent config is tracked; anything else under .claude/ is local.
+# Directories are un-ignored so their contents stay visible to git — a
+# negation cannot reach inside an excluded directory.
 .claude/*
 !.claude/settings.json
+!.claude/commands/
+!.claude/hooks/
+!.claude/skills/
 .claude-working/
-.claude
 CLAUDE.md
 .DS_Store
 .env*
