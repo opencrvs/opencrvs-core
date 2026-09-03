@@ -272,7 +272,7 @@ event.birth.custom.action.issue-vc.field.requester.option.father,Requester optio
 event.birth.custom.action.issue-vc.field.requester.option.mother,Requester option mother in VC action,Mother,Mère
 event.birth.custom.action.issue-vc.field.supporting-copy,Supporting copy shown before issuing verifiable credential,Select the requester you would like to issue this verifiable credential to.,Sélectionnez le demandeur à qui vous souhaitez délivrer cette attestation vérifiable.
 event.birth.custom.action.revoke-registration.field.reason.label,This is the label for the reason field for revoke registration action,Reason,Raison
-event.birth.custom.action.seal.audit-history-label,The label to show in audit history for the seal action,Unsealed,Descellé
+event.birth.custom.action.seal.audit-history-label,The label to show in audit history for the seal action,Sealed,Scellé
 event.birth.custom.action.seal.field.courtOrderCopy.label,This is the label for the supporting document field,Supporting document — court order copy,Document justificatif — copie de la décision de justice
 event.birth.custom.action.seal.field.courtOrderReference.label,This is the label for the court order reference field,Court order reference,Référence de la décision de justice
 event.birth.custom.action.seal.field.reason.label,This is the label for the seal reason field,Seal reason / legal basis,Motif du scellement / base légale
@@ -281,6 +281,7 @@ event.birth.custom.action.seal.field.reason.option.courtOrder.label,Option label
 event.birth.custom.action.seal.field.reason.option.other.label,Option label for other seal reasons,Other,Autre
 event.birth.custom.action.seal.field.requestingParty.label,This is the label for the requesting party field,Requesting party,Partie requérante
 event.birth.custom.action.seal.label,This is shown as the action name anywhere the user can trigger the action from,Seal,Sceller
+event.birth.custom.action.unseal.audit-history-label,The label to show in audit history for the seal action,Unsealed,Descellé
 event.birth.custom.action.unseal.label,This is shown as the action name anywhere the user can trigger the action from,Unseal,Desceller
 event.birth.custom.action.validate-declaration.audit-history-label,The label to show in audit history for the validate action,Validated,Validé
 event.birth.custom.action.validate-declaration.field.comments.label,This is the label for the comments field for the validate declaration action,Comments,Commentaires
