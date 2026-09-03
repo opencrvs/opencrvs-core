@@ -125,7 +125,7 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
-  http.post(`${env.COUNTRY_CONFIG_URL}/triggers/user/:event`, () =>
+  http.post(`${env.COUNTRY_CONFIG_URL}/trigger/user/:event`, () =>
     HttpResponse.json({})
   ),
   http.post(`${env.COUNTRY_CONFIG_URL}/trigger/telemetry`, () =>

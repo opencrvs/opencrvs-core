@@ -12,6 +12,7 @@ import { main as addExplicitCorrectionFlags } from './add-explicit-correction-fl
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
 import { main as addTranslations } from './add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
+import { main as renameTriggerPaths } from './rename-trigger-paths'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -19,6 +20,7 @@ import { main as enableTelemetry } from './enable-telemetry'
  */
 export async function runUpgrade(dockerSwarm: boolean) {
   await addExplicitCorrectionFlags()
+  await renameTriggerPaths()
   await addRecoveryLinkNotifications()
   await addTranslations()
   await enableTelemetry()

@@ -34,7 +34,7 @@
  *     `convertPayloadToVariable` switch, building the recovery URL from the
  *     token in the payload
  *   - `src/config/routes/userNotificationRoutes.ts`: adds the two
- *     `POST /triggers/user/*` routes core posts to
+ *     `POST /trigger/user/*` routes core posts to
  *   - `src/api/notification/email-templates/other/*.html`: writes the two
  *     email bodies
  *   - `src/translations/notification.csv`: adds the two SMS messages
@@ -516,11 +516,11 @@ function updateRoutes(project: Project, cwd: string) {
   }
 
   for (const event of RECOVERY_EVENTS) {
-    if (routesArray.getText().includes(`/triggers/user/${event.id}`)) continue
+    if (routesArray.getText().includes(`/trigger/user/${event.id}`)) continue
 
     routesArray.addElement(`{
   method: 'POST',
-  path: '/triggers/user/${event.id}',
+  path: '/trigger/user/${event.id}',
   handler: makeNotificationHandler('${event.id}'),
   options: {
     auth: false,
@@ -528,7 +528,7 @@ function updateRoutes(project: Project, cwd: string) {
     description: '${event.routeDescription}'
   }
 }`)
-    console.log(`  ✓ ${ROUTES_FILE}: POST /triggers/user/${event.id}`)
+    console.log(`  ✓ ${ROUTES_FILE}: POST /trigger/user/${event.id}`)
   }
 }
 

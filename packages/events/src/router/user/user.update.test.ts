@@ -303,7 +303,7 @@ test('Does not trigger username change when name is not provided', async () => {
   const mock = vi.fn()
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/user-updated`,
       async ({ request }) => {
         const req = await request.json()
         mock(req)
@@ -367,7 +367,7 @@ test('Changes username when the name changes and notifies about it', async () =>
   const mock = vi.fn()
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/user-updated`,
       async ({ request }) => {
         const req = await request.json()
         mock(req)
