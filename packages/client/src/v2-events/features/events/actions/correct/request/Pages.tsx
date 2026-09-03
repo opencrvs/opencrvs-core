@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  FilePathPrefix,
   getDeclarationPages,
   isNonInteractiveFieldType,
   PageConfig
@@ -108,7 +109,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        attachmentPath={`events/${eventId}/`}
+        attachmentPath={`${FilePathPrefix.Events}/${eventId}/`}
         eventConfig={configuration}
         formData={form}
         formPages={correctablePages}

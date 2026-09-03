@@ -27,7 +27,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile } from '@client/v2-events/cache'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { DocumentPath } from '@opencrvs/commons/client'
+import { DocumentPath, FilePathPrefix } from '@opencrvs/commons/client'
 
 const Container = styled.div`
   align-self: center;
@@ -169,7 +169,7 @@ function AvatarChangeModalComp({
   }
 
   const { uploadFileAsync } = useFileUpload(
-    `users/${userDetails?.id}`,
+    `${FilePathPrefix.Users}/${userDetails?.id}`,
     userDetails?.id || '',
     {}
   )

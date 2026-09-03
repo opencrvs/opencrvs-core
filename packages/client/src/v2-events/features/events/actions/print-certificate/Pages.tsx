@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  FilePathPrefix,
   getCurrentEventState,
   getPrintCertificatePages
 } from '@opencrvs/commons/client'
@@ -110,7 +111,7 @@ export function Pages() {
       {modal}
       <PagesComponent
         hideBackToReview
-        attachmentPath={`events/${eventId}/`}
+        attachmentPath={`${FilePathPrefix.Events}/${eventId}/`}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {

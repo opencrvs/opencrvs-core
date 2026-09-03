@@ -13,6 +13,7 @@ import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import {
   DocumentPath,
+  FilePathPrefix,
   FullDocumentPath,
   joinUrlPaths,
   joinValues
@@ -171,6 +172,11 @@ export function useFileUpload(
   uniqueIdentifier: string,
   options: Options = {}
 ) {
+  const prefix = path.split('/')[0]
+  if (!Object.values(FilePathPrefix).includes(prefix as FilePathPrefix)) {
+    throw new Error(`Unrecognized file path prefix: ${prefix}`)
+  }
+
   const upload = useMutation({
     mutationFn: async (variables: UploadFileParams) =>
       uploadFile({ ...variables, meta: { ...variables.meta } }),
