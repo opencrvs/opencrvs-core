@@ -18,6 +18,7 @@ import {
   DocumentPath,
   FileUploadWithOptions,
   MimeType,
+  PrefixedFilePath,
   SelectOption
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
@@ -91,7 +92,7 @@ function DocumentUploaderWithOption({
   value?: FileFieldWithOptionValue
   onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
-  filePath: string
+  filePath: PrefixedFilePath
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number

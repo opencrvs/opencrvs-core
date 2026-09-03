@@ -65,3 +65,6 @@ export const FilePathPrefix = {
 
 export type FilePathPrefix =
   (typeof FilePathPrefix)[keyof typeof FilePathPrefix]
+
+/** A path namespaced under one of the {@link FilePathPrefix} directories. */
+export type PrefixedFilePath = `${FilePathPrefix}/${string}`
