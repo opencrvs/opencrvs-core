@@ -26,10 +26,13 @@ test.describe('Document storage', () => {
   /*
    * Minio does not check that the object exists when it signs a URL. Any key is
    * sufficient to test the bucket policy. An upload is not necessary.
+   *
+   * users/, not events/: it needs no real, pre-existing event to presign.
    */
-  const objectPath = 'events/00000000-0000-4000-8000-000000000000/probe.png'
+  const objectPath = 'users/00000000-0000-4000-8000-000000000000/probe.png'
 
-  test('refuses anonymous reads but honours presigned ones', async () => {
+  // This gateway route had no record-level check; presigning now goes through events-service.
+  test('gateway no longer proxies presigned-url requests to documents-service', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
 
     const response = await fetch(
@@ -37,9 +40,32 @@ test.describe('Document storage', () => {
       { headers: { Authorization: `Bearer ${token}` } }
     )
 
+    expect(response.status).toBe(404)
+  })
+
+  test('refuses anonymous reads but honours presigned ones', async () => {
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+
+    const response = await fetch(
+      `${CLIENT_URL}/api/events/event.file.getPresignedUrl`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ json: { filePath: objectPath } })
+      }
+    )
+
     expect(response.status).toBe(200)
 
-    const { presignedURL } = await response.json()
+    const {
+      result: {
+        data: { json }
+      }
+    } = await response.json()
+    const { presignedURL } = json
     const unsignedURL = new URL(presignedURL)
     unsignedURL.search = ''
 

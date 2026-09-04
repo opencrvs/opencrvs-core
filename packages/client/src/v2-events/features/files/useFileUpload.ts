@@ -14,14 +14,14 @@ import { v4 as uuid } from 'uuid'
 import {
   DocumentPath,
   FullDocumentPath,
-  joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
+import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient } from '@client/v2-events/trpc'
+import { queryClient, trpcClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -110,19 +110,8 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  await ensureFreshAccessToken()
-  const url = joinUrlPaths('/api/presigned-url', filePath)
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  const res = await response.json()
-  return res
+function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  return trpcClient.event.file.getPresignedUrl.query({ filePath })
 }
 
 export async function precacheFile(path: DocumentPath | FullDocumentPath) {
@@ -167,7 +156,7 @@ interface Options {
 }
 
 export function useFileUpload(
-  path: string,
+  path: AttachmentPath,
   uniqueIdentifier: string,
   options: Options = {}
 ) {

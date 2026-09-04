@@ -22,6 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
@@ -91,7 +92,7 @@ function DocumentUploaderWithOption({
   value?: FileFieldWithOptionValue
   onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
-  filePath: string
+  filePath: AttachmentPath
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number

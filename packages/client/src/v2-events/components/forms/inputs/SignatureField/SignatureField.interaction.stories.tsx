@@ -22,6 +22,7 @@ import {
   ActionType,
   DocumentPath,
   FieldType,
+  FilePathPrefix,
   generateEventDocument,
   generateTranslationConfig,
   MimeType,
@@ -127,6 +128,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`${FilePathPrefix.Events}/123-abcd-213/`}
             fields={[
               {
                 id: 'storybook.signature',
@@ -252,6 +254,7 @@ export const UploadButtonsArmLockBypass: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`${FilePathPrefix.Events}/123-abcd-213/`}
             fields={[
               {
                 id: 'storybook.signature',
@@ -395,6 +398,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              attachmentPath={`${FilePathPrefix.Events}/123-abcd-213/`}
               fields={[
                 {
                   id: 'storybook.signature',
@@ -543,6 +547,7 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
         element: (
           <StyledFormFieldGenerator
             ref={noDuplicateErrorFormRef}
+            attachmentPath={`${FilePathPrefix.Events}/123-abcd-213/`}
             fields={[
               {
                 id: 'storybook.signature',

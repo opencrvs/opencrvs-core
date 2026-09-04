@@ -132,7 +132,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { parseFieldReferencesInConfiguration } from './utils'
+import { AttachmentPath, parseFieldReferencesInConfiguration } from './utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -178,7 +178,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   searchMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
-  attachmentPath: string
+  attachmentPath: AttachmentPath
 }
 
 function resolveOptions(

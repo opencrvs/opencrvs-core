@@ -17,12 +17,16 @@ import {
   HttpField,
   IndexMap,
   isCodeToEvaluate,
-  isFieldReference
+  isFieldReference,
+  PrefixedFilePath
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
+
+/** A resolved attachment path, or '' when the form has no file field. */
+export type AttachmentPath = PrefixedFilePath | ''
 
 /**
  * Formik has a feature that automatically nests all form keys that have a dot in them.

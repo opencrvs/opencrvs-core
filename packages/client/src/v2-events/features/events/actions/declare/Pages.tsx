@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import { FilePathPrefix, getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -119,7 +119,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        attachmentPath={`events/${event.id}/`}
+        attachmentPath={`${FilePathPrefix.Events}/${event.id}/`}
         eventConfig={configuration}
         formData={formValues}
         formPages={declarationPages}

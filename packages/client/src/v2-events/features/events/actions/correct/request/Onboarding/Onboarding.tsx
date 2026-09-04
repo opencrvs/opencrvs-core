@@ -15,7 +15,11 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  FilePathPrefix,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -174,7 +178,7 @@ export function Onboarding() {
     >
       <PagesComponent
         hideBackToReview
-        attachmentPath={`events/${event.id}/`}
+        attachmentPath={`${FilePathPrefix.Events}/${event.id}/`}
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         eventConfig={configuration}
         formData={annotation}

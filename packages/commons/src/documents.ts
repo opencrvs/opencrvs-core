@@ -57,3 +57,14 @@ export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
 }
 
+/** Recognized top-level directories a {@link DocumentPath} can live under. */
+export const FilePathPrefix = {
+  Events: 'events',
+  Users: 'users'
+} as const
+
+export type FilePathPrefix =
+  (typeof FilePathPrefix)[keyof typeof FilePathPrefix]
+
+/** A path namespaced under one of the {@link FilePathPrefix} directories. */
+export type PrefixedFilePath = `${FilePathPrefix}/${string}`
