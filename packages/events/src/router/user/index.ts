@@ -46,7 +46,6 @@ import {
   updatePasswordHash,
   updateUserById
 } from '@events/storage/postgres/events/users'
-import { getUserActions } from '@events/service/events/user/actions'
 import {
   queryClientAuditLog,
   writeAuditLog
@@ -71,7 +70,6 @@ import {
   generateAndSendVerificationCode,
   generateNonce
 } from '@events/service/verifyCode'
-import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadUserAudit } from '../middleware'
 
 // Used for changing password, since the initial password does not necessarily have to comply with the password rules.
@@ -372,12 +370,6 @@ export const userRouter = router({
     .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
-  actions: userOnlyProcedure
-    .input(UserActionsQuery)
-    .use(userCanReadUserAudit)
-    .query(async ({ input }) => {
-      return getUserActions(input)
-    }),
   roles: router({
     list: userOnlyProcedure.query(async () => getRoles())
   }),
