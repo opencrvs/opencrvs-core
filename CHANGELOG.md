@@ -131,6 +131,7 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - `pnpm dev` now runs the MOSIP stack alongside the rest of core, so local registrations exercise the same MOSIP path as a real deployment. The testland `NO_MOSIP` escape hatch is gone — it only ever short-circuited local development, and production already defaulted to `false`.
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
+- Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
 
 ### New features
 

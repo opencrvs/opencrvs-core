@@ -6,13 +6,13 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "1"
   labels:
-    app: postgres-on-deploy
+    app: deployment-jobs
   name: postgres-on-deploy
 spec:
   template:
     metadata:
       labels:
-        app: postgres-on-deploy
+        app: deployment-jobs
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.dashboards) | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
@@ -22,3 +22,5 @@ spec:
       restartPolicy: "OnFailure"
       volumes:
         {{- include "postgres-on-deploy.volumes" . | nindent 8 }}
+
+{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}

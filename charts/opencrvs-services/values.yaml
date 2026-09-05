@@ -148,6 +148,40 @@ ingress:
   # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
   tls_resolver: ''
 
+# Kubernetes NetworkPolicy configuration for OpenCRVS workloads.
+# Requires a CNI provider that enforces Kubernetes NetworkPolicy.
+network_policy:
+  # Render NetworkPolicy resources. Requires a CNI provider that enforces
+  # NetworkPolicy - set to false on clusters without one.
+  enabled: true
+  # Baseline policy for ingress to OpenCRVS pods. One of:
+  # - deny: deny ingress unless another NetworkPolicy allows it (default).
+  # - private: allow ingress only from RFC1918 private ranges
+  #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+  # - full: no baseline policy; ingress is unrestricted.
+  ingress_mode: deny
+  # Baseline policy for egress from OpenCRVS pods. Same modes as
+  # ingress_mode, applied to egress instead. Defaults to "private" rather
+  # than "deny": OpenCRVS pods need to reach the dependencies chart's
+  # namespace (see allowed_namespaces below) and typically nothing else
+  # outside the cluster/VPC, so private strikes a safe-by-default balance
+  # without requiring every deployment to enumerate allowed_namespaces up
+  # front. Services that genuinely need public internet (e.g. countryconfig,
+  # for SMTP/SMS provider integrations) opt out individually via their own
+  # network_policy.egress_mode: full; see "Hardening" in README.md.
+  egress_mode: private
+  # Allow OpenCRVS pods in this namespace to communicate with each other.
+  # This keeps the chart practical while blocking unexpected cross-namespace
+  # and external traffic by default.
+  allow_same_namespace: true
+  # Namespaces OpenCRVS pods are allowed to reach. Only takes effect when
+  # egress_mode is not "full". Required for the OpenCRVS application to
+  # keep working once egress is denied by default (e.g. auth/gateway
+  # reaching redis/postgres/elasticsearch/minio), since the dependencies
+  # chart is typically deployed to a separate namespace. See "Hardening"
+  # in README.md.
+  allowed_namespaces: []
+
 # See kubernetes documentation for more information on service types:
 # https://kubernetes.io/docs/concepts/services-networking/service/
 service_type: ClusterIP
@@ -284,6 +318,8 @@ auth:
     # tag: v2.0.0
 
 client:
+  network_policy:
+    ingress_mode: private
   port: 3000
   image:
     name: ocrvs-client
@@ -316,6 +352,14 @@ countryconfig:
     name: opencrvs/ocrvs-countryconfig
     tag: v2.0.0
   port: 3040
+  network_policy:
+    # countryconfig needs public-internet egress regardless of the global
+    # network_policy.egress_mode: it integrates with per-country SMTP
+    # servers and SMS gateways (e.g. Infobip) at arbitrary external hosts
+    # configured via env vars/secrets, not fixed IPs a private-range or
+    # namespace-scoped rule could cover.
+    egress_mode: full
+    ingress_mode: private
 
 dashboards:
   enabled: false
@@ -323,8 +367,10 @@ dashboards:
     name: metabase
     repository: metabase
     tag: v0.56.4
-  use_default_credentials: true
   port: 4444
+  network_policy:
+    ingress_mode: private
+  use_default_credentials: true
   env:
     METABASE_DATABASE_SSL: false
     OPENCRVS_METABASE_MAP_NAME: Farajaland
@@ -347,10 +393,12 @@ gateway:
   port: 7070
   image:
     name: ocrvs-gateway
-
+  network_policy:
+    ingress_mode: private
   env:
     CHECK_INVALID_TOKEN: 'true'
     CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'
+    CONFIG_TOKEN_EXPIRY_SECONDS: '604800'
     COUNTRY: FAR
     DISABLE_RATE_LIMIT: 'false'
     LANGUAGES: 'en,fr'
@@ -359,6 +407,8 @@ login:
   port: 3020
   image:
     name: ocrvs-login
+  network_policy:
+    ingress_mode: private
   # login is an nginx docker image
   # nginx_conf_d_configmaps:
   #     List of Configmap names to store custom configuration:
@@ -414,6 +464,9 @@ events:
 deployment_jobs:
   service_account:
     name: deployment-jobs
+    network_policy:
+      ingress_mode: deny
+      egress_mode: full
     annotations:
       'helm.sh/hook': pre-install,pre-upgrade
       'helm.sh/hook-weight': '-10'

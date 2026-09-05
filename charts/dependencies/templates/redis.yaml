@@ -69,4 +69,6 @@ spec:
           configMap:
             name: redis-opencrvs-conf
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "redis" "Values" .Values) }}
 {{- end }}
