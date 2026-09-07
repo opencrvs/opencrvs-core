@@ -5,11 +5,19 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: postgres-on-deploy
+  labels:
+    app: backup-runner
+    job-type: backup
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   template:
+    metadata:
+      labels:
+        app: backup-runner
+        job-type: backup
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
       serviceAccountName: backup-runner

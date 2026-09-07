@@ -94,11 +94,11 @@ const SECURED_ENDPOINTS: readonly EndpointCheck[] = [
   ...SECURED_TRIGGER_USER_EVENTS.map(
     (event): EndpointCheck => ({
       method: 'POST',
-      path: `/triggers/user/${event}`
+      path: `/trigger/user/${event}`
     })
   ),
   { method: 'POST', path: '/trigger/telemetry' },
-  { method: 'GET', path: '/triggers/system/ready' },
+  { method: 'GET', path: '/trigger/system/ready' },
   {
     method: 'GET',
     path: `/certificates/${PROBE_SEGMENT}`,

@@ -199,11 +199,11 @@ export async function createDeathRegisteredWithInactiveFacility() {
   const result = await createDeathDeclaration(
     token,
     {
-      'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
       'eventDetails.deathLocation': facility.id,
       'eventDetails.deathLocationId': facility.id
     },
-    ActionType.REGISTER
+    ActionType.REGISTER,
+    'HEALTH_FACILITY'
   )
 
   const [initialVersion] = facility.versions
@@ -299,7 +299,6 @@ export async function createDeathArchivedControlRecord() {
   const { eventId } = await createDeathDeclaration(
     token,
     {
-      'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
       'eventDetails.deathLocation': facilityId,
       'eventDetails.deathLocationId': facilityId,
       'deceased.address': {
@@ -308,7 +307,8 @@ export async function createDeathArchivedControlRecord() {
         administrativeArea: mbulaId
       }
     },
-    ActionType.DECLARE
+    ActionType.DECLARE,
+    'HEALTH_FACILITY'
   )
 
   const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)

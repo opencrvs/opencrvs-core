@@ -720,7 +720,7 @@ export async function createServer() {
 
   server.route({
     method: 'GET',
-    path: '/triggers/system/ready',
+    path: '/trigger/system/ready',
     handler: systemReadyHandler,
     options: {
       tags: ['api', 'integration'],

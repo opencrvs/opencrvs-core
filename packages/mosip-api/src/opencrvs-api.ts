@@ -93,6 +93,13 @@ export const assertCanConfirmRegistrations = async (
     const payload = decode(token) as { scope?: string[] } | null
     scope = payload?.scope ?? []
   } catch (error) {
+    if (!env.isProd) {
+      logger.warn(
+        'Could not authenticate the OpenCRVS system client yet — waiting for OpenCRVS to be ready and the MOSIP integration to be seeded. Retrying in 3s...'
+      )
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      return assertCanConfirmRegistrations(logger)
+    }
     logger.error(
       { event: 'opencrvs.system-client.auth.failed', err: error },
       'Could not authenticate the OpenCRVS system client. Set OPENCRVS_CLIENT_ID and OPENCRVS_CLIENT_SECRET to valid credentials.'

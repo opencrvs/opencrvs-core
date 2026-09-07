@@ -101,6 +101,8 @@ spec:
 
 {{- include "service-account-helper" (dict "service_name" "client" "Values" .Values) }}
 
+{{- include "network-policy-rules" (dict "service_name" "client" "Values" .Values) }}
+
 {{- include "service-helper" (dict "service_name" "client" "Values" .Values) }}
 
 {{- include "hpa-helper" (dict "service_name" "client" "Values" .Values) }}
