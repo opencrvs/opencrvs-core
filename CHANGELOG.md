@@ -4,12 +4,11 @@
 
 ### Improvements
 
-- Reading and deleting an event's actions no longer scans the whole `event_actions` table. Indexes are added on `event_actions.event_id` and on `event_actions.original_action_id`, the latter for the self-referencing foreign key check a delete triggers: on a 120,000-action database, removing one event's actions dropped from 57 ms to 2 ms. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
 
   **Deployment notes:**
 
-  - Building the indexes stalls writes to both tables until it completes, for a time proportional to their size. Reads are unaffected, and stalled writes queue rather than fail.
-  - Events migrations now run with `--no-check-order`. Release branches carry migrations timestamped after work authored earlier on `develop`, which the order check rejects; once a database has run migrations out of name order its ledger stays that way, so the flag is permanent. Upstream branches need the same flag for databases upgraded from 1.9.
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
 
 ## 1.9.16
 
