@@ -91,10 +91,6 @@ outstanding rather than guessed at. Anything left over is listed at the end,
 and the command exits non-zero while that list is not empty.
 
 Options:
-  --docker-swarm   Also list the manual steps that only apply to a Docker
-                   Swarm deployment, which lives in compose files no codemod
-                   here touches. Omit it for Kubernetes, where the charts and
-                   the postgres-on-deploy job cover the same ground.
   -h, --help       Show this message.
 `.trim()
 
@@ -189,23 +185,18 @@ async function handleUpgrade() {
     process.exit(0)
   }
 
-  const KNOWN_FLAGS = new Set(['--docker-swarm'])
-  const unknownFlags = upgradeArgs.filter(
-    (arg) => arg.startsWith('-') && !KNOWN_FLAGS.has(arg)
-  )
+  const unknownFlags = upgradeArgs.filter((arg) => arg.startsWith('-'))
   if (unknownFlags.length > 0) {
     console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
     console.log(UPGRADE_USAGE)
     process.exit(1)
   }
 
-  const dockerSwarm = upgradeArgs.includes('--docker-swarm')
-
   console.log('Initiating upgrade...')
 
   let outstanding: string[]
   try {
-    ;({ outstanding } = await runUpgrade(dockerSwarm))
+    ;({ outstanding } = await runUpgrade())
   } catch (error) {
     console.error('Upgrade failed:', error)
     process.exit(1)

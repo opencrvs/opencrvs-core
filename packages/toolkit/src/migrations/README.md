@@ -6,7 +6,7 @@ to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.0/
 Run from inside a country config checkout:
 
 ```bash
-opencrvs upgrade [--docker-swarm]
+opencrvs upgrade
 ```
 
 Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/version-upgrades#step-2-update-code-and-test-locally
@@ -27,14 +27,21 @@ itself, which an upgrade has no business rewriting.
 ## Adding a step
 
 1. **Create** `v2.0/<your-step-name>.ts` — export `async function main()` that
-   mutates files under `process.cwd()`.
+   mutates files under `process.cwd()` and returns the steps it could **not**
+   do, as strings a country can act on.
+
+   A codemod is best-effort: a country config that renamed or restructured the
+   files you target keeps its own structure, so skip rather than guess, and
+   report the skip. `opencrvs upgrade` prints every returned string as one list
+   and exits non-zero, which is what stops a half-finished upgrade being
+   mistaken for a complete one — a step you skip silently is invisible.
 
 2. **Wire up** in `v2.0/index.ts`:
 
    ```ts
    import { main as yourStepName } from './your-step-name'
    // inside runUpgrade():
-   await yourStepName()
+   outstanding.push(...(await yourStepName()))
    ```
 
 3. **Make it idempotent** — safe to run twice (check before create/remove/rewrite).
