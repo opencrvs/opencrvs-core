@@ -20,6 +20,34 @@ ingress:
   # Resolver will be attached to Traefik CRD IngressRoute
   tls_resolver: ''
 
+# Kubernetes NetworkPolicy configuration for dependency workloads.
+network_policy:
+  # Render NetworkPolicy resources. Requires a CNI provider that enforces
+  # NetworkPolicy - set to false on clusters without one.
+  enabled: true
+  # Baseline policy for ingress to dependency pods. One of:
+  # - deny: deny ingress unless another NetworkPolicy allows it (default).
+  # - private: allow ingress only from RFC1918 private ranges
+  #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+  # - full: no baseline policy; ingress is unrestricted.
+  ingress_mode: deny
+  # Baseline policy for egress from dependency pods. Same modes as
+  # ingress_mode, applied to egress instead. DNS (TCP/UDP 53) is always
+  # allowed regardless of mode, except when full.
+  egress_mode: deny
+  # Allow dependency pods in this namespace to communicate with each other.
+  # This keeps the chart practical while blocking unexpected cross-namespace
+  # and external traffic by default.
+  allow_same_namespace: true
+  # Namespaces allowed to reach dependency pods. Only takes effect when
+  # ingress_mode is not "full". Dependency pods accept ingress on any port
+  # from every pod in each listed namespace (e.g. auth/gateway reaching
+  # redis/postgres/elasticsearch/minio from the opencrvs-services
+  # namespace). Required for the OpenCRVS application to keep working while
+  # ingress is denied by default, since the two charts are typically
+  # deployed to separate namespaces.
+  allowed_namespaces: []
+
 # Kubernetes storage type, available options are `pvc` or `host_path`
 storage_type: pvc
 
@@ -52,6 +80,31 @@ postgres:
   image:
     repository: postgres
     tag: 17.6
+  port: 5432
+  network_policy:
+    app_label:
+    ingress_mode: private
+    # FIXME: In future releases replace postgres image to more robust
+    # version with all required utilities installed and drop allow-package-repo-egress rule
+    # Chart-provided rules for this service. Postgres installs
+    # openssh-client/rsync/pgbackrest packages at runtime (see Air-Gap
+    # Installation in README.md); apt keeps package repositories
+    # reachable even when egress is denied by default. Some apt mirrors are
+    # HTTP-only, so both 80 and 443 are opened.
+    rules:
+      - name: allow-package-repo-egress
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 443
+
   # By default postgres is deployed with authentication enabled user/password: postgres/postgres
   use_default_credentials: true
   # postgres databases and users to create, if `use_default_credentials` is set to `false`.
@@ -142,14 +195,16 @@ postgres:
     # Host:
     # host: backup server hostname or IP
 
-
 # Elasticsearch Configuration
 elasticsearch:
+  # Enable Elasticsearch deployment.
+  enabled: true
   image:
     repository: docker.elastic.co/elasticsearch/elasticsearch
     tag: 8.19.15
-  # Enable Elasticsearch deployment.
-  enabled: true
+  port: 9200
+  network_policy:
+    ingress_mode: private
   # By default Elasticsearch is deployed without authentication enabled.
   use_default_credentials: true
   admin_user_secret_name: elasticsearch-admin-user
@@ -196,11 +251,17 @@ apm_server:
   image:
     repository: docker.elastic.co/apm/apm-server
     tag: 8.19.15
+  port: 8200
 
 kibana:
   image:
     repository: docker.elastic.co/kibana/kibana
     tag: 8.19.15
+  port: 5601
+
+  network_policy:
+    ingress_mode: private
+
   users_secret: kibana-users-secret
   # Configmap for custom configuration file
   # custom_config_configmap: kibana-custom-config
@@ -269,6 +330,39 @@ minio:
   image:
     repository: quay.io/minio/minio
     tag: RELEASE.2025-06-13T11-33-47Z
+  port: 3535
+  network_policy:
+    ingress_mode: private
+    rules:
+      # FIXME: See comment on postgres service
+      # FIXME: MinIO listens on two ports (API: 3535, Console: 3536), but
+      # network_policy.ingress_mode only scopes to the service's single `port`
+      # value (API here) - it can't express "console only". Ingress for the
+      # console is opened explicitly below instead; the API port keeps relying
+      # on allow_same_namespace / allowed_namespaces for internal access.
+      - name: allow-console-ingress
+        policyTypes:
+          - Ingress
+        ingress:
+          - ports:
+              - protocol: TCP
+                port: 3536
+      # MinIO installs packages such as openssh/rsync/minio-client at
+      # runtime (see Air-Gap Installation in README.md); apk keeps package
+      # repositories reachable even when egress is denied by default. Some
+      # apk mirrors are HTTP-only, so both 80 and 443 are opened.
+      - name: allow-package-repo-egress
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 443
 
   # Use default credentials (username: minioadmin, password: minioadmin).
   # Highly discouraged for production environments—see official docs:
@@ -337,6 +431,9 @@ redis:
   image:
     repository: redis
     tag: '8'
+  port: 6379
+  network_policy:
+    ingress_mode: private
   # By default Redis is deployed without authentication enabled.
   # auth_mode:
   #   - disabled: no authentication
