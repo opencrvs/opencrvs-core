@@ -151,7 +151,7 @@ function cloneRepository(
   repoUrl,
   ref,
   targetDir,
-  { keepHistory = false } = {}
+  { keepHistory = false, replaceOriginWithUpstream = false } = {}
 ) {
   const depthFlag = keepHistory ? '' : '--depth 1 '
   execSync(
@@ -179,6 +179,17 @@ function cloneRepository(
       )
       process.exit(1)
     }
+  }
+  if (replaceOriginWithUpstream) {
+    console.log("Replacing 'origin' remote with 'upstream' in " + targetDir + "...")
+    execSync('git remote remove origin', {
+      cwd: targetDir,
+      stdio: 'inherit'
+    })
+    execSync('git remote add upstream ' + repoUrl, {
+      cwd: targetDir,
+      stdio: 'inherit'
+    })
   }
 }
 
@@ -251,7 +262,8 @@ console.log(
 
 try {
   cloneRepository(INFRASTRUCTURE_REPO_URL, ref, infrastructureDirName, {
-    keepHistory: true
+    keepHistory: true,
+    replaceOriginWithUpstream: true
   })
 } catch (err) {
   console.error('Failed to clone the infrastructure repository:', err.message)
@@ -267,4 +279,3 @@ console.log('  git init')
 console.log('  npm install\n')
 console.log('To get started with the infrastructure:\n')
 console.log('  cd ' + infrastructureDirName)
-console.log('  git init\n')
