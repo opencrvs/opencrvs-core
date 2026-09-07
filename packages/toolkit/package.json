@@ -45,6 +45,7 @@
     "libsodium-wrappers": "^0.7.13",
     "lodash": "^4.17.10",
     "object-hash": "^3.0.0",
+    "pino": "^7.0.0",
     "prompts": "^2.4.2",
     "qs": "6.15.2",
     "ssh2": "^1.17.0",

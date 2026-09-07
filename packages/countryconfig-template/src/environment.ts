@@ -22,6 +22,7 @@ export const env = cleanEnv(process.env, {
   SENTRY_DSN: str({ default: undefined }),
   TWO_FA_ENABLED: bool({ default: true }),
   OPENCRVS_ENVIRONMENT: str({ devDefault: 'development' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   ANALYTICS_DATABASE_URL: url({
     devDefault:
       'postgres://events_analytics:analytics_password@localhost:5432/events',

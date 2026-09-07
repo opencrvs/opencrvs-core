@@ -17,7 +17,7 @@ export const invalidRequest = (h: Hapi.ResponseToolkit) =>
       error_description:
         'Invalid request. Check that all required parameters have been provided.',
       error_uri:
-        'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
+        'Refer to https://documentation.opencrvs.org/technical/guides/configuration/integrations/authenticate-a-client'
     })
     .header('Cache-Control', 'no-store')
     .code(400)
@@ -35,7 +35,7 @@ export const queryParametersDeprecated = (
         `secrets into access logs and will stop being read; production still ` +
         `accepts it, non-production no longer does.`,
       error_uri:
-        'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
+        'Refer to https://documentation.opencrvs.org/technical/guides/configuration/integrations/authenticate-a-client'
     })
     .header('Cache-Control', 'no-store')
     .code(400)
@@ -44,9 +44,9 @@ export const invalidGrantType = (h: Hapi.ResponseToolkit) =>
   h
     .response({
       error: 'unsupported_grant_type',
-      error_description: `Invalid or undefined grant type. Only "client_credentials" or "urn:opencrvs:oauth:grant-type:token-exchange" are supported.`,
+      error_description: `Invalid or undefined grant type. Only "client_credentials" is supported.`,
       error_uri:
-        'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
+        'Refer to https://documentation.opencrvs.org/technical/guides/configuration/integrations/authenticate-a-client'
     })
 
     .header('Cache-Control', 'no-store')
@@ -58,7 +58,7 @@ export const invalidClient = (h: Hapi.ResponseToolkit) =>
       error: 'invalid_client',
       error_description: 'Invalid client id or secret',
       error_uri:
-        'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
+        'Refer to https://documentation.opencrvs.org/technical/guides/configuration/integrations/authenticate-a-client'
     })
     .header('Cache-Control', 'no-store')
     .code(401)

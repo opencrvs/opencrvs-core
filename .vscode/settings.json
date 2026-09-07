@@ -36,5 +36,38 @@
   },
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "chat.tools.edits.autoApprove": {
+    "**/*": true,
+    "**/.env": false,
+    "**/.env.*": false,
+    "**/id_rsa": false,
+    "**/id_ed25519": false,
+    "**/*.pem": false,
+    "**/*.key": false,
+    "**/.secrets/**": false,
+    "**/wireguard/**": false,
+    "**/wg*.conf": false,
+    "**/openvpn/**": false,
+    "**/*.ovpn": false,
+    "**/vnc/**": false
+  },
+  "chat.tools.terminal.autoApprove": {
+    "rm": false,
+    "rmdir": false,
+    "del": false,
+    "kill": false,
+    "curl": false,
+    "wget": false,
+    "eval": false,
+    "chmod": false,
+    "chown": false,
+    "sudo": false,
+    "ssh": false,
+    "docker push": false,
+    "git push --force": false,
+    "kubectl": false,
+    "docker": false,
+    "git commit": false
   }
 }

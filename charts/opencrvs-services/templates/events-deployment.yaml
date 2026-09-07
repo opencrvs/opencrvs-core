@@ -8,6 +8,7 @@ metadata:
   name: events
 spec:
   replicas: {{ .Values.events.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "events" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: events
@@ -72,6 +73,8 @@ spec:
                 path: public-key.pem
 
 {{- include "service-account-helper" (dict "service_name" "events" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "events" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "events" "Values" .Values) }}
 

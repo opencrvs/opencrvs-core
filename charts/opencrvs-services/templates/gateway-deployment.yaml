@@ -38,6 +38,7 @@ metadata:
   name: gateway
 spec:
   replicas: {{ .Values.gateway.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "gateway" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: gateway
@@ -109,6 +110,8 @@ spec:
           name: public-key
 
 {{- include "service-account-helper" (dict "service_name" "gateway" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "gateway" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "gateway" "Values" .Values) }}
 

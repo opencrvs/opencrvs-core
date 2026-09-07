@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { within, expect } from 'storybook/test'
+import { within, expect, fireEvent } from 'storybook/test'
 import { userEvent } from 'storybook/test'
 import { SearchableSelect } from './SearchableSelect'
 
@@ -62,6 +62,76 @@ export const SearchOptions: StoryObj<typeof SearchableSelect> = {
     await expect(canvas.queryByText('Option 1')).toBeNull()
     await expect(canvas.queryByText('Option 2')).toBeNull()
     await userEvent.click(await canvas.findByText('Option 3'))
+  }
+}
+
+export const ClearSelectedOption: StoryObj<typeof SearchableSelect> = {
+  name: 'Selected value can be removed with the clear indicator',
+  args: {
+    options: [
+      {
+        label: 'Central',
+        value: 'central'
+      },
+      {
+        label: 'Sulaka',
+        value: 'sulaka'
+      }
+    ],
+    'data-testid': 'clearable-searchable-select',
+    id: 'clearable-select-field'
+  },
+  render: function Component(args) {
+    const [value, setValue] =
+      React.useState<React.ComponentProps<typeof SearchableSelect>['value']>(
+        null
+      )
+
+    return (
+      <div>
+        <label htmlFor={args.id}>{'Province'}</label>
+        <SearchableSelect {...args} value={value} onChange={setValue} />
+        <div data-testid="searchable-select-value-output">
+          {JSON.stringify(value?.value ?? null)}
+        </div>
+      </div>
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Nothing is selected, so there is nothing to clear',
+      async () => {
+        await expect(
+          canvasElement.querySelector('.react-select__clear-indicator')
+        ).toBeNull()
+      }
+    )
+
+    await step('Selecting an option reveals the clear indicator', async () => {
+      await userEvent.click(await canvas.findByLabelText('Province'))
+      await userEvent.click(await canvas.findByText('Sulaka'))
+
+      await expect(
+        await canvas.findByTestId('searchable-select-value-output')
+      ).toHaveTextContent('"sulaka"')
+      await expect(
+        canvasElement.querySelector('.react-select__clear-indicator')
+      ).not.toBeNull()
+    })
+
+    await step('Clicking the clear indicator removes the value', async () => {
+      const clearIndicator = canvasElement.querySelector(
+        '.react-select__clear-indicator'
+      )
+      // react-select handles clearing on mousedown rather than click
+      await fireEvent.mouseDown(clearIndicator as Element)
+
+      await expect(
+        await canvas.findByTestId('searchable-select-value-output')
+      ).toHaveTextContent('null')
+    })
   }
 }
 

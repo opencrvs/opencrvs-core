@@ -23,12 +23,12 @@ import {
   FieldType,
   FieldValue,
   EventState,
-  buildFormState,
   UUID,
   ClientAdministrativeArea,
   FieldGroup,
   TextField,
   FieldConfigDefaultValue,
+  buildFormState,
   isFieldValueWithoutTemplates,
   isTemplateVariable,
   mapFieldTypeToZod,
@@ -297,7 +297,14 @@ export function mapFieldToDefaultValue(
     case FieldType.FILE:
     case FieldType.FILE_WITH_OPTIONS:
       if (isSerializedUserField(field.defaultValue)) {
-        return resolveSerializedUserField(field.defaultValue, context)
+        /*
+         * A user field that resolves to nothing is no value at all, not an
+         * empty one. The difference matters: a conditional asking whether a
+         * field `isUndefined()` counts an empty string as defined.
+         */
+        return (
+          resolveSerializedUserField(field.defaultValue, context) || undefined
+        )
       }
 
       return replacePlaceholders({

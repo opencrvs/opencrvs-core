@@ -125,18 +125,30 @@ export function ValueOutput({
     if (!field.value) {
       return null
     }
+
+    const groupValue = field.value
+    const { separator, hideEmptyFields } = field.config.configuration ?? {}
+
+    const visibleFields = field.config.fields.filter(
+      (subfield) => subfield.type !== FieldType.ALPHA_HIDDEN
+    )
+
+    const subfields = hideEmptyFields
+      ? visibleFields.filter((subfield) => Boolean(groupValue[subfield.id]))
+      : visibleFields
+
     return (
       <>
-        {field.config.fields.map((subfield, idx, subfields) => (
+        {subfields.map((subfield, idx) => (
           <React.Fragment key={subfield.id}>
             <ValueOutput
               anchor={anchor}
               config={subfield}
               eventConfig={eventConfig}
               searchMode={searchMode}
-              value={field.value?.[subfield.id]}
+              value={groupValue[subfield.id]}
             />
-            {idx < subfields.length - 1 ? <br /> : undefined}
+            {idx < subfields.length - 1 ? (separator ?? <br />) : undefined}
           </React.Fragment>
         ))}
       </>

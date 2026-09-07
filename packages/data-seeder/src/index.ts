@@ -60,46 +60,6 @@ async function getToken(): Promise<string> {
   return body.token
 }
 
-/** Runs after writing has begun, so it throws rather than calling `raise()`:
- * `write()` below turns anything leaving it into a `PartialSeedError` carrying
- * the clear-the-database remedy. */
-async function triggerSystemReady(token: string) {
-  // eslint-disable-next-line no-console
-  console.log('Triggering system ready')
-  const systemReadyUrl = new URL(
-    'triggers/system/ready',
-    env.COUNTRY_CONFIG_HOST
-  ).toString()
-
-  const res = await fetch(systemReadyUrl, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }).catch((error: unknown) => {
-    throw new Error(
-      `System ready trigger failed with error: ${describeError(error)}`
-    )
-  })
-
-  // 501, 404, and 2xx responses are acceptable
-  if (
-    res.status === 501 ||
-    res.status === 404 ||
-    (res.status >= 200 && res.status < 300)
-  ) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `System ready trigger responded with acceptable status: ${res.status} ${res.statusText}`
-    )
-    return
-  }
-
-  throw new Error(
-    `System ready trigger failed with unexpected status: ${res.status} ${res.statusText}`
-  )
-}
-
 async function deactivateSuperuser(token: string) {
   const client = createInitialisationClient(token)
   await client.complete.mutate()
@@ -153,7 +113,6 @@ async function write(
     console.log('Seeding users')
     await seedUsers(token, users)
 
-    await triggerSystemReady(token)
     await deactivateSuperuser(token)
   } catch (error) {
     // `seedUsers` knows which record failed, so its report stands.

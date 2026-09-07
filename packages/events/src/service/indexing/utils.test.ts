@@ -8,9 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { UUID } from '@opencrvs/commons'
 import { eventQueryDataGenerator } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { decodeEventIndex, encodeEventIndex } from './utils'
+import { TrpcUserContext } from '../../context'
+import {
+  decodeEventIndex,
+  encodeEventIndex,
+  resolveRecordActionScopeToIds
+} from './utils'
 
 describe('EventIndex utils', () => {
   const eventConfig = tennisClubMembershipEvent
@@ -46,5 +52,81 @@ describe('EventIndex utils', () => {
       },
       'applicant.dob': '1990-01-01'
     })
+  })
+})
+
+describe('resolveRecordActionScopeToIds()', () => {
+  const user = {
+    id: 'a3e0b4c7-1f2d-4a58-9c3b-6d7e8f901234' as UUID,
+    primaryOfficeId: 'b4f1c5d8-2e3a-4b69-8d4c-7e8f90123456' as UUID,
+    administrativeAreaId: 'c5a2d6e9-3f4b-4c7a-9e5d-8f9012345678' as UUID
+  } as TrpcUserContext
+
+  test('resolves createdIn: location to the user primary office', () => {
+    expect(
+      resolveRecordActionScopeToIds(
+        { type: 'record.search', options: { createdIn: 'location' } },
+        user
+      ).options?.createdIn
+    ).toBe(user.primaryOfficeId)
+  })
+
+  test('resolves createdIn: administrativeArea to the user administrative area', () => {
+    expect(
+      resolveRecordActionScopeToIds(
+        {
+          type: 'record.search',
+          options: { createdIn: 'administrativeArea' }
+        },
+        user
+      ).options?.createdIn
+    ).toBe(user.administrativeAreaId)
+  })
+
+  test('resolves createdIn: all to no filter', () => {
+    expect(
+      resolveRecordActionScopeToIds(
+        { type: 'record.search', options: { createdIn: 'all' } },
+        user
+      ).options?.createdIn
+    ).toBeUndefined()
+  })
+})
+
+describe('resolveRecordActionScopeToIds()', () => {
+  const user = {
+    id: 'a3e0b4c7-1f2d-4a58-9c3b-6d7e8f901234' as UUID,
+    primaryOfficeId: 'b4f1c5d8-2e3a-4b69-8d4c-7e8f90123456' as UUID,
+    administrativeAreaId: 'c5a2d6e9-3f4b-4c7a-9e5d-8f9012345678' as UUID
+  } as TrpcUserContext
+
+  test('resolves createdIn: location to the user primary office', () => {
+    expect(
+      resolveRecordActionScopeToIds(
+        { type: 'record.search', options: { createdIn: 'location' } },
+        user
+      ).options?.createdIn
+    ).toBe(user.primaryOfficeId)
+  })
+
+  test('resolves createdIn: administrativeArea to the user administrative area', () => {
+    expect(
+      resolveRecordActionScopeToIds(
+        {
+          type: 'record.search',
+          options: { createdIn: 'administrativeArea' }
+        },
+        user
+      ).options?.createdIn
+    ).toBe(user.administrativeAreaId)
+  })
+
+  test('resolves createdIn: all to no filter', () => {
+    expect(
+      resolveRecordActionScopeToIds(
+        { type: 'record.search', options: { createdIn: 'all' } },
+        user
+      ).options?.createdIn
+    ).toBeUndefined()
   })
 })

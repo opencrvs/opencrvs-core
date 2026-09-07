@@ -96,27 +96,29 @@ function getLatestCommonReleaseTag() {
 }
 
 /**
- * A prerelease-shaped own version (e.g. "2.1.0-rc.f5ea803", what npm resolves
- * `@next` to - a build published from every push to a branch) never has a
- * matching release tag, so it's resolved as a branch instead. Its base
- * version (stripped of the "-rc.<sha>" suffix) tells apart two different
- * situations: an RC for a version already being stabilized on its own
- * "release/X.Y.Z" branch (e.g. "2.0.1-rc.*" while a patch release is in
- * progress) versus an RC for a version that hasn't been branched off yet and
- * only exists on develop (e.g. "2.1.0-rc.*" while that release branch hasn't
- * been cut). Scaffold from the release branch when it exists in both
- * repositories, otherwise fall back to develop.
+ * Resolves the ref that both repositories are cloned from. A single ref
+ * clones both, so every candidate must exist in *both* - a tag present in
+ * only one of them can't be used.
  *
- * Otherwise, the own "X.Y.Z" version - whether resolved via npm's `latest`
- * dist-tag (bare invocation) or an explicit `@X.Y.Z` pin - scaffolds from the
- * matching "vX.Y.Z" tag when it exists in both repositories. If it doesn't
- * (e.g. `latest` lagging behind the repos, or a pin that predates one repo's
- * tagging), fall back to the highest release tag common to both, rather than
- * a mismatched pairing of one tagged repo at that version and another repo
- * at a different release. Exits with an error if no matching release tag
- * exists in both repositories.
+ * The exact "v<version>" tag wins whenever it exists: it pins a commit, so
+ * a release, an explicit `@X.Y.Z` pin, or a blessed prerelease (npm `@beta`,
+ * published from that tag) reproduces however late it's scaffolded.
+ *
+ * Otherwise a prerelease falls back to a branch, since a rolling release
+ * candidate (npm `@next`) is never tagged: "release/X.Y.Z" of the base
+ * version when that release has been cut, otherwise develop. A release
+ * falls back to the highest tag common to both repositories - never a
+ * mismatched pairing of the two at different releases - or errors.
  */
 function resolveRef() {
+  const versionTag = 'v' + version
+  if (
+    tagExists(CORE_REPO_URL, versionTag) &&
+    tagExists(INFRASTRUCTURE_REPO_URL, versionTag)
+  ) {
+    return versionTag
+  }
+
   if (version.includes('-')) {
     const releaseBranch = 'release/' + version.split('-')[0]
     if (
@@ -128,19 +130,11 @@ function resolveRef() {
     return 'develop'
   }
 
-  const tag = 'v' + version
-  if (
-    tagExists(CORE_REPO_URL, tag) &&
-    tagExists(INFRASTRUCTURE_REPO_URL, tag)
-  ) {
-    return tag
-  }
-
   const latestCommonTag = getLatestCommonReleaseTag()
   if (latestCommonTag) {
     console.warn(
       '\nWarning: tag "' +
-        tag +
+        versionTag +
         '" was not found in both repositories; falling back to the latest ' +
         'available release, ' +
         latestCommonTag +

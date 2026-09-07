@@ -22,6 +22,15 @@ import {
 
 export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
 
+/**
+ * Subject of the short-lived bootstrap token countryconfig uses to register
+ * integrations on startup. Must be a well-formed UUID so it can be resolved as
+ * a `SystemContext` by services verifying the token — hence the v4 version and
+ * variant nibbles rather than an all-zero sentinel like `REINDEX_USER_ID`.
+ */
+export const INTEGRATION_CREATOR_USER_ID =
+  '00000000-0000-4000-8000-000000000001' as UUID
+
 export const UserName = NameFieldValue.omit({ middlename: true })
 
 const UserStatus = z.enum(['active', 'deactivated', 'pending'])

@@ -5,7 +5,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   labels:
-    app: common
+    app: deployment-jobs
     job-type: restore
   name: on-db-restore-cronjob
 spec:
@@ -18,7 +18,7 @@ spec:
       template:
         metadata:
           labels:
-            app: common
+            app: deployment-jobs
             job-type: restore
         spec:
           {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 10 }}
@@ -32,4 +32,7 @@ spec:
           volumes:
             {{- include "postgres-on-deploy.volumes" . | nindent 10 }}
             {{- include "elasticsearch-reindex.volumes" . | nindent 10 }}
+
+{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
+
 {{- end }}

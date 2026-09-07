@@ -30,7 +30,7 @@ const checkbox = (options: any) => inquirerPrompt('checkbox', options)
 
 import { info, warn } from './logger'
 import { readYamlFile, writeYamlFile } from './utils'
-import { getUsers } from './templates'
+import { extractAndModifyUsers } from './templates'
 
 export interface User {
   name: string
@@ -62,7 +62,7 @@ function updateInventoryFile(filePath: string, users: User[]) {
 function parseInventoryFile(filePath: string): User[] {
   try {
     const data = readYamlFile(filePath)
-    return getUsers(data)
+    return extractAndModifyUsers(data)
   } catch {
     return []
   }

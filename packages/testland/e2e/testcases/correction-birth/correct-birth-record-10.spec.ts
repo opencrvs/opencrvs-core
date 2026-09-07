@@ -252,7 +252,10 @@ test.describe('10. Correct record', () => {
           `/events/request-correction/${eventId}/pages/child?from=review&backTo=/workqueue/pending-certification#child____gender`
         )
 
-        await page.getByTestId('select__child____gender').locator('svg').click()
+        await page
+          .getByTestId('select__child____gender')
+          .locator('.react-select__dropdown-indicator')
+          .click()
         await page.getByText('Male', { exact: true }).click()
 
         await page.getByRole('button', { name: 'Go to review' }).click()

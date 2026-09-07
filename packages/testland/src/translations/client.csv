@@ -48,6 +48,7 @@ buttons.backToLogin,Button label to navigate back to the login page,Back to logi
 buttons.cancel,Cancel button text in the modal,Cancel,Annuler
 buttons.change,The label for the change button,Change,Modifier
 buttons.changeAll,The label for the change all button,Change all,Changer tous
+buttons.clear,Label for the button clearing all fields on the form page,Clear,Effacer
 buttons.closeDeclaration,Close declaration button text,Close declaration,Clôturer la déclaration
 buttons.configure,Configure button text,Configure,Paramétrer
 buttons.confirm,Confirm button,Confirm,Confirmer
@@ -119,6 +120,8 @@ changeModal.continue,The label for continue button of change modal,Continue,Cont
 changeModal.description,The description for change modal,A record will be created of any changes you make,Un enregistrement sera créé pour toute modification que vous apporterez
 changeModal.title,The title for change modal,Edit declaration?,Modifier la déclaration ?
 changePhone.validation.msg,Phone number validation message,Must be a valid 10 digit number that starts with 0,Doit être un numéro valide à {num} chiffres qui commence par {start}.
+clearForm.desc.clearFormConfirm,Description for clear form confirmation modal,All fields on this page will be cleared. Are you sure you want to continue?,Tous les champs de cette page seront effacés. Voulez-vous vraiment continuer ?
+clearForm.title.clearFormConfirm,Title for clear form confirmation modal,Clear form?,Effacer le formulaire ?
 config.advanced.search,This is used for the advanced search,Advanced Search,Recherche avancée
 config.advanced.search.instruction,This is used for the advanced search,Select the options to build an advanced search. A minimum of two search parameters is required.,Sélectionnez les options pour construire une recherche avancée. Un minimum de deux paramètres de recherche est requis.
 config.certificate.options,Show options,Options,Options
@@ -608,7 +611,7 @@ event.edit.comment.label,The label for the comment,Comments,Commentaires
 event.edit.declareWithEdits.label,Label for `Declare with edits` in edit action menu,Declare with edits,Déclarer avec modifications
 event.edit.notifyWithEdits.label,Label for `Notify with edits` in edit action menu,Notify with edits,Notifier avec modifications
 event.edit.registerWithEdits.label,Label for `Register with edits` in edit action menu,Register with edits,Enregistrer avec modifications
-event.history.role,Label for the role in event history,"{role, select, LOCAL_REGISTRAR {Registrar} REGISTRATION_AGENT {Registration Officer} HOSPITAL_CLERK {Hospital Official} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} COMMUNITY_LEADER {Community Leader} PROVINCIAL_REGISTRAR {Provincial Registrar} EMBASSY_OFFICIAL {Embassy Official} HEALTH_ADMINISTRATOR {Health Administrator} other {Unknown}}","{role, select, LOCAL_REGISTRAR {Officier d'état civil local} REGISTRATION_AGENT {Agent d'enregistrement} PERFORMANCE_MANAGER {Responsable des opérations} LOCAL_SYSTEM_ADMIN {Administrateur} NATIONAL_SYSTEM_ADMIN {Administrateur national} NATIONAL_REGISTRAR {Registraire général} HOSPITAL_CLERK {Officiel de l'hôpital} COMMUNITY_LEADER {Responsable communautaire} PROVINCIAL_REGISTRAR {Registraire provincial} EMBASSY_OFFICIAL {Officiel d'ambassade} HEALTH_ADMINISTRATOR {Administrateur de santé} other {Inconnu}}"
+event.history.role,Label for the role in event history,"{role, select, LOCAL_REGISTRAR {Registrar} REGISTRATION_AGENT {Registration Officer} HOSPITAL_CLERK {Hospital Official} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} COMMUNITY_LEADER {Community Leader} PROVINCIAL_REGISTRAR {Provincial Registrar} EMBASSY_OFFICIAL {Embassy Official} HEALTH_ADMINISTRATOR {Health Administrator} FIELD_AGENT {Field Agent} other {Unknown}}","{role, select, LOCAL_REGISTRAR {Officier d'état civil local} REGISTRATION_AGENT {Agent d'enregistrement} PERFORMANCE_MANAGER {Responsable des opérations} LOCAL_SYSTEM_ADMIN {Administrateur} NATIONAL_SYSTEM_ADMIN {Administrateur national} NATIONAL_REGISTRAR {Registraire général} HOSPITAL_CLERK {Officiel de l'hôpital} COMMUNITY_LEADER {Responsable communautaire} PROVINCIAL_REGISTRAR {Registraire provincial} EMBASSY_OFFICIAL {Officiel d'ambassade} HEALTH_ADMINISTRATOR {Administrateur de santé} FIELD_AGENT {Agent de terrain} other {Inconnu}}"
 event.history.system,Name for system initiated actions in the event history,System,System
 event.history.systemDefaultName,Fallback for system integration name in the event history,System integration,Intégration système
 event.not.downloaded,Shown when user tries to perform an action on event that is not available,Please ensure the event is first assigned and downloaded to the browser.,Veuillez vous assurer que l'événement est d'abord attribué et téléchargé dans le navigateur.
@@ -830,6 +833,7 @@ integrations.revealKeys,Label for reveal keys option,Reveal Keys,Montrer clés d
 integrations.scopes,Heading for the scopes list in the client details dialog,Scopes,Autorisations
 integrations.shaSecret,Label for SHA secret,SHA secret,SHA Secret
 integrations.type,Labels for integration types,"{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} other {Custom}}","{type, select, HEALTH {Intégration de la santé} NATIONAL_ID {Identité nationale} RECORD_SEARCH {Recherche d'enregistrements} other {Personnalisé}}"
+integrations.type.api,Label for integration clients registered by the country configuration without a legacy system type,API integration,Intégration API
 integrations.uniqueKeyDescription,Label for the unique key description,These unique keys will be required by the client integrating...,Ces clés uniques seront requises par l'interface du système
 integrations.updatePermissionsMsg,Label for update permissions message,Permissions update successfully,Mise à jour des permissions avec succès
 messages.emptyString,Empty string, ,

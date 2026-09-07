@@ -30,7 +30,7 @@ export default async function invalidateTokenHandler(
   const { token } = request.payload as IInvalidateTokenPayload
   const userId = getUserIdFromToken(token)
   if (userId) {
-    recordUserAuditEvent(`Bearer ${token}`, {
+    void recordUserAuditEvent(userId, {
       operation: 'user.logged_out',
       requestData: { subjectId: userId }
     })

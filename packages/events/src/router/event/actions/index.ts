@@ -40,7 +40,6 @@ import {
 import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import { setBearerForToken } from '@events/router/middleware'
 import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
@@ -53,7 +52,6 @@ import {
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
-import { getActionConfirmationToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   ActionConfirmationResponse,
@@ -198,7 +196,7 @@ const AsyncActionInput = BaseActionInput.pick({
   actionId: UUID
 })
 
-export type AsyncActionInput = z.infer<typeof AsyncActionInput>
+type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
   declaration: true,
@@ -253,15 +251,11 @@ export async function defaultRequestHandler(
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
-  const eventActionToken = await getActionConfirmationToken(
-    { eventId: input.eventId, actionId: requestedAction.id },
-    token
-  )
   const { responseStatus, responseBody } = await requestActionConfirmation(
     input.type,
     input.transactionId,
     eventWithRequestedAction,
-    setBearerForToken(eventActionToken)
+    token
   )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
@@ -373,6 +367,15 @@ export function getDefaultActionProcedures(
     ? userAndSystemProcedure
     : userOnlyProcedure
 
+  // Confirming an action (accept/reject) requires the same scope as requesting
+  // it. Custom actions have no static scope in ACTION_SCOPE_MAP — their access
+  // is granted through `record.custom-action` (see `customActionProcedures`), so
+  // that is what their confirmation is checked against too.
+  const confirmationScopes =
+    actionType === ActionType.CUSTOM
+      ? ['record.custom-action' as const]
+      : ACTION_SCOPE_MAP[actionType]
+
   return {
     request: userTypeBasedProcedure
       .meta(meta)
@@ -437,7 +440,7 @@ export function getDefaultActionProcedures(
               .shape
           )
       )
-      .use(middleware.requireActionConfirmationAuthorization)
+      .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -509,7 +512,7 @@ export function getDefaultActionProcedures(
 
     reject: userAndSystemProcedure
       .input(AsyncActionInput)
-      .use(middleware.requireActionConfirmationAuthorization)
+      .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)

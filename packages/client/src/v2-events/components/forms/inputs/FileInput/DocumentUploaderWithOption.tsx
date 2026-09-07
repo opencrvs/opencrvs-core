@@ -257,7 +257,7 @@ function DocumentUploaderWithOption({
             value={selectedOption}
             onChange={(val) => {
               void helpers.setTouched(true)
-              setSelectedOption(val)
+              setSelectedOption(val ?? undefined)
               setUnselectedOptionError('')
             }}
           />

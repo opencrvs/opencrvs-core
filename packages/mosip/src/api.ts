@@ -38,6 +38,13 @@ export const MosipNotificationSchema = z.object({
 })
 
 export const MosipInteropPayloadSchema = z.object({
+  /**
+   * The OpenCRVS event being registered. mosip-api stores this alongside the
+   * MOSIP transaction id so it can confirm the registration when MOSIP later
+   * issues the credential — MOSIP does not echo arbitrary metadata back on the
+   * WebSub callback, so the correlation has to be persisted here.
+   */
+  eventId: z.string(),
   trackingId: z.string(),
   notification: MosipNotificationSchema,
   requestFields: z.union([

@@ -77,7 +77,7 @@ test('Registering an adoption seals the original birth record', async ({
 
   await test.step('Looking up a non-existent BRN shows no match', async () => {
     await page.locator('#search').fill('NOTAREALBRN1')
-    await page.getByRole('button', { name: 'Search', exact: true }).click()
+    await page.locator('#search').press('Enter')
 
     await expect(page.getByTestId('search-input-error')).toContainText(
       'No birth record found with this BRN'
@@ -89,7 +89,7 @@ test('Registering an adoption seals the original birth record', async ({
     // no need to go through the "Clear" confirmation (only shown once a
     // record has actually been linked).
     await page.locator('#search').fill(birthRegistrationNumber)
-    await page.getByRole('button', { name: 'Search', exact: true }).click()
+    await page.locator('#search').press('Enter')
 
     await expect(page.getByTestId('search-input-error')).toContainText(
       'Birth record found'

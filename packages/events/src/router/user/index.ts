@@ -12,11 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { decode } from 'jsonwebtoken'
-import {
-  AuditLogEntrySchema,
-  UserAuditRecordInput,
-  UUID
-} from '@opencrvs/commons/events'
+import { AuditLogEntrySchema, UUID } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
   getAcceptedScopesFromToken,
@@ -279,15 +275,6 @@ const UserAuditListQuery = z.object({
 })
 
 const auditRouter = router({
-  record: userAndSystemProcedure
-    .input(UserAuditRecordInput)
-    .mutation(async ({ input, ctx }) => {
-      await writeAuditLog({
-        ...input,
-        clientId: ctx.user.id,
-        clientType: ctx.user.type
-      })
-    }),
   list: userOnlyProcedure
     .input(UserAuditListQuery)
     .output(

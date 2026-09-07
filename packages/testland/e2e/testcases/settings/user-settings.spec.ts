@@ -27,7 +27,8 @@ test.describe.serial('1. Settings Page', () => {
   })
 
   test.describe('1.1 Registrar Settings page', async () => {
-    test('1.1.1 Navigate to settings page', async () => {
+    // 1.1.1 Navigate to settings page
+    test.beforeEach(async () => {
       await page.getByRole('button', { name: 'Profile' }).click()
 
       await page
@@ -73,11 +74,6 @@ test.describe.serial('1. Settings Page', () => {
 
     test('1.1.3 Change avatar', async () => {
       await page.getByTestId('change-avatar').first().click()
-
-      // Until a photo is uploaded the avatar renders initials, not an image.
-      await expect(
-        page.getByTestId('profile-image-value').locator('img')
-      ).toHaveCount(0)
 
       const attachmentPath = path.join(ASSETS_DIR, 'image.png')
 

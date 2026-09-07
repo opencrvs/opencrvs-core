@@ -238,7 +238,7 @@ test('UNAUTHORIZED error is thrown when internal request is made without token',
   expect(url).toBeDefined()
 
   await expect(
-    internalServiceClient.user.ping.query('ping')
+    internalServiceClient.user.getById.query(getUUID())
   ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
@@ -247,7 +247,7 @@ test('UNAUTHORIZED error is thrown when request is made with valid APP token', a
   expect(url).toBeDefined()
 
   await expect(
-    internalServiceClient.user.ping.query('ping', {
+    internalServiceClient.user.getById.query(getUUID(), {
       context: {
         headers: {
           authorization: `Bearer ${createValidAppToken()}`
@@ -273,7 +273,7 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
   })
 
   await expect(
-    internalServiceClient.user.ping.query('ping', {
+    internalServiceClient.user.getById.query(getUUID(), {
       context: {
         headers: {
           authorization: `Bearer ${forgedInternalServiceToken}`
@@ -287,6 +287,8 @@ test('API response is returned when internal request is made with valid token', 
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
+  const { user } = await setupTestCase()
+
   const internalServiceToken = jwt.sign({}, cert, {
     subject: 'opencrvs:auth-service',
     algorithm: 'RS256',
@@ -295,7 +297,7 @@ test('API response is returned when internal request is made with valid token', 
     issuer: 'opencrvs:auth-service'
   })
 
-  const response = await internalServiceClient.user.ping.query('ping', {
+  const response = await internalServiceClient.user.getById.query(user.id, {
     context: {
       headers: {
         authorization: `Bearer ${internalServiceToken}`
@@ -303,7 +305,11 @@ test('API response is returned when internal request is made with valid token', 
     }
   })
 
-  expect(response).toEqual(`pong: ping`)
+  expect(response).toEqual({
+    id: user.id,
+    role: user.role,
+    status: user.status
+  })
 })
 
 test('UNAUTHORIZED error is thrown when internal request is made with token is not signed with matching key', async () => {
@@ -319,7 +325,7 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
     issuer: 'opencrvs:auth-service'
   })
   await expect(
-    internalServiceClient.user.ping.query('ping', {
+    internalServiceClient.user.getById.query(getUUID(), {
       context: {
         headers: {
           authorization: `Bearer ${forgedInternalServiceToken}`

@@ -42,7 +42,7 @@ async function captureError(promise: Promise<unknown>) {
   throw new Error('Expected the call to be refused, but it resolved')
 }
 
-function sleep(ms: number) {
+async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
@@ -268,8 +268,9 @@ describe('integrations.audit', () => {
       )
 
       // The integration itself does something audited.
-      const machine = createSystemTestClient(clientId)
-      await machine.user.audit.record({
+      await writeAuditLog({
+        clientId,
+        clientType: TokenUserType.enum.system,
         operation: 'user.username_reminder',
         requestData: { subjectId: user.id }
       })

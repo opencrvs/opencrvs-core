@@ -53,6 +53,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   /** form id */
   id: string
   readonlyMode?: boolean
+  searchMode?: boolean
   className?: string
   attachmentPath?: string
   /** Which fields are generated */
@@ -82,6 +83,7 @@ export const FormFieldGenerator = forwardRef<
       formValues,
       className,
       eventConfig,
+      searchMode,
       attachmentPath = '',
       readonlyMode,
       id,
@@ -211,6 +213,7 @@ export const FormFieldGenerator = forwardRef<
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
               }}
               readonlyMode={readonlyMode}
+              searchMode={searchMode}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}

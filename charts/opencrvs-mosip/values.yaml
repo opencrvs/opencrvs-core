@@ -7,6 +7,16 @@ storage_type: host_path
 platform:
   tag: 'v2.1.0'
 
+# Deployment rollout strategy, applied to all three MOSIP mock/test services
+# below unless overridden per-service under <service>.strategy (e.g.
+# mosip_api.strategy.type).
+# - Recreate: terminate the existing pod before creating its replacement.
+#   Guarantees the old pod is gone before the new one starts; causes a
+#   brief outage since these run a single replica.
+# - RollingUpdate: Kubernetes' default gradual pod swap.
+strategy:
+  type: Recreate
+
 mosip_mock:
   enabled: true
   image:

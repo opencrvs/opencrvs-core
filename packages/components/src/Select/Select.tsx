@@ -184,9 +184,10 @@ function CustomControl(props: ControlProps) {
 export const Select = (props: ISelectProps) => {
   const { searchableLength, onChange, disabled, options, value, error } = props
 
-  const handleChange = (selectedOption: ISelectOption) => {
+  // react-select calls onChange with null when a clearable select is cleared
+  const handleChange = (selectedOption: ISelectOption | null) => {
     if (onChange) {
-      onChange(selectedOption.value)
+      onChange(selectedOption ? selectedOption.value : '')
     }
   }
   const length = searchableLength || 10

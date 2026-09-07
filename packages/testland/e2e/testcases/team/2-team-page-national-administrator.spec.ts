@@ -9,14 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CREDENTIALS } from '@e2e/support/constants'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   continueForm,
   continueUntilReview,
   drawSignature,
+  getToken,
   login
 } from '@e2e/support/helpers'
 import { expectInUrl } from '@e2e/support/utils'
+import { createClient } from '@opencrvs/toolkit/api'
+import { faker } from '@faker-js/faker'
+import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
 
 test('Basic UI check', async ({ browser }) => {
   const page = await browser.newPage()
@@ -52,17 +56,52 @@ test('Basic UI check', async ({ browser }) => {
   })
 })
 
+const TEST_OFFICE = 'Bakari Village Office'
+
 test('User Account Actions', async ({ browser }) => {
   const page = await browser.newPage()
+
+  const name = {
+    firstname: faker.person.firstName(),
+    surname: faker.person.lastName()
+  }
+  const fullName = `${name.firstname} ${name.surname}`
+
+  /*
+   * A user is created for every run in an office no other test touches, so that
+   * editing it below does not mutate users other tests rely on.
+   */
+  await test.step(`Create a new user in ${TEST_OFFICE}`, async () => {
+    const token = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+    const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
+    const offices = await getLocations('CRVS_OFFICE', token)
+
+    await client.user.create.mutate({
+      name,
+      // Registrar roles have the 'profile.electronic-signature' scope, which is
+      // what makes the signature page part of the edit form below.
+      role: 'LOCAL_REGISTRAR',
+      primaryOfficeId: getIdByName(offices, TEST_OFFICE),
+      mobile: `07${faker.string.numeric(8)}`,
+      email: faker.internet.email(),
+      fullHonorificName: fullName,
+      device: 'web',
+      data: {}
+    })
+  })
 
   await test.step('Login and navigate to edit details page', async () => {
     await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
     await page.getByRole('button', { name: 'Team' }).click()
-    await page.locator('//nav[@id="user-item-0-menu-dropdownMenu"]').click()
-    await page
-      .locator('//ul[@id="user-item-0-menu-Dropdown-Content"]')
-      .getByText('Edit details')
-      .click()
+
+    await page.getByRole('button', { name: 'HQ Office' }).click()
+    await page.getByTestId('locationSearchInput').fill(TEST_OFFICE)
+    await page.getByText(new RegExp(TEST_OFFICE)).click()
+    await expect(page.locator('#content-name')).toHaveText(TEST_OFFICE)
+
+    const userRow = page.getByRole('row').filter({ hasText: fullName })
+    await userRow.locator('nav[id$="-menu-dropdownMenu"]').click()
+    await userRow.getByText('Edit details').click()
     await expect(page.getByText('Confirm details')).toBeVisible()
   })
 

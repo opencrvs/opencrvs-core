@@ -14,8 +14,11 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
+  buildClientFunctionContext,
   flattenFieldReference,
+  isCodeToEvaluate,
   isFieldVisible,
+  runClientFunction,
   FieldType,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -57,7 +60,23 @@ export function computeInitialValues(
         ? values[field.id]
         : (resolveSyncedFieldValue(field, (syncRef) => {
             const key = flattenFieldReference(syncRef)
-            return get(values, key) ?? get(context.baseFormState, key)
+            const referenced =
+              get(values, key) ?? get(context.baseFormState, key)
+
+            /*
+             * A computed reference names the value it reads from; what it
+             * stores is what it's function makes of that value, not the value
+             * itself.
+             */
+            return isCodeToEvaluate(syncRef)
+              ? (runClientFunction(
+                  syncRef.$$code,
+                  referenced,
+                  buildClientFunctionContext({
+                    form: { ...context.baseFormState, ...values }
+                  })
+                ) as FieldValue | undefined)
+              : referenced
           }) ?? getDefaultValue(field, values))
 
     values[field.id] = effectiveValue

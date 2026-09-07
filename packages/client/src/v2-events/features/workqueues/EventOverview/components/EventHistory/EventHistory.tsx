@@ -17,13 +17,17 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
+  ActionStatus,
   ActionType,
   isActionConfigType,
   EventDocument,
   getActionConfig,
+  isSelectableAtAnchor,
   TokenUserType,
+  todayISO,
   toPlainDate
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -49,7 +53,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
+    '{status, select, Requested {Waiting for external validation} Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -187,7 +191,9 @@ function Integration({ action }: { action: ActionDocument }) {
       <div>
         <Box />
       </div>
-      {name}
+      <Text color="primary" element="span" variant="bold14">
+        {name}
+      </Text>
     </SystemName>
   )
 }
@@ -226,6 +232,9 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     ? resolveLocationName(location, toPlainDate(action.createdAt))
     : undefined
 
+  const isOfficeActiveToday =
+    !!location && isSelectableAtAnchor(location.versions, todayISO())
+
   const hasAccessToOffice =
     !!user &&
     canAccessOffice({
@@ -242,11 +251,12 @@ function ActionLocation({ action }: { action: ActionDocument }) {
         : undefined
   })
 
-  if (type === 'system') {
+  // Integrations have no office by design
+  if (type === 'system' || type === 'integration') {
     return null
   }
 
-  return hasAccessToOffice ? (
+  return hasAccessToOffice && isOfficeActiveToday ? (
     <LinkLeftAligned
       font="bold14"
       onClick={() => {
@@ -282,7 +292,8 @@ function EventHistorySkeleton() {
  */
 function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const validatorContext = useValidatorContext()
+
+  const validatorContext = useValidatorContext(fullEvent)
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
@@ -292,9 +303,20 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const history = extractHistoryActions(fullEvent)
 
-  const visibleHistory = history.filter(
-    ({ type }) => type !== ActionType.CREATE
+  // Rejected action confirmations (e.g. an external ID system such as MOSIP
+  // rejecting a deferred registration) are excluded from the regular history
+  // extraction. Surface rejected registrations so the record does not appear
+  // to be waiting for external validation forever.
+  const rejectedRegistrations = fullEvent.actions.filter(
+    (a): a is ActionDocument =>
+      a.type === ActionType.REGISTER &&
+      a.status === ActionStatus.Rejected &&
+      Boolean(a.originalActionId)
   )
+
+  const visibleHistory = [...history, ...rejectedRegistrations]
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (
     action: ActionDocument,
@@ -379,7 +401,10 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(history, action),
-              status: action.status
+              status: action.status,
+              // Lets countries configure different wording for actions
+              // performed by an integration, e.g. "Registered and UIN created"
+              userType: action.createdByUserType
             })
 
       return {
@@ -396,7 +421,8 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           intl.formatMessage(messages.timeFormat)
         ),
         user: <ActionCreator action={action} />,
-        role,
+        // Integrations have no role, and the table cell type takes no undefined
+        role: role ?? '',
         location: <ActionLocation action={action} />
       }
     })

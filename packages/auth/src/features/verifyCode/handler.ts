@@ -59,7 +59,7 @@ export default async function authenticateHandler(
 
   await deleteUsedVerificationCode(nonce)
 
-  void recordUserAuditEvent(`Bearer ${token}`, {
+  void recordUserAuditEvent(userId, {
     operation: 'user.logged_in',
     requestData: { subjectId: userId }
   })

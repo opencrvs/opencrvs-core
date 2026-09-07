@@ -38,6 +38,7 @@ metadata:
   name: client
 spec:
   replicas: {{ .Values.client.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "client" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: client
@@ -99,6 +100,8 @@ spec:
       {{- end }}
 
 {{- include "service-account-helper" (dict "service_name" "client" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "client" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "client" "Values" .Values) }}
 

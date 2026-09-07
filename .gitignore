@@ -12,6 +12,11 @@ build
 
 # misc
 CLAUDE.local.md
+.claude/*
+!.claude/settings.json
+.claude-working/
+.claude
+CLAUDE.md
 .DS_Store
 .env*
 *.log

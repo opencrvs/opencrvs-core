@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,6 +8,7 @@ metadata:
   name: auth
 spec:
   replicas: {{ .Values.auth.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "auth" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: auth
@@ -82,6 +84,8 @@ spec:
           name: private-key
 
 {{- include "service-account-helper" (dict "service_name" "auth" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "auth" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "auth" "Values" .Values) }}
 

@@ -759,6 +759,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         defaultMessage: 'Who is applying for the membership?',
         description: 'This is the title of the section'
       },
+      showClearButton: true,
       fields: [
         {
           id: 'applicant.name',

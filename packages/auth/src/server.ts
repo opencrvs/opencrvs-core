@@ -65,6 +65,9 @@ import serviceTokenHandler from './features/serviceToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
+import integrationCreatorTokenHandler, {
+  responseSchema as integrationCreatorResponseSchema
+} from './features/integrationCreatorToken/handler'
 import { badRequest } from '@hapi/boom'
 
 export type AuthServer = {
@@ -149,6 +152,21 @@ export async function createServer() {
         'Returns a token to be used for reindexing endpoints. This endpoint should never be called directly by clients.',
       response: {
         schema: reindexResponseSchema
+      }
+    }
+  })
+  server.route({
+    method: 'POST',
+    path: '/internal/integration-creator-token',
+    handler: integrationCreatorTokenHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Create a short-lived bootstrap token for countryconfig to register integrations',
+      notes:
+        'Returns a 60-second token with integration.create scope. This endpoint should only be reachable on the internal network.',
+      response: {
+        schema: integrationCreatorResponseSchema
       }
     }
   })

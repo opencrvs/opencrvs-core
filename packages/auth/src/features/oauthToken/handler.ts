@@ -12,7 +12,6 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { clientCredentialsHandler } from './client-credentials'
 import * as oauthResponse from './responses'
-import { tokenExchangeHandler } from './token-exchange'
 import { deprecatedQueryParams, getParam } from './utils'
 
 export async function tokenHandler(
@@ -39,10 +38,6 @@ export async function tokenHandler(
 
   if (grantType === 'client_credentials') {
     return clientCredentialsHandler(request, h)
-  }
-
-  if (grantType === 'urn:opencrvs:oauth:grant-type:token-exchange') {
-    return tokenExchangeHandler(request, h)
   }
 
   return oauthResponse.invalidGrantType(h)

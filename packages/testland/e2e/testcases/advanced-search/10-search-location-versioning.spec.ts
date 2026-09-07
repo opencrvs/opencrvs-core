@@ -259,17 +259,23 @@ test.describe
 
     // Province/district only auto-fill to the searching user's own
     // jurisdiction — Registrar General has none, so both start empty here.
-    await page.locator('#province').fill('Central')
+    await page
+      .locator('[id="child____birthLocation____other.province"]')
+      .fill('Central')
     await selectLocationOption(page, 'Central')
 
     // Exact match: "Ibombo" is also a substring of "Ibombo-north (old)".
-    await page.locator('#district').fill('Ibombo')
+    await page
+      .locator('[id="child____birthLocation____other.district"]')
+      .fill('Ibombo')
     await page
       .locator('[id^="locationOption"]')
       .getByText('Ibombo', { exact: true })
       .click()
 
-    await page.locator('#village').fill(areaName)
+    await page
+      .locator('[id="child____birthLocation____other.village"]')
+      .fill(areaName)
 
     // Unlike office/facility filters, the address admin-area filter only
     // ever offers currently-active areas — the option never appears here.

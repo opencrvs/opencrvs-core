@@ -24,8 +24,7 @@ export const INTEGRATION_SCOPES = [
   'type=record.read',
   'type=record.correct&event=birth',
   'record.registration-request-correction[event=birth]',
-  'record.confirm-registration[event=birth]',
-  'record.reject-registration[event=birth]'
+  'record.register[event=birth]'
 ]
 
 export async function fetchClientAPI(

@@ -75,13 +75,20 @@ async function insertAdminWithEmail(
   const email = 'admin@test.com'
   const result = await eventsDb
     .insertInto('users')
-    .values({ role: 'ADMIN', status: 'active', email, officeId, firstname: '', surname: '' })
+    .values({
+      role: 'ADMIN',
+      status: 'active',
+      email,
+      officeId,
+      firstname: '',
+      surname: ''
+    })
     .returning('id')
     .executeTakeFirstOrThrow()
   return { id: result.id as UUID, email }
 }
 
-const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
+const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/trigger/user/all-user-notification`
 
 describe('announcement.broadcast', () => {
   describe('authorization', () => {
@@ -464,10 +471,12 @@ describe('processNextAnnouncement', () => {
       .execute()
 
     const capturedBcc: string[] = []
+    const capturedAuth: (string | null)[] = []
     mswServer.use(
       http.post(ALL_USER_NOTIFICATION_URL, async ({ request }) => {
         const body = (await request.json()) as { recipient: { bcc: string[] } }
         capturedBcc.push(...body.recipient.bcc)
+        capturedAuth.push(request.headers.get('authorization'))
         return HttpResponse.json({ ok: true })
       })
     )
@@ -481,6 +490,12 @@ describe('processNextAnnouncement', () => {
 
     expect(announcement.status).toBe('SENT')
     expect(capturedBcc).toEqual(expect.arrayContaining(recipients))
+    /*
+     * A broadcast has no acting user, so the worker fetches an anonymous token
+     * of its own. Asserted explicitly: if it stops doing so, country config
+     * rejects the dispatch with a 401 and no announcement is ever delivered.
+     */
+    expect(capturedAuth).toEqual([`Bearer service-token`])
   })
 
   test('sends recipients in chunks of BCC_CHUNK_SIZE and updates progress after each', async () => {

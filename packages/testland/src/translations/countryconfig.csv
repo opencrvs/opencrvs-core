@@ -272,7 +272,7 @@ event.birth.custom.action.issue-vc.field.requester.option.father,Requester optio
 event.birth.custom.action.issue-vc.field.requester.option.mother,Requester option mother in VC action,Mother,Mère
 event.birth.custom.action.issue-vc.field.supporting-copy,Supporting copy shown before issuing verifiable credential,Select the requester you would like to issue this verifiable credential to.,Sélectionnez le demandeur à qui vous souhaitez délivrer cette attestation vérifiable.
 event.birth.custom.action.revoke-registration.field.reason.label,This is the label for the reason field for revoke registration action,Reason,Raison
-event.birth.custom.action.seal.audit-history-label,The label to show in audit history for the seal action,Unsealed,Descellé
+event.birth.custom.action.seal.audit-history-label,The label to show in audit history for the seal action,Sealed,Scellé
 event.birth.custom.action.seal.field.courtOrderCopy.label,This is the label for the supporting document field,Supporting document — court order copy,Document justificatif — copie de la décision de justice
 event.birth.custom.action.seal.field.courtOrderReference.label,This is the label for the court order reference field,Court order reference,Référence de la décision de justice
 event.birth.custom.action.seal.field.reason.label,This is the label for the seal reason field,Seal reason / legal basis,Motif du scellement / base légale
@@ -281,6 +281,7 @@ event.birth.custom.action.seal.field.reason.option.courtOrder.label,Option label
 event.birth.custom.action.seal.field.reason.option.other.label,Option label for other seal reasons,Other,Autre
 event.birth.custom.action.seal.field.requestingParty.label,This is the label for the requesting party field,Requesting party,Partie requérante
 event.birth.custom.action.seal.label,This is shown as the action name anywhere the user can trigger the action from,Seal,Sceller
+event.birth.custom.action.unseal.audit-history-label,The label to show in audit history for the seal action,Unsealed,Descellé
 event.birth.custom.action.unseal.label,This is shown as the action name anywhere the user can trigger the action from,Unseal,Desceller
 event.birth.custom.action.validate-declaration.audit-history-label,The label to show in audit history for the validate action,Validated,Validé
 event.birth.custom.action.validate-declaration.field.comments.label,This is the label for the comments field for the validate declaration action,Comments,Commentaires
@@ -687,6 +688,7 @@ unit.years,Years,Years,Années
 userRole.administrator,Name for user role Administrator,Administrator,Administrateur
 userRole.communityLeader,Name for user role Community Leader,Community Leader,Leader communautaire
 userRole.embassyOffical,Name for the user role Embassy Official,Embassy Official,Officiel d'ambassade
+userRole.fieldAgent,Name for user role Field Agent,Field Agent,Agent de terrain
 userRole.healthAdministrator,Name for user role Health Administrator,Health Administrator,Administrateur de santé
 userRole.hospitalClerk,Name for user role Hospital Clerk,Hospital Official,Officiel de l'hôpital
 userRole.localRegistrar,Name for user role Registrar,Registrar,Registraire
@@ -711,6 +713,7 @@ v2.event.death.action.declare.form.section.person.field.idType.label,This is the
 v2.event.death.action.declare.form.section.person.field.nationality.label,This is the label for the field,Nationality,Nationalité
 v2.event.death.action.declare.form.section.person.field.nid.label,This is the label for the field,ID Number,Numéro de pièce d'identité
 v2.event.death.action.declare.form.section.person.field.passport.label,This is the label for the field,ID Number,Numéro de pièce d'identité
+v2.events.correction.reject.label,Label for the reject correction action,Reject correction,Rejeter la correction
 verified.status.description,Description text of the status,"{value, select, authenticated {This identity has been successfully authenticated with the Farajaland’s National ID System. To make edits, please remove the authentication first.} verified {This identity data has been successfully verified with the Farajaland’s National ID System. Please note that their identity has not been authenticated using the individual's biometrics. To make edits, please remove the verification first.} pending {Identity pending verification with Farajaland’s National ID system} failed {The identity data does not match an entry in Farajaland’s National ID System} other {Invalid value}}","{value, select, authenticated {Cette identité a été authentifiée avec succès auprès du système national d'identité du Farajaland. Pour modifier, veuillez d'abord retirer l'authentification.} verified {Ces données d'identité ont été vérifiées avec succès auprès du système national d'identité du Farajaland. Veuillez noter que l'identité n'a pas été authentifiée à l'aide des données biométriques de la personne. Pour modifier, veuillez d'abord retirer la vérification.} pending {Identité en attente de vérification auprès du système national d'identité du Farajaland} failed {Les données d'identité ne correspondent à aucune entrée du système national d'identité du Farajaland} other {Valeur invalide}}"
 verified.status.text,Status text shown on the pill on both form declaration and review page,"{value, select, authenticated {ID Authenticated} verified {ID Verified} failed {Unverified ID} pending {Pending verification} other {Invalid value}}","{value, select, authenticated {Identité authentifiée} verified {Identité vérifiée} failed {Identité non vérifiée} pending {Vérification en attente} other {Valeur invalide}}"
 verify.label,The title for the E-Signet verification button,Authenticate with National ID system,S'authentifier auprès du système national d'identité
