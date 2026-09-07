@@ -9,19 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/*
- * Regression test for https://github.com/opencrvs/opencrvs-core/issues/13701
- *
- * A death event is declared with the informant as Spouse and all spouse
- * details filled. During a first edit the informant is changed to another
- * relation and "Spouse's details are not available" is checked (with a reason).
- * During a second edit that checkbox is unchecked, and the previously entered
- * spouse details are restored.
- *
- * The bug: the second edit's spouse-detail changes are reflected neither on the
- * Review page nor in the Record Audit ("Edited") entry. This test asserts the
- * expected behaviour — that the restored spouse details ARE surfaced in both.
- */
 import { test, expect } from '@playwright/test'
 import {
   getRandomDate,
