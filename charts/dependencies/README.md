@@ -27,22 +27,122 @@ Any particular service within this helm chart can be disabled by setting `<servi
 
 ## Global configuration options
 
-| Parameter               | Type   | Default        | Description                                                                                                                                                                                    |
-| ----------------------- | ------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| hostname                | string | farajaland.dev | All chart services will be available under specified domain. Exposed services are MinIO and Kibana, if Monitoring is enabled                                                                   |
-| ingress.ssl_enabled     | bool   | false          | Enable or disable https endpoint, by default all http traffic is routed to https                                                                                                               |
-| ingress.tls_resolver    | string | ` `            | If traefik was deployed with custom resolver, please define resolver name here. Resolver will be attached to Traefik CRD IngressRoute, otherwise default Traefik SSL Certificate will be used. |
-| ingress.tls_secret_name | string | ` `            | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                          |
-| timezone                | string | ` `            | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                    |
-| storage_type            | string | `pvc`          | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                   |
-| platform.imagePullSecrets | list | `[]`         | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                    |
-| node_selector           | dict   | `{}`           | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                       |
-| monitoring.enabled      | bool   | `false`        | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                    |
-| priority_class.enabled  | bool   | `false`        | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                     |
-| backup.enabled          | bool   | `true`         | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                           |
-| restore.enabled         | bool   | `true`         | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                           |
-| utilities.image.repository | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                     |
-| utilities.image.tag     | string | `v2.1.0`       | Shared utilities image tag used by helper jobs and init containers.                                                                                                                            |
+| Parameter                           | Type   | Default                            | Description                                                                                                                                                                                                                                                    |
+| ----------------------------------- | ------ | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| hostname                            | string | farajaland.dev                     | All chart services will be available under specified domain. Exposed services are MinIO and Kibana, if Monitoring is enabled                                                                                                                                   |
+| ingress.ssl_enabled                 | bool   | false                              | Enable or disable https endpoint, by default all http traffic is routed to https                                                                                                                                                                               |
+| ingress.tls_resolver                | string | ` `                                | If traefik was deployed with custom resolver, please define resolver name here. Resolver will be attached to Traefik CRD IngressRoute, otherwise default Traefik SSL Certificate will be used.                                                                 |
+| ingress.tls_secret_name             | string | ` `                                | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                                                                                          |
+| network_policy.enabled              | bool   | `true`                             | Render Kubernetes NetworkPolicy resources for dependency workloads. Requires a CNI provider that enforces NetworkPolicy.                                                                                                                                       |
+| network_policy.ingress_mode         | string | `deny`                             | Baseline policy for ingress to dependency pods: `deny` (default, requires another NetworkPolicy to allow it), `private` (allow only RFC1918 private ranges), or `full` (unrestricted).                                                                         |
+| network_policy.egress_mode          | string | `deny`                             | Baseline policy for egress from dependency pods. Same modes as `ingress_mode`, applied to egress. DNS (53) is always allowed except in `full` mode.                                                                                                            |
+| network_policy.allow_same_namespace | bool   | `true`                             | Allow dependency pods in the same namespace to communicate with each other.                                                                                                                                                                                    |
+| network_policy.allowed_namespaces   | list   | `[]`                               | Namespaces allowed to reach dependency pods (e.g. the opencrvs-services namespace). When set, dependency pods accept ingress on any port from every pod in each listed namespace, so the OpenCRVS application keeps working once ingress is denied by default. |
+| timezone                            | string | ` `                                | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                                                                                    |
+| storage_type                        | string | `pvc`                              | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                                                                                   |
+| platform.imagePullSecrets           | list   | `[]`                               | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                                                                                    |
+| node_selector                       | dict   | `{}`                               | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                                                                                       |
+| monitoring.enabled                  | bool   | `false`                            | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                                                                                    |
+| priority_class.enabled              | bool   | `false`                            | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                                                                                     |
+| backup.enabled                      | bool   | `true`                             | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                                                                                           |
+| restore.enabled                     | bool   | `true`                             | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                                                                                           |
+| utilities.image.repository          | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                                                                                                                     |
+| utilities.image.tag                 | string | `v2.1.0`                           | Shared utilities image tag used by helper jobs and init containers.                                                                                                                                                                                            |
+
+## Network Policies
+
+The chart can render Kubernetes `NetworkPolicy` resources for dependency workloads. This requires a CNI provider that enforces NetworkPolicy — set `network_policy.enabled: false` on clusters without one.
+
+When enabled, the chart can render:
+
+- a default deny ingress and/or egress policy for dependency pods, per `ingress_mode`/`egress_mode`
+- an allow-private-ingress and/or allow-private-egress policy (RFC1918 ranges only), when `ingress_mode`/`egress_mode` is `private`
+- a same-namespace allow policy, enabled by default
+- an allow-ingress-namespaces policy, when `network_policy.allowed_namespaces` is set and `ingress_mode` is not `full`
+- a DNS egress allow policy for TCP/UDP port 53, unless `egress_mode` is `full`
+- service-specific rules defined under `<service>.network_policy.rules`
+- operator-provided service rules defined under `<service>.network_policy.custom_rules`
+- an ingress and/or egress rule for a service, when `<service>.network_policy.ingress_mode`/`egress_mode` is set to `private` or `full`
+
+`network_policy.ingress_mode`/`egress_mode` each take one of three values, both at the global level and per-service under `<service>.network_policy`:
+
+- `deny` (default) — nothing is allowed beyond same-namespace/`allowed_namespaces`/per-service rules.
+- `private` — additionally allow traffic to/from RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), blocking the public internet either way.
+- `full` — no baseline policy at all; unrestricted.
+
+The same-namespace allow policy is intended as a practical first hardening step: dependency pods can still communicate inside the chart namespace, while unexpected cross-namespace and external traffic is blocked unless explicitly allowed.
+
+`<service>.network_policy.ingress_mode`/`egress_mode` are a shortcut for opting one service into `private` or `full` access without writing out an ingress/egress rule under `rules`/`custom_rules` — independent of the global `network_policy.ingress_mode`/`egress_mode`, which control whether the chart-wide baseline policies are rendered at all. For ingress, `private`/`full` accept traffic from RFC1918 ranges/any source respectively, scoped to the service's own `port` value; it renders nothing if `port` is not set, rather than silently opening every port. For egress, `private`/`full` accept traffic to RFC1918 ranges/any destination on any port, since a service's own port doesn't describe what it calls out to.
+
+The dependencies chart and the opencrvs-services chart are typically deployed to separate namespaces (see the default `*.host` values in `charts/opencrvs-services/values.yaml`, e.g. `redis-0.redis.opencrvs-deps-dev.svc.cluster.local`). While `network_policy.ingress_mode` is `deny` (the default), application pods (auth, gateway, events, etc.) can no longer reach Postgres, Elasticsearch, MinIO or Redis unless the opencrvs-services release namespace is listed in `network_policy.allowed_namespaces`. This rule allows all ports from every pod in each listed namespace, rather than requiring a separate rule per service/port pair.
+
+Example:
+
+```yaml
+network_policy:
+  allowed_namespaces:
+    - opencrvs-production
+```
+
+Service-specific rules follow Kubernetes `NetworkPolicy.spec` syntax, except `podSelector` is generated by the chart from the service `app_label`.
+
+Example — open ingress for a service's own port, custom egress via `rules`:
+
+```yaml
+minio:
+  network_policy:
+    rules:
+      - name: allow-console-ingress
+        policyTypes:
+          - Ingress
+        ingress:
+          - ports:
+              - protocol: TCP
+                port: 3536 # console; API (3535) is not opened here
+      - name: allow-package-repo-egress
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 443 # apk mirrors are sometimes HTTP-only, so both are opened
+```
+
+Each rule must define `name`; the chart uses it to generate deterministic `NetworkPolicy` resource names. `ingress_mode: full` is a shortcut for the same shape, but only supports a single port (the service's `port` value) — write a `rules` entry instead when a service listens on more than one port, as MinIO does.
+
+For backup and restore jobs, external backup server access must be allowed explicitly. Standard Kubernetes `NetworkPolicy` supports IP blocks, pod selectors, namespace selectors, and ports; it does not support DNS/FQDN destinations.
+
+To handle this, the chart computes an `ipBlock` egress rule (`<host>/32`, TCP port 22) for Postgres and MinIO directly from the resolved backup/restore host (`backup.host`, `restore.host`, `postgres.backup.host`, `postgres.restore.host`, `minio.backup.host`, `minio.restore.host`), rendered only when the corresponding `backup.enabled`/`restore.enabled` flag is true. **This requires the host value to be a literal IP address** — if you configure a DNS hostname instead, the generated `ipBlock.cidr` will be invalid and the policy will not match traffic to that host.
+
+### Service connections
+
+Applies once `network_policy.enabled: true`. Every dependency pod always accepts traffic from its own namespace (`allow_same_namespace`) and from any namespace listed in `allowed_namespaces`, and may always egress to DNS (53). The table below shows what each service allows **beyond** that baseline, per its current `values.yaml` configuration:
+
+| Service                                                | Port(s)                    | Extra ingress                                             | Extra egress                                                                                               |
+| ------------------------------------------------------ | -------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Postgres                                               | 5432                       | any source (`ingress_mode: full`)                         | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
+| Elasticsearch                                          | 9200                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
+| Redis                                                  | 6379                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
+| MinIO                                                  | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
+| Kibana                                                 | 5601                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
+| Filebeat, Metricbeat, Logstash, APM Server, Elastalert | —                          | —                                                         | —                                                                                                          |
+| backup-runner (differential backup/restore jobs)       | —                          | —                                                         | any port, RFC1918 private ranges only (Kubernetes API server, for `kubectl exec`/`scale`/`delete`/`apply`) |
+
+`ingress_mode: full` opens a service to any source, not just Traefik — narrow it with an explicit `rules` entry (e.g. a `namespaceSelector` for `traefik`), or use `ingress_mode: private` to restrict to RFC1918 ranges, if `full` is too broad for your deployment.
+
+Postgres and MinIO also get an unconditional `allow-package-repo-egress` rule (`0.0.0.0/0:80,443`) so that runtime package installation (see [Air-Gap Installation](#air-gap-installation)) keeps working when egress is denied by default — port 80 is included since some apt/apk mirrors are HTTP-only. This rule is intentionally broad: it also permits port 80/443 egress to other pods/namespaces in the cluster, not just the internet. Elasticsearch does not get this rule since it has no backup path and installs no packages at runtime in this chart.
+
+Differential-type backup/restore automation (`postgres-on-deploy`, `postgres-backup-diff`, `postgres-backup-full`, `postgres-restore`, `minio-backup`, `minio-restore`) drives the actual backup/restore by issuing `kubectl exec`/`scale`/`delete`/`apply` against the Kubernetes API server — it never talks to the Postgres/MinIO pods over the network directly, since `kubectl exec` is proxied through the API server. These pods are labeled `app: backup-runner` (not `app: postgres`/`app: minio`) and get their own unconditional `backup-runner-allow-egress` rule for that access, rather than relying on incidental coverage from the package-repo rule.
+
+`backup-runner-allow-egress` intentionally allows all ports, not just 443. The `kubernetes` Service in the `default` namespace exposes port 443, but many CNIs enforce egress `NetworkPolicy` against the _post-DNAT_ destination — i.e. the API server's real `targetPort` (commonly 6443 on kubeadm-style clusters), not the Service's port — so a rule scoped to `port: 443` can silently fail to match. Run `kubectl get endpoints kubernetes -n default` to see the actual port on your cluster if you'd rather scope this down.
+
+The destination is scoped to RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) rather than `0.0.0.0/0`, since the only legitimate destination is the API server (a ClusterIP, pod IP, or node IP — always private in a normally-networked cluster) and these pods have no reason to reach the public internet. **If your cluster's nodes have a public IP as their primary interface** (common on bare VPS-style setups without a private VPC network) and the CNI enforces policy against the post-DNAT node IP rather than the ClusterIP, this scoping could exclude the API server — check with `kubectl get nodes -o wide` (INTERNAL-IP vs EXTERNAL-IP) and `kubectl get endpoints kubernetes -n default -o wide` before relying on it, and fall back to `0.0.0.0/0` if needed. These pods are already privileged (their `backup-runner` ServiceAccount can `exec`/`scale`/`delete` arbitrary pods via RBAC), so the extra egress breadth of `0.0.0.0/0` wouldn't add meaningful risk beyond what their RBAC already grants — the private-range scoping here is defense in depth, not a hard requirement.
+
 ## Postgres
 
 Postgres configuration section for Helm values.yaml
@@ -83,46 +183,46 @@ This section allows you to configure the postgres deployment within your infrast
 
 This section allows you to configure the deployment and authentication settings for Elasticsearch.
 
-| Key                     | Type    | Example               | Description                                                                                                                                  |
-| ----------------------- | ------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| image.repository        | string  | `docker.elastic.co/elasticsearch/elasticsearch` | Elasticsearch Docker image repository.                                                                                 |
-| image.tag               | string  | `8.19.15`            | Elasticsearch Docker image tag.                                                                                                               |
-| enabled                 | boolean | true                  | Enable or disable the Elasticsearch deployment.                                                                                              |
-| use_default_credentials | boolean | true                  | Deploy Elasticsearch without enabled authentication.                                                                                         |
-| storage_type            | string  | `global storage_type` | Optional Elasticsearch-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
-| pvc.storage_class       | string  | `n/a`                 | StorageClass name used for dynamic volume provisioning                                                                                       |
-| pvc.storage_size        | string  | 10Gi                  | Persistent volume claim size for Postgres data volume                                                                                        |
-| pvc.access_mode         | string  | ReadWriteOnce         | Kubernetes PVC access mode                                                                                                                   |
-| host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on the host when `storage_type` is `host_path`.                                                                     |
-| node_selector           | dict    | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
+| Key                     | Type    | Example                                         | Description                                                                                                                                                                |
+| ----------------------- | ------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| image.repository        | string  | `docker.elastic.co/elasticsearch/elasticsearch` | Elasticsearch Docker image repository.                                                                                                                                     |
+| image.tag               | string  | `8.19.15`                                       | Elasticsearch Docker image tag.                                                                                                                                            |
+| enabled                 | boolean | true                                            | Enable or disable the Elasticsearch deployment.                                                                                                                            |
+| use_default_credentials | boolean | true                                            | Deploy Elasticsearch without enabled authentication.                                                                                                                       |
+| storage_type            | string  | `global storage_type`                           | Optional Elasticsearch-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
+| pvc.storage_class       | string  | `n/a`                                           | StorageClass name used for dynamic volume provisioning                                                                                                                     |
+| pvc.storage_size        | string  | 10Gi                                            | Persistent volume claim size for Postgres data volume                                                                                                                      |
+| pvc.access_mode         | string  | ReadWriteOnce                                   | Kubernetes PVC access mode                                                                                                                                                 |
+| host_data_path          | string  | `/data/elasticsearch`                           | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                                    |
+| node_selector           | dict    | `{}`                                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                                   |
 
 ## MinIO
 
 ### Configuration options
 
-| Key                     | Type   | Default value                   | Description                                                                                                                                  |
-| ----------------------- | ------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| enabled                 | bool   | true                            | Enable or disable minio service                                                                                                              |
-| image.repository        | string | `quay.io/minio/minio`           | MinIO Docker image repository.                                                                                                               |
-| image.tag               | string | `RELEASE.2025-06-13T11-33-47Z`  | MinIO Docker image tag.                                                                                                                      |
-| use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                           |
+| Key                     | Type   | Default value                   | Description                                                                                                                                                        |
+| ----------------------- | ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| enabled                 | bool   | true                            | Enable or disable minio service                                                                                                                                    |
+| image.repository        | string | `quay.io/minio/minio`           | MinIO Docker image repository.                                                                                                                                     |
+| image.tag               | string | `RELEASE.2025-06-13T11-33-47Z`  | MinIO Docker image tag.                                                                                                                                            |
+| use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                                                 |
 | storage_type            | string | `global storage_type`           | Optional MinIO-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
-| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                       |
-| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                        |
-| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                   |
-| host_data_path          | string | `/data/minio`                   | Path to persistent data on the host when `storage_type` is `host_path`.                                                                      |
-| node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
-| backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                          |
-| backup.enabled          | string | `false`                         | Backup enabled or disabled, section has higher priority over global `backup` section                                                         |
-| backup.type             | string | `dump`                          | `dump` is a full filesystem dump, `differential` is rsync from MinIO filesystem on remote backup server                                      |
-| backup.server_secret    | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials                                                                                 |
-| backup.schedule         | string | `0 1 * * *`                     | Time to run backup job, if not defined then value from `backup.schedule` is used                                                             |
-| backup.server_dir       | string | `n/a`                           | Directory on backup server for encrypted archive backups or filesystem rsync. Uses global value if not set                                   |
-| restore.{}              | dict   | `{}`                            | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README                        |
-| restore.enabled         | string | `false`                         | Enables restore functionality; section overrides global `restore` settings.                                                                  |
-| restore.type            | string | `dump`                          | Restore method: `dump` (from encrypted archive) or `differential` (same as for backup)                                                       |
-| restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared    |
-| restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used                                                          |
+| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                             |
+| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                                              |
+| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                                         |
+| host_data_path          | string | `/data/minio`                   | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                            |
+| node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                           |
+| backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                                                |
+| backup.enabled          | string | `false`                         | Backup enabled or disabled, section has higher priority over global `backup` section                                                                               |
+| backup.type             | string | `dump`                          | `dump` is a full filesystem dump, `differential` is rsync from MinIO filesystem on remote backup server                                                            |
+| backup.server_secret    | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials                                                                                                       |
+| backup.schedule         | string | `0 1 * * *`                     | Time to run backup job, if not defined then value from `backup.schedule` is used                                                                                   |
+| backup.server_dir       | string | `n/a`                           | Directory on backup server for encrypted archive backups or filesystem rsync. Uses global value if not set                                                         |
+| restore.{}              | dict   | `{}`                            | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README                                              |
+| restore.enabled         | string | `false`                         | Enables restore functionality; section overrides global `restore` settings.                                                                                        |
+| restore.type            | string | `dump`                          | Restore method: `dump` (from encrypted archive) or `differential` (same as for backup)                                                                             |
+| restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared                          |
+| restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used                                                                                |
 
 ### MinIO Credentials
 
