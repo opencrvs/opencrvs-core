@@ -25,6 +25,25 @@ export const UserActionsQuery = z.object({
 
 export type UserActionsQuery = z.infer<typeof UserActionsQuery>
 
+/**
+ * Response shape of the user audit action listing. Declared explicitly so that
+ * record content can never be returned from this endpoint by accident, even if
+ * new columns are added to the eventActions table.
+ */
+export const UserActionsResult = z.object({
+  results: z.array(
+    z.object({
+      actionType: z.string(),
+      createdAt: z.string(),
+      createdBy: z.string(),
+      eventId: z.string(),
+      // Left join: null when the event row no longer exists.
+      trackingId: z.string().nullable()
+    })
+  ),
+  total: z.number()
+})
+
 export async function getActionsByUserId({
   userId,
   skip = 0,
@@ -38,9 +57,17 @@ export async function getActionsByUserId({
   let query = db
     .selectFrom('eventActions')
     .leftJoin('events', 'eventActions.eventId', 'events.id')
-    .selectAll()
-    // I'm joining tracking ID here solely to serve the user audit view UI that requires it
-    .select(['events.trackingId'])
+    // Audit metadata only. This endpoint is authorized by user-management
+    // scopes, which grant no access to record content, so record columns
+    // (declaration, annotation, content, createdBySignature) must not be
+    // selected here. Tracking ID is joined in solely for the user audit view.
+    .select([
+      'eventActions.actionType',
+      'eventActions.createdAt',
+      'eventActions.createdBy',
+      'eventActions.eventId',
+      'events.trackingId'
+    ])
     .where('eventActions.createdBy', '=', userId)
 
   if (timeStart) {

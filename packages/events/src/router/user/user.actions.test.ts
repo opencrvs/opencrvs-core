@@ -310,3 +310,32 @@ test('Returns user actions', async () => {
     allUserActions.total - userOtherActions.total
   )
 })
+
+test('Does not return record content to a user authorized only by a user-management scope', async () => {
+  const { users, generator } = await setupTestCase()
+  const clientThatReadsAudit = createTestClient(users[0], [SCOPES.USER_READ])
+  const userThatDoesThings = users[1]
+  const clientThatDoesThings = createTestClient(userThatDoesThings)
+
+  await createEvent(clientThatDoesThings, generator, [ActionType.DECLARE])
+
+  const { results } = await clientThatReadsAudit.user.actions({
+    userId: userThatDoesThings.id,
+    count: 20
+  })
+
+  expect(results.length).toBeGreaterThan(0)
+
+  // USER_READ is a user-administration scope and grants no access to record
+  // content. The audit listing must expose action metadata only — never
+  // declaration, annotation, content or createdBySignature.
+  for (const action of results) {
+    expect(Object.keys(action).sort()).toEqual([
+      'actionType',
+      'createdAt',
+      'createdBy',
+      'eventId',
+      'trackingId'
+    ])
+  }
+})

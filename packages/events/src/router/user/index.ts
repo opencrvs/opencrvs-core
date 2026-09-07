@@ -15,7 +15,10 @@ import { UserOrSystem } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
-import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import {
+  UserActionsQuery,
+  UserActionsResult
+} from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
 
 export const userRouter = router({
@@ -37,6 +40,7 @@ export const userRouter = router({
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
   actions: publicProcedure
     .input(UserActionsQuery)
+    .output(UserActionsResult)
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
