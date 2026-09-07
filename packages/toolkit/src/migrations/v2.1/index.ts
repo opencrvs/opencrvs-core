@@ -23,7 +23,7 @@ const DOCKER_SWARM_MANUAL_STEPS = [
   'Remove the `mongo1` and `influxdb` services from your compose files — MongoDB and InfluxDB are gone in this release.',
   'Remove the `legacy-data-migration` service from your compose files. It only ever migrated MongoDB data during the v2.0 upgrade, and the migration it ran no longer exists.',
   'Change the postgres image from `docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2` back to `postgres:17.6`. The `mongo_fdw` build was only needed for the v2.0 legacy-data migration.',
-  'Run `DROP EXTENSION mongo_fdw CASCADE;` against the events database as a Postgres superuser, if this deployment came through v2.0. The migration that tries this only warns, because the role migrations run as does not own the extension. Until it is dropped, a pg_dump/pg_restore of the database into a v2.1 cluster fails.',
+  'Run `DROP EXTENSION mongo_fdw CASCADE;` against the events database as a Postgres superuser, if this deployment came through v2.0. It has to be a superuser: the extension is owned by the one that ran the v2.0 legacy migration, not by the role the migrations run as. Until it is dropped, a pg_dump/pg_restore of the database into a v2.1 cluster fails.',
   'Run `assets/deployment/reindex.sh` after deploying. `deploy.sh` does not call it, and this release adds `legalStatuses.NOTIFIED` to the Elasticsearch mapping, so records indexed before the upgrade carry none of it until a reindex.'
 ]
 
