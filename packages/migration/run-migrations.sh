@@ -49,7 +49,14 @@ do
   mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file
 done
 
-DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
+# --no-check-order is required, not optional. Release branches carry migrations
+# whose timestamps sort after work that was authored earlier on develop but ships
+# later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
+# node-pg-migrate's order check zips the ledger's run order against the on-disk
+# name order positionally, so any such branch trips it. Once a database has run
+# migrations out of name order the ledger stays non-canonical, so this flag has
+# to remain from here on.
+DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --no-check-order --migrations-dir=./src/migrations/events
 
 # Reverting to the original state after running the migrations
 for migration_file in $FILES_TO_MIGRATE

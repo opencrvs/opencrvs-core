@@ -9,6 +9,7 @@
   **Deployment notes:**
 
   - Building the indexes stalls writes to both tables until it completes, for a time proportional to their size. Reads are unaffected, and stalled writes queue rather than fail.
+  - Events migrations now run with `--no-check-order`. Release branches carry migrations timestamped after work authored earlier on `develop`, which the order check rejects; once a database has run migrations out of name order its ledger stays that way, so the flag is permanent. Upstream branches need the same flag for databases upgraded from 1.9.
 
 ## 1.9.16
 
