@@ -156,13 +156,36 @@ function resolveRef() {
  * @param {*} param0 repository - The repository to clone (e.g., 'opencrvs/opencrvs-core').
  * @param {*} param0 repositorySubPath - The subpath within the repository to clone (optional). Otherwise the entire repository will be cloned.
  * @param {*} param0 branch - The branch to clone (optional). Defaults to the default branch if not specified.
+ * @param {*} param0 keepHistory - Keep the repository's git history instead of degit's usual history-free copy (optional, defaults to false). Not supported together with repositorySubPath, since a plain git clone can't fetch a single subdirectory.
  *
  * @param {*} targetDir - The target directory where the repository will be cloned.
  */
 async function cloneRepository(
-  { repository, repositorySubPath, branch },
+  { repository, repositorySubPath, branch, keepHistory = false },
   targetDir
 ) {
+  if (keepHistory && repositorySubPath) {
+    throw new Error(
+      'cloneRepository: keepHistory is not supported together with repositorySubPath.'
+    )
+  }
+
+  if (keepHistory) {
+    const repoUrl = `https://github.com/${repository}.git`
+    console.log(
+      `Cloning repository from ${repoUrl}#${branch} to ${targetDir}...`
+    )
+
+    execSync('git clone --branch ' + branch + ' ' + repoUrl + ' ' + targetDir, {
+      stdio: 'inherit'
+    })
+
+    console.log(
+      `Copied files from ${repoUrl}#${branch} to ${targetDir} succesfully.`
+    )
+    return
+  }
+
   const repositoryPath = joinValues([repository, repositorySubPath], '/')
   const fullPath = joinValues([repositoryPath, branch], '#')
 
@@ -418,7 +441,7 @@ async function main() {
 
   try {
     await cloneRepository(
-      { repository: INFRASTRUCTURE_REPOSITORY, branch: ref },
+      { repository: INFRASTRUCTURE_REPOSITORY, branch: ref, keepHistory: true },
       infrastructureTargetPath
     )
   } catch (err) {
@@ -443,8 +466,7 @@ async function main() {
   console.log('  git init')
   console.log('  tilt up\n')
   console.log('To get started with the infrastructure:\n')
-  console.log('  cd ' + infrastructureDirName)
-  console.log('  git init\n')
+  console.log('  cd ' + infrastructureDirName + '\n')
 }
 
 main()
