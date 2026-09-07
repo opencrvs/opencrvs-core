@@ -179,7 +179,20 @@ function cloneRepository(
       )
       process.exit(1)
     }
+    return
   }
+
+  console.log(
+    "Replacing 'origin' remote with 'upstream' in " + targetDir + '...'
+  )
+  execSync('git remote remove origin', {
+    cwd: targetDir,
+    stdio: 'inherit'
+  })
+  execSync('git remote add upstream ' + repoUrl, {
+    cwd: targetDir,
+    stdio: 'inherit'
+  })
 }
 
 const projectName = process.argv[2]
@@ -267,4 +280,9 @@ console.log('  git init')
 console.log('  npm install\n')
 console.log('To get started with the infrastructure:\n')
 console.log('  cd ' + infrastructureDirName)
-console.log('  git init\n')
+console.log('  git remote add origin <your-infrastructure-repo-url>')
+console.log('  git push -u origin ' + ref + '\n')
+console.log(
+  'The "upstream" remote points at the official infrastructure repository, ' +
+    'so you can pull future releases with `git fetch upstream`.\n'
+)
