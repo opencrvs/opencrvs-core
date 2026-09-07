@@ -114,13 +114,23 @@ function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   return trpcClient.event.file.getPresignedUrl.query({ filePath })
 }
 
-export async function precacheFile(path: DocumentPath | FullDocumentPath) {
+async function precacheFile(path: DocumentPath | FullDocumentPath) {
   const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
   const file = await fetchFileFromUrl(presignedUrl, path)
 
   if (file) {
     await cacheFile({ url: path, file })
+  }
+}
+
+/** Same as {@link precacheFile}, but never rejects — one file failing shouldn't fail the whole batch. */
+export async function safePrecacheFile(path: DocumentPath | FullDocumentPath) {
+  try {
+    await precacheFile(path)
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Failed to precache file', error)
   }
 }
 

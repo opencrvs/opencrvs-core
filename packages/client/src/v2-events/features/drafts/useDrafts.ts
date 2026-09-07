@@ -30,7 +30,7 @@ import {
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFile } from '../files/useFileUpload'
+import { safePrecacheFile } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"
@@ -49,14 +49,8 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    const filenames = drafts.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action])
-    )
-
-    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
-
     const missingEventsToDownload = drafts
-      .filter((event) => !findLocalEventDocument(event.eventId))
+      .filter((draft) => !findLocalEventDocument(draft.eventId))
       .map(async (draft) =>
         queryClient.prefetchQuery({
           queryKey: trpcOptionsProxy.event.get.queryKey({
@@ -71,6 +65,24 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       )
 
     await Promise.all(missingEventsToDownload)
+
+    /*
+     * Only precache documents for drafts whose event is actually present
+     * locally (already cached, or just downloaded above) — a draft whose
+     * event never loaded won't appear in the workqueue, so there's no
+     * reason to fetch its documents either.
+     */
+    const draftsWithLocalEvent = drafts.filter((draft) =>
+      findLocalEventDocument(draft.eventId)
+    )
+
+    const filenames = draftsWithLocalEvent.flatMap((draft) =>
+      getFilepathsFromActionDocument([draft.action])
+    )
+
+    await Promise.all(
+      filenames.map(async (filename) => safePrecacheFile(filename))
+    )
 
     return drafts
   }

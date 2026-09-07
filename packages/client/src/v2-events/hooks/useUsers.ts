@@ -32,7 +32,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFile } from '../features/files/useFileUpload'
+import { safePrecacheFile } from '../features/files/useFileUpload'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -61,10 +61,10 @@ setQueryDefaults<
     }
 
     if (user.signature) {
-      await precacheFile(user.signature)
+      await safePrecacheFile(user.signature)
     }
     if (user.avatar) {
-      await precacheFile(user.avatar)
+      await safePrecacheFile(user.avatar)
     }
 
     return deepDropNulls({
@@ -117,7 +117,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
             return user
           }
           if (user.avatar) {
-            await precacheFile(user.avatar)
+            await safePrecacheFile(user.avatar)
           }
           return user
         })
