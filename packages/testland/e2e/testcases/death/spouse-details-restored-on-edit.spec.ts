@@ -142,7 +142,14 @@ test('Spouse details restored on a later edit are reflected in review and audit 
     await page.getByLabel("Spouse's details are not available").uncheck()
 
     // The first edit cleared the hidden spouse values, so the fields come back
-    // empty and required — re-enter them.
+    // empty rather than repopulated with the originally declared details.
+    await expect(page.locator('#firstname')).toHaveValue('')
+    await expect(page.locator('#surname')).toHaveValue('')
+    await expect(page.getByPlaceholder('dd')).toHaveValue('')
+    await expect(page.getByPlaceholder('mm')).toHaveValue('')
+    await expect(page.getByPlaceholder('yyyy')).toHaveValue('')
+
+    // Re-enter them.
     await page.locator('#firstname').fill(restoredSpouse.name.firstNames)
     await page.locator('#surname').fill(restoredSpouse.name.familyName)
     await page.getByPlaceholder('dd').fill(restoredSpouse.birthDate.dd)
