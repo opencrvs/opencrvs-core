@@ -156,7 +156,7 @@ function resolveRef() {
  * @param {*} param0 repository - The repository to clone (e.g., 'opencrvs/opencrvs-core').
  * @param {*} param0 repositorySubPath - The subpath within the repository to clone (optional). Otherwise the entire repository will be cloned.
  * @param {*} param0 branch - The branch to clone (optional). Defaults to the default branch if not specified.
- * @param {*} param0 keepHistory - Keep the repository's git history instead of degit's usual history-free copy (optional, defaults to false). Not supported together with repositorySubPath, since a plain git clone can't fetch a single subdirectory.
+ * @param {*} param0 keepHistory - Keep the repository's git history instead of degit's usual history-free copy (optional, defaults to false). The cloned "origin" remote is replaced with "upstream", leaving the directory ready for the user to add their own fork/repo as "origin". Not supported together with repositorySubPath, since a plain git clone can't fetch a single subdirectory.
  *
  * @param {*} targetDir - The target directory where the repository will be cloned.
  */
@@ -183,6 +183,13 @@ async function cloneRepository(
     console.log(
       `Copied files from ${repoUrl}#${branch} to ${targetDir} succesfully.`
     )
+
+    console.log(`Replacing 'origin' remote with 'upstream' in ${targetDir}...`)
+    execSync('git remote remove origin', { cwd: targetDir, stdio: 'inherit' })
+    execSync('git remote add upstream ' + repoUrl, {
+      cwd: targetDir,
+      stdio: 'inherit'
+    })
     return
   }
 
@@ -466,7 +473,13 @@ async function main() {
   console.log('  git init')
   console.log('  tilt up\n')
   console.log('To get started with the infrastructure:\n')
-  console.log('  cd ' + infrastructureDirName + '\n')
+  console.log('  cd ' + infrastructureDirName)
+  console.log('  git remote add origin <your-infrastructure-repo-url>')
+  console.log('  git push -u origin ' + ref + '\n')
+  console.log(
+    'The "upstream" remote points at the official infrastructure repository, ' +
+      'so you can pull future releases with `git fetch upstream`.\n'
+  )
 }
 
 main()
