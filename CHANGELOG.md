@@ -25,10 +25,10 @@ Confirming an asynchronous action (the `accept`/`reject` endpoints) now requires
 
 Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
-- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time;
+- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. For the MOSIP integration specifically, the client needs **`record.register`, `record.read` and `record.correct`** — see below;
 - **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
 
-`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.register`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing any of **`record.register`, `record.read` or `record.correct`** — all three are needed to confirm a registration, so a client granted only `record.register` still exits at boot and the container crash-loops. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
 The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
 
@@ -102,6 +102,10 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 
 ### Improvements
 
+- `opencrvs upgrade` now ends with one list of everything it could not do for you, instead of leaving each codemod's warnings to be spotted in the scrollback, and exits non-zero while that list is not empty. It previously printed `Upgrade completed successfully!` even when every step had been skipped — a country config that renamed the files a codemod targets could come away believing the upgrade was complete.
+- `opencrvs upgrade --docker-swarm` now lists the manual steps that only apply to a Docker Swarm deployment (the `mongo1`, `influxdb` and `legacy-data-migration` services, the postgres image, dropping `mongo_fdw`, and running `reindex.sh`). The flag previously did nothing at all: it was accepted, documented as merging `infrastructure/` — which is what it did during the v2.0 upgrade — and then ignored.
+- Added `opencrvs verify-upgrade`, which runs every post-upgrade check together and reports them as one summary: translation rows, the scopes this release added being assigned to at least one role, and the endpoint checks of `verify-endpoints`. Run it from the country config directory with the upgraded config running. Exits non-zero if anything fails.
+- The `mongo_fdw` extension left behind by the v2.0 legacy-data migration is now dropped, along with the `mongo` foreign server and the `legacy_*` foreign tables. v2.0 only ever dropped them in its _down_ migrations, so a database that came through v2.0 still carried a wrapper the v2.1 postgres image cannot install — harmless at runtime, but `pg_dump` still emitted `CREATE EXTENSION mongo_fdw`, so a logical restore into a v2.1 cluster failed. Kubernetes drops it in the superuser `postgres-on-deploy` job; the migration itself can only try, because the role migrations run as does not own the extension, and warns with the statement to run by hand when it cannot.
 - User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
