@@ -109,7 +109,6 @@ const sourceCauseDeathOptions = createSelectOptions(
 
 export const PlaceOfDeath = {
   HEALTH_FACILITY: 'HEALTH_FACILITY',
-  DECEASED_USUAL_RESIDENCE: 'DECEASED_USUAL_RESIDENCE',
   OTHER: 'OTHER'
 } as const
 
@@ -118,12 +117,6 @@ const placeOfDeathMessageDescriptors = {
     defaultMessage: 'Health Institution',
     description: 'Select item for Health Institution',
     id: 'form.field.label.healthInstitution'
-  },
-  DECEASED_USUAL_RESIDENCE: {
-    defaultMessage: "Deceased's usual place of residence",
-    description:
-      'Option for place of occurrence of death same as deceased primary address',
-    id: 'form.field.label.placeOfDeathSameAsPrimary'
   },
   OTHER: {
     defaultMessage: 'Other',
@@ -385,22 +378,6 @@ export const eventDetails = defineFormPage({
       }
     },
     {
-      id: 'eventDetails.deathLocationResidence',
-      type: FieldType.ALPHA_HIDDEN,
-      required: false,
-      label: placeOfDeathMessageDescriptors.DECEASED_USUAL_RESIDENCE,
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: field('eventDetails.placeOfDeath').isEqualTo(
-            PlaceOfDeath.DECEASED_USUAL_RESIDENCE
-          )
-        }
-      ],
-      parent: [field('eventDetails.placeOfDeath'), field('deceased.address')],
-      value: field('deceased.address').get('administrativeArea')
-    },
-    {
       id: 'eventDetails.deathLocationId',
       type: FieldType.ALPHA_HIDDEN,
       required: false,
@@ -417,8 +394,7 @@ export const eventDetails = defineFormPage({
       ],
       value: [
         field('eventDetails.deathLocation'),
-        field('eventDetails.deathLocationOther').get('administrativeArea'),
-        field('eventDetails.deathLocationResidence')
+        field('eventDetails.deathLocationOther').get('administrativeArea')
       ]
     }
   ]
