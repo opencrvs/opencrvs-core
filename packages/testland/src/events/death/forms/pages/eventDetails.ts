@@ -152,7 +152,10 @@ const placeOfDeathOptions = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(user.hasRole('HOSPITAL_CLERK'))
+        conditional: or(
+          user.hasRole('EMBASSY_OFFICIAL'),
+          user.hasRole('NATIONAL_REGISTRAR')
+        )
       }
     ]
   },

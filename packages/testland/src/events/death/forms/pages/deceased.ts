@@ -509,8 +509,6 @@ export const deceased = defineFormPage({
       },
       configuration: {
         streetAddressForm: defaultStreetAddressConfiguration,
-        // Deceased's residence at time of death is a demographic fact about the event, not a current address.
-        anchorToDateOfEvent: true,
         activeOnly: true
       }
     }
