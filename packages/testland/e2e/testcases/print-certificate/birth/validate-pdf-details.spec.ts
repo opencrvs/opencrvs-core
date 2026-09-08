@@ -91,6 +91,16 @@ test.describe
       'Ibombo, Central, Farajaland'
     )
   })
+
+  test('Place of registration includes the office name', async () => {
+    await expect(page.locator('#print')).toContainText('Ibombo District Office')
+  })
+
+  test('Certificate count area has no missing-translation text', async () => {
+    await expect(page.locator('#print')).not.toContainText(
+      'Missing translation for certificates.birth.printedCertificateCount'
+    )
+  })
 })
 
 test.describe.serial("Validate 'Birth Certificate' PDF details", () => {
@@ -138,6 +148,16 @@ test.describe.serial("Validate 'Birth Certificate' PDF details", () => {
     await expect(page.locator('#print')).toContainText('Klow Village Hospital')
     await expect(page.locator('#print')).toContainText(
       'Ibombo, Central, Farajaland'
+    )
+  })
+
+  test('Place of registration includes the office name', async () => {
+    await expect(page.locator('#print')).toContainText('Ibombo District Office')
+  })
+
+  test('Certificate count area has no missing-translation text', async () => {
+    await expect(page.locator('#print')).not.toContainText(
+      'Missing translation for certificates.birth.printedCertificateCount'
     )
   })
 })
