@@ -34,7 +34,7 @@ async function attemptSystemReady() {
   // window, so it is minted per attempt rather than once up front
   const bootstrapToken = await getIntegrationCreatorToken(REQUEST_TIMEOUT_MS)
   const res = await fetch(
-    new URL('/triggers/system/ready', env.COUNTRY_CONFIG_URL).toString(),
+    new URL('/trigger/system/ready', env.COUNTRY_CONFIG_URL).toString(),
     {
       method: 'GET',
       headers: { Authorization: `Bearer ${bootstrapToken}` },

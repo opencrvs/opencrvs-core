@@ -224,8 +224,7 @@ async function promptTelemetryConfig(): Promise<TelemetryConfig> {
   const organisation = (
     await input({
       message: 'Organisation running this instance:',
-      validate: (value) =>
-        value.trim() !== '' || 'Enter an organisation name.'
+      validate: (value) => value.trim() !== '' || 'Enter an organisation name.'
     })
   ).trim()
 
@@ -421,6 +420,42 @@ function addEnvironmentVariables(
   )
 }
 
+/**
+ * Add the handler import, or top up the named imports of one that is already
+ * there.
+ */
+function ensureHandlerNamedImports(sourceFile: SourceFile, names: string[]) {
+  const importDeclaration = sourceFile
+    .getImportDeclarations()
+    .find(
+      (declaration) => declaration.getModuleSpecifierValue() === HANDLER_MODULE
+    )
+
+  if (!importDeclaration) {
+    sourceFile.addImportDeclaration({
+      moduleSpecifier: HANDLER_MODULE,
+      namedImports: names
+    })
+    console.log(`  ✓ ${INDEX_FILE}: import ${HANDLER_MODULE}`)
+    return
+  }
+
+  const existing = new Set(
+    importDeclaration.getNamedImports().map((named) => named.getName())
+  )
+  const missing = names.filter((name) => !existing.has(name))
+
+  for (const name of missing) {
+    importDeclaration.addNamedImport(name)
+  }
+
+  if (missing.length > 0) {
+    console.log(
+      `  ✓ ${INDEX_FILE}: import ${missing.join(', ')} from ${HANDLER_MODULE}`
+    )
+  }
+}
+
 function wireIndex(project: Project, cwd: string) {
   const sourceFile = project.addSourceFileAtPathIfExists(
     path.join(cwd, INDEX_FILE)
@@ -433,21 +468,11 @@ function wireIndex(project: Project, cwd: string) {
   }
 
   // 1. import
-  if (
-    !sourceFile
-      .getImportDeclarations()
-      .some((d) => d.getModuleSpecifierValue() === HANDLER_MODULE)
-  ) {
-    sourceFile.addImportDeclaration({
-      moduleSpecifier: HANDLER_MODULE,
-      namedImports: [
-        'telemetryHandler',
-        'telemetrySchema',
-        'TELEMETRY_DISABLED_NOTICE'
-      ]
-    })
-    console.log(`  ✓ ${INDEX_FILE}: import ${HANDLER_MODULE}`)
-  }
+  ensureHandlerNamedImports(sourceFile, [
+    'telemetryHandler',
+    'telemetrySchema',
+    'TELEMETRY_DISABLED_NOTICE'
+  ])
 
   // 2. route, inserted after the last server.route(...) call
   if (!sourceFile.getText().includes("path: '/trigger/telemetry'")) {

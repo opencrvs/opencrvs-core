@@ -88,7 +88,7 @@ async function insertAdminWithEmail(
   return { id: result.id as UUID, email }
 }
 
-const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
+const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/trigger/user/all-user-notification`
 
 describe('announcement.broadcast', () => {
   describe('authorization', () => {
