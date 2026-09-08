@@ -177,6 +177,18 @@ test.describe.serial('Birth correction trigger eligibility checks', () => {
       .toBeTruthy()
 
     const event = await getEventById(eventId, token)
+
+    // The correction was deferred to external validation: a Requested
+    // APPROVE_CORRECTION remains in the action log (surfaced in the audit as the
+    // "Waiting for external validation" action), alongside its Accepted
+    // confirmation.
+    const requestedApproveAction = event.actions.find(
+      ({ type, status }) =>
+        type === 'APPROVE_CORRECTION' && status === 'Requested'
+    )
+    expect(requestedApproveAction).toBeTruthy()
+
+    // MOSIP confirmed the correction, generating the child UIN.
     const declaration = aggregateActionDeclarations(event)
     expect(declaration['child.nid']).toMatch(/^\d{10}$/)
   })
