@@ -20,6 +20,7 @@ import {
   EventDocument,
   EventDocumentOnlyLastAction,
   EventIndex,
+  ActionType,
   findLastAssignmentAction,
   getCurrentEventState,
   User
@@ -309,12 +310,29 @@ export async function onMarkNotDuplicate(data: EventDocument) {
   await refetchSearchQuery(data.id)
 }
 
-export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
-  await Promise.all([
-    invalidateWorkqueues(),
-    refetchSearchQuery(updatedEvent.id)
-  ])
+/**
+ * Write a new assignee onto every cached search result for an event.
+ *
+ * Only the assignment is patched, never the whole row: the server redacts a
+ * sealed record's index while leaving the document readable, so rebuilding the
+ * row from the local document would put the real title back on screen.
+ */
+function setLocalEventIndexAssignment(id: string, assignedTo: string | null) {
+  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey]) => {
+    queryClient.setQueryData<inferOutput<typeof trpcOptionsProxy.event.search>>(
+      queryKey,
+      (oldData) =>
+        oldData && {
+          ...oldData,
+          results: oldData.results.map((eventIndex) =>
+            eventIndex.id === id ? { ...eventIndex, assignedTo } : eventIndex
+          )
+        }
+    )
+  })
+}
 
+export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
   const localEvent = findLocalEventDocument(updatedEvent.id)
 
@@ -328,6 +346,22 @@ export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
     ...updatedEvent,
     actions: localActions.concat(updatedEvent.actions)
   })
+
+  /*
+   * Nothing below refreshes the workqueue rows: `invalidateWorkqueues` only
+   * invalidates `workqueue.count` and `refetchSearchQuery` only the by-id
+   * entry, while the count-diff (procedures/count.ts) never fires for an
+   * assignment, which moves no record between workqueues.
+   */
+  setLocalEventIndexAssignment(
+    updatedEvent.id,
+    lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
+  )
+
+  await Promise.all([
+    invalidateWorkqueues(),
+    refetchSearchQuery(updatedEvent.id)
+  ])
 }
 
 export async function refetchDraftsList() {
