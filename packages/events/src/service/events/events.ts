@@ -426,16 +426,6 @@ function isEventIndexable(event: EventDocument) {
   return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
 }
 
-export async function ensureEventIndexed(
-  event: EventDocument,
-  configuration: EventConfig,
-  waitFor: boolean
-) {
-  if (isEventIndexable(event)) {
-    await indexEvent(event, configuration, waitFor)
-  }
-}
-
 /**
  * Resolves the effective `keepAssignment` for an action based on the
  * status-specific `keepAssignmentIfAccepted` / `keepAssignmentIfRejected`
@@ -503,7 +493,10 @@ export async function processAction(
     )
   }
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration, input.waitFor)
+  if (isEventIndexable(updatedEvent)) {
+    await indexEvent(updatedEvent, configuration, input.waitFor)
+  }
+
   return updatedEvent
 }
 
