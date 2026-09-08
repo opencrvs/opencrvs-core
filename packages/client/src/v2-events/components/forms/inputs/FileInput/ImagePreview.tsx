@@ -24,10 +24,10 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { toFileUrl } from '@client/v2-events/cache'
 import { precacheFile } from '@client/v2-events/features/files/useFileUpload'
+import { PreviewErrorBox } from './PreviewErrorBox'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -53,16 +53,6 @@ const ViewerContainer = styled.div`
     max-width: 80vw;
     width: auto;
   }
-`
-
-const ErrorContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
 `
 
 interface IProps {
@@ -186,10 +176,8 @@ export function ImagePreview({
 
       <ViewerContainer>
         {imageFailed ? (
-          <ErrorContainer>
-            <Text element="span" variant="reg16">
-              {intl.formatMessage(formMessages.imageLoadFailed)}
-            </Text>
+          <PreviewErrorBox>
+            {intl.formatMessage(formMessages.imageLoadFailed)}
             <Button
               id="preview_retry"
               loading={isRetrying}
@@ -198,7 +186,7 @@ export function ImagePreview({
             >
               {intl.formatMessage(buttonMessages.retry)}
             </Button>
-          </ErrorContainer>
+          </PreviewErrorBox>
         ) : (
           <PanViewer
             key={Math.random()}
