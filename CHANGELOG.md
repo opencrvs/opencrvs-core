@@ -2,6 +2,14 @@
 
 ## 1.9.17 Release Candidate
 
+### Improvements
+
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
+
 ## 1.9.16
 
 ### New features
