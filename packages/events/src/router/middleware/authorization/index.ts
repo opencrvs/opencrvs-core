@@ -15,8 +15,10 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
+  Action,
   ActionDocument,
   ActionInputWithType,
+  ActionStatus,
   ActionType,
   DeleteActionInput,
   getAssignedUserFromActions,
@@ -337,6 +339,74 @@ const ActionConfirmationParams = z.object({
  *
  * A logged-in user's own token satisfies neither, which is the point.
  */
+/**
+ * Resolves the action an accept/reject call names, and refuses anything other
+ * than the pending action of the matching type.
+ *
+ * `actionId` is otherwise only looked up by id, so an action of any type or
+ * status would do — including one already accepted, or a CREATE. That would let
+ * a caller manufacture an accepted action of the type they picked, bypassing
+ * `throwConflictIfActionNotAllowed`, `validateAction`, `requireAssignment` and
+ * duplicate detection, all of which run on `request` and none of which run on a
+ * confirmation.
+ *
+ * Passes the event and the two actions on in context so the handler does not
+ * fetch and scan them a second time.
+ */
+export function requireConfirmableAction(actionType: ActionType) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & {
+      event: EventDocument
+      originalAction: Action
+      confirmationAction?: Action
+    },
+    unknown
+  > = async ({ ctx, next, getRawInput }) => {
+    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const event = await getEventById(input.eventId)
+    const originalAction = event.actions.find(({ id }) => id === input.actionId)
+
+    if (!originalAction) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Action not found.' })
+    }
+
+    if (originalAction.status !== ActionStatus.Requested) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is not awaiting confirmation.`
+      })
+    }
+
+    if (originalAction.type !== actionType) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is of type ${originalAction.type}, cannot be confirmed as ${actionType}.`
+      })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        event,
+        originalAction,
+        confirmationAction: event.actions.find(
+          ({ originalActionId }) => originalActionId === input.actionId
+        )
+      }
+    })
+  }
+
+  return fn
+}
+
 export function requireActionConfirmation({
   scopeType,
   systemClientScopes

@@ -55,7 +55,6 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getActionConfirmationToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { assertConfirmableAction } from './confirmable'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -464,34 +463,14 @@ export function getDefaultActionProcedures(
           systemClientScopes
         })
       )
+      .use(middleware.requireConfirmableAction(actionType))
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
-        const originalAction = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
+        const { token, user, event, confirmationAction } = ctx
+        const { actionId } = input
         const configuration = await getEventConfigurationById({
           token,
           eventType: event.type
         })
-
-        // Original action is not found
-        if (!originalAction) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Action not found.'
-          })
-        }
-
-        /*
-         * Only a pending action of this same type can be confirmed. Without
-         * this, any existing action id (a CREATE, or an already accepted
-         * action) could be passed in to mint a fresh accepted action of an
-         * arbitrary type, sidestepping the request flow and every check it runs.
-         */
-        assertConfirmableAction(originalAction, actionType)
 
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
@@ -549,20 +528,10 @@ export function getDefaultActionProcedures(
           systemClientScopes
         })
       )
+      .use(middleware.requireConfirmableAction(actionType))
       .mutation(async ({ input, ctx }) => {
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
-        const action = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
-
-        // Action is not found
-        if (!action) {
-          throw new Error(`Action not found.`)
-        }
-
-        assertConfirmableAction(action, actionType)
+        const { event, confirmationAction } = ctx
+        const { actionId } = input
 
         if (confirmationAction) {
           // Action is already accepted
