@@ -15,6 +15,7 @@ import {
   encodeScope,
   getScopeOptionValue,
   hasScopeForActionConfirmation,
+  isUnboundActionConfirmationScope,
   JurisdictionFilter,
   Scope,
   ScopesWithDeclaredOptions,
@@ -22,6 +23,7 @@ import {
   ScopesWithPlaceEventOptions
 } from './scopes'
 import { getUUID } from './uuid'
+import { getOrThrow } from './utils'
 
 import {
   migrateLegacyScopesToV2,
@@ -844,25 +846,47 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
 describe('action confirmation scopes', () => {
   const actionId = getUUID()
 
-  test('cannot exist without naming an action', () => {
-    // The binding is the whole authorisation, so an unbound accept/reject scope
-    // must be impossible to define — including via `defineScopes` in a country
-    // config or the integration scopes seeded on startup.
-    expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(
-      false
-    )
-    expect(
-      Scope.safeParse({
-        type: 'record.action.reject',
-        options: { id: 'not-a-uuid' }
-      }).success
-    ).toBe(false)
+  test('comes in a bound and an unbound form', () => {
+    // Bound: what core mints per confirmation request.
     expect(
       Scope.safeParse({
         type: 'record.action.accept',
         options: { id: actionId }
       }).success
     ).toBe(true)
+
+    // Unbound: a standing grant to an integration, which still takes the
+    // ordinary record-scope options.
+    expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(true)
+    expect(
+      Scope.safeParse({
+        type: 'record.action.reject',
+        options: { event: ['birth'] }
+      }).success
+    ).toBe(true)
+
+    expect(
+      Scope.safeParse({
+        type: 'record.action.reject',
+        options: { id: 'not-a-uuid' }
+      }).success
+    ).toBe(false)
+  })
+
+  test('tells a bound scope apart from a standing grant', () => {
+    const bound = getOrThrow(
+      decodeScope(
+        encodeScope({ type: 'record.action.accept', options: { id: actionId } })
+      ),
+      'bound scope should decode'
+    )
+    const unbound = getOrThrow(
+      decodeScope(encodeScope({ type: 'record.action.accept' })),
+      'unbound scope should decode'
+    )
+
+    expect(isUnboundActionConfirmationScope(bound)).toBe(false)
+    expect(isUnboundActionConfirmationScope(unbound)).toBe(true)
   })
 
   test('survives the encode/decode round trip used in tokens', () => {

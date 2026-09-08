@@ -142,11 +142,11 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
-  test('a system client holding the action scope can still accept', async () => {
+  test('an integration holding an unbound confirmation scope can accept', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 
     const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: 'record.register' })
+      encodeScope({ type: 'record.action.accept' })
     ])
 
     const response = await systemClient.event.actions.register.accept({
@@ -164,6 +164,45 @@ describe('confirming an action requires more than the scope that requested it', 
           action.status === ActionStatus.Accepted
       )
     ).toMatchObject({ originalActionId: actionId })
+  })
+
+  test('the action scope alone no longer confirms, for an integration either', async () => {
+    const { event, input, actionId } = await requestPendingRegistration()
+
+    const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.register' })
+    ])
+
+    await expect(
+      systemClient.event.actions.register.accept({
+        ...input,
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
+  test('an unbound grant is still confined to its event types', async () => {
+    const { event, input, actionId } = await requestPendingRegistration()
+
+    const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({
+        type: 'record.action.accept',
+        options: { event: ['birth'] }
+      })
+    ])
+
+    await expect(
+      systemClient.event.actions.register.accept({
+        ...input,
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
   })
 })
 

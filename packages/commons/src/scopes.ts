@@ -51,7 +51,9 @@ export const RecordScopeTypeV2 = z.enum([
   'record.request-correction',
   'record.correct',
   'record.unassign-others',
-  'record.custom-action'
+  'record.custom-action',
+  'record.action.accept',
+  'record.action.reject'
 ])
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
@@ -239,14 +241,21 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
 })
 
 /**
- * Scope types that authorise confirming (accepting or rejecting) one single
- * requested action. Unlike every other record scope these are never granted to
- * a role: core mints them on the fly, bound to the action being confirmed, and
- * hands them to the country configuration in the action confirmation request.
+ * Scopes that authorise confirming (accepting or rejecting) an action, in two
+ * forms distinguished by whether they name one:
  *
- * @see ActionConfirmationScopeOptions for the binding.
+ * - **Bound** (`options.id` set). Core mints these per confirmation request and
+ *   hands them to the country configuration in place of the caller's own token.
+ *   The binding is the whole authorisation, so no event check is needed.
+ * - **Unbound** (`options.id` omitted). A standing grant for an integration
+ *   that confirms under its own credentials, long after a bound token would
+ *   have expired. The remaining options apply as they do to any record scope.
+ *
+ * These must not be granted to a user role: a caller who can request an action
+ * and also confirm it needs no country configuration to register a record, and
+ * can pick its registration number and override the reviewed declaration.
  */
-export const ActionConfirmationScopeType = z.enum([
+export const ActionConfirmationScopeType = RecordScopeTypeV2.extract([
   'record.action.accept',
   'record.action.reject'
 ])
@@ -254,13 +263,11 @@ export type ActionConfirmationScopeType = z.infer<
   typeof ActionConfirmationScopeType
 >
 
-const ActionConfirmationScopeOptions = z
-  .object({
-    id: UUID.describe('Id of the requested action this scope may confirm.')
-  })
-  .describe(
-    'Binds an action confirmation scope to a single action. A scope minted for one action never authorises confirming another.'
+const ActionConfirmationScopeOptions = AllRecordScopeOptions.extend({
+  id: UUID.optional().describe(
+    'Binds this scope to a single action, so it authorises confirming that action and no other. Core mints such a scope per confirmation request and hands it to the country configuration. Omit it to grant an integration the standing ability to confirm, in which case the remaining options apply as they do to any record scope.'
   )
+}).describe('Options for confirming (accepting or rejecting) an action.')
 
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
@@ -283,6 +290,10 @@ export const RecordScopeV2 = z
     z.object({
       type: z.literal('record.print-certified-copies'),
       options: ScopeOptionsPrintCertifiedCopies.optional()
+    }),
+    z.object({
+      type: ActionConfirmationScopeType,
+      options: ActionConfirmationScopeOptions.optional()
     })
   ])
   .describe(
@@ -404,10 +415,6 @@ export const Scope = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('dashboard.view'),
     options: WorkqueueOrDashboardOptions
-  }),
-  z.object({
-    type: ActionConfirmationScopeType,
-    options: ActionConfirmationScopeOptions
   })
 ])
 
@@ -417,7 +424,6 @@ export const ScopeType = z.enum([
   ...SystemScopeType.options,
   ...RecordScopeTypeV2.options,
   ...PlainScopeType.options,
-  ...ActionConfirmationScopeType.options,
   'workqueue',
   'dashboard.view'
 ])
@@ -690,9 +696,21 @@ export function hasScopeForActionConfirmation(
       scope !== undefined &&
       isActionConfirmationScope(scope) &&
       scope.type === type &&
-      scope.options.id === actionId
+      scope.options?.id === actionId
     )
   })
+}
+
+/**
+ * True for a confirmation scope that names no action, i.e. a standing grant
+ * rather than one core minted for a single confirmation request.
+ *
+ * Callers must exclude bound scopes before applying the ordinary record-scope
+ * event checks: a scope bound to action B would otherwise satisfy a
+ * type-and-jurisdiction match while confirming action A.
+ */
+export function isUnboundActionConfirmationScope(scope: Scope): boolean {
+  return isActionConfirmationScope(scope) && scope.options?.id === undefined
 }
 
 /**

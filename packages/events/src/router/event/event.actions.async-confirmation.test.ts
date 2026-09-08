@@ -10,7 +10,7 @@
  */
 
 import { HttpResponse, http } from 'msw'
-import { ActionType, ActionStatus, getUUID } from '@opencrvs/commons'
+import { ActionType, ActionStatus, getUUID, UUID } from '@opencrvs/commons'
 import {
   createTestClient,
   createCountryConfigClient,
@@ -23,17 +23,13 @@ function mockDeclareApi(status: number) {
   return mswServer.use(
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
-      () =>
-        HttpResponse.json(
-          {},
-          { status }
-        )
+      () => HttpResponse.json({}, { status })
     )
   )
 }
 
 function getDeclareActionId(
-  actions: { type: ActionType; status: ActionStatus; id: string }[]
+  actions: { type: ActionType; status: ActionStatus; id: UUID }[]
 ) {
   const id = actions.find(
     (a) => a.type === ActionType.DECLARE && a.status === ActionStatus.Requested

@@ -21,19 +21,21 @@ How the migration runs during the v2.0.0 upgrade:
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
 
-Confirming an asynchronous action (the `accept`/`reject` endpoints) now requires **one of two credentials**, and a logged-in user's own token is neither:
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients. These scopes come in two forms:
 
-- an **action-bound token**, whose only scopes are the new `record.action.accept` and `record.action.reject` bound to a single action id. Core mints this itself and sends it to the country configuration in the action confirmation request, in place of the caller's token. Country configuration handlers need no change — they keep forwarding the `Authorization` header they receive — but they no longer hold the registrar's own scopes, and can only confirm the one action they were asked about;
-- a **system client** holding the action's own scope (e.g. `record.register`), for integrations that confirm later under their own credentials.
+- **bound**, carrying an `id` naming one action. Core mints these per confirmation request and sends them to the country configuration in place of the caller's own token. Country configuration handlers need no change — they keep forwarding the `Authorization` header they receive — but they no longer hold the registrar's own scopes, and can confirm only the action they were asked about;
+- **unbound**, omitting `id`. A standing grant for an integration that confirms under its own credentials, long after a bound token would have expired. The remaining options (`event`, jurisdiction) apply as they do to any record scope, so an integration stays confined to what it was granted.
 
 This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. `accept`/`reject` additionally now refuse any `actionId` that is not a pending action of the matching type.
 
+**These scopes must not be granted to a user role.** A caller that can both request an action and confirm it needs no country configuration to register a record. Core does not enforce this — grant them only to integrations.
+
 Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
-- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time;
+- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects) without an `id`** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`; it still needs `record.read` to resolve the pending action;
 - **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
 
-`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.register`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.action.accept` or `record.read`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
 The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` now controls the lifetime of the action-bound token described above, and **defaults to 600 seconds** (was 604800). It only has to outlive the confirmation round trip to the country configuration; integrations that confirm hours or days later use their own system client, so it must not be raised to cover them.
 

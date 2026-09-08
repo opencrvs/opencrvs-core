@@ -25,7 +25,8 @@ import {
   getCurrentEventState,
   getOrThrow,
   getUUID,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  UUID
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -857,8 +858,8 @@ describe('Request and confirmation flow', () => {
 
         const countryConfigClient = createCountryConfigClient(
           user,
-          'cafecafe-cafe-4caf-8afe-cafecafecafe',
-          'abbaabba-abba-4abb-8baa-abbaabbaabba'
+          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID,
+          'abbaabba-abba-4abb-8baa-abbaabbaabba' as UUID
         )
 
         await expect(
@@ -1205,8 +1206,8 @@ describe('Request and confirmation flow', () => {
 
         const countryConfigClient = createCountryConfigClient(
           user,
-          'cafecafe-cafe-4caf-8afe-cafecafecafe',
-          'abbaabba-abba-4abb-8baa-abbaabbaabba'
+          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID,
+          'abbaabba-abba-4abb-8baa-abbaabbaabba' as UUID
         )
 
         await expect(

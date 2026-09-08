@@ -46,7 +46,9 @@ import {
   CreateUserInput,
   canAccessUserWithScope,
   ActionConfirmationScopeType,
-  hasScopeForActionConfirmation
+  hasScopeForActionConfirmation,
+  isUnboundActionConfirmationScope,
+  Scope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -249,7 +251,14 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
  * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
  *
  */
-export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+export const canAccessEventWithScopes = (
+  scopes: RecordScopeTypeV2[],
+  /**
+   * Narrows the matched scopes further, for scope types where holding one is
+   * not on its own enough — see `requireActionConfirmation`.
+   */
+  scopeFilter?: (scope: Scope) => boolean
+) => {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -259,7 +268,9 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   > = async ({ next, ctx, getRawInput }) => {
     const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes).filter(
+      (scope) => scopeFilter?.(scope) ?? true
+    )
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
@@ -320,25 +331,62 @@ const ActionConfirmationParams = z.object({
 /**
  * Authorises confirming (accepting or rejecting) one requested action.
  *
- * Confirming must never be reachable with the same credentials that requested
- * the action: otherwise whoever requests a registration can immediately confirm
+ * Confirming must never be reachable with the credentials that requested the
+ * action: otherwise whoever can request a registration can immediately confirm
  * it themselves, choosing the registration number and overriding the reviewed
- * declaration, without the country configuration ever being involved. Two
- * callers are legitimate here, and each gets its own path:
+ * declaration, with the country configuration never involved. So it takes its
+ * own scope — `record.action.accept` / `record.action.reject` — which no user
+ * role is granted, in either of the two forms that scope comes in:
  *
- * 1. The country configuration, holding the action-bound token core minted for
- *    it in `defaultRequestHandler`. Its `record.action.accept` /
- *    `record.action.reject` scope names this exact action, so the binding is the
- *    whole authorisation — no further event scope is required.
+ * - **bound** to this exact action, which core mints per confirmation request
+ *   and hands to the country configuration. The binding is the whole
+ *   authorisation, so no event check applies;
+ * - **unbound**, a standing grant to an integration that confirms under its own
+ *   credentials (e.g. mosip-api, once MOSIP issues a credential, long after any
+ *   bound token would have expired). Those are subject to the ordinary
+ *   record-scope event checks, so an integration stays confined to the event
+ *   types and jurisdiction it was granted.
  *
- * 2. A long-running integration confirming later under its own system client
- *    (e.g. mosip-api, which confirms once MOSIP issues a credential, long after
- *    any bound token would have expired). A system client is provisioned by an
- *    administrator and cannot request the action in the first place, so holding
- *    the action's own scope is enough for it.
- *
- * A logged-in user's own token satisfies neither, which is the point.
+ * Bound scopes are excluded from the second check on purpose: one bound to
+ * action B would otherwise pass a type-and-jurisdiction match while confirming
+ * action A.
  */
+export function requireActionConfirmation(
+  scopeType: ActionConfirmationScopeType
+) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    unknown
+  > = async (opts) => {
+    const { ctx, next, getRawInput } = opts
+    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    if (
+      hasScopeForActionConfirmation(
+        getScopes(ctx.token),
+        scopeType,
+        input.actionId
+      )
+    ) {
+      return next()
+    }
+
+    return canAccessEventWithScopes(
+      [scopeType],
+      isUnboundActionConfirmationScope
+    )(opts)
+  }
+
+  return fn
+}
+
 /**
  * Resolves the action an accept/reject call names, and refuses anything other
  * than the pending action of the matching type.
@@ -401,51 +449,6 @@ export function requireConfirmableAction(actionType: ActionType) {
           ({ originalActionId }) => originalActionId === input.actionId
         )
       }
-    })
-  }
-
-  return fn
-}
-
-export function requireActionConfirmation({
-  scopeType,
-  systemClientScopes
-}: {
-  scopeType: ActionConfirmationScopeType
-  systemClientScopes: RecordScopeTypeV2[]
-}) {
-  const fn: MiddlewareFunction<
-    TrpcContext,
-    OpenApiMeta,
-    TrpcContext,
-    TrpcContext,
-    unknown
-  > = async (opts) => {
-    const { ctx, next, getRawInput } = opts
-    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
-
-    if (!input) {
-      throw new TRPCError({ code: 'BAD_REQUEST' })
-    }
-
-    if (
-      hasScopeForActionConfirmation(
-        getScopes(ctx.token),
-        scopeType,
-        input.actionId
-      )
-    ) {
-      return next()
-    }
-
-    if (ctx.user.type === TokenUserType.enum.system) {
-      return canAccessEventWithScopes(systemClientScopes)(opts)
-    }
-
-    throw new TRPCError({
-      code: 'FORBIDDEN',
-      message:
-        'Confirming an action requires a token bound to that action, or a system client holding the action scope.'
     })
   }
 

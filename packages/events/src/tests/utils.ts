@@ -283,20 +283,20 @@ export function createInitialisationToken(
  * @see createTokenForActionConfirmation in the auth service
  */
 function createActionConfirmationTestToken(
-  userId: string,
-  eventId: string,
-  actionId: string
+  userId: UUID,
+  eventId: UUID,
+  actionId: UUID
 ): TokenWithBearer {
   const token = jwt.sign(
     {
       scope: [
         encodeScope({
           type: 'record.action.accept',
-          options: { id: actionId as UUID }
+          options: { id: actionId }
         }),
         encodeScope({
           type: 'record.action.reject',
-          options: { id: actionId as UUID }
+          options: { id: actionId }
         }),
         encodeScope({ type: 'record.read' })
       ],
@@ -391,8 +391,8 @@ export function createInitialisationTestClient(
  */
 export function createCountryConfigClient(
   user: CreatedUser,
-  eventId: string,
-  actionId: string
+  eventId: UUID,
+  actionId: UUID
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createActionConfirmationTestToken(user.id, eventId, actionId)

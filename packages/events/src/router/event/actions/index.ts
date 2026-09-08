@@ -381,18 +381,6 @@ export function getDefaultActionProcedures(
     ? userAndSystemProcedure
     : userOnlyProcedure
 
-  /*
-   * Fallback scopes for a system client confirming under its own credentials
-   * (see `middleware.requireActionConfirmation`). Custom actions have no static
-   * scope in ACTION_SCOPE_MAP — their access is granted through
-   * `record.custom-action` (see `customActionProcedures`), so that is what their
-   * confirmation is checked against too.
-   */
-  const systemClientScopes =
-    actionType === ActionType.CUSTOM
-      ? ['record.custom-action' as const]
-      : ACTION_SCOPE_MAP[actionType]
-
   return {
     request: userTypeBasedProcedure
       .meta(meta)
@@ -457,12 +445,7 @@ export function getDefaultActionProcedures(
               .shape
           )
       )
-      .use(
-        middleware.requireActionConfirmation({
-          scopeType: 'record.action.accept',
-          systemClientScopes
-        })
-      )
+      .use(middleware.requireActionConfirmation('record.action.accept'))
       .use(middleware.requireConfirmableAction(actionType))
       .mutation(async ({ ctx, input }) => {
         const { token, user, event, confirmationAction } = ctx
@@ -522,12 +505,7 @@ export function getDefaultActionProcedures(
 
     reject: userAndSystemProcedure
       .input(AsyncActionInput)
-      .use(
-        middleware.requireActionConfirmation({
-          scopeType: 'record.action.reject',
-          systemClientScopes
-        })
-      )
+      .use(middleware.requireActionConfirmation('record.action.reject'))
       .use(middleware.requireConfirmableAction(actionType))
       .mutation(async ({ input, ctx }) => {
         const { event, confirmationAction } = ctx
