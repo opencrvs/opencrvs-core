@@ -10,6 +10,7 @@
  */
 /* eslint-disable no-console */
 import { bold, dim, green, red, yellow } from 'kleur/colors'
+import * as z from 'zod/v4'
 // Type-only import: erased at build time, so it adds no runtime dependency on
 // @opencrvs/commons (which is a devDependency of the toolkit).
 import type { TriggerEvent } from '@opencrvs/commons/notification'
@@ -290,10 +291,24 @@ function readTemplateTranslations(contents: string): TemplateTranslations {
   }
 }
 
-interface ServedLanguage {
-  lang: string
-  messages: Record<string, string>
-}
+/**
+ * What `GET /content/{application}` answers with: one entry per language, each
+ * carrying every message id that language has copy for.
+ *
+ * Parsed rather than cast, because the whole check turns on which ids are
+ * present — a bundle that is not this shape cannot be read as "the id is
+ * missing", and reporting it as such would be a false failure.
+ */
+const ServedTranslations = z.object({
+  languages: z.array(
+    z.object({
+      lang: z.string(),
+      messages: z.record(z.string(), z.string())
+    })
+  )
+})
+
+type ServedLanguage = z.infer<typeof ServedTranslations>['languages'][number]
 
 /**
  * The bundle `GET /content/{application}` serves, or `null` when it cannot be
@@ -311,32 +326,9 @@ async function fetchServedTranslations(
     if (!response.ok) {
       return null
     }
-    const body: unknown = await response.json()
-    if (typeof body !== 'object' || body === null) {
-      return null
-    }
-    const languages = (body as Record<string, unknown>).languages
-    if (!Array.isArray(languages)) {
-      return null
-    }
-    return languages
-      .map((entry): ServedLanguage | null => {
-        if (typeof entry !== 'object' || entry === null) {
-          return null
-        }
-        const { lang, messages } = entry as Record<string, unknown>
-        if (typeof lang !== 'string') {
-          return null
-        }
-        return {
-          lang,
-          messages:
-            typeof messages === 'object' && messages !== null
-              ? (messages as Record<string, string>)
-              : {}
-        }
-      })
-      .filter((entry): entry is ServedLanguage => entry !== null)
+    const parsed = ServedTranslations.safeParse(await response.json())
+
+    return parsed.success ? parsed.data.languages : null
   } catch {
     return null
   }
