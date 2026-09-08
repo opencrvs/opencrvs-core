@@ -148,12 +148,10 @@ async function requestStatus(
   url: string,
   method: 'GET' | 'POST'
 ): Promise<CheckStatus> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
     const response = await fetch(url, {
       method,
-      signal: controller.signal,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       // Sent without an Authorization header on purpose. A secured route
       // rejects with 401/403 before ever reading the body.
       headers:
@@ -163,8 +161,6 @@ async function requestStatus(
     return response.status
   } catch {
     return 'error'
-  } finally {
-    clearTimeout(timer)
   }
 }
 
@@ -207,11 +203,9 @@ function toEventTriggerConfig(value: unknown): EventTriggerConfig | null {
 async function fetchEventConfigs(
   baseUrl: string
 ): Promise<EventTriggerConfig[] | null> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
     const response = await fetch(`${baseUrl}/config/events`, {
-      signal: controller.signal
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
     })
     if (!response.ok) {
       return null
@@ -225,8 +219,6 @@ async function fetchEventConfigs(
       .filter((config): config is EventTriggerConfig => config !== null)
   } catch {
     return null
-  } finally {
-    clearTimeout(timer)
   }
 }
 
@@ -312,11 +304,9 @@ async function fetchServedTranslations(
   baseUrl: string,
   application: string
 ): Promise<ServedLanguage[] | null> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
     const response = await fetch(`${baseUrl}/content/${application}`, {
-      signal: controller.signal
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
     })
     if (!response.ok) {
       return null
@@ -349,8 +339,6 @@ async function fetchServedTranslations(
       .filter((entry): entry is ServedLanguage => entry !== null)
   } catch {
     return null
-  } finally {
-    clearTimeout(timer)
   }
 }
 
