@@ -47,7 +47,8 @@ spec:
                   name: {{ .Values.minio.users_secret }}
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_seed" "Values" .Values) }}
-      restartPolicy: "OnFailure"
+      restartPolicy: "Never"
+  backoffLimit: 0
 
 {{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
 
