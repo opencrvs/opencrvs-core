@@ -133,6 +133,10 @@ jobs:
           ' charts/opencrvs-services/values.yaml
           rm charts/opencrvs-services/values.yaml.bak
 
+          # Bump the shared utilities image tag (used by helper jobs and init
+          # containers) to track the same release version.
+          yq -i ".utilities.image.tag = \"v$VERSION\"" charts/dependencies/values.yaml
+
           # Point the countryconfig-template Tiltfile's local-dev defaults at
           # this release, so `tilt up` picks up the right core images and
           # Helm charts out of the box without anyone needing to export
