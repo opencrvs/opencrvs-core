@@ -3027,6 +3027,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3041,8 +3043,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.action.accept
-                                - record.action.reject
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3306,6 +3306,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3320,8 +3322,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.action.accept
-                                - record.action.reject
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3996,6 +3996,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -4010,8 +4012,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.action.accept
-                            - record.action.reject
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9142,6 +9142,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9156,8 +9158,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.action.accept
-                            - record.action.reject
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9629,6 +9629,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9643,8 +9645,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.action.accept
-                            - record.action.reject
                             - workqueue
                             - dashboard.view
                         $option:
@@ -15156,6 +15156,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -15170,8 +15172,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.action.accept
-                                  - record.action.reject
                                   - workqueue
                                   - dashboard.view
                               $option:
@@ -15473,6 +15473,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -15487,8 +15489,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.action.accept
-                                  - record.action.reject
                                   - workqueue
                                   - dashboard.view
                               $option:
