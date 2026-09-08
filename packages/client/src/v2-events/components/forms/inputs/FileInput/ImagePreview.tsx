@@ -24,6 +24,7 @@ import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanVie
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { toFileUrl } from '@client/v2-events/cache'
+import { useFileRetry } from '@client/v2-events/features/files/useFileRetry'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -72,6 +73,7 @@ export function ImagePreview({
 }: IProps) {
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
+  const retryProps = useFileRetry()
 
   function zoomIn() {
     setZoom((prevState) => prevState + 0.2)
@@ -152,7 +154,7 @@ export function ImagePreview({
 
       <ViewerContainer>
         <PanViewer
-          key={Math.random()}
+          {...retryProps(previewImage.path)}
           id="document_image"
           image={toFileUrl(previewImage.path)}
           rotation={rotation}

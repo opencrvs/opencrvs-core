@@ -19,7 +19,7 @@ import {
   FileFieldWithOptionValue,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { removeCached } from '@client/v2-events/cache'
+import { isFileCached, removeCached } from '@client/v2-events/cache'
 import { precacheFile } from './useFileUpload'
 
 export function getFilepathsFromActionDocument(
@@ -66,6 +66,45 @@ export async function cacheFiles(event: EventDocument) {
   const fileNames = getFilepathsFromActionDocument(actions)
 
   return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
+}
+
+/**
+ * The files this event refers to that the browser cache cannot answer — either
+ * because they were never cached, because they were removed (browser eviction,
+ * Chrome's "Cached images and files", `removeCachedFiles`), or because the SPA
+ * shell was cached under their URL.
+ */
+export async function getUncachedFilepaths(event: EventDocument) {
+  const actions = getAcceptedActions(event)
+  const filenames = getFilepathsFromActionDocument(actions)
+
+  const uncached = await Promise.all(
+    filenames.map(async (filename) =>
+      (await isFileCached(filename)) ? undefined : filename
+    )
+  )
+
+  return uncached.filter((filename): filename is DocumentPath => !!filename)
+}
+
+/**
+ * Re-caches those files, and only those.
+ *
+ * Needed because an event read back from the persisted react-query cache never
+ * re-runs `cacheFiles`: the two caches are cleared independently, so the event
+ * document can outlive the files it refers to.
+ */
+export async function cacheMissingFiles(event: EventDocument) {
+  const filenames = await getUncachedFilepaths(event)
+
+  return Promise.all(
+    filenames.map(async (filename) => {
+      // A poisoned entry has to go before `precacheFile` can replace it.
+      await removeCached(filename)
+
+      return precacheFile(filename)
+    })
+  )
 }
 
 export async function removeCachedFiles(event: EventDocument) {

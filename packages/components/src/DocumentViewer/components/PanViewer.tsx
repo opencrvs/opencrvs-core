@@ -36,9 +36,11 @@ interface IProps {
   zoom: number
   rotation: number
   controllerCenter?: boolean
+  /* Whoever owns the image decides how to recover from it failing to load. */
+  onError?: React.ReactEventHandler<HTMLImageElement>
 }
 
-const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
+const PanViewer: React.FC<IProps> = ({ image, zoom, rotation, onError }) => {
   const [dx] = useState(0)
   const [dy] = useState(0)
 
@@ -55,6 +57,7 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
           src={image}
           alt="Supporting Document"
           style={{ transform: `rotate(${rotation}deg)` }}
+          onError={onError}
         />
       </StyledReactPanZoom>
     </React.Fragment>

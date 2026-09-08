@@ -26,6 +26,7 @@ import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile, toFileUrl } from '@client/v2-events/cache'
+import { useFileRetry } from '@client/v2-events/features/files/useFileRetry'
 import { setLockBypass } from '@client/utils/lockBypass'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
@@ -201,11 +202,14 @@ const SignatureOutputPreview = styled(SignaturePreview)`
 `
 
 function SignatureOutput({ value }: { value?: FileFieldValue }) {
+  const retryProps = useFileRetry()
+
   if (!value) {
     return null
   }
   return (
     <SignatureOutputPreview
+      {...retryProps(value.path)}
       alt="Signature preview"
       src={toFileUrl(value.path)}
     />

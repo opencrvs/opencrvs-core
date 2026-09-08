@@ -30,6 +30,33 @@ export function toFileUrl(path: DocumentPath): string {
 }
 
 /**
+ * Whether a response cached under a document's URL is the SPA shell rather than
+ * the document.
+ *
+ * Document URLs are answered by the service worker's runtime cache alone, and
+ * `CacheFirst` stores whatever the network returned. A cache miss therefore
+ * reaches the client origin, which serves `index.html` with a 200 for any path,
+ * and that HTML is then cached under the document's URL — where it stays, and
+ * every later render of the document is a broken image.
+ *
+ * @see src-sw.ts — refuses to store and to serve these.
+ */
+export function isSpaShellResponse(response: Response) {
+  return (response.headers.get('content-type') ?? '').startsWith('text/html')
+}
+
+/**
+ * Whether the **BROWSER** cache can answer this file's URL with the file.
+ * A poisoned entry (see `isSpaShellResponse`) counts as not cached.
+ * @see CACHE_NAME
+ */
+export async function isFileCached(path: DocumentPath) {
+  const cached = await caches.match(toFileUrl(path), { ignoreSearch: true })
+
+  return !!cached && !isSpaShellResponse(cached)
+}
+
+/**
  * Sets file to **BROWSER** cache with given filename.
  * Normalizes url to an absolute path (prepends / if missing).
  * @see CACHE_NAME

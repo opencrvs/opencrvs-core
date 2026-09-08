@@ -17,7 +17,9 @@ import {
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
+import { WorkboxPlugin } from 'workbox-core/types'
 import { MINIO_REGEX } from '@opencrvs/commons/client'
+import { isSpaShellResponse } from '@client/v2-events/cache'
 
 self.__WB_DISABLE_DEV_LOGS = true
 
@@ -70,8 +72,35 @@ registerRoute(/http(.+)config$/, new NetworkFirst())
 // This caches certificates fetched from the countryconfig microservice
 registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
 
+/*
+ * Documents and signatures render from a URL only this cache can answer, so a
+ * miss reaches the client origin — which serves the SPA shell with a 200 for
+ * any path. Without this plugin `CacheFirst` stores that HTML under the file's
+ * own URL, and the file renders as a broken image from then on, for good.
+ *
+ * Documents are stored as `binary/octet-stream` (which is what Minio serves
+ * them as), so this cannot be an allowlist of image types.
+ */
+const documentsOnly: WorkboxPlugin = {
+  cacheWillUpdate: async ({ response }) =>
+    isSpaShellResponse(response) ? null : response,
+
+  // Repairs entries poisoned by an earlier version: dropping the entry and
+  // returning nothing makes CacheFirst fall through to the network.
+  cachedResponseWillBeUsed: async ({ cachedResponse, cacheName, request }) => {
+    if (!cachedResponse || !isSpaShellResponse(cachedResponse)) {
+      return cachedResponse
+    }
+
+    const cache = await caches.open(cacheName)
+    await cache.delete(request)
+
+    return undefined
+  }
+}
+
 // This caches the minio urls
-registerRoute(MINIO_REGEX, new CacheFirst())
+registerRoute(MINIO_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist

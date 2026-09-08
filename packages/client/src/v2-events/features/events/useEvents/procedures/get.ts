@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
+import { useEnsureCachedFiles } from '@client/v2-events/features/files/useEnsureCachedFiles'
 import {
   useTRPC,
   trpcOptionsProxy,
@@ -102,7 +103,7 @@ function getViewEventQuery(
   }
 }
 
-function useGetOrDownloadEvent(id: UUID) {
+function useEventFromCacheOrNetwork(id: UUID) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
   const cachedAssignedEvent = queryClient.getQueryData(
@@ -135,6 +136,20 @@ function useGetOrDownloadEvent(id: UUID) {
 
   // Otherwise: explicit download
   return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
+}
+
+/**
+ * Whichever of the three sources answers, the files the event refers to have to
+ * be in the browser cache before it is rendered — the cached-and-assigned
+ * branch above reads the event without a network request, so nothing there
+ * re-runs `cacheFiles`.
+ */
+function useGetOrDownloadEvent(id: UUID) {
+  const event = useEventFromCacheOrNetwork(id)
+
+  useEnsureCachedFiles(event)
+
+  return event
 }
 
 export function useGetEvent() {

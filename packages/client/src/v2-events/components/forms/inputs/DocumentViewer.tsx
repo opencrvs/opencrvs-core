@@ -16,6 +16,7 @@ import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanVie
 import { DocumentPath } from '@opencrvs/commons/client'
 import { Option } from '@client/v2-events/utils'
 import { toFileUrl } from '@client/v2-events/cache'
+import { useFileRetry } from '@client/v2-events/features/files/useFileRetry'
 import { Select } from './Select'
 import { SimplePdfPreview } from './FileInput/SimplePdfPreview'
 
@@ -78,6 +79,8 @@ export function DocumentViewer({
   const onChange = (val: Option<DocumentViewerOptionValue>) =>
     setSelectedOption(val)
 
+  const retryProps = useFileRetry()
+
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
 
@@ -107,6 +110,7 @@ export function DocumentViewer({
 
     return (
       <PanViewer
+        {...retryProps(url as DocumentPath)}
         image={toFileUrl(url as DocumentPath)}
         rotation={rotation}
         zoom={zoom}
