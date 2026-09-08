@@ -102,7 +102,7 @@ export function DocumentViewer({
     const url = selectedOption?.value.url || ''
 
     if (url.toLowerCase().endsWith('.pdf')) {
-      return <SimplePdfPreview pdfUrl={toFileUrl(url as DocumentPath)} />
+      return <SimplePdfPreview path={url as DocumentPath} />
     }
 
     return (
