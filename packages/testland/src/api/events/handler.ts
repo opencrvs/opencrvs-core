@@ -143,8 +143,26 @@ export async function onBirthCorrectionActionHandler(
   const event = request.payload
   await sendInformantNotification({ event, token })
   const pendingAction = getPendingAction(event.actions)
+  // The correction's changed values (e.g. a newly verified parent ID that must
+  // trigger child UIN creation) live on the REQUEST_CORRECTION this approval is
+  // for. `aggregateActionDeclarations` only folds those in once the
+  // APPROVE_CORRECTION is *accepted*, but at confirmation time it is still
+  // pending — so merge the requested correction's declaration in explicitly.
+  // Without it `shouldForwardBirthRegistrationToMosip` never sees the
+  // `*.verified` flag and the correction is not forwarded to MOSIP.
+  const requestedCorrection =
+    'requestId' in pendingAction
+      ? event.actions.find((action) => action.id === pendingAction.requestId)
+      : undefined
+  const requestedCorrectionDeclaration =
+    requestedCorrection && 'declaration' in requestedCorrection
+      ? requestedCorrection.declaration
+      : {}
   const declaration = deepMerge(
-    aggregateActionDeclarations(event),
+    deepMerge(
+      aggregateActionDeclarations(event),
+      requestedCorrectionDeclaration
+    ),
     pendingAction.declaration
   )
 

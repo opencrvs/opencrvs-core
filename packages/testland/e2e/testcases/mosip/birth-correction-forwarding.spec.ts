@@ -93,9 +93,12 @@ test.describe.serial('Birth correction trigger eligibility checks', () => {
      * - Setup creates a registered birth event where mother identity is not authenticated,
      *   so MOSIP does not generate child.nid during initial registration.
      * - Eligibility remains valid for correction forwarding (child has a date of birth and is younger than 16).
-     * - REQUEST_CORRECTION is submitted successfully and transitions to Accepted.
-     * - APPROVE_CORRECTION is submitted against the accepted request and transitions to Accepted.
-     * - After approval completes, child.nid is generated and present in the latest event state.
+     * - REQUEST_CORRECTION carries the newly verified parent flag and transitions to Accepted.
+     * - APPROVE_CORRECTION is submitted against the accepted request WITHOUT re-stating
+     *   the verified flag (as the real UI flow does), and transitions to Accepted.
+     * - After approval completes, child.nid is generated and present in the latest event state
+     *   — which only happens if the confirmation reads the verified flag from the requested
+     *   correction.
      */
     const aggregatedDeclaration = aggregateActionDeclarations(registeredEvent)
     const childNid = aggregatedDeclaration['child.nid']
@@ -145,9 +148,7 @@ test.describe.serial('Birth correction trigger eligibility checks', () => {
         transactionId: uuidv4(),
         requestId: acceptedRequestActionId,
         type: 'APPROVE_CORRECTION',
-        declaration: {
-          'mother.verified': 'verified'
-        },
+        declaration: {},
         annotation: {
           'review.comment': 'MOSIP correction approval e2e check'
         },
