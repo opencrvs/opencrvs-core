@@ -6,5 +6,5 @@ description: |
   can be used as a starting point for creating new add-on/custom app charts
   by providing common configurations and templates.
 type: application
-version: v2.1.0
-appVersion: 'v2.1.0'
+version: v1.2.4
+appVersion: 'v1.2.4'

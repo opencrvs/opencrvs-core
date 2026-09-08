@@ -284,7 +284,7 @@ imagePullSecrets: []
 # by a service-specific image configuration.
 platform:
   # Default tag for all OpenCRVS images.
-  tag: v2.0.0
+  tag: v1.2.4
 
   # Default repository for all OpenCRVS images,
   # for example: ghcr.io/opencrvs or myorg
@@ -350,7 +350,7 @@ config:
 countryconfig:
   image:
     name: opencrvs/ocrvs-countryconfig
-    tag: v2.0.0
+    tag: v1.2.4
   port: 3040
   network_policy:
     # countryconfig needs public-internet egress regardless of the global
