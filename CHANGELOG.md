@@ -85,6 +85,21 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 [#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
 
+#### Country config triggers are all served under `/trigger`
+
+The user-notification and system-ready triggers were served under `/triggers/`, while the event action and telemetry triggers used `/trigger/`. All of them now use the singular prefix:
+
+| Before | After |
+| --- | --- |
+| `POST /triggers/user/{event}` | `POST /trigger/user/{event}` |
+| `GET /triggers/system/ready` | `GET /trigger/system/ready` |
+
+`POST /trigger/events/{event}/actions/{action}` and `POST /trigger/telemetry` are unchanged.
+
+**Country configs must rename these routes.** `opencrvs upgrade` does it for you: the `rename-trigger-paths` codemod rewrites the `path` of every matching Hapi route under `src/`, then lists every `/triggers/` reference it could not rewrite — a path built at runtime, a route config it did not recognise — for you to rename by hand.
+
+[#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
+
 ### Deprecations
 
 #### `POST /auth/token` parameters in the query string
@@ -121,6 +136,7 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - `pnpm dev` now runs the MOSIP stack alongside the rest of core, so local registrations exercise the same MOSIP path as a real deployment. The testland `NO_MOSIP` escape hatch is gone — it only ever short-circuited local development, and production already defaulted to `false`.
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
+- Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
 
 ### New features
 
@@ -228,7 +244,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 
 ### Security fixes
 
-- Every `/triggers/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
+- Every `/trigger/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
 
   **Deployment notes:**
 
