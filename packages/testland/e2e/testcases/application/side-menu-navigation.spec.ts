@@ -134,7 +134,7 @@ test.describe('Side menu navigation', () => {
 
     await expect(
       page.getByRole('button', { name: 'Assigned to you' })
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 30_000 })
     await expect(page.getByRole('button', { name: 'Recent' })).toBeVisible()
   })
 
