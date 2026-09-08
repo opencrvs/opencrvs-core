@@ -238,6 +238,30 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
     )
 })
 
+/**
+ * Scope types that authorise confirming (accepting or rejecting) one single
+ * requested action. Unlike every other record scope these are never granted to
+ * a role: core mints them on the fly, bound to the action being confirmed, and
+ * hands them to the country configuration in the action confirmation request.
+ *
+ * @see ActionConfirmationScopeOptions for the binding.
+ */
+export const ActionConfirmationScopeType = z.enum([
+  'record.action.accept',
+  'record.action.reject'
+])
+export type ActionConfirmationScopeType = z.infer<
+  typeof ActionConfirmationScopeType
+>
+
+const ActionConfirmationScopeOptions = z
+  .object({
+    id: UUID.describe('Id of the requested action this scope may confirm.')
+  })
+  .describe(
+    'Binds an action confirmation scope to a single action. A scope minted for one action never authorises confirming another.'
+  )
+
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -332,6 +356,12 @@ export function isCustomActionScope(
   return scope.type === 'record.custom-action'
 }
 
+export function isActionConfirmationScope(
+  scope: Scope
+): scope is Extract<Scope, { type: ActionConfirmationScopeType }> {
+  return ActionConfirmationScopeType.options.some((type) => type === scope.type)
+}
+
 export const ResolvedRecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -374,6 +404,10 @@ export const Scope = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('dashboard.view'),
     options: WorkqueueOrDashboardOptions
+  }),
+  z.object({
+    type: ActionConfirmationScopeType,
+    options: ActionConfirmationScopeOptions
   })
 ])
 
@@ -383,6 +417,7 @@ export const ScopeType = z.enum([
   ...SystemScopeType.options,
   ...RecordScopeTypeV2.options,
   ...PlainScopeType.options,
+  ...ActionConfirmationScopeType.options,
   'workqueue',
   'dashboard.view'
 ])
@@ -629,6 +664,34 @@ export function canUserCreateEvent(
     }
 
     return scope.options?.event?.includes(eventType)
+  })
+}
+
+/**
+ * Whether the given scopes authorise confirming one specific action.
+ *
+ * An action confirmation scope is bound to a single action id, so holding
+ * `record.action.accept` for action A grants nothing over action B. Core mints
+ * these per confirmation request; they cannot be granted to a role.
+ *
+ * @param scopes - The encoded scopes to inspect, e.g. from a JWT.
+ * @param type - Which confirmation the caller is attempting.
+ * @param actionId - Id of the requested action being confirmed.
+ */
+export function hasScopeForActionConfirmation(
+  scopes: EncodedScope[],
+  type: ActionConfirmationScopeType,
+  actionId: UUID
+): boolean {
+  return scopes.some((encodedScope) => {
+    const scope = decodeScope(encodedScope)
+
+    return (
+      scope !== undefined &&
+      isActionConfirmationScope(scope) &&
+      scope.type === type &&
+      scope.options.id === actionId
+    )
   })
 }
 

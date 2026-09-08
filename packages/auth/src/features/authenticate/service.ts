@@ -40,7 +40,11 @@ import {
 } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
+import {
+  EncodedScope,
+  encodeScope,
+  TokenUserType
+} from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -243,6 +247,54 @@ export async function createRefreshToken(
 ): Promise<string> {
   const { familyId, jti } = await createFamily(userId)
   return signRefreshToken(userId, userType, familyId, jti)
+}
+
+/**
+ * Mints a token that authorises confirming (accepting or rejecting) exactly one
+ * requested action, and nothing else on its own.
+ *
+ * Core sends this to the country configuration in place of the caller's own
+ * token when it requests action confirmation. Because the accept/reject scopes
+ * are bound to `actionId`, a replayed confirmation token cannot be turned into a
+ * second registration nor used against another record — and the country
+ * configuration never receives the registrar's full set of scopes.
+ *
+ * `extraScopes` carries over read access a country configuration handler may
+ * already rely on. It is deliberately a narrow allowlist rather than the
+ * subject token's whole scope list.
+ */
+export async function createTokenForActionConfirmation(
+  { eventId, actionId }: { eventId: UUID; actionId: UUID },
+  userId: UUID,
+  userType: TokenUserType,
+  extraScopes: EncodedScope[] = []
+) {
+  return sign(
+    {
+      scope: [
+        encodeScope({
+          type: 'record.action.accept',
+          options: { id: actionId }
+        }),
+        encodeScope({
+          type: 'record.action.reject',
+          options: { id: actionId }
+        }),
+        ...extraScopes
+      ],
+      eventId,
+      actionId,
+      userType
+    },
+    cert,
+    {
+      subject: userId,
+      algorithm: 'RS256',
+      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
+      audience: ['opencrvs:countryconfig-user'],
+      issuer: JWT_ISSUER
+    }
+  )
 }
 
 export async function storeUserInformation(

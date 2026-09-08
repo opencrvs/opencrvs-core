@@ -35,5 +35,10 @@ export const env = cleanEnv(process.env, {
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS: num({ default: 3600 }), // 1 hour
+  // Bound to a single action and handed to the country configuration inside the
+  // action confirmation request. Long-running integrations (e.g. mosip-api)
+  // confirm with their own system client instead, so this does not need to
+  // outlive the confirmation round trip.
+  CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_RECOVERY_LINK_EXPIRY_SECONDS: num({ default: 3600 }) // 1 hour (account recovery link)
 })

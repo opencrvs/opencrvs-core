@@ -68,6 +68,10 @@ import reindexingTokenHandler, {
 import integrationCreatorTokenHandler, {
   responseSchema as integrationCreatorResponseSchema
 } from './features/integrationCreatorToken/handler'
+import actionConfirmationTokenHandler, {
+  requestSchema as actionConfirmationRequestSchema,
+  responseSchema as actionConfirmationResponseSchema
+} from './features/actionConfirmationToken/handler'
 import { badRequest } from '@hapi/boom'
 
 export type AuthServer = {
@@ -167,6 +171,24 @@ export async function createServer() {
         'Returns a 60-second token with integration.create scope. This endpoint should only be reachable on the internal network.',
       response: {
         schema: integrationCreatorResponseSchema
+      }
+    }
+  })
+  server.route({
+    method: 'POST',
+    path: '/internal/action-confirmation-token',
+    handler: actionConfirmationTokenHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Create a token bound to one requested action, for confirming that action',
+      notes:
+        "Returns a short-lived token whose only scopes are record.action.accept and record.action.reject bound to the given action id. The identity is taken from the caller's own token, not the payload. Core calls this before requesting action confirmation from countryconfig. This endpoint should only be reachable on the internal network.",
+      validate: {
+        payload: actionConfirmationRequestSchema
+      },
+      response: {
+        schema: actionConfirmationResponseSchema
       }
     }
   })

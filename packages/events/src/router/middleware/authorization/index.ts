@@ -42,7 +42,9 @@ import {
   canAccessOtherUserWithScopes,
   UserScopeType,
   CreateUserInput,
-  canAccessUserWithScope
+  canAccessUserWithScope,
+  ActionConfirmationScopeType,
+  hasScopeForActionConfirmation
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -302,6 +304,78 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
         eventId: input.eventId,
         eventType: event.type
       }
+    })
+  }
+
+  return fn
+}
+
+const ActionConfirmationParams = z.object({
+  eventId: UUID,
+  actionId: UUID
+})
+
+/**
+ * Authorises confirming (accepting or rejecting) one requested action.
+ *
+ * Confirming must never be reachable with the same credentials that requested
+ * the action: otherwise whoever requests a registration can immediately confirm
+ * it themselves, choosing the registration number and overriding the reviewed
+ * declaration, without the country configuration ever being involved. Two
+ * callers are legitimate here, and each gets its own path:
+ *
+ * 1. The country configuration, holding the action-bound token core minted for
+ *    it in `defaultRequestHandler`. Its `record.action.accept` /
+ *    `record.action.reject` scope names this exact action, so the binding is the
+ *    whole authorisation — no further event scope is required.
+ *
+ * 2. A long-running integration confirming later under its own system client
+ *    (e.g. mosip-api, which confirms once MOSIP issues a credential, long after
+ *    any bound token would have expired). A system client is provisioned by an
+ *    administrator and cannot request the action in the first place, so holding
+ *    the action's own scope is enough for it.
+ *
+ * A logged-in user's own token satisfies neither, which is the point.
+ */
+export function requireActionConfirmation({
+  scopeType,
+  systemClientScopes
+}: {
+  scopeType: ActionConfirmationScopeType
+  systemClientScopes: RecordScopeTypeV2[]
+}) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    unknown
+  > = async (opts) => {
+    const { ctx, next, getRawInput } = opts
+    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    if (
+      hasScopeForActionConfirmation(
+        getScopes(ctx.token),
+        scopeType,
+        input.actionId
+      )
+    ) {
+      return next()
+    }
+
+    if (ctx.user.type === TokenUserType.enum.system) {
+      return canAccessEventWithScopes(systemClientScopes)(opts)
+    }
+
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message:
+        'Confirming an action requires a token bound to that action, or a system client holding the action scope.'
     })
   }
 

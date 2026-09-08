@@ -40,6 +40,7 @@ import {
 import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
+import { setBearerForToken } from '@events/router/middleware'
 import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
@@ -52,7 +53,9 @@ import {
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
+import { getActionConfirmationToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { assertConfirmableAction } from './confirmable'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -251,11 +254,23 @@ export async function defaultRequestHandler(
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
+  /*
+   * The country configuration gets a token bound to this one action rather than
+   * the caller's own token. Its only scopes are `record.action.accept` and
+   * `record.action.reject` for `requestedAction.id`, so it can confirm what it
+   * was asked about and nothing else — it cannot register a second record, act
+   * on another event, or use the registrar's write scopes.
+   */
+  const eventActionToken = await getActionConfirmationToken(
+    { eventId: input.eventId, actionId: requestedAction.id },
+    token
+  )
+
   const { responseStatus, responseBody } = await requestActionConfirmation(
     input.type,
     input.transactionId,
     eventWithRequestedAction,
-    token
+    setBearerForToken(eventActionToken)
   )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
@@ -367,11 +382,14 @@ export function getDefaultActionProcedures(
     ? userAndSystemProcedure
     : userOnlyProcedure
 
-  // Confirming an action (accept/reject) requires the same scope as requesting
-  // it. Custom actions have no static scope in ACTION_SCOPE_MAP — their access
-  // is granted through `record.custom-action` (see `customActionProcedures`), so
-  // that is what their confirmation is checked against too.
-  const confirmationScopes =
+  /*
+   * Fallback scopes for a system client confirming under its own credentials
+   * (see `middleware.requireActionConfirmation`). Custom actions have no static
+   * scope in ACTION_SCOPE_MAP — their access is granted through
+   * `record.custom-action` (see `customActionProcedures`), so that is what their
+   * confirmation is checked against too.
+   */
+  const systemClientScopes =
     actionType === ActionType.CUSTOM
       ? ['record.custom-action' as const]
       : ACTION_SCOPE_MAP[actionType]
@@ -440,7 +458,12 @@ export function getDefaultActionProcedures(
               .shape
           )
       )
-      .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(
+        middleware.requireActionConfirmation({
+          scopeType: 'record.action.accept',
+          systemClientScopes
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -461,6 +484,14 @@ export function getDefaultActionProcedures(
             message: 'Action not found.'
           })
         }
+
+        /*
+         * Only a pending action of this same type can be confirmed. Without
+         * this, any existing action id (a CREATE, or an already accepted
+         * action) could be passed in to mint a fresh accepted action of an
+         * arbitrary type, sidestepping the request flow and every check it runs.
+         */
+        assertConfirmableAction(originalAction, actionType)
 
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
@@ -512,7 +543,12 @@ export function getDefaultActionProcedures(
 
     reject: userAndSystemProcedure
       .input(AsyncActionInput)
-      .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(
+        middleware.requireActionConfirmation({
+          scopeType: 'record.action.reject',
+          systemClientScopes
+        })
+      )
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)
@@ -525,6 +561,8 @@ export function getDefaultActionProcedures(
         if (!action) {
           throw new Error(`Action not found.`)
         }
+
+        assertConfirmableAction(action, actionType)
 
         if (confirmationAction) {
           // Action is already accepted

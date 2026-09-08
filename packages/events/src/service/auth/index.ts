@@ -11,6 +11,7 @@
 
 import fetch from 'node-fetch'
 import * as z from 'zod/v4'
+import { UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   getSystemInitialisation as getSystemInitialisationQuery,
@@ -43,6 +44,45 @@ export async function getIntegrationCreatorToken(timeoutMs: number) {
   }
   const { token } = await res.json()
   return token as string
+}
+
+/**
+ * Fetches a token whose only scopes are `record.action.accept` and
+ * `record.action.reject`, both bound to `actionId`.
+ *
+ * This is what core sends to the country configuration when it requests action
+ * confirmation, in place of the caller's own token: the country configuration
+ * can confirm the one action it was asked about and nothing else, and never
+ * holds the registrar's write scopes.
+ *
+ * The caller's `token` authenticates the mint request; the resulting token
+ * carries that same identity, so a confirmation is still attributed to the user
+ * whose action it is.
+ */
+export async function getActionConfirmationToken(
+  { eventId, actionId }: { eventId: UUID; actionId: UUID },
+  token: string
+) {
+  const res = await fetch(
+    new URL('/internal/action-confirmation-token', env.AUTH_URL).toString(),
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      },
+      body: JSON.stringify({ eventId, actionId })
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch action confirmation token: ${res.status} ${res.statusText}`
+    )
+  }
+
+  const { token: actionConfirmationToken } = await res.json()
+  return actionConfirmationToken as string
 }
 
 const SystemInitialisation = z

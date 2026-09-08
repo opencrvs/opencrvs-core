@@ -275,6 +275,13 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
+/**
+ * Mirrors the token core mints in `defaultRequestHandler` and hands to the
+ * country configuration: bound to one action id, and carrying nothing beyond
+ * the accept/reject scopes for it plus read access.
+ *
+ * @see createTokenForActionConfirmation in the auth service
+ */
 function createActionConfirmationTestToken(
   userId: string,
   eventId: string,
@@ -283,19 +290,15 @@ function createActionConfirmationTestToken(
   const token = jwt.sign(
     {
       scope: [
-        ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
-          type: 'record.custom-action',
-          options: {
-            event: [
-              'birth',
-              'death',
-              'tennis-club-membership',
-              'child-onboarding'
-            ],
-            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
-          }
-        })
+          type: 'record.action.accept',
+          options: { id: actionId as UUID }
+        }),
+        encodeScope({
+          type: 'record.action.reject',
+          options: { id: actionId as UUID }
+        }),
+        encodeScope({ type: 'record.read' })
       ],
       sub: userId,
       userType: TokenUserType.enum.user,
@@ -383,9 +386,8 @@ export function createInitialisationTestClient(
 }
 
 /**
- * Simulates the confirmation caller (e.g. countryconfig / an integration)
- * hitting the action `accept`/`reject` endpoints. Confirming requires the
- * action's own scope (e.g. `record.register`), which this client carries.
+ * Simulates the country configuration hitting the action `accept`/`reject`
+ * endpoints with the action-bound token core minted for it.
  */
 export function createCountryConfigClient(
   user: CreatedUser,

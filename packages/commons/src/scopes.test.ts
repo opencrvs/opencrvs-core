@@ -14,11 +14,14 @@ import {
   EncodedScope,
   encodeScope,
   getScopeOptionValue,
+  hasScopeForActionConfirmation,
   JurisdictionFilter,
+  Scope,
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
 } from './scopes'
+import { getUUID } from './uuid'
 
 import {
   migrateLegacyScopesToV2,
@@ -835,5 +838,59 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
         role: ['FIELD_AGENT']
       }
     })
+  })
+})
+
+describe('action confirmation scopes', () => {
+  const actionId = getUUID()
+
+  test('cannot exist without naming an action', () => {
+    // The binding is the whole authorisation, so an unbound accept/reject scope
+    // must be impossible to define — including via `defineScopes` in a country
+    // config or the integration scopes seeded on startup.
+    expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(
+      false
+    )
+    expect(
+      Scope.safeParse({
+        type: 'record.action.reject',
+        options: { id: 'not-a-uuid' }
+      }).success
+    ).toBe(false)
+    expect(
+      Scope.safeParse({
+        type: 'record.action.accept',
+        options: { id: actionId }
+      }).success
+    ).toBe(true)
+  })
+
+  test('survives the encode/decode round trip used in tokens', () => {
+    const encoded = encodeScope({
+      type: 'record.action.accept',
+      options: { id: actionId }
+    })
+
+    expect(encoded).toBe(`type=record.action.accept&id=${actionId}`)
+    expect(decodeScope(encoded)).toEqual({
+      type: 'record.action.accept',
+      options: { id: actionId }
+    })
+  })
+
+  test('grants nothing beyond the one action and direction it names', () => {
+    const scopes = [
+      encodeScope({ type: 'record.action.accept', options: { id: actionId } })
+    ]
+
+    expect(
+      hasScopeForActionConfirmation(scopes, 'record.action.accept', actionId)
+    ).toBe(true)
+    expect(
+      hasScopeForActionConfirmation(scopes, 'record.action.accept', getUUID())
+    ).toBe(false)
+    expect(
+      hasScopeForActionConfirmation(scopes, 'record.action.reject', actionId)
+    ).toBe(false)
   })
 })
