@@ -24,6 +24,7 @@ import {
   uploadImage
 } from '@e2e/support/helpers'
 import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser } from '@e2e/support/utils'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
@@ -58,6 +59,7 @@ interface Sample {
 const FILE_URL_REGEX = /\/events\/[^?]+\.(png|jpg|jpeg|svg|pdf)(\?.*)?$/i
 
 const samples: Sample[] = []
+const cacheProbes: { label: string; entries: string[] }[] = []
 const fileResponses: string[] = []
 
 /*
@@ -116,12 +118,48 @@ function persistSummary() {
         ).length,
         totalSamples: samples.length,
         samples,
+        cacheProbes,
         fileResponses
       },
       null,
       2
     )
   )
+}
+
+/*
+ * What the workbox-runtime cache holds for this record's files, read without
+ * touching it — evidence of what the app itself put there or removed.
+ */
+async function probeCache(page: Page, label: string) {
+  const entries = await page.evaluate(async (pattern: string) => {
+    const regex = new RegExp(pattern, 'i')
+    const cacheKey = (await caches.keys()).find((key) =>
+      key.includes('workbox-runtime')
+    )
+
+    if (!cacheKey) {
+      return ['no workbox-runtime cache']
+    }
+
+    const cache = await caches.open(cacheKey)
+    const requests = (await cache.keys()).filter((request) =>
+      regex.test(request.url)
+    )
+
+    return Promise.all(
+      requests.map(async (request) => {
+        const match = await cache.match(request)
+
+        return `${new URL(request.url).pathname.split('/').pop()}: ${
+          match?.headers.get('content-type') ?? 'no content-type'
+        }`
+      })
+    )
+  }, FILE_URL_REGEX.source)
+
+  cacheProbes.push({ label, entries: entries.length ? entries : ['EMPTY'] })
+  persistSummary()
 }
 
 /*
@@ -137,11 +175,35 @@ async function openRecordBySearch(page: Page, childName: string) {
 
 async function readRecordTab(page: Page, scenario: string, childName: string) {
   await switchEventTab(page, 'Record')
-  await expect(page.getByTestId('child.name-value')).toHaveText(childName)
+  // A throttled context can take a while to render the record's own fields.
+  await expect(page.getByTestId('child.name-value')).toHaveText(childName, {
+    timeout: 30000
+  })
 
   await sampleRecordTab(page, scenario, 'immediately')
   await page.waitForTimeout(3000)
   await sampleRecordTab(page, scenario, 'after 3s')
+}
+
+/*
+ * The numbered scenarios are independent of each other, so a run can ask for a
+ * subset (`OCRVS_13618_SCENARIOS=8`) instead of paying for all of them — the
+ * declaration is created either way, since every scenario needs a record.
+ */
+const REQUESTED_SCENARIOS = process.env.OCRVS_13618_SCENARIOS?.split(',').map(
+  Number
+)
+
+async function scenarioStep(
+  number: number,
+  title: string,
+  body: () => Promise<void>
+) {
+  if (REQUESTED_SCENARIOS && !REQUESTED_SCENARIOS.includes(number)) {
+    return
+  }
+
+  await test.step(title, body)
 }
 
 function recordFileResponses(page: Page) {
@@ -300,7 +362,7 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
    * The session that uploaded the files also cached them: the best case, and the
    * baseline the other scenarios are compared against.
    */
-  await test.step('1. Same session, straight after registering', async () => {
+  await scenarioStep(1, '1. Same session, straight after registering', async () => {
     await openRecordBySearch(page, childName)
     await readRecordTab(page, '1. same session after register', childName)
   })
@@ -310,7 +372,7 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
    * from the cache for a record the viewer is not assigned to. Reading the record
    * again then has to precache them from scratch.
    */
-  await test.step('2. Leave the Record tab and read it again', async () => {
+  await scenarioStep(2, '2. Leave the Record tab and read it again', async () => {
     for (let visit = 1; visit <= 3; visit++) {
       await openRecordBySearch(page, childName)
       await readRecordTab(page, `2. re-opened, visit ${visit}`, childName)
@@ -321,7 +383,7 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
    * A reload renders from the IndexedDB-persisted event document, whose lifetime is
    * independent of the service worker cache the images come from.
    */
-  await test.step('3. Reload while on the Record tab', async () => {
+  await scenarioStep(3, '3. Reload while on the Record tab', async () => {
     for (let reload = 1; reload <= 3; reload++) {
       await page.reload()
       await readRecordTab(page, `3. after reload ${reload}`, childName)
@@ -333,7 +395,7 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
    * of a 528KB document is no longer instant, so anything rendering before it
    * finishes shows a broken image.
    */
-  await test.step('4. Fresh context on a throttled connection', async () => {
+  await scenarioStep(4, '4. Fresh context on a throttled connection', async () => {
     for (let attempt = 1; attempt <= 2; attempt++) {
       const context = await browser.newContext()
       const freshPage = await context.newPage()
@@ -367,7 +429,7 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
    * image's own URL. This scenario fails the document's presigned-url lookup once
    * and then restores the network, to see whether the Record tab recovers.
    */
-  await test.step('5. Presigned-url lookup fails once', async () => {
+  await scenarioStep(5, '5. Presigned-url lookup fails once', async () => {
     const context = await browser.newContext()
     const failingPage = await context.newPage()
 
@@ -405,7 +467,7 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
    * survives in the IndexedDB-persisted react-query cache, so nothing precaches them
    * again before the <img> elements render.
    */
-  await test.step('6. Files evicted from the cache, event document kept', async () => {
+  await scenarioStep(6, '6. Files evicted from the cache, event document kept', async () => {
     const context = await browser.newContext()
     const evictedPage = await context.newPage()
 
@@ -446,6 +508,119 @@ test('Supporting document and signature render in the Record tab (#13618)', asyn
       await evictedPage.reload()
       await readRecordTab(evictedPage, `6. reload ${reload} after eviction`, childName)
     }
+
+    await context.close()
+  })
+
+  /*
+   * The `ReadOnlyView` cleanup path, driven entirely through the UI:
+   *
+   * 1. An unassigned viewer opens the Record tab. The files are precached by the
+   *    'view-event' query, and the images render.
+   * 2. Leaving the Record tab unmounts `ReadOnlyView`, whose cleanup removes those
+   *    files from the cache because the record is not assigned to the viewer.
+   * 3. Assigning the record populates the `event.get` cache entry. From then on
+   *    `useGetOrDownloadEvent` reads the event from that entry with `queryFn`
+   *    stripped and `refetchOnMount: false`, so `cacheFiles` never runs again.
+   * 4. Re-opening the Record tab therefore renders <img> elements for files that
+   *    are no longer in the cache.
+   */
+  await scenarioStep(7, '7. ReadOnlyView cleanup, then assign', async () => {
+    const context = await browser.newContext()
+    const viewerPage = await context.newPage()
+
+    recordFileResponses(viewerPage)
+    await login(viewerPage, CREDENTIALS.REGISTRAR)
+    await openRecordBySearch(viewerPage, childName)
+
+    await readRecordTab(viewerPage, '7a. unassigned viewer', childName)
+    await probeCache(viewerPage, '7a. after reading the Record tab')
+
+    // Unmounts ReadOnlyView while the record is still unassigned.
+    await switchEventTab(viewerPage, 'Summary')
+    await viewerPage.waitForTimeout(2000)
+    await probeCache(viewerPage, '7b. after leaving the Record tab')
+
+    await ensureAssignedToUser(viewerPage, CREDENTIALS.REGISTRAR)
+    await probeCache(viewerPage, '7c. after assigning')
+
+    await readRecordTab(viewerPage, '7c. assigned, re-opened Record tab', childName)
+    await probeCache(viewerPage, '7c. after re-opening the Record tab')
+
+    await viewerPage.reload()
+    await readRecordTab(viewerPage, '7d. assigned, after reload', childName)
+    await probeCache(viewerPage, '7d. after reload')
+
+    await context.close()
+  })
+
+  /*
+   * Chrome's "Cached images and files" clears Cache Storage but leaves IndexedDB
+   * alone — they are separate checkboxes — and browser eviction can hit one and
+   * not the other too. The persisted `event.get` entry therefore outlives the
+   * files it refers to, and `useGetOrDownloadEvent` reads that entry with its
+   * `queryFn` stripped and `refetchOnMount: false`, so nothing re-runs
+   * `cacheFiles`. Unlike scenario 6 the cache is emptied by the browser rather
+   * than by this test.
+   */
+  await scenarioStep(8, '8. Cache Storage cleared, IndexedDB kept', async () => {
+    const context = await browser.newContext()
+    const clearedPage = await context.newPage()
+
+    recordFileResponses(clearedPage)
+
+    // Whether anything refetches the event after the files are gone.
+    const eventRequests: string[] = []
+
+    clearedPage.on('request', (request) => {
+      if (/event\.get|view-event/.test(request.url())) {
+        eventRequests.push(new URL(request.url()).pathname)
+      }
+    })
+
+    await login(clearedPage, CREDENTIALS.REGISTRAR)
+    await openRecordBySearch(clearedPage, childName)
+
+    // Assigned to self, so `ReadOnlyView`'s cleanup cannot be what empties the cache.
+    await ensureAssignedToUser(clearedPage, CREDENTIALS.REGISTRAR)
+    await readRecordTab(
+      clearedPage,
+      '8. before clearing Cache Storage',
+      childName
+    )
+    await probeCache(clearedPage, '8a. before clearing Cache Storage')
+
+    const cdp = await context.newCDPSession(clearedPage)
+
+    await cdp.send('Storage.clearDataForOrigin', {
+      origin: new URL(CLIENT_URL).origin,
+      storageTypes: 'cache_storage'
+    })
+
+    await probeCache(clearedPage, '8b. after clearing Cache Storage')
+
+    eventRequests.length = 0
+
+    await switchEventTab(clearedPage, 'Summary')
+    await readRecordTab(clearedPage, '8. re-rendered after clearing', childName)
+
+    for (let reload = 1; reload <= 2; reload++) {
+      await clearedPage.reload()
+      await readRecordTab(
+        clearedPage,
+        `8. reload ${reload} after clearing`,
+        childName
+      )
+    }
+
+    await probeCache(clearedPage, '8c. after two reloads')
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `#13618 scenario 8, event requests after the clear: ${JSON.stringify(
+        eventRequests
+      )}`
+    )
 
     await context.close()
   })
