@@ -10,7 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { decodeScope, EncodedScope, TokenUserType, UUID } from '@opencrvs/commons'
+import { decodeScope, EncodedScope, UUID } from '@opencrvs/commons'
 import {
   createTokenForActionConfirmation,
   verifyToken
@@ -59,6 +59,18 @@ export default async function actionConfirmationTokenHandler(
 
   const { sub, userType } = decodedOrError.right
 
+  /*
+   * Every token that can clear `verifyToken` carries `userType` — the only
+   * signing paths that omit it (the internal service and initialisation tokens)
+   * lack the `opencrvs:auth-user` audience it requires. It is optional in the
+   * payload codec rather than in practice, so refuse instead of guessing:
+   * assuming `user` here would mint a confirmation token asserting user
+   * identity for what may be a system client.
+   */
+  if (!userType) {
+    return h.response({ error: 'invalid_subject_token' }).code(401)
+  }
+
   const extraScopes = decodedOrError.right.scope.filter(
     (scope): scope is EncodedScope => {
       const decoded = decodeScope(scope as EncodedScope)
@@ -70,7 +82,7 @@ export default async function actionConfirmationTokenHandler(
   const token = await createTokenForActionConfirmation(
     { eventId, actionId },
     sub as UUID,
-    (userType as TokenUserType) ?? TokenUserType.enum.user,
+    userType,
     extraScopes
   )
 
