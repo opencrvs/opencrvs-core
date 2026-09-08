@@ -1692,6 +1692,19 @@ paths:
                   type: array
                   items:
                     type: string
+                credentials:
+                  type: object
+                  properties:
+                    clientId:
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    clientSecret:
+                      type: string
+                      minLength: 1
+                  required:
+                    - clientId
+                    - clientSecret
               required:
                 - name
                 - scopes
@@ -1758,9 +1771,11 @@ paths:
                       format: date-time
                       pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
                     createdBy:
-                      type: string
-                      format: uuid
-                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
                   required:
                     - id
                     - name
@@ -3266,8 +3281,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.confirm-registration
-                                - record.reject-registration
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3275,6 +3288,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
+                                - createdIn
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -3293,8 +3308,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3545,8 +3558,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.confirm-registration
-                                - record.reject-registration
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3554,6 +3565,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
+                                - createdIn
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -3572,8 +3585,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3775,6 +3786,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        configuration:
+          type: object
+          properties:
+            separator:
+              description: Joins the subfield values when the group is rendered as output,
+                e.g. ", ". Defaults to one subfield per line.
+              type: string
+            hideEmptyFields:
+              description: Leaves subfields without a value out of the output. Pair it with a
+                separator so the separator does not double up around the gaps.
+              default: false
+              type: boolean
+          additionalProperties: false
       required:
         - id
         - label
@@ -4222,8 +4246,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -4231,6 +4253,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -4249,11 +4273,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option. Propagated to the embedded admin-area
-                selectors.
-              type: boolean
             activeOnly:
               description: Offer only admin areas that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9371,8 +9390,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9380,6 +9397,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9398,10 +9417,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9860,8 +9875,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9869,6 +9882,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9887,10 +9902,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -14316,6 +14327,10 @@ components:
               description: If true, all required fields must be filled before continuing to
                 the next page
               type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
+              type: boolean
             fields:
               type: array
               items:
@@ -14348,6 +14363,10 @@ components:
               default: false
               description: If true, all required fields must be filled before continuing to
                 the next page
+              type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
               type: boolean
             fields:
               type: array
@@ -14715,6 +14734,11 @@ components:
                 description: If true, all required fields must be filled before continuing to
                   the next page
                 type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
+                type: boolean
               fields:
                 type: array
                 items:
@@ -15028,8 +15052,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.confirm-registration
-                                  - record.reject-registration
                                   - workqueue
                                   - dashboard.view
                               $option:
@@ -15037,6 +15059,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
+                                  - createdIn
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
@@ -15343,8 +15367,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.confirm-registration
-                                  - record.reject-registration
                                   - workqueue
                                   - dashboard.view
                               $option:
@@ -15352,6 +15374,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
+                                  - createdIn
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
