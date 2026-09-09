@@ -10,7 +10,12 @@
  */
 import path from 'path'
 import { test, expect } from '@playwright/test'
-import { getToken, login, switchEventTab } from '@e2e/support/helpers'
+import {
+  getToken,
+  login,
+  searchFromSearchBar,
+  switchEventTab
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
@@ -168,9 +173,12 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
   })
 
   await test.step('Record audit shows "Waiting for external validation" and the child UIN', async () => {
-    await page.goto(recordUrl)
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await page.getByRole('button', { name: 'Assign record' }).click()
 
+    // Verify the child UIN is visible in the record summary
+    await expect(page.getByTestId('child.nid-value')).toContainText(childNid)
+
+    // Verify the "Waiting for external validation" action is visible in the audit tab
     await switchEventTab(page, 'Audit')
     await expect(
       page.getByRole('button', {
@@ -178,8 +186,5 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
         exact: true
       })
     ).toBeVisible()
-
-    await switchEventTab(page, 'Record')
-    await expect(page.getByTestId('child.nid-value')).toContainText(childNid)
   })
 })

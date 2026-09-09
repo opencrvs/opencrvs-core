@@ -18,9 +18,11 @@ import {
 import { createMosipInteropClient } from '@opencrvs/mosip/api'
 import {
   Action,
+  ActionDocument,
   ActionType,
   aggregateActionDeclarations,
   deepMerge,
+  getCompleteActionDeclaration,
   getPendingAction,
   RegisterAction,
   NameFieldValue
@@ -143,8 +145,28 @@ export async function onBirthCorrectionActionHandler(
   const event = request.payload
   await sendInformantNotification({ event, token })
   const pendingAction = getPendingAction(event.actions)
+
+  // The correction's changed values (e.g. a newly verified parent ID that must
+  // trigger child UIN creation) live on the REQUEST_CORRECTION this approval is
+  // for. `aggregateActionDeclarations` only folds them in once the
+  // APPROVE_CORRECTION is accepted, but at confirmation time it is still pending.
+  // Its `requestId` points at the *Accepted* correction request, whose own
+  // declaration is empty — the values sit on the linked Requested action — so
+  // resolve the request's complete declaration explicitly (the same way
+  // `aggregateActionDeclarations` does for an accepted approval).
+  const requestAction =
+    'requestId' in pendingAction
+      ? event.actions.find((action) => action.id === pendingAction.requestId)
+      : undefined
+  const declarationWithCorrection = requestAction
+    ? getCompleteActionDeclaration(
+        aggregateActionDeclarations(event),
+        event,
+        requestAction as ActionDocument
+      )
+    : aggregateActionDeclarations(event)
   const declaration = deepMerge(
-    aggregateActionDeclarations(event),
+    declarationWithCorrection,
     pendingAction.declaration
   )
 

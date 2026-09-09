@@ -360,11 +360,16 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       return x
     })
     .filter((x) => {
-      // removing immediately APPROVED_CORRECTION since we only show
-      // associated REQUEST_CORRECTION as 'Record corrected'
+      // Removing immediately APPROVED_CORRECTION since we only show
+      // the associated REQUEST_CORRECTION as 'Record corrected'.
+      //
+      // A still-Requested approval is kept: when a correction with a verified
+      // parent is forwarded to MOSIP the approval is deferred, and this row is
+      // what surfaces as "Waiting for external validation" in the audit.
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
-        x.content?.immediateCorrection
+        x.content?.immediateCorrection &&
+        x.status !== ActionStatus.Requested
       ) {
         return false
       }
