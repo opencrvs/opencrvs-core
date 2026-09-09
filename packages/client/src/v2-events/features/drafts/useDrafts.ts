@@ -17,9 +17,11 @@ import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
+  findLocalEventIndex,
   refetchDraftsList,
   refetchAllSearchQueries,
-  setDraftData
+  setDraftData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
@@ -55,22 +57,24 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
 
     await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
 
-    const missingEventsToDownload = drafts
-      .filter((event) => !findLocalEventDocument(event.eventId))
-      .map(async (draft) =>
-        queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey({
-            eventId: draft.eventId,
-            waitFor: false
-          }),
-          queryFn: trpcOptionsProxy.event.get.queryOptions({
-            eventId: draft.eventId,
-            waitFor: false
-          }).queryFn
-        })
-      )
+    const eventsToSync = drafts.map(async (draft) => {
+      const input = { eventId: draft.eventId, waitFor: false }
 
-    await Promise.all(missingEventsToDownload)
+      if (!findLocalEventDocument(draft.eventId)) {
+        await queryClient.prefetchQuery({
+          queryKey: trpcOptionsProxy.event.get.queryKey(input),
+          queryFn: trpcOptionsProxy.event.get.queryOptions(input).queryFn
+        })
+      }
+
+      const event = findLocalEventDocument(draft.eventId)
+
+      if (event && !findLocalEventIndex(draft.eventId)) {
+        updateLocalEventIndex(draft.eventId, event)
+      }
+    })
+
+    await Promise.all(eventsToSync)
 
     return drafts
   }
