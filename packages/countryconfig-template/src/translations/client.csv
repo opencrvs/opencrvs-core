@@ -1014,7 +1014,7 @@ sysAdHome.resentPasswordError,The label for error notification of reset password
 sysAdHome.resentPasswordSuccess,The label for success notification of reset password sms invite,Temporary password sent to {username},Mot de passe temporaire envoyé à {username}
 sysAdHome.sendUsernameReminderInvite,The label for menu option to send username reminder,Send username reminder,Envoyer un rappel de nom d'utilisateur
 sysAdHome.sendUsernameReminderInviteError,The label for error notification of send username reminder,Username reminder could not be sent,Le rappel du nom d'utilisateur n'a pas pu être envoyé
-sysAdHome.sendUsernameReminderInviteModalMessage,Message for send username reminder,The user will receive a username reminder via an {deliveryMethod} sent to {recipient},L'utilisateur recevra un rappel de son nom d'utilisateur par un {deliveryMethod} envoyé à {recipient}.
+sysAdHome.sendUsernameReminderInviteModalMessage,Message for send username reminder,The user will receive a username reminder via {deliveryMethod},L'utilisateur recevra un rappel de son nom d'utilisateur par {deliveryMethod}.
 sysAdHome.sendUsernameReminderInviteModalTitle,Title for send username reminder,Send username reminder?,Envoyer un rappel de nom d'utilisateur ?
 sysAdHome.sendUsernameReminderInviteSuccess,The label for success notification of send username reminder,Username reminder sent to {name},Rappel de l'identifiant envoyé à {name}
 sysAdHome.toggleActivateStatusError,The label for error notification when toggling user activate status,"Failed to update {name}'s account status to ""{status}""","Échec de la mise à jour du statut du compte de {name} en ""{status}"""
@@ -1026,7 +1026,7 @@ sysAdHome.user.audit.reactivation.title,The title of user reactivation confirmat
 sysAdHome.user.deactivate,Label for toggle menu option deactivate,Deactivate,Désactiver
 sysAdHome.user.header,Title for edit user details,Edit details,Modifier les détails
 sysAdHome.user.reactivate,Label for toggle menu option reactivate,Reactivate,Réactiver
-sysAdHome.user.resetPasswordModal.message,Message for reset password modal,The user will receive a temporary password via {deliveryMethod} sent to {recipient}. They will then be prompted to create a new password on successful login,L'utilisateur recevra un mot de passe temporaire par {deliveryMethod} envoyé à {recipient}. Il sera ensuite invité à créer un nouveau mot de passe après avoir réussi à se connecter.
+sysAdHome.user.resetPasswordModal.message,Message for reset password modal,The user will receive a temporary password via {deliveryMethod}. They will then be prompted to create a new password on successful login,L'utilisateur recevra un mot de passe temporaire par {deliveryMethod}. Il sera ensuite invité à créer un nouveau mot de passe après avoir réussi à se connecter.
 sysAdHome.user.resetPasswordModal.title,Title for reset user password modal,Reset password?,Réinitialiser le mot de passe?
 sysAdHome.user.resetpassword.title,Title for reset user password,Reset Password,Réinitialiser le mot de passe
 system.user.active,Pill label for active user,Active,Actif

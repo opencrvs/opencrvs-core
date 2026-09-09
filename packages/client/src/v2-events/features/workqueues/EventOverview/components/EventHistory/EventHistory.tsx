@@ -39,7 +39,8 @@ import { useEventOverviewContext } from '@client/v2-events/features/workqueues/E
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
   useActionForHistory,
-  extractHistoryActions
+  extractHistoryActions,
+  findImmediateApproveCorrection
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -341,12 +342,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const displayableHistory = visibleHistory
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
-        const immediateApprovedCorrection = visibleHistory.find(
-          (h) =>
-            h.type === ActionType.APPROVE_CORRECTION &&
-            (h.requestId === x.id || h.requestId === x.originalActionId) &&
-            h.content?.immediateCorrection &&
-            h.createdBy === x.createdBy
+        const immediateApprovedCorrection = findImmediateApproveCorrection(
+          visibleHistory,
+          x
         )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
         // as 'Record corrected' in history table
@@ -360,11 +358,14 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       return x
     })
     .filter((x) => {
-      // removing immediately APPROVED_CORRECTION since we only show
-      // associated REQUEST_CORRECTION as 'Record corrected'
+      // Removing immediately APPROVED_CORRECTION since we only show
+      // the associated REQUEST_CORRECTION as 'Record corrected'.
+      //
+      // Asyncronous correction request is kept to surface the fact that a correction is in-flight
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
-        x.content?.immediateCorrection
+        x.content?.immediateCorrection &&
+        x.status !== ActionStatus.Requested
       ) {
         return false
       }
