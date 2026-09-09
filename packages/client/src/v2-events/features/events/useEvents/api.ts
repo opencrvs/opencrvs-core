@@ -272,13 +272,6 @@ async function deleteEventData(updatedEvent: EventDocument) {
       waitFor: false
     })
   })
-  /*
-   * 'view-event' is a separately-keyed cache entry used by the Record tab. It is not
-   * automatically cleared when 'event.get' is removed, and the IndexedDB persister keeps
-   * it alive across page reloads. Explicitly removing it here keeps both caches in sync
-   * so the Record tab always reflects the latest server state after an action is submitted.
-   */
-  queryClient.removeQueries({ queryKey: [['view-event', id]] })
 
   /* When event is created, We derive local cache for search query from that (event with no declaration data).
    * If we delete only the event.get, we will have stale data until event is explicitly searched again.

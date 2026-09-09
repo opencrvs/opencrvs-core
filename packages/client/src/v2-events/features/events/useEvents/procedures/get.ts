@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useEffect } from 'react'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
@@ -71,35 +72,50 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
   }
 })
 
+async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
+  const eventDocument = await trpcClient.event.get.query({
+    eventId: id,
+    waitFor: false
+  })
+
+  await Promise.all([
+    cacheFiles(eventDocument),
+    cacheUsersFromEventDocument(eventDocument)
+  ])
+
+  return eventDocument
+}
+
 /**
- * Shared query config for explicitly downloading an event for viewing.
+ * Fetches a not-yet-downloaded record for viewing, via a Suspense query so
+ * React Query owns the promise across suspend/retry (safe under Strict Mode
+ * / concurrent-render remounts, unlike a hand-rolled ref+promise).
+ *
+ * `gcTime` alone isn't enough to guarantee this is gone once unmounted —
+ * React Query defers garbage collection via `setTimeout`, so a quick
+ * remount can still hit the stale cache entry. The unmount effect below
+ * removes it synchronously instead, so every visit to an undownloaded
+ * record is a real network call with a real loading state.
  */
-function getViewEventQuery(
-  id: UUID,
-  eventConfig: ReturnType<typeof useEventConfigurations>
-) {
-  return {
-    queryKey: [['view-event', id]],
-    meta: { eventConfig },
-    queryFn: async () => {
-      const eventDocument = await trpcClient.event.get.query({
-        eventId: id,
-        waitFor: false
-      })
+function useViewEvent(id: UUID): EventDocument {
+  const queryKey = [['view-event', id]]
 
-      await Promise.all([
-        cacheFiles(eventDocument),
-        cacheUsersFromEventDocument(eventDocument)
-      ])
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({ queryKey, exact: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
-      return eventDocument
-    },
+  return useSuspenseQuery({
+    queryKey,
+    queryFn: () => fetchEventForViewing(id),
     gcTime: 0,
     staleTime: Infinity,
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false
-  }
+  }).data
 }
 
 function useGetOrDownloadEvent(id: UUID) {
@@ -108,12 +124,6 @@ function useGetOrDownloadEvent(id: UUID) {
   const cachedAssignedEvent = queryClient.getQueryData(
     trpc.event.get.queryKey({ eventId: id, waitFor: false })
   )
-  const cachedViewEvent = queryClient.getQueryData([['view-event', id]])
-
-  // Already explicitly downloaded
-  if (cachedViewEvent) {
-    return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
-  }
 
   // If assigned & cached, read from cache without network
   if (cachedAssignedEvent) {
@@ -133,8 +143,8 @@ function useGetOrDownloadEvent(id: UUID) {
     }).data
   }
 
-  // Otherwise: explicit download
-  return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
+  // Not downloaded: always a real network call and a real loading state
+  return useViewEvent(id)
 }
 
 export function useGetEvent() {
@@ -181,13 +191,6 @@ export function useGetEvent() {
       const downloaded = queryClient.getQueryData(
         trpc.event.get.queryKey({ eventId: id, waitFor: false })
       )
-      const downloadedForViewing = queryClient.getQueryData([
-        ['view-event', id]
-      ])
-
-      if (downloadedForViewing) {
-        return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
-      }
 
       if (!downloaded) {
         throwStructuredError({
