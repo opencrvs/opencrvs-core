@@ -58,7 +58,11 @@ metadata:
     app: minio
   name: minio
 spec:
-  type: {{ .Values.service_type | default "ClusterIP" }}
+  {{- $service_type := default .Values.service_type .Values.minio.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
+  clusterIP: None
+  {{- end }}
   ports:
     - name: '3535'
       port: 3535
