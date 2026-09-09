@@ -184,7 +184,7 @@ export function EventOverviewLayout({
 
   const exit = () => {
     if (backTo) {
-      navigate(backTo)
+      navigate(backTo, { replace: true })
       return
     }
 
