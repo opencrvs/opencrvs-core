@@ -11,7 +11,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ApolloError, ApolloConsumer, ApolloClient } from '@apollo/client'
-import * as Sentry from '@sentry/react'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -147,7 +146,6 @@ const FetchButton = (props: IFullProps) => {
         onFetch(transformedResponse)
       }
     } catch (error) {
-      Sentry.captureException(error)
       setError(true)
       setLoading(false)
       setSuccess(false)

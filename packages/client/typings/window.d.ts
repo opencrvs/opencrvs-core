@@ -58,7 +58,6 @@ interface Window {
     PHONE_NUMBER_PATTERN: RegExp
     NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string
-    SENTRY: string
     DASHBOARDS: Array<{
       id: string
       title: {

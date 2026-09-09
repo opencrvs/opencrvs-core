@@ -25,7 +25,6 @@
     "envalid": "^8.0.0",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-pino": "^9.0.0",
-    "hapi-sentry": "^3.1.0",
     "jest-fetch-mock": "^2.1.2",
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",

@@ -24,7 +24,6 @@ export const DAILY_NOTIFICATION_LIMIT = 1
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
-export const SENTRY_DSN = env.SENTRY_DSN
 export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
 export const MONGO_URL = env.MONGO_URL

@@ -8,11 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { env } from '@auth/environment'
 import { ServerRegisterPluginObject } from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import * as Pino from 'hapi-pino'
-import * as Sentry from 'hapi-sentry'
 
 type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
@@ -30,20 +28,5 @@ export default function getPlugins() {
     })
   }
 
-  if (env.SENTRY_DSN) {
-    plugins.push({
-      plugin: Sentry,
-      options: {
-        client: {
-          environment: process.env.DOMAIN,
-          dsn: env.SENTRY_DSN,
-          initialScope: {
-            tags: { service: 'auth' }
-          }
-        },
-        catchLogErrors: true
-      }
-    })
-  }
   return plugins
 }

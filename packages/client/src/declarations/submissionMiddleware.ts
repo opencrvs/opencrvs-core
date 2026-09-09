@@ -47,8 +47,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
-// eslint-disable-next-line no-restricted-imports
-import { captureException } from '@sentry/browser'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -351,7 +349,6 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.FAILED_NETWORK
         })
-        captureException(error)
         return
       }
 
@@ -359,6 +356,5 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         ...declaration,
         submissionStatus: SUBMISSION_STATUS.FAILED
       })
-      captureException(error)
     }
   }

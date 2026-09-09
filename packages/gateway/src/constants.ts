@@ -47,7 +47,6 @@ export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const EVENTS_URL = env.EVENTS_URL
 export const DISABLE_RATE_LIMIT = env.DISABLE_RATE_LIMIT
-export const SENTRY_DSN = env.SENTRY_DSN
 export const PRODUCTION = env.isProd
 export const QA_ENV = env.QA_ENV
 export const CHECK_INVALID_TOKEN = env.CHECK_INVALID_TOKEN

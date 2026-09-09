@@ -16,12 +16,9 @@ import { createStore } from '@client/store'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { SubmissionController } from '@client/SubmissionController'
-import * as Sentry from '@sentry/react'
-import { BrowserTracing } from '@sentry/tracing'
 import { createBrowserRouter } from 'react-router-dom'
 import WebFont from 'webfontloader'
 import { App, routesConfig } from './App'
-import { APPLICATION_VERSION } from './utils/constants'
 
 WebFont.load({
   google: {
@@ -32,25 +29,6 @@ WebFont.load({
 storage.configStorage()
 
 const { store } = createStore()
-
-if (
-  window.location.hostname !== 'localhost' &&
-  window.location.hostname !== '127.0.0.1'
-) {
-  // setup error reporting using sentry
-  if (window.config.SENTRY) {
-    Sentry.init({
-      release: APPLICATION_VERSION,
-      environment: import.meta.env.NODE_ENV,
-      integrations: [new BrowserTracing()],
-
-      // We recommend adjusting this value in production, or using tracesSampler
-      // for finer control
-      tracesSampleRate: 1.0,
-      dsn: window.config.SENTRY
-    })
-  }
-}
 
 function userReconnectedToast() {
   const action = actions.showUserReconnectedToast()

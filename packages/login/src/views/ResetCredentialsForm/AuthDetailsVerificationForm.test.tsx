@@ -45,8 +45,7 @@ const server = setupServer(
           COUNTRY_LOGO: {
             fileName: 'dummy-file-name',
             file: 'dummy-logo'
-          },
-          SENTRY: ''
+          }
         }
       })
     )

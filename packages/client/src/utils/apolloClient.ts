@@ -22,7 +22,6 @@ import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
-import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
 import { CachePersistor } from 'apollo3-cache-persist'
@@ -65,8 +64,6 @@ export const createClient = (
         error.graphQLErrors[0].extensions.code === 'UNAUTHENTICATED')
     ) {
       store.dispatch(showSessionExpireConfirmation())
-    } else {
-      Sentry.captureException(error)
     }
   })
 
@@ -119,7 +116,8 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
     // skipping the persistent client in tests for now
     if (import.meta.env.MODE !== 'test') {
       // Version mismatch modal will surface the issue to the user
-      init().catch((err) => Sentry.captureException(err))
+      // eslint-disable-next-line no-console
+      init().catch((err) => console.error(err))
     }
   }, [store])
 

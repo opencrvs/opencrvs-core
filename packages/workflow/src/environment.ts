@@ -24,7 +24,6 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  SENTRY_DSN: str({ default: undefined }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040/' }),
   LANGUAGES: str({ default: 'en,fr' })
 })

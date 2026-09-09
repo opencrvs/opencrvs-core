@@ -51,7 +51,6 @@ describe('Login app step one', () => {
               backgroundImage: '',
               imageFit: 'FILL'
             },
-            SENTRY: '',
             USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
             INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms'
           }
