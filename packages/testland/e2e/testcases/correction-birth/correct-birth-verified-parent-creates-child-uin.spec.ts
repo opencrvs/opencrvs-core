@@ -38,8 +38,7 @@ async function getEventById(eventId: string, token: string) {
 }
 
 test('Correcting a birth with a verified parent ID creates the child UIN (#13734)', async ({
-  page,
-  context
+  page
 }) => {
   test.setTimeout(180_000)
   let token: string
