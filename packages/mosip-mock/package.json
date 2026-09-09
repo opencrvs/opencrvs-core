@@ -6,7 +6,7 @@
     "node": "22.x.x"
   },
   "scripts": {
-    "start": "NODE_ENV=development tsx watch src/index.ts",
+    "start": "NODE_ENV=development tsx watch --env-file-if-exists=../../.env src/index.ts",
     "start:prod": "NODE_ENV=production tsx src/index.ts",
     "test:compilation": "tsc --noEmit"
   },
