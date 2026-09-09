@@ -423,7 +423,7 @@ export function getDefaultActionProcedures(
         })
 
         if (existingAction) {
-          return ctx.event
+          return event
         }
 
         if (duplicates.detected) {
@@ -468,6 +468,7 @@ export function getDefaultActionProcedures(
           )
       )
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.requireAssignment)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -536,10 +537,10 @@ export function getDefaultActionProcedures(
           }
         )
       }),
-
     reject: userAndSystemProcedure
       .input(AsyncActionInput)
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)

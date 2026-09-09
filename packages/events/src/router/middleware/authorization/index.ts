@@ -196,6 +196,13 @@ export const requireAssignment: MiddlewareFunction<
     })
   }
 
+  if (user.type === TokenUserType.enum.system && assignedTo !== null) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: 'User is assigned to this event'
+    })
+  }
+
   // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
   if ('transactionId' in input) {
     const existingAction = findLast(
@@ -255,6 +262,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   > = async ({ next, ctx, getRawInput }) => {
     const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
     if (acceptedScopes.length === 0) {

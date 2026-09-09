@@ -584,6 +584,11 @@ export async function createEvent(
 
   return createdEvent
 }
+type SeedAction =
+  | DeclarationActionType
+  | typeof ActionType.UNASSIGN
+  | typeof ActionType.REQUEST_CORRECTION
+  | typeof ActionType.ARCHIVE
 
 /**
  * Seeds an event with the specified actions directly into the database.
@@ -601,12 +606,7 @@ export async function seedEvent(
     administrativeHierarchy
   }: {
     eventConfig: EventConfig
-    actions: (
-      | DeclarationActionType
-      | typeof ActionType.UNASSIGN
-      | typeof ActionType.REQUEST_CORRECTION
-      | typeof ActionType.ARCHIVE
-    )[]
+    actions: (SeedAction | { type: SeedAction; status: ActionStatus })[]
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
@@ -625,7 +625,10 @@ export async function seedEvent(
   /** offset variable for timestamps, ensures the array order is maintained. */
   let offset = 0
 
-  await dbClient.transaction().execute(async (trx) => {
+  /** Ids of the requested actions, keyed by action type. Needed to call .accept / .reject against them. */
+  const requestedActionIds: Partial<Record<ActionType, UUID>> = {}
+
+  return dbClient.transaction().execute(async (trx) => {
     const event = await trx
       .insertInto('events')
       .values({
@@ -666,7 +669,12 @@ export async function seedEvent(
     }
 
     const generatedActions: NewEventActions[] = actions.flatMap(
-      (actionType): NewEventActions[] => {
+      (action): NewEventActions[] => {
+        const { type: actionType, status } =
+          typeof action === 'string'
+            ? { type: action, status: ActionStatus.Accepted }
+            : action
+
         if (actionType === ActionType.UNASSIGN) {
           return [
             {
@@ -682,6 +690,7 @@ export async function seedEvent(
 
         // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
         const originalActionId = getUUID()
+        requestedActionIds[actionType] = originalActionId
 
         // correction, partial declaration which changes a value without uncorrectable: true is enough.
         const declaration =
@@ -695,25 +704,35 @@ export async function seedEvent(
                 administrativeHierarchy
               )
 
+        const requestedAction = {
+          ...baseAction,
+          actionType,
+          id: originalActionId,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Requested,
+          createdAt: new Date(baseTime + ++offset).toISOString(),
+          declaration
+        }
+
+        if (status === ActionStatus.Requested) {
+          return [requestedAction]
+        }
+
         return [
-          {
-            ...baseAction,
-            actionType,
-            id: originalActionId,
-            transactionId: generateUuid(rng),
-            status: ActionStatus.Requested,
-            createdAt: new Date(baseTime + ++offset).toISOString(),
-            declaration
-          },
+          requestedAction,
           {
             ...baseAction,
             actionType,
             transactionId: generateUuid(rng),
             originalActionId,
-            status: ActionStatus.Accepted,
+            status:
+              status === ActionStatus.Accepted
+                ? ActionStatus.Accepted
+                : ActionStatus.Rejected,
             createdAt: new Date(baseTime + ++offset).toISOString(),
             registrationNumber:
-              actionType === ActionTypes.enum.REGISTER
+              actionType === ActionTypes.enum.REGISTER &&
+              status === ActionStatus.Accepted
                 ? generateRegistrationNumber(rng)
                 : null,
             declaration: {}
@@ -729,6 +748,8 @@ export async function seedEvent(
         oc.columns(['transactionId', 'actionType', 'status']).doNothing()
       )
       .execute()
+
+    return { eventId: event.id, requestedActionIds }
   })
 }
 
