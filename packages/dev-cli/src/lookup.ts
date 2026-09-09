@@ -32,6 +32,13 @@ export interface LookupEnvironmentInput {
   isPrimaryWorktree: boolean
   /** The registry as read from disk. Never mutated. */
   registry: RegistrySnapshot
+  /**
+   * Names whose recorded worktree directory has disappeared, exactly as
+   * `resolve` computes them. Required rather than defaulted: a lookup that
+   * silently claimed nothing was stale would answer with a different slot than
+   * the `resolve` that started the environment (see `lookupEnvironment`).
+   */
+  staleNames: string[]
 }
 
 /**
@@ -53,6 +60,14 @@ export interface LookupEnvironmentInput {
  *
  * Anything else — an unregistered environment in a linked worktree — would
  * require picking a free slot, i.e. creating an environment, so it is refused.
+ *
+ * "Keeps the slot the registry recorded" is not a plain read, though:
+ * `resolveEnvironment` defends slot uniqueness and moves a name off a slot
+ * another *live* environment holds. Both verbs must therefore be told the same
+ * thing about staleness, which is why `staleNames` is an input here and not an
+ * assumption — a lookup that treated a deleted worktree's entry as live would
+ * see a collision `resolve` did not, and point seeds, clears and reindexes at
+ * ports nothing is listening on.
  */
 export function lookupEnvironment(
   input: LookupEnvironmentInput
@@ -79,11 +94,7 @@ export function lookupEnvironment(
     isDefaultEnvironment:
       input.isPrimaryWorktree && !hasExplicitName(input.envOverride),
     registry: input.registry,
-    /*
-     * Irrelevant: neither branch that reaches here allocates a slot, and
-     * staleness only ever influences allocation.
-     */
-    staleNames: []
+    staleNames: input.staleNames
   })
 }
 
@@ -119,15 +130,22 @@ export interface RunLookupResult {
 /**
  * The whole contract of an existing environment, for a script to source.
  *
- * `registry.read` is the only registry call — no `recordUse`, no `release`, no
- * write of any kind — so running it leaves the state file byte-identical.
+ * `read` and `findStaleNames` are the only registry calls — no `recordUse`, no
+ * `release`, no write of any kind — so running it leaves the state file
+ * byte-identical. `findStaleNames` only stats the recorded worktree
+ * directories, and it is the same call `runResolve` makes: staleness is a fact
+ * about the filesystem, so the two verbs can only agree by asking it the same
+ * question.
  */
 export function runLookup(input: RunLookupInput): RunLookupResult {
+  const snapshot = input.registry.read()
+
   const descriptor = lookupEnvironment({
     envOverride: input.envOverride,
     worktreePath: input.worktreePath,
     isPrimaryWorktree: input.isPrimaryWorktree,
-    registry: input.registry.read()
+    registry: snapshot,
+    staleNames: input.registry.findStaleNames(snapshot)
   })
 
   const env = toEnvironmentVariables(descriptor)
