@@ -11,7 +11,13 @@
 
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useLocation, useNavigate, matchPath } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useNavigationType,
+  matchPath,
+  NavigationType
+} from 'react-router-dom'
 import {
   useTypedParams,
   useTypedSearchParams
@@ -108,7 +114,9 @@ function EventOverviewTabs() {
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.path) ? 'active' : ''}
         onClick={() => {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
+            replace: true
+          })
         }}
       >
         {intl.formatMessage(messages.summary)}
@@ -120,7 +128,8 @@ function EventOverviewTabs() {
           }
           onClick={() => {
             navigate(
-              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo })
+              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo }),
+              { replace: true }
             )
           }}
         >
@@ -131,7 +140,8 @@ function EventOverviewTabs() {
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
         onClick={() => {
           navigate(
-            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo })
+            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo }),
+            { replace: true }
           )
         }}
       >
@@ -165,6 +175,7 @@ export function EventOverviewLayout({
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
   const navigate = useNavigate()
+  const navigationType = useNavigationType()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   if (eventResults.total === 0) {
@@ -181,15 +192,17 @@ export function EventOverviewLayout({
     : event
 
   const isDraft = event.status === EventStatus.enum.CREATED
-  const location = useLocation()
 
   const exit = () => {
+    // If backTo is set and we navigated via push (from a list), pop history to go back to the list.
+    // Otherwise, replace or go home as appropriate.
+    if (backTo && navigationType === NavigationType.Push) {
+      navigate(-1)
+      return
+    }
+
     if (backTo) {
-      if (location.state?.fromList) {
-        navigate(-1)
-      } else {
-        navigate(backTo, { replace: true })
-      }
+      navigate(backTo, { replace: true })
       return
     }
 
