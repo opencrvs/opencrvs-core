@@ -55,7 +55,8 @@ export function SearchResultItemTitle({
       color={useFallbackTitle ? 'red' : 'primary'}
       onClick={() => {
         navigate(
-          ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }, { backTo })
+          ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }, { backTo }),
+          { state: { fromList: true } }
         )
       }}
     >

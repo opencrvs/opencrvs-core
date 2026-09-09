@@ -181,10 +181,15 @@ export function EventOverviewLayout({
     : event
 
   const isDraft = event.status === EventStatus.enum.CREATED
+  const location = useLocation()
 
   const exit = () => {
     if (backTo) {
-      navigate(backTo, { replace: true })
+      if (location.state?.fromList) {
+        navigate(-1)
+      } else {
+        navigate(backTo, { replace: true })
+      }
       return
     }
 

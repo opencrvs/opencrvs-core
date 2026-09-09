@@ -67,9 +67,8 @@ test('Mobile: in-app Back on advanced-search results does not loop back into the
     await expect(page.getByTestId('search-result')).toBeVisible()
   })
 
-  await test.step('In-app Back must not re-open the closed record', async () => {
+  await test.step('In-app Back returns to the page before the search results', async () => {
     await page.locator('#header-go-back-button').click()
-    await expect(page.getByTestId('exit-event')).toBeHidden()
-    await expect(page).toHaveURL(/.*\/(advanced-search|search-result)/)
+    await expectInUrl(page, '/advanced-search')
   })
 })
