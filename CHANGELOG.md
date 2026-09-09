@@ -11,6 +11,12 @@
   - `SENTRY_DSN` is no longer read by any service, and the browser no longer reads `window.config.SENTRY`. Both can be dropped from your environment and country configuration; leaving them set has no effect.
   - **Crash reporting is no longer built in.** Browser and server errors now go to logs and the browser console only. Deployments that relied on Sentry for alerting should put their own error tracking in place.
 
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
+
 ## 1.9.16
 
 ### New features
