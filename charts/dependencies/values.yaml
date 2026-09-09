@@ -507,4 +507,4 @@ priority_class:
 utilities:
   image:
     repository: ghcr.io/opencrvs/ocrvs-utilities
-    tag: v2.1.0
+    tag: v2.1.0-beta
