@@ -15,6 +15,7 @@ import {
   runLookup
 } from './lookup'
 import { Registry } from './registry'
+import { runResolve } from './resolve-command'
 import { RegistrySnapshot } from './types'
 
 const PRIMARY = '/home/dev/opencrvs-core'
@@ -28,9 +29,14 @@ function entry(slot: number, worktreePath: string) {
  * A registry that reads a fixed snapshot and fails loudly on any write. Every
  * script that looks an environment up (clearing it, seeding it, reindexing it)
  * must be safe to run without creating anything, so "never writes" is asserted
- * rather than assumed.
+ * rather than assumed. `findStaleNames` is allowed: it only stats the recorded
+ * worktree directories, and lookup has to ask it the same question resolve
+ * does to land on the same slot.
  */
-function readOnlyRegistry(snapshot: RegistrySnapshot): Registry {
+function readOnlyRegistry(
+  snapshot: RegistrySnapshot,
+  staleNames: string[] = []
+): Registry {
   const forbidden = (operation: string) => (): never => {
     throw new Error(`lookup must not call registry.${operation}`)
   }
@@ -39,7 +45,7 @@ function readOnlyRegistry(snapshot: RegistrySnapshot): Registry {
     stateFilePath: '/nowhere/envs.json',
     read: () => snapshot,
     write: forbidden('write'),
-    findStaleNames: forbidden('findStaleNames'),
+    findStaleNames: () => staleNames,
     recordUse: forbidden('recordUse'),
     release: forbidden('release')
   }
@@ -50,7 +56,8 @@ describe('lookupEnvironment', () => {
     const descriptor = lookupEnvironment({
       worktreePath: PRIMARY,
       isPrimaryWorktree: true,
-      registry: {}
+      registry: {},
+      staleNames: []
     })
 
     expect(descriptor).toMatchObject({
@@ -71,7 +78,8 @@ describe('lookupEnvironment', () => {
       registry: {
         opencrvs_core: entry(0, PRIMARY),
         feature_a: entry(3, LINKED)
-      }
+      },
+      staleNames: []
     })
 
     expect(descriptor).toMatchObject({
@@ -91,7 +99,8 @@ describe('lookupEnvironment', () => {
       envOverride: 'feature-a',
       worktreePath: PRIMARY,
       isPrimaryWorktree: true,
-      registry: { feature_a: entry(2, LINKED) }
+      registry: { feature_a: entry(2, LINKED) },
+      staleNames: []
     })
 
     expect(descriptor).toMatchObject({
@@ -108,7 +117,8 @@ describe('lookupEnvironment', () => {
       lookupEnvironment({
         worktreePath: LINKED,
         isPrimaryWorktree: false,
-        registry: { opencrvs_core: entry(0, PRIMARY) }
+        registry: { opencrvs_core: entry(0, PRIMARY) },
+        staleNames: []
       })
     ).toThrow(EnvironmentNotRegisteredError)
   })
@@ -118,7 +128,8 @@ describe('lookupEnvironment', () => {
       lookupEnvironment({
         worktreePath: LINKED,
         isPrimaryWorktree: false,
-        registry: {}
+        registry: {},
+        staleNames: []
       })
     ).toThrow(/feature_a[\s\S]*pnpm dev[\s\S]*pnpm env:list/)
   })
@@ -137,7 +148,8 @@ describe('lookupEnvironment', () => {
       lookupEnvironment({
         worktreePath: LINKED,
         isPrimaryWorktree: false,
-        registry
+        registry,
+        staleNames: []
       }).slot
     ).toBe(1)
   })
@@ -172,5 +184,54 @@ describe('runLookup', () => {
     expect(result.exports).toContain(
       "export GATEWAY_URL='http://localhost:17070'"
     )
+  })
+})
+
+describe('lookup and resolve', () => {
+  const GONE = '/home/dev/worktrees/deleted'
+
+  /**
+   * The same fixed snapshot and staleness answer `readOnlyRegistry` gives, but
+   * writable, because `resolve` legitimately records the use it resolves. Its
+   * writes are dropped: this block is about what the two verbs *return* from
+   * identical state.
+   */
+  function recordingRegistry(
+    snapshot: RegistrySnapshot,
+    staleNames: string[]
+  ): Registry {
+    return {
+      ...readOnlyRegistry(snapshot, staleNames),
+      write: () => undefined,
+      recordUse: () => snapshot,
+      release: () => snapshot
+    }
+  }
+
+  it('agree on the slot when a stale entry sits on the slot the registry recorded', () => {
+    const snapshot: RegistrySnapshot = {
+      feature_a: entry(2, LINKED),
+      deleted: entry(2, GONE)
+    }
+    const where = {
+      worktreePath: LINKED,
+      isPrimaryWorktree: false
+    }
+
+    const resolved = runResolve({
+      ...where,
+      registry: recordingRegistry(snapshot, ['deleted'])
+    })
+    // Read-only: a lookup that agrees with resolve must still write nothing.
+    const lookedUp = runLookup({
+      ...where,
+      registry: readOnlyRegistry(snapshot, ['deleted'])
+    })
+
+    // The recorded slot: the only other claim on it lapsed with its worktree.
+    expect(resolved.descriptor.slot).toBe(2)
+    expect(lookedUp.descriptor.slot).toBe(2)
+    expect(lookedUp.env.EVENTS_URL).toBe(resolved.env.EVENTS_URL)
+    expect(lookedUp.env.REDIS_DB).toBe(resolved.env.REDIS_DB)
   })
 })
