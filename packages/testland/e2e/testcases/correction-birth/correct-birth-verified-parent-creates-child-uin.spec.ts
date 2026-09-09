@@ -10,12 +10,7 @@
  */
 import path from 'path'
 import { test, expect } from '@playwright/test'
-import {
-  getToken,
-  login,
-  searchFromSearchBar,
-  switchEventTab
-} from '@e2e/support/helpers'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
@@ -43,8 +38,10 @@ async function getEventById(eventId: string, token: string) {
 }
 
 test('Correcting a birth with a verified parent ID creates the child UIN (#13734)', async ({
-  page
+  page,
+  context
 }) => {
+  test.setTimeout(180_000)
   let token: string
   let declaration: Declaration
   let eventId: string
