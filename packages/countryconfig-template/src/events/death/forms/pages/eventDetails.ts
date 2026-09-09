@@ -109,7 +109,6 @@ const sourceCauseDeathOptions = createSelectOptions(
 
 export const PlaceOfDeath = {
   HEALTH_FACILITY: 'HEALTH_FACILITY',
-  DECEASED_USUAL_RESIDENCE: 'DECEASED_USUAL_RESIDENCE',
   OTHER: 'OTHER'
 } as const
 
@@ -118,12 +117,6 @@ const placeOfDeathMessageDescriptors = {
     defaultMessage: 'Health Institution',
     description: 'Select item for Health Institution',
     id: 'form.field.label.healthInstitution'
-  },
-  DECEASED_USUAL_RESIDENCE: {
-    defaultMessage: "Deceased's usual place of residence",
-    description:
-      'Option for place of occurrence of death same as deceased primary address',
-    id: 'form.field.label.placeOfDeathSameAsPrimary'
   },
   OTHER: {
     defaultMessage: 'Other',
@@ -401,8 +394,7 @@ export const eventDetails = defineFormPage({
       ],
       value: [
         field('eventDetails.deathLocation'),
-        field('eventDetails.deathLocationOther').get('administrativeArea'),
-        field('deceased.address').get('administrativeArea')
+        field('eventDetails.deathLocationOther').get('administrativeArea')
       ]
     }
   ]

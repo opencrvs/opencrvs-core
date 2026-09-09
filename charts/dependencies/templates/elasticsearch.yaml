@@ -130,4 +130,6 @@ spec:
             path: {{ .Values.elasticsearch.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "elasticsearch"  "Values" .Values) }}
 {{- end }}

@@ -8,6 +8,48 @@
 - Removed InfluxDB from deployment infrastructure and data-generator references.
 - The employee seeder seeds `<ENVIRONMENT_NAME>-employees.csv` from `src/data-seeding/employees/source/` when that file exists, otherwise `default-employees.csv`. It uses the `ENVIRONMENT_NAME` env var (also the telemetry environment label); add per-environment files such as `production-employees.csv` to seed different users per environment — no code change needed. The previous `EMPLOYEES_CSV` env var and the `OPENCRVS_ENVIRONMENT`-based `prod-employees.csv` selection have been removed [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
 
+### Bug fixes
+
+- Deaths abroad are no longer filed under the deceased's home district. `eventDetails.deathLocationId` (the event's `placeOfEvent`) fell back to `deceased.address` — the usual residence, always filled in — so a death abroad with no facility or "Other" address was assigned to the home district and the declaring embassy lost its record. The fallback now uses a new hidden field `eventDetails.deathLocationResidence`, populated only when the place of death is the usual residence. [#13651](https://github.com/opencrvs/opencrvs-core/issues/13651)
+
+  Apply both edits in `src/events/death/forms/pages/eventDetails.ts`:
+
+  1. Add the hidden field `eventDetails.deathLocationResidence` just before `eventDetails.deathLocationId`:
+
+  ```ts
+  {
+    id: 'eventDetails.deathLocationResidence',
+    type: FieldType.ALPHA_HIDDEN,
+    required: false,
+    label: placeOfDeathMessageDescriptors.DECEASED_USUAL_RESIDENCE,
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('eventDetails.placeOfDeath').isEqualTo(
+          PlaceOfDeath.DECEASED_USUAL_RESIDENCE
+        )
+      }
+    ],
+    parent: [field('eventDetails.placeOfDeath'), field('deceased.address')],
+    value: field('deceased.address').get('administrativeArea')
+  },
+  ```
+
+  2. Point the last `deathLocationId` fallback at it:
+
+  ```diff
+   value: [
+     field('eventDetails.deathLocation'),
+     field('eventDetails.deathLocationOther').get('administrativeArea'),
+  -  field('deceased.address').get('administrativeArea')
+  +  field('eventDetails.deathLocationResidence')
+   ]
+  ```
+
+  No new translation key — it reuses `DECEASED_USUAL_RESIDENCE`. If your form has diverged, port the intent: the fallback must not contribute a location unless the place of death is the usual residence.
+
+  Existing records are not corrected — this affects only declarations filled in after the upgrade; re-indexing won't change stored `deathLocationId`, only a correction that re-saves the form will. Present since 2.0.0, so audit your data if embassy offices are in use.
+
 ## 2.0.0
 
 ### Breaking changes
