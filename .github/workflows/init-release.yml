@@ -158,6 +158,10 @@ jobs:
       # target with the release merged in, so the PR diff is only what this
       # channel adds. A merge needing a human is handed over in the job summary
       # instead of failing the release.
+      #
+      # The branch is a snapshot and nothing updates it afterwards, so fixes
+      # that land on the release branch later have to be merged into it by hand
+      # before the PR goes in, or they never reach the target.
       - name: Create the merge-back branch
         id: merge_back
         run: |
