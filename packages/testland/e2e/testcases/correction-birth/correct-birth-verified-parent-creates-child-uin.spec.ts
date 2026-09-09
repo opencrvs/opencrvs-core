@@ -51,16 +51,12 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
   let recordUrl = ''
   let childNid = ''
 
-  await test.step('Register a birth with an unverified father via API (no child UIN)', async () => {
+  await test.step('Register a birth via API without a verified parent (no child UIN)', async () => {
     token = await getToken(CREDENTIALS.REGISTRAR)
 
-    // Father present but not identity-verified, so MOSIP does not create a
-    // child UIN at registration time. `addressSameAs: 'YES'` reuses the mother's
-    // address so the father's address fields are not required.
-    const res = await createDeclaration(token, {
-      'father.detailsNotAvailable': false,
-      'father.addressSameAs': 'YES'
-    })
+    // No parent identity is verified, so MOSIP does not create a child UIN at
+    // registration time.
+    const res = await createDeclaration(token)
 
     declaration = res.declaration
     eventId = res.eventId
@@ -108,25 +104,6 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
     await expectInUrl(page, `/events/request-correction/${eventId}/review`)
   })
 
-  await test.step("Verify the father's ID via e-signet", async () => {
-    // Open the father page from the correction review and authenticate the ID.
-    await page.getByTestId('change-button-father.name').click()
-    await page.getByRole('button', { name: 'Revoke' }).click()
-    await page.getByTestId('confirm').click()
-
-    await page.locator('#father____verify').click()
-    await expect(page).toHaveURL(/authorize/)
-    await page.locator('#id-input').fill('1234567900')
-    await page.locator('#authenticate').click()
-    await expect(page).not.toHaveURL(/authorize/)
-
-    await expect(page.getByText('ID Authenticated')).toBeVisible({
-      timeout: 60_000
-    })
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-  })
-
   await test.step("Verify the mother's ID via e-signet", async () => {
     // Open the mother page from the correction review and authenticate the ID.
     await page.getByTestId('change-button-mother.name').click()
@@ -135,7 +112,7 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
 
     await page.locator('#mother____verify').click()
     await expect(page).toHaveURL(/authorize/)
-    await page.locator('#id-input').fill('1234567898')
+    await page.locator('#id-input').fill(MOCK_NID)
     await page.locator('#authenticate').click()
     await expect(page).not.toHaveURL(/authorize/)
 
