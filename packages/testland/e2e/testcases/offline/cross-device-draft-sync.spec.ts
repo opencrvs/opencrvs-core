@@ -75,9 +75,14 @@ test.describe.serial('Draft created on another device syncs in full', () => {
     await page.getByRole('button', { name: 'Drafts' }).click()
     await expect(page.locator('#content-name')).toHaveText('Drafts')
 
+    /*
+     * Reconnecting refetches the drafts list on mount, so the row lands in a
+     * second or two; the headroom is for the 20s `refetchInterval` in Draft.tsx
+     * being the fallback if that refetch is missed on loaded CI.
+     */
     await expect(
       page.getByTestId('row-item').filter({ hasText: childName })
-    ).toBeVisible({ timeout: 60000 })
+    ).toBeVisible({ timeout: 30000 })
   })
 
   test('Device A opens the synced draft offline', async () => {
