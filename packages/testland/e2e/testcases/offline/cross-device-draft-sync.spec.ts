@@ -83,6 +83,9 @@ test.describe.serial('Draft created on another device syncs in full', () => {
   test('Device A opens the synced draft offline', async () => {
     await mockNetworkConditions(page, 'offline')
     await openRecordByTitle(page, childName)
+
+    // Not SuspenseLoadingFallback's "has not been downloaded yet" screen.
+    await expect(page.locator('#suspense-offline-message')).toBeHidden()
   })
 
   test('The draft shows in full without having been opened online', async () => {
