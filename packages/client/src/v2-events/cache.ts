@@ -29,6 +29,11 @@ export function toFileUrl(path: DocumentPath): string {
   return path.startsWith('/') ? path : `/${path}`
 }
 
+// Whether a cached response under a document's URL is the app shell rather than the document.
+export function isAppShellResponse(response: Response) {
+  return (response.headers.get('content-type') ?? '').startsWith('text/html')
+}
+
 /**
  * Sets file to **BROWSER** cache with given filename.
  * Normalizes url to an absolute path (prepends / if missing).
