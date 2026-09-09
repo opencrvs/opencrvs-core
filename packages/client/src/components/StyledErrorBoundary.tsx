@@ -12,9 +12,7 @@ import React, { useState } from 'react'
 import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { Box } from '@opencrvs/components/lib/Box'
+import { Button, PageWrapper, Box } from '@opencrvs/components'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 
 const ErrorContainer = styled(Box)`
@@ -70,12 +68,14 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
             <ErrorMessage>
               {intl.formatMessage(errorMessages.unknownErrorDescription)}
             </ErrorMessage>
-            <TertiaryButton
+            <Button
+              type="tertiary"
+              size="large"
               id="GoToHomepage"
               onClick={() => (window.location.href = '/')}
             >
               {intl.formatMessage(buttonMessages.goToHomepage)}
-            </TertiaryButton>
+            </Button>
           </ErrorContainer>
         </PageWrapper>
       }

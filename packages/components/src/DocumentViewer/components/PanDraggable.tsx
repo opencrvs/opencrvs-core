@@ -62,9 +62,9 @@ export default class ReactPanZoom extends React.PureComponent<
     rotation: 0
   }
 
-  private panWrapper: HTMLDivElement | null
+  private panWrapper: HTMLDivElement | null = null
 
-  private panContainer: HTMLDivElement | null
+  private panContainer: HTMLDivElement | null = null
   private getInitialState = () => {
     const { pandx, pandy, zoom } = this.props
     const defaultDragData = {

@@ -56,6 +56,13 @@ const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
+const actionConfirmationForm = z
+  .array(FieldConfig)
+  .optional()
+  .describe(
+    'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+  )
+
 const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
@@ -69,12 +76,87 @@ const ReadActionConfig = ActionConfigBase.extend(
   }).shape
 )
 
+const NotifyConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.NOTIFY),
+    form: actionConfirmationForm
+  }).shape
+)
+
+const DuplicateDetectedConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.DUPLICATE_DETECTED),
+    label: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
+      ),
+    supportingCopy: z.never().optional(),
+    icon: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no icon.'
+      ),
+    conditionals: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it cannot be disabled or hidden with conditionals.'
+      )
+  }).shape
+)
+
+const MarkAsDuplicateConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.MARK_AS_DUPLICATE)
+  }).shape
+)
+
+const MarkAsNotDuplicateConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE)
+  }).shape
+)
+
+const AssignConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.ASSIGN),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'ASSIGN is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
+  }).shape
+)
+
+const UnassignConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.UNASSIGN),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'UNASSIGN is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
+  }).shape
+)
+
+const DeleteConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.DELETE)
+  }).shape
+)
+
 const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     ),
+    form: actionConfirmationForm,
     dialogCopy: z
       .object({
         notify: TranslationConfig.describe(
@@ -93,7 +175,14 @@ const DeclareConfig = DeclarationActionBase.extend(
 
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE),
+    form: actionConfirmationForm
+  }).shape
+)
+
+const UnarchiveConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.UNARCHIVE)
   }).shape
 )
 
@@ -116,13 +205,15 @@ const EditActionConfig = ActionConfigBase.extend(
 
 const RejectConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT),
+    form: actionConfirmationForm
   }).shape
 )
 
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
-    type: z.literal(ActionType.REGISTER)
+    type: z.literal(ActionType.REGISTER),
+    form: actionConfirmationForm
   }).shape
 )
 
@@ -140,7 +231,19 @@ const RequestCorrectionConfig = ActionConfigBase.extend(
   }).shape
 )
 
-const CustomActionConfig = ActionConfigBase.merge(
+const ApproveCorrectionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION)
+  }).shape
+)
+
+const RejectCorrectionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION)
+  }).shape
+)
+
+const CustomActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.CUSTOM),
     customActionType: z
@@ -155,7 +258,7 @@ const CustomActionConfig = ActionConfigBase.merge(
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
     )
-  })
+  }).shape
 )
 
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
@@ -171,10 +274,42 @@ export const ActionConfig = z
       description:
         'Configuration for the read action — defines the record-tab content displayed on the event overview page.'
     }),
+    AssignConfig.meta({
+      id: 'AssignActionConfig',
+      description: 'Configuration for assigning a record to the current user.'
+    }),
+    UnassignConfig.meta({
+      id: 'UnassignActionConfig',
+      description:
+        'Configuration for unassigning a record from its current assignee.'
+    }),
+    DeleteConfig.meta({
+      id: 'DeleteActionConfig',
+      description: 'Configuration for deleting a draft record.'
+    }),
+    NotifyConfig.meta({
+      id: 'NotifyActionConfig',
+      description:
+        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+    }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. Shared with the notify action (ActionType.NOTIFY).'
+        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+    }),
+    DuplicateDetectedConfig.meta({
+      id: 'DuplicateDetectedActionConfig',
+      description:
+        'Configuration for the system-generated duplicate-detection action. Never shown as a button, so it only supports flags — not label, icon, or conditionals.'
+    }),
+    MarkAsDuplicateConfig.meta({
+      id: 'MarkAsDuplicateActionConfig',
+      description: 'Configuration for marking a record as a duplicate.'
+    }),
+    MarkAsNotDuplicateConfig.meta({
+      id: 'MarkAsNotDuplicateActionConfig',
+      description:
+        'Configuration for marking a record as not a duplicate, after it was previously flagged as one.'
     }),
     RejectConfig.meta({
       id: 'RejectActionConfig',
@@ -194,14 +329,25 @@ export const ActionConfig = z
       description:
         'Configuration for requesting a correction on a registered record.'
     }),
+    ApproveCorrectionConfig.meta({
+      id: 'ApproveCorrectionActionConfig',
+      description: 'Configuration for approving a requested correction.'
+    }),
+    RejectCorrectionConfig.meta({
+      id: 'RejectCorrectionActionConfig',
+      description: 'Configuration for rejecting a requested correction.'
+    }),
     EditActionConfig.meta({
       id: 'EditActionConfig',
-      description:
-        'Configuration for editing a record before registration.'
+      description: 'Configuration for editing a record before registration.'
     }),
     ArchiveConfig.meta({
       id: 'ArchiveActionConfig',
       description: 'Configuration for archiving a record.'
+    }),
+    UnarchiveConfig.meta({
+      id: 'UnarchiveActionConfig',
+      description: 'Configuration for unarchiving a record.'
     }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',
@@ -225,8 +371,8 @@ export const actionConfigTypes: Set<ActionConfigTypes> = new Set(
  *
  * These are not the same as the broader workflow `action.type` values.
  * `ActionConfigTypes` includes only the action kinds that can be defined
- * in the country configuration (e.g. DECLARE, VALIDATE, CUSTOM), and
- * excludes workflow-only types such as CREATE or NOTIFY.
+ * in the country configuration (e.g. NOTIFY, DECLARE, VALIDATE, CUSTOM), and
+ * excludes workflow-only types such as CREATE.
  */
 export type ActionConfigTypes = ActionConfig['type']
 

@@ -51,6 +51,7 @@ spec:
       labels:
         app: postgres
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
     {{- if .Values.priority_class.enabled }}
       priorityClassName: {{ .Values.priority_class.name }}
     {{- end }}
@@ -70,7 +71,7 @@ spec:
     {{- end }}
       containers: 
         - name: postgres
-          image: {{ .Values.postgres.image }}
+          image: {{ include "opencrvs.imageReference" .Values.postgres }}
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -123,10 +124,7 @@ spec:
                   name: {{ default .Values.postgres.backup.server_secret .Values.backup.backup_server_secret }}
                   key: user
             - name: PGBACKREST_REPO1_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: {{ default .Values.postgres.backup.server_secret .Values.backup.backup_server_secret }}
-                  key: host
+              value: {{ default .Values.backup.host .Values.postgres.backup.host }}
             - name: PGBACKREST_REPO1_TYPE
               value: posix
             - name: PGBACKREST_REPO1_CIPHER_TYPE
@@ -169,6 +167,8 @@ spec:
             items:
               - key: postgres-backup-config.sh
                 path: postgres-backup-config.sh
+              - key: ensure-deb-utils.sh
+                path: ensure-deb-utils.sh
         - name: postgres-run
           emptyDir: {}
         - name: data
@@ -177,7 +177,7 @@ spec:
             claimName: postgres-data
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.postgres.host_data_path | default "/data/postgres" }}
+            path: {{ .Values.postgres.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
       {{- if (eq (include "postgres.use_pgBackRest" .) "true") }}
@@ -196,4 +196,7 @@ spec:
               - key: ssh_key
                 path: id_rsa
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "postgres"  "Values" .Values) }}
+
 {{- end }}

@@ -13,16 +13,19 @@ flowchart TD
 
     subgraph CORE["Core"]
         C1["Verify CHANGELOG.md + package.json match release version"]
-        C2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
-        C3["⚡ Pipeline triggered automatically\n(docker images)"]
-        C4["Verify docker images published\nCompare size vs previous — report unusual increases"]
-        C5[Create draft release]
-        C6[Paste CHANGELOG.md to GitHub release]
-        C7["Paste copy items to release notes\n(generate with notebook)"]
-        C8[Publish GitHub release]
-        C9["⚡ npm publish for toolkit triggered automatically"]
-        C10[Verify toolkit version visible on npm]
-        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9 --> C10
+        C2["Dispatch 'Publish toolkit to NPM registry'\nref: release/X.Y.Z, version: X.Y.Z"]
+        C3["Approve the run in the npm-publish environment\nany @opencrvs/developers member, including you"]
+        C4[Verify toolkit version visible on npm]
+        C5["Bump @opencrvs/toolkit to X.Y.Z in\npackages/countryconfig-template/package.json\n⚠️ pnpm i --ignore-workspace to update its lockfile"]
+        C6[Commit the pin bump]
+        C7["git tag vX.Y.Z\ngit push origin tag vX.Y.Z\n⚠️ Tag as soon as C6 is committed — from C2 until\nthis tag exists, create-countryconfig@X.Y.Z\nscaffolds from the previous release tag"]
+        C8["⚡ Pipeline triggered automatically\n(docker images)"]
+        C9["Verify docker images published\nCompare size vs previous — report unusual increases"]
+        C10[Create draft release]
+        C11[Paste CHANGELOG.md to GitHub release]
+        C12["Paste copy items to release notes\n(generate with notebook)"]
+        C13[Publish GitHub release]
+        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9 --> C10 --> C11 --> C12 --> C13
     end
 
     subgraph CC["CountryConfig — after Core visible on npm"]
@@ -74,3 +77,4 @@ flowchart TD
 
 - Copy items notebook: https://gist.github.com/rikukissa/9415b88016c0acfc0e0d4e00add45993
 - init-release workflow: https://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml
+- Publish toolkit to NPM registry workflow: https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml

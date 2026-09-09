@@ -5,16 +5,25 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: postgres-on-deploy
+  labels:
+    app: backup-runner
+    job-type: backup
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   template:
+    metadata:
+      labels:
+        app: backup-runner
+        job-type: backup
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
       serviceAccountName: backup-runner
       containers:
         - name: stanza
-          image: bitnami/kubectl:latest
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           env:
             - name: PGBACKREST_STANZA
               value: main
@@ -23,11 +32,11 @@ spec:
             - -c
             - |
               kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
-                  pgbackrest --stanza="$PGBACKREST_STANZA" info > /tmp/pgbackrest_info 2>&1
+                  su postgres -c "pgbackrest --stanza=$PGBACKREST_STANZA info" > /tmp/pgbackrest_info 2>&1
               if grep -q "missing stanza path" /tmp/pgbackrest_info; then
                 echo "Stanza '$PGBACKREST_STANZA' does not exist. Initializing..."
                 kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
-                  pgbackrest --stanza="$PGBACKREST_STANZA" stanza-create
+                  su postgres -c "pgbackrest --stanza=$PGBACKREST_STANZA stanza-create"
                 echo "Stanza '$PGBACKREST_STANZA' created."
               else
                 echo "Stanza '$PGBACKREST_STANZA' already exists."

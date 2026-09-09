@@ -10,9 +10,8 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
-import { waitFor } from '@testing-library/dom'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import {
   ActionType,
   eventQueryDataGenerator,
@@ -118,7 +117,7 @@ export const DirectsCreatedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Declare'
+      name: 'Send an application'
     })
 
     await userEvent.click(actionButton)
@@ -261,7 +260,7 @@ export const directsRegisteredToPrint: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Print'
+      name: 'Print certificate'
     })
 
     await userEvent.click(actionButton)

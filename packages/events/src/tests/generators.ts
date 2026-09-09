@@ -10,7 +10,7 @@
  */
 
 import {
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   EventConfig,
   eventPayloadGenerator,
@@ -18,7 +18,7 @@ import {
   generateTrackingId,
   generateUuid,
   getUUID,
-  Location,
+  SetLocationPayload,
   pickRandom,
   TestUserRole,
   TokenUserType,
@@ -68,35 +68,36 @@ export function payloadGenerator(
 
   const locations = {
     /** Create test data by providing count or desired locations */
-    set: (input: Array<Partial<Location>> | number, prng: () => number) => {
+    set: (
+      input: Array<Partial<SetLocationPayload>> | number,
+      prng: () => number
+    ) => {
       if (typeof input === 'number') {
         return Array.from({ length: input }).map((_, i) => ({
           id: generateUuid(prng),
           name: `Location name ${i}`,
           administrativeAreaId: null,
-          validUntil: null,
           externalId: generateTrackingId(prng) + generateTrackingId(prng),
           locationType: pickRandom(prng, ['CRVS_OFFICE', 'HEALTH_FACILITY'])
-        })) satisfies Location[]
+        })) satisfies SetLocationPayload[]
       }
 
       return input.map((location, i) => ({
         id: location.id ?? generateUuid(prng),
         name: location.name ?? `Location name ${i}`,
         administrativeAreaId: location.administrativeAreaId ?? null,
-        validUntil: null,
         externalId:
           location.externalId ??
           generateTrackingId(prng) + generateTrackingId(prng),
         locationType: 'CRVS_OFFICE'
-      })) as Location[]
+      })) as SetLocationPayload[]
     }
   }
 
   const administrativeAreas = {
     /** Create test data by providing count or desired administrativeAreas */
     set: (
-      input: Array<Partial<AdministrativeArea>> | number,
+      input: Array<Partial<SetAdministrativeAreaPayload>> | number,
       prng: () => number
     ) => {
       if (typeof input === 'number') {
@@ -104,20 +105,18 @@ export function payloadGenerator(
           id: generateUuid(prng),
           name: `Location name ${i}`,
           parentId: null,
-          validUntil: null,
           externalId: generateTrackingId(prng) + generateTrackingId(prng)
-        })) satisfies AdministrativeArea[]
+        })) satisfies SetAdministrativeAreaPayload[]
       }
 
       return input.map((administrativeArea, i) => ({
         id: administrativeArea.id ?? generateUuid(prng),
         name: administrativeArea.name ?? `administrativeArea name ${i}`,
         parentId: administrativeArea.parentId ?? null,
-        validUntil: null,
         externalId:
           administrativeArea.externalId ??
           generateTrackingId(prng) + generateTrackingId(prng)
-      })) satisfies AdministrativeArea[]
+      })) satisfies SetAdministrativeAreaPayload[]
     }
   }
 
@@ -175,10 +174,11 @@ export function seeder() {
       id
     }
   }
-  const seedLocations = async (locations: Location[]) => setLocations(locations)
+  const seedLocations = async (locations: SetLocationPayload[]) =>
+    setLocations(locations)
 
   const seedAdministrativeAreas = async (
-    administrativeAreas: AdministrativeArea[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
   ) => setAdministrativeAreas(administrativeAreas)
   return {
     user: seedUser,
@@ -191,9 +191,9 @@ export function seeder() {
  * Creates test locations (CRVS offices and Health Facilities) under each provided administrative area and **at the country level**.
  */
 function generateTestLocations(
-  administrativeAreas: AdministrativeArea[],
+  administrativeAreas: SetAdministrativeAreaPayload[],
   rng: () => number
-): Location[] {
+): SetLocationPayload[] {
   const locationsUnderAdministrativeAreas = administrativeAreas.flatMap(
     (admin) => {
       const crvs = {
@@ -201,18 +201,16 @@ function generateTestLocations(
         locationType: 'CRVS_OFFICE',
         administrativeAreaId: admin.id,
         id: generateUuid(rng),
-        validUntil: null,
         externalId: generateUuid(rng)
-      } satisfies Location
+      } satisfies SetLocationPayload
 
       const health = {
         name: `${admin.name} Health Facility`,
         locationType: 'HEALTH_FACILITY',
         administrativeAreaId: admin.id,
         id: generateUuid(rng),
-        validUntil: null,
         externalId: generateUuid(rng)
-      } satisfies Location
+      } satisfies SetLocationPayload
 
       return [crvs, health]
     }
@@ -224,7 +222,6 @@ function generateTestLocations(
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       id: generateUuid(rng),
-      validUntil: null,
       externalId: generateUuid(rng)
     },
     {
@@ -232,10 +229,9 @@ function generateTestLocations(
       locationType: 'HEALTH_FACILITY',
       administrativeAreaId: null,
       id: generateUuid(rng),
-      validUntil: null,
       externalId: generateUuid(rng)
     }
-  ] satisfies Location[]
+  ] satisfies SetLocationPayload[]
 
   return [...locationsUnderAdministrativeAreas, ...locationsUnderCountry]
 }
@@ -247,49 +243,43 @@ function generateTestAdministrativeAreas() {
     name: 'Province A',
     parentId: null,
     id: generateUuid(rng),
-    validUntil: null,
     externalId: generateUuid(rng)
-  } satisfies AdministrativeArea
+  } satisfies SetAdministrativeAreaPayload
 
   const provinceB = {
     name: 'Province B',
     parentId: null,
     id: generateUuid(rng),
-    validUntil: null,
     externalId: generateUuid(rng)
-  } satisfies AdministrativeArea
+  } satisfies SetAdministrativeAreaPayload
 
   const districtC = {
     name: 'District C',
     parentId: null,
     id: generateUuid(rng),
-    validUntil: null,
     externalId: generateUuid(rng)
-  } satisfies AdministrativeArea
+  } satisfies SetAdministrativeAreaPayload
 
   const districtA = {
     name: 'District A',
     parentId: provinceA.id,
     id: generateUuid(rng),
-    validUntil: null,
     externalId: generateUuid(rng)
-  } satisfies AdministrativeArea
+  } satisfies SetAdministrativeAreaPayload
 
   const villageA = {
     name: 'Village A',
     parentId: districtA.id,
     id: generateUuid(rng),
-    validUntil: null,
     externalId: generateUuid(rng)
-  } satisfies AdministrativeArea
+  } satisfies SetAdministrativeAreaPayload
 
   const villageB = {
     name: 'Village B',
     parentId: provinceB.id,
     id: generateUuid(rng),
-    validUntil: null,
     externalId: generateUuid(rng)
-  } satisfies AdministrativeArea
+  } satisfies SetAdministrativeAreaPayload
 
   const administrativeAreas = [
     provinceA,
@@ -308,7 +298,7 @@ function generateTestAdministrativeAreas() {
  *
  */
 function generateTestUsersForLocations(
-  locations: Location[],
+  locations: SetLocationPayload[],
   rng: () => number
 ) {
   // 3. Create two users for each office to test 'user' scope limitations.

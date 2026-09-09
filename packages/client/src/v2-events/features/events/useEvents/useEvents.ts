@@ -29,11 +29,8 @@ import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
-import {
-  useEventAction,
-  useEventCustomAction,
-  useIsMutating
-} from './procedures/actions/action'
+import { useEventAction, useIsMutating } from './procedures/actions/action'
+import { useEventCustomAction } from './procedures/actions/customAction'
 import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
@@ -197,6 +194,7 @@ export function useEvents() {
       custom: useEventAction(trpc.event.actions.custom.request),
       reject: useEventAction(trpc.event.actions.reject.request),
       archive: useEventAction(trpc.event.actions.archive.request),
+      unarchive: useEventAction(trpc.event.actions.unarchive.request),
       notify: useEventAction(trpc.event.actions.notify.request),
       declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),

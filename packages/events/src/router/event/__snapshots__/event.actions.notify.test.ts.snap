@@ -48,4 +48,4 @@ exports[`event.actions.notify > system user > should require createdAtLocation f
 
 exports[`event.actions.notify > system user > should require createdAtLocation for system user 4`] = `[TRPCError: createdAtLocation must be a valid location id]`;
 
-exports[`event.actions.notify > system user > system user should not be able to perform action on assigned event 1`] = `[TRPCError: System user can not perform action on assigned event]`;
+exports[`event.actions.notify > system user > system user should not be able to perform action on assigned event 1`] = `[TRPCError: createdAtLocation is required and must be a valid location id]`;

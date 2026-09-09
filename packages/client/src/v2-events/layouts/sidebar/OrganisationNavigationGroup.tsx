@@ -60,6 +60,7 @@ export function OrganisationNavigationGroup({
       {hasAccess(TAB_GROUPS.organisations) && (
         <NavigationGroup>
           <NavigationItem
+            data-testid={`navigation_${WORKQUEUE_TABS.organisation}`}
             icon={() => <Icon name="Buildings" size="small" />}
             id={`navigation_${WORKQUEUE_TABS.organisation}`}
             isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.organisation}

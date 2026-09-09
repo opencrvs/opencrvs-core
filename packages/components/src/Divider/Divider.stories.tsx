@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { Meta, Story } from '@storybook/react-vite'
 import { Divider, DividerProps } from './Divider'
 import { Text } from '../Text'
 

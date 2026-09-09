@@ -8,8 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { userMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
 import * as routes from '@client/navigation/routes'
@@ -21,23 +25,25 @@ import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   FieldValue,
   FileFieldValue,
+  getDeclaration,
+  getDeclarationPages,
   TokenUserType,
   UUID,
   CreateUserInput,
   UpdateUserInput
 } from '@opencrvs/commons/client'
-import { AppBar, Frame, Spinner } from '@opencrvs/components'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { Text } from '@opencrvs/components/lib/Text'
-import { Button } from '@opencrvs/components/lib/Button'
 import {
-  CircleButton,
-  ICON_ALIGNMENT,
-  SuccessButton
-} from '@opencrvs/components/lib/buttons'
+  AppBar,
+  Frame,
+  Spinner,
+  Toast,
+  Button,
+  Icon,
+  Dialog,
+  Text
+} from '@opencrvs/components'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { TRPCClientError } from '@trpc/client'
 import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'
@@ -49,12 +55,14 @@ import {
 import styled from 'styled-components'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
+import { todayISO } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import toast from 'react-hot-toast'
 import { showToast } from '@client/v2-events/features/events/useToastAndRedirect'
 import { messages as notificationMessages } from '@client/i18n/messages/views/notifications'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 import { useUserFormState } from './useUserFormState'
 
@@ -161,7 +169,8 @@ const CreateNewUserComponent = () => {
           pageId: 'user.details'
         },
         { from }
-      )
+      ),
+      { replace: true }
     )
   }, [clear, navigate, officeId, setUserForm, from])
   return <div />
@@ -192,7 +201,7 @@ const EditUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
-  const formConfig = eventConfig.declaration
+  const formConfig = getDeclaration(eventConfig)
 
   const { canEditUser, canAddOfficeUsers } = usePermissions()
 
@@ -237,32 +246,52 @@ const EditUserComponent = () => {
     }
   }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
 
+  const title = isNewUser
+    ? intl.formatMessage(messages.userFormTitle)
+    : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+
   if (userQuery.isLoading) {
     return (
-      <ActionPageLight
-        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
-        goBack={() => navigate(-1)}
-        hideBackground={true}
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={<FormHeader label={title} onClose={() => navigate(-1)} />}
       >
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-loading-spinner" size={25} />
           </SpinnerWrapper>
         </Container>
-      </ActionPageLight>
+      </Frame>
     )
   }
 
+  const currentPageId = pageId || getDeclarationPages(eventConfig)[0].id
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+        { pageId: nextPageId, userId: userId },
+        searchParams
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages: formConfig.pages,
+    formData: formState as Record<string, FieldValue>,
+    validatorContext: {},
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
     <FormLayout
+      backAction={backAction}
       onClose={handleClose}
       isUnauthorized={isUnauthorized}
       userId={userId}
-      title={
-        isNewUser
-          ? intl.formatMessage(messages.userFormTitle)
-          : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-      }
+      title={title}
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
@@ -270,20 +299,10 @@ const EditUserComponent = () => {
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
-        pageId={pageId || eventConfig.declaration.pages[0].id}
+        pageId={currentPageId}
         setFormData={setUserForm}
         validatorContext={{}}
-        onPageChange={(nextPageId: string) =>
-          navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-              {
-                pageId: nextPageId,
-                userId: userId
-              },
-              searchParams
-            )
-          )
-        }
+        onPageChange={onPageChange}
         onSubmit={() => {
           navigate(
             ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
@@ -359,7 +378,7 @@ const ReviewUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
-  const formConfig = eventConfig.declaration
+  const formConfig = getDeclaration(eventConfig)
 
   const alreadyInitialized =
     useUserFormState.getState().userId === userId &&
@@ -448,44 +467,29 @@ const ReviewUserComponent = () => {
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending
 
-  if (existingUserQuery.isLoading) {
-    return (
-      <ActionPageLight
-        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
-        goBack={() => navigate(-1)}
-        hideBackground={true}
-      >
-        <Container>
-          <SpinnerWrapper>
-            <Spinner id="user-form-submitting-spinner" size={25} />
-          </SpinnerWrapper>
-        </Container>
-      </ActionPageLight>
-    )
-  }
+  if (existingUserQuery.isLoading || isSubmitting) {
+    const title = isNewUser
+      ? intl.formatMessage(messages.userFormTitle)
+      : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
 
-  if (isSubmitting) {
+    const submittingText = isNewUser
+      ? intl.formatMessage(messages.creatingNewUser)
+      : intl.formatMessage(messages.updatingUser)
+
     return (
-      <ActionPageLight
-        title={
-          isNewUser
-            ? intl.formatMessage(messages.userFormTitle)
-            : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-        }
-        goBack={() => navigate(-1)}
-        hideBackground={true}
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={<FormHeader label={title} onClose={() => navigate(-1)} />}
       >
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-submitting-spinner" size={25} />
-            <p>
-              {isNewUser
-                ? intl.formatMessage(messages.creatingNewUser)
-                : intl.formatMessage(messages.updatingUser)}
-            </p>
+            {isSubmitting && <p>{submittingText}</p>}
           </SpinnerWrapper>
         </Container>
-      </ActionPageLight>
+      </Frame>
     )
   }
 
@@ -523,6 +527,7 @@ const ReviewUserComponent = () => {
         </Toast>
       )}
       <ReviewComponent.Body
+        anchor={todayISO()}
         form={formState as Record<string, FieldValue>}
         formConfig={formConfig}
         reviewFields={[]}
@@ -589,7 +594,9 @@ const ReviewUserComponent = () => {
             {intl.formatMessage(buttonMessages.createUser)}
           </Button>
         ) : (
-          <SuccessButton
+          <Button
+            type="positive"
+            size="large"
             id="submit-edit-user-form"
             onClick={() => {
               resetErrors()
@@ -624,11 +631,9 @@ const ReviewUserComponent = () => {
                 submitUpdate(payload)
               }
             }}
-            icon={() => <Check />}
-            align={ICON_ALIGNMENT.LEFT}
           >
-            {intl.formatMessage(buttonMessages.confirm)}
-          </SuccessButton>
+            <Check /> {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
         )}
       </ReviewComponent.Body>
       {pendingPayload && (
@@ -685,7 +690,8 @@ function FormLayout({
   title,
   actionComponent,
   isUnauthorized,
-  userId
+  userId,
+  backAction
 }: {
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
@@ -694,6 +700,7 @@ function FormLayout({
   actionComponent?: React.ReactNode
   isUnauthorized?: boolean
   userId?: string
+  backAction?: () => void
 }) {
   const intl = useIntl()
   const unauthorizedHandledRef = React.useRef(false)
@@ -723,12 +730,15 @@ function FormLayout({
       header={
         <FormHeader
           actionComponent={actionComponent}
+          backAction={backAction}
           label={title}
           onSaveAndExit={onSaveAndExit}
           onClose={onClose ? () => onClose() : undefined}
         />
       }
-      skipToContentText="Skip to form"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
         {children}
@@ -739,13 +749,17 @@ function FormLayout({
 
 function FormHeader({
   label,
-  onClose
+  onClose,
+  backAction
 }: {
   label: string
   onSaveAndExit?: () => void
   onClose?: () => void
   actionComponent?: React.ReactNode
+  backAction?: () => void
 }) {
+  const intl = useIntl()
+
   const getHeaderRight = () => {
     return (
       <CircleButton
@@ -759,10 +773,24 @@ function FormHeader({
     )
   }
 
+  const leftSlot = backAction ? (
+    <Button
+      aria-label={intl.formatMessage(buttonMessages.back)}
+      data-testid="back-button"
+      size="small"
+      type="icon"
+      onClick={backAction}
+    >
+      <Icon name="ArrowLeft" />
+    </Button>
+  ) : null
+
   return (
     <>
       <AppBar
+        desktopLeft={leftSlot}
         desktopTitle={label}
+        mobileLeft={leftSlot}
         mobileTitle={label}
         desktopRight={getHeaderRight()}
         mobileRight={getHeaderRight()}

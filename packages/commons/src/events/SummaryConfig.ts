@@ -11,6 +11,44 @@
 import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ShowConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
+
+export const InfoBox = z
+  .object({
+    type: z
+      .enum(['info', 'positive', 'warning', 'negative'])
+      .describe(
+        'Semantic tint of the icon block: info (blue), positive (green), warning (orange), negative (red).'
+      ),
+    background: z
+      .enum(['tinted', 'white'])
+      .default('tinted')
+      .optional()
+      .describe(
+        'tinted reads as a recessed empty state; white reads as a standalone card.'
+      ),
+    icon: AvailableIcons.optional().describe(
+      'Icon displayed inside the icon block. Defaults to FileSearch.'
+    ),
+    heading: TranslationConfig.describe(
+      'Primary message. Short, sentence-case.'
+    ),
+    description: TranslationConfig.optional().describe(
+      'Secondary copy displayed below the heading, typically a suggested next step.'
+    ),
+    conditionals: z
+      .array(ShowConditional)
+      .default([])
+      .optional()
+      .describe(
+        'Conditions under which the info box is shown. When omitted, it is always shown.'
+      )
+  })
+  .describe(
+    'A compact icon-block + heading + description block displayed above the summary fields in the event overview.'
+  )
+
+export type InfoBox = z.infer<typeof InfoBox>
 
 const BaseField = z.object({
   emptyValueMessage: TranslationConfig.optional().describe(
@@ -36,6 +74,13 @@ const Field = BaseField.extend({
 
 export const SummaryConfig = z
   .object({
+    banners: z
+      .array(InfoBox)
+      .default([])
+      .optional()
+      .describe(
+        'Info boxes displayed above the summary fields in the event overview.'
+      ),
     fields: z
       .array(z.union([Field, ReferenceField]))
       .describe('Fields displayed in the event summary view.')

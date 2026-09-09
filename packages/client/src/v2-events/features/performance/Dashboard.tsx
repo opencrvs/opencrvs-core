@@ -23,7 +23,7 @@ import {
   NavigationStack,
   useNavigationHistory
 } from '@client/v2-events/components/NavigationStack'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { useDashboards } from '@client/hooks/useDashboards'
 
 const StyledIFrame = styled(IframeResizer)`
@@ -68,7 +68,6 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
     searchParams.entries()
   )
   const history = useNavigationHistory()
-  const token = getToken()
 
   const handleCrossBar = () => {
     if (history.length > 1) {
@@ -87,7 +86,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
       return
     }
 
-    if (!token || dashboard.context?.auth !== 'REQUEST_AUTH_TOKEN') {
+    if (dashboard.context?.auth !== 'REQUEST_AUTH_TOKEN') {
       return
     }
 
@@ -96,7 +95,9 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
     }
 
     const dashboardOrigin = new URL(dashboard.url).origin
-    const handleMessage = (event: MessageEvent) => {
+
+    let cancelled = false
+    const handleMessage = async (event: MessageEvent) => {
       if (event.origin !== dashboardOrigin) {
         return
       }
@@ -108,19 +109,25 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
       }
 
       if (event.data?.type === 'REQUEST_AUTH_TOKEN') {
-        sourceWindow.postMessage({ type: 'AUTH_TOKEN', token }, event.origin)
+        await ensureFreshAccessToken()
+        const token = getToken()
+        if (!cancelled && token) {
+          sourceWindow.postMessage({ type: 'AUTH_TOKEN', token }, event.origin)
+        }
       }
     }
 
     window.addEventListener('message', handleMessage)
 
-    return () => window.removeEventListener('message', handleMessage)
+    return () => {
+      cancelled = true
+      window.removeEventListener('message', handleMessage)
+    }
   }, [
     allowedDashboardIds,
     dashboard.context?.auth,
     dashboard.id,
-    dashboard.url,
-    token
+    dashboard.url
   ])
 
   return (

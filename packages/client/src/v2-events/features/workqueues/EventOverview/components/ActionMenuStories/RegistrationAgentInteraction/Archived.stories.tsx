@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta } from '@storybook/react'
+import type { Meta } from '@storybook/react-vite'
 import {
   TestUserRole,
   ActionType,
@@ -42,7 +42,8 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Assign']: AssertType.ENABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.DISABLED
     }
   },
   {
@@ -58,7 +59,8 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Unassign']: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.ENABLED
     }
   },
   {
@@ -73,7 +75,8 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Unarchive']: AssertType.DISABLED
     }
   }
 ]

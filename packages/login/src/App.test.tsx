@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestApp } from '@login/tests/util'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { act } from 'react'
 
 describe('Login app step one', () => {
   let app: any
@@ -43,5 +46,53 @@ describe('Login app step one', () => {
       .simulate('change', { target: { value: 'kennedy.mweene' } })
 
     app.find('input#password').simulate('change', { target: { value: 'test' } })
+  })
+})
+
+describe('Login error', () => {
+  it('shows rate limit error', async () => {
+    const server = setupServer(
+      rest.post('/api/auth/authenticate', (_, res, ctx) => {
+        return res(
+          ctx.status(429),
+          ctx.json({
+            statusCode: 429,
+            error: 'RATE_LIMIT_ERROR',
+            message: 'Rate limited'
+          })
+        )
+      })
+    )
+    server.listen()
+
+    try {
+      const { app } = await createTestApp()
+
+      app
+        .find('input#username')
+        .simulate('change', { target: { value: 'kennedy.mweene' } })
+      app
+        .find('input#password')
+        .simulate('change', { target: { value: 'test' } })
+
+      await act(async () => {
+        app.find('form#STEP_ONE').simulate('submit')
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+      app.update()
+
+      const toast = app.findWhere(
+        (node) =>
+          node.type() !== undefined &&
+          node
+            .text()
+            .includes(
+              'Too many login attempts. You can try again after one minute.'
+            )
+      )
+      expect(toast.exists()).toBe(true)
+    } finally {
+      server.close()
+    }
   })
 })

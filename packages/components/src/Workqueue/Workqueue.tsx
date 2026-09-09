@@ -178,7 +178,7 @@ const WorkqueueComp = ({
       {content.length > 0 &&
         width > grid.breakpoints.lg &&
         !hideTableHeader && (
-          <TableHeader>
+          <TableHeader data-testid="workqueue-table-header">
             {columns.map((preference, index) => (
               <ColumnContainer
                 key={index}

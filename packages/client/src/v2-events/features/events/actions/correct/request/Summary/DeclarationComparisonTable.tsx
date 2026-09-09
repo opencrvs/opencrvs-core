@@ -12,11 +12,14 @@ import React from 'react'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import {
+  ActionDocument,
   applyDeclarationToEventIndex,
   EventConfig,
   EventDocument,
   EventState,
   FieldTypesToHideInReview,
+  getAcceptedActions,
+  getCurrentEventState,
   getDeclaration,
   getDeclarationFields,
   isFieldDisplayedOnReview,
@@ -27,17 +30,12 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import {
   getAnnotationComparisonForField,
   getReviewFormFields,
   hasFieldChanged
 } from '@client/v2-events/features/events/actions/correct/utils'
-import {
-  expandWithClientSpecificActions,
-  EventHistoryActionDocument,
-  EventHistoryDocument,
-  getCurrentEventStateSafe
-} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 const TableHeader = styled.th`
@@ -55,13 +53,13 @@ interface BaseDeclarationComparisonTableProps {
 type DeclarationComparisonTableProps =
   | (BaseDeclarationComparisonTableProps & {
       /** When action is provided, the comparison is done between the state before the action and the state after it. */
-      action: EventHistoryActionDocument
+      action: ActionDocument
       form?: EventState
     })
   | (BaseDeclarationComparisonTableProps & {
       /** When form is provided, form is applied on top of the latest state and compared to the previous one. */
       form: EventState
-      action?: EventHistoryActionDocument
+      action?: ActionDocument
     })
 
 const messages = defineMessages({
@@ -77,10 +75,10 @@ const messages = defineMessages({
  * Needed when action is not provided as props e.g. - correction summary
  */
 function sliceEventAt(
-  fullEvent: EventHistoryDocument,
+  fullEvent: EventDocument,
   actionId: string,
   includeCurrent = false
-): EventHistoryDocument {
+): EventDocument {
   const index = fullEvent.actions.findIndex((a) => a.id === actionId)
 
   if (index === -1) {
@@ -102,23 +100,13 @@ function sliceEventAt(
 function DeclarationComparisonTableComponent({
   action,
   form,
-  fullEvent: fullEventWithoutUpdatedAction,
+  fullEvent,
   eventConfig,
   id,
   validatorContext
 }: DeclarationComparisonTableProps) {
-  const historyWithUpdatedActions = expandWithClientSpecificActions(
-    fullEventWithoutUpdatedAction,
-    validatorContext,
-    eventConfig
-  )
-
-  const fullEvent = {
-    ...fullEventWithoutUpdatedAction,
-    actions: historyWithUpdatedActions
-  }
-
-  const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
+  const acceptedActions = getAcceptedActions(fullEvent)
+  const index = acceptedActions.findIndex((a) => a.id === action?.id)
 
   const declarationConfig = getDeclaration(eventConfig)
   const reviewFormFields = getReviewFormFields(eventConfig)
@@ -134,12 +122,10 @@ function DeclarationComparisonTableComponent({
     ? sliceEventAt(fullEvent, action.id, true)
     : fullEvent
 
-  const currentState = getCurrentEventStateSafe(
-    currentEvent,
-    eventConfiguration
-  )
+  const currentState = getCurrentEventState(currentEvent, eventConfiguration)
+  const anchor = recordAnchorDate(currentState)
 
-  const previousDeclaration = getCurrentEventStateSafe(
+  const previousDeclaration = getCurrentEventState(
     eventBeforeUpdate,
     eventConfiguration
   ).declaration
@@ -171,8 +157,7 @@ function DeclarationComparisonTableComponent({
     .map((f) => {
       const comparison = getAnnotationComparisonForField(
         f,
-        // History contains only accepted actions.
-        fullEvent.actions,
+        acceptedActions,
         index,
         validatorContext
       )
@@ -182,6 +167,7 @@ function DeclarationComparisonTableComponent({
 
       const previous = (
         <Output
+          anchor={anchor}
           eventConfig={eventConfig}
           field={f}
           formConfig={declarationConfig}
@@ -192,6 +178,7 @@ function DeclarationComparisonTableComponent({
 
       const latest = (
         <Output
+          anchor={anchor}
           eventConfig={eventConfig}
           field={f}
           value={currentAnnotations[f.id]}
@@ -232,6 +219,7 @@ function DeclarationComparisonTableComponent({
             const previous = (
               <Output
                 displayEmptyAsDash
+                anchor={anchor}
                 eventConfig={eventConfig}
                 field={f}
                 formConfig={declarationConfig}
@@ -243,6 +231,7 @@ function DeclarationComparisonTableComponent({
             const latest = (
               <Output
                 displayEmptyAsDash
+                anchor={anchor}
                 eventConfig={eventConfig}
                 field={f}
                 value={latestDeclaration[f.id]}

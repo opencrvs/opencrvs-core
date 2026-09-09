@@ -68,7 +68,8 @@ function resolveInternalActionConditions({
   isDownloaded,
   assignmentStatus,
   isAssigning,
-  isDeclareDraftOpen
+  isDeclareDraftOpen,
+  areDuplicatesAvailable
 }: {
   assignmentStatus: AssignmentStatus
   actionType: WorkqueueActionType | ActionMenuActionType
@@ -76,6 +77,7 @@ function resolveInternalActionConditions({
   isDownloaded: boolean
   isAssigning: boolean
   isDeclareDraftOpen: boolean
+  areDuplicatesAvailable: boolean
 }): {
   enabled: boolean
   visible: boolean
@@ -91,6 +93,7 @@ function resolveInternalActionConditions({
         visible: true
       }
     case ActionType.ARCHIVE:
+    case ActionType.UNARCHIVE:
     case ActionType.DELETE:
     case ActionType.EDIT:
     case ActionType.REJECT:
@@ -101,7 +104,10 @@ function resolveInternalActionConditions({
       return { enabled: isDownloadedAndAssignedToUser, visible: true }
     case ActionType.MARK_AS_DUPLICATE:
       return {
-        enabled: isDownloadedAndAssignedToUser && !isAssigning,
+        enabled:
+          isDownloadedAndAssignedToUser &&
+          !isAssigning &&
+          areDuplicatesAvailable,
         visible: true
       }
     case ActionType.DECLARE:
@@ -130,7 +136,8 @@ export function resolveActionConditionals({
   eventConfiguration,
   isOnline,
   isDownloaded,
-  isAssigning
+  isAssigning,
+  areDuplicatesAvailable = true
 }: {
   event: EventIndex
   actionType: WorkqueueActionType | ActionMenuActionType
@@ -141,6 +148,7 @@ export function resolveActionConditionals({
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
+  areDuplicatesAvailable?: boolean
 }): {
   enabled: boolean
   visible: boolean
@@ -193,7 +201,8 @@ export function resolveActionConditionals({
     assignmentStatus,
     isDownloaded,
     isAssigning,
-    isDeclareDraftOpen
+    isDeclareDraftOpen,
+    areDuplicatesAvailable
   })
 
   return {

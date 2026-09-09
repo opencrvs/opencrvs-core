@@ -8,10 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Name'
-export * from './Role'
+export * from './AssignedOffice'
+export * from './EmailAddress'
 export * from './Language'
+export * from './Name'
 export * from './Password'
-export * from './PIN'
 export * from './PhoneNumber'
+export * from './PIN'
 export * from './ProfileImage'
+export * from './Role'

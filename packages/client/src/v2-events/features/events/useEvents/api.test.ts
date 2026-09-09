@@ -18,6 +18,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import {
   addLocalEventConfig,
   deleteLocalEvent,
+  setEventData,
   updateLocalEventIndex
 } from './api'
 
@@ -37,21 +38,29 @@ describe('deleteLocalEvent', () => {
     queryClient.clear()
   })
 
-  it('clears both event.get and view-event cache entries', async () => {
+  it('clears event.get and view-event cache entries', async () => {
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
       eventDocument
     )
     queryClient.setQueryData([['view-event', id]], eventDocument)
 
+    setEventData(eventDocument.id, eventDocument)
+
     await deleteLocalEvent(eventDocument)
+
+    expect(queryClient.getQueryData([['view-event', id]])).toBeUndefined()
 
     expect(
       queryClient.getQueryData(
-        trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false })
+        trpcOptionsProxy.event.search.queryKey({
+          query: {
+            type: 'and',
+            clauses: [{ id }]
+          }
+        })
       )
     ).toBeUndefined()
-    expect(queryClient.getQueryData([['view-event', id]])).toBeUndefined()
   })
 })
 

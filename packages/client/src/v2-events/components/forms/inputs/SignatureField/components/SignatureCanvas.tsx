@@ -13,9 +13,22 @@ import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import SignatureCanvasComponent from 'react-signature-canvas'
+import SignatureCanvasImport from 'react-signature-canvas'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messages } from '@client/i18n/messages/views/review'
+
+/*
+ * UMD/CJS default export interop: Vite 8 must resolve this to the component
+ * constructor, not the module namespace object.
+ */
+const SignatureCanvasComponent =
+  (
+    SignatureCanvasImport as {
+      default?: typeof SignatureCanvasImport
+    }
+  ).default ?? SignatureCanvasImport
+
+type SignatureCanvasInstance = InstanceType<typeof SignatureCanvasComponent>
 
 /** Based on packages/client/src/components/form/SignatureField/SignatureUploader.tsx */
 
@@ -45,7 +58,7 @@ export function SignatureCanvas({
 }) {
   const [canvasWidth, setCanvasWidth] = useState(300)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<SignatureCanvasComponent>(null)
+  const canvasRef = useRef<SignatureCanvasInstance>(null)
   const intl = useIntl()
 
   useEffect(() => {

@@ -9,19 +9,19 @@ exports[`transform legacy scope to v2 1`] = `
     },
     {
       "v1": "search[event=birth,access=all]",
-      "v2": "type=record.search&event=birth&placeOfEvent=all",
+      "v2": "type=record.search&event[]=birth&placeOfEvent=all",
     },
     {
       "v1": "search[event=death,access=all]",
-      "v2": "type=record.search&event=death&placeOfEvent=all",
+      "v2": "type=record.search&event[]=death&placeOfEvent=all",
     },
     {
       "v1": "search[event=tennis-club-membership,access=all]",
-      "v2": "type=record.search&event=tennis-club-membership&placeOfEvent=all",
+      "v2": "type=record.search&event[]=tennis-club-membership&placeOfEvent=all",
     },
     {
       "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
-      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
+      "v2": "type=record.search&event[]=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
     },
     {
       "v1": "record.create[event=birth|death|tennis-club-membership]",
@@ -59,19 +59,19 @@ exports[`transform legacy scope to v2 1`] = `
     },
     {
       "v1": "search[event=birth,access=all]",
-      "v2": "type=record.search&event=birth&placeOfEvent=all",
+      "v2": "type=record.search&event[]=birth&placeOfEvent=all",
     },
     {
       "v1": "search[event=death,access=all]",
-      "v2": "type=record.search&event=death&placeOfEvent=all",
+      "v2": "type=record.search&event[]=death&placeOfEvent=all",
     },
     {
       "v1": "search[event=tennis-club-membership,access=all]",
-      "v2": "type=record.search&event=tennis-club-membership&placeOfEvent=all",
+      "v2": "type=record.search&event[]=tennis-club-membership&placeOfEvent=all",
     },
     {
       "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
-      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
+      "v2": "type=record.search&event[]=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
     },
     {
       "v1": "user.read:only-my-audit",
@@ -128,10 +128,6 @@ exports[`transform legacy scope to v2 1`] = `
       "v2": "type=user.read&accessLevel=administrativeArea",
     },
     {
-      "v1": "user.update:my-jurisdiction",
-      "v2": "type=user.edit&accessLevel=administrativeArea",
-    },
-    {
       "v1": "organisation.read-locations:my-jurisdiction",
       "v2": "type=organisation.read-locations&accessLevel=administrativeArea",
     },
@@ -172,10 +168,6 @@ exports[`transform legacy scope to v2 1`] = `
     {
       "v1": "user.create:all",
       "v2": "type=user.create",
-    },
-    {
-      "v1": "user.update:all",
-      "v2": "type=user.edit",
     },
     {
       "v1": "user.read:all",
@@ -229,19 +221,19 @@ exports[`transform legacy scope to v2 1`] = `
     },
     {
       "v1": "search[event=birth,access=all]",
-      "v2": "type=record.search&event=birth&placeOfEvent=all",
+      "v2": "type=record.search&event[]=birth&placeOfEvent=all",
     },
     {
       "v1": "search[event=death,access=all]",
-      "v2": "type=record.search&event=death&placeOfEvent=all",
+      "v2": "type=record.search&event[]=death&placeOfEvent=all",
     },
     {
       "v1": "search[event=tennis-club-membership,access=all]",
-      "v2": "type=record.search&event=tennis-club-membership&placeOfEvent=all",
+      "v2": "type=record.search&event[]=tennis-club-membership&placeOfEvent=all",
     },
     {
       "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
-      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
+      "v2": "type=record.search&event[]=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
     },
     {
       "v1": "record.create[event=birth|death|tennis-club-membership]",

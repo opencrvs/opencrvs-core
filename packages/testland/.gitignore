@@ -1,0 +1,50 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+package-lock.json
+
+# testing
+coverage
+
+# production
+build
+
+
+# NOTE: Only for OpenCRVS Core Team:
+# Sparce checkout from OpenCRVS core
+# Folder introduced in OpenCRVS v2.0 to allow pushing changes to helm charts
+.opencrvs-core-charts
+
+# misc
+.DS_Store
+.env
+*.log
+.secrets/*
+# But, keep the .gitignore so the folder is created
+!.secrets/.gitignore
+.idea
+/data
+
+.vscode/launch.json
+.history
+
+src/features/employees/tmp/login-details.json
+src/tests/locations.json
+
+graphql.schema.json
+
+*.tar.gz
+.secrets
+.env*
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+notebooks
+
+ctrf/
+
+infrastructure/provision-server/hetzner-cloud-empty-server/.terraform*
+infrastructure/provision-server/hetzner-cloud-empty-server/terraform*
+infrastructure/provision-server/hetzner-cloud-empty-server/.ssh

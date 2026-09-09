@@ -13,19 +13,18 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const archive: QuickActionConfig = {
   modal: {
-    confirmButtonType: 'danger',
+    confirmButtonType: 'negative',
     confirmButtonLabel: {
       id: 'buttons.archive',
       defaultMessage: 'Archive',
       description: 'Archive button text'
     }
   },
-  onConfirm: ({ eventId, actions }) => {
+  onConfirm: ({ eventId, actions, formValues }) => {
     return actions.archive.mutate({
       eventId,
       transactionId: uuid(),
-      /** On v1.9, content was hardcoded to { reason: 'Archived from action menu' }. I guess the idea has been to add a reason field, but that has not been implemented. */
-      content: { reason: '-' }
+      annotation: formValues
     })
   }
 }

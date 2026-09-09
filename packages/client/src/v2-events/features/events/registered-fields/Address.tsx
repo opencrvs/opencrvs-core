@@ -19,9 +19,9 @@ import {
   Country as CountryField,
   field as fieldHelper,
   FieldType,
-  Location,
+  ClientLocation,
   not,
-  AdministrativeArea,
+  ClientAdministrativeArea,
   AdministrativeAreas,
   alwaysTrue,
   AddressType,
@@ -34,7 +34,8 @@ import {
   IndexMap,
   FormState,
   FieldConfig,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -185,7 +186,7 @@ function withDisabledConditional<T extends FieldConfig>(field: T): T {
  * const fields = generateAddressFields(addressConfig, adminStructure, true)
  * // All fields in fields.domesticFields have { type: 'ENABLE', conditional: not(alwaysTrue()) }
  */
-function generateAddressFields(
+export function generateAddressFields(
   addressConfig: AddressField,
   adminStructure: AdminStructureItem[],
   disabled?: boolean
@@ -251,7 +252,11 @@ function generateAddressFields(
 
     const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      allowedLocations: addressConfig.configuration?.allowedLocations
+      allowedLocations: addressConfig.configuration?.allowedLocations,
+      // Propagate event-date-anchoring behaviour to the embedded admin-area
+      // selectors.
+      activeOnly: addressConfig.configuration?.activeOnly,
+      anchorToDateOfEvent: addressConfig.configuration?.anchorToDateOfEvent
     }
 
     if (!isFirst && prevItem?.id) {
@@ -348,7 +353,7 @@ function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
 function transformParentValueToNestedValue(
   value: AddressFieldValue,
   adminLevelIds: string[],
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
 ): EventState {
   const fullAdminHierarchy = getAdminLevelHierarchy(
     getAdministrativeAreaIdFromAddress(value),
@@ -392,6 +397,7 @@ function transformParentValueToNestedValue(
  * //   streetLevelDetails: { addressLine1: '42 Main St' }
  * // }
  */
+
 function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
@@ -402,8 +408,8 @@ function transformNestedValueToParentValue(
     adminLevelIds
   )
   const country = nestedValue.country as string
-  const defaultCountry = window.config.COUNTRY || 'FAR'
-  if (country === defaultCountry) {
+
+  if (country === window.config.COUNTRY) {
     return {
       country,
       addressType: AddressType.DOMESTIC,
@@ -411,6 +417,7 @@ function transformNestedValueToParentValue(
       streetLevelDetails: addressLines
     }
   }
+
   return {
     country,
     addressType: AddressType.INTERNATIONAL,
@@ -608,11 +615,13 @@ function AddressInput(props: Props) {
 function AddressOutput({
   value,
   lineSeparator,
-  configuration
+  configuration,
+  anchor
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
   configuration: AddressField
+  anchor: PlainDate
 }) {
   const validatorContext = useValidatorContext()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -663,7 +672,7 @@ function AddressOutput({
     <>
       {fieldsToShow.map((field, index) => (
         <React.Fragment key={field.field.id}>
-          <Output field={field.field} value={field.value} />
+          <Output anchor={anchor} field={field.field} value={field.value} />
           {index < fieldsToShow.length - 1 && (lineSeparator || <br />)}
         </React.Fragment>
       ))}
@@ -675,8 +684,9 @@ function toCertificateVariables(
   value: AddressFieldValue,
   context: {
     intl: IntlShape
-    locations: Map<UUID, Location>
-    administrativeAreas: Map<UUID, AdministrativeArea>
+    locations: Map<UUID, ClientLocation>
+    administrativeAreas: Map<UUID, ClientAdministrativeArea>
+    anchor: PlainDate
     adminLevels?: AdminStructureItem[]
   }
 ) {
@@ -685,11 +695,12 @@ function toCertificateVariables(
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
 
-  const { intl, locations, adminLevels, administrativeAreas } = context
+  const { intl, locations, adminLevels, administrativeAreas, anchor } = context
   const stringifier = getFormDataStringifier(
     intl,
     locations,
-    administrativeAreas
+    administrativeAreas,
+    anchor
   )
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { streetLevelDetails } = value
@@ -719,7 +730,8 @@ function toCertificateVariables(
     administrativeAreaId,
     administrativeAreas,
     appConfigAdminLevels as string[],
-    'withNames'
+    'withNames',
+    anchor
   )
 
   // Reverse so the most specific level (e.g. district) comes first

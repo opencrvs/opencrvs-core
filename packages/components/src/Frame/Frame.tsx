@@ -11,7 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Layout, LayoutCentered, LayoutForm } from './components/Layout'
-import { Section, SectionFormBackAction } from './components/Section'
+import { Section } from './components/Section'
 import {
   SkipToContent,
   MAIN_CONTENT_ANCHOR_ID
@@ -22,10 +22,12 @@ export interface FrameProps {
   header: React.ReactNode
   /** Accepts a navigation component that will be rendered in the left sidebar of an application frame */
   navigation?: React.ReactNode
-  /** Text inside skip to content -link. Example: "Skip to main content" */
+  /** Text inside skip to content -link. Example: "Skip to main content". Important for a11y purposes. */
   skipToContentText: string
   /** The content to display inside the frame. */
   children: React.ReactNode
+  /** The ID for the frame element. */
+  id?: string
 }
 
 const FrameGrid = styled.div`
@@ -57,10 +59,11 @@ export function Frame({
   header,
   navigation,
   skipToContentText,
+  id,
   children
 }: FrameProps) {
   return (
-    <FrameGrid>
+    <FrameGrid id={id}>
       <SkipToContent>{skipToContentText}</SkipToContent>
       <FrameNavigation>{navigation}</FrameNavigation>
       <FrameHeader id="page-title">{header}</FrameHeader>
@@ -75,4 +78,3 @@ Frame.Layout = Layout
 Frame.LayoutForm = LayoutForm
 Frame.LayoutCentered = LayoutCentered
 Frame.Section = Section
-Frame.SectionFormBackAction = SectionFormBackAction

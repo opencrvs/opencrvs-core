@@ -16,7 +16,8 @@ import {
   mockUserResponse,
   getItem,
   userDetails,
-  mockRegistrarUserResponse
+  mockRegistrarUserResponse,
+  flushPromises
 } from '@client/tests/util'
 import { storage } from '@client/storage'
 import { getCmd, getModel } from 'redux-loop'
@@ -34,20 +35,41 @@ describe('profileReducer tests', () => {
     store = createStore().store
   })
 
-  it('sets user as logged out on bad token', async () => {
-    const expectedState = {
-      ...initialState,
-      authenticated: false
-    }
+  it('CHECK_AUTH_COMPLETE with an undecodable token redirects to authentication', () => {
+    const result = profileReducer(
+      initialState,
+      actions.checkAuthComplete('bad.token.here')
+    )
+    expect(getModel(result)).toMatchObject({ authenticated: false })
+    expect(getCmd(result)).toMatchObject({
+      actionToDispatch: { type: actions.REDIRECT_TO_AUTHENTICATION }
+    })
+  })
 
-    const action = {
-      type: actions.CHECK_AUTH,
-      payload: {
-        badToken: '12345'
-      }
+  it('CHECK_AUTH_COMPLETE with a decodable token sets authenticated and schedules setInitialUserDetails', () => {
+    // fieldAgent JWT from testDataGenerator (no exp claim → getTokenPayload still decodes → authenticated:true)
+    const token =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlIiwidHlwZT1yZWNvcmQucmVhZCIsInR5cGU9cmVjb3JkLm5vdGlmeSIsInR5cGU9cmVjb3JkLmRlY2xhcmUiLCJ0eXBlPXJlY29yZC5lZGl0Il0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJGSUVMRF9BR0VOVCIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiOGY4YjQzMWItZWY0Ny00MDY4LWI2NzgtZWYyZGQ5M2U5MjA4In0.XS7EAFINQTq0wTiRTjed9QUmzKiQhI7Ntv-OjeMtsEi2uij7WhURIToMjfl75_GWz9MWtAFGofqtlpenK51fv3wa-VrXgbD4Ku_C-yceLc81JZhWuM-X_gadwfiGr7A4hfLmFpp7kk0VjCeO9zAAnfnnXDBM_Fujow2Nhq2FY_NV94c-uFJsZTo3bRu5jtRTwh7U6Svpg187k5fKltmCrq3WL5vtktSwKAzagidGeBtbPIJ28U-zlWA9OX_N1Ct4bVAgq69ILQvoh_fvbzOtFp6qOF_zbT_EcJ5vGx85k1M1B7bsr5j6Edusu1XnLx-ZSeUdRPXzVssQNYiw4ZdkduR5Z7Q-29ajt0Rka_LOH3VjiFFbUkUH0_bOwBrilPCrftsrKSF4wBtWp3e0h3mDRACr1pZASYAuJXNi4qFGIGTVNaTfw2fYNCCSEkfLDs2BhM1M71IKH3Q8qtYVG36yzB51l6v3IRrEiLEdsMyiU-NOYIzWb8bLGdzW4M4nw5f-qBLHurI9uzbN7D88UzayU0dSCxylkRC_srHlrjfoGwY9z2U7hpJnbBi5pjwwSQ6nTDrpl_Xey5_kJhmELV-1F8gEwL_ZkFL_IX9sAJ2gHyYYYJshfyrk3W4C_yYktwGg7I1PlMghNhQ-pG9j-idUptxFSG12L6NWb9hnm6fCAgc'
+    const result = profileReducer(
+      initialState,
+      actions.checkAuthComplete(token)
+    )
+    expect(getModel(result)).toMatchObject({ authenticated: true })
+    expect(getModel(result).tokenPayload).not.toBeNull()
+    const cmd = getCmd(result) as {
+      cmds: Array<{ actionToDispatch?: { type: string } }>
     }
-    store.dispatch(action)
-    expect(store.getState().profile).toEqual(expectedState)
+    expect(
+      cmd.cmds.some(
+        (c) => c.actionToDispatch?.type === actions.SET_INITIAL_USER_DETAILS
+      )
+    ).toBe(true)
+  })
+
+  it('CHECK_AUTH schedules an async Cmd.run', () => {
+    const result = profileReducer(initialState, actions.checkAuth())
+    const cmd = getCmd(result) as { func?: unknown }
+    expect(typeof cmd.func).toBe('function')
   })
 
   it('sets user details', async () => {
@@ -125,6 +147,7 @@ describe('profileReducer tests', () => {
       }
     }
     store.dispatch(action)
+    await flushPromises()
     expect(store.getState().profile.authenticated).toEqual(false)
     expect(store.getState().profile.userDetailsFetched).toEqual(false)
     expect(store.getState().profile.tokenPayload).toEqual(null)

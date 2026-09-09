@@ -26,8 +26,8 @@ import {
   QueryParamReaderFieldUpdateValue,
   QueryParamReaderFieldValue
 } from './CompositeFieldValue'
-import { PlainDate, plainDateToLocalDate } from './PlainDate'
-export { PlainDate, plainDateToLocalDate }
+import { PlainDate, plainDateToLocalDate, toPlainDate } from './PlainDate'
+export { PlainDate, plainDateToLocalDate, toPlainDate }
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).

@@ -9,22 +9,23 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-apk add --no-cache minio-client
+. /scripts/ensure-alpine-utils.sh
+
+ensure_alpine_utils || exit 1
 MINIO_ALIAS=local-cleanup
 
-mcli alias set $MINIO_ALIAS 
-http://minio:3535 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+mcli alias set "$MINIO_ALIAS" http://minio:3535 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
 
 # Figure out buckets to back up
 if [ -z "$BUCKETS" ]; then
 # All buckets
-BUCKETS=$(mcli ls --json $MINIO_ALIAS | jq -r .key | sed 's:/$::')
+BUCKETS=$(mcli ls --json "$MINIO_ALIAS" | jq -r .key | sed 's:/$::')
 fi
 
 echo "Cleanup MinIO buckets: $BUCKETS"
 for bucket in $BUCKETS; do
   echo "Backing up bucket: $bucket"
-  mcli rm --recursive --force $MINIO_ALIAS/$bucket
-  mcli rb $MINIO_ALIAS/$bucket
-  [ "${make_bucket:-true}" == 'true' ] && mcli mb $MINIO_ALIAS/$bucket
+  mcli rm --recursive --force "$MINIO_ALIAS/$bucket"
+  mcli rb "$MINIO_ALIAS/$bucket"
+  [ "${make_bucket:-true}" = "true" ] && mcli mb "$MINIO_ALIAS/$bucket"
 done

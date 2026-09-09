@@ -16,8 +16,7 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   Content,
   Link,
-  ListViewItemSimplified,
-  ListViewSimplified,
+  List,
   BreadCrumb,
   Divider
 } from '@opencrvs/components/lib'
@@ -30,12 +29,15 @@ import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
-  AdministrativeArea,
+  ClientAdministrativeArea,
+  ClientLocation,
   getAdministrativeAreaHierarchy,
-  Location,
+  isSelectableAtAnchor,
+  todayISO,
   UUID
 } from '@opencrvs/commons/client'
-import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { resolveLocationName } from '@client/v2-events/utils'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -44,7 +46,7 @@ type IRouteProps = {
 }
 
 type IGetNewLevel = {
-  childLocations: (Location | AdministrativeArea)[]
+  childLocations: (ClientLocation | ClientAdministrativeArea)[]
   breadCrumb: IBreadCrumbData[]
 }
 
@@ -67,19 +69,26 @@ export function AdministrativeLevels() {
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
 
+  // The organisation view is a present-tense surface: names and active status
+  // are resolved at today's date.
+  const today = todayISO()
+  const isActiveToday = (entity: ClientLocation | ClientAdministrativeArea) =>
+    isSelectableAtAnchor(entity.versions, today)
+  const nameToday = (entity: ClientLocation | ClientAdministrativeArea) =>
+    resolveLocationName(entity, today)
+
   const getNewLevel = (
     currentlySelectedLocationId: UUID | null
   ): IGetNewLevel => {
     const childLocations = [...locations.values()].filter(
-      ({ administrativeAreaId, validUntil }) =>
-        (validUntil === null || new Date(validUntil) > new Date()) &&
-        administrativeAreaId === currentlySelectedLocationId
+      (location) =>
+        isActiveToday(location) &&
+        location.administrativeAreaId === currentlySelectedLocationId
     )
 
     const childAdministrativeAreas = [...administrativeAreas.values()].filter(
-      ({ parentId, validUntil }) =>
-        (validUntil === null || new Date(validUntil) > new Date()) &&
-        parentId === currentlySelectedLocationId
+      (area) =>
+        isActiveToday(area) && area.parentId === currentlySelectedLocationId
     )
 
     let dataOfBreadCrumb: IBreadCrumbData[] = [
@@ -96,7 +105,7 @@ export function AdministrativeLevels() {
           administrativeAreas
         )
           .reverse()
-          .map((area) => ({ label: area.name, paramId: area.id }))
+          .map((area) => ({ label: nameToday(area), paramId: area.id }))
 
       dataOfBreadCrumb = [...dataOfBreadCrumb, ...locationBreadCrumb]
     }
@@ -141,25 +150,25 @@ export function AdministrativeLevels() {
           onSelect={onClickBreadCrumb}
         />
         <Divider />
-        <ListViewSimplified bottomBorder rowHeight={'small'}>
-          {dataLocations.childLocations.length > 0 ? (
-            dataLocations.childLocations
+        {dataLocations.childLocations.length > 0 ? (
+          <List>
+            {dataLocations.childLocations
               ?.slice(
                 (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
                 currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
               )
-              .map((level: Location | AdministrativeArea, index: number) => (
-                <ListViewItemSimplified
-                  key={index}
+              .map((level: ClientLocation | ClientAdministrativeArea) => (
+                <List.Item
+                  key={level.id}
                   label={
-                    AdministrativeArea.safeParse(level).success ? (
+                    ClientAdministrativeArea.safeParse(level).success ? (
                       <Link
                         onClick={(e) => {
                           setCurrentPageNumber(1)
                           changeLevelAction(e, level.id)
                         }}
                       >
-                        {level.name}
+                        {nameToday(level)}
                       </Link>
                     ) : (
                       <Link
@@ -173,18 +182,18 @@ export function AdministrativeLevels() {
                           })
                         }
                       >
-                        {level.name}
+                        {nameToday(level)}
                       </Link>
                     )
                   }
                 />
-              ))
-          ) : (
-            <NoRecord id="no-record">
-              {intl.formatMessage(constantsMessages.noResults)}
-            </NoRecord>
-          )}
-        </ListViewSimplified>
+              ))}
+          </List>
+        ) : (
+          <NoRecord id="no-record">
+            {intl.formatMessage(constantsMessages.noResults)}
+          </NoRecord>
+        )}
       </Fragment>
       {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (
         <Pagination

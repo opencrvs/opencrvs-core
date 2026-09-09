@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { AdministrativeArea, Location } from '@opencrvs/commons'
+import {
+  SetAdministrativeAreaPayload,
+  SetLocationPayload
+} from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 import * as locationRepo from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -22,8 +25,8 @@ export async function setAdministrativeHierarchy({
   administrativeAreas,
   locations
 }: {
-  administrativeAreas: AdministrativeArea[]
-  locations: Location[]
+  administrativeAreas: SetAdministrativeAreaPayload[]
+  locations: SetLocationPayload[]
 }) {
   const db = getClient()
 

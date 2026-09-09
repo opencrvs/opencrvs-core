@@ -6,7 +6,7 @@
 
 {{- define "render-opencrvs-host-matchers" -}}
 {{- $root := . -}}
-{{- $service_names := list "register" "login" "gateway" "events" "countryconfig" "metabase" -}}
+{{- $service_names := list "register" "login" "gateway" "countryconfig" "metabase" -}}
 {{- $host_matchers := list (printf "Host(`%s`)" $root.Values.hostname) -}}
 {{- range $service_name := $service_names -}}
 {{- $host := include "render-external-subdomain" (dict "service_name" $service_name "Values" $root.Values) -}}

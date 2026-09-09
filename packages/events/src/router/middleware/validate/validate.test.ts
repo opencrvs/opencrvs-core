@@ -9,14 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionType,
   ConditionalType,
+  errorMessages,
+  eventQueryDataGenerator,
   field,
   FieldType,
+  flag,
+  generateEventDocument,
   TestUserRole,
   TokenUserType,
   user
 } from '@opencrvs/commons'
-import { getFieldErrors } from './index'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { getFieldErrors, validateNotifyAction } from './index'
 
 export const testContext = {
   user: {
@@ -290,6 +296,67 @@ describe('getFieldErrors()', () => {
     expect(errors).toMatchSnapshot()
   })
 
+  /*
+   * `flag(...)` in a *field* conditional resolves through `context.eventState` — this
+   * path gets no `EventIndex` argument, so without it every event looks unflagged and
+   * the server would reject values the client legitimately collected.
+   */
+  describe('flag() in a field conditional', () => {
+    const flaggedField = {
+      id: 'test.input',
+      type: FieldType.TEXT,
+      required: true,
+      label: {
+        id: 'test.field.label',
+        defaultMessage: 'Test Field',
+        description: 'Test Field Description'
+      },
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: flag('sealed') }
+      ]
+    }
+
+    const document = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+    })
+
+    it('accepts a value when the event carries the flag that makes the field visible', () => {
+      const errors = getFieldErrors(
+        [flaggedField],
+        { 'test.input': 'not empty' },
+        {
+          ...testContext,
+          event: {
+            document,
+            state: eventQueryDataGenerator({ flags: ['sealed'] })
+          }
+        }
+      )
+
+      expect(errors).toEqual([])
+    })
+
+    it('rejects a value when the event does not carry the flag', () => {
+      const errors = getFieldErrors(
+        [flaggedField],
+        { 'test.input': 'not empty' },
+        {
+          ...testContext,
+          event: { document, state: eventQueryDataGenerator({ flags: [] }) }
+        }
+      )
+
+      expect(errors).toEqual([
+        {
+          message: errorMessages.hiddenField.defaultMessage,
+          id: 'test.input',
+          value: 'not empty'
+        }
+      ])
+    })
+  })
+
   it('should return errors for field with custom validation if value does not pass validation', () => {
     const errors = getFieldErrors(
       [
@@ -350,5 +417,64 @@ describe('getFieldErrors()', () => {
     )
 
     expect(errors).toMatchSnapshot()
+  })
+})
+
+describe('core action dialog form validation', () => {
+  const dialogField = {
+    id: 'notify.dialog.comments',
+    type: FieldType.TEXT,
+    required: true,
+    label: {
+      id: 'notify.dialog.comments.label',
+      defaultMessage: 'Comments',
+      description: 'Dialog comments field'
+    }
+  }
+
+  // The fixture already ships a NOTIFY action (without a `form`).
+  // `getActionFormFields`/`getActionConfig` resolve the NOTIFY action via
+  // `Array.find`, i.e. the *first* matching entry, so the fixture's own NOTIFY
+  // action must be replaced (not merely appended after) or it would shadow
+  // the one under test here.
+  const eventConfigWithNotifyForm = {
+    ...tennisClubMembershipEvent,
+    actions: [
+      ...tennisClubMembershipEvent.actions.filter(
+        (action) => action.type !== ActionType.NOTIFY
+      ),
+      {
+        type: ActionType.NOTIFY,
+        label: {
+          id: 'event.tennis-club-membership.action.notify.label',
+          defaultMessage: 'Notify',
+          description: 'Notify action label'
+        },
+        flags: [],
+        form: [dialogField]
+      }
+    ]
+  }
+
+  it('accepts NOTIFY annotation values matching the NOTIFY dialog form', () => {
+    const errors = validateNotifyAction({
+      eventConfig: eventConfigWithNotifyForm,
+      annotation: { 'notify.dialog.comments': 'reported at facility' },
+      declaration: {},
+      context: testContext
+    })
+
+    expect(errors).toEqual([])
+  })
+
+  it('rejects NOTIFY annotation values not present in any configured field', () => {
+    const errors = validateNotifyAction({
+      eventConfig: eventConfigWithNotifyForm,
+      annotation: { 'unknown.field': 'boom' },
+      declaration: {},
+      context: testContext
+    })
+
+    expect(errors).toHaveLength(1)
   })
 })

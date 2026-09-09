@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EventStatus, InherentFlags } from '@opencrvs/commons/client'
 import { IconWithNameEvent } from './IconWithNameEvent'
 
@@ -27,7 +27,5 @@ export const PotentialDuplicateInMobileView: Story = {
     event: 'Birth Registration',
     flags: [InherentFlags.POTENTIAL_DUPLICATE]
   },
-  parameters: {
-    viewport: { defaultViewport: 'mobile' }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }

@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { updateUserById } from '@events/storage/postgres/events/users'
 
 // TWO_FA_ENABLED is false in the test environment, so the verification
 // code is always the default one
@@ -89,6 +90,25 @@ describe('user.changePhone', () => {
         verifyCode: '999999'
       })
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  test('rejects a phone number another user already has', async () => {
+    const { user, users } = await setupTestCase()
+    const [, secondUser] = users
+
+    await updateUserById(secondUser.id, { mobile: '01711111111' })
+
+    const client = createTestClient(user)
+    const nonce = await requestPhoneChange(client)
+
+    await expect(
+      client.user.changePhone({
+        userId: user.id,
+        phoneNumber: '01711111111',
+        nonce,
+        verifyCode: VERIFY_CODE
+      })
+    ).rejects.toMatchObject({ code: 'CONFLICT' })
   })
 
   test("cannot change another user's phone number", async () => {

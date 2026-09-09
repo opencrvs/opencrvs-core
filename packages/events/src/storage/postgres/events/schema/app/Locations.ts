@@ -23,6 +23,12 @@ export default interface LocationsTable {
   administrativeAreaId: ColumnType<UUID | null, UUID | null, UUID | null>
 
   externalId: ColumnType<string | null, string | null, string | null>
+
+  versions: ColumnType<
+    Record<string, any>,
+    Record<string, any>,
+    Record<string, any>
+  >
 }
 
 export type Locations = Selectable<LocationsTable>

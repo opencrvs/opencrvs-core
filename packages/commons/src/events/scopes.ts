@@ -53,6 +53,7 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.MARK_AS_DUPLICATE]: ['record.review-duplicates'],
   [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.review-duplicates'],
   [ActionType.ARCHIVE]: ['record.archive'],
+  [ActionType.UNARCHIVE]: ['record.unarchive'],
   [ActionType.REJECT]: ['record.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,

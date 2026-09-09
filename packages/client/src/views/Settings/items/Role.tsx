@@ -13,34 +13,30 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
   DynamicHeightLinkButton,
-  LabelContainer,
-  ValueContainer
+  SettingsRow
 } from '@client/views/Settings/items/components'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 
-export function Role() {
+export function useRole(): SettingsRow {
   const intl = useIntl()
   const role = useSelector<IStoreState, string>((state) => {
     const userDetails = getUserDetails(state)
     return formatUserRole(userDetails?.role, intl)
   })
-  return (
-    <ListViewItemSimplified
-      label={
-        <LabelContainer>
-          {intl.formatMessage(constantsMessages.labelRole)}
-        </LabelContainer>
-      }
-      value={<ValueContainer>{role}</ValueContainer>}
-      actions={
+
+  return {
+    id: 'role',
+    item: {
+      label: intl.formatMessage(constantsMessages.labelRole),
+      value: role,
+      actions: (
         <DynamicHeightLinkButton disabled>
           {intl.formatMessage(buttonMessages.change)}
         </DynamicHeightLinkButton>
-      }
-    />
-  )
+      )
+    }
+  }
 }

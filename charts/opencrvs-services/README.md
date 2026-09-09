@@ -21,7 +21,7 @@ helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik \
 
 **2. Install the OpenCRVS Dependencies Chart (Database & Storage Components)**
 
-OpenCRVS requires supporting services (MongoDB, Postgres, MinIO, InfluxDB, Elasticsearch, Redis):
+OpenCRVS requires supporting services (Postgres, MinIO, Elasticsearch, Redis):
 
 ```
 helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart \
@@ -98,9 +98,9 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>elasticsearch.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret and urls_secret</li>
+                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
+                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user</li>
+                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret and urls_secret</li>
                 <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
                 It is recommended to use <code>auth_mode: auto</code> or <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
             </td>
@@ -119,26 +119,6 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>elasticsearch.urls_secret</td>
             <td>elasticsearch-opencrvs-urls</td>
             <td>Secret to store Elasticsearch URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: auto</code> and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
-        </tr>
-       <tr>
-            <th>influxdb.{}</th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <td>influxdb.host</td>
-            <td>influxdb-0.influxdb.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>InfluxDB hostname configuration.</td>
-        </tr>
-        <tr>
-            <td>influxdb.port</td>
-            <td>8086</td>
-            <td>InfluxDB port configuration.</td>
-        </tr>
-        <tr>
-            <td>influxdb.db</td>
-            <td>ocrvs</td>
-            <td>InfluxDB database name.</td>
         </tr>
        <tr>
             <th>minio.{}</th>
@@ -169,8 +149,8 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>minio.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret</li>
+                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
+                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret</li>
                 <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
                 It is recommended to use <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
             </td>
@@ -181,37 +161,6 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret name to store MinIO credentials, more information about credentials secret is at <a href="#authentication-configuration">Authentication configuration</a></td>
         </tr>
        <tr>
-            <th>mongodb.{}</th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <td>mongodb.host</td>
-            <td>mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>MongoDB hostname.</td>
-        </tr>
-        <tr>
-            <td>mongodb.auth_mode</td>
-            <td>disabled</td>
-            <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret and urls_secret</li>
-                <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
-                It is recommended to use <code>auth_mode: auto</code> or <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
-            </td>
-        </tr>
-        <tr>
-            <td>mongodb.admin_user_secret_name</td>
-            <td>mongodb-admin-user</td>
-            <td>Secret to store MongoDB admin user and password, If <code>auth_mode: auto</code> is configured, OpenCRVS will connect to MongoDB server and create all required for OpenCRVS databases and users.</td>
-        </tr>
-        <tr>
-            <td>mongodb.urls_secret</td>
-            <td>mongodb-urls</td>
-            <td>Secret to store MongoDB URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: auto</code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
-        </tr>
-       <tr>
             <th>postgres.{}</th>
             <th></th>
             <th></th>
@@ -219,7 +168,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>postgres.host</td>
             <td>postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>MongoDB hostname.</td>
+            <td>Postgres hostname.</td>
         </tr>
         <tr>
             <td>postgres.auth_mode</td>
@@ -240,7 +189,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>postgres.urls_secret</td>
             <td>postgres-urls</td>
-            <td>Secret to store MongoDB URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: &ltauto|disabled></code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
+            <td>Secret to store Postgres URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: &ltauto|disabled></code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
         </tr>
        <tr>
             <th>redis.{}</th>
@@ -256,8 +205,8 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>redis.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret</li>
+                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
+                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret</li>
                 <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
                 It is recommended to use <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
             </td>
@@ -308,6 +257,31 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Global environment variables, each variable defined here is available to all workloads (service) deployed by helm chart. See example at <a href="values.yaml">values.yaml</a></td>
         </tr>
         <tr>
+            <td>otel.enabled</td>
+            <td>false</td>
+            <td>Enable OpenTelemetry tracing environment variables for instrumented services.</td>
+        </tr>
+        <tr>
+            <td>otel.deployment_environment</td>
+            <td>production</td>
+            <td>Value used for <code>OTEL_DEPLOYMENT_ENVIRONMENT</code> and <code>deployment.environment.name</code> in <code>OTEL_RESOURCE_ATTRIBUTES</code>.</td>
+        </tr>
+        <tr>
+            <td>otel.exporter_otlp_endpoint</td>
+            <td></td>
+            <td>OTLP/gRPC collector endpoint, for example <code>opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4317</code>. Required when <code>otel.enabled</code> is <code>true</code>. Node.js receives this as an insecure gRPC URL with <code>http://</code> added automatically; nginx receives the host and port without a scheme.</td>
+        </tr>
+        <tr>
+            <td>otel.exporter_otlp_protocol</td>
+            <td>grpc</td>
+            <td>OTLP exporter protocol.</td>
+        </tr>
+        <tr>
+            <td>OTEL_RESOURCE_ATTRIBUTES</td>
+            <td></td>
+            <td>Generated automatically when <code>otel.enabled</code> is <code>true</code>. It includes <code>service.version</code> from <code>platform.tag</code>, <code>deployment.environment.name</code> from <code>otel.deployment_environment</code>, and <code>service.namespace</code> from the Helm release namespace.</td>
+        </tr>
+        <tr>
             <td>timezone</td>
             <td></td>
             <td>Time zone for a backup and restore CronJobs, by default local time zone is used from server. See example at <a href="values.yaml">values.yaml</a></td>
@@ -319,18 +293,68 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         </tr>
         <tr>
         <td>platform.tag</td>
-        <td>v1.9.11</td>
+        <td>v2.1.0</td>
         <td>Defines the default image tag for all OpenCRVS services.</td>
         </tr>
         <tr>
         <td>platform.repository</td>
-        <td>opencrvs</td>
+        <td>ghcr.io/opencrvs</td>
         <td>Defines the repository used for OpenCRVS service images. Can be overridden at service level.</td>
         </tr>
         <tr>
         <td>platform.imagePullSecrets</td>
         <td>[]</td>
         <td>Defines the image pull secrets applied at Pod level for authenticating with private registries.</td>
+        </tr>
+        <tr>
+        <td>platform.imagePullPolicy</td>
+        <td>-</td>
+        <td>Default <code>imagePullPolicy</code> applied to all OpenCRVS service containers. Leave unset to use Kubernetes' own tag-based default (<code>IfNotPresent</code> for versioned tags, <code>Always</code> for <code>:latest</code>). Environments deploying a floating tag (e.g. <code>develop</code>) should set this to <code>Always</code>, otherwise nodes keep serving whatever image was first cached under that tag. Can be overridden at service level.</td>
+        </tr>
+        <tr>
+            <th>NetworkPolicy configuration</th>
+            <th></th>
+            <th>Optional Kubernetes NetworkPolicy resources for OpenCRVS workloads.</th>
+        </tr>
+        <tr>
+            <td>network_policy.enabled</td>
+            <td>true</td>
+            <td>Render NetworkPolicy resources. Requires a CNI provider that enforces NetworkPolicy — set to false on clusters without one.</td>
+        </tr>
+        <tr>
+            <td>network_policy.ingress_mode</td>
+            <td>deny</td>
+            <td>Baseline policy for ingress to OpenCRVS pods: <code>deny</code> (default, requires another NetworkPolicy to allow it), <code>private</code> (allow only RFC1918 private ranges), or <code>full</code> (unrestricted).</td>
+        </tr>
+        <tr>
+            <td>network_policy.egress_mode</td>
+            <td>private</td>
+            <td>Baseline policy for egress from OpenCRVS pods. Same modes as <code>ingress_mode</code>, applied to egress instead (DNS on TCP/UDP 53 stays allowed except in <code>full</code> mode). Defaults to <code>private</code> rather than <code>deny</code> so pods can reach the dependencies chart and other in-VPC services without every deployment having to enumerate <code>allowed_namespaces</code> up front; services needing real internet (e.g. <code>countryconfig</code>) opt out individually via their own <code>network_policy.egress_mode: full</code> — see "Hardening" in this README.</td>
+        </tr>
+        <tr>
+            <td>network_policy.allow_same_namespace</td>
+            <td>true</td>
+            <td>Allow OpenCRVS pods in the release namespace to communicate with each other.</td>
+        </tr>
+        <tr>
+            <td>network_policy.allowed_namespaces</td>
+            <td>[]</td>
+            <td>List of namespaces OpenCRVS pods are allowed to reach. Only takes effect when <code>egress_mode</code> is not <code>full</code>. Grants egress on any port to every pod in each listed namespace (e.g. the dependencies chart's namespace) — see "Hardening" in this README.</td>
+        </tr>
+        <tr>
+            <td>&lt;service&gt;.network_policy.rules</td>
+            <td>[]</td>
+            <td>Chart-provided service-specific NetworkPolicy rules. Rules use Kubernetes NetworkPolicy spec syntax, except <code>podSelector</code> is generated from <code>app_label</code>.</td>
+        </tr>
+        <tr>
+            <td>&lt;service&gt;.network_policy.custom_rules</td>
+            <td>[]</td>
+            <td>Operator-provided service-specific NetworkPolicy rules appended to chart-provided rules.</td>
+        </tr>
+        <tr>
+            <td>&lt;service&gt;.network_policy.ingress_mode / egress_mode</td>
+            <td>deny</td>
+            <td>Same <code>deny</code>/<code>private</code>/<code>full</code> modes as the global flags, applied per service instead of writing an ingress/egress rule under <code>rules</code>/<code>custom_rules</code>. For ingress, <code>private</code>/<code>full</code> accept from RFC1918 ranges/any source respectively, scoped to the service's own <code>port</code>; renders nothing if <code>port</code> is not set, rather than silently opening every port. For egress, <code>private</code>/<code>full</code> accept to RFC1918 ranges/any destination on any port, since a service's own port doesn't describe what it calls out to. Independent of the global <code>network_policy.ingress_mode</code>/<code>egress_mode</code>, which control whether the chart-wide baseline policies are rendered at all — <code>countryconfig</code> uses <code>egress_mode: full</code> to keep public-internet egress for its SMTP/SMS integrations regardless of the global mode.</td>
         </tr>
         <tr>
             <th>Common Service properties</th>
@@ -350,7 +374,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
         <td>image.name</td>
         <td>-</td>
-        <td>Name of the container image (for example <code>ocrvs-auth</code>). Combined with registry and repository to form the full image reference.</td>
+        <td>Name of the container image without repository and tag. For example, if the full image is <code>ghcr.io/opencrvs/ocrvs-auth:v2.1.0</code>, then <code>image.name</code> is <code>ocrvs-auth</code>.</td>
         </tr>
         <tr>
         <td>image.tag</td>
@@ -361,6 +385,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>image.repository</td>
         <td>platform.repository</td>
         <td>Overrides the default repository defined in <code>platform.repository</code>.</td>
+        </tr>
+        <tr>
+        <td>image.pullPolicy</td>
+        <td>platform.imagePullPolicy</td>
+        <td>Overrides the default <code>imagePullPolicy</code> defined in <code>platform.imagePullPolicy</code> for this service only.</td>
         </tr>
         <tr>
             <td>hpa.enabled</td>
@@ -391,6 +420,21 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>pdb.minAvailable</td>
             <td>50%</td>
             <td>Number of PODs not available while deployment within ReplicaSet</td>
+        </tr>
+        <tr>
+            <td>service_account.create</td>
+            <td>true</td>
+            <td>Create Kubernetes ServiceAccount resources for OpenCRVS workloads. Each workload gets its own ServiceAccount. Configuration is available per workload as well, add <code>&ltservice_name&gt.service_account.&ltkey&gt</code>. For more information see <a href="#service-accounts">Service accounts</a>.</td>
+        </tr>
+        <tr>
+            <td>service_account.annotations</td>
+            <td>{}</td>
+            <td>Annotations applied to all workload ServiceAccounts. Per-workload annotations override global annotations with the same key.</td>
+        </tr>
+        <tr>
+            <td>service_account.automount_service_account_token</td>
+            <td>true</td>
+            <td>Controls <code>automountServiceAccountToken</code> on generated ServiceAccounts and workload Pod specs. Can be overridden per workload.</td>
         </tr>
         <tr>
             <td>strategy.type</td>
@@ -463,6 +507,16 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Use default OpenCRVS login/password or generate random values</td>
         </tr>
         <tr>
+            <td>deployment_jobs.service_account.name</td>
+            <td>deployment-jobs</td>
+            <td>Common ServiceAccount name used by Helm pre/post deployment jobs.</td>
+        </tr>
+        <tr>
+            <td>deployment_jobs.service_account.annotations</td>
+            <td>{}</td>
+            <td>Annotations applied to the common ServiceAccount used by Helm pre/post deployment jobs.</td>
+        </tr>
+        <tr>
             <td>on_restore_cronjob.enabled</td>
             <td><pre>false</pre></td>
             <td>Special cronjob for OpenCRVS maintenance after database restore. Job runs reindex and postgres passwords update.</td>
@@ -475,14 +529,166 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
     </tbody>
 </table>
 
+# Service accounts
+
+OpenCRVS Helm chart creates a Kubernetes ServiceAccount for each regular workload and injects the matching `serviceAccountName` into the workload Pod spec.
+
+By default, ServiceAccount names match workload names:
+
+- `auth`
+- `client`
+- `countryconfig`
+- `dashboards`, when `dashboards.enabled` is `true`
+- `documents`
+- `events`
+- `gateway`
+- `login`
+- `data-cleanup`, when `data_cleanup.enabled` is `true`
+- `on-db-restore-cronjob`, when `on_restore_cronjob.enabled` is `true`
+
+Helm pre/post deployment jobs use one shared ServiceAccount named `deployment-jobs` by default. This includes validation, datastore setup, data migration, data seed, and Elasticsearch reindex jobs.
+
+**Example: global annotations**
+
+```yaml
+service_account:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-default
+```
+
+**Example: workload-specific annotations**
+
+```yaml
+auth:
+  service_account:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-auth
+```
+
+**Example: deployment job annotations**
+
+```yaml
+deployment_jobs:
+  service_account:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/opencrvs-deployment-jobs
+```
+
+If ServiceAccounts are managed outside of this chart, set `service_account.create` to `false` and provide matching existing ServiceAccounts in the namespace. A custom name can be set per workload:
+
+```yaml
+service_account:
+  create: false
+
+auth:
+  service_account:
+    name: existing-auth-service-account
+```
+
+# Network Policies
+
+NetworkPolicy resources require a CNI provider that enforces Kubernetes
+NetworkPolicy — set `network_policy.enabled=false` on clusters without one.
+
+When `network_policy.enabled=true`, the chart can render (resource names are
+prefixed with the Helm release name, e.g. `<release>-default-deny`, so
+multiple releases in the same namespace don't collide):
+
+- `<release>-default-deny`, which denies ingress and/or egress for OpenCRVS workloads, per `ingress_mode`/`egress_mode`.
+- `<release>-allow-private-ingress`/`<release>-allow-private-egress`, when `ingress_mode`/`egress_mode` is `private`, allowing traffic to/from RFC1918 private ranges only.
+- `<release>-allow-same-namespace`, which allows OpenCRVS pods in the same namespace to communicate with each other.
+- `<release>-allow-egress-namespaces`, when `network_policy.allowed_namespaces` is set and `egress_mode` is not `full`, which allows egress on any port to every pod in each listed namespace.
+- `<release>-allow-dns`, which allows egress to any DNS server on TCP and UDP port 53, unless `egress_mode` is `full`.
+- Service-specific policies from `<service>.network_policy.rules` and `<service>.network_policy.custom_rules`.
+- An ingress and/or egress policy for a service, when `<service>.network_policy.ingress_mode`/`egress_mode` is set to `private` or `full`.
+
+`network_policy.ingress_mode`/`egress_mode` each take one of three values:
+
+- `deny` — nothing is allowed beyond same-namespace/`allowed_namespaces`/per-service rules. Default for `ingress_mode`.
+- `private` — additionally allow traffic to/from RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), blocking the public internet either way. Default for `egress_mode`.
+- `full` — no baseline policy at all; unrestricted.
+
+Rules under `custom_rules` are appended to chart-provided `rules`, so operators can
+add site-specific ingress or egress without replacing service defaults.
+
+`<service>.network_policy.ingress_mode`/`egress_mode` are a shortcut for opting
+one service into `private` or `full` access, without writing an ingress/egress
+rule under `rules`/`custom_rules`. For ingress, `private`/`full` accept traffic
+from RFC1918 ranges/any source respectively, scoped to the service's own `port`
+value; it renders nothing if `port` is not set, rather than silently opening
+every port. For egress, `private`/`full` accept traffic to RFC1918 ranges/any
+destination on any port, since a service's own port doesn't describe what it
+calls out to. Both are independent of the global `network_policy.ingress_mode`/
+`egress_mode`, which control whether the chart-wide baseline policies are
+rendered at all.
+
+`client`, `gateway` and `login` are the OpenCRVS entry points reached directly by
+end users and external clients, so their `allow-ingress` rule intentionally accepts
+traffic from any namespace or client on their service port, rather than being
+scoped to a specific source namespace. `countryconfig` and `dashboards` remain
+scoped to ingress from the `traefik` namespace only.
+
+## Hardening
+
+`ingress_mode` defaults to `deny` and `egress_mode` defaults to `private` —
+OpenCRVS pods can reach RFC1918 private destinations (the dependencies chart,
+other in-VPC services) but not the public internet, without every deployment
+having to enumerate `allowed_namespaces` up front. `countryconfig` is the one
+service that genuinely needs public internet by default (SMTP and SMS gateway
+integrations point at arbitrary external hosts configured via env vars/secrets,
+not fixed IPs a private-range rule could cover), so it carries its own
+`network_policy.egress_mode: full` regardless of the global `egress_mode`.
+
+For a fully locked-down deployment, set `egress_mode: deny` and list every
+namespace OpenCRVS pods actually need in `allowed_namespaces` — otherwise auth,
+gateway, events, etc. lose access to Postgres, Elasticsearch, MinIO and Redis
+the moment the private-range baseline goes away too.
+
+The dependencies chart and this chart are typically deployed to separate namespaces
+(see the default `*.host` values in `values.yaml`, e.g.
+`redis-0.redis.opencrvs-deps-dev.svc.cluster.local`), so at minimum that namespace
+must be listed. `allowed_namespaces` is the egress-side counterpart to
+`network_policy.allowed_namespaces` in the dependencies chart, which must separately
+list this chart's namespace to grant the matching ingress — both sides need setting
+for traffic to actually flow.
+
+```yaml
+network_policy:
+  egress_mode: deny
+  allowed_namespaces:
+    - opencrvs-deps-production
+    - traefik
+```
+
+`allowed_namespaces` grants egress on **any port** to every pod in each listed
+namespace — it's a namespace-level trust boundary, not a per-service/per-port
+allowlist. If you need tighter control over what a specific service can reach,
+add a scoped `custom_rules` entry for that service instead (see the `rules` example
+above) and leave `allowed_namespaces` empty. The same applies to `countryconfig`:
+if its blanket `egress_mode: full` is broader than you'd like, replace it with a
+`custom_rules` entry scoped to your specific SMTP/SMS provider IPs instead.
+
+### Service connections
+
+Applies once `network_policy.enabled: true`. Every OpenCRVS pod always accepts traffic from its own namespace (`allow_same_namespace`). With the default `egress_mode: private`, egress is also allowed to DNS (53) and any RFC1918 private range; `countryconfig` additionally has unrestricted egress. The table below shows what each service allows **beyond** that baseline, per its current `values.yaml` configuration:
+
+| Service                                                                                                                                                           | Port             | Extra ingress                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------- |
+| client, gateway, login                                                                                                                                            | 3000, 7070, 3020 | any source (`rules: allow-ingress`) — public entry points |
+| countryconfig                                                                                                                                                     | 3040             | `traefik` namespace only (`rules: from-traefik`)          |
+| dashboards (disabled by default)                                                                                                                                  | 4444             | `traefik` namespace only (`rules: from-traefik`)          |
+| auth, config, documents, events, migration, data-migration-analytics, data-cleanup, data-seed, elasticsearch-on-deploy, elasticsearch-reindex, postgres-on-deploy | —                | —                                                         |
+
+Only `countryconfig` defines an extra egress rule (`network_policy.egress_mode: full` — unrestricted, for its SMTP/SMS integrations); every other service relies solely on the shared `egress_mode`/`allowed_namespaces` baseline above to reach the dependencies chart.
+
 # Authentication configuration
 
 ## General information
 
-OpenCRVS has more then 10 microservices that require authentication to multiple datastores (MongoDB, Elasticsearch, Redis and MinIO. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
+OpenCRVS has more then 10 microservices that require authentication to multiple datastores (Elasticsearch, Redis and MinIO. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
 
 - No authentication enabled (`disabled`), password-less access to datastores. MinIO will use default credentials (minioadmin/minioadmin). All other services will work without authentication.
-- Auto (`auto`) mode allows OpenCRVS chart to create users for MongoDB and Elasticsearch at installation time, but you need to provide admin credentials for those services. Mode is not supported by MinIO and Redis.
+- Auto (`auto`) mode allows OpenCRVS chart to create users for Elasticsearch at installation time, but you need to provide admin credentials for that service. Mode is not supported by MinIO and Redis.
 - In case when users are created by datastore administrator (`use_secret`) and DevOps gets those credentials, kubernetes secrets needs to be created manually as well. Check how to create secret in the section below.
 - DevOps may decide to manage secrets by own way and map to environment variables manually (`managed`). Check [Mapping secrets](#mapping-secrets) section for details. **NOTE**: This way is not recommended since we can't avoid human error and mapping secrets manually requires deep knowledge of OpenCRVS internals.
 
@@ -490,53 +696,12 @@ Table contains list of required secrets for each `auth_mode` grouped by datastor
 
 | Datastore     | auth_mode: auto        | default secret name      | auth_mode: use_secret | default secret name         |
 | ------------- | ---------------------- | ------------------------ | --------------------- | --------------------------- |
-| MongoDB       | admin_user_secret_name | mongodb-admin-user       | urls_secret           | mongodb-urls                |
 | Postgres      | admin_user_secret_name | postgres-admin-user      | urls_secret           | postgres-urls               |
 | Elasticsearch | admin_user_secret_name | elasticsearch-admin-user | urls_secret           | elasticsearch-opencrvs-urls |
 | MinIO         | not supported          |                          | users_secret          | minio-opencrvs-users        |
 | Redis         | not supported          |                          | users_secret          | redis-opencrvs-users        |
 
 ## Secrets specification
-
-### MongoDB secrets
-
-#### mongodb.admin_user_secret_name
-
-Default secret name: mongodb-admin-user
-
-**auth_mode:** auto
-
-**Keys:**
-
-- MONGODB_ADMIN_USER
-- MONGODB_ADMIN_PASSWORD
-
-#### mongodb.urls_secret
-
-**Default secret name:** mongodb-urls
-
-**auth_mode:** use_secret
-
-**Keys:**
-
-- EVENTS_MONGO_URL
-- OPENHIM_MONGO_URL
-- PERFORMANCE_MONGO_URL
-- USER_MGNT_MONGO_URL
-
-**Description:** Each key in this secrets represents connection string to MongoDB database as URL, user and database must exist. OpenCRVS will pickup correct credentials by key values and assign to appropriate microservice containers.
-
-Value format:
-
-```
-mongodb://<username>:<password>@<mongodb-hostname>:27017/<db-name>
-```
-
-Example value:
-
-```
-mongodb://user-mgnt:password@mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local:27017/user-mgnt
-```
 
 ### Postgres secrets
 
@@ -633,7 +798,7 @@ search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 `SEARCH_ELASTIC_URL` value example:
 
 ```
-http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200pigeon@godlike-laptop:~$
+http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 ```
 
 ### Minio Secret (minio.users_secret)
@@ -801,56 +966,9 @@ kubectl logs job/data-cleanup -f --all-containers=true
 
 # Contributors guide
 
-## Adding MongoDB users and databases
-
-When deploying OpenCRVS with MongoDB authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `mongodb.databases` section.
-Following table shows list of available parameters:
-
-| Parameter          | Type   | Default         | Description                                                                                                                                                                                                                                                                              |
-| ------------------ | ------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| databases          | list   | See values.yaml | List of databases and users to create when authentication is enabled (`auth_mode: auto`). Each item supports the following fields:                                                                                                                                                       |
-| databases[].prefix | string | -//-            | Prefix used to generate environment variable names for the database, user, password, and roles.                                                                                                                                                                                          |
-| databases[].db     | string | -//-            | Name of the MongoDB database to create.                                                                                                                                                                                                                                                  |
-| databases[].user   | string | -//-            | Name of the MongoDB user to create and assign to the database.                                                                                                                                                                                                                           |
-| databases[].roles  | string | -//-            | (Optional) JSON string specifying roles to assign to the user. If not provided, the user is granted the `readWrite` role on the specified database by default. When specifying custom roles, ensure to include `readWrite` or `read` for the database defined at `databases[].db` field. |
-
-**Example:**
-
-```yaml
-databases:
-  - prefix: APP
-    db: app-db
-    user: app-user
-  - prefix: REPORTS
-    db: reports
-    user: reports-user
-    roles: "[{ role: 'readWrite', db: 'reports' }, { role: 'read', db: 'app-db' }]"
-```
-
-In this example:
-
-- The first entry creates a database named `app-db` with a user `app-user` and grants the default `readWrite` role on `app-db`.
-- The second entry creates a database named `reports` with a user `reports-user` and assigns custom roles: `readWrite` on `reports` and `read` on `app-db`. Note, roles field must explicitly define access level for both databases.
-- The `prefix` field is used to generate environment variable names for each database and user, making it easier to reference credentials in your application configuration.
-
-The generated credentials can be accessed from the `mongo-opencrvs-users` secret.
-List of Variables Generated at helm installation time:
-
-- `<PREFIX>_DB`: Database name
-- `<PREFIX>_MONGODB_USER`: Username
-- `<PREFIX>_MONGODB_PASSWORD`: Randomly generated password
-- `<PREFIX>_MONGODB_ROLES`: Roles in JSON format
-
-Additionally secret `mongodb-urls` with all MongoDB URLs is created. Secret keys are in format
-`<PREFIX>_MONGO_URL` and can be used for OpenCRVS authentication.
-
-Notes:
-
-- The 'roles' field must be a valid JSON string.
-
 # Adding Elasticsearch users
 
-When deploying OpenCRVS with Elasticsearch authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `mongodb.databases` section.
+When deploying OpenCRVS with Elasticsearch authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `elasticsearch` section.
 Following table shows list of available parameters:
 
 | Parameter  | Type | Default            | Description                                                       |
@@ -900,13 +1018,11 @@ The generated credentials can be accessed from the `elasticsearch-opencrvs-users
 Helm chart has following pre-install/upgrade hooks:
 
 - elasticsearch-on-deploy: create elasticsearch users and configure permissions, see `elasticsearch` configuration options for more details how to configure users and permissions
-- influxdb-on-deploy: create database
-- mongo-on-deploy: create databases and users with correct permissions, see `mongodb` configuration options for more details how to configure users and permissions
 - postgres-on-deploy: create database, schemas and users with correct permissions
 
 Helm chart has following post-install/upgrade hooks:
 
-- data-migration: apply data migrations to postgres, mongodb, influxdb
+- data-migration: apply data migrations to postgres
 - data-migration-analytics: apply data migrations to postgres, this hook use Countryconfig assets docker image, see documentation on how to create own analytics dashboards.
 - data-seed: initial data seed, runs only on post-install
 - elasticsearch-reindex: reindex data after deployment

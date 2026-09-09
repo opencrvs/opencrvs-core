@@ -20,6 +20,34 @@ ingress:
   # Resolver will be attached to Traefik CRD IngressRoute
   tls_resolver: ''
 
+# Kubernetes NetworkPolicy configuration for dependency workloads.
+network_policy:
+  # Render NetworkPolicy resources. Requires a CNI provider that enforces
+  # NetworkPolicy - set to false on clusters without one.
+  enabled: true
+  # Baseline policy for ingress to dependency pods. One of:
+  # - deny: deny ingress unless another NetworkPolicy allows it (default).
+  # - private: allow ingress only from RFC1918 private ranges
+  #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+  # - full: no baseline policy; ingress is unrestricted.
+  ingress_mode: deny
+  # Baseline policy for egress from dependency pods. Same modes as
+  # ingress_mode, applied to egress instead. DNS (TCP/UDP 53) is always
+  # allowed regardless of mode, except when full.
+  egress_mode: deny
+  # Allow dependency pods in this namespace to communicate with each other.
+  # This keeps the chart practical while blocking unexpected cross-namespace
+  # and external traffic by default.
+  allow_same_namespace: true
+  # Namespaces allowed to reach dependency pods. Only takes effect when
+  # ingress_mode is not "full". Dependency pods accept ingress on any port
+  # from every pod in each listed namespace (e.g. auth/gateway reaching
+  # redis/postgres/elasticsearch/minio from the opencrvs-services
+  # namespace). Required for the OpenCRVS application to keep working while
+  # ingress is denied by default, since the two charts are typically
+  # deployed to separate namespaces.
+  allowed_namespaces: []
+
 # Kubernetes storage type, available options are `pvc` or `host_path`
 storage_type: pvc
 
@@ -34,6 +62,10 @@ storage_type: pvc
 # For OpenCRVS developers there is no need to deploy dependencies helm chart as template.
 chart_dev_mode: true
 
+platform:
+  # Secrets used to pull images from private registries, if needed.
+  imagePullSecrets: []
+
 # Label selector for datastore nodes, usually used to keep data persistent
 node_selector: {}
 resources:
@@ -42,23 +74,37 @@ resources:
   memoryLimit: '8Gi'
   cpuLimit: '8'
 
-mongodb:
-  # Enable MongoDB deployment.
-  enabled: true
-  # MongoDB docker image version to use: https://hub.docker.com/_/mongo
-  version: 4.4
-  # By default MongoDB is deployed without authentication enabled.
-  use_default_credentials: true
-  # MongoDB databases and users to create, if `use_default_credentials` is set to `false`.
-  admin_user_secret_name: mongodb-admin-user
-  # Pass mongodb credentials over variables:
-  # admin_user_name: admin
-  # admin_user_password: password
-
 postgres:
   # Enable postgres deployment.
   enabled: true
-  image: chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
+  image:
+    repository: postgres
+    tag: 17.6
+  port: 5432
+  network_policy:
+    app_label:
+    ingress_mode: private
+    # FIXME: In future releases replace postgres image to more robust
+    # version with all required utilities installed and drop allow-package-repo-egress rule
+    # Chart-provided rules for this service. Postgres installs
+    # openssh-client/rsync/pgbackrest packages at runtime (see Air-Gap
+    # Installation in README.md); apt keeps package repositories
+    # reachable even when egress is denied by default. Some apt mirrors are
+    # HTTP-only, so both 80 and 443 are opened.
+    rules:
+      - name: allow-package-repo-egress
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 443
+
   # By default postgres is deployed with authentication enabled user/password: postgres/postgres
   use_default_credentials: true
   # postgres databases and users to create, if `use_default_credentials` is set to `false`.
@@ -66,6 +112,9 @@ postgres:
   # admin user name is postgres, define password here:
   # admin_user_password:
 
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/postgres
   # Persistent Volume Claim (PVC) configuration
   # NOTE: This configuration is used only when `storage_type` is set to `pvc`.
   # For `host_path` storage, data is stored on the host filesystem at the path defined in `postgres.host_data_path`.
@@ -95,13 +144,6 @@ postgres:
   backup:
     # Enable/Disable backup
     enabled: false
-
-    # Run backup jobs as cronjob
-    # Default: true
-    # If you need to run manual backup, then set this property to false
-    # and run helm template ... instead
-    cronjob: true
-
     # Backup implementation:
     # - dump: logical full backup using pg_dump (protocol-based, cross-version).
     # - differential: physical backup using pgBackRest (full/diff/incr/PITR).
@@ -116,6 +158,9 @@ postgres:
     #
     # Both dump and differential flows can reuse this Secret.
     server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
 
     # Secret holding the pgBackRest repository encryption passphrase.
     # Encryption is always enabled; cipher type is fixed in templates
@@ -140,12 +185,6 @@ postgres:
   restore:
     # Enable/Disable restore
     enabled: false
-
-    # Run backup jobs as cronjob
-    # Default: true
-    # If you need to run manual restore, then set this property to false
-    # and run helm template ... instead
-    cronjob: true
     # Restore type should be the same as backup type
     type: dump
     # See description within backup section
@@ -153,11 +192,19 @@ postgres:
     # encryption_secret: restore-encryption-secret
     # server_secret: backup-server-ssh-credentials
 
+    # Host:
+    # host: backup server hostname or IP
+
 # Elasticsearch Configuration
 elasticsearch:
-  image: docker.elastic.co/elasticsearch/elasticsearch:8.19.15
   # Enable Elasticsearch deployment.
   enabled: true
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: 8.19.15
+  port: 9200
+  network_policy:
+    ingress_mode: private
   # By default Elasticsearch is deployed without authentication enabled.
   use_default_credentials: true
   admin_user_secret_name: elasticsearch-admin-user
@@ -171,6 +218,9 @@ elasticsearch:
   users_secret: elasticsearch-opencrvs-users
   urls_secret: elasticsearch-opencrvs-urls
 
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/elasticsearch
   # PVC Configuration
   pvc:
     # storage_class: "default"
@@ -192,34 +242,57 @@ elasticsearch:
 # - elastic-apm
 monitoring:
   enabled: false
+  logs:
+    retention_days: 30
+  metrics:
+    retention_days: 30
 
 apm_server:
-  image: docker.elastic.co/apm/apm-server:8.19.15
+  image:
+    repository: docker.elastic.co/apm/apm-server
+    tag: 8.19.15
+  port: 8200
 
 kibana:
-  image: docker.elastic.co/kibana/kibana:8.19.15
+  image:
+    repository: docker.elastic.co/kibana/kibana
+    tag: 8.19.15
+  port: 5601
+
+  network_policy:
+    ingress_mode: private
+
   users_secret: kibana-users-secret
   # Configmap for custom configuration file
   # custom_config_configmap: kibana-custom-config
 
 metricbeat:
-  image: docker.elastic.co/beats/metricbeat:8.19.15
+  image:
+    repository: docker.elastic.co/beats/metricbeat
+    tag: 8.19.15
   # Configmap for custom configuration file
   # custom_config_configmap: metricbeat-config
   # Configmap for custom index lifecycle management policy
   # custom_ilm_configmap: metricbeat-ilm-policy
 
 filebeat:
-  image: docker.elastic.co/beats/filebeat:8.19.15
+  image:
+    repository: docker.elastic.co/beats/filebeat
+    tag: 8.19.15
   # Configmap for custom configuration file
   # custom_config_configmap: filebeat-config
   # Configmap for custom index lifecycle management policy
   # custom_ilm_configmap: filebeat-ilm-policy
 
 logstash:
-  image: docker.elastic.co/logstash/logstash:8.19.15
+  image:
+    repository: docker.elastic.co/logstash/logstash
+    tag: 8.19.15
 
 elastalert:
+  image:
+    repository: jertel/elastalert2
+    tag: 2.25.0
   # Create configmap with custom rules for elastalert
   # custom_rules_configmap:
   env:
@@ -254,6 +327,42 @@ elastalert:
 minio:
   # Enable or disable MinIO deployment.
   enabled: true
+  image:
+    repository: quay.io/minio/minio
+    tag: RELEASE.2025-06-13T11-33-47Z
+  port: 3535
+  network_policy:
+    ingress_mode: private
+    rules:
+      # FIXME: See comment on postgres service
+      # FIXME: MinIO listens on two ports (API: 3535, Console: 3536), but
+      # network_policy.ingress_mode only scopes to the service's single `port`
+      # value (API here) - it can't express "console only". Ingress for the
+      # console is opened explicitly below instead; the API port keeps relying
+      # on allow_same_namespace / allowed_namespaces for internal access.
+      - name: allow-console-ingress
+        policyTypes:
+          - Ingress
+        ingress:
+          - ports:
+              - protocol: TCP
+                port: 3536
+      # MinIO installs packages such as openssh/rsync/minio-client at
+      # runtime (see Air-Gap Installation in README.md); apk keeps package
+      # repositories reachable even when egress is denied by default. Some
+      # apk mirrors are HTTP-only, so both 80 and 443 are opened.
+      - name: allow-package-repo-egress
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 443
 
   # Use default credentials (username: minioadmin, password: minioadmin).
   # Highly discouraged for production environments—see official docs:
@@ -267,6 +376,7 @@ minio:
     access_mode: 'ReadWriteOnce'
     storage_size: '10Gi'
 
+  # Storage configuration:
   # Path to persistent data on the VM (when storage_type is host_path).
   host_data_path: /data/minio
 
@@ -284,6 +394,9 @@ minio:
 
     # Name of the Kubernetes secret containing backup server SSH credentials.
     # server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
 
     # Cron schedule to run backup job (format: "MIN HOUR DAY MONTH WEEKDAY").
     # schedule: "0 1 * * *"
@@ -304,6 +417,9 @@ minio:
     # Name of the Kubernetes secret containing backup server SSH credentials.
     # server_secret: backup-server-ssh-credentials
 
+    # Host:
+    # host: backup server hostname or IP
+
     # Cron schedule for restore job.
     # schedule: "0 3 * * *"
 
@@ -312,6 +428,12 @@ redis:
   # Redis is built on top of bitnami/redis docker image:
   # https://hub.docker.com/r/bitnami/redis
   enabled: true
+  image:
+    repository: redis
+    tag: '8'
+  port: 6379
+  network_policy:
+    ingress_mode: private
   # By default Redis is deployed without authentication enabled.
   # auth_mode:
   #   - disabled: no authentication
@@ -326,9 +448,6 @@ redis:
   auth_users:
     - GATEWAY
     - AUTH
-
-influxdb:
-  enabled: true
 
 # Backup configuration
 backup:
@@ -346,6 +465,10 @@ backup:
   # - host, hostname / IP of backup server
   # - ssh_key, ssh key for passwordless connection
   backup_server_secret: backup-server-ssh-credentials
+
+  # Host:
+  # host: backup server hostname or IP
+
   backup_server_dir: /home/backup/demo
   backup_encryption_secret: backup-encryption-secret
 
@@ -365,6 +488,10 @@ restore:
   # - host, hostname / IP of backup server
   # - ssh_key, ssh key for passwordless connection
   backup_server_secret: backup-server-ssh-credentials
+
+  # Host:
+  # host: backup server hostname or IP
+
   # backup_server_dir: /home/backup/demo
   backup_encryption_secret: restore-encryption-secret
 
@@ -373,3 +500,11 @@ restore:
 priority_class:
   name: opencrvs-datastore-high-priority
   enabled: false
+
+# Shared utilities image used by helper jobs and init containers.
+# This image is expected to include common tools such as curl, jq, rsync and kubectl.
+# Override repository or tag if you mirror OpenCRVS images into a private registry.
+utilities:
+  image:
+    repository: ghcr.io/opencrvs/ocrvs-utilities
+    tag: v2.1.0

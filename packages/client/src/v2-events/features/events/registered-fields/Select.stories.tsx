@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import styled from 'styled-components'
-import { within, expect } from '@storybook/test'
-import { userEvent, waitFor } from '@storybook/testing-library'
+import { within, expect } from 'storybook/test'
+import { userEvent, waitFor } from 'storybook/test'
 import {
   ConditionalType,
   FieldType,
@@ -116,6 +116,80 @@ export const WithHiddenOption: Story = {
                   description: 'Cherry option'
                 }
               }
+            ]
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
+async function getPlaceholderElement(canvasElement: HTMLElement) {
+  return waitFor(() => {
+    const el = canvasElement.querySelector('.react-select__placeholder')
+    if (!el) {
+      throw new Error('Placeholder not found')
+    }
+    return el
+  })
+}
+
+export const WithDefaultPlaceholder: Story = {
+  name: 'With default placeholder',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    // An empty select with no configured placeholder shows "Select",
+    // not react-select's built-in "Select..." default.
+    const placeholder = await getPlaceholderElement(canvasElement)
+    await expect(placeholder).toHaveTextContent(/^Select$/)
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.select',
+            type: FieldType.SELECT,
+            label: generateTranslationConfig('Favourite fruit'),
+            options: [
+              { value: 'apple', label: generateTranslationConfig('Apple') },
+              { value: 'banana', label: generateTranslationConfig('Banana') }
+            ]
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
+export const WithConfiguredPlaceholder: Story = {
+  name: 'With configured placeholder',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    // A configured placeholder overrides the "Select" default.
+    const placeholder = await getPlaceholderElement(canvasElement)
+    await expect(placeholder).toHaveTextContent(/^Choose a fruit$/)
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.select',
+            type: FieldType.SELECT,
+            label: generateTranslationConfig('Favourite fruit'),
+            placeholder: generateTranslationConfig('Choose a fruit'),
+            options: [
+              { value: 'apple', label: generateTranslationConfig('Apple') },
+              { value: 'banana', label: generateTranslationConfig('Banana') }
             ]
           }
         ]}

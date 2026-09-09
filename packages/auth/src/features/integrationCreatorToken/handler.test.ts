@@ -32,9 +32,7 @@ describe('integration creator token handler', () => {
     const { token } = JSON.parse(res.payload)
     const payload = decodeTokenPayload(token)
 
-    expect(payload.scope).toEqual([
-      encodeScope({ type: 'integration.create' })
-    ])
+    expect(payload.scope).toEqual([encodeScope({ type: 'integration.create' })])
     // A UUID subject, so events can resolve the token as a SystemContext
     expect(payload.sub).toBe(INTEGRATION_CREATOR_USER_ID)
     expect(payload.userType).toBe('system')

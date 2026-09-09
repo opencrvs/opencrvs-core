@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button, Dialog, Toast } from '@opencrvs/components'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   userMessages,
@@ -19,14 +17,12 @@ import {
   constantsMessages
 } from '@client/i18n/messages'
 import {
-  LabelContainer,
-  ValueContainer,
   DynamicHeightLinkButton,
   Message,
-  Label
+  Label,
+  SettingsRow
 } from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Select } from '@opencrvs/components/lib/Select'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -37,7 +33,7 @@ interface ILanguageOptions {
   [key: string]: string
 }
 
-export function Language() {
+export function useLanguage(): SettingsRow {
   const [showModal, setShowModal] = React.useState(false)
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)
@@ -88,69 +84,70 @@ export function Language() {
     []
   )
 
-  return (
-    <>
-      <ListViewItemSimplified
-        label={
-          <LabelContainer>
-            {intl.formatMessage(userMessages.systemLanguage)}
-          </LabelContainer>
-        }
-        value={
-          <ValueContainer>
-            {intl.formatMessage(userMessages.language, {
-              language: languages[language].lang
-            })}
-          </ValueContainer>
-        }
-        actions={
-          <DynamicHeightLinkButton
-            id="BtnChangeLanguage"
-            onClick={toggleLanguageModal}
-          >
-            {intl.formatMessage(buttonMessages.change)}
-          </DynamicHeightLinkButton>
-        }
-      />
-      <ResponsiveModal
-        id="ChangeLanguageModal"
-        title={intl.formatMessage(userMessages.changeLanguageTitle)}
-        show={showModal}
-        actions={[
-          <TertiaryButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={cancelLanguageSettings}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          <PrimaryButton key="apply" id="apply_change" onClick={changeLanguage}>
-            {intl.formatMessage(buttonMessages.apply)}
-          </PrimaryButton>
-        ]}
-        handleClose={cancelLanguageSettings}
-        contentHeight={175}
-        contentScrollableY={true}
-      >
-        <Message>
-          {intl.formatMessage(userMessages.changeLanguageMessege)}
-        </Message>
-        <Label>{intl.formatMessage(constantsMessages.labelLanguage)}</Label>
-        <Select
-          id="SelectLanguage"
-          onChange={(val: string) => {
-            setSelectedLanguage(val)
-          }}
-          value={selectedLanguage}
-          options={langChoice}
-          placeholder=""
-        />
-      </ResponsiveModal>
-      {showSuccessNotification && (
-        <Toast type="success" onClose={toggleSuccessNotification}>
-          <FormattedMessage {...userMessages.changeLanguageSuccessMessage} />
-        </Toast>
-      )}
-    </>
-  )
+  return {
+    id: 'language',
+    item: {
+      label: intl.formatMessage(userMessages.systemLanguage),
+      value: intl.formatMessage(userMessages.language, {
+        language: languages[language].lang
+      }),
+      actions: (
+        <DynamicHeightLinkButton
+          id="BtnChangeLanguage"
+          onClick={toggleLanguageModal}
+        >
+          {intl.formatMessage(buttonMessages.change)}
+        </DynamicHeightLinkButton>
+      )
+    },
+    overlay: (
+      <>
+        <Dialog
+          id="ChangeLanguageModal"
+          title={intl.formatMessage(userMessages.changeLanguageTitle)}
+          isOpen={showModal}
+          actions={[
+            <Button
+              size="large"
+              type="tertiary"
+              key="cancel"
+              id="modal_cancel"
+              onClick={cancelLanguageSettings}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>,
+            <Button
+              size="large"
+              type="primary"
+              key="apply"
+              id="apply_change"
+              onClick={changeLanguage}
+            >
+              {intl.formatMessage(buttonMessages.apply)}
+            </Button>
+          ]}
+          onClose={cancelLanguageSettings}
+        >
+          <Message>
+            {intl.formatMessage(userMessages.changeLanguageMessege)}
+          </Message>
+          <Label>{intl.formatMessage(constantsMessages.labelLanguage)}</Label>
+          <Select
+            id="SelectLanguage"
+            onChange={(val: string) => {
+              setSelectedLanguage(val)
+            }}
+            value={selectedLanguage}
+            options={langChoice}
+            placeholder=""
+          />
+        </Dialog>
+        {showSuccessNotification && (
+          <Toast type="success" onClose={toggleSuccessNotification}>
+            <FormattedMessage {...userMessages.changeLanguageSuccessMessage} />
+          </Toast>
+        )}
+      </>
+    )
+  }
 }

@@ -10,25 +10,28 @@
  */
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
-  deepDropNulls
+  deepDropNulls,
+  dropSecuredDeclarationFields
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
+import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
+import { useDuplicatesAvailable } from '../../events/actions/dedup/useDuplicatesAvailable'
 import { EventSummary } from './components/EventSummary'
 import { useEventOverviewInfo } from './components/useEventOverviewInfo'
 
@@ -37,6 +40,7 @@ import { useEventOverviewInfo } from './components/useEventOverviewInfo'
  */
 function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
@@ -52,8 +56,18 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       })
     : getCurrentEventState(event, eventConfiguration)
 
+  // NOTE: Summary is build to expect all fields, including secured ones.
+  // In cases where title is secured, we do not show it. This is to keep it consistent with the rest of the application, since they depend on event.search for their data.
+  const eventWithoutSecuredFields = dropSecuredDeclarationFields(
+    eventConfiguration,
+    eventWithDrafts,
+    validatorContext
+  )
+
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventWithoutSecuredFields)
+
   const { getUsers } = useUsers()
-  const intl = useIntl()
 
   const assignedToUser = getUsers.useQueryById(
     eventWithDrafts.assignedTo || '',
@@ -74,13 +88,17 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     'event.assignedTo': assignedTo,
     flags: eventIndex.flags
   }
-  const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
-      size={ContentSize.LARGE}
+      icon={() => (
+        <EventIcon
+          event={eventIndex}
+          eventConfig={eventConfiguration}
+          name={''}
+        />
+      )}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
     >
@@ -135,8 +153,14 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
-      size={ContentSize.LARGE}
+      icon={() => (
+        <EventIcon
+          event={eventIndex}
+          eventConfig={eventConfiguration}
+          name={''}
+        />
+      )}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
     >
@@ -154,16 +178,26 @@ function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { eventIndex, fullEvent, shouldShowFullOverview } =
     useEventOverviewInfo(params.eventId)
+  const areDuplicatesAvailable = useDuplicatesAvailable(eventIndex)
+  const isDownloaded = fullEvent !== undefined
+  /*
+   * Until the record is downloaded the matches have not been fetched either, so
+   * their absence says nothing about whether the user may review them.
+   */
+  const canNotReviewDuplicate = isDownloaded && !areDuplicatesAvailable
 
   return (
     <>
-      {eventIndex.potentialDuplicates.length > 0 && (
-        <DuplicateWarning
-          duplicateTrackingIds={eventIndex.potentialDuplicates.map(
-            ({ trackingId }) => trackingId
-          )}
-        />
-      )}
+      {eventIndex.potentialDuplicates.length > 0 &&
+        (canNotReviewDuplicate ? (
+          <DuplicateReviewUnavailable />
+        ) : (
+          <DuplicateWarning
+            duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+              ({ trackingId }) => trackingId
+            )}
+          />
+        ))}
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (

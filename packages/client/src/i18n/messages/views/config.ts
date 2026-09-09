@@ -22,58 +22,6 @@ const messagesToDefine = {
       'Select the options to build an advanced search. A minimum of two search parameters is required.',
     description: 'This is used for the advanced search'
   },
-  vsexport: {
-    id: 'config.application.vsexport',
-    defaultMessage: 'Vital statistics',
-    description: 'VS Export tab'
-  },
-  vitalStatisticsExport: {
-    id: 'config.application.vitalStatistics',
-    defaultMessage:
-      'Month-{month}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
-    description: 'Vital Statistics Export'
-  },
-  export: {
-    id: 'config.application.export',
-    defaultMessage: 'Export',
-    description: 'Download Export CSV'
-  },
-  vsEmptyStateText: {
-    id: 'config.application.emptystate',
-    defaultMessage:
-      "The previous month's vital statistics data (based on vital event registrations occurring within that month) will become available for you to export as of the 1st of every month. Large CSV files cannot be opened in Excel and should therefore be opened in a statistical program such as {posit}.",
-    description: 'Vital Statistics Export Empty State Text'
-  },
-  vsExportDownloadFailed: {
-    id: 'config.application.vsExportDownloadFailed',
-    defaultMessage: 'Sorry! Something went wrong',
-    description: 'Vital Statistics Export Empty State Text'
-  },
-  certificateTemplate: {
-    id: 'config.certTemplate',
-    defaultMessage: 'Certificate Template',
-    description: 'Label for certificate templates'
-  },
-  birthTabTitle: {
-    id: 'config.application.birthTabTitle',
-    defaultMessage: 'Birth',
-    description: 'The title for birth tab'
-  },
-  birthTabTitleExport: {
-    id: 'config.application.birthTabTitleExport',
-    defaultMessage: 'Births',
-    description: 'The title for birth tab for VSExport'
-  },
-  deathTabTitle: {
-    id: 'config.application.deathTabTitle',
-    defaultMessage: 'Death',
-    description: 'The title for death tab'
-  },
-  deathTabTitleExport: {
-    id: 'config.application.deathTabTitleExport',
-    defaultMessage: 'Deaths',
-    description: 'The title for death tab for VSExport'
-  },
   options: {
     id: 'config.certificate.options',
     defaultMessage: 'Options',

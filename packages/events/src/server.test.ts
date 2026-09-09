@@ -17,10 +17,8 @@ import {
   createTRPCClient,
   httpBatchLink,
   HTTPHeaders,
-  httpLink,
-  TRPCClientError
+  httpLink
 } from '@trpc/client'
-import { TRPCError } from '@trpc/server'
 import * as jwt from 'jsonwebtoken'
 import {
   ActionStatus,
@@ -169,7 +167,7 @@ test('continues accepting requests after a failed one', async () => {
     appClient.event.create.mutate(generator.event.create(), {
       context: { headers: { authorization: tokenWithoutScope } }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).rejects.toMatchObject({ data: { code: 'FORBIDDEN' } })
 
   const tokenWithScope = createTestToken({
     userId: user.id,
@@ -193,12 +191,10 @@ test('rejects requests with no authorization header', async () => {
       { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
       { context: { headers: {} } }
     )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
-  )
+  ).rejects.toMatchObject({
+    message: 'Authorization token is missing',
+    data: { code: 'UNAUTHORIZED' }
+  })
 })
 
 test('rejects requests with a malformed token', async () => {
@@ -222,7 +218,7 @@ test('rejects requests where token lacks required scope', async () => {
       { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
       { context: { headers: { authorization: tokenWithoutScope } } }
     )
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).rejects.toMatchObject({ data: { code: 'FORBIDDEN' } })
 })
 
 test('Throws with unsigned forged token', async () => {
@@ -242,8 +238,8 @@ test('UNAUTHORIZED error is thrown when internal request is made without token',
   expect(url).toBeDefined()
 
   await expect(
-    internalServiceClient.user.ping.query('ping')
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+    internalServiceClient.user.getById.query(getUUID())
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('UNAUTHORIZED error is thrown when request is made with valid APP token', async () => {
@@ -251,14 +247,14 @@ test('UNAUTHORIZED error is thrown when request is made with valid APP token', a
   expect(url).toBeDefined()
 
   await expect(
-    internalServiceClient.user.ping.query('ping', {
+    internalServiceClient.user.getById.query(getUUID(), {
       context: {
         headers: {
           authorization: `Bearer ${createValidAppToken()}`
         }
       }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('UNAUTHORIZED error is thrown when internal request is made with token is not signed by the correct issuer', async () => {
@@ -277,19 +273,21 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
   })
 
   await expect(
-    internalServiceClient.user.ping.query('ping', {
+    internalServiceClient.user.getById.query(getUUID(), {
       context: {
         headers: {
           authorization: `Bearer ${forgedInternalServiceToken}`
         }
       }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('API response is returned when internal request is made with valid token', async () => {
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
+
+  const { user } = await setupTestCase()
 
   const internalServiceToken = jwt.sign({}, cert, {
     subject: 'opencrvs:auth-service',
@@ -299,7 +297,7 @@ test('API response is returned when internal request is made with valid token', 
     issuer: 'opencrvs:auth-service'
   })
 
-  const response = await internalServiceClient.user.ping.query('ping', {
+  const response = await internalServiceClient.user.getById.query(user.id, {
     context: {
       headers: {
         authorization: `Bearer ${internalServiceToken}`
@@ -307,7 +305,11 @@ test('API response is returned when internal request is made with valid token', 
     }
   })
 
-  expect(response).toEqual(`pong: ping`)
+  expect(response).toEqual({
+    id: user.id,
+    role: user.role,
+    status: user.status
+  })
 })
 
 test('UNAUTHORIZED error is thrown when internal request is made with token is not signed with matching key', async () => {
@@ -323,14 +325,14 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
     issuer: 'opencrvs:auth-service'
   })
   await expect(
-    internalServiceClient.user.ping.query('ping', {
+    internalServiceClient.user.getById.query(getUUID(), {
       context: {
         headers: {
           authorization: `Bearer ${forgedInternalServiceToken}`
         }
       }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 // ─── upstream failures ───────────────────────────────────────────────────────
 
@@ -342,6 +344,6 @@ describe('upstream error handling', () => {
   test('propagates a TRPC error returned by the upstream service', async () => {
     await expect(
       createEvent(BearerTokenByUserType.localRegistrar)
-    ).rejects.toMatchObject(new TRPCClientError('fetch failed'))
+    ).rejects.toMatchObject({ message: 'fetch failed' })
   })
 })

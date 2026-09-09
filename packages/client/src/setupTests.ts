@@ -24,10 +24,11 @@ import createFetchMock from 'vitest-fetch-mock'
  * Navigator & Window
  */
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
 // `window.config` is stubbed in ./setupConfig.ts, which runs before this file.
 
 /*
- * GraphQL Queries
+ * Profile queries
  */
 import { queries } from './profile/queries'
 
@@ -64,18 +65,6 @@ vi.mock('@client/forms/conditionals', async () => {
     ...actual,
     conditionals: actual.builtInConditionals,
     initConditionals: () => Promise.resolve()
-  }
-})
-
-vi.mock('@client/forms/handlebarHelpers', async () => {
-  const actual = (await vi.importActual(
-    '@client/forms/handlebarHelpers'
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  )) as any
-  return {
-    ...actual,
-    handlebarHelpers: {},
-    initHandlebarHelpers: () => Promise.resolve()
   }
 })
 

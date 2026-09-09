@@ -11,8 +11,8 @@
 
 import { ILanguage } from '@client/i18n/reducer'
 import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
-import { getToken } from '@client/utils/authUtils'
-import { EventType } from '@client/utils/gateway'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
+import { EventType } from '@client/utils/gateway-types'
 import { cacheFile } from '@client/v2-events/cache'
 import { ApplicationConfig, TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
@@ -100,6 +100,7 @@ export interface IApplicationConfigResponse {
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
   const url = '/api/config'
+  await ensureFreshAccessToken()
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -189,6 +190,7 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
 async function loadContent(): Promise<IContentResponse> {
   const url = `${countryconfigBase}/content/client`
 
+  await ensureFreshAccessToken()
   const res = await fetch(url, {
     method: 'GET',
     headers: {

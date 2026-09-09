@@ -1,0 +1,10 @@
+apiVersion: v2
+name: opencrvs-addon
+description: |
+  Generic helm chart template for deploying add-on applications alongside
+  OpenCRVS (e.g. Metabase). Not the OpenCRVS application itself - this chart
+  can be used as a starting point for creating new add-on/custom app charts
+  by providing common configurations and templates.
+type: application
+version: v2.1.0
+appVersion: 'v2.1.0'

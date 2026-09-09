@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta } from '@storybook/react'
+import type { Meta } from '@storybook/react-vite'
 import {
   TestUserRole,
   ActionType,
@@ -43,7 +43,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
-      ['Confirm']: AssertType.DISABLED
+      ['Confirm']: AssertType.DISABLED,
+      ['Unarchive']: AssertType.DISABLED
     }
   },
   {
@@ -59,7 +60,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Unassign']: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.ENABLED
     }
   },
   {
@@ -76,7 +78,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Confirm']: AssertType.DISABLED,
-      ['Unassign']: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.DISABLED
     }
   }
 ]

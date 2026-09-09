@@ -69,6 +69,17 @@ const messagesToDefine: IStepOneFormMessages = {
     description:
       'The error that appears when the user entered details are forbidden'
   },
+  tooManyLoginAttemptError: {
+    id: 'login.tooManyLoginAttemptError',
+    defaultMessage:
+      'Too many login attempts. You can try again after one minute.',
+    description: 'Error shown when login attempt is limited by the system'
+  },
+  somethingWentWrong: {
+    id: 'login.somethingWentWrong',
+    defaultMessage: 'Something went wrong. Please try again.',
+    description: 'Error toast message for general errors'
+  },
   optionalLabel: {
     id: 'login.optionalLabel',
     defaultMessage: 'Optional',
@@ -84,6 +95,13 @@ const messagesToDefine: IStepOneFormMessages = {
     defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
+  },
+  officeInactiveError: {
+    id: 'login.officeInactiveError',
+    defaultMessage:
+      'Your assigned office has been made inactive. Please contact your administrator to be reassigned',
+    description:
+      "The error that appears when the user's assigned office is inactive"
   }
 }
 

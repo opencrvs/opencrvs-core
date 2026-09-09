@@ -11,12 +11,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
-import { PrimaryButton } from '../buttons'
+import { Button } from '../Button'
 import { InputError } from '../InputField/InputError'
 
 const SEARCH_DEBOUNCE_DURATION = 300
 
-const SearchButton = styled(PrimaryButton)`
+const SearchButton = styled(Button)`
   height: 40px;
   margin-left: 4px;
 `
@@ -243,6 +243,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
             return (
               <DropDownItem
                 id={`locationOption${item.id}`}
+                data-testid={`locationOption${item.id}`}
                 key={item.id}
                 onClick={() => this.dropDownItemSelect(item)}
               >
@@ -321,6 +322,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
           </Wrapper>
           {this.props.searchButtonHandler && (
             <SearchButton
+              type="primary"
               id="location-search-btn"
               onClick={this.props.searchButtonHandler}
               disabled={
@@ -345,3 +347,5 @@ export class LocationSearch extends React.Component<IProps, IState> {
     )
   }
 }
+
+export type { IProps as ILocationSearchProps }

@@ -79,7 +79,8 @@ import {
   isHiddenFieldType,
   isImageViewFieldType,
   isAutocompleteFieldType,
-  isUserRoleFieldType
+  isUserRoleFieldType,
+  todayISO
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -125,6 +126,7 @@ import { NumberWithUnit } from '@client/v2-events/features/events/registered-fie
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
+import { liveAnchorDate } from '@client/v2-events/utils'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -173,6 +175,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBlur: (formikFieldId: string, newTouched?: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
+  searchMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
   attachmentPath: string
@@ -224,7 +227,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
     ocrvsFullForm,
     disabled,
     attachmentPath,
-    readonlyMode
+    readonlyMode,
+    searchMode
   } = props
   const intl = useIntl()
   const [input, meta] = useField<FieldValue>(name)
@@ -254,6 +258,26 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   function handleBlur<E>(_: React.FocusEvent<E>) {
     onBlur(name)
+  }
+
+  /**
+   * The date a location field resolves its options against. Fields that opt
+   * in via `anchorToDateOfEvent` anchor to the event's date-of-event field
+   * (read live off the form being filled in, falling back to the record's
+   * creation date); all others keep resolving against today, unchanged.
+   */
+  function resolveLocationAnchor(configuration?: {
+    anchorToDateOfEvent?: boolean
+  }) {
+    if (!configuration?.anchorToDateOfEvent) {
+      return todayISO()
+    }
+
+    return liveAnchorDate({
+      dateOfEvent: eventConfig?.dateOfEvent,
+      form: { ...validatorContext.baseFormState, ...ocrvsFullForm },
+      createdAt: validatorContext.event?.document.createdAt ?? todayISO()
+    })
   }
 
   const inputProps = {
@@ -296,10 +320,26 @@ export const GeneratedInputField = <T extends FieldConfig>(
       // only forward error if it is coming from the group custom validations
       error: typeof error === 'string' ? error : ''
     }
+
+    /*
+     * A group's subfields reference each other by their own ids — `partOf` on an
+     * admin level, or the SHOW conditional on a street field waiting for a
+     * district. e.g: `not(field('district').isUndefined())`.
+     * Those ids do not exist in the outer form, where the whole group
+     * sits under a single key, so the group's own values are laid over it to
+     * give the subfields the scope they expect.
+     */
+    const groupValue: Record<string, FieldValue> = field.value ?? {}
+
+    const groupScope = {
+      ...ocrvsFullForm,
+      ...groupValue
+    }
+
     return (
       <InputField {...parentInputFieldProps}>
         {field.config.fields.map((subfield) => {
-          if (!isFieldVisible(subfield, ocrvsFullForm, validatorContext)) {
+          if (!isFieldVisible(subfield, groupScope, validatorContext)) {
             return null
           }
           const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
@@ -313,6 +353,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
                 {...props}
                 fieldDefinition={subfield}
                 name={subfieldFullName}
+                ocrvsFullForm={groupScope}
               />
             </FormItem>
           )
@@ -744,9 +785,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps} htmlFor={name}>
         <AdministrativeArea.Input
           {...inputProps}
+          anchor={resolveLocationAnchor(field.config.configuration)}
           configuration={field.config.configuration}
           eventType={eventConfig?.id}
           partOf={typeof partOf === 'string' ? partOf : null}
+          searchMode={searchMode}
           value={field.value}
         />
       </InputField>
@@ -758,9 +801,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={resolveLocationAnchor(field.config.configuration)}
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={field.config.configuration?.locationTypes}
+          searchMode={searchMode}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -774,6 +819,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={todayISO()}
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={['CRVS_OFFICE']}
@@ -790,6 +836,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={todayISO()}
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={['CRVS_OFFICE']}
@@ -915,9 +962,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Search.Input
           key={name}
           configuration={field.config.configuration}
+          disabled={inputProps.disabled}
           form={ocrvsFullForm}
           helperText={fieldDefinition.helperText}
           label={inputLabel}
+          placeholder={inputProps.placeholder}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />

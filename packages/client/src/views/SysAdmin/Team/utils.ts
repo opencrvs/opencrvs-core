@@ -11,9 +11,11 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { MessageDescriptor } from 'react-intl'
 import {
-  AdministrativeArea,
+  ClientAdministrativeArea,
   UUID,
-  getAdministrativeAreaHierarchy
+  getAdministrativeAreaHierarchy,
+  resolveVersion,
+  todayISO
 } from '@opencrvs/commons/client'
 
 export enum UserStatus {
@@ -66,16 +68,20 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
 }
 
 export const getAddressNameV2 = (
-  administrativeAreas: Map<UUID, AdministrativeArea>,
-  administrativeArea?: AdministrativeArea
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
+  administrativeArea?: ClientAdministrativeArea
 ): string => {
   if (!administrativeArea) {
     return ''
   }
-  const { name, parentId } = administrativeArea
 
-  if (!parentId) {
-    return name
+  // Team/user administration is a present-tense surface — today's names.
+  const today = todayISO()
+  const nameToday = (area: ClientAdministrativeArea) =>
+    resolveVersion(area.versions, today).name
+
+  if (!administrativeArea.parentId) {
+    return nameToday(administrativeArea)
   }
 
   const hierarchy = getAdministrativeAreaHierarchy(
@@ -83,7 +89,7 @@ export const getAddressNameV2 = (
     administrativeAreas
   )
 
-  return hierarchy.map((area) => area.name).join(', ')
+  return hierarchy.map((area) => nameToday(area)).join(', ')
 }
 
 export function getUserAuditDescription(

@@ -9,9 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { createRequire } from 'node:module'
 import type { StorybookConfig } from '@storybook/react-vite'
-
 import { join, dirname } from 'path'
+
+const require = createRequire(import.meta.url)
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -25,10 +28,9 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: [
     getAbsolutePath('@storybook/addon-onboarding'),
-    getAbsolutePath('@storybook/addon-essentials'),
     getAbsolutePath('@chromatic-com/storybook'),
-    getAbsolutePath('@storybook/addon-interactions'),
-    'storybook-addon-source-link'
+    'storybook-addon-source-link',
+    getAbsolutePath('@storybook/addon-docs')
   ],
   framework: {
     name: getAbsolutePath('@storybook/react-vite'),
@@ -45,11 +47,12 @@ const config: StorybookConfig = {
       const list = Array.isArray(plugins) ? plugins : [plugins]
       return !list
         .filter(
-          (plugin): plugin is Plugin =>
+          (plugin): plugin is { name: string } =>
             typeof plugin === 'object' && plugin !== null && 'name' in plugin
         )
         .some((plugin) => plugin.name.startsWith('vite-plugin-pwa'))
     })
+
     return config
   }
 }

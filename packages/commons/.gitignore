@@ -9,8 +9,10 @@
 # production
 /build
 
-# development
-.wireit
+# typecheck-only output of `test:compilation` (tsc -b needs an outDir but
+# nothing consumes it); kept out of /build so it cannot collide with the
+# nx-cached outputs of the `build` target
+/.tsc-tests
 
 # misc
 .DS_Store

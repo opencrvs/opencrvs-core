@@ -18,20 +18,19 @@ import {
   Alert,
   InputField,
   Link,
-  ListViewItemSimplified,
-  ListViewSimplified,
+  List,
   Pill,
   Select,
   Spinner,
   Stack,
   TextInput,
   Toast,
+  Dialog,
   ToggleMenu
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -302,11 +301,11 @@ export function SystemList() {
 
         {isLoading && <Spinner id="system-list-spinner" size={24} />}
 
-        <ListViewSimplified>
+        <List>
           {integrations.map((integration: IntegrationItem) => {
             const user = users.find((user) => user.id === integration.createdBy)
             return (
-              <ListViewItemSimplified
+              <List.Item
                 key={integration.id}
                 actions={
                   <>
@@ -365,18 +364,16 @@ export function SystemList() {
               />
             )
           })}
-        </ListViewSimplified>
+        </List>
       </Content>
 
       {/* Client Details Modal */}
       {clientDetails && (
-        <ResponsiveModal
+        <Dialog
           title={intl.formatMessage(integrationMessages.clientDetails)}
-          autoHeight={true}
+          variant="large"
           width={512}
-          titleHeightAuto={true}
-          show={true}
-          handleClose={() => setClientDetails(null)}
+          onClose={() => setClientDetails(null)}
           actions={[
             <Button
               type="tertiary"
@@ -408,19 +405,17 @@ export function SystemList() {
               </ScopeList>
             </Stack>
           </Stack>
-        </ResponsiveModal>
+        </Dialog>
       )}
 
       {/* Toggle Activation Modal */}
       {toggleActivation.integration && (
-        <ResponsiveModal
+        <Dialog
           title={
             toggleActivation.integration.status === 'active'
               ? intl.formatMessage(integrationMessages.deactivateClient)
               : intl.formatMessage(integrationMessages.activateClient)
           }
-          contentHeight={50}
-          responsive={false}
           actions={[
             <Button
               type="tertiary"
@@ -440,21 +435,18 @@ export function SystemList() {
               {intl.formatMessage(buttonMessages.confirm)}
             </Button>
           ]}
-          show={true}
-          handleClose={() => setToggleActivation({ integration: null })}
+          onClose={() => setToggleActivation({ integration: null })}
         >
           {toggleActivation.integration.status === 'active'
             ? intl.formatMessage(integrationMessages.deactivateClientText)
             : intl.formatMessage(integrationMessages.activateClientText)}
-        </ResponsiveModal>
+        </Dialog>
       )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm.integration && (
-        <ResponsiveModal
+        <Dialog
           title={intl.formatMessage(integrationMessages.delete)}
-          contentHeight={50}
-          responsive={false}
           actions={[
             <Button
               type="tertiary"
@@ -474,25 +466,23 @@ export function SystemList() {
               {intl.formatMessage(integrationMessages.delete)}
             </Button>
           ]}
-          show={true}
-          handleClose={() => setDeleteConfirm({ integration: null })}
+          onClose={() => setDeleteConfirm({ integration: null })}
         >
           <FormattedMessage {...integrationMessages.deleteSystemText} />
-        </ResponsiveModal>
+        </Dialog>
       )}
 
       {/* Reveal Keys Modal */}
-      <ResponsiveModal
+      <Dialog
         actions={[
           <Link key="cancel-link" onClick={closeRevealKeys}>
             {intl.formatMessage(buttonMessages.cancel)}
           </Link>
         ]}
-        autoHeight={true}
+        variant="large"
         width={512}
-        titleHeightAuto={true}
-        show={revealKeys.visible}
-        handleClose={closeRevealKeys}
+        isOpen={revealKeys.visible}
+        onClose={closeRevealKeys}
         title={revealKeys.integration?.name ?? ''}
       >
         <Text variant="reg16" element="p" id="revealKeyId">
@@ -560,10 +550,10 @@ export function SystemList() {
             </Stack>
           </Stack>
         )}
-      </ResponsiveModal>
+      </Dialog>
 
       {/* Create Client Modal */}
-      <ResponsiveModal
+      <Dialog
         actions={
           createResult
             ? []
@@ -591,11 +581,10 @@ export function SystemList() {
                 </Button>
               ]
         }
+        variant="large"
         width={512}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
-        handleClose={() => {
+        isOpen={showModal}
+        onClose={() => {
           toggleModal()
           clearNewSystemDraft()
           resetCreate()
@@ -767,7 +756,7 @@ export function SystemList() {
             </Stack>
           </Stack>
         )}
-      </ResponsiveModal>
+      </Dialog>
 
       {createError && (
         <Toast

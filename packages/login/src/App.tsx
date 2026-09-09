@@ -21,7 +21,8 @@ import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ForgottenItem } from './views/ResetCredentialsForm/ForgottenItemForm'
 import { AuthDetailsVerification } from './views/ResetCredentialsForm/AuthDetailsVerificationForm'
-import { RecoveryCodeEntry } from './views/ResetCredentialsForm/RecoveryCodeEntryForm'
+import { RecoveryInstructionsSent } from './views/ResetCredentialsForm/RecoveryInstructionsSentPage'
+import { RecoveryLinkLanding } from './views/ResetCredentialsForm/RecoveryLinkLandingPage'
 import { SecurityQuestion } from './views/ResetCredentialsForm/SecurityQuestionForm'
 import { UpdatePassword } from './views/ResetCredentialsForm/UpdatePasswordForm'
 import { Page } from './Page'
@@ -89,10 +90,18 @@ export const routesConfig = [
         )
       },
       {
-        path: routes.RECOVERY_CODE_ENTRY,
+        path: routes.RECOVERY_LINK_SENT,
         element: (
           <PageContainer>
-            <RecoveryCodeEntry />
+            <RecoveryInstructionsSent />
+          </PageContainer>
+        )
+      },
+      {
+        path: routes.RECOVERY_LINK_LANDING,
+        element: (
+          <PageContainer>
+            <RecoveryLinkLanding />
           </PageContainer>
         )
       },

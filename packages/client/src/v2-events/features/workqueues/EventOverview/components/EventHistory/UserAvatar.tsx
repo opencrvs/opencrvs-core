@@ -11,8 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { User } from '@opencrvs/commons/client'
-import { Avatar, Maybe } from '@client/utils/gateway'
-import { AvatarSmall } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { getUsersFullName } from '@client/v2-events/utils'
 
 const NameAvatar = styled.div`
@@ -32,14 +31,14 @@ export function UserAvatar({
   avatar
 }: {
   names: User['name'] | string
-  avatar?: string | undefined | null
+  avatar?: User['avatar'] | null
 }) {
   const name = typeof names === 'string' ? names : getUsersFullName(names)
 
   return (
     <NameAvatar>
-      <AvatarSmall avatar={avatar} name={name} />
-      <span>{name}</span>
+      <Avatar aria-hidden name={name} size="sm" src={avatar} />
+      <span data-testid="user-name">{name}</span>
     </NameAvatar>
   )
 }

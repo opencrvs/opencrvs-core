@@ -1,0 +1,111 @@
+{{- if .Values.network_policy.enabled }}
+{{- $ingress_mode := .Values.network_policy.ingress_mode | default "deny" -}}
+{{- $egress_mode := .Values.network_policy.egress_mode | default "deny" -}}
+{{- $deny_ingress := ne $ingress_mode "full" -}}
+{{- $deny_egress := ne $egress_mode "full" -}}
+{{- $private_cidrs := list "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" -}}
+
+{{- if or $deny_ingress $deny_egress }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  {{- if $deny_ingress }}
+    - Ingress
+  {{- end }}
+  {{- if $deny_egress }}
+    - Egress
+  {{- end }}
+{{- if eq $ingress_mode "deny" }}
+  ingress: []
+{{- end }}
+{{- if eq $ingress_mode "private" }}
+  ingress:
+    - from:
+        {{- range $private_cidrs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+{{- end }}
+{{- if eq $egress_mode "deny" }}
+  egress: []
+{{- end }}
+{{- if eq $egress_mode "private" }}
+  egress:
+    - to:
+        {{- range $private_cidrs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+{{- end }}
+{{- end }}
+
+{{- if and .Values.network_policy.allow_same_namespace (or $deny_ingress $deny_egress) }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-allow-same-namespace
+spec:
+  podSelector: {}
+  policyTypes:
+  {{- if $deny_ingress }}
+    - Ingress
+  {{- end }}
+  {{- if $deny_egress }}
+    - Egress
+  {{- end }}
+{{- if $deny_ingress }}
+  ingress:
+    - from:
+        - podSelector: {}
+{{- end }}
+{{- if $deny_egress }}
+  egress:
+    - to:
+        - podSelector: {}
+{{- end }}
+{{- end }}
+
+{{- if and $deny_egress .Values.network_policy.allowed_namespaces }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-allow-egress-namespaces
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        {{- range .Values.network_policy.allowed_namespaces }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ . }}
+        {{- end }}
+{{- end }}
+
+{{- if $deny_egress }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-allow-dns
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}
+
+{{- end }}

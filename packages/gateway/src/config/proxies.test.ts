@@ -34,29 +34,30 @@ const makeArgs = (payload: unknown, path: string) => {
 }
 
 describe('rate-limited auth proxy', () => {
-  // Every nonce-keyed auth route added to close the brute-force / SMS-flooding
-  // pentest findings. Keep this list in sync with `rateLimitedAuthProxy`.
-  const nonceKeyedRoutes = [
-    ['verifyCode', '/auth/verifyCode'],
-    ['resendAuthenticationCode', '/auth/resendAuthenticationCode'],
-    ['verifyNumber', '/auth/verifyNumber'],
-    ['verifySecurityAnswer', '/auth/verifySecurityAnswer'],
-    ['sendUserName', '/auth/sendUserName'],
-    ['changePassword', '/auth/changePassword']
+  // Every payload-keyed auth route added to close the brute-force /
+  // SMS-flooding pentest findings, with the payload field each one keys on.
+  // Keep this list in sync with `rateLimitedAuthProxy`.
+  const keyedRoutes = [
+    ['verifyCode', '/auth/verifyCode', 'nonce'],
+    ['resendAuthenticationCode', '/auth/resendAuthenticationCode', 'nonce'],
+    ['verifySecurityAnswer', '/auth/verifySecurityAnswer', 'nonce'],
+    ['sendUserName', '/auth/sendUserName', 'nonce'],
+    ['changePassword', '/auth/changePassword', 'nonce'],
+    ['verifyRecoveryToken', '/auth/verifyRecoveryToken', 'token']
   ] as const
 
-  it.each(nonceKeyedRoutes)(
-    'proxies %s when the nonce key is present',
-    (name, path) => {
+  it.each(keyedRoutes)(
+    'proxies %s when the %s key is present',
+    (name, path, keyField) => {
       const route = rateLimitedAuthProxy[name]
-      const result = route.handler(...makeArgs({ nonce: 'abc123' }, path))
+      const result = route.handler(...makeArgs({ [keyField]: 'abc123' }, path))
 
       expect(result).toBe('PROXIED')
     }
   )
 
-  it.each(nonceKeyedRoutes)(
-    'throws on %s when the nonce key is missing (fails closed)',
+  it.each(keyedRoutes)(
+    'throws on %s when the %s key is missing (fails closed)',
     (name, path) => {
       const route = rateLimitedAuthProxy[name]
 
@@ -66,12 +67,22 @@ describe('rate-limited auth proxy', () => {
     }
   )
 
+  it('does not proxy verifyRecoveryToken when a different payload field carries the token', () => {
+    const route = rateLimitedAuthProxy.verifyRecoveryToken
+
+    // Guards the key name itself: keying on anything the client does not send
+    // would put every request in one bucket, or none.
+    expect(() =>
+      route.handler(...makeArgs({ nonce: 'abc123' }, '/auth/verifyRecoveryToken'))
+    ).toThrow("Couldn't find the value for a rate limiting key in payload")
+  })
+
   it('registers every rate-limited auth route before the catch-all is reachable', () => {
     const paths = getRoutes().map((route) => route.path)
 
     // Each must have a dedicated route; otherwise it falls through to the
     // unthrottled `/auth/{suffix}` catch-all (the original pentest finding).
-    for (const [, path] of nonceKeyedRoutes) {
+    for (const [, path] of keyedRoutes) {
       expect(paths).toContain(path)
     }
     expect(paths).toContain('/auth/{suffix}')

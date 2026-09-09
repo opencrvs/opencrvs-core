@@ -10,7 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import React, { useCallback } from 'react'
-import { useIntl } from 'react-intl'
+
 import {
   ActionType,
   EventIndex,
@@ -19,11 +19,12 @@ import {
   getOrThrow,
   WorkqueueActionType,
   AssignmentStatus,
-  getAssignmentStatus
+  getAssignmentStatus,
+  todayISO
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { getUsersFullName } from '@client/v2-events/utils'
+import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useModal } from '@client/hooks/useModal'
@@ -84,6 +85,8 @@ export function useEventActionsOnClick(event: EventIndex) {
           return onQuickAction(ActionType.REGISTER, backTo)
         case ActionType.ARCHIVE:
           return onQuickAction(ActionType.ARCHIVE, backTo)
+        case ActionType.UNARCHIVE:
+          return onQuickAction(ActionType.UNARCHIVE, backTo)
         case ActionType.PRINT_CERTIFICATE:
           clearEphemeralFormState()
           return navigate(
@@ -180,7 +183,7 @@ export function useAssignmentActions(event: EventIndex) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
-  const intl = useIntl()
+
   const { getUsers } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -191,8 +194,11 @@ export function useAssignmentActions(event: EventIndex) {
     ? getUsersFullName(assignedToUser.data.name)
     : null
   const assignedOffice = assignedToUser.data?.primaryOfficeId
-  const assignedOfficeName =
-    (assignedOffice && locations.get(assignedOffice)?.name) || ''
+  // Assigned office is a present-tense surface — today's name.
+  const assignedOfficeName = resolveLocationName(
+    assignedOffice ? locations.get(assignedOffice) : undefined,
+    todayISO()
+  )
   const [modal, openModal] = useModal()
 
   const onAssign = useCallback(async () => {

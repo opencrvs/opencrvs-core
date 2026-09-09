@@ -1,2 +1,2 @@
-yarn check:license
-yarn lint-staged
+pnpm check:license
+pnpm lint-staged

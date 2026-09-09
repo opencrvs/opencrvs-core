@@ -89,8 +89,7 @@ test('Prevents changing user who is located outside callers jurisdiction', async
       name: 'top-level-location',
       administrativeAreaId: null,
       id: topLevelLocationId,
-      locationType: 'EMBASSY',
-      validUntil: null
+      locationType: 'EMBASSY'
     }
   ])
 
@@ -135,8 +134,7 @@ test('Allows changing primaryOfficeId when user.edit scope covers both old and n
       name: 'top-level-location',
       administrativeAreaId: null,
       id: topLevelLocationId,
-      locationType: 'EMBASSY',
-      validUntil: null
+      locationType: 'EMBASSY'
     }
   ])
 
@@ -183,6 +181,22 @@ test('throws CONFLICT with DUPLICATE_EMAIL if email is already in use by another
   ).rejects.toMatchObject(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
   )
+})
+
+test("allows update when the email is only a substring of another user's email", async () => {
+  const { user, users } = await setupTestCase()
+  const [, secondUser] = users
+
+  await updateUserById(secondUser.id, { email: 'ba@x.com' })
+
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update({
+      ...generateUpdateInput(user),
+      email: 'a@x.com'
+    })
+  ).resolves.not.toThrow()
 })
 
 test("allows update when mobile is the same user's own mobile", async () => {
@@ -289,7 +303,7 @@ test('Does not trigger username change when name is not provided', async () => {
   const mock = vi.fn()
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/user-updated`,
       async ({ request }) => {
         const req = await request.json()
         mock(req)
@@ -353,7 +367,7 @@ test('Changes username when the name changes and notifies about it', async () =>
   const mock = vi.fn()
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/user-updated`,
       async ({ request }) => {
         const req = await request.json()
         mock(req)

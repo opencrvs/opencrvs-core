@@ -65,9 +65,6 @@ const tennisClubMembershipEventWithCustomAction = {
   ])
 }
 
-/** Token the mocked auth service hands out for anonymous (userless) callers. */
-export const ANONYMOUS_TOKEN = 'anonymous-token'
-
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
     `${env.DOCUMENTS_URL}/presigned-urls`,
@@ -128,22 +125,21 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
-  http.post(`${env.COUNTRY_CONFIG_URL}/triggers/user/:event`, () =>
+  http.post(`${env.COUNTRY_CONFIG_URL}/trigger/user/:event`, () =>
     HttpResponse.json({})
   ),
+  http.post(`${env.COUNTRY_CONFIG_URL}/trigger/telemetry`, () =>
+    HttpResponse.json({ status: 'forwarded' }, { status: 202 })
+  ),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
-  // query params such as `subject_token`, `subject_token_type` omitted for simplicity
+  // body params such as `subject_token`, `subject_token_type` omitted for simplicity
   http.post(`${env.AUTH_URL}/token`, () =>
     HttpResponse.json({
       access_token: 'some-token'
     })
   ),
-  // The announcement worker fetches this before dispatching a broadcast, since
-  // no user is involved. Without a handler the call escapes to a real auth
-  // service, so the test only passes on machines where one happens to be
-  // running.
-  http.get(`${env.AUTH_URL}/internal/anonymous-token`, () =>
-    HttpResponse.json({ token: ANONYMOUS_TOKEN })
+  http.get(`${env.AUTH_URL}/internal/service-token`, () =>
+    HttpResponse.json({ token: 'service-token' })
   )
 ]
 

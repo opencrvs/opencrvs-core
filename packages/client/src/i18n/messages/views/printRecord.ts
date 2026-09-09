@@ -11,32 +11,6 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
-  warningDeclarationDetails: {
-    id: 'print.declaration.warning.declarationDetails',
-    defaultMessage: 'To be completed by office',
-    description: 'Warning text that shows before declaration details'
-  },
-  civilRegistrationCentre: {
-    id: 'print.declaration.header.title',
-    defineMessage: 'Civil Registration Centre',
-    description: 'Print record header message'
-  },
-  informantAttestation: {
-    id: 'print.declaration.informantAttestation',
-    defaultMessage:
-      'I attest to having received this {eventType, select, birth{birth} death{death} marriage{marriage} other{}} declaration',
-    description: 'Text for declaration details table entry'
-  },
-  placeOfDeclaration: {
-    id: 'print.declaration.placeOfDeclaration',
-    defaultMessage: 'Place of declaration',
-    description: 'Label for declaration details table entry'
-  },
-  civilRegistrationOffice: {
-    id: 'print.declaration.civilRegistrationOffice',
-    defaultMessage: 'Civil registration office',
-    description: 'Label for declaration details table entry'
-  }
 }
 
 export const printRecordMessages = defineMessages(messagesToDefine)

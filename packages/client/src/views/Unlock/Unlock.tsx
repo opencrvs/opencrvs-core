@@ -28,7 +28,7 @@ import {
 import { connect } from 'react-redux'
 import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
-import { AvatarLarge } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box, Stack, Text, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -200,9 +200,10 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           </LogoutButton>
 
           <Content direction="column" gap={16} justifyContent="flex-start">
-            <AvatarLarge
+            <Avatar
               name={getUserName(userDetails)}
-              avatar={userDetails?.avatar}
+              size="xl"
+              src={userDetails?.avatar}
             />
             <EnterPinLabel />
             <PINKeypad

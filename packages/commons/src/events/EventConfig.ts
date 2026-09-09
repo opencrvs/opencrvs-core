@@ -17,6 +17,9 @@ import { DeclarationFormConfig, DeclarationFormConfigInput } from './FormConfig'
 import { FieldReference } from './FieldConfig'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
 import { FlagConfig } from './Flag'
+import { Conditional } from './Conditional'
+import type { JSONSchema } from '../conditionals/conditionals'
+import { AvailableIcons } from '../icons'
 import {
   validateActionOrder,
   validateActionFlags,
@@ -45,6 +48,7 @@ export type EventConfig = {
   advancedSearch: AdvancedSearchConfig[]
   flags: FlagConfig[]
   analytics: boolean
+  icon?: Partial<Record<AvailableIcons, JSONSchema>>
 }
 
 export type EventConfigInput = Omit<
@@ -131,6 +135,12 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
     .default(true)
     .describe(
       'Indicates whether the records of this event type are included in analytics'
+    ),
+  icon: z
+    .partialRecord(AvailableIcons, Conditional)
+    .optional()
+    .describe(
+      'Maps an icon name to a conditional. The icon of the first entry (in definition order) whose conditional matches the event is used when rendering it (e.g. in the "iconWithName"/"iconWithNameEvent" workqueue columns). Falls back to the default status-based icon when unset or when no conditional matches.'
     )
 })
 

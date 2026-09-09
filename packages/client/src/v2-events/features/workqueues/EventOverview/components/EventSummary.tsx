@@ -10,23 +10,32 @@
  */
 
 import React from 'react'
-import { Summary } from '@opencrvs/components/lib/Summary'
+import { List } from '@opencrvs/components/lib/List'
 import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
   getMixedPath,
   EventIndex,
-  EventDocument
+  EventDocument,
+  isFieldSecured,
+  FieldValue
 } from '@opencrvs/commons/client'
-import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
+import { InfoBox } from './InfoBox'
 
 const messages = {
+  /** Names the bar shown in place of a value the reader may not see. */
+  redacted: {
+    id: 'event.summary.redacted',
+    defaultMessage: 'Hidden',
+    description: 'Accessible name for a value the user is not permitted to see'
+  },
   assignedTo: {
     label: {
       id: 'event.summary.assignedTo.label',
@@ -128,23 +137,26 @@ export function EventSummary({
   eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validationContext = useValidatorContext(eventDocument)
+  const validatorContext = useValidatorContext(eventDocument)
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
-    .filter(({ secured }) => secured)
+    .filter((declarationField) =>
+      isFieldSecured(declarationField, eventIndex, validatorContext)
+    )
     .map(({ id }) => id)
 
+  const visibleBanners = (summary.banners ?? []).filter(
+    (banner) =>
+      !banner.conditionals ||
+      banner.conditionals.length === 0 ||
+      areConditionsMet(banner.conditionals, event, validatorContext, eventIndex)
+  )
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
-      !areConditionsMet(
-        field.conditionals,
-        event,
-        validationContext,
-        eventIndex
-      )
+      !areConditionsMet(field.conditionals, event, validatorContext, eventIndex)
     ) {
       return null
     }
@@ -162,9 +174,10 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
-        secured: config.secured ?? false,
+        secured: isFieldSecured(config, eventIndex, validatorContext),
         value: (
           <Output
+            anchor={recordAnchorDate(eventIndex)}
             eventConfig={eventConfiguration}
             field={config}
             value={value}
@@ -197,8 +210,21 @@ export function EventSummary({
 
   return (
     <>
-      <Summary id="summary">
-        <Summary.Row
+      {visibleBanners.map((banner, index) => (
+        <InfoBox
+          key={index}
+          background={banner.background}
+          data-testid={`summary-info-box-${index}`}
+          description={
+            banner.description && intl.formatMessage(banner.description)
+          }
+          heading={intl.formatMessage(banner.heading)}
+          icon={banner.icon}
+          type={banner.type}
+        />
+      ))}
+      <List id="summary" redactedLabel={intl.formatMessage(messages.redacted)}>
+        <List.Item
           key="assignedTo"
           data-testid="assignedTo"
           label={intl.formatMessage(messages.assignedTo.label)}
@@ -207,26 +233,26 @@ export function EventSummary({
           )}
           value={intl.formatMessage(messages.assignedTo.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
           value={intl.formatMessage(messages.status.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="flags"
           data-testid="flags"
           label={intl.formatMessage(messages.flags.label)}
           placeholder={intl.formatMessage(messages.flags.placeholder)}
           value={flagLabels}
         />
-        <Summary.Row
+        <List.Item
           key="event"
           data-testid="event"
           label={intl.formatMessage(messages.event.label)}
           value={intl.formatMessage(eventLabelMessage)}
         />
-        <Summary.Row
+        <List.Item
           key="tracking-id"
           data-testid="tracking-id"
           label={intl.formatMessage(messages.trackingId.label)}
@@ -235,7 +261,7 @@ export function EventSummary({
           )}
           value={intl.formatMessage(messages.trackingId.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="registrationNumber"
           data-testid="registrationNumber"
           label={intl.formatMessage(messages.registrationNumber.label)}
@@ -247,19 +273,19 @@ export function EventSummary({
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
           .map((field) => (
-            <Summary.Row
+            <List.Item
               key={field.id}
               data-testid={field.id}
               label={intl.formatMessage(field.label)}
-              locked={field.secured && hideSecuredFields}
               placeholder={
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
+              redacted={field.secured && hideSecuredFields}
               value={field.value}
             />
           ))}
-      </Summary>
+      </List>
     </>
   )
 }

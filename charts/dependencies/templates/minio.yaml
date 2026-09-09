@@ -86,6 +86,7 @@ spec:
       labels:
         app: minio
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 6 }}
     {{- if .Values.priority_class.enabled }}
       priorityClassName: {{ .Values.priority_class.name }}
     {{- end }}
@@ -111,7 +112,7 @@ spec:
             - --console-address
             - :3536
             - /data
-          image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
+          image: {{ include "opencrvs.imageReference" .Values.minio }}
           name: minio
           env:
             - name: MINIO_BROWSER_REDIRECT_URL
@@ -142,7 +143,7 @@ spec:
             - mountPath: /data
               name: minio
       {{- if eq (include "minio.use_rsync" .) "true" }}
-        - image: eeacms/rsync:3.0
+        - image: {{ include "opencrvs.imageReference" .Values.utilities }}
           name: rsync
           command: ["sleep", "infinity"]
           env:
@@ -156,14 +157,11 @@ spec:
                 {{- end }}
                   key: user
             - name: BACKUP_HOST
-              valueFrom:
-                secretKeyRef:
-                {{- if (eq (include "minio.backup_enabled" .) "true") }}
-                  name: {{ default .Values.backup.backup_server_secret .Values.minio.backup.server_secret}}
-                {{- else }}
-                  name: {{ default .Values.restore.backup_server_secret .Values.minio.restore.server_secret}}
-                {{- end }}
-                  key: host
+              {{- if (eq (include "minio.backup_enabled" .) "true") }}
+              value: {{ default .Values.backup.host .Values.minio.backup.host }}
+              {{- else }}
+              value: {{ default .Values.restore.host .Values.minio.restore.host }}
+              {{- end }}
             - name: BACKUP_REMOTE_DIR
               {{- if (eq (include "minio.backup_enabled" .) "true") }}
               value: {{ default .Values.backup.backup_server_dir .Values.minio.backup.server_dir }}
@@ -185,7 +183,7 @@ spec:
             claimName: minio
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.minio.host_data_path | default "/data/minio" }}
+            path: {{ .Values.minio.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
       {{- if eq (include "minio.use_rsync" .) "true" }}
@@ -203,4 +201,6 @@ spec:
               - key: ssh_key
                 path: id_rsa
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "minio"  "Values" .Values) }}
 {{- end }}

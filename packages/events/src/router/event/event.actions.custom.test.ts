@@ -21,9 +21,7 @@ import {
 import {
   sanitizeForSnapshot,
   setupTestCase,
-  UNSTABLE_EVENT_FIELDS
-} from '@events/tests/utils'
-import {
+  UNSTABLE_EVENT_FIELDS,
   createTestClient,
   createCountryConfigClient
 } from '@events/tests/utils'
@@ -179,6 +177,45 @@ describe('event.actions.custom', () => {
     ).rejects.toMatchSnapshot()
   })
 
+  test('returns HTTP409 if trying to execute an action on a draft, since it would destroy the draft', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+      }),
+      encodeScope({
+        type: 'record.read',
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+      }),
+      encodeScope({
+        type: 'record.custom-action',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP],
+          customActionTypes: [CUSTOM_ACTION_TYPE]
+        }
+      })
+    ])
+
+    // The event is only created, never declared, so it stays in CREATED state.
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.custom.request({
+        type: ActionType.CUSTOM,
+        eventId: event.id,
+        transactionId: getUUID(),
+        customActionType: CUSTOM_ACTION_TYPE,
+        annotation: { notes: 'Confirmed membership' }
+      })
+    ).rejects.toMatchObject({
+      code: 'CONFLICT',
+      message: expect.stringContaining(
+        `Action 'CUSTOM' cannot be performed on an event in 'CREATED' state`
+      )
+    })
+  })
+
   test('returns HTTP409 if trying to execute an action where the condition is not met', async () => {
     const { client, payload } = await initialiseTest(
       [
@@ -257,7 +294,6 @@ describe('event.actions.custom', () => {
         http.post<never, { actionId: string }>(
           `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/CUSTOM`,
           () => {
-            // @ts-expect-error - For some reason the msw types here complain about the status, even though this is correct
             return HttpResponse.json({}, { status })
           }
         )

@@ -13,7 +13,7 @@ import { start, stop } from './redis'
 
 const REDIS_HTTP_PORT = 6379
 
-const container = new GenericContainer('redis:5')
+const container = new GenericContainer('redis:8')
 
 export const startContainer = async () => {
   const testContainer = await container

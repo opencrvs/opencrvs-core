@@ -10,7 +10,7 @@
  */
 
 import { getTheme } from '@opencrvs/components/lib/theme'
-import type { Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react-vite'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import React, { PropsWithChildren } from 'react'
 
@@ -34,7 +34,8 @@ import {
   addUserToQueryData,
   setEventData,
   addLocalEventConfig,
-  setDraftData
+  setDraftData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   ActionType,
@@ -143,7 +144,7 @@ export const parameters = {
     handlers
   },
   viewport: {
-    viewports: {
+    options: {
       mobile: {
         name: 'Mobile',
         styles: {
@@ -158,8 +159,7 @@ export const parameters = {
           height: '1024px'
         }
       }
-    },
-    defaultViewport: 'responsive'
+    }
   }
 }
 
@@ -330,6 +330,7 @@ const preview: Preview = {
 
       offlineEvents.forEach((event) => {
         setEventData(event.id, event)
+        updateLocalEventIndex(event.id, event)
       })
 
       if (options.parameters?.offline?.drafts) {
@@ -356,7 +357,8 @@ const preview: Preview = {
         </Wrapper>
       )
     }
-  ]
+  ],
+  initialGlobals: { viewport: { value: 'responsive' } }
 }
 
 export default preview

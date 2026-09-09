@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from '@opencrvs/commons/client'
+import { V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP } from '@opencrvs/commons/client'
 export {
   getLeafAdministrativeAreaIds,
   useSuspenseGetLeafAdministrativeAreaIds
@@ -18,7 +18,7 @@ export {
 export function useAdministrativeAreas() {
   return {
     getAdministrativeAreas: {
-      useSuspenseQuery: () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      useSuspenseQuery: () => V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
     }
   }
 }

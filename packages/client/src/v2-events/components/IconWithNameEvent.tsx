@@ -13,9 +13,15 @@ import * as React from 'react'
 
 import styled from 'styled-components'
 import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
-import { Stack } from '@opencrvs/components'
-import { InherentFlags } from '@opencrvs/commons/client'
-import { Flex, getIconColor, Icon, IconWithName } from './IconWithName'
+import { Icon as GenericIcon, Stack } from '@opencrvs/components'
+import { AvailableIcons, InherentFlags, Flag } from '@opencrvs/commons/client'
+import {
+  Flex,
+  getIconColor,
+  Icon,
+  IconWithName,
+  STATUS_TO_COLOR_MAP
+} from './IconWithName'
 
 interface IconWithNameEventProps
   extends React.ComponentProps<typeof IconWithName> {
@@ -26,26 +32,43 @@ const Event = styled.div`
   color: ${({ theme }) => theme.colors.grey500};
   ${({ theme }) => theme.fonts.reg16}
 `
+
+export function getEventIcon(
+  flags: Flag[] | undefined,
+  status: keyof typeof STATUS_TO_COLOR_MAP,
+  isArchived: boolean | undefined,
+  isValidatedOnReview: boolean | undefined,
+  iconName?: AvailableIcons
+) {
+  if (iconName) {
+    return <GenericIcon name={iconName} />
+  }
+
+  if (flags?.includes(InherentFlags.POTENTIAL_DUPLICATE)) {
+    return <Duplicate />
+  }
+
+  return (
+    <DeclarationIcon
+      color={getIconColor(status, flags)}
+      isArchive={isArchived}
+      isValidatedOnReview={isValidatedOnReview}
+    />
+  )
+}
 export function IconWithNameEvent({
   status,
   name,
   isValidatedOnReview,
   isArchived,
   flags,
-  event
+  event,
+  iconName
 }: IconWithNameEventProps) {
   return (
     <Flex id="flex">
       <Icon>
-        {flags?.includes(InherentFlags.POTENTIAL_DUPLICATE) ? (
-          <Duplicate />
-        ) : (
-          <DeclarationIcon
-            color={getIconColor(status, flags)}
-            isArchive={isArchived}
-            isValidatedOnReview={isValidatedOnReview}
-          />
-        )}
+        {getEventIcon(flags, status, isArchived, isValidatedOnReview, iconName)}
       </Icon>
       <Stack alignItems="flex-start" direction="column" gap={0}>
         {name}

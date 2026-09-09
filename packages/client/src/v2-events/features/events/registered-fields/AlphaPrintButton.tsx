@@ -46,7 +46,8 @@ interface PrintButtonProps {
 const addedButtonLabel = { id: 'buttons.print', defaultMessage: 'Print' }
 
 /**
- * Indicates that declaration action changed declaration content. Satisfies V1 spec.
+ * Client-only synthetic action appended before certificate rendering, which represents the current printing action.
+ * This allows e.g. current user details to be accessed on the SVG being printed.
  */
 const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
 type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE

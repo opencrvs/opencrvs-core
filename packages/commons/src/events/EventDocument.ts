@@ -42,3 +42,14 @@ export const EventDocument = z
   .meta({ id: 'EventDocument' })
 
 export type EventDocument = z.infer<typeof EventDocument>
+
+export const EventDocumentOnlyLastAction = EventDocument.extend({
+  actions: z
+    .array(Action)
+    .max(1)
+    .describe('Only the last action associated with the event.')
+}).brand('EventDocumentOnlyLastAction')
+
+export type EventDocumentOnlyLastAction = z.infer<
+  typeof EventDocumentOnlyLastAction
+>

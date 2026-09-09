@@ -6,18 +6,20 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "3"
   labels:
-    app: data-migration-analytics
+    app: deployment-jobs
   name: data-migration-analytics
 spec:
   template:
     metadata:
       labels:
-        app: data-migration-analytics
+        app: deployment-jobs
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
       initContainers:
         - name: copy-assets
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
+          imagePullPolicy: {{ .Values.countryconfig.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command:
             - sh
             - -c
@@ -44,7 +46,7 @@ spec:
                 echo "Running ${script}"
                 "${script}"
               done
-          image: {{ .Values.postgres.image }}
+          image: {{ include "opencrvs.imageReference" .Values.postgres }}
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgres.host }}

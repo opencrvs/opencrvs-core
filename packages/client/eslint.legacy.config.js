@@ -39,11 +39,6 @@ module.exports = defineConfig([
     Query component now sends errors automatically to Sentry.`
             },
             {
-              name: '@apollo/client/react/components',
-              importNames: ['Query'],
-              message: `Please use our own <Query /> component instead from components/Query.tsx`
-            },
-            {
               name: 'date-fns',
               message: 'Please use submodules instead'
             },

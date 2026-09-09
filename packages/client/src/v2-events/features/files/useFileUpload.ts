@@ -17,7 +17,7 @@ import {
   joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
@@ -37,6 +37,7 @@ async function uploadFile({
   path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
+  await ensureFreshAccessToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
@@ -70,6 +71,7 @@ async function uploadFile({
  *
  */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
+  await ensureFreshAccessToken()
   /*
    * The path is derived from the event id, which is still temporary when the file is
    * attached before the event has synced (e.g. offline). Actions referring to the file
@@ -105,10 +107,11 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
   return
 }
 
-export const UPLOAD_MUTATION_KEY = 'uploadFile'
+const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  await ensureFreshAccessToken()
   const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {

@@ -11,7 +11,7 @@
         }
       },
       "delete": {
-        "min_age": "2d",
+        "min_age": "{{ .Values.monitoring.logs.retention_days }}d",
         "actions": {
           "delete": {
             "delete_searchable_snapshot": true
@@ -21,7 +21,7 @@
     },
     "_meta": {
       "managed": true,
-      "description": "built-in ILM policy using the hot and warm phases with a retention of 7 days"
+      "description": "built-in ILM policy using the hot and warm phases with a retention of {{ .Values.monitoring.logs.retention_days }} days"
     }
   }
 }

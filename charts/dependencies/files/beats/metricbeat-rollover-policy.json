@@ -2,7 +2,7 @@
   "policy": {
     "_meta": {
       "managed": true,
-      "description": "built-in ILM policy using the hot and warm phases with a retention of 30 days"
+      "description": "built-in ILM policy using the hot and warm phases with a retention of {{ .Values.monitoring.metrics.retention_days }} days"
     },
     "phases": {
       "hot": {
@@ -31,7 +31,7 @@
         }
       },
       "delete": {
-        "min_age": "30d",
+        "min_age": "{{ .Values.monitoring.metrics.retention_days }}d",
         "actions": {
           "delete": {}
         }

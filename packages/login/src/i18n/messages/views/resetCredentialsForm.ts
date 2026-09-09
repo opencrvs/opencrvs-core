@@ -37,36 +37,44 @@ const messagesToDefine = {
     description:
       'Form body header used in the body of email address confirmation step'
   },
-  // Recovery code entry form messages
-  recoveryCodeEntryFormBodyHeader: {
-    id: 'resetCredentials.recoveryCodeEntry.form.body.header',
-    defaultMessage: 'Enter the 6-digit recovery code',
-    description: 'Form body header used for recovery code entry step'
+  // Recovery instructions sent page messages
+  recoveryInstructionsSentTitleEmail: {
+    id: 'resetCredentials.recoveryInstructionsSent.title.email',
+    defaultMessage: 'Check your email',
+    description:
+      'Title for the recovery instructions sent page when notifications are delivered by email'
   },
-  recoveryCodeEntryFormBodySubheaderMobile: {
-    id: 'resetCredentials.recoveryCodeEntry.form.body.subheader',
+  recoveryInstructionsSentTitlePhone: {
+    id: 'resetCredentials.recoveryInstructionsSent.title.phone',
+    defaultMessage: 'Check your phone',
+    description:
+      'Title for the recovery instructions sent page when notifications are delivered by SMS'
+  },
+  recoveryInstructionsSentBody: {
+    id: 'resetCredentials.recoveryInstructionsSent.body',
     defaultMessage:
-      "The recovery code was sent to your phone number. Please enter the code. Didn't receive it? {link}",
+      "If we found an account, you'll receive instructions for {forgottenItem, select, username {retrieving your username} other {resetting your password}}. The link expires in 1 hour.",
     description:
-      'Form body subheader used for recovery code entry step in mobile flow'
+      'Body message for the recovery instructions sent page. Must not assert delivery, since the account may not exist.'
   },
-  recoveryCodeEntryFormBodySubheaderEmail: {
-    id: 'resetCredentials.recoveryCodeEntry.form.body.subheader.email',
-    defaultMessage:
-      "The recovery code was sent to your email. Please enter the code. Didn't receive it? {link}",
+  // Recovery link landing page messages
+  recoveryLinkExpiredTitle: {
+    id: 'resetCredentials.recoveryLinkLanding.expired.title',
+    defaultMessage: 'This link has expired',
     description:
-      'Form body subheader used for recovery code entry step in email flow'
+      'Title shown when a recovery link is invalid, expired, or already used'
   },
-  codeResentTitle: {
-    id: 'resetCredentials.recoveryCodeEntry.codeResent.form.body.header',
-    defaultMessage: 'Verification code resent',
+  recoveryLinkExpiredBody: {
+    id: 'resetCredentials.recoveryLinkLanding.expired.body',
+    defaultMessage: 'This link is no longer valid. Request a new one to continue.',
     description:
-      'The title that appears in step two of the form after resend button click'
+      'Body shown when a recovery link is invalid, expired, or already used. Must not reveal whether the underlying account exists.'
   },
-  resentSMS: {
-    id: 'resetCredentials.recoveryCodeEntry.codeResent.form.body.subheader',
-    defaultMessage: 'We just resent you another code to {number}.',
-    description: 'The message that appears when the resend button is clicked.'
+  recoveryLinkExpiredLinkLabel: {
+    id: 'resetCredentials.recoveryLinkLanding.expired.link',
+    defaultMessage: 'Start again',
+    description:
+      'Link back to the forgotten item form shown on an expired/invalid recovery link'
   },
   // Security question form messages
   securityQuestionFormBodySubheader: {
@@ -153,11 +161,6 @@ const messagesToDefine = {
     defaultMessage: 'Email Address',
     description: 'Label used for email address input field'
   },
-  verificationCodeFieldLabel: {
-    id: 'resetCredentials.label.field.verificationCode',
-    defaultMessage: 'Verification code (6 digits)',
-    description: 'Label used for verification code input field'
-  },
   answerFieldLabel: {
     id: 'resetCredentials.label.field.answer',
     defaultMessage: 'Answer',
@@ -203,26 +206,16 @@ const messagesToDefine = {
     defaultMessage: 'Login',
     description: 'Label used for login button'
   },
+  backToLoginButtonLabel: {
+    id: 'buttons.backToLogin',
+    defaultMessage: 'Back to login',
+    description:
+      'Label used to leave a screen that is waiting on an emailed link, where logging in is not yet possible'
+  },
   error: {
     id: 'label.error',
     defaultMessage: 'Invalid input',
     description: 'Generic error message for invalid form nput'
-  },
-  errorPhoneNumberNotFound: {
-    id: 'error.errorPhoneNumberNotFound',
-    defaultMessage: 'Mobile phone number not found.',
-    description: 'Error message for phone number not found'
-  },
-  errorEmailAddressNotFound: {
-    id: 'error.errorEmailAddressNotFound',
-    defaultMessage: 'Email address not found.',
-    description: 'Error message for email address not found'
-  },
-  resend: {
-    id: 'resend.sms',
-    defaultMessage:
-      'Resend {notificationMethod, select, sms {SMS} email {Email} other {}}',
-    description: 'Text for button that resend SMS or email verification code'
   }
 }
 

@@ -13,12 +13,11 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
   modal: {},
-  onConfirm: ({ eventId, actions }) => {
+  onConfirm: ({ eventId, actions, formValues }) => {
     return actions.register.mutate({
       eventId,
       declaration: {},
-      /** As part of https://github.com/opencrvs/opencrvs-core/issues/11305, we will implement annotation fields to the register modal */
-      annotation: {},
+      annotation: formValues,
       transactionId: uuid()
     })
   }

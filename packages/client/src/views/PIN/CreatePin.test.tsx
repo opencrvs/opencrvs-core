@@ -12,7 +12,7 @@ import * as React from 'react'
 import { createTestComponent } from '@client/tests/util'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { createStore } from '@client/store'
-import { storage } from '@opencrvs/client/src/storage'
+import { storage } from '@client/storage'
 import { ReactWrapper } from 'enzyme'
 import { vi } from 'vitest'
 

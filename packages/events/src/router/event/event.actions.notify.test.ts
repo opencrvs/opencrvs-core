@@ -22,9 +22,11 @@ import {
   encodeScope
 } from '@opencrvs/commons'
 import {
+  createInitialisationTestClient,
   createSystemTestClient,
   createTestClient,
   setupTestCase,
+  systemInitialisationTestSetup,
   TEST_SYSTEM_ID,
   TEST_SYSTEM_ID_2
 } from '@events/tests/utils'
@@ -286,9 +288,9 @@ describe('event.actions.notify', () => {
     test('should require createdAtLocation for system user', async () => {
       const { user, generator, rng } = await setupTestCase()
 
-      const dataSeedingClient = createTestClient(user, [
-        encodeScope({ type: 'user.data-seeding' })
-      ])
+      const client = createTestClient(user, [])
+      await systemInitialisationTestSetup()
+      const seeder = createInitialisationTestClient()
 
       const administrativeAreaId = generateUuid(rng)
 
@@ -304,10 +306,10 @@ describe('event.actions.notify', () => {
         locationRng
       )
 
-      await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
-      await dataSeedingClient.locations.set(locationPayload)
+      await seeder.administrativeAreas.set(administrativeAreaPayload)
+      await seeder.locations.set(locationPayload)
 
-      const locations = await dataSeedingClient.locations.list()
+      const locations = await client.locations.list()
 
       const childLocation = locations.find(
         (l) => l.administrativeAreaId === administrativeAreaId

@@ -10,8 +10,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { waitFor, expect, userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { waitFor, expect, userEvent, within } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -364,7 +364,9 @@ const fields = [
   {
     id: 'club.rules',
     type: FieldType.PARAGRAPH,
-    label: generateTranslationConfig('All members must follow club guidelines and regulations.'),
+    label: generateTranslationConfig(
+      'All members must follow club guidelines and regulations.'
+    ),
     configuration: {
       styles: { hint: true }
     }

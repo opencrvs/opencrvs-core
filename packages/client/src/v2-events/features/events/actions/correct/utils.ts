@@ -21,15 +21,10 @@ import {
   omitHiddenFields,
   getDeclarationFields,
   EventConfig,
-  getDeclaration,
-  isFieldDisplayedOnReview,
-  getCurrentEventState,
   ActionDocument,
-  getAcceptedActions,
   FieldUpdateValue,
   deepDropNulls
 } from '@opencrvs/commons/client'
-import { EventHistoryActionDocument } from './useActionForHistory'
 
 /**
  * Function we use for checking whether a field value has changed.
@@ -92,7 +87,7 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }
 
-export function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+export function aggregateAnnotations(actions: ActionDocument[]) {
   return actions.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {} as EventState)
@@ -111,7 +106,7 @@ export function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
  */
 export function getAnnotationComparisonForField(
   field: FieldConfig,
-  acceptedActions: EventHistoryActionDocument[],
+  acceptedActions: ActionDocument[],
   currentActionIndex: number,
   context: ValidatorContext
 ) {
@@ -154,121 +149,4 @@ export function getReviewFormFields(configuration: EventConfig) {
     reviewForms.flatMap((form) => form.fields),
     (field) => field.id
   )
-}
-
-function isFirstDeclareOrNotifyAction(
-  action: ActionDocument,
-  fullEvent: EventDocument
-) {
-  if (action.type !== ActionType.DECLARE && action.type !== ActionType.NOTIFY) {
-    return false
-  }
-  const acceptedActions = getAcceptedActions(fullEvent)
-  const firstDeclareOrNotifyAction = acceptedActions.find(
-    (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
-  )
-  return firstDeclareOrNotifyAction?.id === action.id
-}
-
-export function getDeclarationComparison(
-  fullEvent: EventDocument,
-  currentAction: ActionDocument,
-  validatorContext: ValidatorContext,
-  eventConfiguration: EventConfig
-) {
-  const acceptedActions = getAcceptedActions(fullEvent)
-  const currentActionIndex = acceptedActions.findIndex(
-    (a) => a.id === currentAction.id
-  )
-
-  const eventUpToCurrentAction = acceptedActions.slice(
-    0,
-    currentActionIndex + 1
-  )
-  const eventUpToPreviousAction = acceptedActions.slice(0, currentActionIndex)
-
-  if (
-    currentActionIndex < 0 ||
-    isFirstDeclareOrNotifyAction(currentAction, fullEvent)
-  ) {
-    return {
-      updatedValues: {},
-      oldValues: {},
-      valueHasChanged: false
-    }
-  }
-
-  const declarationConfig = getDeclaration(eventConfiguration)
-
-  const latestDeclaration = getCurrentEventState(
-    { ...fullEvent, actions: eventUpToCurrentAction },
-    eventConfiguration
-  ).declaration
-
-  const previousDeclaration = getCurrentEventState(
-    { ...fullEvent, actions: eventUpToPreviousAction },
-    eventConfiguration
-  ).declaration
-
-  const { updatedValues, oldValues } = declarationConfig.pages
-    .flatMap((page) =>
-      page.fields.filter((field) =>
-        isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
-      )
-    )
-    .reduce<{
-      updatedValues: Record<string, unknown>
-      oldValues: Record<string, unknown>
-    }>(
-      (acc, f) => {
-        if (
-          hasFieldChanged(
-            f,
-            latestDeclaration,
-            previousDeclaration,
-            validatorContext
-          )
-        ) {
-          acc.updatedValues[f.id] = latestDeclaration[f.id]
-          acc.oldValues[f.id] = previousDeclaration[f.id]
-        }
-        return acc
-      },
-      { updatedValues: {}, oldValues: {} }
-    )
-
-  return {
-    valueHasChanged: !_.isEmpty(updatedValues),
-    updatedValues,
-    oldValues
-  }
-}
-
-export function hasAnnotationChanged(
-  fullEvent: EventDocument,
-  currentAction: ActionDocument,
-  validatorContext: ValidatorContext,
-  eventConfiguration: EventConfig
-) {
-  if (isFirstDeclareOrNotifyAction(currentAction, fullEvent)) {
-    return false
-  }
-
-  const acceptedActions = getAcceptedActions(fullEvent)
-
-  const reviewFormFields = getReviewFormFields(eventConfiguration)
-
-  const index = acceptedActions.findIndex((a) => a.id === currentAction.id)
-
-  const changedAnnotationFields = reviewFormFields.filter(
-    (f) =>
-      getAnnotationComparisonForField(
-        f,
-        acceptedActions,
-        index,
-        validatorContext
-      ).valueHasChanged
-  )
-
-  return changedAnnotationFields.length > 0
 }

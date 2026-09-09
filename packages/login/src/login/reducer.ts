@@ -22,6 +22,7 @@ import { IStoreState } from '@login/store'
 export type LoginState = {
   submitting: boolean
   token: string
+  refreshToken?: string
   authenticationDetails: { nonce: string; mobile?: string; email?: string }
   submissionError: boolean
   resentAuthenticationCode: boolean
@@ -35,6 +36,7 @@ export type LoginState = {
 export const initialState: LoginState = {
   submitting: false,
   token: '',
+  refreshToken: '',
   config: {},
   authenticationDetails: {
     nonce: '',
@@ -126,6 +128,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submitting: action.payload.token ? true : false,
           submissionError: false,
           resentAuthenticationCode: false,
+          refreshToken: action.payload.refreshToken,
           authenticationDetails: {
             ...state.authenticationDetails,
             nonce: action.payload.nonce,
@@ -137,9 +140,13 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             if (action.payload.token) {
+              if (!action.payload.refreshToken) {
+                window.location.assign('/login')
+                return
+              }
               window.location.assign(
-                `/register/?token=${
-                  action.payload.token
+                `/register/?refreshToken=${
+                  action.payload.refreshToken
                 }&lang=${getState().i18n.language}`
               )
             } else {
@@ -226,17 +233,22 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           stepSubmitting: false,
           submissionError: false,
           resentAuthenticationCode: false,
-          token: action.payload.token
+          token: action.payload.token,
+          refreshToken: action.payload.refreshToken
         },
         Cmd.run(
           (getState: () => IStoreState) => {
+            if (!action.payload.refreshToken) {
+              window.location.assign('/login')
+              return
+            }
             const redirectToURL = getState().login.redirectToURL
             // Strip leading slash from redirectToURL to avoid double slash e.g. /register//events/...
             const fullURL = redirectToURL
-              ? `/register/${redirectToURL.replace(/^\//, '')}?token=${action.payload.token}&lang=${
+              ? `/register/${redirectToURL.replace(/^\//, '')}?refreshToken=${action.payload.refreshToken}&lang=${
                   getState().i18n.language
                 }`
-              : `/register?token=${action.payload.token}&lang=${
+              : `/register?refreshToken=${action.payload.refreshToken}&lang=${
                   getState().i18n.language
                 }`
 
@@ -251,7 +263,13 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state
         },
         Cmd.run(() => {
-          window.location.assign(`/register/?token=${state.token}`)
+          if (state.refreshToken) {
+            window.location.assign(
+              `/register/?refreshToken=${state.refreshToken}`
+            )
+          } else {
+            window.location.assign('/login')
+          }
         })
       )
     case actions.RELOAD_MODAL_VISIBILITY:

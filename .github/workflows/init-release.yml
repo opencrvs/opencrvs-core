@@ -23,10 +23,11 @@
 #        b. merge-back/release-<version>-to-develop → develop  (merge-back PR)
 #           A dedicated branch is used so that conflict-resolution commits
 #           stay off the release branch.
-#   5. Triggers the same init-release workflow in opencrvs-countryconfig and
-#      opencrvs-testland so all three repos move in lockstep.
+#   5. Triggers the same init-release workflow in the infrastructure repo and
+#      creates the matching release branch in the e2e repo.
 #   6. Creates a draft GitHub release and immediately deletes the backing tag
-#      (the tag will be re-created by the publish workflow after the PR merges).
+#      (the release tag is created by hand later in the release sequence, see
+#      release-steps.md).
 name: Release - Start a new release
 on:
   workflow_dispatch:
@@ -38,7 +39,7 @@ on:
 
 jobs:
   release_workflow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       # Derive base_branch and target_branch from the version number.
       #   - patch (z > 0): base = release/<x>.<y>.<z-1>, target = master
@@ -72,6 +73,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Nx needs node_modules to compute the project graph; without an
+      # install, `npx lerna` falls back to fetching an unpinned latest
+      # lerna/nx from the registry, which can fail to parse this repo's
+      # pnpm-lock.yaml.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Check if release branch already exists
         id: check_branch
         run: |
@@ -94,9 +111,36 @@ jobs:
 
           git checkout -b "release/${{ inputs.version }}"
 
+          VERSION="${{ inputs.version }}"
+
           # Bump all workspace package.json files and the root in one command.
-          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
-          yarn version --new-version ${{ inputs.version }} --no-git-tag-version
+          npx lerna exec 'npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version'
+          npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
+          # Bump helm chart version without creating a git tag.
+          find charts/ -name Chart.yaml -exec yq -i ".version = \"v$VERSION\"" {} \;
+          find charts/ -name Chart.yaml -exec yq -i ".appVersion = \"v$VERSION\"" {} \;
+          # Bump version in default values.yaml for opencrvs-services
+          # TODO: yq is not relaiable for this case, check if we can use ruamel.yaml (python) library
+          sed -i.bak -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+
+          # Point the countryconfig-template Tiltfile's local-dev defaults at
+          # this release, so `tilt up` picks up the right core images and
+          # Helm charts out of the box without anyone needing to export
+          # OPENCRVS_CORE_IMAGE_TAG / OPENCRVS_CORE_REF by hand.
+          sed -i.bak -E 's#(core_images_tag = os\.getenv\("OPENCRVS_CORE_IMAGE_TAG", ")[^"]*(")#\1v${{ inputs.version }}\2#' packages/countryconfig-template/Tiltfile
+          sed -i.bak -E 's#(core_ref = os\.getenv\("OPENCRVS_CORE_REF", ")[^"]*(")#\1release/${{ inputs.version }}\2#' packages/countryconfig-template/Tiltfile
+          rm packages/countryconfig-template/Tiltfile.bak
+
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
@@ -185,26 +229,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Mirror this release initialisation in the companion repositories so all
-      # three repos create their release branches and PRs at the same time.
+      # Mirror this release initialisation in the companion repositories so
+      # they create their release branches and PRs at the same time.
       # ${{ github.ref_name }} resolves to the branch name selected in the
       # "Run workflow" dropdown (e.g. "master"), not the full ref path
       # ("refs/heads/master") that context.ref carries. The workflow dispatch
       # API requires a plain branch name, so ref_name is the correct value.
-      - name: Trigger workflow in opencrvs-countryconfig
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: 'opencrvs-countryconfig',
-              workflow_id: 'init-release.yml',
-              ref: '${{ github.ref_name }}',
-              inputs: {
-                version: '${{ inputs.version }}'
-              }
-            })
       - name: Trigger workflow in infrastructure
         uses: actions/github-script@v8
         with:
@@ -219,25 +249,10 @@ jobs:
                 version: '${{ inputs.version }}'
               }
             })
-      - name: Trigger workflow in opencrvs-testland
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: 'opencrvs-testland',
-              workflow_id: 'init-release.yml',
-              ref: '${{ github.ref_name }}',
-              inputs: {
-                version: '${{ inputs.version }}'
-              }
-            })
-
       - name: Create release branch in e2e repo
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.E2E_WORKFLOW_TOKEN }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const branchRef = 'refs/heads/release/${{ inputs.version }}'
             const { data: ref } = await github.rest.git.getRef({

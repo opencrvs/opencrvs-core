@@ -40,7 +40,16 @@ const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
       id: DISTRICT_ID,
       parentId: PROVINCE_ID,
       name: 'Test District',
-      validUntil: null
+      status: 'active' as const,
+      versions: [
+        {
+          versionId: DISTRICT_ID,
+          effectiveFrom: '0001-01-01',
+          name: 'Test District',
+          externalId: null,
+          status: 'active' as const
+        }
+      ]
     }
   ],
   [
@@ -49,7 +58,16 @@ const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
       id: PROVINCE_ID,
       parentId: null,
       name: 'Test Province',
-      validUntil: null
+      status: 'active' as const,
+      versions: [
+        {
+          versionId: PROVINCE_ID,
+          effectiveFrom: '0001-01-01',
+          name: 'Test Province',
+          externalId: null,
+          status: 'active' as const
+        }
+      ]
     }
   ]
 ])
@@ -167,7 +185,45 @@ describe('mapFieldToDefaultValue', () => {
     })
   })
 
-  it('for ADDRESS fields', () => {
+  it('leaves an admin level unset when the user has none at that level', () => {
+    /*
+     * The mock user sits at district level, so nothing answers for a level
+     * below it. Returning an empty string instead of nothing would read as an
+     * answer: `not(field('village').isUndefined())` would pass, and a street
+     * field waiting on that level would appear with the level still blank.
+     */
+    const villageField = {
+      id: 'village',
+      type: FieldType.ADMINISTRATIVE_AREA,
+      label: {
+        defaultMessage: 'Village',
+        description: 'Village label',
+        id: 'field.address.village.label'
+      },
+      configuration: { type: 'ADMIN_STRUCTURE' as const },
+      defaultValue: user('administrativeAreaId').locationLevel('village')
+    } as unknown as Parameters<typeof mapFieldToDefaultValue>[0]
+
+    expect(mapFieldToDefaultValue(villageField, mockContext)).toBeUndefined()
+  })
+
+  it('resolves an admin level the user does have', () => {
+    const districtField = {
+      id: 'district',
+      type: FieldType.ADMINISTRATIVE_AREA,
+      label: {
+        defaultMessage: 'District',
+        description: 'District label',
+        id: 'field.address.district.label'
+      },
+      configuration: { type: 'ADMIN_STRUCTURE' as const },
+      defaultValue: user('administrativeAreaId').locationLevel('district')
+    } as unknown as Parameters<typeof mapFieldToDefaultValue>[0]
+
+    expect(mapFieldToDefaultValue(districtField, mockContext)).toBe(DISTRICT_ID)
+  })
+
+  describe('for ADDRESS fields', () => {
     const addressField = {
       id: 'applicant.address',
       type: FieldType.ADDRESS,

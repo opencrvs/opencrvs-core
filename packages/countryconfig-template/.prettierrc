@@ -1,0 +1,9 @@
+{
+  "printWidth": 80,
+  "singleQuote": true,
+  "useTabs": false,
+  "tabWidth": 2,
+  "trailingComma": "none",
+  "semi": false,
+  "overrides": [{ "files": ["roles.ts"], "options": { "printWidth": 280 } }]
+}

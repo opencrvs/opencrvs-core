@@ -265,7 +265,6 @@ describe('Request and confirmation flow', () => {
         () => {
           registrationNumber = generateRegistrationNumber(prng)
           const responseBody = status === 200 ? { registrationNumber } : {}
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
           return HttpResponse.json(responseBody, { status })
         }
       )
@@ -370,7 +369,6 @@ describe('Request and confirmation flow', () => {
           () => {
             return HttpResponse.json(
               { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
-              // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
               { status: 200 }
             )
           }
@@ -593,6 +591,7 @@ describe('Request and confirmation flow', () => {
       test('should successfully accept a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -745,6 +744,7 @@ describe('Request and confirmation flow', () => {
       test('allows accepting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -816,6 +816,7 @@ describe('Request and confirmation flow', () => {
       test('does not allow accepting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -867,7 +868,7 @@ describe('Request and confirmation flow', () => {
             actionId: originalActionId,
             registrationNumber: MOCK_REGISTRATION_NUMBER
           })
-        ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+        ).rejects.toMatchObject({ code: 'FORBIDDEN' })
       })
     })
 
@@ -906,6 +907,7 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -965,6 +967,7 @@ describe('Request and confirmation flow', () => {
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -1212,7 +1215,7 @@ describe('Request and confirmation flow', () => {
             transactionId: getUUID(),
             actionId: originalActionId
           })
-        ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+        ).rejects.toMatchObject({ code: 'FORBIDDEN' })
       })
     })
   })
@@ -1299,9 +1302,7 @@ describe('Register action - hidden field nullification', () => {
   describe('Invalid keys scenarios', () => {
     test('rejects hidden field with non-null value during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const declaredDocument = await client.event.get({ eventId: event.id })
       const declaredCurrentEventState = getCurrentEventState(
@@ -1352,9 +1353,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('rejects multiple hidden fields with non-null values during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const declaredDocument = await client.event.get({ eventId: event.id })
       const declaredCurrentEventState = getCurrentEventState(
@@ -1410,9 +1409,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('rejects non-existent field during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1444,9 +1441,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('rejects hidden field from conditional page during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1484,12 +1479,13 @@ describe('Register action - hidden field nullification', () => {
         ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
           type: 'record.search',
-          options: { event: ['tennis-club-membership'], placeOfEvent: 'administrativeArea' }
+          options: {
+            event: ['tennis-club-membership'],
+            placeOfEvent: 'administrativeArea'
+          }
         })
       ])
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1569,9 +1565,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('accepts multiple hidden fields with null values during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1614,9 +1608,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('accepts visible field with any value during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1717,12 +1709,13 @@ describe('Register action - hidden field nullification', () => {
         ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
           type: 'record.search',
-          options: { event: ['tennis-club-membership'], placeOfEvent: 'administrativeArea' }
+          options: {
+            event: ['tennis-club-membership'],
+            placeOfEvent: 'administrativeArea'
+          }
         })
       ])
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1802,9 +1795,7 @@ describe('Register action - hidden field nullification', () => {
   describe('Edge cases', () => {
     test('accepts null for hidden field on hidden page during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1844,9 +1835,7 @@ describe('Register action - hidden field nullification', () => {
 
     test('mixed valid and invalid keys returns only invalid keys in error during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {

@@ -127,7 +127,6 @@ test('Finds user in nested location using administrative area id with my jurisdi
       name: 'Child office',
       parentId: userOnParentLocation.administrativeAreaId,
       id: childAdministrativeAreaId,
-      validUntil: null,
       externalId: 'abc123xyz457'
     }
   ])
@@ -138,7 +137,6 @@ test('Finds user in nested location using administrative area id with my jurisdi
       administrativeAreaId: childAdministrativeAreaId,
       locationType: 'CRVS_OFFICE',
       id: grandchildLocationId,
-      validUntil: null,
       externalId: 'abc123xyz458'
     }
   ])
@@ -176,7 +174,6 @@ test('Find user with appropriate scopes', async () => {
       administrativeAreaId: userOnParentLocation.administrativeAreaId,
       locationType: 'CRVS_OFFICE',
       id: userToSearchLocationId,
-      validUntil: null,
       externalId: 'abc123xyz459'
     }
   ])

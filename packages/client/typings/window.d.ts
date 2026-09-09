@@ -16,5 +16,11 @@ declare global {
     config: ApplicationConfig & ClientConfig
     __localeId__: string
     __WB_MANIFEST: Array<{ url: string; revision: string }>
+    /**
+     * Dev-only helper (only assigned when running in `import.meta.env.DEV`)
+     * to force-mint a fresh access token, e.g. to pick up scopes after a
+     * role/scope change made server-side without needing to log out.
+     */
+    __refreshToken?: () => Promise<void>
   }
 }

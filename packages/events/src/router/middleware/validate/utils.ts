@@ -15,12 +15,13 @@ import {
   errorMessages,
   EventConfig,
   EventState,
+  EventValidatorContext,
   getDeclarationFields,
   ValidatorContext
 } from '@opencrvs/commons/events'
 import { getOrThrow, flattenEntries } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
-import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/administrative-areas'
+import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/locations'
 
 type ValidationError = {
   message: string
@@ -92,13 +93,17 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
-export async function getValidatorContext(
+export async function getValidatorContext({
+  token,
+  event
+}: {
   token: string
-): Promise<Omit<ValidatorContext, 'event'>> {
+  event?: EventValidatorContext
+}): Promise<ValidatorContext> {
   const leafAdminStructureLocationIds =
     await getLeafLevelAdministrativeAreaIds()
 
   const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
 
-  return { leafAdminStructureLocationIds, user }
+  return { leafAdminStructureLocationIds, user, event }
 }

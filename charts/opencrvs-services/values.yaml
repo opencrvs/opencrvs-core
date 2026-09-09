@@ -20,9 +20,9 @@ elasticsearch:
     enabled: false
     schedule: '0 2 * * *'
   # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  # - disabled: No authentication enabled, password-less access to databases
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
   #               will pick up data from users_secret and urls_secret
   # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
   #            please check README.md
@@ -44,11 +44,6 @@ elasticsearch:
     - SEARCH:search
   # TEMPORAL SECRET TO STORE ELASTICSEARCH USERS
   users_secret: elasticsearch-opencrvs-users
-# InfluxDB configuration, including the hostname, port, and database name.
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-dev.svc.cluster.local
-  port: 8086
-  db: ocrvs
 
 # MinIO configuration, including the hostname and port.
 minio:
@@ -58,75 +53,30 @@ minio:
   #                   Default: minio.<opencrvs domain>
   # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
   # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  # - disabled: No authentication enabled, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
   #               will pick up data from users_secret
   # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
   #            please check README.md
   auth_mode: disabled
   users_secret: minio-opencrvs-users
+  # Image used as client to run OpenCRVS configuration scripts
+  image:
+    repository: minio/mc
+    tag: 'latest'
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
   # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  # - disabled: No authentication enabled, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
   #               will pick up data from users_secret
   # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
   #            please check README.md
   auth_mode: disabled
   users_secret: redis-opencrvs-users
 
-mongodb:
-  # MongoDB hostname configuration.
-  host: mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local
-  # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
-  #               will pick up data from users_secret and urls_secret
-  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
-  #            please check README.md
-  # It is recommended to setup auto or use_secret values for server environment
-  auth_mode: disabled
-
-  # MongoDB databases and users to create, if `use_default_credentials` is set to `false`.
-  admin_user_secret_name: mongodb-admin-user
-  users_secret: mongo-opencrvs-users
-  urls_secret: mongodb-urls
-  # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
-  # Mapping users to databases
-  databases:
-    # prefix: <PLACEHOLDER> to generate variable names:
-    # - <PLACEHOLDER>_DB, database name from `db` field
-    # - <PLACEHOLDER>_MONGODB_USER, user name from `user` field
-    # - <PLACEHOLDER>_MONGODB_PASSWORD, random password for user
-    # - <PLACEHOLDER>_MONGODB_ROLES, roles for user in JSON format
-    # db: Name of MongoDB database to create.
-    # user: Name of MongoDB user to create and attach to database.
-    # roles: JSON string with roles to assign to user.
-    #        If not provided, then user is created with `readWrite` role on the database.
-    #        If roles are provided, please add explicitly `readWrite` role for the database.
-    #        For example:
-    #        [{ role: 'readWrite', db: 'user-mgnt' }, ...]
-    - prefix: USER_MGNT
-      db: user-mgnt
-      user: user-mgnt
-    - prefix: HEARTH
-      db: hearth-dev
-      user: hearth
-      roles: "[{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]"
-    - prefix: PERFORMANCE
-      db: performance
-      user: performance
-    - prefix: EVENTS
-      db: events
-      user: events
-      roles: "[{ role: 'readWrite', db: 'events' }, {role: 'read', db: 'user-mgnt'}]"
-
 postgres:
-  # Image used as postgres client to run init scripts, it should contain psql and postgres_fdw extension installed
-  image: chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
   # Postgres hostname configuration
   host: postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local
   port: 5432
@@ -145,7 +95,13 @@ postgres:
   admin_user_secret_name: postgres-admin-user
   users_secret: postgres-opencrvs-users
   urls_secret: postgres-urls
-  # FIXME: Refactor like mongodb in the future when we get more databases
+
+  # Image used as client to run OpenCRVS configuration scripts
+  image:
+    repository: postgres
+    tag: 17.6
+
+  # FIXME: Refactor this in the future when we get more databases
   events_db: events
   events_migrator: events_migrator
   events_app: events_app
@@ -192,6 +148,40 @@ ingress:
   # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
   tls_resolver: ''
 
+# Kubernetes NetworkPolicy configuration for OpenCRVS workloads.
+# Requires a CNI provider that enforces Kubernetes NetworkPolicy.
+network_policy:
+  # Render NetworkPolicy resources. Requires a CNI provider that enforces
+  # NetworkPolicy - set to false on clusters without one.
+  enabled: true
+  # Baseline policy for ingress to OpenCRVS pods. One of:
+  # - deny: deny ingress unless another NetworkPolicy allows it (default).
+  # - private: allow ingress only from RFC1918 private ranges
+  #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+  # - full: no baseline policy; ingress is unrestricted.
+  ingress_mode: deny
+  # Baseline policy for egress from OpenCRVS pods. Same modes as
+  # ingress_mode, applied to egress instead. Defaults to "private" rather
+  # than "deny": OpenCRVS pods need to reach the dependencies chart's
+  # namespace (see allowed_namespaces below) and typically nothing else
+  # outside the cluster/VPC, so private strikes a safe-by-default balance
+  # without requiring every deployment to enumerate allowed_namespaces up
+  # front. Services that genuinely need public internet (e.g. countryconfig,
+  # for SMTP/SMS provider integrations) opt out individually via their own
+  # network_policy.egress_mode: full; see "Hardening" in README.md.
+  egress_mode: private
+  # Allow OpenCRVS pods in this namespace to communicate with each other.
+  # This keeps the chart practical while blocking unexpected cross-namespace
+  # and external traffic by default.
+  allow_same_namespace: true
+  # Namespaces OpenCRVS pods are allowed to reach. Only takes effect when
+  # egress_mode is not "full". Required for the OpenCRVS application to
+  # keep working once egress is denied by default (e.g. auth/gateway
+  # reaching redis/postgres/elasticsearch/minio), since the dependencies
+  # chart is typically deployed to a separate namespace. See "Hardening"
+  # in README.md.
+  allowed_namespaces: []
+
 # See kubernetes documentation for more information on service types:
 # https://kubernetes.io/docs/concepts/services-networking/service/
 service_type: ClusterIP
@@ -230,6 +220,15 @@ pdb:
   enabled: true
   minAvailable: 50%
 
+# ServiceAccount configuration.
+# By default, the chart creates one ServiceAccount per workload.
+# Override annotations globally here, or per workload under
+# <workload>.service_account.annotations.
+service_account:
+  create: true
+  annotations: {}
+  automount_service_account_token: true
+
 # Deployment rollout strategy, applied to all services below unless
 # overridden per-service under <service>.strategy (e.g. auth.strategy).
 # - Recreate: terminate all existing pods before creating replacements.
@@ -251,6 +250,7 @@ resources:
 # Global environment variables applied to
 # all OpenCRVS microservices (Kubernetes PODs):
 env:
+  OPENCRVS_ENVIRONMENT: production
   NODE_ENV: production
   MINIO_BUCKET: ocrvs
   # LOG_LEVEL: debug
@@ -260,6 +260,16 @@ env:
   # Sentry DSN (Data Source Name) configuration for error tracking.
   # Note: The SENTRY_DSN should be defined at the global level of environment variables.
   # SENTRY_DSN: https://...@o309867.ingest.sentry.io/....
+
+# OpenTelemetry tracing configuration for instrumented OpenCRVS services.
+# When enabled, auth, countryconfig, documents, events and gateway receive
+# OTEL exporter and resource environment variables.
+otel:
+  enabled: false
+  # Defaults to env.NODE_ENV
+  # deployment_environment: production
+  exporter_otlp_endpoint: ''
+  exporter_otlp_protocol: grpc
 
 # OpenCRVS core image tag:
 # Deprecated: use platform.tag instead.
@@ -274,7 +284,7 @@ imagePullSecrets: []
 # by a service-specific image configuration.
 platform:
   # Default tag for all OpenCRVS images.
-  tag: v1.9.12
+  tag: v2.0.0
 
   # Default repository for all OpenCRVS images,
   # for example: ghcr.io/opencrvs or myorg
@@ -285,6 +295,14 @@ platform:
   # imagePullSecrets:
   #   - name: registry-secret
   imagePullSecrets: []
+
+# Shared utilities image used by helper jobs and init containers.
+# Full image reference is resolved the same way as for application images:
+# <platform.repository>/<utilities.image.name>:<platform.tag>
+# Override repository or tag here only if the utilities image is published separately.
+utilities:
+  image:
+    name: ocrvs-utilities
 
 ##############################################################
 # Per service configuration:
@@ -300,6 +318,8 @@ auth:
     # tag: v2.0.0
 
 client:
+  network_policy:
+    ingress_mode: private
   port: 3000
   image:
     name: ocrvs-client
@@ -330,13 +350,27 @@ config:
 countryconfig:
   image:
     name: opencrvs/ocrvs-countryconfig
-    tag: v1.9.11
+    tag: v2.0.0
   port: 3040
+  network_policy:
+    # countryconfig needs public-internet egress regardless of the global
+    # network_policy.egress_mode: it integrates with per-country SMTP
+    # servers and SMS gateways (e.g. Infobip) at arbitrary external hosts
+    # configured via env vars/secrets, not fixed IPs a private-range or
+    # namespace-scoped rule could cover.
+    egress_mode: full
+    ingress_mode: private
 
 dashboards:
   enabled: false
-  use_default_credentials: true
+  image:
+    name: metabase
+    repository: metabase
+    tag: v0.56.4
   port: 4444
+  network_policy:
+    ingress_mode: private
+  use_default_credentials: true
   env:
     METABASE_DATABASE_SSL: false
     OPENCRVS_METABASE_MAP_NAME: Farajaland
@@ -359,7 +393,8 @@ gateway:
   port: 7070
   image:
     name: ocrvs-gateway
-
+  network_policy:
+    ingress_mode: private
   env:
     CHECK_INVALID_TOKEN: 'true'
     CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'
@@ -372,6 +407,8 @@ login:
   port: 3020
   image:
     name: ocrvs-login
+  network_policy:
+    ingress_mode: private
   # login is an nginx docker image
   # nginx_conf_d_configmaps:
   #     List of Configmap names to store custom configuration:
@@ -423,14 +460,22 @@ events:
 
 ##############################################################
 # One time jobs:
+# Common service account for Helm pre/post deployment jobs.
+deployment_jobs:
+  service_account:
+    name: deployment-jobs
+    network_policy:
+      ingress_mode: deny
+      egress_mode: full
+    annotations:
+      'helm.sh/hook': pre-install,pre-upgrade
+      'helm.sh/hook-weight': '-10'
+      'helm.sh/hook-delete-policy': before-hook-creation
 
 # data_migration: Job to migrate datastores while deployment
 data_migration:
   image:
     name: ocrvs-migration
-
-data_migration_legacy:
-  enabled: true
 
 # data_cleanup: Wipe all persistent data from datastores including users
 # By running this job on production environment all data will be lost
@@ -447,6 +492,21 @@ data_seed:
     # When users are seeded, are they immediately active using a test password and
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
     ACTIVATE_USERS: 'false'
+
+validation:
+  enabled: false
+  timeout_seconds: 5
+  active_deadline_seconds: 300
+  cert_endpoint: 'https://traefik.traefik.svc.cluster.local'
+  monitoring_enabled: false
+  allow_insecure_https: false
+  smtp_secret_name: smtp-config
+  preflight:
+    enabled: true
+    hook_weight: '0'
+  postdeploy:
+    enabled: true
+    hook_weight: '5'
 
 on_restore_cronjob:
   enabled: false

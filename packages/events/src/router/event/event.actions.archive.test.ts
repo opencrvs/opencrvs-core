@@ -10,7 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, encodeScope, getUUID } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  ActionType,
+  encodeScope,
+  getUUID
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -112,6 +117,83 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
 
   expect(actions.at(-2)).toStrictEqual(ActionType.ARCHIVE)
   expect(actions.at(-3)).not.toStrictEqual(ActionType.MARK_AS_DUPLICATE)
+})
+
+test(`${ActionType.ARCHIVE} stores no reason when none is given`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const event = await client.event.actions.archive.request(
+    generator.event.actions.archive(originalEvent.id)
+  )
+
+  const archiveActions = event.actions.flatMap((action) =>
+    action.type === ActionType.ARCHIVE &&
+    action.status === ActionStatus.Accepted
+      ? [action]
+      : []
+  )
+
+  expect(archiveActions).toHaveLength(1)
+  expect(archiveActions[0].content).toBeUndefined()
+})
+
+test(`${ActionType.ARCHIVE} keeps the reason when one is given`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const event = await client.event.actions.archive.request({
+    ...generator.event.actions.archive(originalEvent.id),
+    content: { reason: 'Duplicate of TEST123' }
+  })
+
+  const archiveActions = event.actions.flatMap((action) =>
+    action.type === ActionType.ARCHIVE &&
+    action.status === ActionStatus.Accepted
+      ? [action]
+      : []
+  )
+
+  expect(archiveActions).toHaveLength(1)
+  expect(archiveActions[0].content).toEqual({ reason: 'Duplicate of TEST123' })
 })
 
 test(`${ActionType.ARCHIVE} action is idempotent`, async () => {

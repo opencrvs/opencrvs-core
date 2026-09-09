@@ -2,9 +2,9 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@client/*": ["./*"],
-      "@gateway/*": ["../../gateway/src/*"],
-      "@events/*": ["../../events/src/*"]
+      "@client/*": ["./src/*"],
+      "@gateway/*": ["../gateway/src/*"],
+      "@events/*": ["../events/src/*"]
     }
   }
 }

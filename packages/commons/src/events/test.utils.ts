@@ -23,6 +23,10 @@ import {
   ActionUpdate
 } from './ActionDocument'
 import {
+  getEventValidatorContext,
+  ValidatorContext
+} from '../conditionals/validate'
+import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
@@ -35,6 +39,7 @@ import {
   RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
+  UnarchiveActionInput,
   UnassignActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
@@ -55,7 +60,12 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { Location, AdministrativeArea } from './locations'
+import {
+  LocationVersion,
+  SetLocationPayload,
+  SetAdministrativeAreaPayload,
+  ClientAdministrativeArea
+} from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -66,10 +76,16 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { FieldValue, PlainDate } from './FieldValue'
-import { TokenUserType } from '../authentication'
+import {
+  EncodedScope,
+  encodeScope,
+  ITokenPayload,
+  TokenUserType
+} from '../authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
+import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -164,6 +180,26 @@ export function generateRandomSignature(rng: () => number): DocumentPath {
 }
 
 /**
+ * Builds one element of a location / administrative area `versions` history.
+ * Every field is defaulted so a call names only what its assertion is about —
+ * an `effectiveFrom`, a `name`, or an explicit `versionId` when the test needs
+ * to control version identity.
+ */
+export function locationVersion(
+  overrides: Partial<LocationVersion> = {},
+  rng?: () => number
+): LocationVersion {
+  return {
+    versionId: generateUuid(rng),
+    effectiveFrom: '0001-01-01',
+    name: 'Location name',
+    externalId: null,
+    status: 'active',
+    ...overrides
+  }
+}
+
+/**
  * Quick-and-dirty mock data generator for event actions.
  */
 function mapFieldTypeToMockValue(
@@ -174,8 +210,8 @@ function mapFieldTypeToMockValue(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): FieldValue {
   const leafLevelAdministrativeAreas =
@@ -312,8 +348,8 @@ export function fieldConfigsToActionPayload(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): ActionUpdate {
   return fields.reduce(
@@ -339,8 +375,8 @@ export function generateActionDeclarationInput(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
@@ -570,7 +606,6 @@ export function eventPayloadGenerator(
         > = {}
       ) => ({
         type: ActionType.EDIT,
-        content: { comment: 'Test comment' },
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
@@ -617,9 +652,22 @@ export function eventPayloadGenerator(
         declaration: {},
         annotation: {},
         eventId,
-        content: {
-          reason: `${ActionType.ARCHIVE}`
-        },
+        ...input
+      }),
+      unarchive: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            UnarchiveActionInput,
+            'transactionId' | 'declaration' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.UNARCHIVE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
         ...input
       }),
       reject: (
@@ -882,6 +930,7 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.NOTIFY:
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
+    case ActionType.UNARCHIVE:
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {
@@ -1234,4 +1283,83 @@ export const generateEventConfig = ({
       }
     ]
   })
+}
+
+/**
+ * Get the leaf administrative area IDs from a list of administrative areas.
+ *
+ * A leaf administrative area is defined as an administrative area that does not have any children in the provided list.
+ * AdministrativeArea  might have a CRVS_OFFICE as children, but is still considered to be a leaf administrative area.
+ *
+ * @param administrativeAreas - The list of administrative areas to search.
+ * @returns The list of leaf administrative area IDs.
+ */
+export function getLeafAdministrativeAreaIds(
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+): Array<{ id: UUID }> {
+  const nonLeafAdministrativeAreaIds = new Set<string>()
+
+  for (const [, location] of administrativeAreas) {
+    if (location.parentId) {
+      nonLeafAdministrativeAreaIds.add(location.parentId)
+    }
+  }
+
+  const result: { id: UUID }[] = []
+  for (const [id] of administrativeAreas) {
+    if (!nonLeafAdministrativeAreaIds.has(id)) {
+      result.push({ id })
+    }
+  }
+
+  return result
+}
+
+/**
+ *
+ * @returns TokenPayload. Useful for building test setup for ValidatorContext
+ */
+function generateUserTokenPayload({
+  role,
+  scope
+}: {
+  role?: TestUserRole
+  scope?: EncodedScope[]
+}): ITokenPayload {
+  return {
+    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
+    sub: generateUuid(),
+    algorithm: 'RS256',
+    exp: '1787221786',
+    role: role ?? TestUserRole.enum.FIELD_AGENT,
+    scope: scope ?? [
+      encodeScope({
+        type: 'record.read'
+      })
+    ],
+    userType: TokenUserType.enum.user
+  }
+}
+
+export function generateTestValidatorContext(
+  userRole?: TestUserRole,
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): ValidatorContext {
+  const user = generateUserTokenPayload({ role: userRole })
+
+  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
+    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+  )
+
+  if (!eventWithConfig) {
+    return { user, leafAdminStructureLocationIds }
+  }
+
+  const { event, eventConfig } = eventWithConfig
+
+  return {
+    user,
+    leafAdminStructureLocationIds,
+    event: getEventValidatorContext(event, eventConfig)
+  }
 }

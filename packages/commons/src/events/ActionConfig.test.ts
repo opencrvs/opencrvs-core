@@ -1,0 +1,140 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { ActionConfig } from './ActionConfig'
+import { ActionType } from './ActionType'
+
+const label = {
+  defaultMessage: 'Test action',
+  description: 'Test action label',
+  id: 'events.actionConfig.test.label'
+}
+
+describe('DuplicateDetectedConfig', () => {
+  it('accepts a config with flags', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.DUPLICATE_DETECTED,
+      flags: [{ id: 'custom-duplicate-flag', operation: 'add' }]
+    })
+
+    expect(res.success).toBe(true)
+  })
+
+  it('defaults flags to an empty array when omitted', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.DUPLICATE_DETECTED
+    })
+
+    expect(res.success).toBe(true)
+    if (res.success && res.data.type === ActionType.DUPLICATE_DETECTED) {
+      expect(res.data.flags).toEqual([])
+    }
+  })
+
+  it('rejects a label, icon, or conditionals, since it is never rendered', () => {
+    expect(
+      ActionConfig.safeParse({
+        type: ActionType.DUPLICATE_DETECTED,
+        flags: [],
+        label
+      }).success
+    ).toBe(false)
+
+    expect(
+      ActionConfig.safeParse({
+        type: ActionType.DUPLICATE_DETECTED,
+        flags: [],
+        icon: 'Trash'
+      }).success
+    ).toBe(false)
+
+    expect(
+      ActionConfig.safeParse({
+        type: ActionType.DUPLICATE_DETECTED,
+        flags: [],
+        conditionals: [{ type: 'SHOW', conditional: true }]
+      }).success
+    ).toBe(false)
+  })
+
+  it('requires a type', () => {
+    const res = ActionConfig.safeParse({
+      flags: []
+    })
+
+    expect(res.success).toBe(false)
+  })
+})
+
+describe.each([
+  ActionType.ASSIGN,
+  ActionType.UNASSIGN,
+  ActionType.DELETE,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.MARK_AS_NOT_DUPLICATE
+])('%s action config', (type) => {
+  it('accepts label, icon and conditionals', () => {
+    const res = ActionConfig.safeParse({
+      type,
+      label,
+      icon: 'Trash',
+      conditionals: [{ type: 'SHOW', conditional: true }]
+    })
+
+    expect(res.success).toBe(true)
+  })
+
+  it('accepts a minimal config with only a label', () => {
+    const res = ActionConfig.safeParse({ type, label })
+
+    expect(res.success).toBe(true)
+  })
+
+  it('requires a label', () => {
+    const res = ActionConfig.safeParse({ type })
+
+    expect(res.success).toBe(false)
+  })
+})
+
+describe.each([
+  ActionType.DELETE,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.MARK_AS_NOT_DUPLICATE
+])('%s action config flags', (type) => {
+  it('accepts flags', () => {
+    const res = ActionConfig.safeParse({
+      type,
+      label,
+      flags: [{ id: 'custom-flag', operation: 'add' }]
+    })
+
+    expect(res.success).toBe(true)
+  })
+})
+
+describe.each([ActionType.ASSIGN, ActionType.UNASSIGN])(
+  '%s action config flags',
+  (type) => {
+    it('rejects flags, since it is a meta action excluded from flag resolution', () => {
+      const res = ActionConfig.safeParse({
+        type,
+        label,
+        flags: [{ id: 'custom-flag', operation: 'add' }]
+      })
+
+      expect(res.success).toBe(false)
+    })
+  }
+)

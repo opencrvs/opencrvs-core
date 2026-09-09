@@ -10,7 +10,6 @@
 
 
 set -o pipefail
-apk add curl jq grep
 
 # Define common variables
 kibana_alerting_api_url="${KIBANA_URL}/api/alerting/rules/_find?page=1&per_page=100&default_search_operator=AND&sort_field=name&sort_order=asc"

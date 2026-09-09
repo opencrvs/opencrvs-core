@@ -1,17 +1,19 @@
 {{ if and .Values.postgres.enabled (eq (include "postgres.backup_enabled" .) "true") }}
-{{- $run_as_cronjob := or .Values.backup.cronjob .Values.postgres.backup.cronjob }}
 {{- if eq .Values.postgres.backup.type "differential" }}
 ---
 apiVersion: batch/v1
-{{ if $run_as_cronjob }}
+{{ if .Values.backup.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
 {{- end }}
 metadata:
   name: postgres-backup-diff
+  labels:
+    app: backup-runner
+    job-type: backup
 spec:
-  {{ if $run_as_cronjob }}
+  {{ if .Values.backup.cronjob }}
   schedule: {{ .Values.postgres.backup.schedule.differential }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
@@ -20,11 +22,16 @@ spec:
     spec:
   {{- end }}
       template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: backup
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
           serviceAccountName: backup-runner
           containers:
             - name: runner
-              image: bitnami/kubectl:latest
+              image: {{ include "opencrvs.imageReference" .Values.utilities }}
               command:
                 - /bin/sh
                 - -c

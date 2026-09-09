@@ -18,7 +18,7 @@ import {
   ActionStatus,
   ActionType,
   ActionTypes,
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   DeclarationActionType,
   encodeScope,
@@ -33,7 +33,7 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
-  Location,
+  SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
@@ -57,6 +57,9 @@ import {
   seeder,
   setupHierarchyWithUsers
 } from './generators'
+
+export const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
 export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
@@ -175,6 +178,12 @@ export const TEST_USER_DEFAULT_SCOPES = [
     }
   }),
   encodeScope({
+    type: 'record.unarchive',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
     type: 'record.register',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
@@ -266,7 +275,7 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
-function createTokenExchangeTestToken(
+function createActionConfirmationTestToken(
   userId: string,
   eventId: string,
   actionId: string
@@ -274,8 +283,19 @@ function createTokenExchangeTestToken(
   const token = jwt.sign(
     {
       scope: [
-        encodeScope({ type: 'record.confirm-registration' }),
-        encodeScope({ type: 'record.reject-registration' })
+        ...TEST_USER_DEFAULT_SCOPES,
+        encodeScope({
+          type: 'record.custom-action',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ],
+            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
+          }
+        })
       ],
       sub: userId,
       userType: TokenUserType.enum.user,
@@ -363,7 +383,9 @@ export function createInitialisationTestClient(
 }
 
 /**
- * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
+ * Simulates the confirmation caller (e.g. countryconfig / an integration)
+ * hitting the action `accept`/`reject` endpoints. Confirming requires the
+ * action's own scope (e.g. `record.register`), which this client carries.
  */
 export function createCountryConfigClient(
   user: CreatedUser,
@@ -371,7 +393,7 @@ export function createCountryConfigClient(
   actionId: string
 ) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createTokenExchangeTestToken(user.id, eventId, actionId)
+  const token = createActionConfirmationTestToken(user.id, eventId, actionId)
 
   const caller = createCaller({
     user: {
@@ -486,6 +508,11 @@ function actionToClientAction(
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
+    case ActionType.UNARCHIVE:
+      return async (eventId: string) =>
+        client.event.actions.unarchive.request(
+          generator.event.actions.unarchive(eventId, { keepAssignment: true })
+        )
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
@@ -578,12 +605,13 @@ export async function seedEvent(
       | DeclarationActionType
       | typeof ActionType.UNASSIGN
       | typeof ActionType.REQUEST_CORRECTION
+      | typeof ActionType.ARCHIVE
     )[]
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
-      administrativeAreas: AdministrativeArea[]
-      locations: Location[]
+      administrativeAreas: SetAdministrativeAreaPayload[]
+      locations: SetLocationPayload[]
     }
   }
 ) {
@@ -709,6 +737,8 @@ function eventMatchesScope({
   eventIndex,
   user,
   placeOfEvent,
+  notifiedBy,
+  notifiedIn,
   createdBy,
   createdIn,
   declaredBy,
@@ -725,6 +755,8 @@ function eventMatchesScope({
   placeOfEvent?: JurisdictionFilter
   createdBy?: UserFilter
   createdIn?: JurisdictionFilter
+  notifiedBy?: UserFilter
+  notifiedIn?: JurisdictionFilter
   declaredBy?: UserFilter
   registeredBy?: UserFilter
   declaredIn?: JurisdictionFilter
@@ -735,6 +767,37 @@ function eventMatchesScope({
     adminAreaId: UUID | null
   ) => boolean
 }): boolean {
+  if (notifiedBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.NOTIFIED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (notifiedIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.NOTIFIED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (notifiedIn === JurisdictionFilter.enum.administrativeArea) {
+    const notifiedLocation =
+      eventIndex.legalStatuses.NOTIFIED?.createdAtLocation
+    if (!notifiedLocation) {
+      return false
+    }
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(notifiedLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
   if (createdBy === UserFilter.enum.user) {
     if (eventIndex.createdBy !== user.id) {
       return false
@@ -975,12 +1038,14 @@ export async function setupScopeTestFixture(
         | DeclarationActionType
         | typeof ActionType.REQUEST_CORRECTION
         | typeof ActionType.UNASSIGN
+        | typeof ActionType.ARCHIVE
       )[]
     | fc.Arbitrary<
         (
           | DeclarationActionType
           | typeof ActionType.REQUEST_CORRECTION
           | typeof ActionType.UNASSIGN
+          | typeof ActionType.ARCHIVE
         )[]
       >
 ) {
@@ -1057,7 +1122,15 @@ export async function attemptScopedAction(
     testClient: ReturnType<typeof createTestClient>
   ) => Promise<EventDocument>
 ): Promise<{ success: boolean; event: EventDocument }> {
-  const testClient = createTestClient(user, [scope])
+  // Assignment always assigns to the calling user (processAction ignores
+  // `input.assignedTo`), so it must be self-assigned by `testClient` — but
+  // it also requires `record.read`, which the scope under test may not
+  // grant. Add unrestricted `record.read` alongside it; this only affects
+  // the assign/get endpoints, not the action under test.
+  const testClient = createTestClient(user, [
+    scope,
+    encodeScope({ type: 'record.read' })
+  ])
 
   await expect(
     testClient.event.actions.assignment.assign({
@@ -1089,6 +1162,8 @@ export function assertScopeResult(
     event,
     placeOfEvent,
     isUnderAdministrativeArea,
+    notifiedBy,
+    notifiedIn,
     createdBy,
     createdIn,
     declaredBy,
@@ -1103,6 +1178,8 @@ export function assertScopeResult(
       locationId: UUID,
       adminAreaId: UUID | null
     ) => boolean
+    notifiedBy?: UserFilter
+    notifiedIn?: JurisdictionFilter
     createdBy?: UserFilter
     createdIn?: JurisdictionFilter
     declaredBy?: UserFilter
@@ -1121,6 +1198,8 @@ export function assertScopeResult(
   const isAccessibleWithScope = eventMatchesScope({
     eventIndex,
     user,
+    notifiedBy,
+    notifiedIn,
     createdBy,
     createdIn,
     declaredBy,
