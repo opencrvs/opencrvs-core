@@ -20,6 +20,8 @@ ingress:
   # Resolver will be attached to Traefik CRD IngressRoute
   tls_resolver: ''
 
+service_type: ClusterIP
+
 # Kubernetes storage type, available options are `pvc` or `host_path`
 storage_type: pvc
 

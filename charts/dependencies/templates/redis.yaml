@@ -6,7 +6,11 @@ metadata:
     app: redis
   name: redis
 spec:
-  type: {{ .Values.service_type | default "ClusterIP" }}
+  {{- $service_type := default .Values.service_type .Values.redis.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
+  clusterIP: None
+  {{- end }}
   ports:
     - port: 6379
       targetPort: 6379
