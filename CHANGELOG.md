@@ -2,6 +2,10 @@
 
 ## 2.0.2 Release Candidate
 
+### Bug fixes
+
+- Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
+
 ## 2.0.1 Release
 
 ### Security fixes
