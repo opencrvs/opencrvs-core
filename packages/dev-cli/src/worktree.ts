@@ -16,8 +16,9 @@ export interface Worktree {
   /** Absolute path of the checkout root (or cwd outside a repository). */
   path: string
   /**
-   * True for the primary checkout, false for a `git worktree add` checkout.
-   * The primary checkout is the one that gets slot 0.
+   * True for the primary checkout, false for a `git worktree add` checkout and
+   * for a directory that no longer exists. The primary checkout is the one
+   * that gets slot 0.
    */
   isPrimary: boolean
 }
@@ -40,10 +41,26 @@ function git(args: string[], cwd: string): string | undefined {
  * Linked worktrees are detected the way git itself distinguishes them: a
  * linked worktree's `--git-dir` is `<common>/worktrees/<id>` while its
  * `--git-common-dir` is `<common>`; in the primary checkout the two are the
- * same directory. Anything that is not a git repository is treated as primary,
- * so a source tarball behaves exactly like a normal checkout.
+ * same directory. An existing directory that is not a git repository is
+ * treated as primary, so a source tarball behaves exactly like a normal
+ * checkout.
+ *
+ * A directory that is *absent* is not that case, and is deliberately kept out
+ * of it. `git` fails there for a different reason but in the same way — no
+ * output — and callers do pass paths that may be gone: `env:destroy` inspects
+ * the worktree a registry entry records, which is exactly the path that
+ * disappears when a worktree is deleted. Answering "primary" for it would make
+ * every orphaned entry look like the default environment and become
+ * undestroyable. A directory that does not exist cannot be the primary
+ * checkout, so `false` is both the safe answer and the true one.
  */
 export function inspectWorktree(cwd: string = process.cwd()): Worktree {
+  const resolved = path.resolve(cwd)
+
+  if (!fs.existsSync(resolved)) {
+    return { path: resolved, isPrimary: false }
+  }
+
   const topLevel = git(['rev-parse', '--show-toplevel'], cwd)
   const gitDir = git(['rev-parse', '--absolute-git-dir'], cwd)
   const commonDir = git(
@@ -56,7 +73,7 @@ export function inspectWorktree(cwd: string = process.cwd()): Worktree {
     gitDir === undefined ||
     commonDir === undefined
   ) {
-    return { path: path.resolve(cwd), isPrimary: true }
+    return { path: resolved, isPrimary: true }
   }
 
   return {

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as fs from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
   DestroyPlan,
@@ -18,6 +19,7 @@ import {
   selectIndicesToDelete
 } from './destroy'
 import { RegistrySnapshot } from './types'
+import { inspectWorktree } from './worktree'
 
 function snapshot(
   entries: Record<string, { slot: number; worktreePath: string }>
@@ -158,6 +160,36 @@ describe('planDestroy', () => {
       expect(plan.isDefaultEnvironment).toBe(false)
       expect(plan.refusal).toBe(undefined)
       expect(plan.identifiers.dbName).toBe('events_side_quest')
+    })
+
+    it('is not triggered by an entry whose worktree has been deleted', () => {
+      const orphanPath = '/home/dev/wt/deleted-a'
+      const orphan = snapshot({
+        deleted_a: { slot: 2, worktreePath: orphanPath }
+      })
+
+      // The precondition, stated rather than assumed: this is what a registry
+      // entry points at once its worktree is gone.
+      expect(fs.existsSync(orphanPath)).toBe(false)
+
+      const plan = planFor({
+        name: 'deleted-a',
+        snapshot: orphan,
+        // Exactly how `cli.ts` answers this for a registered entry.
+        registeredWorktreeIsPrimary: inspectWorktree(orphanPath).isPrimary
+      })
+
+      // An orphan owns derived data like any other linked worktree's
+      // environment, so it must be destroyable without --force.
+      expect(plan.isDefaultEnvironment).toBe(false)
+      expect(plan.refusal).toBe(undefined)
+      expect(plan.identifiers).toEqual({
+        dbName: 'events_deleted_a',
+        esPrefix: 'events_deleted_a',
+        esReindexingStatusIndex: 'events_deleted_a_reindexing_status',
+        bucket: 'deleted-a--ocrvs'
+      })
+      expect(plan.releaseRegistryEntry).toBe(true)
     })
 
     it('is not triggered by a linked worktree that happens to share its basename', () => {
