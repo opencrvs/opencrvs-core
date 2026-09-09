@@ -111,6 +111,8 @@ postgres:
   admin_user_secret_name: postgres-admin-user
   # admin user name is postgres, define password here:
   # admin_user_password:
+  # Fixed NodePort to expose port 5432 on, only used when `service_type` is `NodePort`.
+  # node_port: 30432
 
   # Storage configuration:
   # Path to persistent data on the VM (when storage_type is host_path).
@@ -233,6 +235,9 @@ elasticsearch:
     memoryLimit: '8Gi'
     cpuLimit: '8'
 
+  # Fixed NodePorts, only used when `service_type` is `NodePort`.
+  # node_port: 30920            # exposes port 9200
+
 # monitoring aggregates following components:
 # - kibana
 # - metricbeat
@@ -265,6 +270,8 @@ kibana:
   users_secret: kibana-users-secret
   # Configmap for custom configuration file
   # custom_config_configmap: kibana-custom-config
+  # Fixed NodePort to expose port 5601 on, only used when `service_type` is `NodePort`.
+  # node_port: 30601
 
 metricbeat:
   image:
@@ -383,6 +390,10 @@ minio:
   # Node selector for MinIO pods, usually used to keep data persistent on specified nodes.
   node_selector: {}
 
+  # Fixed NodePorts, only used when `service_type` is `NodePort`.
+  # node_port: 30535         # exposes port 3535
+  # node_port_console: 30536 # exposes port 3536
+
   backup:
     # Enable or disable backup functionality for MinIO.
     enabled: false
@@ -448,6 +459,8 @@ redis:
   auth_users:
     - GATEWAY
     - AUTH
+  # Fixed NodePort to expose port 6379 on, only used when `service_type` is `NodePort`.
+  # node_port: 30379
 
 # Backup configuration
 backup:

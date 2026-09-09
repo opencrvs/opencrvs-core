@@ -235,6 +235,8 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Return a conflict naming the offending field, instead of an internal server error, when a write trips a unique constraint on a user's email, mobile or username. The application-level duplicate checks are broader than the constraints, so this is reachable only when two requests race — but the cause was masked in production and reached the caller as `Internal server error`. Covers creating a user as well as changing an existing user's email, phone number or name. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 - Stop the gateway's `/events/{path*}` proxy from forwarding requests outside the events service. [#13587](https://github.com/opencrvs/opencrvs-core/issues/13587)
 
+## 2.0.2 Release Candidate
+
 ## 2.0.1 Release
 
 ### Security fixes
@@ -253,6 +255,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Expose `POST /locations` and `POST /administrative-areas` REST endpoints to create or update a single location or administrative area, for correcting individual data-seeding errors. Bulk seeding is unaffected and still uses the existing `locations.set`/`administrativeAreas.set` tRPC mutations. [#13336](https://github.com/opencrvs/opencrvs-core/pull/13336)
 - The MOSIP charts now pass `OPENCRVS_AUTH_URL` to mosip-api and pin the mosip-api, mosip-mock and esignet-mock images to `2.0.1`. Implementations running the MOSIP integration should redeploy the `opencrvs-mosip` chart. [#13362](https://github.com/opencrvs/opencrvs-core/pull/13362)
 - Make the Deployment rollout strategy configurable, and default it to `Recreate`, for OpenCRVS services [#11994](https://github.com/opencrvs/opencrvs-core/issues/11994)
+- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
 
 ### Bug fixes
 

@@ -58,14 +58,23 @@ metadata:
     app: minio
   name: minio
 spec:
-  clusterIP: None
+  type: {{ .Values.service_type | default "ClusterIP" }}
+  {{- if eq .Values.service_type "NodePort" }}
+  nodePort: {{ .Values.minio.node_port | default 30535 }}
+  {{- end }}
   ports:
     - name: '3535'
       port: 3535
       targetPort: 3535
+      {{- if .Values.minio.node_port }}
+      nodePort: {{ .Values.minio.node_port }}
+      {{- end }}
     - name: '3536'
       port: 3536
       targetPort: 3536
+      {{- if .Values.minio.node_port_console }}
+      nodePort: {{ .Values.minio.node_port_console }}
+      {{- end }}
   selector:
     app: minio
 ---
