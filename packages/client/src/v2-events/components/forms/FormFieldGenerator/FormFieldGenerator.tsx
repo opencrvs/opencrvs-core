@@ -23,11 +23,13 @@ import {
   FormState,
   IndexMap,
   mapFormState,
+  PrefixedFilePath,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
 import {
+  AttachmentPath,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
@@ -55,7 +57,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   readonlyMode?: boolean
   searchMode?: boolean
   className?: string
-  attachmentPath?: string
+  attachmentPath?: PrefixedFilePath
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -84,7 +86,7 @@ export const FormFieldGenerator = forwardRef<
       className,
       eventConfig,
       searchMode,
-      attachmentPath = '',
+      attachmentPath: attachmentPathProp,
       readonlyMode,
       id,
       onValidSubmit,
@@ -94,6 +96,7 @@ export const FormFieldGenerator = forwardRef<
     },
     ref
   ) => {
+    const attachmentPath: AttachmentPath = attachmentPathProp ?? ''
     const formikRef = useRef<FormikProps<EventState>>(null)
 
     useImperativeHandle(ref, () => ({
