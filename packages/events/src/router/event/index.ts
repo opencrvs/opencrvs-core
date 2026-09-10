@@ -14,7 +14,6 @@ import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   EventDocumentOnlyLastAction,
-  FilePathPrefix,
   getUUID,
   UUID
 } from '@opencrvs/commons'
@@ -351,7 +350,7 @@ export const eventRouter = router({
          * here instead. `events/{eventId}/...` is record-bound; `users/{userId}/...`
          * and bare `{uuid}.{ext}` (pre-2.0 legacy) aren't.
          */
-        if (firstSegment === FilePathPrefix.Events) {
+        if (firstSegment === 'events') {
           const eventId = UUID.safeParse(secondSegment).data
 
           if (!eventId) {
@@ -371,10 +370,7 @@ export const eventRouter = router({
             getRawInput: () => ({ eventId }),
             next: (opts: unknown) => opts
           } as unknown as MiddlewareOptions)
-        } else if (
-          firstSegment !== FilePathPrefix.Users &&
-          filePath.includes('/')
-        ) {
+        } else if (firstSegment !== 'users' && filePath.includes('/')) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: `Unrecognized file path: ${filePath}`

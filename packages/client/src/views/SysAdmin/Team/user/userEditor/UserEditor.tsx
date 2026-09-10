@@ -24,7 +24,6 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   FieldValue,
-  FilePathPrefix,
   FileFieldValue,
   getDeclaration,
   getDeclarationPages,
@@ -295,7 +294,7 @@ const EditUserComponent = () => {
       title={title}
     >
       <PagesComponent
-        attachmentPath={`${FilePathPrefix.Users}/${userId}/`}
+        attachmentPath={`users/${userId}/`}
         hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
