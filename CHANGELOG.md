@@ -37,7 +37,7 @@ Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
 `mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.action.accept` or `record.read`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
-The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` now controls the lifetime of the action-bound token described above, and **defaults to 600 seconds** (was 604800). It only has to outlive the confirmation round trip to the country configuration; integrations that confirm hours or days later use their own system client, so it must not be raised to cover them.
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is now an internal service token and lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
 
 #### `validUntil` removed from location APIs
 

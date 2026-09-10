@@ -285,7 +285,7 @@ export async function createTokenForActionConfirmation({
     {
       subject: SERVICE_USER_ID,
       algorithm: 'RS256',
-      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
+      expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
       audience: ['opencrvs:countryconfig-user'],
       issuer: JWT_ISSUER
     }
