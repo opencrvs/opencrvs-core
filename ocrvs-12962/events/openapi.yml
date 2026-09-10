@@ -17834,7 +17834,9 @@ components:
                   - type: object
                     properties:
                       age:
-                        type: number
+                        type: integer
+                        minimum: 0
+                        maximum: 999
                       asOfDateRef:
                         type: string
                     required:
@@ -18101,7 +18103,9 @@ components:
                             - type: object
                               properties:
                                 age:
-                                  type: number
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 999
                                 asOfDateRef:
                                   type: string
                               required:
@@ -18370,7 +18374,9 @@ components:
                     - type: object
                       properties:
                         age:
-                          type: number
+                          type: integer
+                          minimum: 0
+                          maximum: 999
                         asOfDateRef:
                           type: string
                       required:
