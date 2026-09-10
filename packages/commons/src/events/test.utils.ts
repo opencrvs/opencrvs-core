@@ -651,13 +651,16 @@ export function eventPayloadGenerator(
       }),
       unassign: (
         eventId: string,
-        input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+        input: Partial<
+          Pick<UnassignActionInput, 'transactionId' | 'waitFor'>
+        > = {}
       ) => ({
         type: ActionType.UNASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: null,
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       archive: (
         eventId: string,

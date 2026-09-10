@@ -145,7 +145,8 @@ describe('Custom action', () => {
       await expect(
         client.event.actions.assignment.assign(
           generator.event.actions.assign(event.id, {
-            assignedTo: user.id
+            assignedTo: user.id,
+            waitFor: false
           })
         )
       ).resolves.toBeDefined()
@@ -198,7 +199,8 @@ describe('Custom action', () => {
       await expect(
         client.event.actions.assignment.assign(
           generator.event.actions.assign(event.id, {
-            assignedTo: user.id
+            assignedTo: user.id,
+            waitFor: false
           })
         )
       ).resolves.toBeDefined()

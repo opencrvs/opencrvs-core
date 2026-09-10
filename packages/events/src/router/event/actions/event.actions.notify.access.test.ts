@@ -53,7 +53,7 @@ describe('Notify action', () => {
     const event = await client.event.create(generator.event.create())
 
     await client.event.actions.assignment.unassign(
-      generator.event.actions.unassign(event.id)
+      generator.event.actions.unassign(event.id, { waitFor: false })
     )
 
     await expect(

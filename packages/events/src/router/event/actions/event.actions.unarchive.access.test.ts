@@ -25,7 +25,6 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
-import { EventIdParam } from '@events/router/middleware'
 
 const ASSIGNED_ERROR = 'User is assigned to this event'
 const FORBIDDEN_ERROR = 'FORBIDDEN'

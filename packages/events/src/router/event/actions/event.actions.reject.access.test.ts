@@ -32,14 +32,17 @@ const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
   encodeScope({ type: 'record.reject' })
 ])
 
-describe('Register action', () => {
+describe('Rejet action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
 
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id, { keepAssignment: true })
+      generator.event.actions.declare(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await expect(
@@ -54,7 +57,7 @@ describe('Register action', () => {
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id)
+      generator.event.actions.declare(event.id, { waitFor: false })
     )
 
     await expect(
