@@ -10,11 +10,13 @@
  */
 import { expect, Page, test } from '@playwright/test'
 
+import { faker } from '@faker-js/faker'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { getToken, login } from '@e2e/support/helpers'
 import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 import {
   createDeclaration,
+  getDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -25,14 +27,35 @@ test.describe.serial('Can view non-downloaded event online', () => {
   let page: Page
   let declaration: Declaration
   let childName: string
+  let childFullName: string
   let trackingId: string
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
     const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
-    const res = await createDeclaration(token, undefined, ActionType.DECLARE)
+    // Set a middle name via the API
+    const childFirstName = faker.person.firstName()
+    const childMiddleName = faker.person.middleName()
+    const childSurname = faker.person.lastName()
+    const declarationWithMiddleName = await getDeclaration({
+      token,
+      partialDeclaration: {
+        'child.name': {
+          firstname: childFirstName,
+          middlename: childMiddleName,
+          surname: childSurname
+        }
+      }
+    })
+    const res = await createDeclaration(
+      token,
+      declarationWithMiddleName,
+      ActionType.DECLARE
+    )
     declaration = res.declaration
+    // The event title (and therefore the workqueue/heading) only uses first and surname
     childName = formatV2ChildName(declaration)
+    childFullName = `${childFirstName} ${childMiddleName} ${childSurname}`
     trackingId = res.trackingId!
   })
 
@@ -58,7 +81,7 @@ test.describe.serial('Can view non-downloaded event online', () => {
 
   test('Verify that user can see details on "Record"-tab', async () => {
     await page.getByRole('button', { name: 'Record', exact: true }).click()
-    await expect(page.getByTestId('child.name-value')).toHaveText(childName)
+    await expect(page.getByTestId('child.name-value')).toHaveText(childFullName)
   })
 })
 

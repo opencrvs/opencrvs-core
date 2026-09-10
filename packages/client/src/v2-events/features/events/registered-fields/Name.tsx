@@ -266,11 +266,8 @@ function NameOutput({
   value?: NameFieldValue
   configuration?: NameField
 }) {
-  const defaultNameOrder = [
-    'firstname',
-    ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
-    'surname'
-  ]
+  // Always include middlename in the default order. joinValues() drops empty values, so it only renders when present
+  const defaultNameOrder = ['firstname', 'middlename', 'surname']
   const order = configuration?.configuration?.order || defaultNameOrder
 
   return joinValues(
