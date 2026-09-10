@@ -507,11 +507,7 @@ describe('Request and confirmation flow', () => {
 
         const allegedActionId = getUUID()
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          event.id,
-          allegedActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, event.id)
 
         await expect(
           countryConfigClient.event.actions.register.accept({
@@ -563,11 +559,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.reject({
           eventId,
@@ -631,11 +623,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         const response =
           await countryConfigClient.event.actions.register.accept({
@@ -702,11 +690,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.accept({
           ...data,
@@ -784,11 +768,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         const response =
           await countryConfigClient.event.actions.register.accept({
@@ -858,8 +838,7 @@ describe('Request and confirmation flow', () => {
 
         const countryConfigClient = createCountryConfigClient(
           user,
-          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID,
-          'abbaabba-abba-4abb-8baa-abbaabbaabba' as UUID
+          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID
         )
 
         await expect(
@@ -891,11 +870,7 @@ describe('Request and confirmation flow', () => {
 
         const allegedActionId = getUUID()
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          event.id,
-          allegedActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, event.id)
 
         await expect(
           countryConfigClient.event.actions.register.reject({
@@ -940,11 +915,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.accept({
           ...data,
@@ -1003,11 +974,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.reject({
           eventId,
@@ -1070,11 +1037,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         const response =
           await countryConfigClient.event.actions.register.reject({
@@ -1137,11 +1100,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        const countryConfigClient = createCountryConfigClient(user, eventId)
 
         const response =
           await countryConfigClient.event.actions.register.reject({
@@ -1206,8 +1165,7 @@ describe('Request and confirmation flow', () => {
 
         const countryConfigClient = createCountryConfigClient(
           user,
-          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID,
-          'abbaabba-abba-4abb-8baa-abbaabbaabba' as UUID
+          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID
         )
 
         await expect(

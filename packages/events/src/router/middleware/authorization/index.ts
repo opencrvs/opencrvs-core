@@ -325,14 +325,31 @@ const ActionConfirmationParams = z.object({
  * declaration, with the country configuration never involved. So it takes its
  * own scope — `record.action.accept` / `record.action.reject` — which no user
  * role is granted. It belongs to an integration that confirms under its own
- * credentials (e.g. mosip-api, once MOSIP issues a credential). Such a grant is
+ * credentials (e.g. mosip-api, once MOSIP issues a credential).
+ *
+ * Those scopes are only ever honoured for a **system** client: a human user's
+ * token cannot confirm even if it somehow carried one. The grant is still
  * subject to the ordinary record-scope event checks, so an integration stays
  * confined to the event types and jurisdiction it was granted.
  */
 export function requireActionConfirmation(
   scopeType: ActionConfirmationScopeType
 ) {
-  return canAccessEventWithScopes([scopeType])
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & { eventId: UUID; eventType: string },
+    unknown
+  > = async (opts) => {
+    if (opts.ctx.user.type !== TokenUserType.enum.system) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    return canAccessEventWithScopes([scopeType])(opts)
+  }
+
+  return fn
 }
 
 /**

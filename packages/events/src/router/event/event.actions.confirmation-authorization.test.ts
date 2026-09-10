@@ -171,11 +171,7 @@ describe('accept only confirms the pending action it names', () => {
       'Could not find the create action'
     )
 
-    const countryConfigClient = createCountryConfigClient(
-      user,
-      event.id,
-      createActionId
-    )
+    const countryConfigClient = createCountryConfigClient(user, event.id)
 
     await expect(
       countryConfigClient.event.actions.register.accept({
@@ -201,11 +197,7 @@ describe('accept only confirms the pending action it names', () => {
       'Could not find the accepted declare action'
     )
 
-    const countryConfigClient = createCountryConfigClient(
-      user,
-      event.id,
-      acceptedDeclareId
-    )
+    const countryConfigClient = createCountryConfigClient(user, event.id)
 
     await expect(
       countryConfigClient.event.actions.declare.accept({

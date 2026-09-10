@@ -52,7 +52,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.reject({
       eventId: event.id,
@@ -74,7 +74,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.reject({
       eventId: event.id,
@@ -88,7 +88,11 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
 })
 
 describe('Async confirmation - keepAssignment flags on accept', () => {
-  test('default: assignment dropped after async accept', async () => {
+  // Accept is confirmed by the country config's system client, and system
+  // users do not partake in assignment, so the accept never drops it — the
+  // keepAssignment flag has no effect here. (Reject still drops it; see
+  // addAsyncRejectAction.)
+  test('assignment kept after async accept by a system client', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
@@ -99,7 +103,7 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.accept({
       ...data,
@@ -107,7 +111,7 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
       transactionId: getUUID()
     })
 
-    expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
+    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
   })
 
   test('keepAssignment=true: assignment kept after async accept', async () => {
@@ -121,7 +125,7 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.accept({
       ...data,

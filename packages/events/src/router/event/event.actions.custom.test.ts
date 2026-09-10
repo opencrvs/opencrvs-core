@@ -345,11 +345,7 @@ describe('event.actions.custom', () => {
       })
       await client.event.actions.assignment.assign(assignmentInput)
 
-      const countryConfigClient = createCountryConfigClient(
-        user,
-        eventId,
-        originalActionId
-      )
+      const countryConfigClient = createCountryConfigClient(user, eventId)
 
       const response = await countryConfigClient.event.actions.custom.accept({
         ...payload,
