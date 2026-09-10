@@ -11,6 +11,7 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
+import * as Sentry from '@sentry/react'
 import {
   DocumentPath,
   FullDocumentPath,
@@ -21,7 +22,11 @@ import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient, trpcClient } from '@client/v2-events/trpc'
+import {
+  isExpectedAccessError,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -114,23 +119,21 @@ function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   return trpcClient.event.file.getPresignedUrl.query({ filePath })
 }
 
-async function precacheFile(path: DocumentPath | FullDocumentPath) {
-  const presignedUrl = (await getPresignedUrl(path)).presignedURL
-
-  const file = await fetchFileFromUrl(presignedUrl, path)
-
-  if (file) {
-    await cacheFile({ url: path, file })
-  }
-}
-
-/** Same as {@link precacheFile}, but never rejects — one file failing shouldn't fail the whole batch. */
-export async function safePrecacheFile(path: DocumentPath | FullDocumentPath) {
+/** Caches a file's contents locally. Never rejects — one file failing shouldn't fail the whole batch. */
+export async function precacheFile(path: DocumentPath | FullDocumentPath) {
   try {
-    await precacheFile(path)
+    const presignedUrl = (await getPresignedUrl(path)).presignedURL
+    const file = await fetchFileFromUrl(presignedUrl, path)
+
+    if (file) {
+      await cacheFile({ url: path, file })
+    }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.warn('Failed to precache file', error)
+    if (!isExpectedAccessError(error)) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to precache file', error)
+    }
+    Sentry.captureException(error)
   }
 }
 
