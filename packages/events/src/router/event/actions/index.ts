@@ -195,6 +195,10 @@ const AsyncActionInput = BaseActionInput.pick({
   actionId: UUID
 })
 
+const AsyncRejectCorrectionRejectInput = AsyncActionInput.extend({
+  requestId: UUID
+})
+
 type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
@@ -538,11 +542,13 @@ export function getDefaultActionProcedures(
         )
       }),
     reject: userAndSystemProcedure
-      .input(AsyncActionInput)
+      // @TODO: Use better type. REJECT CORRECTION REJECT endpoint has been broken
+      .input(AsyncRejectCorrectionRejectInput)
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
+
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
