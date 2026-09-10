@@ -63,7 +63,6 @@ import nodePath from 'path'
 const CLIENT_VALID_KEYS = new Set([
   'COUNTRY',
   'LANGUAGES',
-  'SENTRY',
   'REGISTER_BACKGROUND',
   'DASHBOARDS',
   'FEATURES'
@@ -75,8 +74,7 @@ const LOGIN_VALID_KEYS = new Set([
   'USER_NOTIFICATION_DELIVERY_METHOD',
   'INFORMANT_NOTIFICATION_DELIVERY_METHOD',
   'PHONE_NUMBER_PATTERN',
-  'LOGIN_BACKGROUND',
-  'SENTRY'
+  'LOGIN_BACKGROUND'
 ])
 
 // Keys defined in ApplicationConfig from packages/commons/src/application-config.ts
@@ -333,14 +331,13 @@ function transformDashboardsValue(init: Node, isProd: boolean): string {
  *
  * Prod files (isProd = true):
  *   - Import `env` from './environment'
- *   - Define `scheme = 'https'`, `hostname = env.DOMAIN`, `sentry = env.SENTRY_DSN`
- *   - Use `sentry` for the SENTRY property
+ *   - Define `scheme = 'https'`, `hostname = env.DOMAIN`
  *   - Rewrite DASHBOARDS[].url origins to use scheme/hostname template expressions
  *
  * Dev files (isProd = false):
  *   - No env import
  *   - Define `scheme = 'http'`, `hostname = 'localhost'`
- *   - Keep SENTRY and DASHBOARDS URLs as-is from the original JS file
+ *   - Keep DASHBOARDS URLs as-is from the original JS file
  */
 function generateTsContent(
   configObj: ObjectLiteralExpression,
@@ -368,8 +365,6 @@ function generateTsContent(
 
     if (name === 'LANGUAGES') {
       propertyLines.push(`  LANGUAGES: ${convertLanguages(init)}`)
-    } else if (name === 'SENTRY' && isProd) {
-      propertyLines.push(`  SENTRY: sentry`)
     } else if (name === 'DASHBOARDS') {
       propertyLines.push(
         `  DASHBOARDS: ${transformDashboardsValue(init, isProd)}`
@@ -416,7 +411,6 @@ function generateTsContent(
   if (isProd) {
     headerLines.push(`const scheme = 'https'`)
     headerLines.push(`const hostname = env.DOMAIN`)
-    headerLines.push(`const sentry = env.SENTRY_DSN`)
   } else {
     headerLines.push(`const scheme = 'http'`)
     headerLines.push(`const hostname = 'localhost'`)
