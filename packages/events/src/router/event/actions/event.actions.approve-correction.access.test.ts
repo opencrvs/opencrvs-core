@@ -156,7 +156,7 @@ describe('Approve correction action', () => {
       const getRequestActionPayload = () => ({
         eventId,
         requestId: getOrThrow(
-          requestedActionIds?.REQUEST_CORRECTION,
+          requestedActionIds.REQUEST_CORRECTION,
           'no action id'
         ),
         transactionId: getUUID(),

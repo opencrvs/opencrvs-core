@@ -115,7 +115,7 @@ describe('Request correction action', () => {
       actionPayload = {
         eventId,
         actionId: getOrThrow(
-          requestedActionIds?.REQUEST_CORRECTION,
+          requestedActionIds.REQUEST_CORRECTION,
           'no action id'
         ),
         transactionId: getUUID()

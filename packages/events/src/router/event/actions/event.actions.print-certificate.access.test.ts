@@ -71,8 +71,8 @@ describe('Print certificate action', () => {
         keepAssignment: true
       })
     )
-    client.event.actions.register.request(
-      generator.event.actions.register(event.id)
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { waitFor: false })
     )
 
     await expect(
