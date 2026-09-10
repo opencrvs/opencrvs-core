@@ -75,8 +75,8 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     font-size="8" letter-spacing="0px">
     <tspan x="234.289" y="654.552">&#x2028;</tspan>
     <tspan x="80.9999" y="667.352">{{$lookup $metadata "updatedAt"}}</tspan>
-    <tspan x="80.9999" y="643.352">{{$intlWithParams 'certificates.birth.printedCertificateCount'
-      'copiesPrintedForTemplate' ($lookup $metadata "copiesPrintedForTemplate")}}</tspan>
+    {{#ifCond ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.name") '!==' undefined }}<tspan x="80.9999" y="643.352">{{$intlWithParams 'certificates.birth.printedCertificateCount'
+      'copiesPrintedForTemplate' ($lookup $metadata "copiesPrintedForTemplate")}}</tspan>{{/ifCond}}
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" font-weight="bold" letter-spacing="0px">

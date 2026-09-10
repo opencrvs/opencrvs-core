@@ -10,9 +10,12 @@
  */
 /* eslint-disable no-console */
 import { bold, dim, green, red, yellow } from 'kleur/colors'
+import * as z from 'zod/v4'
 // Type-only import: erased at build time, so it adds no runtime dependency on
 // @opencrvs/commons (which is a devDependency of the toolkit).
 import type { TriggerEvent } from '@opencrvs/commons/notification'
+import { idOf, parseCsvLine } from '../csv'
+import { candidateRefs, fetchTemplate } from '../translations/template'
 
 const REQUEST_TIMEOUT_MS = 15000
 
@@ -146,12 +149,10 @@ async function requestStatus(
   url: string,
   method: 'GET' | 'POST'
 ): Promise<CheckStatus> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
     const response = await fetch(url, {
       method,
-      signal: controller.signal,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       // Sent without an Authorization header on purpose. A secured route
       // rejects with 401/403 before ever reading the body.
       headers:
@@ -161,8 +162,6 @@ async function requestStatus(
     return response.status
   } catch {
     return 'error'
-  } finally {
-    clearTimeout(timer)
   }
 }
 
@@ -205,11 +204,9 @@ function toEventTriggerConfig(value: unknown): EventTriggerConfig | null {
 async function fetchEventConfigs(
   baseUrl: string
 ): Promise<EventTriggerConfig[] | null> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
     const response = await fetch(`${baseUrl}/config/events`, {
-      signal: controller.signal
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
     })
     if (!response.ok) {
       return null
@@ -223,8 +220,6 @@ async function fetchEventConfigs(
       .filter((config): config is EventTriggerConfig => config !== null)
   } catch {
     return null
-  } finally {
-    clearTimeout(timer)
   }
 }
 
@@ -263,6 +258,210 @@ function securedDetail(status: CheckStatus): string {
     return `${describeStatus(status)} — request failed`
   }
   return `${describeStatus(status)} — INSECURE: ensure this endpoint requires authentication!`
+}
+
+/**
+ * The version of the country config template to check against. Bump it with
+ * the toolkit's own major.minor: a toolkit release checks that a country config
+ * serves the copy core requires *at that version*, which is the same template
+ * the `add-translations` codemod adds rows from.
+ */
+const TEMPLATE_VERSION = '2.1'
+
+/** The translation bundles a country config serves, one per CSV file core owns. */
+const TRANSLATED_APPLICATIONS = ['client', 'login'] as const
+
+interface TemplateTranslations {
+  ids: string[]
+  /** The column names other than `id` and `description`. */
+  languages: string[]
+}
+
+function readTemplateTranslations(contents: string): TemplateTranslations {
+  const lines = contents.replace(/\r?\n$/, '').split(/\r?\n/)
+
+  return {
+    ids: lines
+      .slice(1)
+      .filter((line) => line !== '')
+      .map(idOf),
+    languages: parseCsvLine(lines[0]).filter(
+      (column) => column !== 'id' && column !== 'description'
+    )
+  }
+}
+
+/**
+ * What `GET /content/{application}` answers with: one entry per language, each
+ * carrying every message id that language has copy for.
+ *
+ * Parsed rather than cast, because the whole check turns on which ids are
+ * present — a bundle that is not this shape cannot be read as "the id is
+ * missing", and reporting it as such would be a false failure.
+ */
+const ServedTranslations = z.object({
+  languages: z.array(
+    z.object({
+      lang: z.string(),
+      messages: z.record(z.string(), z.string())
+    })
+  )
+})
+
+type ServedLanguage = z.infer<typeof ServedTranslations>['languages'][number]
+
+/**
+ * The bundle `GET /content/{application}` serves, or `null` when it cannot be
+ * read. An unreachable endpoint is already a failure in the public-endpoints
+ * section above, so it is not counted twice here.
+ */
+async function fetchServedTranslations(
+  baseUrl: string,
+  application: string
+): Promise<ServedLanguage[] | null> {
+  try {
+    const response = await fetch(`${baseUrl}/content/${application}`, {
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+    })
+    if (!response.ok) {
+      return null
+    }
+    const parsed = ServedTranslations.safeParse(await response.json())
+
+    return parsed.success ? parsed.data.languages : null
+  } catch {
+    return null
+  }
+}
+
+/** How many missing ids to print before summarising the rest. */
+const MISSING_IDS_SHOWN = 10
+
+/**
+ * Checks that every message id the country config template carries is served
+ * by the running country config.
+ *
+ * This is the API-side half of the translation checks: which files the copy is
+ * kept in, and what shape they are, is the country config's own business — this
+ * only asks whether the copy core needs comes back out of `/content/*`. A
+ * country config checks its *own* messages against its *own* files itself; see
+ * `check-translations.ts` in the country config template.
+ *
+ * An id is looked for across every language served rather than in one of them:
+ * a row in a CSV yields an entry under each of that file's language columns, so
+ * absent everywhere means absent from the files. Whether the copy is written is
+ * a separate matter, and an empty cell is legitimate — the template itself ships
+ * a few.
+ *
+ * Returns the number of failures.
+ */
+async function verifyTranslations(baseUrl: string): Promise<number> {
+  let refs: string[]
+  try {
+    refs = await candidateRefs(TEMPLATE_VERSION)
+  } catch (error) {
+    console.log(
+      '  ' +
+        yellow(
+          `Could not list the ${TEMPLATE_VERSION} refs on GitHub (${
+            (error as Error).message
+          }); translations not checked.`
+        )
+    )
+    return 0
+  }
+
+  let failures = 0
+
+  for (const application of TRANSLATED_APPLICATIONS) {
+    const endpoint = `GET /content/${application}`
+
+    let fetched: Awaited<ReturnType<typeof fetchTemplate>>
+    try {
+      fetched = await fetchTemplate(refs, application)
+    } catch (error) {
+      console.log(
+        '  ' +
+          yellow(
+            `Could not read ${application}.csv from the country config template on GitHub (${
+              (error as Error).message
+            }); ${endpoint} not checked.`
+          )
+      )
+      continue
+    }
+
+    if (!fetched) {
+      console.log(
+        '  ' +
+          yellow(
+            `No ${application}.csv in the ${TEMPLATE_VERSION} country config template on GitHub; ${endpoint} not checked.`
+          )
+      )
+      continue
+    }
+
+    const template = readTemplateTranslations(fetched.contents)
+    const served = await fetchServedTranslations(baseUrl, application)
+
+    if (!served) {
+      console.log(
+        '  ' + yellow(`Could not read ${endpoint}; translations not checked.`)
+      )
+      continue
+    }
+
+    const servedIds = new Set(
+      served.flatMap(({ messages }) => Object.keys(messages))
+    )
+    const missing = template.ids.filter((id) => !servedIds.has(id))
+    const servedLanguages = new Set(served.map(({ lang }) => lang))
+    const absentLanguages = template.languages.filter(
+      (lang) => !servedLanguages.has(lang)
+    )
+
+    if (missing.length === 0) {
+      console.log(
+        line(
+          true,
+          endpoint,
+          `all ${template.ids.length} id(s) from the ${fetched.ref} template served`
+        )
+      )
+    } else {
+      failures++
+      console.log(
+        line(
+          false,
+          endpoint,
+          `${missing.length} of ${template.ids.length} id(s) from the ${fetched.ref} template not served`
+        )
+      )
+      for (const id of missing.slice(0, MISSING_IDS_SHOWN)) {
+        console.log(`      ${dim(id)}`)
+      }
+      if (missing.length > MISSING_IDS_SHOWN) {
+        console.log(
+          `      ${dim(`… and ${missing.length - MISSING_IDS_SHOWN} more`)}`
+        )
+      }
+    }
+
+    // A country dropping a language the template ships is its own decision, so
+    // this is worth saying but is not a failure.
+    if (absentLanguages.length > 0) {
+      console.log(
+        '    ' +
+          yellow(
+            `${application}: the template carries ${absentLanguages.join(
+              ', '
+            )}, which this country config does not serve.`
+          )
+      )
+    }
+  }
+
+  return failures
 }
 
 export async function runVerifyEndpoints(
@@ -387,6 +586,10 @@ export async function runVerifyEndpoints(
       }
     }
   }
+
+  console.log()
+  console.log(bold('Translations served (must cover the copy core requires):'))
+  failures += await verifyTranslations(baseUrl)
 
   console.log()
   if (failures > 0) {

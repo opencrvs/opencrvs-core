@@ -108,9 +108,12 @@ export async function fileUploadHandler(
     )
   }
 
+  // Persist the content type the client reported for the file
+  const contentType = file.hapi.headers['content-type']
+
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
-    ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
+    ...(contentType && { 'content-type': contentType })
   })
 
   return filePath
