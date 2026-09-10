@@ -546,7 +546,6 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
-            | 'waitFor'
             | 'keepAssignmentIfRejected'
             | 'waitFor'
           >
@@ -620,8 +619,8 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
-            | 'waitFor'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -713,8 +712,8 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
-            | 'waitFor'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -739,8 +738,8 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'registrationNumber'
             | 'keepAssignmentIfAccepted'
-            | 'waitFor'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
