@@ -257,6 +257,20 @@ export const FileInputButton: Story = {
       }
     )
 
+    await step(
+      'Prevents upload of a .jfif image even though the browser reports it as image/jpeg',
+      async () => {
+        const jfifFile = new File(['a'.repeat(512)], 'photo.jfif', {
+          type: MimeType.enum['image/jpeg']
+        })
+
+        await userEvent.upload(input, jfifFile)
+        await canvas.findByText(
+          'File format not supported. Please attach jpeg (max 1mb)'
+        )
+      }
+    )
+
     await step('Accepts file of valid size and type', async () => {
       const filename = 'valid.jpg'
       const validFile = new File(['a'.repeat(512 * 512)], filename, {

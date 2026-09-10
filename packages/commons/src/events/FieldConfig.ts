@@ -304,6 +304,30 @@ export const MimeType = z.enum([
 ])
 export type MimeType = z.infer<typeof MimeType>
 
+/**
+ * Filename extensions permitted for each accepted MIME type.
+ */
+export const MIME_TYPE_EXTENSIONS: Record<MimeType, string[]> = {
+  'image/png': ['png'],
+  'image/jpg': ['jpg'],
+  'image/jpeg': ['jpg', 'jpeg'],
+  'image/svg+xml': ['svg'],
+  'application/pdf': ['pdf'],
+  'application/msword': ['doc'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
+    'docx'
+  ],
+  'application/vnd.oasis.opendocument.text': ['odt']
+}
+
+/**
+ * Returns the filename extensions (lowercase, without a leading dot) allowed
+ * for the given accepted MIME types.
+ */
+export function getAllowedFileExtensions(mimeTypes: MimeType[]): string[] {
+  return mimeTypes.flatMap((mimeType) => MIME_TYPE_EXTENSIONS[mimeType])
+}
+
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 
 const SignatureField = BaseField.extend({

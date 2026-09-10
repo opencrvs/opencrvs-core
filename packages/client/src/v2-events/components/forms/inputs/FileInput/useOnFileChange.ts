@@ -10,8 +10,13 @@
  */
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
-import { MimeType } from '@opencrvs/commons/client'
+import { getAllowedFileExtensions, MimeType } from '@opencrvs/commons/client'
 import { bytesToMB } from '@client/utils/imageUtils'
+
+function getFileExtension(fileName: string): string {
+  const lastDot = fileName.lastIndexOf('.')
+  return lastDot === -1 ? '' : fileName.slice(lastDot + 1).toLowerCase()
+}
 
 const messages = {
   fileSizeError: {
@@ -60,11 +65,16 @@ export function useOnFileChange({
     onUploadingStateChanged?.(false)
 
     const isFileTooLarge = uploadedFile.size > maxFileSize
-
     const hasFileCriteria = acceptedFileTypes.length > 0
-    const isWrongFileType = acceptedFileTypes.every(
-      (fileType) => fileType !== uploadedFile.type
-    )
+
+    // Certain file extensions share an accepted MIME type but we dont want to support them,
+    // since they can not be displayed in the document viewer.
+    // For example we dont want to allow .jfif images for image/jpeg MIME-type.
+    const allowedExtensions = getAllowedFileExtensions(acceptedFileTypes)
+    const isWrongFileType =
+      acceptedFileTypes.every((fileType) => fileType !== uploadedFile.type) ||
+      !allowedExtensions.includes(getFileExtension(uploadedFile.name))
+
     if ((hasFileCriteria && isWrongFileType) || isFileTooLarge) {
       onUploadingStateChanged?.(false)
       setFilesBeingUploaded([])
