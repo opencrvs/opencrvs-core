@@ -14,12 +14,21 @@
 {{- $egress_mode := $network_policy.egress_mode | default "deny" -}}
 {{- $private_cidrs := list "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" -}}
 
+{{- $annotations := merge ($network_policy.annotations | default dict) ($root.network_policy.annotations | default dict) -}}
+{{- $labels := merge (dict "app" $appLabel) ($network_policy.labels | default dict) ($root.network_policy.labels | default dict) -}}
+
 {{- if and (ne $ingress_mode "deny") $service_values.port }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ printf "%s-allow-ingress" $service_name | trunc 63 | trimSuffix "-" }}
+{{- if $annotations }}
+  annotations:
+{{ toYaml $annotations | indent 4 }}
+{{- end }}
+  labels:
+{{ toYaml $labels | indent 4 }}
 spec:
   podSelector:
     matchLabels:
@@ -49,6 +58,12 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ printf "%s-allow-egress" $service_name | trunc 63 | trimSuffix "-" }}
+{{- if $annotations }}
+  annotations:
+{{ toYaml $annotations | indent 4 }}
+{{- end }}
+  labels:
+{{ toYaml $labels | indent 4 }}
 spec:
   podSelector:
     matchLabels:
@@ -71,11 +86,19 @@ spec:
 {{- if not $rule.name }}
 {{- fail (printf "network_policy rule for service %s must define name" $service_name) }}
 {{- end }}
+{{- $rule_annotations := merge ($rule.annotations | default dict) $annotations -}}
+{{- $rule_labels := merge ($rule.labels | default dict) $labels -}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ printf "%s-%s" $service_name $rule.name | trunc 63 | trimSuffix "-" }}
+{{- if $rule_annotations }}
+  annotations:
+{{ toYaml $rule_annotations | indent 4 }}
+{{- end }}
+  labels:
+{{ toYaml $rule_labels | indent 4 }}
 spec:
   podSelector:
     matchLabels:
