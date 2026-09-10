@@ -190,7 +190,7 @@ describe('Reject correction action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.correction.reject.reject(actionPayload)
+        systemClient.event.actions.correction.reject.accept(actionPayload)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
 

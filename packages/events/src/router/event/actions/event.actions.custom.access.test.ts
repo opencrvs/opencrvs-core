@@ -163,7 +163,7 @@ describe('Custom action', () => {
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
 
-    test('Prevents system accepting the action when it is assigned to a user', async () => {
+    test('Prevents system rejecting the action when it is assigned to a user', async () => {
       mockActionApi(ActionType.CUSTOM, 202)
 
       const { user, generator } = await setupTestCase()

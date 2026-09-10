@@ -50,7 +50,8 @@ describe('Print certificate action', () => {
 
     await client.event.actions.register.request(
       generator.event.actions.register(event.id, {
-        waitFor: false
+        waitFor: false,
+        keepAssignment: true
       })
     )
 

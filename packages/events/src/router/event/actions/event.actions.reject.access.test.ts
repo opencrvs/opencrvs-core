@@ -32,7 +32,7 @@ const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
   encodeScope({ type: 'record.reject' })
 ])
 
-describe('Rejet action', () => {
+describe('Reject action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)

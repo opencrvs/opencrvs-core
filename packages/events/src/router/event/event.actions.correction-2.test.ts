@@ -476,7 +476,7 @@ describe('Search index should reflect corrected null informant fields', () => {
   })
 })
 
-test.only('System may reject REJECT_CORRECTION action', async () => {
+test('System may reject REJECT_CORRECTION action', async () => {
   function mockActionApi(action: ActionType, status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
@@ -507,7 +507,7 @@ test.only('System may reject REJECT_CORRECTION action', async () => {
   const getRequestActionPayload = () => ({
     eventId,
     requestId: getOrThrow(
-      requestedActionIds?.REQUEST_CORRECTION,
+      requestedActionIds.REQUEST_CORRECTION,
       'no action id'
     ),
     transactionId: getUUID(),
