@@ -374,6 +374,13 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
   ActionType.REQUEST_CORRECTION
 ] as const
 
+function getAsyncRejectInputSchema(actionType: ActionType) {
+  if (actionType === ActionType.REJECT_CORRECTION) {
+    return AsyncRejectCorrectionRejectInput
+  }
+
+  return AsyncActionInput
+}
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
@@ -542,8 +549,7 @@ export function getDefaultActionProcedures(
         )
       }),
     reject: userAndSystemProcedure
-      // @TODO: Use better type. REJECT CORRECTION REJECT endpoint has been broken
-      .input(AsyncRejectCorrectionRejectInput)
+      .input(getAsyncRejectInputSchema(actionType))
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {

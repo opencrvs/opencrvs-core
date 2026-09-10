@@ -28,12 +28,19 @@ import {
   generateTranslationConfig,
   EventState,
   UUID,
-  getDeclarationFields
+  getDeclarationFields,
+  createPrng,
+  getOrThrow,
+  getUUID
 } from '@opencrvs/commons'
-import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
+import {
+  ChildOnboardingEvent,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestClient,
+  seedEvent,
   setupTestCase,
   TEST_SYSTEM_ID
 } from '@events/tests/utils'
@@ -467,4 +474,66 @@ describe('Search index should reflect corrected null informant fields', () => {
     expect(resultsAfterCorrectionByChildDob).toHaveLength(1)
     expect(resultsAfterCorrectionByChildDob[0].id).toBe(event.id)
   })
+})
+
+test.only('System may reject REJECT_CORRECTION action', async () => {
+  function mockActionApi(action: ActionType, status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+        () => {
+          return HttpResponse.json({}, { status })
+        }
+      )
+    )
+  }
+
+  mockActionApi(ActionType.REJECT_CORRECTION, 202)
+
+  const { user, eventsDb } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const { eventId, requestedActionIds } = await seedEvent(eventsDb, {
+    actions: [
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REQUEST_CORRECTION
+    ],
+    eventConfig: tennisClubMembershipEvent,
+    user,
+    rng: createPrng(1243429)
+  })
+
+  const getRequestActionPayload = () => ({
+    eventId,
+    requestId: getOrThrow(
+      requestedActionIds?.REQUEST_CORRECTION,
+      'no action id'
+    ),
+    transactionId: getUUID(),
+    content: {
+      reason: 'content'
+    },
+    waitFor: false
+  })
+
+  const rejectActionResponse =
+    await client.event.actions.correction.reject.request(
+      getRequestActionPayload()
+    )
+
+  const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+    encodeScope({ type: 'record.correct' })
+  ])
+
+  const rejectRequestAction = rejectActionResponse.actions.find(
+    (a) => a.type === ActionType.REJECT_CORRECTION
+  )
+
+  await expect(
+    systemClient.event.actions.correction.reject.reject({
+      ...getRequestActionPayload(),
+      actionId: getOrThrow(rejectRequestAction?.id, 'no action id')
+    })
+  ).resolves.toBeDefined()
 })
