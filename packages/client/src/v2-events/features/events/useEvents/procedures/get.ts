@@ -109,7 +109,7 @@ function useViewEvent(id: UUID): EventDocument {
 
   return useSuspenseQuery({
     queryKey,
-    queryFn: () => fetchEventForViewing(id),
+    queryFn: async () => fetchEventForViewing(id),
     gcTime: 0,
     staleTime: Infinity,
     refetchOnMount: false,
