@@ -98,50 +98,6 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
-  test('the action-bound token core mints for country config can accept', async () => {
-    const { user, event, input, actionId } = await requestPendingRegistration()
-
-    const countryConfigClient = createCountryConfigClient(
-      user,
-      event.id,
-      actionId
-    )
-
-    const response = await countryConfigClient.event.actions.register.accept({
-      ...input,
-      transactionId: getUUID(),
-      actionId,
-      registrationNumber: MOCK_REGISTRATION_NUMBER
-    })
-
-    expect(
-      response.actions.find(
-        (action) =>
-          action.type === ActionType.REGISTER &&
-          action.status === ActionStatus.Accepted
-      )
-    ).toMatchObject({ originalActionId: actionId })
-  })
-
-  test('a token bound to another action cannot accept this one', async () => {
-    const { user, event, input, actionId } = await requestPendingRegistration()
-
-    const clientBoundElsewhere = createCountryConfigClient(
-      user,
-      event.id,
-      getUUID()
-    )
-
-    await expect(
-      clientBoundElsewhere.event.actions.register.accept({
-        ...input,
-        transactionId: getUUID(),
-        actionId,
-        registrationNumber: MOCK_REGISTRATION_NUMBER
-      })
-    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
-  })
-
   test('an integration holding an unbound confirmation scope can accept', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 

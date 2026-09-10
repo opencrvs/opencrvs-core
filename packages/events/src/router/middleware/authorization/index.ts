@@ -45,10 +45,7 @@ import {
   UserScopeType,
   CreateUserInput,
   canAccessUserWithScope,
-  ActionConfirmationScopeType,
-  hasScopeForActionConfirmation,
-  isUnboundActionConfirmationScope,
-  Scope
+  ActionConfirmationScopeType
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -251,14 +248,7 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
  * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
  *
  */
-export const canAccessEventWithScopes = (
-  scopes: RecordScopeTypeV2[],
-  /**
-   * Narrows the matched scopes further, for scope types where holding one is
-   * not on its own enough — see `requireActionConfirmation`.
-   */
-  scopeFilter?: (scope: Scope) => boolean
-) => {
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -268,9 +258,7 @@ export const canAccessEventWithScopes = (
   > = async ({ next, ctx, getRawInput }) => {
     const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes).filter(
-      (scope) => scopeFilter?.(scope) ?? true
-    )
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
@@ -336,55 +324,15 @@ const ActionConfirmationParams = z.object({
  * it themselves, choosing the registration number and overriding the reviewed
  * declaration, with the country configuration never involved. So it takes its
  * own scope — `record.action.accept` / `record.action.reject` — which no user
- * role is granted, in either of the two forms that scope comes in:
- *
- * - **bound** to this exact action, which core mints per confirmation request
- *   and hands to the country configuration. The binding is the whole
- *   authorisation, so no event check applies;
- * - **unbound**, a standing grant to an integration that confirms under its own
- *   credentials (e.g. mosip-api, once MOSIP issues a credential, long after any
- *   bound token would have expired). Those are subject to the ordinary
- *   record-scope event checks, so an integration stays confined to the event
- *   types and jurisdiction it was granted.
- *
- * Bound scopes are excluded from the second check on purpose: one bound to
- * action B would otherwise pass a type-and-jurisdiction match while confirming
- * action A.
+ * role is granted. It belongs to an integration that confirms under its own
+ * credentials (e.g. mosip-api, once MOSIP issues a credential). Such a grant is
+ * subject to the ordinary record-scope event checks, so an integration stays
+ * confined to the event types and jurisdiction it was granted.
  */
 export function requireActionConfirmation(
   scopeType: ActionConfirmationScopeType
 ) {
-  const fn: MiddlewareFunction<
-    TrpcContext,
-    OpenApiMeta,
-    TrpcContext,
-    TrpcContext,
-    unknown
-  > = async (opts) => {
-    const { ctx, next, getRawInput } = opts
-    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
-
-    if (!input) {
-      throw new TRPCError({ code: 'BAD_REQUEST' })
-    }
-
-    if (
-      hasScopeForActionConfirmation(
-        getScopes(ctx.token),
-        scopeType,
-        input.actionId
-      )
-    ) {
-      return next()
-    }
-
-    return canAccessEventWithScopes(
-      [scopeType],
-      isUnboundActionConfirmationScope
-    )(opts)
-  }
-
-  return fn
+  return canAccessEventWithScopes([scopeType])
 }
 
 /**
