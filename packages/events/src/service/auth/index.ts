@@ -11,7 +11,7 @@
 
 import fetch from 'node-fetch'
 import * as z from 'zod/v4'
-import { UUID } from '@opencrvs/commons'
+import { TokenWithBearer, UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   getSystemInitialisation as getSystemInitialisationQuery,
@@ -59,7 +59,7 @@ export async function getIntegrationCreatorToken(timeoutMs: number) {
  */
 export async function getActionConfirmationToken(
   { eventId, actionId }: { eventId: UUID; actionId: UUID },
-  token: string
+  token: TokenWithBearer
 ) {
   const res = await fetch(
     new URL('/internal/action-confirmation-token', env.AUTH_URL).toString(),
