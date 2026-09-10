@@ -22,6 +22,7 @@ import {
   seedLocalEventIndex,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
+import { usePendingDeleteEventIds } from '@client/v2-events/features/events/useEvents/procedures/delete'
 import {
   createEventActionMutationFn,
   QueryOptions,
@@ -199,6 +200,8 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
+  const pendingDeleteEventIds = usePendingDeleteEventIds()
+
   function getDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
@@ -245,8 +248,11 @@ export function useDrafts() {
      * can't be resolved (e.g. access lost after an office change) — where it isn't
      * actionable anyway.
      */
-    return drafts.data.filter(({ eventId }) =>
-      Boolean(findLocalEventDocument(eventId))
+    return drafts.data.filter(
+      ({ eventId }) =>
+        Boolean(findLocalEventDocument(eventId)) &&
+        // The server keeps serving a draft until its delete lands.
+        !pendingDeleteEventIds.includes(eventId)
     )
   }
 
