@@ -43,6 +43,10 @@ spec:
     - name: minio
       namespace: {{ .Release.Namespace }}
       port: 3536
+    {{- if .Values.ingress.admin_console_allowlist }}
+    middlewares:
+      - name: admin-console-ip-allowlist
+    {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}

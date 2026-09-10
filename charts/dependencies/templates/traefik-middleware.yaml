@@ -1,0 +1,10 @@
+{{- if .Values.ingress.admin_console_allowlist }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: admin-console-ip-allowlist
+spec:
+  ipAllowList:
+    sourceRange:
+      {{- toYaml .Values.ingress.admin_console_allowlist | nindent 6 }}
+{{- end }}
