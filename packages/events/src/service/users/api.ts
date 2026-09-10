@@ -239,7 +239,12 @@ export async function updateUser(
       officeId: incomingOfficeId
     })
 
-    if (incomingOfficeId && incomingOfficeId !== existingUser.officeId) {
+    const officeChanged =
+      incomingOfficeId && incomingOfficeId !== existingUser.officeId
+    const roleChanged =
+      otherFields.role && otherFields.role !== existingUser.role
+
+    if (officeChanged || roleChanged) {
       await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
     }
 
