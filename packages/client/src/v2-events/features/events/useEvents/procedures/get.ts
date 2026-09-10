@@ -10,7 +10,11 @@
  */
 
 import { useEffect } from 'react'
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useQuery,
+  useSuspenseQuery,
+  UseSuspenseQueryOptions
+} from '@tanstack/react-query'
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -25,7 +29,6 @@ import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/ca
 import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
-import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
 /*
@@ -86,38 +89,9 @@ async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
   return eventDocument
 }
 
-/**
- * Fetches a not-yet-downloaded record for viewing, via a Suspense query so
- * React Query owns the promise across suspend/retry (safe under Strict Mode
- * / concurrent-render remounts, unlike a hand-rolled ref+promise).
- *
- * `gcTime` alone isn't enough to guarantee this is gone once unmounted —
- * React Query defers garbage collection via `setTimeout`, so a quick
- * remount can still hit the stale cache entry. The unmount effect below
- * removes it synchronously instead, so every visit to an undownloaded
- * record is a real network call with a real loading state.
- */
-function useViewEvent(id: UUID): EventDocument {
-  const queryKey = [['view-event', id]]
-
-  useEffect(() => {
-    return () => {
-      queryClient.removeQueries({ queryKey, exact: true })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
-
-  return useSuspenseQuery({
-    queryKey,
-    queryFn: async () => fetchEventForViewing(id),
-    gcTime: 0,
-    staleTime: Infinity,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false
-  }).data
-}
-
+// Both branches call the same hooks in the same order — cachedAssignedEvent
+// can flip mid-session, and branching hooks on it breaks rules-of-hooks.
+// Only the queryOptions passed to useSuspenseQuery differ per branch.
 function useGetOrDownloadEvent(id: UUID) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
@@ -125,26 +99,48 @@ function useGetOrDownloadEvent(id: UUID) {
     trpc.event.get.queryKey({ eventId: id, waitFor: false })
   )
 
-  // If assigned & cached, read from cache without network
-  if (cachedAssignedEvent) {
-    const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
-      eventId: id,
-      waitFor: false
-    })
+  const viewEventQueryKey = [['view-event', id]]
 
-    return useSuspenseQuery({
-      ...queryOptions,
-      queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
-      meta: { eventConfig },
-      staleTime: Infinity,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchOnWindowFocus: false
-    }).data
-  }
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({ queryKey: viewEventQueryKey, exact: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
-  // Not downloaded: always a real network call and a real loading state
-  return useViewEvent(id)
+  const { queryFn, ...assignedQueryOptions } = trpc.event.get.queryOptions({
+    eventId: id,
+    waitFor: false
+  })
+
+  // The tRPC-derived branch's error type doesn't structurally match a plain
+  // `Error`, but both branches resolve to the same `EventDocument` on
+  // success, which is all the caller relies on.
+  const queryOptions = (
+    cachedAssignedEvent
+      ? {
+          // Assigned & cached: read from cache without network
+          ...assignedQueryOptions,
+          queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
+          meta: { eventConfig },
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
+        }
+      : {
+          // Not downloaded: always a real network call and a real loading state
+          queryKey: viewEventQueryKey,
+          queryFn: async () => fetchEventForViewing(id),
+          gcTime: 0,
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
+        }
+  ) as UseSuspenseQueryOptions<EventDocument>
+
+  return useSuspenseQuery(queryOptions).data
 }
 
 export function useGetEvent() {
