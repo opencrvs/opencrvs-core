@@ -530,7 +530,7 @@ form.field.label.medicallyCertified,,Medically Certified Cause of Death,Cause of
 form.field.label.otherInstitution,Select item for Other location,Other,Autre
 form.field.label.physician,,Physician,Médecin
 form.field.label.placeOfDeathSameAsPrimary,,Deceased's usual place of residence,Lieu de résidence habituel du défunt
-form.field.label.proofOfBirth.fileName,The following documents are required,The following documents are required,Les documents suivants sont requis
+form.field.label.proofOfBirth.fileName,File name for proof of birth,Notification of birth,Notification de naissance
 form.field.label.reasonNotApplying,,Reason,Motif de la mère
 form.field.label.verbalAutopsy,,Verbal autopsy,Autopsie verbale
 form.field.label.verbalAutopsyReport,,Verbal autopsy report,Rapport d'autopsie verbal
