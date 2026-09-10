@@ -49,39 +49,34 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    const missingEventsToDownload = drafts
-      .filter((draft) => !findLocalEventDocument(draft.eventId))
-      .map(async (draft) =>
-        queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey({
-            eventId: draft.eventId,
-            waitFor: false
-          }),
-          queryFn: trpcOptionsProxy.event.get.queryOptions({
-            eventId: draft.eventId,
-            waitFor: false
-          }).queryFn
-        })
-      )
-
-    await Promise.all(missingEventsToDownload)
-
-    /*
-     * Only precache documents for drafts whose event is actually present
-     * locally (already cached, or just downloaded above) — a draft whose
-     * event never loaded won't appear in the workqueue, so there's no
-     * reason to fetch its documents either.
-     */
-    const draftsWithLocalEvent = drafts.filter((draft) =>
-      findLocalEventDocument(draft.eventId)
-    )
-
-    const filenames = draftsWithLocalEvent.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action])
-    )
-
     await Promise.all(
-      filenames.map(async (filename) => safePrecacheFile(filename))
+      drafts.map(async (draft) => {
+        if (!findLocalEventDocument(draft.eventId)) {
+          await queryClient.prefetchQuery({
+            queryKey: trpcOptionsProxy.event.get.queryKey({
+              eventId: draft.eventId,
+              waitFor: false
+            }),
+            queryFn: trpcOptionsProxy.event.get.queryOptions({
+              eventId: draft.eventId,
+              waitFor: false
+            }).queryFn
+          })
+        }
+
+        /*
+         * A draft whose event never loaded won't appear in the workqueue,
+         * so there's no reason to fetch its documents either.
+         */
+        if (!findLocalEventDocument(draft.eventId)) {
+          return
+        }
+
+        const filenames = getFilepathsFromActionDocument([draft.action])
+        await Promise.all(
+          filenames.map(async (filename) => safePrecacheFile(filename))
+        )
+      })
     )
 
     return drafts
