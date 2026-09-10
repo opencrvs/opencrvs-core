@@ -231,7 +231,10 @@ test('Scope changes after office change - user loses access when the office chan
 
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.getByTestId('confirm_office_change').click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -315,7 +318,10 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
 
     await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.getByTestId('confirm_office_change').click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -423,7 +429,10 @@ test('Drafts are removed when only the role changes', async ({ browser }) => {
       )
     ).toBeVisible()
 
-    await page.getByTestId('confirm_office_change').click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
 
     await expect(
       page.getByText('Registration Officer', { exact: true })
