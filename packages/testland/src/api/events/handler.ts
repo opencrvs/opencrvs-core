@@ -19,9 +19,7 @@ import { createMosipInteropClient } from '@opencrvs/mosip/api'
 import {
   Action,
   ActionType,
-  aggregateActionDeclarations,
-  deepMerge,
-  getPendingAction,
+  getDeclarationWithPendingAction,
   RegisterAction,
   NameFieldValue
 } from '@opencrvs/toolkit/events'
@@ -67,11 +65,7 @@ export async function onBirthActionHandler(
   const event = request.payload
   await sendInformantNotification({ event, token })
 
-  const pendingAction = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+  const declaration = getDeclarationWithPendingAction(event)
 
   const mosipInteropClient = createMosipInteropClient(
     MOSIP_INTEROP_URL,
@@ -142,11 +136,12 @@ export async function onBirthCorrectionActionHandler(
   const token = request.auth.artifacts.token as string
   const event = request.payload
   await sendInformantNotification({ event, token })
-  const pendingAction = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+
+  // The correction's changed values (e.g. a newly verified parent ID that must
+  // trigger child UIN creation) live on the pending APPROVE_CORRECTION's linked
+  // REQUEST_CORRECTION. `getDeclarationWithPendingAction` resolves them the same
+  // way `aggregateActionDeclarations` does for an already-accepted approval.
+  const declaration = getDeclarationWithPendingAction(event)
 
   const childHasNid = Boolean(declaration['child.nid'])
   const shouldForwardToMosip =
@@ -263,11 +258,7 @@ export async function onDeathActionHandler(
   const event = request.payload
   await sendInformantNotification({ event, token })
 
-  const pendingAction = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+  const declaration = getDeclarationWithPendingAction(event)
 
   const mosipInteropClient = createMosipInteropClient(
     MOSIP_INTEROP_URL,

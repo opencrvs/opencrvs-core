@@ -129,6 +129,15 @@ test.describe('Side menu navigation', () => {
     }
   })
 
+  test('Check Provincial Registrar navigation items', async () => {
+    await login(page, CREDENTIALS.PROVINCIAL_REGISTRAR)
+
+    await expect(
+      page.getByRole('button', { name: 'Assigned to you' })
+    ).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByRole('button', { name: 'Recent' })).toBeVisible()
+  })
+
   test('Check National System Admin navigation items', async () => {
     await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
 
