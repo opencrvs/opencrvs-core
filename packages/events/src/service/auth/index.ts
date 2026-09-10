@@ -47,17 +47,15 @@ export async function getIntegrationCreatorToken(timeoutMs: number) {
 }
 
 /**
- * Fetches a token whose only scopes are `record.action.accept` and
- * `record.action.reject`, both bound to `actionId`.
+ * Fetches the scopeless service-identity token core sends to the country
+ * configuration when it requests action confirmation, in place of the caller's
+ * own token. It carries no scopes and its subject is the fixed service user, so
+ * it only proves to the country configuration that an internal core service is
+ * calling — it grants nothing on its own.
  *
- * This is what core sends to the country configuration when it requests action
- * confirmation, in place of the caller's own token: the country configuration
- * can confirm the one action it was asked about and nothing else, and never
- * holds the registrar's write scopes.
- *
- * The caller's `token` authenticates the mint request; the resulting token
- * carries that same identity, so a confirmation is still attributed to the user
- * whose action it is.
+ * The caller's `token` authenticates the mint request but is not carried over.
+ * A country configuration that confirms an action asynchronously must do so with
+ * its own system client's credentials, not with the returned token.
  */
 export async function getActionConfirmationToken(
   { eventId, actionId }: { eventId: UUID; actionId: UUID },

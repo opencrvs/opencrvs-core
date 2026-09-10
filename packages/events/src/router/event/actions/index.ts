@@ -254,11 +254,12 @@ export async function defaultRequestHandler(
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
   /*
-   * The country configuration gets a token bound to this one action rather than
-   * the caller's own token. Its only scopes are `record.action.accept` and
-   * `record.action.reject` for `requestedAction.id`, so it can confirm what it
-   * was asked about and nothing else — it cannot register a second record, act
-   * on another event, or use the registrar's write scopes.
+   * The country configuration gets a scopeless service-identity token rather
+   * than the caller's own token. It only proves the confirmation request comes
+   * from an internal core service; it grants nothing, so the country
+   * configuration cannot register a second record, act on another event, or use
+   * the registrar's write scopes. Confirming asynchronously requires the country
+   * configuration's own system client credentials.
    */
   const eventActionToken = await getActionConfirmationToken(
     { eventId: input.eventId, actionId: requestedAction.id },

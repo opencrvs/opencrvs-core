@@ -42,7 +42,7 @@ import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import {
   EncodedScope,
-  encodeScope,
+  SERVICE_USER_ID,
   TokenUserType
 } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
@@ -250,45 +250,40 @@ export async function createRefreshToken(
 }
 
 /**
- * Mints a token that authorises confirming (accepting or rejecting) exactly one
- * requested action, and nothing else on its own.
+ * Mints the token core hands to the country configuration when it requests
+ * action confirmation.
  *
- * Core sends this to the country configuration in place of the caller's own
- * token when it requests action confirmation. Because the accept/reject scopes
- * are bound to `actionId`, a replayed confirmation token cannot be turned into a
- * second registration nor used against another record — and the country
- * configuration never receives the registrar's full set of scopes.
+ * This is not a capability token: it carries no scopes and its subject is the
+ * fixed service user, so `isServiceToken` recognises it. Its sole purpose is to
+ * prove to the country configuration that the confirmation request really comes
+ * from an internal core service and not from an outside caller — nothing more.
  *
- * `extraScopes` carries over read access a country configuration handler may
- * already rely on. It is deliberately a narrow allowlist rather than the
- * subject token's whole scope list.
+ * Confirming an action asynchronously (accepting or rejecting after the initial
+ * request) is therefore no longer possible with this token; a country
+ * configuration must do that with its own system client's credentials, which
+ * hold the `record.action.accept` / `record.action.reject` scopes.
+ *
+ * `eventId` and `actionId` are kept as claims for traceability only.
  */
-export async function createTokenForActionConfirmation(
-  { eventId, actionId }: { eventId: UUID; actionId: UUID },
-  userId: UUID,
-  userType: TokenUserType,
-  extraScopes: EncodedScope[] = []
-) {
+export async function createTokenForActionConfirmation({
+  eventId,
+  actionId
+}: {
+  eventId: UUID
+  actionId: UUID
+}) {
   return sign(
     {
-      scope: [
-        encodeScope({
-          type: 'record.action.accept',
-          options: { id: actionId }
-        }),
-        encodeScope({
-          type: 'record.action.reject',
-          options: { id: actionId }
-        }),
-        ...extraScopes
-      ],
+      scope: [],
       eventId,
       actionId,
-      userType
+      // The events service short-circuits system tokens to a system context
+      // without a user lookup; `SERVICE_USER_ID` is not a real user record.
+      userType: TokenUserType.enum.system
     },
     cert,
     {
-      subject: userId,
+      subject: SERVICE_USER_ID,
       algorithm: 'RS256',
       expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
       audience: ['opencrvs:countryconfig-user'],

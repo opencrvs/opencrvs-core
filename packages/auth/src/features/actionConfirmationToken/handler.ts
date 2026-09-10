@@ -10,7 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { decodeScope, EncodedScope, UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons'
 import {
   createTokenForActionConfirmation,
   verifyToken
@@ -21,19 +21,15 @@ interface IAuthResponse {
 }
 
 /**
- * Scopes carried over from the requesting user's token into the action
- * confirmation token. A country configuration handler may read the record it
- * was asked to confirm; it has no business holding the caller's write scopes.
- */
-const CARRIED_OVER_SCOPE_TYPES = ['record.read']
-
-/**
- * Mints a token bound to a single requested action, for core to hand to the
- * country configuration when requesting action confirmation.
+ * Mints the token core hands to the country configuration when requesting
+ * action confirmation.
  *
- * The identity comes from the caller's own token rather than the payload, so
- * this can only ever mint a confirmation token for whoever already
- * authenticated. Reachable on the internal network only.
+ * The minted token carries no scopes and no caller identity — it only proves to
+ * the country configuration that an internal core service is calling (see
+ * {@link createTokenForActionConfirmation}). We still require the caller to
+ * present a valid token so that an arbitrary internal caller cannot mint one;
+ * its contents are otherwise not carried over. Reachable on the internal
+ * network only.
  */
 export default async function actionConfirmationTokenHandler(
   request: Hapi.Request,
@@ -57,34 +53,7 @@ export default async function actionConfirmationTokenHandler(
     return h.response({ error: 'invalid_subject_token' }).code(401)
   }
 
-  const { sub, userType } = decodedOrError.right
-
-  /*
-   * Every token that can clear `verifyToken` carries `userType` — the only
-   * signing paths that omit it (the internal service and initialisation tokens)
-   * lack the `opencrvs:auth-user` audience it requires. It is optional in the
-   * payload codec rather than in practice, so refuse instead of guessing:
-   * assuming `user` here would mint a confirmation token asserting user
-   * identity for what may be a system client.
-   */
-  if (!userType) {
-    return h.response({ error: 'invalid_subject_token' }).code(401)
-  }
-
-  const extraScopes = decodedOrError.right.scope.filter(
-    (scope): scope is EncodedScope => {
-      const decoded = decodeScope(scope as EncodedScope)
-
-      return CARRIED_OVER_SCOPE_TYPES.some((type) => type === decoded?.type)
-    }
-  )
-
-  const token = await createTokenForActionConfirmation(
-    { eventId, actionId },
-    sub as UUID,
-    userType,
-    extraScopes
-  )
+  const token = await createTokenForActionConfirmation({ eventId, actionId })
 
   return { token }
 }
