@@ -136,6 +136,11 @@ test.describe.serial('1. Create and update user -1', () => {
       await continueForm(page)
 
       await page.getByRole('button', { name: 'Confirm' }).click()
+      await page
+        .getByRole('dialog')
+        .getByRole('button', { name: 'Confirm' })
+        .click()
+
       await expect(page.getByText('Farajaland CRS')).toBeVisible()
     })
 
