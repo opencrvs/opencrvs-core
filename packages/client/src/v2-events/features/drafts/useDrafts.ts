@@ -19,6 +19,7 @@ import {
   findLocalEventDocument,
   refetchDraftsList,
   refetchAllSearchQueries,
+  seedLocalEventIndex,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
@@ -57,8 +58,8 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
 
     const missingEventsToDownload = drafts
       .filter((event) => !findLocalEventDocument(event.eventId))
-      .map(async (draft) =>
-        queryClient.prefetchQuery({
+      .map(async (draft) => {
+        await queryClient.prefetchQuery({
           queryKey: trpcOptionsProxy.event.get.queryKey({
             eventId: draft.eventId,
             waitFor: false
@@ -68,7 +69,17 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
             waitFor: false
           }).queryFn
         })
-      )
+
+        const event = findLocalEventDocument(draft.eventId)
+
+        /*
+         * The document alone is not enough to open the record: the event
+         * overview resolves it through `event.search`, which offline cannot run.
+         */
+        if (event) {
+          seedLocalEventIndex(draft.eventId, event)
+        }
+      })
 
     await Promise.all(missingEventsToDownload)
 
