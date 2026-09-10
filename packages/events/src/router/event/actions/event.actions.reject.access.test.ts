@@ -89,17 +89,21 @@ describe('Register action', () => {
 
       const event = await client.event.create(generator.event.create())
       await client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, { keepAssignment: true })
+        generator.event.actions.declare(event.id, {
+          keepAssignment: true,
+          waitFor: false
+        })
       )
 
       const rejectRequestResponse = await client.event.actions.reject.request(
-        generator.event.actions.reject(event.id)
+        generator.event.actions.reject(event.id, { waitFor: false })
       )
 
       await expect(
         client.event.actions.assignment.assign(
           generator.event.actions.assign(event.id, {
-            assignedTo: user.id
+            assignedTo: user.id,
+            waitFor: false
           })
         )
       ).resolves.toBeDefined()

@@ -40,7 +40,10 @@ describe('Edit action', () => {
     const event = await client.event.create(generator.event.create())
 
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id, { keepAssignment: true })
+      generator.event.actions.declare(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await expect(
@@ -55,7 +58,7 @@ describe('Edit action', () => {
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id)
+      generator.event.actions.declare(event.id, { waitFor: false })
     )
 
     await expect(

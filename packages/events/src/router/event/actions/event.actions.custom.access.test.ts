@@ -71,7 +71,8 @@ describe('Custom action', () => {
     const event = await client.event.create(generator.event.create())
 
     const declareInput = generator.event.actions.declare(event.id, {
-      keepAssignment: true
+      keepAssignment: true,
+      waitFor: false
     })
 
     await client.event.actions.declare.request({
@@ -125,7 +126,8 @@ describe('Custom action', () => {
       const event = await client.event.create(generator.event.create())
 
       const declareInput = generator.event.actions.declare(event.id, {
-        keepAssignment: true
+        keepAssignment: true,
+        waitFor: false
       })
 
       await client.event.actions.declare.request({
@@ -177,7 +179,8 @@ describe('Custom action', () => {
       const event = await client.event.create(generator.event.create())
 
       const declareInput = generator.event.actions.declare(event.id, {
-        keepAssignment: true
+        keepAssignment: true,
+        waitFor: false
       })
 
       await client.event.actions.declare.request({

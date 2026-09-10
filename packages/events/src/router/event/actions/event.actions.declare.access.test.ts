@@ -54,7 +54,8 @@ describe('Declare action', () => {
     await client.event.actions.assignment.unassign({
       eventId: event.id,
       assignedTo: null,
-      transactionId: getUUID()
+      transactionId: getUUID(),
+      waitFor: false
     })
 
     await expect(

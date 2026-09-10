@@ -546,7 +546,9 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -578,6 +580,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => {
@@ -617,6 +620,7 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
             | 'keepAssignmentIfRejected'
           >
         > = {}
@@ -635,14 +639,15 @@ export function eventPayloadGenerator(
       assign: (
         eventId: string,
         input: Partial<
-          Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+          Pick<AssignActionInput, 'transactionId' | 'assignedTo' | 'waitFor'>
         > = {}
       ) => ({
         type: ActionType.ASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: input.assignedTo ?? getUUID(),
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       unassign: (
         eventId: string,
@@ -664,6 +669,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -684,6 +690,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -703,6 +710,7 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
             | 'keepAssignmentIfRejected'
           >
         > = {}
@@ -728,6 +736,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'registrationNumber'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
             | 'keepAssignmentIfRejected'
           >
         > = {}
@@ -761,6 +770,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -789,6 +799,7 @@ export function eventPayloadGenerator(
               | 'keepAssignment'
               | 'keepAssignmentIfRejected'
               | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -814,7 +825,8 @@ export function eventPayloadGenerator(
           eventId,
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         approve: (
           eventId: string,
@@ -827,6 +839,7 @@ export function eventPayloadGenerator(
               | 'keepAssignment'
               | 'keepAssignmentIfRejected'
               | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -844,7 +857,8 @@ export function eventPayloadGenerator(
           requestId,
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         reject: (
           eventId: string,
@@ -858,6 +872,7 @@ export function eventPayloadGenerator(
               | 'keepAssignment'
               | 'keepAssignmentIfRejected'
               | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           >
         ) => ({
@@ -876,7 +891,8 @@ export function eventPayloadGenerator(
           content: input.content ?? { reason: 'too late' },
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         })
       },
       duplicate: {

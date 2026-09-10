@@ -25,6 +25,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { EventIdParam } from '@events/router/middleware'
 
 const ASSIGNED_ERROR = 'User is assigned to this event'
 const FORBIDDEN_ERROR = 'FORBIDDEN'
@@ -39,11 +40,17 @@ describe('Unarchive action', () => {
     const event = await client.event.create(generator.event.create())
 
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id, { keepAssignment: true })
+      generator.event.actions.declare(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await client.event.actions.archive.request(
-      generator.event.actions.archive(event.id, { keepAssignment: true })
+      generator.event.actions.archive(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await expect(
@@ -58,16 +65,22 @@ describe('Unarchive action', () => {
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id, { keepAssignment: true })
+      generator.event.actions.declare(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await client.event.actions.archive.request(
-      generator.event.actions.archive(event.id, { keepAssignment: true })
+      generator.event.actions.archive(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await expect(
       systemClient.event.actions.unarchive.request(
-        generator.event.actions.unarchive(event.id)
+        generator.event.actions.unarchive(event.id, { waitFor: false })
       )
     ).rejects.toThrow(FORBIDDEN_ERROR)
   })
@@ -97,22 +110,29 @@ describe('Unarchive action', () => {
 
       const event = await client.event.create(generator.event.create())
       await client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, { keepAssignment: true })
+        generator.event.actions.declare(event.id, {
+          keepAssignment: true,
+          waitFor: false
+        })
       )
 
       await client.event.actions.archive.request(
-        generator.event.actions.archive(event.id, { keepAssignment: true })
+        generator.event.actions.archive(event.id, {
+          keepAssignment: true,
+          waitFor: false
+        })
       )
 
       const unarchiveRequestResponse =
         await client.event.actions.unarchive.request(
-          generator.event.actions.unarchive(event.id)
+          generator.event.actions.unarchive(event.id, { waitFor: false })
         )
 
       await expect(
         client.event.actions.assignment.assign(
           generator.event.actions.assign(event.id, {
-            assignedTo: user.id
+            assignedTo: user.id,
+            waitFor: false
           })
         )
       ).resolves.toBeDefined()

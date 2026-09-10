@@ -39,7 +39,10 @@ describe('Archive action', () => {
     const event = await client.event.create(generator.event.create())
 
     await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id, { keepAssignment: true })
+      generator.event.actions.declare(event.id, {
+        keepAssignment: true,
+        waitFor: false
+      })
     )
 
     await expect(
@@ -89,7 +92,10 @@ describe('Archive action', () => {
 
       const event = await client.event.create(generator.event.create())
       await client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, { keepAssignment: true })
+        generator.event.actions.declare(event.id, {
+          keepAssignment: true,
+          waitFor: false
+        })
       )
 
       const archiveRequestResponse = await client.event.actions.archive.request(
