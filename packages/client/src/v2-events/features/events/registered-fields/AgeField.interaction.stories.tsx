@@ -205,7 +205,7 @@ export const AgeFieldInteractionEmpty: Story = {
 }
 
 export const AgeFieldInteractionDigits: Story = {
-  name: '5 digits',
+  name: '5 digits (capped at max 999)',
   parameters: {
     layout: 'centered',
     chromatic: { disableSnapshot: true }
@@ -221,5 +221,70 @@ export const AgeFieldInteractionDigits: Story = {
     await userEvent.type(ageInput, '12345')
     ageInput.blur()
     await expect(ageInput).toHaveValue('123')
+  }
+}
+
+export const AgeFieldInteractionAlphabetic: Story = {
+  name: 'Alphabetic (abc)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const ageInput = await canvas.findByTestId('age__storybook____age')
+    await userEvent.clear(ageInput)
+    await userEvent.type(ageInput, 'abc')
+    await expect(ageInput).toHaveValue('')
+  }
+}
+
+export const AgeFieldInteractionAlphanumeric: Story = {
+  name: 'Alphanumeric (1a2)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const ageInput = await canvas.findByTestId('age__storybook____age')
+    await userEvent.clear(ageInput)
+    await userEvent.type(ageInput, '1a2')
+    ageInput.blur()
+    await expect(ageInput).toHaveValue('12')
+  }
+}
+
+export const AgeFieldInteractionZero: Story = {
+  name: 'Zero (0 reaches form state)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const ageInput = await canvas.findByTestId('age__storybook____age')
+    await userEvent.clear(ageInput)
+    await userEvent.type(ageInput, '0')
+    ageInput.blur()
+    await expect(ageInput).toHaveValue('0')
+    await userEvent.click(ageInput)
+    ageInput.blur()
+    // 0 is a value, so the range validator runs instead of 'Required'
+    await expect(
+      canvas.findByText('Age must be between 12 and 120')
+    ).resolves.toBeInTheDocument()
   }
 }
