@@ -397,8 +397,8 @@ export function createCountryConfigClient(
 
   const caller = createCaller({
     user: {
-      ...user,
-      type: TokenUserType.enum.user
+      id: getUUID(),
+      type: TokenUserType.enum.system
     },
     token
   })
