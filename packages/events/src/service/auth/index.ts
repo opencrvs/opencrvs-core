@@ -11,7 +11,6 @@
 
 import fetch from 'node-fetch'
 import * as z from 'zod/v4'
-import { TokenWithBearer, UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   getSystemInitialisation as getSystemInitialisationQuery,
@@ -44,43 +43,6 @@ export async function getIntegrationCreatorToken(timeoutMs: number) {
   }
   const { token } = await res.json()
   return token as string
-}
-
-/**
- * Fetches the scopeless service-identity token core sends to the country
- * configuration when it requests action confirmation, in place of the caller's
- * own token. It carries no scopes and its subject is the fixed service user, so
- * it only proves to the country configuration that an internal core service is
- * calling — it grants nothing on its own.
- *
- * The caller's `token` authenticates the mint request but is not carried over.
- * A country configuration that confirms an action asynchronously must do so with
- * its own system client's credentials, not with the returned token.
- */
-export async function getActionConfirmationToken(
-  { eventId, actionId }: { eventId: UUID; actionId: UUID },
-  token: TokenWithBearer
-) {
-  const res = await fetch(
-    new URL('/internal/action-confirmation-token', env.AUTH_URL).toString(),
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      },
-      body: JSON.stringify({ eventId, actionId })
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Failed to fetch action confirmation token: ${res.status} ${res.statusText}`
-    )
-  }
-
-  const { token: actionConfirmationToken } = await res.json()
-  return actionConfirmationToken as string
 }
 
 const SystemInitialisation = z

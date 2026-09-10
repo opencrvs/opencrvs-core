@@ -40,11 +40,7 @@ import {
 } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import {
-  EncodedScope,
-  SERVICE_USER_ID,
-  TokenUserType
-} from '@opencrvs/commons/authentication'
+import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -247,49 +243,6 @@ export async function createRefreshToken(
 ): Promise<string> {
   const { familyId, jti } = await createFamily(userId)
   return signRefreshToken(userId, userType, familyId, jti)
-}
-
-/**
- * Mints the token core hands to the country configuration when it requests
- * action confirmation.
- *
- * This is not a capability token: it carries no scopes and its subject is the
- * fixed service user, so `isServiceToken` recognises it. Its sole purpose is to
- * prove to the country configuration that the confirmation request really comes
- * from an internal core service and not from an outside caller — nothing more.
- *
- * Confirming an action asynchronously (accepting or rejecting after the initial
- * request) is therefore no longer possible with this token; a country
- * configuration must do that with its own system client's credentials, which
- * hold the `record.action.accept` / `record.action.reject` scopes.
- *
- * `eventId` and `actionId` are kept as claims for traceability only.
- */
-export async function createTokenForActionConfirmation({
-  eventId,
-  actionId
-}: {
-  eventId: UUID
-  actionId: UUID
-}) {
-  return sign(
-    {
-      scope: [],
-      eventId,
-      actionId,
-      // The events service short-circuits system tokens to a system context
-      // without a user lookup; `SERVICE_USER_ID` is not a real user record.
-      userType: TokenUserType.enum.system
-    },
-    cert,
-    {
-      subject: SERVICE_USER_ID,
-      algorithm: 'RS256',
-      expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
-      audience: ['opencrvs:countryconfig-user'],
-      issuer: JWT_ISSUER
-    }
-  )
 }
 
 export async function storeUserInformation(
