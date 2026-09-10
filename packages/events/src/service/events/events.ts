@@ -506,6 +506,7 @@ type AsyncRejectActionInput = Pick<
 > & {
   keepAssignment: boolean
   waitFor: boolean
+  requestId?: UUID
 }
 
 export async function addAsyncRejectAction(
@@ -514,7 +515,8 @@ export async function addAsyncRejectAction(
     originalActionId,
     type,
     keepAssignment,
-    waitFor
+    waitFor,
+    requestId
   }: AsyncRejectActionInput,
   {
     user,
@@ -533,6 +535,7 @@ export async function addAsyncRejectAction(
     actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
+    requestId,
     createdBy: user.id,
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,

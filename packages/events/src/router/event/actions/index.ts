@@ -195,6 +195,10 @@ const AsyncActionInput = BaseActionInput.pick({
   actionId: UUID
 })
 
+const AsyncRejectCorrectionRejectInput = AsyncActionInput.extend({
+  requestId: UUID
+})
+
 type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
@@ -370,6 +374,13 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
   ActionType.REQUEST_CORRECTION
 ] as const
 
+function getAsyncRejectInputSchema(actionType: ActionType) {
+  if (actionType === ActionType.REJECT_CORRECTION) {
+    return AsyncRejectCorrectionRejectInput
+  }
+
+  return AsyncActionInput
+}
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
@@ -423,7 +434,7 @@ export function getDefaultActionProcedures(
         })
 
         if (existingAction) {
-          return ctx.event
+          return event
         }
 
         if (duplicates.detected) {
@@ -468,6 +479,7 @@ export function getDefaultActionProcedures(
           )
       )
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.requireAssignment)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -536,12 +548,13 @@ export function getDefaultActionProcedures(
           }
         )
       }),
-
     reject: userAndSystemProcedure
-      .input(AsyncActionInput)
+      .input(getAsyncRejectInputSchema(actionType))
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
+
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(

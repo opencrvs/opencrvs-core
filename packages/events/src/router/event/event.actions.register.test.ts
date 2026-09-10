@@ -259,7 +259,7 @@ describe('Request and confirmation flow', () => {
   const prng = createPrng(1046)
   let registrationNumber: string
 
-  function mockNotifyApi(status: number) {
+  function mockRegisterActionApi(status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
         `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
@@ -286,7 +286,7 @@ describe('Request and confirmation flow', () => {
     ])
 
     const { id: eventId } = originalEvent
-    mockNotifyApi(200)
+    mockRegisterActionApi(200)
 
     const createAction = originalEvent.actions.filter(
       (action) => action.type === ActionType.CREATE
@@ -334,7 +334,7 @@ describe('Request and confirmation flow', () => {
         ActionType.DECLARE
       ])
 
-      mockNotifyApi(200)
+      mockRegisterActionApi(200)
 
       const data = generator.event.actions.register(eventId)
 
@@ -404,7 +404,7 @@ describe('Request and confirmation flow', () => {
         ActionType.DECLARE
       ])
 
-      mockNotifyApi(400)
+      mockRegisterActionApi(400)
 
       const data = generator.event.actions.register(eventId, {
         declaration
@@ -438,7 +438,7 @@ describe('Request and confirmation flow', () => {
         ActionType.DECLARE
       ])
 
-      mockNotifyApi(500)
+      mockRegisterActionApi(500)
 
       await expect(
         client.event.actions.register.request(
@@ -471,7 +471,7 @@ describe('Request and confirmation flow', () => {
 
       const event = await createEvent(client, generator, [ActionType.DECLARE])
 
-      mockNotifyApi(202)
+      mockRegisterActionApi(202)
 
       const registerInput = generator.event.actions.register(event.id)
 
@@ -497,9 +497,13 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
         ])
-        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
-        mockNotifyApi(202)
+        const event = await client.event.create(generator.event.create())
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, { waitFor: false })
+        )
+
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(event.id, {
           declaration
@@ -531,14 +535,22 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.register' })
         ])
 
-        const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE
-        ])
+        mockRegisterActionApi(202)
 
+        const originalEvent = await client.event.create(
+          generator.event.create()
+        )
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(eventId, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
 
-        const data = generator.event.actions.register(eventId)
+        const data = generator.event.actions.register(eventId, {
+          waitFor: false
+        })
 
         const registerResponse =
           await client.event.actions.register.request(data)
@@ -550,19 +562,6 @@ describe('Request and confirmation flow', () => {
           'Could not find register action for id'
         )
 
-        const createAction = originalEvent.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(
-          originalEvent.id,
-          {
-            assignedTo: createAction[0].createdBy
-          }
-        )
-
-        await client.event.actions.assignment.assign(assignmentInput)
-
         const countryConfigClient = createCountryConfigClient(
           user,
           eventId,
@@ -572,11 +571,6 @@ describe('Request and confirmation flow', () => {
         await countryConfigClient.event.actions.register.reject({
           eventId,
           actionId: originalActionId,
-          transactionId: getUUID()
-        })
-
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
           transactionId: getUUID()
         })
 
@@ -598,12 +592,18 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.register' })
         ])
 
-        const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE
-        ])
+        mockRegisterActionApi(202)
 
+        const originalEvent = await client.event.create(
+          generator.event.create()
+        )
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(eventId, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
 
         const data = generator.event.actions.register(eventId)
 
@@ -627,9 +627,17 @@ describe('Request and confirmation flow', () => {
             assignedTo: createAction[0].createdBy
           }
         )
-        await client.event.actions.assignment.assign(assignmentInput)
 
+        await client.event.actions.assignment.assign(assignmentInput)
         await client.event.actions.register.request(data)
+
+        await client.event.actions.assignment.assign(assignmentInput)
+        await client.event.actions.register.request(data)
+
+        await client.event.actions.assignment.unassign({
+          eventId: originalEvent.id,
+          transactionId: getUUID()
+        })
 
         const countryConfigClient = createCountryConfigClient(
           user,
@@ -669,15 +677,22 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
         ])
-        const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE
-        ])
+        mockRegisterActionApi(202)
 
+        const originalEvent = await client.event.create(
+          generator.event.create()
+        )
         const { id: eventId } = originalEvent
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(eventId, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
 
-        mockNotifyApi(202)
-
-        const data = generator.event.actions.register(eventId)
+        const data = generator.event.actions.register(eventId, {
+          waitFor: false
+        })
 
         const registerResponse =
           await client.event.actions.register.request(data)
@@ -688,19 +703,6 @@ describe('Request and confirmation flow', () => {
           )?.id,
           'Could not find register action for id'
         )
-
-        const createAction = originalEvent.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(
-          originalEvent.id,
-          {
-            assignedTo: createAction[0].createdBy
-          }
-        )
-
-        await client.event.actions.assignment.assign(assignmentInput)
 
         const countryConfigClient = createCountryConfigClient(
           user,
@@ -715,10 +717,6 @@ describe('Request and confirmation flow', () => {
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
-          transactionId: getUUID()
-        })
         const response =
           await countryConfigClient.event.actions.register.accept({
             ...data,
@@ -742,7 +740,8 @@ describe('Request and confirmation flow', () => {
       })
       test.todo('should be able to edit the event data while accept action')
 
-      test('allows accepting a registration request with the same exchanged event and action id', async () => {
+      // @TODO: Should not work after Riku's PR
+      test('Allows accepting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
           encodeScope({ type: 'record.read' }),
@@ -756,7 +755,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -784,19 +783,14 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          eventId,
-          originalActionId
-        )
+        await client.event.actions.assignment.assign(assignmentInput)
 
-        const response =
-          await countryConfigClient.event.actions.register.accept({
-            ...data,
-            transactionId: getUUID(),
-            actionId: originalActionId,
-            registrationNumber: MOCK_REGISTRATION_NUMBER
-          })
+        const response = await client.event.actions.register.accept({
+          ...data,
+          transactionId: getUUID(),
+          actionId: originalActionId,
+          registrationNumber: MOCK_REGISTRATION_NUMBER
+        })
 
         const registerActions = response.actions.filter(
           (action) =>
@@ -828,7 +822,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -881,9 +875,13 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
         ])
-        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
-        mockNotifyApi(202)
+        const event = await client.event.create(generator.event.create())
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, { waitFor: false })
+        )
+
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(event.id, {
           declaration
@@ -913,23 +911,21 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
         ])
-        const event = await createEvent(client, generator, [ActionType.DECLARE])
+        const event = await client.event.create(generator.event.create())
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
         const eventId = event.id
 
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
         const registerResponse =
           await client.event.actions.register.request(data)
-
-        const createAction = event.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(event.id, {
-          assignedTo: createAction[0].createdBy
-        })
 
         const originalActionId = getOrThrow(
           registerResponse.actions.find(
@@ -937,8 +933,6 @@ describe('Request and confirmation flow', () => {
           )?.id,
           'Could not find register action for id'
         )
-
-        await client.event.actions.assignment.assign(assignmentInput)
 
         const countryConfigClient = createCountryConfigClient(
           user,
@@ -953,10 +947,6 @@ describe('Request and confirmation flow', () => {
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
-          transactionId: getUUID()
-        })
         await expect(
           countryConfigClient.event.actions.register.reject({
             ...data,
@@ -973,11 +963,16 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
         ])
-        const event = await createEvent(client, generator, [ActionType.DECLARE])
+        const event = await client.event.create(generator.event.create())
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
+        const eventId = event.id
 
-        const { id: eventId } = event
-
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId, {
           declaration
@@ -993,16 +988,6 @@ describe('Request and confirmation flow', () => {
           'Could not find register action for id'
         )
 
-        const createAction = event.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(event.id, {
-          assignedTo: createAction[0].createdBy
-        })
-
-        await client.event.actions.assignment.assign(assignmentInput)
-
         const countryConfigClient = createCountryConfigClient(
           user,
           eventId,
@@ -1015,10 +1000,6 @@ describe('Request and confirmation flow', () => {
           actionId: originalActionId
         })
 
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
-          transactionId: getUUID()
-        })
         const response =
           await countryConfigClient.event.actions.register.reject({
             eventId,
@@ -1043,10 +1024,16 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
         ])
-        const event = await createEvent(client, generator, [ActionType.DECLARE])
+        const event = await client.event.create(generator.event.create())
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
+        const eventId = event.id
 
-        const { id: eventId } = event
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -1059,16 +1046,6 @@ describe('Request and confirmation flow', () => {
           )?.id,
           'Could not find register action for id'
         )
-
-        const createAction = event.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(event.id, {
-          assignedTo: createAction[0].createdBy
-        })
-
-        await client.event.actions.assignment.assign(assignmentInput)
 
         const countryConfigClient = createCountryConfigClient(
           user,
@@ -1104,12 +1081,16 @@ describe('Request and confirmation flow', () => {
           encodeScope({ type: 'record.register' })
         ])
 
-        const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE
-        ])
+        const event = await client.event.create(generator.event.create())
+        await client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, {
+            waitFor: false,
+            keepAssignment: true
+          })
+        )
+        const eventId = event.id
 
-        const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -1122,20 +1103,6 @@ describe('Request and confirmation flow', () => {
           )?.id,
           'Could not find register action for id'
         )
-
-        const createAction = originalEvent.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(
-          originalEvent.id,
-          {
-            assignedTo: createAction[0].createdBy
-          }
-        )
-        await client.event.actions.assignment.assign(assignmentInput)
-
-        await client.event.actions.register.request(data)
 
         const countryConfigClient = createCountryConfigClient(
           user,
@@ -1176,7 +1143,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
