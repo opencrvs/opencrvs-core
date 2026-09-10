@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/mosip",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Helpers for wiring an OpenCRVS country configuration to the MOSIP integration API",
   "repository": {
     "type": "git",
