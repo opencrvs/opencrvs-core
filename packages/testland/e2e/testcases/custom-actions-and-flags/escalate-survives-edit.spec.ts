@@ -158,6 +158,4 @@ test('An escalated declaration keeps its escalation flag when edited by the RO',
       ESCALATION_FLAG
     )
   })
-
-  await page.close()
 })
