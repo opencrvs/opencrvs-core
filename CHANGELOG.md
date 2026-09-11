@@ -237,6 +237,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
+- Keep a status badge's label on a single line. A badge narrower than its text broke the label mid-word, e.g. `Active` rendering as `Activ` / `e` in the team members list [#13572](https://github.com/opencrvs/opencrvs-core/issues/13572)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
 - Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)

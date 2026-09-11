@@ -17,9 +17,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 const NameAvatar = styled.div`
   display: flex;
   align-items: center;
-  img {
-    margin-right: 10px;
-  }
+  gap: 10px;
 `
 
 /**
