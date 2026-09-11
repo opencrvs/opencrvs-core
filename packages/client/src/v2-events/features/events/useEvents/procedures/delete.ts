@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useMutationState } from '@tanstack/react-query'
+import * as z from 'zod'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
   refetchAllSearchQueries,
+  refetchDraftsList,
   refetchSearchQuery,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -28,9 +30,18 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
     return true
   },
   retryDelay: 10000,
-  onSuccess: ({ id }) => {
+  onSuccess: async ({ id }) => {
     void refetchAllSearchQueries()
     deleteDraft(id)
+    /*
+     * The drafts list may have a fetch in flight that started before the event was
+     * deleted on the server, and its response still contains this draft. Refetching
+     * cancels that fetch and reissues it against a server that has now forgotten the
+     * draft. Awaiting the call ensures the mutation stays 'pending' until onSuccess
+     * resolves, so usePendingDeleteEventIds keeps hiding the draft until the fresh
+     * response has landed.
+     */
+    await refetchDraftsList()
   },
   onMutate: ({ eventId }) => {
     // Delete all drafts for the event (including optimistically added)
@@ -56,6 +67,23 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
     return waitUntilEventIsCreated(originalMutationFn)(variables)
   }
 })
+
+const DeleteVariables = z.object({ eventId: z.string() })
+
+export function usePendingDeleteEventIds(): string[] {
+  const pendingVariables = useMutationState({
+    filters: {
+      mutationKey: trpcOptionsProxy.event.delete.mutationKey(),
+      status: 'pending'
+    },
+    select: (mutation) => mutation.state.variables
+  })
+
+  return pendingVariables.flatMap((variables) => {
+    const parsed = DeleteVariables.safeParse(variables)
+    return parsed.success ? [parsed.data.eventId] : []
+  })
+}
 
 export const useDeleteEvent = () => {
   // mutationFn will be removed at this stage to ensure it has been specified in a serializable manner under /procedures. This ensures early error detection

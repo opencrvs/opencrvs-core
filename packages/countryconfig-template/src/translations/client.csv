@@ -664,8 +664,6 @@ form.field.label.app.whoContDet.father,,Father,Père
 form.field.label.app.whoContDet.mother,,Mother,Mère
 form.field.label.birthLocation,,Hospital / Clinic,Hôpital / Clinique
 form.field.label.certificatePrintInAdvance,,Print in advance,Imprimer à l'avance pour les signatures et la collecte
-form.field.label.changeOfficeWarningBody,,Changing this user's office will remove their in-progress drafts. Do you want to continue?,Changer le bureau de cet utilisateur supprimera ses brouillons en cours. Voulez-vous continuer ?
-form.field.label.changeOfficeWarningTitle,,Change office?,Changer de bureau ?
 form.field.label.cityUrbanOption,Label for City,Town,Ville
 form.field.label.confirm,,Yes,Oui
 form.field.label.country,,Country,Pays
@@ -729,6 +727,8 @@ form.field.label.registrationOffice,,Registration Office,Bureau d'enregistrement
 form.field.label.relationOtherFamilyMember,Label for other family member relation,Other family member,Autre membre de la famille
 form.field.label.relationSomeoneElse,,Someone else,Quelqu'un d'autre
 form.field.label.relationshipToSpouses,,Relationship to spouses,Relation avec les époux
+form.field.label.removeDraftsWarningBody,Body for the confirmation dialog when a change removes a user in-progress drafts,Changing this user's role or office will remove their in-progress drafts. Do you want to continue?,Changer le rôle ou le bureau de cet utilisateur supprimera ses brouillons en cours. Voulez-vous continuer ?
+form.field.label.removeDraftsWarningTitle,Title for the confirmation dialog when a change removes a user in-progress drafts,Change role or office?,Changer de rôle ou de bureau ?
 form.field.label.self,The title that appears when selecting self as informant,Self,Soi-même
 form.field.label.sex,,Sex,Sexe
 form.field.label.sexFemale,Label for option female,Female,Femme

@@ -21,6 +21,9 @@ spec:
       port: {{ .Values.dashboards.port }}
     middlewares:
       - name: sts-and-basic-response-headers
+      {{- if .Values.ingress.admin_console_allowlist }}
+      - name: admin-console-ip-allowlist
+      {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}
