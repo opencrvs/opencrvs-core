@@ -724,12 +724,12 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     },
     {
       label: intl.formatMessage(messages.when),
-      width: 16,
+      width: 15,
       key: 'when'
     },
     {
       label: '',
-      width: 3,
+      width: 4,
       key: 'expand',
       isIconColumn: true,
       alignment: ColumnContentAlignment.RIGHT,
