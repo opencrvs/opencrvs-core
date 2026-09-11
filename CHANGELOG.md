@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.0.2 Release Candidate
+
+### Improvements
+
+- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
+
+### Bug fixes
+
+- Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
+
+## 1.9.17
+
+### Improvements
+
+- Removed Sentry from OpenCRVS entirely. The client and login apps no longer initialise Sentry, report exceptions to it, or show its "report a problem" dialog on a crash, and the ten backend services no longer register `hapi-sentry`. The `@sentry/*`, `redux-sentry-middleware` and `hapi-sentry` dependencies are gone. `script-src` no longer allow-lists `https://sentry.io/api/embed/error-page/`, so it names no third-party host and the login app loads scripts from `'self'` only. React error boundaries now render the apps' own error pages. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+  **Deployment notes:**
+
+  - `SENTRY_DSN` is no longer read by any service, and the browser no longer reads `window.config.SENTRY`. Both can be dropped from your environment and country configuration; leaving them set has no effect.
+  - **Crash reporting is no longer built in.** Browser and server errors now go to logs and the browser console only. Deployments that relied on Sentry for alerting should put their own error tracking in place.
+
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
+
 ## 2.0.1 Release
 
 ### Security fixes

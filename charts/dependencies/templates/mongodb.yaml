@@ -23,10 +23,17 @@ metadata:
     app: mongodb
   name: mongodb
 spec:
+  {{- $service_type := default .Values.service_type .Values.mongodb.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
   clusterIP: None
+  {{- end }}
   ports:
     - port: 27017
       targetPort: 27017
+      {{- if .Values.mongodb.node_port }}
+      nodePort: {{ .Values.mongodb.node_port }}
+      {{- end }}
   selector:
     app: mongodb
 ---

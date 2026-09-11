@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import decode from 'jwt-decode'
-import * as Sentry from '@sentry/react'
 
 export const ERROR_CODE_FIELD_MISSING = 500
 export const ERROR_CODE_INVALID_CREDENTIALS = 401
@@ -31,7 +30,8 @@ export const getTokenPayload = (token: string) => {
   try {
     decoded = decode(token)
   } catch (err) {
-    Sentry.captureException(err)
+    // eslint-disable-next-line no-console
+    console.error(err)
     return null
   }
 

@@ -42,6 +42,8 @@ Any particular service within this helm chart can be disabled by setting `<servi
 | priority_class.enabled  | bool   | `false`        | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                     |
 | backup.enabled          | bool   | `true`         | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                           |
 | restore.enabled         | bool   | `true`         | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                           |
+| service_type            | string | `ClusterIP`    | Kubernetes Service type for datastore Services (MongoDB, Postgres, Elasticsearch, Kibana, Redis, MinIO), e.g. `ClusterIP` or `NodePort`. Applies to all of them; there is no per-service override. |
+
 
 ## MongoDB
 
@@ -59,6 +61,7 @@ This section allows you to configure the deployment of MongoDB within your infra
 | node_selector | dict | `{}` | Label selector for datastore nodes, usually used to keep data persistent |
 | backup_schedule | string | `n/a` | Backup cronjob schedule, if not defined then values from `backup.schedule` is used |
 | backup_server_dir | string | `n/a` | Directory to store encrypted backup on backup server, if not defined `backup.backup_server_dir` is used |
+| node_port | int | `n/a` | Fixed NodePort to expose port `27017` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
 
 ## Postgres
 
@@ -91,6 +94,7 @@ This section allows you to configure the postgres deployment within your infrast
 | restore.server_secret | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared |
 | restore.encryption_secret | string | `restore-encryption-secret` | Name of the Kubernetes secret containing the backup encryption key |
 | restore.schedule | string | `0 3 * * *` | Restore cronjob schedule, if not defined then value from `restore.schedule` is used |
+| node_port | int | `n/a` | Fixed NodePort to expose port `5432` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
 
 ## Elasticsearch
 
@@ -106,6 +110,8 @@ This section allows you to configure the deployment and authentication settings 
 | pvc.access_mode         | string  | ReadWriteOnce         | Kubernetes PVC access mode                                                                                                                   |
 | host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict    | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
+| node_port               | int     | `n/a`                 | Fixed NodePort to expose port `9200` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned          |
+| node_port_transport     | int     | `n/a`                 | Fixed NodePort to expose port `9300` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned          |
 
 ## MinIO
 
@@ -132,6 +138,8 @@ This section allows you to configure the deployment and authentication settings 
 | restore.type            | string | `dump`                          | Restore method: `dump` (from encrypted archive) or `differential` (same as for backup)                                                       |
 | restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared    |
 | restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used                                                          |
+| node_port               | int    | `n/a`                            | Fixed NodePort to expose port `3535` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned          |
+| node_port_console       | int    | `n/a`                            | Fixed NodePort to expose port `3536` (console) on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
 
 ### MinIO Credentials
 
@@ -188,6 +196,7 @@ OpenCRVS is using Bitnami package for Redis https://hub.docker.com/r/bitnami/red
 | enabled   | true          | Enable or disable redis service                                                 |
 | env       | {}            | Flat dictionary (key/value) of environment variables passed to docker container |
 | auth_mode | disabled      | Authentication mode, possible values `disabled`, `acl` or `password`            |
+| node_port | `n/a`         | Fixed NodePort to expose port `6379` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
 
 ### Redis authentication
 
@@ -387,6 +396,10 @@ Elastalert rules can be extended by modifying or defining new rules. Rules can b
 4. Re-deploy dependencies helm chart
 
 ### Kibana
+
+| Key       | Type   | Default | Description                                                                                                                          |
+| --------- | ------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| node_port | int    | `n/a`   | Fixed NodePort to expose port `5601` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
 
 Kibana has support for custom configuration shipped by default as config.ndjson file in helm chart: [charts/dependencies/files/kibana/config.ndjson](https://github.com/opencrvs/infrastructure/blob/develop/charts/dependencies/files/kibana/config.ndjson)
 
