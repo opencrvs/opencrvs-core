@@ -295,6 +295,7 @@ event.death.action.declare.form.section.documents.field.proofOfCauseOfDeath.labe
 event.death.action.declare.form.section.documents.field.proofOfDeath.label,This is the label for the field,Proof of death of deceased,Preuve du décès du défunt
 event.death.action.declare.form.section.documents.field.proofOfDeceased.label,This is the label for the field,Proof of deceased's ID,Preuve de l'identité du défunt
 event.death.action.declare.form.section.documents.field.proofOfInformant.label,This is the label for the field,Proof of informant's ID,Preuve de l'identité de l'informateur
+event.death.action.declare.form.section.documents.helper,Helper text shown above the death supporting documents,The following documents are required,Les documents suivants sont requis
 event.death.action.declare.form.section.event.field.addressHelper.label,This is the label for the field,Place of death,Lieu du décès
 event.death.action.declare.form.section.event.field.causeOfDeath.label,This is the label for the field,Cause of death has been established,La cause du décès a été établie
 event.death.action.declare.form.section.event.field.date.error,This is the error message for invalid date,Must be a valid date,Doit être une date valide
@@ -530,7 +531,7 @@ form.field.label.medicallyCertified,,Medically Certified Cause of Death,Cause of
 form.field.label.otherInstitution,Select item for Other location,Other,Autre
 form.field.label.physician,,Physician,Médecin
 form.field.label.placeOfDeathSameAsPrimary,,Deceased's usual place of residence,Lieu de résidence habituel du défunt
-form.field.label.proofOfBirth.fileName,The following documents are required,The following documents are required,Les documents suivants sont requis
+form.field.label.proofOfBirth.fileName,File name for proof of birth,Notification of birth,Notification de naissance
 form.field.label.reasonNotApplying,,Reason,Motif de la mère
 form.field.label.verbalAutopsy,,Verbal autopsy,Autopsie verbale
 form.field.label.verbalAutopsyReport,,Verbal autopsy report,Rapport d'autopsie verbal
