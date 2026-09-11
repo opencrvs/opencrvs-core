@@ -140,11 +140,6 @@ function getAsyncConfirmation(
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const messages = defineMessages({
-  timeFormat: {
-    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'configuration.timeFormat',
-    description: 'Time format for timestamps in event history'
-  },
   dateFormat: {
     defaultMessage: 'MMMM dd, yyyy',
     id: 'configuration.dateFormat',
@@ -175,20 +170,10 @@ const messages = defineMessages({
     description: 'Label for By (the person who performed the action)',
     id: 'constants.by'
   },
-  date: {
-    defaultMessage: 'Date',
-    description: 'Date Label',
-    id: 'constants.label.date'
-  },
   audit: {
     defaultMessage: 'Audit',
     description: 'Audit heading',
     id: 'constants.audit'
-  },
-  labelRole: {
-    defaultMessage: 'Role',
-    description: 'Role label',
-    id: 'constants.role'
   },
   waitingForExternalValidation: {
     defaultMessage: 'Waiting for external validation',
