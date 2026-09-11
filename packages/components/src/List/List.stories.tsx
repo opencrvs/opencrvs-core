@@ -12,6 +12,10 @@ import React from 'react'
 import { Meta } from '@storybook/react-vite'
 import { List } from './index'
 import { Link } from '../Link'
+import { Avatar } from '../Avatar'
+import { Pill } from '../Pill'
+import { Icon } from '../Icon'
+import { ToggleMenu } from '../ToggleMenu'
 
 export default {
   title: 'Data/List',
@@ -19,17 +23,12 @@ export default {
     docs: {
       description: {
         component: `
-\`<List>\` is a vertical list of label / value rows — a record's fields, a set of
-settings, a team's users. Each row is one thing: the label names it, the value
-columns describe it, and any actions apply to it.
+Use a list to show a set of things, one per row, where each row names something
+and says a little about it: the fields of a declaration, a user's settings, the
+members of a team, the offices under a district.
 
-Reach for \`<Table>\` instead where the reader compares values down a grid of
-columns that carry their own affordances — click-to-sort, totals, per-column
-filters.
-
-Which optional columns exist is derived from the rows, so every row renders the
-same cells and the columns line up. A list with actions on only some rows keeps
-its value column at the same x throughout.
+Reach for \`<Table>\` instead when the reader is comparing values down columns
+and wants to sort them, total them, or filter by them.
 `
       }
     }
@@ -43,7 +42,7 @@ const Change = (
   </Link>
 )
 
-/** A record's fields. */
+/** The fields of a record, so a reader can check them at a glance. */
 export const Default = () => (
   <List>
     <List.Item label="Event" value="Birth" />
@@ -53,7 +52,7 @@ export const Default = () => (
   </List>
 )
 
-/** Column names above the rows, on the same grid. */
+/** Name the columns when the values need saying what they are. */
 export const WithHeader = () => (
   <List>
     <List.Header label="Field" value="Input" />
@@ -68,8 +67,9 @@ export const WithHeader = () => (
 )
 
 /**
- * The three states of a value column are distinct and must not be rendered
- * alike: a value; no value; a value the reader is not permitted to see.
+ * A field the reader may see, a field nobody filled in, and a field this
+ * reader is not cleared for are three different things, and the list says
+ * which is which rather than leaving a blank.
  */
 export const ValueStates = () => (
   <List redactedLabel="Hidden">
@@ -83,9 +83,9 @@ export const ValueStates = () => (
 )
 
 /**
- * A list whose rows are only labels — a set of places to navigate into. No row
- * carries a value, so there is no value column and the labels take the width
- * rather than sitting against an empty half.
+ * Somewhere to go rather than something to read: a list of districts, offices
+ * or sections the reader picks from. Nothing to say about each one, so the
+ * names have the full width.
  */
 export const LabelsOnly = () => (
   <List>
@@ -96,8 +96,9 @@ export const LabelsOnly = () => (
 )
 
 /**
- * Actions on only some rows. The trailing gutter is reserved for the whole
- * table, so every value sits at the same x.
+ * A reader can often act on some rows and not others — change their own email
+ * but not someone else's. The rows they cannot act on still line up with the
+ * rows they can.
  */
 export const PartialActions = () => (
   <List>
@@ -108,7 +109,7 @@ export const PartialActions = () => (
   </List>
 )
 
-/** A second attribute of the row's subject. */
+/** Two things worth saying about each row, not one. */
 export const TwoValueColumns = () => (
   <List>
     <List.Header label="Name" value="Role" value2="Office" />
@@ -119,9 +120,9 @@ export const TwoValueColumns = () => (
 )
 
 /**
- * The same field for two records. Each column resolves independently, so an
- * empty column says so rather than rendering blank. Narrow the viewport to see
- * each value take its column's name.
+ * The same field on two records side by side, for a reader deciding whether
+ * they are the same person. On a phone the two values stack, each keeping the
+ * name of the record it came from.
  */
 export const Comparison = () => (
   <List redactedLabel="Hidden">
@@ -144,7 +145,7 @@ export const Comparison = () => (
   </List>
 )
 
-/** Rows may be mapped and wrapped in fragments; the columns still derive. */
+/** Rows usually come from data, not written out one by one. */
 export const MappedRows = () => {
   const fields = [
     { id: 'event', label: 'Event', value: 'Birth' },
@@ -158,6 +159,60 @@ export const MappedRows = () => {
         <React.Fragment key={field.id}>
           <List.Item actions={Change} label={field.label} value={field.value} />
         </React.Fragment>
+      ))}
+    </List>
+  )
+}
+
+/**
+ * The members of a team. Each row shows whether that account is active, and
+ * offers a menu of things the reader can do to it — except on their own row,
+ * which they cannot action.
+ */
+export const TeamMembers = () => {
+  const members = [
+    {
+      id: 'mitchel',
+      name: 'Mitchel Owen',
+      role: 'Local Registrar',
+      menu: true
+    },
+    {
+      id: 'emmanuel',
+      name: 'Emmanuel Mayuka',
+      role: 'Administrator',
+      menu: false
+    }
+  ]
+
+  return (
+    <List>
+      <List.Header label="User" value="Role" />
+      {members.map((member) => (
+        <List.Item
+          key={member.id}
+          actions={
+            <>
+              <Pill label="Active" type="active" />
+              {member.menu && (
+                <ToggleMenu
+                  id={`menu-${member.id}`}
+                  menuItems={[{ label: 'Edit details', handler: () => {} }]}
+                  toggleButton={
+                    <Icon
+                      color="primary"
+                      name="DotsThreeVertical"
+                      size="large"
+                    />
+                  }
+                />
+              )}
+            </>
+          }
+          label={member.name}
+          start={<Avatar aria-hidden name={member.name} size="sm" />}
+          value={member.role}
+        />
       ))}
     </List>
   )
