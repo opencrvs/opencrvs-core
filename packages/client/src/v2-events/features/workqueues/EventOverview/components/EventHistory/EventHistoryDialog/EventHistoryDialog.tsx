@@ -45,6 +45,13 @@ const messages = defineMessages({
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
+  },
+  externalValidationBanner: {
+    defaultMessage:
+      'This action has been initiated, but is still awaiting validation from an external system.',
+    description:
+      'Banner shown in the action detail dialog when the action is still awaiting external validation',
+    id: 'events.history.externalValidationBanner'
   }
 })
 
@@ -115,12 +122,12 @@ const StyledText = styled(Text)`
 `
 
 function ExternalValidationBannerComponent() {
+  const intl = useIntl()
   return (
     <BannerWrapper>
       <Icon name="PauseCircle" size="small" />
       <StyledText color="orangeDarker" element="span" variant="bold14">
-        This action has been initiated, but is still awaiting validation from an
-        external system.
+        {intl.formatMessage(messages.externalValidationBanner)}
       </StyledText>
     </BannerWrapper>
   )
@@ -135,7 +142,8 @@ export function EventHistoryDialog({
   close,
   fullEvent,
   validatorContext,
-  title
+  title,
+  isWaitingForExternalValidation
 }: {
   action: ActionDocument
   userName: string
@@ -143,6 +151,7 @@ export function EventHistoryDialog({
   fullEvent: EventDocument
   validatorContext: ValidatorContext
   title: string
+  isWaitingForExternalValidation: boolean
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
@@ -155,7 +164,11 @@ export function EventHistoryDialog({
     <Dialog
       isOpen
       actions={[]}
-      banner={ExternalValidationBannerComponent()}
+      banner={
+        isWaitingForExternalValidation ? (
+          <ExternalValidationBannerComponent />
+        ) : undefined
+      }
       id="event-history-modal"
       title={title}
       variant="large"

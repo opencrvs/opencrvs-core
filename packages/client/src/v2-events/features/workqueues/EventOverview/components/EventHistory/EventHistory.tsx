@@ -53,6 +53,8 @@ import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
+/* eslint-disable max-lines */
+
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
@@ -75,10 +77,8 @@ const LinkLeftAligned = styled(Link)`
 `
 
 /**
- * The action whose confirmation status the row should reflect. Usually the row
- * action itself, but for a direct correction shown as "Record corrected" it is
- * the paired APPROVE_CORRECTION — that is the action awaiting external
- * validation, not the request that is displayed.
+ * The action whose confirmation status the row reflects: normally itself, but
+ * for a direct correction ("Record corrected") the paired APPROVE_CORRECTION.
  */
 function getStatusSourceAction(
   action: ActionDocument,
@@ -91,10 +91,8 @@ function getStatusSourceAction(
 }
 
 /**
- * The effective status of an original action: the status of its confirmation
- * (accept/reject, linked via `originalActionId`) when one exists, otherwise the
- * action's own status. A still-`Requested` action with no confirmation is
- * waiting for external validation.
+ * The status of an action's confirmation (accept/reject via `originalActionId`)
+ * when one exists, otherwise its own status. `Requested` with none = waiting.
  */
 function getEffectiveStatus(
   action: ActionDocument,
@@ -394,13 +392,15 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const onHistoryRowClick = (
     action: ActionDocument,
     userName: string,
-    title: string
+    title: string,
+    isWaitingForExternalValidation: boolean
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={action}
         close={close}
         fullEvent={fullEvent}
+        isWaitingForExternalValidation={isWaitingForExternalValidation}
         title={title}
         userName={userName}
         validatorContext={validatorContext}
@@ -472,6 +472,8 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         getStatusSourceAction(action, history),
         fullEvent.actions
       )
+      const isWaitingForExternalValidation =
+        effectiveStatus === ActionStatus.Requested
 
       // If a audit history label is configured in action config, use that!
       const title =
@@ -496,7 +498,14 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         action: (
           <LinkLeftAligned
             font="bold14"
-            onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
+            onClick={() =>
+              onHistoryRowClick(
+                action,
+                actionCreatorName,
+                title,
+                isWaitingForExternalValidation
+              )
+            }
           >
             {title}
           </LinkLeftAligned>
