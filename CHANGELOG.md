@@ -39,6 +39,14 @@ Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
 The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is now an internal service token and lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
 
+#### Document presign requests are no longer authorized by scope alone
+
+`GET /presigned-url/{filePath*}` on the gateway proxied straight to documents-service, which validates only that a JWT is genuinely signed — not that its scopes grant access to the record the document belongs to. Any authenticated user, regardless of scope, could obtain a valid presigned URL for any document whose path they knew.
+
+The route has been removed. Presigning a document tied to a record now goes through events-service's `event.file.getPresignedUrl`, which requires `record.read` on the event derived from the path (`events/{eventId}/...`) before asking documents-service to sign it. `users/{userId}/...` paths (avatars, signatures) and bare `{uuid}.ext` legacy paths (pre-2.0 uploads, or any upload where `path` is omitted) still presign without a record check, since they carry no record binding to check against.
+
+[#12962](https://github.com/opencrvs/opencrvs-core/issues/12962)
+
 #### `validUntil` removed from location APIs
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.
@@ -91,10 +99,10 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 The user-notification and system-ready triggers were served under `/triggers/`, while the event action and telemetry triggers used `/trigger/`. All of them now use the singular prefix:
 
-| Before | After |
-| --- | --- |
+| Before                        | After                        |
+| ----------------------------- | ---------------------------- |
 | `POST /triggers/user/{event}` | `POST /trigger/user/{event}` |
-| `GET /triggers/system/ready` | `GET /trigger/system/ready` |
+| `GET /triggers/system/ready`  | `GET /trigger/system/ready`  |
 
 `POST /trigger/events/{event}/actions/{action}` and `POST /trigger/telemetry` are unchanged.
 
@@ -139,6 +147,8 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
 - Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
+- Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
+
 
 ### New features
 
@@ -242,6 +252,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Return a conflict naming the offending field, instead of an internal server error, when a write trips a unique constraint on a user's email, mobile or username. The application-level duplicate checks are broader than the constraints, so this is reachable only when two requests race — but the cause was masked in production and reached the caller as `Internal server error`. Covers creating a user as well as changing an existing user's email, phone number or name. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 - Stop the gateway's `/events/{path*}` proxy from forwarding requests outside the events service. [#13587](https://github.com/opencrvs/opencrvs-core/issues/13587)
 - Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
+- Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 
 ## 2.0.1 Release
 

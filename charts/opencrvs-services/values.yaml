@@ -147,6 +147,31 @@ ingress:
   ssl_enabled: true
   # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
   tls_resolver: ''
+  # Restrict the Metabase dashboards console to specific source IP ranges,
+  # using Traefik's ipAllowList middleware. It is an admin console and is
+  # otherwise reachable by anyone who can resolve its hostname. Leave
+  # empty to leave it publicly reachable (not recommended for production
+  # - see "Hardening" in README.md).
+  # Example:
+  #   admin_console_allowlist:
+  #     - 203.0.113.0/24
+  #     - 198.51.100.42/32
+  admin_console_allowlist: []
+  # Restrict the whole OpenCRVS application (client, login, gateway,
+  # countryconfig) to specific source IP ranges, using Traefik's
+  # ipAllowList middleware. Unlike admin_console_allowlist above, this
+  # gates every public entry point, not just admin consoles - useful for
+  # deployments that want to allow only the deploying country's own IP
+  # ranges, cutting off most automated/opportunistic attacks without
+  # requiring a VPN. admin_console_allowlist is always merged in, so admin
+  # console IPs never need repeating here. Leave empty to leave the
+  # application publicly reachable (not recommended for production - see
+  # "Hardening" in README.md).
+  # Example:
+  #   application_allowlist:
+  #     - 203.0.113.0/24
+  #     - 198.51.100.42/32
+  application_allowlist: []
 
 # Kubernetes NetworkPolicy configuration for OpenCRVS workloads.
 # Requires a CNI provider that enforces Kubernetes NetworkPolicy.
@@ -181,6 +206,13 @@ network_policy:
   # chart is typically deployed to a separate namespace. See "Hardening"
   # in README.md.
   allowed_namespaces: []
+  # Extra annotations/labels applied to every generated NetworkPolicy's
+  # metadata (not the podSelector). Override per service under
+  # <service>.network_policy.annotations / .labels, which take precedence
+  # over these; a rule under network_policy.rules/custom_rules can further
+  # override via its own annotations/labels.
+  annotations: {}
+  labels: {}
 
 # See kubernetes documentation for more information on service types:
 # https://kubernetes.io/docs/concepts/services-networking/service/
@@ -464,13 +496,16 @@ events:
 deployment_jobs:
   service_account:
     name: deployment-jobs
-    network_policy:
-      ingress_mode: deny
-      egress_mode: full
     annotations:
       'helm.sh/hook': pre-install,pre-upgrade
       'helm.sh/hook-weight': '-10'
       'helm.sh/hook-delete-policy': before-hook-creation
+  network_policy:
+    annotations:
+      'helm.sh/hook': pre-install,pre-upgrade
+      'helm.sh/hook-weight': '-10'
+    ingress_mode: deny
+    egress_mode: full
 
 # data_migration: Job to migrate datastores while deployment
 data_migration:

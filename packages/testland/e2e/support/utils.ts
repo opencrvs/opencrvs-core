@@ -49,6 +49,7 @@ type Workqueue =
   | 'Pending attestation'
   | 'Pending approval'
   | 'Escalated'
+  | 'Pending feedback'
   | 'Pending registration'
   | 'Pending external validation'
   | 'Pending certification'

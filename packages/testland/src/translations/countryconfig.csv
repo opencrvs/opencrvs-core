@@ -6,8 +6,8 @@ birth.search.criteria.label.prefix.informant,Informant prefix,Informant's,Du dé
 birth.search.criteria.label.prefix.mother,Mother prefix,Mother's,De la mère
 certificates.birth.certificate,Birth Certificate,Birth Certificate,Acte de naissance
 certificates.birth.certificate.copy,Birth Certificate Certified Copy,Birth Certificate Certified Copy,Copie certifiée conforme de l'acte de naissance
-certificates.birth.registration.receipt,Birth Registration Receipt,Birth Registration Receipt,Reçu d'enregistrement de naissance
 certificates.birth.printedCertificateCount,Number of copies printed of this birth certificate,Printed copies: {copiesPrintedForTemplate},Exemplaires imprimés : {copiesPrintedForTemplate}
+certificates.birth.registration.receipt,Birth Registration Receipt,Birth Registration Receipt,Reçu d'enregistrement de naissance
 certificates.death.certificate,Death Certificate,Death Certificate,Certificat de décès
 certificates.death.certificate.copy,Death Certificate Certified Copy,Death Certificate Certified Copy,Copie certifiée conforme du certificat de décès
 certificates.marriage.certificate,Marriage Certificate,Marriage Certificate,Acte de mariage
@@ -384,6 +384,7 @@ event.death.action.declare.form.section.documents.field.proofOfCauseOfDeath.labe
 event.death.action.declare.form.section.documents.field.proofOfDeath.label,This is the label for the field,Proof of death of deceased,Preuve du décès du défunt
 event.death.action.declare.form.section.documents.field.proofOfDeceased.label,This is the label for the field,Proof of deceased's ID,Preuve de l'identité du défunt
 event.death.action.declare.form.section.documents.field.proofOfInformant.label,This is the label for the field,Proof of informant's ID,Preuve de l'identité de l'informateur
+event.death.action.declare.form.section.documents.helper,Helper text shown above the death supporting documents,The following documents are required,Les documents suivants sont requis
 event.death.action.declare.form.section.event.field.addressHelper.label,This is the label for the field,Place of death,Lieu du décès
 event.death.action.declare.form.section.event.field.causeOfDeath.label,This is the label for the field,Cause of death has been established,La cause du décès a été établie
 event.death.action.declare.form.section.event.field.date.error,This is the error message for invalid date,Must be a valid date,Doit être une date valide
@@ -641,7 +642,7 @@ form.field.label.otherInstitution,Select item for Other location,Other,Autre
 form.field.label.padding.60px,60px padding for layout,"<div style=""height:60px""></div>","<div style=""height:60px""></div>"
 form.field.label.physician,,Physician,Médecin
 form.field.label.placeOfDeathSameAsPrimary,,Deceased's usual place of residence,Lieu de résidence habituel du défunt
-form.field.label.proofOfBirth.fileName,The following documents are required,The following documents are required,Les documents suivants sont requis
+form.field.label.proofOfBirth.fileName,File name for proof of birth,Notification of birth,Notification de naissance
 form.field.label.reason,This is the label for reason field,Reason,Raison
 form.field.label.reasonNotApplying,,Reason,Motif de la mère
 form.field.label.verbalAutopsy,,Verbal autopsy,Autopsie verbale

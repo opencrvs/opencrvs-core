@@ -22,6 +22,7 @@ import {
   seedLocalEventIndex,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
+import { usePendingDeleteEventIds } from '@client/v2-events/features/events/useEvents/procedures/delete'
 import {
   createEventActionMutationFn,
   QueryOptions,
@@ -50,25 +51,20 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    const filenames = drafts.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action])
-    )
-
-    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
-
-    const missingEventsToDownload = drafts
-      .filter((event) => !findLocalEventDocument(event.eventId))
-      .map(async (draft) => {
-        await queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey({
-            eventId: draft.eventId,
-            waitFor: false
-          }),
-          queryFn: trpcOptionsProxy.event.get.queryOptions({
-            eventId: draft.eventId,
-            waitFor: false
-          }).queryFn
-        })
+    await Promise.all(
+      drafts.map(async (draft) => {
+        if (!findLocalEventDocument(draft.eventId)) {
+          await queryClient.prefetchQuery({
+            queryKey: trpcOptionsProxy.event.get.queryKey({
+              eventId: draft.eventId,
+              waitFor: false
+            }),
+            queryFn: trpcOptionsProxy.event.get.queryOptions({
+              eventId: draft.eventId,
+              waitFor: false
+            }).queryFn
+          })
+        }
 
         const event = findLocalEventDocument(draft.eventId)
 
@@ -79,9 +75,21 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
         if (event) {
           seedLocalEventIndex(draft.eventId, event)
         }
-      })
 
-    await Promise.all(missingEventsToDownload)
+        /*
+         * A draft whose event never loaded won't appear in the workqueue,
+         * so there's no reason to fetch its documents either.
+         */
+        if (!event) {
+          return
+        }
+
+        const filenames = getFilepathsFromActionDocument([draft.action])
+        await Promise.all(
+          filenames.map(async (filename) => precacheFile(filename))
+        )
+      })
+    )
 
     return drafts
   }
@@ -192,6 +200,8 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
+  const pendingDeleteEventIds = usePendingDeleteEventIds()
+
   function getDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
@@ -238,8 +248,11 @@ export function useDrafts() {
      * can't be resolved (e.g. access lost after an office change) — where it isn't
      * actionable anyway.
      */
-    return drafts.data.filter(({ eventId }) =>
-      Boolean(findLocalEventDocument(eventId))
+    return drafts.data.filter(
+      ({ eventId }) =>
+        Boolean(findLocalEventDocument(eventId)) &&
+        // The server keeps serving a draft until its delete lands.
+        !pendingDeleteEventIds.includes(eventId)
     )
   }
 
