@@ -10,15 +10,17 @@
  */
 import React from 'react'
 import format from 'date-fns/format'
-import styled from 'styled-components'
-import { defineMessages, useIntl } from 'react-intl'
+import styled, { useTheme } from 'styled-components'
+import { defineMessages, useIntl, IntlShape } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
+  Action,
   ActionDocument,
   ActionStatus,
   ActionType,
@@ -54,7 +56,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
+    '{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -71,6 +73,38 @@ const TableDiv = styled.div`
 const LinkLeftAligned = styled(Link)`
   text-align: left;
 `
+
+/**
+ * The action whose confirmation status the row should reflect. Usually the row
+ * action itself, but for a direct correction shown as "Record corrected" it is
+ * the paired APPROVE_CORRECTION — that is the action awaiting external
+ * validation, not the request that is displayed.
+ */
+function getStatusSourceAction(
+  action: ActionDocument,
+  history: ActionDocument[]
+): ActionDocument {
+  if (action.type === ActionType.REQUEST_CORRECTION) {
+    return findImmediateApproveCorrection(history, action) ?? action
+  }
+  return action
+}
+
+/**
+ * The effective status of an original action: the status of its confirmation
+ * (accept/reject, linked via `originalActionId`) when one exists, otherwise the
+ * action's own status. A still-`Requested` action with no confirmation is
+ * waiting for external validation.
+ */
+function getEffectiveStatus(
+  action: ActionDocument,
+  allActions: Action[]
+): ActionStatus {
+  const confirmation = allActions.find(
+    (other) => other.originalActionId === action.id
+  )
+  return confirmation ? confirmation.status : action.status
+}
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
@@ -110,12 +144,58 @@ const messages = defineMessages({
     description: 'Role label',
     id: 'constants.role'
   },
+  waitingForExternalValidation: {
+    defaultMessage: 'Waiting for external validation',
+    description:
+      'Status badge shown on an action that is still awaiting confirmation from an external system',
+    id: 'events.history.waitingForExternalValidation'
+  },
+  statusAccepted: {
+    defaultMessage: 'Accepted',
+    description: 'Status badge shown on an action that has been confirmed',
+    id: 'events.history.status.accepted'
+  },
+  statusRejected: {
+    defaultMessage: 'Rejected',
+    description: 'Status badge shown on an action that was rejected',
+    id: 'events.history.status.rejected'
+  },
   location: {
     defaultMessage: 'Location',
     description: 'Label for location',
     id: 'constants.location'
   }
 })
+
+function StatusBadge({
+  status,
+  intl
+}: {
+  status: ActionStatus
+  intl: IntlShape
+}) {
+  if (status === ActionStatus.Rejected) {
+    return (
+      <span title={intl.formatMessage(messages.statusRejected)}>
+        <Icon color="red" name="XCircle" size="large" />
+      </span>
+    )
+  }
+
+  if (status === ActionStatus.Requested) {
+    return (
+      <span title={intl.formatMessage(messages.waitingForExternalValidation)}>
+        <Icon color="orange" name="PauseCircle" size="large" />
+      </span>
+    )
+  }
+
+  return (
+    <span title={intl.formatMessage(messages.statusAccepted)}>
+      <Icon color="green" name="CheckCircle" size="large" />
+    </span>
+  )
+}
 
 const SystemName = styled.div`
   display: flex;
@@ -298,24 +378,17 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
+  const theme = useTheme()
   const [modal, openModal] = useModal()
   const { getActionTypeForHistory } = useActionForHistory()
   const { getUserDetails } = useUserDetails()
 
   const history = extractHistoryActions(fullEvent)
 
-  // Rejected action confirmations (e.g. an external ID system such as MOSIP
-  // rejecting a deferred registration) are excluded from the regular history
-  // extraction. Surface rejected registrations so the record does not appear
-  // to be waiting for external validation forever.
-  const rejectedRegistrations = fullEvent.actions.filter(
-    (a): a is ActionDocument =>
-      a.type === ActionType.REGISTER &&
-      a.status === ActionStatus.Rejected &&
-      Boolean(a.originalActionId)
-  )
-
-  const visibleHistory = [...history, ...rejectedRegistrations]
+  // Each row is an original action; the outcome of its confirmation (accepted,
+  // rejected, or still waiting) is surfaced as a status on the row itself, so a
+  // rejected registration no longer needs a separate row.
+  const visibleHistory = [...history]
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     .filter(({ type }) => type !== ActionType.CREATE)
 
@@ -358,14 +431,14 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       return x
     })
     .filter((x) => {
-      // Removing immediately APPROVED_CORRECTION since we only show
-      // the associated REQUEST_CORRECTION as 'Record corrected'.
-      //
-      // Asyncronous correction request is kept to surface the fact that a correction is in-flight
+      // Remove every immediately-approved correction row (whether the approval
+      // is accepted or still requested). The pair is shown as a single
+      // 'Record corrected' row on the REQUEST_CORRECTION; its pending external
+      // validation is surfaced there as a status badge instead of a separate
+      // 'Waiting for external validation' row.
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
-        x.content?.immediateCorrection &&
-        x.status !== ActionStatus.Requested
+        x.content?.immediateCorrection
       ) {
         return false
       }
@@ -396,19 +469,27 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         })
       }
 
+      const effectiveStatus = getEffectiveStatus(
+        getStatusSourceAction(action, history),
+        fullEvent.actions
+      )
+
       // If a audit history label is configured in action config, use that!
       const title =
         actionConfig && actionConfig.type === ActionType.CUSTOM
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(history, action),
-              status: action.status,
+              // The row shows the original (request) action; label it by the
+              // outcome of its confirmation.
+              status: effectiveStatus,
               // Lets countries configure different wording for actions
               // performed by an integration, e.g. "Registered and UIN created"
               userType: action.createdByUserType
             })
 
       return {
+        status: <StatusBadge intl={intl} status={effectiveStatus} />,
         action: (
           <LinkLeftAligned
             font="bold14"
@@ -424,24 +505,36 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         user: <ActionCreator action={action} />,
         // Integrations have no role, and the table cell type takes no undefined
         role: role ?? '',
-        location: <ActionLocation action={action} />
+        location: <ActionLocation action={action} />,
+        // Highlight rows still waiting for external validation.
+        rowBackgroundColor:
+          effectiveStatus === ActionStatus.Requested
+            ? theme.colors.orangeLighter
+            : undefined
       }
     })
 
   const columns = [
     {
+      label: '',
+      width: 6,
+      key: 'status',
+      isIconColumn: true,
+      ICON_ALIGNMENT: ColumnContentAlignment.LEFT
+    },
+    {
       label: intl.formatMessage(messages.action),
-      width: 22,
+      width: 20,
       key: 'action'
     },
     {
       label: intl.formatMessage(messages.date),
-      width: 22,
+      width: 21,
       key: 'date'
     },
     {
       label: intl.formatMessage(messages.by),
-      width: 22,
+      width: 20,
       key: 'user',
       isIconColumn: true,
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
@@ -460,6 +553,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   return (
     <Content
+      noPadding
       size={ContentSize.LARGE}
       title={intl.formatMessage(messages.audit)}
     >

@@ -256,39 +256,39 @@ export default meta
 type Story = StoryObj<typeof EventOverviewIndex>
 
 /**
- * A pending async registration is shown as "Waiting for external validation"
- * and there is no "Registered" row yet.
+ * A pending async registration shows the register row with a yellow
+ * "Waiting for external validation" status badge — not a separate row.
  */
 export const RegistrationWaitingForExternalValidation: Story = {
   parameters: auditParameters(registrationWaitingEvent),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    await step(
-      'the pending registration is waiting for validation',
-      async () => {
-        await expect(
-          await canvas.findByRole(
-            'button',
-            { name: 'Waiting for external validation' },
-            { timeout: 10000 }
-          )
-        ).toBeVisible()
-      }
-    )
-
-    await step('there is no "Registered" row yet', async () => {
+    await step('the register row is shown', async () => {
       await expect(
-        canvas.queryByRole('button', { name: 'Registered' })
+        await canvas.findByRole(
+          'button',
+          { name: 'Registered' },
+          { timeout: 10000 }
+        )
+      ).toBeVisible()
+    })
+
+    await step('its status shows waiting for external validation', async () => {
+      // The status is an icon badge (first column) with a descriptive title,
+      // not a row of its own.
+      await expect(
+        await canvas.findByTitle('Waiting for external validation')
+      ).toBeVisible()
+      await expect(
+        canvas.queryByRole('button', {
+          name: 'Waiting for external validation'
+        })
       ).toBeNull()
     })
   }
 }
 
-/**
- * A pending async (direct) correction shows both the "Record corrected" row and
- * the "Waiting for external validation" row.
- */
 export const CorrectionWaitingForExternalValidation: Story = {
   parameters: auditParameters(correctionWaitingEvent),
   play: async ({ canvasElement, step }) => {
@@ -304,20 +304,25 @@ export const CorrectionWaitingForExternalValidation: Story = {
       ).toBeVisible()
     })
 
-    await step('the correction is waiting for external validation', async () => {
+    await step('its status shows waiting for external validation', async () => {
+      // The status is an icon badge (first column) with a descriptive title,
+      // not a row of its own.
       await expect(
-        await canvas.findByRole('button', {
+        await canvas.findByTitle('Waiting for external validation')
+      ).toBeVisible()
+      await expect(
+        canvas.queryByRole('button', {
           name: 'Waiting for external validation'
         })
-      ).toBeVisible()
+      ).toBeNull()
     })
   }
 }
 
 /**
- * Once the registration's external validation completes, the audit shows the
- * "Registered" row. It currently still keeps the "Waiting for external
- * validation" row too — the state this work will replace with a status.
+ * Once the registration's external validation completes, the audit shows a
+ * single "Registered" row with no waiting badge — the requested action is no
+ * longer surfaced separately.
  */
 export const RegistrationExternalValidationFinished: Story = {
   parameters: auditParameters(registrationFinishedEvent),
@@ -334,23 +339,17 @@ export const RegistrationExternalValidationFinished: Story = {
       ).toBeVisible()
     })
 
-    await step(
-      'the "Waiting for external validation" row still lingers (to be improved)',
-      async () => {
-        await expect(
-          await canvas.findByRole('button', {
-            name: 'Waiting for external validation'
-          })
-        ).toBeVisible()
-      }
-    )
+    await step('there is no waiting status', async () => {
+      await expect(
+        canvas.queryByTitle('Waiting for external validation')
+      ).toBeNull()
+    })
   }
 }
 
 /**
- * Once the correction's external validation completes, the audit still shows
- * "Record corrected". As with registration, the "Waiting for external
- * validation" row lingers even though the correction has finished.
+ * Once the correction's external validation completes, the audit shows the
+ * "Record corrected" row with no waiting badge.
  */
 export const CorrectionExternalValidationFinished: Story = {
   parameters: auditParameters(correctionFinishedEvent),
@@ -367,15 +366,10 @@ export const CorrectionExternalValidationFinished: Story = {
       ).toBeVisible()
     })
 
-    await step(
-      'the "Waiting for external validation" row still lingers (to be improved)',
-      async () => {
-        await expect(
-          await canvas.findByRole('button', {
-            name: 'Waiting for external validation'
-          })
-        ).toBeVisible()
-      }
-    )
+    await step('there is no waiting status', async () => {
+      await expect(
+        canvas.queryByTitle('Waiting for external validation')
+      ).toBeNull()
+    })
   }
 }

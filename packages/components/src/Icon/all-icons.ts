@@ -70,6 +70,7 @@ export {
   NotePencil,
   Paperclip,
   PaperPlaneTilt,
+  PauseCircle,
   Pen,
   PenNib,
   Pencil,

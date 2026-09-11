@@ -145,19 +145,21 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
     childNid = aggregateActionDeclarations(event)['child.nid'] as string
   })
 
-  await test.step('Record audit shows "Waiting for external validation" and the child UIN', async () => {
+  await test.step('Record audit shows the corrected record and the child UIN', async () => {
     await page.getByRole('button', { name: 'Assign record' }).click()
 
     // Verify the child UIN is visible in the record summary
     await expect(page.getByTestId('child.nid-value')).toContainText(childNid)
 
-    // Verify the "Waiting for external validation" action is visible in the audit tab
+    // The correction is shown as a single 'Record corrected' row. Its external
+    // validation has finished (the child UIN was created), so its status badge
+    // is no longer 'Waiting for external validation'.
     await switchEventTab(page, 'Audit')
     await expect(
-      page.getByRole('button', {
-        name: 'Waiting for external validation',
-        exact: true
-      })
+      page.getByRole('button', { name: 'Record corrected', exact: true })
     ).toBeVisible()
+    await expect(
+      page.getByTitle('Waiting for external validation')
+    ).toHaveCount(0)
   })
 })

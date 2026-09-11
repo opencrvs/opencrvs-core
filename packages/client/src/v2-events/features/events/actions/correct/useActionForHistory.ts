@@ -30,21 +30,7 @@ export function extractHistoryActions(
   fullEvent: EventDocument
 ): ActionDocument[] {
   function isHistoryAction(a: Action): a is ActionDocument {
-    if (a.status === ActionStatus.Accepted) {
-      return true
-    }
-
-    if (a.status === ActionStatus.Requested) {
-      const immediatelyAcceptedAction = fullEvent.actions.find(
-        ({ originalActionId, transactionId }) =>
-          originalActionId === a.id && transactionId === a.transactionId
-      )
-      if (!immediatelyAcceptedAction) {
-        return true
-      }
-    }
-
-    return false
+    return !a.originalActionId
   }
 
   return fullEvent.actions.filter(isHistoryAction).map((action) => {

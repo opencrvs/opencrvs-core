@@ -84,6 +84,7 @@ const RowWrapper = styled.div<{
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
   columns: IColumn[]
+  backgroundColor?: string
 }>`
   display: flex;
   width: 100%;
@@ -91,6 +92,8 @@ const RowWrapper = styled.div<{
   padding-top: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  ${({ backgroundColor }) =>
+    backgroundColor && `background-color: ${backgroundColor};`}
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -411,6 +414,11 @@ export const Table = ({
                         horizontalPadding={rowStyle?.horizontalPadding}
                         hideTableBottomBorder={hideTableBottomBorder}
                         columns={columns}
+                        backgroundColor={
+                          typeof item.rowBackgroundColor === 'string'
+                            ? item.rowBackgroundColor
+                            : undefined
+                        }
                       >
                         {columns.map((preference, indx) => {
                           return (
