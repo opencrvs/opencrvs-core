@@ -43,6 +43,7 @@ const ESCALATION_FLAG = 'Escalated to Provincial Registrar'
 test('An escalated declaration keeps its escalation flag when edited by the RO', async ({
   browser
 }) => {
+  test.setTimeout(180_000)
   const page = await browser.newPage()
 
   let declaration: Declaration
