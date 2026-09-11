@@ -29,7 +29,7 @@ export function useDuplicatesAvailable(
 ) {
   const duplicatesQuery = useQuery({
     queryKey: potentialDuplicatesQueryKey(event.id),
-    queryFn: () => fetchAndCachePotentialDuplicates(event.id),
+    queryFn: async () => fetchAndCachePotentialDuplicates(event.id),
     enabled: canReviewDuplicates && event.potentialDuplicates.length > 0
   })
 

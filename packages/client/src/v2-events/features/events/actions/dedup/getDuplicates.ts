@@ -22,7 +22,7 @@ export function potentialDuplicatesQueryKey(eventId: string) {
   return ['event', 'potentialDuplicates', eventId] as const
 }
 
-async function fetchPotentialDuplicates(eventId: string) {
+function fetchPotentialDuplicates(eventId: string) {
   return trpcClient.event.getDuplicates.query({ eventId })
 }
 
@@ -55,7 +55,7 @@ export async function prefetchPotentialDuplicates(eventId: string) {
   try {
     await queryClient.fetchQuery({
       queryKey: potentialDuplicatesQueryKey(eventId),
-      queryFn: () => fetchAndCachePotentialDuplicates(eventId)
+      queryFn: async () => fetchAndCachePotentialDuplicates(eventId)
     })
   } catch (error) {
     // The user is not authorized to see duplicates — otherwise, rethrow.
