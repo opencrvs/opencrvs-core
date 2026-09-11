@@ -15,8 +15,10 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
+  Action,
   ActionDocument,
   ActionInputWithType,
+  ActionStatus,
   ActionType,
   DeleteActionInput,
   getAssignedUserFromActions,
@@ -42,7 +44,8 @@ import {
   canAccessOtherUserWithScopes,
   UserScopeType,
   CreateUserInput,
-  canAccessUserWithScope
+  canAccessUserWithScope,
+  ActionConfirmationScopeType
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -301,6 +304,135 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
         acceptedScopes,
         eventId: input.eventId,
         eventType: event.type
+      }
+    })
+  }
+
+  return fn
+}
+
+const ActionConfirmationParams = z.object({
+  eventId: UUID,
+  actionId: UUID,
+  // Present on custom-action `accept` (see `CustomActionInput`); absent on
+  // `reject`, which records no custom action type. Verified against the pending
+  // action below so a confirmer cannot accept one custom action as another.
+  customActionType: z.string().optional()
+})
+
+/**
+ * Authorises confirming (accepting or rejecting) one requested action.
+ *
+ * Confirming must never be reachable with the credentials that requested the
+ * action: otherwise whoever can request a registration can immediately confirm
+ * it themselves, choosing the registration number and overriding the reviewed
+ * declaration, with the country configuration never involved. So it takes its
+ * own scope — `record.action.accept` / `record.action.reject` — which no user
+ * role is granted. It belongs to an integration that confirms under its own
+ * credentials (e.g. mosip-api, once MOSIP issues a credential).
+ *
+ * Those scopes are only ever honoured for a **system** client: a human user's
+ * token cannot confirm even if it somehow carried one. The grant is still
+ * subject to the ordinary record-scope event checks, so an integration stays
+ * confined to the event types and jurisdiction it was granted.
+ */
+export function requireActionConfirmation(
+  scopeType: ActionConfirmationScopeType
+) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & { eventId: UUID; eventType: string },
+    unknown
+  > = async (opts) => {
+    if (opts.ctx.user.type !== TokenUserType.enum.system) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    return canAccessEventWithScopes([scopeType])(opts)
+  }
+
+  return fn
+}
+
+/**
+ * Resolves the action an accept/reject call names, and refuses anything other
+ * than the pending action of the matching type.
+ *
+ * `actionId` is otherwise only looked up by id, so an action of any type or
+ * status would do — including one already accepted, or a CREATE. That would let
+ * a caller manufacture an accepted action of the type they picked, bypassing
+ * `throwConflictIfActionNotAllowed`, `validateAction`, `requireAssignment` and
+ * duplicate detection, all of which run on `request` and none of which run on a
+ * confirmation.
+ *
+ * Passes the event and the two actions on in context so the handler does not
+ * fetch and scan them a second time.
+ */
+export function requireConfirmableAction(actionType: ActionType) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & {
+      event: EventDocument
+      originalAction: Action
+      confirmationAction?: Action
+    },
+    unknown
+  > = async ({ ctx, next, getRawInput }) => {
+    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const event = await getEventById(input.eventId)
+    const originalAction = event.actions.find(({ id }) => id === input.actionId)
+
+    if (!originalAction) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Action not found.' })
+    }
+
+    if (originalAction.status !== ActionStatus.Requested) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is not awaiting confirmation.`
+      })
+    }
+
+    if (originalAction.type !== actionType) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is of type ${originalAction.type}, cannot be confirmed as ${actionType}.`
+      })
+    }
+
+    // For custom actions the type above is always CUSTOM, so it does not
+    // distinguish e.g. CONFIRM_SENIOR_MEMBERSHIP from another custom action.
+    // The accepted action records the caller's `customActionType`, so it must
+    // match the pending action's — otherwise a confirmer could accept one custom
+    // action as another.
+    if (
+      originalAction.type === ActionType.CUSTOM &&
+      input.customActionType !== undefined &&
+      input.customActionType !== originalAction.customActionType
+    ) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is custom action ${originalAction.customActionType}, cannot be confirmed as ${input.customActionType}.`
+      })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        event,
+        originalAction,
+        confirmationAction: event.actions.find(
+          ({ originalActionId }) => originalActionId === input.actionId
+        )
       }
     })
   }

@@ -275,32 +275,26 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
+/**
+ * Mints the token a country configuration uses to confirm (accept/reject) an
+ * action: the `record.action.accept` / `record.action.reject` scopes no user
+ * role holds, scoped to one event. The token is always a **system** client's —
+ * these scopes are only ever honoured for a system user (see
+ * `requireActionConfirmation`), never a human one.
+ */
 function createActionConfirmationTestToken(
-  userId: string,
-  eventId: string,
-  actionId: string
+  systemId: UUID,
+  eventId: UUID
 ): TokenWithBearer {
   const token = jwt.sign(
     {
       scope: [
-        ...TEST_USER_DEFAULT_SCOPES,
-        encodeScope({
-          type: 'record.custom-action',
-          options: {
-            event: [
-              'birth',
-              'death',
-              'tennis-club-membership',
-              'child-onboarding'
-            ],
-            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
-          }
-        })
+        encodeScope({ type: 'record.action.accept' }),
+        encodeScope({ type: 'record.action.reject' })
       ],
-      sub: userId,
-      userType: TokenUserType.enum.user,
-      eventId,
-      actionId
+      sub: systemId,
+      userType: TokenUserType.enum.system,
+      eventId
     },
     readFileSync(join(__dirname, './cert.key')),
     {
@@ -383,23 +377,21 @@ export function createInitialisationTestClient(
 }
 
 /**
- * Simulates the confirmation caller (e.g. countryconfig / an integration)
- * hitting the action `accept`/`reject` endpoints. Confirming requires the
- * action's own scope (e.g. `record.register`), which this client carries.
+ * Simulates the country configuration hitting the action `accept`/`reject`
+ * endpoints with its own system client's confirmation credentials, scoped to
+ * `eventId`. Confirmation is a system-client action, so the caller is a system
+ * context — the passed `user` only supplies an id to attribute it to.
  */
-export function createCountryConfigClient(
-  user: CreatedUser,
-  eventId: string,
-  actionId: string
-) {
+export function createCountryConfigClient(user: CreatedUser, eventId: UUID) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createActionConfirmationTestToken(user.id, eventId, actionId)
+  const token = createActionConfirmationTestToken(user.id, eventId)
 
   const caller = createCaller({
-    user: {
-      ...user,
-      type: TokenUserType.enum.user
-    },
+    user: SystemContext.parse({
+      id: user.id,
+      primaryOfficeId: undefined,
+      type: TokenUserType.enum.system
+    }),
     token
   })
   return caller

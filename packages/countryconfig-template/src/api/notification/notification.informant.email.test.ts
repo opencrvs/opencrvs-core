@@ -53,6 +53,7 @@ vi.mock('nodemailer', () => {
 })
 
 import { createServer } from '../../index'
+import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 
 import { informantNotificationTestData } from './testData'
 
@@ -74,7 +75,9 @@ describe('Informant notification - Email', () => {
           payload: eventDocument,
           auth: {
             strategy: 'jwt',
-            credentials: {},
+            // Action confirmation requests are only accepted from core's
+            // service token (see the onPostAuth guard in ../../index).
+            credentials: { sub: SERVICE_USER_ID },
             artifacts: { token: 'mock-token' }
           }
         })
