@@ -64,10 +64,12 @@ test.describe
     await expect(rows).toHaveCount(expectedActions.length)
 
     for (let i = 0; i < expectedActions.length; i++) {
-      const actionCell = rows.nth(i).locator('span').first()
-      await expect(actionCell).toHaveText(expectedActions[i])
+      const actionButton = rows
+        .nth(i)
+        .getByRole('button', { name: expectedActions[i], exact: true })
+      await expect(actionButton).toBeVisible()
 
-      await actionCell.getByRole('button').click()
+      await actionButton.click()
 
       const modal = page.getByTestId('event-history-modal')
 

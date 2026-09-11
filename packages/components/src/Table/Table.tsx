@@ -69,6 +69,8 @@ const RowWrapper = styled.div<{
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
   columns: IColumn[]
+  backgroundColor?: string
+  clickable?: boolean
 }>`
   display: flex;
   width: 100%;
@@ -76,6 +78,9 @@ const RowWrapper = styled.div<{
   padding-top: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  ${({ backgroundColor }) =>
+    backgroundColor && `background-color: ${backgroundColor};`}
+  ${({ clickable }) => clickable && `cursor: pointer;`}
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -175,7 +180,7 @@ const TableScrollerHorizontal = styled.div<{
 }>`
   ${({ disableScrollOnOverflow }) =>
     !disableScrollOnOverflow && `overflow: auto`};
-  padding-bottom: 8px;
+
   &::-webkit-scrollbar {
     border-radius: 8px;
     width: 8px;
@@ -402,6 +407,17 @@ export const Table = ({
                         horizontalPadding={rowStyle?.horizontalPadding}
                         hideTableBottomBorder={hideTableBottomBorder}
                         columns={columns}
+                        backgroundColor={
+                          typeof item.rowBackgroundColor === 'string'
+                            ? item.rowBackgroundColor
+                            : undefined
+                        }
+                        clickable={typeof item.onRowClick === 'function'}
+                        onClick={
+                          typeof item.onRowClick === 'function'
+                            ? (item.onRowClick as React.MouseEventHandler<HTMLDivElement>)
+                            : undefined
+                        }
                       >
                         {columns.map((preference, indx) => {
                           return (

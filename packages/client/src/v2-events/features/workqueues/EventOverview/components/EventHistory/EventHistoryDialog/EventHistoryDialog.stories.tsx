@@ -114,7 +114,8 @@ const meta: Meta<typeof EventHistoryDialog> = {
   args: {
     userName: 'Jane Doe',
     fullEvent,
-    validatorContext: getTestValidatorContext()
+    validatorContext: getTestValidatorContext(),
+    isWaitingForExternalValidation: false
   }
 }
 
@@ -338,7 +339,8 @@ export const WaitingForExternalValidation: Story = {
     ...argbase,
     title: 'Waiting for external validation',
     fullEvent: eventWaitingForExternalValidation,
-    action: waitingForExternalValidationRegisterAction
+    action: waitingForExternalValidationRegisterAction,
+    isWaitingForExternalValidation: true
   },
   parameters: {
     offline: {

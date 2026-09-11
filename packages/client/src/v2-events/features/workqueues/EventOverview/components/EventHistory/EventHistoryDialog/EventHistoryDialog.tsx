@@ -11,17 +11,18 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { Dialog, Stack, Table } from '@opencrvs/components'
+import styled from 'styled-components'
+import { Dialog, Icon, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
   EventDocument,
   getAcceptedActions,
+  joinValues,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { joinValues } from '@opencrvs/commons/client'
 import { ActionTypeSpecificContent } from './components'
 
 const messages = defineMessages({
@@ -44,6 +45,13 @@ const messages = defineMessages({
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
+  },
+  externalValidationBanner: {
+    defaultMessage:
+      'This action has been initiated, but is still awaiting validation from an external system.',
+    description:
+      'Banner shown in the action detail dialog when the action is still awaiting external validation',
+    id: 'events.history.externalValidationBanner'
   }
 })
 
@@ -99,6 +107,32 @@ function prepareDuplicateOf(
   )
 }
 
+const BannerWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  background-color: ${({ theme }) => theme.colors.orangeLight};
+  padding: 8px 20px;
+  border-radius: 4px 4px 0 0;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.orangeDarker};
+`
+
+const StyledText = styled(Text)`
+  margin-left: 8px;
+`
+
+function ExternalValidationBannerComponent() {
+  const intl = useIntl()
+  return (
+    <BannerWrapper>
+      <Icon name="PauseCircle" size="small" />
+      <StyledText color="orangeDarker" element="span" variant="bold14">
+        {intl.formatMessage(messages.externalValidationBanner)}
+      </StyledText>
+    </BannerWrapper>
+  )
+}
+
 /**
  * Detailed view of single Action, showing the history of the event.
  */
@@ -108,7 +142,8 @@ export function EventHistoryDialog({
   close,
   fullEvent,
   validatorContext,
-  title
+  title,
+  isWaitingForExternalValidation
 }: {
   action: ActionDocument
   userName: string
@@ -116,6 +151,7 @@ export function EventHistoryDialog({
   fullEvent: EventDocument
   validatorContext: ValidatorContext
   title: string
+  isWaitingForExternalValidation: boolean
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
@@ -128,6 +164,11 @@ export function EventHistoryDialog({
     <Dialog
       isOpen
       actions={[]}
+      banner={
+        isWaitingForExternalValidation ? (
+          <ExternalValidationBannerComponent />
+        ) : undefined
+      }
       id="event-history-modal"
       title={title}
       variant="large"
