@@ -179,6 +179,23 @@ function StatusBadge({ status }: { status: ActionStatus }) {
   return <Icon color="green" name="CheckCircle" />
 }
 
+// Flex-centre the icon so it lines up vertically with the text in other cells
+// (a bare inline SVG sits on the text baseline).
+const StatusCell = styled.span`
+  display: flex;
+  align-items: center;
+`
+
+function getStatusLabel(status: ActionStatus, intl: IntlShape): string {
+  if (status === ActionStatus.Rejected) {
+    return intl.formatMessage(messages.statusRejected)
+  }
+  if (status === ActionStatus.Requested) {
+    return intl.formatMessage(messages.waitingForExternalValidation)
+  }
+  return intl.formatMessage(messages.statusAccepted)
+}
+
 const SystemName = styled.div`
   display: flex;
   align-items: center;
@@ -472,9 +489,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
       return {
         status: (
-          <span>
+          <StatusCell title={getStatusLabel(effectiveStatus, intl)}>
             <StatusBadge status={effectiveStatus} />
-          </span>
+          </StatusCell>
         ),
         action: (
           <LinkLeftAligned
