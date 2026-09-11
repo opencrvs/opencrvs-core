@@ -253,14 +253,6 @@ export async function defaultRequestHandler(
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
-  /*
-   * The country configuration gets core's own internal service token rather
-   * than the caller's own token. It only proves the confirmation request comes
-   * from an internal core service; it grants nothing, so the country
-   * configuration cannot register a second record, act on another event, or use
-   * the registrar's write scopes. Confirming asynchronously requires the country
-   * configuration's own system client credentials.
-   */
   const eventActionToken = await getServiceToken()
 
   const { responseStatus, responseBody } = await requestActionConfirmation(
