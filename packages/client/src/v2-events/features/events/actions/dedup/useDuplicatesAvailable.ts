@@ -19,13 +19,18 @@ import {
 /**
  * Whether every potential duplicate of `event` is available to the current
  * user. Resolves to `true` while still loading, to avoid a false "not
- * available" before the fetch has settled.
+ * available" before the fetch has settled. Fetches nothing when
+ * `canReviewDuplicates` is `false` — the server rejects the call outright in
+ * that case, so there's nothing to ask for.
  */
-export function useDuplicatesAvailable(event: EventIndex) {
+export function useDuplicatesAvailable(
+  event: EventIndex,
+  canReviewDuplicates: boolean
+) {
   const duplicatesQuery = useQuery({
     queryKey: potentialDuplicatesQueryKey(event.id),
     queryFn: () => fetchAndCachePotentialDuplicates(event.id),
-    enabled: event.potentialDuplicates.length > 0
+    enabled: canReviewDuplicates && event.potentialDuplicates.length > 0
   })
 
   if (duplicatesQuery.isLoading) {
