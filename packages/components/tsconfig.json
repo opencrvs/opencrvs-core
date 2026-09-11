@@ -1,16 +1,13 @@
 {
   "compilerOptions": {
-    "outDir": "lib/",
     "module": "ESNext",
     "target": "es6",
     "lib": ["es6", "dom", "es2019"],
-    "sourceMap": true,
+    "noEmit": true,
     "allowJs": false,
-    "declaration": true,
     "jsx": "react",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -18,12 +15,10 @@
     "strictNullChecks": true,
     "noUnusedLocals": false,
     "skipLibCheck": true,
-    "declarationMap": true,
     "types": ["node"]
   },
   "include": ["src/**/*.tsx", "src/**/*.ts", ".storybook"],
-  // Stories are excluded from the build: their inferred Storybook types are
-  // not portable for declaration emit under pnpm's symlinked node_modules
-  // (TS2883), and nothing imports them from lib/. Storybook reads src/.
-  "exclude": ["node_modules", "lib", "src/**/*.stories.tsx"]
+  // Stories excluded: they still use the pre-Storybook-10 ComponentMeta /
+  // ComponentStory API, which no longer exists. Migrating them is separate work.
+  "exclude": ["node_modules", "src/**/*.stories.tsx"]
 }

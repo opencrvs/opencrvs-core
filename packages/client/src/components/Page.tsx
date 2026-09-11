@@ -27,7 +27,7 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
-import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { LoadingBar } from '@opencrvs/components/lib/LoadingBar/LoadingBar'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 
 const StyledPage = styled.div<IPageProps>`
