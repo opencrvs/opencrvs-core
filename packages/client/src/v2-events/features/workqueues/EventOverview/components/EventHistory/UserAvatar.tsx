@@ -14,11 +14,6 @@ import { User } from '@opencrvs/commons/client'
 import { Avatar } from '@client/components/Avatar'
 import { getUsersFullName } from '@client/v2-events/utils'
 
-/*
- * The gap belongs to the row, not to the avatar's markup: an avatar renders as
- * an `<img>` only when the user has uploaded a photo, and as initials or a
- * placeholder otherwise.
- */
 const NameAvatar = styled.div`
   display: flex;
   align-items: center;
