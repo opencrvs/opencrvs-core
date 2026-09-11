@@ -62,6 +62,8 @@ export interface IDynamicValues {
     | null
     | undefined
     | Record<string, unknown>
+    // Optional per-row click handler read by `Table` (e.g. `onRowClick`).
+    | ((event: React.MouseEvent) => void)
 }
 
 export interface IActionObject {

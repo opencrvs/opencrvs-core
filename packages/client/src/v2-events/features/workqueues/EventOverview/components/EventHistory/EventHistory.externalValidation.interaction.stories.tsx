@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
-import { expect, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 import {
   ActionDocument,
   ActionStatus,
@@ -344,6 +344,22 @@ export const RegistrationExternalValidationFinished: Story = {
         canvas.queryByTitle('Waiting for external validation')
       ).toBeNull()
     })
+
+    await step(
+      'the row can be expanded to reveal who confirmed it and when',
+      async () => {
+        // The confirmation details are not shown until the row is expanded.
+        await expect(canvas.queryByText('Accepted')).toBeNull()
+
+        await userEvent.click(
+          await canvas.findByRole('button', {
+            name: 'Show validation details'
+          })
+        )
+
+        await expect(await canvas.findByText('Accepted')).toBeVisible()
+      }
+    )
   }
 }
 
