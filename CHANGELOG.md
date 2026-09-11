@@ -32,6 +32,14 @@ Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
 The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
 
+#### Document presign requests are no longer authorized by scope alone
+
+`GET /presigned-url/{filePath*}` on the gateway proxied straight to documents-service, which validates only that a JWT is genuinely signed — not that its scopes grant access to the record the document belongs to. Any authenticated user, regardless of scope, could obtain a valid presigned URL for any document whose path they knew.
+
+The route has been removed. Presigning a document tied to a record now goes through events-service's `event.file.getPresignedUrl`, which requires `record.read` on the event derived from the path (`events/{eventId}/...`) before asking documents-service to sign it. `users/{userId}/...` paths (avatars, signatures) and bare `{uuid}.ext` legacy paths (pre-2.0 uploads, or any upload where `path` is omitted) still presign without a record check, since they carry no record binding to check against.
+
+[#12962](https://github.com/opencrvs/opencrvs-core/issues/12962)
+
 #### `validUntil` removed from location APIs
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.

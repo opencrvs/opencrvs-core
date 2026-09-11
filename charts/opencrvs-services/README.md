@@ -342,6 +342,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>List of namespaces OpenCRVS pods are allowed to reach. Only takes effect when <code>egress_mode</code> is not <code>full</code>. Grants egress on any port to every pod in each listed namespace (e.g. the dependencies chart's namespace) — see "Hardening" in this README.</td>
         </tr>
         <tr>
+            <td>network_policy.annotations / labels</td>
+            <td>{}</td>
+            <td>Extra annotations/labels applied to the <code>metadata</code> of every generated NetworkPolicy (not the <code>podSelector</code>). Overridable per service via <code>&lt;service&gt;.network_policy.annotations</code>/<code>.labels</code>, which in turn can be overridden per rule via <code>annotations</code>/<code>labels</code> on an entry in <code>rules</code>/<code>custom_rules</code>.</td>
+        </tr>
+        <tr>
             <td>&lt;service&gt;.network_policy.rules</td>
             <td>[]</td>
             <td>Chart-provided service-specific NetworkPolicy rules. Rules use Kubernetes NetworkPolicy spec syntax, except <code>podSelector</code> is generated from <code>app_label</code>.</td>
