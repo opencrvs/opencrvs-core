@@ -104,17 +104,18 @@ export const messages = {
     description: 'label for updating user',
     id: 'form.field.label.updatingUser'
   },
-  changeOfficeWarningTitle: {
-    defaultMessage: 'Change office?',
+  removeDraftsWarningTitle: {
+    defaultMessage: 'Change role or office?',
     description:
-      'Title for the confirmation dialog when changing a user office',
-    id: 'form.field.label.changeOfficeWarningTitle'
+      'Title for the confirmation dialog when a change removes a user in-progress drafts',
+    id: 'form.field.label.removeDraftsWarningTitle'
   },
-  changeOfficeWarningBody: {
+  removeDraftsWarningBody: {
     defaultMessage:
-      "Changing this user's office will remove their in-progress drafts. Do you want to continue?",
-    description: 'Body for the confirmation dialog when changing a user office',
-    id: 'form.field.label.changeOfficeWarningBody'
+      "Changing this user's role or office will remove their in-progress drafts. Do you want to continue?",
+    description:
+      'Body for the confirmation dialog when a change removes a user in-progress drafts',
+    id: 'form.field.label.removeDraftsWarningBody'
   },
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
