@@ -407,7 +407,7 @@ function ActionByCell({
   if (type !== 'user') {
     return (
       <TwoLineCell>
-        <NameLine>{name}</NameLine>
+        <NameLine data-testid="user-name">{name}</NameLine>
         <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
       </TwoLineCell>
     )
@@ -420,6 +420,7 @@ function ActionByCell({
     <TwoLineCell>
       {canViewUser ? (
         <LinkLeftAligned
+          data-testid="user-name"
           font="bold14"
           id="profile-link"
           onClick={() =>
@@ -431,7 +432,7 @@ function ActionByCell({
           {name}
         </LinkLeftAligned>
       ) : (
-        <NameLine>{name}</NameLine>
+        <NameLine data-testid="user-name">{name}</NameLine>
       )}
       {role && <SecondaryLine>{role}</SecondaryLine>}
     </TwoLineCell>

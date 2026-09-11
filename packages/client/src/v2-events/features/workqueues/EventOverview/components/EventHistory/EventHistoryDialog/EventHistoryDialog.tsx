@@ -19,10 +19,10 @@ import {
   ActionType,
   EventDocument,
   getAcceptedActions,
+  joinValues,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { joinValues } from '@opencrvs/commons/client'
 import { ActionTypeSpecificContent } from './components'
 
 const messages = defineMessages({
