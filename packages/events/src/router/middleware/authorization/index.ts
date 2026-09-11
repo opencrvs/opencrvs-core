@@ -313,7 +313,11 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
 const ActionConfirmationParams = z.object({
   eventId: UUID,
-  actionId: UUID
+  actionId: UUID,
+  // Present on custom-action `accept` (see `CustomActionInput`); absent on
+  // `reject`, which records no custom action type. Verified against the pending
+  // action below so a confirmer cannot accept one custom action as another.
+  customActionType: z.string().optional()
 })
 
 /**
@@ -402,6 +406,22 @@ export function requireConfirmableAction(actionType: ActionType) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: `Action ${originalAction.id} is of type ${originalAction.type}, cannot be confirmed as ${actionType}.`
+      })
+    }
+
+    // For custom actions the type above is always CUSTOM, so it does not
+    // distinguish e.g. CONFIRM_SENIOR_MEMBERSHIP from another custom action.
+    // The accepted action records the caller's `customActionType`, so it must
+    // match the pending action's — otherwise a confirmer could accept one custom
+    // action as another.
+    if (
+      originalAction.type === ActionType.CUSTOM &&
+      input.customActionType !== undefined &&
+      input.customActionType !== originalAction.customActionType
+    ) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is custom action ${originalAction.customActionType}, cannot be confirmed as ${input.customActionType}.`
       })
     }
 
