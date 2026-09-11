@@ -288,6 +288,11 @@ function getActionLifecycleLabel(
   return intl.formatMessage(messages.statusAccepted)
 }
 
+const SecondaryLine = styled.div`
+  ${({ theme }) => theme.fonts.reg14};
+  color: ${({ theme }) => theme.colors.grey500};
+`
+
 function ActionLocation({
   action,
   muted
@@ -361,11 +366,6 @@ function ActionLocation({
 const TwoLineCell = styled.div`
   display: flex;
   flex-direction: column;
-`
-
-const SecondaryLine = styled.div`
-  ${({ theme }) => theme.fonts.reg14};
-  color: ${({ theme }) => theme.colors.grey500};
 `
 
 /**
