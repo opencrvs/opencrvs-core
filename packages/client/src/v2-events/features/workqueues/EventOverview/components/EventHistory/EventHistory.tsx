@@ -699,14 +699,14 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       key: 'action'
     },
     {
-      label: intl.formatMessage(messages.by),
-      width: 21,
-      key: 'by'
-    },
-    {
       label: intl.formatMessage(messages.location),
       width: 22,
       key: 'location'
+    },
+    {
+      label: intl.formatMessage(messages.by),
+      width: 21,
+      key: 'by'
     },
     {
       label: intl.formatMessage(messages.when),
