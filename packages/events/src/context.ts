@@ -26,11 +26,6 @@ import {
 } from '@opencrvs/commons'
 import { getSystem, getUser } from './service/users/api'
 
-// A page load can create several tRPC requests using the same token at once.
-// Share only the pending lookup, so every request is still authenticated by
-// user-mgnt once the previous lookup has finished.
-const pendingUserDetails = new Map<string, Promise<TrpcUserContext>>()
-
 export const UserContext = User.pick({
   id: true,
   primaryOfficeId: true,
@@ -99,24 +94,6 @@ function normalizeHeaders(
 async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
-  const pending = pendingUserDetails.get(token)
-  if (pending) {
-    return pending
-  }
-
-  const resolution = resolveUserDetailsUncached(token)
-  pendingUserDetails.set(token, resolution)
-
-  try {
-    return await resolution
-  } finally {
-    pendingUserDetails.delete(token)
-  }
-}
-
-async function resolveUserDetailsUncached(
-  token: TokenWithBearer
-): Promise<TrpcUserContext> {
   let userId: string | undefined
   let userType: TokenUserType
 
@@ -125,61 +102,61 @@ async function resolveUserDetailsUncached(
     userType = getUserTypeFromToken(token)
   } catch {
     logger.error('Error while parsing token')
+
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 
   try {
-    let resolved: TrpcUserContext
-
     if (userId === REINDEX_USER_ID) {
-      resolved = SystemContext.parse({
+      return SystemContext.parse({
         type: TokenUserType.Enum.system,
         id: userId,
         primaryOfficeId: undefined,
         role: SystemRole.enum.REINDEX
       })
-    } else if (userType === TokenUserType.Enum.system) {
+    }
+
+    if (userType === TokenUserType.Enum.system) {
       const { type } = await getSystem(userId, token)
 
-      resolved = SystemContext.parse({
+      return SystemContext.parse({
         type: userType,
         id: userId,
         primaryOfficeId: undefined,
         role: type
       })
-    } else {
-      const { primaryOfficeId, role, signature, username } = await getUser(
-        userId,
-        token
-      )
-
-      if (username === SEEDER_SUPER_ADMIN) {
-        logger.warn(
-          `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
-        )
-
-        resolved = SuperAdminContext.parse({
-          type: TokenUserType.Enum.system,
-          id: userId,
-          primaryOfficeId: undefined,
-          role
-        })
-      } else {
-        resolved = UserContext.parse({
-          type: userType,
-          id: userId,
-          primaryOfficeId,
-          signature,
-          role
-        })
-      }
     }
 
-    return resolved
+    const { primaryOfficeId, role, signature, username } = await getUser(
+      userId,
+      token
+    )
+
+    if (username === SEEDER_SUPER_ADMIN) {
+      logger.warn(
+        `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
+      )
+
+      return SuperAdminContext.parse({
+        type: TokenUserType.Enum.system,
+        id: userId,
+        primaryOfficeId: undefined,
+        role
+      })
+    }
+
+    return UserContext.parse({
+      type: userType,
+      id: userId,
+      primaryOfficeId,
+      signature,
+      role
+    })
   } catch (error) {
     logger.error(
       `Error retrieving user details for ${userType} ${userId}: ${JSON.stringify(error)}`
     )
+
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
   }
 }
