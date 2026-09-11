@@ -674,46 +674,6 @@ export function canUserCreateEvent(
 }
 
 /**
- * Whether the given scopes authorise confirming one specific action.
- *
- * An action confirmation scope is bound to a single action id, so holding
- * `record.action.accept` for action A grants nothing over action B. Core mints
- * these per confirmation request; they cannot be granted to a role.
- *
- * @param scopes - The encoded scopes to inspect, e.g. from a JWT.
- * @param type - Which confirmation the caller is attempting.
- * @param actionId - Id of the requested action being confirmed.
- */
-export function hasScopeForActionConfirmation(
-  scopes: EncodedScope[],
-  type: ActionConfirmationScopeType,
-  actionId: UUID
-): boolean {
-  return scopes.some((encodedScope) => {
-    const scope = decodeScope(encodedScope)
-
-    return (
-      scope !== undefined &&
-      isActionConfirmationScope(scope) &&
-      scope.type === type &&
-      scope.options?.id === actionId
-    )
-  })
-}
-
-/**
- * True for a confirmation scope that names no action, i.e. a standing grant
- * rather than one core minted for a single confirmation request.
- *
- * Callers must exclude bound scopes before applying the ordinary record-scope
- * event checks: a scope bound to action B would otherwise satisfy a
- * type-and-jurisdiction match while confirming action A.
- */
-export function isUnboundActionConfirmationScope(scope: Scope): boolean {
-  return isActionConfirmationScope(scope) && scope.options?.id === undefined
-}
-
-/**
  * Helper for defining scopes for user roles. Should be used in country config.
  *
  * @param scopes Array of scopes in object format.

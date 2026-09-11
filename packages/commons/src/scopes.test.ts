@@ -14,8 +14,6 @@ import {
   EncodedScope,
   encodeScope,
   getScopeOptionValue,
-  hasScopeForActionConfirmation,
-  isUnboundActionConfirmationScope,
   JurisdictionFilter,
   Scope,
   ScopesWithDeclaredOptions,
@@ -23,7 +21,6 @@ import {
   ScopesWithPlaceEventOptions
 } from './scopes'
 import { getUUID } from './uuid'
-import { getOrThrow } from './utils'
 
 import {
   migrateLegacyScopesToV2,
@@ -873,22 +870,6 @@ describe('action confirmation scopes', () => {
     ).toBe(false)
   })
 
-  test('tells a bound scope apart from a standing grant', () => {
-    const bound = getOrThrow(
-      decodeScope(
-        encodeScope({ type: 'record.action.accept', options: { id: actionId } })
-      ),
-      'bound scope should decode'
-    )
-    const unbound = getOrThrow(
-      decodeScope(encodeScope({ type: 'record.action.accept' })),
-      'unbound scope should decode'
-    )
-
-    expect(isUnboundActionConfirmationScope(bound)).toBe(false)
-    expect(isUnboundActionConfirmationScope(unbound)).toBe(true)
-  })
-
   test('survives the encode/decode round trip used in tokens', () => {
     const encoded = encodeScope({
       type: 'record.action.accept',
@@ -900,21 +881,5 @@ describe('action confirmation scopes', () => {
       type: 'record.action.accept',
       options: { id: actionId }
     })
-  })
-
-  test('grants nothing beyond the one action and direction it names', () => {
-    const scopes = [
-      encodeScope({ type: 'record.action.accept', options: { id: actionId } })
-    ]
-
-    expect(
-      hasScopeForActionConfirmation(scopes, 'record.action.accept', actionId)
-    ).toBe(true)
-    expect(
-      hasScopeForActionConfirmation(scopes, 'record.action.accept', getUUID())
-    ).toBe(false)
-    expect(
-      hasScopeForActionConfirmation(scopes, 'record.action.reject', actionId)
-    ).toBe(false)
   })
 })
