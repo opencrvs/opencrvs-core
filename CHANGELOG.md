@@ -140,6 +140,8 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
 - Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
+- Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
+
 
 ### New features
 
