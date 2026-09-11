@@ -25,8 +25,6 @@ import {
 import { IOfflineDataState, offlineDataReducer } from '@client/offline/reducer'
 import { profileReducer, ProfileState } from '@client/profile/profileReducer'
 import { IUserFormState, userFormReducer } from '@client/user/userReducer'
-import * as Sentry from '@sentry/react'
-import createSentryMiddleware from 'redux-sentry-middleware'
 
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 
@@ -56,8 +54,6 @@ export const createStore = (): { store: AppStore } => {
   const enhancer = compose(
     install(config),
     applyMiddleware(persistenceMiddleware),
-    // @ts-ignore types are not correct for this module yet
-    applyMiddleware(createSentryMiddleware(Sentry)),
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
