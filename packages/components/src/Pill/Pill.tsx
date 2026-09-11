@@ -79,8 +79,6 @@ const StyledPill = styled.span<{
   padding: 0 0.8em;
   align-items: center;
   border-radius: 100px;
-  /* The label is one token, and the pill is a fixed height: a label broken
-     across lines spills out of the pill rather than growing it. */
   white-space: nowrap;
 `
 
