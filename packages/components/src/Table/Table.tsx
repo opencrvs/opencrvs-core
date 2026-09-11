@@ -187,7 +187,7 @@ const TableScrollerHorizontal = styled.div<{
 }>`
   ${({ disableScrollOnOverflow }) =>
     !disableScrollOnOverflow && `overflow: auto`};
-  padding-bottom: 8px;
+
   &::-webkit-scrollbar {
     border-radius: 8px;
     width: 8px;

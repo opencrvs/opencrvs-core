@@ -167,34 +167,16 @@ const messages = defineMessages({
   }
 })
 
-function StatusBadge({
-  status,
-  intl
-}: {
-  status: ActionStatus
-  intl: IntlShape
-}) {
+function StatusBadge({ status }: { status: ActionStatus }) {
   if (status === ActionStatus.Rejected) {
-    return (
-      <span title={intl.formatMessage(messages.statusRejected)}>
-        <Icon color="red" name="XCircle" size="large" />
-      </span>
-    )
+    return <Icon color="red" name="XCircle" />
   }
 
   if (status === ActionStatus.Requested) {
-    return (
-      <span title={intl.formatMessage(messages.waitingForExternalValidation)}>
-        <Icon color="orange" name="PauseCircle" size="large" />
-      </span>
-    )
+    return <Icon color="orange" name="PauseCircle" />
   }
 
-  return (
-    <span title={intl.formatMessage(messages.statusAccepted)}>
-      <Icon color="green" name="CheckCircle" size="large" />
-    </span>
-  )
+  return <Icon color="green" name="CheckCircle" />
 }
 
 const SystemName = styled.div`
@@ -489,7 +471,11 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
             })
 
       return {
-        status: <StatusBadge intl={intl} status={effectiveStatus} />,
+        status: (
+          <span>
+            <StatusBadge status={effectiveStatus} />
+          </span>
+        ),
         action: (
           <LinkLeftAligned
             font="bold14"
@@ -517,19 +503,19 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const columns = [
     {
       label: '',
-      width: 6,
+      width: 5,
       key: 'status',
       isIconColumn: true,
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
       label: intl.formatMessage(messages.action),
-      width: 20,
+      width: 19,
       key: 'action'
     },
     {
       label: intl.formatMessage(messages.date),
-      width: 21,
+      width: 24,
       key: 'date'
     },
     {
@@ -541,12 +527,12 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     },
     {
       label: intl.formatMessage(messages.labelRole),
-      width: 15,
+      width: 14,
       key: 'role'
     },
     {
       label: intl.formatMessage(messages.location),
-      width: 20,
+      width: 18,
       key: 'location'
     }
   ]
@@ -562,7 +548,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           highlightRowOnMouseOver
           columns={columns}
           content={historyRows}
-          fixedWidth={1088}
           id="task-history"
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
