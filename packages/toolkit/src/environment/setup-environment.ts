@@ -52,6 +52,7 @@ import { generateLongPassword, findExistingValue } from './utils'
 import { error, info, log, success, warn } from './logger'
 import { generateInventory, copyChartsValues } from './templates'
 import { generateSSHKeyPair } from './ssh-keygen'
+import { updateWorkflowEnvironments } from './update-workflows'
 import {
   dockerhubQuestions,
   githubQuestions,
@@ -293,7 +294,7 @@ ALL_QUESTIONS.push(
   ...derivedVariables,
   ...metabaseAdminQuestions
 )
-;(async () => {
+export async function runSetupEnvironment() {
   log('\n', kleur.bold().underline('Github'), '\n')
   const { githubOrganisation, githubRepository } = await prompts(
     githubQuestions.map(questionToPrompt),
@@ -1353,6 +1354,10 @@ ALL_QUESTIONS.push(
     backup_type: backupType,
     backup_host: backupHost || ''
   })
+
+  log('\n', kleur.bold().underline('Updating workflow files'))
+  await updateWorkflowEnvironments()
+
   let addon_message =
     kubeWorkerNodes.length > 0 || configureBackup
       ? '--------------------------------------------------------------------------------------------\n' +
@@ -1397,4 +1402,4 @@ ${kleur.yellow('Please KINDLY read hints above')}
       .bold()
       .yellow('Store them in a password manager — they are not saved to disk.')
   )
-})()
+}
