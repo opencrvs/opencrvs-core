@@ -9,24 +9,33 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQueries } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { EventIndex } from '@opencrvs/commons/client'
-import { useTRPC } from '@client/v2-events/trpc'
+import {
+  fetchAndCachePotentialDuplicates,
+  potentialDuplicatesQueryKey
+} from './getDuplicates'
 
 /**
- * Whether every record matched as a potential duplicate of `event` is present in
- * the local cache.
+ * Whether every potential duplicate of `event` is available to the current
+ * user. Resolves to `true` while still loading, to avoid a false "not
+ * available" before the fetch has settled.
  */
 export function useDuplicatesAvailable(event: EventIndex) {
-  const trpc = useTRPC()
-
-  const duplicates = useQueries({
-    queries: event.potentialDuplicates.map(({ id }) => ({
-      ...trpc.event.get.queryOptions({ eventId: id, waitFor: false }),
-      enabled: false,
-      staleTime: Infinity
-    }))
+  const duplicatesQuery = useQuery({
+    queryKey: potentialDuplicatesQueryKey(event.id),
+    queryFn: () => fetchAndCachePotentialDuplicates(event.id),
+    enabled: event.potentialDuplicates.length > 0
   })
 
-  return duplicates.every(({ data }) => Boolean(data))
+  if (duplicatesQuery.isLoading) {
+    return true
+  }
+
+  if (!duplicatesQuery.data) {
+    return false
+  }
+
+  const availableIds = new Set(duplicatesQuery.data.map(({ id }) => id))
+  return event.potentialDuplicates.every(({ id }) => availableIds.has(id))
 }
