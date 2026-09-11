@@ -233,6 +233,7 @@ function StatusBadge({
 const StatusCell = styled.span`
   display: flex;
   align-items: center;
+  padding-left: 6px;
 `
 
 function getStatusLabel(status: ActionStatus, intl: IntlShape): string {
