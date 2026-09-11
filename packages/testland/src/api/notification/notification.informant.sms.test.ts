@@ -65,6 +65,7 @@ vi.mock('nanoid', () => {
 })
 
 import fetch from 'node-fetch'
+import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 import { informantNotificationTestData } from './testData'
 import { createServer } from '../../index'
 
@@ -85,7 +86,9 @@ describe('User notification - sms', () => {
           payload: eventDocument,
           auth: {
             strategy: 'jwt',
-            credentials: {},
+            // Action confirmation requests are only accepted from core's
+            // service token (see the onPostAuth guard in ../../index).
+            credentials: { sub: SERVICE_USER_ID },
             artifacts: { token: 'mock-token' }
           }
         })
