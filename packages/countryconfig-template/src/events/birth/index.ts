@@ -345,8 +345,16 @@ export const birthEvent = defineConfig({
       flags: [
         { id: 'validated', operation: 'remove' },
         { id: 'approval-required-for-late-registration', operation: 'remove' },
-        { id: 'escalated-to-provincial-registrar', operation: 'remove' },
-        { id: 'escalated-to-registrar-general', operation: 'remove' }
+        {
+          id: 'escalated-to-provincial-registrar',
+          operation: 'remove',
+          conditional: user.hasRole('PROVINCIAL_REGISTRAR')
+        },
+        {
+          id: 'escalated-to-registrar-general',
+          operation: 'remove',
+          conditional: user.hasRole('NATIONAL_REGISTRAR')
+        }
       ],
       dialogCopy: {
         notify: {
