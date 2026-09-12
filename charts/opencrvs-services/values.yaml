@@ -64,7 +64,7 @@ minio:
   image:
     repository: minio/mc
     tag: 'latest'
-
+# Dummy build to test minio
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
   # auth_mode:
