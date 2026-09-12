@@ -55,6 +55,10 @@ on:
         type: boolean
         default: false
         required: false
+
+env:
+  TARGET_REPO: ${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}
+
 jobs:
   base:
     strategy:
@@ -119,9 +123,9 @@ jobs:
             push: true
             context: .
             tags: |
-              ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}${{ steps.arch_label.outputs.arch }}
-              ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
-            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.TARGET_REPO }}/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.TARGET_REPO }}/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+            cache-from: type=registry,ref=${{ env.TARGET_REPO }}/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
             cache-to: type=inline
 
     outputs:
@@ -143,16 +147,16 @@ jobs:
         env:
           BUILD_ARM: ${{ inputs.build_arm == true }}
         run: |
-          REPO="ghcr.io/opencrvs/ocrvs-base"
+          REPO="$TARGET_REPO/ocrvs-base"
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             if [[ "$BUILD_ARM" == "true" ]]; then
               MANIFEST_LIST="$REPO:$TAG-amd64 $REPO:$TAG-arm64"
             else
               MANIFEST_LIST="$REPO:$TAG-amd64"
             fi
-            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
-            docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG $MANIFEST_LIST
-            docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
+            echo "[🔁 pushing ] $TARGET_REPO/ocrvs-base:$TAG"
+            docker manifest create $TARGET_REPO/ocrvs-base:$TAG $MANIFEST_LIST
+            docker manifest push $TARGET_REPO/ocrvs-base:$TAG
           done
   build:
     needs: [base, merge-manifest]
@@ -202,13 +206,14 @@ jobs:
             build-args: |
               VERSION=${{ needs.base.outputs.version }}
               BRANCH=${{ needs.base.outputs.branch }}
+              BASE_IMAGE=${{ env.TARGET_REPO }}/ocrvs-base
             provenance: false
             push: true
             context: .
             tags: |
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
-            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.TARGET_REPO }}/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}
+              ${{ env.TARGET_REPO }}/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+            cache-from: type=registry,ref=${{ env.TARGET_REPO }}/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
             cache-to: type=inline
 
   merge-services-manifest:
@@ -231,7 +236,7 @@ jobs:
         env:
           BUILD_ARM: ${{ inputs.build_arm == true }}
         run: |
-          REPO_PREFIX="ghcr.io/opencrvs/ocrvs"
+          REPO_PREFIX="$TARGET_REPO/ocrvs"
 
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             # Create manifest list based on whether ARM build exists
@@ -263,7 +268,7 @@ jobs:
       - name: Gather Trivy output from base branch image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
+          image-ref: '${{ env.TARGET_REPO }}/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
           trivy-config: trivy.yaml
           format: 'sarif'
           output: './trivy-results-base.sarif'
@@ -271,7 +276,7 @@ jobs:
       - name: Gather Trivy output from newly build image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: '${{ env.TARGET_REPO }}/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           format: 'sarif'
           output: './trivy-results-branch.sarif'
@@ -302,5 +307,5 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: '${{ env.TARGET_REPO }}/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
