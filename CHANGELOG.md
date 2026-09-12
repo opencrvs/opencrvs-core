@@ -17,6 +17,21 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### `POST /auth/token` no longer accepts parameters in the query string
+
+The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) is gone. The token endpoint used to read every parameter from the request body _or_ the URL, and the gateway forwarded the raw query string on to the auth service. That let a client send `POST /auth/token?grant_type=client_credentials&client_id=...&client_secret=...`, putting its secret into gateway and proxy access logs, Sentry breadcrumbs, and any intermediary along the way (CWE-598). Parameters are now read only from the form-encoded (or JSON) request body, as RFC 6749 §2.3.1 requires, and the gateway no longer forwards the query string at all. A request that still passes credentials in the URL fails as if they were missing — with `unsupported_grant_type`, since `grant_type` is not read either.
+
+**Integrations that authenticate via the URL must move their parameters into the request body.** This affects the `client_credentials` grant's `grant_type`, `client_id` and `client_secret`.
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Existing client IDs and secrets keep working — only how they are transmitted changes. Operators should also treat any secret previously sent in a URL as exposed and rotate it, since it may still be sitting in retained logs.
+
 #### Registration confirmation no longer uses OAuth token exchange
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
