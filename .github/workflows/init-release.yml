@@ -58,7 +58,7 @@ jobs:
 
       # Full history is required so lerna can traverse the commit graph.
       - name: Checkout ${{ steps.base.outputs.base_branch }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.base.outputs.base_branch }}
           fetch-depth: 0
