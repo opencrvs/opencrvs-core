@@ -62,8 +62,8 @@ minio:
   users_secret: minio-opencrvs-users
   # Image used as client to run OpenCRVS configuration scripts
   image:
-    repository: minio/mc
-    tag: 'latest'
+    repository: quay.io/minio/mc
+    tag: 'RELEASE.2025-08-13T08-35-41Z'
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
