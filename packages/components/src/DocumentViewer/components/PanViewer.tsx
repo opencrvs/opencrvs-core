@@ -36,9 +36,10 @@ interface IProps {
   zoom: number
   rotation: number
   controllerCenter?: boolean
+  onError?: () => void
 }
 
-const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
+const PanViewer: React.FC<IProps> = ({ image, zoom, rotation, onError }) => {
   const [dx] = useState(0)
   const [dy] = useState(0)
 
@@ -52,9 +53,10 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
         key={dx}
       >
         <img
-          src={image}
           alt="Supporting Document"
+          src={image}
           style={{ transform: `rotate(${rotation}deg)` }}
+          onError={onError}
         />
       </StyledReactPanZoom>
     </React.Fragment>

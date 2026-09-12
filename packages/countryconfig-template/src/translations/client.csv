@@ -691,6 +691,7 @@ form.field.label.iDTypeOther,,Other,Autre
 form.field.label.iDTypeOtherLabel,,Other type of ID,Autre type de carte d'identité
 form.field.label.iDTypePassport,Option for form field: Type of ID,Passport,Passeport
 form.field.label.iDTypeRefugeeNumber,,Refugee Number,Numéro de réfugié
+form.field.label.imageLoadFailed,shown when a supporting document image fails to load,Failed to load document,Échec du chargement du document
 form.field.label.informant,Informant Label,Informant,Informateur
 form.field.label.informantRelation.bride,Label for option bride,Bride,Mariée
 form.field.label.informantRelation.brother,Label for option brother,Brother,Frère
