@@ -58,7 +58,10 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const isDownloaded = Boolean(cachedEvent.data)
   const validatorContext = useValidatorContext(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
-  const areDuplicatesAvailable = useDuplicatesAvailable(event)
+  const areDuplicatesAvailable = useDuplicatesAvailable(
+    event,
+    isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
+  )
 
   const resolveAction = useCallback(
     <T extends WorkqueueActionType | ClientSpecificAction>(
