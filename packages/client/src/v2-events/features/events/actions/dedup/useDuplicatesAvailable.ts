@@ -18,22 +18,34 @@ import {
 
 /**
  * Whether every potential duplicate of `event` is available to the current
- * user. Resolves to `true` while still loading, to avoid a false "not
- * available" before the fetch has settled. Fetches nothing when
- * `canReviewDuplicates` is `false` — the server rejects the call outright in
- * that case, so there's nothing to ask for.
+ * user.
+ *
+ * Only asks once the record is downloaded and the user holds
+ * `record.review-duplicates` — the server requires an assignment and that
+ * scope, so a call made any earlier is refused whatever the jurisdiction.
+ * Until an answer has settled, reports `true`, so that an unanswered question
+ * is never mistaken for a denial.
  */
 export function useDuplicatesAvailable(
   event: EventIndex,
-  canReviewDuplicates: boolean
+  canReviewDuplicates: boolean,
+  isDownloaded: boolean
 ) {
   const duplicatesQuery = useQuery({
     queryKey: potentialDuplicatesQueryKey(event.id),
     queryFn: async () => fetchAndCachePotentialDuplicates(event.id),
-    enabled: canReviewDuplicates && event.potentialDuplicates.length > 0
+    enabled:
+      canReviewDuplicates &&
+      isDownloaded &&
+      event.potentialDuplicates.length > 0
   })
 
-  if (duplicatesQuery.isLoading) {
+  /*
+   * Deliberately the last settled answer rather than `isLoading`: a refetch of
+   * an already-answered question must not momentarily read as unanswered, or
+   * the caller flips back and forth as the query is re-run.
+   */
+  if (!duplicatesQuery.isFetched) {
     return true
   }
 

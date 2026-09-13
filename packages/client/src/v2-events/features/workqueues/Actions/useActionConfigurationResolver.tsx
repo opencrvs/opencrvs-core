@@ -60,7 +60,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
   const areDuplicatesAvailable = useDuplicatesAvailable(
     event,
-    isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
+    isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE),
+    isDownloaded
   )
 
   const resolveAction = useCallback(

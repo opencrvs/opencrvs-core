@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  isExpectedAccessError,
-  queryClient,
-  trpcClient
-} from '@client/v2-events/trpc'
+import { trpcClient } from '@client/v2-events/trpc'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { setEventData } from '../../useEvents/api'
@@ -49,18 +45,4 @@ export async function fetchAndCachePotentialDuplicates(eventId: string) {
   const potentialDuplicates = await fetchPotentialDuplicates(eventId)
   await cachePotentialDuplicates(potentialDuplicates)
   return potentialDuplicates
-}
-
-export async function prefetchPotentialDuplicates(eventId: string) {
-  try {
-    await queryClient.fetchQuery({
-      queryKey: potentialDuplicatesQueryKey(eventId),
-      queryFn: async () => fetchAndCachePotentialDuplicates(eventId)
-    })
-  } catch (error) {
-    // The user is not authorized to see duplicates — otherwise, rethrow.
-    if (!isExpectedAccessError(error)) {
-      throw error
-    }
-  }
 }

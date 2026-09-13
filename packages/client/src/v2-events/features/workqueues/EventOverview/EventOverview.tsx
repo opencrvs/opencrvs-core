@@ -182,11 +182,12 @@ function EventOverviewContainer() {
     useEventOverviewInfo(params.eventId)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const hasDuplicateReviewScope = isActionAllowed(ActionType.MARK_AS_DUPLICATE)
+  const isDownloaded = fullEvent !== undefined
   const areDuplicatesAvailable = useDuplicatesAvailable(
     eventIndex,
-    hasDuplicateReviewScope
+    hasDuplicateReviewScope,
+    isDownloaded
   )
-  const isDownloaded = fullEvent !== undefined
   /*
    * Until the record is downloaded the matches have not been fetched either, so
    * their absence says nothing about whether the user may review them.
