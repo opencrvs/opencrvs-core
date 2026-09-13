@@ -185,8 +185,7 @@ function EventOverviewContainer() {
   const isDownloaded = fullEvent !== undefined
   const areDuplicatesAvailable = useDuplicatesAvailable(
     eventIndex,
-    hasDuplicateReviewScope,
-    isDownloaded
+    hasDuplicateReviewScope
   )
   /*
    * Until the record is downloaded the matches have not been fetched either, so

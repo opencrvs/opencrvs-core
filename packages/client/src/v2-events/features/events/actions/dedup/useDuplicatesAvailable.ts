@@ -10,7 +10,12 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import { EventIndex } from '@opencrvs/commons/client'
+import {
+  AssignmentStatus,
+  EventIndex,
+  getAssignmentStatus
+} from '@opencrvs/commons/client'
+import { useAuthentication } from '@client/utils/userUtils'
 import {
   fetchAndCachePotentialDuplicates,
   potentialDuplicatesQueryKey
@@ -18,25 +23,25 @@ import {
 
 /**
  * Whether every potential duplicate of `event` is available to the current
- * user.
- *
- * Only asks once the record is downloaded and the user holds
- * `record.review-duplicates` — the server requires an assignment and that
- * scope, so a call made any earlier is refused whatever the jurisdiction.
- * Until an answer has settled, reports `true`, so that an unanswered question
- * is never mistaken for a denial.
+ * user. Asks only once assigned and scoped, as the server demands both, and
+ * reports `true` until an answer settles, so an unanswered question is never
+ * mistaken for a denial.
  */
 export function useDuplicatesAvailable(
   event: EventIndex,
-  canReviewDuplicates: boolean,
-  isDownloaded: boolean
+  canReviewDuplicates: boolean
 ) {
+  const authentication = useAuthentication()
+  const isAssignedToSelf =
+    getAssignmentStatus(event, authentication?.sub ?? '') ===
+    AssignmentStatus.ASSIGNED_TO_SELF
+
   const duplicatesQuery = useQuery({
     queryKey: potentialDuplicatesQueryKey(event.id),
     queryFn: async () => fetchAndCachePotentialDuplicates(event.id),
     enabled:
       canReviewDuplicates &&
-      isDownloaded &&
+      isAssignedToSelf &&
       event.potentialDuplicates.length > 0
   })
 
