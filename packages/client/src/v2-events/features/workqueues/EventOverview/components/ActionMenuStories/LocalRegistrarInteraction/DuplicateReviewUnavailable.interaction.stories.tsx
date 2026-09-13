@@ -109,11 +109,9 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 /*
- * Regression test: the main record is already downloaded (cached), but the
- * server takes a while to answer `getDuplicates` for the matched record — the
- * user has access to it, it's just slow. The "you cannot review" jurisdiction
- * banner must never render during that wait; only the ordinary duplicate
- * warning should ever be shown, once the match resolves.
+ * The user has access to the matched record, the server is just slow to say
+ * so. While the answer is outstanding no banner may be shown, and once it
+ * arrives it must be the ordinary warning — never the jurisdiction one.
  */
 export const NotShownWhileDuplicateStillLoading: StoryObj = {
   parameters: {
@@ -147,24 +145,28 @@ export const NotShownWhileDuplicateStillLoading: StoryObj = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    await step(
-      'While duplicates are still loading, the jurisdiction banner never appears',
-      async () => {
-        for (let i = 0; i < 10; i++) {
-          await expect(
-            canvas.queryByText('You cannot review this record for duplicates')
-          ).toBeNull()
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        }
+    await step('No banner is shown while the answer is pending', async () => {
+      for (let i = 0; i < 10; i++) {
+        await expect(
+          canvas.queryByText('You cannot review this record for duplicates')
+        ).toBeNull()
+        await expect(
+          canvas.queryByText(
+            `Potential duplicate of record ${duplicateTrackingId}`
+          )
+        ).toBeNull()
+        await new Promise((resolve) => setTimeout(resolve, 100))
       }
-    )
+    })
 
     await step(
       'Once duplicates resolve, the ordinary duplicate warning is shown',
       async () => {
         await expect(
           await canvas.findByText(
-            `Potential duplicate of record ${duplicateTrackingId}`
+            `Potential duplicate of record ${duplicateTrackingId}`,
+            undefined,
+            { timeout: 5000 }
           )
         ).toBeVisible()
         await expect(

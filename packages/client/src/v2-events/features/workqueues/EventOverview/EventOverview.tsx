@@ -32,7 +32,10 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
-import { useDuplicatesAvailable } from '../../events/actions/dedup/useDuplicatesAvailable'
+import {
+  DuplicatesAvailability,
+  useDuplicatesAvailable
+} from '../../events/actions/dedup/useDuplicatesAvailable'
 import { useUserAllowedActions } from '../Actions/useUserAllowedActions'
 import { EventSummary } from './components/EventSummary'
 import { useEventOverviewInfo } from './components/useEventOverviewInfo'
@@ -182,35 +185,33 @@ function EventOverviewContainer() {
     useEventOverviewInfo(params.eventId)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const hasDuplicateReviewScope = isActionAllowed(ActionType.MARK_AS_DUPLICATE)
-  const isDownloaded = fullEvent !== undefined
-  const areDuplicatesAvailable = useDuplicatesAvailable(
+  const duplicatesAvailability = useDuplicatesAvailable(
     eventIndex,
     hasDuplicateReviewScope
   )
+
   /*
-   * Until the record is downloaded the matches have not been fetched either, so
-   * their absence says nothing about whether the user may review them.
+   * Mid-check neither banner would be honest, so show none. Without an answer
+   * the plain warning stands: only a refusal justifies blaming jurisdiction.
    */
-  /*
-   * Without the scope to review duplicates at all, the server refuses every
-   * match lookup regardless of jurisdiction, so there's nothing meaningful to
-   * report — show the ordinary warning, not the "cannot review" banner.
-   */
-  const isMatchUnavailable =
-    hasDuplicateReviewScope && isDownloaded && !areDuplicatesAvailable
+  const duplicateWarning = (
+    <DuplicateWarning
+      duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+        ({ trackingId }) => trackingId
+      )}
+    />
+  )
+
+  const duplicateBanner = {
+    [DuplicatesAvailability.UNDETERMINED]: duplicateWarning,
+    [DuplicatesAvailability.CHECKING]: null,
+    [DuplicatesAvailability.AVAILABLE]: duplicateWarning,
+    [DuplicatesAvailability.UNAVAILABLE]: <DuplicateReviewUnavailable />
+  }[duplicatesAvailability]
 
   return (
     <>
-      {eventIndex.potentialDuplicates.length > 0 &&
-        (isMatchUnavailable ? (
-          <DuplicateReviewUnavailable />
-        ) : (
-          <DuplicateWarning
-            duplicateTrackingIds={eventIndex.potentialDuplicates.map(
-              ({ trackingId }) => trackingId
-            )}
-          />
-        ))}
+      {eventIndex.potentialDuplicates.length > 0 && duplicateBanner}
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (

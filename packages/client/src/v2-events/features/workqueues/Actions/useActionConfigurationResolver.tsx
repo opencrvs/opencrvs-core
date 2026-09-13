@@ -23,7 +23,10 @@ import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { buttonMessages } from '@client/i18n/messages'
-import { useDuplicatesAvailable } from '@client/v2-events/features/events/actions/dedup/useDuplicatesAvailable'
+import {
+  DuplicatesAvailability,
+  useDuplicatesAvailable
+} from '@client/v2-events/features/events/actions/dedup/useDuplicatesAvailable'
 import {
   useAssignmentActions,
   useEventActionsOnClick
@@ -58,10 +61,12 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const isDownloaded = Boolean(cachedEvent.data)
   const validatorContext = useValidatorContext(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
-  const areDuplicatesAvailable = useDuplicatesAvailable(
-    event,
-    isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
-  )
+  // Don't offer a review that may turn out to have nothing to show.
+  const areDuplicatesAvailable =
+    useDuplicatesAvailable(
+      event,
+      isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
+    ) === DuplicatesAvailability.AVAILABLE
 
   const resolveAction = useCallback(
     <T extends WorkqueueActionType | ClientSpecificAction>(

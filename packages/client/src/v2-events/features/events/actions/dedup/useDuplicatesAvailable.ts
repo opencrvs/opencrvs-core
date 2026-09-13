@@ -16,48 +16,74 @@ import {
   getAssignmentStatus
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '@client/utils/userUtils'
+import { isExpectedAccessError, isForbiddenError } from '@client/v2-events/trpc'
 import {
   fetchAndCachePotentialDuplicates,
   potentialDuplicatesQueryKey
 } from './getDuplicates'
 
+export const DuplicatesAvailability = {
+  /** No answer and none coming: we never asked, or the asking failed. */
+  UNDETERMINED: 'UNDETERMINED',
+  CHECKING: 'CHECKING',
+  /** Every match can be opened by this user. */
+  AVAILABLE: 'AVAILABLE',
+  /** At least one match is beyond this user's reach. */
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type DuplicatesAvailability =
+  (typeof DuplicatesAvailability)[keyof typeof DuplicatesAvailability]
+
 /**
- * Whether every potential duplicate of `event` is available to the current
- * user. Asks only once assigned and scoped, as the server demands both, and
- * reports `true` until an answer settles, so an unanswered question is never
- * mistaken for a denial.
+ * How far we have got in establishing whether the potential duplicates of
+ * `event` can be reviewed by the current user. Asks only once assigned and
+ * scoped, as the server demands both.
  */
 export function useDuplicatesAvailable(
   event: EventIndex,
   canReviewDuplicates: boolean
-) {
+): DuplicatesAvailability {
   const authentication = useAuthentication()
   const isAssignedToSelf =
     getAssignmentStatus(event, authentication?.sub ?? '') ===
     AssignmentStatus.ASSIGNED_TO_SELF
 
+  const shouldAsk =
+    canReviewDuplicates &&
+    isAssignedToSelf &&
+    event.potentialDuplicates.length > 0
+
   const duplicatesQuery = useQuery({
     queryKey: potentialDuplicatesQueryKey(event.id),
     queryFn: async () => fetchAndCachePotentialDuplicates(event.id),
-    enabled:
-      canReviewDuplicates &&
-      isAssignedToSelf &&
-      event.potentialDuplicates.length > 0
+    enabled: shouldAsk,
+    // A refusal is the answer, not a failure — retrying only delays it.
+    retry: (failureCount, error) =>
+      !isExpectedAccessError(error) && failureCount < 1
   })
 
-  /*
-   * Deliberately the last settled answer rather than `isLoading`: a refetch of
-   * an already-answered question must not momentarily read as unanswered, or
-   * the caller flips back and forth as the query is re-run.
-   */
+  if (!shouldAsk) {
+    return DuplicatesAvailability.UNDETERMINED
+  }
+
+  // `isFetched` rather than `isLoading`, so re-running a settled check does
+  // not read as though we never had an answer.
   if (!duplicatesQuery.isFetched) {
-    return true
+    return DuplicatesAvailability.CHECKING
   }
 
-  if (!duplicatesQuery.data) {
-    return false
+  // The server hands over the matches only if the user may see all of them,
+  // so a result needs no further vetting and a refusal is the whole answer.
+  if (duplicatesQuery.data) {
+    return DuplicatesAvailability.AVAILABLE
   }
 
-  const availableIds = new Set(duplicatesQuery.data.map(({ id }) => id))
-  return event.potentialDuplicates.every(({ id }) => availableIds.has(id))
+  // Only an outright refusal speaks to jurisdiction; a lapsed session or a
+  // missing record says nothing, so anything else leaves us none the wiser.
+  if (isForbiddenError(duplicatesQuery.error)) {
+    return DuplicatesAvailability.UNAVAILABLE
+  }
+
+  return DuplicatesAvailability.UNDETERMINED
 }
