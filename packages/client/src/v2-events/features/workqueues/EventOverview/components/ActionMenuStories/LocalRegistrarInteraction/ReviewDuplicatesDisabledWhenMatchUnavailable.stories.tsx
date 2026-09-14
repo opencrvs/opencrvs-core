@@ -11,6 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
@@ -114,7 +115,7 @@ function parameters({
   getDuplicates
 }: {
   offlineEvents: EventDocument[]
-  getDuplicates: EventDocument[]
+  getDuplicates: () => EventDocument[]
 }) {
   return {
     chromatic: { disableSnapshot: true },
@@ -134,7 +135,7 @@ function parameters({
             ]
           })),
           tRPCMsw.event.get.query(() => eventUnderReview),
-          tRPCMsw.event.getDuplicates.query(() => getDuplicates)
+          tRPCMsw.event.getDuplicates.query(getDuplicates)
         ]
       }
     }
@@ -154,7 +155,7 @@ async function openActionMenu(canvasElement: HTMLElement) {
  * "you cannot review" banner.
  */
 export const WarningShownBeforeDownload: StoryObj = {
-  parameters: parameters({ offlineEvents: [], getDuplicates: [] }),
+  parameters: parameters({ offlineEvents: [], getDuplicates: () => [] }),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -180,7 +181,9 @@ export const WarningShownBeforeDownload: StoryObj = {
 export const ReviewDisabledWhenMatchUnavailable: StoryObj = {
   parameters: parameters({
     offlineEvents: [eventUnderReview],
-    getDuplicates: []
+    getDuplicates: () => {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
   }),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -226,7 +229,7 @@ export const ReviewDisabledWhenMatchUnavailable: StoryObj = {
 export const ReviewEnabledWhenMatchAvailable: StoryObj = {
   parameters: parameters({
     offlineEvents: [eventUnderReview, matchedEvent],
-    getDuplicates: [matchedEvent]
+    getDuplicates: () => [matchedEvent]
   }),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
