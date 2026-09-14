@@ -100,7 +100,7 @@ spec:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
         - name: cleanup-minio
-          image: "minio/mc"
+          image: "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z"
           command: ["/bin/bash", "-c"]
           args:
             - |
