@@ -921,79 +921,112 @@ export function runFieldValidations({
   return [...fieldValidationResult, ...customValidationResults]
 }
 
+/**
+ * Narrows a single validator JSON schema down to the part that applies to
+ * `fieldId`, or returns `null` when the schema says nothing about that field.
+ */
+function extractFieldSchema(
+  fieldId: FieldConfig['id'],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  jsonSchema: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any | null {
+  if (!jsonSchema.properties) {
+    /*
+     * `and(...)` compiles to `{ type: 'object', allOf: [...] }` with no
+     * top-level `properties`. Every member of an `allOf` has to hold on its
+     * own, so dropping the ones that do not mention `fieldId` leaves the
+     * meaning of the rest intact.
+     *
+     * `or(...)` (`anyOf`) and `not(...)` are deliberately NOT narrowed:
+     * `or(firstnameValid, surnameValid)` passes as a whole while firstname
+     * alone fails, so narrowing it would invent an error on a valid form.
+     */
+    if (Array.isArray(jsonSchema.allOf)) {
+      const members = jsonSchema.allOf
+        .map((member: unknown) => extractFieldSchema(fieldId, member))
+        .filter((member: unknown) => member !== null)
+        // The plain branch below stamps an `$id` on every member, but only the
+        // outermost schema is allowed to carry one.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map(({ $id, ...member }: any) => member)
+
+      if (members.length === 0) {
+        return null
+      }
+
+      return {
+        ...jsonSchema,
+        /*
+         * `validate()` looks schemas up from Ajv's cache by `$id`, so a
+         * narrowed schema must not reuse the id its un-narrowed parent was
+         * compiled under.
+         */
+        ...(typeof jsonSchema.$id === 'string'
+          ? { $id: `${jsonSchema.$id}.${fieldId}` }
+          : {}),
+        allOf: members
+      }
+    }
+
+    return null
+  }
+
+  const $form = jsonSchema.properties.$form
+
+  /*
+   * If you are working with nested "composite fields" like address or name,
+   * It is useful to change the validation to only include the specific fields without the parent layer
+   * for the full form field so
+   *
+   * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
+   * {a: Validator, b: Validator}
+   */
+  if ($form.properties?.[fieldId]?.type === 'object') {
+    return {
+      ...jsonSchema,
+      properties: {
+        $form: {
+          type: 'object',
+          properties: $form.properties?.[fieldId]?.properties || {},
+          required: $form.properties?.[fieldId]?.required || []
+        }
+      }
+    }
+  }
+
+  if (!$form.properties?.[fieldId]) {
+    return null
+  }
+
+  return {
+    ...jsonSchema,
+    $id: jsonSchema.$id + '.' + fieldId,
+    properties: {
+      $form: {
+        type: 'object',
+        properties: {
+          [fieldId]: $form.properties?.[fieldId]
+        },
+        required: $form.required?.includes(fieldId) ? [fieldId] : []
+      }
+    }
+  }
+}
+
 export function getValidatorsForField(
   fieldId: FieldConfig['id'],
   validations: NonNullable<FieldConfig['validation']>
 ): NonNullable<FieldConfig['validation']> {
   return validations
     .map(({ validator, message }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const jsonSchema = validator as any
-      /*
-       * It’s possible the validator is an or(...) / and(...) / similar combinator.
-       * From these it's tricky to extract field-specific validation:
-       *
-       * Currently we assume a plain object validator:
-       *   { firstname: aValidator, middlename: bValidator, lastname: cValidator }
-       * so "lastname" → cValidator directly.
-       *
-       * But with something like:
-       *   (firstname: aValidator) OR (middlename: bValidator) OR (lastname: cValidator)
-       * or even more nested logical combinations, there’s no clear properties structure
-       * (similar to JSON Schema `anyOf` not exposing `properties`).
-       *
-       * Handling all those cases is left unimplemented for now due to complexity/time.
-       */
-      if (!jsonSchema.properties) {
+      const narrowed = extractFieldSchema(fieldId, validator)
+
+      if (narrowed === null) {
         return null
       }
 
-      const $form = jsonSchema.properties.$form
-
-      /*
-       * If you are working with nested "composite fields" like address or name,
-       * It is useful to change the validation to only include the specific fields without the parent layer
-       * for the full form field so
-       *
-       * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
-       * {a: Validator, b: Validator}
-       */
-      if ($form.properties?.[fieldId]?.type === 'object') {
-        return {
-          message,
-          validator: {
-            ...jsonSchema,
-            properties: {
-              $form: {
-                type: 'object',
-                properties: $form.properties?.[fieldId]?.properties || {},
-                required: $form.properties?.[fieldId]?.required || []
-              }
-            }
-          }
-        }
-      }
-
-      if (!$form.properties?.[fieldId]) {
-        return null
-      }
-
-      return {
-        message,
-        validator: {
-          ...jsonSchema,
-          $id: jsonSchema.$id + '.' + fieldId,
-          properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: $form.properties?.[fieldId]
-              },
-              required: $form.required?.includes(fieldId) ? [fieldId] : []
-            }
-          }
-        }
-      }
+      return { message, validator: narrowed }
     })
     .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
 }
