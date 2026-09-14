@@ -23,7 +23,9 @@ import {
   getCurrentEventState,
   getUUID,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  TokenUserType,
+  UserOrSystemSummary
 } from '@opencrvs/commons/client'
 import {
   AppRouter,
@@ -51,6 +53,23 @@ const actionDefaults = {
   createdBy: localRegistrarId,
   createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
   createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId
+} satisfies Partial<ActionDocument>
+
+/**
+ * The external system (e.g. MOSIP) that confirms async validations. Seeded into
+ * the user list so its actions resolve to a system actor in the audit.
+ */
+const systemId = getUUID()
+const system = {
+  id: systemId,
+  name: 'OpenCRVS',
+  type: TokenUserType.enum.system
+} satisfies UserOrSystemSummary
+
+/** Overrides marking an action as created by the external system, not a user. */
+const systemActor = {
+  createdBy: systemId,
+  createdByUserType: TokenUserType.enum.system
 } satisfies Partial<ActionDocument>
 
 /** Deterministic, increasing timestamps so the audit order is stable. */
@@ -146,6 +165,7 @@ const finishedRegisterRequest = action(ActionType.REGISTER, 3, {
   status: ActionStatus.Requested
 })
 const finishedRegisterAccepted = action(ActionType.REGISTER, 4, {
+  ...systemActor,
   originalActionId: finishedRegisterRequest.id
 })
 
@@ -181,6 +201,7 @@ const finishedApproveRequested = action(ActionType.APPROVE_CORRECTION, 5, {
   content: { immediateCorrection: true }
 })
 const finishedApproveAccepted = action(ActionType.APPROVE_CORRECTION, 6, {
+  ...systemActor,
   content: { immediateCorrection: true },
   originalActionId: finishedApproveRequested.id
 })
@@ -219,6 +240,7 @@ const rejectedRegisterRequest = action(ActionType.REGISTER, 3, {
   status: ActionStatus.Requested
 })
 const rejectedRegisterRejected = action(ActionType.REGISTER, 4, {
+  ...systemActor,
   status: ActionStatus.Rejected,
   originalActionId: rejectedRegisterRequest.id
 })
@@ -255,6 +277,7 @@ const rejectedApproveRequested = action(ActionType.APPROVE_CORRECTION, 5, {
   content: { immediateCorrection: true }
 })
 const rejectedApproveRejected = action(ActionType.APPROVE_CORRECTION, 6, {
+  ...systemActor,
   status: ActionStatus.Rejected,
   content: { immediateCorrection: true },
   originalActionId: rejectedApproveRequested.id
@@ -318,12 +341,18 @@ const meta: Meta<typeof EventOverviewIndex> = {
       </TRPCProvider>
     )
   ],
-  // Seed the user list so action creators resolve instead of "Missing user".
+  // Seed the user list (and the confirming system) so action creators resolve
+  // instead of "Missing user". Each actor is seeded under its own query key: the
+  // custom user.list queryFn returns only the ids it was asked for, so a system
+  // sharing the user's cache entry would be dropped when that user is refetched.
   beforeEach: () => {
     queryClient.setQueryData(
       trpcOptionsProxy.user.list.queryKey([localRegistrarId]),
       [refData.user.localRegistrar().v2]
     )
+    queryClient.setQueryData(trpcOptionsProxy.user.list.queryKey([systemId]), [
+      system
+    ])
   }
 }
 
@@ -466,20 +495,20 @@ export const CorrectionExternalValidationFinished: Story = {
 }
 
 /**
- * When the registration's external validation is rejected, the audit shows a
- * single "Registration failed" row with a rejected status badge (no waiting
- * badge), and the row can be expanded to reveal the rejection.
+ * When the registration's external validation is rejected, the top-level row
+ * still reads as "Registered" (the action itself) with a rejected status badge
+ * (no waiting badge); the rejection is only surfaced in the expandable sub-row.
  */
 export const RegistrationExternalValidationRejected: Story = {
   parameters: auditParameters(registrationRejectedEvent),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    await step('the registration failed', async () => {
+    await step('the row still reads as the register action', async () => {
       await expect(
         await canvas.findByRole(
           'button',
-          { name: 'Registration failed' },
+          { name: 'Registered' },
           { timeout: 10000 }
         )
       ).toBeVisible()
@@ -509,19 +538,20 @@ export const RegistrationExternalValidationRejected: Story = {
 }
 
 /**
- * When the correction's external validation is rejected, the audit shows the
- * correction row with a rejected status badge instead of "Record corrected".
+ * When the correction's external validation is rejected, the top-level row still
+ * reads as "Record corrected" (the action itself) with a rejected status badge;
+ * the rejection is surfaced by the badge, not the row title.
  */
 export const CorrectionExternalValidationRejected: Story = {
   parameters: auditParameters(correctionRejectedEvent),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    await step('the correction is shown as rejected', async () => {
+    await step('the row still reads as the correction action', async () => {
       await expect(
         await canvas.findByRole(
           'button',
-          { name: 'Rejected' },
+          { name: 'Record corrected' },
           { timeout: 10000 }
         )
       ).toBeVisible()

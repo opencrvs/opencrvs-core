@@ -300,55 +300,6 @@ export const RegisteredWithDialogFormValues: Story = {
   }
 }
 
-const waitingForExternalValidationRegisterAction = {
-  ...actionBase,
-  status: 'Requested' as const,
-  id: generateUuid(prng),
-  type: ActionType.REGISTER,
-  declaration,
-  annotation: {
-    'register.dialog.comments': 'Reviewed all supporting documents'
-  }
-}
-
-const eventWaitingForExternalValidation = {
-  id: getUUID(),
-  type: 'tennis-club-membership',
-  actions: [
-    {
-      ...actionBase,
-      id: generateUuid(prng),
-      type: ActionType.CREATE
-    },
-    {
-      ...actionBase,
-      id: generateUuid(prng),
-      type: ActionType.DECLARE,
-      declaration
-    },
-    waitingForExternalValidationRegisterAction
-  ],
-  trackingId: 'ABCD123',
-  updatedAt: '2021-01-01',
-  createdAt: '2021-01-01'
-}
-
-export const WaitingForExternalValidation: Story = {
-  name: 'Waiting for external validation — no Register details (regression: #13735)',
-  args: {
-    ...argbase,
-    title: 'Waiting for external validation',
-    fullEvent: eventWaitingForExternalValidation,
-    action: waitingForExternalValidationRegisterAction,
-    isWaitingForExternalValidation: true
-  },
-  parameters: {
-    offline: {
-      configs: [eventConfigurationWithRegisterForm]
-    }
-  }
-}
-
 export const Rejected: Story = {
   args: {
     ...argbase,

@@ -13,6 +13,7 @@ import React from 'react'
 import format from 'date-fns/format'
 import styled, { useTheme } from 'styled-components'
 import { defineMessages, useIntl, IntlShape } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
@@ -50,6 +51,7 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { resolveLocationName } from '@client/v2-events/utils'
+import { getOfflineData } from '@client/offline/selectors'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
@@ -162,11 +164,6 @@ const messages = defineMessages({
     defaultMessage: 'System',
     description: 'Name for system initiated actions in the event history'
   },
-  systemName: {
-    id: 'event.history.systemName',
-    defaultMessage: 'OpenCRVS',
-    description: 'Name for system initiated actions in the event history'
-  },
   action: {
     defaultMessage: 'Action',
     description: 'Action Label',
@@ -181,12 +178,6 @@ const messages = defineMessages({
     defaultMessage: 'Audit',
     description: 'Audit heading',
     id: 'constants.audit'
-  },
-  waitingForExternalValidation: {
-    defaultMessage: 'Waiting for external validation',
-    description:
-      'Status badge shown on an action that is still awaiting confirmation from an external system',
-    id: 'events.history.waitingForExternalValidation'
   },
   statusAccepted: {
     defaultMessage: 'Accepted',
@@ -247,9 +238,11 @@ function getStatusLabel(status: ActionStatus, intl: IntlShape): string {
   if (status === ActionStatus.Rejected) {
     return intl.formatMessage(messages.statusRejected)
   }
+
   if (status === ActionStatus.Requested) {
-    return intl.formatMessage(messages.waitingForExternalValidation)
+    return intl.formatMessage(messages.statusRequested)
   }
+
   return intl.formatMessage(messages.statusAccepted)
 }
 
@@ -395,6 +388,7 @@ function ActionByCell({
   muted?: boolean
 }) {
   const intl = useIntl()
+  const { config } = useSelector(getOfflineData)
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
   const { canReadUser } = usePermissions()
@@ -410,12 +404,13 @@ function ActionByCell({
   const NameLine = muted ? SecondaryLine : BoldLine
 
   // System / integration actors: name with "System" as the role, so it still
-  // renders on two lines like a user. No avatar.
+  // renders on two lines like a user. No avatar. In the dropdown sub-rows the
+  // application name stands in for the system.
   if (type !== 'user') {
     return (
       <TwoLineCell>
         <NameLine data-testid="user-name">
-          {intl.formatMessage(messages.systemName)}
+          {muted ? config.APPLICATION_NAME : name}
         </NameLine>
         <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
       </TwoLineCell>
@@ -537,10 +532,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     })
     .filter((x) => {
       // Remove every immediately-approved correction row (whether the approval
-      // is accepted or still requested). The pair is shown as a single
-      // 'Record corrected' row on the REQUEST_CORRECTION; its pending external
-      // validation is surfaced there as a status badge instead of a separate
-      // 'Waiting for external validation' row.
+      // is accepted or still requested). The pair is shown as a single 'Record corrected' row.
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
         x.content?.immediateCorrection
@@ -627,9 +619,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(allActions, action),
-              // The row shows the original (request) action; label it by the
-              // outcome of its confirmation.
-              status: effectiveStatus,
+              status: statusSourceAction.status,
               // Lets countries configure different wording for actions
               // performed by an integration, e.g. "Registered and UIN created"
               userType: action.createdByUserType
@@ -671,7 +661,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         ) : (
           ''
         ),
-        // Highlight rows still waiting for external validation.
         rowBackgroundColor:
           effectiveStatus === ActionStatus.Requested
             ? theme.colors.orangeLighter
