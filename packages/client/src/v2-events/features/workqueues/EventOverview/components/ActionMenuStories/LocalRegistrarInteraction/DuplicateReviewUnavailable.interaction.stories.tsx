@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
@@ -24,7 +25,8 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, queryClient } from '@client/v2-events/trpc'
+import { potentialDuplicatesQueryKey } from '@client/v2-events/features/events/actions/dedup/getDuplicates'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -174,5 +176,146 @@ export const NotShownWhileDuplicateStillLoading: StoryObj = {
         ).toBeNull()
       }
     )
+  }
+}
+
+/*
+ * A refused check that is asked again — as happens whenever a second view of
+ * the same record mounts. Re-asking a question already answered "no" must not
+ * make the record look reviewable in the meantime.
+ */
+export const StaysUnavailableWhileRechecking: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({ eventId })
+    },
+    offline: { events: [eventUnderReview] },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.search.query(() => ({
+            total: 1,
+            results: [
+              getCurrentEventState(eventUnderReview, tennisClubMembershipEvent)
+            ]
+          })),
+          tRPCMsw.event.get.query(() => eventUnderReview),
+          tRPCMsw.event.getDuplicates.query(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 600))
+            throw new TRPCError({ code: 'FORBIDDEN' })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('The refusal is established', async () => {
+      await expect(
+        await canvas.findByText(
+          'You cannot review this record for duplicates',
+          undefined,
+          { timeout: 10000 }
+        )
+      ).toBeVisible()
+    })
+
+    await step('The same question is asked again', async () => {
+      await queryClient.invalidateQueries({
+        queryKey: potentialDuplicatesQueryKey(eventId)
+      })
+    })
+
+    await step(
+      'The ordinary warning never appears while it is being re-asked',
+      async () => {
+        for (let i = 0; i < 12; i++) {
+          await expect(
+            canvas.queryByText(
+              `Potential duplicate of record ${duplicateTrackingId}`
+            )
+          ).toBeNull()
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+      }
+    )
+
+    await step('The refusal still stands', async () => {
+      await expect(
+        await canvas.findByText(
+          'You cannot review this record for duplicates',
+          undefined,
+          { timeout: 10000 }
+        )
+      ).toBeVisible()
+    })
+  }
+}
+
+/*
+ * Returning to a record whose refusal is already known must not ask again:
+ * the answer cannot have changed, and re-asking blanks the banner for as long
+ * as the server takes to repeat itself.
+ */
+export const StaysVisibleWhenReturningToTheRecord: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({ eventId })
+    },
+    offline: { events: [eventUnderReview] },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.search.query(() => ({
+            total: 1,
+            results: [
+              getCurrentEventState(eventUnderReview, tennisClubMembershipEvent)
+            ]
+          })),
+          tRPCMsw.event.get.query(() => eventUnderReview),
+          tRPCMsw.event.getDuplicates.query(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+            throw new TRPCError({ code: 'FORBIDDEN' })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('The refusal is established', async () => {
+      await expect(
+        await canvas.findByText(
+          'You cannot review this record for duplicates',
+          undefined,
+          { timeout: 10000 }
+        )
+      ).toBeVisible()
+    })
+
+    await step('Leave the summary and come back', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Audit' })
+      )
+      await canvas.findByRole('button', { name: 'Summary' })
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Summary' })
+      )
+    })
+
+    await step('The banner is there without a second wait', async () => {
+      await canvas.findByText('Tracking ID', undefined, { timeout: 10000 })
+      await expect(
+        canvas.queryByText('You cannot review this record for duplicates')
+      ).not.toBeNull()
+    })
   }
 }

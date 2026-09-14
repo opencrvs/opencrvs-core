@@ -60,16 +60,19 @@ export function useDuplicatesAvailable(
     enabled: shouldAsk,
     // A refusal is the answer, not a failure — retrying only delays it.
     retry: (failureCount, error) =>
-      !isExpectedAccessError(error) && failureCount < 1
+      !isExpectedAccessError(error) && failureCount < 1,
+    // Otherwise every view that mounts re-runs the refusal, blanking the
+    // banner each time while the server repeats itself.
+    retryOnMount: false
   })
 
   if (!shouldAsk) {
     return DuplicatesAvailability.UNDETERMINED
   }
 
-  // `isFetched` rather than `isLoading`, so re-running a settled check does
-  // not read as though we never had an answer.
-  if (!duplicatesQuery.isFetched) {
+  // Not `isFetched`: re-asking a refusal clears the error yet stays fetched,
+  // reading as an answer with nothing to say.
+  if (duplicatesQuery.isPending) {
     return DuplicatesAvailability.CHECKING
   }
 
