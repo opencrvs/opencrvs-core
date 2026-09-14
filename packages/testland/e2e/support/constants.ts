@@ -36,11 +36,10 @@ export const METABASE_URL =
     : SCHEME + '://metabase.' + DOMAIN
 
 export const METABASE_EMAIL =
-  process.env.NODE_ENV === 'development'
-    ? 'user@opencrvs.org'
-    : 'user@opencrvs.com'
+  process.env.OPENCRVS_METABASE_ADMIN_EMAIL || 'user@opencrvs.org'
 
-export const METABASE_PASSWORD = 'm3tabase'
+export const METABASE_PASSWORD =
+  process.env.OPENCRVS_METABASE_ADMIN_PASSWORD || 'm3tabase'
 
 /*
  * This timeout is to ensure that all previous actions have been completed
