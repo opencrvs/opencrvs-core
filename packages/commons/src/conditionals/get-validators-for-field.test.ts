@@ -17,6 +17,7 @@ import {
   and,
   or,
   not,
+  user,
   defineFormConditional,
   ConditionalParameters
 } from './conditionals'
@@ -159,6 +160,55 @@ describe('getValidatorsForField -- and() combinator', () => {
     expect(
       validate(inner[0].validator, getFieldParams({ firstname: 'Ann' }))
     ).toBe(true)
+  })
+
+  it('skips and() members that are not $form conditionals', () => {
+    /*
+     * `user.hasScope(...)` / `user.isOnline()` compile to schemas that have
+     * `properties` but no `$form` under it. They say nothing about the field,
+     * so they have to be dropped -- not dereferenced.
+     */
+    const mixed = {
+      message: invalidNameMessage,
+      validator: and(
+        field(NAME_FIELD_ID).get('firstname').isValidEnglishName(),
+        user.isOnline(),
+        user.hasScope('record.declare')
+      )
+    }
+
+    const outer = getValidatorsForField(NAME_FIELD_ID, [mixed])
+
+    expect(outer).toHaveLength(1)
+
+    const inner = getValidatorsForField('firstname', outer)
+
+    expect(inner).toHaveLength(1)
+
+    const schema = asSchema(inner[0])
+
+    expect(schema.allOf).toHaveLength(1)
+    expect(JSON.stringify(schema)).not.toContain('$online')
+    expect(JSON.stringify(schema)).not.toContain('$user')
+
+    expect(
+      validate(inner[0].validator, getFieldParams({ firstname: 'Ann@' }))
+    ).toBe(false)
+    expect(
+      validate(inner[0].validator, getFieldParams({ firstname: 'Ann' }))
+    ).toBe(true)
+  })
+
+  it('returns nothing when no and() member mentions the field', () => {
+    const noFormMembers = {
+      message: invalidNameMessage,
+      validator: and(user.isOnline(), user.hasScope('record.declare'))
+    }
+
+    expect(getValidatorsForField(NAME_FIELD_ID, [noFormMembers])).toHaveLength(
+      0
+    )
+    expect(getValidatorsForField('firstname', [noFormMembers])).toHaveLength(0)
   })
 
   it('does not report an error on a subfield that is valid while a sibling is not', () => {

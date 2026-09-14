@@ -975,6 +975,16 @@ function extractFieldSchema(
   const $form = jsonSchema.properties.$form
 
   /*
+   * Not every schema with `properties` is a `$form` conditional: members of an
+   * `and(...)` built from `user.hasScope(...)`, `user.isOnline()` or an
+   * `$event` conditional have `properties` without a `$form` under it. Those
+   * say nothing about `fieldId`.
+   */
+  if (!$form?.properties) {
+    return null
+  }
+
+  /*
    * If you are working with nested "composite fields" like address or name,
    * It is useful to change the validation to only include the specific fields without the parent layer
    * for the full form field so
