@@ -54,7 +54,7 @@ network_policy:
   # - private: allow ingress only from RFC1918 private ranges
   #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
   # - full: no baseline policy; ingress is unrestricted.
-  ingress_mode: deny
+  ingress_mode: private
   # Baseline policy for egress from dependency pods. Same modes as
   # ingress_mode, applied to egress instead. DNS (TCP/UDP 53) is always
   # allowed regardless of mode, except when full.
@@ -106,8 +106,6 @@ postgres:
     tag: 17.6
   port: 5432
   network_policy:
-    app_label:
-    ingress_mode: private
     # FIXME: In future releases replace postgres image to more robust
     # version with all required utilities installed and drop allow-package-repo-egress rule
     # Chart-provided rules for this service. Postgres installs
@@ -227,8 +225,6 @@ elasticsearch:
     repository: docker.elastic.co/elasticsearch/elasticsearch
     tag: 8.19.15
   port: 9200
-  network_policy:
-    ingress_mode: private
   # By default Elasticsearch is deployed without authentication enabled.
   use_default_credentials: true
   admin_user_secret_name: elasticsearch-admin-user
@@ -282,10 +278,8 @@ kibana:
     repository: docker.elastic.co/kibana/kibana
     tag: 8.19.15
   port: 5601
-
   network_policy:
     ingress_mode: private
-
   users_secret: kibana-users-secret
   # Configmap for custom configuration file
   # custom_config_configmap: kibana-custom-config
@@ -372,22 +366,6 @@ minio:
           - ports:
               - protocol: TCP
                 port: 3536
-      # MinIO installs packages such as openssh/rsync/minio-client at
-      # runtime (see Air-Gap Installation in README.md); apk keeps package
-      # repositories reachable even when egress is denied by default. Some
-      # apk mirrors are HTTP-only, so both 80 and 443 are opened.
-      - name: allow-package-repo-egress
-        policyTypes:
-          - Egress
-        egress:
-          - to:
-              - ipBlock:
-                  cidr: 0.0.0.0/0
-            ports:
-              - protocol: TCP
-                port: 80
-              - protocol: TCP
-                port: 443
 
   # Use default credentials (username: minioadmin, password: minioadmin).
   # Highly discouraged for production environments—see official docs:
@@ -457,8 +435,6 @@ redis:
     repository: redis
     tag: '8'
   port: 6379
-  network_policy:
-    ingress_mode: private
   # By default Redis is deployed without authentication enabled.
   # auth_mode:
   #   - disabled: no authentication
