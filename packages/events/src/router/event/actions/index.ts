@@ -13,7 +13,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -195,10 +195,6 @@ const AsyncActionInput = BaseActionInput.pick({
   actionId: UUID
 })
 
-const AsyncRejectCorrectionRejectInput = AsyncActionInput.extend({
-  requestId: UUID
-})
-
 type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
@@ -374,13 +370,6 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
   ActionType.REQUEST_CORRECTION
 ] as const
 
-function getAsyncRejectInputSchema(actionType: ActionType) {
-  if (actionType === ActionType.REJECT_CORRECTION) {
-    return AsyncRejectCorrectionRejectInput
-  }
-
-  return AsyncActionInput
-}
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
@@ -549,7 +538,7 @@ export function getDefaultActionProcedures(
         )
       }),
     reject: userAndSystemProcedure
-      .input(getAsyncRejectInputSchema(actionType))
+      .input(AsyncActionInput)
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
@@ -581,9 +570,16 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
+        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
+        const originalCorrectionRequestId =
+          action.type === ActionType.REJECT_CORRECTION
+            ? RejectedCorrectionAction.parse(action).requestId
+            : undefined
+
         return addAsyncRejectAction(
           {
             ...input,
+            requestId: originalCorrectionRequestId,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false

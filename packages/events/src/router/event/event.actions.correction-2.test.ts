@@ -518,9 +518,18 @@ test('System may reject REJECT_CORRECTION action', async () => {
   })
 
   const rejectActionResponse =
-    await client.event.actions.correction.reject.request(
-      getRequestActionPayload()
-    )
+    await client.event.actions.correction.reject.request({
+      eventId,
+      requestId: getOrThrow(
+        requestedActionIds.REQUEST_CORRECTION,
+        'no action id'
+      ),
+      transactionId: getUUID(),
+      content: {
+        reason: 'content'
+      },
+      waitFor: false
+    })
 
   const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
     encodeScope({ type: 'record.correct' })
@@ -532,7 +541,8 @@ test('System may reject REJECT_CORRECTION action', async () => {
 
   await expect(
     systemClient.event.actions.correction.reject.reject({
-      ...getRequestActionPayload(),
+      eventId,
+      transactionId: getUUID(),
       actionId: getOrThrow(rejectRequestAction?.id, 'no action id')
     })
   ).resolves.toBeDefined()

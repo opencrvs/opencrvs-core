@@ -131,7 +131,6 @@ describe('Reject correction action', () => {
 
     let actionPayload: {
       eventId: UUID
-      requestId: UUID
       transactionId: UUID
       content: { reason: string }
       actionId: UUID
@@ -142,7 +141,7 @@ describe('Reject correction action', () => {
 
       const { user, eventsDb, generator } = await setupTestCase()
 
-      const { eventId, requestedActionIds } = await seedEvent(eventsDb, {
+      const { eventId } = await seedEvent(eventsDb, {
         actions: [
           ActionType.DECLARE,
           ActionType.REGISTER,
@@ -155,10 +154,6 @@ describe('Reject correction action', () => {
 
       const getRequestActionPayload = () => ({
         eventId,
-        requestId: getOrThrow(
-          requestedActionIds.REQUEST_CORRECTION,
-          'no action id'
-        ),
         transactionId: getUUID(),
         content: {
           reason: 'content'
