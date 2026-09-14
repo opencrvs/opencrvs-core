@@ -20,7 +20,8 @@ import {
   EventDocument,
   EventIndex,
   getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { FormTabs, Frame, Icon, IFormTabs } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -229,6 +230,7 @@ function ReviewDuplicate() {
           <ReviewComponent.Body
             readonlyMode
             anchor={recordAnchorDate(eventState)}
+            attachmentPath={eventAttachmentPath(eventState.id)}
             banner={<DuplicateForm eventIndex={eventState} />}
             form={eventState.declaration}
             formConfig={formConfig}

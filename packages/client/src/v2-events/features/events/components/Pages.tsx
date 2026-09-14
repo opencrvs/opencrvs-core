@@ -19,7 +19,7 @@ import {
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
-  PrefixedFilePath,
+  AttachmentPath,
   ValidatorContext,
   isNameFieldType,
   FieldConfig
@@ -55,7 +55,7 @@ interface PagesProps {
   validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
-  attachmentPath: PrefixedFilePath
+  attachmentPath: AttachmentPath
   isCorrection?: boolean
 }
 

@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType } from '@opencrvs/commons/client'
+import { eventAttachmentPath, FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
@@ -43,6 +43,7 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.file',
@@ -120,6 +121,7 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              attachmentPath={eventAttachmentPath('storybook-event')}
               fields={[
                 {
                   id: 'storybook.file2',

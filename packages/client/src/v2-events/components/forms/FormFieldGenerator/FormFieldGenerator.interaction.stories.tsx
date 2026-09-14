@@ -25,7 +25,8 @@ import {
   EventState,
   generateTranslationConfig,
   tennisClubMembershipEvent,
-  ActionStatus
+  ActionStatus,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import type { EventDocument, UUID } from '@opencrvs/commons/client'
 
@@ -859,6 +860,7 @@ export const NullsHiddenFieldUsingServerState: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath('storybook-event')}
             eventConfig={nixEventConfig}
             fields={nixConditionalFields}
             formValues={{}}
