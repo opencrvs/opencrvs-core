@@ -675,8 +675,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         rowBackgroundColor: theme.colors.grey100
       })
 
-      // Show the request action first, then the accept/reject that followed (if
-      // it has been confirmed yet).
+      // Show the request action first, then the accept/reject that followed
       const detailRows = [
         buildDetailRow(statusSourceAction, ActionStatus.Requested)
       ]
@@ -740,9 +739,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           content={historyRows}
           id="task-history"
           noResultText=""
-          // Pagination is handled below by page number; a page can hold up to
-          // DEFAULT_HISTORY_RECORD_PAGE_SIZE actions plus any expanded detail
-          // rows, so the table must render every row it is given.
           pageSize={Math.max(historyRows.length, 1)}
         />
         {displayableHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
