@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, type Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 import { omit, merge } from 'lodash'
 import { formatName, getRandomDate, joinValuesWith } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
@@ -164,9 +164,37 @@ export function getIdByName(
   return location.id
 }
 
+/*
+ * The team list is paginated, so a member can sit on any page. Walks every page
+ * until the locator shows up and leaves the list on that page.
+ */
+export async function showPageWith(page: Page, locator: Locator) {
+  const pageButtons = page.locator('[data-testid^="page-number-"]')
+  const pageCount = Math.max(await pageButtons.count(), 1)
+
+  for (let index = 0; index < pageCount; index++) {
+    if (index > 0) {
+      await pageButtons.nth(index).click()
+    }
+
+    const isOnThisPage = await locator
+      .first()
+      .waitFor({ state: 'visible', timeout: 2000 })
+      .then(() => true)
+      .catch(() => false)
+
+    if (isOnThisPage) {
+      return
+    }
+  }
+
+  throw new Error('Nothing matched the locator on any team list page')
+}
+
 export async function verifyMembersEnabled(page: Page, members: string[]) {
   for (const member of members) {
     const row = page.getByRole('row', { name: new RegExp(member) })
+    await showPageWith(page, row)
     await expect(row.getByText('Active')).toBeVisible()
     await expect(row.getByRole('button', { name: member })).toBeEnabled()
   }

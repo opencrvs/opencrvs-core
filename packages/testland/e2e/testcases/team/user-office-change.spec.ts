@@ -31,7 +31,8 @@ import {
   formatV2ChildName,
   getIdByName,
   getLocations,
-  openBirthDeclaration
+  openBirthDeclaration,
+  showPageWith
 } from '@e2e/support/birth/helpers'
 
 const createDraft = async (page: Page) => {
@@ -67,13 +68,27 @@ const countDraftRows = async (page: Page, expectedCount?: number) => {
   return rows.count()
 }
 
+/*
+ * The office team list is paginated, so the user can sit on any page. Walk
+ * every page until the row shows up instead of assuming the first one.
+ */
+const openTeamUserProfile = async (page: Page, fullName: string) => {
+  const userButton = page.getByRole('button', { name: fullName })
+
+  await showPageWith(page, userButton)
+  await userButton.click()
+  await expect(page.locator('#content-name')).toHaveText(fullName)
+}
+
 const expectVersionCard = async (
   page: Page,
   fullName: string,
   role: string,
   office: string
 ) => {
-  await expect(page.locator('span').filter({ hasText: fullName })).toBeVisible()
+  await expect(page.locator('span').filter({ hasText: fullName })).toBeVisible({
+    timeout: 30_000
+  })
   await expect(
     page.getByText(`${role} • ${office}`, { exact: true })
   ).toBeVisible()
@@ -205,8 +220,7 @@ test('Scope changes after office change - user loses access when the office chan
       'Ibombo District Office'
     )
 
-    await page.getByRole('button', { name: fullName }).click()
-    await expect(page.locator('#content-name')).toHaveText(fullName)
+    await openTeamUserProfile(page, fullName)
 
     await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
     await page.getByText('Edit details').click()
@@ -295,8 +309,7 @@ test('Scope changes after office and role changes', async ({ browser }) => {
       'Ibombo District Office'
     )
 
-    await page.getByRole('button', { name: fullName }).click()
-    await expect(page.locator('#content-name')).toHaveText(fullName)
+    await openTeamUserProfile(page, fullName)
 
     await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
     await page.getByText('Edit details').click()
@@ -383,8 +396,7 @@ test('Drafts are removed when only the role changes', async ({ browser }) => {
       'Ibombo District Office'
     )
 
-    await page.getByRole('button', { name: fullName }).click()
-    await expect(page.locator('#content-name')).toHaveText(fullName)
+    await openTeamUserProfile(page, fullName)
 
     await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
     await page.getByText('Edit details').click()
