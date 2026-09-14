@@ -226,8 +226,6 @@ function StatusBadge({
   return <Icon color="green" name="CheckCircle" size={size} />
 }
 
-// Flex-centre the icon so it lines up vertically with the text in other cells
-// (a bare inline SVG sits on the text baseline).
 const StatusCell = styled.span`
   display: flex;
   align-items: center;
@@ -246,21 +244,16 @@ function getStatusLabel(status: ActionStatus, intl: IntlShape): string {
   return intl.formatMessage(messages.statusAccepted)
 }
 
-// Divs, not spans: the shared Table adds an 8px left pad to the first <span> in
-// a cell, which would otherwise indent only the first (bold) line of a two-line
-// cell. Divs sidestep that rule without restyling the Table for other pages.
 const BoldLine = styled.div`
   ${({ theme }) => theme.fonts.bold14};
 `
 
-// Small status icon + label for a dropdown sub-row, mirroring StatusBadge.
 const DetailActionCell = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `
 
-/** Lifecycle label for a dropdown sub-row: Requested / Accepted / Rejected. */
 function getActionLifecycleLabel(
   status: ActionStatus,
   intl: IntlShape
@@ -354,10 +347,6 @@ const TwoLineCell = styled.div`
   flex-direction: column;
 `
 
-/**
- * The "When" cell: bold date on the first line, grey time on the second. In
- * `muted` mode (dropdown sub-rows) the date is plain grey like the rest.
- */
 function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
   const intl = useIntl()
   const date = new Date(isoDate)
@@ -375,11 +364,6 @@ function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
   )
 }
 
-/**
- * The "By" cell: the creator's name (bold, a profile link when viewable, no
- * avatar) on the first line and their role on the second. In `muted` mode
- * (dropdown sub-rows) both lines are plain grey with no link.
- */
 function ActionByCell({
   action,
   muted
@@ -403,9 +387,6 @@ function ActionByCell({
 
   const NameLine = muted ? SecondaryLine : BoldLine
 
-  // System / integration actors: name with "System" as the role, so it still
-  // renders on two lines like a user. No avatar. In the dropdown sub-rows the
-  // application name stands in for the system.
   if (type !== 'user') {
     return (
       <TwoLineCell>
@@ -481,9 +462,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const history = extractHistoryActions(fullEvent)
   const allActions = fullEvent.actions as ActionDocument[]
 
-  // Each row is an original action; the outcome of its confirmation (accepted,
-  // rejected, or still waiting) is surfaced as a status on the row itself, so a
-  // rejected registration no longer needs a separate row.
   const visibleHistory = [...history]
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     .filter(({ type }) => type !== ActionType.CREATE)
@@ -680,8 +658,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         return [mainRow]
       }
 
-      // Each sub-row shows a small lifecycle icon and label in the Action
-      // column (Requested / Accepted / Rejected) with its own who and when.
       const buildDetailRow = (
         detailAction: ActionDocument,
         status: ActionStatus
