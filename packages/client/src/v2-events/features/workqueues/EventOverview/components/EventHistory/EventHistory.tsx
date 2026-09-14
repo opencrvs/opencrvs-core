@@ -162,6 +162,11 @@ const messages = defineMessages({
     defaultMessage: 'System',
     description: 'Name for system initiated actions in the event history'
   },
+  systemName: {
+    id: 'event.history.systemName',
+    defaultMessage: 'OpenCRVS',
+    description: 'Name for system initiated actions in the event history'
+  },
   action: {
     defaultMessage: 'Action',
     description: 'Action Label',
@@ -409,7 +414,9 @@ function ActionByCell({
   if (type !== 'user') {
     return (
       <TwoLineCell>
-        <NameLine data-testid="user-name">{name}</NameLine>
+        <NameLine data-testid="user-name">
+          {intl.formatMessage(messages.systemName)}
+        </NameLine>
         <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
       </TwoLineCell>
     )
