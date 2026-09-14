@@ -184,11 +184,18 @@ export const ValidFirstnameShowsNoError: Story = {
     const canvas = within(canvasElement)
 
     const firstname = await canvas.findByTestId('text__firstname')
-    await userEvent.type(firstname, 'Ann')
+    const surname = await canvas.findByTestId('text__surname')
+
+    await userEvent.type(firstname, 'Ann@')
+    await userEvent.tab()
+    await userEvent.type(surname, 'Smith')
     await userEvent.tab()
 
-    const surname = await canvas.findByTestId('text__surname')
-    await userEvent.type(surname, 'Smith')
+    await canvas.findByText(INVALID_NAME_MESSAGE)
+
+    // Correcting the firstname clears it again, and leaves nothing behind.
+    await userEvent.clear(firstname)
+    await userEvent.type(firstname, 'Ann')
     await userEvent.tab()
 
     await waitFor(async () =>
