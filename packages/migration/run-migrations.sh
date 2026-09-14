@@ -60,10 +60,18 @@ run_pg_migrations() {
   done
 
   # --- Run migrations ---
+  # --no-check-order is required, not optional. Release branches carry migrations
+  # whose timestamps sort after work that was authored earlier on develop but ships
+  # later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
+  # node-pg-migrate's order check zips the ledger's run order against the on-disk
+  # name order positionally, so any such branch trips it. Once a database has run
+  # migrations out of name order the ledger stays non-canonical, so this flag has
+  # to remain from here on.
   echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
     pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate up \
     --schema="$schema" \
+    --no-check-order \
     --migrations-dir="$MIGRATIONS_PATH" \
     --migrations-table="$migrations_table"
 

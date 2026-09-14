@@ -21,6 +21,9 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}

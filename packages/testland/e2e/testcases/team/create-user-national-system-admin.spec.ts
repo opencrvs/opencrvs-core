@@ -120,3 +120,49 @@ test('Browser back on the user creation form returns to the team page', async ({
     await expect(page.getByText('User details')).toBeHidden()
   })
 })
+
+test('Creating a Registration Officer routes to the signature upload page', async ({
+  page
+}) => {
+  const user = {
+    firstName: faker.person.firstName('male'),
+    surname: faker.person.lastName('male'),
+    email: faker.internet.email()
+  }
+  const signaturePath = path.join(ASSETS_DIR, 'sign1.png')
+
+  await test.step('National system admin opens the new-user form at a location', async () => {
+    await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+    await page.getByRole('button', { name: 'Team' }).click()
+    await expect(
+      page.locator('#location-range-picker-action').getByText('HQ Office')
+    ).toBeVisible()
+
+    await page.getByRole('button', { name: /HQ Office/ }).click()
+    await page.getByTestId('locationSearchInput').fill('Klow')
+    await page.getByText(/Klow Village Hospital/).click()
+
+    await page.click('#add-user')
+    await expect(page.getByText('User details')).toBeVisible()
+  })
+
+  await test.step('Fill user details with role Registration Officer', async () => {
+    await page.locator('#surname').fill(user.surname)
+    await page.locator('#firstname').fill(user.firstName)
+    await page.locator('#email').fill(user.email)
+    await page.locator('#role').click()
+    await page.getByText('Registration Officer', { exact: true }).click()
+    await continueForm(page)
+  })
+
+  await test.step('The signature upload page is shown', async () => {
+    await expect(page.getByText("User's signature")).toBeVisible()
+    await page.setInputFiles('input[type="file"]', signaturePath)
+    await continueForm(page)
+  })
+
+  await test.step('The user can be created', async () => {
+    await page.getByRole('button', { name: 'Create user' }).click()
+    await expect(page.locator('#header')).toContainText('Klow Village Hospital')
+  })
+})

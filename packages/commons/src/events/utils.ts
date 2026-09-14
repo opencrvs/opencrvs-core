@@ -884,44 +884,92 @@ const EXCLUDED_ACTIONS = [
   ActionType.REJECT_CORRECTION
 ]
 
+/**
+ * Applies a single action's declaration on top of the running declaration,
+ * following the correction-specific merge rules.
+ *
+ * Shared by `aggregateActionDeclarations` (folding accepted actions) and
+ * `getDeclarationWithPendingAction` (applying the pending action), so both use
+ * identical correction-aware logic.
+ *
+ * @param acceptedActions - The event's accepted actions, used to resolve the
+ *   correction request an APPROVE_CORRECTION refers to via `requestId`.
+ */
+function applyActionDeclaration(
+  declaration: EventState,
+  event: EventDocument,
+  action: ActionDocument,
+  acceptedActions: ActionDocument[]
+): EventState {
+  /*
+   * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+   * details in the correction. To do this, we find the original request that this
+   * approval is for and merge its details with the current data of the record.
+   */
+  if (action.type === ActionType.APPROVE_CORRECTION) {
+    const requestAction = acceptedActions.find(
+      ({ id }) => id === action.requestId
+    )
+
+    if (!requestAction) {
+      return declaration
+    }
+
+    const declarationWithApprovedCorrection = getCompleteActionDeclaration(
+      declaration,
+      event,
+      requestAction
+    )
+
+    // Apply async confirmation payload after the approved request so external
+    // integrations can finalize fields (e.g. child.nid) at approve time.
+    return getCompleteActionDeclaration(
+      declarationWithApprovedCorrection,
+      event,
+      action
+    )
+  }
+
+  return getCompleteActionDeclaration(declaration, event, action)
+}
+
 export function aggregateActionDeclarations(event: EventDocument): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  return aggregatedActions.reduce((declaration, action) => {
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = allAcceptedActions.find(
-        ({ id }) => id === action.requestId
-      )
+  return aggregatedActions.reduce<EventState>(
+    (declaration, action) =>
+      applyActionDeclaration(declaration, event, action, allAcceptedActions),
+    {}
+  )
+}
 
-      if (!requestAction) {
-        return declaration
-      }
-
-      const declarationWithApprovedCorrection = getCompleteActionDeclaration(
-        declaration,
-        event,
-        requestAction
-      )
-
-      // Apply async confirmation payload after the approved request so external
-      // integrations can finalize fields (e.g. child.nid) at approve time.
-      return getCompleteActionDeclaration(
-        declarationWithApprovedCorrection,
-        event,
-        action
-      )
-    }
-
-    return getCompleteActionDeclaration(declaration, event, action)
-  }, {})
+/**
+ * Returns the event's declaration state as it will be once the single pending
+ * action is accepted — i.e. the aggregate of all accepted declarations with the
+ * pending action's changes applied on top.
+ *
+ * Country configuration confirmation handlers (and notifications) need the
+ * up-to-date declaration at confirmation time, before core has accepted the
+ * action. Reaching for `aggregateActionDeclarations` alone is not enough for
+ * corrections: when confirming an APPROVE_CORRECTION the changed fields live on
+ * the linked REQUEST_CORRECTION, not on the pending action's own (empty)
+ * declaration. This helper applies the same correction-aware merge that
+ * `aggregateActionDeclarations` uses for already-accepted approvals, so callers
+ * do not have to reimplement the `requestId`/`originalActionId` resolution.
+ */
+export function getDeclarationWithPendingAction(
+  event: EventDocument
+): EventState {
+  const pendingAction = getPendingAction(event.actions)
+  return applyActionDeclaration(
+    aggregateActionDeclarations(event),
+    event,
+    pendingAction,
+    getAcceptedActions(event)
+  )
 }
 
 export function aggregateActionAnnotations(event: EventDocument): EventState {

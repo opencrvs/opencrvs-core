@@ -19,7 +19,6 @@ import {
   login,
   logout,
   switchEventTab,
-  uploadImage,
   uploadImageToSection,
   triggerDeclarationAction
 } from '@e2e/support/helpers'
@@ -27,6 +26,10 @@ import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { fillDate, validateAddress } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+
+// A minimal but valid 1x1 JPEG
+const JFIF_JPEG_BASE64 =
+  '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AfwD/2Q=='
 
 test.describe.serial('3. Birth declaration case - 3', () => {
   let page: Page
@@ -392,11 +395,19 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         await goToSection(page, 'documents')
       })
 
-      test('3.1.5.1 Upload proof of birth', async () => {
-        await uploadImage(
-          page,
-          page.locator('button[name="documents____proofOfBirth"]')
-        )
+      test('3.1.5.1 Upload proof of birth as a .jfif image', async () => {
+        const fileChooserPromise = page.waitForEvent('filechooser')
+        await page.locator('button[name="documents____proofOfBirth"]').click()
+        const fileChooser = await fileChooserPromise
+        await fileChooser.setFiles({
+          name: 'proof-of-birth.jfif',
+          mimeType: 'image/jpeg',
+          buffer: Buffer.from(JFIF_JPEG_BASE64, 'base64')
+        })
+
+        await expect(
+          page.getByRole('button', { name: 'Delete attachment' })
+        ).toBeVisible()
       })
 
       test("3.1.5.2 Upload proof of mother's id", async () => {
@@ -767,6 +778,26 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         (resp) =>
           resp.url().includes('/api/events/event.get') && resp.status() === 200
       )
+    })
+
+    test('3.2.1a The .jfif proof of birth is served as an image and previews correctly', async () => {
+      // The document viewer defaults to the first uploaded file: the proof of birth we uploaded as a `.jfif`.
+      await expect(page.locator('#select_document')).toContainText(
+        'Proof of birth'
+      )
+
+      const previewImage = page.getByAltText('Supporting Document')
+      await expect(previewImage).toBeVisible()
+
+      await expect
+        .poll(
+          () =>
+            previewImage.evaluate(
+              (img) => (img as HTMLImageElement).naturalWidth
+            ),
+          { timeout: 15_000 }
+        )
+        .toBeGreaterThan(0)
     })
 
     test('3.2.2 Verify information on "Record" -tab', async () => {

@@ -37,12 +37,20 @@ spec:
     - name: minio
       namespace: {{ .Release.Namespace }}
       port: 3535
+    {{- if .Values.ingress.application_allowlist }}
+    middlewares:
+      - name: application-ip-allowlist
+    {{- end }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "minio-console" "Values" .Values) }}`)'
     kind: Rule
     services:
     - name: minio
       namespace: {{ .Release.Namespace }}
       port: 3536
+    {{- if .Values.ingress.admin_console_allowlist }}
+    middlewares:
+      - name: admin-console-ip-allowlist
+    {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}

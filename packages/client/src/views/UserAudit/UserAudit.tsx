@@ -323,10 +323,7 @@ export const UserAudit = () => {
           >
             {intl.formatMessage(
               sysMessages.sendUsernameReminderInviteModalMessage,
-              {
-                recipient: deliveryMethod === 'sms' ? user.mobile : user.email,
-                deliveryMethod
-              }
+              { deliveryMethod }
             )}
           </Dialog>
           <Dialog
@@ -359,8 +356,7 @@ export const UserAudit = () => {
             ]}
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
-              deliveryMethod,
-              recipient: deliveryMethod === 'sms' ? user.mobile : user.email
+              deliveryMethod
             })}
           </Dialog>
           {showResendInviteSuccess && (

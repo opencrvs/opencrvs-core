@@ -56,6 +56,26 @@ export async function fileExists(path: DocumentPath | string, token: string) {
   return true
 }
 
+export async function presignFile(path: DocumentPath, token: string) {
+  const res = await fetch(
+    new URL(joinUrlPaths('/presigned-url', path), env.DOCUMENTS_URL),
+    {
+      method: 'GET',
+      headers: {
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to presign file ${path}: ${res.status} ${res.statusText}`
+    )
+  }
+
+  return res.json() as Promise<{ presignedURL: string }>
+}
+
 export async function listFiles(path: string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/list-files', path), env.DOCUMENTS_URL),

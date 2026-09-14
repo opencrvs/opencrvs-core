@@ -13,18 +13,22 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect } from 'storybook/test'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
+import { TRPCError } from '@trpc/server'
+import type { RequestHandler } from 'msw'
 import {
   ActionType,
   createPrng,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
+  getCurrentEventState,
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { WorkqueueIndex } from './index'
 
 const meta: Meta<typeof WorkqueueIndex> = {
@@ -286,6 +290,212 @@ export const DraftCountMatchesListWhenEventUnavailable: Story = {
           {},
           { timeout: 5000 }
         )
+        await expect(draftNav).toHaveTextContent(/^Drafts1$/)
+      }
+    )
+  }
+}
+
+/*
+ * Deleting a draft only clears it from the client's caches. `event.draft.list` keeps
+ * serving it until the delete request lands, and the drafts workqueue refetches on every
+ * mount, so an unfinished delete only stays off screen if the client suppresses it.
+ */
+
+const deleteRng = createPrng(9101)
+const registrationAgent = testDataGenerator().user.registrationAgent().v2
+
+const deletableEvent = generateEventDocument({
+  rng: deleteRng,
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    {
+      type: ActionType.CREATE,
+      user: { id: registrationAgent.id, assignedTo: registrationAgent.id }
+    },
+    {
+      type: ActionType.ASSIGN,
+      user: { id: registrationAgent.id, assignedTo: registrationAgent.id }
+    }
+  ]
+})
+
+const deletableDraft = generateEventDraftDocument({
+  eventId: deletableEvent.id,
+  actionType: ActionType.DECLARE,
+  rng: deleteRng,
+  declaration: {
+    'applicant.name': { firstname: 'Deleted', surname: 'Applicant' }
+  }
+})
+
+/*
+ * Lets a story wait for the workqueue's mount-time refetch to land before asserting.
+ */
+let draftListFetches = 0
+
+const draftListHandler = tRPCMsw.event.draft.list.query(() => {
+  draftListFetches += 1
+  return [deletableDraft]
+})
+
+async function neverSettles(): Promise<never> {
+  return new Promise(() => undefined)
+}
+
+/**
+ * Starts on the record page, where the action menu offers Delete.
+ */
+function deleteFlowParameters(deleteHandler: RequestHandler) {
+  return {
+    userRole: TestUserRole.enum.REGISTRATION_AGENT,
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: deletableEvent.id
+      })
+    },
+    offline: {
+      events: [deletableEvent],
+      drafts: [deletableDraft]
+    },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() =>
+            generateWorkqueues('draft')
+          ),
+          tRPCMsw.workqueue.count.query((input) =>
+            input.reduce((acc, { slug }) => ({ ...acc, [slug]: 1 }), {})
+          )
+        ],
+        event: [
+          draftListHandler,
+          tRPCMsw.event.get.query(() => deletableEvent),
+          tRPCMsw.event.search.query(() => ({
+            results: [
+              getCurrentEventState(deletableEvent, tennisClubMembershipEvent)
+            ],
+            total: 1
+          }))
+        ],
+        drafts: [draftListHandler],
+        deleteEvent: [deleteHandler]
+      }
+    }
+  }
+}
+
+/**
+ * Deletes the record from its action menu and opens the drafts workqueue, the way exiting
+ * a delete lands the user on a list.
+ *
+ * @returns drafts-list fetches served before the workqueue mounted.
+ */
+async function deleteRecordAndOpenDrafts(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement)
+
+  const actionMenu = await canvas.findByTestId(
+    'action-dropdownMenu',
+    {},
+    { timeout: 5000 }
+  )
+  void actionMenu.click()
+
+  const deleteItem = await waitFor(() => {
+    const menu = document.querySelector('#action-Dropdown-Content')
+    const item = Array.from(menu?.querySelectorAll('li') ?? []).find((li) =>
+      li.textContent.includes('Delete')
+    )
+
+    if (!item) {
+      throw new Error('Delete action not found in the record action menu')
+    }
+
+    return item
+  })
+
+  await userEvent.click(deleteItem)
+
+  const confirmDelete = await waitFor(() => {
+    const button = document.querySelector('#confirm_delete')
+
+    if (!button) {
+      throw new Error('Delete confirmation button not found')
+    }
+
+    return button
+  })
+
+  await userEvent.click(confirmDelete)
+
+  const draftNav = await canvas.findByTestId(
+    'navigation_workqueue_draft',
+    {},
+    { timeout: 5000 }
+  )
+
+  const fetchesBeforeMount = draftListFetches
+  // Mounts the drafts workqueue, which refetches `event.draft.list` from the server.
+  await userEvent.click(draftNav)
+
+  return fetchesBeforeMount
+}
+
+export const PendingDeleteStaysOutOfDraftsListAndBadge: Story = {
+  parameters: deleteFlowParameters(tRPCMsw.event.delete.mutation(neverSettles)),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    let fetchesBeforeMount = 0
+
+    await step('Delete the draft from the record action menu', async () => {
+      fetchesBeforeMount = await deleteRecordAndOpenDrafts(canvasElement)
+    })
+
+    await step(
+      'Drafts workqueue and badge omit the draft while the delete is in flight',
+      async () => {
+        await canvas.findByText('No records in drafts', {}, { timeout: 10000 })
+
+        // The server has served the draft again. Asserting before this lands would
+        // pass on the optimistic removal alone and miss the reappearance entirely.
+        await waitFor(
+          async () =>
+            expect(draftListFetches).toBeGreaterThan(fetchesBeforeMount),
+          { timeout: 10000 }
+        )
+
+        await expect(
+          canvas.findByText('Deleted Applicant', {}, { timeout: 3000 })
+        ).rejects.toThrow()
+
+        const draftNav = await canvas.findByTestId('navigation_workqueue_draft')
+        await expect(draftNav).toHaveTextContent(/^Drafts$/)
+      }
+    )
+  }
+}
+
+export const FailedDeletePutsTheDraftBack: Story = {
+  parameters: deleteFlowParameters(
+    tRPCMsw.event.delete.mutation(() => {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    })
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Delete the draft from the record action menu', async () => {
+      await deleteRecordAndOpenDrafts(canvasElement)
+    })
+
+    await step(
+      'Drafts workqueue and badge show the draft again once the delete has failed',
+      async () => {
+        await canvas.findByText('Deleted Applicant', {}, { timeout: 10000 })
+
+        const draftNav = await canvas.findByTestId('navigation_workqueue_draft')
         await expect(draftNav).toHaveTextContent(/^Drafts1$/)
       }
     )

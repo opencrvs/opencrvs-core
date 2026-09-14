@@ -101,6 +101,19 @@ const DeletedEmpty = styled(Deleted)`
   text-decoration: none;
 `
 
+/*
+ * What the field held sits above what it is becoming. They were bare siblings
+ * parted by a `<br>`, which stacks them only while the parent lays its children
+ * out as text; a flex parent instead takes each as an item of its own and sets
+ * them along its main axis. Stacking them here is the row's business no longer.
+ */
+const Changed = styled.span`
+  display: flex;
+  flex-direction: column;
+  /* The strike belongs to the value, so the box may not outgrow its text. */
+  align-items: flex-start;
+`
+
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
@@ -471,22 +484,19 @@ export function Output({
     }
 
     return (
-      <>
+      <Changed>
         {!isEmptyValue(field, previousValue) && (
-          <>
-            <Deleted>
-              <ValueOutput
-                anchor={anchor}
-                config={previousValueField ?? field}
-                eventConfig={eventConfig}
-                value={previousValue}
-              />
-            </Deleted>
-            <br />
-          </>
+          <Deleted>
+            <ValueOutput
+              anchor={anchor}
+              config={previousValueField ?? field}
+              eventConfig={eventConfig}
+              value={previousValue}
+            />
+          </Deleted>
         )}
         {valueOutput}
-      </>
+      </Changed>
     )
   }
 
@@ -500,21 +510,20 @@ export function Output({
       />
     )
     return (
-      <>
+      <Changed>
         {isEmptyValue(field, previousValue) ? (
           // For a deleted 'dash', we dont want to overline the dash
           <DeletedEmpty>{'-'}</DeletedEmpty>
         ) : (
           <Deleted>{deleted}</Deleted>
         )}
-        <br />
         <ValueOutput
           anchor={anchor}
           config={field}
           eventConfig={eventConfig}
           value={value}
         />
-      </>
+      </Changed>
     )
   }
 

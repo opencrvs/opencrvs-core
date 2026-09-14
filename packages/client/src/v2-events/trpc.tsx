@@ -261,3 +261,11 @@ export function hasConflict(error: unknown) {
   }
   return false
 }
+
+/** True when a tRPC call failed because the caller lacks access, or the target doesn't exist — not a bug. */
+export function isExpectedAccessError(error: unknown) {
+  return (
+    error instanceof TRPCClientError &&
+    [401, 403, 404].includes(error.data?.httpStatus)
+  )
+}

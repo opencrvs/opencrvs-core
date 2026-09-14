@@ -11,10 +11,9 @@
 
 import {
   ActionType,
-  aggregateActionDeclarations,
-  deepMerge,
   EventDocument,
   FieldUpdateValue,
+  getDeclarationWithPendingAction,
   getPendingAction,
   type Location
 } from '@opencrvs/toolkit/events'
@@ -89,10 +88,7 @@ async function getNotificationParams(
   const pendingAction = getPendingAction(event.actions)
   const locations = await getLocations(token)
 
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+  const declaration = getDeclarationWithPendingAction(event)
 
   const informant = getInformant(event.type, declaration)
   const { nameObj, fullName } = resolveName(informant)

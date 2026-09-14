@@ -39,9 +39,8 @@ import {
   toCsvLine,
   writeCsvFile
 } from '../../csv'
+import { candidateRefs, fetchTemplate } from '../../translations/template'
 
-const REPOSITORY = 'opencrvs/opencrvs-core'
-const TEMPLATE_TRANSLATIONS = 'packages/countryconfig-template/src/translations'
 const APPLICATIONS = ['client', 'login']
 
 /** The version this folder upgrades a country config to. */
@@ -52,81 +51,6 @@ const skipped: string[] = []
 function warnSkipped(message: string) {
   skipped.push(message)
   console.warn(`  ⚠️  ${message}`)
-}
-
-/**
- * The refs matching a prefix, newest patch first.
- *
- * Every patch gets its own release branch — `release/2.1.0`, `release/2.1.1` —
- * and a translation key added in a patch only exists on that patch's branch, so
- * the newest one is the one worth reading.
- */
-async function matchingRefs(namespace: string, prefix: string) {
-  const url = `https://api.github.com/repos/${REPOSITORY}/git/matching-refs/${namespace}/${prefix}`
-
-  const response = await fetch(url, {
-    headers: { accept: 'application/vnd.github+json' }
-  })
-
-  /*
-   * An empty list and a failed request are not the same thing: GitHub answers
-   * 200 with `[]` for a prefix nothing matches, so anything else is the request
-   * failing rather than the version having no release branch. Swallowing it
-   * would leave `develop` as the only candidate left, and an unauthenticated
-   * api.github.com allows 60 requests an hour per IP — a country upgrading from
-   * a shared network or a CI runner would quietly get unreleased copy.
-   */
-  if (!response.ok) {
-    throw new Error(
-      `GitHub answered ${response.status} ${response.statusText} for ${url}`
-    )
-  }
-
-  const refs = (await response.json()) as Array<{ ref: string }>
-
-  const patchOf = (ref: string) => Number(ref.split('.').pop()) || 0
-
-  return refs
-    .map(({ ref }) => ref.replace(/^refs\/(heads|tags)\//, ''))
-    .sort((a, b) => patchOf(b) - patchOf(a))
-}
-
-/**
- * Where to read the template from, most specific first: the newest release
- * branch of the target version, then its newest tag, then `develop` for anyone
- * running the codemod before the version has been cut.
- */
-async function candidateRefs() {
-  return [
-    ...(await matchingRefs('heads', `release/${TARGET_VERSION}.`)),
-    ...(await matchingRefs('tags', `v${TARGET_VERSION}.`)),
-    'develop'
-  ]
-}
-
-async function fetchTemplate(refs: string[], application: string) {
-  for (const ref of refs) {
-    const url = `https://raw.githubusercontent.com/${REPOSITORY}/${ref}/${TEMPLATE_TRANSLATIONS}/${application}.csv`
-    const response = await fetch(url)
-
-    if (response.ok) {
-      return { ref, contents: await response.text() }
-    }
-
-    // 404 means this ref does not carry the file and the next one is worth a
-    // try. Anything else is the request failing, and moving on would read the
-    // template from a ref older than the one that was asked for.
-    if (response.status !== 404) {
-      throw new Error(
-        `GitHub answered ${response.status} ${response.statusText} for ${url}`
-      )
-    }
-  }
-
-  warnSkipped(
-    `No ${application}.csv found in the ${TARGET_VERSION} country config template on GitHub; ${application}.csv not updated`
-  )
-  return undefined
 }
 
 /**
@@ -167,6 +91,9 @@ async function updateApplication(
   const fetched = await fetchTemplate(refs, application)
 
   if (!fetched) {
+    warnSkipped(
+      `No ${application}.csv found in the ${TARGET_VERSION} country config template on GitHub; ${application}.csv not updated`
+    )
     return
   }
 
@@ -205,7 +132,7 @@ function readTemplate(contents: string): CsvFile {
 /** Refs to read the template from. Undefined when GitHub cannot be asked. */
 async function listRefs() {
   try {
-    return await candidateRefs()
+    return await candidateRefs(TARGET_VERSION)
   } catch (error) {
     warnSkipped(
       `Could not list the ${TARGET_VERSION} refs on GitHub (${(error as Error).message}); translations not added`
