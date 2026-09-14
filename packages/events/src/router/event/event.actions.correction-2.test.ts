@@ -504,19 +504,6 @@ test('System may reject REJECT_CORRECTION action', async () => {
     rng: createPrng(1243429)
   })
 
-  const getRequestActionPayload = () => ({
-    eventId,
-    requestId: getOrThrow(
-      requestedActionIds.REQUEST_CORRECTION,
-      'no action id'
-    ),
-    transactionId: getUUID(),
-    content: {
-      reason: 'content'
-    },
-    waitFor: false
-  })
-
   const rejectActionResponse =
     await client.event.actions.correction.reject.request({
       eventId,
