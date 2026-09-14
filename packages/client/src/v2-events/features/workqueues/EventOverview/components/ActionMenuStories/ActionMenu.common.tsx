@@ -124,14 +124,14 @@ function getMockActions(createdBy: string) {
       createdBy,
       id: generateUuid(rng),
       type: ActionType.APPROVE_CORRECTION,
-      requestId: '827bf7e8-0e1e-4cef-66e71287a2c8-aee7'
+      requestId: '827bf7e8-0e1e-4cef-66e71287a2c8-aee7' as UUID
     },
     [ActionType.REJECT_CORRECTION]: {
       ...actionProps,
       createdBy,
       id: generateUuid(rng),
       type: ActionType.REJECT_CORRECTION,
-      requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
+      requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef' as UUID,
       content: { reason: 'No legal proof' }
     },
     [ActionType.DELETE]: {
