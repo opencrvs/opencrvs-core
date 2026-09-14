@@ -17,6 +17,7 @@ import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
+  ActionUpdate,
   EventDocument,
   getAcceptedActions,
   joinValues,
@@ -24,6 +25,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ActionTypeSpecificContent } from './components'
+import { SystemUpdatedFields } from './components/SystemUpdatedFields'
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
@@ -143,7 +145,8 @@ export function EventHistoryDialog({
   fullEvent,
   validatorContext,
   title,
-  isWaitingForExternalValidation
+  isWaitingForExternalValidation,
+  systemUpdates
 }: {
   action: ActionDocument
   userName: string
@@ -152,10 +155,10 @@ export function EventHistoryDialog({
   validatorContext: ValidatorContext
   title: string
   isWaitingForExternalValidation: boolean
+  systemUpdates?: ActionUpdate
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
-
   const comments = prepareComments(action)
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)
@@ -237,6 +240,13 @@ export function EventHistoryDialog({
         fullEvent={fullEvent}
         validatorContext={validatorContext}
       />
+      {systemUpdates && (
+        <SystemUpdatedFields
+          declaration={systemUpdates}
+          fullEvent={fullEvent}
+          validatorContext={validatorContext}
+        />
+      )}
     </Dialog>
   )
 }

@@ -24,6 +24,8 @@ import {
   ActionDocument,
   ActionStatus,
   ActionType,
+  ActionUpdate,
+  deepMerge,
   isActionConfigType,
   EventDocument,
   getActionConfig,
@@ -488,7 +490,8 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     action: ActionDocument,
     userName: string,
     title: string,
-    isWaitingForExternalValidation: boolean
+    isWaitingForExternalValidation: boolean,
+    systemUpdates?: ActionUpdate
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
@@ -496,6 +499,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         close={close}
         fullEvent={fullEvent}
         isWaitingForExternalValidation={isWaitingForExternalValidation}
+        systemUpdates={systemUpdates}
         title={title}
         userName={userName}
         validatorContext={validatorContext}
@@ -581,6 +585,35 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       const isExpandable = !!asyncConfirmation || isWaitingForExternalValidation
       const isExpanded = expandedActionIds.includes(action.id)
 
+      const acceptedAction =
+        allActions.find(
+          (a) =>
+            a.originalActionId === statusSourceAction.id &&
+            a.status === ActionStatus.Accepted
+        ) ??
+        (statusSourceAction.status === ActionStatus.Accepted
+          ? statusSourceAction
+          : undefined)
+
+      const dialogAction: ActionDocument = acceptedAction
+        ? {
+            ...action,
+            declaration: deepMerge(
+              action.declaration,
+              acceptedAction.declaration
+            ),
+            annotation: deepMerge(
+              action.annotation ?? {},
+              acceptedAction.annotation ?? {}
+            )
+          }
+        : action
+
+      const systemUpdates =
+        asyncConfirmation?.status === ActionStatus.Accepted
+          ? asyncConfirmation.declaration
+          : undefined
+
       // If a audit history label is configured in action config, use that!
       const title =
         actionConfig && actionConfig.type === ActionType.CUSTOM
@@ -606,10 +639,11 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
             font="bold14"
             onClick={() =>
               onHistoryRowClick(
-                action,
+                dialogAction,
                 actionCreatorName,
                 title,
-                isWaitingForExternalValidation
+                isWaitingForExternalValidation,
+                systemUpdates
               )
             }
           >

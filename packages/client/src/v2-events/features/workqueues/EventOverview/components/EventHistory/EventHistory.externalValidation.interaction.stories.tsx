@@ -209,6 +209,81 @@ const correctionFinishedEvent: EventDocument = {
   ]
 }
 
+/**
+ * A registration whose external validation was rejected: the `Requested`
+ * REGISTER is followed by a `Rejected` confirmation (a different transactionId,
+ * as the async rejection carries). The audit shows a single "Registration
+ * failed" row with a rejected status badge — no separate waiting row.
+ */
+const rejectedRegisterRequest = action(ActionType.REGISTER, 3, {
+  status: ActionStatus.Requested
+})
+const rejectedRegisterRejected = action(ActionType.REGISTER, 4, {
+  status: ActionStatus.Rejected,
+  originalActionId: rejectedRegisterRequest.id
+})
+
+const registrationRejectedEvent: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: getUUID(),
+  actions: [
+    action(ActionType.CREATE, 0, { declaration: {} }),
+    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    action(ActionType.DECLARE, 2, {
+      declaration: {
+        'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
+      }
+    }),
+    rejectedRegisterRequest,
+    rejectedRegisterRejected
+  ]
+}
+
+/**
+ * A direct correction whose external validation was rejected: the `Requested`
+ * APPROVE_CORRECTION is followed by a `Rejected` one. The audit shows the
+ * correction row with a rejected status badge, and it can be expanded to reveal
+ * the rejection.
+ */
+const rejectedRequestCorrection = action(ActionType.REQUEST_CORRECTION, 4, {
+  declaration: {
+    'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
+  }
+})
+const rejectedApproveRequested = action(ActionType.APPROVE_CORRECTION, 5, {
+  status: ActionStatus.Requested,
+  content: { immediateCorrection: true }
+})
+const rejectedApproveRejected = action(ActionType.APPROVE_CORRECTION, 6, {
+  status: ActionStatus.Rejected,
+  content: { immediateCorrection: true },
+  originalActionId: rejectedApproveRequested.id
+})
+if (rejectedApproveRequested.type === ActionType.APPROVE_CORRECTION) {
+  rejectedApproveRequested.requestId = rejectedRequestCorrection.id
+}
+if (rejectedApproveRejected.type === ActionType.APPROVE_CORRECTION) {
+  rejectedApproveRejected.requestId = rejectedRequestCorrection.id
+}
+
+const correctionRejectedEvent: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: getUUID(),
+  actions: [
+    action(ActionType.CREATE, 0, { declaration: {} }),
+    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    action(ActionType.DECLARE, 2, {
+      declaration: {
+        'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
+      }
+    }),
+    action(ActionType.REGISTER, 3),
+    rejectedRequestCorrection,
+    rejectedApproveRequested,
+    rejectedApproveRejected
+  ]
+}
+
 function auditParameters(event: EventDocument) {
   return {
     chromatic: { disableSnapshot: true },
@@ -383,6 +458,77 @@ export const CorrectionExternalValidationFinished: Story = {
     })
 
     await step('there is no waiting status', async () => {
+      await expect(
+        canvas.queryByTitle('Waiting for external validation')
+      ).toBeNull()
+    })
+  }
+}
+
+/**
+ * When the registration's external validation is rejected, the audit shows a
+ * single "Registration failed" row with a rejected status badge (no waiting
+ * badge), and the row can be expanded to reveal the rejection.
+ */
+export const RegistrationExternalValidationRejected: Story = {
+  parameters: auditParameters(registrationRejectedEvent),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('the registration failed', async () => {
+      await expect(
+        await canvas.findByRole(
+          'button',
+          { name: 'Registration failed' },
+          { timeout: 10000 }
+        )
+      ).toBeVisible()
+    })
+
+    await step('its status shows as rejected, not waiting', async () => {
+      // The status is an icon badge (first column) with a descriptive title.
+      await expect(await canvas.findByTitle('Rejected')).toBeVisible()
+      await expect(
+        canvas.queryByTitle('Waiting for external validation')
+      ).toBeNull()
+    })
+
+    await step('the row can be expanded to reveal the rejection', async () => {
+      // The confirmation details are not shown until the row is expanded.
+      await expect(canvas.queryByText('Rejected')).toBeNull()
+
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Show validation details'
+        })
+      )
+
+      await expect(await canvas.findByText('Rejected')).toBeVisible()
+    })
+  }
+}
+
+/**
+ * When the correction's external validation is rejected, the audit shows the
+ * correction row with a rejected status badge instead of "Record corrected".
+ */
+export const CorrectionExternalValidationRejected: Story = {
+  parameters: auditParameters(correctionRejectedEvent),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('the correction is shown as rejected', async () => {
+      await expect(
+        await canvas.findByRole(
+          'button',
+          { name: 'Rejected' },
+          { timeout: 10000 }
+        )
+      ).toBeVisible()
+    })
+
+    await step('its status shows as rejected, not waiting', async () => {
+      await expect(await canvas.findByTitle('Rejected')).toBeVisible()
       await expect(
         canvas.queryByTitle('Waiting for external validation')
       ).toBeNull()

@@ -636,6 +636,7 @@ events.history.status,Events status history,"{status, select, Requested {Waiting
 events.history.status.accepted,Status badge shown on an action that has been confirmed,Accepted,Accepté
 events.history.status.rejected,Status badge shown on an action that was rejected,Rejected,Rejeté
 events.history.status.requested,Label for the requested action shown in the expanded audit dropdown,Requested,Demandé
+events.history.systemUpdatedFields.title,Heading for declaration fields an external system populated when it confirmed the action,Updated by the system,Mis à jour par le système
 events.history.toggleConfirmationDetails,Accessible label for the toggle that expands a row to show who accepted or rejected the action and when,Show validation details,Afficher les détails de validation
 events.history.waitingForExternalValidation,Status badge shown on an action that is still awaiting confirmation from an external system,Waiting for external validation,En attente de validation externe
 events.history.when,Header for the column showing when an action happened,When,Quand

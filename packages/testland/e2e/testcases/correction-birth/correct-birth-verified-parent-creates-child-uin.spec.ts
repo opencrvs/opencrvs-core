@@ -44,7 +44,6 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
   let token: string
   let declaration: Declaration
   let eventId: string
-  let recordUrl = ''
   let childNid = ''
 
   await test.step('Register a birth via API without a verified parent (no child UIN)', async () => {
@@ -63,8 +62,6 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
 
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await openRecordByTitle(page, formatV2ChildName(declaration))
-    recordUrl = page.url()
-
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
@@ -151,8 +148,10 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
     await expect(page.getByTestId('child.nid-value')).toContainText(childNid)
 
     await switchEventTab(page, 'Audit')
-    await expect(
-      page.getByRole('button', { name: 'Record corrected', exact: true })
-    ).toBeVisible()
+
+    await page
+      .getByRole('button', { name: 'Record corrected', exact: true })
+      .click()
+    await expect(page.getByText(childNid)).toBeVisible()
   })
 })
