@@ -247,6 +247,16 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.</td>
         </tr>
         <tr>
+            <td>ingress.admin_console_allowlist</td>
+            <td>[]</td>
+            <td>Source IP ranges (CIDR) allowed to reach the Metabase dashboards console, enforced via a Traefik <code>ipAllowList</code> middleware. Leave empty to leave it publicly reachable - see "Hardening" in this README.</td>
+        </tr>
+        <tr>
+            <td>ingress.application_allowlist</td>
+            <td>[]</td>
+            <td>Source IP ranges (CIDR) allowed to reach the whole application (client, login, gateway, countryconfig), enforced via a Traefik <code>ipAllowList</code> middleware. Unlike <code>admin_console_allowlist</code>, this gates every public entry point, not just admin consoles. <code>admin_console_allowlist</code> is always merged in. Leave empty to leave the application publicly reachable - see "Hardening" in this README.</td>
+        </tr>
+        <tr>
             <td>service_type</td>
             <td>{}</td>
             <td>Kubernetes service type. See <a href="https://kubernetes.io/docs/concepts/services-networking/service/">kubernetes documentation</a> for more information on service types</td>
@@ -685,6 +695,32 @@ Applies once `network_policy.enabled: true`. Every OpenCRVS pod always accepts t
 | auth, config, documents, events, migration, data-migration-analytics, data-cleanup, data-seed, elasticsearch-on-deploy, elasticsearch-reindex, postgres-on-deploy | —                | —                                                         |
 
 Only `countryconfig` defines an extra egress rule (`network_policy.egress_mode: full` — unrestricted, for its SMTP/SMS integrations); every other service relies solely on the shared `egress_mode`/`allowed_namespaces` baseline above to reach the dependencies chart.
+
+### Restricting application access
+
+`network_policy` only governs traffic between pods inside the cluster — it has no effect on public traffic arriving through Traefik. For deployments that want to allow only a known set of source IP ranges (e.g. the deploying country's own IP space) to reach the application at all — cutting off most automated/opportunistic attacks without requiring a VPN — set `ingress.application_allowlist` to those CIDR ranges. This attaches a Traefik `ipAllowList` middleware to every public route (`client`, `login`, `gateway`, `countryconfig`) and requires no additional infrastructure:
+
+```yaml
+ingress:
+  application_allowlist:
+    - 203.0.113.0/24
+```
+
+This is a plain IP allowlist, not geo-aware — it admits any request from the listed ranges regardless of where it actually originates, and rejects everything else regardless of origin. True country-level geoblocking would need a Traefik plugin or a CDN/WAF in front of the cluster.
+
+`ingress.admin_console_allowlist` (see below) is always merged into this list, so an IP trusted for the admin consoles is never accidentally locked out of the application itself — it doesn't need repeating in `application_allowlist`.
+
+### Restricting admin consoles
+
+Similarly, the Metabase dashboards console (and, in the dependencies chart, the MinIO console and Kibana) are admin consoles reachable by anyone who can resolve their hostname. Set `ingress.admin_console_allowlist` to the CIDR ranges that should be allowed to reach these consoles (e.g. office/VPN egress IPs) — this can stay narrower than `application_allowlist`, since admin consoles usually only need to be reachable by ops staff rather than the whole country:
+
+```yaml
+ingress:
+  admin_console_allowlist:
+    - 203.0.113.0/24
+```
+
+Set the same key in the dependencies chart's `values.yaml` to also restrict the MinIO console and Kibana (the MinIO S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
 
 # Authentication configuration
 

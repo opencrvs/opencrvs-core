@@ -81,20 +81,25 @@ const expectVersionCard = async (
   await expect(page.getByText('OpenCRVS v2.1.0', { exact: true })).toBeVisible()
 }
 
-test('Scope changes after office change - user loses access when the office changes', async ({
-  browser
-}) => {
-  test.setTimeout(180_000)
+type RegistrarWithDrafts = {
+  username: string
+  fullName: string
+  childName: string
+  trackingId: string
+  eventId: string
+  draftNames: string[]
+  draftCountBeforeChange: number
+}
 
-  const page = await browser.newPage()
-  let username = ''
-  let fullName = ''
-  let childName = ''
-  let trackingId = ''
-  let eventId = ''
-  let draftCountBeforeChange = 0
-
-  await test.step('Create a new registrar user and set up initial record and drafts', async () => {
+/**
+ * Creates a Registrar in Ibombo District Office, logs them in, declares one
+ * record and leaves `draftCount` in-progress drafts behind.
+ *
+ * Every test below starts from this state and then has an administrator change
+ * something about the user, so what survives the change is all that differs.
+ */
+const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
+  test.step('Create a new registrar user and set up initial record and drafts', async (): Promise<RegistrarWithDrafts> => {
     const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
     const client = createClient(
       GATEWAY_HOST + '/events',
@@ -107,8 +112,8 @@ test('Scope changes after office change - user loses access when the office chan
       surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
     }
 
-    fullName = `${name.firstname} ${name.surname}`
-    username = `${name.firstname[0]}.${name.surname}`
+    const fullName = `${name.firstname} ${name.surname}`
+    const username = `${name.firstname[0]}.${name.surname}`
       .toLowerCase()
       .replace(/[^a-z0-9.]/g, '')
 
@@ -146,9 +151,8 @@ test('Scope changes after office change - user loses access when the office chan
       ActionType.DECLARE
     )
 
-    trackingId = declaration.trackingId!
-    eventId = declaration.eventId
-    childName = formatV2ChildName(declaration.declaration)
+    const trackingId = declaration.trackingId!
+    const childName = formatV2ChildName(declaration.declaration)
 
     await searchFromSearchBar(page, childName, true)
     await expect(page.getByTestId('tracking-id-value')).toContainText(
@@ -156,11 +160,11 @@ test('Scope changes after office change - user loses access when the office chan
     )
 
     const draftNames: string[] = []
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < draftCount; i++) {
       draftNames.push(await createDraft(page))
     }
 
-    draftCountBeforeChange = await countDraftRows(page, draftNames.length)
+    const draftCountBeforeChange = await countDraftRows(page, draftNames.length)
     expect(draftCountBeforeChange).toBe(draftNames.length)
 
     for (const draftName of draftNames) {
@@ -168,7 +172,26 @@ test('Scope changes after office change - user loses access when the office chan
         page.getByRole('button', { name: draftName, exact: true })
       ).toBeVisible()
     }
+
+    return {
+      username,
+      fullName,
+      childName,
+      trackingId,
+      eventId: declaration.eventId,
+      draftNames,
+      draftCountBeforeChange
+    }
   })
+
+test('Scope changes after office change - user loses access when the office changes', async ({
+  browser
+}) => {
+  test.setTimeout(180_000)
+
+  const page = await browser.newPage()
+  const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
+    await setupRegistrarWithDrafts(page, 3)
 
   await test.step('Local administrator moves the user to Isamba District Office', async () => {
     await logout(page)
@@ -208,7 +231,10 @@ test('Scope changes after office change - user loses access when the office chan
 
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.getByTestId('confirm_office_change').click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -244,95 +270,16 @@ test('Scope changes after office and role changes', async ({ browser }) => {
   test.setTimeout(180_000)
 
   const page = await browser.newPage()
-  let username = ''
-  let fullName = ''
-  let childName = ''
-  let trackingId = ''
-  let eventId = ''
-  let draftCountBeforeChange = 0
+  const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
+    await setupRegistrarWithDrafts(page, 3)
 
-  await test.step('Create a new registrar user and set up initial record and drafts', async () => {
-    const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
-    const client = createClient(
-      GATEWAY_HOST + '/events',
-      `Bearer ${adminToken}`
-    )
-
-    const name = {
-      firstname: faker.person.firstName(),
-      // Append random chars to ensure username is unique
-      surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
-    }
-
-    fullName = `${name.firstname} ${name.surname}`
-    username = `${name.firstname[0]}.${name.surname}`
-      .toLowerCase()
-      .replace(/[^a-z0-9.]/g, '')
-
-    const offices = await getLocations('CRVS_OFFICE', adminToken)
-    const ibomboDistrictOfficeId = getIdByName(
-      offices,
-      'Ibombo District Office'
-    )
-
-    await client.user.create.mutate({
-      name,
-      role: 'LOCAL_REGISTRAR',
-      primaryOfficeId: ibomboDistrictOfficeId,
-      mobile: `07${faker.string.numeric(8)}`,
-      email: faker.internet.email(),
-      fullHonorificName: fullName,
-      device: 'web',
-      data: {}
-    })
-
-    await loginWithNewUser(page, username)
-
-    const { token, refreshToken } = await getAuthTokens(
-      username,
-      NEW_USER_PASSWORD
-    )
-
-    await waitForAuthenticatedLanding(page, refreshToken)
-
-    await createPIN(page)
-    await page.goto(CLIENT_URL)
-
-    const declaration = await createDeclaration(
-      token,
-      undefined,
-      ActionType.DECLARE
-    )
-
-    trackingId = declaration.trackingId!
-    eventId = declaration.eventId
-    childName = formatV2ChildName(declaration.declaration)
-
-    await searchFromSearchBar(page, childName, true)
-    await expect(page.getByTestId('tracking-id-value')).toContainText(
-      trackingId
-    )
-
-    const draftNames: string[] = []
-    for (let i = 0; i < 3; i++) {
-      draftNames.push(await createDraft(page))
-    }
-
+  await test.step('The new user starts out as a Registrar in Ibombo District Office', async () => {
     await expectVersionCard(
       page,
       fullName,
       'Registrar',
       'Ibombo District Office'
     )
-
-    draftCountBeforeChange = await countDraftRows(page, draftNames.length)
-    await expect(draftCountBeforeChange).toBe(draftNames.length)
-
-    for (const draftName of draftNames) {
-      await expect(
-        page.getByRole('button', { name: draftName, exact: true })
-      ).toBeVisible()
-    }
 
     await logout(page)
   })
@@ -371,7 +318,10 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
 
     await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.getByTestId('confirm_office_change').click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -411,5 +361,115 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(
       page.getByText(`No event or draft found with id: ${eventId}`)
     ).toBeVisible()
+  })
+})
+
+test('Drafts are removed when only the role changes', async ({ browser }) => {
+  test.setTimeout(180_000)
+
+  const page = await browser.newPage()
+  const { username, fullName, childName, trackingId, draftCountBeforeChange } =
+    await setupRegistrarWithDrafts(page, 3)
+
+  await test.step('Local administrator changes the role to Registration Officer, keeping the office', async () => {
+    await logout(page)
+    await login(page, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
+
+    await page.getByRole('button', { name: 'Organisation' }).click()
+    await page.getByRole('button', { name: 'Central' }).click()
+    await page.getByRole('button', { name: 'Ibombo', exact: true }).click()
+    await page.getByRole('button', { name: 'Ibombo District Office' }).click()
+    await expect(page.locator('#content-name')).toHaveText(
+      'Ibombo District Office'
+    )
+
+    await page.getByRole('button', { name: fullName }).click()
+    await expect(page.locator('#content-name')).toHaveText(fullName)
+
+    await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
+    await page.getByText('Edit details').click()
+    await expect(page.getByText('Confirm details')).toBeVisible()
+
+    await page.getByTestId('change-button-role').click()
+    await page.locator('#role').click()
+    await page.getByText('Registration Officer', { exact: true }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    /*
+     * Registration Officer holds `profile.electronic-signature`, so the
+     * signature page stays in the flow between the role page and the review.
+     */
+    const signButton = page.getByRole('button', { name: 'Sign', exact: true })
+    if (await signButton.isVisible()) {
+      await signButton.click()
+      await drawSignature(page, 'signature_canvas_element', false)
+      await page.getByRole('button', { name: 'Apply' }).click()
+    }
+
+    const continueButton = page.getByRole('button', { name: 'Continue' })
+    if (await continueButton.isVisible()) {
+      await continueButton.click()
+    }
+
+    await expect(page.getByText('Confirm details')).toBeVisible()
+    await expect(page.getByTestId('role-value')).toHaveText(
+      'Registration Officer'
+    )
+    // The office is deliberately left alone: the role alone must clear drafts.
+    await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
+      'Ibombo District Office, Ibombo, Central, Farajaland'
+    )
+
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    await expect(page.getByText('Change role or office?')).toBeVisible()
+    await expect(
+      page.getByText(
+        "Changing this user's role or office will remove their in-progress drafts. Do you want to continue?"
+      )
+    ).toBeVisible()
+
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
+
+    await expect(
+      page.getByText('Registration Officer', { exact: true })
+    ).toBeVisible()
+    await expect(page.getByTestId('office-link-value')).toHaveText(
+      'Ibombo District Office'
+    )
+
+    await logout(page)
+  })
+
+  await test.step('The drafts are gone, while the records of the office remain accessible', async () => {
+    const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
+    expect(refreshToken).toBeDefined()
+
+    await waitForAuthenticatedLanding(page, refreshToken)
+    await page.goto(CLIENT_URL)
+
+    await expectVersionCard(
+      page,
+      fullName,
+      'Registration Officer',
+      'Ibombo District Office'
+    )
+
+    const draftCountAfterChange = await countDraftRows(page, 0)
+    expect(draftCountAfterChange).toBe(0)
+    expect(draftCountBeforeChange).toBeGreaterThan(0)
+
+    /*
+     * The office did not change, so everything but the drafts is still there.
+     * Without this the test would also pass if the role change had locked the
+     * user out of the office's records altogether.
+     */
+    await searchFromSearchBar(page, childName, true)
+    await expect(page.getByTestId('tracking-id-value')).toContainText(
+      trackingId
+    )
   })
 })

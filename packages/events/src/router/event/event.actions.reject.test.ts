@@ -10,8 +10,19 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, encodeScope, getUUID } from '@opencrvs/commons'
+import { http, HttpResponse } from 'msw'
+import {
+  ActionStatus,
+  ActionType,
+  encodeScope,
+  EventStatus,
+  getCurrentEventState,
+  getUUID
+} from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -110,4 +121,143 @@ test(`${ActionType.REJECT} is idempotent`, async () => {
     await client.event.actions.reject.request(rejectPayload)
 
   expect(firstResponse).toEqual(secondResponse)
+})
+
+describe('3rd party integration confirmation behaviour', () => {
+  function mockActionApi(action: ActionType, status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+        () => {
+          return HttpResponse.json({}, { status })
+        }
+      )
+    )
+  }
+
+  test('Throws when integration responds with 202 when keepAssignment is given', async () => {
+    mockActionApi(ActionType.REJECT, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.reject.request(
+        generator.event.actions.reject(event.id, { keepAssignment: true })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
+    mockActionApi(ActionType.REJECT, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.reject.request(
+        generator.event.actions.reject(event.id, {
+          keepAssignmentIfRejected: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
+    mockActionApi(ActionType.REJECT, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.reject.request(
+        generator.event.actions.reject(event.id, {
+          keepAssignmentIfAccepted: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Unassigns when integration responds with 202', async () => {
+    mockActionApi(ActionType.REJECT, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.reject.request(
+      generator.event.actions.reject(event.id)
+    )
+
+    const lastAction = response.actions[response.actions.length - 1]
+
+    expect(lastAction.type).toEqual(ActionType.UNASSIGN)
+    expect(lastAction.status).toEqual(ActionStatus.Accepted)
+
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['reject:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+    expect(currentState.assignedTo).toEqual(undefined)
+  })
+
+  test('Keeps assignment when integration responds with 500', async () => {
+    mockActionApi(ActionType.REJECT, 500)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.reject.request(
+        generator.event.actions.reject(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
+    )
+
+    const eventAfterFailure = await client.event.get({ eventId: event.id })
+
+    const currentState = getCurrentEventState(
+      eventAfterFailure,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['reject:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+    expect(currentState.assignedTo).toEqual(user.id)
+  })
 })

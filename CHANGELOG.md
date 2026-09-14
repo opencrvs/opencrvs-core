@@ -17,6 +17,10 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### Calling action .accept & .reject endpoints require system user token
+
+Previously it was possible for the countryconfig to call events API using user's token. This required user to be assigned to the event, which allowed two entities to perform actions under same identity. User is unassigned from the event when system returns 202, and system must request system user token to perform accept or reject actions.
+
 #### Registration confirmation no longer uses OAuth token exchange
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
@@ -92,10 +96,10 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 The user-notification and system-ready triggers were served under `/triggers/`, while the event action and telemetry triggers used `/trigger/`. All of them now use the singular prefix:
 
-| Before | After |
-| --- | --- |
+| Before                        | After                        |
+| ----------------------------- | ---------------------------- |
 | `POST /triggers/user/{event}` | `POST /trigger/user/{event}` |
-| `GET /triggers/system/ready` | `GET /trigger/system/ready` |
+| `GET /triggers/system/ready`  | `GET /trigger/system/ready`  |
 
 `POST /trigger/events/{event}/actions/{action}` and `POST /trigger/telemetry` are unchanged.
 
@@ -140,6 +144,8 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
 - Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
+- Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
+
 
 ### New features
 
@@ -235,6 +241,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
+- Keep a status badge's label on a single line. A badge narrower than its text broke the label mid-word, e.g. `Active` rendering as `Activ` / `e` in the team members list [#13572](https://github.com/opencrvs/opencrvs-core/issues/13572)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
 - Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
@@ -243,6 +250,8 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Return a conflict naming the offending field, instead of an internal server error, when a write trips a unique constraint on a user's email, mobile or username. The application-level duplicate checks are broader than the constraints, so this is reachable only when two requests race — but the cause was masked in production and reached the caller as `Internal server error`. Covers creating a user as well as changing an existing user's email, phone number or name. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 - Stop the gateway's `/events/{path*}` proxy from forwarding requests outside the events service. [#13587](https://github.com/opencrvs/opencrvs-core/issues/13587)
 - Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
+- Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
+- Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 
 ## 2.0.1 Release
 

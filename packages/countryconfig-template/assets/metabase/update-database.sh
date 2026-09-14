@@ -28,13 +28,13 @@ environment_configuration_sql_file=${OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE
 # as environment variables
 #########
 
-if ! which envsubst >/dev/null; then
-  echo "envsubst could not be found. Please install envsubst before continuing."
-  echo "MacOS: brew install gettext && brew link --force gettext"
-  exit 1
-fi
 echo "Applying environment configuration from $environment_configuration_sql_file"
-envsubst < $environment_configuration_sql_file > $environment_configuration_sql_file.tmp
+
+# Expand $VAR / ${VAR} using bash's own heredoc expansion instead of envsubst,
+# because envsubst is not installed in the Metabase image
+eval "cat <<OPENCRVS_ENV_EOF
+$(cat "$environment_configuration_sql_file")
+OPENCRVS_ENV_EOF" > "$environment_configuration_sql_file.tmp"
 
 java -cp "$metabase_jar" org.h2.tools.RunScript -url jdbc:h2:"$metabase_db_path_for_metabase" -script "$environment_configuration_sql_file.tmp"
 rm $environment_configuration_sql_file.tmp
