@@ -47,7 +47,6 @@ import {
   addAction,
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
-  ensureEventIndexed,
   processAction
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -233,6 +232,14 @@ export async function defaultRequestHandler(
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
+  // If keep assignment is given, we expect there to be a series of actions. (e.g. declare + register).
+  // 2.1.0 onwards, we do not support async checks for these "intermediary" actions.
+  const expectSynchronousResponse = [
+    input.keepAssignment,
+    input.keepAssignmentIfAccepted,
+    input.keepAssignmentIfRejected
+  ].some((i) => !!i)
+
   await throwConflictIfActionNotAllowed(
     input.eventId,
     input.type,
@@ -258,7 +265,7 @@ export async function defaultRequestHandler(
     token
   )
 
-  // If we get an unexpected failure response, we just return HTTP 500 without saving the
+  // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
@@ -268,12 +275,32 @@ export async function defaultRequestHandler(
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
   if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(
-      eventWithRequestedAction,
-      configuration,
-      input.waitFor
-    )
-    return eventWithRequestedAction
+    if (expectSynchronousResponse) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Confirmation API did not return a synchronous response.'
+      })
+    } else {
+      const eventWithUnassign = await processAction(
+        {
+          eventId: input.eventId,
+          transactionId: input.transactionId,
+          declaration: {},
+          type: ActionType.UNASSIGN,
+          assignedTo: null,
+          waitFor: true
+        },
+        {
+          eventId: event.id,
+          user,
+          token,
+          status: ActionStatus.Accepted,
+          configuration
+        }
+      )
+
+      return eventWithUnassign
+    }
   }
 
   // For Sync flow, we parse the result and merge it with the action input
