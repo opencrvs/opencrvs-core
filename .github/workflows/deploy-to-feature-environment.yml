@@ -42,7 +42,10 @@ jobs:
         id: validate
         uses: ./.github/actions/validate-branch
         with:
-          pattern: '^[a-z][a-z0-9\/\-]{1,44}$'
+          # Dots are allowed so that `release/x.y.z` branches validate. The
+          # stack name is slugified downstream (`[^\w\s-]` is stripped), so a
+          # dot in the branch name never reaches an environment name.
+          pattern: '^[a-z][a-z0-9\/\-\.]{1,44}$'
 
       - name: Check for e2e labels
         id: set_skip_flag
