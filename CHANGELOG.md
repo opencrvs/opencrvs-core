@@ -17,6 +17,10 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### Calling action .accept & .reject endpoints require system user token
+
+Previously it was possible for the countryconfig to call events API using user's token. This required user to be assigned to the event, which allowed two entities to perform actions under same identity. User is unassigned from the event when system returns 202, and system must request system user token to perform accept or reject actions.
+
 #### Registration confirmation no longer uses OAuth token exchange
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.

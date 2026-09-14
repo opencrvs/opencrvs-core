@@ -50,7 +50,7 @@ export type ActionConfirmationRequest = Hapi.Request<ActionConfirmationRefs>
  *
  * - HTTP 202: Defer the decision (asynchronous flow). The action enters a 'Requested' state
  *   until it is later explicitly accepted or rejected. When using this approach, you must
- *   store the token, actionId, eventId and action payload to use with the accept/reject API calls later.
+ *   store the actionId, eventId and action payload to use with the accept/reject API calls later. To call the endpoints you'll need to retrieve system user token. Human users receive 403.
  *
  * For registration actions specifically, when accepting asynchronously, you must provide
  * a registration number as shown in the acceptRequestedRegistration example below.
@@ -84,10 +84,10 @@ export async function onRegisterHandler(
   // return h.response({ reason: 'Rejection reason here' }).code(400)
 
   // OPTION 3: Deferred decision (HTTP 202)
-  // To implement an asynchronous workflow where the decision is made later:
-  // 1. Store the token, eventId, actionId, and action details in your system
+  // 1. Store the eventId, actionId, and action details in your system.
   // 2. Return HTTP 202 to place the action in 'Requested' state
-  // 3. Later call client.event.actions.register.accept.mutate() or client.event.actions.register.reject.mutate()
+  // 3. Request new system token for the specific action.
+  // 4. Later call client.event.actions.register.accept.mutate() or client.event.actions.register.reject.mutate()
   //
   // Below is example of how to defer the confirmation, accepting it after a 10 second delay
   // To defer the confirmation, uncomment the following:
