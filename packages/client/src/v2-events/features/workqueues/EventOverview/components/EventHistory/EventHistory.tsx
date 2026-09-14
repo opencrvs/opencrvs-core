@@ -113,9 +113,7 @@ function getEffectiveStatus(
   action: ActionDocument,
   allActions: Action[]
 ): ActionStatus {
-  const confirmation = allActions.find(
-    (other) => other.originalActionId === action.id
-  )
+  const confirmation = allActions.find((a) => a.originalActionId === action.id)
   return confirmation ? confirmation.status : action.status
 }
 
@@ -123,17 +121,16 @@ function getEffectiveStatus(
  * The accept/reject action that confirmed this action *asynchronously* — a
  * separate confirmation (different transactionId) added after the fact, as an
  * external system does. Returns undefined for directly (synchronously) accepted
- * actions, which have no separate confirmation to reveal.
+ * actions, which have no separate confirmation.
  */
 function getAsyncConfirmation(
   action: ActionDocument,
   allActions: Action[]
 ): ActionDocument | undefined {
   const confirmation = allActions.find(
-    (other) =>
-      other.originalActionId === action.id &&
-      (other.status === ActionStatus.Accepted ||
-        other.status === ActionStatus.Rejected)
+    (a) =>
+      a.originalActionId === action.id &&
+      (a.status === ActionStatus.Accepted || a.status === ActionStatus.Rejected)
   )
   if (confirmation && confirmation.transactionId !== action.transactionId) {
     return confirmation as ActionDocument
