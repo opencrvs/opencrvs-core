@@ -26,8 +26,6 @@ node_selector:
   role: data1
 
 minio:
-  network_policy:
-    ingress_mode: private
   use_default_credentials: false
   {{#if restore_enabled}}
   restore:
@@ -57,10 +55,6 @@ redis:
 
 monitoring:
   enabled: true
-
-kibana:
-  network_policy:
-    ingress_mode: private
 
 elastalert:
   env:
