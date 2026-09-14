@@ -48,12 +48,12 @@ const messages = defineMessages({
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
   },
-  externalValidationBanner: {
+  awaitingConfirmationBanner: {
     defaultMessage:
-      'This action has been initiated, but is still awaiting validation from an external system.',
+      'This action has been initiated, but is still awaiting confirmation from an external system.',
     description:
-      'Banner shown in the action detail dialog when the action is still awaiting external validation',
-    id: 'events.history.externalValidationBanner'
+      'Banner shown in the action detail dialog when the action is still awaiting external confirmation',
+    id: 'events.history.awaitingConfirmationBanner'
   }
 })
 
@@ -123,13 +123,13 @@ const StyledText = styled(Text)`
   margin-left: 8px;
 `
 
-function ExternalValidationBannerComponent() {
+function AwaitingConfirmationBanner() {
   const intl = useIntl()
   return (
     <BannerWrapper>
       <Icon name="PauseCircle" size="small" />
       <StyledText color="orangeDarker" element="span" variant="bold14">
-        {intl.formatMessage(messages.externalValidationBanner)}
+        {intl.formatMessage(messages.awaitingConfirmationBanner)}
       </StyledText>
     </BannerWrapper>
   )
@@ -169,7 +169,7 @@ export function EventHistoryDialog({
       actions={[]}
       banner={
         isWaitingForExternalValidation ? (
-          <ExternalValidationBannerComponent />
+          <AwaitingConfirmationBanner />
         ) : undefined
       }
       id="event-history-modal"
