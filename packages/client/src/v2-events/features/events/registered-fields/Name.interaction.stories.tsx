@@ -137,8 +137,8 @@ function StatefulNameForm(args: FormFieldGeneratorPropsWithoutRef) {
   )
 }
 
-export const InvalidFirstnameShowsInlineError: Story = {
-  name: 'and() validator shows inline error on the firstname input',
+export const InvalidNameShowsInlineErrorOnEverySubfield: Story = {
+  name: 'and() validator shows an inline error on every invalid subfield',
   render: StatefulNameForm,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -147,9 +147,33 @@ export const InvalidFirstnameShowsInlineError: Story = {
     await userEvent.type(firstname, 'Ann@')
     await userEvent.tab()
 
+    // Optional, and still validated once it holds a value.
+    const middlename = await canvas.findByTestId('text__middlename')
+    await userEvent.type(middlename, 'Lee%')
+    await userEvent.tab()
+
+    const surname = await canvas.findByTestId('text__surname')
+    await userEvent.type(surname, 'Smith#')
+    await userEvent.tab()
+
     await expect(
-      await canvas.findByText(INVALID_NAME_MESSAGE)
-    ).toBeInTheDocument()
+      (await canvas.findAllByText(INVALID_NAME_MESSAGE)).length
+    ).toBeGreaterThan(0)
+
+    // Every part is invalid, so every input says so — the user does not have to
+    // fix one, resubmit, and discover the next.
+    await waitFor(async () =>
+      expect(canvas.getAllByText(INVALID_NAME_MESSAGE)).toHaveLength(3)
+    )
+    await expect(
+      canvasElement.querySelector('#firstname_error')
+    ).toHaveTextContent(INVALID_NAME_MESSAGE)
+    await expect(
+      canvasElement.querySelector('#middlename_error')
+    ).toHaveTextContent(INVALID_NAME_MESSAGE)
+    await expect(
+      canvasElement.querySelector('#surname_error')
+    ).toHaveTextContent(INVALID_NAME_MESSAGE)
   }
 }
 
