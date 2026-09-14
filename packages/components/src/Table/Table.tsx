@@ -205,8 +205,8 @@ const TableScroller = styled.div<{
     isFullPage
       ? `calc(100vh - ${offsetTop}px - 180px)`
       : height
-        ? `${height}px`
-        : 'auto'};
+      ? `${height}px`
+      : 'auto'};
 
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth
@@ -241,9 +241,16 @@ const defaultConfiguration = {
   currentPage: 1
 }
 
+export interface ITableRow extends IDynamicValues {
+  /** Background colour applied to the whole row. */
+  rowBackgroundColor?: string
+  /** Click handler for the whole row; its presence makes the row clickable. */
+  onRowClick?: (event: React.MouseEvent) => void
+}
+
 export interface ITableProps {
   id?: string
-  content: IDynamicValues[]
+  content: ITableRow[]
   columns: IColumn[]
   footerColumns?: IFooterFColumn[]
   noResultText?: string
@@ -306,7 +313,7 @@ export const Table = ({
   const getDisplayItems = (
     currentPage: number,
     pageSize: number,
-    allItems: IDynamicValues[]
+    allItems: ITableRow[]
   ) => {
     if (allItems.length <= pageSize) {
       // expect that allItem is already sliced correctly externally
@@ -407,17 +414,9 @@ export const Table = ({
                         horizontalPadding={rowStyle?.horizontalPadding}
                         hideTableBottomBorder={hideTableBottomBorder}
                         columns={columns}
-                        backgroundColor={
-                          typeof item.rowBackgroundColor === 'string'
-                            ? item.rowBackgroundColor
-                            : undefined
-                        }
-                        clickable={typeof item.onRowClick === 'function'}
-                        onClick={
-                          typeof item.onRowClick === 'function'
-                            ? (item.onRowClick as React.MouseEventHandler<HTMLDivElement>)
-                            : undefined
-                        }
+                        backgroundColor={item.rowBackgroundColor}
+                        clickable={Boolean(item.onRowClick)}
+                        onClick={item.onRowClick}
                       >
                         {columns.map((preference, indx) => {
                           return (
