@@ -279,6 +279,19 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      # Chromatic's TurboSnap needs the full history. This used to be done by
+      # bare-cloning opencrvs-core over `.git` after the fact, which only ever
+      # worked in that one repository — anywhere else (a fork, or a private
+      # copy) it fetches the wrong history and then fails on
+      # `git checkout <branch>`, because the branch does not exist there.
+      # Check out this repository instead; the artifact extracted on top adds
+      # the prebuilt outputs, and source files match the current commit so the
+      # overwrites are no-ops.
+      - name: Checkout PR branch (for git history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Download filesystem artifact
         uses: actions/download-artifact@v4.1.8
         with:
@@ -302,18 +315,6 @@ jobs:
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
-
-      - name: Fetch full Git history
-        run: |
-          git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
-          git config --local --bool core.bare false
-          git reset --hard
-          git clean -fd
-          git fetch --prune
-          git checkout ${{ github.head_ref || github.ref_name }}
-          git reset --hard
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Chromatic
         run: yarn run chromatic
