@@ -23,11 +23,7 @@ function mockDeclareApi(status: number) {
   return mswServer.use(
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
-      () =>
-        HttpResponse.json(
-          {},
-          { status }
-        )
+      () => HttpResponse.json({}, { status })
     )
   )
 }
@@ -92,7 +88,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
 })
 
 describe('Async confirmation - keepAssignment flags on accept', () => {
-  test('default: assignment dropped after async accept', async () => {
+  test('default: assignment dropped after request is handled async', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
@@ -101,6 +97,7 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
 
     const data = generator.event.actions.declare(event.id)
     const requestResponse = await client.event.actions.declare.request(data)
+    expect(requestResponse.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
 
     const actionId = getDeclareActionId(requestResponse.actions)
     const ccClient = createCountryConfigClient(user, event.id, actionId)
@@ -111,29 +108,6 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
       transactionId: getUUID()
     })
 
-    expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
-  })
-
-  test('keepAssignment=true: assignment kept after async accept', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockDeclareApi(202)
-
-    const data = generator.event.actions.declare(event.id)
-    const requestResponse = await client.event.actions.declare.request(data)
-
-    const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
-
-    const response = await ccClient.event.actions.declare.accept({
-      ...data,
-      actionId,
-      transactionId: getUUID(),
-      keepAssignment: true
-    })
-
-    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
+    expect(response.actions.at(-1)?.type).toEqual(ActionType.DECLARE)
   })
 })

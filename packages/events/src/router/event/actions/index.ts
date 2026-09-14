@@ -13,7 +13,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -423,7 +423,7 @@ export function getDefaultActionProcedures(
         })
 
         if (existingAction) {
-          return ctx.event
+          return event
         }
 
         if (duplicates.detected) {
@@ -468,6 +468,7 @@ export function getDefaultActionProcedures(
           )
       )
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.requireAssignment)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -536,12 +537,13 @@ export function getDefaultActionProcedures(
           }
         )
       }),
-
     reject: userAndSystemProcedure
       .input(AsyncActionInput)
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
+
         const event = await getEventById(eventId)
         const action = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
@@ -568,9 +570,16 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
+        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
+        const originalCorrectionRequestId =
+          action.type === ActionType.REJECT_CORRECTION
+            ? RejectedCorrectionAction.parse(action).requestId
+            : undefined
+
         return addAsyncRejectAction(
           {
             ...input,
+            requestId: originalCorrectionRequestId,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false
