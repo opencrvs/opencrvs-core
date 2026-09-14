@@ -277,6 +277,12 @@ jobs:
     name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
+    # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
+    # On average, every day we create roughly 7500 - 10000 snapshots per working day
+    # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
+    #
+    # develop and the 2.0.x release branches already carry this same guard.
+    if: false
 
     steps:
       # Chromatic's TurboSnap needs the full history. This used to be done by
