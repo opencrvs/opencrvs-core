@@ -93,10 +93,10 @@ const ConfirmationDetailLabel = styled.div`
  */
 function getStatusSourceAction(
   action: ActionDocument,
-  history: ActionDocument[]
+  allActions: ActionDocument[]
 ): ActionDocument {
   if (action.type === ActionType.REQUEST_CORRECTION) {
-    return findImmediateApproveCorrection(history, action) ?? action
+    return findImmediateApproveCorrection(allActions, action) ?? action
   }
   return action
 }
@@ -475,6 +475,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     )
 
   const history = extractHistoryActions(fullEvent)
+  const allActions = fullEvent.actions as ActionDocument[]
 
   // Each row is an original action; the outcome of its confirmation (accepted,
   // rejected, or still waiting) is surfaced as a status on the row itself, so a
@@ -509,7 +510,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection = findImmediateApproveCorrection(
-          visibleHistory,
+          allActions,
           x
         )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
@@ -562,7 +563,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         })
       }
 
-      const statusSourceAction = getStatusSourceAction(action, history)
+      const statusSourceAction = getStatusSourceAction(action, allActions)
       const effectiveStatus = getEffectiveStatus(
         statusSourceAction,
         fullEvent.actions
@@ -585,7 +586,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         actionConfig && actionConfig.type === ActionType.CUSTOM
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
-              action: getActionTypeForHistory(history, action),
+              action: getActionTypeForHistory(allActions, action),
               // The row shows the original (request) action; label it by the
               // outcome of its confirmation.
               status: effectiveStatus,
