@@ -241,7 +241,7 @@ export type RequestedCorrectionAction = z.infer<
 const ApprovedCorrectionAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION),
-    requestId: z.string(), // TODO move into 'content' property
+    requestId: UUID, // TODO move into 'content' property
     content: z
       .object({ immediateCorrection: z.boolean().optional() })
       .optional()
@@ -251,7 +251,7 @@ const ApprovedCorrectionAction = ActionBase.extend(
 const RejectedCorrectionAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
-    requestId: z.string(), // TODO move into 'content' property
+    requestId: UUID, // TODO move into 'content' property
     content: ReasonContent
   }).shape
 )

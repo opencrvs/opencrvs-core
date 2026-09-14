@@ -57,13 +57,15 @@ export function findImmediateApproveCorrection(
   actions: ActionDocument[],
   requestCorrection: ActionDocument
 ): ActionDocument | undefined {
-  const requestIds = new Set<string>([requestCorrection.id])
+  const requestIds = new Set([requestCorrection.id])
+
   if (requestCorrection.originalActionId) {
     requestIds.add(requestCorrection.originalActionId)
   }
-  for (const candidate of actions) {
-    if (candidate.originalActionId === requestCorrection.id) {
-      requestIds.add(candidate.id)
+
+  for (const a of actions) {
+    if (a.originalActionId === requestCorrection.id) {
+      requestIds.add(a.id)
     }
   }
 
