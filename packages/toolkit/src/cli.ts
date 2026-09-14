@@ -32,7 +32,8 @@ Commands:
   check-translations     Check translation files for completeness
   verify-upgrade         Run every post-upgrade check and report them together
   verify-endpoints       Verify the locally-running country config exposes the
-                         expected endpoints and keeps secured ones locked down
+                         expected endpoints, keeps secured ones locked down and
+                         serves the translations core requires
 
 Run 'opencrvs <command> --help' for more information on a command.
 `.trim()
@@ -63,9 +64,14 @@ Usage: opencrvs verify-endpoints [country-config-url]
 
 Run this after 'opencrvs upgrade', with the upgraded country config running
 locally, to confirm it still behaves correctly. It checks over HTTP that:
-  - required public endpoints exist (respond 2xx), and
+  - required public endpoints exist (respond 2xx),
   - user-notification trigger endpoints are either absent or reject
-    unauthenticated requests (never processed without a token).
+    unauthenticated requests (never processed without a token), and
+  - '/content/client' and '/content/login' serve every message id the country
+    config template of this version carries.
+
+Checking the translations reads the template off GitHub. When GitHub cannot be
+reached the other checks still run and that one is skipped with a warning.
 
 Arguments:
   [country-config-url]   Optional. Domain or URL of the country config
@@ -251,11 +257,6 @@ function handleCheckTranslations() {
     return
   }
 
-  /*
-   * Only options are inspected. This runs from lint-staged, which appends the
-   * staged filenames to the command, and the check always covers the whole
-   * package rather than a file list.
-   */
   const unknownFlags = checkArgs.filter(
     (arg) => arg.startsWith('-') && !['--write', '--outdated'].includes(arg)
   )

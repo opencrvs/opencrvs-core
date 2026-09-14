@@ -48,7 +48,7 @@ jobs:
               - If it's a breaking change, include a migration guide answering "What do I need to do to upgrade?".
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -130,7 +130,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -210,7 +210,7 @@ jobs:
 
       - name: Setup pnpm
         if: steps.check-scripts.outputs.skip != 'true'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         if: steps.check-scripts.outputs.skip != 'true'
@@ -309,7 +309,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -346,7 +346,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -406,7 +406,7 @@ jobs:
           path: .
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -461,7 +461,7 @@ jobs:
           path: .
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -512,7 +512,7 @@ jobs:
           path: .
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -556,7 +556,7 @@ jobs:
           path: .
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -591,7 +591,7 @@ jobs:
           path: pr
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           package_json_file: pr/package.json
 
@@ -652,7 +652,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6

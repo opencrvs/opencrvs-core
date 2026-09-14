@@ -213,6 +213,20 @@ export const goToSection = async (
   }
 }
 
+/**
+ * Saves a declaration that's still being filled out as a draft, via the
+ * form's own `Save & Exit` button - not `triggerDeclarationAction`, which is
+ * for actions on a record that's already been opened from a workqueue.
+ */
+export async function saveAndExit(page: Page) {
+  await page.getByRole('button', { name: 'Save & Exit' }).click()
+  const draftResponse = page.waitForResponse(
+    (res) => res.url().includes('event.draft.create') && res.ok()
+  )
+  await page.getByRole('button', { name: 'Confirm' }).click()
+  await draftResponse
+}
+
 /*
   Generates a random past date
   at least 'minAge' years + 'offset' days ago

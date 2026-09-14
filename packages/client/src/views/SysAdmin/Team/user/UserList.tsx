@@ -711,13 +711,7 @@ function UserListComponent({ userDetails }: UserListProps) {
           >
             {intl.formatMessage(
               messages.sendUsernameReminderInviteModalMessage,
-              {
-                recipient:
-                  deliveryMethod === 'sms'
-                    ? toggleUsernameReminder.selectedUser?.mobile
-                    : toggleUsernameReminder.selectedUser?.email,
-                deliveryMethod
-              }
+              { deliveryMethod }
             )}
           </Dialog>
           <Dialog
@@ -750,11 +744,7 @@ function UserListComponent({ userDetails }: UserListProps) {
             ]}
           >
             {intl.formatMessage(messages.resetUserPasswordModalMessage, {
-              deliveryMethod,
-              recipient:
-                deliveryMethod === 'sms'
-                  ? toggleResetPassword.selectedUser?.mobile
-                  : toggleResetPassword.selectedUser?.email
+              deliveryMethod
             })}
           </Dialog>
         </UserTable>

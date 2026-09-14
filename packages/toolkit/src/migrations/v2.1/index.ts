@@ -12,6 +12,7 @@ import { main as addExplicitCorrectionFlags } from './add-explicit-correction-fl
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
 import { main as addTranslations } from './add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
+import { main as renameTriggerPaths } from './rename-trigger-paths'
 
 export interface UpgradeResult {
   /**
@@ -35,6 +36,7 @@ export async function runUpgrade(): Promise<UpgradeResult> {
   const outstanding: string[] = []
 
   outstanding.push(...(await addExplicitCorrectionFlags()))
+  await renameTriggerPaths()
   outstanding.push(...(await addRecoveryLinkNotifications()))
   outstanding.push(...(await addTranslations()))
   outstanding.push(...(await enableTelemetry()))

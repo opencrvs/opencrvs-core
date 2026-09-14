@@ -303,7 +303,7 @@ test('Does not trigger username change when name is not provided', async () => {
   const mock = vi.fn()
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/user-updated`,
       async ({ request }) => {
         const req = await request.json()
         mock(req)
@@ -367,7 +367,7 @@ test('Changes username when the name changes and notifies about it', async () =>
   const mock = vi.fn()
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/user/user-updated`,
       async ({ request }) => {
         const req = await request.json()
         mock(req)
@@ -812,7 +812,30 @@ test('clears all drafts when primaryOfficeId changes via user.update', async () 
   expect(await draftClient.event.draft.list()).toHaveLength(0)
 })
 
-test('preserves drafts when primaryOfficeId stays the same via user.update', async () => {
+test('clears all drafts when role changes via user.update', async () => {
+  const { user, generator } = await setupTestCase()
+  const adminClient = createTestClient(user, [USER_EDIT_SCOPE])
+  const draftClient = createTestClient(user)
+
+  const event = await draftClient.event.create(generator.event.create())
+  await draftClient.event.draft.create({
+    eventId: event.id,
+    type: 'DECLARE',
+    status: 'Accepted',
+    transactionId: 'test-transaction-id'
+  })
+
+  expect(await draftClient.event.draft.list()).toHaveLength(1)
+
+  await adminClient.user.update({
+    ...generateUpdateInput(user),
+    role: 'some-other-role'
+  })
+
+  expect(await draftClient.event.draft.list()).toHaveLength(0)
+})
+
+test('preserves drafts when neither primaryOfficeId nor role changes via user.update', async () => {
   const { user, generator } = await setupTestCase()
   const adminClient = createTestClient(user, [USER_EDIT_SCOPE])
   const draftClient = createTestClient(user)

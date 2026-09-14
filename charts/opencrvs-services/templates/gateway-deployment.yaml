@@ -21,6 +21,9 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}
@@ -110,6 +113,8 @@ spec:
           name: public-key
 
 {{- include "service-account-helper" (dict "service_name" "gateway" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "gateway" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "gateway" "Values" .Values) }}
 

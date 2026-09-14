@@ -6,14 +6,14 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "4"
   labels:
-    app: elasticsearch-reindex
+    app: deployment-jobs
   name: elasticsearch-reindex
   namespace: {{ .Release.Namespace }}
 spec:
   template:
     metadata:
       labels:
-        app: elasticsearch-reindex
+        app: deployment-jobs
     spec:
       {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
@@ -24,4 +24,7 @@ spec:
       restartPolicy: "OnFailure"
       volumes:
       {{- include "elasticsearch-reindex.volumes" . | nindent 8 }}
+
+{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
+
 {{- end }}

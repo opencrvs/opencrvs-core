@@ -96,27 +96,29 @@ function getLatestCommonReleaseTag() {
 }
 
 /**
- * A prerelease-shaped own version (e.g. "2.1.0-rc.f5ea803", what npm resolves
- * `@next` to - a build published from every push to a branch) never has a
- * matching release tag, so it's resolved as a branch instead. Its base
- * version (stripped of the "-rc.<sha>" suffix) tells apart two different
- * situations: an RC for a version already being stabilized on its own
- * "release/X.Y.Z" branch (e.g. "2.0.1-rc.*" while a patch release is in
- * progress) versus an RC for a version that hasn't been branched off yet and
- * only exists on develop (e.g. "2.1.0-rc.*" while that release branch hasn't
- * been cut). Scaffold from the release branch when it exists in both
- * repositories, otherwise fall back to develop.
+ * Resolves the ref that both repositories are cloned from. A single ref
+ * clones both, so every candidate must exist in *both* - a tag present in
+ * only one of them can't be used.
  *
- * Otherwise, the own "X.Y.Z" version - whether resolved via npm's `latest`
- * dist-tag (bare invocation) or an explicit `@X.Y.Z` pin - scaffolds from the
- * matching "vX.Y.Z" tag when it exists in both repositories. If it doesn't
- * (e.g. `latest` lagging behind the repos, or a pin that predates one repo's
- * tagging), fall back to the highest release tag common to both, rather than
- * a mismatched pairing of one tagged repo at that version and another repo
- * at a different release. Exits with an error if no matching release tag
- * exists in both repositories.
+ * The exact "v<version>" tag wins whenever it exists: it pins a commit, so
+ * a release, an explicit `@X.Y.Z` pin, or a blessed prerelease (npm `@beta`,
+ * published from that tag) reproduces however late it's scaffolded.
+ *
+ * Otherwise a prerelease falls back to a branch, since a rolling release
+ * candidate (npm `@next`) is never tagged: "release/X.Y.Z" of the base
+ * version when that release has been cut, otherwise develop. A release
+ * falls back to the highest tag common to both repositories - never a
+ * mismatched pairing of the two at different releases - or errors.
  */
 function resolveRef() {
+  const versionTag = 'v' + version
+  if (
+    tagExists(CORE_REPO_URL, versionTag) &&
+    tagExists(INFRASTRUCTURE_REPO_URL, versionTag)
+  ) {
+    return versionTag
+  }
+
   if (version.includes('-')) {
     const releaseBranch = 'release/' + version.split('-')[0]
     if (
@@ -128,19 +130,11 @@ function resolveRef() {
     return 'develop'
   }
 
-  const tag = 'v' + version
-  if (
-    tagExists(CORE_REPO_URL, tag) &&
-    tagExists(INFRASTRUCTURE_REPO_URL, tag)
-  ) {
-    return tag
-  }
-
   const latestCommonTag = getLatestCommonReleaseTag()
   if (latestCommonTag) {
     console.warn(
       '\nWarning: tag "' +
-        tag +
+        versionTag +
         '" was not found in both repositories; falling back to the latest ' +
         'available release, ' +
         latestCommonTag +
@@ -162,13 +156,43 @@ function resolveRef() {
  * @param {*} param0 repository - The repository to clone (e.g., 'opencrvs/opencrvs-core').
  * @param {*} param0 repositorySubPath - The subpath within the repository to clone (optional). Otherwise the entire repository will be cloned.
  * @param {*} param0 branch - The branch to clone (optional). Defaults to the default branch if not specified.
+ * @param {*} param0 keepHistory - Keep the repository's git history instead of degit's usual history-free copy (optional, defaults to false). The cloned "origin" remote is replaced with "upstream", leaving the directory ready for the user to add their own fork/repo as "origin". Not supported together with repositorySubPath, since a plain git clone can't fetch a single subdirectory.
  *
  * @param {*} targetDir - The target directory where the repository will be cloned.
  */
 async function cloneRepository(
-  { repository, repositorySubPath, branch },
+  { repository, repositorySubPath, branch, keepHistory = false },
   targetDir
 ) {
+  if (keepHistory && repositorySubPath) {
+    throw new Error(
+      'cloneRepository: keepHistory is not supported together with repositorySubPath.'
+    )
+  }
+
+  if (keepHistory) {
+    const repoUrl = `https://github.com/${repository}.git`
+    console.log(
+      `Cloning repository from ${repoUrl}#${branch} to ${targetDir}...`
+    )
+
+    execSync('git clone --branch ' + branch + ' ' + repoUrl + ' ' + targetDir, {
+      stdio: 'inherit'
+    })
+
+    console.log(
+      `Copied files from ${repoUrl}#${branch} to ${targetDir} succesfully.`
+    )
+
+    console.log(`Replacing 'origin' remote with 'upstream' in ${targetDir}...`)
+    execSync('git remote remove origin', { cwd: targetDir, stdio: 'inherit' })
+    execSync('git remote add upstream ' + repoUrl, {
+      cwd: targetDir,
+      stdio: 'inherit'
+    })
+    return
+  }
+
   const repositoryPath = joinValues([repository, repositorySubPath], '/')
   const fullPath = joinValues([repositoryPath, branch], '#')
 
@@ -424,7 +448,7 @@ async function main() {
 
   try {
     await cloneRepository(
-      { repository: INFRASTRUCTURE_REPOSITORY, branch: ref },
+      { repository: INFRASTRUCTURE_REPOSITORY, branch: ref, keepHistory: true },
       infrastructureTargetPath
     )
   } catch (err) {
@@ -450,7 +474,12 @@ async function main() {
   console.log('  tilt up\n')
   console.log('To get started with the infrastructure:\n')
   console.log('  cd ' + infrastructureDirName)
-  console.log('  git init\n')
+  console.log('  git remote add origin <your-infrastructure-repo-url>')
+  console.log('  git push -u origin ' + ref + '\n')
+  console.log(
+    'The "upstream" remote points at the official infrastructure repository, ' +
+      'so you can pull future releases with `git fetch upstream`.\n'
+  )
 }
 
 main()

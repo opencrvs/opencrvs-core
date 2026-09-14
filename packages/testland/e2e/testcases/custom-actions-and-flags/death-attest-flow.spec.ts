@@ -9,7 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { getToken, login, validateActionMenuButton } from '@e2e/support/helpers'
+import {
+  drawSignature,
+  getToken,
+  login,
+  switchEventTab,
+  triggerDeclarationAction,
+  validateActionMenuButton
+} from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
   ensureAssignedToUser,
@@ -125,5 +132,54 @@ test('Death notified at a health facility is held for attestation, then reaches 
 
     await navigateToWorkqueue(page, 'Notifications')
     await expect(page.getByRole('button', { name })).toBeVisible()
+  })
+
+  let notifiedSignatureSrc: string | null = null
+
+  await test.step('Registrar notes the signature captured at notification', async () => {
+    await openRecordByTitle(page, name)
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+
+    await switchEventTab(page, 'Record')
+    notifiedSignatureSrc = await page
+      .getByAltText('Signature preview')
+      .first()
+      .getAttribute('src')
+    expect(notifiedSignatureSrc).toBeTruthy()
+  })
+
+  await test.step('Registrar edits the record and draws a new signature', async () => {
+    await switchEventTab(page, 'Summary')
+    await selectAction(page, 'Edit')
+
+    // Replace the informant signature on the review page.
+    await page.getByRole('button', { name: 'Delete', exact: true }).click()
+    await page.getByRole('button', { name: 'Sign', exact: true }).click()
+    await drawSignature(page, 'review____signature_canvas_element', false)
+    await page
+      .locator('#review____signature_modal')
+      .getByRole('button', { name: 'Apply' })
+      .click()
+    await expect(page.getByRole('dialog')).not.toBeVisible()
+
+    await triggerDeclarationAction(page, 'Register with edits')
+  })
+
+  await test.step('Record tab shows the edited signature, not the notified one', async () => {
+    await navigateToWorkqueue(page, 'Pending certification')
+    await openRecordByTitle(page, name)
+    await expect(page.getByTestId('status-value')).toHaveText('Registered')
+
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await switchEventTab(page, 'Record')
+
+    const registeredSignatureSrc = await page
+      .getByAltText('Signature preview')
+      .first()
+      .getAttribute('src')
+    expect(registeredSignatureSrc).toBeTruthy()
+    // The edited signature is a freshly uploaded file, so its path differs from
+    // the one captured at notification.
+    expect(registeredSignatureSrc).not.toEqual(notifiedSignatureSrc)
   })
 })

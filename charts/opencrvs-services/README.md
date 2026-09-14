@@ -247,6 +247,16 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.</td>
         </tr>
         <tr>
+            <td>ingress.admin_console_allowlist</td>
+            <td>[]</td>
+            <td>Source IP ranges (CIDR) allowed to reach the Metabase dashboards console, enforced via a Traefik <code>ipAllowList</code> middleware. Leave empty to leave it publicly reachable - see "Hardening" in this README.</td>
+        </tr>
+        <tr>
+            <td>ingress.application_allowlist</td>
+            <td>[]</td>
+            <td>Source IP ranges (CIDR) allowed to reach the whole application (client, login, gateway, countryconfig), enforced via a Traefik <code>ipAllowList</code> middleware. Unlike <code>admin_console_allowlist</code>, this gates every public entry point, not just admin consoles. <code>admin_console_allowlist</code> is always merged in. Leave empty to leave the application publicly reachable - see "Hardening" in this README.</td>
+        </tr>
+        <tr>
             <td>service_type</td>
             <td>{}</td>
             <td>Kubernetes service type. See <a href="https://kubernetes.io/docs/concepts/services-networking/service/">kubernetes documentation</a> for more information on service types</td>
@@ -310,6 +320,56 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>platform.imagePullPolicy</td>
         <td>-</td>
         <td>Default <code>imagePullPolicy</code> applied to all OpenCRVS service containers. Leave unset to use Kubernetes' own tag-based default (<code>IfNotPresent</code> for versioned tags, <code>Always</code> for <code>:latest</code>). Environments deploying a floating tag (e.g. <code>develop</code>) should set this to <code>Always</code>, otherwise nodes keep serving whatever image was first cached under that tag. Can be overridden at service level.</td>
+        </tr>
+        <tr>
+            <th>NetworkPolicy configuration</th>
+            <th></th>
+            <th>Optional Kubernetes NetworkPolicy resources for OpenCRVS workloads.</th>
+        </tr>
+        <tr>
+            <td>network_policy.enabled</td>
+            <td>true</td>
+            <td>Render NetworkPolicy resources. Requires a CNI provider that enforces NetworkPolicy — set to false on clusters without one.</td>
+        </tr>
+        <tr>
+            <td>network_policy.ingress_mode</td>
+            <td>deny</td>
+            <td>Baseline policy for ingress to OpenCRVS pods: <code>deny</code> (default, requires another NetworkPolicy to allow it), <code>private</code> (allow only RFC1918 private ranges), or <code>full</code> (unrestricted).</td>
+        </tr>
+        <tr>
+            <td>network_policy.egress_mode</td>
+            <td>private</td>
+            <td>Baseline policy for egress from OpenCRVS pods. Same modes as <code>ingress_mode</code>, applied to egress instead (DNS on TCP/UDP 53 stays allowed except in <code>full</code> mode). Defaults to <code>private</code> rather than <code>deny</code> so pods can reach the dependencies chart and other in-VPC services without every deployment having to enumerate <code>allowed_namespaces</code> up front; services needing real internet (e.g. <code>countryconfig</code>) opt out individually via their own <code>network_policy.egress_mode: full</code> — see "Hardening" in this README.</td>
+        </tr>
+        <tr>
+            <td>network_policy.allow_same_namespace</td>
+            <td>true</td>
+            <td>Allow OpenCRVS pods in the release namespace to communicate with each other.</td>
+        </tr>
+        <tr>
+            <td>network_policy.allowed_namespaces</td>
+            <td>[]</td>
+            <td>List of namespaces OpenCRVS pods are allowed to reach. Only takes effect when <code>egress_mode</code> is not <code>full</code>. Grants egress on any port to every pod in each listed namespace (e.g. the dependencies chart's namespace) — see "Hardening" in this README.</td>
+        </tr>
+        <tr>
+            <td>network_policy.annotations / labels</td>
+            <td>{}</td>
+            <td>Extra annotations/labels applied to the <code>metadata</code> of every generated NetworkPolicy (not the <code>podSelector</code>). Overridable per service via <code>&lt;service&gt;.network_policy.annotations</code>/<code>.labels</code>, which in turn can be overridden per rule via <code>annotations</code>/<code>labels</code> on an entry in <code>rules</code>/<code>custom_rules</code>.</td>
+        </tr>
+        <tr>
+            <td>&lt;service&gt;.network_policy.rules</td>
+            <td>[]</td>
+            <td>Chart-provided service-specific NetworkPolicy rules. Rules use Kubernetes NetworkPolicy spec syntax, except <code>podSelector</code> is generated from <code>app_label</code>.</td>
+        </tr>
+        <tr>
+            <td>&lt;service&gt;.network_policy.custom_rules</td>
+            <td>[]</td>
+            <td>Operator-provided service-specific NetworkPolicy rules appended to chart-provided rules.</td>
+        </tr>
+        <tr>
+            <td>&lt;service&gt;.network_policy.ingress_mode / egress_mode</td>
+            <td>deny</td>
+            <td>Same <code>deny</code>/<code>private</code>/<code>full</code> modes as the global flags, applied per service instead of writing an ingress/egress rule under <code>rules</code>/<code>custom_rules</code>. For ingress, <code>private</code>/<code>full</code> accept from RFC1918 ranges/any source respectively, scoped to the service's own <code>port</code>; renders nothing if <code>port</code> is not set, rather than silently opening every port. For egress, <code>private</code>/<code>full</code> accept to RFC1918 ranges/any destination on any port, since a service's own port doesn't describe what it calls out to. Independent of the global <code>network_policy.ingress_mode</code>/<code>egress_mode</code>, which control whether the chart-wide baseline policies are rendered at all — <code>countryconfig</code> uses <code>egress_mode: full</code> to keep public-internet egress for its SMTP/SMS integrations regardless of the global mode.</td>
         </tr>
         <tr>
             <th>Common Service properties</th>
@@ -539,6 +599,128 @@ auth:
   service_account:
     name: existing-auth-service-account
 ```
+
+# Network Policies
+
+NetworkPolicy resources require a CNI provider that enforces Kubernetes
+NetworkPolicy — set `network_policy.enabled=false` on clusters without one.
+
+When `network_policy.enabled=true`, the chart can render (resource names are
+prefixed with the Helm release name, e.g. `<release>-default-deny`, so
+multiple releases in the same namespace don't collide):
+
+- `<release>-default-deny`, which denies ingress and/or egress for OpenCRVS workloads, per `ingress_mode`/`egress_mode`.
+- `<release>-allow-private-ingress`/`<release>-allow-private-egress`, when `ingress_mode`/`egress_mode` is `private`, allowing traffic to/from RFC1918 private ranges only.
+- `<release>-allow-same-namespace`, which allows OpenCRVS pods in the same namespace to communicate with each other.
+- `<release>-allow-egress-namespaces`, when `network_policy.allowed_namespaces` is set and `egress_mode` is not `full`, which allows egress on any port to every pod in each listed namespace.
+- `<release>-allow-dns`, which allows egress to any DNS server on TCP and UDP port 53, unless `egress_mode` is `full`.
+- Service-specific policies from `<service>.network_policy.rules` and `<service>.network_policy.custom_rules`.
+- An ingress and/or egress policy for a service, when `<service>.network_policy.ingress_mode`/`egress_mode` is set to `private` or `full`.
+
+`network_policy.ingress_mode`/`egress_mode` each take one of three values:
+
+- `deny` — nothing is allowed beyond same-namespace/`allowed_namespaces`/per-service rules. Default for `ingress_mode`.
+- `private` — additionally allow traffic to/from RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), blocking the public internet either way. Default for `egress_mode`.
+- `full` — no baseline policy at all; unrestricted.
+
+Rules under `custom_rules` are appended to chart-provided `rules`, so operators can
+add site-specific ingress or egress without replacing service defaults.
+
+`<service>.network_policy.ingress_mode`/`egress_mode` are a shortcut for opting
+one service into `private` or `full` access, without writing an ingress/egress
+rule under `rules`/`custom_rules`. For ingress, `private`/`full` accept traffic
+from RFC1918 ranges/any source respectively, scoped to the service's own `port`
+value; it renders nothing if `port` is not set, rather than silently opening
+every port. For egress, `private`/`full` accept traffic to RFC1918 ranges/any
+destination on any port, since a service's own port doesn't describe what it
+calls out to. Both are independent of the global `network_policy.ingress_mode`/
+`egress_mode`, which control whether the chart-wide baseline policies are
+rendered at all.
+
+`client`, `gateway` and `login` are the OpenCRVS entry points reached directly by
+end users and external clients, so their `allow-ingress` rule intentionally accepts
+traffic from any namespace or client on their service port, rather than being
+scoped to a specific source namespace. `countryconfig` and `dashboards` remain
+scoped to ingress from the `traefik` namespace only.
+
+## Hardening
+
+`ingress_mode` defaults to `deny` and `egress_mode` defaults to `private` —
+OpenCRVS pods can reach RFC1918 private destinations (the dependencies chart,
+other in-VPC services) but not the public internet, without every deployment
+having to enumerate `allowed_namespaces` up front. `countryconfig` is the one
+service that genuinely needs public internet by default (SMTP and SMS gateway
+integrations point at arbitrary external hosts configured via env vars/secrets,
+not fixed IPs a private-range rule could cover), so it carries its own
+`network_policy.egress_mode: full` regardless of the global `egress_mode`.
+
+For a fully locked-down deployment, set `egress_mode: deny` and list every
+namespace OpenCRVS pods actually need in `allowed_namespaces` — otherwise auth,
+gateway, events, etc. lose access to Postgres, Elasticsearch, MinIO and Redis
+the moment the private-range baseline goes away too.
+
+The dependencies chart and this chart are typically deployed to separate namespaces
+(see the default `*.host` values in `values.yaml`, e.g.
+`redis-0.redis.opencrvs-deps-dev.svc.cluster.local`), so at minimum that namespace
+must be listed. `allowed_namespaces` is the egress-side counterpart to
+`network_policy.allowed_namespaces` in the dependencies chart, which must separately
+list this chart's namespace to grant the matching ingress — both sides need setting
+for traffic to actually flow.
+
+```yaml
+network_policy:
+  egress_mode: deny
+  allowed_namespaces:
+    - opencrvs-deps-production
+    - traefik
+```
+
+`allowed_namespaces` grants egress on **any port** to every pod in each listed
+namespace — it's a namespace-level trust boundary, not a per-service/per-port
+allowlist. If you need tighter control over what a specific service can reach,
+add a scoped `custom_rules` entry for that service instead (see the `rules` example
+above) and leave `allowed_namespaces` empty. The same applies to `countryconfig`:
+if its blanket `egress_mode: full` is broader than you'd like, replace it with a
+`custom_rules` entry scoped to your specific SMTP/SMS provider IPs instead.
+
+### Service connections
+
+Applies once `network_policy.enabled: true`. Every OpenCRVS pod always accepts traffic from its own namespace (`allow_same_namespace`). With the default `egress_mode: private`, egress is also allowed to DNS (53) and any RFC1918 private range; `countryconfig` additionally has unrestricted egress. The table below shows what each service allows **beyond** that baseline, per its current `values.yaml` configuration:
+
+| Service                                                                                                                                                           | Port             | Extra ingress                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------- |
+| client, gateway, login                                                                                                                                            | 3000, 7070, 3020 | any source (`rules: allow-ingress`) — public entry points |
+| countryconfig                                                                                                                                                     | 3040             | `traefik` namespace only (`rules: from-traefik`)          |
+| dashboards (disabled by default)                                                                                                                                  | 4444             | `traefik` namespace only (`rules: from-traefik`)          |
+| auth, config, documents, events, migration, data-migration-analytics, data-cleanup, data-seed, elasticsearch-on-deploy, elasticsearch-reindex, postgres-on-deploy | —                | —                                                         |
+
+Only `countryconfig` defines an extra egress rule (`network_policy.egress_mode: full` — unrestricted, for its SMTP/SMS integrations); every other service relies solely on the shared `egress_mode`/`allowed_namespaces` baseline above to reach the dependencies chart.
+
+### Restricting application access
+
+`network_policy` only governs traffic between pods inside the cluster — it has no effect on public traffic arriving through Traefik. For deployments that want to allow only a known set of source IP ranges (e.g. the deploying country's own IP space) to reach the application at all — cutting off most automated/opportunistic attacks without requiring a VPN — set `ingress.application_allowlist` to those CIDR ranges. This attaches a Traefik `ipAllowList` middleware to every public route (`client`, `login`, `gateway`, `countryconfig`) and requires no additional infrastructure:
+
+```yaml
+ingress:
+  application_allowlist:
+    - 203.0.113.0/24
+```
+
+This is a plain IP allowlist, not geo-aware — it admits any request from the listed ranges regardless of where it actually originates, and rejects everything else regardless of origin. True country-level geoblocking would need a Traefik plugin or a CDN/WAF in front of the cluster.
+
+`ingress.admin_console_allowlist` (see below) is always merged into this list, so an IP trusted for the admin consoles is never accidentally locked out of the application itself — it doesn't need repeating in `application_allowlist`.
+
+### Restricting admin consoles
+
+Similarly, the Metabase dashboards console (and, in the dependencies chart, the MinIO console and Kibana) are admin consoles reachable by anyone who can resolve their hostname. Set `ingress.admin_console_allowlist` to the CIDR ranges that should be allowed to reach these consoles (e.g. office/VPN egress IPs) — this can stay narrower than `application_allowlist`, since admin consoles usually only need to be reachable by ops staff rather than the whole country:
+
+```yaml
+ingress:
+  admin_console_allowlist:
+    - 203.0.113.0/24
+```
+
+Set the same key in the dependencies chart's `values.yaml` to also restrict the MinIO console and Kibana (the MinIO S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
 
 # Authentication configuration
 

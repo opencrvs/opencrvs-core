@@ -49,6 +49,7 @@ export const FileInputWithOptionTest: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`events/123-kalsnk-213/`}
             fields={[
               {
                 id: 'storybook.file',
@@ -186,6 +187,7 @@ export const FileInputButton: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`events/123-kalsnk-213/`}
             fields={[
               {
                 id: 'storybook.file',
@@ -279,6 +281,7 @@ export const FileInputPdfWithPreview: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`events/123-kalsnk-213/`}
             fields={[
               {
                 id: 'storybook.file',
@@ -413,6 +416,7 @@ export const FileInputButtonMaxImage: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`events/123-kalsnk-213/`}
             fields={[
               {
                 id: 'storybook.file',

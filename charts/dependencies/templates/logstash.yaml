@@ -68,4 +68,6 @@ spec:
       - name: logstash-configmap
         configMap:
           name: logstash-configmap
+
+{{ include "network-policy-rules" (dict "service_name" "logstash" "Values" .Values) }}
 {{- end }}

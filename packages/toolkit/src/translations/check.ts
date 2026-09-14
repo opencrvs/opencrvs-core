@@ -77,6 +77,9 @@ function messagesDeclaredIn(cwd: string) {
   project.addSourceFilesAtPaths([
     path.join(cwd, 'src/**/*.ts'),
     path.join(cwd, 'src/**/*.tsx'),
+    // This file builds a `{ id, defaultMessage }` of its own out of what it
+    // finds, and would otherwise report itself as declaring a dynamic id.
+    `!${path.join(cwd, 'src/check-translations.ts')}`,
     `!${path.join(cwd, 'src/**/*.test.ts')}`,
     `!${path.join(cwd, 'src/**/*.test.tsx')}`,
     `!${path.join(cwd, 'src/**/*.stories.ts')}`,

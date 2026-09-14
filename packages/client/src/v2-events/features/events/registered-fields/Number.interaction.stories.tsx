@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
+import { expect, waitFor } from 'storybook/test'
 import { userEvent, within } from 'storybook/test'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
@@ -87,7 +87,7 @@ export const IntegerBlocksDecimal: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, '12.6')
     input.blur()
-    await expect(input).toHaveValue(126)
+    await expect(input).toHaveValue('126')
   }
 }
 
@@ -109,7 +109,7 @@ export const IntegerBlocksExponent: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, '1e2')
     input.blur()
-    await expect(input).toHaveValue(12)
+    await expect(input).toHaveValue('12')
   }
 }
 
@@ -131,7 +131,206 @@ export const DecimalAllowsDecimal: Story = {
     await userEvent.clear(input)
     await userEvent.type(input, '12.6')
     input.blur()
-    await expect(input).toHaveValue(12.6)
+    await expect(input).toHaveValue('12.6')
+  }
+}
+
+const positiveIntegerFields = [
+  {
+    id: 'storybook.number',
+    type: FieldType.NUMBER,
+    label: { ...integerLabel, defaultMessage: 'Positive integer' },
+    configuration: { integer: true, min: 0 }
+  }
+]
+
+export const IntegerBlocksAlphabetic: Story = {
+  name: 'Integer blocks alphabetic (abc)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator {...args} fields={integerFields} id="my-form" />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, 'abc')
+    await expect(input).toHaveValue('')
+  }
+}
+
+export const DecimalBlocksAlphabetic: Story = {
+  name: 'Decimal blocks alphabetic (1a.b2)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator {...args} fields={decimalFields} id="my-form" />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, '1a.b2')
+    input.blur()
+    await expect(input).toHaveValue('1.2')
+  }
+}
+
+export const PositiveIntegerBlocksNegative: Story = {
+  name: 'min 0 blocks negative (-5 -> 5)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={positiveIntegerFields}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, '-5')
+    input.blur()
+    await expect(input).toHaveValue('5')
+  }
+}
+
+export const DecimalAllowsNegative: Story = {
+  name: 'Default allows negative (-1.5)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator {...args} fields={decimalFields} id="my-form" />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, '-1.5')
+    input.blur()
+    await expect(input).toHaveValue('-1.5')
+  }
+}
+
+const cappedIntegerFields = [
+  {
+    id: 'storybook.number',
+    type: FieldType.NUMBER,
+    label: { ...integerLabel, defaultMessage: 'Capped integer' },
+    configuration: { integer: true, min: 0, max: 120 }
+  }
+]
+
+export const MaxRejectsLargerValue: Story = {
+  name: 'max 120 rejects 150 (-> 15)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={cappedIntegerFields}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, '150')
+    input.blur()
+    await expect(input).toHaveValue('15')
+  }
+}
+
+export const DecimalClearsLoneMinusRepeatedly: Story = {
+  name: 'Lone - clears on every blur',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator {...args} fields={decimalFields} id="my-form" />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, '-')
+    input.blur()
+    await waitFor(async () => {
+      await expect(input).toHaveValue('')
+    })
+
+    // The second round commits the same undefined, so nothing but the blur
+    // itself can clear the input.
+    await userEvent.click(input)
+    await userEvent.type(input, '-')
+    input.blur()
+    await waitFor(async () => {
+      await expect(input).toHaveValue('')
+    })
+  }
+}
+
+export const DecimalNormalisesTrailingSeparator: Story = {
+  name: 'Trailing separator normalises on every blur (12. -> 12)',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator {...args} fields={decimalFields} id="my-form" />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const input = await canvas.findByTestId('number__storybook____number')
+    await userEvent.clear(input)
+    await userEvent.type(input, '12.')
+    input.blur()
+    await waitFor(async () => {
+      await expect(input).toHaveValue('12')
+    })
+
+    await userEvent.click(input)
+    await userEvent.type(input, '.')
+    input.blur()
+    await waitFor(async () => {
+      await expect(input).toHaveValue('12')
+    })
   }
 }
 

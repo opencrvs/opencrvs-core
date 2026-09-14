@@ -8,12 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { css } from 'styled-components'
+import { css, FlattenSimpleInterpolation } from 'styled-components'
 
-/** Colours and fonts here approximate the v4 tokens; they are realigned to Figma separately. */
-
-/** The leading slot holds a 40px avatar or icon, plus its gap to the label. */
-export const START_COLUMN_WIDTH = '52px'
+export const START_COLUMN_WIDTH = '44px'
 
 /**
  * The trailing gutter is reserved for the whole table, so the value columns sit
@@ -21,7 +18,7 @@ export const START_COLUMN_WIDTH = '52px'
  */
 export const ACTIONS_COLUMN_WIDTH = '96px'
 
-const stackedBelow = (styles: ReturnType<typeof css>) => css`
+const stackedBelow = (styles: FlattenSimpleInterpolation) => css`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${styles}
   }
@@ -63,6 +60,8 @@ export const row = css`
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: start;
+    padding: 16px 0;
+    row-gap: 4px;
   `)}
 `
 
@@ -87,6 +86,11 @@ const cell = css`
   vertical-align: top;
   text-align: left;
   word-wrap: anywhere;
+
+  ${stackedBelow(css`
+    padding-top: 0;
+    padding-bottom: 0;
+  `)}
 `
 
 export const startCell = css`
@@ -109,7 +113,6 @@ export const labelCell = css`
   ${stackedBelow(css`
     display: block;
     width: 100%;
-    padding-bottom: 0;
     grid-column: 2;
     grid-row: 1;
   `)}
@@ -132,7 +135,6 @@ export const valueCell = css`
     justify-content: space-between;
     gap: 16px;
     width: 100%;
-    padding-top: 8px;
     grid-column: 2;
   `)}
 `

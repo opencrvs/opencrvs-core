@@ -99,6 +99,9 @@ kind: Job
 {{- end }}
 metadata:
   name: postgres-restore
+  labels:
+    app: backup-runner
+    job-type: restore
 spec:
   {{- if .Values.restore.cronjob }}
   schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
@@ -109,6 +112,10 @@ spec:
     spec:
   {{- end }}
       template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: restore
         spec:
           {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
           serviceAccountName: backup-runner
@@ -138,7 +145,7 @@ spec:
                   kubectl exec postgres-restore-runner -- \
                     rm -rf /var/lib/postgresql/data/*
                   kubectl exec postgres-restore-runner -- \
-                    pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" restore --delta --force || exit 1
+                    su postgres -c 'pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" restore --delta --force' || exit 1
                   kubectl scale statefulset postgres --replicas=1
               volumeMounts:
                 - mountPath: /manifests

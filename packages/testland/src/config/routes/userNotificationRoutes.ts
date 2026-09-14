@@ -13,7 +13,7 @@ import { makeNotificationHandler } from '@countryconfig/api/notification/handler
 import { ReqRefDefaults, ServerRoute } from '@hapi/hapi'
 
 /*
- * All `/triggers/user/*` routes below inherit the default JWT auth strategy
+ * All `/trigger/user/*` routes below inherit the default JWT auth strategy
  * (see `server.auth.default('jwt')` in index.ts). Every core caller forwards a
  * token whose audience includes `opencrvs:countryconfig-user`:
  *   - the events service forwards the acting user's token (user tokens carry
@@ -33,7 +33,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
   return [
     {
       method: 'POST',
-      path: '/triggers/user/user-created',
+      path: '/trigger/user/user-created',
       handler: makeNotificationHandler('user-created'),
       options: {
         tags: ['api'],
@@ -42,7 +42,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/user-updated',
+      path: '/trigger/user/user-updated',
       handler: makeNotificationHandler('user-updated'),
       options: {
         tags: ['api'],
@@ -51,7 +51,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/username-reminder',
+      path: '/trigger/user/username-reminder',
       handler: makeNotificationHandler('username-reminder'),
       options: {
         tags: ['api'],
@@ -60,7 +60,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/reset-password',
+      path: '/trigger/user/reset-password',
       handler: makeNotificationHandler('reset-password'),
       options: {
         tags: ['api'],
@@ -69,7 +69,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/reset-password-by-admin',
+      path: '/trigger/user/reset-password-by-admin',
       handler: makeNotificationHandler('reset-password-by-admin'),
       options: {
         tags: ['api'],
@@ -78,7 +78,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/password-reset-link',
+      path: '/trigger/user/password-reset-link',
       handler: makeNotificationHandler('password-reset-link'),
       options: {
         tags: ['api'],
@@ -87,7 +87,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/username-reminder-link',
+      path: '/trigger/user/username-reminder-link',
       handler: makeNotificationHandler('username-reminder-link'),
       options: {
         tags: ['api'],
@@ -96,7 +96,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/resend-invite',
+      path: '/trigger/user/resend-invite',
       handler: makeNotificationHandler('resend-invite'),
       options: {
         tags: ['api'],
@@ -105,7 +105,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/2fa',
+      path: '/trigger/user/2fa',
       handler: makeNotificationHandler('2fa'),
       options: {
         tags: ['api'],
@@ -114,7 +114,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/all-user-notification',
+      path: '/trigger/user/all-user-notification',
       handler: makeNotificationHandler('all-user-notification'),
       options: {
         tags: ['api'],
@@ -123,7 +123,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/change-phone-number',
+      path: '/trigger/user/change-phone-number',
       handler: makeNotificationHandler('change-phone-number'),
       options: {
         tags: ['api'],
@@ -132,7 +132,7 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
-      path: '/triggers/user/change-email-address',
+      path: '/trigger/user/change-email-address',
       handler: makeNotificationHandler('change-email-address'),
       options: {
         tags: ['api'],

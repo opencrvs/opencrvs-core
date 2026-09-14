@@ -474,8 +474,16 @@ export const birthEvent = defineConfig({
       flags: [
         { id: 'validated', operation: 'remove' },
         { id: 'approval-required-for-late-registration', operation: 'remove' },
-        { id: 'escalated-to-provincial-registrar', operation: 'remove' },
-        { id: 'escalated-to-registrar-general', operation: 'remove' }
+        {
+          id: 'escalated-to-provincial-registrar',
+          operation: 'remove',
+          conditional: user.hasRole('PROVINCIAL_REGISTRAR')
+        },
+        {
+          id: 'escalated-to-registrar-general',
+          operation: 'remove',
+          conditional: user.hasRole('NATIONAL_REGISTRAR')
+        }
       ],
       dialogCopy: {
         notify: {
@@ -1137,6 +1145,17 @@ export const birthEvent = defineConfig({
       correctionForm: CORRECTION_FORM
     },
     {
+      type: ActionType.REJECT_CORRECTION,
+      label: {
+        id: 'v2.events.correction.reject.label',
+        defaultMessage: 'Reject correction',
+        description: 'Label for the reject correction action'
+      },
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
+      ]
+    },
+    {
       type: ActionType.APPROVE_CORRECTION,
       label: {
         defaultMessage: 'Approve correction',
@@ -1302,7 +1321,7 @@ export const birthEvent = defineConfig({
       auditHistoryLabel: {
         defaultMessage: 'Unsealed',
         description: 'The label to show in audit history for the seal action',
-        id: 'event.birth.custom.action.seal.audit-history-label'
+        id: 'event.birth.custom.action.unseal.audit-history-label'
       },
       form: [
         {

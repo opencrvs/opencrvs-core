@@ -58,23 +58,40 @@ export function extractHistoryActions(
   }) as ActionDocument[]
 }
 
+/**
+ * Finds the APPROVE_CORRECTION that immediately (directly) approved the given
+ * REQUEST_CORRECTION — i.e. a direct correction where the same user requested
+ * and approved in a single step. Such pairs are collapsed in the audit history
+ * to a single 'Record corrected' row.
+ *
+ * Shared by the history label resolution (`getActionTypeForHistory`) and the
+ * history row visibility/flagging in `EventHistory`, so both agree on what
+ * counts as an immediate correction.
+ */
+export function findImmediateApproveCorrection(
+  actions: ActionDocument[],
+  requestCorrection: ActionDocument
+): ActionDocument | undefined {
+  return actions.find(
+    (x) =>
+      x.type === ActionType.APPROVE_CORRECTION &&
+      (x.requestId === requestCorrection.id ||
+        x.requestId === requestCorrection.originalActionId) &&
+      x.content?.immediateCorrection &&
+      x.createdBy === requestCorrection.createdBy
+  )
+}
+
 export function useActionForHistory() {
   function getActionTypeForHistory(
     actions: ActionDocument[],
     action: ActionDocument
   ) {
-    if (action.type === ActionType.REQUEST_CORRECTION) {
-      const approveAction = actions.find(
-        (x) =>
-          x.type === ActionType.APPROVE_CORRECTION &&
-          (x.requestId === action.id ||
-            x.requestId === action.originalActionId) &&
-          x.content?.immediateCorrection &&
-          x.createdBy === action.createdBy
-      )
-      if (approveAction) {
-        return 'CORRECTED'
-      }
+    if (
+      action.type === ActionType.REQUEST_CORRECTION &&
+      findImmediateApproveCorrection(actions, action)
+    ) {
+      return 'CORRECTED'
     }
 
     return action.type
