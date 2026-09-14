@@ -11,17 +11,22 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
+import * as Sentry from '@sentry/react'
 import {
   DocumentPath,
   FullDocumentPath,
-  joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
+import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient } from '@client/v2-events/trpc'
+import {
+  isExpectedAccessError,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -110,28 +115,25 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  await ensureFreshAccessToken()
-  const url = joinUrlPaths('/api/presigned-url', filePath)
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  const res = await response.json()
-  return res
+function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  return trpcClient.event.file.getPresignedUrl.query({ filePath })
 }
 
+/** Caches a file's contents locally. Never rejects — one file failing shouldn't fail the whole batch. */
 export async function precacheFile(path: DocumentPath | FullDocumentPath) {
-  const presignedUrl = (await getPresignedUrl(path)).presignedURL
+  try {
+    const presignedUrl = (await getPresignedUrl(path)).presignedURL
+    const file = await fetchFileFromUrl(presignedUrl, path)
 
-  const file = await fetchFileFromUrl(presignedUrl, path)
-
-  if (file) {
-    await cacheFile({ url: path, file })
+    if (file) {
+      await cacheFile({ url: path, file })
+    }
+  } catch (error) {
+    if (!isExpectedAccessError(error)) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to precache file', error)
+    }
+    Sentry.captureException(error)
   }
 }
 
@@ -167,7 +169,7 @@ interface Options {
 }
 
 export function useFileUpload(
-  path: string,
+  path: AttachmentPath,
   uniqueIdentifier: string,
   options: Options = {}
 ) {

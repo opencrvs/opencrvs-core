@@ -6,13 +6,13 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "1"
   labels:
-    app: elasticsearch-on-deploy
+    app: deployment-jobs
   name: elasticsearch-on-deploy
 spec:
   template:
     metadata:
       labels:
-        app: elasticsearch-on-deploy
+        app: deployment-jobs
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
@@ -48,4 +48,7 @@ spec:
             name: elasticsearch-on-update-script
             defaultMode: 0755
       restartPolicy: "OnFailure"
+
+{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
+
 {{- end }}

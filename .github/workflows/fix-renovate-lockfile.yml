@@ -64,7 +64,7 @@ jobs:
       - name: Setup pnpm
         # No `version:` — action-setup reads `packageManager` from package.json
         # (pnpm@10.34.5), matching what the lockfile was authored with.
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6

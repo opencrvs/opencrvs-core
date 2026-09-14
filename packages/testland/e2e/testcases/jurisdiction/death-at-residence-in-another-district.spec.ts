@@ -23,8 +23,10 @@ import { CREDENTIALS } from '@e2e/support/constants'
 
 /**
  * Picks an option out of an administrative area dropdown. The options are
- * matched inside the open dropdown: a registrar's own province and district are
- * pre-filled, so their names also appear in the closed select.
+ * matched inside the open dropdown: a local registrar's own province
+ * and district are pre-filled, so their names also appear in the closed select.
+ * Nothing is pre-filled for the Registrar General, who has no administrative
+ * area of their own.
  */
 async function selectAdministrativeArea(page: Page, id: string, name: string) {
   await page.locator(`#${id}`).click()
@@ -36,9 +38,13 @@ async function selectAdministrativeArea(page: Page, id: string, name: string) {
 
 /**
  * A death at the deceased's usual place of residence belongs to the district
- * that residence is in, whoever declares it. Declaring it from a district it
- * did not happen in is what tells the two apart: the record has to land where
- * the deceased lived, not at the office that filed it.
+ * that residence is in, whoever declares it. Filing it from an office that is
+ * not in that district is what tells the two apart: the record has to land
+ * where the deceased lived, not at the office that filed it.
+ *
+ * The Registrar General declares it because the option is only offered to roles
+ * whose `record.create` placeOfEvent is unrestricted — an administrative area
+ * bound registrar cannot pick a usual residence at all.
  */
 test.describe.serial('Death at a usual residence in another district', () => {
   let page: Page
@@ -53,7 +59,6 @@ test.describe.serial('Death at a usual residence in another district', () => {
       dob: getRandomDate(75, 200),
       idType: 'None',
       maritalStatus: 'Single',
-      // Isamba, not the Ibombo district the declaring registrar works in
       address: {
         province: 'Central',
         district: 'Isamba',
@@ -77,7 +82,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
       idType: 'None'
     },
     review: {
-      comment: 'Died at home, reported to the Ibombo office'
+      comment: 'Died at home, reported to the HQ office'
     }
   }
 
@@ -94,8 +99,8 @@ test.describe.serial('Death at a usual residence in another district', () => {
     await page.close()
   })
 
-  test('Ibombo registrar starts a death declaration', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
+  test('Registrar General starts a death declaration', async () => {
+    await login(page, CREDENTIALS.REGISTRAR_GENERAL)
 
     await page.click('#header-new-event')
     await page.getByLabel('Death').click()

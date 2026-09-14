@@ -7,7 +7,7 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "0"
   labels:
-    app: validate-predeploy
+    app: deployment-jobs
   name: validate-predeploy
 spec:
   backoffLimit: 0
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: validate-predeploy
+        app: deployment-jobs
         helm.sh/revision: {{ .Release.Revision | quote }}
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}

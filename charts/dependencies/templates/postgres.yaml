@@ -196,4 +196,7 @@ spec:
               - key: ssh_key
                 path: id_rsa
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "postgres"  "Values" .Values) }}
+
 {{- end }}

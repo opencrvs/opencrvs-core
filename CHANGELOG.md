@@ -47,6 +47,14 @@ Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
 The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
 
+#### Document presign requests are no longer authorized by scope alone
+
+`GET /presigned-url/{filePath*}` on the gateway proxied straight to documents-service, which validates only that a JWT is genuinely signed — not that its scopes grant access to the record the document belongs to. Any authenticated user, regardless of scope, could obtain a valid presigned URL for any document whose path they knew.
+
+The route has been removed. Presigning a document tied to a record now goes through events-service's `event.file.getPresignedUrl`, which requires `record.read` on the event derived from the path (`events/{eventId}/...`) before asking documents-service to sign it. `users/{userId}/...` paths (avatars, signatures) and bare `{uuid}.ext` legacy paths (pre-2.0 uploads, or any upload where `path` is omitted) still presign without a record check, since they carry no record binding to check against.
+
+[#12962](https://github.com/opencrvs/opencrvs-core/issues/12962)
+
 #### `validUntil` removed from location APIs
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.
@@ -95,6 +103,21 @@ For the integration's own release history prior to this move, see [`packages/mos
 
 [#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
 
+#### Country config triggers are all served under `/trigger`
+
+The user-notification and system-ready triggers were served under `/triggers/`, while the event action and telemetry triggers used `/trigger/`. All of them now use the singular prefix:
+
+| Before                        | After                        |
+| ----------------------------- | ---------------------------- |
+| `POST /triggers/user/{event}` | `POST /trigger/user/{event}` |
+| `GET /triggers/system/ready`  | `GET /trigger/system/ready`  |
+
+`POST /trigger/events/{event}/actions/{action}` and `POST /trigger/telemetry` are unchanged.
+
+**Country configs must rename these routes.** `opencrvs upgrade` does it for you: the `rename-trigger-paths` codemod rewrites the `path` of every matching Hapi route under `src/`, then lists every `/triggers/` reference it could not rewrite — a path built at runtime, a route config it did not recognise — for you to rename by hand.
+
+[#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
+
 ### Deprecations
 
 #### `POST /auth/token` parameters in the query string
@@ -131,6 +154,9 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - `pnpm dev` now runs the MOSIP stack alongside the rest of core, so local registrations exercise the same MOSIP path as a real deployment. The testland `NO_MOSIP` escape hatch is gone — it only ever short-circuited local development, and production already defaulted to `false`.
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
+- Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
+- Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
+
 
 ### New features
 
@@ -226,6 +252,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
+- Keep a status badge's label on a single line. A badge narrower than its text broke the label mid-word, e.g. `Active` rendering as `Activ` / `e` in the team members list [#13572](https://github.com/opencrvs/opencrvs-core/issues/13572)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
 - Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
@@ -233,12 +260,15 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Stop reporting an email or mobile number as already in use when it is merely contained in an existing one. Duplicate and existence checks on users matched substrings, so creating a user with the email `a@x.com` was rejected as a duplicate of an existing `ba@x.com`. Email, mobile and username now match whole values; email and username stay case-insensitive in effect. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 - Return a conflict naming the offending field, instead of an internal server error, when a write trips a unique constraint on a user's email, mobile or username. The application-level duplicate checks are broader than the constraints, so this is reachable only when two requests race — but the cause was masked in production and reached the caller as `Internal server error`. Covers creating a user as well as changing an existing user's email, phone number or name. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
 - Stop the gateway's `/events/{path*}` proxy from forwarding requests outside the events service. [#13587](https://github.com/opencrvs/opencrvs-core/issues/13587)
+- Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
+- Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
+- Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 
 ## 2.0.1 Release
 
 ### Security fixes
 
-- Every `/triggers/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
+- Every `/trigger/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
 
   **Deployment notes:**
 

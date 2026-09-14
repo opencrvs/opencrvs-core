@@ -9,13 +9,13 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "2"
   labels:
-    app: migration
+    app: deployment-jobs
   name: {{ .Values.data_migration.job_name | default "data-migration" }}
 spec:
   template:
     metadata:
       labels:
-        app: migration
+        app: deployment-jobs
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.data_migration) | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
@@ -45,3 +45,5 @@ spec:
               value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }}"
           {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}
       restartPolicy: "OnFailure"
+
+{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}

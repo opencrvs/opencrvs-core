@@ -41,14 +41,6 @@ const TableHeader = styled.div<{
   align-items: top;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 2px 2px 0 0;
-
-  & span:first-child {
-    padding-left: 8px;
-  }
-
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 
 const TableHeaderText = styled.div`
@@ -68,13 +60,6 @@ const TableBody = styled.div<{
 
   & div:last-of-type {
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
-  }
-  & span:first-child {
-    padding-left: 8px;
-  }
-
-  & span:last-child {
-    padding-right: 8px;
   }
 `
 const RowWrapper = styled.div<{
@@ -118,12 +103,6 @@ const TableFooter = styled(RowWrapper)<{
     color: ${({ theme }) => theme.colors.copy};
     ${({ theme }) => theme.fonts.bold14};
   }
-  & span:first-child {
-    padding-left: 8px;
-  }
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 
 const ContentWrapper = styled.span<{
@@ -139,6 +118,12 @@ const ContentWrapper = styled.span<{
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
   color: ${({ theme }) => theme.colors.grey400};
   padding: 0 4px;
+  &:first-child {
+    padding-left: 8px;
+  }
+  &:last-child {
+    padding-right: 8px;
+  }
 `
 const ValueWrapper = styled.span<{
   width: number
@@ -161,6 +146,12 @@ const ValueWrapper = styled.span<{
   text-overflow: ellipsis;
   overflow: hidden;
   ${({ color }) => color && `color: ${color};`}
+  &:first-child {
+    padding-left: 8px;
+  }
+  &:last-child {
+    padding-right: 8px;
+  }
 `
 const Error = styled.span`
   color: ${({ theme }) => theme.colors.negative};

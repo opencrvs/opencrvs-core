@@ -15,8 +15,8 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     font-size="8" letter-spacing="0px">
     <tspan x="220.625" y="678.552">&#x2028;</tspan>
     <tspan x="61" y="691.352">{{ $lookup $metadata "modifiedAt"}}</tspan>
-    <tspan x="61" y="701.352">{{$intlWithParams 'certificates.birth.printedCertificateCount'
-      'copiesPrintedForTemplate' ($lookup $metadata "copiesPrintedForTemplate")}}</tspan>
+    {{#ifCond ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.name") '!==' undefined }}<tspan x="61" y="701.352">{{$intlWithParams 'certificates.birth.printedCertificateCount'
+      'copiesPrintedForTemplate' ($lookup $metadata "copiesPrintedForTemplate")}}</tspan>{{/ifCond}}
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" font-weight="600" letter-spacing="0px">
@@ -345,7 +345,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
         {{#ifCond (lookup $declaration 'father.addressSameAs') '===' 'YES'}}
           <tspan x="307" y="432.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
         {{else}}
-          <tspan x="307" y="432.104">{{$join ", " ($or ($lookup $declaration 'father.address.district') ($lookup $declaration 'father.address.streetLevelDetails.district2')) ($or ($lookup $declaration 'father.address.province') ($lookup $declaration 'father.address.streetLevelDetails.state')) ($lookup $declaration 'father.address.country')}}</tspan>
+          <tspan x="307" y="432.104">{{$lookup $declaration 'father.address.administrativeHierarchy'}}</tspan>
         {{/ifCond}}
       {{/ifCond}}
     </text>
@@ -422,7 +422,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
   <g clip-path="url(#clip17_946_2501)">
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
       font-size="8" letter-spacing="0px">
-      <tspan x="307" y="550.104">{{$join ", " ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.district") ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.province") ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.country")}}</tspan>
+      <tspan x="307" y="550.104">{{$join ", " ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.name") ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.district") ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.province") ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.country")}}</tspan>
     </text>
   </g>
   <line x1="65" y1="556.5" x2="533" y2="556.5" stroke="#ECECEC" />

@@ -622,10 +622,16 @@ const ReviewUserComponent = () => {
                 },
                 data
               }
-              const officeChanged =
+              /*
+               * Both a new office and a new role clear the user's in-progress
+               * drafts server-side, so either change needs confirming first.
+               */
+              const clearsDrafts =
                 targetUser?.type === TokenUserType.enum.user &&
-                payload.primaryOfficeId !== targetUser.primaryOfficeId
-              if (officeChanged) {
+                (payload.primaryOfficeId !== targetUser.primaryOfficeId ||
+                  payload.role !== targetUser.role)
+
+              if (clearsDrafts) {
                 setPendingPayload(payload)
               } else {
                 submitUpdate(payload)
@@ -664,13 +670,13 @@ const ReviewUserComponent = () => {
             </Button>
           ]}
           isOpen={true}
-          title={intl.formatMessage(messages.changeOfficeWarningTitle)}
+          title={intl.formatMessage(messages.removeDraftsWarningTitle)}
           onClose={() => {
             setPendingPayload(null)
           }}
         >
           <Text color="grey500" element="p" variant="reg16">
-            {intl.formatMessage(messages.changeOfficeWarningBody)}
+            {intl.formatMessage(messages.removeDraftsWarningBody)}
           </Text>
         </Dialog>
       )}

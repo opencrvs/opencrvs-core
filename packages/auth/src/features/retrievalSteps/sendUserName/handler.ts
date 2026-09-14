@@ -71,7 +71,7 @@ export default async function sendUserNameHandler(
      * itself with the nonce, not a token, so there is no incoming
      * Authorization header to forward. Mint a short-lived system token
      * instead — the same way the 2FA and password-reset code notifications do
-     * — so country config can require auth on `/triggers/user/*`.
+     * — so country config can require auth on `/trigger/user/*`.
      */
     authHeader: {
       Authorization: `Bearer ${await createToken(

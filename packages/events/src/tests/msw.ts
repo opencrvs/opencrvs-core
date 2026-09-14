@@ -114,6 +114,13 @@ const handlers = [
   http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
     return HttpResponse.json([])
   }),
+  // event.file.getPresignedUrl.test.ts
+  http.get(`${env.DOCUMENTS_URL}/presigned-url/:filePath*`, () => {
+    return HttpResponse.json({
+      presignedURL:
+        'http://localhost:3535/ocrvs/mock-presigned-url.png?X-Amz-Signature=test'
+    })
+  }),
   http.post(
     `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,
     (ctx) => {
@@ -125,7 +132,7 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
-  http.post(`${env.COUNTRY_CONFIG_URL}/triggers/user/:event`, () =>
+  http.post(`${env.COUNTRY_CONFIG_URL}/trigger/user/:event`, () =>
     HttpResponse.json({})
   ),
   http.post(`${env.COUNTRY_CONFIG_URL}/trigger/telemetry`, () =>

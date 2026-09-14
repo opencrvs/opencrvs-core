@@ -9,6 +9,9 @@ kind: Job
 {{- end }}
 metadata:
   name: postgres-backup-diff
+  labels:
+    app: backup-runner
+    job-type: backup
 spec:
   {{ if .Values.backup.cronjob }}
   schedule: {{ .Values.postgres.backup.schedule.differential }}
@@ -19,6 +22,10 @@ spec:
     spec:
   {{- end }}
       template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: backup
         spec:
           {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
           serviceAccountName: backup-runner

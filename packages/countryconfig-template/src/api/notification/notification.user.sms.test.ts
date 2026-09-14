@@ -59,7 +59,7 @@ describe('User notification - sms', () => {
       await server.server
         .inject({
           method: 'POST',
-          url: `/triggers/user/${event}`,
+          url: `/trigger/user/${event}`,
           payload,
           auth: { strategy: 'jwt', credentials: {} }
         })
