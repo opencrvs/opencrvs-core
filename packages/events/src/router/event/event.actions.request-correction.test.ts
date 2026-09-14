@@ -9,119 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
+import { HttpResponse, http } from 'msw'
 import {
   ActionStatus,
   ActionType,
-  encodeScope,
-  EventStatus,
   getCurrentEventState,
-  getUUID
+  EventStatus
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
-
-test(`prevents forbidden access if missing required scope`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [])
-
-  await expect(
-    client.event.actions.reject.request(
-      generator.event.actions.reject('event-test-id-12345')
-    )
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
-})
-
-test(`allows access if required scope is present`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    encodeScope({
-      type: 'record.reject',
-      options: {
-        event: ['birth', 'death', 'tennis-club-membership']
-      }
-    })
-  ])
-
-  await expect(
-    client.event.actions.reject.request(
-      generator.event.actions.reject('event-test-id-12345')
-    )
-  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
-})
-
-test(`should contain REJECT action for a valid request`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const originalEvent = await client.event.create(generator.event.create())
-
-  const createAction = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  const declareInput = generator.event.actions.declare(originalEvent.id)
-
-  await client.event.actions.declare.request(declareInput)
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-  const actions = (
-    await client.event.actions.reject.request(
-      generator.event.actions.reject(originalEvent.id)
-    )
-  ).actions.map(({ type }) => type)
-
-  expect(actions.slice(-2)).toStrictEqual([
-    ActionType.REJECT,
-    ActionType.UNASSIGN
-  ])
-})
-
-test(`${ActionType.REJECT} is idempotent`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const originalEvent = await client.event.create(generator.event.create())
-
-  const createAction = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  const declareInput = generator.event.actions.declare(originalEvent.id)
-
-  await client.event.actions.declare.request(declareInput)
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-  const rejectPayload = generator.event.actions.reject(originalEvent.id, {
-    keepAssignment: true
-  })
-  const firstResponse = await client.event.actions.reject.request(rejectPayload)
-  const secondResponse =
-    await client.event.actions.reject.request(rejectPayload)
-
-  expect(firstResponse).toEqual(secondResponse)
-})
 
 describe('3rd party integration confirmation behaviour', () => {
   function mockActionApi(action: ActionType, status: number) {
@@ -136,7 +34,7 @@ describe('3rd party integration confirmation behaviour', () => {
   }
 
   test('Throws when integration responds with 202 when keepAssignment is given', async () => {
-    mockActionApi(ActionType.REJECT, 202)
+    mockActionApi(ActionType.REQUEST_CORRECTION, 202)
     const { generator, user } = await setupTestCase()
 
     const client = createTestClient(user)
@@ -147,15 +45,21 @@ describe('3rd party integration confirmation behaviour', () => {
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
 
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
+
     await expect(
-      client.event.actions.reject.request(
-        generator.event.actions.reject(event.id, { keepAssignment: true })
+      client.event.actions.correction.request.request(
+        generator.event.actions.correction.request(event.id, {
+          keepAssignment: true
+        })
       )
     ).rejects.toThrow('Confirmation API did not return a synchronous response.')
   })
 
   test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
-    mockActionApi(ActionType.REJECT, 202)
+    mockActionApi(ActionType.REQUEST_CORRECTION, 202)
     const { generator, user } = await setupTestCase()
 
     const client = createTestClient(user)
@@ -166,9 +70,15 @@ describe('3rd party integration confirmation behaviour', () => {
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
 
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, {
+        keepAssignment: true
+      })
+    )
+
     await expect(
-      client.event.actions.reject.request(
-        generator.event.actions.reject(event.id, {
+      client.event.actions.correction.request.request(
+        generator.event.actions.correction.request(event.id, {
           keepAssignmentIfRejected: true
         })
       )
@@ -176,7 +86,7 @@ describe('3rd party integration confirmation behaviour', () => {
   })
 
   test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
-    mockActionApi(ActionType.REJECT, 202)
+    mockActionApi(ActionType.REQUEST_CORRECTION, 202)
     const { generator, user } = await setupTestCase()
 
     const client = createTestClient(user)
@@ -186,10 +96,14 @@ describe('3rd party integration confirmation behaviour', () => {
     await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
-
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, {
+        keepAssignment: true
+      })
+    )
     await expect(
-      client.event.actions.reject.request(
-        generator.event.actions.reject(event.id, {
+      client.event.actions.correction.request.request(
+        generator.event.actions.correction.request(event.id, {
           keepAssignmentIfAccepted: true
         })
       )
@@ -197,7 +111,7 @@ describe('3rd party integration confirmation behaviour', () => {
   })
 
   test('Unassigns when integration responds with 202', async () => {
-    mockActionApi(ActionType.REJECT, 202)
+    mockActionApi(ActionType.REQUEST_CORRECTION, 202)
 
     const { generator, user } = await setupTestCase()
 
@@ -209,8 +123,12 @@ describe('3rd party integration confirmation behaviour', () => {
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
 
-    const response = await client.event.actions.reject.request(
-      generator.event.actions.reject(event.id)
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
     )
 
     const lastAction = response.actions[response.actions.length - 1]
@@ -223,13 +141,13 @@ describe('3rd party integration confirmation behaviour', () => {
       tennisClubMembershipEvent
     )
 
-    expect(currentState.flags).toEqual(['reject:requested'])
-    expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+    expect(currentState.flags).toEqual(['request_correction:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.REGISTERED)
     expect(currentState.assignedTo).toEqual(undefined)
   })
 
   test('Keeps assignment when integration responds with 500', async () => {
-    mockActionApi(ActionType.REJECT, 500)
+    mockActionApi(ActionType.REQUEST_CORRECTION, 500)
 
     const { generator, user } = await setupTestCase()
 
@@ -240,10 +158,13 @@ describe('3rd party integration confirmation behaviour', () => {
     await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
 
     await expect(
-      client.event.actions.reject.request(
-        generator.event.actions.reject(event.id)
+      client.event.actions.correction.request.request(
+        generator.event.actions.correction.request(event.id)
       )
     ).rejects.toThrow(
       'Unexpected failure from country config action confirmation API'
@@ -256,8 +177,8 @@ describe('3rd party integration confirmation behaviour', () => {
       tennisClubMembershipEvent
     )
 
-    expect(currentState.flags).toEqual(['reject:requested'])
-    expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+    expect(currentState.flags).toEqual(['request_correction:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.REGISTERED)
     expect(currentState.assignedTo).toEqual(user.id)
   })
 })
