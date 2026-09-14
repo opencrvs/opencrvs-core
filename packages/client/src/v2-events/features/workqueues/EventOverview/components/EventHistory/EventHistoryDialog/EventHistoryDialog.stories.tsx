@@ -115,7 +115,7 @@ const meta: Meta<typeof EventHistoryDialog> = {
     userName: 'Jane Doe',
     fullEvent,
     validatorContext: getTestValidatorContext(),
-    isWaitingForExternalValidation: false
+    isAwaitingConfirmation: false
   }
 }
 

@@ -492,7 +492,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     action: ActionDocument,
     userName: string,
     title: string,
-    isWaitingForExternalValidation: boolean,
+    isAwaitingConfirmation: boolean,
     systemUpdates?: ActionUpdate
   ) => {
     void openModal<void>((close) => (
@@ -500,7 +500,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         action={action}
         close={close}
         fullEvent={fullEvent}
-        isWaitingForExternalValidation={isWaitingForExternalValidation}
+        isAwaitingConfirmation={isAwaitingConfirmation}
         systemUpdates={systemUpdates}
         title={title}
         userName={userName}
@@ -571,8 +571,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         statusSourceAction,
         fullEvent.actions
       )
-      const isWaitingForExternalValidation =
-        effectiveStatus === ActionStatus.Requested
+      const isAwaitingConfirmation = effectiveStatus === ActionStatus.Requested
 
       // A row can be expanded when there is a lifecycle to reveal: an action
       // accepted/rejected asynchronously (request + confirmation), or one still
@@ -581,7 +580,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         statusSourceAction,
         fullEvent.actions
       )
-      const isExpandable = !!asyncConfirmation || isWaitingForExternalValidation
+      const isExpandable = !!asyncConfirmation || isAwaitingConfirmation
       const isExpanded = expandedActionIds.includes(action.id)
 
       const acceptedAction =
@@ -639,7 +638,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
                 dialogAction,
                 actionCreatorName,
                 title,
-                isWaitingForExternalValidation,
+                isAwaitingConfirmation,
                 systemUpdates
               )
             }

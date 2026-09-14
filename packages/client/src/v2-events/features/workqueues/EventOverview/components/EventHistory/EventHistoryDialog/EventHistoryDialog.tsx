@@ -145,7 +145,7 @@ export function EventHistoryDialog({
   fullEvent,
   validatorContext,
   title,
-  isWaitingForExternalValidation,
+  isAwaitingConfirmation,
   systemUpdates
 }: {
   action: ActionDocument
@@ -154,7 +154,7 @@ export function EventHistoryDialog({
   fullEvent: EventDocument
   validatorContext: ValidatorContext
   title: string
-  isWaitingForExternalValidation: boolean
+  isAwaitingConfirmation: boolean
   systemUpdates?: ActionUpdate
 }) {
   const intl = useIntl()
@@ -168,9 +168,7 @@ export function EventHistoryDialog({
       isOpen
       actions={[]}
       banner={
-        isWaitingForExternalValidation ? (
-          <AwaitingConfirmationBanner />
-        ) : undefined
+        isAwaitingConfirmation ? <AwaitingConfirmationBanner /> : undefined
       }
       id="event-history-modal"
       title={title}
