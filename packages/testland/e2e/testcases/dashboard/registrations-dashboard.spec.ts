@@ -50,12 +50,9 @@ test('Registrations dashboard cards render and survive filtering', async ({
   })
 
   await test.step('Location filter does not break any card', async () => {
-    await frame.getByRole('button', { name: 'Location' }).click()
-    await frame.getByText('Ibombo District Office', { exact: true }).click()
-    await frame.getByRole('button', { name: 'Add filter' }).click()
-
     await expect(
-      frame.getByText('Location: Ibombo District Office')
+      frame.getByText('Location: Ibombo District Office'),
+      'Location filter is already applied'
     ).toBeVisible()
     await expectNoBrokenCards(frame, EXPECTED_CARD_TITLES, UNTITLED_CARDS)
   })
