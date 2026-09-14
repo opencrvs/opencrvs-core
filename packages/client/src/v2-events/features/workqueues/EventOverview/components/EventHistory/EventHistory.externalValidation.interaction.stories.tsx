@@ -92,7 +92,6 @@ function action<T extends ActionType>(
 /**
  * A record whose registration was deferred to an external system (e.g. MOSIP)
  * and is still pending: the REGISTER action is `Requested`, not yet accepted.
- * The audit surfaces this as a "Waiting for external validation" row.
  */
 const registrationWaitingEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
@@ -109,16 +108,6 @@ const registrationWaitingEvent: EventDocument = {
   ]
 }
 
-/**
- * A registered record with a direct (immediate) correction whose approval was
- * deferred to an external system and is still pending. The audit currently
- * shows two rows: the REQUEST_CORRECTION as "Record corrected", and the
- * `Requested` APPROVE_CORRECTION as "Waiting for external validation".
- *
- * Note the ordering quirk this documents: "Record corrected" sorts before
- * "Waiting for external validation" even though it is that correction that is
- * awaiting external validation.
- */
 const requestCorrection = action(ActionType.REQUEST_CORRECTION, 4, {
   declaration: {
     'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
@@ -156,10 +145,6 @@ const correctionWaitingEvent: EventDocument = {
  * REGISTER is now followed by an `Accepted` REGISTER (its `originalActionId`
  * points at the request, but it carries a different transactionId, as the async
  * confirmation does). The audit shows the completed "Registered" row.
- *
- * It currently ALSO keeps the earlier "Waiting for external validation" row —
- * the request is not hidden once accepted asynchronously. This is the behaviour
- * this work aims to improve (drop the standalone row, show a status instead).
  */
 const finishedRegisterRequest = action(ActionType.REGISTER, 3, {
   status: ActionStatus.Requested
@@ -187,9 +172,7 @@ const registrationFinishedEvent: EventDocument = {
 
 /**
  * A direct correction whose external validation has finished: the `Requested`
- * APPROVE_CORRECTION is now followed by an `Accepted` one. As above, the
- * accepted confirmation carries a different transactionId, so the audit still
- * keeps the "Waiting for external validation" row alongside "Record corrected".
+ * APPROVE_CORRECTION is now followed by an `Accepted` one.
  */
 const finishedRequestCorrection = action(ActionType.REQUEST_CORRECTION, 4, {
   declaration: {
@@ -361,7 +344,7 @@ type Story = StoryObj<typeof EventOverviewIndex>
 
 /**
  * A pending async registration shows the register row with a yellow
- * "Waiting for external validation" status badge — not a separate row.
+ * "Requested" status badge — not a separate row.
  */
 export const RegistrationWaitingForExternalValidation: Story = {
   parameters: auditParameters(registrationWaitingEvent),
@@ -378,15 +361,11 @@ export const RegistrationWaitingForExternalValidation: Story = {
       ).toBeVisible()
     })
 
-    await step('its status shows waiting for external validation', async () => {
-      // The status is an icon badge (first column) with a descriptive title,
-      // not a row of its own.
-      await expect(
-        await canvas.findByTitle('Waiting for external validation')
-      ).toBeVisible()
+    await step('it shows status "Requested"', async () => {
+      await expect(await canvas.findByTitle('Requested')).toBeVisible()
       await expect(
         canvas.queryByRole('button', {
-          name: 'Waiting for external validation'
+          name: 'Requested'
         })
       ).toBeNull()
     })
@@ -408,15 +387,13 @@ export const CorrectionWaitingForExternalValidation: Story = {
       ).toBeVisible()
     })
 
-    await step('its status shows waiting for external validation', async () => {
+    await step('it shows status "Requested"', async () => {
       // The status is an icon badge (first column) with a descriptive title,
       // not a row of its own.
-      await expect(
-        await canvas.findByTitle('Waiting for external validation')
-      ).toBeVisible()
+      await expect(await canvas.findByTitle('Requested')).toBeVisible()
       await expect(
         canvas.queryByRole('button', {
-          name: 'Waiting for external validation'
+          name: 'Requested'
         })
       ).toBeNull()
     })
@@ -444,9 +421,7 @@ export const RegistrationExternalValidationFinished: Story = {
     })
 
     await step('there is no waiting status', async () => {
-      await expect(
-        canvas.queryByTitle('Waiting for external validation')
-      ).toBeNull()
+      await expect(canvas.queryByTitle('Requested')).toBeNull()
     })
 
     await step(
@@ -487,9 +462,7 @@ export const CorrectionExternalValidationFinished: Story = {
     })
 
     await step('there is no waiting status', async () => {
-      await expect(
-        canvas.queryByTitle('Waiting for external validation')
-      ).toBeNull()
+      await expect(canvas.queryByTitle('Requested')).toBeNull()
     })
   }
 }
@@ -517,9 +490,7 @@ export const RegistrationExternalValidationRejected: Story = {
     await step('its status shows as rejected, not waiting', async () => {
       // The status is an icon badge (first column) with a descriptive title.
       await expect(await canvas.findByTitle('Rejected')).toBeVisible()
-      await expect(
-        canvas.queryByTitle('Waiting for external validation')
-      ).toBeNull()
+      await expect(canvas.queryByTitle('Requested')).toBeNull()
     })
 
     await step('the row can be expanded to reveal the rejection', async () => {
@@ -559,9 +530,7 @@ export const CorrectionExternalValidationRejected: Story = {
 
     await step('its status shows as rejected, not waiting', async () => {
       await expect(await canvas.findByTitle('Rejected')).toBeVisible()
-      await expect(
-        canvas.queryByTitle('Waiting for external validation')
-      ).toBeNull()
+      await expect(canvas.queryByTitle('Requested')).toBeNull()
     })
   }
 }
