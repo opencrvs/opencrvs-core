@@ -995,6 +995,11 @@ function extractFieldSchema(
   if ($form.properties?.[fieldId]?.type === 'object') {
     return {
       ...jsonSchema,
+      // See the `$id` note in the `allOf` branch above: Ajv caches by `$id`,
+      // so a narrowed schema must not reuse its parent's id.
+      ...(typeof jsonSchema.$id === 'string'
+        ? { $id: `${jsonSchema.$id}.${fieldId}` }
+        : {}),
       properties: {
         $form: {
           type: 'object',

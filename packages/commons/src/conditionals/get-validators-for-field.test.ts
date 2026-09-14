@@ -309,4 +309,42 @@ describe('getValidatorsForField -- properties-shaped validators (unchanged)', ()
       validate(inner[0].validator, getFieldParams({ firstname: 'Ann' }))
     ).toBe(true)
   })
+
+  it('gives the parent-stripped schema an $id of its own', () => {
+    const validator = {
+      message: invalidNameMessage,
+      validator: field('applicant.name').object({
+        firstname: field('firstname').isValidEnglishName(),
+        surname: field('surname').isValidEnglishName()
+      })
+    }
+
+    /*
+     * Validate the un-narrowed parent first so Ajv caches it under its own
+     * `$id`. A narrowed schema that reused that id would be served the parent
+     * validator from the cache, which still demands an `applicant.name` key.
+     */
+    expect(
+      validate(
+        validator.validator,
+        getFieldParams({
+          'applicant.name': { firstname: 'Ann', surname: 'Smith' }
+        })
+      )
+    ).toBe(true)
+
+    const outer = getValidatorsForField('applicant.name', [validator])
+
+    expect(asSchema(outer[0]).$id).toBe(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      `${(validator.validator as any).$id}.applicant.name`
+    )
+
+    expect(
+      validate(
+        outer[0].validator,
+        getFieldParams({ firstname: 'Ann', surname: 'Smith' })
+      )
+    ).toBe(true)
+  })
 })
