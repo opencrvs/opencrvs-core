@@ -144,7 +144,9 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
 
   await test.step('Record audit shows the corrected record and the child UIN', async () => {
     await page.getByRole('button', { name: 'Assign record' }).click()
+    await page.getByRole('button', { name: 'Assign', exact: true }).click()
 
+    // Verify the child UIN is visible in the record summary
     await expect(page.getByTestId('child.nid-value')).toContainText(childNid)
 
     await switchEventTab(page, 'Audit')
