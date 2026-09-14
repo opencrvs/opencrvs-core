@@ -60,20 +60,13 @@ spec:
             - bash
             - -c
             - |
-              if ! command -v envsubst >/dev/null 2>&1 && ! apk add --no-cache envsubst; then
-                echo "[ERROR] Missing utility: envsubst" >&2
-                echo "[ERROR] Automatic installation failed. Ensure the container can access its package repositories, or include the required package in the base image for air-gapped deployments." >&2
-                exit 1
-              fi
               mkdir -p /rules
-              for f in /rules-templates/*.yaml; do
+              for f in /rules-templates/*.yaml /rules-custom/*.yaml; do
+                [ -e "$f" ] || continue
                 echo "processing file $f"
-                envsubst < "$f" > "/rules/$(basename $f)"
-              done
-              [ ! -d /rules-custom ] && exit 0
-              for f in /rules-custom/*.yaml; do
-                echo "processing file $f"
-                envsubst < "$f" > "/rules/$(basename $f)"
+                eval "cat <<OPENCRVS_ENV_EOF
+                $(cat "$f")
+              OPENCRVS_ENV_EOF" > "/rules/$(basename $f)"
               done
           volumeMounts:
             - name: rules

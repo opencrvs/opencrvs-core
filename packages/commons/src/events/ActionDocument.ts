@@ -248,7 +248,7 @@ const ApprovedCorrectionAction = ActionBase.extend(
   }).shape
 )
 
-const RejectedCorrectionAction = ActionBase.extend(
+export const RejectedCorrectionAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
     requestId: UUID, // TODO move into 'content' property
