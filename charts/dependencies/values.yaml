@@ -54,7 +54,7 @@ network_policy:
   # - private: allow ingress only from RFC1918 private ranges
   #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
   # - full: no baseline policy; ingress is unrestricted.
-  ingress_mode: private
+  ingress_mode: deny
   # Baseline policy for egress from dependency pods. Same modes as
   # ingress_mode, applied to egress instead. DNS (TCP/UDP 53) is always
   # allowed regardless of mode, except when full.
@@ -278,8 +278,6 @@ kibana:
     repository: docker.elastic.co/kibana/kibana
     tag: 8.19.15
   port: 5601
-  network_policy:
-    ingress_mode: private
   users_secret: kibana-users-secret
   # Configmap for custom configuration file
   # custom_config_configmap: kibana-custom-config
@@ -351,7 +349,6 @@ minio:
     tag: RELEASE.2025-06-13T11-33-47Z
   port: 3535
   network_policy:
-    ingress_mode: private
     rules:
       # FIXME: See comment on postgres service
       # FIXME: MinIO listens on two ports (API: 3535, Console: 3536), but
