@@ -14,7 +14,12 @@ import { expect, waitFor, within } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from 'storybook/test'
-import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
+import {
+  eventAttachmentPath,
+  FieldType,
+  MimeType,
+  TestUserRole
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { createImageFile } from '@client/tests/image-file'
@@ -49,7 +54,7 @@ export const FileInputWithOptionTest: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-kalsnk-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.file',
@@ -187,7 +192,7 @@ export const FileInputButton: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-kalsnk-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.file',
@@ -281,7 +286,7 @@ export const FileInputPdfWithPreview: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-kalsnk-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.file',
@@ -416,7 +421,7 @@ export const FileInputButtonMaxImage: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-kalsnk-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.file',

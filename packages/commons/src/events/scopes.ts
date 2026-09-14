@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { intersection } from 'lodash'
+import { intersection, uniq } from 'lodash'
 
 import {
   ClientSpecificAction,
@@ -20,6 +20,7 @@ import {
   getAcceptedScopesByType,
   RecordScopeTypeV2,
   RecordScopeV2,
+  ScopeType,
   UserScopeV2
 } from '../scopes'
 import {
@@ -60,6 +61,46 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.DUPLICATE_DETECTED]: [],
   [ActionType.CUSTOM]: []
 } satisfies Record<DisplayableAction, RecordScopeTypeV2[] | AlwaysAllowed>
+
+/**
+ * The scopes of every action that can write to a record. Each of them can
+ * trigger a sweep of the record's prefix, so each of them has to be able to
+ * delete. `record.read` is absent: reading a record is not grounds for erasing
+ * it.
+ */
+export const RECORD_WRITE_SCOPES: RecordScopeTypeV2[] = uniq(
+  Object.entries(ACTION_SCOPE_MAP)
+    .filter(([action]) => action !== ActionType.READ)
+    .flatMap(([, scopes]) => scopes ?? [])
+)
+
+/**
+ * Scopes that authorize deleting objects held by the documents service.
+ *
+ * Documents records no link between an object and the record it belongs to, so
+ * it cannot check that the caller owns a prefix. It checks instead that the
+ * caller holds a scope that lets them change a record or edit a user, and the
+ * service that forwarded the request has already checked that this particular
+ * record or user is theirs to act on.
+ *
+ * Listed rather than derived, so that adding an action to `ACTION_SCOPE_MAP`
+ * cannot silently grant deletion. `scopes.test.ts` fails when the two drift.
+ */
+export const DOCUMENT_DELETE_SCOPES: ScopeType[] = [
+  'record.create',
+  'record.notify',
+  'record.declare',
+  'record.register',
+  'record.edit',
+  'record.print-certified-copies',
+  'record.request-correction',
+  'record.correct',
+  'record.review-duplicates',
+  'record.archive',
+  'record.unarchive',
+  'record.reject',
+  'user.edit'
+]
 
 export function hasAnyOfScopes(a: string[], b: string[]) {
   return intersection(a, b).length > 0

@@ -24,7 +24,8 @@ import {
   EventState,
   generateTranslationConfig,
   DocumentPath,
-  PlainDate
+  PlainDate,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -473,6 +474,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={fields.map((f) => ({
               ...f,
               // Make all fields disabled
@@ -531,6 +533,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={fields}
             formValues={{
               ...declaration,
@@ -584,6 +587,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={fields
               .map((f) => {
                 if (f.id === 'applicant.age') {

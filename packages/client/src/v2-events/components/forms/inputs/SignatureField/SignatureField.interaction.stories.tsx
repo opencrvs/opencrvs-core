@@ -25,7 +25,8 @@ import {
   generateEventDocument,
   generateTranslationConfig,
   MimeType,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
@@ -127,7 +128,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-abcd-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.signature',
@@ -253,7 +254,7 @@ export const UploadButtonsArmLockBypass: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-abcd-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.signature',
@@ -397,7 +398,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
-              attachmentPath={`events/123-abcd-213/`}
+              attachmentPath={eventAttachmentPath('storybook-event')}
               fields={[
                 {
                   id: 'storybook.signature',
@@ -535,7 +536,7 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
         element: (
           <StyledFormFieldGenerator
             ref={noDuplicateErrorFormRef}
-            attachmentPath={`events/123-abcd-213/`}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             fields={[
               {
                 id: 'storybook.signature',
