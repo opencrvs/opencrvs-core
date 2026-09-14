@@ -17,6 +17,12 @@
 # - countryconfig.image.tag: Countryconfig image tag
 environment_type: {{environment_type}}
 
+network_policy:
+  ingress_mode: deny
+  egress_mode: deny
+  allowed_namespaces:
+    - opencrvs-deps-{{env}}
+
 hpa:
   enabled: false
 
