@@ -215,12 +215,7 @@ async function handleUsernameUpdate(
 /**
  * Moving a user to another office or another role drops the drafts they were
  * working on. A CREATED event has no submitted action, so once its draft is
- * gone there is nothing left in it and it goes with the draft. A declared
- * event stays.
- *
- * An event can hold only one draft: the drafts table is unique on
- * (event_id, created_by), and an UNASSIGN clears every draft on the event, so
- * the user taking over starts from none.
+ * gone there is nothing left in it and it's also removed with the draft.
  *
  * @returns the ids of the events that were deleted, so the caller can sweep
  * their attachments once the transaction has committed.
