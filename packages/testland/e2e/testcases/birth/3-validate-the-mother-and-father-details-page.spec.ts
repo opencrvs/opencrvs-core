@@ -12,6 +12,7 @@ import { test, expect } from '@playwright/test'
 import { goToSection, login } from '@e2e/support/helpers'
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
+import { type } from '@e2e/support/utils'
 
 test.describe('3. Validate the mothers and fathers details pages', () => {
   trackAndDeleteCreatedEvents()
@@ -41,8 +42,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
   test.describe.serial('3.1 Validate "First Name(s)" text field', async () => {
     test.describe('3.1.1 Enter Non-English characters', async () => {
       test('Using name: Richard the 3rd', async ({ page }) => {
-        await page.locator('#firstname').fill('Richard the 3rd')
-        await page.getByRole('heading', { name: 'Birth' })
+        await type(page, '#firstname', 'Richard the 3rd')
 
         /*
          * Expected result: should accept the input and not throw any error
@@ -51,18 +51,18 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
       })
 
       test('Using name: John_Peter', async ({ page }) => {
-        await page.locator('#firstname').fill('John_Peter')
-        await page.getByRole('heading', { name: 'Birth' })
+        await type(page, '#firstname', 'John_Peter')
 
         /*
-         * Expected result: should accept the input and not throw any error
+         * Expected result: should throw error:
+         * - Input contains invalid characters. An underscore is not one of the
+         *   characters `isValidEnglishName` allows.
          */
-        await expect(page.locator('#firstname_error')).toBeHidden()
+        await expect(page.locator('#firstname_error')).toBeVisible()
       })
 
       test('Using name: John-Peter', async ({ page }) => {
-        await page.locator('#firstname').fill('John-Peter')
-        await page.getByRole('heading', { name: 'Birth' })
+        await type(page, '#firstname', 'John-Peter')
 
         /*
          * Expected result: should accept the input and not throw any error
@@ -71,8 +71,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
       })
 
       test("Using name: O'Neill", async ({ page }) => {
-        await page.locator('#firstname').fill("O'Neill")
-        await page.getByRole('heading', { name: 'Birth' })
+        await type(page, '#firstname', "O'Neill")
 
         /*
          * Expected result: should accept the input and not throw any error
@@ -82,7 +81,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
     })
 
     test('3.1.2 Enter less than 33 English characters', async ({ page }) => {
-      await page.locator('#firstname').fill('Rakibul Islam')
+      await type(page, '#firstname', 'Rakibul Islam')
       await page.getByRole('heading', { name: 'Birth' })
 
       /*
@@ -107,7 +106,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
 
     test('3.1.4 Enter more than 32 English characters', async ({ page }) => {
       const LONG_NAME = 'Ovuvuevuevue Enyetuenwuevue Ugbemugbem Osas'
-      await page.locator('#firstname').fill(LONG_NAME)
+      await type(page, '#firstname', LONG_NAME)
       await page.getByRole('heading', { name: 'Birth' })
 
       /*
