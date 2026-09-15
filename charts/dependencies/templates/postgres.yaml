@@ -27,9 +27,10 @@ metadata:
     app: postgres
   name: postgres
 spec:
-  type: {{ .Values.service_type | default "ClusterIP" }}
-  {{- if eq .Values.service_type "NodePort" }}
-  nodePort: {{ .Values.postgres.node_port | default 30432 }}
+  {{- $service_type := default .Values.service_type .Values.postgres.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
+  clusterIP: None
   {{- end }}
   ports:
     - port: 5432

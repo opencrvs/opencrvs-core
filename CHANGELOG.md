@@ -146,7 +146,6 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
 - Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
 
-
 ### New features
 
 #### Location and administrative area write API
@@ -253,7 +252,35 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 
-## 2.0.2 Release Candidate
+## 2.0.2
+
+### Improvements
+
+- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
+
+### Bug fixes
+
+- Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
+- Minio DockerHub image has been deprecated. Replace minio/mc image with quay.io/minio/mc [#13797](https://github.com/opencrvs/opencrvs-core/issues/13797)
+
+## 1.9.18
+
+## 1.9.17
+
+### Improvements
+
+- Removed Sentry from OpenCRVS entirely. The client and login apps no longer initialise Sentry, report exceptions to it, or show its "report a problem" dialog on a crash, and the ten backend services no longer register `hapi-sentry`. The `@sentry/*`, `redux-sentry-middleware` and `hapi-sentry` dependencies are gone. `script-src` no longer allow-lists `https://sentry.io/api/embed/error-page/`, so it names no third-party host and the login app loads scripts from `'self'` only. React error boundaries now render the apps' own error pages. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+  **Deployment notes:**
+
+  - `SENTRY_DSN` is no longer read by any service, and the browser no longer reads `window.config.SENTRY`. Both can be dropped from your environment and country configuration; leaving them set has no effect.
+  - **Crash reporting is no longer built in.** Browser and server errors now go to logs and the browser console only. Deployments that relied on Sentry for alerting should put their own error tracking in place.
+
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
 
 ## 2.0.1 Release
 
@@ -273,7 +300,6 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Expose `POST /locations` and `POST /administrative-areas` REST endpoints to create or update a single location or administrative area, for correcting individual data-seeding errors. Bulk seeding is unaffected and still uses the existing `locations.set`/`administrativeAreas.set` tRPC mutations. [#13336](https://github.com/opencrvs/opencrvs-core/pull/13336)
 - The MOSIP charts now pass `OPENCRVS_AUTH_URL` to mosip-api and pin the mosip-api, mosip-mock and esignet-mock images to `2.0.1`. Implementations running the MOSIP integration should redeploy the `opencrvs-mosip` chart. [#13362](https://github.com/opencrvs/opencrvs-core/pull/13362)
 - Make the Deployment rollout strategy configurable, and default it to `Recreate`, for OpenCRVS services [#11994](https://github.com/opencrvs/opencrvs-core/issues/11994)
-- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
 
 ### Bug fixes
 

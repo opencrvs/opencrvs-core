@@ -72,6 +72,8 @@ network_policy:
   # deployed to separate namespaces.
   allowed_namespaces: []
 
+service_type: ClusterIP
+
 # Kubernetes storage type, available options are `pvc` or `host_path`
 storage_type: pvc
 
