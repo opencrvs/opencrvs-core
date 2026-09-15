@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/workflow",
-  "version": "1.9.18",
+  "version": "1.9.19",
   "description": "OpenCRVS workflow service",
   "license": "MPL-2.0",
   "private": true,
