@@ -19,10 +19,10 @@ export const PreviewErrorBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   text-align: center;
   padding: 16px;
   border-radius: 8px;
   z-index: 20;
-  ${({ theme }) => theme.fonts.bold12};
+  ${({ theme }) => theme.fonts.bold16};
 `
