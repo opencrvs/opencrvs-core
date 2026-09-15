@@ -97,7 +97,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       {{#ifCond ($lookup $declaration "deceased.address.addressType") '===' "INTERNATIONAL" }}
         <tspan x="312" y="188.104">{{$join ", " ($lookup $declaration 'deceased.address.streetLevelDetails.district2') ($lookup $declaration 'deceased.address.streetLevelDetails.state') ($lookup $declaration 'deceased.address.country')}}</tspan>
       {{else}}
-        <tspan x="312" y="188.104">{{$join ", " ($lookup $declaration 'deceased.address.district') ($lookup $declaration 'deceased.address.province') ($lookup $declaration 'deceased.address.country')}}</tspan>
+        <tspan x="312" y="188.104">{{$lookup $declaration 'deceased.address.administrativeHierarchy'}}</tspan>
       {{/ifCond}}
     </text>
   </g>
@@ -157,12 +157,18 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
           <tspan x="312" y="306.104">{{$join ", " ($lookup $declaration 'eventDetails.deathLocation.district') ($lookup $declaration 'eventDetails.deathLocation.province') ($lookup $declaration 'eventDetails.deathLocation.country')}}</tspan>
         {{else}}
           {{#ifCond ($lookup $declaration 'eventDetails.deathLocationOther') '!==' undefined }}
-          <tspan x="312" y="294.104">{{$or ($lookup $declaration 'eventDetails.deathLocationOther.district') ($lookup $declaration 'eventDetails.deathLocationOther.streetLevelDetails.district2')}}&#10;</tspan>
-          <tspan x="312" y="306.104">{{$join ", " ($or ($lookup $declaration 'eventDetails.deathLocationOther.streetLevelDetails.state') ($lookup $declaration 'eventDetails.deathLocationOther.province')) ($lookup $declaration 'eventDetails.deathLocationOther.country')}}</tspan>
+          {{#ifCond ($lookup $declaration "eventDetails.deathLocationOther.addressType") '===' "INTERNATIONAL" }}
+            <tspan x="312" y="294.104">{{$join ", " ($lookup $declaration 'eventDetails.deathLocationOther.streetLevelDetails.district2') ($lookup $declaration 'eventDetails.deathLocationOther.streetLevelDetails.state') ($lookup $declaration 'eventDetails.deathLocationOther.country')}}</tspan>
+          {{else}}
+            <tspan x="312" y="294.104">{{$lookup $declaration 'eventDetails.deathLocationOther.administrativeHierarchy'}}</tspan>
+          {{/ifCond}}
           {{else}}
             {{#ifCond ($lookup $declaration 'deceased.address') '!==' undefined }}
-            <tspan x="312" y="294.104">{{$or ($lookup $declaration 'deceased.address.district') ($lookup $declaration 'deceased.address.streetLevelDetails.district2')}}&#10;</tspan>
-            <tspan x="312" y="306.104">{{$join ", " ($or ($lookup $declaration 'deceased.address.streetLevelDetails.state') ($lookup $declaration 'deceased.address.province')) ($lookup $declaration 'deceased.address.country')}}</tspan>
+            {{#ifCond ($lookup $declaration "deceased.address.addressType") '===' "INTERNATIONAL" }}
+              <tspan x="312" y="294.104">{{$join ", " ($lookup $declaration 'deceased.address.streetLevelDetails.district2') ($lookup $declaration 'deceased.address.streetLevelDetails.state') ($lookup $declaration 'deceased.address.country')}}</tspan>
+            {{else}}
+              <tspan x="312" y="294.104">{{$lookup $declaration 'deceased.address.administrativeHierarchy'}}</tspan>
+            {{/ifCond}}
             {{/ifCond}}
           {{/ifCond}}
         {{/ifCond}}
@@ -211,7 +217,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
   </text>
   <g clip-path="url(#clip9_948_2918)">
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
-      <tspan x="312" y="404.104">{{$join ", " ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.district') ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.province') ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.country')}}</tspan>
+      <tspan x="312" y="404.104">{{$join ", " ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.name') ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.district') ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.province') ($lookup $metadata 'legalStatuses.REGISTERED.createdAtLocation.country')}}</tspan>
     </text>
   </g>
   <line x1="70" y1="410.5" x2="514" y2="410.5" stroke="#ECECEC" />
