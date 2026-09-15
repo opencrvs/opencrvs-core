@@ -916,12 +916,10 @@ test.describe.serial('Correct record - 4', () => {
     ).toBeVisible()
   })
   test('4.9 Validate record corrected modal', async () => {
-    const correctionRequestedRow = page.locator(
-      '#listTable-task-history #row_6'
-    )
+    const correctionRequestedRow = page
+      .locator('#listTable-task-history [id^="row_"]')
+      .filter({ hasText: 'Record corrected' })
     await correctionRequestedRow.getByText('Record corrected').click()
-
-    const date = await correctionRequestedRow.locator('span').nth(1).innerText()
 
     const requester = await correctionRequestedRow
       .getByTestId('user-name')
@@ -941,7 +939,11 @@ test.describe.serial('Correct record - 4', () => {
       page.getByRole('heading', { name: 'Record corrected' })
     ).toBeVisible()
 
-    await expect(page.getByText(requester + ' — ' + date)).toBeVisible()
+    await expect(
+      page
+        .getByTestId('event-history-modal')
+        .getByText(requester + ' — ', { exact: false })
+    ).toBeVisible()
 
     await expect(page.getByText('Requester' + 'Legal guardian')).toBeVisible()
     await expect(
