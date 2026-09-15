@@ -13,7 +13,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -40,6 +40,7 @@ import {
 import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
+import { setBearerForToken } from '@events/router/middleware'
 import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
@@ -51,6 +52,7 @@ import {
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
+import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   ActionConfirmationResponse,
@@ -247,6 +249,15 @@ export async function defaultRequestHandler(
     'customActionType' in input ? input.customActionType : undefined,
     event
   )
+  /*
+   * The country configuration gets core's own internal service token rather
+   * than the caller's own token. It only proves the confirmation request comes
+   * from an internal core service; it grants nothing, so the country
+   * configuration cannot register a second record, act on another event, or use
+   * the registrar's write scopes. Confirming asynchronously requires the country
+   * configuration's own system client credentials.
+   */
+  const eventActionToken = await getServiceToken()
 
   const eventWithRequestedAction = await addAction(input, {
     eventId: event.id,
@@ -262,7 +273,7 @@ export async function defaultRequestHandler(
     input.type,
     input.transactionId,
     eventWithRequestedAction,
-    token
+    setBearerForToken(eventActionToken)
   )
 
   // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
@@ -394,15 +405,6 @@ export function getDefaultActionProcedures(
     ? userAndSystemProcedure
     : userOnlyProcedure
 
-  // Confirming an action (accept/reject) requires the same scope as requesting
-  // it. Custom actions have no static scope in ACTION_SCOPE_MAP — their access
-  // is granted through `record.custom-action` (see `customActionProcedures`), so
-  // that is what their confirmation is checked against too.
-  const confirmationScopes =
-    actionType === ActionType.CUSTOM
-      ? ['record.custom-action' as const]
-      : ACTION_SCOPE_MAP[actionType]
-
   return {
     request: userTypeBasedProcedure
       .meta(meta)
@@ -423,7 +425,7 @@ export function getDefaultActionProcedures(
         })
 
         if (existingAction) {
-          return event
+          return ctx.event
         }
 
         if (duplicates.detected) {
@@ -467,28 +469,15 @@ export function getDefaultActionProcedures(
               .shape
           )
       )
-      .use(middleware.canAccessEventWithScopes(confirmationScopes))
-      .use(middleware.requireAssignment)
+      .use(middleware.requireActionConfirmation('record.action.accept'))
+      .use(middleware.requireConfirmableAction(actionType))
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
-        const originalAction = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
+        const { token, user, event, confirmationAction } = ctx
+        const { actionId } = input
         const configuration = await getEventConfigurationById({
           token,
           eventType: event.type
         })
-
-        // Original action is not found
-        if (!originalAction) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Action not found.'
-          })
-        }
 
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
@@ -537,23 +526,14 @@ export function getDefaultActionProcedures(
           }
         )
       }),
+
     reject: userAndSystemProcedure
       .input(AsyncActionInput)
-      .use(middleware.canAccessEventWithScopes(confirmationScopes))
-      .use(middleware.requireAssignment)
+      .use(middleware.requireActionConfirmation('record.action.reject'))
+      .use(middleware.requireConfirmableAction(actionType))
       .mutation(async ({ input, ctx }) => {
-        const { eventId, actionId } = input
-
-        const event = await getEventById(eventId)
-        const action = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
-
-        // Action is not found
-        if (!action) {
-          throw new Error(`Action not found.`)
-        }
+        const { event, confirmationAction } = ctx
+        const { actionId } = input
 
         if (confirmationAction) {
           // Action is already accepted
@@ -570,16 +550,9 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
-        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
-        const originalCorrectionRequestId =
-          action.type === ActionType.REJECT_CORRECTION
-            ? RejectedCorrectionAction.parse(action).requestId
-            : undefined
-
         return addAsyncRejectAction(
           {
             ...input,
-            requestId: originalCorrectionRequestId,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false

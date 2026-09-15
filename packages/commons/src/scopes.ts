@@ -51,7 +51,9 @@ export const RecordScopeTypeV2 = z.enum([
   'record.request-correction',
   'record.correct',
   'record.unassign-others',
-  'record.custom-action'
+  'record.custom-action',
+  'record.action.accept',
+  'record.action.reject'
 ])
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
@@ -238,6 +240,35 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
     )
 })
 
+/**
+ * Scopes that authorise confirming (accepting or rejecting) an action, in two
+ * forms distinguished by whether they name one:
+ *
+ * - **Bound** (`options.id` set). Core mints these per confirmation request and
+ *   hands them to the country configuration in place of the caller's own token.
+ *   The binding is the whole authorisation, so no event check is needed.
+ * - **Unbound** (`options.id` omitted). A standing grant for an integration
+ *   that confirms under its own credentials, long after a bound token would
+ *   have expired. The remaining options apply as they do to any record scope.
+ *
+ * These must not be granted to a user role: a caller who can request an action
+ * and also confirm it needs no country configuration to register a record, and
+ * can pick its registration number and override the reviewed declaration.
+ */
+export const ActionConfirmationScopeType = RecordScopeTypeV2.extract([
+  'record.action.accept',
+  'record.action.reject'
+])
+export type ActionConfirmationScopeType = z.infer<
+  typeof ActionConfirmationScopeType
+>
+
+const ActionConfirmationScopeOptions = AllRecordScopeOptions.extend({
+  id: UUID.optional().describe(
+    'Binds this scope to a single action, so it authorises confirming that action and no other. Core mints such a scope per confirmation request and hands it to the country configuration. Omit it to grant an integration the standing ability to confirm, in which case the remaining options apply as they do to any record scope.'
+  )
+}).describe('Options for confirming (accepting or rejecting) an action.')
+
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -259,6 +290,10 @@ export const RecordScopeV2 = z
     z.object({
       type: z.literal('record.print-certified-copies'),
       options: ScopeOptionsPrintCertifiedCopies.optional()
+    }),
+    z.object({
+      type: ActionConfirmationScopeType,
+      options: ActionConfirmationScopeOptions.optional()
     })
   ])
   .describe(
@@ -330,6 +365,12 @@ export function isCustomActionScope(
   scope: Scope
 ): scope is Extract<Scope, { type: 'record.custom-action' }> {
   return scope.type === 'record.custom-action'
+}
+
+export function isActionConfirmationScope(
+  scope: Scope
+): scope is Extract<Scope, { type: ActionConfirmationScopeType }> {
+  return ActionConfirmationScopeType.options.some((type) => type === scope.type)
 }
 
 export const ResolvedRecordScopeV2 = z

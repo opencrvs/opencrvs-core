@@ -79,6 +79,7 @@ import {
 } from '@opencrvs/toolkit/events'
 
 import { onRegisterHandler } from './api/registration'
+import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { workqueueconfigHandler } from './api/workqueue/handler'
 import getUserNotificationRoutes from './config/routes/userNotificationRoutes'
 import {
@@ -606,6 +607,32 @@ export async function createServer() {
       request.sentryScope?.setExtra('payload', request.payload)
       return h.continue
     }
+  })
+
+  /*
+   * Action confirmation requests must come from an internal core service. Core
+   * sends its service token (see isServiceToken) rather than any user's token,
+   * so this proves the request originates from core and not from an outside
+   * caller. The token is only proof of origin — it carries no scopes, so a
+   * country configuration that confirms an action asynchronously must use its
+   * own system client's credentials for the accept/reject call, not this token.
+   */
+  server.ext('onPostAuth', (request, h) => {
+    const isActionConfirmationRequest =
+      request.method === 'post' &&
+      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
+
+    if (
+      isActionConfirmationRequest &&
+      !isServiceToken(request.auth.credentials)
+    ) {
+      logger.warn(
+        'Action confirmation: rejected a request that is not from the core service token'
+      )
+      return h.response({ error: 'forbidden' }).code(403).takeover()
+    }
+
+    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {

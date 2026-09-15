@@ -10,7 +10,7 @@
  */
 
 import { HttpResponse, http } from 'msw'
-import { ActionType, ActionStatus, getUUID } from '@opencrvs/commons'
+import { ActionType, ActionStatus, getUUID, UUID } from '@opencrvs/commons'
 import {
   createTestClient,
   createCountryConfigClient,
@@ -29,7 +29,7 @@ function mockDeclareApi(status: number) {
 }
 
 function getDeclareActionId(
-  actions: { type: ActionType; status: ActionStatus; id: string }[]
+  actions: { type: ActionType; status: ActionStatus; id: UUID }[]
 ) {
   const id = actions.find(
     (a) => a.type === ActionType.DECLARE && a.status === ActionStatus.Requested
@@ -52,7 +52,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.reject({
       eventId: event.id,
@@ -74,7 +74,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.reject({
       eventId: event.id,
@@ -88,7 +88,11 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
 })
 
 describe('Async confirmation - keepAssignment flags on accept', () => {
-  test('default: assignment dropped after request is handled async', async () => {
+  // Accept is confirmed by the country config's system client, and system
+  // users do not partake in assignment, so the accept never drops it — the
+  // keepAssignment flag has no effect here. (Reject still drops it; see
+  // addAsyncRejectAction.)
+  test('assignment kept after async accept by a system client', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
@@ -97,10 +101,9 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
 
     const data = generator.event.actions.declare(event.id)
     const requestResponse = await client.event.actions.declare.request(data)
-    expect(requestResponse.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id, actionId)
+    const ccClient = createCountryConfigClient(user, event.id)
 
     const response = await ccClient.event.actions.declare.accept({
       ...data,
@@ -108,6 +111,29 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
       transactionId: getUUID()
     })
 
-    expect(response.actions.at(-1)?.type).toEqual(ActionType.DECLARE)
+    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
+  })
+
+  test('keepAssignment=true: assignment kept after async accept', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    mockDeclareApi(202)
+
+    const data = generator.event.actions.declare(event.id)
+    const requestResponse = await client.event.actions.declare.request(data)
+
+    const actionId = getDeclareActionId(requestResponse.actions)
+    const ccClient = createCountryConfigClient(user, event.id)
+
+    const response = await ccClient.event.actions.declare.accept({
+      ...data,
+      actionId,
+      transactionId: getUUID(),
+      keepAssignment: true
+    })
+
+    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
   })
 })

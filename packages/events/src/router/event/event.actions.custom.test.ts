@@ -293,7 +293,7 @@ describe('event.actions.custom', () => {
   })
 
   describe('Asynchronous confirmation flow', () => {
-    function mockCustomActionApi(status: number) {
+    function mockNotifyApi(status: number) {
       return mswServer.use(
         http.post<never, { actionId: string }>(
           `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/CUSTOM`,
@@ -309,7 +309,7 @@ describe('event.actions.custom', () => {
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
-      mockCustomActionApi(202)
+      mockNotifyApi(202)
 
       await expect(
         client.event.actions.custom.request(payload)
@@ -323,13 +323,13 @@ describe('event.actions.custom', () => {
     })
 
     test('should successfully accept a previously requested action', async () => {
-      const { client, payload, user } = await initialiseTest([
+      const { client, payload, generator, user } = await initialiseTest([
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
       const eventId = payload.eventId
 
-      mockCustomActionApi(202)
+      mockNotifyApi(202)
 
       const requestResponse = await client.event.actions.custom.request(payload)
 
@@ -340,11 +340,7 @@ describe('event.actions.custom', () => {
         'Could not find id for custom action'
       )
 
-      const countryConfigClient = createCountryConfigClient(
-        user,
-        eventId,
-        originalActionId
-      )
+      const countryConfigClient = createCountryConfigClient(user, eventId)
 
       const response = await countryConfigClient.event.actions.custom.accept({
         ...payload,
@@ -355,6 +351,47 @@ describe('event.actions.custom', () => {
       expect(
         sanitizeForSnapshot(response, UNSTABLE_EVENT_FIELDS)
       ).toMatchSnapshot()
+    })
+
+    test('rejects confirming a pending custom action as a different custom action type', async () => {
+      const { client, payload, generator, user } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      const eventId = payload.eventId
+
+      mockNotifyApi(202)
+
+      const requestResponse = await client.event.actions.custom.request(payload)
+
+      const originalActionId = getOrThrow(
+        requestResponse.actions.find(
+          (action) => action.type === ActionType.CUSTOM
+        )?.id,
+        'Could not find id for custom action'
+      )
+
+      const createAction = requestResponse.actions.filter(
+        (action) => action.type === ActionType.CREATE
+      )
+
+      const assignmentInput = generator.event.actions.assign(payload.eventId, {
+        assignedTo: createAction[0].createdBy
+      })
+      await client.event.actions.assignment.assign(assignmentInput)
+
+      const countryConfigClient = createCountryConfigClient(user, eventId)
+
+      // The pending action is CUSTOM_ACTION_TYPE; confirming it under a
+      // different customActionType must be refused rather than silently recorded.
+      await expect(
+        countryConfigClient.event.actions.custom.accept({
+          ...payload,
+          customActionType: 'A_DIFFERENT_CUSTOM_ACTION',
+          transactionId: getUUID(),
+          actionId: originalActionId
+        })
+      ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
     })
   })
 

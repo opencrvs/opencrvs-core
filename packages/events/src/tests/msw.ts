@@ -145,6 +145,10 @@ const handlers = [
       access_token: 'some-token'
     })
   ),
+  // Core sends its internal service token to the country config when requesting
+  // action confirmation; the country config endpoints are mocked and never
+  // inspect it. `createCountryConfigClient` builds the real thing for tests that
+  // call accept/reject.
   http.get(`${env.AUTH_URL}/internal/service-token`, () =>
     HttpResponse.json({ token: 'service-token' })
   )

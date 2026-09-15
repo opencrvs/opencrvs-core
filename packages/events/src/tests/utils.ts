@@ -275,32 +275,26 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
+/**
+ * Mints the token a country configuration uses to confirm (accept/reject) an
+ * action: the `record.action.accept` / `record.action.reject` scopes no user
+ * role holds, scoped to one event. The token is always a **system** client's —
+ * these scopes are only ever honoured for a system user (see
+ * `requireActionConfirmation`), never a human one.
+ */
 function createActionConfirmationTestToken(
-  userId: string,
-  eventId: string,
-  actionId: string
+  systemId: UUID,
+  eventId: UUID
 ): TokenWithBearer {
   const token = jwt.sign(
     {
       scope: [
-        ...TEST_USER_DEFAULT_SCOPES,
-        encodeScope({
-          type: 'record.custom-action',
-          options: {
-            event: [
-              'birth',
-              'death',
-              'tennis-club-membership',
-              'child-onboarding'
-            ],
-            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
-          }
-        })
+        encodeScope({ type: 'record.action.accept' }),
+        encodeScope({ type: 'record.action.reject' })
       ],
-      sub: userId,
-      userType: TokenUserType.enum.user,
-      eventId,
-      actionId
+      sub: systemId,
+      userType: TokenUserType.enum.system,
+      eventId
     },
     readFileSync(join(__dirname, './cert.key')),
     {
@@ -383,23 +377,21 @@ export function createInitialisationTestClient(
 }
 
 /**
- * Simulates the confirmation caller (e.g. countryconfig / an integration)
- * hitting the action `accept`/`reject` endpoints. Confirming requires the
- * action's own scope (e.g. `record.register`), which this client carries.
+ * Simulates the country configuration hitting the action `accept`/`reject`
+ * endpoints with its own system client's confirmation credentials, scoped to
+ * `eventId`. Confirmation is a system-client action, so the caller is a system
+ * context — the passed `user` only supplies an id to attribute it to.
  */
-export function createCountryConfigClient(
-  user: CreatedUser,
-  eventId: string,
-  actionId: string
-) {
+export function createCountryConfigClient(user: CreatedUser, eventId: UUID) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createActionConfirmationTestToken(user.id, eventId, actionId)
+  const token = createActionConfirmationTestToken(user.id, eventId)
 
   const caller = createCaller({
-    user: {
-      id: getUUID(),
+    user: SystemContext.parse({
+      id: user.id,
+      primaryOfficeId: undefined,
       type: TokenUserType.enum.system
-    },
+    }),
     token
   })
   return caller
@@ -584,11 +576,6 @@ export async function createEvent(
 
   return createdEvent
 }
-type SeedAction =
-  | DeclarationActionType
-  | typeof ActionType.UNASSIGN
-  | typeof ActionType.REQUEST_CORRECTION
-  | typeof ActionType.ARCHIVE
 
 /**
  * Seeds an event with the specified actions directly into the database.
@@ -606,7 +593,12 @@ export async function seedEvent(
     administrativeHierarchy
   }: {
     eventConfig: EventConfig
-    actions: (SeedAction | { type: SeedAction; status: ActionStatus })[]
+    actions: (
+      | DeclarationActionType
+      | typeof ActionType.UNASSIGN
+      | typeof ActionType.REQUEST_CORRECTION
+      | typeof ActionType.ARCHIVE
+    )[]
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
@@ -625,10 +617,7 @@ export async function seedEvent(
   /** offset variable for timestamps, ensures the array order is maintained. */
   let offset = 0
 
-  /** Ids of the requested actions, keyed by action type. Needed to call .accept / .reject against them. */
-  const requestedActionIds: Partial<Record<ActionType, UUID>> = {}
-
-  return dbClient.transaction().execute(async (trx) => {
+  await dbClient.transaction().execute(async (trx) => {
     const event = await trx
       .insertInto('events')
       .values({
@@ -669,12 +658,7 @@ export async function seedEvent(
     }
 
     const generatedActions: NewEventActions[] = actions.flatMap(
-      (action): NewEventActions[] => {
-        const { type: actionType, status } =
-          typeof action === 'string'
-            ? { type: action, status: ActionStatus.Accepted }
-            : action
-
+      (actionType): NewEventActions[] => {
         if (actionType === ActionType.UNASSIGN) {
           return [
             {
@@ -690,7 +674,6 @@ export async function seedEvent(
 
         // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
         const originalActionId = getUUID()
-        requestedActionIds[actionType] = originalActionId
 
         // correction, partial declaration which changes a value without uncorrectable: true is enough.
         const declaration =
@@ -704,35 +687,25 @@ export async function seedEvent(
                 administrativeHierarchy
               )
 
-        const requestedAction = {
-          ...baseAction,
-          actionType,
-          id: originalActionId,
-          transactionId: generateUuid(rng),
-          status: ActionStatus.Requested,
-          createdAt: new Date(baseTime + ++offset).toISOString(),
-          declaration
-        }
-
-        if (status === ActionStatus.Requested) {
-          return [requestedAction]
-        }
-
         return [
-          requestedAction,
+          {
+            ...baseAction,
+            actionType,
+            id: originalActionId,
+            transactionId: generateUuid(rng),
+            status: ActionStatus.Requested,
+            createdAt: new Date(baseTime + ++offset).toISOString(),
+            declaration
+          },
           {
             ...baseAction,
             actionType,
             transactionId: generateUuid(rng),
             originalActionId,
-            status:
-              status === ActionStatus.Accepted
-                ? ActionStatus.Accepted
-                : ActionStatus.Rejected,
+            status: ActionStatus.Accepted,
             createdAt: new Date(baseTime + ++offset).toISOString(),
             registrationNumber:
-              actionType === ActionTypes.enum.REGISTER &&
-              status === ActionStatus.Accepted
+              actionType === ActionTypes.enum.REGISTER
                 ? generateRegistrationNumber(rng)
                 : null,
             declaration: {}
@@ -748,8 +721,6 @@ export async function seedEvent(
         oc.columns(['transactionId', 'actionType', 'status']).doNothing()
       )
       .execute()
-
-    return { eventId: event.id, requestedActionIds }
   })
 }
 
