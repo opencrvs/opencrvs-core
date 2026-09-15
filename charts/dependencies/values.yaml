@@ -324,8 +324,9 @@ elastalert:
     #   - email: send email alert using configured SMTP server
     #   - post2: send alert to external system via HTTP POST (Docker swarm backward compatible way)
     NOTIFICATION_TYPE: post2
-    # If the notification type is post2, SMTP settings are not required
-    # These are dummy values to satisfy the envsubst command.
+    # If the notification type is post2, SMTP settings are not required for notifications to work.
+    # However, templates for rules may still require SMTP settings to be present in the environment,
+    # so dummy values are provided below.
     ALERT_EMAIL: 'dummy@example.com'
     SENDER_EMAIL_ADDRESS: 'dummy@example.com'
     SMTP_HOST: localhost
