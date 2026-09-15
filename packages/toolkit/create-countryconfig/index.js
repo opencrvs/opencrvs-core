@@ -147,11 +147,52 @@ function resolveRef() {
   process.exit(1)
 }
 
-function cloneRepository(repoUrl, ref, targetDir) {
+function cloneRepository(
+  repoUrl,
+  ref,
+  targetDir,
+  { keepHistory = false } = {}
+) {
+  const depthFlag = keepHistory ? '' : '--depth 1 '
   execSync(
-    'git clone --depth 1 --branch ' + ref + ' ' + repoUrl + ' ' + targetDir,
+    'git clone ' +
+      depthFlag +
+      '--branch ' +
+      ref +
+      ' ' +
+      repoUrl +
+      ' ' +
+      targetDir,
     { stdio: 'inherit' }
   )
+
+  if (!keepHistory) {
+    try {
+      fs.rmSync(path.join(targetDir, '.git'), {
+        recursive: true,
+        force: true
+      })
+    } catch (err) {
+      console.error(
+        'Failed to remove .git directory from ' + targetDir + ':',
+        err.message
+      )
+      process.exit(1)
+    }
+    return
+  }
+
+  console.log(
+    "Replacing 'origin' remote with 'upstream' in " + targetDir + '...'
+  )
+  execSync('git remote remove origin', {
+    cwd: targetDir,
+    stdio: 'inherit'
+  })
+  execSync('git remote add upstream ' + repoUrl, {
+    cwd: targetDir,
+    stdio: 'inherit'
+  })
 }
 
 const projectName = process.argv[2]
@@ -199,19 +240,6 @@ try {
   process.exit(1)
 }
 
-try {
-  fs.rmSync(path.join(countryconfigTargetDir, '.git'), {
-    recursive: true,
-    force: true
-  })
-} catch (err) {
-  console.error(
-    'Failed to remove .git directory from country config:',
-    err.message
-  )
-  process.exit(1)
-}
-
 const pkgPath = path.join(countryconfigTargetDir, 'package.json')
 if (fs.existsSync(pkgPath)) {
   try {
@@ -235,22 +263,11 @@ console.log(
 )
 
 try {
-  cloneRepository(INFRASTRUCTURE_REPO_URL, ref, infrastructureDirName)
-} catch (err) {
-  console.error('Failed to clone the infrastructure repository:', err.message)
-  process.exit(1)
-}
-
-try {
-  fs.rmSync(path.join(infrastructureTargetDir, '.git'), {
-    recursive: true,
-    force: true
+  cloneRepository(INFRASTRUCTURE_REPO_URL, ref, infrastructureDirName, {
+    keepHistory: true
   })
 } catch (err) {
-  console.error(
-    'Failed to remove .git directory from infrastructure:',
-    err.message
-  )
+  console.error('Failed to clone the infrastructure repository:', err.message)
   process.exit(1)
 }
 
@@ -263,4 +280,9 @@ console.log('  git init')
 console.log('  npm install\n')
 console.log('To get started with the infrastructure:\n')
 console.log('  cd ' + infrastructureDirName)
-console.log('  git init\n')
+console.log('  git remote add origin <your-infrastructure-repo-url>')
+console.log('  git push -u origin ' + ref + '\n')
+console.log(
+  'The "upstream" remote points at the official infrastructure repository, ' +
+    'so you can pull future releases with `git fetch upstream`.\n'
+)

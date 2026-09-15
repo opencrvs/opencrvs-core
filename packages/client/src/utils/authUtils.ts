@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import decode from 'jwt-decode'
-import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { ITokenPayload } from '@opencrvs/commons/client'
@@ -33,7 +32,8 @@ export async function removeToken() {
     try {
       await authApi.invalidateToken(token)
     } catch (err) {
-      Sentry.captureException(err)
+      // eslint-disable-next-line no-console
+      console.error(err)
     }
   }
   localStorage.removeItem('opencrvs')
@@ -47,7 +47,8 @@ export const getTokenPayload = (token: string) => {
   try {
     decoded = decode(token)
   } catch (err) {
-    Sentry.captureException(err)
+    // eslint-disable-next-line no-console
+    console.error(err)
     return null
   }
 

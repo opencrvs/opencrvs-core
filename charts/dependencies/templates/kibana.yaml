@@ -32,12 +32,15 @@ kind: Service
 metadata:
   name: kibana
 spec:
-  type: ClusterIP
+  type: {{ .Values.service_type | default "ClusterIP" }}
   ports:
     - port: 5601
       targetPort: 5601
       protocol: TCP
       name: http
+      {{- if .Values.kibana.node_port }}
+      nodePort: {{ .Values.kibana.node_port }}
+      {{- end }}
   selector:
     app: kibana
 ---
