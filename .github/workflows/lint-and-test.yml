@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check package.json and scripts
         id: check-scripts
@@ -88,7 +88,7 @@ jobs:
 
       - name: Use Node.js from .nvmrc
         if: steps.check-scripts.outputs.skip != 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
@@ -126,7 +126,7 @@ jobs:
           done
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             **/node_modules
@@ -168,12 +168,12 @@ jobs:
       contents: read
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Fetch history to compare PR changes against the base branch
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
@@ -209,7 +209,7 @@ jobs:
           done
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             **/node_modules
@@ -250,12 +250,12 @@ jobs:
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             **/node_modules
@@ -286,12 +286,12 @@ jobs:
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             **/node_modules
@@ -334,12 +334,12 @@ jobs:
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             **/node_modules
@@ -384,12 +384,12 @@ jobs:
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             **/node_modules
@@ -410,19 +410,19 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.base_ref }}
           path: base
 
       - name: Checkout the PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
           path: pr
 
       - name: Use Node.js from .nvmrc from base branch
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: base/.nvmrc
 
@@ -431,7 +431,7 @@ jobs:
         working-directory: base
 
       - name: Use Node.js from .nvmrc from PR branch
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: pr/.nvmrc
 
@@ -474,10 +474,10 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
