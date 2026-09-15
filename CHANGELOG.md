@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9.18 Release Candidate
+## 1.9.18
 
 ## 1.9.17
 
