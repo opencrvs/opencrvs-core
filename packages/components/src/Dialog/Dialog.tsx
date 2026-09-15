@@ -27,6 +27,8 @@ export interface IDialogProps {
    */
   width?: number
   variant?: 'small' | 'large'
+  /** Banner element displayed at the top of the dialog */
+  banner?: React.ReactNode
 }
 
 const DialogWrapper = styled.div`
@@ -78,6 +80,7 @@ const DialogHeader = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
   min-height: 40px;
+  flex-shrink: 0;
 `
 const DialogTitle = styled.div`
   display: flex;
@@ -115,7 +118,8 @@ export function Dialog({
   actions,
   variant = 'small',
   width,
-  titleIcon
+  titleIcon,
+  banner
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
@@ -149,6 +153,7 @@ export function Dialog({
             role="dialog"
             data-testid={id}
           >
+            {banner}
             <DialogHeader>
               <DialogTitle>
                 {titleIcon}

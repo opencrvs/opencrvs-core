@@ -13,9 +13,6 @@ import {
   FieldConfig,
   EventState,
   isFieldVisible,
-  isMetaAction,
-  EventDocument,
-  ActionType,
   ValidatorContext,
   deepMerge,
   omitHiddenFields,
@@ -79,12 +76,6 @@ export function hasDeclarationFieldChanged(
     previousFormValues,
     validatorContext
   )
-}
-
-export function isLastActionCorrectionRequest(event: EventDocument) {
-  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
-  const lastWriteAction = writeActions[writeActions.length - 1]
-  return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }
 
 export function aggregateAnnotations(actions: ActionDocument[]) {

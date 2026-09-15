@@ -13,49 +13,52 @@ import {
   Action,
   ActionDocument,
   ActionType,
-  ActionStatus,
-  EventDocument,
-  getCompleteActionDeclaration,
-  getCompleteActionAnnotation,
-  getCompleteActionContent
+  EventDocument
 } from '@opencrvs/commons/client'
 
-/**
- * Includes a request action, if the corresponding accepted action has different transactionId
- * Merges declarations and annotations from the corresponding request action for an accepted action
- * @param fullEvent - The full EventDocument containing an actions array to filter.
- * @returns An array of actionDocument considered part of the event history.
- */
 export function extractHistoryActions(
   fullEvent: EventDocument
 ): ActionDocument[] {
-  function isHistoryAction(a: Action): a is ActionDocument {
-    if (a.status === ActionStatus.Accepted) {
-      return true
-    }
-
-    if (a.status === ActionStatus.Requested) {
-      const immediatelyAcceptedAction = fullEvent.actions.find(
-        ({ originalActionId, transactionId }) =>
-          originalActionId === a.id && transactionId === a.transactionId
-      )
-      if (!immediatelyAcceptedAction) {
-        return true
-      }
-    }
-
-    return false
+  function isHistoryAction(action: Action): action is ActionDocument {
+    return !action.originalActionId
   }
 
-  return fullEvent.actions.filter(isHistoryAction).map((action) => {
-    const content = getCompleteActionContent(fullEvent, action)
-    return {
-      ...action,
-      ...(content !== undefined ? { content } : {}),
-      declaration: getCompleteActionDeclaration({}, fullEvent, action),
-      annotation: getCompleteActionAnnotation(fullEvent, action)
+  return fullEvent.actions.filter(isHistoryAction)
+}
+
+/**
+ * Finds the APPROVE_CORRECTION that immediately (directly) approved the given
+ * REQUEST_CORRECTION — i.e. a direct correction where the same user requested
+ * and approved in a single step. Such pairs are collapsed in the audit history
+ * to a single 'Record corrected' row.
+ *
+ * Shared by the history label resolution (`getActionTypeForHistory`) and the
+ * history row visibility/flagging in `EventHistory`, so both agree on what
+ * counts as an immediate correction.
+ */
+export function findImmediateApproveCorrection(
+  actions: ActionDocument[],
+  requestCorrection: ActionDocument
+): ActionDocument | undefined {
+  const requestIds = new Set([requestCorrection.id])
+
+  if (requestCorrection.originalActionId) {
+    requestIds.add(requestCorrection.originalActionId)
+  }
+
+  for (const a of actions) {
+    if (a.originalActionId === requestCorrection.id) {
+      requestIds.add(a.id)
     }
-  }) as ActionDocument[]
+  }
+
+  return actions.find(
+    (x) =>
+      x.type === ActionType.APPROVE_CORRECTION &&
+      requestIds.has(x.requestId) &&
+      x.content?.immediateCorrection &&
+      x.createdBy === requestCorrection.createdBy
+  )
 }
 
 export function useActionForHistory() {
@@ -63,18 +66,11 @@ export function useActionForHistory() {
     actions: ActionDocument[],
     action: ActionDocument
   ) {
-    if (action.type === ActionType.REQUEST_CORRECTION) {
-      const approveAction = actions.find(
-        (x) =>
-          x.type === ActionType.APPROVE_CORRECTION &&
-          (x.requestId === action.id ||
-            x.requestId === action.originalActionId) &&
-          x.content?.immediateCorrection &&
-          x.createdBy === action.createdBy
-      )
-      if (approveAction) {
-        return 'CORRECTED'
-      }
+    if (
+      action.type === ActionType.REQUEST_CORRECTION &&
+      findImmediateApproveCorrection(actions, action)
+    ) {
+      return 'CORRECTED'
     }
 
     return action.type

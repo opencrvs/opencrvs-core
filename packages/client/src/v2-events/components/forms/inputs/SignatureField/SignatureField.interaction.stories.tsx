@@ -127,6 +127,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`events/123-abcd-213/`}
             fields={[
               {
                 id: 'storybook.signature',
@@ -252,6 +253,7 @@ export const UploadButtonsArmLockBypass: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={`events/123-abcd-213/`}
             fields={[
               {
                 id: 'storybook.signature',
@@ -395,6 +397,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              attachmentPath={`events/123-abcd-213/`}
               fields={[
                 {
                   id: 'storybook.signature',
@@ -428,14 +431,11 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               )
             }),
 
-            http.get('/:id', async (request) => {
-              const { id } = request.params
-              const response = await fetch(signaturePngBase64)
-              const binary = new Uint8Array(await response.arrayBuffer())
+            ...['/:id', '/events/:eventId/:filename'].map((path) =>
+              http.get(path, async () => {
+                const response = await fetch(signaturePngBase64)
+                const binary = new Uint8Array(await response.arrayBuffer())
 
-              // condition here is just to differentiate that the same mock serves two different requests.
-              // It is hard to differentiate at path level after we removed /ocrvs/ from the url.
-              if (id && typeof id === 'string' && id.startsWith('signature')) {
                 spies.getImage++
                 return new HttpResponse(binary, {
                   headers: {
@@ -443,16 +443,8 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
                     'Cache-Control': 'no-cache'
                   }
                 })
-              } else {
-                spies.getImage++
-                return new HttpResponse(binary, {
-                  headers: {
-                    'Content-Type': MimeType.enum['image/png'],
-                    'Cache-Control': 'no-cache'
-                  }
-                })
-              }
-            })
+              })
+            )
           ]
         }
       }
@@ -543,6 +535,7 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
         element: (
           <StyledFormFieldGenerator
             ref={noDuplicateErrorFormRef}
+            attachmentPath={`events/123-abcd-213/`}
             fields={[
               {
                 id: 'storybook.signature',
