@@ -30,7 +30,8 @@ import {
   getCurrentEventState,
   UUID,
   getAssignmentStatus,
-  AssignmentStatus
+  AssignmentStatus,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -138,6 +139,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       readonlyMode
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
+      attachmentPath={eventAttachmentPath(eventId)}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}

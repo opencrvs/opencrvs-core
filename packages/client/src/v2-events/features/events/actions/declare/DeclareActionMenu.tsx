@@ -21,7 +21,8 @@ import {
   getActionReview,
   getAvailableActionsForEvent,
   getActionConfig,
-  isValidIcon
+  isValidIcon,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -187,6 +188,7 @@ function useDeclarationActions(event: EventDocument) {
         return (
           <Review.ActionModal.Accept
             action="Declare"
+            attachmentPath={eventAttachmentPath(eventId)}
             close={close}
             copy={{
               supportingCopy: action.supportingCopy,

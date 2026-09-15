@@ -18,7 +18,8 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState
+  getCurrentEventState,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
@@ -93,6 +94,7 @@ export function Review() {
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
         anchor={recordAnchorDate(eventIndex)}
+        attachmentPath={eventAttachmentPath(eventId)}
         form={form}
         formConfig={formConfig}
         isCorrection={true}

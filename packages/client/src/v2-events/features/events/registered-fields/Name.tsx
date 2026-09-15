@@ -236,6 +236,7 @@ function NameInput({
   return (
     <>
       <FormFieldGenerator
+        attachmentPath={null}
         eventConfig={eventConfig}
         fields={fields}
         formTouched={touched}

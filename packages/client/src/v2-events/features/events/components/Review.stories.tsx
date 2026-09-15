@@ -33,7 +33,8 @@ import {
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
   tennisClubMembershipEvent,
-  toPlainDate
+  toPlainDate,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -200,6 +201,7 @@ export const ReviewWithValidationErrors: Story = {
     async function handleRejection() {
       await openModal<RejectActionModalResult | null>((close) => (
         <Review.ActionModal.Reject
+          attachmentPath={eventAttachmentPath('storybook-event')}
           close={close}
           eventConfiguration={tennisClubMembershipEvent}
         />
@@ -542,6 +544,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
           <Review.Body
             anchor={toPlainDate('2025-01-01')}
             annotation={{}}
+            attachmentPath={eventAttachmentPath('storybook-event')}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             readonlyMode={false}
@@ -672,6 +675,7 @@ export const AcceptModalWithFormFields: Story = {
     return (
       <Review.ActionModal.Accept
         action="Declare"
+        attachmentPath={eventAttachmentPath('storybook-event')}
         close={fn()}
         copy={{
           title: generateTranslationConfig('Declare this event?'),
@@ -710,6 +714,7 @@ export const AcceptModalWithRequiredField: Story = {
     return (
       <Review.ActionModal.Accept
         action="Declare"
+        attachmentPath={eventAttachmentPath('storybook-event')}
         close={acceptModalRequiredFieldClose}
         copy={{
           title: generateTranslationConfig('Declare this event?'),
@@ -763,6 +768,7 @@ export const RejectModalWithFormFields: Story = {
   render: function Component() {
     return (
       <Review.ActionModal.Reject
+        attachmentPath={eventAttachmentPath('storybook-event')}
         close={rejectModalWithFormFieldsClose}
         eventConfiguration={tennisClubMembershipEvent}
         fields={[modalCommentsField, modalCategoryField]}

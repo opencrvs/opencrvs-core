@@ -111,7 +111,7 @@ const handlers = [
   http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
-  http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
+  http.get(`${env.DOCUMENTS_URL}/list-files/:prefix*`, () => {
     return HttpResponse.json([])
   }),
   // event.file.getPresignedUrl.test.ts
@@ -120,6 +120,10 @@ const handlers = [
       presignedURL:
         'http://localhost:3535/ocrvs/mock-presigned-url.png?X-Amz-Signature=test'
     })
+  }),
+  // event.delete.test.ts
+  http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, () => {
+    return HttpResponse.json({ deleted: 0 })
   }),
   http.post(
     `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,

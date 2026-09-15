@@ -365,9 +365,6 @@ export const handlers = {
 
       return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
     }),
-    http.delete('/api/files/:filePath*', async (request) => {
-      return HttpResponse.text('OK')
-    }),
     http.get('/files/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
 
