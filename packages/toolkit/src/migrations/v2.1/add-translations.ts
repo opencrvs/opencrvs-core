@@ -141,7 +141,7 @@ async function listRefs() {
   }
 }
 
-async function main() {
+async function main(): Promise<string[]> {
   const cwd = process.cwd()
 
   console.log('Adding the translation keys core gained this version...\n')
@@ -160,14 +160,7 @@ async function main() {
     }
   }
 
-  if (skipped.length > 0) {
-    console.warn(
-      `\n⚠️  ${skipped.length} step(s) were skipped. Add the missing translations by hand before upgrading:`
-    )
-    for (const message of skipped) {
-      console.warn(`  - ${message}`)
-    }
-  }
+  return skipped
 }
 
 export { main }

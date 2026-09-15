@@ -25,7 +25,7 @@ const REQUEST_TIMEOUT_MS = 15000
  * confirm the upgraded config still exposes the expected endpoints and keeps
  * the secured ones locked down.
  */
-const DEFAULT_TARGET_URL = 'http://localhost:3040'
+export const DEFAULT_TARGET_URL = 'http://localhost:3040'
 
 interface EndpointCheck {
   method: 'GET' | 'POST'
@@ -227,7 +227,7 @@ async function fetchEventConfigs(
  * Normalises the CLI argument into a base URL. Accepts either a bare domain
  * (`example.org`, assumed https) or a full URL, and strips any trailing slash.
  */
-function resolveBaseUrl(input: string): string {
+export function resolveBaseUrl(input: string): string {
   const withProtocol = /^https?:\/\//i.test(input) ? input : `https://${input}`
   return withProtocol.replace(/\/+$/, '')
 }
@@ -242,7 +242,7 @@ function endpointLabel(check: EndpointCheck): string {
   return `${check.method} ${shown}${suffix}`
 }
 
-function line(ok: boolean, label: string, detail: string): string {
+export function line(ok: boolean, label: string, detail: string): string {
   const mark = ok ? green('✓') : red('✗')
   return `  ${mark} ${label} ${dim(`(${detail})`)}`
 }
@@ -464,9 +464,13 @@ async function verifyTranslations(baseUrl: string): Promise<number> {
   return failures
 }
 
+/**
+ * @returns the number of failed checks, so a caller that runs several
+ * verifications can report them together. Exiting is the CLI's decision.
+ */
 export async function runVerifyEndpoints(
   target: string = DEFAULT_TARGET_URL
-): Promise<void> {
+): Promise<number> {
   const baseUrl = resolveBaseUrl(target)
   console.log(bold(`Verifying country config endpoints at ${baseUrl}\n`))
 
@@ -597,7 +601,8 @@ export async function runVerifyEndpoints(
       red(bold(`✗ ${failures} check(s) failed.`)) +
         yellow(' See the lines marked ✗ above.')
     )
-    process.exit(1)
+    return failures
   }
   console.log(green(bold('✓ All endpoint checks passed.')))
+  return 0
 }

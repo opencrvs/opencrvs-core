@@ -10,6 +10,7 @@
  */
 /* eslint-disable no-console */
 import { runUpgrade } from './migrations/v2.1'
+import { check, writeMissing } from './translations/check'
 import {
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,
@@ -18,6 +19,7 @@ import {
   runEnvironmentUsers
 } from './environment'
 import { runVerifyEndpoints } from './verify/endpoints'
+import { runVerifyUpgrade } from './verify/upgrade'
 
 const args = process.argv.slice(2)
 
@@ -27,11 +29,34 @@ Usage: opencrvs <command>
 Commands:
   environment            Manage deployment environments
   upgrade                Upgrade an existing environment
+  check-translations     Check translation files for completeness
+  verify-upgrade         Run every post-upgrade check and report them together
   verify-endpoints       Verify the locally-running country config exposes the
                          expected endpoints, keeps secured ones locked down and
                          serves the translations core requires
 
 Run 'opencrvs <command> --help' for more information on a command.
+`.trim()
+
+const VERIFY_UPGRADE_USAGE = `
+Usage: opencrvs verify-upgrade [country-config-url]
+
+Run this after 'opencrvs upgrade', from the country config directory, with the
+upgraded country config running. It runs every post-upgrade check there is and
+reports them together:
+  - every message declared in src has a translation row,
+  - every scope this release added is assigned to at least one role, and
+  - the endpoint checks of 'verify-endpoints'.
+
+Arguments:
+  [country-config-url]   Optional. Domain or URL of the country config
+                         service. Defaults to 'http://localhost:3040'. A bare
+                         domain is assumed to use https.
+
+Options:
+  -h, --help             Show this message.
+
+Exits with a non-zero status if any check fails.
 `.trim()
 
 const VERIFY_ENDPOINTS_USAGE = `
@@ -66,11 +91,12 @@ Usage: opencrvs upgrade [options]
 Upgrade the country config in the current working directory to the next
 major version of OpenCRVS.
 
+Codemods are best-effort: a country config that renamed or restructured the
+files a codemod targets keeps its own structure, and the step is reported as
+outstanding rather than guessed at. Anything left over is listed at the end,
+and the command exits non-zero while that list is not empty.
+
 Options:
-  --docker-swarm   Keep and merge the 'infrastructure/' directory with
-                   upstream changes. Use this if your country deploys
-                   OpenCRVS via Docker Swarm. When omitted, the
-                   'infrastructure/' directory is deleted (default).
   -h, --help       Show this message.
 `.trim()
 
@@ -87,6 +113,10 @@ function main() {
       return handleEnvironment()
     case 'upgrade':
       return handleUpgrade()
+    case 'check-translations':
+      return handleCheckTranslations()
+    case 'verify-upgrade':
+      return handleVerifyUpgrade()
     case 'verify-endpoints':
       return handleVerifyEndpoints()
     default:
@@ -161,26 +191,119 @@ async function handleUpgrade() {
     process.exit(0)
   }
 
-  const KNOWN_FLAGS = new Set(['--docker-swarm'])
-  const unknownFlags = upgradeArgs.filter(
-    (arg) => arg.startsWith('-') && !KNOWN_FLAGS.has(arg)
-  )
+  const unknownFlags = upgradeArgs.filter((arg) => arg.startsWith('-'))
   if (unknownFlags.length > 0) {
     console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
     console.log(UPGRADE_USAGE)
     process.exit(1)
   }
 
-  const dockerSwarm = upgradeArgs.includes('--docker-swarm')
-
   console.log('Initiating upgrade...')
+
+  let outstanding: string[]
   try {
-    await runUpgrade(dockerSwarm)
-    console.log('Upgrade completed successfully!')
+    ;({ outstanding } = await runUpgrade())
   } catch (error) {
     console.error('Upgrade failed:', error)
     process.exit(1)
   }
+
+  /*
+   * Reporting success while steps were skipped is how an upgrade quietly ends
+   * up half-done: each codemod warns as it goes, but those warnings scroll past
+   * amongst everything else the upgrade prints. Nothing outstanding is the only
+   * case that gets to be called a success, and the exit code says so too.
+   */
+  if (outstanding.length === 0) {
+    console.log('\nUpgrade completed successfully!')
+    console.log(
+      "Next, start the country config and run 'opencrvs verify-upgrade'."
+    )
+    return
+  }
+
+  console.error(
+    `\nUpgrade ran, but ${outstanding.length} step(s) could not be done for you.`
+  )
+  console.error('Do these by hand before deploying:\n')
+
+  outstanding.forEach((step, index) => {
+    console.error(`  ${index + 1}. ${step}`)
+  })
+
+  console.error(
+    "\nThen start the country config and run 'opencrvs verify-upgrade' to check what is left."
+  )
+  process.exit(1)
+}
+
+const CHECK_TRANSLATIONS_USAGE = `
+Usage: opencrvs check-translations [options]
+
+Check that every message this country config declares has a row in
+src/translations/countryconfig.csv.
+
+Options:
+  --write       Add the missing rows, filling in English only
+  --outdated    List rows nothing in the source declares any more
+  -h, --help    Show this help
+`
+
+function handleCheckTranslations() {
+  const checkArgs = args.slice(1)
+
+  if (checkArgs.includes('--help') || checkArgs.includes('-h')) {
+    console.log(CHECK_TRANSLATIONS_USAGE)
+    return
+  }
+
+  const unknownFlags = checkArgs.filter(
+    (arg) => arg.startsWith('-') && !['--write', '--outdated'].includes(arg)
+  )
+
+  if (unknownFlags.length > 0) {
+    console.error(`Unknown option: ${unknownFlags.join(', ')}\n`)
+    console.log(CHECK_TRANSLATIONS_USAGE)
+    process.exit(1)
+  }
+
+  const cwd = process.cwd()
+  const { missing, outdated, dynamicIds } = check(cwd)
+
+  for (const file of dynamicIds) {
+    console.warn(
+      `Warning: ${file} declares a message whose id is built at runtime. Ids have to be hardcoded to be checked.`
+    )
+  }
+
+  if (checkArgs.includes('--outdated')) {
+    console.log(
+      `${outdated.length} row(s) in countryconfig.csv are not declared in src:\n`
+    )
+    console.log(outdated.join('\n'))
+    return
+  }
+
+  if (missing.length === 0) {
+    console.log('Every message declared in src has a translation row.')
+    return
+  }
+
+  console.error(
+    `${missing.length} message(s) declared in src have no row in src/translations/countryconfig.csv:\n`
+  )
+  console.error(missing.map(({ id }) => `  ${id}`).join('\n'))
+
+  if (!checkArgs.includes('--write')) {
+    console.error(
+      '\nRun `pnpm extract:translations --write` to add them with their English copy.'
+    )
+    process.exit(1)
+  }
+
+  const added = writeMissing(cwd, missing)
+  console.log(`\nAdded ${added.length} row(s) to countryconfig.csv.`)
+  console.log('The languages other than English are still yours to write.')
 }
 
 async function handleVerifyEndpoints() {
@@ -203,10 +326,53 @@ async function handleVerifyEndpoints() {
 
   try {
     // Defaults to http://localhost:3040 when no target is given.
-    await runVerifyEndpoints(positional[0])
+    const failures = await runVerifyEndpoints(positional[0])
+    if (failures > 0) {
+      process.exit(1)
+    }
   } catch (error) {
     console.error(
       'Endpoint verification failed:',
+      error instanceof Error ? error.message : error
+    )
+    process.exit(1)
+  }
+}
+
+async function handleVerifyUpgrade() {
+  const verifyArgs = args.slice(1)
+
+  if (verifyArgs.includes('--help') || verifyArgs.includes('-h')) {
+    console.log(VERIFY_UPGRADE_USAGE)
+    process.exit(0)
+  }
+
+  const unknownFlags = verifyArgs.filter((arg) => arg.startsWith('-'))
+
+  if (unknownFlags.length > 0) {
+    console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
+    console.log(VERIFY_UPGRADE_USAGE)
+    process.exit(1)
+  }
+
+  const positional = verifyArgs.filter((arg) => !arg.startsWith('-'))
+
+  if (positional.length > 1) {
+    console.error(
+      `Unexpected extra argument(s): ${positional.slice(1).join(', ')}\n`
+    )
+    console.log(VERIFY_UPGRADE_USAGE)
+    process.exit(1)
+  }
+
+  try {
+    const failures = await runVerifyUpgrade(positional[0])
+    if (failures > 0) {
+      process.exit(1)
+    }
+  } catch (error) {
+    console.error(
+      'Upgrade verification failed:',
       error instanceof Error ? error.message : error
     )
     process.exit(1)

@@ -559,7 +559,7 @@ function wireIndex(project: Project, cwd: string) {
 
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
-async function main() {
+async function main(): Promise<string[]> {
   const cwd = process.cwd()
 
   const config = await promptTelemetryConfig()
@@ -584,14 +584,7 @@ async function main() {
 
   await project.save()
 
-  if (skipped.length > 0) {
-    console.warn(
-      `\n⚠️  ${skipped.length} telemetry step(s) were skipped. Wire the following by hand:`
-    )
-    for (const message of skipped) {
-      console.warn(`  - ${message}`)
-    }
-  }
+  return skipped
 }
 
 export { main }

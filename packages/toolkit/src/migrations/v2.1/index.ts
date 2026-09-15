@@ -14,14 +14,32 @@ import { main as addTranslations } from './add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
 import { main as renameTriggerPaths } from './rename-trigger-paths'
 
+export interface UpgradeResult {
+  /**
+   * Everything the upgrade could not do for the country config, gathered from
+   * every codemod. Empty means the upgrade is genuinely complete.
+   */
+  outstanding: string[]
+}
+
 /**
  * Run the upgrade process for the country config in the current working
  * directory.
+ *
+ * Each codemod is best-effort: a country config that renamed or restructured
+ * the files a codemod targets keeps its own structure, and the codemod records
+ * what it could not do rather than guessing. Those records are collected here
+ * so the caller can present one list of what is left, instead of the operator
+ * having to notice individual warnings in the scrollback.
  */
-export async function runUpgrade(dockerSwarm: boolean) {
-  await addExplicitCorrectionFlags()
+export async function runUpgrade(): Promise<UpgradeResult> {
+  const outstanding: string[] = []
+
+  outstanding.push(...(await addExplicitCorrectionFlags()))
   await renameTriggerPaths()
-  await addRecoveryLinkNotifications()
-  await addTranslations()
-  await enableTelemetry()
+  outstanding.push(...(await addRecoveryLinkNotifications()))
+  outstanding.push(...(await addTranslations()))
+  outstanding.push(...(await enableTelemetry()))
+
+  return { outstanding }
 }

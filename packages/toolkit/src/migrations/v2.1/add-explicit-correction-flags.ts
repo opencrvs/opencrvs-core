@@ -39,6 +39,7 @@
 
 import { Project, SyntaxKind, ObjectLiteralExpression, Node } from 'ts-morph'
 import path from 'path'
+import { existsSync } from 'fs'
 
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const ACTIONS_PROPERTY_NAME = 'actions'
@@ -48,6 +49,13 @@ const CONDITIONALS_PROPERTY_NAME = 'conditionals'
 const ACTION_TYPE_ENUM_NAME = 'ActionType'
 
 const REQUEST_CORRECTION_TYPE = 'REQUEST_CORRECTION'
+
+const skipped: string[] = []
+
+function warnSkipped(message: string) {
+  skipped.push(message)
+  console.warn(`  ⚠️  ${message}`)
+}
 
 const CORRECTION_ACTIONS_TO_ADD = [
   {
@@ -155,11 +163,22 @@ function buildCorrectionActionText(
   return `{\n  ${lines.join(',\n  ')}\n}`
 }
 
-function processFile(filePath: string, project: Project): number {
+interface FileResult {
+  changes: number
+  /**
+   * How many `defineConfig` calls the file had. Counted so `main` can tell a
+   * country config that needed no change apart from one this codemod never
+   * managed to locate — the latter needs a human to look at it.
+   */
+  defineConfigs: number
+}
+
+function processFile(filePath: string, project: Project): FileResult {
   const sourceFile = project.getSourceFile(filePath)
-  if (!sourceFile) return 0
+  if (!sourceFile) return { changes: 0, defineConfigs: 0 }
 
   let changes = 0
+  let defineConfigs = 0
   const relPath = path.relative(process.cwd(), filePath)
 
   const callExpressions = sourceFile.getDescendantsOfKind(
@@ -174,6 +193,8 @@ function processFile(filePath: string, project: Project): number {
     ) {
       continue
     }
+
+    defineConfigs++
 
     const args = call.getArguments()
     if (args.length === 0) continue
@@ -244,15 +265,24 @@ function processFile(filePath: string, project: Project): number {
     }
   }
 
-  return changes
+  return { changes, defineConfigs }
 }
 
-async function main() {
+async function main(): Promise<string[]> {
   const srcDir = path.join(process.cwd(), 'src')
+  const tsConfigFilePath = path.resolve(srcDir, '../tsconfig.json')
+
   console.log(`Scanning for defineConfig calls in: ${srcDir}\n`)
 
+  if (!existsSync(tsConfigFilePath)) {
+    warnSkipped(
+      `tsconfig.json not found next to ${srcDir}, so no source could be read; add APPROVE_CORRECTION/REJECT_CORRECTION action configs by hand wherever REQUEST_CORRECTION sets flags or conditionals`
+    )
+    return skipped
+  }
+
   const project = new Project({
-    tsConfigFilePath: path.resolve(srcDir, '../tsconfig.json'),
+    tsConfigFilePath,
     skipAddingFilesFromTsConfig: false
   })
 
@@ -264,11 +294,14 @@ async function main() {
   console.log(`Found ${sourceFiles.length} source file(s) to analyse.\n`)
 
   let totalChanges = 0
+  let totalDefineConfigs = 0
   const modifiedFiles: string[] = []
 
   for (const sourceFile of sourceFiles) {
     const filePath = sourceFile.getFilePath()
-    const changes = processFile(filePath, project)
+    const { changes, defineConfigs } = processFile(filePath, project)
+
+    totalDefineConfigs += defineConfigs
 
     if (changes > 0) {
       totalChanges += changes
@@ -276,11 +309,26 @@ async function main() {
     }
   }
 
+  /*
+   * Finding no `defineConfig` call at all is not the same as finding nothing to
+   * change. This codemod recognises event configuration only through that call,
+   * so a country config that declares its events some other way looks
+   * identical to one that needed no change — and would silently keep flags and
+   * conditionals that stopped applying to APPROVE_CORRECTION/REJECT_CORRECTION
+   * in this release. Say so rather than reporting success.
+   */
+  if (totalDefineConfigs === 0) {
+    warnSkipped(
+      'No defineConfig call was found under src/, so no event configuration could be inspected; check by hand that any flags or conditionals on REQUEST_CORRECTION are repeated on APPROVE_CORRECTION and REJECT_CORRECTION'
+    )
+    return skipped
+  }
+
   if (modifiedFiles.length === 0) {
     console.log(
-      'No REQUEST_CORRECTION actions with flags/conditionals found. Nothing to do.'
+      `No REQUEST_CORRECTION actions with flags/conditionals found across ${totalDefineConfigs} defineConfig call(s). Nothing to do.`
     )
-    return
+    return skipped
   }
 
   console.log(`\nSaving ${modifiedFiles.length} modified file(s)...`)
@@ -294,6 +342,8 @@ async function main() {
   console.log(
     `\nDone. Added ${totalChanges} correction action config(s) across ${modifiedFiles.length} file(s).`
   )
+
+  return skipped
 }
 
 export { main }
