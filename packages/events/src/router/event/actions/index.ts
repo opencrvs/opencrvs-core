@@ -13,7 +13,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -471,6 +471,7 @@ export function getDefaultActionProcedures(
       )
       .use(middleware.requireActionConfirmation('record.action.accept'))
       .use(middleware.requireConfirmableAction(actionType))
+      .use(middleware.requireAssignment)
       .mutation(async ({ ctx, input }) => {
         const { token, user, event, confirmationAction } = ctx
         const { actionId } = input
@@ -531,8 +532,9 @@ export function getDefaultActionProcedures(
       .input(AsyncActionInput)
       .use(middleware.requireActionConfirmation('record.action.reject'))
       .use(middleware.requireConfirmableAction(actionType))
+      .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
-        const { event, confirmationAction } = ctx
+        const { event, confirmationAction, originalAction } = ctx
         const { actionId } = input
 
         if (confirmationAction) {
@@ -550,9 +552,16 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
+        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
+        const originalCorrectionRequestId =
+          originalAction.type === ActionType.REJECT_CORRECTION
+            ? RejectedCorrectionAction.parse(originalAction).requestId
+            : undefined
+
         return addAsyncRejectAction(
           {
             ...input,
+            requestId: originalCorrectionRequestId,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false

@@ -340,15 +340,6 @@ describe('event.actions.custom', () => {
         'Could not find id for custom action'
       )
 
-      const createAction = requestResponse.actions.filter(
-        (action) => action.type === ActionType.CREATE
-      )
-
-      const assignmentInput = generator.event.actions.assign(payload.eventId, {
-        assignedTo: createAction[0].createdBy
-      })
-      await client.event.actions.assignment.assign(assignmentInput)
-
       const countryConfigClient = createCountryConfigClient(user, eventId)
 
       const response = await countryConfigClient.event.actions.custom.accept({

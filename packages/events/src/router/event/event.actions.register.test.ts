@@ -560,16 +560,16 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
+
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.reject({
           eventId,
           actionId: originalActionId,
-          transactionId: getUUID()
-        })
-
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
           transactionId: getUUID()
         })
 
@@ -623,6 +623,11 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.assignment.assign(assignmentInput)
 
         await client.event.actions.register.request(data)
+
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
 
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
@@ -691,6 +696,11 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
+
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.accept({
@@ -700,10 +710,6 @@ describe('Request and confirmation flow', () => {
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
-          transactionId: getUUID()
-        })
         const response =
           await countryConfigClient.event.actions.register.accept({
             ...data,
@@ -768,6 +774,11 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.assignment.assign(assignmentInput)
 
         await client.event.actions.register.request(data)
+
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
 
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
@@ -836,6 +847,11 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.assignment.assign(assignmentInput)
 
         await client.event.actions.register.request(data)
+
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
 
         const countryConfigClient = createCountryConfigClient(
           user,
@@ -916,6 +932,11 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
+
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.accept({
@@ -925,10 +946,6 @@ describe('Request and confirmation flow', () => {
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
-          transactionId: getUUID()
-        })
         await expect(
           countryConfigClient.event.actions.register.reject({
             ...data,
@@ -975,6 +992,11 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
+
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
         await countryConfigClient.event.actions.register.reject({
@@ -983,10 +1005,6 @@ describe('Request and confirmation flow', () => {
           actionId: originalActionId
         })
 
-        await client.event.actions.assignment.assign({
-          ...assignmentInput,
-          transactionId: getUUID()
-        })
         const response =
           await countryConfigClient.event.actions.register.reject({
             eventId,
@@ -1037,6 +1055,11 @@ describe('Request and confirmation flow', () => {
         })
 
         await client.event.actions.assignment.assign(assignmentInput)
+
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
 
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
@@ -1101,6 +1124,11 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
+
         const countryConfigClient = createCountryConfigClient(user, eventId)
 
         const response =
@@ -1163,6 +1191,11 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.assignment.assign(assignmentInput)
 
         await client.event.actions.register.request(data)
+
+        await client.event.actions.assignment.unassign({
+          eventId,
+          transactionId: getUUID()
+        })
 
         const countryConfigClient = createCountryConfigClient(
           user,
