@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import {
+  useQuery,
+  useSuspenseQuery,
+  UseSuspenseQueryOptions
+} from '@tanstack/react-query'
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -24,7 +29,6 @@ import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/ca
 import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
-import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
 /*
@@ -71,70 +75,72 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
   }
 })
 
-/**
- * Shared query config for explicitly downloading an event for viewing.
- */
-function getViewEventQuery(
-  id: UUID,
-  eventConfig: ReturnType<typeof useEventConfigurations>
-) {
-  return {
-    queryKey: [['view-event', id]],
-    meta: { eventConfig },
-    queryFn: async () => {
-      const eventDocument = await trpcClient.event.get.query({
-        eventId: id,
-        waitFor: false
-      })
+async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
+  const eventDocument = await trpcClient.event.get.query({
+    eventId: id,
+    waitFor: false
+  })
 
-      await Promise.all([
-        cacheFiles(eventDocument),
-        cacheUsersFromEventDocument(eventDocument)
-      ])
+  await Promise.all([
+    cacheFiles(eventDocument),
+    cacheUsersFromEventDocument(eventDocument)
+  ])
 
-      return eventDocument
-    },
-    gcTime: 0,
-    staleTime: Infinity,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false
-  }
+  return eventDocument
 }
 
+// Both branches call the same hooks in the same order — cachedAssignedEvent
+// can flip mid-session, and branching hooks on it breaks rules-of-hooks.
+// Only the queryOptions passed to useSuspenseQuery differ per branch.
 function useGetOrDownloadEvent(id: UUID) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
   const cachedAssignedEvent = queryClient.getQueryData(
     trpc.event.get.queryKey({ eventId: id, waitFor: false })
   )
-  const cachedViewEvent = queryClient.getQueryData([['view-event', id]])
 
-  // Already explicitly downloaded
-  if (cachedViewEvent) {
-    return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
-  }
+  const viewEventQueryKey = [['view-event', id]]
 
-  // If assigned & cached, read from cache without network
-  if (cachedAssignedEvent) {
-    const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
-      eventId: id,
-      waitFor: false
-    })
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({ queryKey: viewEventQueryKey, exact: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
-    return useSuspenseQuery({
-      ...queryOptions,
-      queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
-      meta: { eventConfig },
-      staleTime: Infinity,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchOnWindowFocus: false
-    }).data
-  }
+  const { queryFn, ...assignedQueryOptions } = trpc.event.get.queryOptions({
+    eventId: id,
+    waitFor: false
+  })
 
-  // Otherwise: explicit download
-  return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
+  // The tRPC-derived branch's error type doesn't structurally match a plain
+  // `Error`, but both branches resolve to the same `EventDocument` on
+  // success, which is all the caller relies on.
+  const queryOptions = (
+    cachedAssignedEvent
+      ? {
+          // Assigned & cached: read from cache without network
+          ...assignedQueryOptions,
+          queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
+          meta: { eventConfig },
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
+        }
+      : {
+          // Not downloaded: always a real network call and a real loading state
+          queryKey: viewEventQueryKey,
+          queryFn: async () => fetchEventForViewing(id),
+          gcTime: 0,
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
+        }
+  ) as UseSuspenseQueryOptions<EventDocument>
+
+  return useSuspenseQuery(queryOptions).data
 }
 
 export function useGetEvent() {
@@ -181,13 +187,6 @@ export function useGetEvent() {
       const downloaded = queryClient.getQueryData(
         trpc.event.get.queryKey({ eventId: id, waitFor: false })
       )
-      const downloadedForViewing = queryClient.getQueryData([
-        ['view-event', id]
-      ])
-
-      if (downloadedForViewing) {
-        return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
-      }
 
       if (!downloaded) {
         throwStructuredError({

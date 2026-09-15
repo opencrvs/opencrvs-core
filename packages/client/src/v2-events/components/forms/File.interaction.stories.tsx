@@ -18,6 +18,7 @@ import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { createImageFile } from '@client/tests/image-file'
+import { TestPdf } from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
 import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
@@ -321,29 +322,8 @@ export const FileInputPdfWithPreview: Story = {
       'input[type="file"]'
     ) as HTMLInputElement
 
-    const pdfContent = `%PDF-1.0
-1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
-2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
-3 0 obj<</Type/Page/MediaBox[0 0 200 50]/Parent 2 0 R/Resources<</Font<</F1<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>/Contents 4 0 R>>endobj
-4 0 obj<</Length 44>>
-stream
-BT /F1 12 Tf 10 20 Td (pdf loaded) Tj ET
-endstream
-endobj
-xref
-0 5
-0000000000 65535 f
-0000000009 00000 n
-0000000058 00000 n
-0000000115 00000 n
-0000000266 00000 n
-trailer<</Size 5/Root 1 0 R>>
-startxref
-360
-%%EOF`
-
     await step('Uploads a valid PDF file', async () => {
-      const pdfFile = new File([pdfContent], 'document.pdf', {
+      const pdfFile = new File([TestPdf], 'document.pdf', {
         type: MimeType.enum['application/pdf']
       })
 
@@ -362,13 +342,10 @@ startxref
     const originalFetch = window.fetch
     window.fetch = async (url, ...args) => {
       if (String(url).includes('.pdf')) {
-        return new Response(
-          new Blob([pdfContent], { type: 'application/pdf' }),
-          {
-            status: 200,
-            headers: { 'Content-Type': 'application/pdf' }
-          }
-        )
+        return new Response(new Blob([TestPdf], { type: 'application/pdf' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/pdf' }
+        })
       }
       return originalFetch(url as RequestInfo, ...args)
     }

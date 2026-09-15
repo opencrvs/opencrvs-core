@@ -21,6 +21,11 @@ export const formMessages = defineMessages({
     description: 'text for upload file button',
     id: 'form.field.label.uploadFile'
   },
+  imageLoadFailed: {
+    defaultMessage: 'Failed to load document',
+    description: 'shown when a supporting document image fails to load',
+    id: 'form.field.label.imageLoadFailed'
+  },
   iDType: {
     id: 'form.field.label.iDType',
     defaultMessage: 'Type of ID'
