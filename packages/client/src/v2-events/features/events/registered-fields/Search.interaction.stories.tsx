@@ -306,9 +306,14 @@ export const SearchWithRegistrationNumber: Story = {
     )
 
     // names should clear because search was successfull
-    await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
-      'Royal'
+    await waitFor(
+      async () =>
+        expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+          'Royal'
+        ),
+      { timeout: 3000 }
     )
+
     await expect(await canvas.findByTestId('text__surname')).toHaveValue(
       'Dietrich'
     )
