@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export async function deleteFile(path: DocumentPath | string, token: string) {
+async function deleteFile(path: DocumentPath | string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
