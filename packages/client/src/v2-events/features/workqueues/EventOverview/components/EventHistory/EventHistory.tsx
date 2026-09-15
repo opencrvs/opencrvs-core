@@ -188,6 +188,12 @@ const messages = defineMessages({
       'Label for the requested action shown in the expanded audit dropdown',
     id: 'events.history.status.requested'
   },
+  awaitingConfirmation: {
+    defaultMessage: 'Awaiting confirmation',
+    description:
+      'Placeholder label in the audit dropdown for an action that has not been accepted or rejected yet',
+    id: 'events.history.status.awaitingConfirmation'
+  },
   toggleConfirmationDetails: {
     defaultMessage: 'Show validation details',
     description:
@@ -347,6 +353,19 @@ function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
   )
 }
 
+function SystemByCell() {
+  const intl = useIntl()
+  const { config } = useSelector(getOfflineData)
+  return (
+    <TwoLineCell>
+      <SecondaryLine data-testid="user-name">
+        {config.APPLICATION_NAME}
+      </SecondaryLine>
+      <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
+    </TwoLineCell>
+  )
+}
+
 function ActionByCell({
   action,
   muted
@@ -355,7 +374,6 @@ function ActionByCell({
   muted?: boolean
 }) {
   const intl = useIntl()
-  const { config } = useSelector(getOfflineData)
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
   const { canReadUser } = usePermissions()
@@ -371,11 +389,11 @@ function ActionByCell({
   const NameLine = muted ? SecondaryLine : BoldLine
 
   if (type !== 'user') {
-    return (
+    return muted ? (
+      <SystemByCell />
+    ) : (
       <TwoLineCell>
-        <NameLine data-testid="user-name">
-          {muted ? config.APPLICATION_NAME : name}
-        </NameLine>
+        <NameLine data-testid="user-name">{name}</NameLine>
         <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
       </TwoLineCell>
     )
@@ -641,33 +659,69 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         return [mainRow]
       }
 
-      const buildDetailRow = (
-        detailAction: ActionDocument,
-        status: ActionStatus
-      ) => ({
+      const buildDetailRow = ({
+        badge,
+        label,
+        detailAction
+      }: {
+        badge: React.ReactNode
+        label: string
+        detailAction?: ActionDocument
+      }) => ({
         status: '',
         action: (
           <DetailActionCell>
-            <StatusBadge size="small" status={status} />
-            <ConfirmationDetailLabel>
-              {getStatusLabel(status, intl)}
-            </ConfirmationDetailLabel>
+            {badge}
+            <ConfirmationDetailLabel>{label}</ConfirmationDetailLabel>
           </DetailActionCell>
         ),
-        when: <WhenCell muted isoDate={detailAction.createdAt} />,
-        by: <ActionByCell muted action={detailAction} />,
-        location: <ActionLocation muted action={detailAction} />,
+        when: detailAction ? (
+          <WhenCell muted isoDate={detailAction.createdAt} />
+        ) : (
+          ''
+        ),
+        by: detailAction ? (
+          <ActionByCell muted action={detailAction} />
+        ) : (
+          <SystemByCell />
+        ),
+        location: detailAction ? (
+          <ActionLocation muted action={detailAction} />
+        ) : (
+          ''
+        ),
         expand: '',
         rowBackgroundColor: theme.colors.grey100
       })
 
-      // Show the request action first, then the accept/reject that followed
+      // The request itself was recorded successfully, so it always shows a
+      // success badge — regardless of whether its confirmation is still pending.
       const detailRows = [
-        buildDetailRow(statusSourceAction, ActionStatus.Requested)
+        buildDetailRow({
+          badge: <Icon color="green" name="CheckCircle" size="small" />,
+          label: getStatusLabel(ActionStatus.Requested, intl),
+          detailAction: statusSourceAction
+        })
       ]
+
       if (asyncConfirmation) {
+        // The accept/reject that followed: its own matching status badge.
         detailRows.push(
-          buildDetailRow(asyncConfirmation, asyncConfirmation.status)
+          buildDetailRow({
+            badge: (
+              <StatusBadge size="small" status={asyncConfirmation.status} />
+            ),
+            label: getStatusLabel(asyncConfirmation.status, intl),
+            detailAction: asyncConfirmation
+          })
+        )
+      } else {
+        // Not accepted or rejected yet — a pending placeholder row.
+        detailRows.push(
+          buildDetailRow({
+            badge: <Icon color="grey400" name="Circle" size="small" />,
+            label: intl.formatMessage(messages.awaitingConfirmation)
+          })
         )
       }
 
