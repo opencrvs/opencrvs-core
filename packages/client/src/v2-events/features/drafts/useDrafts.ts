@@ -266,8 +266,8 @@ export function useDrafts() {
     getLocalDraftOrDefault,
     /**
      * Only the declare view saves a draft to the server. The store it reads
-     * from is shared with the edit and correction views, whose drafts stay
-     * local, so the type has to be narrowed before submitting.
+     * from is shared with the edit, print and correction views, whose drafts
+     * stay local, so the type has to be narrowed before submitting.
      */
     submitLocalDraft: () => {
       if (!localDraft) {
