@@ -52,6 +52,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { resolveLocationName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
+import { messages as dateFieldMessages } from '@client/v2-events/features/events/registered-fields/DateField'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
@@ -141,11 +142,6 @@ function getAsyncConfirmation(
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const messages = defineMessages({
-  dateFormat: {
-    defaultMessage: 'MMMM dd, yyyy',
-    id: 'configuration.dateFormat',
-    description: 'Date format for the date line of the "When" column'
-  },
   timeOnlyFormat: {
     defaultMessage: 'hh.mm a',
     id: 'configuration.timeOnlyFormat',
@@ -347,7 +343,10 @@ const TwoLineCell = styled.div`
 function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
   const intl = useIntl()
   const date = new Date(isoDate)
-  const dateText = format(date, intl.formatMessage(messages.dateFormat))
+  const dateText = format(
+    date,
+    intl.formatMessage(dateFieldMessages.dateFormat)
+  )
   const timeText = format(date, intl.formatMessage(messages.timeOnlyFormat))
   return (
     <TwoLineCell>
