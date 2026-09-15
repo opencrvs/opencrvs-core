@@ -13,34 +13,17 @@ import {
   Action,
   ActionDocument,
   ActionType,
-  EventDocument,
-  getCompleteActionDeclaration,
-  getCompleteActionAnnotation,
-  getCompleteActionContent
+  EventDocument
 } from '@opencrvs/commons/client'
 
-/**
- * Includes a request action, if the corresponding accepted action has different transactionId
- * Merges declarations and annotations from the corresponding request action for an accepted action
- * @param fullEvent - The full EventDocument containing an actions array to filter.
- * @returns An array of actionDocument considered part of the event history.
- */
 export function extractHistoryActions(
   fullEvent: EventDocument
 ): ActionDocument[] {
-  function isHistoryAction(a: Action): a is ActionDocument {
-    return !a.originalActionId
+  function isHistoryAction(action: Action): action is ActionDocument {
+    return !action.originalActionId
   }
 
-  return fullEvent.actions.filter(isHistoryAction).map((action) => {
-    const content = getCompleteActionContent(fullEvent, action)
-    return {
-      ...action,
-      ...(content !== undefined ? { content } : {}),
-      declaration: getCompleteActionDeclaration({}, fullEvent, action),
-      annotation: getCompleteActionAnnotation(fullEvent, action)
-    }
-  }) as ActionDocument[]
+  return fullEvent.actions.filter(isHistoryAction)
 }
 
 /**

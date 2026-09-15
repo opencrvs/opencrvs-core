@@ -247,19 +247,6 @@ const DetailActionCell = styled.div`
   gap: 8px;
 `
 
-function getActionLifecycleLabel(
-  status: ActionStatus,
-  intl: IntlShape
-): string {
-  if (status === ActionStatus.Rejected) {
-    return intl.formatMessage(messages.statusRejected)
-  }
-  if (status === ActionStatus.Requested) {
-    return intl.formatMessage(messages.statusRequested)
-  }
-  return intl.formatMessage(messages.statusAccepted)
-}
-
 const SecondaryLine = styled.div`
   ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.grey500};
@@ -663,7 +650,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           <DetailActionCell>
             <StatusBadge size="small" status={status} />
             <ConfirmationDetailLabel>
-              {getActionLifecycleLabel(status, intl)}
+              {getStatusLabel(status, intl)}
             </ConfirmationDetailLabel>
           </DetailActionCell>
         ),
