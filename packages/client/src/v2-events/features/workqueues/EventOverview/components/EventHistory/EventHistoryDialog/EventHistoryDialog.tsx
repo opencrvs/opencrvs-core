@@ -11,18 +11,21 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { Dialog, Stack, Table } from '@opencrvs/components'
+import styled from 'styled-components'
+import { Dialog, Icon, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
+  ActionUpdate,
   EventDocument,
   getAcceptedActions,
+  joinValues,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { joinValues } from '@opencrvs/commons/client'
 import { ActionTypeSpecificContent } from './components'
+import { SystemUpdatedFields } from './components/SystemUpdatedFields'
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
@@ -44,6 +47,13 @@ const messages = defineMessages({
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
+  },
+  awaitingConfirmationBanner: {
+    defaultMessage:
+      'This action has been initiated, but is still awaiting confirmation from an external system.',
+    description:
+      'Banner shown in the action detail dialog when the action is still awaiting external confirmation',
+    id: 'events.history.awaitingConfirmationBanner'
   }
 })
 
@@ -99,6 +109,32 @@ function prepareDuplicateOf(
   )
 }
 
+const BannerWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  background-color: ${({ theme }) => theme.colors.orangeLight};
+  padding: 8px 20px;
+  border-radius: 4px 4px 0 0;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.orangeDarker};
+`
+
+const StyledText = styled(Text)`
+  margin-left: 8px;
+`
+
+function AwaitingConfirmationBanner() {
+  const intl = useIntl()
+  return (
+    <BannerWrapper>
+      <Icon name="PauseCircle" size="small" />
+      <StyledText color="orangeDarker" element="span" variant="bold14">
+        {intl.formatMessage(messages.awaitingConfirmationBanner)}
+      </StyledText>
+    </BannerWrapper>
+  )
+}
+
 /**
  * Detailed view of single Action, showing the history of the event.
  */
@@ -108,7 +144,9 @@ export function EventHistoryDialog({
   close,
   fullEvent,
   validatorContext,
-  title
+  title,
+  isAwaitingConfirmation,
+  systemUpdates
 }: {
   action: ActionDocument
   userName: string
@@ -116,10 +154,11 @@ export function EventHistoryDialog({
   fullEvent: EventDocument
   validatorContext: ValidatorContext
   title: string
+  isAwaitingConfirmation: boolean
+  systemUpdates?: ActionUpdate
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
-
   const comments = prepareComments(action)
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)
@@ -128,6 +167,9 @@ export function EventHistoryDialog({
     <Dialog
       isOpen
       actions={[]}
+      banner={
+        isAwaitingConfirmation ? <AwaitingConfirmationBanner /> : undefined
+      }
       id="event-history-modal"
       title={title}
       variant="large"
@@ -196,6 +238,13 @@ export function EventHistoryDialog({
         fullEvent={fullEvent}
         validatorContext={validatorContext}
       />
+      {systemUpdates && (
+        <SystemUpdatedFields
+          declaration={systemUpdates}
+          fullEvent={fullEvent}
+          validatorContext={validatorContext}
+        />
+      )}
     </Dialog>
   )
 }
