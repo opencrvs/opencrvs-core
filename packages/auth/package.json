@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/auth",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "OpenCRVS authentication service",
   "license": "MPL-2.0",
   "private": true,
@@ -28,7 +28,6 @@
     "envalid": "^8.0.0",
     "fp-ts": "^2.12.3",
     "hapi-pino": "^9.0.0",
-    "hapi-sentry": "^3.1.0",
     "io-ts": "^2.2.18",
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
