@@ -305,20 +305,6 @@ exports[`event.actions.custom > Asynchronous confirmation flow > should successf
       "type": "UNASSIGN",
     },
     {
-      "assignedTo": "[sanitized]",
-      "createdAt": "[sanitized]",
-      "createdAtLocation": "[sanitized]",
-      "createdBy": "[sanitized]",
-      "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "[sanitized]",
-      "createdByUserType": "[sanitized]",
-      "declaration": {},
-      "id": "[sanitized]",
-      "status": "Accepted",
-      "transactionId": "[sanitized]",
-      "type": "ASSIGN",
-    },
-    {
       "annotation": {
         "notes": "Confirmed membership",
       },
