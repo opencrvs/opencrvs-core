@@ -161,6 +161,7 @@ event.birth.action.declare.form.section.child.field.name.label,This is the label
 event.birth.action.declare.form.section.child.field.nid.label,Label for national ID field for child,National ID,Pièce d'identité nationale
 event.birth.action.declare.form.section.child.field.placeOfBirth.label,This is the label for the field,Place of delivery,Lieu de l'accouchement
 event.birth.action.declare.form.section.child.field.reason.label,This is the label for the field,Reason for delayed registration,Motif de l'enregistrement tardif
+event.birth.action.declare.form.section.child.field.registrationNote.label,This is the label for the field,Registration note,Note d'enregistrement
 event.birth.action.declare.form.section.child.field.weightAtBirth.label,This is the label for the field,Weight at birth,Poids à la naissance
 event.birth.action.declare.form.section.child.field.weightAtBirth.postfix,This is the postfix for the weight field,Kilograms (kg),Kilograms (kg)
 event.birth.action.declare.form.section.documents.field.proofOfBirth.label,This is the label for the field,Proof of birth,Preuve de naissance
