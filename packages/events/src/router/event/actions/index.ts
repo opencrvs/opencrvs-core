@@ -469,6 +469,7 @@ export function getDefaultActionProcedures(
       )
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .use(middleware.requireAssignment)
+      .use(middleware.validateActionAccept)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input

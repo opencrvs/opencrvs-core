@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -49,7 +50,8 @@ import {
   getCustomActionFields,
   EventInput,
   UUID,
-  getDeclarationFieldById
+  getDeclarationFieldById,
+  getPendingAction
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -502,6 +504,133 @@ export const validateAction: MiddlewareFunction<
       actionType: annotationActionParse.data,
       declaration,
       context
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
+  throw new Error('Trying to validate unsupported action type')
+}
+
+export const validateActionAccept: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  unknown,
+  unknown,
+  ActionInputWithType
+> = async ({ input, next, ctx }) => {
+  const actionType = input.type
+
+  const event = await getEventById(input.eventId)
+  const eventConfig = await getEventConfigurationById({
+    eventType: event.type,
+    token: ctx.token
+  })
+
+  // 1. In order to accept an action, there must be only one pending (without accept / reject)
+  const pendingAction = getPendingAction(event.actions)
+
+  // 2. If pending action is of different type, we throw.
+  if (pendingAction.type !== input.type) {
+    throw new TRPCError({ code: 'BAD_REQUEST' })
+  }
+
+  // 3. Since we are treating requested + accepted payloads as a single declaration, we will set the validator context
+  // to a state before the **REQUEST** action.
+
+  const eventActionsWithoutPendingAction = event.actions.filter(
+    (a) => a.id !== pendingAction.id
+  )
+  const eventWithoutPendingAction = {
+    ...event,
+    actions: eventActionsWithoutPendingAction
+  } satisfies EventDocument
+
+  const eventStateWithoutPendingAction = getCurrentEventState(
+    eventWithoutPendingAction,
+    eventConfig
+  )
+
+  const contextWithoutPendingAction = await getValidatorContext({
+    token: ctx.token,
+    event: {
+      document: eventWithoutPendingAction,
+      state: eventStateWithoutPendingAction
+    }
+  })
+
+  // 4. Incoming accept payload declaration should be merged with the requested one, and treated as a single update during validation.
+  const combinedDeclarationUpdate = deepMerge(
+    pendingAction.declaration,
+    input.declaration
+  )
+
+  if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
+    const errors = validateNotifyAction({
+      eventConfig,
+      annotation: input.annotation,
+      declaration: input.declaration,
+      context: contextWithoutPendingAction
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
+  if (actionType === ActionType.REQUEST_CORRECTION) {
+    const errors = validateCorrectableFields({
+      eventConfig,
+      declarationUpdate: combinedDeclarationUpdate
+    })
+
+    throwWhenNotEmpty(errors)
+  }
+
+  if (
+    actionType === ActionType.APPROVE_CORRECTION ||
+    actionType === ActionType.REJECT_CORRECTION
+  ) {
+    throwIfRequestActionNotFound(event, input)
+  }
+
+  if (actionType === ActionType.CUSTOM) {
+    const errors = validateCustomAction({
+      eventConfig,
+      annotation: input.annotation,
+      context: contextWithoutPendingAction,
+      customActionType: input.customActionType
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
+  const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
+
+  if (declarationUpdateAction.success) {
+    const errors = validateDeclarationUpdateAction({
+      eventConfig,
+      event: eventWithoutPendingAction,
+      declarationUpdate: combinedDeclarationUpdate,
+      annotation: input.annotation,
+      actionType: declarationUpdateAction.data,
+      context: contextWithoutPendingAction
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
+  const annotationActionParse = annotationActions.safeParse(actionType)
+
+  if (annotationActionParse.success) {
+    const errors = validateActionAnnotation({
+      eventConfig,
+      annotation: input.annotation,
+      actionType: annotationActionParse.data,
+      declaration: eventStateWithoutPendingAction.declaration,
+      context: contextWithoutPendingAction
     })
 
     throwWhenNotEmpty(errors)
