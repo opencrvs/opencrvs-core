@@ -15,7 +15,7 @@ import { http, HttpResponse } from 'msw'
 import { DocumentPath } from '@opencrvs/commons/client'
 import { CACHE_NAME } from '@client/v2-events/cache'
 import { Option } from '@client/v2-events/utils'
-import { TestPdf } from '@client/v2-events/features/events/fixtures'
+import { TestImage, TestPdf } from '@client/v2-events/features/events/fixtures'
 import { DocumentViewer, DocumentViewerOptionValue } from './DocumentViewer'
 
 // Serves whatever the real app would have precached under this same-origin
@@ -63,7 +63,7 @@ export const ImageFailsThenRetrySucceeds: Story = {
           http.get(
             'http://localhost:3535/ocrvs/:id',
             () =>
-              new HttpResponse('<svg xmlns="http://www.w3.org/2000/svg" />', {
+              new HttpResponse(TestImage.Tree, {
                 headers: {
                   'Content-Type': 'image/svg+xml',
                   'Cache-Control': 'no-cache'

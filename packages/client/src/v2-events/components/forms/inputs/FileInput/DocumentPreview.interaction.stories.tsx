@@ -14,7 +14,7 @@ import { expect, waitFor, userEvent, within } from 'storybook/test'
 import { http, HttpResponse } from 'msw'
 import { DocumentPath, FileFieldValue } from '@opencrvs/commons/client'
 import { CACHE_NAME } from '@client/v2-events/cache'
-import { TestPdf } from '@client/v2-events/features/events/fixtures'
+import { TestImage, TestPdf } from '@client/v2-events/features/events/fixtures'
 import { DocumentPreview } from './DocumentPreview'
 
 /**
@@ -67,7 +67,7 @@ export const ImageFailsThenRetrySucceeds: Story = {
           http.get(
             'http://localhost:3535/ocrvs/:id',
             () =>
-              new HttpResponse('<svg xmlns="http://www.w3.org/2000/svg" />', {
+              new HttpResponse(TestImage.Tree, {
                 headers: {
                   'Content-Type': 'image/svg+xml',
                   'Cache-Control': 'no-cache'
