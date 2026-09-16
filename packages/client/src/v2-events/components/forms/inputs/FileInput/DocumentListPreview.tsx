@@ -35,8 +35,8 @@ const Container = styled.div`
   justify-content: space-between;
   gap: 4px;
   border-top: 1.5px solid ${({ theme }) => theme.colors.grey100};
-  height: 48px;
-  padding: 0px 10px;
+  min-height: 48px;
+  padding: 8px 10px;
 `
 
 const SpinnerContainer = styled(Spinner)`
@@ -48,9 +48,7 @@ const Label = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   svg {
     flex-shrink: 0;
   }
