@@ -66,7 +66,8 @@ const messagesToDefine = {
   },
   recoveryLinkExpiredBody: {
     id: 'resetCredentials.recoveryLinkLanding.expired.body',
-    defaultMessage: 'This link is no longer valid. Request a new one to continue.',
+    defaultMessage:
+      'This link is no longer valid. Request a new one to continue.',
     description:
       'Body shown when a recovery link is invalid, expired, or already used. Must not reveal whether the underlying account exists.'
   },
@@ -216,6 +217,13 @@ const messagesToDefine = {
     id: 'label.error',
     defaultMessage: 'Invalid input',
     description: 'Generic error message for invalid form nput'
+  },
+  securityAnswerVerificationError: {
+    id: 'resetCredentials.securityQuestion.verificationError',
+    defaultMessage:
+      "We couldn't verify your answer. Your link may have expired — please request a new one.",
+    description:
+      'Shown when submitting a security answer fails for a reason other than a wrong answer (e.g. the recovery session expired or the server errored)'
   }
 }
 

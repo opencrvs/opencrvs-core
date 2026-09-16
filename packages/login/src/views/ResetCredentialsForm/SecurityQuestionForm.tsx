@@ -84,6 +84,7 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
   const [answer, setAnswer] = useState('')
   const [touched, setTouched] = useState(false)
   const [error, setError] = useState(false)
+  const [verificationFailed, setVerificationFailed] = useState(false)
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -96,6 +97,7 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
     setAnswer(value)
     setTouched(true)
     setError(value === '')
+    setVerificationFailed(false)
   }
 
   const handleContinue = async (event: React.FormEvent) => {
@@ -129,9 +131,8 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
       }
 
       navigate(routes.UPDATE_PASSWORD, { state: { nonce: result.nonce } })
-    } catch (error) {
-      // @todo error handling
-      setError(true)
+    } catch (err) {
+      setVerificationFailed(true)
     }
   }
 
@@ -210,7 +211,15 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
                 key="securityAnswerFieldContainer"
                 label={intl.formatMessage(sharedMessages.answerFieldLabel)}
                 touched={touched}
-                error={error ? intl.formatMessage(sharedMessages.error) : ''}
+                error={
+                  verificationFailed
+                    ? intl.formatMessage(
+                        sharedMessages.securityAnswerVerificationError
+                      )
+                    : error
+                      ? intl.formatMessage(sharedMessages.error)
+                      : ''
+                }
                 hideAsterisk={true}
               >
                 <TextInput
@@ -222,7 +231,7 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
                   value={answer}
                   onChange={(e) => handleChange(e.target.value)}
                   touched={touched}
-                  error={error}
+                  error={error || verificationFailed}
                 />
               </InputField>
             </Actions>

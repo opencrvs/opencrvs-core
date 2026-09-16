@@ -10,6 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
+import { logger } from '@opencrvs/commons'
 
 import { verifySecurityAnswer, IVerifySecurityAnswerResponse } from './service'
 
@@ -57,6 +58,7 @@ export default async function verifySecurityQuestionHandler(
       payload.answer
     )
   } catch (err) {
+    logger.error(err)
     return unauthorized()
   }
 

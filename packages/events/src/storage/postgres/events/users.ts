@@ -164,7 +164,10 @@ export async function getUserCredentialsByUsername(username: string) {
     .executeTakeFirst()
 }
 
-export async function getUserCredentialsByUserId(userId: UUID) {
+export async function getUserCredentialsByUserId(
+  userId: UUID,
+  requireActive = true
+) {
   const db = getClient()
   return db
     .selectFrom('users')
@@ -177,7 +180,7 @@ export async function getUserCredentialsByUserId(userId: UUID) {
       'userCredentials.securityQuestions'
     ])
     .where('users.id', '=', userId)
-    .where('users.status', '=', 'active')
+    .$if(requireActive, (qb) => qb.where('users.status', '=', 'active'))
     .executeTakeFirst()
 }
 

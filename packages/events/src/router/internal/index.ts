@@ -145,7 +145,7 @@ export const internalUserRouter = serviceRouter({
     )
     .output(z.object({ matched: z.boolean(), questionKey: z.string() }))
     .mutation(async ({ input }) => {
-      const record = await getCredentials(input.userId)
+      const record = await getCredentials(input.userId, false)
 
       const questions = getSecurityQuestionsForUser(record)
       return checkSecurityQuestionMatch({
@@ -172,7 +172,7 @@ export const internalUserRouter = serviceRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const record = await getCredentials(input.userId)
+      const record = await getCredentials(input.userId, false)
       const newHash = await generateHash(input.password, record.salt)
       await updatePasswordHash(UUID.parse(input.userId), newHash)
       void writeAuditLog({

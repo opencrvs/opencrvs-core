@@ -257,3 +257,38 @@ test('returns matched: true when answer is correct', async () => {
   expect(result.matched).toBe(true)
   expect(result.questionKey).toBe('BIRTH_TOWN')
 })
+
+test('verifies the answer even when the account is not active', async () => {
+  // Account recovery starts from a lookup with no status filter, so a user who
+  // can reach the security question but is not `active` (deactivated, or never
+  // activated) must still be able to answer it — otherwise every answer 401s.
+  const { eventsDb, user } = await setupTestCase()
+  const { salt } = await generateSaltedHash('irrelevant')
+  const answerHash = await generateHash('london', salt)
+
+  await eventsDb
+    .updateTable('userCredentials')
+    .set({
+      salt,
+      securityQuestions: sql`cast (${JSON.stringify([
+        { questionKey: 'BIRTH_TOWN', answerHash }
+      ])} as jsonb)` as unknown as Record<string, unknown>
+    })
+    .where('userId', '=', user.id)
+    .execute()
+
+  await eventsDb
+    .updateTable('users')
+    .set({ status: 'deactivated' })
+    .where('id', '=', user.id)
+    .execute()
+
+  const result = await caller.user.verifySecurityAnswer({
+    userId: user.id,
+    questionKey: 'BIRTH_TOWN',
+    answer: 'London'
+  })
+
+  expect(result.matched).toBe(true)
+  expect(result.questionKey).toBe('BIRTH_TOWN')
+})

@@ -463,8 +463,8 @@ export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
   return userOrSystem.type === TokenUserType.enum.user
 }
 
-export const getCredentials = async (userId: UUID) => {
-  const credentials = await getUserCredentialsByUserId(userId)
+export const getCredentials = async (userId: UUID, requireActive = true) => {
+  const credentials = await getUserCredentialsByUserId(userId, requireActive)
 
   if (!credentials) {
     logger.error(`No user details found by given userid: ${userId}`)
