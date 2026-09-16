@@ -323,7 +323,7 @@ describe('event.actions.custom', () => {
     })
 
     test('should successfully accept a previously requested action', async () => {
-      const { client, payload, generator, user } = await initialiseTest([
+      const { client, payload, user } = await initialiseTest([
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
