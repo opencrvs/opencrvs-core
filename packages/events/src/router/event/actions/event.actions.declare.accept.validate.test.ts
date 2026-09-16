@@ -225,7 +225,7 @@ describe('Declare async accept action', () => {
   })
 })
 
-describe.only('Declare sync accept action', () => {
+describe('Declare sync accept action', () => {
   function mockActionApi(
     action: ActionType,
     status: number,
@@ -305,7 +305,7 @@ describe.only('Declare sync accept action', () => {
     })
   })
 
-  test.only('Throws error when declaration includes properties outside the event configuration', async () => {
+  test('Throws error when declaration includes properties outside the event configuration', async () => {
     mockActionApi(ActionType.DECLARE, 200, {
       declaration: {
         kissa: 'cat'
@@ -345,4 +345,48 @@ describe.only('Declare sync accept action', () => {
       expect.objectContaining({ actionType: ActionType.UNASSIGN })
     ])
   })
+
+  test.todo(
+    'Throws error when declaration includes properties outside the event configuration',
+    async () => {
+      mockActionApi(ActionType.DECLARE, 200, {
+        declaration: {
+          kissa: 'cat'
+        }
+      })
+
+      const { user, generator, eventsDb } = await setupTestCase()
+      const client = createTestClient(user)
+
+      const event = await client.event.create(generator.event.create())
+      await expect(
+        client.event.actions.declare.request(
+          generator.event.actions.declare(event.id, {
+            waitFor: false
+          })
+        )
+      ).rejects.toThrow('Field with id kissa not found in event config')
+
+      const persistedActions = await eventsDb
+        .selectFrom('eventActions')
+        .selectAll()
+        .where('eventActions.eventId', '=', event.id)
+        .orderBy('createdAt', 'asc')
+        .execute()
+
+      expect(persistedActions).toHaveLength(4)
+      expect(persistedActions).toEqual([
+        expect.objectContaining({ actionType: ActionType.CREATE }),
+        expect.objectContaining({ actionType: ActionType.ASSIGN }),
+        expect.objectContaining({
+          actionType: ActionType.DECLARE,
+          status: ActionStatus.Requested,
+          createdByUserType: TokenUserType.enum.user,
+          createdBy: user.id,
+          createdByRole: TestUserRole.enum.REGISTRATION_AGENT
+        }),
+        expect.objectContaining({ actionType: ActionType.UNASSIGN })
+      ])
+    }
+  )
 })
