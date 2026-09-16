@@ -597,7 +597,7 @@ export const JurisdictionScope_Location: Story = {
         // `queryAllByRole` is synchronous, so on its own it snapshots the
         // listbox while it is still being populated and reads a partial
         // count. Wait for the count to settle before asserting on it.
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(within(listbox).queryAllByRole('listitem')).toHaveLength(1)
         )
         const options = within(listbox).queryAllByRole('listitem')
@@ -647,7 +647,7 @@ export const JurisdictionScope_AdministrativeArea: Story = {
         // `queryAllByRole` is synchronous, so on its own it snapshots the
         // listbox while it is still being populated and reads a partial
         // count. Wait for the count to settle before asserting on it.
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
             locationsUnderAdministration.length
           )
@@ -709,7 +709,7 @@ export const JurisdictionScope_All: Story = {
         // `queryAllByRole` is synchronous, so on its own it snapshots the
         // listbox while it is still being populated and reads a partial
         // count. Wait for the count to settle before asserting on it.
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
             allLocations.length
           )
@@ -749,7 +749,7 @@ export const JurisdictionScope_AllBeatsLocation: Story = {
         // `queryAllByRole` is synchronous, so on its own it snapshots the
         // listbox while it is still being populated and reads a partial
         // count. Wait for the count to settle before asserting on it.
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
             allLocations.length
           )
@@ -898,7 +898,7 @@ export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
         // `queryAllByRole` is synchronous, so on its own it snapshots the
         // listbox while it is still being populated and reads a partial
         // count. Wait for the count to settle before asserting on it.
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
             locationsUnderAdministration.length
           )
