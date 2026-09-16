@@ -11,7 +11,6 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import * as Sentry from '@sentry/react'
 import {
   DocumentPath,
   FullDocumentPath,
@@ -133,7 +132,6 @@ export async function precacheFile(path: DocumentPath | FullDocumentPath) {
       // eslint-disable-next-line no-console
       console.warn('Failed to precache file', error)
     }
-    Sentry.captureException(error)
   }
 }
 
