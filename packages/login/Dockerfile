@@ -1,6 +1,6 @@
 ARG  BRANCH=develop
 ARG  BASE_IMAGE=ghcr.io/opencrvs/ocrvs-base
-FROM ${BASE_IMAGE}:${BRANCH}
+FROM ${BASE_IMAGE}:${BRANCH} as base
 
 USER node
 
