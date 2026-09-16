@@ -719,7 +719,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         // Not accepted or rejected yet — a pending placeholder row.
         detailRows.push(
           buildDetailRow({
-            badge: <Icon color="grey400" name="Circle" size="small" />,
+            badge: <Icon color="grey400" name="CircleDashed" size="small" />,
             label: intl.formatMessage(messages.awaitingConfirmation)
           })
         )
