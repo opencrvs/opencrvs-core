@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Client } from 'pg'
+import { Client, Pool } from 'pg'
 import { inject, vi } from 'vitest'
 import { getDeclarationFields } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -20,7 +20,12 @@ import {
 import { createIndex } from '@events/service/indexing/indexing'
 import { getReindexingStatusIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { mswServer } from './msw'
-import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
+import {
+  createDatabase,
+  dropDatabase,
+  initializeSchemaAccess,
+  migrate
+} from './postgres'
 
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
@@ -39,16 +44,53 @@ async function resetESServer() {
   await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
+// Database created for the test currently running. Tracked so it can be
+// dropped afterwards — every test creates its own database, and without the
+// drop a full run leaves behind ~8MB per test, filling up the CI runner.
+let currentDb: string | null = null
+
+// The pool handed to the code under test, kept so this file can close it.
+// resetServer only drops the module's reference to it.
+let currentPool: Pool | null = null
+
+function getClusterClient() {
+  return new Client({
+    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/postgres`
+  })
+}
+
+async function dropPostgresDatabase() {
+  if (currentDb === null) {
+    return
+  }
+
+  // End the pool before its database goes away: DROP DATABASE refuses while a
+  // session is connected, and FORCE terminating one server-side surfaces as an
+  // unhandled 'error' on a pool that has no error listener.
+  if (currentPool !== null) {
+    await currentPool.end()
+    currentPool = null
+  }
+  resetEventsPostgresServer()
+
+  const clusterClient = getClusterClient()
+  await clusterClient.connect()
+  await dropDatabase(clusterClient, currentDb)
+  await clusterClient.end()
+
+  currentDb = null
+}
+
 async function resetPostgresServer() {
   const targetDb = `events_${Date.now()}_${Math.random()}`
 
   const EVENTS_APP_POSTGRES_URI = `postgres://events_app:app_password@${inject('POSTGRES_URI')}/${targetDb}`
 
-  const clusterInitializer = new Client({
-    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/postgres`
-  })
+  const clusterInitializer = getClusterClient()
   await clusterInitializer.connect()
   await createDatabase(clusterInitializer, targetDb)
+  // Set before migrating so a failed migration still leaves a droppable name.
+  currentDb = targetDb
   await clusterInitializer.end()
 
   const databaseInitializer = new Client({
@@ -60,7 +102,7 @@ async function resetPostgresServer() {
   await databaseInitializer.end()
 
   resetEventsPostgresServer()
-  getPool(EVENTS_APP_POSTGRES_URI)
+  currentPool = getPool(EVENTS_APP_POSTGRES_URI)
 }
 
 beforeEach(async () => Promise.all([resetPostgresServer(), resetESServer()]))
@@ -78,7 +120,8 @@ beforeAll(() =>
     }
   })
 )
-afterEach(() => {
+afterEach(async () => {
   mswServer.resetHandlers()
+  await dropPostgresDatabase()
 })
 afterAll(() => mswServer.close())
