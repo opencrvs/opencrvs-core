@@ -21,13 +21,6 @@ import {
 } from '@client/v2-events/features/events/fixtures'
 import { DocumentPreview } from './DocumentPreview'
 
-/**
- * DocumentPreview is what the record audit modal renders when a past
- * action's attached document is opened. These stories reproduce a
- * document whose file was never successfully cached — the first render
- * fails, and retrying should fetch, cache, and display it.
- */
-
 const meta: Meta<typeof DocumentPreview> = {
   title: 'Inputs/File/DocumentPreview/Interaction'
 }
