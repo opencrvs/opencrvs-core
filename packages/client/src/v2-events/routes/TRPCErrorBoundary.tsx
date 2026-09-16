@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { Component } from 'react'
-import * as Sentry from '@sentry/react'
 import { z } from 'zod'
 import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
@@ -298,21 +297,13 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <Sentry.ErrorBoundary
-          showDialog={!development}
-          onError={(err) => {
-            // eslint-disable-next-line no-console
-            console.log('Sentry.ErrorBoundary: ', err)
-          }}
-        >
-          <PageWrapper>
-            {variant === 'notice' ? (
-              <NoticeContainer>{content}</NoticeContainer>
-            ) : (
-              <ErrorContainer>{content}</ErrorContainer>
-            )}
-          </PageWrapper>
-        </Sentry.ErrorBoundary>
+        <PageWrapper>
+          {variant === 'notice' ? (
+            <NoticeContainer>{content}</NoticeContainer>
+          ) : (
+            <ErrorContainer>{content}</ErrorContainer>
+          )}
+        </PageWrapper>
       )
     }
 

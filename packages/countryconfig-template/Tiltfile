@@ -48,6 +48,7 @@ docker_build(
   ".",
   dockerfile="Dockerfile",
   network="host",
+  entrypoint=["pnpm", "start:tilt"],
   only=[
     './src',
     './package.json',
