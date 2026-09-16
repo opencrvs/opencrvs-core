@@ -173,7 +173,9 @@ function ReadonlyView() {
   const trpc = useTRPC()
 
   if (!canAccessEventWithScopes()) {
-    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
+    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
+      replace: true
+    })
     return null
   }
 

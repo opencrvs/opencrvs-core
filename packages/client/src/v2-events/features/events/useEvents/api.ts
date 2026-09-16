@@ -105,6 +105,33 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
+function setLocalEventIndexById(id: string, eventIndex: EventIndex) {
+  queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id }]
+      }
+    }),
+    () => ({ results: [eventIndex], total: 1 })
+  )
+}
+
+/**
+ * Makes an event resolvable by id from the local cache, leaving every other
+ * cached search alone — for an event that has been synced rather than acted on,
+ * where the workqueue searches are still the server's to fill.
+ *
+ * Does nothing when the event's configuration is not cached.
+ */
+export function seedLocalEventIndex(id: string, event: EventDocument) {
+  const config = findLocalEventConfig(event.type)
+
+  if (config) {
+    setLocalEventIndexById(id, getCurrentEventState(event, config))
+  }
+}
+
 export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
 
@@ -118,16 +145,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   /*
    * Ensure there exists a local cached search query for this event
    */
-
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    }),
-    () => ({ results: [updatedEventIndex], total: 1 })
-  )
+  setLocalEventIndexById(id, updatedEventIndex)
 
   /**
    * Keeps the cache in sync when an event is updated.

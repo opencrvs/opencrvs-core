@@ -294,6 +294,34 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
     expect(minioPutMock).toHaveBeenCalled()
   })
+
+  it('persists the client-reported content type so extensions Minio cannot infer (e.g. .jfif) stay renderable', async () => {
+    const transactionId = 'transaction-jfif'
+    const body =
+      `--${boundary}${CRLF}` +
+      createFormProperty('transactionId', transactionId) +
+      `--${boundary}${CRLF}` +
+      `Content-Disposition: form-data; name="file"; filename="photo.jfif"${CRLF}` +
+      `Content-Type: image/jpeg${CRLF}${CRLF}` +
+      `jpeg-bytes${CRLF}` +
+      `--${boundary}--${CRLF}`
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/files',
+      payload: Buffer.from(body, 'utf8'),
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toEqual(`${transactionId}.jfif`)
+
+    const metaData = minioPutMock.mock.calls[0][3]
+    expect(metaData['content-type']).toBe('image/jpeg')
+  })
 })
 
 describe('verify document uploader handler', () => {

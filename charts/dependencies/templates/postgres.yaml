@@ -27,10 +27,17 @@ metadata:
     app: postgres
   name: postgres
 spec:
+  {{- $service_type := default .Values.service_type .Values.postgres.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
   clusterIP: None
+  {{- end }}
   ports:
     - port: 5432
       targetPort: 5432
+      {{- if .Values.postgres.node_port }}
+      nodePort: {{ .Values.postgres.node_port }}
+      {{- end }}
   selector:
     app: postgres
 ---

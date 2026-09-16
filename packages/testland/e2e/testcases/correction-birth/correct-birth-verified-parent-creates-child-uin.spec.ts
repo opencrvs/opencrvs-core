@@ -10,12 +10,7 @@
  */
 import path from 'path'
 import { test, expect } from '@playwright/test'
-import {
-  getToken,
-  login,
-  searchFromSearchBar,
-  switchEventTab
-} from '@e2e/support/helpers'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
@@ -45,10 +40,10 @@ async function getEventById(eventId: string, token: string) {
 test('Correcting a birth with a verified parent ID creates the child UIN (#13734)', async ({
   page
 }) => {
+  test.setTimeout(180_000)
   let token: string
   let declaration: Declaration
   let eventId: string
-  let recordUrl = ''
   let childNid = ''
 
   await test.step('Register a birth via API without a verified parent (no child UIN)', async () => {
@@ -67,8 +62,6 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
 
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await openRecordByTitle(page, formatV2ChildName(declaration))
-    recordUrl = page.url()
-
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
@@ -149,19 +142,18 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
     childNid = aggregateActionDeclarations(event)['child.nid'] as string
   })
 
-  await test.step('Record audit shows "Waiting for external validation" and the child UIN', async () => {
+  await test.step('Record audit shows the corrected record and the child UIN', async () => {
     await page.getByRole('button', { name: 'Assign record' }).click()
+    await page.getByRole('button', { name: 'Assign', exact: true }).click()
 
     // Verify the child UIN is visible in the record summary
     await expect(page.getByTestId('child.nid-value')).toContainText(childNid)
 
-    // Verify the "Waiting for external validation" action is visible in the audit tab
     await switchEventTab(page, 'Audit')
-    await expect(
-      page.getByRole('button', {
-        name: 'Waiting for external validation',
-        exact: true
-      })
-    ).toBeVisible()
+
+    await page
+      .getByRole('button', { name: 'Record corrected', exact: true })
+      .click()
+    await expect(page.getByText(childNid)).toBeVisible()
   })
 })

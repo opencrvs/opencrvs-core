@@ -21,6 +21,9 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/email`)'
     kind: Rule
     services:

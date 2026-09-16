@@ -37,12 +37,20 @@ spec:
     - name: minio
       namespace: {{ .Release.Namespace }}
       port: 3535
+    {{- if .Values.ingress.application_allowlist }}
+    middlewares:
+      - name: application-ip-allowlist
+    {{- end }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "minio-console" "Values" .Values) }}`)'
     kind: Rule
     services:
     - name: minio
       namespace: {{ .Release.Namespace }}
       port: 3536
+    {{- if .Values.ingress.admin_console_allowlist }}
+    middlewares:
+      - name: admin-console-ip-allowlist
+    {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}
@@ -58,14 +66,24 @@ metadata:
     app: minio
   name: minio
 spec:
+  {{- $service_type := default .Values.service_type .Values.minio.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
   clusterIP: None
+  {{- end }}
   ports:
     - name: '3535'
       port: 3535
       targetPort: 3535
+      {{- if .Values.minio.node_port }}
+      nodePort: {{ .Values.minio.node_port }}
+      {{- end }}
     - name: '3536'
       port: 3536
       targetPort: 3536
+      {{- if .Values.minio.node_port_console }}
+      nodePort: {{ .Values.minio.node_port_console }}
+      {{- end }}
   selector:
     app: minio
 ---

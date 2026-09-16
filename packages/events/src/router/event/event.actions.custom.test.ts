@@ -11,13 +11,17 @@
 import { TRPCError } from '@trpc/server'
 import { HttpResponse, http } from 'msw'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   encodeScope,
+  EventStatus,
+  getCurrentEventState,
   getOrThrow,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   sanitizeForSnapshot,
   setupTestCase,
@@ -289,7 +293,7 @@ describe('event.actions.custom', () => {
   })
 
   describe('Asynchronous confirmation flow', () => {
-    function mockNotifyApi(status: number) {
+    function mockCustomActionApi(status: number) {
       return mswServer.use(
         http.post<never, { actionId: string }>(
           `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/CUSTOM`,
@@ -305,7 +309,7 @@ describe('event.actions.custom', () => {
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
-      mockNotifyApi(202)
+      mockCustomActionApi(202)
 
       await expect(
         client.event.actions.custom.request(payload)
@@ -319,13 +323,13 @@ describe('event.actions.custom', () => {
     })
 
     test('should successfully accept a previously requested action', async () => {
-      const { client, payload, generator, user } = await initialiseTest([
+      const { client, payload, user } = await initialiseTest([
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
       const eventId = payload.eventId
 
-      mockNotifyApi(202)
+      mockCustomActionApi(202)
 
       const requestResponse = await client.event.actions.custom.request(payload)
 
@@ -335,15 +339,6 @@ describe('event.actions.custom', () => {
         )?.id,
         'Could not find id for custom action'
       )
-
-      const createAction = requestResponse.actions.filter(
-        (action) => action.type === ActionType.CREATE
-      )
-
-      const assignmentInput = generator.event.actions.assign(payload.eventId, {
-        assignedTo: createAction[0].createdBy
-      })
-      await client.event.actions.assignment.assign(assignmentInput)
 
       const countryConfigClient = createCountryConfigClient(
         user,
@@ -360,6 +355,120 @@ describe('event.actions.custom', () => {
       expect(
         sanitizeForSnapshot(response, UNSTABLE_EVENT_FIELDS)
       ).toMatchSnapshot()
+    })
+  })
+
+  describe('3rd party integration confirmation behaviour', () => {
+    function mockActionApi(action: ActionType, status: number) {
+      return mswServer.use(
+        http.post<never, { actionId: string }>(
+          `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+          () => {
+            return HttpResponse.json({}, { status })
+          }
+        )
+      )
+    }
+
+    test('Throws when integration responds with 202 when keepAssignment is given', async () => {
+      mockActionApi(ActionType.CUSTOM, 202)
+
+      const { client, payload } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      await expect(
+        client.event.actions.custom.request({
+          ...payload,
+          keepAssignment: true
+        })
+      ).rejects.toThrow(
+        'Confirmation API did not return a synchronous response.'
+      )
+    })
+
+    test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
+      mockActionApi(ActionType.CUSTOM, 202)
+      const { client, payload } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      await expect(
+        client.event.actions.custom.request({
+          ...payload,
+          keepAssignmentIfRejected: true
+        })
+      ).rejects.toThrow(
+        'Confirmation API did not return a synchronous response.'
+      )
+    })
+
+    test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
+      mockActionApi(ActionType.CUSTOM, 202)
+
+      const { client, payload } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      await expect(
+        client.event.actions.custom.request({
+          ...payload,
+          keepAssignmentIfAccepted: true
+        })
+      ).rejects.toThrow(
+        'Confirmation API did not return a synchronous response.'
+      )
+    })
+
+    test('Unassigns when integration responds with 202', async () => {
+      mockActionApi(ActionType.CUSTOM, 202)
+
+      const { client, payload } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      const response = await client.event.actions.custom.request(payload)
+
+      const lastAction = response.actions[response.actions.length - 1]
+
+      expect(lastAction.type).toEqual(ActionType.UNASSIGN)
+      expect(lastAction.status).toEqual(ActionStatus.Accepted)
+
+      const currentState = getCurrentEventState(
+        response,
+        tennisClubMembershipEvent
+      )
+
+      expect(currentState.flags).toEqual(['custom:requested'])
+      expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+      expect(currentState.assignedTo).toEqual(undefined)
+    })
+
+    test('Keeps assignment when integration responds with 500', async () => {
+      mockActionApi(ActionType.CUSTOM, 500)
+
+      const { client, payload, user } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      await expect(
+        client.event.actions.custom.request(payload)
+      ).rejects.toThrow(
+        'Unexpected failure from country config action confirmation API'
+      )
+
+      const eventAfterFailure = await client.event.get({
+        eventId: payload.eventId
+      })
+
+      const currentState = getCurrentEventState(
+        eventAfterFailure,
+        tennisClubMembershipEvent
+      )
+
+      expect(currentState.flags).toEqual(['custom:requested'])
+      expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+      expect(currentState.assignedTo).toEqual(user.id)
     })
   })
 })

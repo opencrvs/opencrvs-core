@@ -44,6 +44,7 @@ import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
+  AttachmentPath,
   makeFormikFieldIdsOpenCRVSCompatible,
   resolveSyncedFieldValue
 } from './utils'
@@ -56,7 +57,7 @@ type AllProps = {
   className?: string
   readonlyMode?: boolean
   searchMode?: boolean
-  attachmentPath: string
+  attachmentPath: AttachmentPath
   /**
    * Update the form values in the non-formik state.
    */

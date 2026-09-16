@@ -541,7 +541,13 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             DeclareActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -568,7 +574,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             NotifyActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => {
@@ -593,7 +604,9 @@ export function eventPayloadGenerator(
           transactionId: input.transactionId ?? getUUID(),
           declaration,
           eventId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected
         }
       },
       edit: (
@@ -601,7 +614,13 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             EditActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -619,31 +638,40 @@ export function eventPayloadGenerator(
       assign: (
         eventId: string,
         input: Partial<
-          Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+          Pick<AssignActionInput, 'transactionId' | 'assignedTo' | 'waitFor'>
         > = {}
       ) => ({
         type: ActionType.ASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: input.assignedTo ?? getUUID(),
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       unassign: (
         eventId: string,
-        input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+        input: Partial<
+          Pick<UnassignActionInput, 'transactionId' | 'waitFor'>
+        > = {}
       ) => ({
         type: ActionType.UNASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: null,
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       archive: (
         eventId: string,
         input: Partial<
           Pick<
             ArchiveActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -659,7 +687,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             UnarchiveActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -675,7 +708,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             RejectDeclarationActionInput,
-            'transactionId' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -699,6 +737,9 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'registrationNumber'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -726,7 +767,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             RegisterActionInput,
-            'transactionId' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -749,7 +795,13 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               RequestCorrectionActionInput,
-              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+              | 'transactionId'
+              | 'declaration'
+              | 'annotation'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -773,7 +825,10 @@ export function eventPayloadGenerator(
               rng
             ),
           eventId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         approve: (
           eventId: string,
@@ -781,7 +836,12 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               ApproveCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              | 'transactionId'
+              | 'annotation'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -797,7 +857,10 @@ export function eventPayloadGenerator(
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         reject: (
           eventId: string,
@@ -805,7 +868,13 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment' | 'content'
+              | 'transactionId'
+              | 'annotation'
+              | 'content'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           >
         ) => ({
@@ -821,8 +890,11 @@ export function eventPayloadGenerator(
             ),
           eventId,
           requestId,
+          content: input.content ?? { reason: 'too late' },
           keepAssignment: input.keepAssignment,
-          content: input.content ?? { reason: '' }
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         })
       },
       duplicate: {

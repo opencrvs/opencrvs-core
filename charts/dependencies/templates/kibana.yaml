@@ -19,6 +19,10 @@ spec:
     - name: kibana
       namespace: {{ .Release.Namespace }}
       port: 5601
+    {{- if .Values.ingress.admin_console_allowlist }}
+    middlewares:
+      - name: admin-console-ip-allowlist
+    {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}
@@ -33,12 +37,15 @@ kind: Service
 metadata:
   name: kibana
 spec:
-  type: ClusterIP
+  type: {{ .Values.service_type | default "ClusterIP" }}
   ports:
     - port: 5601
       targetPort: 5601
       protocol: TCP
       name: http
+      {{- if .Values.kibana.node_port }}
+      nodePort: {{ .Values.kibana.node_port }}
+      {{- end }}
   selector:
     app: kibana
 

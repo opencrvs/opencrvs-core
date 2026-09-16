@@ -34,11 +34,6 @@ module.exports = defineConfig([
         {
           paths: [
             {
-              name: '@sentry/browser',
-              message: `Errors should be sent to Sentry from a few centralized places in our codebase.
-    Query component now sends errors automatically to Sentry.`
-            },
-            {
               name: 'date-fns',
               message: 'Please use submodules instead'
             },

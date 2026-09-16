@@ -426,16 +426,6 @@ function isEventIndexable(event: EventDocument) {
   return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
 }
 
-export async function ensureEventIndexed(
-  event: EventDocument,
-  configuration: EventConfig,
-  waitFor: boolean
-) {
-  if (isEventIndexable(event)) {
-    await indexEvent(event, configuration, waitFor)
-  }
-}
-
 /**
  * Resolves the effective `keepAssignment` for an action based on the
  * status-specific `keepAssignmentIfAccepted` / `keepAssignmentIfRejected`
@@ -503,7 +493,10 @@ export async function processAction(
     )
   }
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration, input.waitFor)
+  if (isEventIndexable(updatedEvent)) {
+    await indexEvent(updatedEvent, configuration, input.waitFor)
+  }
+
   return updatedEvent
 }
 
@@ -513,6 +506,7 @@ type AsyncRejectActionInput = Pick<
 > & {
   keepAssignment: boolean
   waitFor: boolean
+  requestId?: UUID
 }
 
 export async function addAsyncRejectAction(
@@ -521,7 +515,8 @@ export async function addAsyncRejectAction(
     originalActionId,
     type,
     keepAssignment,
-    waitFor
+    waitFor,
+    requestId
   }: AsyncRejectActionInput,
   {
     user,
@@ -540,6 +535,7 @@ export async function addAsyncRejectAction(
     actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
+    requestId,
     createdBy: user.id,
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
