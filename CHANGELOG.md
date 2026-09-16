@@ -4,6 +4,10 @@
 
 ### Upgrade guidance
 
+#### Sentry — nothing to do, the upgrade script removes it
+
+`SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
 **Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
@@ -253,6 +257,10 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 
 ## 2.0.2
+
+### Breaking changes
+
+- Sentry is gone from the v2 line, as it already was from 1.9.17. `ClientConfig` and `LoginConfig` no longer accept a `SENTRY` field, so **a country config that still sets it fails to compile** on 2.0.2 and later. Delete `SENTRY` from `src/client-config.ts`, `src/client-config.prod.ts`, `src/login-config.ts` and `src/login-config.prod.ts`, and drop `SENTRY_DSN` from your environment. Going straight to 2.1.0? `npx @opencrvs/toolkit upgrade` does all of this for you. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
 
 ### Improvements
 
