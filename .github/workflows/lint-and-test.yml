@@ -61,7 +61,7 @@ jobs:
 
       - name: Post coverage explanation to PR
         if: github.event_name == 'pull_request'
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message-id: test-coverage-explanation
           message: ${{ env.COVERAGE_EXPLANATION }}
@@ -147,7 +147,7 @@ jobs:
           done
 
       - name: Restore Yarn cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         id: yarn-cache
         with:
           path: |
@@ -166,7 +166,7 @@ jobs:
         if: |
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           steps.yarn-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/yarn/v6
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
@@ -223,7 +223,7 @@ jobs:
       - name: Post test coverage to PR
         if: github.event_name == 'pull_request'
           && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message-id: ${{ matrix.package }}-test-coverage
           message: ${{ env.PR_COMMENT_BODY }}
@@ -274,7 +274,7 @@ jobs:
           done
 
       - name: Restore Yarn cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         id: yarn-cache
         with:
           path: |
@@ -288,7 +288,7 @@ jobs:
         if: |
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           steps.yarn-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/yarn/v6
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
@@ -315,7 +315,7 @@ jobs:
         run: yarn run build-storybook --webpack-stats-json
 
       - name: Upload filesystem as artifact
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v7
         with:
           name: client
           include-hidden-files: true
@@ -342,7 +342,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Restore Yarn cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         id: yarn-cache
         with:
           path: |
@@ -356,7 +356,7 @@ jobs:
         if: |
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           steps.yarn-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/yarn/v6
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
@@ -416,7 +416,7 @@ jobs:
           steps.detect.outputs.affects == 'true' &&
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           steps.yarn-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/yarn/v6
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
@@ -448,7 +448,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Restore Yarn cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         id: yarn-cache
         with:
           path: |
@@ -462,7 +462,7 @@ jobs:
         if: |
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           steps.yarn-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/yarn/v6
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
@@ -504,7 +504,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Restore Yarn cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         id: yarn-cache
         with:
           path: |
@@ -518,7 +518,7 @@ jobs:
         if: |
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
           steps.yarn-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/yarn/v6
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
