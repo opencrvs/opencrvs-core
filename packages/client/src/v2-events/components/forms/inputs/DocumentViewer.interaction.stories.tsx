@@ -31,7 +31,7 @@ const passiveFileRoute = http.get(
 )
 
 const meta: Meta<typeof DocumentViewer> = {
-  title: 'Inputs/DocumentViewer'
+  title: 'Inputs/DocumentViewer/Interaction'
 }
 
 export default meta

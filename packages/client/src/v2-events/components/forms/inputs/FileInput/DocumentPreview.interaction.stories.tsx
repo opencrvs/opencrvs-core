@@ -37,7 +37,7 @@ const passiveFileRoute = http.get(
 )
 
 const meta: Meta<typeof DocumentPreview> = {
-  title: 'Inputs/File/DocumentPreview'
+  title: 'Inputs/File/DocumentPreview/Interaction'
 }
 
 export default meta
