@@ -25,7 +25,8 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { createImageFile } from '@client/tests/image-file'
 import {
   TestPdf,
-  passiveFileRoute
+  passiveFileRoute,
+  storybookEventId
 } from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
 import { handlers as defaultHandlers } from '../../../../.storybook/default-request-handlers'
@@ -70,7 +71,7 @@ export const FileInputWithOptionTest: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.file',
@@ -231,7 +232,7 @@ export const FileInputButton: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.file',
@@ -349,7 +350,7 @@ export const FileInputPdfWithPreview: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.file',
@@ -460,7 +461,7 @@ export const FileInputButtonMaxImage: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.file',

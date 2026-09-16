@@ -10,6 +10,7 @@
  */
 
 import * as z from 'zod/v4'
+import { UUID } from './uuid'
 
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|jpeg|jfif|png|pdf|svg)(\?.*)?$/i
@@ -76,11 +77,11 @@ export type UserAttachmentPath = `users/${string}/`
  */
 export type AttachmentPath = EventAttachmentPath | UserAttachmentPath
 
-export function eventAttachmentPath(eventId: string): EventAttachmentPath {
+export function eventAttachmentPath(eventId: UUID): EventAttachmentPath {
   return `events/${eventId}/`
 }
 
-export function userAttachmentPath(userId: string): UserAttachmentPath {
+export function userAttachmentPath(userId: UUID): UserAttachmentPath {
   return `users/${userId}/`
 }
 

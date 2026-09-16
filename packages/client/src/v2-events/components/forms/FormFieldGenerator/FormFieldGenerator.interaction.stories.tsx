@@ -37,6 +37,7 @@ import {
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
+import { storybookEventId } from '@client/v2-events/features/events/fixtures'
 import {
   getTestValidatorContext,
   withValidatorContext
@@ -860,7 +861,7 @@ export const NullsHiddenFieldUsingServerState: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             eventConfig={nixEventConfig}
             fields={nixConditionalFields}
             formValues={{}}

@@ -37,7 +37,7 @@ import {
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { storybookEventId, tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
   getTestValidatorContext,
@@ -201,7 +201,7 @@ export const ReviewWithValidationErrors: Story = {
     async function handleRejection() {
       await openModal<RejectActionModalResult | null>((close) => (
         <Review.ActionModal.Reject
-          attachmentPath={eventAttachmentPath('storybook-event')}
+          attachmentPath={eventAttachmentPath(storybookEventId)}
           close={close}
           eventConfiguration={tennisClubMembershipEvent}
         />
@@ -544,7 +544,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
           <Review.Body
             anchor={toPlainDate('2025-01-01')}
             annotation={{}}
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             readonlyMode={false}
@@ -675,7 +675,7 @@ export const AcceptModalWithFormFields: Story = {
     return (
       <Review.ActionModal.Accept
         action="Declare"
-        attachmentPath={eventAttachmentPath('storybook-event')}
+        attachmentPath={eventAttachmentPath(storybookEventId)}
         close={fn()}
         copy={{
           title: generateTranslationConfig('Declare this event?'),
@@ -714,7 +714,7 @@ export const AcceptModalWithRequiredField: Story = {
     return (
       <Review.ActionModal.Accept
         action="Declare"
-        attachmentPath={eventAttachmentPath('storybook-event')}
+        attachmentPath={eventAttachmentPath(storybookEventId)}
         close={acceptModalRequiredFieldClose}
         copy={{
           title: generateTranslationConfig('Declare this event?'),
@@ -768,7 +768,7 @@ export const RejectModalWithFormFields: Story = {
   render: function Component() {
     return (
       <Review.ActionModal.Reject
-        attachmentPath={eventAttachmentPath('storybook-event')}
+        attachmentPath={eventAttachmentPath(storybookEventId)}
         close={rejectModalWithFormFieldsClose}
         eventConfiguration={tennisClubMembershipEvent}
         fields={[modalCommentsField, modalCategoryField]}

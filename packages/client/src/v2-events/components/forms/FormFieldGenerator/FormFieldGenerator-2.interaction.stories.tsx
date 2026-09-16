@@ -30,6 +30,7 @@ import {
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { storybookEventId } from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
@@ -474,7 +475,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={fields.map((f) => ({
               ...f,
               // Make all fields disabled
@@ -533,7 +534,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={fields}
             formValues={{
               ...declaration,
@@ -587,7 +588,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={eventAttachmentPath('storybook-event')}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={fields
               .map((f) => {
                 if (f.id === 'applicant.age') {

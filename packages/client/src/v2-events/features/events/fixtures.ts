@@ -28,6 +28,14 @@ import { CACHE_NAME } from '@client/v2-events/cache'
 
 const localRegistrarId = testDataGenerator().user.id.localRegistrar
 
+/*
+ * The record a story's uploads belong to. A story renders a form outside any
+ * real record, but a file field still has to name the prefix it writes to.
+ */
+export const storybookEventId = UUID.parse(
+  '9e1d2f48-3b4a-4c5d-8e6f-7a8b9c0d1e2f'
+)
+
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: getUUID(),
   type: TENNIS_CLUB_MEMBERSHIP,
