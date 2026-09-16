@@ -35,7 +35,7 @@ jobs:
       matrix: ${{ steps.resolve-applicable-versions.outputs.matrix }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -70,7 +70,7 @@ jobs:
               local input_version=$1
 
               # List remote branches, extract versions, and sort them semantically
-              versions=$(git ls-remote --heads origin 'release-*' | awk -F'release-' '{print $2}' | sort -V)
+              versions=$(git ls-remote --heads origin 'release/*' | awk -F'release/' '{print $2}' | sort -V)
 
               # Filter out versions less than the input version
               filtered_versions=$(echo "$versions" | awk -v input="$input_version" '
@@ -118,7 +118,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get PR details from workflow dispatch
         if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -161,7 +161,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
-          RELEASE_BRANCH="release-${{ matrix.version }}"
+          RELEASE_BRANCH="release/${{ matrix.version }}"
           MILESTONE="${{ matrix.version }}"
 
           # Check for semantic prefix
