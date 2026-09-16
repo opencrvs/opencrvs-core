@@ -159,9 +159,8 @@ export const WithDisableCondition: StoryObj<{}> = {
 }
 
 /**
- * Verifies that the AlphaPrintButton renders when the URL `eventId` is a
- * temporary id (e.g. `tmp-<uuid>`). Before the fix, `UUID.parse()` threw on
- * non-UUID strings and the component failed to mount on draft records.
+ * Verifies that the AlphaPrintButton renders for a record whose id is
+ * temporary (e.g. `tmp-<uuid>`), as draft records have before they are saved.
  */
 const temporaryEventId = createTemporaryId()
 const temporaryEventDocument: EventDocument = {

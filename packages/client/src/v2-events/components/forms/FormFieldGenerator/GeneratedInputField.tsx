@@ -840,16 +840,18 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isPrintButtonFieldType(field)) {
-    return (
+    // The button prints the record it is rendered for. Renderers that have no
+    // record in context, such as the search form, have nothing to print.
+    return validatorContext.event ? (
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
+        event={validatorContext.event}
         id={name}
         template={field.config.configuration.template}
-        value={field.value}
         onChange={(val) => onFieldValueChange(name, val)}
       />
-    )
+    ) : null
   }
 
   if (isButtonFieldType(field)) {
