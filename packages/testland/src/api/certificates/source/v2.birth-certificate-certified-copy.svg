@@ -263,7 +263,11 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
       font-size="8" letter-spacing="0px">
       {{#ifCond ($lookup $declaration 'mother.name.fullname') '!==' undefined }}
-      <tspan x="307" y="306.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+      {{#ifCond ($lookup $declaration "mother.address.addressType") '===' "INTERNATIONAL" }}
+        <tspan x="307" y="306.104">{{$join ", " ($lookup $declaration 'mother.address.streetLevelDetails.district2') ($lookup $declaration 'mother.address.streetLevelDetails.state') ($lookup $declaration 'mother.address.country')}}</tspan>
+      {{else}}
+        <tspan x="307" y="306.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+      {{/ifCond}}
       {{/ifCond}}
     </text>
   </g>
@@ -349,9 +353,17 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       font-size="8" letter-spacing="0px">
       {{#ifCond ($lookup $declaration 'father.name.fullname') '!==' undefined }}
         {{#ifCond (lookup $declaration 'father.addressSameAs') '===' 'YES'}}
-          <tspan x="307" y="432.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+          {{#ifCond ($lookup $declaration "mother.address.addressType") '===' "INTERNATIONAL" }}
+            <tspan x="307" y="432.104">{{$join ", " ($lookup $declaration 'mother.address.streetLevelDetails.district2') ($lookup $declaration 'mother.address.streetLevelDetails.state') ($lookup $declaration 'mother.address.country')}}</tspan>
+          {{else}}
+            <tspan x="307" y="432.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+          {{/ifCond}}
         {{else}}
-          <tspan x="307" y="432.104">{{$lookup $declaration 'father.address.administrativeHierarchy'}}</tspan>
+          {{#ifCond ($lookup $declaration "father.address.addressType") '===' "INTERNATIONAL" }}
+            <tspan x="307" y="432.104">{{$join ", " ($lookup $declaration 'father.address.streetLevelDetails.district2') ($lookup $declaration 'father.address.streetLevelDetails.state') ($lookup $declaration 'father.address.country')}}</tspan>
+          {{else}}
+            <tspan x="307" y="432.104">{{$lookup $declaration 'father.address.administrativeHierarchy'}}</tspan>
+          {{/ifCond}}
         {{/ifCond}}
       {{/ifCond}}
     </text>
