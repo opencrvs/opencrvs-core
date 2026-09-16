@@ -23,6 +23,7 @@ import {
   passiveFileRoute
 } from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
+import { handlers as defaultHandlers } from '../../../../.storybook/default-request-handlers'
 import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
@@ -38,12 +39,14 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
       </TRPCProvider>
     )
   ],
-  // Lets an uploaded file's own preview modal load its just-cached blob back,
-  // the same way the real service worker's CacheFirst route would.
+  // Story-level `files` replaces (not merges with) the global default
+  // handler group of the same name, so it's re-included here alongside
+  // passiveFileRoute (which lets an uploaded file's own preview modal load
+  // its just-cached blob back, the same way the real service worker would).
   parameters: {
     msw: {
       handlers: {
-        files: [passiveFileRoute]
+        files: [...defaultHandlers.files, passiveFileRoute]
       }
     }
   }

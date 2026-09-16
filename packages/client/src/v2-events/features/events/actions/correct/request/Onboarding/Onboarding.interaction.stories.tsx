@@ -19,9 +19,14 @@ import {
   generateTranslationConfig
 } from '@opencrvs/commons/client'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  passiveFileRoute
+} from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { createImageFile } from '@client/tests/image-file'
+import { handlers as defaultHandlers } from '../../../../../../../../.storybook/default-request-handlers'
 
 const generator = testDataGenerator()
 
@@ -137,6 +142,14 @@ export const UploadedDocumentPersistsAcrossPageNavigation: Story = {
         eventId: tennisClubMembershipEventDocument.id,
         pageId: 'documents'
       })
+    },
+    // Story-level `files` replaces (not merges with) the global default
+    // handler group of the same name, so it's re-included here alongside
+    // passiveFileRoute.
+    msw: {
+      handlers: {
+        files: [...defaultHandlers.files, passiveFileRoute]
+      }
     }
   },
   play: async ({ canvasElement, step }) => {
@@ -164,9 +177,10 @@ export const UploadedDocumentPersistsAcrossPageNavigation: Story = {
       const input = canvasElement.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement
-      const validFile = new File(['a'.repeat(512)], 'affidavit.jpg', {
-        type: 'image/jpeg'
-      })
+      // Must be a real, decodable image — a fake JPEG byte string uploads
+      // fine but can never actually render in an <img>, regardless of
+      // caching, so previewing it would always fail.
+      const validFile = await createImageFile('affidavit.jpg', 100, 100)
       await userEvent.upload(input, validFile)
 
       await waitFor(async () => {
@@ -192,5 +206,24 @@ export const UploadedDocumentPersistsAcrossPageNavigation: Story = {
         ).toBeInTheDocument()
       }
     )
+
+    await step('Clicking the file name opens it without an error', async () => {
+      await userEvent.click(canvas.getByRole('button', { name: 'Affidavit' }))
+
+      // Both checks belong inside the same retrying waitFor: onError/onload
+      // fire asynchronously, so a one-off check right after the click can
+      // pass by observing the <img> before it has actually settled.
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByText('Failed to load document')
+        ).not.toBeInTheDocument()
+
+        const img = canvasElement.querySelector(
+          'img'
+        ) as HTMLImageElement | null
+        await expect(img).not.toBeNull()
+        await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
+      })
+    })
   }
 }
