@@ -33,7 +33,11 @@ const pdfLoadErrorMessage = {
   defaultMessage: 'Failed to load PDF',
   description: 'PDF loading error message'
 }
-/* Hook to fetch and render PDF */
+/*
+ * Adds a retry-able failure state: a failed load surfaces `error` (shown
+ * as "Failed to load PDF" with a Retry action) instead of hanging forever.
+ * Takes a DocumentPath (not a pre-built URL) so retry can re-precache it.
+ */
 export function usePreviewPdf(path: DocumentPath) {
   const i18n = useIntl()
   const pdfUrl = toFileUrl(path)
