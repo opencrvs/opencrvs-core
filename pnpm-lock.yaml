@@ -2188,9 +2188,6 @@ importers:
       hapi-pino:
         specifier: ^9.0.0
         version: 9.4.0
-      hapi-sentry:
-        specifier: ^3.1.0
-        version: 3.2.0(@hapi/hapi@21.4.8)
       joi:
         specifier: ^17.4.0
         version: 17.13.4
@@ -6311,30 +6308,6 @@ packages:
 
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
-
-  '@sentry/core@6.19.7':
-    resolution: {integrity: sha512-tOfZ/umqB2AcHPGbIrsFLcvApdTm9ggpi/kQZFkej7kMphjT+SGBiQfYtjyg9jcRW+ilAR4JXC9BGKsdEQ+8Vw==}
-    engines: {node: '>=6'}
-
-  '@sentry/hub@6.19.7':
-    resolution: {integrity: sha512-y3OtbYFAqKHCWezF0EGGr5lcyI2KbaXW2Ik7Xp8Mu9TxbSTuwTe4rTntwg8ngPjUQU3SUHzgjqVB8qjiGqFXCA==}
-    engines: {node: '>=6'}
-
-  '@sentry/minimal@6.19.7':
-    resolution: {integrity: sha512-wcYmSJOdvk6VAPx8IcmZgN08XTXRwRtB1aOLZm+MVHjIZIhHoBGZJYTVQS/BWjldsamj2cX3YGbGXNunaCfYJQ==}
-    engines: {node: '>=6'}
-
-  '@sentry/node@6.19.7':
-    resolution: {integrity: sha512-gtmRC4dAXKODMpHXKfrkfvyBL3cI8y64vEi3fDD046uqYcrWdgoQsffuBbxMAizc6Ez1ia+f0Flue6p15Qaltg==}
-    engines: {node: '>=6'}
-
-  '@sentry/types@6.19.7':
-    resolution: {integrity: sha512-jH84pDYE+hHIbVnab3Hr+ZXr1v8QABfhx39KknxqKWr2l0oEItzepV0URvbEhB446lk/S/59230dlUUIBGsXbg==}
-    engines: {node: '>=6'}
-
-  '@sentry/utils@6.19.7':
-    resolution: {integrity: sha512-z95ECmE3i9pbWoXQrD/7PgkBAzJYR+iXtPuTkpBjDKs86O3mT+PXOT3BAn79w2wkn7/i3vOGD2xVr1uiMl26dA==}
-    engines: {node: '>=6'}
 
   '@sideway/address@4.1.5':
     resolution: {integrity: sha512-IqO/DUQHUkPeixNQ8n0JA6102hT9CmaljNTPmQ1u8MEhBo/R4Q8eKLN/vGZxuebwOroDB4cbpjheD4+/sKFK4Q==}
@@ -11856,12 +11829,6 @@ packages:
   hapi-pino@9.4.0:
     resolution: {integrity: sha512-QGxTgsAOw2siV8/vspYmFc19/lCeoPe/LLafSJ6NiUQNPTQmo6/PbiEtKVHjL1Mw1REokQCDZUOuOA80einRKQ==}
 
-  hapi-sentry@3.2.0:
-    resolution: {integrity: sha512-tMmSUoP1jtLLUk8foh2VfFajykkEqZgvBa9ofjsM0Xf5/xxjsXlXIFczJ4h3T2qiAxRPEcmkuWF2QQjrnflezw==}
-    deprecated: 'Switch to native sentry hapi integration: https://docs.sentry.io/platforms/javascript/guides/hapi/'
-    peerDependencies:
-      '@hapi/hapi': ^19.0.0 || ^20.0.0
-
   hapi-swagger@17.3.2:
     resolution: {integrity: sha512-mj1KPBl5UY4rLTLj9CrgNCps29iZ7vKNTEey3Ztm7fZ/DrMdJ7KHdxSucACyaFdPAiEpfJtHvm/5lxJVXVxa4g==}
     engines: {node: '>=16.0.0'}
@@ -13820,9 +13787,6 @@ packages:
   lru-cache@7.18.3:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
-
-  lru_map@0.3.3:
-    resolution: {integrity: sha512-Pn9cox5CsMYngeDbmChANltQl+5pi6XmTrraMSzhPmMBbmgcxmqWry0U3PGapCU1yB4/LqCcom7qhHZiF/jGfQ==}
 
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
@@ -21969,7 +21933,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3':
+  '@jest/test-sequencer@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -21977,7 +21941,11 @@ snapshots:
       jest-runner: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-runtime: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -23798,46 +23766,6 @@ snapshots:
   '@rvf/set-get@7.0.1': {}
 
   '@scarf/scarf@1.4.0': {}
-
-  '@sentry/core@6.19.7':
-    dependencies:
-      '@sentry/hub': 6.19.7
-      '@sentry/minimal': 6.19.7
-      '@sentry/types': 6.19.7
-      '@sentry/utils': 6.19.7
-      tslib: 1.14.1
-
-  '@sentry/hub@6.19.7':
-    dependencies:
-      '@sentry/types': 6.19.7
-      '@sentry/utils': 6.19.7
-      tslib: 1.14.1
-
-  '@sentry/minimal@6.19.7':
-    dependencies:
-      '@sentry/hub': 6.19.7
-      '@sentry/types': 6.19.7
-      tslib: 1.14.1
-
-  '@sentry/node@6.19.7':
-    dependencies:
-      '@sentry/core': 6.19.7
-      '@sentry/hub': 6.19.7
-      '@sentry/types': 6.19.7
-      '@sentry/utils': 6.19.7
-      cookie: 0.4.2
-      https-proxy-agent: 5.0.1
-      lru_map: 0.3.3
-      tslib: 1.14.1
-    transitivePeerDependencies:
-      - supports-color
-
-  '@sentry/types@6.19.7': {}
-
-  '@sentry/utils@6.19.7':
-    dependencies:
-      '@sentry/types': 6.19.7
-      tslib: 1.14.1
 
   '@sideway/address@4.1.5':
     dependencies:
@@ -29834,7 +29762,7 @@ snapshots:
   extract-pg-schema@5.8.1(@electric-sql/pglite@0.4.4):
     dependencies:
       knex: 3.1.0(pg@8.17.2)
-      knex-pglite: 0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.22.0))
+      knex-pglite: 0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.17.2))
       pg: 8.17.2
       pg-query-emscripten: 5.1.0
       ramda: 0.31.3
@@ -30654,15 +30582,6 @@ snapshots:
       abstract-logging: 2.0.1
       get-caller-file: 2.0.5
       pino: 7.11.0
-
-  hapi-sentry@3.2.0(@hapi/hapi@21.4.8):
-    dependencies:
-      '@hapi/hapi': 21.4.8
-      '@hapi/hoek': 9.3.0
-      '@sentry/node': 6.19.7
-      joi: 17.13.4
-    transitivePeerDependencies:
-      - supports-color
 
   hapi-swagger@17.3.2(@hapi/hapi@21.4.8)(joi@17.13.4)(openapi-types@12.1.3):
     dependencies:
@@ -31631,7 +31550,7 @@ snapshots:
       jest-util: 30.4.1
       p-limit: 3.1.0
 
-  jest-circus@26.6.0:
+  jest-circus@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/traverse': 7.29.8
       '@jest/environment': 26.6.2
@@ -31655,7 +31574,11 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-circus@29.7.0(babel-plugin-macros@3.1.0):
     dependencies:
@@ -31818,7 +31741,7 @@ snapshots:
   jest-config@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/core': 7.29.7
-      '@jest/test-sequencer': 26.6.3
+      '@jest/test-sequencer': 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.29.7)
       chalk: 4.1.2
@@ -33158,7 +33081,7 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knex-pglite@0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.22.0)):
+  knex-pglite@0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.17.2)):
     dependencies:
       '@electric-sql/pglite': 0.4.4
       knex: 3.1.0(pg@8.17.2)
@@ -33656,8 +33579,6 @@ snapshots:
       yallist: 4.0.0
 
   lru-cache@7.18.3: {}
-
-  lru_map@0.3.3: {}
 
   luxon@3.7.2: {}
 
@@ -36398,7 +36319,7 @@ snapshots:
       html-webpack-plugin: 4.5.0(webpack@4.44.2)
       identity-obj-proxy: 3.0.0
       jest: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
-      jest-circus: 26.6.0
+      jest-circus: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-resolve: 26.6.0
       jest-watch-typeahead: 0.6.1(jest@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)))
       mini-css-extract-plugin: 0.11.3(webpack@4.44.2)
