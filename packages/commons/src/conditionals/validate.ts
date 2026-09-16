@@ -509,11 +509,19 @@ export function getEventValidatorContext(
   return { document, state: getCurrentEventState(document, config) }
 }
 
+/** deprecated */
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
   baseFormState?: EventState
   event?: EventValidatorContext
+}
+
+export type StrictValidatorContext = {
+  user: ITokenPayload
+  leafAdminStructureLocationIds: Array<{ id: UUID }>
+  baseFormState?: EventState
+  event: EventValidatorContext
 }
 
 function isFieldConditionMet(

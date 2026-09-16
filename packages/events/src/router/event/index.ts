@@ -398,7 +398,7 @@ export const eventRouter = router({
         .input(AssignActionInput)
         .output(EventDocumentOnlyLastAction)
         .use(middleware.canAccessEventWithScopes(['record.read']))
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
@@ -420,7 +420,7 @@ export const eventRouter = router({
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
         .output(EventDocumentOnlyLastAction)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
           const result = await unassignRecord({ input, user, token })
@@ -453,7 +453,7 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
@@ -489,7 +489,7 @@ export const eventRouter = router({
         .input(MarkNotDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)

@@ -331,7 +331,7 @@ describe('Declare sync accept action', () => {
       .orderBy('createdAt', 'asc')
       .execute()
 
-    expect(persistedActions).toHaveLength(4)
+    expect(persistedActions).toHaveLength(3)
     expect(persistedActions).toEqual([
       expect.objectContaining({ actionType: ActionType.CREATE }),
       expect.objectContaining({ actionType: ActionType.ASSIGN }),
@@ -341,8 +341,7 @@ describe('Declare sync accept action', () => {
         createdByUserType: TokenUserType.enum.user,
         createdBy: user.id,
         createdByRole: TestUserRole.enum.REGISTRATION_AGENT
-      }),
-      expect.objectContaining({ actionType: ActionType.UNASSIGN })
+      })
     ])
   })
 

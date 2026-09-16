@@ -17,7 +17,8 @@ import {
   EventState,
   EventValidatorContext,
   getDeclarationFields,
-  ValidatorContext
+  ValidatorContext,
+  StrictValidatorContext
 } from '@opencrvs/commons/events'
 import { getOrThrow, flattenEntries } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
@@ -93,6 +94,10 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
+/**
+ * @deprecated getValidatorContext does not require context, but allows optionality.
+ * @see getStrictValidatorContext
+ */
 export async function getValidatorContext({
   token,
   event
@@ -105,5 +110,21 @@ export async function getValidatorContext({
 
   const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
 
+  return { leafAdminStructureLocationIds, user, event }
+}
+
+export async function getStrictValidatorContext({
+  token,
+  event
+}: {
+  token: string
+  event: EventValidatorContext
+}): Promise<StrictValidatorContext> {
+  const leafAdminStructureLocationIds =
+    await getLeafLevelAdministrativeAreaIds()
+
+  const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
+
+  // @todo: what is baseFormState?
   return { leafAdminStructureLocationIds, user, event }
 }
