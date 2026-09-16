@@ -15,20 +15,12 @@ import { http, HttpResponse } from 'msw'
 import { DocumentPath } from '@opencrvs/commons/client'
 import { CACHE_NAME } from '@client/v2-events/cache'
 import { Option } from '@client/v2-events/utils'
-import { TestImage, TestPdf } from '@client/v2-events/features/events/fixtures'
+import {
+  TestImage,
+  TestPdf,
+  passiveFileRoute
+} from '@client/v2-events/features/events/fixtures'
 import { DocumentViewer, DocumentViewerOptionValue } from './DocumentViewer'
-
-// Serves whatever the real app would have precached under this same-origin
-// synthetic path, or a 404 if nothing has been cached yet — standing in for
-// the real service worker's CacheFirst route, which isn't active in Storybook.
-const passiveFileRoute = http.get(
-  '/events/:eventId/:filename',
-  async ({ request }) => {
-    const cache = await caches.open(CACHE_NAME)
-    const cached = await cache.match(request)
-    return cached ?? new HttpResponse(null, { status: 404 })
-  }
-)
 
 const meta: Meta<typeof DocumentViewer> = {
   title: 'Inputs/DocumentViewer/Interaction'

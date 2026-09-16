@@ -18,7 +18,10 @@ import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { createImageFile } from '@client/tests/image-file'
-import { TestPdf } from '@client/v2-events/features/events/fixtures'
+import {
+  TestPdf,
+  passiveFileRoute
+} from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
 import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
@@ -34,7 +37,16 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
         <Story />
       </TRPCProvider>
     )
-  ]
+  ],
+  // Lets an uploaded file's own preview modal load its just-cached blob back,
+  // the same way the real service worker's CacheFirst route would.
+  parameters: {
+    msw: {
+      handlers: {
+        files: [passiveFileRoute]
+      }
+    }
+  }
 }
 
 export default meta
@@ -175,6 +187,16 @@ export const FileInputWithOptionTest: Story = {
         await canvas.findByRole('button', { name: 'Forest' })
       }
     )
+
+    await step('Opens the uploaded file without an error', async () => {
+      await userEvent.click(canvas.getByRole('button', { name: 'Forest' }))
+      await expect(
+        canvas.queryByText('Failed to load document')
+      ).not.toBeInTheDocument()
+      await waitFor(async () => {
+        await expect(canvasElement.querySelector('img')).not.toBeNull()
+      })
+    })
   }
 }
 
@@ -267,6 +289,18 @@ export const FileInputButton: Story = {
       await userEvent.upload(input, validFile)
 
       await canvas.findByRole('button', { name: 'Uploaded photo' })
+    })
+
+    await step('Opens the uploaded file without an error', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Uploaded photo' })
+      )
+      await expect(
+        canvas.queryByText('Failed to load document')
+      ).not.toBeInTheDocument()
+      await waitFor(async () => {
+        await expect(canvasElement.querySelector('img')).not.toBeNull()
+      })
     })
   }
 }

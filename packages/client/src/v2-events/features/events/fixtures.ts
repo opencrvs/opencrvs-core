@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { http, HttpResponse } from 'msw'
 import {
   Action,
   ActionDocument,
@@ -23,6 +24,7 @@ import {
   getUUID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { CACHE_NAME } from '@client/v2-events/cache'
 
 const localRegistrarId = testDataGenerator().user.id.localRegistrar
 
@@ -270,3 +272,15 @@ trailer<</Size 5/Root 1 0 R>>
 startxref
 360
 %%EOF`
+
+// Storybook has no real service worker, so file requests would otherwise
+// just fail. This stands in for it: serve the file from Cache Storage if
+// it's there, otherwise 404 — mirroring what the real app would do.
+export const passiveFileRoute = http.get(
+  '/events/:eventId/:filename',
+  async ({ request }) => {
+    const cache = await caches.open(CACHE_NAME)
+    const cached = await cache.match(request)
+    return cached ?? new HttpResponse(null, { status: 404 })
+  }
+)

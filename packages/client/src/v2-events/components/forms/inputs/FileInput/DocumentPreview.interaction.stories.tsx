@@ -11,10 +11,14 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, waitFor, userEvent, within } from 'storybook/test'
-import { http, HttpResponse } from 'msw'
+import { HttpResponse, http } from 'msw'
 import { DocumentPath, FileFieldValue } from '@opencrvs/commons/client'
 import { CACHE_NAME } from '@client/v2-events/cache'
-import { TestImage, TestPdf } from '@client/v2-events/features/events/fixtures'
+import {
+  TestImage,
+  TestPdf,
+  passiveFileRoute
+} from '@client/v2-events/features/events/fixtures'
 import { DocumentPreview } from './DocumentPreview'
 
 /**
@@ -23,18 +27,6 @@ import { DocumentPreview } from './DocumentPreview'
  * document whose file was never successfully cached — the first render
  * fails, and retrying should fetch, cache, and display it.
  */
-
-// Serves whatever the real app would have precached under this same-origin
-// synthetic path, or a 404 if nothing has been cached yet — standing in for
-// the real service worker's CacheFirst route, which isn't active in Storybook.
-const passiveFileRoute = http.get(
-  '/events/:eventId/:filename',
-  async ({ request }) => {
-    const cache = await caches.open(CACHE_NAME)
-    const cached = await cache.match(request)
-    return cached ?? new HttpResponse(null, { status: 404 })
-  }
-)
 
 const meta: Meta<typeof DocumentPreview> = {
   title: 'Inputs/File/DocumentPreview/Interaction'
