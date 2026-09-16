@@ -14,7 +14,9 @@ import {
   ActionType,
   FieldType,
   PageTypes,
-  tennisClubMembershipEvent
+  TENNIS_CLUB_MEMBERSHIP,
+  generateEventConfig,
+  generateTranslationConfig
 } from '@opencrvs/commons/client'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -29,16 +31,15 @@ const generator = testDataGenerator()
  * page and back, because the field seeded its own local state from its
  * value prop once at mount and never resynced with it.
  */
-const eventConfigWithTwoPages = {
-  ...tennisClubMembershipEvent,
-  actions: tennisClubMembershipEvent.actions.map((action) => {
-    if (action.type !== ActionType.REQUEST_CORRECTION) {
-      return action
-    }
-    return {
-      ...action,
+const eventConfigWithTwoPages = generateEventConfig({
+  id: TENNIS_CLUB_MEMBERSHIP,
+  fields: [],
+  actions: [
+    {
+      type: ActionType.REQUEST_CORRECTION,
+      label: generateTranslationConfig('Request correction'),
       correctionForm: {
-        ...action.correctionForm,
+        label: generateTranslationConfig('Correction form'),
         pages: [
           {
             id: 'documents',
@@ -105,8 +106,8 @@ const eventConfigWithTwoPages = {
         ]
       }
     }
-  })
-}
+  ]
+})
 
 const meta: Meta<typeof OnboardingIndex> = {
   title: 'CorrectionRequest/Interaction',
