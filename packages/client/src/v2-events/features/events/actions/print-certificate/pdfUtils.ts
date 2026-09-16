@@ -661,7 +661,9 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
-export async function downloadAndEmbedImages(svgString: string): Promise<string> {
+export async function downloadAndEmbedImages(
+  svgString: string
+): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
   const svg = doc.documentElement
@@ -677,14 +679,13 @@ export async function downloadAndEmbedImages(svgString: string): Promise<string>
         const imageUrl = new URL(href)
         let response: Response
 
-        // User signatures may be represented by an unsigned MinIO path in
-        // the V2 users cache. Resolve a fresh signed URL before downloading,
-        // avoiding a predictable 403 request in the browser console.
-        if (!imageUrl.searchParams.has('X-Amz-Signature')) {
+        if (imageUrl.pathname.startsWith('/ocrvs/')) {
           const presignedResponse = await fetch(
             `/api/presigned-url${imageUrl.pathname}`,
             {
-              headers: { Authorization: `Bearer ${getToken()}` }
+              headers: {
+                Authorization: `Bearer ${getToken()}`
+              }
             }
           )
 
@@ -694,14 +695,24 @@ export async function downloadAndEmbedImages(svgString: string): Promise<string>
             )
           }
 
-          const { presignedURL } = await presignedResponse.json()
-          response = await fetch(presignedURL)
+          const data = (await presignedResponse.json()) as {
+            presignedURL?: string
+          }
+
+          if (!data.presignedURL) {
+            throw new Error('Presigned certificate image URL is missing')
+          }
+
+          response = await fetch(data.presignedURL)
         } else {
+          // External HTTP/HTTPS images are not refreshed through OpenCRVS.
           response = await fetch(href)
         }
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch certificate image (${response.status})`)
+          throw new Error(
+            `Failed to fetch certificate image (${response.status})`
+          )
         }
 
         const blob = await response.blob()
