@@ -85,7 +85,8 @@ const documentsOnly: WorkboxPlugin = {
     }
 
     const cache = await caches.open(cacheName)
-    console.log('deleting app-shell response from cache', request.url)
+    // eslint-disable-next-line no-console
+    console.log('deleting app-shell response from cache')
     await cache.delete(request)
 
     return undefined
