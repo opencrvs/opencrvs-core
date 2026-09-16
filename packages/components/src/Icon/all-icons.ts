@@ -30,6 +30,7 @@ export {
   CheckCircle,
   CheckSquare,
   Circle,
+  CircleDashed,
   CircleWavyCheck,
   CircleWavyQuestion,
   Clock,

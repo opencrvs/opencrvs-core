@@ -12,7 +12,7 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
 import styled from 'styled-components'
-import { Dialog, Icon, Stack, Table } from '@opencrvs/components'
+import { Dialog, Icon, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
@@ -20,7 +20,6 @@ import {
   ActionUpdate,
   EventDocument,
   getAcceptedActions,
-  joinValues,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -163,6 +162,11 @@ export function EventHistoryDialog({
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)
 
+  const subtitle = `${userName} — ${format(
+    new Date(action.createdAt),
+    intl.formatMessage(messages['event.history.modal.timeFormat'])
+  )}`
+
   return (
     <Dialog
       isOpen
@@ -171,25 +175,12 @@ export function EventHistoryDialog({
         isAwaitingConfirmation ? <AwaitingConfirmationBanner /> : undefined
       }
       id="event-history-modal"
+      subtitle={subtitle}
       title={title}
       variant="large"
       width={1024}
       onClose={close}
     >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg19">
-          {joinValues(
-            [
-              userName,
-              format(
-                new Date(action.createdAt),
-                intl.formatMessage(messages['event.history.modal.timeFormat'])
-              )
-            ],
-            ' — '
-          )}
-        </Text>
-      </Stack>
       {Boolean(duplicateOf) && (
         <Table
           columns={[
@@ -199,11 +190,7 @@ export function EventHistoryDialog({
               width: 100
             }
           ]}
-          content={[
-            {
-              duplicateOf
-            }
-          ]}
+          content={[{ duplicateOf }]}
           noResultText=" "
         />
       )}

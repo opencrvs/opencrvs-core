@@ -397,6 +397,26 @@ export const CorrectionWaitingForExternalValidation: Story = {
         })
       ).toBeNull()
     })
+
+    await step(
+      'expanding reveals the succeeded request and a pending placeholder',
+      async () => {
+        await expect(canvas.queryByText('Awaiting confirmation')).toBeNull()
+
+        await userEvent.click(
+          await canvas.findByRole('button', {
+            name: 'Show validation details'
+          })
+        )
+
+        // The request itself is shown as succeeded, and its confirmation is
+        // still pending.
+        await expect(await canvas.findByText('Requested')).toBeVisible()
+        await expect(
+          await canvas.findByText('Awaiting confirmation')
+        ).toBeVisible()
+      }
+    )
   }
 }
 
