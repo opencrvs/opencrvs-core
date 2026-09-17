@@ -44,8 +44,7 @@ import {
   canAccessOtherUserWithScopes,
   UserScopeType,
   CreateUserInput,
-  canAccessUserWithScope,
-  ActionConfirmationScopeType
+  canAccessUserWithScope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
