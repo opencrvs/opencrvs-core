@@ -128,7 +128,7 @@
     "qrcode": "^1.5.4",
     "regex-to-strings": "^2.1.0",
     "short-uid": "^0.1.0",
-    "stream-json": "^1.9.1",
+    "stream-json": "^3.0.0",
     "tsx": "^4.15.7",
     "uuid": "^11.1.0",
     "whatwg-fetch": "^3.0.0",
