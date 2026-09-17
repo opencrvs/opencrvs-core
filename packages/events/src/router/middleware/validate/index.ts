@@ -24,7 +24,6 @@ import {
   DeclarationUpdateActionType,
   DeclarationUpdateActions,
   EventConfig,
-  EventDocument,
   FieldConfig,
   annotationActions,
   deepDropNulls,
@@ -49,8 +48,7 @@ import {
   UUID,
   getDeclarationFieldById,
   getPendingAction,
-  StrictValidatorContext,
-  ActionDocument
+  StrictValidatorContext
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
