@@ -104,11 +104,10 @@ export const getUserIdFromToken = (token: string): string | null => {
 }
 
 /**
- * Fixed subject (`sub`) of the service token that core's auth service mints
- * at `GET /internal/service-token`. The token carries no scopes and has
- * userType 'system'; core uses it for unattended service-to-service calls where
- * no user is involved — startup event-config load, background broadcasts and
- * telemetry. See packages/auth/src/features/serviceToken/handler.ts.
+ * Fixed subject (`sub`) of the service token that core's auth service mints at `GET /internal/service-token`.
+ * Core uses it for service-to-service calls where no user is involved.
+ *
+ * See packages/auth/src/features/serviceToken/handler.ts
  */
 export const SERVICE_USER_ID = '__SERVICE_USER__'
 
