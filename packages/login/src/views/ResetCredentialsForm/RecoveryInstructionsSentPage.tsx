@@ -27,6 +27,7 @@ import { selectCountryLogo } from '@login/login/selectors'
 import { IStoreState } from '@login/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
+import { ActiveAccountNote } from '@login/views/ResetCredentialsForm/ForgottenItemForm'
 
 type Props = IntlShapeProps & { logo: string | undefined }
 
@@ -77,6 +78,7 @@ const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
                   forgottenItem
                 })}
               </Text>
+              <ActiveAccountNote intl={intl} />
             </Stack>
 
             <Button
