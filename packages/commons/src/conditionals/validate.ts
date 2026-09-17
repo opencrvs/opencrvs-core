@@ -510,6 +510,8 @@ export function getEventValidatorContext(
 }
 
 export type UserValidatorContext = {
+  // In system-wide context internal service tokens do not have UUID.
+  sub: string
   scope: EncodedScope[]
   role?: string
   userType: TokenUserType

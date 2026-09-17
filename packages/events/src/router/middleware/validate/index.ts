@@ -139,7 +139,7 @@ function validateDeclarationUpdateAction({
 
   const declarationConfig = getDeclaration(eventConfig)
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
-  const previousDeclaration = context.event?.state.declaration
+  const previousDeclaration = context.event.state.declaration
 
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)

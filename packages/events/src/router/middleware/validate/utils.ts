@@ -139,6 +139,7 @@ export async function getStrictValidatorContext({
       leafAdminStructureLocationIds,
       event,
       user: {
+        sub: tokenPayload.sub,
         scope: tokenPayload.scope,
         userType: tokenPayload.userType,
         role: tokenPayload.role
