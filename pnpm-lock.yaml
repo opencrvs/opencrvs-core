@@ -2240,8 +2240,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0
       stream-json:
-        specifier: ^1.9.1
-        version: 1.9.1
+        specifier: ^3.0.0
+        version: 3.6.0
       tsx:
         specifier: ^4.15.7
         version: 4.23.1
@@ -17017,8 +17017,9 @@ packages:
   stream-browserify@2.0.2:
     resolution: {integrity: sha512-nX6hmklHs/gr2FuxYDltq8fJA1GDlxKQCz8O/IM4atRqBH8OORmBNgfvW5gG10GT/qQ9u0CzIvr2X5Pkt6ntqg==}
 
-  stream-chain@2.2.5:
-    resolution: {integrity: sha512-1TJmBx6aSWqZ4tx7aTpBDXK0/e2hhcNSTV8+CbFJtDjbb+I1mZ8lHit0Grw9GRT+6JbIrrDd8esncgBi8aBXGA==}
+  stream-chain@4.2.5:
+    resolution: {integrity: sha512-Wtyq3bNE3ggLR0v2vftqvuhltym3WbZAkZpfIrkr5F/6vpeUmWmwTgXa16zD87gpahwJ/Qulq3zVfUlgIc0J2A==}
+    engines: {node: '>=22'}
 
   stream-each@1.2.3:
     resolution: {integrity: sha512-vlMC2f8I2u/bZGqkdfLQW/13Zihpej/7PmSiMQsbYddxuTsJp8vRe2x2FvVExZg7FaOds43ROAuFJwPR4MTZLw==}
@@ -17026,8 +17027,8 @@ packages:
   stream-http@2.8.3:
     resolution: {integrity: sha512-+TSkfINHDo4J+ZobQLWiMouQYB+UVYFttRA94FpEzzJ7ZdqcL4uUUQ7WkdkI4DSozGmgBUE/a47L+38PenXhUw==}
 
-  stream-json@1.9.1:
-    resolution: {integrity: sha512-uWkjJ+2Nt/LO9Z/JyKZbMusL8Dkh97uUBTv3AJQ74y07lVahLY4eEFsPsE97pxYBwr8nnjMAIch5eqI0gPShyw==}
+  stream-json@3.6.0:
+    resolution: {integrity: sha512-NiJdqxKyau579z/E8vfqcjWfSDWxW/AT99javFXdPXF147Z5za85LRXSHEmSX9TKOakB7gaIccfD0fOIctb7KQ==}
 
   stream-shift@1.0.3:
     resolution: {integrity: sha512-76ORR0DO1o1hlKwTbi/DM3EXWGf3ZJYO8cXX5RJwnul2DEg2oyoZyjLNoQM8WsvZiFKCRfC1O0J7iCvie3RZmQ==}
@@ -21971,7 +21972,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -21979,11 +21980,7 @@ snapshots:
       jest-runner: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-runtime: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -31596,7 +31593,7 @@ snapshots:
       jest-util: 30.4.1
       p-limit: 3.1.0
 
-  jest-circus@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
+  jest-circus@26.6.0:
     dependencies:
       '@babel/traverse': 7.29.8
       '@jest/environment': 26.6.2
@@ -31620,11 +31617,7 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-circus@29.7.0(babel-plugin-macros@3.1.0):
     dependencies:
@@ -31787,7 +31780,7 @@ snapshots:
   jest-config@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/core': 7.29.7
-      '@jest/test-sequencer': 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.29.7)
       chalk: 4.1.2
@@ -36365,7 +36358,7 @@ snapshots:
       html-webpack-plugin: 4.5.0(webpack@4.44.2)
       identity-obj-proxy: 3.0.0
       jest: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
-      jest-circus: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
+      jest-circus: 26.6.0
       jest-resolve: 26.6.0
       jest-watch-typeahead: 0.6.1(jest@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)))
       mini-css-extract-plugin: 0.11.3(webpack@4.44.2)
@@ -37804,7 +37797,7 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 2.3.8
 
-  stream-chain@2.2.5: {}
+  stream-chain@4.2.5: {}
 
   stream-each@1.2.3:
     dependencies:
@@ -37819,9 +37812,9 @@ snapshots:
       to-arraybuffer: 1.0.1
       xtend: 4.0.2
 
-  stream-json@1.9.1:
+  stream-json@3.6.0:
     dependencies:
-      stream-chain: 2.2.5
+      stream-chain: 4.2.5
 
   stream-shift@1.0.3: {}
 
