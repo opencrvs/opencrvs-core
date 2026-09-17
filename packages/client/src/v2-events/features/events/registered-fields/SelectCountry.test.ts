@@ -75,6 +75,52 @@ describe('sortOptionsByLabel', () => {
     ])
   })
 
+  it("sorts a non-Latin script in that script's own alphabetical order", () => {
+    const bengali = createIntl({
+      locale: 'bn',
+      onError: ignoreMissingTranslations
+    })
+    const sorted = sortOptionsByLabel(
+      [
+        option('IND', 'ভারত'),
+        option('AUS', 'অস্ট্রেলিয়া'),
+        option('CAN', 'কানাডা'),
+        option('JPN', 'জাপান')
+      ],
+      bengali
+    )
+
+    expect(
+      sorted.map((o) =>
+        typeof o.label === 'string' ? o.label : o.label.defaultMessage
+      )
+    ).toEqual(['অস্ট্রেলিয়া', 'কানাডা', 'জাপান', 'ভারত'])
+  })
+
+  it("groups untranslated names after the ones in the locale's script", () => {
+    /*
+     * A country configuration rarely translates all 249 names, so the list is
+     * usually mixed: translated labels in the locale's script, the rest falling
+     * back to the English defaultMessage. The collator groups by script rather
+     * than interleaving, which keeps each block readable.
+     */
+    const bengali = createIntl({
+      locale: 'bn',
+      onError: ignoreMissingTranslations
+    })
+    const sorted = sortOptionsByLabel(
+      [
+        option('IND', 'ভারত'),
+        option('ZWE', 'Zimbabwe'),
+        option('AUS', 'অস্ট্রেলিয়া'),
+        option('ALB', 'Albania')
+      ],
+      bengali
+    )
+
+    expect(sorted.map((o) => o.value)).toEqual(['AUS', 'IND', 'ALB', 'ZWE'])
+  })
+
   it('sorts options whose label is a plain string', () => {
     const sorted = sortOptionsByLabel(
       [
