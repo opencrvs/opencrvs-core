@@ -10,6 +10,7 @@
  */
 /* eslint-disable max-lines */
 import { readFileSync } from 'fs'
+import { IncomingMessage } from 'http'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
@@ -33,6 +34,7 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
+  SERVICE_USER_ID,
   SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
@@ -44,6 +46,7 @@ import {
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
 import { t, tService } from '@events/router/trpc'
+import { createContext } from '@events/context'
 import { appRouter } from '@events/router/router'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
@@ -321,6 +324,20 @@ export function createSystemTestClient(
   })
 
   return caller
+}
+
+export async function createServiceTokenTestClient() {
+  const token = createTestToken({
+    userId: SERVICE_USER_ID as UUID,
+    scopes: [],
+    userType: TokenUserType.enum.system
+  })
+
+  const ctx = await createContext({
+    req: { headers: { authorization: token } } as unknown as IncomingMessage
+  })
+
+  return createCallerFactory(appRouter)(ctx)
 }
 
 export function createTestClient(
