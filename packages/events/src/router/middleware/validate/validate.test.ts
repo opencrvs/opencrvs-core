@@ -29,8 +29,6 @@ export const testContext = {
     sub: 'user_12345',
     scope: [],
     role: TestUserRole.enum.LOCAL_REGISTRAR,
-    exp: '1678890000',
-    algorithm: 'RS256',
     userType: TokenUserType.enum.user
   },
   leafAdminStructureLocationIds: []

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,7 +14,13 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
+import {
+  deepMerge,
+  getCurrentEventState,
+  logger,
+  RejectedCorrectionAction,
+  UUID
+} from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -52,6 +59,7 @@ import {
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { getStrictValidatorContext } from '@events/router/middleware/validate/utils'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -328,7 +336,31 @@ export async function defaultRequestHandler(
     })
   }
 
-  const parsedBody = maybeParsed.data
+  const contextBeforeAccept = await getStrictValidatorContext({
+    token,
+    event: {
+      document: eventWithRequestedAction,
+      state: getCurrentEventState(eventWithRequestedAction, configuration)
+    }
+  })
+
+  // @TODO: fix types
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const parsedBody = maybeParsed.data as any
+
+  middleware.validateAction({
+    eventConfig: configuration,
+    context: contextBeforeAccept,
+    input: {
+      type: input.type as any,
+      annotation: deepMerge(input.annotation ?? {}, parsedBody.annotation),
+
+      // @ts-expect-error -- type needs to be tightened
+      requestId: input.requestId as any
+    },
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+    declarationUpdate: deepMerge(input.declaration, parsedBody.declaration)
+  })
 
   logger.debug(
     {
@@ -409,7 +441,7 @@ export function getDefaultActionProcedures(
       .use(middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType]))
       .input(actionConfig.inputSchema.strict())
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction)
+      .use(middleware.validateRequestAction)
       .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
@@ -417,6 +449,7 @@ export function getDefaultActionProcedures(
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
         const event = ctx.event
+
         const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type
@@ -469,6 +502,7 @@ export function getDefaultActionProcedures(
       )
       .use(middleware.canAccessEventWithScopes(confirmationScopes))
       .use(middleware.requireAssignment)
+      .use(middleware.validateAcceptAction)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -490,6 +524,7 @@ export function getDefaultActionProcedures(
           })
         }
 
+        // @todo: should be taken care of by middleware
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
           if (confirmationAction.status === ActionStatus.Rejected) {

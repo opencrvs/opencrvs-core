@@ -17,7 +17,9 @@ import {
   EventState,
   EventValidatorContext,
   getDeclarationFields,
-  ValidatorContext
+  ValidatorContext,
+  StrictValidatorContext,
+  UserValidatorContext
 } from '@opencrvs/commons/events'
 import { getOrThrow, flattenEntries } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
@@ -93,6 +95,10 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
+/**
+ * @deprecated getValidatorContext does not require context, but allows optionality.
+ * @see getStrictValidatorContext
+ */
 export async function getValidatorContext({
   token,
   event
@@ -106,4 +112,45 @@ export async function getValidatorContext({
   const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
 
   return { leafAdminStructureLocationIds, user, event }
+}
+
+export async function getStrictValidatorContext({
+  token,
+  user,
+  event
+}:
+  | {
+      user?: never
+      token: string
+      event: EventValidatorContext
+    }
+  | {
+      token?: never
+      user: UserValidatorContext
+      event: EventValidatorContext
+    }): Promise<StrictValidatorContext> {
+  const leafAdminStructureLocationIds =
+    await getLeafLevelAdministrativeAreaIds()
+
+  if (token) {
+    const tokenPayload = getOrThrow(getTokenPayload(token), 'Token is missing.')
+
+    return {
+      leafAdminStructureLocationIds,
+      event,
+      user: {
+        sub: tokenPayload.sub,
+        scope: tokenPayload.scope,
+        userType: tokenPayload.userType,
+        role: tokenPayload.role
+      }
+    }
+  }
+
+  return {
+    leafAdminStructureLocationIds,
+    event,
+    // types prevent calling without user but inference won't work in this scenario.
+    user: getOrThrow(user, 'User is missing.')
+  }
 }

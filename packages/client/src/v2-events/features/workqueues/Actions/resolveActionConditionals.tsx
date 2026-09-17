@@ -24,7 +24,6 @@ import {
   getOrThrow,
   isActionEnabled,
   isActionVisible,
-  ITokenPayload,
   ValidatorContext,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
@@ -37,12 +36,8 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.ARCHIVED
 ]
 
-function getAvailableAssignmentActions(
-  event: EventIndex,
-  authentication: ITokenPayload
-) {
-  filterActionsByFlags
-  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+function getAvailableAssignmentActions(event: EventIndex, userId: string) {
+  const assignmentStatus = getAssignmentStatus(event, userId)
   const eventStatus = event.status
 
   let actions: ActionTypes[] = []
@@ -159,7 +154,7 @@ export function resolveActionConditionals({
   )
 
   const availableEventActions = getAvailableActionsForEvent(event)
-  const availableAssignActions = getAvailableAssignmentActions(event, user)
+  const availableAssignActions = getAvailableAssignmentActions(event, user.sub)
   // 1. Gather all available actions for the event, including assignment actions
   const allAvailableActions = [
     ...availableEventActions,
