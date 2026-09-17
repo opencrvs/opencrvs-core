@@ -263,11 +263,9 @@ export type ActionConfirmationScopeType = z.infer<
   typeof ActionConfirmationScopeType
 >
 
-const ActionConfirmationScopeOptions = AllRecordScopeOptions.extend({
-  id: UUID.optional().describe(
-    'Binds this scope to a single action, so it authorises confirming that action and no other. Core mints such a scope per confirmation request and hands it to the country configuration. Omit it to grant an integration the standing ability to confirm, in which case the remaining options apply as they do to any record scope.'
-  )
-}).describe('Options for confirming (accepting or rejecting) an action.')
+const ActionConfirmationScopeOptions = AllRecordScopeOptions.describe(
+  'Options for confirming (accepting or rejecting) an action. A standing grant to an integration, narrowed by the ordinary record-scope options — confirmation is never bound to one action by the scope; `requireConfirmableAction` pins the call to the pending action instead.'
+)
 
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
@@ -365,12 +363,6 @@ export function isCustomActionScope(
   scope: Scope
 ): scope is Extract<Scope, { type: 'record.custom-action' }> {
   return scope.type === 'record.custom-action'
-}
-
-export function isActionConfirmationScope(
-  scope: Scope
-): scope is Extract<Scope, { type: ActionConfirmationScopeType }> {
-  return ActionConfirmationScopeType.options.some((type) => type === scope.type)
 }
 
 export const ResolvedRecordScopeV2 = z

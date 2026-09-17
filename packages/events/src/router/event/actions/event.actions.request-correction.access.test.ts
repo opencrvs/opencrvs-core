@@ -30,7 +30,9 @@ import {
 const ASSIGNED_ERROR = 'User is assigned to this event'
 
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-  encodeScope({ type: 'record.request-correction' })
+  encodeScope({ type: 'record.request-correction' }),
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
 ])
 
 describe('Request correction action', () => {

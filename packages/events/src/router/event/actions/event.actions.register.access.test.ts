@@ -30,7 +30,9 @@ import {
 const ASSIGNED_ERROR = 'User is assigned to this event'
 const FORBIDDEN_ERROR = 'FORBIDDEN'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-  encodeScope({ type: 'record.register' })
+  encodeScope({ type: 'record.register' }),
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
 ])
 
 describe('Register action', () => {

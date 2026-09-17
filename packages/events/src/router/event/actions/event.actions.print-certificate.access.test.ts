@@ -32,7 +32,9 @@ import { env } from '@events/environment'
 const ASSIGNED_ERROR = 'User is assigned to this event'
 const FORBIDDEN_ERROR = 'FORBIDDEN'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-  encodeScope({ type: 'record.print-certified-copies' })
+  encodeScope({ type: 'record.print-certified-copies' }),
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
 ])
 
 describe('Print certificate action', () => {

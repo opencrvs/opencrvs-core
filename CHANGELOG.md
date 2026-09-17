@@ -21,31 +21,28 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
-#### Calling action .accept & .reject endpoints require system user token
-
-Previously it was possible for the countryconfig to call events API using user's token. This required user to be assigned to the event, which allowed two entities to perform actions under same identity. User is unassigned from the event when system returns 202, and system must request system user token to perform accept or reject actions.
-
-#### Registration confirmation no longer uses OAuth token exchange
+#### Confirming an asynchronous action now takes credentials the requester does not have
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
 
-Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients. These scopes come in two forms:
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients. The scopes are a standing grant to an integration, narrowed by the ordinary record-scope options (`event`, jurisdiction) like any other record scope.
 
-- **bound**, carrying an `id` naming one action. Core mints these per confirmation request and sends them to the country configuration in place of the caller's own token. Country configuration handlers need no change — they keep forwarding the `Authorization` header they receive — but they no longer hold the registrar's own scopes, and can confirm only the action they were asked about;
-- **unbound**, omitting `id`. A standing grant for an integration that confirms under its own credentials, long after a bound token would have expired. The remaining options (`event`, jurisdiction) apply as they do to any record scope, so an integration stays confined to what it was granted.
+This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. Three further rules back it up:
 
-This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. `accept`/`reject` additionally now refuse any `actionId` that is not a pending action of the matching type.
+- **`accept`/`reject` require a system client's token.** Previously the country configuration could call the events API with the user's token. That required the user to be assigned to the event, which allowed two entities to act under the same identity. A human token is now refused outright, whatever scopes it carries.
+- **A confirmation is refused while a user holds the assignment.** The user is unassigned from the event when the country configuration returns 202, so this normally does not arise; it surfaces when someone assigns themselves while a confirmation is still pending.
+- **`accept`/`reject` refuse any `actionId` that is not a pending action of the matching type**, so a confirmation cannot be pointed at an arbitrary action to manufacture an accepted one.
 
 **These scopes must not be granted to a user role.** A caller that can both request an action and confirm it needs no country configuration to register a record. Core does not enforce this — grant them only to integrations.
 
 Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
-- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects) without an `id`** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`; it still needs `record.read` to resolve the pending action;
+- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects)** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`; it still needs `record.read` to resolve the pending action;
 - **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
 
-`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.action.accept` or `record.read`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+`mosip-api` checks its OpenCRVS system client on startup and exits with code 1 if it is missing `record.action.accept` or `record.read`. It does the same when the client cannot authenticate at all, but **only in production** — elsewhere it logs a warning and retries every 3 seconds indefinitely, so a misconfigured `OPENCRVS_CLIENT_ID` / `OPENCRVS_CLIENT_SECRET` shows up as a hang rather than a crash (both default to an empty string and are not validated at startup). It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
-The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is now an internal service token and lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is an internal service token that only proves the request came from core — it carries no scopes, so a country configuration confirming asynchronously must use its own system client's credentials for the `accept`/`reject` call. It lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
 
 #### Document presign requests are no longer authorized by scope alone
 

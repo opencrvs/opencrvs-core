@@ -30,7 +30,9 @@ const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
     options: {
       customActionTypes: [CUSTOM_ACTION_TYPE]
     }
-  })
+  }),
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
 ])
 
 describe('Custom action', () => {

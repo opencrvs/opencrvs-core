@@ -20,7 +20,6 @@ import {
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
 } from './scopes'
-import { getUUID } from './uuid'
 
 import {
   migrateLegacyScopesToV2,
@@ -841,19 +840,7 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
 })
 
 describe('action confirmation scopes', () => {
-  const actionId = getUUID()
-
-  test('comes in a bound and an unbound form', () => {
-    // Bound: what core mints per confirmation request.
-    expect(
-      Scope.safeParse({
-        type: 'record.action.accept',
-        options: { id: actionId }
-      }).success
-    ).toBe(true)
-
-    // Unbound: a standing grant to an integration, which still takes the
-    // ordinary record-scope options.
+  test('is a standing grant, taking the ordinary record-scope options', () => {
     expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(true)
     expect(
       Scope.safeParse({
@@ -861,25 +848,18 @@ describe('action confirmation scopes', () => {
         options: { event: ['birth'] }
       }).success
     ).toBe(true)
-
-    expect(
-      Scope.safeParse({
-        type: 'record.action.reject',
-        options: { id: 'not-a-uuid' }
-      }).success
-    ).toBe(false)
   })
 
   test('survives the encode/decode round trip used in tokens', () => {
     const encoded = encodeScope({
       type: 'record.action.accept',
-      options: { id: actionId }
+      options: { event: ['birth'] }
     })
 
-    expect(encoded).toBe(`type=record.action.accept&id=${actionId}`)
+    expect(encoded).toBe('type=record.action.accept&event[]=birth')
     expect(decodeScope(encoded)).toEqual({
       type: 'record.action.accept',
-      options: { id: actionId }
+      options: { event: ['birth'] }
     })
   })
 })
