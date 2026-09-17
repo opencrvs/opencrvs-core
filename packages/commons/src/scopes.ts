@@ -240,21 +240,6 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
     )
 })
 
-/**
- * Scopes that authorise confirming (accepting or rejecting) an action, in two
- * forms distinguished by whether they name one:
- *
- * - **Bound** (`options.id` set). Core mints these per confirmation request and
- *   hands them to the country configuration in place of the caller's own token.
- *   The binding is the whole authorisation, so no event check is needed.
- * - **Unbound** (`options.id` omitted). A standing grant for an integration
- *   that confirms under its own credentials, long after a bound token would
- *   have expired. The remaining options apply as they do to any record scope.
- *
- * These must not be granted to a user role: a caller who can request an action
- * and also confirm it needs no country configuration to register a record, and
- * can pick its registration number and override the reviewed declaration.
- */
 export const ActionConfirmationScopeType = RecordScopeTypeV2.extract([
   'record.action.accept',
   'record.action.reject'
@@ -264,7 +249,7 @@ export type ActionConfirmationScopeType = z.infer<
 >
 
 const ActionConfirmationScopeOptions = AllRecordScopeOptions.describe(
-  'Options for confirming (accepting or rejecting) an action. A standing grant to an integration, narrowed by the ordinary record-scope options — confirmation is never bound to one action by the scope; `requireConfirmableAction` pins the call to the pending action instead.'
+  'Options for confirming (accepting or rejecting) an action.'
 )
 
 export const RecordScopeV2 = z

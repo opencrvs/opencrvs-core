@@ -329,35 +329,8 @@ const ActionConfirmationParams = z.object({
 })
 
 /**
- * Requires the scope that confirming (accepting or rejecting) an action needs.
- *
- * Whoever requests a registration must not be able to confirm it as well — they
- * would register the record themselves, pick its number and override the
- * reviewed declaration, with no country configuration involved. So confirming
- * takes a scope of its own that no user role is granted, leaving it to an
- * integration using its own credentials (e.g. mosip-api, once MOSIP answers),
- * and is only ever honoured for a system client.
- *
- * A wrapper rather than a direct `canAccessEventWithScopes` call so the
- * parameter type accepts nothing but those two scopes: passing e.g.
- * `record.register` here would reopen exactly that hole.
- */
-export function requireActionConfirmation(
-  scopeType: ActionConfirmationScopeType
-) {
-  return canAccessEventWithScopes([scopeType])
-}
-
-/**
  * Resolves the action an accept/reject call names, and refuses anything other
  * than the pending action of the matching type.
- *
- * `actionId` is otherwise only looked up by id, so an action of any type or
- * status would do — including one already accepted, or a CREATE. That would let
- * a caller manufacture an accepted action of the type they picked, bypassing
- * `throwConflictIfActionNotAllowed`, `validateAction`, `requireAssignment` and
- * duplicate detection, all of which run on `request` and none of which run on a
- * confirmation.
  *
  * Passes the event and the two actions on in context so the handler does not
  * fetch and scan them a second time.
@@ -401,11 +374,8 @@ export function requireConfirmableAction(actionType: ActionType) {
       })
     }
 
-    // For custom actions the type above is always CUSTOM, so it does not
-    // distinguish e.g. CONFIRM_SENIOR_MEMBERSHIP from another custom action.
-    // The accepted action records the caller's `customActionType`, so it must
-    // match the pending action's — otherwise a confirmer could accept one custom
-    // action as another.
+    // For custom actions the type above is always CUSTOM, so it does not distinguish one custom action from another.
+    // The accepted action records the caller's `customActionType` we can use instead.
     if (
       originalAction.type === ActionType.CUSTOM &&
       input.customActionType !== undefined &&

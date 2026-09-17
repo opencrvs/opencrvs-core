@@ -49,13 +49,8 @@ const INTEGRATIONS: IntegrationConfig[] = [
   {
     name: 'MOSIP',
     scopes: [
-      // Confirming an action takes its own scope, granted here without an
-      // action id so it is a standing grant rather than one core mints per
-      // request. It replaces the action scopes (record.register,
-      // record.correct) that confirmation used to be checked against.
       { type: 'record.action.accept', options: { event: ['birth', 'death'] } },
       { type: 'record.action.reject', options: { event: ['birth', 'death'] } },
-      // Resolving the pending action from a websub callback reads the event.
       { type: 'record.read', options: { event: ['birth', 'death'] } }
     ],
     clientId: MOSIP_INTEGRATION_CLIENT_ID,

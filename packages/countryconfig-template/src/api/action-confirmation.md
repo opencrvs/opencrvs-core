@@ -75,11 +75,6 @@ request came from core — it carries no scopes. Confirming asynchronously means
   confirming it;
 - `record.read`, to resolve the pending action.
 
-A human user's token is refused outright, whatever scopes it carries. For a worked example of
-registering such an integration, see `packages/testland/src/api/integration/handler.ts`. Note that
-`countryconfig-template` ships an empty `INTEGRATIONS` array, so a country config forked from it
-must add its own.
-
 #### Assignment
 
 A confirmation is refused while a human user still holds the assignment on the event

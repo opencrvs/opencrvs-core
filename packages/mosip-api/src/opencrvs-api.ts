@@ -79,13 +79,7 @@ export const getSystemToken = async (): Promise<string> => {
 }
 
 /**
- * Fails fast on startup unless this integration's system client can
- * authenticate and holds the scopes its confirmations require:
- * `record.action.accept` to confirm the action ([[opencrvs-api]]
- * `confirmRegistration`, `confirmApprovedBirthCorrection`) and `record.read` to
- * resolve the pending action from a websub callback ([[opencrvs-api]]
- * `findEventActionType`). Without them every confirmation would fail
- * asynchronously, long after the record was sent to MOSIP.
+ * Fails fast on startup unless this integration's system client can authenticate and holds the scopes its confirmations require.
  */
 export const assertCanConfirmRegistrations = async (
   logger: FastifyBaseLogger

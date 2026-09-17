@@ -275,13 +275,6 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
-/**
- * Mints the token a country configuration uses to confirm (accept/reject) an
- * action: the `record.action.accept` / `record.action.reject` scopes no user
- * role holds, scoped to one event. The token is always a **system** client's —
- * these scopes are only ever honoured for a system user (see
- * `requireActionConfirmation`), never a human one.
- */
 function createActionConfirmationTestToken(
   systemId: UUID,
   eventId: UUID

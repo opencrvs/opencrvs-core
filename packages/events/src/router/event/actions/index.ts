@@ -253,14 +253,7 @@ export async function defaultRequestHandler(
     'customActionType' in input ? input.customActionType : undefined,
     event
   )
-  /*
-   * The country configuration gets core's own internal service token rather
-   * than the caller's own token. It only proves the confirmation request comes
-   * from an internal core service; it grants nothing, so the country
-   * configuration cannot register a second record, act on another event, or use
-   * the registrar's write scopes. Confirming asynchronously requires the country
-   * configuration's own system client credentials.
-   */
+
   const eventActionToken = await getServiceToken()
 
   const eventWithRequestedAction = await addAction(input, {
@@ -473,7 +466,7 @@ export function getDefaultActionProcedures(
               .shape
           )
       )
-      .use(middleware.requireActionConfirmation('record.action.accept'))
+      .use(middleware.canAccessEventWithScopes(['record.action.accept']))
       .use(middleware.requireConfirmableAction(actionType))
       .use(middleware.requireAssignment)
       .mutation(async ({ ctx, input }) => {
@@ -534,7 +527,7 @@ export function getDefaultActionProcedures(
 
     reject: systemOnlyProcedure
       .input(AsyncActionInput)
-      .use(middleware.requireActionConfirmation('record.action.reject'))
+      .use(middleware.canAccessEventWithScopes(['record.action.reject']))
       .use(middleware.requireConfirmableAction(actionType))
       .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
