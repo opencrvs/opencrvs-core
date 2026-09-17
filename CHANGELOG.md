@@ -5,7 +5,7 @@
 ### Bug fixes
 
 - A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
-- The country dropdown is now sorted on the translated label rather than a hardcoded English order, so it stays alphabetical in every language, and the core default country names have been corrected. One country was declared with another's translation key: implementations maintaining their own `client.csv` need to add a `countries.LAO` row, which `yarn extract:translations` reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
+- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 
