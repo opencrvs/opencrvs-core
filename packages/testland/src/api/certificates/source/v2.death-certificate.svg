@@ -301,5 +301,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     </clipPath>
   </defs>
   <image width="36" height="36" xlink:href="{{qrCode}}" x="500" y="770"></image>
-  <image width="140" height="70" xlink:href="{{$lookup ($action 'REGISTER') 'createdBySignature'}}" x="347" y="605"></image>
+  {{#ifCond (lookup (lookup ($action 'PRINT_CERTIFICATE') 'annotation') 'collector.requesterId') '!==' 'PRINT_IN_ADVANCE'}}
+  <image data-testid="registrar-signature" width="140" height="70" xlink:href="{{$lookup ($action 'REGISTER') 'createdBySignature'}}" x="347" y="605"></image>
+  {{/ifCond}}
 </svg>

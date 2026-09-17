@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
+import { faker } from '@faker-js/faker'
 import {
   Declaration,
   createDeclaration,
@@ -238,7 +239,38 @@ test.describe('Residential place of birth renders every administrative level', (
 })
 
 test.describe('International place of birth renders the required street levels', () => {
-  const EXPECTED_PLACE_OF_BIRTH = 'Ngozi District, Ngozi Province, Burundi'
+  const NGOZI = 'Ngozi District, Ngozi Province, Burundi'
+  const GITEGA = 'Gitega District, Gitega Province, Burundi'
+
+  const MOTHER_ADDRESS = {
+    country: 'BDI',
+    addressType: AddressType.INTERNATIONAL,
+    streetLevelDetails: {
+      state: 'Ngozi Province',
+      district2: 'Ngozi District'
+    }
+  }
+
+  const FATHER_ADDRESS = {
+    country: 'BDI',
+    addressType: AddressType.INTERNATIONAL,
+    streetLevelDetails: {
+      state: 'Gitega Province',
+      district2: 'Gitega District'
+    }
+  }
+
+  const father = () => ({
+    'father.detailsNotAvailable': false,
+    'father.name': {
+      firstname: faker.person.firstName(),
+      surname: faker.person.lastName()
+    },
+    'father.dob': '1990-01-01',
+    'father.nationality': 'FAR',
+    'father.idType': 'NATIONAL_ID',
+    'father.nid': faker.string.numeric(10)
+  })
 
   test('Street levels survive on both birth certificate templates', async ({
     page
@@ -253,14 +285,11 @@ test.describe('International place of birth renders the required street levels',
         token,
         placeOfBirthType: 'PRIVATE_HOME',
         partialDeclaration: {
-          'child.birthLocation.privateHome': {
-            country: 'BDI',
-            addressType: AddressType.INTERNATIONAL,
-            streetLevelDetails: {
-              state: 'Ngozi Province',
-              district2: 'Ngozi District'
-            }
-          }
+          'child.birthLocation.privateHome': MOTHER_ADDRESS,
+          'mother.address': MOTHER_ADDRESS,
+          ...father(),
+          'father.addressSameAs': 'NO',
+          'father.address': FATHER_ADDRESS
         }
       })
       const res = await createDeclaration(token, dec)
@@ -285,9 +314,7 @@ test.describe('International place of birth renders the required street levels',
       await page.getByRole('button', { name: 'Verified' }).click()
       await page.getByRole('button', { name: 'Continue' }).click()
 
-      await expect(page.locator('#print')).toContainText(
-        EXPECTED_PLACE_OF_BIRTH
-      )
+      await expect(page.locator('#print')).toContainText(NGOZI)
 
       await page.getByRole('button', { name: 'Yes, print certificate' }).click()
       await page.getByRole('button', { name: 'Print', exact: true }).click()
@@ -309,9 +336,83 @@ test.describe('International place of birth renders the required street levels',
       await page.getByRole('button', { name: 'Verified' }).click()
       await page.getByRole('button', { name: 'Continue' }).click()
 
-      await expect(page.locator('#print')).toContainText(
-        EXPECTED_PLACE_OF_BIRTH
+      // Place of birth and the mother's "Resident at" (#13785).
+      await expect(
+        page.locator('#print').getByText(NGOZI, { exact: true })
+      ).toHaveCount(2)
+
+      // The father's row, on the arm of the branch where he has his own address.
+      await expect(
+        page.locator('#print').getByText(GITEGA, { exact: true })
+      ).toHaveCount(1)
+    })
+  })
+
+  test("Father's row falls back to the mother's address when it is shared", async ({
+    page
+  }) => {
+    test.setTimeout(240_000)
+
+    let declaration: Declaration
+
+    await test.step("Seed a registered birth record whose father shares the mother's address (via API)", async () => {
+      const token = await getToken(CREDENTIALS.REGISTRAR)
+      const dec = await getDeclaration({
+        token,
+        placeOfBirthType: 'PRIVATE_HOME',
+        partialDeclaration: {
+          'child.birthLocation.privateHome': MOTHER_ADDRESS,
+          'mother.address': MOTHER_ADDRESS,
+          ...father(),
+          'father.addressSameAs': 'YES'
+        }
+      })
+      const res = await createDeclaration(token, dec)
+
+      declaration = res.declaration
+    })
+
+    await test.step('Log in as the registrar', async () => {
+      await login(page)
+    })
+
+    await test.step('Print the standard certificate, which unlocks the certified copy', async () => {
+      await page.getByRole('button', { name: 'Pending certification' }).click()
+      await navigateToCertificatePrintAction(
+        page,
+        declaration,
+        CREDENTIALS.REGISTRAR
       )
+      await selectCertificationType(page, 'Birth Certificate')
+      await selectRequesterType(page, 'Print and issue to Informant (Mother)')
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Verified' }).click()
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Yes, print certificate' }).click()
+      await page.getByRole('button', { name: 'Print', exact: true }).click()
+    })
+
+    await test.step("'Birth Certificate Certified Copy' repeats the mother's address", async () => {
+      await page
+        .getByRole('textbox', { name: 'Search for a record' })
+        .fill(formatV2ChildName(declaration))
+
+      await page.getByRole('button', { name: 'Search' }).click()
+      await openRecordByTitle(page, formatV2ChildName(declaration))
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+
+      await selectAction(page, 'Print')
+      await selectCertificationType(page, 'Birth Certificate Certified Copy')
+      await selectRequesterType(page, 'Print and issue to Informant (Mother)')
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Verified' }).click()
+      await page.getByRole('button', { name: 'Continue' }).click()
+
+      // Place of birth, the mother's "Resident at", and the father's row
+      // resolving to the mother's address.
+      await expect(
+        page.locator('#print').getByText(NGOZI, { exact: true })
+      ).toHaveCount(3)
     })
   })
 })

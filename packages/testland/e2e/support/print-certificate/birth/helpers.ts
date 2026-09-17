@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Page, expect } from '@playwright/test'
+import { v4 as uuidv4 } from 'uuid'
+import { createClient } from '@opencrvs/toolkit/api'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
-import { CREDENTIALS } from '@e2e/support/constants'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 
 export async function selectCertificationType(page: Page, type: string) {
   await page
@@ -116,4 +118,46 @@ export async function printAndExpectPopup(page: Page) {
   // Check that the popup URL contains PDF content
   await expect(popup.url()).toBe('about:blank')
   await expect(download.suggestedFilename()).toMatch(/^.*\.pdf$/)
+}
+
+export async function printCertificateViaApi({
+  token,
+  eventId,
+  templateId,
+  requesterId = 'INFORMANT'
+}: {
+  token: string
+  eventId: string
+  templateId: string
+  requesterId?: string
+}) {
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
+  const { sub: userId } = JSON.parse(
+    Buffer.from(token.split('.')[1], 'base64').toString()
+  )
+
+  await client.event.actions.assignment.assign.mutate({
+    eventId,
+    type: 'ASSIGN',
+    assignedTo: userId,
+    transactionId: uuidv4(),
+    declaration: {},
+    annotation: {},
+    keepAssignment: true
+  })
+
+  await client.event.actions.printCertificate.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration: {},
+    annotation: {
+      'collector.requesterId': requesterId,
+      // Every collector but 'print in advance' passes through the identity
+      // verification page, which the backend requires an answer for.
+      ...(requesterId === 'PRINT_IN_ADVANCE'
+        ? {}
+        : { 'collector.identity.verify': true })
+    },
+    content: { templateId }
+  })
 }
