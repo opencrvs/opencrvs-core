@@ -51,6 +51,7 @@ import { Hidden } from './Hidden'
 import { IdReader } from './IdReader'
 import { Loader } from './Loader'
 import { QrReader } from './QrReader'
+import { TextArea } from './TextArea'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -169,15 +170,17 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Hidden
     case FieldType._EXPERIMENTAL_CUSTOM:
       return Custom
-    /*
-     * The remaining types have no module of their own: PHONE, ID, EMAIL and
-     * TEXTAREA are plain strings, and FIELD_GROUP is a container its callers
-     * unwrap into its subfields.
-     */
+    case FieldType.TEXTAREA:
+      return TextArea
+    // Plain strings entered through Text, differing only in the input's type.
     case FieldType.PHONE:
     case FieldType.ID:
     case FieldType.EMAIL:
-    case FieldType.TEXTAREA:
+      return Text
+    /*
+     * FIELD_GROUP is a container rather than a field of its own: callers unwrap
+     * it into its subfields before asking for a module.
+     */
     case FieldType.FIELD_GROUP:
       return undefined
   }
