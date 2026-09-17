@@ -260,7 +260,7 @@ describe('Request and confirmation flow', () => {
   const prng = createPrng(1046)
   let registrationNumber: string
 
-  function mockNotifyApi(status: number) {
+  function mockRegisterActionApi(status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
         `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
@@ -287,7 +287,7 @@ describe('Request and confirmation flow', () => {
     ])
 
     const { id: eventId } = originalEvent
-    mockNotifyApi(200)
+    mockRegisterActionApi(200)
 
     const createAction = originalEvent.actions.filter(
       (action) => action.type === ActionType.CREATE
@@ -335,7 +335,7 @@ describe('Request and confirmation flow', () => {
         ActionType.DECLARE
       ])
 
-      mockNotifyApi(200)
+      mockRegisterActionApi(200)
 
       const data = generator.event.actions.register(eventId)
 
@@ -405,7 +405,7 @@ describe('Request and confirmation flow', () => {
         ActionType.DECLARE
       ])
 
-      mockNotifyApi(400)
+      mockRegisterActionApi(400)
 
       const data = generator.event.actions.register(eventId, {
         declaration
@@ -439,7 +439,7 @@ describe('Request and confirmation flow', () => {
         ActionType.DECLARE
       ])
 
-      mockNotifyApi(500)
+      mockRegisterActionApi(500)
 
       await expect(
         client.event.actions.register.request(
@@ -472,7 +472,7 @@ describe('Request and confirmation flow', () => {
 
       const event = await createEvent(client, generator, [ActionType.DECLARE])
 
-      mockNotifyApi(202)
+      mockRegisterActionApi(202)
 
       const registerInput = generator.event.actions.register(event.id)
 
@@ -500,7 +500,7 @@ describe('Request and confirmation flow', () => {
         ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(event.id, {
           declaration
@@ -533,7 +533,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -596,7 +596,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -669,7 +669,7 @@ describe('Request and confirmation flow', () => {
 
         const { id: eventId } = originalEvent
 
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -747,7 +747,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -820,7 +820,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -879,7 +879,7 @@ describe('Request and confirmation flow', () => {
         ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(event.id, {
           declaration
@@ -908,7 +908,7 @@ describe('Request and confirmation flow', () => {
         const event = await createEvent(client, generator, [ActionType.DECLARE])
         const eventId = event.id
 
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -966,7 +966,7 @@ describe('Request and confirmation flow', () => {
 
         const { id: eventId } = event
 
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId, {
           declaration
@@ -1032,7 +1032,7 @@ describe('Request and confirmation flow', () => {
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -1096,7 +1096,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
@@ -1164,7 +1164,7 @@ describe('Request and confirmation flow', () => {
         ])
 
         const { id: eventId } = originalEvent
-        mockNotifyApi(202)
+        mockRegisterActionApi(202)
 
         const data = generator.event.actions.register(eventId)
 
