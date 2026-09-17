@@ -36,8 +36,8 @@ importers:
         specifier: ^20.0.1
         version: 20.3.0
       '@hapi/inert':
-        specifier: ^6.0.3
-        version: 6.0.5
+        specifier: ^7.0.0
+        version: 7.1.2
       '@opencrvs/toolkit':
         specifier: 2.1.0-rc.7737766
         version: 2.1.0-rc.7737766(@types/node@18.19.130)(typescript@7.0.2)
@@ -665,6 +665,9 @@ packages:
   '@hapi/ammo@5.0.1':
     resolution: {integrity: sha512-FbCNwcTbnQP4VYYhLNGZmA76xb2aHg9AMPiy18NZyWMG310P5KdFGyA9v2rm5ujrIny77dEEIkMOwl0Xv+fSSA==}
 
+  '@hapi/ammo@6.0.1':
+    resolution: {integrity: sha512-pmL+nPod4g58kXrMcsGLp05O2jF4P2Q3GiL8qYV7nKYEh3cGf+rV4P5Jyi2Uq0agGhVU63GtaSAfBEZOlrJn9w==}
+
   '@hapi/b64@5.0.0':
     resolution: {integrity: sha512-ngu0tSEmrezoiIaNGG6rRvKOUkUuDdf4XTPnONHGYfSGRmDqPZX5oJL6HAdKTo1UQHECbdB4OzhWrfgVppjHUw==}
 
@@ -676,6 +679,9 @@ packages:
 
   '@hapi/bounce@2.0.0':
     resolution: {integrity: sha512-JesW92uyzOOyuzJKjoLHM1ThiOvHPOLDHw01YV8yh5nCso7sDwJho1h0Ad2N+E62bZyz46TG3xhAi/78Gsct6A==}
+
+  '@hapi/bounce@3.0.2':
+    resolution: {integrity: sha512-d0XmlTi3H9HFDHhQLjg4F4auL1EY3Wqj7j7/hGDhFFe6xAbnm3qiGrXeT93zZnPH8gH+SKAFYiRzu26xkXcH3g==}
 
   '@hapi/bourne@2.1.0':
     resolution: {integrity: sha512-i1BpaNDVLJdRBEKeJWkVO6tYX6DMFBuwMhSuWqLsY4ufeTKGVuV5rBsUhxPayXqnnWHgXUAmWK16H/ykO5Wj4Q==}
@@ -715,8 +721,8 @@ packages:
   '@hapi/hoek@9.3.0':
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
 
-  '@hapi/inert@6.0.5':
-    resolution: {integrity: sha512-eVAdUVhJLmmXLM/Zt7u5H5Vzazs9GKe4zfPK2b97ePHEfs3g/AQkxHfYQjJqMy11hvyB7a21Z6rBEA0R//dtXw==}
+  '@hapi/inert@7.1.2':
+    resolution: {integrity: sha512-fr0XmsYTUhahIbioBemFlc+o4ro4bj1HPMKN3dG9m6XC+UkF9fdVYfb7uNoDj0vO+HdXendbKk6YEfZG9ToeTQ==}
 
   '@hapi/iron@6.0.0':
     resolution: {integrity: sha512-zvGvWDufiTGpTJPG1Y/McN8UqWBu0k/xs/7l++HVU535NLHXsHhy54cfEMdW7EjwKfbBfM9Xy25FmTiobb7Hvw==}
@@ -3065,6 +3071,10 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
+  lru-cache@7.18.3:
+    resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
+    engines: {node: '>=12'}
+
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
     engines: {node: '>=12'}
@@ -4591,6 +4601,10 @@ snapshots:
     dependencies:
       '@hapi/hoek': 9.3.0
 
+  '@hapi/ammo@6.0.1':
+    dependencies:
+      '@hapi/hoek': 11.0.7
+
   '@hapi/b64@5.0.0':
     dependencies:
       '@hapi/hoek': 9.3.0
@@ -4607,6 +4621,11 @@ snapshots:
     dependencies:
       '@hapi/boom': 9.1.4
       '@hapi/hoek': 9.3.0
+
+  '@hapi/bounce@3.0.2':
+    dependencies:
+      '@hapi/boom': 10.0.1
+      '@hapi/hoek': 11.0.7
 
   '@hapi/bourne@2.1.0': {}
 
@@ -4675,14 +4694,14 @@ snapshots:
 
   '@hapi/hoek@9.3.0': {}
 
-  '@hapi/inert@6.0.5':
+  '@hapi/inert@7.1.2':
     dependencies:
-      '@hapi/ammo': 5.0.1
-      '@hapi/boom': 9.1.4
-      '@hapi/bounce': 2.0.0
-      '@hapi/hoek': 9.3.0
-      '@hapi/validate': 1.1.3
-      lru-cache: 6.0.0
+      '@hapi/ammo': 6.0.1
+      '@hapi/boom': 10.0.1
+      '@hapi/bounce': 3.0.2
+      '@hapi/hoek': 11.0.7
+      '@hapi/validate': 2.0.1
+      lru-cache: 7.18.3
 
   '@hapi/iron@6.0.0':
     dependencies:
@@ -7272,6 +7291,8 @@ snapshots:
   lru-cache@6.0.0:
     dependencies:
       yallist: 4.0.0
+
+  lru-cache@7.18.3: {}
 
   luxon@3.7.2: {}
 
