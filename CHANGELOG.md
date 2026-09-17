@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3 Release Candidate
+
+### Bug fixes
+
+- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+
 ## 2.0.2
 
 ### Improvements

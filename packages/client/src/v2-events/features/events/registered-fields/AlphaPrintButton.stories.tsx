@@ -71,7 +71,10 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
+            validatorContext={getTestValidatorContext(
+              undefined,
+              tennisClubMembershipEventDocument
+            )}
           />
         )
       },
