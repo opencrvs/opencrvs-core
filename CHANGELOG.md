@@ -4,6 +4,10 @@
 
 ### Upgrade guidance
 
+#### Sentry — nothing to do, the upgrade script removes it
+
+`SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
 **Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
@@ -146,7 +150,6 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
 - Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
 
-
 ### New features
 
 #### Location and administrative area write API
@@ -252,6 +255,40 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
+
+## 2.0.2
+
+### Breaking changes
+
+- Sentry is gone from the v2 line, as it already was from 1.9.17. `ClientConfig` and `LoginConfig` no longer accept a `SENTRY` field, so **a country config that still sets it fails to compile** on 2.0.2 and later. Delete `SENTRY` from `src/client-config.ts`, `src/client-config.prod.ts`, `src/login-config.ts` and `src/login-config.prod.ts`, and drop `SENTRY_DSN` from your environment. Going straight to 2.1.0? `npx @opencrvs/toolkit upgrade` does all of this for you. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+### Improvements
+
+- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
+
+### Bug fixes
+
+- Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
+- Minio DockerHub image has been deprecated. Replace minio/mc image with quay.io/minio/mc [#13797](https://github.com/opencrvs/opencrvs-core/issues/13797)
+
+## 1.9.18
+
+## 1.9.17
+
+### Improvements
+
+- Removed Sentry from OpenCRVS entirely. The client and login apps no longer initialise Sentry, report exceptions to it, or show its "report a problem" dialog on a crash, and the ten backend services no longer register `hapi-sentry`. The `@sentry/*`, `redux-sentry-middleware` and `hapi-sentry` dependencies are gone. `script-src` no longer allow-lists `https://sentry.io/api/embed/error-page/`, so it names no third-party host and the login app loads scripts from `'self'` only. React error boundaries now render the apps' own error pages. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+  **Deployment notes:**
+
+  - `SENTRY_DSN` is no longer read by any service, and the browser no longer reads `window.config.SENTRY`. Both can be dropped from your environment and country configuration; leaving them set has no effect.
+  - **Crash reporting is no longer built in.** Browser and server errors now go to logs and the browser console only. Deployments that relied on Sentry for alerting should put their own error tracking in place.
+
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
 
 ## 2.0.1 Release
 

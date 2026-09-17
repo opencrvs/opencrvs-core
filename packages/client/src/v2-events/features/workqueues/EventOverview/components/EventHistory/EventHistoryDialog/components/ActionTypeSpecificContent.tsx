@@ -87,11 +87,6 @@ export function ActionTypeSpecificContent({
   ]
 
   if (coreDialogFormActions.includes(type)) {
-    // For the "Waiting for external validation" action, dont render any form content.
-    if (action.status === ActionStatus.Requested) {
-      return null
-    }
-
     return (
       <ActionFormContent
         action={action}

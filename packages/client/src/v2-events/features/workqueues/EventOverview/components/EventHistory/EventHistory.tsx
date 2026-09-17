@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,18 +11,22 @@
  */
 import React from 'react'
 import format from 'date-fns/format'
-import styled from 'styled-components'
-import { defineMessages, useIntl } from 'react-intl'
+import styled, { useTheme } from 'styled-components'
+import { defineMessages, useIntl, IntlShape } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Table } from '@opencrvs/components/lib/Table'
-import { Text } from '@opencrvs/components/lib/Text'
 import {
+  Action,
   ActionDocument,
   ActionStatus,
   ActionType,
+  ActionUpdate,
+  deepMerge,
   isActionConfigType,
   EventDocument,
   getActionConfig,
@@ -30,7 +35,6 @@ import {
   todayISO,
   toPlainDate
 } from '@opencrvs/commons/client'
-import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -47,14 +51,15 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { resolveLocationName } from '@client/v2-events/utils'
+import { getOfflineData } from '@client/offline/selectors'
+import { messages as dateFieldMessages } from '@client/v2-events/features/events/registered-fields/DateField'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
-import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
+    '{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -72,13 +77,80 @@ const LinkLeftAligned = styled(Link)`
   text-align: left;
 `
 
+const ExpandToggle = styled.button`
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.grey500};
+`
+
+const ConfirmationDetailLabel = styled.div`
+  ${({ theme }) => theme.fonts.reg14};
+  color: ${({ theme }) => theme.colors.grey500};
+`
+
+/**
+ * The action whose confirmation status the row reflects: normally itself, but
+ * for a direct correction ("Record corrected") the paired APPROVE_CORRECTION.
+ */
+function getStatusSourceAction(
+  action: ActionDocument,
+  allActions: ActionDocument[]
+): ActionDocument {
+  if (action.type === ActionType.REQUEST_CORRECTION) {
+    return findImmediateApproveCorrection(allActions, action) ?? action
+  }
+  return action
+}
+
+/**
+ * The status of an action's confirmation (accept/reject via `originalActionId`)
+ * when one exists, otherwise its own status. `Requested` with none = waiting.
+ */
+function getEffectiveStatus(
+  action: ActionDocument,
+  allActions: Action[]
+): ActionStatus {
+  const confirmation = allActions.find((a) => a.originalActionId === action.id)
+  return confirmation ? confirmation.status : action.status
+}
+
+/**
+ * The accept/reject action that confirmed this action *asynchronously* — a
+ * separate confirmation (different transactionId) added after the fact, as an
+ * external system does. Returns undefined for directly (synchronously) accepted
+ * actions, which have no separate confirmation.
+ */
+function getAsyncConfirmation(
+  action: ActionDocument,
+  allActions: Action[]
+): ActionDocument | undefined {
+  const confirmation = allActions.find(
+    (a) =>
+      a.originalActionId === action.id &&
+      (a.status === ActionStatus.Accepted || a.status === ActionStatus.Rejected)
+  )
+  if (confirmation && confirmation.transactionId !== action.transactionId) {
+    return confirmation as ActionDocument
+  }
+  return undefined
+}
+
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const messages = defineMessages({
-  timeFormat: {
-    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'configuration.timeFormat',
-    description: 'Time format for timestamps in event history'
+  timeOnlyFormat: {
+    defaultMessage: 'hh.mm a',
+    id: 'configuration.timeOnlyFormat',
+    description: 'Time format for the time line of the "When" column'
+  },
+  when: {
+    defaultMessage: 'When',
+    description: 'Header for the column showing when an action happened',
+    id: 'events.history.when'
   },
   system: {
     id: 'event.history.system',
@@ -95,20 +167,38 @@ const messages = defineMessages({
     description: 'Label for By (the person who performed the action)',
     id: 'constants.by'
   },
-  date: {
-    defaultMessage: 'Date',
-    description: 'Date Label',
-    id: 'constants.label.date'
-  },
   audit: {
     defaultMessage: 'Audit',
     description: 'Audit heading',
     id: 'constants.audit'
   },
-  labelRole: {
-    defaultMessage: 'Role',
-    description: 'Role label',
-    id: 'constants.role'
+  statusAccepted: {
+    defaultMessage: 'Accepted',
+    description: 'Status badge shown on an action that has been confirmed',
+    id: 'events.history.status.accepted'
+  },
+  statusRejected: {
+    defaultMessage: 'Rejected',
+    description: 'Status badge shown on an action that was rejected',
+    id: 'events.history.status.rejected'
+  },
+  statusRequested: {
+    defaultMessage: 'Requested',
+    description:
+      'Label for the requested action shown in the expanded audit dropdown',
+    id: 'events.history.status.requested'
+  },
+  awaitingConfirmation: {
+    defaultMessage: 'Awaiting confirmation',
+    description:
+      'Placeholder label in the audit dropdown for an action that has not been accepted or rejected yet',
+    id: 'events.history.status.awaitingConfirmation'
+  },
+  toggleConfirmationDetails: {
+    defaultMessage: 'Show validation details',
+    description:
+      'Accessible label for the toggle that expands a row to show who accepted or rejected the action and when',
+    id: 'events.history.toggleConfirmationDetails'
   },
   location: {
     defaultMessage: 'Location',
@@ -117,107 +207,64 @@ const messages = defineMessages({
   }
 })
 
-const SystemName = styled.div`
+function StatusBadge({
+  status,
+  size = 'medium'
+}: {
+  status: ActionStatus
+  size?: 'small' | 'medium' | 'large'
+}) {
+  if (status === ActionStatus.Rejected) {
+    return <Icon color="red" name="XCircle" size={size} />
+  }
+
+  if (status === ActionStatus.Requested) {
+    return <Icon color="orange" name="PauseCircle" size={size} />
+  }
+
+  return <Icon color="green" name="CheckCircle" size={size} />
+}
+
+const StatusCell = styled.span`
   display: flex;
   align-items: center;
-
-  > div {
-    flex-grow: 0;
-    flex-shrink: 0;
-    border-radius: 100%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-    justify-content: center;
-    background-color: ${({ theme }) => theme.colors.grey200};
-  }
+  padding-left: 6px;
 `
 
-function User({ action }: { action: ActionDocument }) {
-  const { findUser } = useEventOverviewContext()
-  const navigate = useNavigate()
-  const user = findUser(action.createdBy)
-  const { canReadUser } = usePermissions()
-  const { getUserDetails } = useUserDetails()
-
-  const { type, name } = getUserDetails({
-    createdByUserType: action.createdByUserType,
-    createdBy: action.createdBy,
-    type: action.type,
-    createdByRole: action.createdByRole
-  })
-
-  if (type !== 'user') {
-    throw new Error('Expected action creator to be a user')
+function getStatusLabel(status: ActionStatus, intl: IntlShape): string {
+  if (status === ActionStatus.Rejected) {
+    return intl.formatMessage(messages.statusRejected)
   }
 
-  const canViewUser = !!user && canReadUser(user)
+  if (status === ActionStatus.Requested) {
+    return intl.formatMessage(messages.statusRequested)
+  }
 
-  return canViewUser ? (
-    <LinkLeftAligned
-      font="bold14"
-      id="profile-link"
-      onClick={() =>
-        navigate(
-          ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-            userId: user.id
-          })
-        )
-      }
-    >
-      <UserAvatar avatar={user.avatar} names={name} />
-    </LinkLeftAligned>
-  ) : (
-    <UserAvatar avatar={user?.avatar} names={name} />
-  )
+  return intl.formatMessage(messages.statusAccepted)
 }
 
-function Integration({ action }: { action: ActionDocument }) {
-  const { getUserDetails } = useUserDetails()
+const BoldLine = styled.div`
+  ${({ theme }) => theme.fonts.bold14};
+`
 
-  const { type, name } = getUserDetails({
-    createdByUserType: action.createdByUserType,
-    createdBy: action.createdBy,
-    type: action.type
-  })
+const DetailActionCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
 
-  if (type !== 'integration') {
-    throw new Error('Expected action creator to be an integration')
-  }
+const SecondaryLine = styled.div`
+  ${({ theme }) => theme.fonts.reg14};
+  color: ${({ theme }) => theme.colors.grey500};
+`
 
-  return (
-    <SystemName>
-      <div>
-        <Box />
-      </div>
-      <Text color="primary" element="span" variant="bold14">
-        {name}
-      </Text>
-    </SystemName>
-  )
-}
-
-function ActionCreator({ action }: { action: ActionDocument }) {
-  const intl = useIntl()
-  if (action.createdByUserType === 'system') {
-    return <Integration action={action} />
-  }
-  if (action.type === ActionType.DUPLICATE_DETECTED) {
-    return (
-      <SystemName>
-        <div>
-          <Box />
-        </div>
-        {intl.formatMessage(messages.system)}
-      </SystemName>
-    )
-  }
-  return <User action={action} />
-}
-
-function ActionLocation({ action }: { action: ActionDocument }) {
+function ActionLocation({
+  action,
+  muted
+}: {
+  action: ActionDocument
+  muted?: boolean
+}) {
   const { findUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
@@ -257,6 +304,11 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     return null
   }
 
+  // Dropdown sub-rows render the office name as plain grey text, never a link.
+  if (muted) {
+    return <SecondaryLine>{locationName}</SecondaryLine>
+  }
+
   return hasAccessToOffice && isOfficeActiveToday ? (
     <LinkLeftAligned
       font="bold14"
@@ -273,6 +325,103 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     </LinkLeftAligned>
   ) : (
     locationName
+  )
+}
+
+const TwoLineCell = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
+  const intl = useIntl()
+  const date = new Date(isoDate)
+  const dateText = format(
+    date,
+    intl.formatMessage(dateFieldMessages.dateFormat)
+  )
+  const timeText = format(date, intl.formatMessage(messages.timeOnlyFormat))
+  return (
+    <TwoLineCell>
+      {muted ? (
+        <SecondaryLine>{dateText}</SecondaryLine>
+      ) : (
+        <BoldLine>{dateText}</BoldLine>
+      )}
+      <SecondaryLine>{timeText}</SecondaryLine>
+    </TwoLineCell>
+  )
+}
+
+function SystemByCell() {
+  const intl = useIntl()
+  const { config } = useSelector(getOfflineData)
+  return (
+    <TwoLineCell>
+      <SecondaryLine data-testid="user-name">
+        {config.APPLICATION_NAME}
+      </SecondaryLine>
+      <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
+    </TwoLineCell>
+  )
+}
+
+function ActionByCell({
+  action,
+  muted
+}: {
+  action: ActionDocument
+  muted?: boolean
+}) {
+  const intl = useIntl()
+  const { findUser } = useEventOverviewContext()
+  const navigate = useNavigate()
+  const { canReadUser } = usePermissions()
+  const { getUserDetails } = useUserDetails()
+
+  const { type, name, role } = getUserDetails({
+    createdByUserType: action.createdByUserType,
+    createdBy: action.createdBy,
+    type: action.type,
+    createdByRole: action.createdByRole
+  })
+
+  const NameLine = muted ? SecondaryLine : BoldLine
+
+  if (type !== 'user') {
+    return muted ? (
+      <SystemByCell />
+    ) : (
+      <TwoLineCell>
+        <NameLine data-testid="user-name">{name}</NameLine>
+        <SecondaryLine>{intl.formatMessage(messages.system)}</SecondaryLine>
+      </TwoLineCell>
+    )
+  }
+
+  const user = findUser(action.createdBy)
+  const canViewUser = !muted && !!user && canReadUser(user)
+
+  return (
+    <TwoLineCell>
+      {canViewUser ? (
+        <LinkLeftAligned
+          data-testid="user-name"
+          font="bold14"
+          id="profile-link"
+          onClick={() =>
+            navigate(
+              ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId: user.id })
+            )
+          }
+        >
+          {name}
+        </LinkLeftAligned>
+      ) : (
+        <NameLine data-testid="user-name">{name}</NameLine>
+      )}
+      {role && <SecondaryLine>{role}</SecondaryLine>}
+    </TwoLineCell>
   )
 }
 
@@ -298,37 +447,40 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
+  const theme = useTheme()
   const [modal, openModal] = useModal()
+  const [expandedActionIds, setExpandedActionIds] = React.useState<string[]>([])
   const { getActionTypeForHistory } = useActionForHistory()
   const { getUserDetails } = useUserDetails()
 
+  const toggleExpanded = (actionId: string) =>
+    setExpandedActionIds((ids) =>
+      ids.includes(actionId)
+        ? ids.filter((id) => id !== actionId)
+        : [...ids, actionId]
+    )
+
   const history = extractHistoryActions(fullEvent)
+  const allActions = fullEvent.actions as ActionDocument[]
 
-  // Rejected action confirmations (e.g. an external ID system such as MOSIP
-  // rejecting a deferred registration) are excluded from the regular history
-  // extraction. Surface rejected registrations so the record does not appear
-  // to be waiting for external validation forever.
-  const rejectedRegistrations = fullEvent.actions.filter(
-    (a): a is ActionDocument =>
-      a.type === ActionType.REGISTER &&
-      a.status === ActionStatus.Rejected &&
-      Boolean(a.originalActionId)
-  )
-
-  const visibleHistory = [...history, ...rejectedRegistrations]
+  const visibleHistory = [...history]
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (
     action: ActionDocument,
     userName: string,
-    title: string
+    title: string,
+    isAwaitingConfirmation: boolean,
+    systemUpdates?: ActionUpdate
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={action}
         close={close}
         fullEvent={fullEvent}
+        isAwaitingConfirmation={isAwaitingConfirmation}
+        systemUpdates={systemUpdates}
         title={title}
         userName={userName}
         validatorContext={validatorContext}
@@ -343,7 +495,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection = findImmediateApproveCorrection(
-          visibleHistory,
+          allActions,
           x
         )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
@@ -358,14 +510,11 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       return x
     })
     .filter((x) => {
-      // Removing immediately APPROVED_CORRECTION since we only show
-      // the associated REQUEST_CORRECTION as 'Record corrected'.
-      //
-      // Asyncronous correction request is kept to surface the fact that a correction is in-flight
+      // Remove every immediately-approved correction row (whether the approval
+      // is accepted or still requested). The pair is shown as a single 'Record corrected' row.
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
-        x.content?.immediateCorrection &&
-        x.status !== ActionStatus.Requested
+        x.content?.immediateCorrection
       ) {
         return false
       }
@@ -377,8 +526,8 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
-    .map((action) => {
-      const { name: actionCreatorName, role } = getUserDetails({
+    .flatMap((action) => {
+      const { name: actionCreatorName } = getUserDetails({
         createdByUserType: action.createdByUserType,
         createdBy: action.createdBy,
         type: action.type,
@@ -396,70 +545,230 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         })
       }
 
+      const statusSourceAction = getStatusSourceAction(action, allActions)
+      const effectiveStatus = getEffectiveStatus(
+        statusSourceAction,
+        fullEvent.actions
+      )
+      const isAwaitingConfirmation = effectiveStatus === ActionStatus.Requested
+
+      // A row can be expanded when there is a lifecycle to reveal: an action
+      // accepted/rejected asynchronously (request + confirmation), or one still
+      // only requested and awaiting approval (just the request).
+      const asyncConfirmation = getAsyncConfirmation(
+        statusSourceAction,
+        fullEvent.actions
+      )
+      const isExpandable = !!asyncConfirmation || isAwaitingConfirmation
+      const isExpanded = expandedActionIds.includes(action.id)
+
+      const acceptedAction =
+        allActions.find(
+          (a) =>
+            a.originalActionId === statusSourceAction.id &&
+            a.status === ActionStatus.Accepted
+        ) ??
+        (statusSourceAction.status === ActionStatus.Accepted
+          ? statusSourceAction
+          : undefined)
+
+      const dialogAction: ActionDocument = acceptedAction
+        ? {
+            ...action,
+            declaration: deepMerge(
+              action.declaration,
+              acceptedAction.declaration
+            ),
+            annotation: deepMerge(
+              action.annotation ?? {},
+              acceptedAction.annotation ?? {}
+            )
+          }
+        : action
+
+      const systemUpdates =
+        asyncConfirmation?.status === ActionStatus.Accepted
+          ? asyncConfirmation.declaration
+          : undefined
+
       // If a audit history label is configured in action config, use that!
       const title =
         actionConfig && actionConfig.type === ActionType.CUSTOM
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
-              action: getActionTypeForHistory(history, action),
-              status: action.status,
+              action: getActionTypeForHistory(allActions, action),
+              status: statusSourceAction.status,
               // Lets countries configure different wording for actions
               // performed by an integration, e.g. "Registered and UIN created"
               userType: action.createdByUserType
             })
 
-      return {
+      const mainRow = {
+        status: (
+          <StatusCell title={getStatusLabel(effectiveStatus, intl)}>
+            <StatusBadge status={effectiveStatus} />
+          </StatusCell>
+        ),
         action: (
           <LinkLeftAligned
             font="bold14"
-            onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
+            onClick={() =>
+              onHistoryRowClick(
+                dialogAction,
+                actionCreatorName,
+                title,
+                isAwaitingConfirmation,
+                systemUpdates
+              )
+            }
           >
             {title}
           </LinkLeftAligned>
         ),
-        date: format(
-          new Date(action.createdAt),
-          intl.formatMessage(messages.timeFormat)
+        when: <WhenCell isoDate={action.createdAt} />,
+        by: <ActionByCell action={action} />,
+        location: <ActionLocation action={action} />,
+        expand: isExpandable ? (
+          <ExpandToggle
+            aria-expanded={isExpanded}
+            aria-label={intl.formatMessage(messages.toggleConfirmationDetails)}
+            onClick={() => toggleExpanded(action.id)}
+          >
+            <Icon name={isExpanded ? 'CaretDown' : 'CaretRight'} size="small" />
+          </ExpandToggle>
+        ) : (
+          ''
         ),
-        user: <ActionCreator action={action} />,
-        // Integrations have no role, and the table cell type takes no undefined
-        role: role ?? '',
-        location: <ActionLocation action={action} />
+        rowBackgroundColor:
+          effectiveStatus === ActionStatus.Requested
+            ? theme.colors.orangeLighter
+            : undefined,
+        // The whole row toggles the dropdown, except when a link or button
+        // inside it (the action, name or location) was clicked.
+        onRowClick: isExpandable
+          ? (e: React.MouseEvent) => {
+              if ((e.target as HTMLElement).closest('a, button')) {
+                return
+              }
+              toggleExpanded(action.id)
+            }
+          : undefined
       }
+
+      if (!isExpandable || !isExpanded) {
+        return [mainRow]
+      }
+
+      const buildDetailRow = ({
+        badge,
+        label,
+        detailAction
+      }: {
+        badge: React.ReactNode
+        label: string
+        detailAction?: ActionDocument
+      }) => ({
+        status: '',
+        action: (
+          <DetailActionCell>
+            {badge}
+            <ConfirmationDetailLabel>{label}</ConfirmationDetailLabel>
+          </DetailActionCell>
+        ),
+        when: detailAction ? (
+          <WhenCell muted isoDate={detailAction.createdAt} />
+        ) : (
+          ''
+        ),
+        by: detailAction ? (
+          <ActionByCell muted action={detailAction} />
+        ) : (
+          <SystemByCell />
+        ),
+        location: detailAction ? (
+          <ActionLocation muted action={detailAction} />
+        ) : (
+          ''
+        ),
+        expand: '',
+        rowBackgroundColor: theme.colors.grey100
+      })
+
+      // The request itself was recorded successfully, so it always shows a
+      // success badge — regardless of whether its confirmation is still pending.
+      const detailRows = [
+        buildDetailRow({
+          badge: <Icon color="green" name="CheckCircle" size="small" />,
+          label: getStatusLabel(ActionStatus.Requested, intl),
+          detailAction: statusSourceAction
+        })
+      ]
+
+      if (asyncConfirmation) {
+        // The accept/reject that followed: its own matching status badge.
+        detailRows.push(
+          buildDetailRow({
+            badge: (
+              <StatusBadge size="small" status={asyncConfirmation.status} />
+            ),
+            label: getStatusLabel(asyncConfirmation.status, intl),
+            detailAction: asyncConfirmation
+          })
+        )
+      } else {
+        // Not accepted or rejected yet — a pending placeholder row.
+        detailRows.push(
+          buildDetailRow({
+            badge: <Icon color="grey400" name="CircleDashed" size="small" />,
+            label: intl.formatMessage(messages.awaitingConfirmation)
+          })
+        )
+      }
+
+      return [mainRow, ...detailRows]
     })
 
   const columns = [
     {
-      label: intl.formatMessage(messages.action),
-      width: 22,
-      key: 'action'
-    },
-    {
-      label: intl.formatMessage(messages.date),
-      width: 22,
-      key: 'date'
-    },
-    {
-      label: intl.formatMessage(messages.by),
-      width: 22,
-      key: 'user',
+      label: '',
+      width: 4,
+      key: 'status',
       isIconColumn: true,
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(messages.labelRole),
-      width: 15,
-      key: 'role'
+      label: intl.formatMessage(messages.action),
+      width: 34,
+      key: 'action'
     },
     {
       label: intl.formatMessage(messages.location),
-      width: 20,
+      width: 22,
       key: 'location'
+    },
+    {
+      label: intl.formatMessage(messages.by),
+      width: 21,
+      key: 'by'
+    },
+    {
+      label: intl.formatMessage(messages.when),
+      width: 15,
+      key: 'when'
+    },
+    {
+      label: '',
+      width: 4,
+      key: 'expand',
+      isIconColumn: true,
+      alignment: ColumnContentAlignment.RIGHT,
+      ICON_ALIGNMENT: ColumnContentAlignment.RIGHT
     }
   ]
 
   return (
     <Content
+      noPadding
       size={ContentSize.LARGE}
       title={intl.formatMessage(messages.audit)}
     >
@@ -468,10 +777,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           highlightRowOnMouseOver
           columns={columns}
           content={historyRows}
-          fixedWidth={1088}
           id="task-history"
           noResultText=""
-          pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
+          pageSize={Math.max(historyRows.length, 1)}
         />
         {displayableHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination

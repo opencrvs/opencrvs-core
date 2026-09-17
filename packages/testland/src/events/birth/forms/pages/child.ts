@@ -10,10 +10,12 @@
  */
 
 import {
+  ActionType,
   defineFormPage,
   TranslationConfig,
   ConditionalType,
   and,
+  event,
   FieldType,
   AddressType,
   or,
@@ -548,6 +550,22 @@ export const child = defineFormPage({
           id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
         }
       }
+    },
+    {
+      id: 'child.registrationNote',
+      type: FieldType.TEXTAREA,
+      required: false,
+      label: {
+        defaultMessage: 'Registration note',
+        description: 'This is the label for the field',
+        id: 'event.birth.action.declare.form.section.child.field.registrationNote.label'
+      },
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: event.hasAction(ActionType.DECLARE)
+        }
+      ]
     }
   ]
 })

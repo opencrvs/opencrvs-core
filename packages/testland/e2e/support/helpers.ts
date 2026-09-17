@@ -116,8 +116,6 @@ export async function login(
     await createPIN(page)
   }
 
-  await page.goto(CLIENT_URL)
-
   return token
 }
 
