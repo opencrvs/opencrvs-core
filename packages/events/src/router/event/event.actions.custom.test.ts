@@ -293,7 +293,7 @@ describe('event.actions.custom', () => {
   })
 
   describe('Asynchronous confirmation flow', () => {
-    function mockNotifyApi(status: number) {
+    function mockCustomActionApi(status: number) {
       return mswServer.use(
         http.post<never, { actionId: string }>(
           `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/CUSTOM`,
@@ -309,7 +309,7 @@ describe('event.actions.custom', () => {
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
-      mockNotifyApi(202)
+      mockCustomActionApi(202)
 
       await expect(
         client.event.actions.custom.request(payload)
@@ -329,7 +329,7 @@ describe('event.actions.custom', () => {
 
       const eventId = payload.eventId
 
-      mockNotifyApi(202)
+      mockCustomActionApi(202)
 
       const requestResponse = await client.event.actions.custom.request(payload)
 
@@ -360,7 +360,7 @@ describe('event.actions.custom', () => {
 
       const eventId = payload.eventId
 
-      mockNotifyApi(202)
+      mockCustomActionApi(202)
 
       const requestResponse = await client.event.actions.custom.request(payload)
 
