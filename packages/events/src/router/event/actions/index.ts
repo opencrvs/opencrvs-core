@@ -41,7 +41,11 @@ import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import { setBearerForToken } from '@events/router/middleware'
-import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
+import {
+  systemOnlyProcedure,
+  userAndSystemProcedure,
+  userOnlyProcedure
+} from '@events/router/trpc'
 
 import {
   getEventById,
@@ -460,7 +464,7 @@ export function getDefaultActionProcedures(
         return result
       }),
 
-    accept: userAndSystemProcedure
+    accept: systemOnlyProcedure
       .input(
         actionConfig.inputSchema
           .extend(AsyncActionInput.shape)
@@ -528,7 +532,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    reject: userAndSystemProcedure
+    reject: systemOnlyProcedure
       .input(AsyncActionInput)
       .use(middleware.requireActionConfirmation('record.action.reject'))
       .use(middleware.requireConfirmableAction(actionType))

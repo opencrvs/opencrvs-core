@@ -329,39 +329,23 @@ const ActionConfirmationParams = z.object({
 })
 
 /**
- * Authorises confirming (accepting or rejecting) one requested action.
+ * Requires the scope that confirming (accepting or rejecting) an action needs.
  *
- * Confirming must never be reachable with the credentials that requested the
- * action: otherwise whoever can request a registration can immediately confirm
- * it themselves, choosing the registration number and overriding the reviewed
- * declaration, with the country configuration never involved. So it takes its
- * own scope — `record.action.accept` / `record.action.reject` — which no user
- * role is granted. It belongs to an integration that confirms under its own
- * credentials (e.g. mosip-api, once MOSIP issues a credential).
+ * Whoever requests a registration must not be able to confirm it as well — they
+ * would register the record themselves, pick its number and override the
+ * reviewed declaration, with no country configuration involved. So confirming
+ * takes a scope of its own that no user role is granted, leaving it to an
+ * integration using its own credentials (e.g. mosip-api, once MOSIP answers),
+ * and is only ever honoured for a system client.
  *
- * Those scopes are only ever honoured for a **system** client: a human user's
- * token cannot confirm even if it somehow carried one. The grant is still
- * subject to the ordinary record-scope event checks, so an integration stays
- * confined to the event types and jurisdiction it was granted.
+ * A wrapper rather than a direct `canAccessEventWithScopes` call so the
+ * parameter type accepts nothing but those two scopes: passing e.g.
+ * `record.register` here would reopen exactly that hole.
  */
 export function requireActionConfirmation(
   scopeType: ActionConfirmationScopeType
 ) {
-  const fn: MiddlewareFunction<
-    TrpcContext,
-    OpenApiMeta,
-    TrpcContext,
-    TrpcContext & { eventId: UUID; eventType: string },
-    unknown
-  > = async (opts) => {
-    if (opts.ctx.user.type !== TokenUserType.enum.system) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
-    }
-
-    return canAccessEventWithScopes([scopeType])(opts)
-  }
-
-  return fn
+  return canAccessEventWithScopes([scopeType])
 }
 
 /**
@@ -375,8 +359,15 @@ export function requireActionConfirmation(
  * duplicate detection, all of which run on `request` and none of which run on a
  * confirmation.
  *
- * Passes the event and the two actions on in context so the handler does not
- * fetch and scan them a second time.
+ * Passes the event and two actions on in context so the handler does not fetch
+ * and scan them a second time:
+ *
+ * - `originalAction` is the pending action being confirmed — the one `actionId`
+ *   names, resolved and checked here.
+ * - `confirmationAction` is the action that has already confirmed it, if any: an
+ *   accept or reject recorded earlier that points back at `originalAction` via
+ *   `originalActionId`. Normally absent; when present the call is a repeat, and
+ *   the handler answers from it instead of confirming again.
  */
 export function requireConfirmableAction(actionType: ActionType) {
   const fn: MiddlewareFunction<
