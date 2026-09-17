@@ -23,6 +23,11 @@ name: Fix Renovate Lockfile
 #
 # So we repair the lockfile ourselves: re-run the install WITH .pnpmfile.cjs
 # active on our own runner and push the corrected lock back to the branch.
+#
+# The job also repairs packages/countryconfig-template/pnpm-lock.yaml. That
+# package is left out of pnpm-workspace.yaml and ships a standalone lockfile,
+# which only resolves under `--ignore-workspace` — a flag Renovate never
+# passes, so it bumps the package.json and leaves the lock behind.
 
 on:
   push:
@@ -72,24 +77,32 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Regenerate lockfile with .pnpmfile.cjs applied
+      - name: Regenerate workspace lockfile with .pnpmfile.cjs applied
         # Deliberately NO --ignore-pnpmfile: honoring the hook is the point.
         # --ignore-scripts is safe (the pnpmfile is a resolution hook, not a
         # lifecycle script) and keeps the run fast; --lockfile-only skips
         # node_modules linking entirely.
         run: pnpm install --lockfile-only --ignore-scripts
 
-      - name: Commit corrected lockfile
-        # Idempotent: if the lock is already pnpmfile-consistent there is no
-        # diff, so nothing is pushed. This no-op is also the loop breaker —
-        # after one repair the next push produces no changes.
+      - name: Regenerate countryconfig-template lockfile
+        # Without --ignore-workspace pnpm resolves against the root workspace
+        # and leaves this lockfile untouched.
+        working-directory: packages/countryconfig-template
+        run: pnpm install --lockfile-only --ignore-scripts --ignore-workspace
+
+      - name: Commit corrected lockfiles
+        # Idempotent: if both locks are already consistent there is no diff, so
+        # nothing is pushed. This no-op is also the loop breaker — after one
+        # repair the next push produces no changes.
         run: |
-          if git diff --quiet -- pnpm-lock.yaml; then
-            echo "Lockfile already .pnpmfile.cjs-consistent; nothing to fix."
+          LOCKS="pnpm-lock.yaml packages/countryconfig-template/pnpm-lock.yaml"
+          if git diff --quiet -- $LOCKS; then
+            echo "Lockfiles already consistent; nothing to fix."
             exit 0
           fi
+          git diff --stat -- $LOCKS
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add pnpm-lock.yaml
-          git commit -m "chore: restore .pnpmfile.cjs-applied pnpm-lock.yaml"
+          git add -- $LOCKS
+          git commit -m "chore: regenerate pnpm lockfiles"
           git push origin HEAD:${{ github.ref_name }}
