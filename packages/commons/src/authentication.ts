@@ -107,9 +107,12 @@ export const getUserIdFromToken = (token: string): string | null => {
  * Fixed subject (`sub`) of the service token that core's auth service mints at `GET /internal/service-token`.
  * Core uses it for service-to-service calls where no user is involved.
  *
+ * Must be a well-formed UUID so a service verifying the token can resolve it as
+ * a `SystemContext` as with `INTEGRATION_CREATOR_USER_ID` / `REINDEX_USER_ID`.
+ *
  * See packages/auth/src/features/serviceToken/handler.ts
  */
-export const SERVICE_USER_ID = '__SERVICE_USER__'
+export const SERVICE_USER_ID = '00000000-0000-4000-8000-000000000002'
 
 /**
  * True when a decoded token payload (e.g. Hapi's `request.auth.credentials`)
