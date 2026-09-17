@@ -519,7 +519,8 @@ test('System may reject REJECT_CORRECTION action', async () => {
     })
 
   const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-    encodeScope({ type: 'record.correct' })
+    encodeScope({ type: 'record.correct' }),
+    encodeScope({ type: 'record.action.reject' })
   ])
 
   const rejectRequestAction = rejectActionResponse.actions.find(
