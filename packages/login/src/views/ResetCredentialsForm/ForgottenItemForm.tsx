@@ -10,7 +10,7 @@
  */
 
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
@@ -32,39 +32,15 @@ const Actions = styled.div`
   }
 `
 
-const Note = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  background-color: ${({ theme }) => theme.colors.grey100};
-  border-left: 4px solid ${({ theme }) => theme.colors.primaryBlue};
-  padding: 12px 16px;
-  margin-top: 16px;
-  margin-bottom: 0;
-`
-
-const NoteIconWrapper = styled.div`
-  flex-shrink: 0;
-  margin-top: 2px;
-  color: ${({ theme }) => theme.colors.primaryBlue}; /* fallback for theme */
+const StyledAlert = styled(Alert)`
+  margin-top: 20px;
 `
 
 export function ActiveAccountNote({ intl }: WrappedComponentProps) {
   return (
-    <Note>
-      <NoteIconWrapper>
-        <Icon name="Info" />
-      </NoteIconWrapper>
-      <Text
-        id="recovery-active-account-note"
-        variant="reg14"
-        element="p"
-        color="grey500"
-        style={{ margin: 0, paddingTop: 2 }}
-      >
-        {intl.formatMessage(messages.recoveryActiveAccountNote)}
-      </Text>
-    </Note>
+    <StyledAlert type="info" id="recovery-active-account-note">
+      {intl.formatMessage(messages.recoveryActiveAccountNote)}
+    </StyledAlert>
   )
 }
 
