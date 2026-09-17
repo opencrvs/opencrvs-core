@@ -43,11 +43,11 @@ const httpLogger = pinoHttp({
   genReqId: (req) => req.headers['x-correlation-id']?.toString() ?? randomUUID(),
   // NOTE: pino-http@7 types customLogLevel as taking the request, but never
   // passes it. Read it off the response instead.
-  customLogLevel: (_, res, error) => {
+  customLogLevel: (_, res) => {
     if (HEALTH_CHECK_PATHS.includes(pathnameOf(res.req))) {
       return 'debug'
     }
-    if (error || res.statusCode >= 500) {
+    if (res.statusCode >= 500) {
       return 'error'
     }
     return res.statusCode >= 400 ? 'warn' : 'info'
