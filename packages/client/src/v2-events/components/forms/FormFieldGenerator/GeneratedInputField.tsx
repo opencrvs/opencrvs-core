@@ -79,7 +79,8 @@ import {
   isHiddenFieldType,
   isImageViewFieldType,
   isAutocompleteFieldType,
-  isUserRoleFieldType
+  isUserRoleFieldType,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -176,6 +177,24 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
   attachmentPath: string
+}
+
+/**
+ * The print button prints the record it is rendered for. Rendering one without
+ * an event in context leaves nothing to print, so the field is misconfigured
+ * rather than merely empty.
+ */
+function requireEvent(
+  event: EventDocument | undefined,
+  fieldId: string
+): EventDocument {
+  if (!event) {
+    throw new Error(
+      `Field ${fieldId} prints a record, but the form around it was rendered without an event`
+    )
+  }
+
+  return event
 }
 
 function resolveOptions(
@@ -840,18 +859,16 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isPrintButtonFieldType(field)) {
-    // The button prints the record it is rendered for. Renderers that have no
-    // record in context, such as the search form, have nothing to print.
-    return validatorContext.event ? (
+    return (
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
-        event={validatorContext.event}
+        event={requireEvent(validatorContext.event, name)}
         id={name}
         template={field.config.configuration.template}
         onChange={(val) => onFieldValueChange(name, val)}
       />
-    ) : null
+    )
   }
 
   if (isButtonFieldType(field)) {
