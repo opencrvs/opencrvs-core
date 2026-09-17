@@ -50,7 +50,17 @@ export function listLocationsRoute(
         })
         .optional()
     )
-    .output(z.array(Location))
+    .output(
+      // Deliberately not validated at runtime to improve performance.
+      z
+        .custom<Location[]>()
+        .meta(
+          z.toJSONSchema(z.array(Location), { io: 'output' }) as Record<
+            string,
+            unknown
+          >
+        )
+    )
     .query(async ({ input }) =>
       getLocations({
         isActive: input?.isActive,
