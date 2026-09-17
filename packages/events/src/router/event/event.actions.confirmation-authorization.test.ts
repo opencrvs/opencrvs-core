@@ -98,6 +98,24 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
+  test('a user holding the confirmation scope still cannot accept', async () => {
+    const { user, input, actionId } = await requestPendingRegistration()
+
+    const userClient = createTestClient(user, [
+      ...REGISTRAR_SCOPES,
+      encodeScope({ type: 'record.action.accept' })
+    ])
+
+    await expect(
+      userClient.event.actions.register.accept({
+        ...input,
+        transactionId: getUUID(),
+        actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
   test('an integration holding an unbound confirmation scope can accept', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 
@@ -180,7 +198,10 @@ describe('accept only confirms the pending action it names', () => {
         actionId: createActionId,
         registrationNumber: MOCK_REGISTRATION_NUMBER
       })
-    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+    ).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+      message: expect.stringContaining('is not awaiting confirmation')
+    })
   })
 
   test('cannot be pointed at an action that is not awaiting confirmation', async () => {
@@ -205,6 +226,9 @@ describe('accept only confirms the pending action it names', () => {
         transactionId: getUUID(),
         actionId: acceptedDeclareId
       })
-    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+    ).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+      message: expect.stringContaining('is not awaiting confirmation')
+    })
   })
 })
