@@ -840,7 +840,7 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
 })
 
 describe('action confirmation scopes', () => {
-  test('is a standing grant, taking the ordinary record-scope options', () => {
+  test('parses with or without the usual record-scope options', () => {
     expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(true)
     expect(
       Scope.safeParse({

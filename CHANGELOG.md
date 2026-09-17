@@ -25,7 +25,7 @@ How the migration runs during the v2.0.0 upgrade:
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
 
-Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients. The scopes are a standing grant to an integration, narrowed by the ordinary record-scope options (`event`, jurisdiction) like any other record scope.
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients.
 
 This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. Three further rules back it up:
 
