@@ -146,8 +146,18 @@ export async function ensureAssignedToUser(
   username: keyof typeof usernameToFullNameMap,
   options?: { timeout?: number }
 ) {
-  const userFullName = usernameToFullNameMap[username]
+  return ensureAssignedToFullName(
+    page,
+    usernameToFullNameMap[username],
+    options
+  )
+}
 
+export async function ensureAssignedToFullName(
+  page: Page,
+  userFullName: string,
+  options?: { timeout?: number }
+) {
   /* A value renders as bare text; only a placeholder or bar adds an element. */
   const assignedTo = page.getByTestId('assignedTo-value')
 

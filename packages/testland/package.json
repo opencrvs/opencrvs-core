@@ -111,7 +111,6 @@
     "handlebars": "^4.7.9",
     "hapi-auth-jwt2": "10.4.0",
     "hapi-pino": "^9.0.0",
-    "hapi-sentry": "^3.1.0",
     "joi": "^17.4.0",
     "jwt-decode": "^2.2.0",
     "kysely": "^0.28.14",

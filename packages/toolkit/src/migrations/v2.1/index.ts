@@ -12,6 +12,7 @@ import { main as addExplicitCorrectionFlags } from './add-explicit-correction-fl
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
 import { main as addTranslations } from './add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
+import { main as removeSentry } from './remove-sentry'
 import { main as renameTriggerPaths } from './rename-trigger-paths'
 
 /**
@@ -23,5 +24,6 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await renameTriggerPaths()
   await addRecoveryLinkNotifications()
   await addTranslations()
+  await removeSentry()
   await enableTelemetry()
 }
