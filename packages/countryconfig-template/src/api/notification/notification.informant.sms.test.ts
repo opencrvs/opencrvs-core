@@ -45,13 +45,11 @@ vi.mock('node-fetch', () => {
 vi.mock('@opencrvs/toolkit/api', () => ({
   createClient: vi.fn(() => ({
     locations: {
-      list: {
-        query: vi.fn().mockResolvedValue([
-          {
-            id: '9e069dda-0d83-4f67-a4f2-9adbf5658e2e',
-            name: 'Windmill village registrar office'
-          }
-        ])
+      get: {
+        query: vi.fn().mockResolvedValue({
+          id: '9e069dda-0d83-4f67-a4f2-9adbf5658e2e',
+          name: 'Windmill village registrar office'
+        })
       }
     }
   }))
