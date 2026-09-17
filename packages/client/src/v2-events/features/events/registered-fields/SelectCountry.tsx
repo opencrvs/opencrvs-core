@@ -18,12 +18,14 @@ import { StringifierContext } from './RegisteredField'
 type CountryOptions = SelectInputProps['options']
 
 /*
- * `countries` is declared in English alphabetical order, which stops being
- * alphabetical as soon as the labels are translated, or when a country is
- * renamed (Türkiye, North Macedonia). Sorting on the formatted label keeps the
- * dropdown alphabetical in every locale, and a locale-aware collator puts the
- * accented names (Åland Islands, Côte d'Ivoire, Türkiye) where a reader of that
- * locale expects them rather than after Z.
+ * `countries` is declared in English alphabetical order, which stops holding as
+ * soon as a country configuration translates the labels. Sorting on the
+ * formatted label keeps the dropdown alphabetical in every locale, and a
+ * locale-aware collator puts accented names (Åland Islands, Türkiye) where a
+ * reader of that locale expects them rather than after Z.
+ *
+ * Labels are formatted once up front rather than inside the comparator, which
+ * would format them O(n log n) times.
  */
 export function sortOptionsByLabel(
   options: CountryOptions,
@@ -43,19 +45,14 @@ export function sortOptionsByLabel(
     .map(({ option }) => option)
 }
 
-function useOptionsSortedByLabel(options: CountryOptions): CountryOptions {
-  const intl = useIntl()
-
-  return useMemo(() => sortOptionsByLabel(options, intl), [options, intl])
-}
-
 function SelectCountryInput(
-  props: Omit<SelectInputProps, 'options'> & {
-    options?: SelectInputProps['options']
-  }
+  props: Omit<SelectInputProps, 'options'> & { options?: CountryOptions }
 ) {
-  const options = useOptionsSortedByLabel(
-    props.options ?? (countries as SelectOption[])
+  const intl = useIntl()
+  const options = props.options ?? (countries as SelectOption[])
+  const sortedOptions = useMemo(
+    () => sortOptionsByLabel(options, intl),
+    [options, intl]
   )
 
   return (
@@ -63,7 +60,7 @@ function SelectCountryInput(
       {...props}
       // @Todo ensure countries are of the same type
       data-testid={`location__${props.id}`}
-      options={options}
+      options={sortedOptions}
     />
   )
 }
