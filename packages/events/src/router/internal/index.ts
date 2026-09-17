@@ -172,7 +172,7 @@ export const internalUserRouter = serviceRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const record = await getCredentials(input.userId, false)
+      const record = await getCredentials(input.userId)
       const newHash = await generateHash(input.password, record.salt)
       await updatePasswordHash(UUID.parse(input.userId), newHash)
       void writeAuditLog({
