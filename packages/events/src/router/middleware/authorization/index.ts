@@ -359,15 +359,8 @@ export function requireActionConfirmation(
  * duplicate detection, all of which run on `request` and none of which run on a
  * confirmation.
  *
- * Passes the event and two actions on in context so the handler does not fetch
- * and scan them a second time:
- *
- * - `originalAction` is the pending action being confirmed — the one `actionId`
- *   names, resolved and checked here.
- * - `confirmationAction` is the action that has already confirmed it, if any: an
- *   accept or reject recorded earlier that points back at `originalAction` via
- *   `originalActionId`. Normally absent; when present the call is a repeat, and
- *   the handler answers from it instead of confirming again.
+ * Passes the event and the two actions on in context so the handler does not
+ * fetch and scan them a second time.
  */
 export function requireConfirmableAction(actionType: ActionType) {
   const fn: MiddlewareFunction<
