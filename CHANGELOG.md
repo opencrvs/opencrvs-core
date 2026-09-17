@@ -5,6 +5,7 @@
 ### Bug fixes
 
 - A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+- Corrected the default country list, which had not been reviewed since 2017. `Turkey` is now `Türkiye` and `The former Yugoslav Republic of Macedonia` is now `North Macedonia`; the Hong Kong and Macao entries no longer render surrounding quote characters. Laos was declared with Kyrgyzstan's translation key, which made Kyrgyzstan unselectable — both now have their own entry. The country dropdown is also sorted on the translated label instead of the hardcoded English order, so it stays alphabetical in every language. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 
