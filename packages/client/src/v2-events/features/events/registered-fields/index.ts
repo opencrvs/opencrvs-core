@@ -44,6 +44,13 @@ import { QueryParamReader } from './QueryParamReader'
 import { Autocomplete } from './Autocomplete'
 import { ImageView } from './ImageView'
 import { UserRole } from './UserRole'
+import { Custom } from './Custom'
+import { Data } from './Data'
+import { DateRangeField } from './DateRangeField'
+import { Hidden } from './Hidden'
+import { IdReader } from './IdReader'
+import { Loader } from './Loader'
+import { QrReader } from './QrReader'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -78,7 +85,7 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): RegisteredFieldModule<any> | undefined {
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+  // Don't skip the exhaustive check, it is important we register all field types
   switch (type.type) {
     case FieldType.ADDRESS:
       return Address
@@ -148,7 +155,30 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return FileWithOption
     case FieldType.SIGNATURE:
       return SignatureField
-    default:
+    case FieldType.DATE_RANGE:
+      return DateRangeField
+    case FieldType.DATA:
+      return Data
+    case FieldType.ID_READER:
+      return IdReader
+    case FieldType.QR_READER:
+      return QrReader
+    case FieldType.LOADER:
+      return Loader
+    case FieldType.ALPHA_HIDDEN:
+      return Hidden
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      return Custom
+    /*
+     * The remaining types have no module of their own: PHONE, ID, EMAIL and
+     * TEXTAREA are plain strings, and FIELD_GROUP is a container its callers
+     * unwrap into its subfields.
+     */
+    case FieldType.PHONE:
+    case FieldType.ID:
+    case FieldType.EMAIL:
+    case FieldType.TEXTAREA:
+    case FieldType.FIELD_GROUP:
       return undefined
   }
 }
