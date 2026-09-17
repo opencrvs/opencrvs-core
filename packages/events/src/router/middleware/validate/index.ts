@@ -49,7 +49,8 @@ import {
   UUID,
   getDeclarationFieldById,
   getPendingAction,
-  StrictValidatorContext
+  StrictValidatorContext,
+  ActionDocument
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -532,6 +533,13 @@ export const validateRequestAction: MiddlewareFunction<
   return next()
 }
 
+/**
+ * Guard for validating .accept action.
+ * accept is called by system user when response could not be returned immediately.
+ *
+ * Accept content is always bound by the user details of the **action requester**.
+ *
+ */
 export const validateAcceptAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
@@ -553,23 +561,12 @@ export const validateAcceptAction: MiddlewareFunction<
     throw new TRPCError({ code: 'BAD_REQUEST' })
   }
 
-  // 3. Since we are treating requested + accepted payloads as a single declaration, we will set the validator context
-  // to a state before the **REQUEST** action.
-  const eventWithoutPendingAction = {
-    ...event,
-    actions: event.actions.filter((a) => a.id !== pendingAction.id)
-  } satisfies EventDocument
-
-  const stateWithoutPendingAction = getCurrentEventState(
-    eventWithoutPendingAction,
-    eventConfig
-  )
-
-  const contextWithoutPendingAction = await getStrictValidatorContext({
+  const context = await getStrictValidatorContext({
+    // @todo: requester should be used as context.
     token: ctx.token,
     event: {
-      document: eventWithoutPendingAction,
-      state: stateWithoutPendingAction
+      document: event,
+      state: getCurrentEventState(event, eventConfig)
     }
   })
 
@@ -578,7 +575,7 @@ export const validateAcceptAction: MiddlewareFunction<
     input,
     eventConfig,
     declarationUpdate: deepMerge(pendingAction.declaration, input.declaration),
-    context: contextWithoutPendingAction
+    context
   })
 
   return next()

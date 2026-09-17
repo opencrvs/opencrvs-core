@@ -336,11 +336,11 @@ export async function defaultRequestHandler(
     })
   }
 
-  const contextBeforeRequest = await getStrictValidatorContext({
+  const contextBeforeAccept = await getStrictValidatorContext({
     token,
     event: {
-      document: event,
-      state: getCurrentEventState(event, configuration)
+      document: eventWithRequestedAction,
+      state: getCurrentEventState(eventWithRequestedAction, configuration)
     }
   })
 
@@ -350,7 +350,7 @@ export async function defaultRequestHandler(
 
   middleware.validateAction({
     eventConfig: configuration,
-    context: contextBeforeRequest,
+    context: contextBeforeAccept,
     input: {
       type: input.type as any,
       annotation: deepMerge(input.annotation ?? {}, parsedBody.annotation),
@@ -524,6 +524,7 @@ export function getDefaultActionProcedures(
           })
         }
 
+        // @todo: should be taken care of by middleware
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
           if (confirmationAction.status === ActionStatus.Rejected) {

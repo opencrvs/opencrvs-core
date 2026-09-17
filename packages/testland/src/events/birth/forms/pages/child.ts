@@ -21,9 +21,11 @@ import {
   field,
   user,
   never,
-  SelectOption
+  SelectOption,
+  ActionType,
+  ActionStatus
 } from '@opencrvs/toolkit/events'
-import { not } from '@opencrvs/toolkit/conditionals'
+import { flag, not } from '@opencrvs/toolkit/conditionals'
 
 import {
   createSelectOptions,
@@ -237,7 +239,14 @@ export const child = defineFormPage({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: never()
+          conditional: or(
+            flag(
+              `${ActionType.REGISTER}:${ActionStatus.Requested}`.toLowerCase()
+            ),
+            flag(
+              `${ActionType.APPROVE_CORRECTION}:${ActionStatus.Requested}`.toLowerCase()
+            )
+          )
         }
       ]
     },
