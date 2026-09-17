@@ -336,6 +336,22 @@ const messagesToDefine = {
     defaultMessage: 'Client name',
     description: 'Heading for the client name field in the details dialog'
   },
+  refreshSecretTitle: {
+    id: 'integrations.refreshSecretTitle',
+    defaultMessage: 'Refresh client secret?',
+    description: 'Title for the refresh client secret confirmation dialog'
+  },
+  refreshSecretText: {
+    id: 'integrations.refreshSecretText',
+    defaultMessage:
+      'This will generate a new client secret and immediately invalidate the current one. The integration will stop working until the new secret is configured in the integrating client. Are you sure you want to continue?',
+    description: 'Warning shown before refreshing an integration client secret'
+  },
+  refresh: {
+    id: 'integrations.refresh',
+    defaultMessage: 'Refresh',
+    description: 'Label for the refresh client secret confirmation button'
+  },
   scopes: {
     id: 'integrations.scopes',
     defaultMessage: 'Scopes',

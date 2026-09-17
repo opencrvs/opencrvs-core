@@ -116,6 +116,8 @@ export function SystemList() {
     integration: null
   })
 
+  const [showRefreshConfirm, setShowRefreshConfirm] = useState(false)
+
   const [clientDetails, setClientDetails] = useState<IntegrationItem | null>(
     null
   )
@@ -244,6 +246,7 @@ export function SystemList() {
   const handleRefreshSecret = async () => {
     if (!revealKeys.integration) return
     await refreshSecret(revealKeys.integration.id)
+    setShowRefreshConfirm(false)
   }
 
   const closeRevealKeys = () => {
@@ -253,6 +256,7 @@ export function SystemList() {
       details: null,
       loading: false
     })
+    setShowRefreshConfirm(false)
     resetRefreshSecret()
   }
 
@@ -526,7 +530,7 @@ export function SystemList() {
                   />
                 </Stack>
               ) : (
-                <ButtonLink onClick={handleRefreshSecret}>
+                <ButtonLink onClick={() => setShowRefreshConfirm(true)}>
                   {intl.formatMessage(buttonMessages.refresh)}
                 </ButtonLink>
               )}
@@ -551,6 +555,34 @@ export function SystemList() {
           </Stack>
         )}
       </Dialog>
+
+      {showRefreshConfirm && (
+        <Dialog
+          title={intl.formatMessage(integrationMessages.refreshSecretTitle)}
+          actions={[
+            <Button
+              type="tertiary"
+              id="cancelRefreshSecret"
+              key="cancelRefreshSecret"
+              onClick={() => setShowRefreshConfirm(false)}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>,
+            <Button
+              type="primary"
+              id="confirmRefreshSecret"
+              key="confirmRefreshSecret"
+              loading={isRefreshingSecret}
+              onClick={handleRefreshSecret}
+            >
+              {intl.formatMessage(integrationMessages.refresh)}
+            </Button>
+          ]}
+          onClose={() => setShowRefreshConfirm(false)}
+        >
+          {intl.formatMessage(integrationMessages.refreshSecretText)}
+        </Dialog>
+      )}
 
       {/* Create Client Modal */}
       <Dialog
