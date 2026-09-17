@@ -182,9 +182,9 @@ export const FileInputWithOptionTest: Story = {
     await step(
       'Accepts file of valid size and type when option is selected',
       async () => {
-        const validFile = new File(['a'.repeat(512 * 512)], 'valid.jpg', {
-          type: MimeType.enum['image/jpeg']
-        })
+        // Must be a real, decodable image — fake bytes upload fine but can
+        // never render in an <img>, regardless of caching.
+        const validFile = await createImageFile('valid.jpg', 100, 100)
 
         await userEvent.upload(input, validFile)
 
@@ -193,12 +193,25 @@ export const FileInputWithOptionTest: Story = {
     )
 
     await step('Opens the uploaded file without an error', async () => {
-      await userEvent.click(canvas.getByRole('button', { name: 'Forest' }))
-      await expect(
-        canvas.queryByText('Failed to load document')
-      ).not.toBeInTheDocument()
+      // Retries the click too: the link can briefly stay non-interactive
+      // right after upload.
       await waitFor(async () => {
-        await expect(canvasElement.querySelector('img')).not.toBeNull()
+        await userEvent.click(canvas.getByRole('button', { name: 'Forest' }))
+      })
+
+      // Both checks belong inside the same retrying waitFor: onError/onload
+      // fire asynchronously, so a one-off check right after the click can
+      // pass by observing the <img> before it has actually settled.
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByText('Failed to load document')
+        ).not.toBeInTheDocument()
+
+        const img = canvasElement.querySelector(
+          'img'
+        ) as HTMLImageElement | null
+        await expect(img).not.toBeNull()
+        await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
       })
     })
   }
@@ -286,10 +299,9 @@ export const FileInputButton: Story = {
     )
 
     await step('Accepts file of valid size and type', async () => {
-      const filename = 'valid.jpg'
-      const validFile = new File(['a'.repeat(512 * 512)], filename, {
-        type: MimeType.enum['image/jpeg']
-      })
+      // Must be a real, decodable image — fake bytes upload fine but can
+      // never render in an <img>, regardless of caching.
+      const validFile = await createImageFile('valid.jpg', 100, 100)
 
       await userEvent.upload(input, validFile)
 
@@ -297,14 +309,27 @@ export const FileInputButton: Story = {
     })
 
     await step('Opens the uploaded file without an error', async () => {
-      await userEvent.click(
-        canvas.getByRole('button', { name: 'Uploaded photo' })
-      )
-      await expect(
-        canvas.queryByText('Failed to load document')
-      ).not.toBeInTheDocument()
+      // Retries the click too: the link can briefly stay non-interactive
+      // right after upload.
       await waitFor(async () => {
-        await expect(canvasElement.querySelector('img')).not.toBeNull()
+        await userEvent.click(
+          canvas.getByRole('button', { name: 'Uploaded photo' })
+        )
+      })
+
+      // Both checks belong inside the same retrying waitFor: onError/onload
+      // fire asynchronously, so a one-off check right after the click can
+      // pass by observing the <img> before it has actually settled.
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByText('Failed to load document')
+        ).not.toBeInTheDocument()
+
+        const img = canvasElement.querySelector(
+          'img'
+        ) as HTMLImageElement | null
+        await expect(img).not.toBeNull()
+        await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
       })
     })
   }

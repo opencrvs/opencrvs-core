@@ -20,6 +20,7 @@ import {
   TestPdf,
   passiveFileRoute
 } from '@client/v2-events/features/events/fixtures'
+import { tRPCMsw } from '../../../../../.storybook/default-request-handlers'
 import { DocumentViewer, DocumentViewerOptionValue } from './DocumentViewer'
 
 const meta: Meta<typeof DocumentViewer> = {
@@ -47,11 +48,9 @@ export const ImageFailsThenRetrySucceeds: Story = {
     msw: {
       handlers: {
         files: [
-          http.get('/api/presigned-url/:filePath*', () =>
-            HttpResponse.json({
-              presignedURL: 'http://localhost:3535/ocrvs/tree.svg'
-            })
-          ),
+          tRPCMsw.event.file.getPresignedUrl.query(() => ({
+            presignedURL: 'http://localhost:3535/ocrvs/tree.svg'
+          })),
           http.get(
             'http://localhost:3535/ocrvs/:id',
             () =>
@@ -76,13 +75,20 @@ export const ImageFailsThenRetrySucceeds: Story = {
 
     await step('Retry loads the image', async () => {
       await userEvent.click(canvas.getByRole('button', { name: 'Retry' }))
+
+      // Both checks belong inside the same retrying waitFor: onError/onload
+      // fire asynchronously, so a one-off check right after the click can
+      // pass by observing the <img> before it has actually settled.
       await waitFor(async () => {
         await expect(
           canvas.queryByText('Failed to load document')
         ).not.toBeInTheDocument()
-      })
-      await waitFor(async () => {
-        await expect(canvasElement.querySelector('img')).not.toBeNull()
+
+        const img = canvasElement.querySelector(
+          'img'
+        ) as HTMLImageElement | null
+        await expect(img).not.toBeNull()
+        await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
       })
     })
   },
@@ -107,11 +113,9 @@ export const PdfFailsThenRetrySucceeds: Story = {
     msw: {
       handlers: {
         files: [
-          http.get('/api/presigned-url/:filePath*', () =>
-            HttpResponse.json({
-              presignedURL: 'http://localhost:3535/ocrvs/test.pdf'
-            })
-          ),
+          tRPCMsw.event.file.getPresignedUrl.query(() => ({
+            presignedURL: 'http://localhost:3535/ocrvs/test.pdf'
+          })),
           http.get(
             'http://localhost:3535/ocrvs/:id',
             () =>
