@@ -95,4 +95,22 @@ describe('User notification - sms', () => {
         expect((fetch as any).mock.calls[1][1].body).toMatchSnapshot()
       })
   )
+
+  it('rejects an action confirmation request that is not from the service token', async () => {
+    const { eventType, actionType, eventDocument } =
+      informantNotificationTestData[0]
+
+    const response = await server.server.inject({
+      method: 'POST',
+      url: `/trigger/events/${eventType}/actions/${actionType}`,
+      payload: eventDocument,
+      auth: {
+        strategy: 'jwt',
+        credentials: { sub: 'f8b1a0c2-3d4e-4f5a-8b6c-7d8e9f0a1b2c' },
+        artifacts: { token: 'mock-token' }
+      }
+    })
+
+    expect(response.statusCode).toBe(403)
+  })
 })
