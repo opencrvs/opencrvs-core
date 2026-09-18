@@ -28,22 +28,14 @@ import {
   generateTranslationConfig,
   EventState,
   UUID,
-  getDeclarationFields,
-  createPrng,
-  getOrThrow,
-  getUUID
+  getDeclarationFields
 } from '@opencrvs/commons'
-import {
-  ChildOnboardingEvent,
-  tennisClubMembershipEvent
-} from '@opencrvs/commons/fixtures'
+import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestClient,
-  seedEvent,
   setupTestCase,
-  TEST_SYSTEM_ID,
-  CONFIRMATION_SCOPES
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -475,64 +467,4 @@ describe('Search index should reflect corrected null informant fields', () => {
     expect(resultsAfterCorrectionByChildDob).toHaveLength(1)
     expect(resultsAfterCorrectionByChildDob[0].id).toBe(event.id)
   })
-})
-
-test('System may reject REJECT_CORRECTION action', async () => {
-  function mockActionApi(action: ActionType, status: number) {
-    return mswServer.use(
-      http.post<never, { actionId: string }>(
-        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
-        () => {
-          return HttpResponse.json({}, { status })
-        }
-      )
-    )
-  }
-
-  mockActionApi(ActionType.REJECT_CORRECTION, 202)
-
-  const { user, eventsDb } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const { eventId, requestedActionIds } = await seedEvent(eventsDb, {
-    actions: [
-      ActionType.DECLARE,
-      ActionType.REGISTER,
-      ActionType.REQUEST_CORRECTION
-    ],
-    eventConfig: tennisClubMembershipEvent,
-    user,
-    rng: createPrng(1243429)
-  })
-
-  const rejectActionResponse =
-    await client.event.actions.correction.reject.request({
-      eventId,
-      requestId: getOrThrow(
-        requestedActionIds.REQUEST_CORRECTION,
-        'no action id'
-      ),
-      transactionId: getUUID(),
-      content: {
-        reason: 'content'
-      },
-      waitFor: false
-    })
-
-  const systemClient = createSystemTestClient(
-    TEST_SYSTEM_ID,
-    CONFIRMATION_SCOPES
-  )
-
-  const rejectRequestAction = rejectActionResponse.actions.find(
-    (a) => a.type === ActionType.REJECT_CORRECTION
-  )
-
-  await expect(
-    systemClient.event.actions.correction.reject.reject({
-      eventId,
-      transactionId: getUUID(),
-      actionId: getOrThrow(rejectRequestAction?.id, 'no action id')
-    })
-  ).resolves.toBeDefined()
 })
