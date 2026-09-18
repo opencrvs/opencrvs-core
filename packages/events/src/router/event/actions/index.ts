@@ -170,12 +170,14 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
+export type ConfirmableActionType = keyof typeof ACTION_PROCEDURE_CONFIG
+
 /**
  * Maps action types to their corresponding audit log operation names (tRPC paths).
  * Only includes action types that should be audit-logged.
  */
 const AUDIT_LOG_OPERATION_MAP: Partial<
-  Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
+  Record<ConfirmableActionType, EventActionAuditLog['operation']>
 > = {
   [ActionType.NOTIFY]: 'event.actions.notify.request',
   [ActionType.DECLARE]: 'event.actions.declare.request',
@@ -390,7 +392,7 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
  * @param actionType - The action type for which we want to create router handlers.
  */
 export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+  actionType: ConfirmableActionType
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
