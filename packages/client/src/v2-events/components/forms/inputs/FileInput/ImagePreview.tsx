@@ -10,7 +10,8 @@
  */
 
 import * as React from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   FileFieldValue,
@@ -23,7 +24,10 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { toFileUrl } from '@client/v2-events/cache'
+import { precacheFile } from '@client/v2-events/features/files/useFileUpload'
+import { PreviewErrorBox } from './PreviewErrorBox'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -70,8 +74,16 @@ export function ImagePreview({
   disableDelete,
   id
 }: IProps) {
+  const intl = useIntl()
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
+  const [imageFailed, setImageFailed] = useState(false)
+  const [isRetrying, setIsRetrying] = useState(false)
+
+  // ImagePreview isn't remounted when switching documents, so clear a previous document's failure state before the new one loads.
+  useEffect(() => {
+    setImageFailed(false)
+  }, [previewImage.path])
 
   function zoomIn() {
     setZoom((prevState) => prevState + 0.2)
@@ -81,6 +93,18 @@ export function ImagePreview({
   }
   function rotateLeft() {
     setRotation((prevState) => (prevState - 90) % 360)
+  }
+
+  async function retry() {
+    setIsRetrying(true)
+    try {
+      await precacheFile(previewImage.path)
+      setImageFailed(false)
+    } catch {
+      setImageFailed(true)
+    } finally {
+      setIsRetrying(false)
+    }
   }
 
   return (
@@ -151,13 +175,28 @@ export function ImagePreview({
       />
 
       <ViewerContainer>
-        <PanViewer
-          key={Math.random()}
-          id="document_image"
-          image={toFileUrl(previewImage.path)}
-          rotation={rotation}
-          zoom={zoom}
-        />
+        {imageFailed ? (
+          <PreviewErrorBox>
+            {intl.formatMessage(formMessages.imageLoadFailed)}
+            <Button
+              id="preview_retry"
+              loading={isRetrying}
+              type="secondary"
+              onClick={retry}
+            >
+              {intl.formatMessage(buttonMessages.retry)}
+            </Button>
+          </PreviewErrorBox>
+        ) : (
+          <PanViewer
+            key={Math.random()}
+            id="document_image"
+            image={toFileUrl(previewImage.path)}
+            rotation={rotation}
+            zoom={zoom}
+            onError={() => setImageFailed(true)}
+          />
+        )}
       </ViewerContainer>
     </ViewerWrapper>
   )
