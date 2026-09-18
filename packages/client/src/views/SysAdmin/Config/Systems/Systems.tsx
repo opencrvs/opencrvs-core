@@ -42,12 +42,15 @@ import {
 } from './useIntegrations'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 
-const ButtonLink = styled(Link)`
-  text-align: left;
-`
-
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
+`
+
+const AlignedList = styled(List)`
+  td,
+  th {
+    vertical-align: middle;
+  }
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -94,6 +97,10 @@ interface DeleteConfirmState {
   integration: IntegrationItem | null
 }
 
+interface RefreshSecretState {
+  integration: IntegrationItem | null
+}
+
 export function SystemList() {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
@@ -115,6 +122,9 @@ export function SystemList() {
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmState>({
     integration: null
   })
+
+  const [refreshSecretConfirm, setRefreshSecretConfirm] =
+    useState<RefreshSecretState>({ integration: null })
 
   const [clientDetails, setClientDetails] = useState<IntegrationItem | null>(
     null
@@ -242,8 +252,22 @@ export function SystemList() {
   }
 
   const handleRefreshSecret = async () => {
-    if (!revealKeys.integration) return
-    await refreshSecret(revealKeys.integration.id)
+    const integration = refreshSecretConfirm.integration
+    if (!integration) return
+    try {
+      await refreshSecret(integration.id)
+    } catch {
+      setToastMessage({
+        message: intl.formatMessage(integrationMessages.error),
+        type: 'error'
+      })
+      setRefreshSecretConfirm({ integration: null })
+    }
+  }
+
+  const closeRefreshSecret = () => {
+    setRefreshSecretConfirm({ integration: null })
+    resetRefreshSecret()
   }
 
   const closeRevealKeys = () => {
@@ -265,6 +289,10 @@ export function SystemList() {
       {
         handler: () => handleRevealKeys(integration),
         label: intl.formatMessage(integrationMessages.revealKeys)
+      },
+      {
+        handler: () => setRefreshSecretConfirm({ integration }),
+        label: intl.formatMessage(integrationMessages.refreshSecret)
       },
       {
         handler: () => setToggleActivation({ integration }),
@@ -301,7 +329,7 @@ export function SystemList() {
 
         {isLoading && <Spinner id="system-list-spinner" size={24} />}
 
-        <List>
+        <AlignedList>
           {integrations.map((integration: IntegrationItem) => {
             const user = users.find((user) => user.id === integration.createdBy)
             return (
@@ -364,7 +392,7 @@ export function SystemList() {
               />
             )
           })}
-        </List>
+        </AlignedList>
       </Content>
 
       {/* Client Details Modal */}
@@ -472,6 +500,72 @@ export function SystemList() {
         </Dialog>
       )}
 
+      {refreshSecretConfirm.integration && (
+        <Dialog
+          variant="large"
+          width={512}
+          title={refreshSecretConfirm.integration.name}
+          actions={
+            refreshSecretData
+              ? []
+              : [
+                  <Button
+                    type="tertiary"
+                    id="cancelRefreshSecret"
+                    key="cancelRefreshSecret"
+                    onClick={closeRefreshSecret}
+                  >
+                    {intl.formatMessage(buttonMessages.cancel)}
+                  </Button>,
+                  <Button
+                    type="primary"
+                    id="confirmRefreshSecret"
+                    key="confirmRefreshSecret"
+                    loading={isRefreshingSecret}
+                    onClick={handleRefreshSecret}
+                  >
+                    {intl.formatMessage(integrationMessages.refreshSecret)}
+                  </Button>
+                ]
+          }
+          onClose={closeRefreshSecret}
+        >
+          {refreshSecretData ? (
+            <Stack direction="column" alignItems="stretch" gap={16}>
+              <Text variant="reg16" element="p">
+                {intl.formatMessage(
+                  integrationMessages.refreshSecretSuccessText
+                )}
+              </Text>
+              <Stack direction="column" alignItems="stretch" gap={8}>
+                <Text variant="bold16" element="span">
+                  {intl.formatMessage(integrationMessages.clientSecret)}
+                </Text>
+                <Stack justifyContent="space-between" alignItems="center">
+                  <Text variant="reg16" element="span">
+                    {refreshSecretData.clientSecret}
+                  </Text>
+                  <CopyButton
+                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                    copyLabel={intl.formatMessage(buttonMessages.copy)}
+                    data={refreshSecretData.clientSecret}
+                  />
+                </Stack>
+              </Stack>
+            </Stack>
+          ) : (
+            <Stack direction="column" alignItems="stretch" gap={16}>
+              <Text variant="reg16" element="p">
+                {intl.formatMessage(integrationMessages.refreshSecretText)}
+              </Text>
+              <Alert type="error" customIcon={<Icon name="WarningCircle" />}>
+                {intl.formatMessage(integrationMessages.refreshSecretWarning)}
+              </Alert>
+            </Stack>
+          )}
+        </Dialog>
+      )}
+
       {/* Reveal Keys Modal */}
       <Dialog
         actions={[
@@ -512,24 +606,9 @@ export function SystemList() {
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              {isRefreshingSecret ? (
-                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-              ) : refreshSecretData ? (
-                <Stack justifyContent="space-between" alignItems="center">
-                  <Text variant="reg16" element="span">
-                    {refreshSecretData.clientSecret}
-                  </Text>
-                  <CopyButton
-                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
-                    copyLabel={intl.formatMessage(buttonMessages.copy)}
-                    data={refreshSecretData.clientSecret}
-                  />
-                </Stack>
-              ) : (
-                <ButtonLink onClick={handleRefreshSecret}>
-                  {intl.formatMessage(buttonMessages.refresh)}
-                </ButtonLink>
-              )}
+              <Text variant="reg16" element="p" color="grey500">
+                {intl.formatMessage(integrationMessages.clientSecretHiddenNote)}
+              </Text>
             </Stack>
             <Stack direction="column" alignItems="stretch" gap={8}>
               <Text variant="bold16" element="span">
