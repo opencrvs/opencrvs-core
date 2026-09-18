@@ -233,6 +233,26 @@ describe('accept only confirms the pending action it names', () => {
     })
   })
 
+  test('cannot be pointed at a pending action of another event', async () => {
+    const { event, input } = await requestPendingRegistration()
+    const other = await requestPendingRegistration()
+
+    const countryConfigClient = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
+
+    await expect(
+      countryConfigClient.event.actions.register.accept({
+        ...input,
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId: other.actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+  })
+
   test('cannot be pointed at an action that is not awaiting confirmation', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, REGISTRAR_SCOPES)
