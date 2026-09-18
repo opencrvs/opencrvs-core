@@ -485,6 +485,24 @@ describe('event.actions.custom', () => {
       expect(currentState.assignedTo).toEqual(undefined)
     })
 
+    test('Records a rejected action when integration responds with 400', async () => {
+      mockActionApi(ActionType.CUSTOM, 400)
+
+      const { client, payload } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      const response = await client.event.actions.custom.request(payload)
+
+      expect(
+        response.actions.find(
+          (action) =>
+            action.type === ActionType.CUSTOM &&
+            action.status === ActionStatus.Rejected
+        )
+      ).toBeDefined()
+    })
+
     test('Keeps assignment when integration responds with 500', async () => {
       mockActionApi(ActionType.CUSTOM, 500)
 
