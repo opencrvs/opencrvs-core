@@ -513,17 +513,25 @@ describe.each(Object.entries(PENDING_ACTIONS))(
       ).toMatchObject({ originalActionId: pending.actionId })
     })
 
-    test('rejecting the pending action records it as rejected', async () => {
+    test('rejecting the pending action keeps the fields it carried', async () => {
       const pending = await requestPendingAction()
 
       const response = await pending.reject()
+      const requested = getOrThrow(
+        response.actions.find((action) => action.id === pending.actionId),
+        'Could not find the requested action'
+      )
 
       expect(
         response.actions.find(
           (action) =>
             action.type === type && action.status === ActionStatus.Rejected
         )
-      ).toMatchObject({ originalActionId: pending.actionId })
+      ).toMatchObject({
+        originalActionId: pending.actionId,
+        ...('requestId' in requested ? { requestId: requested.requestId } : {}),
+        ...('content' in requested ? { content: requested.content } : {})
+      })
     })
 
     test('rejecting an accepted action is refused', async () => {
