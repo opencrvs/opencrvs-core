@@ -100,6 +100,7 @@ const eventAssigned: EventDocument = {
  * Mutable reference so MSW handlers always return current state.
  */
 let currentDoc: EventDocument = eventUnassigned
+let getDuplicatesCallCount = 0
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -108,10 +109,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 /*
  * The match sits outside the user's jurisdiction, so `getDuplicates` refuses
- * every call. Once assigned, the "cannot review" banner must stay put rather
- * than flipping back to the ordinary warning.
+ * every call — but only once the record is assigned. Unassigned, the server
+ * answers 409, which says nothing about jurisdiction, so the check waits.
  */
-export const StaysUnavailableAfterAssign: StoryObj = {
+export const NoCheckUntilAssigned: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
@@ -130,6 +131,7 @@ export const StaysUnavailableAfterAssign: StoryObj = {
           })),
           tRPCMsw.event.get.query(() => currentDoc),
           tRPCMsw.event.getDuplicates.query(async () => {
+            getDuplicatesCallCount++
             // Genuinely, consistently outside jurisdiction — never available.
             await new Promise((resolve) => setTimeout(resolve, 100))
             throw new TRPCError({ code: 'FORBIDDEN' })
@@ -149,14 +151,21 @@ export const StaysUnavailableAfterAssign: StoryObj = {
   // The module outlives a run, so reset or a replay would start assigned.
   beforeEach: () => {
     currentDoc = eventUnassigned
+    getDuplicatesCallCount = 0
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
     await step(
-      'Leave the record open long enough for the first duplicate check to settle, as a real user would',
+      'Unassigned: the ordinary warning shows and the check is never asked',
       async () => {
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        await expect(
+          await canvas.findByText(
+            `Potential duplicate of record ${duplicateTrackingId}`
+          )
+        ).toBeVisible()
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await expect(getDuplicatesCallCount).toBe(0)
       }
     )
 
@@ -170,30 +179,21 @@ export const StaysUnavailableAfterAssign: StoryObj = {
       )
     })
 
-    await step('The "cannot review" banner appears', async () => {
-      await expect(
-        await canvas.findByText(
-          'You cannot review this record for duplicates',
-          undefined,
-          { timeout: 10000 }
-        )
-      ).toBeVisible()
-    })
-
     await step(
-      'Having established the match is unavailable, it never reverts to the ordinary warning',
+      'Now that the refusal is a real answer, the banner appears',
       async () => {
-        for (let i = 0; i < 40; i++) {
-          await expect(
-            canvas.queryByText(
-              `Potential duplicate of record ${duplicateTrackingId}`
-            )
-          ).toBeNull()
-          await expect(
-            canvas.queryByText('You cannot review this record for duplicates')
-          ).not.toBeNull()
-          await new Promise((resolve) => setTimeout(resolve, 50))
-        }
+        await expect(
+          await canvas.findByText(
+            'You cannot review this record for duplicates',
+            undefined,
+            { timeout: 10000 }
+          )
+        ).toBeVisible()
+        await expect(
+          canvas.queryByText(
+            `Potential duplicate of record ${duplicateTrackingId}`
+          )
+        ).toBeNull()
       }
     )
   }

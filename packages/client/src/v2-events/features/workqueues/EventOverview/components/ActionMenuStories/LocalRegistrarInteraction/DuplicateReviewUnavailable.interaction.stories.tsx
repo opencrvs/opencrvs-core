@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import superjson from 'superjson'
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -111,6 +111,27 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 /*
+ * `getDuplicates` answers only when a story releases it, so the pending window
+ * belongs to the test rather than to a timer.
+ */
+let getDuplicatesCallCount = 0
+let releaseDuplicates!: () => void
+let duplicatesReleased!: Promise<void>
+
+/** Makes the next `getDuplicates` call wait. */
+function holdDuplicates() {
+  duplicatesReleased = new Promise((resolve) => {
+    releaseDuplicates = resolve
+  })
+}
+
+async function refuseWhenReleased(): Promise<EventDocument[]> {
+  getDuplicatesCallCount++
+  await duplicatesReleased
+  throw new TRPCError({ code: 'FORBIDDEN' })
+}
+
+/*
  * The user has access to the matched record, the server is just slow to say
  * so. While the answer is outstanding no banner may be shown, and once it
  * arrives it must be the ordinary warning — never the jurisdiction one.
@@ -123,8 +144,8 @@ export const NotShownWhileDuplicateStillLoading: StoryObj = {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({ eventId })
     },
-    // Only the main record is already in cache — the matched record is not,
-    // it only becomes available once the slow `getDuplicates` call resolves.
+    // Only the main record is already in cache — the matched record arrives
+    // with the `getDuplicates` answer.
     offline: { events: [eventUnderReview] },
     msw: {
       handlers: {
@@ -137,18 +158,29 @@ export const NotShownWhileDuplicateStillLoading: StoryObj = {
           })),
           tRPCMsw.event.get.query(() => eventUnderReview),
           tRPCMsw.event.getDuplicates.query(async () => {
-            await new Promise((resolve) => setTimeout(resolve, 1500))
+            getDuplicatesCallCount++
+            await duplicatesReleased
             return [matchedEvent]
           })
         ]
       }
     }
   },
+  beforeEach: () => {
+    getDuplicatesCallCount = 0
+    holdDuplicates()
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    await step('No banner is shown while the answer is pending', async () => {
-      for (let i = 0; i < 10; i++) {
+    await step('The check is asked, and left unanswered', async () => {
+      await waitFor(() => expect(getDuplicatesCallCount).toBe(1))
+    })
+
+    await step(
+      'Neither banner is shown while the answer is outstanding',
+      async () => {
+        // Nothing can answer until we release, so one look is enough.
         await expect(
           canvas.queryByText('You cannot review this record for duplicates')
         ).toBeNull()
@@ -157,18 +189,18 @@ export const NotShownWhileDuplicateStillLoading: StoryObj = {
             `Potential duplicate of record ${duplicateTrackingId}`
           )
         ).toBeNull()
-        await new Promise((resolve) => setTimeout(resolve, 100))
       }
-    })
+    )
 
     await step(
-      'Once duplicates resolve, the ordinary duplicate warning is shown',
+      'Once the matches arrive, the ordinary warning is shown',
       async () => {
+        releaseDuplicates()
         await expect(
           await canvas.findByText(
             `Potential duplicate of record ${duplicateTrackingId}`,
             undefined,
-            { timeout: 5000 }
+            { timeout: 10000 }
           )
         ).toBeVisible()
         await expect(
@@ -203,18 +235,22 @@ export const StaysUnavailableWhileRechecking: StoryObj = {
             ]
           })),
           tRPCMsw.event.get.query(() => eventUnderReview),
-          tRPCMsw.event.getDuplicates.query(async () => {
-            await new Promise((resolve) => setTimeout(resolve, 600))
-            throw new TRPCError({ code: 'FORBIDDEN' })
-          })
+          tRPCMsw.event.getDuplicates.query(refuseWhenReleased)
         ]
       }
     }
+  },
+  beforeEach: () => {
+    getDuplicatesCallCount = 0
+    holdDuplicates()
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
     await step('The refusal is established', async () => {
+      await waitFor(() => expect(getDuplicatesCallCount).toBe(1))
+      releaseDuplicates()
+
       await expect(
         await canvas.findByText(
           'You cannot review this record for duplicates',
@@ -224,27 +260,33 @@ export const StaysUnavailableWhileRechecking: StoryObj = {
       ).toBeVisible()
     })
 
-    await step('The same question is asked again', async () => {
-      await queryClient.invalidateQueries({
+    await step('The same question is asked again, and held open', async () => {
+      holdDuplicates()
+      // Not awaited: it only settles once we let the call answer.
+      void queryClient.invalidateQueries({
         queryKey: potentialDuplicatesQueryKey(eventId)
       })
+
+      await waitFor(() => expect(getDuplicatesCallCount).toBe(2))
     })
 
     await step(
-      'The ordinary warning never appears while it is being re-asked',
+      'While it is being re-asked the record never looks reviewable',
       async () => {
-        for (let i = 0; i < 12; i++) {
-          await expect(
-            canvas.queryByText(
-              `Potential duplicate of record ${duplicateTrackingId}`
-            )
-          ).toBeNull()
-          await new Promise((resolve) => setTimeout(resolve, 50))
-        }
+        // Mid-check neither banner is honest, so neither is shown.
+        await expect(
+          canvas.queryByText(
+            `Potential duplicate of record ${duplicateTrackingId}`
+          )
+        ).toBeNull()
+        await expect(
+          canvas.queryByText('You cannot review this record for duplicates')
+        ).toBeNull()
       }
     )
 
     await step('The refusal still stands', async () => {
+      releaseDuplicates()
       await expect(
         await canvas.findByText(
           'You cannot review this record for duplicates',
@@ -280,18 +322,22 @@ export const StaysVisibleWhenReturningToTheRecord: StoryObj = {
             ]
           })),
           tRPCMsw.event.get.query(() => eventUnderReview),
-          tRPCMsw.event.getDuplicates.query(async () => {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            throw new TRPCError({ code: 'FORBIDDEN' })
-          })
+          tRPCMsw.event.getDuplicates.query(refuseWhenReleased)
         ]
       }
     }
+  },
+  beforeEach: () => {
+    getDuplicatesCallCount = 0
+    holdDuplicates()
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
     await step('The refusal is established', async () => {
+      await waitFor(() => expect(getDuplicatesCallCount).toBe(1))
+      releaseDuplicates()
+
       await expect(
         await canvas.findByText(
           'You cannot review this record for duplicates',
@@ -302,6 +348,9 @@ export const StaysVisibleWhenReturningToTheRecord: StoryObj = {
     })
 
     await step('Leave the summary and come back', async () => {
+      // Held open, so asking again would blank the banner and be caught below.
+      holdDuplicates()
+
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Audit' })
       )
@@ -311,11 +360,13 @@ export const StaysVisibleWhenReturningToTheRecord: StoryObj = {
       )
     })
 
-    await step('The banner is there without a second wait', async () => {
+    await step('The banner is there, and nothing was asked again', async () => {
       await canvas.findByText('Tracking ID', undefined, { timeout: 10000 })
+
       await expect(
         canvas.queryByText('You cannot review this record for duplicates')
       ).not.toBeNull()
+      await expect(getDuplicatesCallCount).toBe(1)
     })
   }
 }
