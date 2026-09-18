@@ -24,7 +24,6 @@ import type {
 } from '@trpc/tanstack-react-query'
 import { isObject } from 'lodash'
 import {
-  ActionType,
   deepMerge,
   FileFieldValue,
   FileFieldValueWithOption,
@@ -36,7 +35,6 @@ import {
 } from '@client/v2-events/features/events/useEvents/temporary-id'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
-import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
 
 export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>
@@ -188,9 +186,6 @@ export function createEventActionMutationFn<
         ...params,
         declaration: params.declaration
       })
-      if (params.type === ActionType.ASSIGN) {
-        await prefetchPotentialDuplicates(params.eventId)
-      }
       return response
     }
   )
