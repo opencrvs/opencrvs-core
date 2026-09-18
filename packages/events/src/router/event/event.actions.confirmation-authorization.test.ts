@@ -27,6 +27,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { appRouter } from '@events/router/router'
 
 const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
@@ -236,5 +237,154 @@ describe('accept only confirms the pending action it names', () => {
       code: 'BAD_REQUEST',
       message: expect.stringContaining('is not awaiting confirmation')
     })
+  })
+})
+
+type UserClient = ReturnType<typeof createTestClient>
+
+const CONFIRMATION_ENDPOINTS: [
+  string,
+  (client: UserClient) => Promise<unknown>
+][] = [
+  [
+    'event.actions.archive.accept',
+    async (client: UserClient) =>
+      client.event.actions.archive.accept({} as never)
+  ],
+  [
+    'event.actions.archive.reject',
+    async (client: UserClient) =>
+      client.event.actions.archive.reject({} as never)
+  ],
+  [
+    'event.actions.correction.approve.accept',
+    async (client: UserClient) =>
+      client.event.actions.correction.approve.accept({} as never)
+  ],
+  [
+    'event.actions.correction.approve.reject',
+    async (client: UserClient) =>
+      client.event.actions.correction.approve.reject({} as never)
+  ],
+  [
+    'event.actions.correction.reject.accept',
+    async (client: UserClient) =>
+      client.event.actions.correction.reject.accept({} as never)
+  ],
+  [
+    'event.actions.correction.reject.reject',
+    async (client: UserClient) =>
+      client.event.actions.correction.reject.reject({} as never)
+  ],
+  [
+    'event.actions.correction.request.accept',
+    async (client: UserClient) =>
+      client.event.actions.correction.request.accept({} as never)
+  ],
+  [
+    'event.actions.correction.request.reject',
+    async (client: UserClient) =>
+      client.event.actions.correction.request.reject({} as never)
+  ],
+  [
+    'event.actions.custom.accept',
+    async (client: UserClient) =>
+      client.event.actions.custom.accept({} as never)
+  ],
+  [
+    'event.actions.custom.reject',
+    async (client: UserClient) =>
+      client.event.actions.custom.reject({} as never)
+  ],
+  [
+    'event.actions.declare.accept',
+    async (client: UserClient) =>
+      client.event.actions.declare.accept({} as never)
+  ],
+  [
+    'event.actions.declare.reject',
+    async (client: UserClient) =>
+      client.event.actions.declare.reject({} as never)
+  ],
+  [
+    'event.actions.edit.accept',
+    async (client: UserClient) => client.event.actions.edit.accept({} as never)
+  ],
+  [
+    'event.actions.edit.reject',
+    async (client: UserClient) => client.event.actions.edit.reject({} as never)
+  ],
+  [
+    'event.actions.notify.accept',
+    async (client: UserClient) =>
+      client.event.actions.notify.accept({} as never)
+  ],
+  [
+    'event.actions.notify.reject',
+    async (client: UserClient) =>
+      client.event.actions.notify.reject({} as never)
+  ],
+  [
+    'event.actions.printCertificate.accept',
+    async (client: UserClient) =>
+      client.event.actions.printCertificate.accept({} as never)
+  ],
+  [
+    'event.actions.printCertificate.reject',
+    async (client: UserClient) =>
+      client.event.actions.printCertificate.reject({} as never)
+  ],
+  [
+    'event.actions.register.accept',
+    async (client: UserClient) =>
+      client.event.actions.register.accept({} as never)
+  ],
+  [
+    'event.actions.register.reject',
+    async (client: UserClient) =>
+      client.event.actions.register.reject({} as never)
+  ],
+  [
+    'event.actions.reject.accept',
+    async (client: UserClient) =>
+      client.event.actions.reject.accept({} as never)
+  ],
+  [
+    'event.actions.reject.reject',
+    async (client: UserClient) =>
+      client.event.actions.reject.reject({} as never)
+  ],
+  [
+    'event.actions.unarchive.accept',
+    async (client: UserClient) =>
+      client.event.actions.unarchive.accept({} as never)
+  ],
+  [
+    'event.actions.unarchive.reject',
+    async (client: UserClient) =>
+      client.event.actions.unarchive.reject({} as never)
+  ]
+]
+
+describe('no user may confirm an action, whichever endpoint they call', () => {
+  test.each(CONFIRMATION_ENDPOINTS)('%s', async (_, call) => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [
+      ...REGISTRAR_SCOPES,
+      ...CONFIRMATION_SCOPES
+    ])
+
+    // An empty payload is enough: the system-only check runs before the input is validated.
+    await expect(call(client)).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
+  test('the list above covers every confirmation endpoint the router has', () => {
+    const inRouter = Object.keys(appRouter._def.procedures).filter((path) =>
+      /\.(accept|reject)$/.test(path)
+    )
+
+    expect(new Set(inRouter)).toEqual(
+      new Set(CONFIRMATION_ENDPOINTS.map(([path]) => path))
+    )
   })
 })
