@@ -20,118 +20,210 @@ import {
   selectCertificationType,
   selectRequesterType
 } from '@e2e/support/print-certificate/death/helpers'
+import { AddressType } from '@opencrvs/toolkit/events'
 
 async function expectInPdf(page: Page, text: string) {
   await expect(page.locator('#print')).toContainText(text)
 }
 
-test.describe.serial("Validate 'Death Certificate' PDF details", () => {
-  let page: Page
-  let declaration: Declaration
+test.describe("Validate 'Death Certificate' PDF details", () => {
+  test('Standard certificate renders deceased name, place of death and registrar', async ({
+    page
+  }) => {
+    test.setTimeout(180_000)
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
+    let declaration: Declaration
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+    await test.step('Seed a registered death record (via API)', async () => {
+      const token = await getToken(CREDENTIALS.REGISTRAR)
+      const res = await createDeclaration(token)
 
-  test('Log in', async () => {
-    await login(page)
-  })
+      declaration = res.declaration
+    })
 
-  test('Go to review', async () => {
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await navigateToCertificatePrintAction(
-      page,
-      declaration,
-      CREDENTIALS.REGISTRAR
-    )
-    await selectCertificationType(page, 'Death Certificate')
-    await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Verified' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
+    await test.step('Log in as the registrar', async () => {
+      await login(page)
+    })
 
-  test('Validate deceased name', async () => {
-    await expectInPdf(
-      page,
-      `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
-    )
-  })
+    await test.step('Open the death certificate preview', async () => {
+      await page.getByRole('button', { name: 'Pending certification' }).click()
+      await navigateToCertificatePrintAction(
+        page,
+        declaration,
+        CREDENTIALS.REGISTRAR
+      )
+      await selectCertificationType(page, 'Death Certificate')
+      await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Verified' }).click()
+      await page.getByRole('button', { name: 'Continue' }).click()
+    })
 
-  test('Validate deceased place of death', async () => {
-    await expectInPdf(page, 'Ibombo, Central, Farajaland')
-  })
+    await test.step('Validate deceased name', async () => {
+      await expectInPdf(
+        page,
+        `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
+      )
+    })
 
-  test('Validate registrar name', async () => {
-    await expectInPdf(page, 'Kennedy Mweene')
+    await test.step('Validate deceased place of death', async () => {
+      await expectInPdf(page, 'Klow, Ibombo, Central, Farajaland')
+    })
+
+    await test.step('Validate registrar name', async () => {
+      await expectInPdf(page, 'Kennedy Mweene')
+    })
   })
 })
 
-test.describe
-  .serial("Validate 'Death Certificate Certified Copy' PDF details", () => {
-  let page: Page
-  let declaration: Declaration
+test.describe("Validate 'Death Certificate Certified Copy' PDF details", () => {
+  test('Certified copy renders deceased, spouse, place of death and office name', async ({
+    page
+  }) => {
+    test.setTimeout(180_000)
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    page = await browser.newPage()
+    let declaration: Declaration
+
+    await test.step('Seed a registered death record (via API)', async () => {
+      const token = await getToken(CREDENTIALS.REGISTRAR)
+      const res = await createDeclaration(token)
+
+      declaration = res.declaration
+    })
+
+    await test.step('Log in as the registrar', async () => {
+      await login(page)
+    })
+
+    await test.step('Open the certified copy preview', async () => {
+      await page.getByRole('button', { name: 'Pending certification' }).click()
+      await navigateToCertificatePrintAction(
+        page,
+        declaration,
+        CREDENTIALS.REGISTRAR
+      )
+      await selectCertificationType(page, 'Death Certificate Certified Copy')
+      await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Verified' }).click()
+      await page.getByRole('button', { name: 'Continue' }).click()
+    })
+
+    await test.step('Validate deceased name', async () => {
+      await expectInPdf(
+        page,
+        `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
+      )
+    })
+
+    await test.step('Validate deceased place of death', async () => {
+      await expectInPdf(page, 'Klow, Ibombo, Central, Farajaland')
+    })
+
+    await test.step('Validate registrar name', async () => {
+      await expectInPdf(page, 'Registrar: Kennedy Mweene')
+    })
+
+    await test.step('Place of registration includes the office name', async () => {
+      await expectInPdf(page, 'Ibombo District Office')
+    })
+
+    await test.step('Validate spouse name', async () => {
+      await expectInPdf(
+        page,
+        `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
+      )
+      await expectInPdf(page, 'Spouse')
+    })
+  })
+})
+
+test.describe('International addresses render the required street levels', () => {
+  const EXPECTED = 'Ngozi District, Ngozi Province, Burundi'
+
+  const INTERNATIONAL_ADDRESS = {
+    country: 'BDI',
+    addressType: AddressType.INTERNATIONAL,
+    streetLevelDetails: {
+      state: 'Ngozi Province',
+      district2: 'Ngozi District'
+    }
+  }
+
+  test('Street levels survive on both death certificate templates', async ({
+    page
+  }) => {
+    test.setTimeout(240_000)
+
+    let declaration: Declaration
+
+    await test.step('Seed a registered death record with international addresses (via API)', async () => {
+      const token = await getToken(CREDENTIALS.REGISTRAR)
+      const res = await createDeclaration(token, {
+        'deceased.address': INTERNATIONAL_ADDRESS,
+        'eventDetails.deathLocationOther': INTERNATIONAL_ADDRESS
+      })
+
+      declaration = res.declaration
+    })
+
+    await test.step('Log in as the registrar', async () => {
+      await login(page)
+    })
+
+    await test.step("'Death Certificate' keeps the street levels", async () => {
+      await page.getByRole('button', { name: 'Pending certification' }).click()
+      await navigateToCertificatePrintAction(
+        page,
+        declaration,
+        CREDENTIALS.REGISTRAR
+      )
+      await selectCertificationType(page, 'Death Certificate')
+      await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Verified' }).click()
+      await page.getByRole('button', { name: 'Continue' }).click()
+
+      await expectInPdf(page, EXPECTED)
+    })
   })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  test('Street levels survive on the death certified copy', async ({
+    page
+  }) => {
+    test.setTimeout(240_000)
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+    let declaration: Declaration
 
-  test('Log in', async () => {
-    await login(page)
-  })
+    await test.step('Seed a registered death record with international addresses (via API)', async () => {
+      const token = await getToken(CREDENTIALS.REGISTRAR)
+      const res = await createDeclaration(token, {
+        'deceased.address': INTERNATIONAL_ADDRESS,
+        'eventDetails.deathLocationOther': INTERNATIONAL_ADDRESS
+      })
 
-  test('Go to review', async () => {
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await navigateToCertificatePrintAction(
-      page,
-      declaration,
-      CREDENTIALS.REGISTRAR
-    )
-    await selectCertificationType(page, 'Death Certificate Certified Copy')
-    await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Verified' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
+      declaration = res.declaration
+    })
 
-  test('Validate deceased name', async () => {
-    await expectInPdf(
-      page,
-      `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
-    )
-  })
+    await test.step('Log in as the registrar', async () => {
+      await login(page)
+    })
 
-  test('Validate deceased place of death', async () => {
-    await expectInPdf(page, 'Ibombo, Central, Farajaland')
-  })
+    await test.step("'Death Certificate Certified Copy' keeps the street levels", async () => {
+      await page.getByRole('button', { name: 'Pending certification' }).click()
+      await navigateToCertificatePrintAction(
+        page,
+        declaration,
+        CREDENTIALS.REGISTRAR
+      )
+      await selectCertificationType(page, 'Death Certificate Certified Copy')
+      await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.getByRole('button', { name: 'Verified' }).click()
+      await page.getByRole('button', { name: 'Continue' }).click()
 
-  test('Validate registrar name', async () => {
-    await expectInPdf(page, 'Registrar: Kennedy Mweene')
-  })
-
-  test('Validate spouse name', async () => {
-    await expectInPdf(
-      page,
-      `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
-    )
-    await expectInPdf(page, 'Spouse')
+      // Both "Resident at" (row 3) and "Place of death" (row 7).
+      await expect(page.locator('#print')).toContainText(EXPECTED)
+    })
   })
 })

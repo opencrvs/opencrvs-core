@@ -26,13 +26,11 @@ import * as Hapi from '@hapi/hapi'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 import * as inert from '@hapi/inert'
-import * as Sentry from 'hapi-sentry'
 import fetch from 'node-fetch'
 import {
   CLIENT_APP_URL,
   DOMAIN,
   LOGIN_URL,
-  SENTRY_DSN,
   COUNTRY_CONFIG_HOST,
   COUNTRY_CONFIG_PORT,
   AUTH_URL,
@@ -111,19 +109,6 @@ export default function getPlugins() {
         prettyPrint: false,
         logPayload: false,
         instance: logger
-      }
-    })
-  }
-
-  if (SENTRY_DSN) {
-    plugins.push({
-      plugin: Sentry,
-      options: {
-        client: {
-          environment: process.env.NODE_ENV,
-          dsn: SENTRY_DSN
-        },
-        catchLogErrors: true
       }
     })
   }
@@ -597,14 +582,6 @@ export async function createServer() {
       tags: ['api', 'integration'],
       description:
         'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
-    }
-  })
-
-  server.ext({
-    type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
-      request.sentryScope?.setExtra('payload', request.payload)
-      return h.continue
     }
   })
 

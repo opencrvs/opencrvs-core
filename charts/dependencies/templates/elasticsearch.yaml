@@ -25,11 +25,18 @@ metadata:
     app: elasticsearch
   name: elasticsearch
 spec:
+  {{- $service_type := default .Values.service_type .Values.elasticsearch.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
   clusterIP: None
+  {{- end }}
   ports:
     - name: '9200'
       port: 9200
       targetPort: 9200
+      {{- if .Values.elasticsearch.node_port }}
+      nodePort: {{ .Values.elasticsearch.node_port }}
+      {{- end }}
     - name: '9300'
       port: 9300
       targetPort: 9300

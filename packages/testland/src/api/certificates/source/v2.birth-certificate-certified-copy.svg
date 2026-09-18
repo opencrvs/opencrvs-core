@@ -195,12 +195,18 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
         <tspan x="307" y="220.104">{{$join ", " ($lookup $declaration 'child.birthLocation.district') ($lookup $declaration 'child.birthLocation.province') ($lookup $declaration 'child.birthLocation.country')}}</tspan>
       {{else}}
         {{#ifCond ($lookup $declaration 'child.birthLocation.other') '!==' undefined }}
-        <tspan x="307" y="208.104">{{$or ($lookup $declaration 'child.birthLocation.other.district') ($lookup $declaration 'child.birthLocation.other.streetLevelDetails.district2')}}&#10;</tspan>
-        <tspan x="307" y="220.104">{{$join ", " ($or ($lookup $declaration 'child.birthLocation.other.streetLevelDetails.state') ($lookup $declaration 'child.birthLocation.other.province')) ($lookup $declaration 'child.birthLocation.other.country')}}</tspan>
+        {{#ifCond ($lookup $declaration "child.birthLocation.other.addressType") '===' "INTERNATIONAL" }}
+          <tspan x="307" y="208.104">{{$join ", " ($lookup $declaration 'child.birthLocation.other.streetLevelDetails.district2') ($lookup $declaration 'child.birthLocation.other.streetLevelDetails.state') ($lookup $declaration 'child.birthLocation.other.country')}}</tspan>
+        {{else}}
+          <tspan x="307" y="208.104">{{$lookup $declaration 'child.birthLocation.other.administrativeHierarchy'}}</tspan>
+        {{/ifCond}}
         {{else}}
           {{#ifCond ($lookup $declaration 'child.birthLocation.privateHome') '!==' undefined }}
-            <tspan x="307" y="208.104">{{$or ($lookup $declaration 'child.birthLocation.privateHome.district') ($lookup $declaration 'child.birthLocation.privateHome.streetLevelDetails.district2')}}&#10;</tspan>
-            <tspan x="307" y="220.104">{{$join ", " ($or ($lookup $declaration 'child.birthLocation.privateHome.streetLevelDetails.state') ($lookup $declaration 'child.birthLocation.privateHome.province')) ($lookup $declaration 'child.birthLocation.privateHome.country')}}</tspan>
+            {{#ifCond ($lookup $declaration "child.birthLocation.privateHome.addressType") '===' "INTERNATIONAL" }}
+              <tspan x="307" y="208.104">{{$join ", " ($lookup $declaration 'child.birthLocation.privateHome.streetLevelDetails.district2') ($lookup $declaration 'child.birthLocation.privateHome.streetLevelDetails.state') ($lookup $declaration 'child.birthLocation.privateHome.country')}}</tspan>
+            {{else}}
+              <tspan x="307" y="208.104">{{$lookup $declaration 'child.birthLocation.privateHome.administrativeHierarchy'}}</tspan>
+            {{/ifCond}}
           {{/ifCond}}
         {{/ifCond}}
       {{/ifCond}}
@@ -257,7 +263,11 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
       font-size="8" letter-spacing="0px">
       {{#ifCond ($lookup $declaration 'mother.name.fullname') '!==' undefined }}
-      <tspan x="307" y="306.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+      {{#ifCond ($lookup $declaration "mother.address.addressType") '===' "INTERNATIONAL" }}
+        <tspan x="307" y="306.104">{{$join ", " ($lookup $declaration 'mother.address.streetLevelDetails.district2') ($lookup $declaration 'mother.address.streetLevelDetails.state') ($lookup $declaration 'mother.address.country')}}</tspan>
+      {{else}}
+        <tspan x="307" y="306.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+      {{/ifCond}}
       {{/ifCond}}
     </text>
   </g>
@@ -343,9 +353,17 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       font-size="8" letter-spacing="0px">
       {{#ifCond ($lookup $declaration 'father.name.fullname') '!==' undefined }}
         {{#ifCond (lookup $declaration 'father.addressSameAs') '===' 'YES'}}
-          <tspan x="307" y="432.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+          {{#ifCond ($lookup $declaration "mother.address.addressType") '===' "INTERNATIONAL" }}
+            <tspan x="307" y="432.104">{{$join ", " ($lookup $declaration 'mother.address.streetLevelDetails.district2') ($lookup $declaration 'mother.address.streetLevelDetails.state') ($lookup $declaration 'mother.address.country')}}</tspan>
+          {{else}}
+            <tspan x="307" y="432.104">{{$lookup $declaration 'mother.address.administrativeHierarchy'}}</tspan>
+          {{/ifCond}}
         {{else}}
-          <tspan x="307" y="432.104">{{$lookup $declaration 'father.address.administrativeHierarchy'}}</tspan>
+          {{#ifCond ($lookup $declaration "father.address.addressType") '===' "INTERNATIONAL" }}
+            <tspan x="307" y="432.104">{{$join ", " ($lookup $declaration 'father.address.streetLevelDetails.district2') ($lookup $declaration 'father.address.streetLevelDetails.state') ($lookup $declaration 'father.address.country')}}</tspan>
+          {{else}}
+            <tspan x="307" y="432.104">{{$lookup $declaration 'father.address.administrativeHierarchy'}}</tspan>
+          {{/ifCond}}
         {{/ifCond}}
       {{/ifCond}}
     </text>
@@ -551,6 +569,8 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     </clipPath>
   </defs>
   <image x="506.287" y="784" width="34.7131" height="35" xlink:href="{{qrCode}}" />
-  <image id="image0_946_2501" x="331.453" y="670" width="194.513" height="68"
+  {{#ifCond (lookup (lookup ($action 'PRINT_CERTIFICATE') 'annotation') 'collector.requesterId') '!==' 'PRINT_IN_ADVANCE'}}
+  <image data-testid="registrar-signature" id="image0_946_2501" x="331.453" y="670" width="194.513" height="68"
     xlink:href="{{$lookup ($action 'ASSIGN') 'createdBySignature'}}" />
+  {{/ifCond}}
 </svg>

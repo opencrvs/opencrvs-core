@@ -557,7 +557,8 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
 
-  if (!user) {
+  // Recovery is only offered for active accounts.
+  if (!user || user.status !== 'active') {
     // Don't reveal whether the account exists
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }

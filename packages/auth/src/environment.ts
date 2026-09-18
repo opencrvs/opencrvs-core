@@ -22,7 +22,6 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  SENTRY_DSN: str({ default: undefined }),
   TWO_FA_ENABLED: bool({
     devDefault: false,
     default: true,

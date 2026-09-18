@@ -38,18 +38,15 @@ describe('deleteLocalEvent', () => {
     queryClient.clear()
   })
 
-  it('clears event.get and view-event cache entries', async () => {
+  it('clears event.get cache entry', async () => {
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
       eventDocument
     )
-    queryClient.setQueryData([['view-event', id]], eventDocument)
 
     setEventData(eventDocument.id, eventDocument)
 
     await deleteLocalEvent(eventDocument)
-
-    expect(queryClient.getQueryData([['view-event', id]])).toBeUndefined()
 
     expect(
       queryClient.getQueryData(

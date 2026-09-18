@@ -18,7 +18,12 @@ import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { createImageFile } from '@client/tests/image-file'
+import {
+  TestPdf,
+  passiveFileRoute
+} from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
+import { handlers as defaultHandlers } from '../../../../.storybook/default-request-handlers'
 import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
@@ -33,7 +38,18 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
         <Story />
       </TRPCProvider>
     )
-  ]
+  ],
+  // Story-level `files` replaces (not merges with) the global default
+  // handler group of the same name, so it's re-included here alongside
+  // passiveFileRoute (which lets an uploaded file's own preview modal load
+  // its just-cached blob back, the same way the real service worker would).
+  parameters: {
+    msw: {
+      handlers: {
+        files: [...defaultHandlers.files, passiveFileRoute]
+      }
+    }
+  }
 }
 
 export default meta
@@ -166,15 +182,38 @@ export const FileInputWithOptionTest: Story = {
     await step(
       'Accepts file of valid size and type when option is selected',
       async () => {
-        const validFile = new File(['a'.repeat(512 * 512)], 'valid.jpg', {
-          type: MimeType.enum['image/jpeg']
-        })
+        // Must be a real, decodable image — fake bytes upload fine but can
+        // never render in an <img>, regardless of caching.
+        const validFile = await createImageFile('valid.jpg', 100, 100)
 
         await userEvent.upload(input, validFile)
 
         await canvas.findByRole('button', { name: 'Forest' })
       }
     )
+
+    await step('Opens the uploaded file without an error', async () => {
+      // Retries the click too: the link can briefly stay non-interactive
+      // right after upload.
+      await waitFor(async () => {
+        await userEvent.click(canvas.getByRole('button', { name: 'Forest' }))
+      })
+
+      // Both checks belong inside the same retrying waitFor: onError/onload
+      // fire asynchronously, so a one-off check right after the click can
+      // pass by observing the <img> before it has actually settled.
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByText('Failed to load document')
+        ).not.toBeInTheDocument()
+
+        const img = canvasElement.querySelector(
+          'img'
+        ) as HTMLImageElement | null
+        await expect(img).not.toBeNull()
+        await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
+      })
+    })
   }
 }
 
@@ -260,14 +299,38 @@ export const FileInputButton: Story = {
     )
 
     await step('Accepts file of valid size and type', async () => {
-      const filename = 'valid.jpg'
-      const validFile = new File(['a'.repeat(512 * 512)], filename, {
-        type: MimeType.enum['image/jpeg']
-      })
+      // Must be a real, decodable image — fake bytes upload fine but can
+      // never render in an <img>, regardless of caching.
+      const validFile = await createImageFile('valid.jpg', 100, 100)
 
       await userEvent.upload(input, validFile)
 
       await canvas.findByRole('button', { name: 'Uploaded photo' })
+    })
+
+    await step('Opens the uploaded file without an error', async () => {
+      // Retries the click too: the link can briefly stay non-interactive
+      // right after upload.
+      await waitFor(async () => {
+        await userEvent.click(
+          canvas.getByRole('button', { name: 'Uploaded photo' })
+        )
+      })
+
+      // Both checks belong inside the same retrying waitFor: onError/onload
+      // fire asynchronously, so a one-off check right after the click can
+      // pass by observing the <img> before it has actually settled.
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByText('Failed to load document')
+        ).not.toBeInTheDocument()
+
+        const img = canvasElement.querySelector(
+          'img'
+        ) as HTMLImageElement | null
+        await expect(img).not.toBeNull()
+        await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
+      })
     })
   }
 }
@@ -321,29 +384,8 @@ export const FileInputPdfWithPreview: Story = {
       'input[type="file"]'
     ) as HTMLInputElement
 
-    const pdfContent = `%PDF-1.0
-1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
-2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
-3 0 obj<</Type/Page/MediaBox[0 0 200 50]/Parent 2 0 R/Resources<</Font<</F1<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>/Contents 4 0 R>>endobj
-4 0 obj<</Length 44>>
-stream
-BT /F1 12 Tf 10 20 Td (pdf loaded) Tj ET
-endstream
-endobj
-xref
-0 5
-0000000000 65535 f
-0000000009 00000 n
-0000000058 00000 n
-0000000115 00000 n
-0000000266 00000 n
-trailer<</Size 5/Root 1 0 R>>
-startxref
-360
-%%EOF`
-
     await step('Uploads a valid PDF file', async () => {
-      const pdfFile = new File([pdfContent], 'document.pdf', {
+      const pdfFile = new File([TestPdf], 'document.pdf', {
         type: MimeType.enum['application/pdf']
       })
 
@@ -362,13 +404,10 @@ startxref
     const originalFetch = window.fetch
     window.fetch = async (url, ...args) => {
       if (String(url).includes('.pdf')) {
-        return new Response(
-          new Blob([pdfContent], { type: 'application/pdf' }),
-          {
-            status: 200,
-            headers: { 'Content-Type': 'application/pdf' }
-          }
-        )
+        return new Response(new Blob([TestPdf], { type: 'application/pdf' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/pdf' }
+        })
       }
       return originalFetch(url as RequestInfo, ...args)
     }
