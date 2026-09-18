@@ -179,7 +179,6 @@ function ReadonlyView() {
     return null
   }
 
-  const isCachedAsView = queryClient.getQueryData([['view-event', eventId]])
   const isCachedAsAssigned = queryClient.getQueryData(
     trpc.event.get.queryKey({ eventId, waitFor: false })
   )
@@ -189,7 +188,7 @@ function ReadonlyView() {
   // the user opens a record they have not previously downloaded.
   // Render a clear message instead — useOnlineStatus re-renders this when
   // the connection returns, so the content loads automatically.
-  if (!isOnline && !isCachedAsView && !isCachedAsAssigned) {
+  if (!isOnline && !isCachedAsAssigned) {
     return <OfflineRecordMessage />
   }
 

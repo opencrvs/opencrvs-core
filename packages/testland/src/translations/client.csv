@@ -634,9 +634,9 @@ event.summary.trackingId.value,Value for the tracking ID field,{event.trackingId
 events.history.awaitingConfirmationBanner,Banner shown in the action detail dialog when the action is still awaiting external validation,"This action has been initiated, but is still awaiting validation from an external system.","Cette action a été initiée, mais est toujours en attente de validation par un système externe."
 events.history.status,Events status history,"{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Declaration started} NOTIFY {Notified} EDIT {Edited} VALIDATE {Sent for approval} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} MARK_AS_NOT_DUPLICATE {Marked not a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}","{status, select, Rejected {{action, select, REGISTER {Enregistrement échoué} other {Rejeté}}} other {{action, select, CREATE {Déclaration commencée} NOTIFY {Envoyé incomplet} EDIT {Modifié} VALIDATE {Envoyé pour approbation} DRAFT {Brouillon} DECLARE {Envoyé pour révision} REGISTER {Enregistré} PRINT_CERTIFICATE {Certifié} REJECT {Rejeté} ARCHIVE {Archivé} UNARCHIVE {Désarchivé} DUPLICATE_DETECTED {Marqué comme doublon} MARK_AS_DUPLICATE {Marqué comme doublon} MARK_AS_NOT_DUPLICATE {Marqué comme non en doublon} CORRECTED {Enregistrement corrigé} REQUEST_CORRECTION {Correction demandée} APPROVE_CORRECTION {Correction approuvée} REJECT_CORRECTION {Correction refusée} READ {Consulté} ASSIGN {Attribué} UNASSIGN {Désattribué} other {Inconnu}}}}"
 events.history.status.accepted,Status badge shown on an action that has been confirmed,Accepted,Accepté
+events.history.status.awaitingConfirmation,Placeholder label in the audit dropdown for an action that has not been accepted or rejected yet,Awaiting confirmation,En attente de confirmation
 events.history.status.rejected,Status badge shown on an action that was rejected,Rejected,Rejeté
 events.history.status.requested,Label for the requested action shown in the expanded audit dropdown,Requested,Demandé
-events.history.status.awaitingConfirmation,Placeholder label in the audit dropdown for an action that has not been accepted or rejected yet,Awaiting confirmation,En attente de confirmation
 events.history.systemUpdatedFields.title,Heading for declaration fields an external system populated when it confirmed the action,Updated by the system,Mis à jour par le système
 events.history.toggleConfirmationDetails,Accessible label for the toggle that expands a row to show who accepted or rejected the action and when,Show validation details,Afficher les détails de validation
 events.history.when,Header for the column showing when an action happened,When,Quand
@@ -700,6 +700,7 @@ form.field.label.iDTypeOther,,Other,Autre
 form.field.label.iDTypeOtherLabel,,Other type of ID,Autre type de carte d'identité
 form.field.label.iDTypePassport,Option for form field: Type of ID,Passport,Passeport
 form.field.label.iDTypeRefugeeNumber,,Refugee Number,Numéro de réfugié
+form.field.label.imageLoadFailed,shown when a supporting document image fails to load,Failed to load document,Échec du chargement du document
 form.field.label.informant,Informant Label,Informant,Informateur
 form.field.label.informantRelation.bride,Label for option bride,Bride,Mariée
 form.field.label.informantRelation.brother,Label for option brother,Brother,Frère
@@ -798,6 +799,7 @@ integrations.clientDetails,Label for the client details menu item and dialog tit
 integrations.clientId,Label for client Id,Client ID,ID du client
 integrations.clientName,Heading for the client name field in the details dialog,Client name,Nom du client
 integrations.clientSecret,Label for client secret,Client secret,Secret du client
+integrations.clientSecretHiddenNote,Note shown in place of the client secret in the reveal keys dialog,"The client secret is only shown once, when created. To refresh it, select ""Refresh secret"" from the client's action menu.","Le secret client n'est affiché qu'une seule fois, lors de sa création. Pour le renouveler, sélectionnez « Actualiser le secret » dans le menu d'actions du client."
 integrations.copy,Label for the text Copy,Copy,copie
 integrations.createClient,Label for the button creating client,Create client,Créer un client
 integrations.createdOn,Label showing when an integration was created (no user info),Created {date},Créé le {date}
@@ -837,6 +839,10 @@ integrations.newIntegrationDescription,Description to help user fill name and ty
 integrations.pageIntroduction,Label for the text integration page intorduction,"For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on both API and webhook technologies.","Pour chaque nouveau client qui doit s'intégrer à OpenCRVS, vous pouvez créer des identifiants client uniques. Un certain nombre de cas d'utilisation de l'intégration sont actuellement pris en charge, sur la base des technologies API et webhook"
 integrations.pageTitle,Title for integrations page,Integrations,Intégrations
 integrations.recordSearchDescription,Label for  record search description,"A Record search client can perform an advanced search on OpenCRVS data. For more information, visit:","Un client de recherche d'enregistrements peut effectuer une recherche avancée sur les données OpenCRVS. Pour plus d'informations, visitez :"
+integrations.refreshSecret,Label for the refresh secret action menu item and confirmation button,Refresh secret,Actualiser le secret
+integrations.refreshSecretSuccessText,Message shown alongside the newly generated client secret after a refresh,Copy the new client secret now. For security it won't be shown again. The integration will stop working until this secret is configured in the integrating client.,"Copiez le nouveau secret client maintenant. Pour des raisons de sécurité, il ne sera plus affiché. L'intégration cessera de fonctionner jusqu'à ce que ce secret soit configuré dans le client intégré."
+integrations.refreshSecretText,Prompt shown before refreshing an integration client secret,This will generate a new client secret and immediately invalidate the current one. Are you sure you want to continue?,Cela générera un nouveau secret client et invalidera immédiatement l'actuel. Êtes-vous sûr de vouloir continuer ?
+integrations.refreshSecretWarning,Warning alert shown in the refresh client secret confirmation dialog,The integration will stop working until the new secret is configured in the integrating client.,L'intégration cessera de fonctionner jusqu'à ce que le nouveau secret soit configuré dans le client intégré.
 integrations.registrationDetailsnNoPII,Label for registration details no PII,Registration Details (No PII),Détails de l'enregistrement (pas de PII)
 integrations.revealKeys,Label for reveal keys option,Reveal Keys,Montrer clés de décodage
 integrations.scopes,Heading for the scopes list in the client details dialog,Scopes,Autorisations

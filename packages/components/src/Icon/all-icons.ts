@@ -60,6 +60,7 @@ export {
   Globe,
   Handshake,
   IdentificationCard,
+  Info,
   List,
   ListBullets,
   Lock,

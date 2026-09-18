@@ -48,7 +48,7 @@ async function ensureCacheExists(cacheName: string) {
 const FAKE_CACHE_NAME = 'workbox-runtime'
 ensureCacheExists(FAKE_CACHE_NAME)
 
-const tRPCMsw = createTRPCMsw<AppRouter>({
+export const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
       url: '/api/events'
