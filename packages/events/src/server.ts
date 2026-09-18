@@ -38,21 +38,25 @@ function stringifyRequest(req: IncomingMessage) {
  * code and response time. Health check probes are logged at debug level so
  * they stay out of production logs.
  */
-const httpLogger = pinoHttp({
-  logger,
-  genReqId: (req) => req.headers['x-correlation-id']?.toString() ?? randomUUID(),
-  // NOTE: pino-http@7 types customLogLevel as taking the request, but never
-  // passes it. Read it off the response instead.
-  customLogLevel: (_, res) => {
-    if (HEALTH_CHECK_PATHS.includes(pathnameOf(res.req))) {
-      return 'debug'
-    }
-    if (res.statusCode >= 500) {
-      return 'error'
-    }
-    return res.statusCode >= 400 ? 'warn' : 'info'
-  }
-})
+const httpLogger =
+  process.env.NODE_ENV === 'production'
+    ? pinoHttp({
+        logger,
+        genReqId: (req) =>
+          req.headers['x-correlation-id']?.toString() ?? randomUUID(),
+        // NOTE: pino-http@7 types customLogLevel as taking the request, but
+        // never passes it. Read it off the response instead.
+        customLogLevel: (_, res) => {
+          if (HEALTH_CHECK_PATHS.includes(pathnameOf(res.req))) {
+            return 'debug'
+          }
+          if (res.statusCode >= 500) {
+            return 'error'
+          }
+          return res.statusCode >= 400 ? 'warn' : 'info'
+        }
+      })
+    : null
 
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
@@ -133,7 +137,7 @@ export function server() {
   const initialisationTrpcServer = createHTTPHandler(initialisationTrpcConfig)
 
   return createServer((req, res) => {
-    httpLogger(req, res)
+    httpLogger?.(req, res)
 
     if (!req.url) {
       res.writeHead(500)
