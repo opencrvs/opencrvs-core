@@ -174,7 +174,9 @@ export const NotShownWhileDuplicateStillLoading: StoryObj = {
     const canvas = within(canvasElement)
 
     await step('The check is asked, and left unanswered', async () => {
-      await waitFor(() => expect(getDuplicatesCallCount).toBe(1))
+      await waitFor(async () => {
+        await expect(getDuplicatesCallCount).toBe(1)
+      })
     })
 
     await step(
@@ -248,7 +250,9 @@ export const StaysUnavailableWhileRechecking: StoryObj = {
     const canvas = within(canvasElement)
 
     await step('The refusal is established', async () => {
-      await waitFor(() => expect(getDuplicatesCallCount).toBe(1))
+      await waitFor(async () => {
+        await expect(getDuplicatesCallCount).toBe(1)
+      })
       releaseDuplicates()
 
       await expect(
@@ -267,7 +271,9 @@ export const StaysUnavailableWhileRechecking: StoryObj = {
         queryKey: potentialDuplicatesQueryKey(eventId)
       })
 
-      await waitFor(() => expect(getDuplicatesCallCount).toBe(2))
+      await waitFor(async () => {
+        await expect(getDuplicatesCallCount).toBe(2)
+      })
     })
 
     await step(
@@ -335,7 +341,9 @@ export const StaysVisibleWhenReturningToTheRecord: StoryObj = {
     const canvas = within(canvasElement)
 
     await step('The refusal is established', async () => {
-      await waitFor(() => expect(getDuplicatesCallCount).toBe(1))
+      await waitFor(async () => {
+        await expect(getDuplicatesCallCount).toBe(1)
+      })
       releaseDuplicates()
 
       await expect(
