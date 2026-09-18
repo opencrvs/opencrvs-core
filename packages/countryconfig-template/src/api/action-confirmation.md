@@ -66,21 +66,21 @@ This places the action in a `Requested` state until it is later accepted or reje
 
 #### Credentials for the asynchronous call
 
-The `accept` / `reject` calls are not made with the token core sent you. That token only proves the
-request came from core — it carries no scopes. Confirming asynchronously means calling core under
-**your own system client's credentials**, obtained on the Integrations page, and that client needs:
+Do not call `accept` / `reject` with the token core sent you. That token only proves the request came from core; it has no scopes.
 
-- `record.action.accept` (and `record.action.reject`, if it rejects) — a scope no user role is
-  granted. The scope of the action being confirmed (e.g. `record.register`) does **not** authorise
-  confirming it;
-- `record.read`, to resolve the pending action.
+Call core with **your own system client's credentials** instead. The client needs these scopes:
+
+- `record.action.accept` to accept an action
+- `record.action.reject` to reject one
+
+No user role has these scopes. Holding the scope for the action itself (e.g. `record.register`) is not enough to confirm it.
 
 #### Assignment
 
-A confirmation is refused while a human user still holds the assignment on the event
-(`CONFLICT: User is assigned to this event`). The requesting user is normally unassigned as soon as
-you return `HTTP 202`, so this does not usually arise — it surfaces when someone assigns themselves
-to the record while your confirmation is still pending. Retry once the record is free.
+Core refuses a confirmation while a user is still assigned to the event (`CONFLICT: User is assigned to this event`).
+The user who started the action is unassigned as soon as you return `HTTP 202`, so you rarely hit this.
+It only happens if someone assigns themselves to the record while your confirmation is still pending.
+Wait until nobody is assigned, then retry.
 
 #### Accepting an Action Asynchronously
 
