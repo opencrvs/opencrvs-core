@@ -142,7 +142,7 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
-  test('an integration holding an unbound confirmation scope can accept', async () => {
+  test('an integration holding the confirmation scope can accept', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 
     const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
@@ -184,7 +184,7 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
-  test('an unbound grant is still confined to its event types', async () => {
+  test('the confirmation scope is still confined to its event types', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 
     const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [

@@ -16,12 +16,8 @@ import { AUTH_URL, GATEWAY_URL } from '@countryconfig/constants'
 import { logger } from '@countryconfig/logger'
 
 /**
- * The adoption REGISTER trigger needs to seal a *different* record (the
- * original birth record) than the one it was called for. The token forwarded
- * to a trigger handler is a single-record token bound to the triggering
- * event's id (see @opencrvs/events token-exchange), so it can never be used
- * to act on another record. This module provisions a dedicated system
- * integration - scoped to exactly what sealing needs - to work around that.
+ * Sealing targets the original birth record, not the adoption record.
+ * The token core sends carries no scopes, so sealing needs its own integration.
  */
 
 const INTEGRATION_NAME = 'Adoption sealing service'

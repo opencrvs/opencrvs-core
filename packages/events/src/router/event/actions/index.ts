@@ -554,7 +554,7 @@ export function getDefaultActionProcedures(
         return addAsyncRejectAction(
           {
             ...input,
-            // `event_actions_check` requires a `requestId` on the correction actions and a reason on REJECT.
+            // `event_actions_check` wants a `requestId` on corrections & a reason on REJECT.
             requestId:
               'requestId' in originalAction
                 ? originalAction.requestId

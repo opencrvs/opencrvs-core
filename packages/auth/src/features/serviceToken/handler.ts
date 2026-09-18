@@ -23,7 +23,7 @@ export default async function serviceTokenHandler(
   const token = await createToken(
     SERVICE_USER_ID,
     [],
-    // Country config validates this token, and relays it to the gateway when it calls core back.
+    // Validated by country config, and relayed by it to the gateway.
     ['opencrvs:countryconfig-user', 'opencrvs:gateway-user'],
     'opencrvs:auth-service',
     undefined,
