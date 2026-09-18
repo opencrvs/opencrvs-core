@@ -21,7 +21,8 @@ import {
   createSystemTestClient,
   createTestClient,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -29,10 +30,13 @@ import { env } from '@events/environment'
 const ASSIGNED_ERROR = 'User is assigned to this event'
 const FORBIDDEN_ERROR = 'FORBIDDEN'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-  encodeScope({ type: 'record.unarchive' }),
-  encodeScope({ type: 'record.action.accept' }),
-  encodeScope({ type: 'record.action.reject' })
+  encodeScope({ type: 'record.unarchive' })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Unarchive action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
@@ -151,7 +155,7 @@ describe('Unarchive action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.unarchive.accept({
+        confirmationClient.event.actions.unarchive.accept({
           ...actionPayload,
           content: {
             reason: 'not good'
@@ -162,7 +166,7 @@ describe('Unarchive action', () => {
 
     test('Prevents system rejecting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.unarchive.reject(actionPayload)
+        confirmationClient.event.actions.unarchive.reject(actionPayload)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
   })

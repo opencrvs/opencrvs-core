@@ -42,7 +42,8 @@ import {
   createTestClient,
   seedEvent,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -518,10 +519,10 @@ test('System may reject REJECT_CORRECTION action', async () => {
       waitFor: false
     })
 
-  const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-    encodeScope({ type: 'record.correct' }),
-    encodeScope({ type: 'record.action.reject' })
-  ])
+  const systemClient = createSystemTestClient(
+    TEST_SYSTEM_ID,
+    CONFIRMATION_SCOPES
+  )
 
   const rejectRequestAction = rejectActionResponse.actions.find(
     (a) => a.type === ActionType.REJECT_CORRECTION
