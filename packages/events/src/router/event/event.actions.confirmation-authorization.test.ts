@@ -19,6 +19,7 @@ import {
 } from '@opencrvs/commons'
 import {
   createEvent,
+  createServiceTokenTestClient,
   createSystemTestClient,
   createTestClient,
   setupTestCase,
@@ -113,6 +114,30 @@ describe('confirming an action requires more than the scope that requested it', 
         transactionId: getUUID(),
         actionId,
         registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
+  test('the service token core sends into country config cannot accept/reject', async () => {
+    const { event, input, actionId } = await requestPendingRegistration()
+
+    const serviceTokenClient = await createServiceTokenTestClient()
+
+    await expect(
+      serviceTokenClient.event.actions.register.accept({
+        ...input,
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+
+    await expect(
+      serviceTokenClient.event.actions.register.reject({
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId
       })
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
