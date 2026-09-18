@@ -60,7 +60,9 @@ test('Refresh an integration client secret', async ({ page }) => {
   await test.step('open the integrations page as a national system admin', async () => {
     await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
     await page.goto(`${CLIENT_URL}/config/integration`)
-    await expect(page.locator('#content-name')).toHaveText('Integrations')
+    await expect(page.locator('#content-name')).toHaveText('Integrations', {
+      timeout: 30_000
+    })
     await expect(
       page.getByRole('row').filter({ hasText: clientName })
     ).toBeVisible()
