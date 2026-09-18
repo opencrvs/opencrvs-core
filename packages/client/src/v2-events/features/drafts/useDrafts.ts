@@ -12,7 +12,12 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  deepDropNulls,
+  Draft,
+  UUID
+} from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
@@ -259,9 +264,20 @@ export function useDrafts() {
   return {
     setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
     getLocalDraftOrDefault,
+    /**
+     * Only the declare view saves a draft to the server. The store it reads
+     * from is shared with the edit, print and correction views, whose drafts
+     * stay local, so the type has to be narrowed before submitting.
+     */
     submitLocalDraft: () => {
       if (!localDraft) {
         throw new Error('No draft to submit')
+      }
+
+      if (localDraft.action.type !== ActionType.DECLARE) {
+        throw new Error(
+          `Only ${ActionType.DECLARE} drafts can be saved to the server, this one is ${localDraft.action.type}`
+        )
       }
 
       createDraft.mutate({

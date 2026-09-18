@@ -30,7 +30,8 @@ import {
   TokenUserType,
   UUID,
   CreateUserInput,
-  UpdateUserInput
+  UpdateUserInput,
+  userAttachmentPath
 } from '@opencrvs/commons/client'
 import {
   AppBar,
@@ -294,7 +295,7 @@ const EditUserComponent = () => {
       title={title}
     >
       <PagesComponent
-        attachmentPath={`users/${userId}/`}
+        attachmentPath={userAttachmentPath(userId)}
         hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
@@ -528,6 +529,7 @@ const ReviewUserComponent = () => {
       )}
       <ReviewComponent.Body
         anchor={todayISO()}
+        attachmentPath={userAttachmentPath(userId)}
         form={formState as Record<string, FieldValue>}
         formConfig={formConfig}
         reviewFields={[]}
