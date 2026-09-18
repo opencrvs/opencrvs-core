@@ -16,6 +16,7 @@ import {
   AddressType,
   encodeScope,
   EventDocument,
+  getCurrentEventState,
   getOrThrow,
   getUUID,
   UUID
@@ -29,7 +30,10 @@ import {
   setupTestCase,
   TEST_SYSTEM_ID
 } from '@events/tests/utils'
-import { mswServer } from '@events/tests/msw'
+import {
+  mswServer,
+  tennisClubMembershipEventWithCustomAction
+} from '@events/tests/msw'
 import { env } from '@events/environment'
 
 type PendingAction = {
@@ -51,6 +55,11 @@ function mockActionApi(action: ActionType, status: number) {
       () => HttpResponse.json({}, { status })
     )
   )
+}
+
+function flagsOf(event: EventDocument) {
+  return getCurrentEventState(event, tennisClubMembershipEventWithCustomAction)
+    .flags
 }
 
 function requestedActionId(event: EventDocument, type: ActionType) {
@@ -511,6 +520,8 @@ describe.each(Object.entries(PENDING_ACTIONS))(
             action.type === type && action.status === ActionStatus.Accepted
         )
       ).toMatchObject({ originalActionId: pending.actionId })
+
+      expect(flagsOf(response)).not.toContain(`${type.toLowerCase()}:requested`)
     })
 
     test('rejecting the pending action keeps the fields it carried', async () => {
@@ -532,6 +543,8 @@ describe.each(Object.entries(PENDING_ACTIONS))(
         ...('requestId' in requested ? { requestId: requested.requestId } : {}),
         ...('content' in requested ? { content: requested.content } : {})
       })
+
+      expect(flagsOf(response)).toContain(`${type.toLowerCase()}:rejected`)
     })
 
     test('rejecting an accepted action is refused', async () => {

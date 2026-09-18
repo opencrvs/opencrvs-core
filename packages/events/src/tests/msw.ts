@@ -14,7 +14,7 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { ActionType, ConditionalType, field } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-const tennisClubMembershipEventWithCustomAction = {
+export const tennisClubMembershipEventWithCustomAction = {
   ...tennisClubMembershipEvent,
   actions: tennisClubMembershipEvent.actions.concat([
     {
