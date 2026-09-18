@@ -444,6 +444,7 @@ export function SystemList() {
               ? intl.formatMessage(integrationMessages.deactivateClient)
               : intl.formatMessage(integrationMessages.activateClient)
           }
+          subtitle={toggleActivation.integration.name}
           actions={[
             <Button
               type="tertiary"
@@ -475,6 +476,7 @@ export function SystemList() {
       {deleteConfirm.integration && (
         <Dialog
           title={intl.formatMessage(integrationMessages.delete)}
+          subtitle={deleteConfirm.integration.name}
           actions={[
             <Button
               type="tertiary"
@@ -504,7 +506,8 @@ export function SystemList() {
         <Dialog
           variant="large"
           width={512}
-          title={refreshSecretConfirm.integration.name}
+          title={intl.formatMessage(integrationMessages.refreshSecret)}
+          subtitle={refreshSecretConfirm.integration.name}
           actions={
             refreshSecretData
               ? []
@@ -542,7 +545,11 @@ export function SystemList() {
                   {intl.formatMessage(integrationMessages.clientSecret)}
                 </Text>
                 <Stack justifyContent="space-between" alignItems="center">
-                  <Text variant="reg16" element="span">
+                  <Text
+                    variant="reg16"
+                    element="span"
+                    id="refreshedClientSecret"
+                  >
                     {refreshSecretData.clientSecret}
                   </Text>
                   <CopyButton
@@ -577,7 +584,8 @@ export function SystemList() {
         width={512}
         isOpen={revealKeys.visible}
         onClose={closeRevealKeys}
-        title={revealKeys.integration?.name ?? ''}
+        title={intl.formatMessage(integrationMessages.revealKeys)}
+        subtitle={revealKeys.integration?.name ?? ''}
       >
         <Text variant="reg16" element="p" id="revealKeyId">
           {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
