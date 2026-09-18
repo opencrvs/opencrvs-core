@@ -13,8 +13,10 @@ import { HttpResponse, http } from 'msw'
 import { ActionType, ActionStatus, getUUID, UUID } from '@opencrvs/commons'
 import {
   createTestClient,
-  createCountryConfigClient,
-  setupTestCase
+  setupTestCase,
+  createSystemTestClient,
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -52,7 +54,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id)
+    const ccClient = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
 
     const response = await ccClient.event.actions.declare.reject({
       eventId: event.id,
@@ -74,7 +76,7 @@ describe('Async confirmation - keepAssignment flags on reject', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id)
+    const ccClient = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
 
     const response = await ccClient.event.actions.declare.reject({
       eventId: event.id,
@@ -103,7 +105,7 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id)
+    const ccClient = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
 
     const response = await ccClient.event.actions.declare.accept({
       ...data,
@@ -125,7 +127,7 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
     const requestResponse = await client.event.actions.declare.request(data)
 
     const actionId = getDeclareActionId(requestResponse.actions)
-    const ccClient = createCountryConfigClient(user, event.id)
+    const ccClient = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
 
     const response = await ccClient.event.actions.declare.accept({
       ...data,

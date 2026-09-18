@@ -21,9 +21,9 @@ import {
   createEvent,
   createSystemTestClient,
   createTestClient,
-  createCountryConfigClient,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -182,14 +182,17 @@ describe('confirming an action requires more than the scope that requested it', 
 
 describe('accept only confirms the pending action it names', () => {
   test('cannot be pointed at an action of another type', async () => {
-    const { user, event, input } = await requestPendingRegistration()
+    const { event, input } = await requestPendingRegistration()
 
     const createActionId = getOrThrow(
       event.actions.find((action) => action.type === ActionType.CREATE)?.id,
       'Could not find the create action'
     )
 
-    const countryConfigClient = createCountryConfigClient(user, event.id)
+    const countryConfigClient = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
 
     await expect(
       countryConfigClient.event.actions.register.accept({
@@ -218,7 +221,10 @@ describe('accept only confirms the pending action it names', () => {
       'Could not find the accepted declare action'
     )
 
-    const countryConfigClient = createCountryConfigClient(user, event.id)
+    const countryConfigClient = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
 
     await expect(
       countryConfigClient.event.actions.declare.accept({

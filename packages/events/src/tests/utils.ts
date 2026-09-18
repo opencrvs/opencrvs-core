@@ -278,31 +278,6 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
-function createActionConfirmationTestToken(
-  systemId: UUID,
-  eventId: UUID
-): TokenWithBearer {
-  const token = jwt.sign(
-    {
-      scope: [
-        encodeScope({ type: 'record.action.accept' }),
-        encodeScope({ type: 'record.action.reject' })
-      ],
-      sub: systemId,
-      userType: TokenUserType.enum.system,
-      eventId
-    },
-    readFileSync(join(__dirname, './cert.key')),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:events-user'
-    }
-  )
-
-  return `Bearer ${token}`
-}
-
 export function createSystemTestClient(
   systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -387,25 +362,14 @@ export function createInitialisationTestClient(
 }
 
 /**
- * Simulates the country configuration hitting the action `accept`/`reject`
- * endpoints with its own system client's confirmation credentials, scoped to
- * `eventId`. Confirmation is a system-client action, so the caller is a system
- * context — the passed `user` only supplies an id to attribute it to.
+ * The scopes an integration confirming an action holds, such as mosip-api
+ * calling back once MOSIP has answered. Confirmation is a system client's job:
+ * no user is involved, and the token is not tied to an event.
  */
-export function createCountryConfigClient(user: CreatedUser, eventId: UUID) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createActionConfirmationTestToken(user.id, eventId)
-
-  const caller = createCaller({
-    user: SystemContext.parse({
-      id: user.id,
-      primaryOfficeId: undefined,
-      type: TokenUserType.enum.system
-    }),
-    token
-  })
-  return caller
-}
+export const CONFIRMATION_SCOPES = [
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
+]
 
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.

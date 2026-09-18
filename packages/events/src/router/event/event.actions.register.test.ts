@@ -26,7 +26,6 @@ import {
   getOrThrow,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  UUID,
   EventStatus
 } from '@opencrvs/commons'
 import {
@@ -36,11 +35,11 @@ import {
 import {
   createEvent,
   createTestClient,
-  createCountryConfigClient,
   createSystemTestClient,
   setupTestCase,
   TEST_SYSTEM_ID,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_USER_DEFAULT_SCOPES,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -508,7 +507,10 @@ describe('Request and confirmation flow', () => {
 
         const allegedActionId = getUUID()
 
-        const countryConfigClient = createCountryConfigClient(user, event.id)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         await expect(
           countryConfigClient.event.actions.register.accept({
@@ -565,7 +567,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         await countryConfigClient.event.actions.register.reject({
           eventId,
@@ -629,7 +634,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         const response =
           await countryConfigClient.event.actions.register.accept({
@@ -701,7 +709,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         await countryConfigClient.event.actions.register.accept({
           ...data,
@@ -733,7 +744,7 @@ describe('Request and confirmation flow', () => {
       })
       test.todo('should be able to edit the event data while accept action')
 
-      test('allows accepting a registration request with the same exchanged event and action id', async () => {
+      test('allows accepting a requested registration', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
           encodeScope({ type: 'record.read' }),
@@ -780,7 +791,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         const response =
           await countryConfigClient.event.actions.register.accept({
@@ -805,68 +819,6 @@ describe('Request and confirmation flow', () => {
           originalActionId: originalActionId
         })
       })
-
-      test('does not allow accepting a registration request with different exchanged event and action id', async () => {
-        const { user, generator } = await setupTestCase()
-        const client = createTestClient(user, [
-          encodeScope({ type: 'record.read' }),
-          encodeScope({ type: 'record.create' }),
-          encodeScope({ type: 'record.declare' }),
-          encodeScope({ type: 'record.register' })
-        ])
-
-        const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE
-        ])
-
-        const { id: eventId } = originalEvent
-        mockRegisterActionApi(202)
-
-        const data = generator.event.actions.register(eventId)
-
-        const registerResponse =
-          await client.event.actions.register.request(data)
-
-        const originalActionId = getOrThrow(
-          registerResponse.actions.find(
-            (action) => action.type === ActionType.REGISTER
-          )?.id,
-          'Could not find register action for id'
-        )
-
-        const createAction = originalEvent.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(
-          originalEvent.id,
-          {
-            assignedTo: createAction[0].createdBy
-          }
-        )
-        await client.event.actions.assignment.assign(assignmentInput)
-
-        await client.event.actions.register.request(data)
-
-        await client.event.actions.assignment.unassign({
-          eventId,
-          transactionId: getUUID()
-        })
-
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID
-        )
-
-        await expect(
-          countryConfigClient.event.actions.register.accept({
-            ...data,
-            transactionId: getUUID(),
-            actionId: originalActionId,
-            registrationNumber: MOCK_REGISTRATION_NUMBER
-          })
-        ).rejects.toMatchObject({ code: 'FORBIDDEN' })
-      })
     })
 
     describe('Rejecting', () => {
@@ -887,7 +839,10 @@ describe('Request and confirmation flow', () => {
 
         const allegedActionId = getUUID()
 
-        const countryConfigClient = createCountryConfigClient(user, event.id)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         await expect(
           countryConfigClient.event.actions.register.reject({
@@ -937,7 +892,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         await countryConfigClient.event.actions.register.accept({
           ...data,
@@ -997,7 +955,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         await countryConfigClient.event.actions.register.reject({
           eventId,
@@ -1061,7 +1022,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         const response =
           await countryConfigClient.event.actions.register.reject({
@@ -1082,7 +1046,7 @@ describe('Request and confirmation flow', () => {
         })
       })
 
-      test('allows rejecting a registration request with the same exchanged event and action id', async () => {
+      test('allows rejecting a requested registration', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
           encodeScope({ type: 'record.read' }),
@@ -1129,7 +1093,10 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
 
-        const countryConfigClient = createCountryConfigClient(user, eventId)
+        const countryConfigClient = createSystemTestClient(
+          TEST_SYSTEM_ID,
+          CONFIRMATION_SCOPES
+        )
 
         const response =
           await countryConfigClient.event.actions.register.reject({
@@ -1148,67 +1115,6 @@ describe('Request and confirmation flow', () => {
           status: ActionStatus.Rejected,
           originalActionId
         })
-      })
-
-      test('does not allow rejecting a registration request with different exchanged event and action id', async () => {
-        const { user, generator } = await setupTestCase()
-        const client = createTestClient(user, [
-          encodeScope({ type: 'record.read' }),
-          encodeScope({ type: 'record.create' }),
-          encodeScope({ type: 'record.declare' }),
-          encodeScope({ type: 'record.register' })
-        ])
-
-        const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE
-        ])
-
-        const { id: eventId } = originalEvent
-        mockRegisterActionApi(202)
-
-        const data = generator.event.actions.register(eventId)
-
-        const registerResponse =
-          await client.event.actions.register.request(data)
-
-        const originalActionId = getOrThrow(
-          registerResponse.actions.find(
-            (action) => action.type === ActionType.REGISTER
-          )?.id,
-          'Could not find register action for id'
-        )
-
-        const createAction = originalEvent.actions.filter(
-          (action) => action.type === ActionType.CREATE
-        )
-
-        const assignmentInput = generator.event.actions.assign(
-          originalEvent.id,
-          {
-            assignedTo: createAction[0].createdBy
-          }
-        )
-        await client.event.actions.assignment.assign(assignmentInput)
-
-        await client.event.actions.register.request(data)
-
-        await client.event.actions.assignment.unassign({
-          eventId,
-          transactionId: getUUID()
-        })
-
-        const countryConfigClient = createCountryConfigClient(
-          user,
-          'cafecafe-cafe-4caf-8afe-cafecafecafe' as UUID
-        )
-
-        await expect(
-          countryConfigClient.event.actions.register.reject({
-            eventId,
-            transactionId: getUUID(),
-            actionId: originalActionId
-          })
-        ).rejects.toMatchObject({ code: 'FORBIDDEN' })
       })
     })
   })
