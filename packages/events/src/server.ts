@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { randomUUID } from 'crypto'
 import { createServer, IncomingMessage } from 'http'
+import { pinoHttp } from 'pino-http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import '@opencrvs/commons/monitoring'
@@ -20,19 +22,46 @@ import { handleHealthCheckResponse } from './service/health'
 import { internalRouter } from './router/internalRouter'
 import { initialisationRouter } from './router/initialisation'
 
-function stringifyRequest(req: IncomingMessage) {
+const HEALTH_CHECK_PATHS = ['/ping', '/health/ready']
+
+function pathnameOf(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
-  return `'${req.method} ${url.pathname}'`
+  return url.pathname
 }
+
+function stringifyRequest(req: IncomingMessage) {
+  return `'${req.method} ${pathnameOf(req)}'`
+}
+
+/**
+ * Logs every request once it has been responded to, with method, url, status
+ * code and response time. Health check probes are logged at debug level so
+ * they stay out of production logs.
+ */
+const httpLogger =
+  process.env.NODE_ENV === 'production'
+    ? pinoHttp({
+        logger,
+        genReqId: (req) =>
+          req.headers['x-correlation-id']?.toString() ?? randomUUID(),
+        // NOTE: pino-http@7 types customLogLevel as taking the request, but
+        // never passes it. Read it off the response instead.
+        customLogLevel: (_, res) => {
+          if (HEALTH_CHECK_PATHS.includes(pathnameOf(res.req))) {
+            return 'debug'
+          }
+          if (res.statusCode >= 500) {
+            return 'error'
+          }
+          return res.statusCode >= 400 ? 'warn' : 'info'
+        }
+      })
+    : null
 
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
   allowBatching: true,
   allowMethodOverride: true,
-  middleware: (req, _, next) => {
-    logger.info(`Request: ${stringifyRequest(req)}`)
-    return next()
-  },
   onError: ({ error, req }) => {
     logger.warn(
       `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`
@@ -48,10 +77,6 @@ const INITIALISATION_TRPC_ROUTER_PREFIX = '/initialisation/'
 const internalTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: internalRouter,
   basePath: INTERNAL_TRPC_ROUTER_PREFIX,
-  middleware: (req, _, next) => {
-    logger.info(`Internal request: ${stringifyRequest(req)}`)
-    return next()
-  },
   onError: ({ error, req }) => {
     logger.warn(
       `Error for internal request: ${stringifyRequest(req)}. Error: '${error.message}'`
@@ -63,10 +88,6 @@ const internalTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
 const initialisationTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: initialisationRouter,
   basePath: INITIALISATION_TRPC_ROUTER_PREFIX,
-  middleware: (req, _, next) => {
-    logger.info(`Initialisation request: ${stringifyRequest(req)}`)
-    return next()
-  },
   onError: ({ error, req }) => {
     logger.warn(
       `Error for initialisation request: ${stringifyRequest(req)}. Error: '${error.message}'`
@@ -116,6 +137,8 @@ export function server() {
   const initialisationTrpcServer = createHTTPHandler(initialisationTrpcConfig)
 
   return createServer((req, res) => {
+    httpLogger?.(req, res)
+
     if (!req.url) {
       res.writeHead(500)
       res.end('No URL provided')
