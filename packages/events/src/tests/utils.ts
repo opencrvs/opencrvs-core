@@ -10,6 +10,7 @@
  */
 /* eslint-disable max-lines */
 import { readFileSync } from 'fs'
+import { IncomingMessage } from 'http'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
@@ -33,6 +34,7 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
+  SERVICE_USER_ID,
   SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
@@ -44,6 +46,7 @@ import {
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
 import { t, tService } from '@events/router/trpc'
+import { createContext } from '@events/context'
 import { appRouter } from '@events/router/router'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
@@ -224,7 +227,6 @@ export const TEST_USER_DEFAULT_SCOPES = [
 export function createTestToken({
   userId,
   scopes,
-  eventId,
   userType,
   role
 }: {
@@ -232,10 +234,9 @@ export function createTestToken({
   scopes: string[]
   userType?: TokenUserType
   role?: string
-  eventId?: string
 }): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId, userType, role, eventId },
+    { scope: scopes, sub: userId, userType, role },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -275,44 +276,6 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
-function createActionConfirmationTestToken(
-  userId: string,
-  eventId: string,
-  actionId: string
-): TokenWithBearer {
-  const token = jwt.sign(
-    {
-      scope: [
-        ...TEST_USER_DEFAULT_SCOPES,
-        encodeScope({
-          type: 'record.custom-action',
-          options: {
-            event: [
-              'birth',
-              'death',
-              'tennis-club-membership',
-              'child-onboarding'
-            ],
-            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
-          }
-        })
-      ],
-      sub: userId,
-      userType: TokenUserType.enum.user,
-      eventId,
-      actionId
-    },
-    readFileSync(join(__dirname, './cert.key')),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:events-user'
-    }
-  )
-
-  return `Bearer ${token}`
-}
-
 export function createSystemTestClient(
   systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -334,6 +297,20 @@ export function createSystemTestClient(
   })
 
   return caller
+}
+
+export async function createServiceTokenTestClient() {
+  const token = createTestToken({
+    userId: SERVICE_USER_ID as UUID,
+    scopes: [],
+    userType: TokenUserType.enum.system
+  })
+
+  const ctx = await createContext({
+    req: { headers: { authorization: token } } as unknown as IncomingMessage
+  })
+
+  return createCallerFactory(appRouter)(ctx)
 }
 
 export function createTestClient(
@@ -383,27 +360,14 @@ export function createInitialisationTestClient(
 }
 
 /**
- * Simulates the confirmation caller (e.g. countryconfig / an integration)
- * hitting the action `accept`/`reject` endpoints. Confirming requires the
- * action's own scope (e.g. `record.register`), which this client carries.
+ * The scopes an integration confirming an action holds, such as mosip-api
+ * calling back once MOSIP has answered. Confirmation is a system client's job:
+ * no user is involved, and the token is not tied to an event.
  */
-export function createCountryConfigClient(
-  user: CreatedUser,
-  eventId: string,
-  actionId: string
-) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createActionConfirmationTestToken(user.id, eventId, actionId)
-
-  const caller = createCaller({
-    user: {
-      id: getUUID(),
-      type: TokenUserType.enum.system
-    },
-    token
-  })
-  return caller
-}
+export const CONFIRMATION_SCOPES = [
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
+]
 
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
@@ -584,6 +548,7 @@ export async function createEvent(
 
   return createdEvent
 }
+
 type SeedAction =
   | DeclarationActionType
   | typeof ActionType.UNASSIGN

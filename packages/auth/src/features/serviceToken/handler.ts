@@ -23,9 +23,8 @@ export default async function serviceTokenHandler(
   const token = await createToken(
     SERVICE_USER_ID,
     [],
-    // Only country config validates this token today (event-config load,
-    // all-user broadcasts, telemetry); no request goes to user-mgnt.
-    ['opencrvs:countryconfig-user'],
+    // Validated by country config, and relayed by it to the gateway.
+    ['opencrvs:countryconfig-user', 'opencrvs:gateway-user'],
     'opencrvs:auth-service',
     undefined,
     TokenUserType.enum.system

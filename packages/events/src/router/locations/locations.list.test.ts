@@ -18,6 +18,7 @@ import {
 } from '@opencrvs/commons'
 import {
   createInitialisationTestClient,
+  createServiceTokenTestClient,
   createTestClient,
   setupTestCase,
   systemInitialisationTestSetup
@@ -224,4 +225,14 @@ test('A future-dated inactivation does not exclude a location from the active li
   expect(activeLocations.find((l) => l.id === locationId)).toMatchObject({
     status: 'active'
   })
+})
+
+test("Core's service token can list locations", async () => {
+  const { user } = await setupTestCase()
+  const userClient = createTestClient(user, [])
+  const serviceTokenClient = await createServiceTokenTestClient()
+
+  await expect(serviceTokenClient.locations.list()).resolves.toEqual(
+    await userClient.locations.list()
+  )
 })

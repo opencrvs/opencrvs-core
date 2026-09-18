@@ -8,10 +8,16 @@ The following actions currently support action confirmation:
 
 - `ActionType.NOTIFY`
 - `ActionType.DECLARE`
+- `ActionType.EDIT`
 - `ActionType.REGISTER`
 - `ActionType.REJECT`
 - `ActionType.ARCHIVE`
+- `ActionType.UNARCHIVE`
 - `ActionType.PRINT_CERTIFICATE`
+- `ActionType.CUSTOM`
+- `ActionType.REQUEST_CORRECTION`
+- `ActionType.APPROVE_CORRECTION`
+- `ActionType.REJECT_CORRECTION`
 
 For implementation examples, see [src/api/registration/index.ts](./registration/index.ts).
 
@@ -20,17 +26,17 @@ For implementation examples, see [src/api/registration/index.ts](./registration/
 When a user initiates an action, an HTTP `POST` request is sent to the Country Configuration API at:
 
 ```
-/events/{event}/actions/{action}
+/trigger/events/{event}/actions/{action}
 ```
 
-By default, an interceptor is configured for all event actions, returning an `HTTP 200` response. This is defined in [src/index.ts#L575](../../src/index.ts#L575).
+By default, a catch-all route is configured for all event actions, returning an `HTTP 200` response. Look for the `/trigger/events/{event}/actions/{action}` route registration in [src/index.ts](../../src/index.ts).
 
 To add a custom action confirmation handler, you can define a route as follows:
 
 ```typescript
 server.route({
   method: 'POST',
-  path: `/events/my-event-name/actions/${ActionType.ARCHIVE}`,
+  path: `/trigger/events/my-event-name/actions/${ActionType.ARCHIVE}`,
   handler: // handler function,
   options: {
     tags: ['api', 'events'],
@@ -57,6 +63,24 @@ The action will be accepted or rejected instantly.
 For cases where confirmation is not available immediately (e.g., requiring human approval), the API should return `HTTP 202` for the initial confirmation request, e.g. `return h.response().code(202);`.
 
 This places the action in a `Requested` state until it is later accepted or rejected.
+
+#### Credentials for the asynchronous call
+
+Do not call `accept` / `reject` with the token core sent you. That token only proves the request came from core; it has no scopes.
+
+Call core with **your own system client's credentials** instead. The client needs these scopes:
+
+- `record.action.accept` to accept an action
+- `record.action.reject` to reject one
+
+No user role has these scopes. Holding the scope for the action itself (e.g. `record.register`) is not enough to confirm it.
+
+#### Assignment
+
+Core refuses a confirmation while a user is still assigned to the event (`CONFLICT: User is assigned to this event`).
+The user who started the action is unassigned as soon as you return `HTTP 202`, so you rarely hit this.
+It only happens if someone assigns themselves to the record while your confirmation is still pending.
+Wait until nobody is assigned, then retry.
 
 #### Accepting an Action Asynchronously
 
