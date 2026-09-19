@@ -62,8 +62,6 @@ const OPERATIONS_TO_HIDE = [
   'event.search',
   'event.actions.assign.request',
   'event.actions.unassign.request',
-  // Location & administrative-area changes should be hidden from the audit log, as per decision by Jon:
-  // https://github.com/opencrvs/opencrvs-core/issues/13292#issuecomment-5713761542
   'locations.create',
   'locations.update',
   'locations.withdrawVersion',
