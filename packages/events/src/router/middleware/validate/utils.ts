@@ -27,7 +27,6 @@ import {
   FieldConfig,
   runStructuralValidations,
   getActionAnnotationFields,
-  ActionInputWithType,
   ActionType,
   getActionFormFields,
   getActionConfig
@@ -218,7 +217,12 @@ export function validateActionPayloadStructure({
   input,
   eventConfig
 }: {
-  input: ActionInputWithType
+  input: {
+    type: ActionType
+    declaration?: ActionUpdate | undefined
+    annotation?: ActionUpdate | undefined
+    customActionType?: string | undefined
+  }
   eventConfig: EventConfig
 }): void {
   const actionConfig = getActionConfig({

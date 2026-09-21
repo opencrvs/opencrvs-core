@@ -312,32 +312,42 @@ export async function defaultRequestHandler(
       ? ActionStatus.Accepted
       : ActionStatus.Rejected
 
-  const schema =
-    responseStatus === ActionConfirmationResponse.Success
-      ? SyncActionConfirmationSchema.extend(
-          (actionConfirmationResponseSchema ?? z.object({})).shape
-        )
-      : z.object({})
+  let parsedBody: z.infer<typeof SyncActionConfirmationSchema> | undefined
 
-  const maybeParsed = schema.safeParse(responseBody ?? {})
+  if (responseStatus === ActionConfirmationResponse.Success) {
+    const maybeParsed = SyncActionConfirmationSchema.safeParse(
+      responseBody ?? {}
+    )
+    // Parse separately to keep type information.
+    if (!maybeParsed.success) {
+      logger.error(fromZodError(maybeParsed.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
 
-  if (!maybeParsed.success) {
-    logger.error(fromZodError(maybeParsed.error))
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message:
-        'Invalid payload received from country config action confirmation API'
+    const maybeCustom = (
+      actionConfirmationResponseSchema ?? z.object({})
+    ).safeParse(responseBody ?? {})
+
+    if (!maybeCustom.success) {
+      logger.error(fromZodError(maybeCustom.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
+
+    parsedBody = { ...maybeParsed.data, ...maybeCustom.data }
+
+    validateActionPayloadStructure({
+      eventConfig: configuration,
+      input: { ...input, ...parsedBody }
     })
   }
-
-  // @TODO: fix types
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const parsedBody = maybeParsed.data as any
-
-  validateActionPayloadStructure({
-    eventConfig: configuration,
-    input: parsedBody
-  })
 
   logger.debug(
     {
