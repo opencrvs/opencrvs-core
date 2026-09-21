@@ -345,7 +345,13 @@ export async function defaultRequestHandler(
 
     validateActionPayloadStructure({
       eventConfig: configuration,
-      input: { ...input, ...parsedBody }
+      input: {
+        type: input.type,
+        annotation: parsedBody.annotation,
+        declaration: parsedBody.declaration,
+        customActionType:
+          input.type === ActionType.CUSTOM ? input.customActionType : undefined
+      }
     })
   }
 
