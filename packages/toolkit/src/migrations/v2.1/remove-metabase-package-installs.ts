@@ -98,7 +98,7 @@ const FIXED_EXPANSION_MARKER = 'OPENCRVS_ENV_EOF'
  * Returns the source unchanged when it is already fixed, and `undefined` when
  * it does not match the upstream v2.0 wording — the caller warns and skips.
  */
-export function patchRunScript(source: string): string | undefined {
+function patchRunScript(source: string): string | undefined {
   if (source.includes(FIXED_SALT_MARKER) && !source.includes(APK_BLOCK)) {
     return source
   }
@@ -117,7 +117,7 @@ export function patchRunScript(source: string): string | undefined {
  * Returns the source unchanged when it is already fixed, and `undefined` when
  * it does not match the upstream v2.0 wording — the caller warns and skips.
  */
-export function patchUpdateDatabaseScript(source: string): string | undefined {
+function patchUpdateDatabaseScript(source: string): string | undefined {
   if (
     source.includes(FIXED_EXPANSION_MARKER) &&
     !source.includes(ENVSUBST_CALL)
