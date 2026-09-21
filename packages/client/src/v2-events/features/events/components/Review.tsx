@@ -41,7 +41,8 @@ import {
   flattenFormState,
   IndexMap,
   FormState,
-  PlainDate
+  PlainDate,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -449,9 +450,12 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
-  anchor
+  anchor,
+  attachmentPath
 }: {
   children?: React.ReactNode
+  /** Where files uploaded from the annotation fields on this page are stored. */
+  attachmentPath: AttachmentPath
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
@@ -538,6 +542,7 @@ function ReviewComponent({
                     name="annotation"
                   >
                     <FormFieldGenerator
+                      attachmentPath={attachmentPath}
                       fields={reviewFields}
                       formTouched={touched}
                       formValues={annotation}
@@ -671,8 +676,10 @@ function AcceptActionModal({
   eventType,
   fields = [],
   eventConfiguration,
-  declaration
+  declaration,
+  attachmentPath
 }: {
+  attachmentPath: AttachmentPath
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
@@ -746,6 +753,7 @@ function AcceptActionModal({
         {fields.length > 0 && (
           <FormFieldGenerator
             {...dialogForm}
+            attachmentPath={attachmentPath}
             eventConfig={eventConfiguration}
             fields={fields}
             id={`accept-action-modal-form-${action}`}
@@ -769,8 +777,10 @@ function RejectActionModal({
   close,
   supportingCopy,
   fields = [],
-  eventConfiguration
+  eventConfiguration,
+  attachmentPath
 }: {
+  attachmentPath: AttachmentPath
   close: (result: RejectActionModalResult | null) => void
   supportingCopy?: MessageDescriptor
   fields?: FieldConfig[]
@@ -843,6 +853,7 @@ function RejectActionModal({
         {fields.length > 0 && (
           <FormFieldGenerator
             {...dialogForm}
+            attachmentPath={attachmentPath}
             eventConfig={eventConfiguration}
             fields={fields}
             id="reject-action-modal-form"

@@ -61,7 +61,13 @@ const DEFAULT_LIST_SIZE = 10
 const OPERATIONS_TO_HIDE = [
   'event.search',
   'event.actions.assign.request',
-  'event.actions.unassign.request'
+  'event.actions.unassign.request',
+  'locations.create',
+  'locations.update',
+  'locations.withdrawVersion',
+  'administrativeAreas.create',
+  'administrativeAreas.update',
+  'administrativeAreas.withdrawVersion'
 ]
 
 const TableDiv = styled.div`

@@ -64,7 +64,12 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
   'event.actions.correction.reject.request':
     messages.rejectedCorrectedAuditAction,
   'event.actions.mark_as_duplicate.request': messages.markedAsDuplicate,
-  'event.actions.mark_as_not_duplicate.request': messages.markedAsNotDuplicate
+  'event.actions.mark_as_not_duplicate.request': messages.markedAsNotDuplicate,
+  'integrations.create': messages.createIntegrationAuditAction,
+  'integrations.refreshSecret': messages.refreshSecretAuditAction,
+  'integrations.deactivate': messages.deactivateIntegrationAuditAction,
+  'integrations.activate': messages.activateIntegrationAuditAction,
+  'integrations.delete': messages.deleteIntegrationAuditAction
 }
 
 export const getAddressNameV2 = (

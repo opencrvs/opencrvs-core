@@ -583,6 +583,7 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
+      attachmentPath={null}
       fields={fields}
       formTouched={nestedTouched}
       formValues={nestedValue}
