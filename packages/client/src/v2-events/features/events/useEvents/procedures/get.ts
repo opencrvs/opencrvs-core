@@ -76,10 +76,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 })
 
 async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
-  const eventDocument = await trpcClient.event.get.query({
-    eventId: id,
-    waitFor: false
-  })
+  const eventDocument = await trpcClient.event.get.query({ eventId: id })
 
   await Promise.all([
     cacheFiles(eventDocument),
@@ -96,7 +93,7 @@ function useGetOrDownloadEvent(id: UUID) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
   const cachedAssignedEvent = queryClient.getQueryData(
-    trpc.event.get.queryKey({ eventId: id, waitFor: false })
+    trpc.event.get.queryKey({ eventId: id })
   )
 
   const viewEventQueryKey = [['view-event', id]]
@@ -109,8 +106,7 @@ function useGetOrDownloadEvent(id: UUID) {
   }, [id])
 
   const { queryFn, ...assignedQueryOptions } = trpc.event.get.queryOptions({
-    eventId: id,
-    waitFor: false
+    eventId: id
   })
 
   // The tRPC-derived branch's error type doesn't structurally match a plain
@@ -121,7 +117,7 @@ function useGetOrDownloadEvent(id: UUID) {
       ? {
           // Assigned & cached: read from cache without network
           ...assignedQueryOptions,
-          queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
+          queryKey: trpc.event.get.queryKey({ eventId: id }),
           meta: { eventConfig },
           staleTime: Infinity,
           refetchOnMount: false,
@@ -153,14 +149,11 @@ export function useGetEvent() {
    */
   const useFindEventFromCache = (id: string) => {
     const eventConfig = useEventConfigurations()
-    const { queryFn, ...options } = trpc.event.get.queryOptions({
-      eventId: id,
-      waitFor: false
-    })
+    const { queryFn, ...options } = trpc.event.get.queryOptions({ eventId: id })
 
     return useQuery({
       ...options,
-      queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
+      queryKey: trpc.event.get.queryKey({ eventId: id }),
       meta: { eventConfig },
       /*
        * We never want to refetch this query automatically
@@ -181,11 +174,10 @@ export function useGetEvent() {
       const intl = useIntl()
       const eventConfig = useEventConfigurations()
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
-        eventId: id,
-        waitFor: false
+        eventId: id
       })
       const downloaded = queryClient.getQueryData(
-        trpc.event.get.queryKey({ eventId: id, waitFor: false })
+        trpc.event.get.queryKey({ eventId: id })
       )
 
       if (!downloaded) {
@@ -200,7 +192,7 @@ export function useGetEvent() {
 
       return useSuspenseQuery({
         ...queryOptions,
-        queryKey: trpc.event.get.queryKey({ eventId: id, waitFor: false }),
+        queryKey: trpc.event.get.queryKey({ eventId: id }),
         meta: { eventConfig },
         /*
          * We never want to refetch this query automatically
