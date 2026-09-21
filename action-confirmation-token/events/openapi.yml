@@ -1804,9 +1804,15 @@ paths:
             schema:
               type: object
               properties:
+                eventId:
+                  type: string
+                  format: uuid
+                  description: The record the attachment belongs to. The storage key is derived
+                    from it, so the file is deleted with the record.
                 path:
                   type: string
-                  description: Optional path in S3 where the file should be stored
+                  deprecated: true
+                  description: Deprecated. Send eventId instead and let the server derive the key.
                 transactionId:
                   type: string
                   description: Transaction ID
@@ -2835,9 +2841,10 @@ components:
                     type: string
                     description: Identifier of the summary field.
                   value:
-                    description: Field value template supporting variables from configuration and
-                      EventMetadata (e.g. "{informant.phoneNo}
-                      {informant.email}").
+                    description: Field value template supports variables from configuration (e.g.
+                      "{informant.phoneNo} {informant.email}") and EventMetadata
+                      (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date,
+                      ::dd MMMM yyyy}").
                     $ref: "#/components/schemas/TranslationConfigOutput"
                   label:
                     $ref: "#/components/schemas/TranslationConfigOutput"
