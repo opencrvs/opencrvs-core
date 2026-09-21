@@ -56,6 +56,7 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
         }),
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={[
               {
                 id: 'storybook.name',

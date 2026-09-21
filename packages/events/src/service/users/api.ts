@@ -12,6 +12,7 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { Kysely } from 'kysely'
+import { uniq } from 'lodash'
 import {
   CreateUserInput,
   CreateUserInputInternal,
@@ -22,10 +23,12 @@ import {
   UpdateUserInput,
   User,
   UserOrSystem,
+  eventAttachmentPath,
   isUUID,
   logger,
   triggerUserEventNotification
 } from '@opencrvs/commons'
+import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 import {
   getSystemByLegacyId,
@@ -51,6 +54,8 @@ import {
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import * as eventsRepo from '@events/storage/postgres/events/events'
+import { deleteFilesByPrefix } from '@events/service/files'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '@events/storage/postgres/events/schema/Database'
 import { getRoles } from '../config/config'
@@ -207,6 +212,40 @@ async function handleUsernameUpdate(
   })
 }
 
+/**
+ * Moving a user to another office or another role drops the drafts they were
+ * working on. A CREATED event has no submitted action, so once its draft is
+ * gone there is nothing left in it and it's also removed with the draft.
+ *
+ * @returns the ids of the events that were deleted, so the caller can sweep
+ * their attachments once the transaction has committed.
+ */
+async function deleteDraftsAndOrphanedEventsInTrx(
+  trx: Kysely<Schema>,
+  userId: UUID
+) {
+  const draftedEventIds = uniq(
+    await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+  )
+
+  if (draftedEventIds.length === 0) {
+    return []
+  }
+
+  const orphaned = (await eventsRepo.getEventsByIdsInTrx(trx, draftedEventIds))
+    .filter(
+      (event) =>
+        getStatusFromActions(event.actions) === EventStatus.enum.CREATED
+    )
+    .map(({ id }) => id)
+
+  for (const eventId of orphaned) {
+    await eventsRepo.deleteEventByIdInTrx(eventId, trx)
+  }
+
+  return orphaned
+}
+
 export async function updateUser(
   input: UpdateUserInput,
   token: string
@@ -220,6 +259,8 @@ export async function updateUser(
     primaryOfficeId: incomingOfficeId,
     ...otherFields
   } = input
+
+  let orphanedEventIds: UUID[] = []
 
   const dbUser = await db.transaction().execute(async (trx) => {
     const existingUser = await getUserByIdInTrx(trx, userId)
@@ -245,7 +286,7 @@ export async function updateUser(
       otherFields.role && otherFields.role !== existingUser.role
 
     if (officeChanged || roleChanged) {
-      await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+      orphanedEventIds = await deleteDraftsAndOrphanedEventsInTrx(trx, userId)
     }
 
     if (incomingName) {
@@ -260,6 +301,16 @@ export async function updateUser(
 
     return getUserByIdInTrx(trx, userId)
   })
+
+  /*
+   * Swept after the commit: the objects live outside Postgres, so a rollback
+   * could not put them back.
+   */
+  await Promise.all(
+    orphanedEventIds.map(async (eventId) =>
+      deleteFilesByPrefix(eventAttachmentPath(eventId), token)
+    )
+  )
 
   if (!dbUser) {
     throw new TRPCError({

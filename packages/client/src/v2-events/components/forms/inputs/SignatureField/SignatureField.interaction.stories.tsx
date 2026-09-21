@@ -25,14 +25,15 @@ import {
   generateEventDocument,
   generateTranslationConfig,
   MimeType,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
   type FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { TestImage } from '@client/v2-events/features/events/fixtures'
+import { storybookEventId, TestImage } from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import { SignatureField } from './SignatureField'
@@ -127,7 +128,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-abcd-213/`}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.signature',
@@ -253,7 +254,7 @@ export const UploadButtonsArmLockBypass: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
-            attachmentPath={`events/123-abcd-213/`}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.signature',
@@ -397,7 +398,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
-              attachmentPath={`events/123-abcd-213/`}
+              attachmentPath={eventAttachmentPath(storybookEventId)}
               fields={[
                 {
                   id: 'storybook.signature',
@@ -535,7 +536,7 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
         element: (
           <StyledFormFieldGenerator
             ref={noDuplicateErrorFormRef}
-            attachmentPath={`events/123-abcd-213/`}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.signature',

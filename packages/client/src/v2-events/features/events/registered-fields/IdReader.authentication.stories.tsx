@@ -194,6 +194,7 @@ function AuthenticationStateStory({
   return (
     <Stack direction="column" gap={4}>
       <StyledFormFieldGenerator
+        attachmentPath={null}
         fields={fields}
         formTouched={initialTouched}
         formValues={initialValues}
