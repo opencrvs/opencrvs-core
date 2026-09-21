@@ -63,6 +63,11 @@ function flagsOf(event: EventDocument) {
     .flags
 }
 
+function assignedToOf(event: EventDocument) {
+  return getCurrentEventState(event, tennisClubMembershipEventWithCustomAction)
+    .assignedTo
+}
+
 function requestedActionId(event: EventDocument, type: ActionType) {
   return getOrThrow(
     event.actions.find(
@@ -661,7 +666,13 @@ describe.each(Object.entries(PENDING_ACTIONS))(
   }
 )
 
-describe('keepAssignment on an async confirmation', () => {
+/**
+ * Assignment is out of the matrix above because it's not action-specific.
+ * `requireAssignment` guards every accept and reject, the
+ * async request releases the record in `defaultRequestHandler`, and `addAction`
+ * skips the unassign for system clients. DECLARE runs all of this.
+ */
+describe('assignment on an async confirmation', () => {
   async function requestPendingDeclareFor() {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
@@ -675,13 +686,69 @@ describe('keepAssignment on an async confirmation', () => {
     const requested = await client.event.actions.declare.request(payload)
 
     return {
-      eventId: event.id,
+      client,
+      generator,
+      event,
+      requested,
       payload,
+      eventId: event.id,
       actionId: requestedActionId(requested, ActionType.DECLARE)
     }
   }
 
-  test('reject drops the assignment by default', async () => {
+  function unassignCountOf(event: EventDocument) {
+    return event.actions.filter((action) => action.type === ActionType.UNASSIGN)
+      .length
+  }
+
+  test('the request releases the record once the confirmation goes async', async () => {
+    const { requested } = await requestPendingDeclareFor()
+
+    expect(assignedToOf(requested)).toBeUndefined()
+  })
+
+  test('a confirmation is refused while a user holds the record', async () => {
+    const { client, generator, event, eventId, payload, actionId } =
+      await requestPendingDeclareFor()
+
+    // Someone picks the record up again while the confirmation is pending.
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(eventId, {
+        waitFor: false,
+        assignedTo: getOrThrow(
+          event.actions.find((action) => action.type === ActionType.CREATE)
+            ?.createdBy,
+          'Could not find the create action'
+        )
+      })
+    )
+
+    await expect(
+      confirmer.event.actions.declare.accept({
+        ...payload,
+        eventId,
+        actionId,
+        transactionId: getUUID()
+      })
+    ).rejects.toMatchObject({
+      code: 'CONFLICT',
+      message: 'User is assigned to this event'
+    })
+
+    await expect(
+      confirmer.event.actions.declare.reject({
+        eventId,
+        actionId,
+        transactionId: getUUID(),
+        waitFor: false
+      })
+    ).rejects.toMatchObject({
+      code: 'CONFLICT',
+      message: 'User is assigned to this event'
+    })
+  })
+
+  test('rejecting records an unassign of its own and leaves nobody assigned', async () => {
     const { eventId, actionId } = await requestPendingDeclareFor()
 
     const response = await confirmer.event.actions.declare.reject({
@@ -691,10 +758,11 @@ describe('keepAssignment on an async confirmation', () => {
       waitFor: false
     })
 
-    expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
+    expect(unassignCountOf(response)).toBe(2)
+    expect(assignedToOf(response)).toBeUndefined()
   })
 
-  test('reject keeps the assignment when asked to', async () => {
+  test("keepAssignment skips that unassign, the record is nobody's either way", async () => {
     const { eventId, actionId } = await requestPendingDeclareFor()
 
     const response = await confirmer.event.actions.declare.reject({
@@ -705,11 +773,13 @@ describe('keepAssignment on an async confirmation', () => {
       waitFor: false
     })
 
-    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
+    expect(unassignCountOf(response)).toBe(1)
+    expect(assignedToOf(response)).toBeUndefined()
   })
 
-  test('accept never drops the assignment, a system client does not hold one', async () => {
-    const { eventId, payload, actionId } = await requestPendingDeclareFor()
+  test('accepting never unassigns, a system client holds no assignment', async () => {
+    const { requested, eventId, payload, actionId } =
+      await requestPendingDeclareFor()
 
     const response = await confirmer.event.actions.declare.accept({
       ...payload,
@@ -718,21 +788,7 @@ describe('keepAssignment on an async confirmation', () => {
       transactionId: getUUID()
     })
 
-    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
-  })
-
-  test('accept keeps the assignment when asked to', async () => {
-    const { eventId, payload, actionId } = await requestPendingDeclareFor()
-
-    const response = await confirmer.event.actions.declare.accept({
-      ...payload,
-      eventId,
-      actionId,
-      transactionId: getUUID(),
-      keepAssignment: true,
-      waitFor: false
-    })
-
-    expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
+    expect(unassignCountOf(response)).toBe(unassignCountOf(requested))
+    expect(assignedToOf(response)).toBeUndefined()
   })
 })
