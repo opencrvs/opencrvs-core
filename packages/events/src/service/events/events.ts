@@ -410,8 +410,15 @@ export async function addAction(
   return updatedEvent
 }
 
-function isEventIndexable(event: EventDocument) {
-  return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+/**
+ * @returns false if the event is still a draft, or if the action is a READ,
+ * since READ never changes the indexed EventIndex.
+ */
+function isEventIndexable(event: EventDocument, actionType: ActionType) {
+  return (
+    actionType !== ActionType.READ &&
+    getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+  )
 }
 
 /**
@@ -480,8 +487,7 @@ export async function processAction(
       `Indexing action without waiting for results. Action type: ${input.type}`
     )
   }
-  // Only send the event to Elasticsearch if it is not a draft
-  if (isEventIndexable(updatedEvent)) {
+  if (isEventIndexable(updatedEvent, input.type)) {
     await indexEvent(updatedEvent, configuration, input.waitFor)
   }
 
