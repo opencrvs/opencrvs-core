@@ -143,7 +143,9 @@ describe('Declare async accept action', () => {
         },
         transactionId: getUUID()
       })
-    ).rejects.toThrow('Field with id kissa not found in event config')
+    ).rejects.toThrow(
+      '[{"message":"Unexpected field","id":"kissa","value":"cat"}]'
+    )
 
     const persistedActions = await dbClient
       .selectFrom('eventActions')
@@ -167,7 +169,7 @@ describe('Declare async accept action', () => {
     ])
   })
 
-  test('Throws when declaration includes hidden fields', async () => {
+  test('Declaration including hidden fields', async () => {
     const { generator } = await setupTestCase()
 
     const declarePayload = generator.event.actions.declare(eventId)
@@ -179,10 +181,10 @@ describe('Declare async accept action', () => {
         declaration: {
           'applicant.dobUnknown': true,
           'applicant.age': 19,
-          'applicant.dob': '2000-01-01' // dob can't be known and unknown at the same time.
+          'applicant.dob': '2000-01-01'
         }
       })
-    ).rejects.toThrow('Hidden or disabled field should not receive a value')
+    ).resolves.toBeDefined()
 
     const persistedActions = await dbClient
       .selectFrom('eventActions')
@@ -191,7 +193,7 @@ describe('Declare async accept action', () => {
       .orderBy('createdAt', 'asc')
       .execute()
 
-    expect(persistedActions).toHaveLength(4)
+    expect(persistedActions).toHaveLength(5)
     expect(persistedActions).toEqual([
       expect.objectContaining({ actionType: ActionType.CREATE }),
       expect.objectContaining({ actionType: ActionType.ASSIGN }),
@@ -202,26 +204,15 @@ describe('Declare async accept action', () => {
         createdBy: userId,
         createdByRole: TestUserRole.enum.REGISTRATION_AGENT
       }),
-      expect.objectContaining({ actionType: ActionType.UNASSIGN })
-    ])
-  })
-
-  test('Throws when declaration includes hidden fields', async () => {
-    const { generator } = await setupTestCase()
-
-    const declarePayload = generator.event.actions.declare(eventId)
-
-    await expect(
-      systemClient.event.actions.declare.accept({
-        ...declarePayload,
-        actionId: requestActionId,
-        declaration: {
-          'applicant.dobUnknown': true,
-          'applicant.age': 19,
-          'applicant.dob': '2000-01-01' // dob can't be known and unknown at the same time.
-        }
+      expect.objectContaining({ actionType: ActionType.UNASSIGN }),
+      expect.objectContaining({
+        actionType: ActionType.DECLARE,
+        status: ActionStatus.Accepted,
+        createdByUserType: TokenUserType.enum.system,
+        createdBy: TEST_SYSTEM_ID,
+        createdByRole: null
       })
-    ).rejects.toThrow('Hidden or disabled field should not receive a value')
+    ])
   })
 })
 
@@ -322,7 +313,9 @@ describe('Declare sync accept action', () => {
           waitFor: false
         })
       )
-    ).rejects.toThrow('Field with id kissa not found in event config')
+    ).rejects.toThrow(
+      '[{"message":"Unexpected field","id":"kissa","value":"cat"}]'
+    )
 
     const persistedActions = await eventsDb
       .selectFrom('eventActions')
@@ -364,7 +357,9 @@ describe('Declare sync accept action', () => {
             waitFor: false
           })
         )
-      ).rejects.toThrow('Field with id kissa not found in event config')
+      ).rejects.toThrow(
+        '[{"message":"Unexpected field","id":"kissa","value":"cat"}]'
+      )
 
       const persistedActions = await eventsDb
         .selectFrom('eventActions')

@@ -393,7 +393,8 @@ function validateCorrectableFields({
   return errors
 }
 
-export function validateAction({
+/** Applies action specific rules for the input and throws on error. */
+function validateAction({
   input,
   eventConfig,
   context

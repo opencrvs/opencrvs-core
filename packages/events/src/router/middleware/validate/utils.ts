@@ -242,7 +242,7 @@ export function validateActionPayloadStructure({
   throwWhenNotEmpty([
     ...getStructuralFieldErrors({
       fields: getDeclarationFields(eventConfig),
-      values: input.declaration,
+      values: input.declaration ?? {},
       context: {},
       fieldOverrides: {
         conditonals: [],
