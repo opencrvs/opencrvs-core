@@ -410,10 +410,7 @@ export async function addAction(
   return updatedEvent
 }
 
-/**
- * @returns false if the event is still a draft, or if the action is a READ,
- * since READ never changes the indexed EventIndex.
- */
+/** @returns false for drafts and READ actions, which never change the EventIndex. */
 function isEventIndexable(event: EventDocument, actionType: ActionType) {
   return (
     actionType !== ActionType.READ &&
