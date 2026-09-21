@@ -393,33 +393,13 @@ function validateCorrectableFields({
   return errors
 }
 
-/** Allows picking across the union type.
- * @eexample DistributivePick<ActionInputWithType, 'type' | 'annotation' | 'customActionType' | 'requestId'> is valid even when not every type has customActionType property
->
-
- */
-type DistributivePick<T, K extends PropertyKey> = T extends unknown
-  ? Pick<T, Extract<K, keyof T>>
-  : never
-
-/** Subset of an action input that the validator needs. Declaration is passed separately. */
-export type ValidatableActionInput = DistributivePick<
-  ActionInputWithType,
-  'type' | 'annotation' | 'customActionType' | 'requestId'
->
-
 export function validateAction({
   input,
   eventConfig,
-  declarationUpdate,
   context
 }: {
-  /**
-   * NOTE: Provide declaration through declarationUpdate parameter.
-   */
-  input: ValidatableActionInput
+  input: ActionInputWithType
   eventConfig: EventConfig
-  declarationUpdate: ActionUpdate
   context: StrictValidatorContext
 }): void {
   if (input.type === ActionType.NOTIFY || input.type === ActionType.EDIT) {
@@ -427,7 +407,7 @@ export function validateAction({
       validateNotifyAction({
         eventConfig,
         annotation: input.annotation,
-        declaration: declarationUpdate,
+        declaration: input.declaration,
         context
       })
     )
@@ -437,7 +417,10 @@ export function validateAction({
 
   if (input.type === ActionType.REQUEST_CORRECTION) {
     throwWhenNotEmpty(
-      validateCorrectableFields({ eventConfig, declarationUpdate })
+      validateCorrectableFields({
+        eventConfig,
+        declarationUpdate: input.declaration
+      })
     )
   }
 
@@ -474,7 +457,7 @@ export function validateAction({
     throwWhenNotEmpty(
       validateDeclarationUpdateAction({
         eventConfig,
-        declarationUpdate,
+        declarationUpdate: input.declaration,
         annotation: input.annotation,
         actionType: declarationUpdateAction.data,
         context
@@ -525,7 +508,6 @@ export const validateRequestAction: MiddlewareFunction<
   validateAction({
     input,
     eventConfig,
-    declarationUpdate: input.declaration,
     context
   })
 

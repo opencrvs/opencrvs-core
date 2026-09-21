@@ -124,6 +124,10 @@ export async function getValidatorContext({
   return { leafAdminStructureLocationIds, user, event }
 }
 
+/**
+ *
+ * @returns ValidatorContext with event enforced and types cleaned up.
+ */
 export async function getStrictValidatorContext({
   token,
   user,
