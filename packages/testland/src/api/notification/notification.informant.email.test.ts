@@ -101,7 +101,7 @@ describe('Informant notification - Email', () => {
       payload,
       auth: {
         strategy: 'jwt',
-        credentials: {},
+        credentials: { sub: SERVICE_USER_ID },
         artifacts: { token: 'mock-token' }
       }
     })
