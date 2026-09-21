@@ -9,9 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { sql } from 'kysely'
+import { generateOpenApiDocument } from 'trpc-to-openapi'
+import * as z from 'zod/v4'
 import {
   createPrng,
   generateUuid,
+  Location,
   LocationVersion,
   SetLocationPayload,
   UUID
@@ -23,6 +26,7 @@ import {
   systemInitialisationTestSetup
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { appRouter } from '@events/router/router'
 
 async function appendVersion(locationId: UUID, version: LocationVersion) {
   await getClient()
@@ -224,4 +228,26 @@ test('A future-dated inactivation does not exclude a location from the active li
   expect(activeLocations.find((l) => l.id === locationId)).toMatchObject({
     status: 'active'
   })
+})
+
+test('Documents the response as an array of locations, without validating it', () => {
+  const document = generateOpenApiDocument(appRouter, {
+    title: 'OpenCRVS API',
+    version: '2.0.0',
+    baseUrl: 'http://localhost:3000/api/events'
+  })
+
+  const response = document.paths?.['/locations']?.get?.responses?.['200']
+  const schema =
+    response && 'content' in response
+      ? response.content?.['application/json']?.schema
+      : undefined
+
+  // The generator drops `$schema` when it inlines the response schema.
+  const expected: Record<string, unknown> = z.toJSONSchema(z.array(Location), {
+    io: 'output'
+  })
+  delete expected.$schema
+
+  expect(schema).toEqual(expected)
 })
