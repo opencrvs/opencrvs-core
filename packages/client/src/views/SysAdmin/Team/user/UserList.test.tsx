@@ -34,10 +34,12 @@ import { SearchUsersQuery, Status } from '@client/utils/gateway'
 import {
   ApolloClient,
   ApolloLink,
+  FetchResult,
   InMemoryCache,
   NetworkStatus,
   Observable
 } from '@apollo/client'
+import { GraphQLError } from 'graphql'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
 import { Select } from '@opencrvs/components/lib/Select'
@@ -1315,5 +1317,184 @@ describe('User list tests', () => {
         await waitForElement(component, '#reset_password_error')
       })
     })
+  })
+
+  describe('when searchUsers query fails', () => {
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a'
+    const createGraphQLError = (message: string, code: string) =>
+      new GraphQLError(
+        message,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        { code }
+      )
+    const rateLimitResponse: FetchResult = {
+      errors: [
+        createGraphQLError(
+          'Too many requests within a minute. Please throttle your requests.',
+          'RATE_LIMIT_EXCEEDED'
+        )
+      ],
+      data: { searchUsers: null }
+    }
+    const originalLocation = window.location
+    const reload = vi.fn()
+
+    beforeEach(() => {
+      // Only setTimeout is faked so the countdown can be advanced while
+      // flushPromises (setImmediate) and waitFor (setInterval) keep working
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+      reload.mockClear()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { ...originalLocation, reload }
+      })
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: originalLocation
+      })
+    })
+
+    const renderUserList = async (responses: Array<FetchResult | Error>) => {
+      let requestCount = 0
+      const apolloClient = new ApolloClient({
+        cache: new InMemoryCache({
+          addTypename: false
+        }),
+        link: new ApolloLink(() => {
+          return new Observable((observer) => {
+            const response =
+              responses[Math.min(requestCount, responses.length - 1)]
+            requestCount++
+            if (response instanceof Error) {
+              observer.error(response)
+              return
+            }
+            observer.next(response)
+            observer.complete()
+          })
+        })
+      })
+      const { component } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
+              locationId: selectedOfficeId
+            })
+        ],
+        apolloClient
+      })
+
+      await waitForElement(component, '#user_loading_error')
+      // let the error panel's effects run so the countdown timer is scheduled
+      await flushPromises()
+      component.update()
+
+      return { component, getRequestCount: () => requestCount }
+    }
+
+    const getErrorPanel = (component: ReactWrapper) =>
+      component.update().find('#user_loading_error').hostNodes()
+    const getRetryButton = (component: ReactWrapper) =>
+      getErrorPanel(component).find('button')
+    const advanceSeconds = (seconds: number) => {
+      for (let i = 0; i < seconds; i++) {
+        act(() => {
+          vi.advanceTimersByTime(1000)
+        })
+      }
+    }
+
+    it('shows the rate limit message with a 60 second retry countdown', async () => {
+      const { component } = await renderUserList([rateLimitResponse])
+
+      expect(getErrorPanel(component).text()).toContain(
+        'Too many requests. Please wait before retrying.'
+      )
+      expect(getErrorPanel(component).text()).not.toContain(
+        'An error occurred while loading system users'
+      )
+      expect(getRetryButton(component).text()).toBe('Retry in 60s')
+      expect(getRetryButton(component).prop('disabled')).toBe(true)
+    })
+
+    it('counts down every second and switches to Refresh after 60 seconds', async () => {
+      const { component, getRequestCount } = await renderUserList([
+        rateLimitResponse
+      ])
+
+      advanceSeconds(1)
+      expect(getRetryButton(component).text()).toBe('Retry in 59s')
+
+      getRetryButton(component).simulate('click')
+      await flushPromises()
+      expect(getRequestCount()).toBe(1)
+
+      advanceSeconds(58)
+      expect(getRetryButton(component).text()).toBe('Retry in 1s')
+      expect(getRetryButton(component).prop('disabled')).toBe(true)
+
+      advanceSeconds(1)
+      expect(getRetryButton(component).text()).toBe('Refresh')
+      expect(getRetryButton(component).prop('disabled')).toBe(false)
+    })
+
+    it('re-runs the searchUsers query when Refresh is clicked instead of reloading the page', async () => {
+      const { component, getRequestCount } = await renderUserList([
+        rateLimitResponse,
+        { data: { searchUsers: { totalItems: 0, results: [] } } }
+      ])
+      expect(getRequestCount()).toBe(1)
+
+      advanceSeconds(60)
+      getRetryButton(component).simulate('click')
+
+      await waitFor(() => getRequestCount() === 2)
+      await waitForElement(component, '#no-record')
+      expect(component.find('#user_loading_error').hostNodes()).toHaveLength(0)
+      expect(reload).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      [
+        'a non rate limit GraphQL error',
+        {
+          errors: [
+            createGraphQLError('Internal server error', 'INTERNAL_SERVER_ERROR')
+          ],
+          data: { searchUsers: null }
+        }
+      ],
+      ['a network error', new Error('Network error')]
+    ])(
+      'keeps the generic error and page reload for %s',
+      async (_, response) => {
+        const { component, getRequestCount } = await renderUserList([response])
+
+        expect(getErrorPanel(component).text()).toContain(
+          'An error occurred while loading system users'
+        )
+        expect(getErrorPanel(component).text()).not.toContain(
+          'Too many requests'
+        )
+        expect(getRetryButton(component).text()).toBe('Refresh')
+        expect(getRetryButton(component).prop('disabled')).toBeFalsy()
+
+        getRetryButton(component).simulate('click')
+        await flushPromises()
+        expect(reload).toHaveBeenCalledTimes(1)
+        expect(getRequestCount()).toBe(1)
+      }
+    )
   })
 })

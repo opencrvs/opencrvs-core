@@ -164,6 +164,7 @@ interface IConstantsMessages
   duplicateOf: MessageDescriptor
   matchedTo: MessageDescriptor
   humanName: MessageDescriptor
+  retryInSeconds: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   action: {
@@ -984,6 +985,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: `{firstName} {middleName} {lastName}`,
     description: 'A localized order of the full name',
     id: 'constants.humanName'
+  },
+  retryInSeconds: {
+    defaultMessage: 'Retry in {seconds}s',
+    description:
+      'Button label showing remaining seconds before retry is allowed',
+    id: 'constants.retryInSeconds'
   }
 }
 export const constantsMessages: Record<
