@@ -56,10 +56,14 @@ function addIndexFieldsToValue(
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
-  if (isNameFieldType(field)) {
+  if (isNameFieldType(field) && field.value) {
     return {
       ...field.value,
-      [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
+      [NAME_QUERY_KEY]: Object.values(field.value)
+        .filter(
+          (part): part is string => typeof part === 'string' && part.length > 0
+        )
+        .join(' ')
     } satisfies IndexedNameFieldValue
   }
   if (isAgeFieldType(field) && field.value) {
