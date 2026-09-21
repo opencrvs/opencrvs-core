@@ -11,7 +11,14 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
+import {
+  getScopes,
+  getUUID,
+  logger,
+  SCOPES,
+  UUID,
+  findScope
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -213,7 +220,21 @@ export const eventRouter = router({
 
         // Re-index the (still undeclared) event with the draft's declaration
         // applied, so it can be found in search by name and other fields.
-        await indexEventWithDraft(event, currentDraft, config)
+        //
+        // The draft is already committed at this point. Indexing is a
+        // read-model update and must never fail the user's save: a failure
+        // here leaves the draft searchable-stale, not lost.
+        try {
+          await indexEventWithDraft(event, currentDraft, config)
+        } catch (error) {
+          logger.error(
+            `Failed to index draft ${currentDraft.id} for event ${eventId}: ${
+              error instanceof Error
+                ? (error.stack ?? error.message)
+                : String(error)
+            }`
+          )
+        }
 
         const actionFromDraft = ActionDocument.safeParse({
           ...currentDraft.action,
