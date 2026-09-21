@@ -80,11 +80,13 @@ describe('the default country list', () => {
 
   it('is declared in collated English order', () => {
     /*
-     * The dropdown sorts on the translated label, so this order is not what a
-     * user sees. It is still worth holding: the list is maintained by hand in
-     * English order, and a rename that leaves an entry stranded (North
-     * Macedonia used to sit under "The former Yugoslav Republic of...") is
-     * invisible in review otherwise.
+     * This is the order the dropdown renders in: nothing sorts the options
+     * between here and the <Select>. The list is maintained by hand, so a
+     * rename that leaves an entry stranded (North Macedonia used to sit under
+     * "The former Yugoslav Republic of...") is invisible in review otherwise.
+     *
+     * English is the only locale the declared order is right for. Sorting on
+     * the translated label is a separate defect, left to its own ticket.
      *
      * Farajaland is excluded: it is a fictional country spliced in for demo
      * environments and has never been in its collated slot.
