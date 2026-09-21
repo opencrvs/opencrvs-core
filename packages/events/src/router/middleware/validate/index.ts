@@ -61,7 +61,8 @@ import {
   getVerificationPageErrors,
   throwWhenNotEmpty,
   omitUncorrectableFields,
-  getStrictValidatorContext
+  getStrictValidatorContext,
+  validateActionPayloadStructure
 } from './utils'
 
 export function getFieldErrors(
@@ -414,7 +415,7 @@ export function validateAction({
   context
 }: {
   /**
-   * NOTE: Provide declaration through @param declarationUpdate
+   * NOTE: Provide declaration through declarationUpdate parameter.
    */
   input: ValidatableActionInput
   eventConfig: EventConfig
@@ -535,8 +536,7 @@ export const validateRequestAction: MiddlewareFunction<
  * Guard for validating .accept action.
  * accept is called by system user when response could not be returned immediately.
  *
- * Accept content is always bound by the user details of the **action requester**.
- *
+ * Accept should only be called by system user type, and limited in use.
  */
 export const validateAcceptAction: MiddlewareFunction<
   TrpcContext,
@@ -551,29 +551,15 @@ export const validateAcceptAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  // 1. In order to accept an action, there must be only one pending (without accept / reject)
   const pendingAction = getPendingAction(event.actions)
 
-  // 2. If pending action is of different type, we throw.
   if (pendingAction.type !== input.type) {
     throw new TRPCError({ code: 'BAD_REQUEST' })
   }
 
-  const context = await getStrictValidatorContext({
-    // @todo: requester should be used as context.
-    token: ctx.token,
-    event: {
-      document: event,
-      state: getCurrentEventState(event, eventConfig)
-    }
-  })
-
-  // 4. Incoming accept payload declaration should be merged with the requested one, and treated as a single update during validation.
-  validateAction({
+  validateActionPayloadStructure({
     input,
-    eventConfig,
-    declarationUpdate: deepMerge(pendingAction.declaration, input.declaration),
-    context
+    eventConfig
   })
 
   return next()

@@ -23,7 +23,6 @@ import {
   field,
   user,
   SelectOption,
-  ActionType,
   ActionStatus
 } from '@opencrvs/toolkit/events'
 import { flag, not } from '@opencrvs/toolkit/conditionals'

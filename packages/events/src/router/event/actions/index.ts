@@ -14,13 +14,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import {
-  deepMerge,
-  getCurrentEventState,
-  logger,
-  RejectedCorrectionAction,
-  UUID
-} from '@opencrvs/commons'
+import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -59,7 +53,7 @@ import {
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { getStrictValidatorContext } from '@events/router/middleware/validate/utils'
+import { validateActionPayloadStructure } from '@events/router/middleware/validate/utils'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -336,30 +330,13 @@ export async function defaultRequestHandler(
     })
   }
 
-  const contextBeforeAccept = await getStrictValidatorContext({
-    token,
-    event: {
-      document: eventWithRequestedAction,
-      state: getCurrentEventState(eventWithRequestedAction, configuration)
-    }
-  })
-
   // @TODO: fix types
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const parsedBody = maybeParsed.data as any
 
-  middleware.validateAction({
+  validateActionPayloadStructure({
     eventConfig: configuration,
-    context: contextBeforeAccept,
-    input: {
-      type: input.type as any,
-      annotation: deepMerge(input.annotation ?? {}, parsedBody.annotation),
-
-      // @ts-expect-error -- type needs to be tightened
-      requestId: input.requestId as any
-    },
-    /* eslint-enable @typescript-eslint/no-explicit-any */
-    declarationUpdate: deepMerge(input.declaration, parsedBody.declaration)
+    input: parsedBody
   })
 
   logger.debug(

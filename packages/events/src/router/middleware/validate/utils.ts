@@ -21,7 +21,17 @@ import {
   StrictValidatorContext,
   UserValidatorContext
 } from '@opencrvs/commons/events'
-import { getOrThrow, flattenEntries } from '@opencrvs/commons'
+import {
+  getOrThrow,
+  flattenEntries,
+  FieldConfig,
+  runStructuralValidations,
+  getActionAnnotationFields,
+  ActionInputWithType,
+  ActionType,
+  getActionFormFields,
+  getActionConfig
+} from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/locations'
 
@@ -153,4 +163,96 @@ export async function getStrictValidatorContext({
     // types prevent calling without user but inference won't work in this scenario.
     user: getOrThrow(user, 'User is missing.')
   }
+}
+
+/**
+ * Determines whether values match the respected type / structure defined in the corresponding FieldConfig.
+ * @returns list of fields with errors.
+ */
+function getStructuralFieldErrors({
+  fields,
+  values,
+  context,
+  fieldOverrides
+}: {
+  fields: FieldConfig[]
+  values: ActionUpdate
+  context: ValidatorContext
+  fieldOverrides?: {
+    required?: boolean
+    conditonals: FieldConfig['conditionals']
+  }
+}) {
+  return Object.entries(values).flatMap(([key, value]) => {
+    const field = fields.find((f) => f.id === key)
+
+    if (!field) {
+      return {
+        message: errorMessages.unexpectedField.defaultMessage,
+        id: key,
+        value
+      }
+    }
+
+    return runStructuralValidations({
+      field: { ...field, ...fieldOverrides },
+      values,
+      context
+    }).map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value
+    }))
+  })
+}
+
+/**
+ * Validate payload structure. Ensures annotation and declaration properties match configuration. Excludes conditionals.
+ *
+ */
+export function validateActionPayloadStructure({
+  input,
+  eventConfig
+}: {
+  input: ActionInputWithType
+  eventConfig: EventConfig
+}): void {
+  const actionConfig = getActionConfig({
+    eventConfiguration: eventConfig,
+    actionType: input.type,
+    customActionType:
+      input.type === ActionType.CUSTOM ? input.customActionType : undefined
+  })
+
+  const annotationFields = [
+    ...(actionConfig ? getActionAnnotationFields(actionConfig) : []),
+    ...(input.type === ActionType.NOTIFY
+      ? getActionFormFields(eventConfig, ActionType.NOTIFY)
+      : [])
+  ]
+
+  // Clean up annotation for actions that do not have one.
+  const annotation =
+    actionConfig || annotationFields.length > 0 ? (input.annotation ?? {}) : {}
+
+  throwWhenNotEmpty([
+    ...getStructuralFieldErrors({
+      fields: getDeclarationFields(eventConfig),
+      values: input.declaration,
+      context: {},
+      fieldOverrides: {
+        conditonals: [],
+        required: false
+      }
+    }),
+    ...getStructuralFieldErrors({
+      fields: annotationFields,
+      values: annotation,
+      context: {},
+      fieldOverrides: {
+        conditonals: [],
+        required: false
+      }
+    })
+  ])
 }
