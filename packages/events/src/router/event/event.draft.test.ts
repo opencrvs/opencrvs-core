@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -62,7 +63,13 @@ test('Throws error when creating a draft for event without assignment', async ()
   ).rejects.toThrow('You are not assigned to this event')
 })
 
-test('Throws error when creating a draft for invalid action', async () => {
+/*
+ * Only the declare view saves drafts, and a declare draft is possible exactly
+ * where the record can still be deleted or is on its way to an action that
+ * sweeps it. NOTIFY is available on a created event, so refusing it here is the
+ * action rule alone, not the availability check behind it.
+ */
+test('Refuses a draft for any action other than declare', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -71,13 +78,12 @@ test('Throws error when creating a draft for invalid action', async () => {
   await expect(
     client.event.draft.create({
       eventId: event.id,
-      type: ActionType.REGISTER,
+      // @ts-expect-error - the input type refuses this, the test proves the server does too
+      type: ActionType.NOTIFY,
       status: 'Accepted',
       transactionId: 'trnx-id'
     })
-  ).rejects.toThrow(
-    "Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE"
-  )
+  ).rejects.toThrow('Invalid input')
 })
 
 test('Allows creating draft for event without actions', async () => {
@@ -134,7 +140,7 @@ test('Creating another draft replaces the previous one', async () => {
   expect(sanitizeForSnapshot(drafts, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
 })
 
-test('Allows creating draft for event with actions', async () => {
+test('Refuses a declare draft once the event has been declared', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -144,16 +150,45 @@ test('Allows creating draft for event with actions', async () => {
     generator.event.actions.declare(event.id, { keepAssignment: true })
   )
 
-  const draftResponse = await client.event.draft.create({
+  await expect(
+    client.event.draft.create({
+      eventId: event.id,
+      type: ActionType.DECLARE,
+      status: 'Accepted',
+      transactionId: 'trnx-id'
+    })
+  ).rejects.toThrow(
+    "Action 'DECLARE' cannot be performed on an event in 'DECLARED' state"
+  )
+})
+
+/*
+ * An edit that did not reach its declare or register leaves the record here.
+ * Save and exit in the declare view has to keep working, or the user cannot
+ * get out of that state without losing what they typed.
+ */
+test('Allows a draft on a declared event that is part way through an edit', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, { keepAssignment: true })
+  )
+  await client.event.actions.edit.request({
+    ...generator.event.actions.edit(event.id),
+    keepAssignmentIfAccepted: true
+  })
+
+  const draft = await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.REGISTER,
+    type: ActionType.DECLARE,
     status: 'Accepted',
     transactionId: 'trnx-id'
   })
 
-  expect(
-    sanitizeForSnapshot(draftResponse, UNSTABLE_EVENT_FIELDS)
-  ).toMatchSnapshot()
+  expect(draft.eventId).toBe(event.id)
 })
 
 test('Creating a draft is idempotent', async () => {
@@ -162,13 +197,9 @@ test('Creating a draft is idempotent', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id, { keepAssignment: true })
-  )
-
   const firstResponse = await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.REGISTER,
+    type: ActionType.DECLARE,
     status: 'Accepted',
     transactionId: 'trnx-id',
     annotation: {
@@ -178,7 +209,7 @@ test('Creating a draft is idempotent', async () => {
 
   await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.REGISTER,
+    type: ActionType.DECLARE,
     status: 'Accepted',
     transactionId: 'trnx-id',
     annotation: {
@@ -267,4 +298,69 @@ test('clears all drafts when user primary office changes', async () => {
   )
 
   expect(await client.event.draft.list()).toHaveLength(0)
+})
+
+test('deletes the events orphaned by a primary office change', async () => {
+  const { user, generator, locations } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.draft.create({
+    eventId: event.id,
+    type: ActionType.DECLARE,
+    status: 'Accepted',
+    transactionId: 'test-transaction-id'
+  })
+
+  const sweptPrefixes: string[] = []
+
+  mswServer.use(
+    http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, ({ request }) => {
+      sweptPrefixes.push(
+        new URL(request.url).pathname.replace('/prefix/', '')
+      )
+      return HttpResponse.json({ deleted: 0 })
+    })
+  )
+
+  await updateUser(
+    { id: user.id, primaryOfficeId: locations[1].id },
+    'test-token'
+  )
+
+  /*
+   * The draft was all the event had, so nothing is left of it and its
+   * attachments go with it.
+   */
+  await expect(client.event.get({ eventId: event.id })).rejects.toThrow(
+    `Event not found with ID: ${event.id}`
+  )
+  expect(sweptPrefixes).toEqual([`events/${event.id}/`])
+})
+
+test('the sweep looks for files under the record prefix', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const listedPrefixes: string[] = []
+
+  mswServer.use(
+    http.get(`${env.DOCUMENTS_URL}/list-files/:prefix*`, ({ request }) => {
+      listedPrefixes.push(
+        new URL(request.url).pathname.replace('/list-files/', '')
+      )
+      return HttpResponse.json([])
+    })
+  )
+
+  await client.event.draft.create({
+    eventId: event.id,
+    type: ActionType.DECLARE,
+    status: 'Accepted',
+    transactionId: 'test-transaction-id'
+  })
+
+  expect(listedPrefixes).toEqual([`events/${event.id}/`])
 })

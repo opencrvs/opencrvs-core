@@ -111,7 +111,21 @@ The user-notification and system-ready triggers were served under `/triggers/`, 
 
 [#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
 
+#### Attachment uploads must name the record they belong to
+
+`POST /attachments` accepted an optional, free-form `path`. Omitting it wrote the file to the bucket root, where it belonged to no record and nothing would ever delete it. The route now takes an `eventId` and derives the storage key from it, and rejects an upload naming neither `eventId` nor `path`.
+
+The gateway's `DELETE /files/{filePath*}` proxy is removed. Its only consumer was the web client, which no longer deletes files one at a time: a file goes when the record holding it is deleted, or is swept when the record's next action leaves it unreferenced.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+
 ### Deprecations
+
+#### `path` on `POST /attachments`
+
+Send `eventId` instead and let the server derive the key. `path` still works, but a file written outside a record's prefix is reached by neither deletion nor sweep, so it outlives the record it was uploaded for. A future release will remove it.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 
 #### `POST /auth/token` parameters in the query string
 
@@ -255,6 +269,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
+- Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 
 ## 2.0.2
 

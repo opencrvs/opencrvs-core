@@ -10,6 +10,7 @@
  */
 
 import * as z from 'zod/v4'
+import { UUID } from './uuid'
 
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|jpeg|jfif|png|pdf|svg)(\?.*)?$/i
@@ -56,8 +57,36 @@ export type DocumentPath = z.infer<typeof DocumentPath>
 export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
 }
-/** Recognized top-level directories a {@link DocumentPath} can live under. */
-export type FilePathPrefix = 'events' | 'users'
+/**
+ * The prefix under which every attachment belonging to a record is stored.
+ * Deletion and sweeps operate on this prefix, so an object written outside one
+ * belongs to no record and nothing will ever remove it.
+ */
+export type EventAttachmentPath = `events/${string}/`
 
-/** A path namespaced under one of the {@link FilePathPrefix} directories. */
-export type PrefixedFilePath = `${FilePathPrefix}/${string}`
+/**
+ * The prefix under which a user's own assets are stored, their avatar and their
+ * signature. These are shared across every record the user touches, so deleting
+ * a record must never reach them.
+ */
+export type UserAttachmentPath = `users/${string}/`
+
+/**
+ * Where a form writes the files uploaded into it. Every upload path is one of
+ * these two, and nothing may upload without one.
+ */
+export type AttachmentPath = EventAttachmentPath | UserAttachmentPath
+
+export function eventAttachmentPath(eventId: UUID): EventAttachmentPath {
+  return `events/${eventId}/`
+}
+
+export function userAttachmentPath(userId: UUID): UserAttachmentPath {
+  return `users/${userId}/`
+}
+
+const ATTACHMENT_PATH = /^(events|users)\/[^/]+\/$/
+
+export function isAttachmentPath(value: string): value is AttachmentPath {
+  return ATTACHMENT_PATH.test(value)
+}
