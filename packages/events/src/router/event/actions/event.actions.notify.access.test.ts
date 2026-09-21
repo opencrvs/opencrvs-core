@@ -24,16 +24,20 @@ import {
   createTestClient,
   seedEvent,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 
 const ASSIGNED_ERROR = 'User is assigned to this event'
 
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-  encodeScope({ type: 'record.notify' }),
-  encodeScope({ type: 'record.action.accept' }),
-  encodeScope({ type: 'record.action.reject' })
+  encodeScope({ type: 'record.notify' })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Notify action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
@@ -88,13 +92,13 @@ describe('Notify action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.notify.accept(action)
+        confirmationClient.event.actions.notify.accept(action)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
 
     test('Prevents system rejecting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.notify.reject(action)
+        confirmationClient.event.actions.notify.reject(action)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
   })

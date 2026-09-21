@@ -19,14 +19,16 @@ import {
 } from '@opencrvs/commons'
 import {
   createEvent,
+  createServiceTokenTestClient,
   createSystemTestClient,
   createTestClient,
-  createCountryConfigClient,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { appRouter } from '@events/router/router'
 
 const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
@@ -116,7 +118,31 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
-  test('an integration holding an unbound confirmation scope can accept', async () => {
+  test('the service token core sends into country config cannot accept/reject', async () => {
+    const { event, input, actionId } = await requestPendingRegistration()
+
+    const serviceTokenClient = await createServiceTokenTestClient()
+
+    await expect(
+      serviceTokenClient.event.actions.register.accept({
+        ...input,
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+
+    await expect(
+      serviceTokenClient.event.actions.register.reject({
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId
+      })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
+  test('an integration holding the confirmation scope can accept', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 
     const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
@@ -158,7 +184,7 @@ describe('confirming an action requires more than the scope that requested it', 
     ).rejects.toMatchObject({ code: 'FORBIDDEN' })
   })
 
-  test('an unbound grant is still confined to its event types', async () => {
+  test('the confirmation scope is still confined to its event types', async () => {
     const { event, input, actionId } = await requestPendingRegistration()
 
     const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
@@ -182,14 +208,17 @@ describe('confirming an action requires more than the scope that requested it', 
 
 describe('accept only confirms the pending action it names', () => {
   test('cannot be pointed at an action of another type', async () => {
-    const { user, event, input } = await requestPendingRegistration()
+    const { event, input } = await requestPendingRegistration()
 
     const createActionId = getOrThrow(
       event.actions.find((action) => action.type === ActionType.CREATE)?.id,
       'Could not find the create action'
     )
 
-    const countryConfigClient = createCountryConfigClient(user, event.id)
+    const countryConfigClient = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
 
     await expect(
       countryConfigClient.event.actions.register.accept({
@@ -202,6 +231,26 @@ describe('accept only confirms the pending action it names', () => {
       code: 'BAD_REQUEST',
       message: expect.stringContaining('is not awaiting confirmation')
     })
+  })
+
+  test('cannot be pointed at a pending action of another event', async () => {
+    const { event, input } = await requestPendingRegistration()
+    const other = await requestPendingRegistration()
+
+    const countryConfigClient = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
+
+    await expect(
+      countryConfigClient.event.actions.register.accept({
+        ...input,
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId: other.actionId,
+        registrationNumber: MOCK_REGISTRATION_NUMBER
+      })
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
   })
 
   test('cannot be pointed at an action that is not awaiting confirmation', async () => {
@@ -218,7 +267,10 @@ describe('accept only confirms the pending action it names', () => {
       'Could not find the accepted declare action'
     )
 
-    const countryConfigClient = createCountryConfigClient(user, event.id)
+    const countryConfigClient = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
 
     await expect(
       countryConfigClient.event.actions.declare.accept({
@@ -230,5 +282,154 @@ describe('accept only confirms the pending action it names', () => {
       code: 'BAD_REQUEST',
       message: expect.stringContaining('is not awaiting confirmation')
     })
+  })
+})
+
+type UserClient = ReturnType<typeof createTestClient>
+
+const CONFIRMATION_ENDPOINTS: [
+  string,
+  (client: UserClient) => Promise<unknown>
+][] = [
+  [
+    'event.actions.archive.accept',
+    async (client: UserClient) =>
+      client.event.actions.archive.accept({} as never)
+  ],
+  [
+    'event.actions.archive.reject',
+    async (client: UserClient) =>
+      client.event.actions.archive.reject({} as never)
+  ],
+  [
+    'event.actions.correction.approve.accept',
+    async (client: UserClient) =>
+      client.event.actions.correction.approve.accept({} as never)
+  ],
+  [
+    'event.actions.correction.approve.reject',
+    async (client: UserClient) =>
+      client.event.actions.correction.approve.reject({} as never)
+  ],
+  [
+    'event.actions.correction.reject.accept',
+    async (client: UserClient) =>
+      client.event.actions.correction.reject.accept({} as never)
+  ],
+  [
+    'event.actions.correction.reject.reject',
+    async (client: UserClient) =>
+      client.event.actions.correction.reject.reject({} as never)
+  ],
+  [
+    'event.actions.correction.request.accept',
+    async (client: UserClient) =>
+      client.event.actions.correction.request.accept({} as never)
+  ],
+  [
+    'event.actions.correction.request.reject',
+    async (client: UserClient) =>
+      client.event.actions.correction.request.reject({} as never)
+  ],
+  [
+    'event.actions.custom.accept',
+    async (client: UserClient) =>
+      client.event.actions.custom.accept({} as never)
+  ],
+  [
+    'event.actions.custom.reject',
+    async (client: UserClient) =>
+      client.event.actions.custom.reject({} as never)
+  ],
+  [
+    'event.actions.declare.accept',
+    async (client: UserClient) =>
+      client.event.actions.declare.accept({} as never)
+  ],
+  [
+    'event.actions.declare.reject',
+    async (client: UserClient) =>
+      client.event.actions.declare.reject({} as never)
+  ],
+  [
+    'event.actions.edit.accept',
+    async (client: UserClient) => client.event.actions.edit.accept({} as never)
+  ],
+  [
+    'event.actions.edit.reject',
+    async (client: UserClient) => client.event.actions.edit.reject({} as never)
+  ],
+  [
+    'event.actions.notify.accept',
+    async (client: UserClient) =>
+      client.event.actions.notify.accept({} as never)
+  ],
+  [
+    'event.actions.notify.reject',
+    async (client: UserClient) =>
+      client.event.actions.notify.reject({} as never)
+  ],
+  [
+    'event.actions.printCertificate.accept',
+    async (client: UserClient) =>
+      client.event.actions.printCertificate.accept({} as never)
+  ],
+  [
+    'event.actions.printCertificate.reject',
+    async (client: UserClient) =>
+      client.event.actions.printCertificate.reject({} as never)
+  ],
+  [
+    'event.actions.register.accept',
+    async (client: UserClient) =>
+      client.event.actions.register.accept({} as never)
+  ],
+  [
+    'event.actions.register.reject',
+    async (client: UserClient) =>
+      client.event.actions.register.reject({} as never)
+  ],
+  [
+    'event.actions.reject.accept',
+    async (client: UserClient) =>
+      client.event.actions.reject.accept({} as never)
+  ],
+  [
+    'event.actions.reject.reject',
+    async (client: UserClient) =>
+      client.event.actions.reject.reject({} as never)
+  ],
+  [
+    'event.actions.unarchive.accept',
+    async (client: UserClient) =>
+      client.event.actions.unarchive.accept({} as never)
+  ],
+  [
+    'event.actions.unarchive.reject',
+    async (client: UserClient) =>
+      client.event.actions.unarchive.reject({} as never)
+  ]
+]
+
+describe('no user may confirm an action, whichever endpoint they call', () => {
+  test.each(CONFIRMATION_ENDPOINTS)('%s', async (_, call) => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [
+      ...REGISTRAR_SCOPES,
+      ...CONFIRMATION_SCOPES
+    ])
+
+    // An empty payload is enough: the system-only check runs before the input is validated.
+    await expect(call(client)).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
+  test('the list above covers every confirmation endpoint the router has', () => {
+    const inRouter = Object.keys(appRouter._def.procedures).filter((path) =>
+      /\.(accept|reject)$/.test(path)
+    )
+
+    expect(new Set(inRouter)).toEqual(
+      new Set(CONFIRMATION_ENDPOINTS.map(([path]) => path))
+    )
   })
 })

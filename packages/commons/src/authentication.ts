@@ -12,7 +12,6 @@ import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
 import { ScopeType, decodeScope, Scope, EncodedScope } from './scopes'
-import { UUID } from './uuid'
 export * from './scopes'
 
 /**
@@ -53,8 +52,6 @@ export interface ITokenPayload {
   scope: EncodedScope[]
   role?: string
   userType: TokenUserType
-  eventId?: UUID
-  actionId?: UUID
 }
 
 /**

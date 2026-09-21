@@ -104,7 +104,7 @@ function DocumentUploaderWithOption({
     DocumentTypeRequiredError
   )
 
-  const [files, setFiles] = useState(value || [])
+  const files = value || []
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
@@ -132,7 +132,6 @@ function DocumentUploaderWithOption({
 
       setFilesBeingProcessed((prev) => prev.filter(({ label }) => label !== id))
 
-      setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
       onChange(getUpdatedFiles(files, newFile))
       setSelectedOption(undefined)
     }
@@ -175,13 +174,7 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: DocumentPath) => {
-    setFiles((prevFiles) => {
-      const updatedFiles = prevFiles.filter((file) => file.path !== path)
-      onChange(updatedFiles)
-
-      return updatedFiles
-    })
-
+    onChange(files.filter((file) => file.path !== path))
     setPreviewImage(null)
   }
 

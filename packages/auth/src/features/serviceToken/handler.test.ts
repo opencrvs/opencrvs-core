@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { SERVICE_USER_ID } from '@opencrvs/commons'
-import { WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import { AuthServer, createServer } from '@auth/server'
 
 const decodeTokenPayload = (token: string) =>
@@ -22,7 +21,7 @@ describe('service token handler', () => {
     server = await createServer()
   })
 
-  it('issues a scopeless system token accepted by every service', async () => {
+  it('issues a scopeless system token for country config and the gateway', async () => {
     const res = await server.server.inject({
       method: 'GET',
       url: '/internal/service-token'
@@ -35,14 +34,10 @@ describe('service token handler', () => {
 
     expect(payload.sub).toBe(SERVICE_USER_ID)
     expect(payload.userType).toBe('system')
-    // Carries no scopes: a broad audience grants no authority, it only lets each
-    // service accept the token.
     expect(payload.scope).toEqual([])
-    // Country config relays this token onward (e.g. informant notifications call
-    // back through the gateway to the events service), so it must be accepted by
-    // the gateway and downstream services, not just country config.
-    expect(payload.aud).toEqual(WEB_USER_JWT_AUDIENCES)
-    expect(payload.aud).toContain('opencrvs:gateway-user')
-    expect(payload.aud).toContain('opencrvs:events-user')
+    expect(payload.aud).toEqual([
+      'opencrvs:countryconfig-user',
+      'opencrvs:gateway-user'
+    ])
   })
 })

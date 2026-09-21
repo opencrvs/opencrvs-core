@@ -13,7 +13,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -170,12 +170,14 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
+export type ConfirmableActionType = keyof typeof ACTION_PROCEDURE_CONFIG
+
 /**
  * Maps action types to their corresponding audit log operation names (tRPC paths).
  * Only includes action types that should be audit-logged.
  */
 const AUDIT_LOG_OPERATION_MAP: Partial<
-  Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
+  Record<ConfirmableActionType, EventActionAuditLog['operation']>
 > = {
   [ActionType.NOTIFY]: 'event.actions.notify.request',
   [ActionType.DECLARE]: 'event.actions.declare.request',
@@ -390,7 +392,7 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
  * @param actionType - The action type for which we want to create router handlers.
  */
 export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+  actionType: ConfirmableActionType
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
@@ -549,16 +551,16 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
-        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
-        const originalCorrectionRequestId =
-          originalAction.type === ActionType.REJECT_CORRECTION
-            ? RejectedCorrectionAction.parse(originalAction).requestId
-            : undefined
-
         return addAsyncRejectAction(
           {
             ...input,
-            requestId: originalCorrectionRequestId,
+            // `event_actions_check` wants a `requestId` on corrections & a reason on REJECT.
+            requestId:
+              'requestId' in originalAction
+                ? originalAction.requestId
+                : undefined,
+            content:
+              'content' in originalAction ? originalAction.content : undefined,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false
