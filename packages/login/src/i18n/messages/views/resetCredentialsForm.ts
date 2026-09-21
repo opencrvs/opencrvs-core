@@ -10,7 +10,7 @@
  */
 import { defineMessages } from 'react-intl'
 
-const messagesToDefine = {
+export const messages = defineMessages({
   // Forgotten item form messages
   forgottenItemFormTitle: {
     id: 'resetCredentials.forgottenItem.form.title',
@@ -57,6 +57,13 @@ const messagesToDefine = {
     description:
       'Body message for the recovery instructions sent page. Must not assert delivery, since the account may not exist.'
   },
+  recoveryActiveAccountNote: {
+    id: 'resetCredentials.recovery.activeAccountNote',
+    defaultMessage:
+      'Note: Username reminder and password reset are only available for active accounts. If you are still completing onboarding or have a pending password reset, please finish that first, then try again. If the problem persists, contact your system administrator.',
+    description:
+      'Note shown on the forgotten-item and recovery-instructions-sent pages explaining that account recovery only works for active accounts'
+  },
   // Recovery link landing page messages
   recoveryLinkExpiredTitle: {
     id: 'resetCredentials.recoveryLinkLanding.expired.title',
@@ -66,7 +73,8 @@ const messagesToDefine = {
   },
   recoveryLinkExpiredBody: {
     id: 'resetCredentials.recoveryLinkLanding.expired.body',
-    defaultMessage: 'This link is no longer valid. Request a new one to continue.',
+    defaultMessage:
+      'This link is no longer valid. Request a new one to continue.',
     description:
       'Body shown when a recovery link is invalid, expired, or already used. Must not reveal whether the underlying account exists.'
   },
@@ -217,6 +225,4 @@ const messagesToDefine = {
     defaultMessage: 'Invalid input',
     description: 'Generic error message for invalid form nput'
   }
-}
-
-export const messages = defineMessages(messagesToDefine)
+})

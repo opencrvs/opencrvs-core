@@ -14,7 +14,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -582,16 +582,12 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
-        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
-        const originalCorrectionRequestId =
-          action.type === ActionType.REJECT_CORRECTION
-            ? RejectedCorrectionAction.parse(action).requestId
-            : undefined
-
         return addAsyncRejectAction(
           {
             ...input,
-            requestId: originalCorrectionRequestId,
+            // `event_actions_check` requires a `requestId` on the correction actions and a reason on REJECT.
+            requestId: 'requestId' in action ? action.requestId : undefined,
+            content: 'content' in action ? action.content : undefined,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false

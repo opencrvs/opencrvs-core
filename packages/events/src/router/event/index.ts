@@ -72,7 +72,7 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles, presignFile } from '@events/service/files'
+import { presignFile, sweepUnreferencedFiles } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -295,6 +295,7 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
+
         await throwConflictIfActionNotAllowed(
           eventId,
           type,
@@ -330,7 +331,7 @@ export const eventRouter = router({
           event.actions.push(actionFromDraft.data)
         }
 
-        await cleanupUnreferencedFiles(event, ctx.token)
+        await sweepUnreferencedFiles(event, ctx.token)
 
         return currentDraft
       })

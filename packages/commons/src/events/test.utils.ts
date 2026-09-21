@@ -44,7 +44,7 @@ import {
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
-import { EventConfig } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
@@ -1310,12 +1310,15 @@ export const generateEventConfig = ({
   id,
   fields,
   placeOfEventId,
-  dateOfEventId
+  dateOfEventId,
+  actions = []
 }: {
   id: string
   fields: FieldConfig[]
   placeOfEventId?: string
   dateOfEventId?: string
+  /** Extra actions appended to the default READ + DECLARE pair, e.g. a REQUEST_CORRECTION action with its own correctionForm. */
+  actions?: EventConfigInput['actions']
 }): EventConfig => {
   return defineConfig({
     id,
@@ -1352,7 +1355,8 @@ export const generateEventConfig = ({
           title: generateTranslationConfig('Review Declare Action'),
           fields: []
         }
-      }
+      },
+      ...actions
     ]
   })
 }

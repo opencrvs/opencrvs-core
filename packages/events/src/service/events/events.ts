@@ -12,7 +12,13 @@
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
-import { logger, TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import {
+  eventAttachmentPath,
+  logger,
+  TokenUserType,
+  TokenWithBearer,
+  UUID
+} from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -27,7 +33,6 @@ import {
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getAcceptedActions,
   getActionConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
@@ -40,8 +45,8 @@ import {
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 import {
-  cleanupUnreferencedFiles,
-  deleteFile,
+  sweepUnreferencedFiles,
+  deleteFilesByPrefix,
   fileExists
 } from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
@@ -70,6 +75,14 @@ export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
   }
 }
 
+/**
+ * Throws tRPC HTTP 404 unless the id names a record. The documents service
+ * cannot make this check, because it knows nothing about events.
+ */
+export const assertEventExists = async (eventId: UUID): Promise<void> => {
+  await getEventById(eventId)
+}
+
 function getValidFileValue(
   fieldKey: string,
   fieldValue: FieldUpdateValue,
@@ -82,31 +95,6 @@ function getValidFileValue(
     return undefined
   }
   return validFieldValue.data
-}
-
-async function deleteEventAttachments(
-  token: TokenWithBearer,
-  event: EventDocument
-) {
-  const configuration = await getEventConfigurationById({
-    eventType: event.type,
-    token
-  })
-
-  const actions = getAcceptedActions(event)
-  // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getDeclarationFields(configuration)
-  for (const ac of actions) {
-    for (const [key, value] of Object.entries(ac.declaration)) {
-      const fileValue = getValidFileValue(key, value, fieldConfigs)
-
-      if (!fileValue) {
-        continue
-      }
-
-      await deleteFile(fileValue.path, token)
-    }
-  }
 }
 
 /**
@@ -185,7 +173,7 @@ export async function deleteEvent(
   }
 
   const { id } = event
-  await deleteEventAttachments(token, event)
+  await deleteFilesByPrefix(eventAttachmentPath(id), token)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
 
@@ -416,7 +404,7 @@ export async function addAction(
 
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
-    await cleanupUnreferencedFiles(updatedEvent, token)
+    await sweepUnreferencedFiles(updatedEvent, token)
   }
 
   return updatedEvent
@@ -507,6 +495,7 @@ type AsyncRejectActionInput = Pick<
   keepAssignment: boolean
   waitFor: boolean
   requestId?: UUID
+  content?: Record<string, unknown> | null
 }
 
 export async function addAsyncRejectAction(
@@ -516,7 +505,8 @@ export async function addAsyncRejectAction(
     type,
     keepAssignment,
     waitFor,
-    requestId
+    requestId,
+    content
   }: AsyncRejectActionInput,
   {
     user,
@@ -536,6 +526,7 @@ export async function addAsyncRejectAction(
     status: ActionStatus.Rejected,
     originalActionId,
     requestId,
+    content,
     createdBy: user.id,
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,

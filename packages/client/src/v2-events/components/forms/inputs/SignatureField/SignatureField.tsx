@@ -20,12 +20,12 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   DocumentPath,
   FileFieldValue,
-  MimeType
+  MimeType,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { cacheFile, toFileUrl } from '@client/v2-events/cache'
 import { setLockBypass } from '@client/utils/lockBypass'
 import { useOnFileChange } from '../FileInput/useOnFileChange'

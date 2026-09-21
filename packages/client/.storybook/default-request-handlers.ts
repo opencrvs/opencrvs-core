@@ -48,7 +48,7 @@ async function ensureCacheExists(cacheName: string) {
 const FAKE_CACHE_NAME = 'workbox-runtime'
 ensureCacheExists(FAKE_CACHE_NAME)
 
-const tRPCMsw = createTRPCMsw<AppRouter>({
+export const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
       url: '/api/events'
@@ -364,9 +364,6 @@ export const handlers = {
       const formData = await req.request.formData()
 
       return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
-    }),
-    http.delete('/api/files/:filePath*', async (request) => {
-      return HttpResponse.text('OK')
     }),
     http.get('/files/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
