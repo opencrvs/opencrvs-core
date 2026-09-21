@@ -482,11 +482,12 @@ export const FileInputButtonMaxImage: Story = {
   name: 'File input without option with maxImageSize configuration',
   parameters: maxImageSizeParameters({ width: 200, height: 200 }),
   play: async ({ canvasElement, step }) => {
-    await step('Opens up image resizing when image exceeds maxImageSize', () =>
-      uploadOversizedImage(canvasElement)
+    await step(
+      'Opens up image resizing when image exceeds maxImageSize',
+      async () => uploadOversizedImage(canvasElement)
     )
 
-    await step('Clicking apply button adds the cropped image', () =>
+    await step('Clicking apply button adds the cropped image', async () =>
       applyCrop(canvasElement)
     )
   }
@@ -496,8 +497,9 @@ export const FileInputCropWindowMatchesTargetSize: Story = {
   name: 'File input crop window matches the configured output aspect ratio',
   parameters: maxImageSizeParameters(PASSPORT_TARGET_SIZE),
   play: async ({ canvasElement, step }) => {
-    await step('Opens up image resizing when image exceeds maxImageSize', () =>
-      uploadOversizedImage(canvasElement)
+    await step(
+      'Opens up image resizing when image exceeds maxImageSize',
+      async () => uploadOversizedImage(canvasElement)
     )
 
     await step(
@@ -525,7 +527,7 @@ export const FileInputCropWindowMatchesTargetSize: Story = {
       }
     )
 
-    await step('Clicking apply button adds the cropped image', () =>
+    await step('Clicking apply button adds the cropped image', async () =>
       applyCrop(canvasElement)
     )
   }
