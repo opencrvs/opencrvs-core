@@ -440,17 +440,20 @@ export const setupTestCase = async (
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: Extract<ActionType, 'CREATE'>
+  action: Extract<ActionType, 'CREATE'>,
+  waitFor?: boolean
 ): () => Promise<EventDocument>
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: Exclude<ActionType, 'CREATE'>
+  action: Exclude<ActionType, 'CREATE'>,
+  waitFor?: boolean
 ): (eventId: string) => Promise<EventDocument>
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: ActionType
+  action: ActionType,
+  waitFor?: boolean
 ):
   | (() => Promise<EventDocument>)
   | ((eventId: string) => Promise<EventDocument>) {
@@ -460,42 +463,57 @@ function actionToClientAction(
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
-          generator.event.actions.declare(eventId, { keepAssignment: true })
+          generator.event.actions.declare(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.REJECT:
       return async (eventId: string) =>
         client.event.actions.reject.request(
-          generator.event.actions.reject(eventId, { keepAssignment: true })
+          generator.event.actions.reject(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.ARCHIVE:
       return async (eventId: string) =>
         client.event.actions.archive.request(
-          generator.event.actions.archive(eventId, { keepAssignment: true })
+          generator.event.actions.archive(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.UNARCHIVE:
       return async (eventId: string) =>
         client.event.actions.unarchive.request(
-          generator.event.actions.unarchive(eventId, { keepAssignment: true })
+          generator.event.actions.unarchive(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
     case ActionType.PRINT_CERTIFICATE:
       return async (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
     case ActionType.REQUEST_CORRECTION:
       return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
 
@@ -528,7 +546,12 @@ function actionToClientAction(
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[],
+  /**
+   * Whether the setup actions wait for indexing. Leave it out unless the test
+   * reads the event back from Elasticsearch, `false` is a lot faster.
+   */
+  waitFor?: boolean
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: EventDocument | undefined
 
@@ -536,13 +559,19 @@ export async function createEvent(
   const createAction = actionToClientAction(
     client,
     generator,
-    ActionType.CREATE
+    ActionType.CREATE,
+    waitFor
   )
 
   createdEvent = await createAction()
 
   for (const action of actions) {
-    const clientAction = actionToClientAction(client, generator, action)
+    const clientAction = actionToClientAction(
+      client,
+      generator,
+      action,
+      waitFor
+    )
     createdEvent = await clientAction(createdEvent.id)
   }
 

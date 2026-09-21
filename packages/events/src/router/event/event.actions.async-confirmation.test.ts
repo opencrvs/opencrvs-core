@@ -88,7 +88,9 @@ async function requestPendingNotify(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
-  const payload = generator.event.actions.notify(event.id)
+  const payload = generator.event.actions.notify(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.NOTIFY, 202)
 
@@ -107,7 +109,8 @@ async function requestPendingNotify(): Promise<PendingAction> {
       confirmer.event.actions.notify.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -116,7 +119,9 @@ async function requestPendingDeclare(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
-  const payload = generator.event.actions.declare(event.id)
+  const payload = generator.event.actions.declare(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.DECLARE, 202)
 
@@ -135,7 +140,8 @@ async function requestPendingDeclare(): Promise<PendingAction> {
       confirmer.event.actions.declare.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -143,8 +149,15 @@ async function requestPendingDeclare(): Promise<PendingAction> {
 async function requestPendingEdit(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [ActionType.DECLARE])
-  const payload = generator.event.actions.edit(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE],
+    false
+  )
+  const payload = generator.event.actions.edit(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.EDIT, 202)
 
@@ -163,7 +176,8 @@ async function requestPendingEdit(): Promise<PendingAction> {
       confirmer.event.actions.edit.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -171,8 +185,15 @@ async function requestPendingEdit(): Promise<PendingAction> {
 async function requestPendingReject(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [ActionType.DECLARE])
-  const payload = generator.event.actions.reject(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE],
+    false
+  )
+  const payload = generator.event.actions.reject(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.REJECT, 202)
 
@@ -191,7 +212,8 @@ async function requestPendingReject(): Promise<PendingAction> {
       confirmer.event.actions.reject.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -199,8 +221,15 @@ async function requestPendingReject(): Promise<PendingAction> {
 async function requestPendingArchive(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [ActionType.DECLARE])
-  const payload = generator.event.actions.archive(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE],
+    false
+  )
+  const payload = generator.event.actions.archive(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.ARCHIVE, 202)
 
@@ -219,7 +248,8 @@ async function requestPendingArchive(): Promise<PendingAction> {
       confirmer.event.actions.archive.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -227,11 +257,15 @@ async function requestPendingArchive(): Promise<PendingAction> {
 async function requestPendingUnarchive(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.ARCHIVE
-  ])
-  const payload = generator.event.actions.unarchive(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.ARCHIVE],
+    false
+  )
+  const payload = generator.event.actions.unarchive(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.UNARCHIVE, 202)
 
@@ -250,7 +284,8 @@ async function requestPendingUnarchive(): Promise<PendingAction> {
       confirmer.event.actions.unarchive.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -258,8 +293,15 @@ async function requestPendingUnarchive(): Promise<PendingAction> {
 async function requestPendingRegister(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [ActionType.DECLARE])
-  const payload = generator.event.actions.register(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE],
+    false
+  )
+  const payload = generator.event.actions.register(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.REGISTER, 202)
 
@@ -279,7 +321,8 @@ async function requestPendingRegister(): Promise<PendingAction> {
       confirmer.event.actions.register.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -287,11 +330,15 @@ async function requestPendingRegister(): Promise<PendingAction> {
 async function requestPendingPrintCertificate(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.REGISTER
-  ])
-  const payload = generator.event.actions.printCertificate(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.REGISTER],
+    false
+  )
+  const payload = generator.event.actions.printCertificate(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.PRINT_CERTIFICATE, 202)
 
@@ -310,7 +357,8 @@ async function requestPendingPrintCertificate(): Promise<PendingAction> {
       confirmer.event.actions.printCertificate.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -318,11 +366,15 @@ async function requestPendingPrintCertificate(): Promise<PendingAction> {
 async function requestPendingRequestCorrection(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.REGISTER
-  ])
-  const payload = generator.event.actions.correction.request(event.id)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.REGISTER],
+    false
+  )
+  const payload = generator.event.actions.correction.request(event.id, {
+    waitFor: false
+  })
 
   mockActionApi(ActionType.REQUEST_CORRECTION, 202)
 
@@ -342,7 +394,8 @@ async function requestPendingRequestCorrection(): Promise<PendingAction> {
       confirmer.event.actions.correction.request.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -350,14 +403,16 @@ async function requestPendingRequestCorrection(): Promise<PendingAction> {
 async function requestPendingApproveCorrection(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.REGISTER,
-    ActionType.REQUEST_CORRECTION
-  ])
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.REGISTER, ActionType.REQUEST_CORRECTION],
+    false
+  )
   const payload = generator.event.actions.correction.approve(
     event.id,
-    correctionRequestId(event)
+    correctionRequestId(event),
+    { waitFor: false }
   )
 
   mockActionApi(ActionType.APPROVE_CORRECTION, 202)
@@ -378,7 +433,8 @@ async function requestPendingApproveCorrection(): Promise<PendingAction> {
       confirmer.event.actions.correction.approve.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -386,15 +442,16 @@ async function requestPendingApproveCorrection(): Promise<PendingAction> {
 async function requestPendingRejectCorrection(): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.REGISTER,
-    ActionType.REQUEST_CORRECTION
-  ])
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.REGISTER, ActionType.REQUEST_CORRECTION],
+    false
+  )
   const payload = generator.event.actions.correction.reject(
     event.id,
     correctionRequestId(event),
-    {}
+    { waitFor: false }
   )
 
   mockActionApi(ActionType.REJECT_CORRECTION, 202)
@@ -415,7 +472,8 @@ async function requestPendingRejectCorrection(): Promise<PendingAction> {
       confirmer.event.actions.correction.reject.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -434,6 +492,7 @@ async function requestPendingCustom(): Promise<PendingAction> {
 
   const event = await client.event.create(generator.event.create())
   const assignment = generator.event.actions.assign(event.id, {
+    waitFor: false,
     assignedTo: getOrThrow(
       event.actions.find((action) => action.type === ActionType.CREATE)
         ?.createdBy,
@@ -444,6 +503,7 @@ async function requestPendingCustom(): Promise<PendingAction> {
   await client.event.actions.assignment.assign(assignment)
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id, {
+      waitFor: false,
       declaration: {
         'applicant.dob': SENIOR_DATE_OF_BIRTH,
         'senior-pass.id': 'SP-123456',
@@ -467,7 +527,8 @@ async function requestPendingCustom(): Promise<PendingAction> {
     eventId: event.id,
     transactionId: getUUID(),
     customActionType: CUSTOM_ACTION_TYPE,
-    annotation: { notes: 'Confirmed membership' }
+    annotation: { notes: 'Confirmed membership' },
+    waitFor: false
   }
 
   mockActionApi(ActionType.CUSTOM, 202)
@@ -487,7 +548,8 @@ async function requestPendingCustom(): Promise<PendingAction> {
       confirmer.event.actions.custom.reject({
         eventId: event.id,
         transactionId: getUUID(),
-        actionId
+        actionId,
+        waitFor: false
       })
   }
 }
@@ -604,7 +666,9 @@ describe('keepAssignment on an async confirmation', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
-    const payload = generator.event.actions.declare(event.id)
+    const payload = generator.event.actions.declare(event.id, {
+      waitFor: false
+    })
 
     mockActionApi(ActionType.DECLARE, 202)
 
@@ -623,7 +687,8 @@ describe('keepAssignment on an async confirmation', () => {
     const response = await confirmer.event.actions.declare.reject({
       eventId,
       actionId,
-      transactionId: getUUID()
+      transactionId: getUUID(),
+      waitFor: false
     })
 
     expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
@@ -636,7 +701,8 @@ describe('keepAssignment on an async confirmation', () => {
       eventId,
       actionId,
       transactionId: getUUID(),
-      keepAssignment: true
+      keepAssignment: true,
+      waitFor: false
     })
 
     expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
@@ -663,7 +729,8 @@ describe('keepAssignment on an async confirmation', () => {
       eventId,
       actionId,
       transactionId: getUUID(),
-      keepAssignment: true
+      keepAssignment: true,
+      waitFor: false
     })
 
     expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
