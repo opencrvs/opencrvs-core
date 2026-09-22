@@ -61,12 +61,10 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
         if (!findLocalEventDocument(draft.eventId)) {
           await queryClient.prefetchQuery({
             queryKey: trpcOptionsProxy.event.get.queryKey({
-              eventId: draft.eventId,
-              waitFor: false
+              eventId: draft.eventId
             }),
             queryFn: trpcOptionsProxy.event.get.queryOptions({
-              eventId: draft.eventId,
-              waitFor: false
+              eventId: draft.eventId
             }).queryFn
           })
         }

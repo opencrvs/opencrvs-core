@@ -40,7 +40,7 @@ describe('deleteLocalEvent', () => {
 
   it('clears event.get cache entry', async () => {
     queryClient.setQueryData(
-      trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
+      trpcOptionsProxy.event.get.queryKey({ eventId: id }),
       eventDocument
     )
 
