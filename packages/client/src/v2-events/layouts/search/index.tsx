@@ -25,6 +25,7 @@ export function SearchLayout({ children }: { children: React.ReactNode }) {
       header={
         <AppBar
           desktopCenter={<DesktopCenter />}
+          desktopLeft={<HistoryNavigator />}
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileCenter={<SearchToolbar />}
           mobileLeft={<HistoryNavigator hideForward />}

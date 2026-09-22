@@ -49,6 +49,7 @@ import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { useEventActionConfigurationResolver } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
@@ -216,11 +217,14 @@ export function EventOverviewLayout({
           appBarRowTwo={<EventOverviewTabs />}
           desktopCenter={<EventOverviewTabs />}
           desktopLeft={
-            <EventIcon
-              event={eventIndexWithDraftApplied}
-              eventConfig={eventConfiguration}
-              name={null}
-            />
+            <>
+              <HistoryNavigator />
+              <EventIcon
+                event={eventIndexWithDraftApplied}
+                eventConfig={eventConfiguration}
+                name={null}
+              />
+            </>
           }
           desktopRight={
             <Stack>

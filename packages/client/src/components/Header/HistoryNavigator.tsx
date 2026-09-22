@@ -12,6 +12,7 @@ import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { useNavigate, useNavigationType } from 'react-router-dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { useHomePage } from '@client/hooks/useHomePage'
 
 export function HistoryNavigator({
@@ -25,8 +26,9 @@ export function HistoryNavigator({
   const { isCurrentPageHome } = useHomePage()
 
   return (
-    <div>
+    <Stack gap={8}>
       <Button
+        aria-label="Go back"
         id="header-go-back-button"
         type="icon"
         size="medium"
@@ -40,6 +42,8 @@ export function HistoryNavigator({
       </Button>
       {!hideForward && (
         <Button
+          aria-label="Go forward"
+          id="header-go-forward-button"
           type="icon"
           size="medium"
           disabled={navigationType === 'PUSH' || navigationType === 'REPLACE'}
@@ -48,6 +52,6 @@ export function HistoryNavigator({
           <Icon name="ArrowRight" />
         </Button>
       )}
-    </div>
+    </Stack>
   )
 }

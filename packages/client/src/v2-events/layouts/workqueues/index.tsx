@@ -29,6 +29,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { emptyMessage } from '@client/v2-events/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -92,6 +93,7 @@ export function WorkqueueLayout({
       header={
         <AppBar
           desktopCenter={<DesktopCenter />}
+          desktopLeft={<HistoryNavigator />}
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<Hamburger />}
           mobileRight={
