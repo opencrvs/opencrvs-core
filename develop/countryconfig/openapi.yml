@@ -3032,6 +3032,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3309,6 +3311,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3997,6 +4001,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9141,6 +9147,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9626,6 +9634,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -15151,6 +15161,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -15466,6 +15478,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
