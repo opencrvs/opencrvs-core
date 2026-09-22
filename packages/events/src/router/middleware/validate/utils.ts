@@ -10,6 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { partition } from 'lodash'
 import {
   ActionUpdate,
   errorMessages,
@@ -29,7 +30,9 @@ import {
   getActionAnnotationFields,
   ActionType,
   getActionFormFields,
-  getActionConfig
+  getActionConfig,
+  findRecordActionPages,
+  isVerificationPage
 } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/locations'
@@ -243,6 +246,28 @@ export function validateActionPayloadStructure({
   const annotation =
     actionConfig || annotationFields.length > 0 ? (input.annotation ?? {}) : {}
 
+  const pages = findRecordActionPages(eventConfig, input.type)
+
+  // Some actions allow passing in verification page id as boolean value.
+  const verificationPageIds = pages
+    .filter((page) => isVerificationPage(page))
+    .map((page) => page.id)
+
+  const annotationErrors = getStructuralFieldErrors({
+    fields: annotationFields,
+    values: annotation,
+    context: {},
+    fieldOverrides: {
+      conditonals: [],
+      required: false
+    }
+  })
+
+  const [verificationPageErrors, otherAnnotationErrors] = partition(
+    annotationErrors,
+    (ae) => verificationPageIds.includes(ae.id)
+  )
+
   throwWhenNotEmpty([
     ...getStructuralFieldErrors({
       fields: getDeclarationFields(eventConfig),
@@ -253,14 +278,10 @@ export function validateActionPayloadStructure({
         required: false
       }
     }),
-    ...getStructuralFieldErrors({
-      fields: annotationFields,
-      values: annotation,
-      context: {},
-      fieldOverrides: {
-        conditonals: [],
-        required: false
-      }
-    })
+    ...otherAnnotationErrors,
+    ...getVerificationPageErrors(
+      verificationPageErrors.map((ae) => ae.id),
+      annotation
+    )
   ])
 }
