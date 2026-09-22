@@ -43,9 +43,11 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { readAdministrativeHierarchyStats } from '@events/storage/postgres/administrative-hierarchy/locations'
+import {
+  primeAdministrativeHierarchyCache,
+  readAdministrativeHierarchyStats
+} from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
-import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
 import {
   collectLocationIds,
@@ -416,11 +418,6 @@ export async function indexEventsInBulk(
   const hiearchyResolutionStarted = new Date()
   const hierarchyStatsBefore = readAdministrativeHierarchyStats()
 
-  /*
-   * `indexDocumentMs` is exact: the work it wraps is synchronous. `hierarchyMs`
-   * is a sum over concurrent awaits, so it over-counts where they overlap —
-   * read it as an upper bound.
-   */
   let hierarchyMs = 0
 
   const indexDocumentStarted = performance.now()
@@ -458,6 +455,13 @@ export async function indexEventsInBulk(
   )
   const batchId = batch[0]?.id ?? 'unknown'
   const hierarchyStats = readAdministrativeHierarchyStats(hierarchyStatsBefore)
+  /*
+   * `indexDocumentMs` is exact: the work it wraps is synchronous. `primeMs` and
+   * `hierarchyMs` are wall clock over awaits that share a connection pool with the
+   * other in-flight batches, so read them as upper bounds. The bracketed counters
+   * are process-wide deltas over the same window and so count those batches too,
+   * except `cacheSize`, which is absolute.
+   */
   logger.info(
     `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms ` +
       `(building index documents ${Math.round(indexDocumentMs)} ms, ` +

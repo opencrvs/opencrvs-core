@@ -190,3 +190,19 @@ test('does not cache a failed lookup', async () => {
   await primeAdministrativeHierarchyCache([officeId])
   expect(await getAdministrativeHierarchyById(officeId)).toContain(officeId)
 })
+
+test('does not cache a failed single-id lookup', async () => {
+  const { officeId } = await seedHierarchy()
+
+  clearAdministrativeHierarchyCache()
+
+  const connect = vi.spyOn(getPool(), 'connect')
+  connect.mockRejectedValueOnce(new Error('connection lost'))
+  await expect(getAdministrativeHierarchyById(officeId)).rejects.toThrow(
+    'connection lost'
+  )
+  connect.mockRestore()
+
+  // The retry sees a clean cache rather than the previous rejection.
+  expect(await getAdministrativeHierarchyById(officeId)).toContain(officeId)
+})

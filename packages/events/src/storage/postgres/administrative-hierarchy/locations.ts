@@ -536,6 +536,24 @@ export function readAdministrativeHierarchyStats(
   }
 }
 
+/*
+ * Guarded on identity so it cannot drop an entry a later write already replaced.
+ */
+function evictAdministrativeHierarchy(id: string, hierarchy: Promise<UUID[]>) {
+  if (administrativeHierarchyByIdCache.get(id) === hierarchy) {
+    administrativeHierarchyByIdCache.delete(id)
+  }
+}
+
+/*
+ * A cached rejection would outlive the failure and poison every later lookup,
+ * including the reindex retry, so a failed entry evicts itself.
+ */
+function cacheAdministrativeHierarchy(id: string, hierarchy: Promise<UUID[]>) {
+  void hierarchy.catch(() => evictAdministrativeHierarchy(id, hierarchy))
+  administrativeHierarchyByIdCache.set(id, hierarchy)
+}
+
 export async function getAdministrativeHierarchyById(
   id: string
 ): Promise<UUID[]> {
@@ -558,7 +576,7 @@ export async function getAdministrativeHierarchyById(
     return result.rows[0]?.ids ?? []
   })
 
-  administrativeHierarchyByIdCache.set(id, promise)
+  cacheAdministrativeHierarchy(id, promise)
   return promise
 }
 
@@ -624,30 +642,32 @@ export async function primeAdministrativeHierarchyCache(
     GROUP BY seed_id;
   `
 
-  const queryStarted = performance.now()
-  const hierarchyBySeedId = db.executeQuery(query.compile(db)).then((result) => {
-    hierarchyStats.dbMs += performance.now() - queryStarted
-    return new Map<string, UUID[]>(
-      result.rows.map((row) => [row.seedId, row.ids])
+  const hierarchyBySeedId = db
+    .executeQuery(query.compile(db))
+    .then(
+      (result) =>
+        new Map<string, UUID[]>(result.rows.map((row) => [row.seedId, row.ids]))
     )
+
+  const entries = uncached.map((id) => {
+    const hierarchy = hierarchyBySeedId.then((bySeedId) => bySeedId.get(id) ?? [])
+    cacheAdministrativeHierarchy(id, hierarchy)
+    return [id, hierarchy] as const
   })
 
-  for (const id of uncached) {
-    const entry = hierarchyBySeedId.then((bySeedId) => bySeedId.get(id) ?? [])
+  try {
+    await hierarchyBySeedId
+  } catch (error) {
     /*
-     * A cached rejection would outlive the failure and poison every later lookup,
-     * including the reindex retry, so a failed entry evicts itself. Guarded on
-     * identity so it cannot drop an entry a later prime already replaced.
+     * An entry evicts itself only a microtask after this rejection reaches the
+     * caller, which is long enough for a concurrently indexing batch to read one.
+     * Evicting here instead means no caller ever observes a poisoned entry.
      */
-    void entry.catch(() => {
-      if (administrativeHierarchyByIdCache.get(id) === entry) {
-        administrativeHierarchyByIdCache.delete(id)
-      }
-    })
-    administrativeHierarchyByIdCache.set(id, entry)
+    for (const [id, hierarchy] of entries) {
+      evictAdministrativeHierarchy(id, hierarchy)
+    }
+    throw error
   }
-
-  await hierarchyBySeedId
 }
 
 export async function isLocationUnderAdministrativeArea({
