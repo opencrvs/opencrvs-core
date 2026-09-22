@@ -340,6 +340,55 @@ export async function getEventIndexWithAdministrativeHierarchy(
   return tempEvent
 }
 
+/**
+ * Lists every location id {@link getEventIndexWithAdministrativeHierarchy} would
+ * resolve for this event, so a caller can prime the hierarchy cache for a whole
+ * batch in one query instead of paying a round trip per field.
+ *
+ * Mirrors that function's traversal rather than sharing it, so the two can drift.
+ * A missed id is only a missed prefetch — the resolver still falls back to its own
+ * lookup — so drift costs a round trip, never correctness.
+ */
+export function collectLocationIds(
+  eventConfig: EventConfig,
+  event: EventIndex
+): string[] {
+  const ids: (string | null | undefined)[] = [
+    event.createdAtLocation,
+    event.placeOfEvent,
+    event.updatedAtLocation,
+    event.legalStatuses.NOTIFIED?.createdAtLocation,
+    event.legalStatuses.DECLARED?.createdAtLocation,
+    event.legalStatuses.REGISTERED?.createdAtLocation
+  ]
+
+  const fieldConfigs = Object.fromEntries(
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
+  )
+
+  for (const [k, value] of Object.entries(event.declaration)) {
+    const fieldConfig = fieldConfigs[decodeFieldId(k)]
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const parsed = AddressFieldValue.safeParse(value)
+      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        ids.push(parsed.data.administrativeArea)
+        continue
+      }
+    }
+
+    const uuid = UUID.safeParse(value)
+    if (uuid.success) {
+      ids.push(uuid.data)
+    }
+  }
+
+  return _.compact(ids)
+}
+
 export function decodeEventIndex(
   eventConfig: EventConfig,
   event: EncodedEventIndex
