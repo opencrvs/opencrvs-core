@@ -43,7 +43,6 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { readAdministrativeHierarchyStats } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import { TrpcUserContext } from '../../context'
 import {
@@ -412,27 +411,14 @@ export async function indexEventsInBulk(
   const esClient = getOrCreateClient()
 
   const hiearchyResolutionStarted = new Date()
-  const hierarchyStatsBefore = readAdministrativeHierarchyStats()
-
-  /*
-   * `indexDocumentMs` is exact: the work it wraps is synchronous. `hierarchyMs`
-   * is a sum over concurrent awaits, so it over-counts where they overlap —
-   * read it as an upper bound.
-   */
-  let indexDocumentMs = 0
-  let hierarchyMs = 0
 
   const indexedDocs = await Promise.all(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
-      const indexDocumentStarted = performance.now()
       const eventIndex = eventToEventIndex(doc, config)
-      const hierarchyStarted = performance.now()
-      indexDocumentMs += hierarchyStarted - indexDocumentStarted
 
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
-      hierarchyMs += performance.now() - hierarchyStarted
       return [
         {
           index: {
@@ -446,13 +432,8 @@ export async function indexEventsInBulk(
     })
   )
   const batchId = batch[0]?.id ?? 'unknown'
-  const hierarchyStats = readAdministrativeHierarchyStats(hierarchyStatsBefore)
   logger.info(
-    `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms ` +
-      `(building index documents ${Math.round(indexDocumentMs)} ms, ` +
-      `resolving hierarchies ${Math.round(hierarchyMs)} ms ` +
-      `[${hierarchyStats.hits} cache hits, ${hierarchyStats.misses} misses, ` +
-      `${Math.round(hierarchyStats.dbMs)} ms in postgres, cache size ${hierarchyStats.cacheSize}])`
+    `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms`
   )
 
   const body = indexedDocs.flat()

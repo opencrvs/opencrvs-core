@@ -510,39 +510,13 @@ export function getAdministrativeHierarchyByIdCte(
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
 
-/*
- * Counters for attributing reindex time. Monotonic for the life of the process;
- * `readAdministrativeHierarchyStats` subtracts an earlier reading to get a delta.
- */
-const hierarchyStats = { hits: 0, misses: 0, dbMs: 0 }
-
-export type AdministrativeHierarchyStats = {
-  hits: number
-  misses: number
-  dbMs: number
-  cacheSize: number
-}
-
-export function readAdministrativeHierarchyStats(
-  since?: AdministrativeHierarchyStats
-): AdministrativeHierarchyStats {
-  return {
-    hits: hierarchyStats.hits - (since?.hits ?? 0),
-    misses: hierarchyStats.misses - (since?.misses ?? 0),
-    dbMs: hierarchyStats.dbMs - (since?.dbMs ?? 0),
-    cacheSize: administrativeHierarchyByIdCache.size
-  }
-}
-
 export async function getAdministrativeHierarchyById(
   id: string
 ): Promise<UUID[]> {
   const cached = administrativeHierarchyByIdCache.get(id)
   if (cached) {
-    hierarchyStats.hits++
     return cached
   }
-  hierarchyStats.misses++
 
   const db = getClient()
   const query = sql<{ ids: UUID[] }>`
@@ -550,11 +524,9 @@ export async function getAdministrativeHierarchyById(
     SELECT array_agg(id ORDER BY depth DESC) AS ids FROM area_chain;
   `
 
-  const queryStarted = performance.now()
-  const promise = db.executeQuery(query.compile(db)).then((result) => {
-    hierarchyStats.dbMs += performance.now() - queryStarted
-    return result.rows.length > 0 ? result.rows[0].ids : []
-  })
+  const promise = db
+    .executeQuery(query.compile(db))
+    .then((result) => (result.rows.length > 0 ? result.rows[0].ids : []))
 
   administrativeHierarchyByIdCache.set(id, promise)
   return promise
