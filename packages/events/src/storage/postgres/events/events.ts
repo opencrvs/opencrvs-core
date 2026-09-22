@@ -113,11 +113,12 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
-async function* processBatch(batch: UUID[]) {
+async function* processBatch(batch: UUID[], chunk: number, idReadMs: number) {
   const db = getClient()
   const ids = batch
 
   let eventDocs: EventDocument[] = []
+  const fetchStarted = performance.now()
   try {
     eventDocs = await getEventsByIdsInTrx(db, ids)
   } catch (err) {
@@ -129,6 +130,15 @@ async function* processBatch(batch: UUID[]) {
     })
     return
   }
+  const fetchMs = performance.now() - fetchStarted
+
+  /*
+   * A yield only returns once the consumer asks for the next event, so this sums
+   * the time the reader spent waiting for the indexing side rather than working.
+   * Reading and fetching dominating instead means the reader is what starves it.
+   */
+  let consumerMs = 0
+  let yielded = 0
 
   for (const event of eventDocs) {
     // filter out records without any DECLARE action
@@ -136,8 +146,17 @@ async function* processBatch(batch: UUID[]) {
       continue
     }
 
+    const yieldStarted = performance.now()
     yield event
+    consumerMs += performance.now() - yieldStarted
+    yielded++
   }
+
+  logger.info(
+    `Read chunk ${chunk}: ${ids.length} ids yielded ${yielded} events ` +
+      `(reading ids ${Math.round(idReadMs)} ms, fetching documents ${Math.round(fetchMs)} ms, ` +
+      `blocked on the indexing side ${Math.round(consumerMs)} ms)`
+  )
 }
 
 /*
@@ -149,16 +168,22 @@ export async function* streamEventDocuments() {
   const db = getClient()
   const eventsStream = db.selectFrom('events').select('id').stream()
   let batch: UUID[] = []
+  let chunk = 0
+  let idReadMs = 0
+  let idReadStarted = performance.now()
 
   for await (const row of eventsStream) {
+    idReadMs += performance.now() - idReadStarted
     batch.push(row.id)
     if (batch.length === STREAM_BATCH_SIZE) {
-      yield* processBatch(batch)
+      yield* processBatch(batch, ++chunk, idReadMs)
       batch = []
+      idReadMs = 0
     }
+    idReadStarted = performance.now()
   }
   if (batch.length) {
-    yield* processBatch(batch)
+    yield* processBatch(batch, ++chunk, idReadMs)
   }
 }
 
