@@ -167,9 +167,7 @@ export async function onMosipBirthRegisterHandler(
       'Birth registration will not be forwarded to MOSIP based on custom logic.'
     )
     await sendInformantNotification({ event, token, registrationNumber })
-    return h
-      .response({ registrationNumber: generateRegistrationNumber() })
-      .code(200)
+    return h.response({ registrationNumber }).code(200)
   }
 
   try {
@@ -234,9 +232,7 @@ export async function onMosipDeathRegisterHandler(
 
   if (!shouldForwardDeathRegistrationToMosip(declaration)) {
     await sendInformantNotification({ event, token, registrationNumber })
-    return h
-      .response({ registrationNumber: generateRegistrationNumber() })
-      .code(200)
+    return h.response({ registrationNumber }).code(200)
   }
 
   try {
