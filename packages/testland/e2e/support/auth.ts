@@ -295,7 +295,10 @@ export async function seedSharedSession(
       database: string
       store: string
       localStorage: { name: string; value: string }[]
-      records: { key: string; value: string }[]
+      userDetailsKey: string
+      userDataKey: string
+      userId: string
+      pinHash: string
     }) => {
       if (window.location.origin !== seed.origin) {
         return
@@ -337,8 +340,41 @@ export async function seedSharedSession(
         const transaction = db.transaction(seed.store, 'readwrite')
         const store = transaction.objectStore(seed.store)
 
-        for (const { key, value } of seed.records) {
-          store.put(value, key)
+        store.put(JSON.stringify({ id: seed.userId }), seed.userDetailsKey)
+
+        /*
+         * Merge the PIN into whatever the store already holds. The app keeps
+         * one entry per user in `USER_DATA` and, unlike `USER_DETAILS`, never
+         * clears it on logout - so a test that signs a second user in on the
+         * same page would otherwise drop the first user's PIN, and the app
+         * would show that user the create-PIN screen when they sign back in.
+         * Mirrors `storePINForUser` in the client's `CreatePin`.
+         */
+        const stored = store.get(seed.userDataKey)
+
+        stored.onsuccess = () => {
+          let allUserData: { userID: string; userPIN?: string }[] = []
+
+          try {
+            const parsed = JSON.parse((stored.result as string) || '[]')
+            if (Array.isArray(parsed)) {
+              allUserData = parsed
+            }
+          } catch {
+            allUserData = []
+          }
+
+          const currentUserData = allUserData.find(
+            (user) => user && user.userID === seed.userId
+          )
+
+          if (currentUserData) {
+            currentUserData.userPIN = seed.pinHash
+          } else {
+            allUserData.push({ userID: seed.userId, userPIN: seed.pinHash })
+          }
+
+          store.put(JSON.stringify(allUserData), seed.userDataKey)
         }
 
         transaction.oncomplete = () => db.close()
@@ -354,15 +390,12 @@ export async function seedSharedSession(
         { name: 'opencrvs', value: token },
         { name: 'opencrvs-refresh', value: refreshToken }
       ],
-      records: [
-        // `ProtectedPage` looks the PIN up by the current user's id; the app
-        // overwrites both entries with the real ones as soon as it has them.
-        { key: USER_DETAILS_KEY, value: JSON.stringify({ id: userId }) },
-        {
-          key: USER_DATA_KEY,
-          value: JSON.stringify([{ userID: userId, userPIN: session.pinHash }])
-        }
-      ]
+      // `ProtectedPage` looks the PIN up by the current user's id; the app
+      // replaces the details with the real ones as soon as it has them.
+      userDetailsKey: USER_DETAILS_KEY,
+      userDataKey: USER_DATA_KEY,
+      userId,
+      pinHash: session.pinHash
     }
   )
 }
