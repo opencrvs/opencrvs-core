@@ -182,6 +182,7 @@ This section allows you to configure the postgres deployment within your infrast
 | restore.schedule | string | `0 3 * * *` | Restore cronjob schedule, if not defined then value from `restore.schedule` is used |
 | restore.cronjob | boolean | `true` | Run restore as cronjob, setting to `false` allows to run one time job, e/g manual restore, or disaster recovery scenario |
 | node_port | int | `n/a` | Fixed NodePort to expose port `5432` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
+| shm_size | string | `1Gi` | Size of `/dev/shm`, mounted as a memory-backed `emptyDir`. Postgres uses it for parallel query workers; the container runtime's default (typically 64Mi) is easily exhausted, causing "could not resize shared memory segment" errors unrelated to disk space. |
 
 ## Elasticsearch
 
