@@ -213,16 +213,6 @@ paths:
           name: customActionType
           schema:
             type: string
-        - in: query
-          name: waitFor
-          schema:
-            default: true
-            description: Whether the action should wait for the event to be indexed before
-              returning. Defaults to true. Setting this to false completes
-              faster but might lead to stale data in the client if the client
-              tries to read the event immediately after performing the action.
-              Use with care.
-            type: boolean
       responses:
         "200":
           description: Successful response
@@ -2947,11 +2937,9 @@ components:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
+          description: READ is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfigOutput"
@@ -2982,44 +2970,11 @@ components:
           description: Configuration of the review page for read-only view.
       required:
         - label
-        - flags
         - type
         - review
       additionalProperties: false
       description: Configuration for the read action — defines the record-tab content
         displayed on the event overview page.
-    ActionFlagConfig:
-      type: object
-      properties:
-        id:
-          anyOf:
-            - anyOf:
-                - type: string
-                - type: string
-                  enum:
-                    - incomplete
-                    - rejected
-                    - correction-requested
-                    - potential-duplicate
-                    - edit-in-progress
-            - type: string
-              description: Custom flag identifier defined by the country config.
-        operation:
-          type: string
-          enum:
-            - add
-            - remove
-          description: Operation to perform on the flag.
-        conditional:
-          description: When conditional is met, the operation is performed on the flag. If
-            not provided, the operation is performed unconditionally.
-          $ref: "#/components/schemas/Conditional"
-      required:
-        - id
-        - operation
-      additionalProperties: false
-      description: Add or remove operation applied to a flag when the parent action is
-        accepted. Optionally gated by a conditional.
     FieldConfig:
       oneOf:
         - $ref: "#/components/schemas/FieldGroup"
@@ -13844,6 +13799,38 @@ components:
         - type
       additionalProperties: false
       description: Configuration for deleting a draft record.
+    ActionFlagConfig:
+      type: object
+      properties:
+        id:
+          anyOf:
+            - anyOf:
+                - type: string
+                - type: string
+                  enum:
+                    - incomplete
+                    - rejected
+                    - correction-requested
+                    - potential-duplicate
+                    - edit-in-progress
+            - type: string
+              description: Custom flag identifier defined by the country config.
+        operation:
+          type: string
+          enum:
+            - add
+            - remove
+          description: Operation to perform on the flag.
+        conditional:
+          description: When conditional is met, the operation is performed on the flag. If
+            not provided, the operation is performed unconditionally.
+          $ref: "#/components/schemas/Conditional"
+      required:
+        - id
+        - operation
+      additionalProperties: false
+      description: Add or remove operation applied to a flag when the parent action is
+        accepted. Optionally gated by a conditional.
     NotifyActionConfig:
       type: object
       properties:
