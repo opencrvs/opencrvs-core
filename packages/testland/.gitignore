@@ -41,6 +41,8 @@ graphql.schema.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+# Shared authentication state captured by the e2e `setup` project
+/playwright/.auth/
 notebooks
 
 ctrf/

@@ -29,6 +29,22 @@ const optInSuites = [
  */
 // require('dotenv').config();
 
+const chromeOptions = {
+  ...devices['Desktop Chrome'],
+  ignoreHTTPSErrors,
+  launchOptions: {
+    args: process.env.CI
+      ? [
+          '--ignore-certificate-errors',
+          '--ignore-ssl-errors',
+          '--allow-running-insecure-content',
+          '--disable-web-security',
+          ...insecureOrigins
+        ]
+      : []
+  }
+}
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -73,23 +89,20 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    /*
+     * Signs in once and persists the session every spec reuses, see
+     * https://playwright.dev/docs/auth and `e2e/auth.setup.ts`.
+     */
+    {
+      name: 'setup',
+      testDir: './e2e',
+      testMatch: /auth\.setup\.ts/,
+      use: chromeOptions
+    },
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        ignoreHTTPSErrors,
-        launchOptions: {
-          args: process.env.CI
-            ? [
-                '--ignore-certificate-errors',
-                '--ignore-ssl-errors',
-                '--allow-running-insecure-content',
-                '--disable-web-security',
-                ...insecureOrigins
-              ]
-            : []
-        }
-      }
+      dependencies: ['setup'],
+      use: chromeOptions
     }
   ]
 })

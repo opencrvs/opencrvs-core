@@ -18,6 +18,11 @@ import {
   SAFE_INPUT_CHANGE_TIMEOUT_MS,
   TEST_USER_PASSWORD
 } from './constants'
+import {
+  captureSharedSessionOnce,
+  readSharedSession,
+  seedSharedSession
+} from './auth'
 import { format, parseISO } from 'date-fns'
 import { random } from 'lodash'
 import fetch from 'node-fetch'
@@ -38,20 +43,32 @@ export async function createPIN(page: Page) {
  * Waits for url change after "client login" url. User is directed to client app page with different url,
  * or if retrieving token fails, the client redirects to the separate login app — detecting
  * that directly surfaces a clear failure immediately
+ *
+ * Without a refresh token the client is expected to authenticate from the
+ * session already seeded into the browser, and the landing is the app's own
+ * redirect off the root path.
  */
 export async function waitForAuthenticatedLanding(
   page: Page,
-  refreshToken: string,
+  refreshToken?: string,
   timeout?: number
 ) {
   const selectorOptions = timeout !== undefined ? { timeout } : {}
-  const clientLoginUrl = `${CLIENT_URL}?refreshToken=${refreshToken}`
+  const clientLoginUrl =
+    refreshToken === undefined
+      ? CLIENT_URL
+      : `${CLIENT_URL}?refreshToken=${refreshToken}`
 
   await page.goto(clientLoginUrl)
 
   const redirectedToApp = page.waitForURL(
     (url) =>
-      url.href !== clientLoginUrl && url.origin !== new URL(LOGIN_URL).origin,
+      url.href !== clientLoginUrl &&
+      url.origin !== new URL(LOGIN_URL).origin &&
+      // With no token in the url there is no query string for the client to
+      // strip, so the first url change is the redirect off the root path,
+      // which only happens once the app has authenticated.
+      (refreshToken !== undefined || url.pathname !== '/'),
     selectorOptions
   )
 
@@ -62,7 +79,7 @@ export async function waitForAuthenticatedLanding(
     )
     .then(() => {
       throw new Error(
-        'Redirected to the login page instead of the client — the refresh token exchange likely failed'
+        'Redirected to the login page instead of the client — the refresh token exchange, or the seeded session, likely failed'
       )
     })
 
@@ -103,17 +120,38 @@ export async function login(
   username: (typeof CREDENTIALS)[keyof typeof CREDENTIALS] = CREDENTIALS.REGISTRAR,
   /**
    * Set to true to skip PIN creation, e.g. when the test context already has pin saved locally.
+   * Has no effect when the shared session is used - no PIN is ever created then.
    */
   skipPin?: boolean
 ) {
   const { token, refreshToken } = await getAuthTokens(username)
   expect(refreshToken).toBeDefined()
 
+  const sharedSession = readSharedSession()
+
+  if (sharedSession) {
+    /*
+     * Reuse the session the `setup` project captured: with the tokens and the
+     * PIN seeded, the app boots authenticated and unlocked - no token handoff
+     * and no PIN screen. See https://playwright.dev/docs/auth and
+     * `e2e/support/auth.ts`.
+     */
+    await seedSharedSession(page, {
+      token,
+      refreshToken,
+      session: sharedSession
+    })
+    await waitForAuthenticatedLanding(page)
+
+    return token
+  }
+
   // Hand off only the refresh token; the client mints the access token from it.
   await waitForAuthenticatedLanding(page, refreshToken)
 
   if (!skipPin) {
     await createPIN(page)
+    await captureSharedSessionOnce(page, token)
   }
 
   return token
