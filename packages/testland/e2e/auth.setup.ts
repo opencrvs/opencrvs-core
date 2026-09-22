@@ -22,9 +22,12 @@ import {
  * Playwright's authentication guide (https://playwright.dev/docs/auth).
  *
  * Every `login()` in the suite reuses what this writes, so no spec has to
- * walk the sign-in handoff and the PIN screen again. The state carries no
- * user-specific data beyond the PIN hash - see `e2e/support/auth.ts` - so one
- * sign-in is enough for every test user.
+ * walk the sign-in handoff and the PIN screen again, and no spec has to wait
+ * for the country configuration to load before the app renders. Nothing it
+ * captures is user-specific except the PIN hash, which is keyed by user id,
+ * and the certificate templates, which are dropped for a user whose scopes
+ * differ - see `e2e/support/auth.ts` - so one sign-in is enough for every
+ * test user.
  *
  * `login()` falls back to signing in through the app when this has not run,
  * which keeps runs that filter tests down to single spec files working.

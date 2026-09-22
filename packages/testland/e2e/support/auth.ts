@@ -30,14 +30,16 @@ import { CLIENT_URL, GATEWAY_HOST } from './constants'
  * unlocked instead of replaying the sign-in handoff and the PIN screen in
  * every spec.
  *
- * Two files, because Playwright's storage state cannot carry everything the
+ * Three files, because Playwright's storage state cannot carry everything the
  * app keeps a session in:
  *
  * - `storage-state.json` is Playwright's own storage state (cookies +
  *   localStorage) of the signed-in setup context.
  * - `session.json` holds the PIN, which the app keeps in IndexedDB.
+ * - `offline.json` holds the country-config cache the app boots on, which it
+ *   also keeps in IndexedDB. See `captureOfflineData` below.
  *
- * Both are written per run into a gitignored directory.
+ * All three are written per run into a gitignored directory.
  */
 export const AUTH_STATE_DIR = path.resolve(__dirname, '../../playwright/.auth')
 export const STORAGE_STATE_FILE = path.join(
@@ -45,6 +47,7 @@ export const STORAGE_STATE_FILE = path.join(
   'storage-state.json'
 )
 export const SESSION_STATE_FILE = path.join(AUTH_STATE_DIR, 'session.json')
+export const OFFLINE_STATE_FILE = path.join(AUTH_STATE_DIR, 'offline.json')
 
 /**
  * idb-keyval store the client app keeps its key-value pairs in.
@@ -54,6 +57,16 @@ const IDB_DATABASE = 'OpenCRVS'
 const IDB_STORE = 'keyvaluepairs'
 const USER_DATA_KEY = 'USER_DATA'
 const USER_DETAILS_KEY = 'USER_DETAILS'
+/** Key the client caches the country configuration under, see `saveOfflineData`. */
+const OFFLINE_KEY = 'offline'
+
+/**
+ * The one scope `/api/config` varies its response by: the gateway filters the
+ * certificate templates it returns down to the templates this scope allows
+ * (`configHandler.getCertificatesConfig`). Nothing else in the cache depends
+ * on who asked for it.
+ */
+const CERTIFICATE_SCOPE_PREFIX = 'record.print-certified-copies'
 
 /**
  * localStorage keys the client keeps its tokens in
@@ -65,8 +78,8 @@ const USER_DETAILS_KEY = 'USER_DETAILS'
  */
 const TOKEN_KEYS = ['opencrvs', 'opencrvs-refresh']
 
-/** Bump when the shape below changes, so stale files are ignored. */
-const SESSION_STATE_VERSION = 1
+/** Bump when the shapes below change, so stale files are ignored. */
+const SESSION_STATE_VERSION = 2
 
 interface PersistedSession {
   version: number
@@ -80,10 +93,38 @@ interface PersistedSession {
   pinHash: string
 }
 
+/**
+ * The client's own `offline` cache entry, as captured from the setup user.
+ *
+ * `offlineData` is the parsed entry. It is stored parsed rather than as the
+ * raw string so the per-role part can be dropped before seeding - see
+ * `offlineDataForToken`.
+ */
+interface PersistedOfflineData {
+  version: number
+  /** Client origin the cache was captured against. */
+  origin: string
+  /**
+   * The capturing user's `record.print-certified-copies` scopes, sorted. A
+   * user whose scopes match gets the captured certificates as they are,
+   * because `/api/config` would return exactly those to them too.
+   */
+  certificateScopes: string[]
+  offlineData: OfflineData
+}
+
+type OfflineData = {
+  config?: unknown
+  languages?: unknown
+  templates?: { certificates?: unknown[] }
+} & Record<string, unknown>
+
 interface SharedSession {
   pinHash: string
   /** Non-token localStorage entries of the client origin. */
   localStorage: { name: string; value: string }[]
+  /** `null` when the country-config cache could not be captured. */
+  offline: PersistedOfflineData | null
 }
 
 /** Per-worker cache so every `login()` does not re-read the files. */
@@ -123,12 +164,26 @@ function readStoredString(page: Page, key: string) {
   )
 }
 
-function readUserIdFromToken(token: string) {
-  const { sub } = JSON.parse(
-    Buffer.from(token.split('.')[1], 'base64').toString()
-  ) as { sub: string }
+function readTokenPayload(token: string) {
+  return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()) as {
+    sub: string
+    scope?: string[]
+  }
+}
 
-  return sub
+/**
+ * The token's certificate scopes, sorted so two users can be compared.
+ * Kept as the raw scope strings - they carry the allowed template ids - so
+ * this does not have to know how a configurable scope is encoded.
+ */
+function readCertificateScopes(token: string) {
+  return (readTokenPayload(token).scope ?? [])
+    .filter((scope) => scope.startsWith(CERTIFICATE_SCOPE_PREFIX))
+    .sort()
+}
+
+function readUserIdFromToken(token: string) {
+  return readTokenPayload(token).sub
 }
 
 async function readPinHash(page: Page, userId: string) {
@@ -171,6 +226,91 @@ async function fetchUserDetails(token: string, userId: string) {
   return client.user.get.query(userId)
 }
 
+/**
+ * Mirrors the client's `isOfflineDataLoaded` (`offline/selectors.ts`): the
+ * three keys it needs before it renders anything but the loading bar.
+ */
+function hasRequiredOfflineData(data: OfflineData) {
+  return Boolean(data.config && data.templates && data.languages)
+}
+
+/**
+ * The country configuration the client caches under `offline`.
+ *
+ * On every boot the app blocks on this: `Page` renders a loading bar until
+ * `offlineDataLoaded` is true, and that only happens once `/api/config` (plus
+ * every certificate font it downloads), the country config's `content/client`
+ * and its handlebars module have all resolved. With the cache already in
+ * IndexedDB the app instead takes the branch it takes on any second boot -
+ * render from the cache straight away and refresh in the background
+ * (`GET_OFFLINE_DATA_SUCCESS`) - which is what this captures it for.
+ *
+ * Best effort: the cache is an optimisation, so a failure here leaves
+ * `offline.json` unwritten and every login boots the slow way, exactly as
+ * before.
+ */
+async function captureOfflineData(page: Page, token: string) {
+  let raw: string | null = null
+
+  try {
+    // Written asynchronously once the app has finished loading the config.
+    await expect(async () => {
+      const stored = await readStoredString(page, OFFLINE_KEY)
+      expect(
+        Boolean(stored && hasRequiredOfflineData(JSON.parse(stored)))
+      ).toBe(true)
+      raw = stored
+    }).toPass({ timeout: 30_000 })
+  } catch {
+    return
+  }
+
+  if (!raw) {
+    return
+  }
+
+  const captured: PersistedOfflineData = {
+    version: SESSION_STATE_VERSION,
+    origin: clientOrigin(),
+    certificateScopes: readCertificateScopes(token),
+    offlineData: JSON.parse(raw) as OfflineData
+  }
+
+  writeJsonAtomically(OFFLINE_STATE_FILE, captured)
+}
+
+/**
+ * What to seed into `offline` for the user behind `token`.
+ *
+ * Everything in the cache is country-wide - the client itself keeps it under
+ * one key for all users, so on a shared browser the next user already boots
+ * on the previous user's copy - with one exception: `/api/config` filters
+ * `templates.certificates` by the caller's `record.print-certified-copies`
+ * scope. Seeding the setup user's certificates for a user with different
+ * scopes would show them templates the gateway would not have given them,
+ * so those are dropped and left to the background refresh, which fills them
+ * in at the same moment it does today.
+ */
+function offlineDataForToken(
+  offline: PersistedOfflineData,
+  token: string
+): string {
+  const sameScopes =
+    JSON.stringify(readCertificateScopes(token)) ===
+    JSON.stringify(offline.certificateScopes)
+
+  if (sameScopes) {
+    return JSON.stringify(offline.offlineData)
+  }
+
+  return JSON.stringify({
+    ...offline.offlineData,
+    // `templates` must stay an object: the app treats a cache without it as
+    // not loaded and blocks on the network again.
+    templates: { ...offline.offlineData.templates, certificates: [] }
+  })
+}
+
 /** Writes JSON so a parallel worker never reads a half-written file. */
 function writeJsonAtomically(filePath: string, contents: unknown) {
   const temporaryPath = `${filePath}.${process.pid}.tmp`
@@ -208,6 +348,8 @@ export async function captureSharedSession(page: Page, token: string) {
   }
 
   writeJsonAtomically(SESSION_STATE_FILE, session)
+
+  await captureOfflineData(page, token)
 
   cachedSession = null
 }
@@ -280,6 +422,7 @@ export function readSharedSession(): SharedSession | null {
 
   cachedSession = {
     pinHash: session.pinHash,
+    offline: readPersistedOfflineData(origin),
     localStorage: (
       storageState.origins?.find((entry) => entry.origin === origin)
         ?.localStorage ?? []
@@ -287,6 +430,37 @@ export function readSharedSession(): SharedSession | null {
   }
 
   return cachedSession
+}
+
+/**
+ * The captured country-config cache, or `null` when there is none to seed -
+ * in which case the app loads it from the network as it always has.
+ */
+function readPersistedOfflineData(origin: string): PersistedOfflineData | null {
+  if (!existsSync(OFFLINE_STATE_FILE)) {
+    return null
+  }
+
+  let offline: PersistedOfflineData
+
+  try {
+    offline = JSON.parse(
+      readFileSync(OFFLINE_STATE_FILE, 'utf8')
+    ) as PersistedOfflineData
+  } catch {
+    return null
+  }
+
+  if (
+    offline.version !== SESSION_STATE_VERSION ||
+    offline.origin !== origin ||
+    !offline.offlineData ||
+    !hasRequiredOfflineData(offline.offlineData)
+  ) {
+    return null
+  }
+
+  return offline
 }
 
 /**
@@ -312,6 +486,9 @@ export async function seedSharedSession(
 ) {
   const userId = readUserIdFromToken(token)
   const userDetails = JSON.stringify(await fetchUserDetails(token, userId))
+  const offlineData = session.offline
+    ? offlineDataForToken(session.offline, token)
+    : null
 
   seedCount += 1
 
@@ -324,8 +501,10 @@ export async function seedSharedSession(
       localStorage: { name: string; value: string }[]
       userDetailsKey: string
       userDataKey: string
+      offlineKey: string
       userId: string
       userDetails: string
+      offlineData: string | null
       pinHash: string
     }) => {
       if (window.location.origin !== seed.origin) {
@@ -369,6 +548,17 @@ export async function seedSharedSession(
         const store = transaction.objectStore(seed.store)
 
         store.put(seed.userDetails, seed.userDetailsKey)
+
+        /*
+         * The country configuration, so the app boots from the cache instead
+         * of blocking on the network for it. Written in the same transaction
+         * as the rest: IndexedDB runs transactions on a store in the order
+         * they were created, so the app's own read of this key - issued from
+         * its own, later transaction - waits for this one to commit.
+         */
+        if (seed.offlineData) {
+          store.put(seed.offlineData, seed.offlineKey)
+        }
 
         /*
          * Merge the PIN into whatever the store already holds. The app keeps
@@ -422,8 +612,10 @@ export async function seedSharedSession(
       // reads out of `USER_DETAILS` - see `fetchUserDetails` above.
       userDetailsKey: USER_DETAILS_KEY,
       userDataKey: USER_DATA_KEY,
+      offlineKey: OFFLINE_KEY,
       userId,
       userDetails,
+      offlineData,
       pinHash: session.pinHash
     }
   )
