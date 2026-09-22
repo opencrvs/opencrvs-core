@@ -17,7 +17,8 @@ import {
   writeFileSync
 } from 'fs'
 import * as path from 'path'
-import { CLIENT_URL } from './constants'
+import { createClient } from '@opencrvs/toolkit/api'
+import { CLIENT_URL, GATEWAY_HOST } from './constants'
 
 /**
  * Shared authentication state, following Playwright's authentication guide
@@ -143,6 +144,31 @@ async function readPinHash(page: Page, userId: string) {
   }[]
 
   return allUserData.find(({ userID }) => userID === userId)?.userPIN ?? null
+}
+
+/**
+ * The signing-in user's record, exactly as the app itself caches it under
+ * `USER_DETAILS`.
+ *
+ * `USER_DETAILS` cannot be left out of the seed: `ProtectedPage.getPIN()`
+ * looks the PIN up by `getCurrentUserID()`, which reads the id from this very
+ * entry, so without it the app shows the create-PIN screen.
+ *
+ * It must not be a stub either. `profileReducer`'s `GET_USER_DETAILS_SUCCESS`
+ * treats a cached record whose id matches the token's `sub` as usable and
+ * renders the app from it straight away - "so offline data loading is not
+ * delayed" - while it refetches in the background. A stub would therefore let
+ * the app run, briefly, with a user that has no name, no role and no primary
+ * office.
+ *
+ * So fetch the real record from the same `user.get` procedure the client
+ * calls (`packages/client/src/profile/queries.ts`), and seed that. What the
+ * background refetch returns is then what is already there.
+ */
+async function fetchUserDetails(token: string, userId: string) {
+  const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
+
+  return client.user.get.query(userId)
 }
 
 /** Writes JSON so a parallel worker never reads a half-written file. */
@@ -285,6 +311,7 @@ export async function seedSharedSession(
   }: { token: string; refreshToken: string; session: SharedSession }
 ) {
   const userId = readUserIdFromToken(token)
+  const userDetails = JSON.stringify(await fetchUserDetails(token, userId))
 
   seedCount += 1
 
@@ -298,6 +325,7 @@ export async function seedSharedSession(
       userDetailsKey: string
       userDataKey: string
       userId: string
+      userDetails: string
       pinHash: string
     }) => {
       if (window.location.origin !== seed.origin) {
@@ -340,7 +368,7 @@ export async function seedSharedSession(
         const transaction = db.transaction(seed.store, 'readwrite')
         const store = transaction.objectStore(seed.store)
 
-        store.put(JSON.stringify({ id: seed.userId }), seed.userDetailsKey)
+        store.put(seed.userDetails, seed.userDetailsKey)
 
         /*
          * Merge the PIN into whatever the store already holds. The app keeps
@@ -390,11 +418,12 @@ export async function seedSharedSession(
         { name: 'opencrvs', value: token },
         { name: 'opencrvs-refresh', value: refreshToken }
       ],
-      // `ProtectedPage` looks the PIN up by the current user's id; the app
-      // replaces the details with the real ones as soon as it has them.
+      // `ProtectedPage` looks the PIN up by the current user's id, which it
+      // reads out of `USER_DETAILS` - see `fetchUserDetails` above.
       userDetailsKey: USER_DETAILS_KEY,
       userDataKey: USER_DATA_KEY,
       userId,
+      userDetails,
       pinHash: session.pinHash
     }
   )
