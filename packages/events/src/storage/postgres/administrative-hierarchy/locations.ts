@@ -33,10 +33,12 @@ let administrativeHierarchyByIdCache: Record<
   string,
   Promise<UUID[]>
 > = Object.create(null)
+let administrativeHierarchyCacheSize = 0
 let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
 export function clearAdministrativeHierarchyCache() {
   administrativeHierarchyByIdCache = Object.create(null)
+  administrativeHierarchyCacheSize = 0
   leafLevelAdministrativeAreaIdsCache = null
 }
 
@@ -523,6 +525,7 @@ export type AdministrativeHierarchyStats = {
   hits: number
   misses: number
   dbMs: number
+  cacheSize: number
 }
 
 export function readAdministrativeHierarchyStats(
@@ -531,7 +534,8 @@ export function readAdministrativeHierarchyStats(
   return {
     hits: hierarchyStats.hits - (since?.hits ?? 0),
     misses: hierarchyStats.misses - (since?.misses ?? 0),
-    dbMs: hierarchyStats.dbMs - (since?.dbMs ?? 0)
+    dbMs: hierarchyStats.dbMs - (since?.dbMs ?? 0),
+    cacheSize: administrativeHierarchyCacheSize
   }
 }
 
@@ -558,6 +562,7 @@ export async function getAdministrativeHierarchyById(
   })
 
   administrativeHierarchyByIdCache[id] = promise
+  administrativeHierarchyCacheSize++
   return promise
 }
 

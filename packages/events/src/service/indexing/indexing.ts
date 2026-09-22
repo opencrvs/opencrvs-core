@@ -452,7 +452,7 @@ export async function indexEventsInBulk(
       `(building index documents ${Math.round(indexDocumentMs)} ms, ` +
       `resolving hierarchies ${Math.round(hierarchyMs)} ms ` +
       `[${hierarchyStats.hits} cache hits, ${hierarchyStats.misses} misses, ` +
-      `${Math.round(hierarchyStats.dbMs)} ms in postgres])`
+      `${Math.round(hierarchyStats.dbMs)} ms in postgres, cache size ${hierarchyStats.cacheSize}])`
   )
 
   const body = indexedDocs.flat()
