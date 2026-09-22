@@ -86,8 +86,13 @@ function buildQrPayload(
     dob = dob ?? (declaration['child.dob'] as string | undefined)
   }
 
-  // "Date of Birth" label always, including on death certs
-  const dateLabel = 'Date of Birth'
+  // Death certificates should surface the date of death, not the
+  // deceased's date of birth. The date of death is captured under
+  // 'eventDetails.date' in the death declaration.
+  const dateLabel = isDeathEvent ? 'Date of Death' : 'Date of Birth'
+  const dateValue = isDeathEvent
+    ? (declaration['eventDetails.date'] as string | undefined)
+    : dob
   const registrationNumberLabel = isDeathEvent ? 'DRN' : 'BRN'
 
   // Adoption's reg number is the selected child's own BRN from the linked
@@ -114,7 +119,7 @@ function buildQrPayload(
     lines.push(`Other Names: ${name.middlename}`)
   }
 
-  lines.push(`${dateLabel}: ${dob ?? ''}`)
+  lines.push(`${dateLabel}: ${dateValue ?? ''}`)
 
   return lines.join('\n')
 }
