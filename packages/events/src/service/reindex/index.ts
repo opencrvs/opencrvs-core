@@ -37,6 +37,8 @@ import {
   updateReindexingProgress
 } from './status'
 
+const REINDEX_CONCURRENCY = 4
+
 async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
   batch: EventDocument[]
@@ -96,14 +98,11 @@ async function reindexSearch(
   )
 
   let buffer: EventDocument[] = []
+  const inFlight = new Set<Promise<void>>()
+  let failure: Error | undefined
 
-  async function flush() {
-    if (buffer.length === 0) {
-      return
-    }
+  async function writeBatch(batch: EventDocument[]) {
     const start = new Date()
-    const batch = buffer
-    buffer = []
     const batchId = batch[0]?.id ?? 'unknown'
     logger.info(`Batch ${batchId}: ${batch.length} events to index`)
 
@@ -120,10 +119,47 @@ async function reindexSearch(
     )
   }
 
+  /*
+   * Starts a batch without waiting for it, so the next batch can be read from
+   * Postgres while this one is written to Elasticsearch and country config.
+   * Only blocks once REINDEX_CONCURRENCY batches are already in flight.
+   */
+  async function flush() {
+    if (buffer.length === 0) {
+      return
+    }
+    const batch = buffer
+    buffer = []
+
+    // The stored promise never rejects, so a failure cannot go unhandled while
+    // nothing is awaiting it. It surfaces on the next flush, or on drain below.
+    const pending: Promise<void> = writeBatch(batch)
+      .catch((err: unknown) => {
+        failure = failure ?? (err as Error)
+      })
+      .finally(() => {
+        inFlight.delete(pending)
+      })
+
+    inFlight.add(pending)
+
+    if (inFlight.size >= REINDEX_CONCURRENCY) {
+      await Promise.race(inFlight)
+    }
+  }
+
+  async function drain() {
+    await flush()
+    await Promise.all(inFlight)
+  }
+
   return new Transform({
     objectMode: true,
     async transform(event: EventDocument, _, cb) {
       try {
+        if (failure) {
+          throw failure
+        }
         buffer.push(event)
         if (buffer.length >= STREAM_BATCH_SIZE) {
           await flush()
@@ -135,7 +171,10 @@ async function reindexSearch(
     },
     async flush(cb) {
       try {
-        await flush()
+        await drain()
+        if (failure) {
+          throw failure
+        }
         cb()
       } catch (e) {
         cb(e as Error)
