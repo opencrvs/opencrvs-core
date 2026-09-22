@@ -29,14 +29,11 @@ const INSERT_MAX_CHUNK_SIZE = 1000
 
 // Process-level caches for administrative hierarchies. Invalidated whenever
 // locations or administrative areas are written.
-let administrativeHierarchyByIdCache: Record<
-  string,
-  Promise<UUID[]>
-> = Object.create(null)
+const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
 let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
 export function clearAdministrativeHierarchyCache() {
-  administrativeHierarchyByIdCache = Object.create(null)
+  administrativeHierarchyByIdCache.clear()
   leafLevelAdministrativeAreaIdsCache = null
 }
 
@@ -523,6 +520,7 @@ export type AdministrativeHierarchyStats = {
   hits: number
   misses: number
   dbMs: number
+  cacheSize: number
 }
 
 export function readAdministrativeHierarchyStats(
@@ -531,14 +529,15 @@ export function readAdministrativeHierarchyStats(
   return {
     hits: hierarchyStats.hits - (since?.hits ?? 0),
     misses: hierarchyStats.misses - (since?.misses ?? 0),
-    dbMs: hierarchyStats.dbMs - (since?.dbMs ?? 0)
+    dbMs: hierarchyStats.dbMs - (since?.dbMs ?? 0),
+    cacheSize: administrativeHierarchyByIdCache.size
   }
 }
 
 export async function getAdministrativeHierarchyById(
   id: string
 ): Promise<UUID[]> {
-  const cached = administrativeHierarchyByIdCache[id]
+  const cached = administrativeHierarchyByIdCache.get(id)
   if (cached) {
     hierarchyStats.hits++
     return cached
@@ -557,7 +556,7 @@ export async function getAdministrativeHierarchyById(
     return result.rows.length > 0 ? result.rows[0].ids : []
   })
 
-  administrativeHierarchyByIdCache[id] = promise
+  administrativeHierarchyByIdCache.set(id, promise)
   return promise
 }
 
