@@ -45,8 +45,10 @@ import {
 } from '@events/storage/elasticsearch'
 import { readAdministrativeHierarchyStats } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
+import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
 import {
+  collectLocationIds,
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
@@ -419,17 +421,26 @@ export async function indexEventsInBulk(
    * is a sum over concurrent awaits, so it over-counts where they overlap —
    * read it as an upper bound.
    */
-  let indexDocumentMs = 0
   let hierarchyMs = 0
 
-  const indexedDocs = await Promise.all(
-    batch.map(async (doc) => {
-      const config = getEventConfigById(configs, doc.type)
-      const indexDocumentStarted = performance.now()
-      const eventIndex = eventToEventIndex(doc, config)
-      const hierarchyStarted = performance.now()
-      indexDocumentMs += hierarchyStarted - indexDocumentStarted
+  const indexDocumentStarted = performance.now()
+  const indexableEvents = batch.map((doc) => {
+    const config = getEventConfigById(configs, doc.type)
+    return { doc, config, eventIndex: eventToEventIndex(doc, config) }
+  })
+  const indexDocumentMs = performance.now() - indexDocumentStarted
 
+  const primeStarted = performance.now()
+  await primeAdministrativeHierarchyCache(
+    indexableEvents.flatMap(({ config, eventIndex }) =>
+      collectLocationIds(config, eventIndex)
+    )
+  )
+  const primeMs = performance.now() - primeStarted
+
+  const indexedDocs = await Promise.all(
+    indexableEvents.map(async ({ doc, config, eventIndex }) => {
+      const hierarchyStarted = performance.now()
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
       hierarchyMs += performance.now() - hierarchyStarted
@@ -450,6 +461,7 @@ export async function indexEventsInBulk(
   logger.info(
     `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms ` +
       `(building index documents ${Math.round(indexDocumentMs)} ms, ` +
+      `priming the hierarchy cache ${Math.round(primeMs)} ms, ` +
       `resolving hierarchies ${Math.round(hierarchyMs)} ms ` +
       `[${hierarchyStats.hits} cache hits, ${hierarchyStats.misses} misses, ` +
       `${Math.round(hierarchyStats.dbMs)} ms in postgres, cache size ${hierarchyStats.cacheSize}])`

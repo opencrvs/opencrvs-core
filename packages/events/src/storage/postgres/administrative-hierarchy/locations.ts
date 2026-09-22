@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { Kysely, RawBuilder, sql } from 'kysely'
 import { chunk } from 'lodash'
 import {
@@ -553,11 +555,99 @@ export async function getAdministrativeHierarchyById(
   const queryStarted = performance.now()
   const promise = db.executeQuery(query.compile(db)).then((result) => {
     hierarchyStats.dbMs += performance.now() - queryStarted
-    return result.rows.length > 0 ? result.rows[0].ids : []
+    return result.rows[0]?.ids ?? []
   })
 
   administrativeHierarchyByIdCache.set(id, promise)
   return promise
+}
+
+/**
+ * Resolves the administrative hierarchies of many ids in one query and stores them
+ * in the same cache {@link getAdministrativeHierarchyById} reads from.
+ *
+ * That function issues one recursive CTE per id, and indexing resolves a location for
+ * every location-typed field of every event, so a batch turns into thousands of round
+ * trips queueing on the connection pool. Priming up front leaves them all cache hits.
+ *
+ * Ids resolving to nothing are cached as an empty hierarchy, the same as the
+ * single-id lookup returns, so a batch does not retry them one by one next call.
+ *
+ * Entries are cached before the query resolves, so a {@link clearAdministrativeHierarchyCache}
+ * landing mid-flight drops them rather than being undone by a late write.
+ */
+export async function primeAdministrativeHierarchyCache(
+  ids: string[]
+): Promise<void> {
+  const uncached = [
+    ...new Set(
+      ids.filter((id) => id && !administrativeHierarchyByIdCache.has(id))
+    )
+  ]
+
+  if (uncached.length === 0) {
+    return
+  }
+
+  const db = getClient()
+  const seeds = sql.val(uncached)
+  /*
+   * The single-id CTE walks one chain, so every row implicitly belongs to the id
+   * asked for. Resolving many at once merges the chains wherever they share an
+   * ancestor, so each row carries the id it started from and the recursive term
+   * propagates it unchanged.
+   */
+  const query = sql<{ seedId: UUID; ids: UUID[] }>`
+    WITH RECURSIVE area_chain AS (
+        -- 1a: Start from the locations among the seeds
+        SELECT l.id AS seed_id, l.id, l.administrative_area_id AS parent_id, 0 AS depth
+        FROM app.locations l
+        WHERE l.id = ANY(${seeds}::uuid[])
+
+        UNION ALL
+
+        -- 1b: Seeds that are not locations start from the administrative area directly
+        SELECT aa.id AS seed_id, aa.id, aa.parent_id, 0 AS depth
+        FROM app.administrative_areas aa
+        WHERE aa.id = ANY(${seeds}::uuid[])
+        AND NOT EXISTS (SELECT 1 FROM app.locations l WHERE l.id = aa.id)
+
+        UNION ALL
+
+        -- 2: Walk up, carrying the seed each chain started from
+        SELECT ac.seed_id, aa.id, aa.parent_id, ac.depth + 1
+        FROM area_chain ac
+        JOIN app.administrative_areas aa ON aa.id = ac.parent_id
+    )
+    SELECT seed_id, array_agg(id ORDER BY depth DESC) AS ids
+    FROM area_chain
+    GROUP BY seed_id;
+  `
+
+  const queryStarted = performance.now()
+  const hierarchyBySeedId = db.executeQuery(query.compile(db)).then((result) => {
+    hierarchyStats.dbMs += performance.now() - queryStarted
+    return new Map<string, UUID[]>(
+      result.rows.map((row) => [row.seedId, row.ids])
+    )
+  })
+
+  for (const id of uncached) {
+    const entry = hierarchyBySeedId.then((bySeedId) => bySeedId.get(id) ?? [])
+    /*
+     * A cached rejection would outlive the failure and poison every later lookup,
+     * including the reindex retry, so a failed entry evicts itself. Guarded on
+     * identity so it cannot drop an entry a later prime already replaced.
+     */
+    void entry.catch(() => {
+      if (administrativeHierarchyByIdCache.get(id) === entry) {
+        administrativeHierarchyByIdCache.delete(id)
+      }
+    })
+    administrativeHierarchyByIdCache.set(id, entry)
+  }
+
+  await hierarchyBySeedId
 }
 
 export async function isLocationUnderAdministrativeArea({
