@@ -454,9 +454,8 @@ export function deepMerge<
   /**
    * Cloning is essential since mergeWith mutates the first argument.
    */
-  const currentDocumentClone = cloneDeep(currentDocument)
   return mergeWith(
-    cloneDeep(currentDocumentClone),
+    cloneDeep(currentDocument),
     actionDocument,
     (previousValue, incomingValue) => {
       if (incomingValue === undefined) {
