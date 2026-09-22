@@ -15,6 +15,7 @@ import {
   encodeScope,
   getScopeOptionValue,
   JurisdictionFilter,
+  Scope,
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
@@ -834,6 +835,31 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
         accessLevel: 'administrativeArea',
         role: ['FIELD_AGENT']
       }
+    })
+  })
+})
+
+describe('action confirmation scopes', () => {
+  test('parses with or without the usual record-scope options', () => {
+    expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(true)
+    expect(
+      Scope.safeParse({
+        type: 'record.action.reject',
+        options: { event: ['birth'] }
+      }).success
+    ).toBe(true)
+  })
+
+  test('survives the encode/decode round trip used in tokens', () => {
+    const encoded = encodeScope({
+      type: 'record.action.accept',
+      options: { event: ['birth'] }
+    })
+
+    expect(encoded).toBe('type=record.action.accept&event[]=birth')
+    expect(decodeScope(encoded)).toEqual({
+      type: 'record.action.accept',
+      options: { event: ['birth'] }
     })
   })
 })

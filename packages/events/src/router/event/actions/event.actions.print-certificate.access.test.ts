@@ -24,7 +24,8 @@ import {
   createTestClient,
   seedEvent,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -34,6 +35,11 @@ const FORBIDDEN_ERROR = 'FORBIDDEN'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
   encodeScope({ type: 'record.print-certified-copies' })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Print certificate action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
@@ -138,7 +144,7 @@ describe('Print certificate action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.printCertificate.accept({
+        confirmationClient.event.actions.printCertificate.accept({
           ...actionPayload,
           registrationNumber: '12HZND4'
         })
@@ -147,7 +153,7 @@ describe('Print certificate action', () => {
 
     test('Prevents system rejecting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.printCertificate.reject(actionPayload)
+        confirmationClient.event.actions.printCertificate.reject(actionPayload)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
   })
