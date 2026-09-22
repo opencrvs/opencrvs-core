@@ -356,6 +356,16 @@ describe('Event indexing behavior', () => {
       await client.event.get({ eventId: event.id })
       expect(indexEvent).not.toHaveBeenCalled()
     })
+
+    test('does not index on read after declare', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      expect(indexEvent).toHaveBeenCalledTimes(1) // declare
+
+      await client.event.get({ eventId: event.id })
+      await client.event.get({ eventId: event.id })
+      expect(indexEvent).toHaveBeenCalledTimes(1) // reads do not add further calls
+    })
   })
 
   describe('Indexing actions', () => {
@@ -382,17 +392,19 @@ describe('Event indexing behavior', () => {
       expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> register
     })
 
-    test('indexes on register (with reads)', async () => {
+    test('indexes on register (reads interspersed do not add calls)', async () => {
       const event = await createEvent()
       await declareEvent(event)
       await client.event.get({ eventId: event.id })
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
       await client.event.get({ eventId: event.id })
+      // Re-assigning to the same user is a no-op (see assignRecord) and does
+      // not reach processAction, so this does not add a call either.
       await assignEvent(event, createAction.createdBy)
       await registerEvent(event)
       await client.event.get({ eventId: event.id })
-      expect(indexEvent).toHaveBeenCalledTimes(6) // declare -> view -> view -> assign -> register -> view
+      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> register (reads skipped)
     })
 
     test('indexes on notify', async () => {

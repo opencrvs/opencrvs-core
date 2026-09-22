@@ -142,13 +142,7 @@ const handlers = [
   http.post(`${env.COUNTRY_CONFIG_URL}/trigger/telemetry`, () =>
     HttpResponse.json({ status: 'forwarded' }, { status: 202 })
   ),
-  // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
-  // body params such as `subject_token`, `subject_token_type` omitted for simplicity
-  http.post(`${env.AUTH_URL}/token`, () =>
-    HttpResponse.json({
-      access_token: 'some-token'
-    })
-  ),
+  // Core sends its internal service token to the country config when requesting action confirmation
   http.get(`${env.AUTH_URL}/internal/service-token`, () =>
     HttpResponse.json({ token: 'service-token' })
   )

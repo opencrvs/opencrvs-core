@@ -659,8 +659,7 @@ describe.each(Object.entries(PENDING_ACTIONS))(
       })
 
       const response = await confirmer.event.get({
-        eventId: pending.eventId,
-        waitFor: false
+        eventId: pending.eventId
       })
 
       const syncAction = getOrThrow(

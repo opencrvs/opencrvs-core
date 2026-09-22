@@ -12,11 +12,7 @@ exports[`Registration by different user with declaration changes > registration 
 
 exports[`Registration by different user with declaration changes > registration agent declares, registrar attempts to set hidden field with value - should fail 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.id","value":"1234"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Person"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"Different"}]]`;
 
-exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept action if action is already rejected 1`] = `[TRPCError: Expected exactly one pending action, but found none]`;
-
-exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept the action if action is not first requested 1`] = `[TRPCError: Expected exactly one pending action, but found none]`;
-
-exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is already accepted 1`] = `[TRPCError: Action has already been accepted.]`;
+exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
 
 exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
 
