@@ -16,7 +16,6 @@ import {
   UUID,
   getUUID,
   getOrThrow,
-  encodeScope,
   ActionUpdate,
   ActionStatus,
   TokenUserType,
@@ -26,6 +25,7 @@ import {
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  CONFIRMATION_SCOPES,
   createSystemTestClient,
   createTestClient,
   setupTestCase,
@@ -35,9 +35,7 @@ import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import AppSchema from '@events/storage/postgres/events/schema/app/AppSchema'
 
-const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
-  encodeScope({ type: 'record.declare' })
-])
+const systemClient = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
 
 describe('Declare async accept action', () => {
   function mockActionApi(action: ActionType, status: number) {
