@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,33 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 
 import { HttpResponse, http } from 'msw'
-import { ActionDocument, generateRegistrationNumber } from '@opencrvs/commons'
 import {
+  ActionDocument,
   ActionStatus,
   ActionType,
   AddressType,
   encodeScope,
   EventDocument,
+  generateRegistrationNumber,
+  getCurrentEventState,
   getOrThrow,
   getUUID,
   UUID
 } from '@opencrvs/commons'
+import { ConfirmableActionType } from '@events/router/event/actions'
 import {
+  CONFIRMATION_SCOPES,
   createEvent,
   createSystemTestClient,
   createTestClient,
   setupTestCase,
-  TEST_SYSTEM_ID,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
-import { mswServer } from '@events/tests/msw'
+import {
+  mswServer,
+  tennisClubMembershipEventWithCustomAction
+} from '@events/tests/msw'
 import { env } from '@events/environment'
-import { ConfirmableActionType } from './actions'
-
-// @TODO: import once pyry is merged in.
-const CONFIRMATION_SCOPES = TEST_USER_DEFAULT_SCOPES
 
 type PendingAction = {
   actionId: UUID
@@ -48,12 +50,29 @@ const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 const CUSTOM_ACTION_TYPE = 'CONFIRM_SENIOR_MEMBERSHIP'
 const SENIOR_DATE_OF_BIRTH = '1949-05-10'
 
-const confirmer = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
+/**
+ * An override replaces only the fields it names. The rest of the original
+ * payload is kept so that fields identifying the action — `requestId`
+ * (correction approve/reject), `content` (reject) and `customActionType`
+ * (CUSTOM) — aren't dropped, which would fail the request on a missing field
+ * instead of on whatever the test is asserting.
+ */
+function withOverride<T extends object>(
+  payload: T,
+  overridePayload?: Record<string, unknown>
+): T {
+  return (overridePayload ? { ...payload, ...overridePayload } : payload) as T
+}
+
+const confirmer = createSystemTestClient(TEST_SYSTEM_ID, [
+  ...CONFIRMATION_SCOPES,
+  encodeScope({ type: 'record.read' })
+])
 
 function mockActionApi(
   action: ActionType,
   status: number,
-  body: Record<string, unknown>
+  body: Record<string, unknown> = {}
 ) {
   return mswServer.use(
     http.post(
@@ -61,6 +80,16 @@ function mockActionApi(
       () => HttpResponse.json(body, { status })
     )
   )
+}
+
+function flagsOf(event: EventDocument) {
+  return getCurrentEventState(event, tennisClubMembershipEventWithCustomAction)
+    .flags
+}
+
+function assignedToOf(event: EventDocument) {
+  return getCurrentEventState(event, tennisClubMembershipEventWithCustomAction)
+    .assignedTo
 }
 
 function requestedActionId(event: EventDocument, type: ActionType) {
@@ -105,14 +134,14 @@ async function requestPendingNotify(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.notify.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.notify.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -142,14 +171,14 @@ async function requestPendingDeclare(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.declare.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.declare.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -184,14 +213,14 @@ async function requestPendingEdit(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.edit.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.edit.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -226,14 +255,14 @@ async function requestPendingReject(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.reject.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.reject.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -268,14 +297,14 @@ async function requestPendingArchive(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.archive.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.archive.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -310,14 +339,14 @@ async function requestPendingUnarchive(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.unarchive.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.unarchive.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -352,7 +381,7 @@ async function requestPendingRegister(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.register.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -360,7 +389,7 @@ async function requestPendingRegister(
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.register.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -395,14 +424,14 @@ async function requestPendingPrintCertificate(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.printCertificate.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.printCertificate.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -438,14 +467,14 @@ async function requestPendingRequestCorrection(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.request.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.request.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -483,14 +512,14 @@ async function requestPendingApproveCorrection(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.approve.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.approve.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -528,14 +557,14 @@ async function requestPendingRejectCorrection(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.reject.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.reject.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -610,14 +639,14 @@ async function requestPendingCustom(
     eventId: event.id,
     accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.custom.accept({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
     reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.custom.reject({
-        ...(overridePayload ?? payload),
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -645,17 +674,240 @@ const PENDING_ACTIONS = {
 >
 
 describe.each(Object.entries(PENDING_ACTIONS))(
+  '%s confirmation',
+  (type, requestPendingAction) => {
+    test('accepting the pending action records it as accepted', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      const response = await pending.accept()
+
+      expect(
+        response.actions.find(
+          (action) =>
+            action.type === type && action.status === ActionStatus.Accepted
+        )
+      ).toMatchObject({ originalActionId: pending.actionId })
+
+      expect(flagsOf(response)).not.toContain(`${type.toLowerCase()}:requested`)
+    })
+
+    test('rejecting the pending action keeps the fields it carried', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      const response = await pending.reject()
+      const requested = getOrThrow(
+        response.actions.find((action) => action.id === pending.actionId),
+        'Could not find the requested action'
+      )
+
+      expect(
+        response.actions.find(
+          (action) =>
+            action.type === type && action.status === ActionStatus.Rejected
+        )
+      ).toMatchObject({
+        originalActionId: pending.actionId,
+        ...('requestId' in requested ? { requestId: requested.requestId } : {}),
+        ...('content' in requested ? { content: requested.content } : {})
+      })
+
+      expect(flagsOf(response)).toContain(`${type.toLowerCase()}:rejected`)
+    })
+
+    test('rejecting an accepted action is refused', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      await pending.accept()
+
+      await expect(pending.reject()).rejects.toThrow(
+        'Action has already been accepted.'
+      )
+    })
+
+    test('accepting a rejected action is refused', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      await pending.reject()
+
+      await expect(pending.accept()).rejects.toMatchObject({
+        code: 'BAD_REQUEST',
+        message: 'Action has already been rejected.'
+      })
+    })
+
+    test('accepting twice records a single accepted action', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      await pending.accept()
+      const response = await pending.accept()
+
+      expect(
+        response.actions.filter(
+          (action) =>
+            action.type === type && action.status === ActionStatus.Accepted
+        )
+      ).toHaveLength(1)
+    })
+
+    test('rejecting twice records a single rejected action', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      await pending.reject()
+      const response = await pending.reject()
+
+      expect(
+        response.actions.filter(
+          (action) =>
+            action.type === type && action.status === ActionStatus.Rejected
+        )
+      ).toHaveLength(1)
+    })
+  }
+)
+
+/**
+ * Assignment is out of the matrix above because it's not action-specific.
+ * `requireAssignment` guards every accept and reject, the
+ * async request releases the record in `defaultRequestHandler`, and `addAction`
+ * skips the unassign for system clients. DECLARE runs all of this.
+ */
+describe('assignment on an async confirmation', () => {
+  async function requestPendingDeclareFor() {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+    const payload = generator.event.actions.declare(event.id, {
+      waitFor: false
+    })
+
+    mockActionApi(ActionType.DECLARE, 202)
+
+    const requested = await client.event.actions.declare.request(payload)
+
+    return {
+      client,
+      generator,
+      event,
+      requested,
+      payload,
+      eventId: event.id,
+      actionId: requestedActionId(requested, ActionType.DECLARE)
+    }
+  }
+
+  function unassignCountOf(event: EventDocument) {
+    return event.actions.filter((action) => action.type === ActionType.UNASSIGN)
+      .length
+  }
+
+  test('the request releases the record once the confirmation goes async', async () => {
+    const { requested } = await requestPendingDeclareFor()
+
+    expect(assignedToOf(requested)).toBeUndefined()
+  })
+
+  test('a confirmation is refused while a user holds the record', async () => {
+    const { client, generator, event, eventId, payload, actionId } =
+      await requestPendingDeclareFor()
+
+    // Someone picks the record up again while the confirmation is pending.
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(eventId, {
+        waitFor: false,
+        assignedTo: getOrThrow(
+          event.actions.find((action) => action.type === ActionType.CREATE)
+            ?.createdBy,
+          'Could not find the create action'
+        )
+      })
+    )
+
+    await expect(
+      confirmer.event.actions.declare.accept({
+        ...payload,
+        eventId,
+        actionId,
+        transactionId: getUUID()
+      })
+    ).rejects.toMatchObject({
+      code: 'CONFLICT',
+      message: 'User is assigned to this event'
+    })
+
+    await expect(
+      confirmer.event.actions.declare.reject({
+        eventId,
+        actionId,
+        transactionId: getUUID(),
+        waitFor: false
+      })
+    ).rejects.toMatchObject({
+      code: 'CONFLICT',
+      message: 'User is assigned to this event'
+    })
+  })
+
+  test('rejecting records an unassign of its own and leaves nobody assigned', async () => {
+    const { eventId, actionId } = await requestPendingDeclareFor()
+
+    const response = await confirmer.event.actions.declare.reject({
+      eventId,
+      actionId,
+      transactionId: getUUID(),
+      waitFor: false
+    })
+
+    expect(unassignCountOf(response)).toBe(2)
+    expect(assignedToOf(response)).toBeUndefined()
+  })
+
+  test("keepAssignment skips that unassign, the record is nobody's either way", async () => {
+    const { eventId, actionId } = await requestPendingDeclareFor()
+
+    const response = await confirmer.event.actions.declare.reject({
+      eventId,
+      actionId,
+      transactionId: getUUID(),
+      keepAssignment: true,
+      waitFor: false
+    })
+
+    expect(unassignCountOf(response)).toBe(1)
+    expect(assignedToOf(response)).toBeUndefined()
+  })
+
+  test('accepting never unassigns, a system client holds no assignment', async () => {
+    const { requested, eventId, payload, actionId } =
+      await requestPendingDeclareFor()
+
+    const response = await confirmer.event.actions.declare.accept({
+      ...payload,
+      eventId,
+      actionId,
+      transactionId: getUUID()
+    })
+
+    expect(unassignCountOf(response)).toBe(unassignCountOf(requested))
+    expect(assignedToOf(response)).toBeUndefined()
+  })
+})
+
+const BAD_DECLARATION = {
+  cat: 'kissa',
+  'applicant.dob': 100
+}
+
+const BAD_ANNOTATION = {
+  dog: 'koira'
+}
+
+describe.each(Object.entries(PENDING_ACTIONS))(
   '%s reject',
   (type, requestPendingAction) => {
     test('synchronous declaration and annotation in response are ignored', async () => {
       const pending = await requestPendingAction(400, {
-        declaration: {
-          cat: 'kissa',
-          'applicant.dob': 100
-        },
-        annotation: {
-          dog: 'koira'
-        }
+        declaration: BAD_DECLARATION,
+        annotation: BAD_ANNOTATION
       })
 
       const response = await confirmer.event.get({
@@ -678,13 +930,8 @@ describe.each(Object.entries(PENDING_ACTIONS))(
       const pending = await requestPendingAction(202, {})
 
       const response = await pending.reject({
-        declaration: {
-          cat: 'kissa',
-          'applicant.dob': 100
-        },
-        annotation: {
-          dog: 'koira'
-        },
+        declaration: BAD_DECLARATION,
+        annotation: BAD_ANNOTATION,
         eventId: pending.eventId,
         waitFor: false
       })
@@ -697,48 +944,59 @@ describe.each(Object.entries(PENDING_ACTIONS))(
         'action not found'
       ) as ActionDocument
 
-      expect(syncAction.declaration).toEqual({})
+      if (type === ActionType.CUSTOM) {
+        expect(syncAction.declaration).toBeUndefined()
+      } else {
+        expect(syncAction.declaration).toEqual({})
+      }
       expect(syncAction.annotation).toBeUndefined()
     })
   }
 )
 
 describe.each(Object.entries(PENDING_ACTIONS))(
-  '%s synchronous accept',
+  '%s accept',
   (type, requestPendingAction) => {
-    test('error is thrown when annotation or action includes bad data', async () => {
-      const annotableActionError =
-        '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Unexpected field","id":"dog","value":"koira"}]'
+    const annotableActionError =
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Unexpected field","id":"dog","value":"koira"}]'
 
-      const nonAnnotableActionError =
-        '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100}]'
+    const nonAnnotableActionError =
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100}]'
 
-      const nonAnnotableActions = [
-        ActionType.EDIT,
-        ActionType.REJECT_CORRECTION,
-        ActionType.APPROVE_CORRECTION,
-        ActionType.ARCHIVE,
-        ActionType.UNARCHIVE
-      ]
+    const nonAnnotableActions = [
+      ActionType.EDIT,
+      ActionType.REJECT_CORRECTION,
+      ActionType.APPROVE_CORRECTION,
+      ActionType.ARCHIVE,
+      ActionType.UNARCHIVE
+    ]
+
+    const expectedError = nonAnnotableActions.some((na) => na === type)
+      ? nonAnnotableActionError
+      : annotableActionError
+
+    test('error is thrown when synchronous response annotation or declaration includes bad data', async () => {
       await expect(
         requestPendingAction(200, {
           registrationNumber:
             type === ActionType.REGISTER
               ? generateRegistrationNumber(() => 0.1)
               : undefined,
-          declaration: {
-            cat: 'kissa',
-            'applicant.dob': 100
-          },
-          annotation: {
-            dog: 'koira'
-          }
+          declaration: BAD_DECLARATION,
+          annotation: BAD_ANNOTATION
         })
-      ).rejects.toThrow(
-        nonAnnotableActions.some((na) => na === type)
-          ? nonAnnotableActionError
-          : annotableActionError
-      )
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('error is thrown when asynchronous request declaration or annotation includes bad data', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      await expect(
+        pending.accept({
+          declaration: BAD_DECLARATION,
+          annotation: BAD_ANNOTATION
+        })
+      ).rejects.toThrow(expectedError)
     })
   }
 )

@@ -47,7 +47,6 @@ import {
   EventInput,
   UUID,
   getDeclarationFieldById,
-  getPendingAction,
   StrictValidatorContext
 } from '@opencrvs/commons/events'
 
@@ -533,12 +532,6 @@ export const validateAcceptAction: MiddlewareFunction<
     eventType: event.type,
     token: ctx.token
   })
-
-  const pendingAction = getPendingAction(event.actions)
-
-  if (pendingAction.type !== input.type) {
-    throw new TRPCError({ code: 'BAD_REQUEST' })
-  }
 
   validateActionPayloadStructure({
     input,
