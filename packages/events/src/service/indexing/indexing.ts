@@ -418,8 +418,6 @@ export async function indexEventsInBulk(
   const hiearchyResolutionStarted = new Date()
   const hierarchyStatsBefore = readAdministrativeHierarchyStats()
 
-  let hierarchyMs = 0
-
   const indexDocumentStarted = performance.now()
   const indexableEvents = batch.map((doc) => {
     const config = getEventConfigById(configs, doc.type)
@@ -435,12 +433,11 @@ export async function indexEventsInBulk(
   )
   const primeMs = performance.now() - primeStarted
 
+  const resolveStarted = performance.now()
   const indexedDocs = await Promise.all(
     indexableEvents.map(async ({ doc, config, eventIndex }) => {
-      const hierarchyStarted = performance.now()
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
-      hierarchyMs += performance.now() - hierarchyStarted
       return [
         {
           index: {
@@ -453,20 +450,22 @@ export async function indexEventsInBulk(
       ]
     })
   )
+  const resolveMs = performance.now() - resolveStarted
+
   const batchId = batch[0]?.id ?? 'unknown'
   const hierarchyStats = readAdministrativeHierarchyStats(hierarchyStatsBefore)
   /*
-   * `indexDocumentMs` is exact: the work it wraps is synchronous. `primeMs` and
-   * `hierarchyMs` are wall clock over awaits that share a connection pool with the
-   * other in-flight batches, so read them as upper bounds. The bracketed counters
-   * are process-wide deltas over the same window and so count those batches too,
-   * except `cacheSize`, which is absolute.
+   * Each timer is the wall clock of one phase, so the three sum to the total. They
+   * include time lost to the other in-flight batches, which share this event loop
+   * and connection pool. The bracketed counters are process-wide deltas over the
+   * same window and so count those batches too, except `cacheSize`, which is
+   * absolute.
    */
   logger.info(
     `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms ` +
       `(building index documents ${Math.round(indexDocumentMs)} ms, ` +
       `priming the hierarchy cache ${Math.round(primeMs)} ms, ` +
-      `resolving hierarchies ${Math.round(hierarchyMs)} ms ` +
+      `resolving hierarchies ${Math.round(resolveMs)} ms ` +
       `[${hierarchyStats.hits} cache hits, ${hierarchyStats.misses} misses, ` +
       `${Math.round(hierarchyStats.dbMs)} ms in postgres, cache size ${hierarchyStats.cacheSize}])`
   )
