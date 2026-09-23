@@ -130,3 +130,46 @@ export async function cleanupTemporaryIndex(tempIndexName: string) {
     logger.info(`Temporary index ${tempIndexName} deleted`)
   }
 }
+
+/** A temp index (`<prefix>_<type>_<timestamp>`) with no alias never finished reindexing (e.g. killed mid-run) and is safe to delete. */
+export async function cleanupOrphanedIndices() {
+  const esClient = getOrCreateClient()
+  const prefix = getEventAliasName()
+  // Matches getTemporaryIndexName's `<prefix>_<timestamp>` suffix, excluding
+  // the bare live index (e.g. `events_birth`), which has no alias before its
+  // first-ever reindex and must not be treated as an orphan.
+  const temporaryIndexPattern = /_\d+$/
+
+  const allIndices = (await esClient.cat.indices({ format: 'json' })) as {
+    index: string
+  }[]
+
+  const candidates = allIndices
+    .map(({ index }) => index)
+    .filter(
+      (index) =>
+        index.startsWith(`${prefix}_`) && temporaryIndexPattern.test(index)
+    )
+
+  const orphaned: string[] = []
+  for (const index of candidates) {
+    const aliasInfo = await esClient.indices.getAlias({ index })
+    if (Object.keys(aliasInfo[index].aliases).length === 0) {
+      orphaned.push(index)
+    }
+  }
+
+  if (orphaned.length === 0) {
+    return
+  }
+
+  logger.warn(
+    `Deleting ${orphaned.length} orphaned index(es) with no alias, left over from an interrupted reindex: ${orphaned.join(', ')}`
+  )
+  // Best-effort: a failure here must not block the reindex it's meant to precede.
+  for (const index of orphaned) {
+    await esClient.indices.delete({ index }).catch((err) => {
+      logger.error(`Failed to delete orphaned index ${index}`, err)
+    })
+  }
+}

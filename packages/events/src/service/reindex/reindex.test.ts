@@ -40,8 +40,13 @@ import {
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
+import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
-import { getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
+import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
+import {
+  getEventIndexName as getEventIndexNameMock,
+  getTemporaryIndexName
+} from '@events/storage/__mocks__/elasticsearch'
 
 // Mock reindex endpoint so there are no side effects
 vi.mock('@events/service/reindex', async (importOriginal) => {
@@ -427,6 +432,87 @@ test('reindex on country config failure, temp index is cleaned up and no orphane
       index !== liveIndexAfter
   )
   expect(tempIndexes).toHaveLength(0)
+})
+
+test('cleanupOrphanedIndices deletes a timestamped index with no alias', async () => {
+  const esClient = getOrCreateClient()
+  const prefix = getEventAliasName()
+  // getEventIndexName's default test mock (`type_id`) doesn't start with the
+  // alias prefix the way production's `${prefix}_${type}` does, which is the
+  // invariant cleanupOrphanedIndices relies on to scope its search safely.
+  // Override it locally so the constructed name matches that real shape.
+  getEventIndexNameMock.mockImplementation(
+    (type: string) => `${prefix}_${type}`
+  )
+
+  const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now()}`
+
+  await esClient.indices.create({ index: orphanIndex })
+
+  await cleanupOrphanedIndices()
+
+  const orphanExistsAfter = await esClient.indices.exists({
+    index: orphanIndex
+  })
+  expect(orphanExistsAfter).toBe(false)
+})
+
+test('cleanupOrphanedIndices logs and continues when deleting an orphaned index fails', async () => {
+  const esClient = getOrCreateClient()
+  // Each getOrCreateClient() call opens a new connection, so make it reuse
+  // esClient -- otherwise cleanupOrphanedIndices would get its own client,
+  // and the delete spy below wouldn't see its calls.
+  vi.spyOn(elasticsearchMocks, 'getOrCreateClient').mockReturnValue(esClient)
+
+  const prefix = getEventAliasName()
+  getEventIndexNameMock.mockImplementation(
+    (type: string) => `${prefix}_${type}`
+  )
+
+  const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now()}`
+  await esClient.indices.create({ index: orphanIndex })
+
+  const deleteSpy = vi
+    .spyOn(esClient.indices, 'delete')
+    .mockRejectedValueOnce(new Error('simulated delete failure'))
+
+  // A failed delete must not throw out of cleanupOrphanedIndices -- it's a
+  // best-effort step that shouldn't be able to block the reindex it precedes.
+  await expect(cleanupOrphanedIndices()).resolves.not.toThrow()
+
+  expect(deleteSpy).toHaveBeenCalledWith({ index: orphanIndex })
+  deleteSpy.mockRestore()
+
+  // Deletion failed, so the index is still there.
+  const orphanExistsAfter = await esClient.indices.exists({
+    index: orphanIndex
+  })
+  expect(orphanExistsAfter).toBe(true)
+})
+
+test('cleanupOrphanedIndices leaves a bare live index (no timestamp suffix) untouched even without an alias', async () => {
+  const esClient = getOrCreateClient()
+  const prefix = getEventAliasName()
+  getEventIndexNameMock.mockImplementation(
+    (type: string) => `${prefix}_${type}`
+  )
+
+  const liveIndexName = getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)
+
+  // A bare live index (no timestamp suffix) has no alias before its
+  // first-ever reindex -- it must not be mistaken for an orphaned temp index.
+  await esClient.indices.create({ index: liveIndexName })
+  const isAliasBefore = await esClient.indices.existsAlias({
+    name: liveIndexName
+  })
+  expect(isAliasBefore).toBe(false)
+
+  await cleanupOrphanedIndices()
+
+  const liveIndexExistsAfter = await esClient.indices.exists({
+    index: liveIndexName
+  })
+  expect(liveIndexExistsAfter).toBe(true)
 })
 
 test('runReindex records completed status in reindexing_status index', async () => {

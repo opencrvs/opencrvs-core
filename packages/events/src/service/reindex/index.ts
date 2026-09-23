@@ -25,6 +25,7 @@ import {
 } from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
 import {
+  cleanupOrphanedIndices,
   cleanupTemporaryIndex,
   finaliseReindexIndex,
   prepareTemporaryIndex
@@ -150,6 +151,7 @@ export async function runReindex(token: TokenWithBearer) {
   const runId = getUUID()
   const startTimestamp = start.toISOString()
 
+  await cleanupOrphanedIndices()
   await createReindexingStatusEntry(runId, startTimestamp)
 
   const configurations = await getEventConfigurations(token)
