@@ -253,19 +253,11 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):lint
 
-      # client and events are sharded across dedicated jobs (`test-client`,
-      # `test-events`) because a single-process run of either dominates this
-      # workflow's wall time. Only their *tests* move: events still takes
-      # typecheck and lint from this matrix, since those are cheap and there
-      # is no reason to repeat them in every shard. (client is the exception
-      # only because `lint-client` reuses the prebuilt artifact.)
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && matrix.package != 'packages/events' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test
 
-      # events' coverage comment is posted by `events-coverage` instead: its
-      # tests are sharded here, so no single job holds the whole picture.
-      - name: Generate test coverage summary
+      - name: Generate commons test coverage summary
         if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         run: |
           export PACKAGE_NAME=$(basename "${{ matrix.package }}")
@@ -582,18 +574,6 @@ jobs:
   test-events:
     name: Test events
     needs: setup
-    # events' unit tests are roughly an order of magnitude slower than the
-    # next-slowest package job, so as a single matrix entry they *are* this
-    # workflow's critical path — hence a dedicated sharded job.
-    #
-    # Three shards, not more: the package's `globalSetup` boots Elasticsearch
-    # and Postgres testcontainers once per vitest process, so every shard pays
-    # that startup itself. Past three, the added container startup cancels out
-    # what the extra parallelism buys.
-    #
-    # Shards are uneven by nature: `--shard` splits by test *file* using a
-    # hash of the path, not by measured duration, so wall times differ between
-    # shards and the job is as slow as its unluckiest one.
     if: contains(needs.setup.outputs.matrix, 'packages/events')
     runs-on: ubuntu-26.04
     strategy:
@@ -623,16 +603,6 @@ jobs:
           path: .nx/cache
           key: nx-deps-${{ github.sha }}
           restore-keys: nx-deps-
-
-      # No --excludeTaskDependencies here (unlike `test-client`): there is no
-      # prebuilt filesystem artifact for events, so each shard leans on nx
-      # resolving `^build` against the cache restored above, exactly as the
-      # generic `test` job does.
-      #
-      # `strategy.job-index` is 0-based while vitest's shard index is 1-based.
-      #
-      # Coverage stays on: the blob report carries each shard's coverage map,
-      # which `events-coverage` merges back into one whole-suite number.
       - name: Run Unit Test
         run: >
           pnpm exec nx run @opencrvs/events:test --
@@ -680,15 +650,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      # A real install is required: the merge runs vitest itself. It does not
-      # re-run any test, so it needs no nx build and no testcontainers —
-      # `globalSetup` is not executed on a merge run.
       - name: Runs dependency installation
         run: pnpm install --frozen-lockfile
 
-      # Only the blob reports. The shards' `coverage/` directories are
-      # deliberately not collected — they are the partial reports this job
-      # exists to replace.
       - name: Download blob reports
         uses: actions/download-artifact@v7
         with:
@@ -696,11 +660,6 @@ jobs:
           pattern: events-blob-*
           merge-multiple: true
 
-      # A shard that dies before writing its blob would leave the merge
-      # perfectly happy and the posted coverage silently deflated, so make
-      # that case loud instead. vitest names each blob
-      # `blob-<shard>-<total>.json`, so the expected shard count comes from
-      # the reports themselves and cannot drift from the matrix above.
       - name: Verify every shard reported
         run: |
           shopt -s nullglob
@@ -719,11 +678,6 @@ jobs:
           done
           echo "All $total shard reports present."
 
-      # --coverage on the merge run regenerates every configured coverage
-      # reporter over the merged map, which is what rewrites
-      # packages/events/coverage/coverage-summary.json as a whole-suite
-      # figure. `--merge-reports` resolves its default directory against the
-      # cwd, so this has to run from inside packages/events.
       - name: Merge reports and regenerate coverage
         run: pnpm --filter @opencrvs/events exec vitest run --merge-reports --coverage
 
