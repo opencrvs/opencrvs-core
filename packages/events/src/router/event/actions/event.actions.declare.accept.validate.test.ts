@@ -21,7 +21,8 @@ import {
   TokenUserType,
   TestUserRole,
   EventStatus,
-  getCurrentEventState
+  getCurrentEventState,
+  event
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -71,6 +72,53 @@ describe('Declare async accept action', () => {
     requestActionId = getOrThrow(
       declaredEvent.actions.find((a) => a.type === ActionType.DECLARE)?.id,
       'no action id'
+    )
+  })
+
+  test('Conditionally invisible field', async () => {
+    const acceptDeclaration = {
+      'declaration.hidden': 'test'
+    }
+    const acceptAnnotation = {
+      'annotation.hidden': 'test2'
+    }
+    const response = await systemClient.event.actions.declare.accept({
+      actionId: requestActionId,
+      eventId,
+      declaration: acceptDeclaration,
+      annotation: acceptAnnotation,
+      transactionId: getUUID(),
+      waitFor: false
+    })
+
+    expect(response.actions).toHaveLength(5)
+
+    expect(response.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Requested,
+        createdByUserType: TokenUserType.enum.user,
+        createdBy: userId,
+        createdByRole: TestUserRole.enum.REGISTRATION_AGENT
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Accepted,
+        createdByUserType: TokenUserType.enum.system,
+        originalActionId: response.actions[2].id,
+        createdBy: TEST_SYSTEM_ID,
+        declaration: acceptDeclaration,
+        annotation: acceptAnnotation
+      })
+    ])
+
+    const eventState = getCurrentEventState(response, tennisClubMembershipEvent)
+
+    expect(eventState.declaration['declaration.hidden']).toEqual(
+      acceptDeclaration['declaration.hidden']
     )
   })
 

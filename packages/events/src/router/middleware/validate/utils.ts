@@ -186,7 +186,7 @@ function getStructuralFieldErrors({
   context: ValidatorContext
   fieldOverrides?: {
     required?: boolean
-    conditonals: FieldConfig['conditionals']
+    conditionals: FieldConfig['conditionals']
   }
 }) {
   return Object.entries(values).flatMap(([key, value]) => {
@@ -259,7 +259,7 @@ export function validateActionPayloadStructure({
     values: annotation,
     context: {},
     fieldOverrides: {
-      conditonals: [],
+      conditionals: [],
       required: false
     }
   })
@@ -276,7 +276,7 @@ export function validateActionPayloadStructure({
       values: input.declaration ?? {},
       context: {},
       fieldOverrides: {
-        conditonals: [],
+        conditionals: [],
         required: false
       }
     }),
