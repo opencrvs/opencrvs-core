@@ -253,13 +253,20 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):lint
 
+      # client and events are sharded across dedicated jobs (`test-client`,
+      # `test-events`) because a single-process run of either dominates this
+      # workflow's wall time. Only their *tests* move: events still takes
+      # typecheck and lint from this matrix, since those are cheap and there
+      # is no reason to repeat them in every shard. (client is the exception
+      # only because `lint-client` reuses the prebuilt artifact.)
       - name: Run Unit Test
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        if: matrix.package != 'packages/client' && matrix.package != 'packages/events' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test
 
+      # events' coverage comment is posted by `events-coverage` instead: its
+      # tests are sharded here, so no single job holds the whole picture.
       - name: Generate test coverage summary
-        if: github.event_name == 'pull_request'
-          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         run: |
           export PACKAGE_NAME=$(basename "${{ matrix.package }}")
           export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
@@ -285,8 +292,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Post test coverage to PR
-        if: github.event_name == 'pull_request'
-          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         uses: mshick/add-pr-comment@v3
         with:
           message-id: ${{ matrix.package }}-test-coverage
@@ -573,6 +579,187 @@ jobs:
       - name: Run Unit Test
         run: pnpm exec nx run @opencrvs/client:test --excludeTaskDependencies -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
+  test-events:
+    name: Test events
+    needs: setup
+    # events' unit tests are roughly an order of magnitude slower than the
+    # next-slowest package job, so as a single matrix entry they *are* this
+    # workflow's critical path — hence a dedicated sharded job.
+    #
+    # Three shards, not more: the package's `globalSetup` boots Elasticsearch
+    # and Postgres testcontainers once per vitest process, so every shard pays
+    # that startup itself. Past three, the added container startup cancels out
+    # what the extra parallelism buys.
+    #
+    # Shards are uneven by nature: `--shard` splits by test *file* using a
+    # hash of the path, not by measured duration, so wall times differ between
+    # shards and the job is as slow as its unluckiest one.
+    if: contains(needs.setup.outputs.matrix, 'packages/events')
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [1, 2, 3]
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Runs dependency installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
+
+      # No --excludeTaskDependencies here (unlike `test-client`): there is no
+      # prebuilt filesystem artifact for events, so each shard leans on nx
+      # resolving `^build` against the cache restored above, exactly as the
+      # generic `test` job does.
+      #
+      # `strategy.job-index` is 0-based while vitest's shard index is 1-based.
+      #
+      # Coverage stays on: the blob report carries each shard's coverage map,
+      # which `events-coverage` merges back into one whole-suite number.
+      - name: Run Unit Test
+        run: >
+          pnpm exec nx run @opencrvs/events:test --
+          --reporter=blob --reporter=default
+          --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+
+      # Uploaded even on failure so a green shard's partial results are still
+      # visible; `events-coverage` only runs when every shard succeeded.
+      - name: Upload blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: events-blob-${{ matrix.shards }}
+          path: packages/events/.vitest-reports/*
+          # .vitest-reports is a dotted directory
+          include-hidden-files: true
+          retention-days: 1
+
+  events-coverage:
+    name: Events test coverage
+    needs: test-events
+    # Each shard only ever sees the files it ran, so each shard's coverage is
+    # partial and none of them can be reported on its own. The shards emit
+    # vitest blob reports instead; merging them replays every shard's coverage
+    # map into one report over the whole suite.
+    #
+    # Default `needs` semantics (success only) are deliberate: if events was
+    # not affected, or any shard failed, this job skips rather than posting a
+    # coverage number derived from an incomplete run.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-26.04
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # A real install is required: the merge runs vitest itself. It does not
+      # re-run any test, so it needs no nx build and no testcontainers —
+      # `globalSetup` is not executed on a merge run.
+      - name: Runs dependency installation
+        run: pnpm install --frozen-lockfile
+
+      # Only the blob reports. The shards' `coverage/` directories are
+      # deliberately not collected — they are the partial reports this job
+      # exists to replace.
+      - name: Download blob reports
+        uses: actions/download-artifact@v7
+        with:
+          path: packages/events/.vitest-reports
+          pattern: events-blob-*
+          merge-multiple: true
+
+      # A shard that dies before writing its blob would leave the merge
+      # perfectly happy and the posted coverage silently deflated, so make
+      # that case loud instead. vitest names each blob
+      # `blob-<shard>-<total>.json`, so the expected shard count comes from
+      # the reports themselves and cannot drift from the matrix above.
+      - name: Verify every shard reported
+        run: |
+          shopt -s nullglob
+          blobs=(packages/events/.vitest-reports/blob-*.json)
+          if [ ${#blobs[@]} -eq 0 ]; then
+            echo "No blob reports found — no shard produced one."
+            exit 1
+          fi
+          total=$(basename "${blobs[0]}" .json | cut -d- -f3)
+          for i in $(seq 1 "$total"); do
+            if [ ! -f "packages/events/.vitest-reports/blob-$i-$total.json" ]; then
+              echo "Missing blob report for shard $i/$total."
+              echo "Merging without it would report coverage for part of the suite as if it were all of it."
+              exit 1
+            fi
+          done
+          echo "All $total shard reports present."
+
+      # --coverage on the merge run regenerates every configured coverage
+      # reporter over the merged map, which is what rewrites
+      # packages/events/coverage/coverage-summary.json as a whole-suite
+      # figure. `--merge-reports` resolves its default directory against the
+      # cwd, so this has to run from inside packages/events.
+      - name: Merge reports and regenerate coverage
+        run: pnpm --filter @opencrvs/events exec vitest run --merge-reports --coverage
+
+      - name: Generate test coverage summary
+        run: |
+          export PACKAGE_NAME=events
+          export COVERAGE_FILE="./packages/events/coverage/coverage-summary.json"
+
+          GENERATED_REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
+            console.log(
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
+              "```"
+            );
+          ')
+
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # Same message-id the generic matrix job used to post under, so the
+      # existing comment is edited in place instead of a second one appearing.
+      - name: Post test coverage to PR
+        uses: mshick/add-pr-comment@v3
+        with:
+          message-id: packages/events-test-coverage
+          message: ${{ env.PR_COMMENT_BODY }}
+
   lint-knip:
     name: Lint unused exports with Knip
     runs-on: ubuntu-26.04
@@ -698,6 +885,8 @@ jobs:
       - lint-client
       - test-storybook
       - test-client
+      - test-events
+      - events-coverage
       - lint-knip
       - build-toolkit
     # `always()`, or a skipped dependency would skip this job too and take
