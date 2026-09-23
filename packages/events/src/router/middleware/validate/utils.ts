@@ -26,13 +26,13 @@ import {
   getOrThrow,
   flattenEntries,
   FieldConfig,
-  runStructuralValidations,
   getActionAnnotationFields,
   ActionType,
   getActionFormFields,
   getActionConfig,
   findRecordActionPages,
-  isVerificationPage
+  isVerificationPage,
+  validateFieldInput
 } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/locations'
@@ -175,19 +175,12 @@ export async function getStrictValidatorContext({
  * Determines whether values match the respected type / structure defined in the corresponding FieldConfig.
  * @returns list of fields with errors.
  */
-function getStructuralFieldErrors({
+function getFieldTypeErrors({
   fields,
-  values,
-  context,
-  fieldOverrides
+  values
 }: {
   fields: FieldConfig[]
   values: ActionUpdate
-  context: ValidatorContext
-  fieldOverrides?: {
-    required?: boolean
-    conditionals: FieldConfig['conditionals']
-  }
 }) {
   return Object.entries(values).flatMap(([key, value]) => {
     const field = fields.find((f) => f.id === key)
@@ -200,11 +193,7 @@ function getStructuralFieldErrors({
       }
     }
 
-    return runStructuralValidations({
-      field: { ...field, ...fieldOverrides },
-      values,
-      context
-    }).map((error) => ({
+    return validateFieldInput({ field, value }).map((error) => ({
       message: error.message.defaultMessage,
       id: field.id,
       value
@@ -254,14 +243,9 @@ export function validateActionPayloadStructure({
     .map((page) => page.id)
 
   // Get all errors from annotation payload
-  const annotationErrors = getStructuralFieldErrors({
+  const annotationErrors = getFieldTypeErrors({
     fields: annotationFields,
-    values: annotation,
-    context: {},
-    fieldOverrides: {
-      conditionals: [],
-      required: false
-    }
+    values: annotation
   })
 
   // Partition errors into verification page errors and other annotation errors
@@ -271,14 +255,9 @@ export function validateActionPayloadStructure({
   )
 
   throwWhenNotEmpty([
-    ...getStructuralFieldErrors({
+    ...getFieldTypeErrors({
       fields: getDeclarationFields(eventConfig),
-      values: input.declaration ?? {},
-      context: {},
-      fieldOverrides: {
-        conditionals: [],
-        required: false
-      }
+      values: input.declaration ?? {}
     }),
     ...otherAnnotationErrors,
     ...getVerificationPageErrors(

@@ -76,7 +76,7 @@ describe('Declare async accept action', () => {
 
   test('Conditionally invisible field', async () => {
     const acceptDeclaration = {
-      'declaration.hidden': 'test'
+      'declaration.hidden': 'test1'
     }
     const acceptAnnotation = {
       'annotation.hidden': 'test2'
