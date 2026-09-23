@@ -219,11 +219,72 @@ async function readPinHash(page: Page, userId: string) {
  * So fetch the real record from the same `user.get` procedure the client
  * calls (`packages/client/src/profile/queries.ts`), and seed that. What the
  * background refetch returns is then what is already there.
+ *
+ * Cached per user id by `fetchUserDetails` below.
  */
-async function fetchUserDetails(token: string, userId: string) {
+async function queryUserDetails(token: string, userId: string) {
   const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
 
   return client.user.get.query(userId)
+}
+
+/**
+ * The records this worker has already looked up, keyed by user id, so the
+ * ~330 `login()` calls of a run stop re-querying the same handful of records.
+ *
+ * Only the seeded users ever land here. `login()` takes nothing but the fixed
+ * `CREDENTIALS`, and every flow that signs in a user created during the run -
+ * `loginWithNewUser`, `loginAsNewUser`, `loginAsProvisionedUser` - drives the
+ * app's own sign-in instead of seeding a session, so a freshly created or
+ * just-provisioned user is never served from here.
+ *
+ * Two specs do edit a seeded user: `settings/user-settings.spec.ts` changes
+ * k.mweene's avatar and `settings/change-email-and-phone.spec.ts` changes
+ * f.katongo's email and phone number. Serving a pre-edit copy afterwards is
+ * still harmless, because:
+ *
+ * - what is seeded is only ever the signing-in user's *own* record. Looking
+ *   at another user's details - the team pages, `Edit details` - always goes
+ *   to the server and never reads `USER_DETAILS`.
+ * - `profileReducer`'s `GET_USER_DETAILS_SUCCESS` renders the seeded record
+ *   and refetches it in the same breath, so a stale field survives one round
+ *   trip of the very query cached here before `SET_USER_DETAILS` overwrites
+ *   it in both redux and IndexedDB.
+ * - no spec asserts on the edited fields of the user it is signed in as,
+ *   apart from those two, and both assert after their own change - against
+ *   the record redux holds by then, not against the seed.
+ *
+ * What is stored is the *resolved record*, never the in-flight promise. An
+ * earlier version of this cache stored the promise and evicted it only on
+ * rejection, which wedged whole workers: nothing bounds `user.get` - the
+ * shared tRPC client in `packages/toolkit/src/api/index.ts` passes no
+ * `AbortSignal` - so a lookup that never settled stayed in the map, and since
+ * nearly every spec logs in as the same default user, every later login in
+ * that worker awaited that one dead promise. 29 of 30 shards failed on 90s
+ * `beforeAll` timeouts. Storing the value instead keeps a hung or failed
+ * lookup to the single test it happened in, because the map is only written
+ * after the query settles successfully and the next login simply re-queries.
+ * Please do not "optimise" this back into caching the promise: de-duplicating
+ * in-flight lookups buys nothing here, as logins within a worker are
+ * sequential.
+ */
+const userDetailsCache = new Map<
+  string,
+  Awaited<ReturnType<typeof queryUserDetails>>
+>()
+
+async function fetchUserDetails(token: string, userId: string) {
+  const cached = userDetailsCache.get(userId)
+
+  if (cached) {
+    return cached
+  }
+
+  const details = await queryUserDetails(token, userId)
+
+  userDetailsCache.set(userId, details)
+
+  return details
 }
 
 /**
