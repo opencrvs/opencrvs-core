@@ -21,8 +21,7 @@ import {
   TokenUserType,
   TestUserRole,
   EventStatus,
-  getCurrentEventState,
-  event
+  getCurrentEventState
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
