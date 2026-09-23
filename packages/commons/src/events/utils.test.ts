@@ -23,6 +23,7 @@ import { EventDocument } from './EventDocument'
 import { EventConfig } from './EventConfig'
 import { ActionType } from './ActionType'
 import {
+  aggregateActionDeclarations,
   dropSecuredDeclarationFields,
   findLastAssignmentAction,
   getActionAnnotationFields,
@@ -31,6 +32,7 @@ import {
   getCompleteActionAnnotation,
   getCompleteActionContent,
   getDeclaration,
+  getDeclarationAfterEachAction,
   getDeclarationFields,
   getMixedPath,
   getPendingAction,
@@ -1189,6 +1191,85 @@ describe('getActionAnnotationFields() with dialog form', () => {
         },
         'applicant.dob': '1990-01-01'
       })
+    })
+  })
+})
+
+describe('getDeclarationAfterEachAction', () => {
+  function action(
+    type: ActionType,
+    createdAt: string,
+    defaults: Partial<ActionDocument> = {}
+  ) {
+    return generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: type,
+      defaults: { createdAt, declaration: {}, ...defaults }
+    })
+  }
+
+  const registerRequestId = 'register-request-id' as UUID
+  const correctionRequestId = 'correction-request-id' as UUID
+
+  const event: EventDocument = {
+    id: 'event-id' as UUID,
+    type: tennisClubMembershipEvent.id,
+    trackingId: 'TEST12',
+    createdAt: '2025-01-01T00:00:00.000Z',
+    updatedAt: '2025-01-01T00:00:08.000Z',
+    actions: [
+      action(ActionType.CREATE, '2025-01-01T00:00:00.000Z'),
+      action(ActionType.DECLARE, '2025-01-01T00:00:01.000Z', {
+        declaration: {
+          'applicant.name': { firstname: 'John', surname: 'Doe' },
+          'applicant.email': 'john@example.com'
+        }
+      }),
+      action(ActionType.NOTIFY, '2025-01-01T00:00:02.000Z', {
+        status: ActionStatus.Rejected,
+        declaration: { 'applicant.email': 'rejected@example.com' }
+      }),
+      action(ActionType.REGISTER, '2025-01-01T00:00:03.000Z', {
+        id: registerRequestId,
+        status: ActionStatus.Requested,
+        declaration: { 'applicant.email': null }
+      }),
+      action(ActionType.REGISTER, '2025-01-01T00:00:04.000Z', {
+        originalActionId: registerRequestId,
+        declaration: { 'applicant.dob': '1990-01-01' }
+      }),
+      action(ActionType.REQUEST_CORRECTION, '2025-01-01T00:00:05.000Z', {
+        id: correctionRequestId,
+        declaration: { 'applicant.name': { firstname: 'Jane', surname: 'Doe' } }
+      }),
+      action(ActionType.PRINT_CERTIFICATE, '2025-01-01T00:00:06.000Z'),
+      {
+        ...action(ActionType.APPROVE_CORRECTION, '2025-01-01T00:00:07.000Z'),
+        requestId: correctionRequestId
+      } as ActionDocument,
+      action(ActionType.ARCHIVE, '2025-01-01T00:00:08.000Z')
+    ]
+  }
+
+  it('matches aggregating each prefix of the actions', () => {
+    const declarations = getDeclarationAfterEachAction(event)
+
+    expect(declarations).toHaveLength(event.actions.length)
+    event.actions.forEach((_, i) => {
+      expect(declarations[i]).toEqual(
+        aggregateActionDeclarations({
+          ...event,
+          actions: event.actions.slice(0, i + 1)
+        })
+      )
+    })
+  })
+
+  it('applies the approved correction', () => {
+    expect(getDeclarationAfterEachAction(event).at(-1)).toEqual({
+      'applicant.name': { firstname: 'Jane', surname: 'Doe' },
+      'applicant.email': null,
+      'applicant.dob': '1990-01-01'
     })
   })
 })

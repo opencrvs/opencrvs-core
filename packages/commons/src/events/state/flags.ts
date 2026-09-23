@@ -23,6 +23,8 @@ import { EventConfig } from '../EventConfig'
 import {
   aggregateActionAnnotations,
   aggregateActionDeclarations,
+  deepMerge,
+  getDeclarationAfterEachAction,
   getAcceptedActions,
   getActionConfig,
   isActionConfigType
@@ -256,7 +258,14 @@ export function resolveEventCustomFlags(
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
+  const declarations = getDeclarationAfterEachAction({ ...event, actions })
+  let annotation: EventState = {}
+
   return actions.reduce<CustomFlag[]>((acc, action, idx) => {
+    if (action.annotation) {
+      annotation = deepMerge(annotation, action.annotation)
+    }
+
     let actionConfig
     if (isActionConfigType(action.type)) {
       actionConfig = getActionConfig({
@@ -271,14 +280,7 @@ export function resolveEventCustomFlags(
       return acc
     }
 
-    const eventUpToThisAction = {
-      ...event,
-      actions: actions.slice(0, idx + 1)
-    }
-
-    const declaration = aggregateActionDeclarations(eventUpToThisAction)
-    const annotation = aggregateActionAnnotations(eventUpToThisAction)
-    const form = { ...declaration, ...annotation }
+    const form = { ...declarations[idx], ...annotation }
 
     const flagsWithMetConditions = (actionConfig.flags ?? []).filter(
       ({ conditional }) =>
