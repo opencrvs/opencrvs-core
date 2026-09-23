@@ -1517,6 +1517,8 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
@@ -1620,6 +1622,8 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
@@ -2595,9 +2599,10 @@ components:
                     type: string
                     description: Identifier of the summary field.
                   value:
-                    description: Field value template supporting variables from configuration and
-                      EventMetadata (e.g. "{informant.phoneNo}
-                      {informant.email}").
+                    description: Field value template supports variables from configuration (e.g.
+                      "{informant.phoneNo} {informant.email}") and EventMetadata
+                      (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date,
+                      ::dd MMMM yyyy}").
                     $ref: "#/components/schemas/TranslationConfig"
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
@@ -2700,11 +2705,9 @@ components:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
         flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
+          description: READ is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -2735,44 +2738,11 @@ components:
           description: Configuration of the review page for read-only view.
       required:
         - label
-        - flags
         - type
         - review
       additionalProperties: false
       description: Configuration for the read action — defines the record-tab content
         displayed on the event overview page.
-    ActionFlagConfig:
-      type: object
-      properties:
-        id:
-          anyOf:
-            - anyOf:
-                - type: string
-                - type: string
-                  enum:
-                    - incomplete
-                    - rejected
-                    - correction-requested
-                    - potential-duplicate
-                    - edit-in-progress
-            - type: string
-              description: Custom flag identifier defined by the country config.
-        operation:
-          type: string
-          enum:
-            - add
-            - remove
-          description: Operation to perform on the flag.
-        conditional:
-          description: When conditional is met, the operation is performed on the flag. If
-            not provided, the operation is performed unconditionally.
-          $ref: "#/components/schemas/Conditional"
-      required:
-        - id
-        - operation
-      additionalProperties: false
-      description: Add or remove operation applied to a flag when the parent action is
-        accepted. Optionally gated by a conditional.
     FieldConfig:
       oneOf:
         - $ref: "#/components/schemas/FieldGroup"
@@ -3027,6 +2997,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3304,6 +3276,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3992,6 +3966,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9136,6 +9112,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9621,6 +9599,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -13935,6 +13915,38 @@ components:
         - type
       additionalProperties: false
       description: Configuration for deleting a draft record.
+    ActionFlagConfig:
+      type: object
+      properties:
+        id:
+          anyOf:
+            - anyOf:
+                - type: string
+                - type: string
+                  enum:
+                    - incomplete
+                    - rejected
+                    - correction-requested
+                    - potential-duplicate
+                    - edit-in-progress
+            - type: string
+              description: Custom flag identifier defined by the country config.
+        operation:
+          type: string
+          enum:
+            - add
+            - remove
+          description: Operation to perform on the flag.
+        conditional:
+          description: When conditional is met, the operation is performed on the flag. If
+            not provided, the operation is performed unconditionally.
+          $ref: "#/components/schemas/Conditional"
+      required:
+        - id
+        - operation
+      additionalProperties: false
+      description: Add or remove operation applied to a flag when the parent action is
+        accepted. Optionally gated by a conditional.
     NotifyActionConfig:
       type: object
       properties:
@@ -15146,6 +15158,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -15461,6 +15475,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -17010,6 +17026,8 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
@@ -17115,6 +17133,8 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
