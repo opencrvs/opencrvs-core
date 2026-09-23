@@ -253,6 +253,7 @@ export function validateActionPayloadStructure({
     .filter((page) => isVerificationPage(page))
     .map((page) => page.id)
 
+  // Get all errors from annotation payload
   const annotationErrors = getStructuralFieldErrors({
     fields: annotationFields,
     values: annotation,
@@ -263,6 +264,7 @@ export function validateActionPayloadStructure({
     }
   })
 
+  // Partition errors into verification page errors and other annotation errors
   const [verificationPageErrors, otherAnnotationErrors] = partition(
     annotationErrors,
     (ae) => verificationPageIds.includes(ae.id)
@@ -280,6 +282,7 @@ export function validateActionPayloadStructure({
     }),
     ...otherAnnotationErrors,
     ...getVerificationPageErrors(
+      // Validate only verification page ids that are present, to ensure they are boolean values
       verificationPageErrors.map((ae) => ae.id),
       annotation
     )
