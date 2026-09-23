@@ -155,7 +155,10 @@ export async function runReindex(token: TokenWithBearer) {
 
   const configurations = await getEventConfigurations(token)
 
-  await cleanupOrphanedIndices(configurations)
+  // Best-effort: leftover orphans are retried on the next run.
+  await cleanupOrphanedIndices(configurations).catch((err) =>
+    logger.error('Failed to clean up orphaned indices', err)
+  )
 
   /*
    * Create temporary indices for all event types

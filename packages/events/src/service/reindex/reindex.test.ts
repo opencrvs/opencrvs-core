@@ -492,6 +492,29 @@ test('reindex per-type write alias is re-pointed on every subsequent reindex', a
   expect(indexAfterSecond).toMatch(new RegExp(`^${writeAliasName}_\\d+$`))
 })
 
+test('does not stop runReindex when the cleanup itself fails', async () => {
+  const esClient = getOrCreateClient()
+  const clientSpy = vi
+    .spyOn(elasticsearchMocks, 'getOrCreateClient')
+    .mockReturnValue(esClient)
+  // The cleanup makes the first getAlias call in runReindex.
+  const getAliasSpy = vi
+    .spyOn(esClient.indices, 'getAlias')
+    .mockRejectedValueOnce(new Error('simulated getAlias failure'))
+
+  await expect(runReindex(reindexToken)).resolves.not.toThrow()
+  expect(getAliasSpy).toHaveBeenCalled()
+
+  getAliasSpy.mockRestore()
+  clientSpy.mockRestore()
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+  expect(history[0].status).toBe('completed')
+})
+
 describe('cleanupOrphanedIndices', () => {
   const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000
 
