@@ -50,13 +50,6 @@ const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 const CUSTOM_ACTION_TYPE = 'CONFIRM_SENIOR_MEMBERSHIP'
 const SENIOR_DATE_OF_BIRTH = '1949-05-10'
 
-/**
- * An override replaces only the fields it names. The rest of the original
- * payload is kept so that fields identifying the action — `requestId`
- * (correction approve/reject), `content` (reject) and `customActionType`
- * (CUSTOM) — aren't dropped, which would fail the request on a missing field
- * instead of on whatever the test is asserting.
- */
 function withOverride<T extends object>(
   payload: T,
   overridePayload?: Record<string, unknown>
