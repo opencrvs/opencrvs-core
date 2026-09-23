@@ -38,7 +38,7 @@ export function declareActionProcedures() {
       .use(requireScopesMiddleware)
       .input(DeclareActionInput)
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction)
+      .use(middleware.validateRequestAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction } = ctx
