@@ -183,7 +183,7 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: {{ .Values.postgres.shm_size | default "1Gi" }}
+            sizeLimit: {{ .Values.postgres.shm_size | default "256Mi" }}
         - name: data
       {{- if eq $storageType "pvc" }}
           persistentVolumeClaim:

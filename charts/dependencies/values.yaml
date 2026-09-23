@@ -144,7 +144,7 @@ postgres:
   # parallel query workers' shared memory; the container runtime's default
   # (typically 64Mi) is easily exhausted by a handful of concurrent workers,
   # causing "could not resize shared memory segment" errors unrelated to disk space.
-  shm_size: '1Gi'
+  shm_size: '256Mi'
 
   # Storage configuration:
   # Path to persistent data on the VM (when storage_type is host_path).
