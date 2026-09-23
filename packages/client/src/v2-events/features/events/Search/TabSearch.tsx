@@ -96,6 +96,7 @@ function SearchSectionForm({
       name={section.title.id}
     >
       <FormFieldGenerator
+        attachmentPath={null}
         eventConfig={eventConfig}
         fields={section.fields}
         formValues={fieldValues}

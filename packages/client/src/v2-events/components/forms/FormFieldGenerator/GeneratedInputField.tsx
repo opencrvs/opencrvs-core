@@ -80,7 +80,8 @@ import {
   isImageViewFieldType,
   isAutocompleteFieldType,
   isUserRoleFieldType,
-  todayISO
+  todayISO,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -132,7 +133,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { AttachmentPath, parseFieldReferencesInConfiguration } from './utils'
+import { parseFieldReferencesInConfiguration } from './utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -178,7 +179,25 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   searchMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
-  attachmentPath: AttachmentPath
+  attachmentPath: AttachmentPath | null
+}
+
+/**
+ * A file field has to know which prefix its uploads belong to. Rendering one
+ * without an attachment path meant uploading to the bucket root, where the file
+ * belongs to no record and no deletion or sweep can reach it.
+ */
+function requireAttachmentPath(
+  attachmentPath: AttachmentPath | null,
+  fieldId: string
+): AttachmentPath {
+  if (attachmentPath === null) {
+    throw new Error(
+      `Field ${fieldId} uploads files, but the form around it was rendered without an attachmentPath`
+    )
+  }
+
+  return attachmentPath
 }
 
 function resolveOptions(
@@ -640,7 +659,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           disabled={disabled}
           error={inputFieldProps.error}
-          filePath={attachmentPath}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           label={uploadedFileNameLabel}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
@@ -763,7 +782,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <SignatureField.Input
           {...field.config}
           disabled={disabled}
-          filePath={attachmentPath}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           maxFileSize={field.config.configuration.maxFileSize}
           modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           name={name}
@@ -864,7 +883,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...inputProps}
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           error={inputFieldProps.error}
-          filePath={attachmentPath}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
           options={resolvedOptions}

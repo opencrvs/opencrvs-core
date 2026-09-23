@@ -50,7 +50,7 @@ export type ActionConfirmationRequest = Hapi.Request<ActionConfirmationRefs>
  *
  * - HTTP 202: Defer the decision (asynchronous flow). The action enters a 'Requested' state
  *   until it is later explicitly accepted or rejected. When using this approach, you must
- *   store the token, actionId, eventId and action payload to use with the accept/reject API calls later.
+ *   store the actionId, eventId and action payload to use with the accept/reject API calls later. To call the endpoints you'll need to retrieve system user token. Human users receive 403.
  *
  * For registration actions specifically, when accepting asynchronously, you must provide
  * a registration number as shown in the acceptRequestedRegistration example below.
@@ -84,10 +84,10 @@ export async function onRegisterHandler(
   // return h.response({ reason: 'Rejection reason here' }).code(400)
 
   // OPTION 3: Deferred decision (HTTP 202)
-  // To implement an asynchronous workflow where the decision is made later:
-  // 1. Store the token, eventId, actionId, and action details in your system
+  // 1. Store the eventId, actionId, and action details in your system.
   // 2. Return HTTP 202 to place the action in 'Requested' state
-  // 3. Later call client.event.actions.register.accept.mutate() or client.event.actions.register.reject.mutate()
+  // 3. Request new system token for the specific action.
+  // 4. Later call client.event.actions.register.accept.mutate() or client.event.actions.register.reject.mutate()
   //
   // Below is example of how to defer the confirmation, accepting it after a 10 second delay
   // To defer the confirmation, uncomment the following:
@@ -167,9 +167,7 @@ export async function onMosipBirthRegisterHandler(
       'Birth registration will not be forwarded to MOSIP based on custom logic.'
     )
     await sendInformantNotification({ event, token, registrationNumber })
-    return h
-      .response({ registrationNumber: generateRegistrationNumber() })
-      .code(200)
+    return h.response({ registrationNumber }).code(200)
   }
 
   try {
@@ -234,9 +232,7 @@ export async function onMosipDeathRegisterHandler(
 
   if (!shouldForwardDeathRegistrationToMosip(declaration)) {
     await sendInformantNotification({ event, token, registrationNumber })
-    return h
-      .response({ registrationNumber: generateRegistrationNumber() })
-      .code(200)
+    return h.response({ registrationNumber }).code(200)
   }
 
   try {
@@ -374,11 +370,8 @@ async function findBirthRecordByBrn(
 type SealResult = { success: true } | { success: false; reason: string }
 
 /**
- * Sealing acts on a *different* record (the original birth record) than the
- * one this handler was invoked for. The token forwarded to trigger handlers
- * is bound to the triggering (adoption) event's id, so it can never be used
- * to act on another record - hence the dedicated sealing-service token here,
- * rather than the request's own token.
+ * Sealing targets the original birth record, not the adoption record.
+ * The token core sends carries no scopes, so we use the sealing service's own token.
  */
 async function sealOriginalBirthRecord(
   declaration: ReturnType<typeof aggregateActionDeclarations>,

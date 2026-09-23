@@ -11,16 +11,15 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import * as Sentry from '@sentry/react'
 import {
+  AttachmentPath,
   DocumentPath,
   FullDocumentPath,
   joinValues
 } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import { cacheFile, removeCached } from '@client/v2-events/cache'
-import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
+import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
 import {
   isExpectedAccessError,
@@ -30,7 +29,7 @@ import {
 
 interface UploadFileParams {
   file: File
-  path: string
+  path: AttachmentPath
   meta: {
     transactionId: string
     referenceId: string
@@ -68,52 +67,7 @@ async function uploadFile({
   return { url: await response.text() }
 }
 
-/**
- * NOTE: This function is used to delete a file from the server.
- * There are two worrying cases:
- * 1. User deletes a file but does not save the changes when they leave. We try to access the file later and it is not there.
- * 2. Documents service includes "fail-safe" for users other than the creator of the file. If a user tries to delete a file that they do not own, it will fail (silently). Given the above scenario, the file would still be there.
- *
- */
-async function deleteFile({ filename }: { filename: string }): Promise<void> {
-  await ensureFreshAccessToken()
-  /*
-   * The path is derived from the event id, which is still temporary when the file is
-   * attached before the event has synced (e.g. offline). Actions referring to the file
-   * are sent with the canonical id, so the file must be stored under it, too.
-   */
-  const filePath = resolveTemporaryIdInPath(filename)
-
-  const response = await fetch('/api/files/' + filePath, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  if (!response.ok) {
-    if (response.status === 403) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Unable to hard-delete the file ${filename}. Only the creator can remove it.`
-      )
-    }
-
-    if (response.status === 404) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Unable to hard-delete the file ${filename}. File not found.`
-      )
-    }
-
-    throw new Error('File deletion failed', { cause: response.status })
-  }
-
-  return
-}
-
 const UPLOAD_MUTATION_KEY = 'uploadFile'
-const DELETE_MUTATION_KEY = 'deleteFile'
 
 function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   return trpcClient.event.file.getPresignedUrl.query({ filePath })
@@ -133,25 +87,9 @@ export async function precacheFile(path: DocumentPath | FullDocumentPath) {
       // eslint-disable-next-line no-console
       console.warn('Failed to precache file', error)
     }
-    Sentry.captureException(error)
   }
 }
 
-queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
-  // @ts-ignore
-  retry: (_, error) => {
-    if (error.cause === 403) {
-      return false
-    }
-    if (error.cause === 404) {
-      return false
-    }
-
-    return true
-  },
-  retryDelay: 5000,
-  mutationFn: deleteFile
-})
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
@@ -199,18 +137,7 @@ export function useFileUpload(
     }
   })
 
-  const del = useMutation({
-    mutationFn: deleteFile,
-    mutationKey: [DELETE_MUTATION_KEY, uniqueIdentifier],
-    onSuccess: (data, { filename }) => {
-      void removeCached(filename as DocumentPath)
-    }
-  })
-
   return {
-    deleteFile: (filename: string) => {
-      return del.mutate({ filename })
-    },
     /**
      * Uploads a file with an optional identifier.
      *

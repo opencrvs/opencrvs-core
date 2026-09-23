@@ -31,7 +31,6 @@ export const env = cleanEnv(process.env, {
     default: false,
     desc: 'Disables the Redis-based rate limiting globally'
   }),
-  SENTRY_DSN: str({ default: undefined }),
   TWO_FA_ENABLED: bool({
     devDefault: false,
     default: true,

@@ -12,7 +12,6 @@ import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
 import { ScopeType, decodeScope, Scope, EncodedScope } from './scopes'
-import { UUID } from './uuid'
 export * from './scopes'
 
 /**
@@ -53,8 +52,6 @@ export interface ITokenPayload {
   scope: EncodedScope[]
   role?: string
   userType: TokenUserType
-  eventId?: UUID
-  actionId?: UUID
 }
 
 /**
@@ -104,13 +101,15 @@ export const getUserIdFromToken = (token: string): string | null => {
 }
 
 /**
- * Fixed subject (`sub`) of the service token that core's auth service mints
- * at `GET /internal/service-token`. The token carries no scopes and has
- * userType 'system'; core uses it for unattended service-to-service calls where
- * no user is involved — startup event-config load, background broadcasts and
- * telemetry. See packages/auth/src/features/serviceToken/handler.ts.
+ * Fixed subject (`sub`) of the service token that core's auth service mints at `GET /internal/service-token`.
+ * Core uses it for service-to-service calls where no user is involved.
+ *
+ * Must be a well-formed UUID so a service verifying the token can resolve it as
+ * a `SystemContext` as with `INTEGRATION_CREATOR_USER_ID` / `REINDEX_USER_ID`.
+ *
+ * See packages/auth/src/features/serviceToken/handler.ts
  */
-export const SERVICE_USER_ID = '__SERVICE_USER__'
+export const SERVICE_USER_ID = '00000000-0000-4000-8000-000000000002'
 
 /**
  * True when a decoded token payload (e.g. Hapi's `request.auth.credentials`)

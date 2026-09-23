@@ -26,13 +26,11 @@ import * as Hapi from '@hapi/hapi'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 import * as inert from '@hapi/inert'
-import * as Sentry from 'hapi-sentry'
 import fetch from 'node-fetch'
 import {
   CLIENT_APP_URL,
   DOMAIN,
   LOGIN_URL,
-  SENTRY_DSN,
   COUNTRY_CONFIG_HOST,
   COUNTRY_CONFIG_PORT,
   AUTH_URL,
@@ -79,6 +77,7 @@ import {
 } from '@opencrvs/toolkit/events'
 
 import { onRegisterHandler } from './api/registration'
+import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { workqueueconfigHandler } from './api/workqueue/handler'
 import getUserNotificationRoutes from './config/routes/userNotificationRoutes'
 import {
@@ -111,19 +110,6 @@ export default function getPlugins() {
         prettyPrint: false,
         logPayload: false,
         instance: logger
-      }
-    })
-  }
-
-  if (SENTRY_DSN) {
-    plugins.push({
-      plugin: Sentry,
-      options: {
-        client: {
-          environment: process.env.NODE_ENV,
-          dsn: SENTRY_DSN
-        },
-        catchLogErrors: true
       }
     })
   }
@@ -600,12 +586,28 @@ export async function createServer() {
     }
   })
 
-  server.ext({
-    type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
-      request.sentryScope?.setExtra('payload', request.payload)
-      return h.continue
+  /*
+   * Core uses a special 'service token' to prove the request originated from core.
+   * The token is only a proof of origin and carries no scopes.
+   *
+   * Action confirmation requests check here that the token is present.
+   */
+  server.ext('onPostAuth', (request, h) => {
+    const isActionConfirmationRequest =
+      request.method === 'post' &&
+      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
+
+    if (
+      isActionConfirmationRequest &&
+      !isServiceToken(request.auth.credentials)
+    ) {
+      logger.warn(
+        'Action confirmation: rejected a request that is not from the core service token'
+      )
+      return h.response({ error: 'forbidden' }).code(403).takeover()
     }
+
+    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {

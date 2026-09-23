@@ -49,9 +49,9 @@ const INTEGRATIONS: IntegrationConfig[] = [
   {
     name: 'MOSIP',
     scopes: [
-      { type: 'record.register', options: { event: ['birth', 'death'] } },
-      { type: 'record.read', options: { event: ['birth', 'death'] } },
-      { type: 'record.correct', options: { event: ['birth', 'death'] } }
+      { type: 'record.action.accept', options: { event: ['birth', 'death'] } },
+      { type: 'record.action.reject', options: { event: ['birth', 'death'] } },
+      { type: 'record.read', options: { event: ['birth', 'death'] } }
     ],
     clientId: MOSIP_INTEGRATION_CLIENT_ID,
     clientSecret: MOSIP_INTEGRATION_CLIENT_SECRET

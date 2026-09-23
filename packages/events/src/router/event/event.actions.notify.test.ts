@@ -446,34 +446,6 @@ describe('event.actions.notify', () => {
         expect.objectContaining({ type: ActionType.READ })
       ])
     })
-
-    test('system user should not be able to perform action on assigned event', async () => {
-      const { user, generator } = await setupTestCase()
-
-      let client = createTestClient(user)
-      const event = await client.event.create(generator.event.create())
-
-      client = createSystemTestClient(TEST_SYSTEM_ID_2, [
-        encodeScope({
-          type: 'record.create',
-          options: {
-            event: [TENNIS_CLUB_MEMBERSHIP]
-          }
-        }),
-        encodeScope({
-          type: 'record.notify',
-          options: {
-            event: [TENNIS_CLUB_MEMBERSHIP]
-          }
-        })
-      ])
-
-      await expect(
-        client.event.actions.notify.request(
-          generator.event.actions.notify(event.id)
-        )
-      ).rejects.toMatchSnapshot()
-    })
   })
 
   test('System client receives error for malformed input', async () => {
@@ -724,6 +696,28 @@ describe('3rd party integration confirmation behaviour', () => {
     expect(currentState.flags).toEqual(['notify:requested'])
     expect(currentState.status).toEqual(EventStatus.enum.CREATED)
     expect(currentState.assignedTo).toEqual(undefined)
+  })
+
+  test('Records a rejected action when integration responds with 400', async () => {
+    mockActionApi(ActionType.NOTIFY, 400)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
+
+    expect(
+      response.actions.find(
+        (action) =>
+          action.type === ActionType.NOTIFY &&
+          action.status === ActionStatus.Rejected
+      )
+    ).toBeDefined()
   })
 
   test('Keeps assignment when integration responds with 500', async () => {

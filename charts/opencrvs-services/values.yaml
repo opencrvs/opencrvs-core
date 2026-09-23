@@ -373,16 +373,11 @@ client:
     # FIXME: Do we need define this variable?
     DECLARED_DECLARATION_SEARCH_QUERY_COUNT: 100
 
-config:
-  port: 2021
-  image:
-    name: ocrvs-config
-
 # Countryconfig service configuration, including the image tag and port number.
 countryconfig:
   image:
     name: opencrvs/ocrvs-countryconfig
-    tag: v2.0.0
+    tag: v2.1.0
   port: 3040
   network_policy:
     # countryconfig needs public-internet egress regardless of the global

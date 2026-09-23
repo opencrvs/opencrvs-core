@@ -42,6 +42,32 @@ _Avoid_: pre-seed validation, dry run (nothing is written even provisionally), v
 One of the users a seed creates, described by one record of the seed-data. Has no creator among the users — the seed brings the first ones into being — which is why username collisions matter differently here than for a user created by an administrator.
 _Avoid_: employee, seeded user, default user
 
+### Record attachments
+
+**Attachment**:
+A file uploaded by a form field for one record, stored under that record's prefix. Contrast with a shared user asset, which a record only points at.
+_Avoid_: document (that is the storage service's name, not the thing it stores), upload, media
+
+**Prefix**:
+The storage location that says which record an attachment belongs to, `events/<eventId>/`. The unit of ownership and of deletion. Deleting a record means deleting its prefix, without consulting references.
+_Avoid_: folder, directory, namespace
+
+**Shared user asset**:
+A file belonging to a user rather than to a record, such as a signature or avatar under `users/<userId>/`. A record references one through an action's `createdBySignature` but never owns it, so it outlives every record pointing at it and no record's deletion removes it.
+_Avoid_: user document, user attachment
+
+**Referenced**:
+Named by some action in the event document, whatever that action's status. Wider than the record's current state, so a superseded or rejected value still protects its file.
+_Avoid_: in use, current, live
+
+**Sweep**:
+Deleting every object under a record's prefix that the record does not reference. Distinct from deleting the prefix, which removes every object under it regardless of references.
+_Avoid_: cleanup, pruning, garbage collection
+
+**Orphaned event**:
+An event in CREATED status with no remaining drafts. Everything a user entered is gone, so the event and its prefix can both be deleted.
+_Avoid_: empty event, abandoned event, stale draft
+
 ### Auditing
 
 **Client**:

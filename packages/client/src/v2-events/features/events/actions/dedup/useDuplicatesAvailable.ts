@@ -22,7 +22,7 @@ export function useDuplicatesAvailable(event: EventIndex) {
 
   const duplicates = useQueries({
     queries: event.potentialDuplicates.map(({ id }) => ({
-      ...trpc.event.get.queryOptions({ eventId: id, waitFor: false }),
+      ...trpc.event.get.queryOptions({ eventId: id }),
       enabled: false,
       staleTime: Infinity
     }))

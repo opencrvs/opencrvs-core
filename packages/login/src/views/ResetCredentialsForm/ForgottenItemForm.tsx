@@ -10,6 +10,7 @@
  */
 
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
@@ -30,6 +31,18 @@ const Actions = styled.div`
     margin-bottom: 16px;
   }
 `
+
+const StyledAlert = styled(Alert)`
+  margin-top: 20px;
+`
+
+export function ActiveAccountNote({ intl }: WrappedComponentProps) {
+  return (
+    <StyledAlert type="info" id="recovery-active-account-note">
+      {intl.formatMessage(messages.recoveryActiveAccountNote)}
+    </StyledAlert>
+  )
+}
 
 const ForgottenItemComponent = ({ intl }: WrappedComponentProps) => {
   const navigate = useNavigate()
@@ -142,6 +155,7 @@ const ForgottenItemComponent = ({ intl }: WrappedComponentProps) => {
                 )
               })}
             </Actions>
+            <ActiveAccountNote intl={intl} />
           </Content>
         </form>
       </Frame>

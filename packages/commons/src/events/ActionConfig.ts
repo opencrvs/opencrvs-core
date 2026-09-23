@@ -72,7 +72,13 @@ const ReadActionConfig = ActionConfigBase.extend(
     conditionals: z
       .never()
       .optional()
-      .describe('Read-action can not be disabled or hidden with conditionals.')
+      .describe('Read-action can not be disabled or hidden with conditionals.'),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'READ is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
   }).shape
 )
 

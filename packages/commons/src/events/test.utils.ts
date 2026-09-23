@@ -44,7 +44,7 @@ import {
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
-import { EventConfig } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
@@ -547,6 +547,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -578,6 +579,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => {
@@ -604,7 +606,8 @@ export function eventPayloadGenerator(
           eventId,
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }
       },
       edit: (
@@ -618,6 +621,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -635,24 +639,28 @@ export function eventPayloadGenerator(
       assign: (
         eventId: string,
         input: Partial<
-          Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+          Pick<AssignActionInput, 'transactionId' | 'assignedTo' | 'waitFor'>
         > = {}
       ) => ({
         type: ActionType.ASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: input.assignedTo ?? getUUID(),
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       unassign: (
         eventId: string,
-        input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+        input: Partial<
+          Pick<UnassignActionInput, 'transactionId' | 'waitFor'>
+        > = {}
       ) => ({
         type: ActionType.UNASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: null,
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       archive: (
         eventId: string,
@@ -664,6 +672,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -684,6 +693,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -704,6 +714,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfAccepted'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -729,6 +740,7 @@ export function eventPayloadGenerator(
             | 'registrationNumber'
             | 'keepAssignmentIfAccepted'
             | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -761,6 +773,7 @@ export function eventPayloadGenerator(
             | 'keepAssignment'
             | 'keepAssignmentIfRejected'
             | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -789,6 +802,7 @@ export function eventPayloadGenerator(
               | 'keepAssignment'
               | 'keepAssignmentIfRejected'
               | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -814,7 +828,8 @@ export function eventPayloadGenerator(
           eventId,
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         approve: (
           eventId: string,
@@ -827,6 +842,7 @@ export function eventPayloadGenerator(
               | 'keepAssignment'
               | 'keepAssignmentIfRejected'
               | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -844,7 +860,8 @@ export function eventPayloadGenerator(
           requestId,
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         reject: (
           eventId: string,
@@ -858,6 +875,7 @@ export function eventPayloadGenerator(
               | 'keepAssignment'
               | 'keepAssignmentIfRejected'
               | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           >
         ) => ({
@@ -876,7 +894,8 @@ export function eventPayloadGenerator(
           content: input.content ?? { reason: 'too late' },
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         })
       },
       duplicate: {
@@ -1292,12 +1311,15 @@ export const generateEventConfig = ({
   id,
   fields,
   placeOfEventId,
-  dateOfEventId
+  dateOfEventId,
+  actions = []
 }: {
   id: string
   fields: FieldConfig[]
   placeOfEventId?: string
   dateOfEventId?: string
+  /** Extra actions appended to the default READ + DECLARE pair, e.g. a REQUEST_CORRECTION action with its own correctionForm. */
+  actions?: EventConfigInput['actions']
 }): EventConfig => {
   return defineConfig({
     id,
@@ -1334,7 +1356,8 @@ export const generateEventConfig = ({
           title: generateTranslationConfig('Review Declare Action'),
           fields: []
         }
-      }
+      },
+      ...actions
     ]
   })
 }

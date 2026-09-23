@@ -18,11 +18,11 @@ import {
   DocumentPath,
   FileUploadWithOptions,
   MimeType,
-  SelectOption
+  SelectOption,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { AttachmentPath } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
@@ -104,7 +104,7 @@ function DocumentUploaderWithOption({
     DocumentTypeRequiredError
   )
 
-  const [files, setFiles] = useState(value || [])
+  const files = value || []
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
@@ -132,7 +132,6 @@ function DocumentUploaderWithOption({
 
       setFilesBeingProcessed((prev) => prev.filter(({ label }) => label !== id))
 
-      setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
       onChange(getUpdatedFiles(files, newFile))
       setSelectedOption(undefined)
     }
@@ -175,13 +174,7 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: DocumentPath) => {
-    setFiles((prevFiles) => {
-      const updatedFiles = prevFiles.filter((file) => file.path !== path)
-      onChange(updatedFiles)
-
-      return updatedFiles
-    })
-
+    onChange(files.filter((file) => file.path !== path))
     setPreviewImage(null)
   }
 

@@ -4,6 +4,10 @@
 
 ### Upgrade guidance
 
+#### Sentry — nothing to do, the upgrade script removes it
+
+`SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
 **Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
@@ -32,20 +36,28 @@ The query-string fallback deprecated in [#13626](https://github.com/opencrvs/ope
 
 Existing client IDs and secrets keep working — only how they are transmitted changes. Operators should also treat any secret previously sent in a URL as exposed and rotate it, since it may still be sitting in retained logs.
 
-#### Registration confirmation no longer uses OAuth token exchange
+#### Confirming an asynchronous action now takes credentials the requester does not have
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
 
-Confirming an asynchronous action (the `accept`/`reject` endpoints) now requires the **same scope as the action being confirmed** — e.g. `record.register` for a registration — checked with the same event-access rules as requesting the action. There is no separate confirmation scope.
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients.
+
+This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. Three further rules back it up:
+
+- **`accept`/`reject` require a system client's token.** Previously the country configuration could call the events API with the user's token. That required the user to be assigned to the event, which allowed two entities to act under the same identity. A human token is now refused outright, whatever scopes it carries.
+- **A confirmation is refused while a user holds the assignment.** The user is unassigned from the event when the country configuration returns 202, so this normally does not arise; it surfaces when someone assigns themselves while a confirmation is still pending.
+- **`accept`/`reject` refuse any `actionId` that is not a pending action of the matching type**, so a confirmation cannot be pointed at an arbitrary action to manufacture an accepted one.
+
+**These scopes must not be granted to a user role.** A caller that can both request an action and confirm it needs no country configuration to register a record. Core does not enforce this — grant them only to integrations.
 
 Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
-- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time;
+- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects)** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`
 - **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
 
-`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.register`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+`mosip-api` checks its OpenCRVS system client on startup and exits with code 1 if it is missing `record.action.accept` or `record.read`. It does the same when the client cannot authenticate at all, but **only in production** — elsewhere it logs a warning and retries every 3 seconds indefinitely, so a misconfigured `OPENCRVS_CLIENT_ID` / `OPENCRVS_CLIENT_SECRET` shows up as a hang rather than a crash (both default to an empty string and are not validated at startup). It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
-The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is an internal service token that only proves the request came from core — it carries no scopes, so a country configuration confirming asynchronously must use its own system client's credentials for the `accept`/`reject` call. It lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
 
 #### Document presign requests are no longer authorized by scope alone
 
@@ -118,7 +130,21 @@ The user-notification and system-ready triggers were served under `/triggers/`, 
 
 [#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
 
+#### Attachment uploads must name the record they belong to
+
+`POST /attachments` accepted an optional, free-form `path`. Omitting it wrote the file to the bucket root, where it belonged to no record and nothing would ever delete it. The route now takes an `eventId` and derives the storage key from it, and rejects an upload naming neither `eventId` nor `path`.
+
+The gateway's `DELETE /files/{filePath*}` proxy is removed. Its only consumer was the web client, which no longer deletes files one at a time: a file goes when the record holding it is deleted, or is swept when the record's next action leaves it unreferenced.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+
 ### Deprecations
+
+#### `path` on `POST /attachments`
+
+Send `eventId` instead and let the server derive the key. `path` still works, but a file written outside a record's prefix is reached by neither deletion nor sweep, so it outlives the record it was uploaded for. A future release will remove it.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 
 #### `POST /auth/token` parameters in the query string
 
@@ -156,7 +182,6 @@ Until the removal, behaviour depends on the environment, so the change surfaces 
 - Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
 - Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
 - Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
-
 
 ### New features
 
@@ -263,6 +288,41 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
+- Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+
+## 2.0.2
+
+### Breaking changes
+
+- Sentry is gone from the v2 line, as it already was from 1.9.17. `ClientConfig` and `LoginConfig` no longer accept a `SENTRY` field, so **a country config that still sets it fails to compile** on 2.0.2 and later. Delete `SENTRY` from `src/client-config.ts`, `src/client-config.prod.ts`, `src/login-config.ts` and `src/login-config.prod.ts`, and drop `SENTRY_DSN` from your environment. Going straight to 2.1.0? `npx @opencrvs/toolkit upgrade` does all of this for you. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+### Improvements
+
+- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
+
+### Bug fixes
+
+- Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
+- Minio DockerHub image has been deprecated. Replace minio/mc image with quay.io/minio/mc [#13797](https://github.com/opencrvs/opencrvs-core/issues/13797)
+
+## 1.9.18
+
+## 1.9.17
+
+### Improvements
+
+- Removed Sentry from OpenCRVS entirely. The client and login apps no longer initialise Sentry, report exceptions to it, or show its "report a problem" dialog on a crash, and the ten backend services no longer register `hapi-sentry`. The `@sentry/*`, `redux-sentry-middleware` and `hapi-sentry` dependencies are gone. `script-src` no longer allow-lists `https://sentry.io/api/embed/error-page/`, so it names no third-party host and the login app loads scripts from `'self'` only. React error boundaries now render the apps' own error pages. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+  **Deployment notes:**
+
+  - `SENTRY_DSN` is no longer read by any service, and the browser no longer reads `window.config.SENTRY`. Both can be dropped from your environment and country configuration; leaving them set has no effect.
+  - **Crash reporting is no longer built in.** Browser and server errors now go to logs and the browser console only. Deployments that relied on Sentry for alerting should put their own error tracking in place.
+
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
 
 ## 2.0.1 Release
 

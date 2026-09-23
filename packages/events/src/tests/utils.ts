@@ -10,6 +10,7 @@
  */
 /* eslint-disable max-lines */
 import { readFileSync } from 'fs'
+import { IncomingMessage } from 'http'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
@@ -33,6 +34,7 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
+  SERVICE_USER_ID,
   SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
@@ -44,6 +46,7 @@ import {
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
 import { t, tService } from '@events/router/trpc'
+import { createContext } from '@events/context'
 import { appRouter } from '@events/router/router'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
@@ -224,7 +227,6 @@ export const TEST_USER_DEFAULT_SCOPES = [
 export function createTestToken({
   userId,
   scopes,
-  eventId,
   userType,
   role
 }: {
@@ -232,10 +234,9 @@ export function createTestToken({
   scopes: string[]
   userType?: TokenUserType
   role?: string
-  eventId?: string
 }): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId, userType, role, eventId },
+    { scope: scopes, sub: userId, userType, role },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -275,44 +276,6 @@ export function createInitialisationToken(
   return `Bearer ${token}`
 }
 
-function createActionConfirmationTestToken(
-  userId: string,
-  eventId: string,
-  actionId: string
-): TokenWithBearer {
-  const token = jwt.sign(
-    {
-      scope: [
-        ...TEST_USER_DEFAULT_SCOPES,
-        encodeScope({
-          type: 'record.custom-action',
-          options: {
-            event: [
-              'birth',
-              'death',
-              'tennis-club-membership',
-              'child-onboarding'
-            ],
-            customActionTypes: ['CONFIRM_SENIOR_MEMBERSHIP']
-          }
-        })
-      ],
-      sub: userId,
-      userType: TokenUserType.enum.user,
-      eventId,
-      actionId
-    },
-    readFileSync(join(__dirname, './cert.key')),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:events-user'
-    }
-  )
-
-  return `Bearer ${token}`
-}
-
 export function createSystemTestClient(
   systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -334,6 +297,20 @@ export function createSystemTestClient(
   })
 
   return caller
+}
+
+export async function createServiceTokenTestClient() {
+  const token = createTestToken({
+    userId: SERVICE_USER_ID as UUID,
+    scopes: [],
+    userType: TokenUserType.enum.system
+  })
+
+  const ctx = await createContext({
+    req: { headers: { authorization: token } } as unknown as IncomingMessage
+  })
+
+  return createCallerFactory(appRouter)(ctx)
 }
 
 export function createTestClient(
@@ -383,27 +360,14 @@ export function createInitialisationTestClient(
 }
 
 /**
- * Simulates the confirmation caller (e.g. countryconfig / an integration)
- * hitting the action `accept`/`reject` endpoints. Confirming requires the
- * action's own scope (e.g. `record.register`), which this client carries.
+ * The scopes an integration confirming an action holds, such as mosip-api
+ * calling back once MOSIP has answered. Confirmation is a system client's job:
+ * no user is involved, and the token is not tied to an event.
  */
-export function createCountryConfigClient(
-  user: CreatedUser,
-  eventId: string,
-  actionId: string
-) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createActionConfirmationTestToken(user.id, eventId, actionId)
-
-  const caller = createCaller({
-    user: {
-      ...user,
-      type: TokenUserType.enum.user
-    },
-    token
-  })
-  return caller
-}
+export const CONFIRMATION_SCOPES = [
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
+]
 
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
@@ -476,17 +440,20 @@ export const setupTestCase = async (
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: Extract<ActionType, 'CREATE'>
+  action: Extract<ActionType, 'CREATE'>,
+  waitFor?: boolean
 ): () => Promise<EventDocument>
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: Exclude<ActionType, 'CREATE'>
+  action: Exclude<ActionType, 'CREATE'>,
+  waitFor?: boolean
 ): (eventId: string) => Promise<EventDocument>
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: ActionType
+  action: ActionType,
+  waitFor?: boolean
 ):
   | (() => Promise<EventDocument>)
   | ((eventId: string) => Promise<EventDocument>) {
@@ -496,42 +463,57 @@ function actionToClientAction(
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
-          generator.event.actions.declare(eventId, { keepAssignment: true })
+          generator.event.actions.declare(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.REJECT:
       return async (eventId: string) =>
         client.event.actions.reject.request(
-          generator.event.actions.reject(eventId, { keepAssignment: true })
+          generator.event.actions.reject(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.ARCHIVE:
       return async (eventId: string) =>
         client.event.actions.archive.request(
-          generator.event.actions.archive(eventId, { keepAssignment: true })
+          generator.event.actions.archive(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.UNARCHIVE:
       return async (eventId: string) =>
         client.event.actions.unarchive.request(
-          generator.event.actions.unarchive(eventId, { keepAssignment: true })
+          generator.event.actions.unarchive(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
     case ActionType.PRINT_CERTIFICATE:
       return async (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
     case ActionType.REQUEST_CORRECTION:
       return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
 
@@ -564,7 +546,12 @@ function actionToClientAction(
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[],
+  /**
+   * Whether the setup actions wait for indexing. Leave it out unless the test
+   * reads the event back from Elasticsearch, `false` is a lot faster.
+   */
+  waitFor?: boolean
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: EventDocument | undefined
 
@@ -572,18 +559,30 @@ export async function createEvent(
   const createAction = actionToClientAction(
     client,
     generator,
-    ActionType.CREATE
+    ActionType.CREATE,
+    waitFor
   )
 
   createdEvent = await createAction()
 
   for (const action of actions) {
-    const clientAction = actionToClientAction(client, generator, action)
+    const clientAction = actionToClientAction(
+      client,
+      generator,
+      action,
+      waitFor
+    )
     createdEvent = await clientAction(createdEvent.id)
   }
 
   return createdEvent
 }
+
+type SeedAction =
+  | DeclarationActionType
+  | typeof ActionType.UNASSIGN
+  | typeof ActionType.REQUEST_CORRECTION
+  | typeof ActionType.ARCHIVE
 
 /**
  * Seeds an event with the specified actions directly into the database.
@@ -601,12 +600,7 @@ export async function seedEvent(
     administrativeHierarchy
   }: {
     eventConfig: EventConfig
-    actions: (
-      | DeclarationActionType
-      | typeof ActionType.UNASSIGN
-      | typeof ActionType.REQUEST_CORRECTION
-      | typeof ActionType.ARCHIVE
-    )[]
+    actions: (SeedAction | { type: SeedAction; status: ActionStatus })[]
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
@@ -625,7 +619,10 @@ export async function seedEvent(
   /** offset variable for timestamps, ensures the array order is maintained. */
   let offset = 0
 
-  await dbClient.transaction().execute(async (trx) => {
+  /** Ids of the requested actions, keyed by action type. Needed to call .accept / .reject against them. */
+  const requestedActionIds: Partial<Record<ActionType, UUID>> = {}
+
+  return dbClient.transaction().execute(async (trx) => {
     const event = await trx
       .insertInto('events')
       .values({
@@ -666,7 +663,12 @@ export async function seedEvent(
     }
 
     const generatedActions: NewEventActions[] = actions.flatMap(
-      (actionType): NewEventActions[] => {
+      (action): NewEventActions[] => {
+        const { type: actionType, status } =
+          typeof action === 'string'
+            ? { type: action, status: ActionStatus.Accepted }
+            : action
+
         if (actionType === ActionType.UNASSIGN) {
           return [
             {
@@ -682,6 +684,7 @@ export async function seedEvent(
 
         // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
         const originalActionId = getUUID()
+        requestedActionIds[actionType] = originalActionId
 
         // correction, partial declaration which changes a value without uncorrectable: true is enough.
         const declaration =
@@ -695,25 +698,35 @@ export async function seedEvent(
                 administrativeHierarchy
               )
 
+        const requestedAction = {
+          ...baseAction,
+          actionType,
+          id: originalActionId,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Requested,
+          createdAt: new Date(baseTime + ++offset).toISOString(),
+          declaration
+        }
+
+        if (status === ActionStatus.Requested) {
+          return [requestedAction]
+        }
+
         return [
-          {
-            ...baseAction,
-            actionType,
-            id: originalActionId,
-            transactionId: generateUuid(rng),
-            status: ActionStatus.Requested,
-            createdAt: new Date(baseTime + ++offset).toISOString(),
-            declaration
-          },
+          requestedAction,
           {
             ...baseAction,
             actionType,
             transactionId: generateUuid(rng),
             originalActionId,
-            status: ActionStatus.Accepted,
+            status:
+              status === ActionStatus.Accepted
+                ? ActionStatus.Accepted
+                : ActionStatus.Rejected,
             createdAt: new Date(baseTime + ++offset).toISOString(),
             registrationNumber:
-              actionType === ActionTypes.enum.REGISTER
+              actionType === ActionTypes.enum.REGISTER &&
+              status === ActionStatus.Accepted
                 ? generateRegistrationNumber(rng)
                 : null,
             declaration: {}
@@ -729,6 +742,8 @@ export async function seedEvent(
         oc.columns(['transactionId', 'actionType', 'status']).doNothing()
       )
       .execute()
+
+    return { eventId: event.id, requestedActionIds }
   })
 }
 

@@ -186,7 +186,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
 }
 
 export function findLocalEventDocument(eventId: string) {
-  return getQueryData(trpcOptionsProxy.event.get, { eventId, waitFor: false })
+  return getQueryData(trpcOptionsProxy.event.get, { eventId })
 }
 
 /*
@@ -230,7 +230,7 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 
 export function setEventData(id: string, data: EventDocument) {
   queryClient.setQueryData(
-    trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
+    trpcOptionsProxy.event.get.queryKey({ eventId: id }),
     data
   )
 
@@ -285,18 +285,8 @@ async function deleteEventData(updatedEvent: EventDocument) {
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
 
   queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey({
-      eventId: id,
-      waitFor: false
-    })
+    queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
   })
-  /*
-   * 'view-event' is a separately-keyed cache entry used by the Record tab. It is not
-   * automatically cleared when 'event.get' is removed, and the IndexedDB persister keeps
-   * it alive across page reloads. Explicitly removing it here keeps both caches in sync
-   * so the Record tab always reflects the latest server state after an action is submitted.
-   */
-  queryClient.removeQueries({ queryKey: [['view-event', id]] })
 
   /* When event is created, We derive local cache for search query from that (event with no declaration data).
    * If we delete only the event.get, we will have stale data until event is explicitly searched again.
