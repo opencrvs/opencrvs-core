@@ -69,6 +69,8 @@ spec:
       app: mosip-api
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: mosip-api
     spec:
