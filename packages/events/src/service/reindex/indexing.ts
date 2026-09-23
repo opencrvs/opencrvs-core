@@ -140,30 +140,29 @@ export async function cleanupOrphanedIndices(configurations: EventConfig[]) {
   const cutoff = Date.now() - ORPHAN_MIN_AGE_MS
   const typeIndexNames = configurations.map(({ id }) => getEventIndexName(id))
 
-  const allIndices = (await esClient.cat.indices({ format: 'json' })) as {
-    index: string
-  }[]
-
-  const candidates = allIndices
-    .map(({ index }) => index)
-    .filter((index) =>
-      typeIndexNames.some((typeIndexName) => {
-        const timestamp = index.slice(typeIndexName.length + 1)
-        return (
-          index.startsWith(`${typeIndexName}_`) &&
-          /^\d{13}$/.test(timestamp) &&
-          Number(timestamp) < cutoff
-        )
-      })
-    )
-
-  const orphaned: string[] = []
-  for (const index of candidates) {
-    const aliasInfo = await esClient.indices.getAlias({ index })
-    if (Object.keys(aliasInfo[index].aliases).length === 0) {
-      orphaned.push(index)
-    }
+  // An empty index list would make getAlias return every index in the cluster.
+  if (typeIndexNames.length === 0) {
+    return
   }
+
+  const aliasInfo = await esClient.indices.getAlias({
+    index: typeIndexNames.map((typeIndexName) => `${typeIndexName}_*`)
+  })
+
+  const orphaned = Object.entries(aliasInfo)
+    .filter(
+      ([index, { aliases }]) =>
+        Object.keys(aliases).length === 0 &&
+        typeIndexNames.some((typeIndexName) => {
+          const timestamp = index.slice(typeIndexName.length + 1)
+          return (
+            index.startsWith(`${typeIndexName}_`) &&
+            /^\d{13}$/.test(timestamp) &&
+            Number(timestamp) < cutoff
+          )
+        })
+    )
+    .map(([index]) => index)
 
   if (orphaned.length === 0) {
     return
