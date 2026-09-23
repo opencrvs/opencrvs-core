@@ -32,6 +32,8 @@ import {
 
 const REINDEX_CONCURRENCY = 4
 
+const PROGRESS_WRITE_INTERVAL_MS = 2000
+
 async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
   batch: EventDocument[]
@@ -172,6 +174,7 @@ export async function runReindex(token: TokenWithBearer) {
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
+  let lastProgressWriteAt = 0
   try {
     await reindexSearch(timestamp, token, configurations, async (batchSize) => {
       const currentSecond = Math.floor(Date.now() / 1000) - startSecond
@@ -180,10 +183,23 @@ export async function runReindex(token: TokenWithBearer) {
       totalProcessed += batchSize
       const perSecond =
         processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
-      await updateReindexingProgress(runId, totalProcessed)
       logger.info(
         `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
       )
+
+      /*
+       * Batches complete concurrently, and the status document is a single
+       * document, so writing it per batch makes Elasticsearch reject the
+       * interleaved updates with a version conflict. Claiming the window before
+       * the await lets exactly one caller through, and the final count is
+       * written once every batch has been processed.
+       */
+      const now = Date.now()
+      if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
+        return
+      }
+      lastProgressWriteAt = now
+      await updateReindexingProgress(runId, totalProcessed)
     })
   } catch (err) {
     logger.error('Reindex failed, cleaning up temporary indexes', err)
@@ -199,6 +215,8 @@ export async function runReindex(token: TokenWithBearer) {
     }
     throw err
   }
+  await updateReindexingProgress(runId, totalProcessed)
+
   await Promise.all(
     configurations.map(async (config) =>
       finaliseReindexIndex(
