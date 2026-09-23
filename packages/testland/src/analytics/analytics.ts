@@ -20,8 +20,9 @@ import {
   EventConfig,
   EventDocument,
   EventState,
+  deepDropNulls,
   getActionAnnotationFields,
-  getCurrentEventState,
+  getDeclarationAfterEachAction,
   getDeclarationFields,
   Location
 } from '@opencrvs/toolkit/events'
@@ -155,10 +156,9 @@ async function upsertAnalyticsEventActions(
     })
     const declareAction = actions.find((a) => a.type === ActionType.DECLARE)
     const registerAction = actions.find((a) => a.type === ActionType.REGISTER)
+    const declarations = getDeclarationAfterEachAction({ ...event, actions })
 
     for (let i = 0; i < actions.length; i++) {
-      const actionsFromStartToCurrentPoint = actions.slice(0, i + 1)
-
       const action = actions[i]
 
       if (
@@ -167,14 +167,6 @@ async function upsertAnalyticsEventActions(
       ) {
         continue
       }
-
-      const actionAtCurrentPoint = getCurrentEventState(
-        {
-          ...event,
-          actions: actionsFromStartToCurrentPoint
-        },
-        eventConfig
-      )
 
       const { type, ...act } = action
 
@@ -199,7 +191,7 @@ async function upsertAnalyticsEventActions(
           precalculateAdditionalAnalytics(
             action,
             pickDeclarationAnalyticsFields(
-              actionAtCurrentPoint.declaration,
+              deepDropNulls(declarations[i]),
               eventConfig
             ),
             eventConfig
