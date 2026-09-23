@@ -29,7 +29,7 @@ import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
-export const STREAM_BATCH_SIZE = 1000
+const STREAM_BATCH_SIZE = 1000
 
 function toEventDocument(
   { eventType, ...event }: Events,
@@ -156,35 +156,30 @@ async function* yieldChunk(fetched: Promise<FetchedChunk>) {
   const { chunk, ids, eventDocs, idReadMs, fetchMs } = await fetched
   const waitMs = performance.now() - waitStarted
 
+  const declared = eventDocs.filter(
+    (event) => getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+  )
+
   /*
-   * A yield only returns once the consumer asks for the next event, so this sums
+   * A yield only returns once the consumer asks for the next batch, so this is
    * the time the reader spent waiting for the indexing side rather than working.
    * Waiting for documents dominating instead means the reader is what starves it.
    */
-  let consumerMs = 0
-  let yielded = 0
-
-  for (const event of eventDocs) {
-    // filter out records without any DECLARE action
-    if (getStatusFromActions(event.actions) === EventStatus.enum.CREATED) {
-      continue
-    }
-
-    const yieldStarted = performance.now()
-    yield event
-    consumerMs += performance.now() - yieldStarted
-    yielded++
+  const yieldStarted = performance.now()
+  if (declared.length) {
+    yield declared
   }
+  const consumerMs = performance.now() - yieldStarted
 
   logger.info(
-    `Read chunk ${chunk}: ${ids.length} ids yielded ${yielded} events ` +
+    `Read chunk ${chunk}: ${ids.length} ids yielded ${declared.length} events ` +
       `(reading ids ${Math.round(idReadMs)} ms, fetching documents ${Math.round(fetchMs)} ms, ` +
       `waiting for documents ${Math.round(waitMs)} ms, ` +
       `blocked on the indexing side ${Math.round(consumerMs)} ms)`
   )
 }
 
-async function* readIdChunks() {
+async function* readIdChunks(batchSize: number) {
   const eventsStream = getClient().selectFrom('events').select('id').stream()
   let ids: UUID[] = []
   let idReadMs = 0
@@ -193,7 +188,7 @@ async function* readIdChunks() {
   for await (const row of eventsStream) {
     idReadMs += performance.now() - idReadStarted
     ids.push(row.id)
-    if (ids.length === STREAM_BATCH_SIZE) {
+    if (ids.length === batchSize) {
       yield { ids, idReadMs }
       ids = []
       idReadMs = 0
@@ -206,18 +201,18 @@ async function* readIdChunks() {
 }
 
 /*
- * Returns a stream of events directly from Postgres.
+ * Returns a stream of events directly from Postgres, one batch per chunk of ids.
  * Useful for cases where you want every event to be processed in bulk,
  * for example, reindexing to ElasticSearch.
  *
  * Each chunk's documents are fetched while the chunk before it is yielded, so
  * Postgres works while the indexing side does rather than taking turns with it.
  */
-export async function* streamEventDocuments() {
+export async function* streamEventDocuments(batchSize = STREAM_BATCH_SIZE) {
   let chunk = 0
   let fetching: Promise<FetchedChunk> | undefined
 
-  for await (const { ids, idReadMs } of readIdChunks()) {
+  for await (const { ids, idReadMs } of readIdChunks(batchSize)) {
     const next = fetchChunk(ids, ++chunk, idReadMs)
     if (fetching) {
       yield* yieldChunk(fetching)

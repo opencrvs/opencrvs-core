@@ -8,16 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Readable, Transform } from 'node:stream'
 import fetch from 'node-fetch'
 import { getUUID, logger, TokenWithBearer } from '@opencrvs/commons'
 import { EventDocument } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 
-import {
-  STREAM_BATCH_SIZE,
-  streamEventDocuments
-} from '@events/storage/postgres/events/events'
+import { streamEventDocuments } from '@events/storage/postgres/events/events'
 import { getTemporaryIndexName } from '@events/storage/elasticsearch'
 import {
   getEventConfigurations,
@@ -97,7 +93,6 @@ async function reindexSearch(
     ])
   )
 
-  let buffer: EventDocument[] = []
   const inFlight = new Set<Promise<void>>()
   let failure: Error | undefined
 
@@ -120,19 +115,17 @@ async function reindexSearch(
   }
 
   /*
-   * Starts a batch without waiting for it, so the next batch can be read from
+   * Starts each batch without waiting for it, so the next batch can be read from
    * Postgres while this one is written to Elasticsearch and country config.
    * Only blocks once REINDEX_CONCURRENCY batches are already in flight.
    */
-  async function flush() {
-    if (buffer.length === 0) {
-      return
+  for await (const batch of streamEventDocuments()) {
+    if (failure) {
+      throw failure
     }
-    const batch = buffer
-    buffer = []
 
     // The stored promise never rejects, so a failure cannot go unhandled while
-    // nothing is awaiting it. It surfaces on the next flush, or on drain below.
+    // nothing is awaiting it. It surfaces on the next batch, or once drained.
     const pending: Promise<void> = writeBatch(batch)
       .catch((err: unknown) => {
         failure = failure ?? (err as Error)
@@ -148,39 +141,10 @@ async function reindexSearch(
     }
   }
 
-  async function drain() {
-    await flush()
-    await Promise.all(inFlight)
+  await Promise.all(inFlight)
+  if (failure) {
+    throw failure
   }
-
-  return new Transform({
-    objectMode: true,
-    async transform(event: EventDocument, _, cb) {
-      try {
-        if (failure) {
-          throw failure
-        }
-        buffer.push(event)
-        if (buffer.length >= STREAM_BATCH_SIZE) {
-          await flush()
-        }
-        cb()
-      } catch (e) {
-        cb(e as Error)
-      }
-    },
-    async flush(cb) {
-      try {
-        await drain()
-        if (failure) {
-          throw failure
-        }
-        cb()
-      } catch (e) {
-        cb(e as Error)
-      }
-    }
-  })
 }
 
 export async function runReindex(token: TokenWithBearer) {
@@ -211,11 +175,8 @@ export async function runReindex(token: TokenWithBearer) {
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
-  const objStream = Readable.from(streamEventDocuments())
-  const searchIndexingStream = await reindexSearch(
-    timestamp,
-    token,
-    async (batchSize) => {
+  try {
+    await reindexSearch(timestamp, token, async (batchSize) => {
       const currentSecond = Math.floor(Date.now() / 1000) - startSecond
       const processedThisSecond = processedCounts[currentSecond] || 0
       processedCounts[currentSecond] = processedThisSecond + batchSize
@@ -226,15 +187,6 @@ export async function runReindex(token: TokenWithBearer) {
       logger.info(
         `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
       )
-    }
-  )
-
-  try {
-    await new Promise<void>((resolve, reject) => {
-      objStream
-        .pipe(searchIndexingStream)
-        .on('finish', resolve)
-        .on('error', reject)
     })
   } catch (err) {
     logger.error('Reindex failed, cleaning up temporary indexes', err)
