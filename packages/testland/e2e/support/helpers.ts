@@ -109,10 +109,8 @@ export async function login(
   const { token, refreshToken } = await getAuthTokens(username)
   expect(refreshToken).toBeDefined()
 
-  await page.clock.install()
   // Hand off only the refresh token; the client mints the access token from it.
   await waitForAuthenticatedLanding(page, refreshToken)
-  await page.clock.runFor(2000)
 
   if (!skipPin) {
     await createPIN(page)
