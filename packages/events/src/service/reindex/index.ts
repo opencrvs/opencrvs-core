@@ -10,15 +10,12 @@
  */
 import fetch from 'node-fetch'
 import { getUUID, logger, TokenWithBearer } from '@opencrvs/commons'
-import { EventDocument } from '@opencrvs/commons/events'
+import { EventConfig, EventDocument } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 
 import { streamEventDocuments } from '@events/storage/postgres/events/events'
 import { getTemporaryIndexName } from '@events/storage/elasticsearch'
-import {
-  getEventConfigurations,
-  getInMemoryEventConfigurations
-} from '../config/config'
+import { getInMemoryEventConfigurations } from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupTemporaryIndex,
@@ -83,9 +80,9 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
+  configurations: EventConfig[],
   onBatchProcessed?: (count: number) => Promise<void>
 ) {
-  const configurations = await getInMemoryEventConfigurations(token)
   const indexNameOverrides = new Map(
     configurations.map((config) => [
       config.id,
@@ -155,7 +152,7 @@ export async function runReindex(token: TokenWithBearer) {
 
   await createReindexingStatusEntry(runId, startTimestamp)
 
-  const configurations = await getEventConfigurations(token)
+  const configurations = await getInMemoryEventConfigurations(token)
 
   /*
    * Create temporary indices for all event types
@@ -176,7 +173,7 @@ export async function runReindex(token: TokenWithBearer) {
   const processedCounts: number[] = []
   let totalProcessed = 0
   try {
-    await reindexSearch(timestamp, token, async (batchSize) => {
+    await reindexSearch(timestamp, token, configurations, async (batchSize) => {
       const currentSecond = Math.floor(Date.now() / 1000) - startSecond
       const processedThisSecond = processedCounts[currentSecond] || 0
       processedCounts[currentSecond] = processedThisSecond + batchSize
