@@ -46,12 +46,12 @@ import { TrpcUserContext } from '../../context'
  */
 const declarationFieldConfigsByEventConfig = new WeakMap<
   EventConfig,
-  Record<string, FieldConfig>
+  Partial<Record<string, FieldConfig>>
 >()
 
 function getDeclarationFieldConfigs(
   eventConfig: EventConfig
-): Record<string, FieldConfig> {
+): Partial<Record<string, FieldConfig>> {
   const cached = declarationFieldConfigsByEventConfig.get(eventConfig)
   if (cached) {
     return cached
@@ -231,7 +231,7 @@ export function getEventIndexWithoutLocationHierarchy(
   // Process declaration fields
   for (const [key, value] of Object.entries(event.declaration)) {
     const fieldConfig = fieldConfigs[key]
-    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
       continue
     }
 
@@ -331,7 +331,7 @@ export async function getEventIndexWithAdministrativeHierarchy(
   for (const [k, value] of Object.entries(event.declaration)) {
     const key = decodeFieldId(k)
     const fieldConfig = fieldConfigs[key]
-    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
       continue
     }
 
