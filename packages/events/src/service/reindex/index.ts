@@ -151,10 +151,11 @@ export async function runReindex(token: TokenWithBearer) {
   const runId = getUUID()
   const startTimestamp = start.toISOString()
 
-  await cleanupOrphanedIndices()
   await createReindexingStatusEntry(runId, startTimestamp)
 
   const configurations = await getEventConfigurations(token)
+
+  await cleanupOrphanedIndices(configurations)
 
   /*
    * Create temporary indices for all event types

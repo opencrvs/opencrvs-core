@@ -131,14 +131,14 @@ export async function cleanupTemporaryIndex(tempIndexName: string) {
   }
 }
 
-/** A temp index (`<prefix>_<type>_<timestamp>`) with no alias never finished reindexing (e.g. killed mid-run) and is safe to delete. */
-export async function cleanupOrphanedIndices() {
+// A reindex takes minutes, so anything newer may still be an in-progress run.
+const ORPHAN_MIN_AGE_MS = 24 * 60 * 60 * 1000
+
+/** A temp index (`<type index>_<timestamp>`) with no alias never finished reindexing (e.g. killed mid-run) and is safe to delete. */
+export async function cleanupOrphanedIndices(configurations: EventConfig[]) {
   const esClient = getOrCreateClient()
-  const prefix = getEventAliasName()
-  // Matches getTemporaryIndexName's `<prefix>_<timestamp>` suffix, excluding
-  // the bare live index (e.g. `events_birth`), which has no alias before its
-  // first-ever reindex and must not be treated as an orphan.
-  const temporaryIndexPattern = /_\d+$/
+  const cutoff = Date.now() - ORPHAN_MIN_AGE_MS
+  const typeIndexNames = configurations.map(({ id }) => getEventIndexName(id))
 
   const allIndices = (await esClient.cat.indices({ format: 'json' })) as {
     index: string
@@ -146,9 +146,15 @@ export async function cleanupOrphanedIndices() {
 
   const candidates = allIndices
     .map(({ index }) => index)
-    .filter(
-      (index) =>
-        index.startsWith(`${prefix}_`) && temporaryIndexPattern.test(index)
+    .filter((index) =>
+      typeIndexNames.some((typeIndexName) => {
+        const timestamp = index.slice(typeIndexName.length + 1)
+        return (
+          index.startsWith(`${typeIndexName}_`) &&
+          /^\d{13}$/.test(timestamp) &&
+          Number(timestamp) < cutoff
+        )
+      })
     )
 
   const orphaned: string[] = []
