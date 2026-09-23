@@ -36,8 +36,7 @@ export function updateEventOptimistically<T extends ActionInput>(
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey({
-        eventId: variables.eventId,
-        waitFor: false
+        eventId: variables.eventId
       })
     )
 

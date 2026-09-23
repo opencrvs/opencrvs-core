@@ -606,7 +606,8 @@ export function eventPayloadGenerator(
           eventId,
           keepAssignment: input.keepAssignment,
           keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
-          keepAssignmentIfRejected: input.keepAssignmentIfRejected
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }
       },
       edit: (

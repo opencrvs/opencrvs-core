@@ -769,7 +769,7 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 
   if (pendingActions.length !== 1) {
     throw new Error(
-      `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
+      `Expected exactly one pending action, but found ${pendingActions.length ? pendingActions.map(({ id }) => id).join(', ') : 'none'}`
     )
   }
 

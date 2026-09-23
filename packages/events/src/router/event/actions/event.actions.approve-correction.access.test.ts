@@ -24,7 +24,8 @@ import {
   createTestClient,
   seedEvent,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -34,6 +35,11 @@ const ASSIGNED_ERROR = 'User is assigned to this event'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
   encodeScope({ type: 'record.correct' })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Approve correction action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
@@ -190,13 +196,17 @@ describe('Approve correction action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.correction.approve.accept(actionPayload)
+        confirmationClient.event.actions.correction.approve.accept(
+          actionPayload
+        )
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
 
     test('Prevents system rejecting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.correction.approve.reject(actionPayload)
+        confirmationClient.event.actions.correction.approve.reject(
+          actionPayload
+        )
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
   })
