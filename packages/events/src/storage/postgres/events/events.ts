@@ -113,14 +113,27 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
-async function* processBatch(batch: UUID[], chunk: number, idReadMs: number) {
-  const db = getClient()
-  const ids = batch
+interface FetchedChunk {
+  chunk: number
+  ids: UUID[]
+  eventDocs: EventDocument[]
+  idReadMs: number
+  fetchMs: number
+}
 
-  let eventDocs: EventDocument[] = []
+/*
+ * Never rejects, so a prefetched chunk cannot go unhandled while the one before
+ * it is still being yielded.
+ */
+async function fetchChunk(
+  ids: UUID[],
+  chunk: number,
+  idReadMs: number
+): Promise<FetchedChunk> {
   const fetchStarted = performance.now()
+  let eventDocs: EventDocument[] = []
   try {
-    eventDocs = await getEventsByIdsInTrx(db, ids)
+    eventDocs = await getEventsByIdsInTrx(getClient(), ids)
   } catch (err) {
     logger.error({
       message: 'Failed to fetch event documents',
@@ -128,14 +141,25 @@ async function* processBatch(batch: UUID[], chunk: number, idReadMs: number) {
       error: (err as Error).message,
       stack: (err as Error).stack
     })
-    return
   }
-  const fetchMs = performance.now() - fetchStarted
+  return {
+    chunk,
+    ids,
+    eventDocs,
+    idReadMs,
+    fetchMs: performance.now() - fetchStarted
+  }
+}
+
+async function* yieldChunk(fetched: Promise<FetchedChunk>) {
+  const waitStarted = performance.now()
+  const { chunk, ids, eventDocs, idReadMs, fetchMs } = await fetched
+  const waitMs = performance.now() - waitStarted
 
   /*
    * A yield only returns once the consumer asks for the next event, so this sums
    * the time the reader spent waiting for the indexing side rather than working.
-   * Reading and fetching dominating instead means the reader is what starves it.
+   * Waiting for documents dominating instead means the reader is what starves it.
    */
   let consumerMs = 0
   let yielded = 0
@@ -155,35 +179,53 @@ async function* processBatch(batch: UUID[], chunk: number, idReadMs: number) {
   logger.info(
     `Read chunk ${chunk}: ${ids.length} ids yielded ${yielded} events ` +
       `(reading ids ${Math.round(idReadMs)} ms, fetching documents ${Math.round(fetchMs)} ms, ` +
+      `waiting for documents ${Math.round(waitMs)} ms, ` +
       `blocked on the indexing side ${Math.round(consumerMs)} ms)`
   )
+}
+
+async function* readIdChunks() {
+  const eventsStream = getClient().selectFrom('events').select('id').stream()
+  let ids: UUID[] = []
+  let idReadMs = 0
+  let idReadStarted = performance.now()
+
+  for await (const row of eventsStream) {
+    idReadMs += performance.now() - idReadStarted
+    ids.push(row.id)
+    if (ids.length === STREAM_BATCH_SIZE) {
+      yield { ids, idReadMs }
+      ids = []
+      idReadMs = 0
+    }
+    idReadStarted = performance.now()
+  }
+  if (ids.length) {
+    yield { ids, idReadMs }
+  }
 }
 
 /*
  * Returns a stream of events directly from Postgres.
  * Useful for cases where you want every event to be processed in bulk,
  * for example, reindexing to ElasticSearch.
+ *
+ * Each chunk's documents are fetched while the chunk before it is yielded, so
+ * Postgres works while the indexing side does rather than taking turns with it.
  */
 export async function* streamEventDocuments() {
-  const db = getClient()
-  const eventsStream = db.selectFrom('events').select('id').stream()
-  let batch: UUID[] = []
   let chunk = 0
-  let idReadMs = 0
-  let idReadStarted = performance.now()
+  let fetching: Promise<FetchedChunk> | undefined
 
-  for await (const row of eventsStream) {
-    idReadMs += performance.now() - idReadStarted
-    batch.push(row.id)
-    if (batch.length === STREAM_BATCH_SIZE) {
-      yield* processBatch(batch, ++chunk, idReadMs)
-      batch = []
-      idReadMs = 0
+  for await (const { ids, idReadMs } of readIdChunks()) {
+    const next = fetchChunk(ids, ++chunk, idReadMs)
+    if (fetching) {
+      yield* yieldChunk(fetching)
     }
-    idReadStarted = performance.now()
+    fetching = next
   }
-  if (batch.length) {
-    yield* processBatch(batch, ++chunk, idReadMs)
+  if (fetching) {
+    yield* yieldChunk(fetching)
   }
 }
 
