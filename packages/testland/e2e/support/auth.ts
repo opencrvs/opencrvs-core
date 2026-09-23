@@ -219,11 +219,61 @@ async function readPinHash(page: Page, userId: string) {
  * So fetch the real record from the same `user.get` procedure the client
  * calls (`packages/client/src/profile/queries.ts`), and seed that. What the
  * background refetch returns is then what is already there.
+ *
+ * Cached per user id by `fetchUserDetails` below.
  */
-async function fetchUserDetails(token: string, userId: string) {
+async function queryUserDetails(token: string, userId: string) {
   const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
 
   return client.user.get.query(userId)
+}
+
+/**
+ * The records this worker has already looked up, keyed by user id, so the
+ * ~330 `login()` calls of a run stop re-querying the same handful of records.
+ *
+ * Only the seeded users ever land here. `login()` takes nothing but the fixed
+ * `CREDENTIALS`, and every flow that signs in a user created during the run -
+ * `loginWithNewUser`, `loginAsNewUser`, `loginAsProvisionedUser` - drives the
+ * app's own sign-in instead of seeding a session, so a freshly created or
+ * just-provisioned user is never served from here.
+ *
+ * Two specs do edit a seeded user: `settings/user-settings.spec.ts` changes
+ * k.mweene's avatar and `settings/change-email-and-phone.spec.ts` changes
+ * f.katongo's email and phone number. Serving a pre-edit copy afterwards is
+ * still harmless, because:
+ *
+ * - what is seeded is only ever the signing-in user's *own* record. Looking
+ *   at another user's details - the team pages, `Edit details` - always goes
+ *   to the server and never reads `USER_DETAILS`.
+ * - `profileReducer`'s `GET_USER_DETAILS_SUCCESS` renders the seeded record
+ *   and refetches it in the same breath, so a stale field survives one round
+ *   trip of the very query cached here before `SET_USER_DETAILS` overwrites
+ *   it in both redux and IndexedDB.
+ * - no spec asserts on the edited fields of the user it is signed in as,
+ *   apart from those two, and both assert after their own change - against
+ *   the record redux holds by then, not against the seed.
+ *
+ * The promise is cached rather than the record, so two logins of the same
+ * user starting at once share one query. A rejected lookup is dropped again:
+ * a transient gateway error should fail the login that hit it, not every
+ * later login of that user in this worker.
+ */
+const userDetailsCache = new Map<string, ReturnType<typeof queryUserDetails>>()
+
+function fetchUserDetails(token: string, userId: string) {
+  const cached = userDetailsCache.get(userId)
+
+  if (cached) {
+    return cached
+  }
+
+  const pending = queryUserDetails(token, userId)
+
+  userDetailsCache.set(userId, pending)
+  pending.catch(() => userDetailsCache.delete(userId))
+
+  return pending
 }
 
 /**
