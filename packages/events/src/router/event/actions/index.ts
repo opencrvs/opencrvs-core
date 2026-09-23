@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -58,6 +59,7 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { validateActionPayloadStructure } from '@events/router/middleware/validate/utils'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -320,25 +322,48 @@ export async function defaultRequestHandler(
       ? ActionStatus.Accepted
       : ActionStatus.Rejected
 
-  const schema =
-    responseStatus === ActionConfirmationResponse.Success
-      ? SyncActionConfirmationSchema.extend(
-          (actionConfirmationResponseSchema ?? z.object({})).shape
-        )
-      : z.object({})
+  let parsedBody: z.infer<typeof SyncActionConfirmationSchema> | undefined
 
-  const maybeParsed = schema.safeParse(responseBody ?? {})
+  if (responseStatus === ActionConfirmationResponse.Success) {
+    const maybeParsed = SyncActionConfirmationSchema.safeParse(
+      responseBody ?? {}
+    )
+    // Parse separately to keep type information.
+    if (!maybeParsed.success) {
+      logger.error(fromZodError(maybeParsed.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
 
-  if (!maybeParsed.success) {
-    logger.error(fromZodError(maybeParsed.error))
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message:
-        'Invalid payload received from country config action confirmation API'
+    const maybeCustom = (
+      actionConfirmationResponseSchema ?? z.object({})
+    ).safeParse(responseBody ?? {})
+
+    if (!maybeCustom.success) {
+      logger.error(fromZodError(maybeCustom.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
+
+    parsedBody = { ...maybeParsed.data, ...maybeCustom.data }
+
+    validateActionPayloadStructure({
+      eventConfig: configuration,
+      input: {
+        type: input.type,
+        annotation: parsedBody.annotation,
+        declaration: parsedBody.declaration,
+        customActionType:
+          input.type === ActionType.CUSTOM ? input.customActionType : undefined
+      }
     })
   }
-
-  const parsedBody = maybeParsed.data
 
   logger.debug(
     {
@@ -410,7 +435,7 @@ export function getDefaultActionProcedures(
       .use(middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType]))
       .input(actionConfig.inputSchema.strict())
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction)
+      .use(middleware.validateRequestAction)
       .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
@@ -418,6 +443,7 @@ export function getDefaultActionProcedures(
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
         const event = ctx.event
+
         const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type
@@ -471,6 +497,7 @@ export function getDefaultActionProcedures(
       .use(middleware.canAccessEventWithScopes(['record.action.accept']))
       .use(middleware.requireConfirmableAction(actionType))
       .use(middleware.requireAssignment)
+      .use(middleware.validateAcceptAction)
       .mutation(async ({ ctx, input }) => {
         const { token, user, event, confirmationAction } = ctx
         const { actionId } = input
