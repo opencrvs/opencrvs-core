@@ -12,11 +12,13 @@
 
 import { HttpResponse, http } from 'msw'
 import {
+  ActionDocument,
   ActionStatus,
   ActionType,
   AddressType,
   encodeScope,
   EventDocument,
+  generateRegistrationNumber,
   getCurrentEventState,
   getOrThrow,
   getUUID,
@@ -39,21 +41,36 @@ import { env } from '@events/environment'
 
 type PendingAction = {
   actionId: UUID
-  accept: () => Promise<EventDocument>
-  reject: () => Promise<EventDocument>
+  eventId: UUID
+  accept: (overridePayload?: Record<string, unknown>) => Promise<EventDocument>
+  reject: (overridePayload?: Record<string, unknown>) => Promise<EventDocument>
 }
 
 const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 const CUSTOM_ACTION_TYPE = 'CONFIRM_SENIOR_MEMBERSHIP'
 const SENIOR_DATE_OF_BIRTH = '1949-05-10'
 
-const confirmer = createSystemTestClient(TEST_SYSTEM_ID, CONFIRMATION_SCOPES)
+function withOverride<T extends object>(
+  payload: T,
+  overridePayload?: Record<string, unknown>
+): T {
+  return (overridePayload ? { ...payload, ...overridePayload } : payload) as T
+}
 
-function mockActionApi(action: ActionType, status: number) {
+const confirmer = createSystemTestClient(TEST_SYSTEM_ID, [
+  ...CONFIRMATION_SCOPES,
+  encodeScope({ type: 'record.read' })
+])
+
+function mockActionApi(
+  action: ActionType,
+  status: number,
+  body: Record<string, unknown> = {}
+) {
   return mswServer.use(
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
-      () => HttpResponse.json({}, { status })
+      () => HttpResponse.json(body, { status })
     )
   )
 }
@@ -89,7 +106,10 @@ function correctionRequestId(event: EventDocument) {
   )
 }
 
-async function requestPendingNotify(): Promise<PendingAction> {
+async function requestPendingNotify(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
@@ -97,21 +117,24 @@ async function requestPendingNotify(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.NOTIFY, 202)
+  mockActionApi(ActionType.NOTIFY, status, syncPayload)
 
   const requested = await client.event.actions.notify.request(payload)
   const actionId = requestedActionId(requested, ActionType.NOTIFY)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.notify.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.notify.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -120,7 +143,10 @@ async function requestPendingNotify(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingDeclare(): Promise<PendingAction> {
+async function requestPendingDeclare(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
@@ -128,21 +154,24 @@ async function requestPendingDeclare(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.DECLARE, 202)
+  mockActionApi(ActionType.DECLARE, status, syncPayload)
 
   const requested = await client.event.actions.declare.request(payload)
   const actionId = requestedActionId(requested, ActionType.DECLARE)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.declare.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.declare.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -151,7 +180,10 @@ async function requestPendingDeclare(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingEdit(): Promise<PendingAction> {
+async function requestPendingEdit(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -164,21 +196,24 @@ async function requestPendingEdit(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.EDIT, 202)
+  mockActionApi(ActionType.EDIT, status, syncPayload)
 
   const requested = await client.event.actions.edit.request(payload)
   const actionId = requestedActionId(requested, ActionType.EDIT)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.edit.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.edit.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -187,7 +222,10 @@ async function requestPendingEdit(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingReject(): Promise<PendingAction> {
+async function requestPendingReject(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -200,21 +238,24 @@ async function requestPendingReject(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.REJECT, 202)
+  mockActionApi(ActionType.REJECT, status, syncPayload)
 
   const requested = await client.event.actions.reject.request(payload)
   const actionId = requestedActionId(requested, ActionType.REJECT)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.reject.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.reject.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -223,7 +264,10 @@ async function requestPendingReject(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingArchive(): Promise<PendingAction> {
+async function requestPendingArchive(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -236,21 +280,24 @@ async function requestPendingArchive(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.ARCHIVE, 202)
+  mockActionApi(ActionType.ARCHIVE, status, syncPayload)
 
   const requested = await client.event.actions.archive.request(payload)
   const actionId = requestedActionId(requested, ActionType.ARCHIVE)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.archive.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.archive.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -259,7 +306,10 @@ async function requestPendingArchive(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingUnarchive(): Promise<PendingAction> {
+async function requestPendingUnarchive(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -272,21 +322,24 @@ async function requestPendingUnarchive(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.UNARCHIVE, 202)
+  mockActionApi(ActionType.UNARCHIVE, status, syncPayload)
 
   const requested = await client.event.actions.unarchive.request(payload)
   const actionId = requestedActionId(requested, ActionType.UNARCHIVE)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.unarchive.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.unarchive.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -295,7 +348,10 @@ async function requestPendingUnarchive(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingRegister(): Promise<PendingAction> {
+async function requestPendingRegister(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -308,22 +364,25 @@ async function requestPendingRegister(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.REGISTER, 202)
+  mockActionApi(ActionType.REGISTER, status, syncPayload)
 
   const requested = await client.event.actions.register.request(payload)
   const actionId = requestedActionId(requested, ActionType.REGISTER)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.register.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId,
         registrationNumber: MOCK_REGISTRATION_NUMBER
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.register.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -332,7 +391,10 @@ async function requestPendingRegister(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingPrintCertificate(): Promise<PendingAction> {
+async function requestPendingPrintCertificate(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -345,21 +407,24 @@ async function requestPendingPrintCertificate(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.PRINT_CERTIFICATE, 202)
+  mockActionApi(ActionType.PRINT_CERTIFICATE, status, syncPayload)
 
   const requested = await client.event.actions.printCertificate.request(payload)
   const actionId = requestedActionId(requested, ActionType.PRINT_CERTIFICATE)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.printCertificate.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.printCertificate.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -368,7 +433,10 @@ async function requestPendingPrintCertificate(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingRequestCorrection(): Promise<PendingAction> {
+async function requestPendingRequestCorrection(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -381,7 +449,7 @@ async function requestPendingRequestCorrection(): Promise<PendingAction> {
     waitFor: false
   })
 
-  mockActionApi(ActionType.REQUEST_CORRECTION, 202)
+  mockActionApi(ActionType.REQUEST_CORRECTION, status, syncPayload)
 
   const requested =
     await client.event.actions.correction.request.request(payload)
@@ -389,14 +457,17 @@ async function requestPendingRequestCorrection(): Promise<PendingAction> {
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.request.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.request.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -405,7 +476,10 @@ async function requestPendingRequestCorrection(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingApproveCorrection(): Promise<PendingAction> {
+async function requestPendingApproveCorrection(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -420,7 +494,7 @@ async function requestPendingApproveCorrection(): Promise<PendingAction> {
     { waitFor: false }
   )
 
-  mockActionApi(ActionType.APPROVE_CORRECTION, 202)
+  mockActionApi(ActionType.APPROVE_CORRECTION, status, syncPayload)
 
   const requested =
     await client.event.actions.correction.approve.request(payload)
@@ -428,14 +502,17 @@ async function requestPendingApproveCorrection(): Promise<PendingAction> {
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.approve.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.approve.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -444,7 +521,10 @@ async function requestPendingApproveCorrection(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingRejectCorrection(): Promise<PendingAction> {
+async function requestPendingRejectCorrection(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await createEvent(
@@ -459,7 +539,7 @@ async function requestPendingRejectCorrection(): Promise<PendingAction> {
     { waitFor: false }
   )
 
-  mockActionApi(ActionType.REJECT_CORRECTION, 202)
+  mockActionApi(ActionType.REJECT_CORRECTION, status, syncPayload)
 
   const requested =
     await client.event.actions.correction.reject.request(payload)
@@ -467,14 +547,17 @@ async function requestPendingRejectCorrection(): Promise<PendingAction> {
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.reject.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.correction.reject.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -483,7 +566,10 @@ async function requestPendingRejectCorrection(): Promise<PendingAction> {
   }
 }
 
-async function requestPendingCustom(): Promise<PendingAction> {
+async function requestPendingCustom(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     encodeScope({ type: 'record.create' }),
@@ -536,21 +622,24 @@ async function requestPendingCustom(): Promise<PendingAction> {
     waitFor: false
   }
 
-  mockActionApi(ActionType.CUSTOM, 202)
+  mockActionApi(ActionType.CUSTOM, status, syncPayload)
 
   const requested = await client.event.actions.custom.request(payload)
   const actionId = requestedActionId(requested, ActionType.CUSTOM)
 
   return {
     actionId,
-    accept: async () =>
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.custom.accept({
-        ...payload,
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
         transactionId: getUUID(),
         actionId
       }),
-    reject: async () =>
+    reject: async (overridePayload?: Record<string, unknown>) =>
       confirmer.event.actions.custom.reject({
+        ...withOverride(payload, overridePayload),
         eventId: event.id,
         transactionId: getUUID(),
         actionId,
@@ -572,13 +661,16 @@ const PENDING_ACTIONS = {
   [ActionType.APPROVE_CORRECTION]: requestPendingApproveCorrection,
   [ActionType.REJECT_CORRECTION]: requestPendingRejectCorrection,
   [ActionType.CUSTOM]: requestPendingCustom
-} satisfies Record<ConfirmableActionType, () => Promise<PendingAction>>
+} satisfies Record<
+  ConfirmableActionType,
+  (status: number, payload: Record<string, unknown>) => Promise<PendingAction>
+>
 
 describe.each(Object.entries(PENDING_ACTIONS))(
   '%s confirmation',
   (type, requestPendingAction) => {
     test('accepting the pending action records it as accepted', async () => {
-      const pending = await requestPendingAction()
+      const pending = await requestPendingAction(202, {})
 
       const response = await pending.accept()
 
@@ -593,7 +685,7 @@ describe.each(Object.entries(PENDING_ACTIONS))(
     })
 
     test('rejecting the pending action keeps the fields it carried', async () => {
-      const pending = await requestPendingAction()
+      const pending = await requestPendingAction(202, {})
 
       const response = await pending.reject()
       const requested = getOrThrow(
@@ -616,7 +708,7 @@ describe.each(Object.entries(PENDING_ACTIONS))(
     })
 
     test('rejecting an accepted action is refused', async () => {
-      const pending = await requestPendingAction()
+      const pending = await requestPendingAction(202, {})
 
       await pending.accept()
 
@@ -626,7 +718,7 @@ describe.each(Object.entries(PENDING_ACTIONS))(
     })
 
     test('accepting a rejected action is refused', async () => {
-      const pending = await requestPendingAction()
+      const pending = await requestPendingAction(202, {})
 
       await pending.reject()
 
@@ -637,7 +729,7 @@ describe.each(Object.entries(PENDING_ACTIONS))(
     })
 
     test('accepting twice records a single accepted action', async () => {
-      const pending = await requestPendingAction()
+      const pending = await requestPendingAction(202, {})
 
       await pending.accept()
       const response = await pending.accept()
@@ -651,7 +743,7 @@ describe.each(Object.entries(PENDING_ACTIONS))(
     })
 
     test('rejecting twice records a single rejected action', async () => {
-      const pending = await requestPendingAction()
+      const pending = await requestPendingAction(202, {})
 
       await pending.reject()
       const response = await pending.reject()
@@ -792,3 +884,112 @@ describe('assignment on an async confirmation', () => {
     expect(assignedToOf(response)).toBeUndefined()
   })
 })
+
+const BAD_DECLARATION = {
+  cat: 'kissa',
+  'applicant.dob': 100
+}
+
+const BAD_ANNOTATION = {
+  dog: 'koira'
+}
+
+describe.each(Object.entries(PENDING_ACTIONS))(
+  '%s reject',
+  (type, requestPendingAction) => {
+    test('synchronous declaration and annotation in response are ignored', async () => {
+      const pending = await requestPendingAction(400, {
+        declaration: BAD_DECLARATION,
+        annotation: BAD_ANNOTATION
+      })
+
+      const response = await confirmer.event.get({
+        eventId: pending.eventId
+      })
+
+      const syncAction = getOrThrow(
+        response.actions.find(
+          (action) =>
+            action.type === type && action.status === ActionStatus.Rejected
+        ),
+        'action not found'
+      ) as ActionDocument
+
+      expect(syncAction.declaration).toEqual({})
+      expect(syncAction.annotation).toBeUndefined()
+    })
+
+    test('async declaration and annotation in reject payload are ignored', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      const response = await pending.reject({
+        declaration: BAD_DECLARATION,
+        annotation: BAD_ANNOTATION,
+        eventId: pending.eventId,
+        waitFor: false
+      })
+
+      const syncAction = getOrThrow(
+        response.actions.find(
+          (action) =>
+            action.type === type && action.status === ActionStatus.Rejected
+        ),
+        'action not found'
+      ) as ActionDocument
+
+      if (type === ActionType.CUSTOM) {
+        expect(syncAction.declaration).toBeUndefined()
+      } else {
+        expect(syncAction.declaration).toEqual({})
+      }
+      expect(syncAction.annotation).toBeUndefined()
+    })
+  }
+)
+
+describe.each(Object.entries(PENDING_ACTIONS))(
+  '%s accept',
+  (type, requestPendingAction) => {
+    const annotableActionError =
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Unexpected field","id":"dog","value":"koira"}]'
+
+    const nonAnnotableActionError =
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100}]'
+
+    const nonAnnotableActions = [
+      ActionType.EDIT,
+      ActionType.REJECT_CORRECTION,
+      ActionType.APPROVE_CORRECTION,
+      ActionType.ARCHIVE,
+      ActionType.UNARCHIVE
+    ]
+
+    const expectedError = nonAnnotableActions.some((na) => na === type)
+      ? nonAnnotableActionError
+      : annotableActionError
+
+    test('error is thrown when synchronous response annotation or declaration includes bad data', async () => {
+      await expect(
+        requestPendingAction(200, {
+          registrationNumber:
+            type === ActionType.REGISTER
+              ? generateRegistrationNumber(() => 0.1)
+              : undefined,
+          declaration: BAD_DECLARATION,
+          annotation: BAD_ANNOTATION
+        })
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('error is thrown when asynchronous request declaration or annotation includes bad data', async () => {
+      const pending = await requestPendingAction(202, {})
+
+      await expect(
+        pending.accept({
+          declaration: BAD_DECLARATION,
+          annotation: BAD_ANNOTATION
+        })
+      ).rejects.toThrow(expectedError)
+    })
+  }
+)
