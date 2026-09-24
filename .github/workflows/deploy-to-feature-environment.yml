@@ -397,7 +397,8 @@ jobs:
             const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
             // Check if the comment already exists
             const comments = await github.rest.issues.listComments({
-              ...context.repo,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               issue_number: prNumber
             });
 
@@ -405,7 +406,8 @@ jobs:
             if (!existingComment) {
               // Add PR comment if it doesn't exist
               await github.rest.issues.createComment({
-                ...context.repo,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
                 issue_number: prNumber,
                 body: deployMessage
               });
