@@ -24,12 +24,15 @@ spec:
       app: mosip-mock
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: mosip-mock
     spec:
       containers:
         - name: mosip-mock
           image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_mock) }}
+          imagePullPolicy: {{ .Values.mosip_mock.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: MOSIP_WEBSUB_CALLBACK_URL
               value: http://mosip-api.{{ .Release.Namespace }}.svc.cluster.local:2024/websub/callback

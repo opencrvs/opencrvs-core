@@ -69,6 +69,8 @@ spec:
       app: mosip-api
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: mosip-api
     spec:
@@ -87,6 +89,7 @@ spec:
       containers:
         - name: mosip-api
           image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_api) }}
+          imagePullPolicy: {{ .Values.mosip_api.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: CLIENT_APP_URL
               value: {{ include "render-external-url" (dict "service_name" "register" "Values" .Values) }}

@@ -612,6 +612,7 @@ describe('omitHiddenPaginatedFields', () => {
     )
 
     expect(missingKeys).toEqual([
+      'declaration.hidden',
       'applicant.dob', // dobUnknown is true
       'applicant.isRecommendedByFieldAgent', // user is not field agent
       'senior-pass.id', // dob is not before the threshhold
@@ -642,6 +643,7 @@ describe('omitHiddenPaginatedFields', () => {
     )
 
     expect(missingKeys).toEqual([
+      'declaration.hidden',
       'applicant.dob', // dobUnknown is true
       'applicant.isRecommendedByFieldAgent', // user is not field agent
       'senior-pass.id', // dob is not before the threshhold
