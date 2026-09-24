@@ -11,6 +11,7 @@
 
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch'
 import { PostgreSqlContainer } from '@testcontainers/postgresql'
+import { Client as ElasticsearchClient } from '@elastic/elasticsearch'
 import type { ProvidedContext } from 'vitest'
 
 type ProvideFunction = <K extends keyof ProvidedContext>(
@@ -50,7 +51,37 @@ export default async function setup({ provide }: { provide: ProvideFunction }) {
   const es = await setupElasticSearchServer()
   const psql = await setupPostgresServer()
 
-  provide('ELASTICSEARCH_URI', `${es.getHost()}:${es.getMappedPort(9200)}`)
+  const elasticsearchUri = `${es.getHost()}:${es.getMappedPort(9200)}`
+
+  const elasticsearch = new ElasticsearchClient({
+    node: `http://${elasticsearchUri}`
+  })
+
+  // Cluster settings are global and last for the whole run, so writing them
+  // once here saves every test from repeating it.
+  await elasticsearch.cluster.putSettings({
+    body: { persistent: { 'action.auto_create_index': 'false' } }
+  })
+
+  // Writes ask Elasticsearch to wait until the new document can be searched.
+  // Elasticsearch only makes documents searchable once per refresh interval,
+  // which defaults to a full second, so every such write costs a test roughly
+  // a second of waiting. Refreshing far more often is cheap on the tiny
+  // indices tests build, and the wait still guarantees the same visibility.
+  // There is only ever one node, so replicas would stay unassigned anyway.
+  await elasticsearch.indices.putIndexTemplate({
+    name: 'test-defaults',
+    index_patterns: ['*'],
+    priority: 1,
+    template: {
+      settings: {
+        refresh_interval: '20ms',
+        number_of_replicas: 0
+      }
+    }
+  })
+
+  provide('ELASTICSEARCH_URI', elasticsearchUri)
   provide('POSTGRES_URI', `${psql.getHost()}:${psql.getMappedPort(5432)}`)
 
   return async () => {

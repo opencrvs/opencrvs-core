@@ -71,14 +71,6 @@ async function resetESServer() {
   }
   previousId = String(id)
 
-  await client.cluster.putSettings({
-    body: {
-      persistent: {
-        'action.auto_create_index': 'false'
-      }
-    }
-  })
-
   // Create concrete indices
   await createIndex(
     getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
