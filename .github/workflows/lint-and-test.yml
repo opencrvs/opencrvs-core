@@ -254,15 +254,14 @@ jobs:
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):lint
 
       - name: Run Unit Test
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        if: matrix.package != 'packages/client' && matrix.package != 'packages/events' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test
 
-      - name: Generate test coverage summary
-        if: github.event_name == 'pull_request'
-          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+      - name: Generate commons test coverage summary
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         run: |
-          export PACKAGE_NAME=$(basename "${{ matrix.package }}")
-          export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
+          export PACKAGE_NAME=commons
+          export COVERAGE_FILE=./packages/commons/coverage/coverage-summary.json
 
           GENERATED_REPORT=$(node -e '
             const s = require(process.env.COVERAGE_FILE).total;
@@ -285,11 +284,10 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Post test coverage to PR
-        if: github.event_name == 'pull_request'
-          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         uses: mshick/add-pr-comment@v3
         with:
-          message-id: ${{ matrix.package }}-test-coverage
+          message-id: packages/commons-test-coverage
           message: ${{ env.PR_COMMENT_BODY }}
 
   countryconfig-template:
@@ -573,6 +571,123 @@ jobs:
       - name: Run Unit Test
         run: pnpm exec nx run @opencrvs/client:test --excludeTaskDependencies -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
+  test-events:
+    name: Test events
+    needs: setup
+    if: contains(needs.setup.outputs.matrix, 'packages/events')
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [1, 2, 3]
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Runs dependency installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
+      - name: Run Unit Test
+        run: >
+          pnpm exec nx run @opencrvs/events:test --
+          --reporter=blob --reporter=default
+          --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+
+      - name: Upload blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: events-blob-${{ matrix.shards }}
+          path: packages/events/.vitest-reports/*
+          include-hidden-files: true
+          retention-days: 1
+
+  events-coverage:
+    name: Events test coverage
+    needs: test-events
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-26.04
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Runs dependency installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v7
+        with:
+          path: packages/events/.vitest-reports
+          pattern: events-blob-*
+          merge-multiple: true
+
+      - name: Verify every shard reported
+        run: |
+          found=$(find packages/events/.vitest-reports -name 'blob-*.json' | wc -l)
+          [ "$found" -eq 3 ] || { echo "Expected 3 shard reports, found $found."; exit 1; }
+
+      - name: Merge reports and regenerate coverage
+        run: pnpm --filter @opencrvs/events exec vitest run --merge-reports --coverage
+
+      - name: Generate test coverage summary
+        run: |
+          export PACKAGE_NAME=events
+          export COVERAGE_FILE="./packages/events/coverage/coverage-summary.json"
+
+          GENERATED_REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
+            console.log(
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
+              "```"
+            );
+          ')
+
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post test coverage to PR
+        uses: mshick/add-pr-comment@v3
+        with:
+          message-id: packages/events-test-coverage
+          message: ${{ env.PR_COMMENT_BODY }}
+
   lint-knip:
     name: Lint unused exports with Knip
     runs-on: ubuntu-26.04
@@ -698,6 +813,8 @@ jobs:
       - lint-client
       - test-storybook
       - test-client
+      - test-events
+      - events-coverage
       - lint-knip
       - build-toolkit
     # `always()`, or a skipped dependency would skip this job too and take

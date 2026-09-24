@@ -887,11 +887,13 @@ describe('assignment on an async confirmation', () => {
 
 const BAD_DECLARATION = {
   cat: 'kissa',
-  'applicant.dob': 100
+  'applicant.dob': 100,
+  'declaration.hidden': 16
 }
 
 const BAD_ANNOTATION = {
-  dog: 'koira'
+  dog: 'koira',
+  'annotation.hidden': 22
 }
 
 describe.each(Object.entries(PENDING_ACTIONS))(
@@ -950,11 +952,14 @@ describe.each(Object.entries(PENDING_ACTIONS))(
 describe.each(Object.entries(PENDING_ACTIONS))(
   '%s accept',
   (type, requestPendingAction) => {
-    const annotableActionError =
-      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Unexpected field","id":"dog","value":"koira"}]'
+    const declareActionError =
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Invalid input","id":"declaration.hidden","value":16},{"message":"Unexpected field","id":"dog","value":"koira"},{"message":"Invalid input","id":"annotation.hidden","value":22}]'
+
+    const otherDeclarationActionError =
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Invalid input","id":"declaration.hidden","value":16},{"message":"Unexpected field","id":"dog","value":"koira"},{"message":"Unexpected field","id":"annotation.hidden","value":22}]'
 
     const nonAnnotableActionError =
-      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100}]'
+      '[{"message":"Unexpected field","id":"cat","value":"kissa"},{"message":"Invalid input","id":"applicant.dob","value":100},{"message":"Invalid input","id":"declaration.hidden","value":16}]'
 
     const nonAnnotableActions = [
       ActionType.EDIT,
@@ -964,9 +969,12 @@ describe.each(Object.entries(PENDING_ACTIONS))(
       ActionType.UNARCHIVE
     ]
 
+    /* eslint-disable no-nested-ternary */
     const expectedError = nonAnnotableActions.some((na) => na === type)
       ? nonAnnotableActionError
-      : annotableActionError
+      : type === ActionType.DECLARE
+        ? declareActionError
+        : otherDeclarationActionError
 
     test('error is thrown when synchronous response annotation or declaration includes bad data', async () => {
       await expect(
