@@ -57,8 +57,6 @@ export default async function setup({ provide }: { provide: ProvideFunction }) {
     node: `http://${elasticsearchUri}`
   })
 
-  // Cluster settings are global and last for the whole run, so writing them
-  // once here saves every test from repeating it.
   await elasticsearch.cluster.putSettings({
     body: { persistent: { 'action.auto_create_index': 'false' } }
   })
