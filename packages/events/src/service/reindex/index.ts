@@ -120,6 +120,8 @@ async function reindexSearch(
    */
   for await (const batch of streamEventDocuments()) {
     if (failure) {
+      // Let in-flight batches settle
+      await Promise.all(inFlight)
       throw failure
     }
 
