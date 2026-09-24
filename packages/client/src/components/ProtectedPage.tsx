@@ -72,7 +72,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   async componentDidMount() {
-    const mountedOn = Date.now()
+    // const mountedOn = Date.now()
     const newState = { ...this.state }
 
     if (await storage.getItem(SCREEN_LOCK)) {
@@ -93,14 +93,16 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     }
 
     newState.loading = false
-    const timeSinceMount = Date.now() - mountedOn
+    // const timeSinceMount = Date.now() - mountedOn
     const progress = document.getElementById('progress')
     if (progress != null) progress.style.width = '100%'
     setTimeout(
       () => {
         this.setState(newState)
       },
-      import.meta.env.PROD ? Math.max(200, 2000 - timeSinceMount) : 0
+      // import.meta.env.PROD ? Math.max(200, 200 - timeSinceMount) : 0
+      // Test how much tests are affected,
+      0
     )
   }
 
