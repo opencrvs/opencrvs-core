@@ -63,12 +63,7 @@ export default async function setup({ provide }: { provide: ProvideFunction }) {
     body: { persistent: { 'action.auto_create_index': 'false' } }
   })
 
-  // Writes ask Elasticsearch to wait until the new document can be searched.
-  // Elasticsearch only makes documents searchable once per refresh interval,
-  // which defaults to a full second, so every such write costs a test roughly
-  // a second of waiting. Refreshing far more often is cheap on the tiny
-  // indices tests build, and the wait still guarantees the same visibility.
-  // There is only ever one node, so replicas would stay unassigned anyway.
+  // Writes wait for the next refresh, which defaults to once a second. A short interval removes that wait. Replicas are off because there is only one node.
   await elasticsearch.indices.putIndexTemplate({
     name: 'test-defaults',
     index_patterns: ['*'],
