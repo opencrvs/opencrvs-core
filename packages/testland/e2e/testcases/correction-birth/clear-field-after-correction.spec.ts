@@ -171,7 +171,6 @@ test('Cleared field values are removed after correcting a registered birth recor
     const birthLocation = page.getByTestId(
       'child.birthLocation.privateHome-value'
     )
-
     await expect(birthLocation).not.toContainText(town)
     await expect(birthLocation).not.toContainText(residentialArea)
   })
