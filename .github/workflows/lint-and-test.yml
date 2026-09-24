@@ -71,6 +71,11 @@ jobs:
     needs: setup
     runs-on: ubuntu-24.04
     permissions:
+      # Declaring any permission drops every other one to `none`, so
+      # `contents: read` has to be spelled out for actions/checkout. On a
+      # public repository the checkout succeeds without it; on a private
+      # one it fails with "Repository not found".
+      contents: read
       pull-requests: write
     strategy:
       fail-fast: false

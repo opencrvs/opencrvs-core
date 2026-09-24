@@ -280,12 +280,16 @@ jobs:
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.TESTLAND_COMMIT_HASH }}',
-                'core-branch': '${{ env.BRANCH_NAME }}',
+                // e2e checks out Helm charts from the public opencrvs-core repo, where
+                // a private repository's branches don't exist. There, use the branch
+                // the PR targets instead.
+                'core-branch': '${{ github.event.repository.private && github.base_ref || env.BRANCH_NAME }}',
                 stack: '${{ steps.generate_stack.outputs.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 branch: e2eBranch,
                 'actor': '${{ github.actor }}',
                 reset: 'true',
+                registry: '${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}',
               },
             });
 
@@ -326,6 +330,8 @@ jobs:
   listen-e2e:
     needs: [trigger-e2e, generate_stack_name_and_branch]
     runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v9
@@ -382,14 +388,13 @@ jobs:
       - name: Update github comment on PR
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.CORE_ISSUES_PR_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
             const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
             // Check if the comment already exists
             const comments = await github.rest.issues.listComments({
-              owner: 'opencrvs',
-              repo: 'opencrvs-core',
+              ...context.repo,
               issue_number: prNumber
             });
 
@@ -397,8 +402,7 @@ jobs:
             if (!existingComment) {
               // Add PR comment if it doesn't exist
               await github.rest.issues.createComment({
-                owner: 'opencrvs',
-                repo: 'opencrvs-core',
+                ...context.repo,
                 issue_number: prNumber,
                 body: deployMessage
               });
