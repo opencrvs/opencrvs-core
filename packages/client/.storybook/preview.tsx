@@ -12,6 +12,7 @@
 import { getTheme } from '@opencrvs/components/lib/theme'
 import type { Preview } from '@storybook/react'
 import { initialize, mswLoader } from 'msw-storybook-addon'
+import { configure } from '@storybook/test'
 import React, { PropsWithChildren } from 'react'
 
 import { Page } from '@client/components/Page'
@@ -63,6 +64,19 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
   }
 })
+
+// Testing Library resolves `findBy*` / `waitFor` against a 1000ms default.
+// That budget races a story's initial data load: on a fast machine the content
+// is painted well inside it, but on a loaded CI runner the page is still
+// showing its spinner when the wait expires and the story fails with
+// "Unable to find an element with the text: ...". Individual stories worked
+// around this by passing `{ timeout: 5000 }` to single queries, which leaves
+// the same trap set for every query that forgets to. Raise the default once,
+// here, so it holds for all of them.
+//
+// This only changes how long a query is willing to WAIT. A query that resolves
+// immediately is unaffected, so passing stories do not get slower.
+configure({ asyncUtilTimeout: 15000 })
 
 // Initialize MSW
 initialize({
