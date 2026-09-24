@@ -111,6 +111,10 @@ function toAbsoluteUrl(url: string) {
 export async function precacheFiles(
   paths: (DocumentPath | FullDocumentPath)[]
 ) {
+  if (paths.length === 0) {
+    return
+  }
+
   const cache = await getFileCache()
 
   if (!cache) {
