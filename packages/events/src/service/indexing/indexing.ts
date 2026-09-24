@@ -43,10 +43,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import {
-  primeAdministrativeHierarchyCache,
-  readAdministrativeHierarchyStats
-} from '@events/storage/postgres/administrative-hierarchy/locations'
+import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import { TrpcUserContext } from '../../context'
 import {
@@ -416,24 +413,18 @@ export async function indexEventsInBulk(
   const esClient = getOrCreateClient()
 
   const hiearchyResolutionStarted = new Date()
-  const hierarchyStatsBefore = readAdministrativeHierarchyStats()
 
-  const indexDocumentStarted = performance.now()
   const indexableEvents = batch.map((doc) => {
     const config = getEventConfigById(configs, doc.type)
     return { doc, config, eventIndex: eventToEventIndex(doc, config) }
   })
-  const indexDocumentMs = performance.now() - indexDocumentStarted
 
-  const primeStarted = performance.now()
   await primeAdministrativeHierarchyCache(
     indexableEvents.flatMap(({ config, eventIndex }) =>
       collectLocationIds(config, eventIndex)
     )
   )
-  const primeMs = performance.now() - primeStarted
 
-  const resolveStarted = performance.now()
   const indexedDocs = await Promise.all(
     indexableEvents.map(async ({ doc, config, eventIndex }) => {
       const eventIndexWithLocationHierarchy =
@@ -450,24 +441,9 @@ export async function indexEventsInBulk(
       ]
     })
   )
-  const resolveMs = performance.now() - resolveStarted
-
   const batchId = batch[0]?.id ?? 'unknown'
-  const hierarchyStats = readAdministrativeHierarchyStats(hierarchyStatsBefore)
-  /*
-   * Each timer is the wall clock of one phase, so the three sum to the total. They
-   * include time lost to the other in-flight batches, which share this event loop
-   * and connection pool. The bracketed counters are process-wide deltas over the
-   * same window and so count those batches too, except `cacheSize`, which is
-   * absolute.
-   */
   logger.info(
-    `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms ` +
-      `(building index documents ${Math.round(indexDocumentMs)} ms, ` +
-      `priming the hierarchy cache ${Math.round(primeMs)} ms, ` +
-      `resolving hierarchies ${Math.round(resolveMs)} ms ` +
-      `[${hierarchyStats.hits} cache hits, ${hierarchyStats.misses} misses, ` +
-      `${Math.round(hierarchyStats.dbMs)} ms in postgres, cache size ${hierarchyStats.cacheSize}])`
+    `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms`
   )
 
   const body = indexedDocs.flat()

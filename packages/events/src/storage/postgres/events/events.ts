@@ -113,27 +113,13 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
-interface FetchedChunk {
-  chunk: number
-  ids: UUID[]
-  eventDocs: EventDocument[]
-  idReadMs: number
-  fetchMs: number
-}
-
 /*
  * Never rejects, so a prefetched chunk cannot go unhandled while the one before
  * it is still being yielded.
  */
-async function fetchChunk(
-  ids: UUID[],
-  chunk: number,
-  idReadMs: number
-): Promise<FetchedChunk> {
-  const fetchStarted = performance.now()
-  let eventDocs: EventDocument[] = []
+async function fetchChunk(ids: UUID[]): Promise<EventDocument[]> {
   try {
-    eventDocs = await getEventsByIdsInTrx(getClient(), ids)
+    return await getEventsByIdsInTrx(getClient(), ids)
   } catch (err) {
     logger.error({
       message: 'Failed to fetch event documents',
@@ -141,62 +127,33 @@ async function fetchChunk(
       error: (err as Error).message,
       stack: (err as Error).stack
     })
-  }
-  return {
-    chunk,
-    ids,
-    eventDocs,
-    idReadMs,
-    fetchMs: performance.now() - fetchStarted
+    return []
   }
 }
 
-async function* yieldChunk(fetched: Promise<FetchedChunk>) {
-  const waitStarted = performance.now()
-  const { chunk, ids, eventDocs, idReadMs, fetchMs } = await fetched
-  const waitMs = performance.now() - waitStarted
-
-  const declared = eventDocs.filter(
+async function* yieldChunk(fetched: Promise<EventDocument[]>) {
+  const declared = (await fetched).filter(
     (event) => getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
   )
 
-  /*
-   * A yield only returns once the consumer asks for the next batch, so this is
-   * the time the reader spent waiting for the indexing side rather than working.
-   * Waiting for documents dominating instead means the reader is what starves it.
-   */
-  const yieldStarted = performance.now()
   if (declared.length) {
     yield declared
   }
-  const consumerMs = performance.now() - yieldStarted
-
-  logger.info(
-    `Read chunk ${chunk}: ${ids.length} ids yielded ${declared.length} events ` +
-      `(reading ids ${Math.round(idReadMs)} ms, fetching documents ${Math.round(fetchMs)} ms, ` +
-      `waiting for documents ${Math.round(waitMs)} ms, ` +
-      `blocked on the indexing side ${Math.round(consumerMs)} ms)`
-  )
 }
 
 async function* readIdChunks(batchSize: number) {
   const eventsStream = getClient().selectFrom('events').select('id').stream()
   let ids: UUID[] = []
-  let idReadMs = 0
-  let idReadStarted = performance.now()
 
   for await (const row of eventsStream) {
-    idReadMs += performance.now() - idReadStarted
     ids.push(row.id)
     if (ids.length === batchSize) {
-      yield { ids, idReadMs }
+      yield ids
       ids = []
-      idReadMs = 0
     }
-    idReadStarted = performance.now()
   }
   if (ids.length) {
-    yield { ids, idReadMs }
+    yield ids
   }
 }
 
@@ -209,11 +166,10 @@ async function* readIdChunks(batchSize: number) {
  * Postgres works while the indexing side does rather than taking turns with it.
  */
 export async function* streamEventDocuments(batchSize = STREAM_BATCH_SIZE) {
-  let chunk = 0
-  let fetching: Promise<FetchedChunk> | undefined
+  let fetching: Promise<EventDocument[]> | undefined
 
-  for await (const { ids, idReadMs } of readIdChunks(batchSize)) {
-    const next = fetchChunk(ids, ++chunk, idReadMs)
+  for await (const ids of readIdChunks(batchSize)) {
+    const next = fetchChunk(ids)
     if (fetching) {
       yield* yieldChunk(fetching)
     }
