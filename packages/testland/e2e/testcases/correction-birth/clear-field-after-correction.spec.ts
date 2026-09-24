@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { getToken, login, switchEventTab } from '@e2e/support/helpers'
+import {
+  getToken,
+  login,
+  searchFromSearchBar,
+  switchEventTab
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -72,8 +77,7 @@ test('Cleared field values are removed after correcting a registered birth recor
   })
 
   await test.step('Open the registered record and capture the values shown', async () => {
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
 
     recordUrl = page.url()
 

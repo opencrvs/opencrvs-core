@@ -14,6 +14,7 @@ import { formatName, login } from '@e2e/support/helpers'
 import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 import { faker } from '@faker-js/faker'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe.serial('Can Open Draft offline', () => {
   let page: Page
@@ -30,7 +31,7 @@ test.describe.serial('Can Open Draft offline', () => {
   })
 
   test('Login', async () => {
-    await login(page)
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL_OTHER)
     await expect(page.getByText('Farajaland CRS')).toBeVisible({
       timeout: 30000
     })
