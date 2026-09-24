@@ -37,7 +37,7 @@ import {
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFile } from '../files/useFileUpload'
+import { precacheFiles } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"
@@ -88,9 +88,8 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
         }
 
         const filenames = getFilepathsFromActionDocument([draft.action])
-        await Promise.all(
-          filenames.map(async (filename) => precacheFile(filename))
-        )
+
+        await precacheFiles(filenames)
       })
     )
 
