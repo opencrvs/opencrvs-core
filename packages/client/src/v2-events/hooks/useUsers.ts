@@ -14,6 +14,7 @@ import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import { useSelector } from 'react-redux'
 import {
   deepDropNulls,
+  DocumentPath,
   System,
   TokenUserType,
   UserOrSystem,
@@ -32,7 +33,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFile } from '../features/files/useFileUpload'
+import { precacheFiles } from '../features/files/useFileUpload'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -60,12 +61,11 @@ setQueryDefaults<
       return user
     }
 
-    if (user.signature) {
-      await precacheFile(user.signature)
-    }
-    if (user.avatar) {
-      await precacheFile(user.avatar)
-    }
+    const files = [user.avatar, user.signature].filter(
+      (file): file is DocumentPath => !!file
+    )
+
+    await precacheFiles(files)
 
     return deepDropNulls({
       ...user,
@@ -117,7 +117,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
             return user
           }
           if (user.avatar) {
-            await precacheFile(user.avatar)
+            await precacheFiles([user.avatar])
           }
           return user
         })

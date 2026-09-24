@@ -20,7 +20,7 @@ import {
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { removeCached } from '@client/v2-events/cache'
-import { precacheFile } from './useFileUpload'
+import { precacheFiles } from './useFileUpload'
 
 export function getFilepathsFromActionDocument(
   actions: ActionDocument[] | Draft['action'][]
@@ -65,7 +65,7 @@ export async function cacheFiles(event: EventDocument) {
   const actions = getAcceptedActions(event)
   const fileNames = getFilepathsFromActionDocument(actions)
 
-  return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
+  precacheFiles(fileNames)
 }
 
 export async function removeCachedFiles(event: EventDocument) {
