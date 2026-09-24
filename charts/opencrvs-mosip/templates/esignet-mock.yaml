@@ -50,6 +50,8 @@ spec:
       app: esignet-mock
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: esignet-mock
     spec:
