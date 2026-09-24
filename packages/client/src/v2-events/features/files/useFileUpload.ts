@@ -127,7 +127,7 @@ export async function precacheFiles(
     (path) => !cachedUrls.has(toAbsoluteUrl(path as DocumentPath))
   )
 
-  await Promise.all(missingFiles.map((path) => precacheFile(path, cache)))
+  await Promise.all(missingFiles.map(async (path) => precacheFile(path, cache)))
 }
 
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
