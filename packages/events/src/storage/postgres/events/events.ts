@@ -29,7 +29,7 @@ import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
-const STREAM_BATCH_SIZE = 1000
+const STREAM_BATCH_SIZE = 300
 
 function toEventDocument(
   { eventType, ...event }: Events,
