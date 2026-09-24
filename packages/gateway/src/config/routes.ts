@@ -56,22 +56,6 @@ export const getRoutes = () => {
         }
       }
     },
-    {
-      method: 'DELETE',
-      path: '/files/{filePath*}',
-      handler: async (req, h) => {
-        return h.proxy({
-          uri: `${DOCUMENTS_URL}/files/${req.params.filePath}`,
-          passThrough: true
-        })
-      },
-      options: {
-        payload: {
-          output: 'data',
-          parse: false
-        }
-      }
-    },
     // application config routes (moved from config service)
     {
       method: 'GET',

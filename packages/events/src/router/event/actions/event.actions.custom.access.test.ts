@@ -16,7 +16,8 @@ import {
   createTestClient,
   setupTestCase,
   TEST_SYSTEM_ID,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_USER_DEFAULT_SCOPES,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -32,6 +33,11 @@ const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
     }
   })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Custom action', () => {
   function mockActionApi(action: ActionType, status: number) {
@@ -156,7 +162,7 @@ describe('Custom action', () => {
       )
 
       await expect(
-        systemClient.event.actions.custom.accept({
+        confirmationClient.event.actions.custom.accept({
           ...getCustomPayload(event.id),
           actionId: getOrThrow(customRequestAction?.id, 'action id missing')
         })
@@ -210,7 +216,7 @@ describe('Custom action', () => {
       )
 
       await expect(
-        systemClient.event.actions.custom.reject({
+        confirmationClient.event.actions.custom.reject({
           eventId: event.id,
           transactionId: getUUID(),
           actionId: getOrThrow(customRequestAction?.id, 'action id missing'),

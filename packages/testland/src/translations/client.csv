@@ -1091,10 +1091,14 @@ user.profile.audit.description.rejected,Description for rejected declaration,Rej
 user.profile.audit.description.updated,Description for updated declaration,Updated,Mise à jour de
 user.profile.audit.description.validated,Description for validated declaration,Sent for approval,Déclaration envoyée pour approbation
 user.profile.audit.list.noDataFound,Text for audit list,No audits to display,Aucun audit à afficher
+user.profile.auditList.activateIntegration,Description for activate integration audit action,Activated integration,Intégration activée
 user.profile.auditList.approvedCorrectionAuditAction,Description for record correction being approved,Approved correction request,Demande de correction approuvée
 user.profile.auditList.archived,Description for declaration archived,Archived,Archivé
 user.profile.auditList.assigned,Description for declaration assignment,Assigned,Assigné
+user.profile.auditList.createIntegration,Description for create integration audit action,Created integration,Intégration créée
 user.profile.auditList.created,Description for created audit action,Created,Créé
+user.profile.auditList.deactivateIntegration,Description for deactivate integration audit action,Deactivated integration,Intégration désactivée
+user.profile.auditList.deleteIntegration,Description for delete integration audit action,Deleted integration,Intégration supprimée
 user.profile.auditList.download,Description for download audit action,Downloaded record,Fichier téléchargé
 user.profile.auditList.emailAddressChanged,Description for user change email,Email Address changed,L'adresse e-mail a été modifiée
 user.profile.auditList.loggedIn,Description for user logged in,Logged in,Connecté
@@ -1106,6 +1110,7 @@ user.profile.auditList.passwordReset,Description for User reset password action,
 user.profile.auditList.passwordResetByAdmin,Description for sending temporal password action,Sent password,Mot de passe envoyé
 user.profile.auditList.phoneNumberChanged,Description for user change phoneNumber,Phone number changed,Changement de numéro de téléphone
 user.profile.auditList.reInstatedToInProgress,Description for sending registration from Reinstated to In progress audit action,Reinstated to in progress,Réintégré dans les travaux en cours
+user.profile.auditList.refreshSecret,Description for refresh integration client secret audit action,Refreshed client secret,Secret client actualisé
 user.profile.auditList.rejectedCorrectedAuditAction,Description for record correction being rejected,Rejected correction request,Demande de correction rejetée
 user.profile.auditList.requestedCorrectionAuditAction,Description for record correction being requested,Requested correction,Correction demandée
 user.profile.auditList.resendInvite,Description for resending user invite audit action,Resent invite,Invitation renvoyée
@@ -1118,11 +1123,7 @@ user.profile.auditList.userReactivated,Description for User reactivated,Reactiva
 user.profile.auditList.usernameReminderByAdmin,Description for send username reminder audit action,Sent username Reminder,Rappel du nom d'utilisateur envoyé
 user.profile.auditList.usernameRequested,Description for User username requested audit action,Username reminder requested,Rappel du nom d'utilisateur demandé
 user.profile.auditList.viewed,Description for declaration viewed audit action,Viewed,Vu
-user.profile.nid,Title for nid,National ID,Carte d'identité nationale
-user.profile.phoneNumber,Title for phoneNumber field,Phone number,Numéro de téléphone
 user.profile.sectionTitle.audit,Title for audit section,History,Historique
-user.profile.startDate,Title for startDate field,Start date,Date de début
-user.profile.userName,Title for userName field,Username,Nom d'utilisateur
 userSetup.complete.instruction,Instruction for the setup complete,Login to your account with your username and newly created password,Connectez-vous maintenant à votre compte avec votre nom d'utilisateur et votre mot de passe nouvellement créé.
 userSetup.complete.title,Title for the setup complete page,Account setup complete,Configuration du compte terminée
 userSetup.landing.instruction,Instruction for the account setup langing page,You are just a few steps away from completing your account set up,Vous n'êtes plus qu'à quelques étapes de la création de votre compte.

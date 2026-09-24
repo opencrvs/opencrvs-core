@@ -16,12 +16,13 @@ import {
   EventDocument,
   FieldUpdateValue,
   getPendingAction,
-  type Location
+  UUID
 } from '@opencrvs/toolkit/events'
 import { applicationConfig } from '../application/application-config'
 import { COUNTRY_LOGO_URL } from './constant'
 import { GATEWAY_URL } from '@countryconfig/constants'
 import { createClient } from '@opencrvs/toolkit/api'
+import { logger } from '@countryconfig/logger'
 
 import { InformantType as BirthInformantType } from '@countryconfig/events/birth/forms/pages/informant'
 import { InformantTemplateType } from './sms-service'
@@ -53,10 +54,24 @@ const resolveName = (name: FieldUpdateValue) => {
   }
 }
 
-async function getLocations(token: string): Promise<Location[]> {
+async function findCrvsOfficeName(
+  locationId: UUID | null | undefined,
+  token: string
+): Promise<string | undefined> {
+  if (!locationId) {
+    return undefined
+  }
+
   const url = new URL('events', GATEWAY_URL).toString()
   const client = createClient(url, `Bearer ${token}`)
-  return client.locations.list.query()
+
+  try {
+    const location = await client.locations.get.query({ id: locationId })
+    return location.name
+  } catch (error) {
+    logger.error(`Failed to resolve location ${locationId}: ${error}`)
+    return undefined
+  }
 }
 
 function getInformant(eventType: string, declaration: Record<string, any>) {
@@ -83,7 +98,8 @@ async function getNotificationParams(
   registrationNumber?: string
 ): Promise<NotificationParams> {
   const pendingAction = getPendingAction(event.actions)
-  const locations = await getLocations(token)
+  const crvsOffice =
+    (await findCrvsOfficeName(pendingAction.createdAtLocation, token)) ?? ''
 
   const declaration = deepMerge(
     aggregateActionDeclarations(event),
@@ -116,10 +132,7 @@ async function getNotificationParams(
   const params = {
     variable: {
       trackingId: event.trackingId,
-      crvsOffice:
-        (locations ?? []).find(
-          ({ id }: { id: string }) => id === pendingAction.createdAtLocation
-        )?.name || '',
+      crvsOffice,
       registrationLocation: '',
       applicationName: applicationConfig.APPLICATION_NAME,
       countryLogo: COUNTRY_LOGO_URL,

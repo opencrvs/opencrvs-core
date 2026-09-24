@@ -38,10 +38,7 @@ import {
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import {
-  EventIdParam,
-  EventIdParamWithWaitFor
-} from '@events/router/middleware'
+import { EventIdParam } from '@events/router/middleware'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import {
   userOnlyProcedure,
@@ -72,7 +69,7 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles, presignFile } from '@events/service/files'
+import { presignFile, sweepUnreferencedFiles } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -211,10 +208,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .input(EventIdParamWithWaitFor)
+    .input(EventIdParam)
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
@@ -223,7 +220,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
-          waitFor: input.waitFor,
+          waitFor: true, // unused for READ, but required by the shared type
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),
@@ -295,6 +292,7 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
+
         await throwConflictIfActionNotAllowed(
           eventId,
           type,
@@ -330,7 +328,7 @@ export const eventRouter = router({
           event.actions.push(actionFromDraft.data)
         }
 
-        await cleanupUnreferencedFiles(event, ctx.token)
+        await sweepUnreferencedFiles(event, ctx.token)
 
         return currentDraft
       })
@@ -398,7 +396,7 @@ export const eventRouter = router({
         .input(AssignActionInput)
         .output(EventDocumentOnlyLastAction)
         .use(middleware.canAccessEventWithScopes(['record.read']))
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
@@ -420,7 +418,7 @@ export const eventRouter = router({
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
         .output(EventDocumentOnlyLastAction)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
           const result = await unassignRecord({ input, user, token })
@@ -453,7 +451,7 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
@@ -489,7 +487,7 @@ export const eventRouter = router({
         .input(MarkNotDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)

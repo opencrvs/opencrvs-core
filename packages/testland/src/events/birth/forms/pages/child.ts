@@ -22,10 +22,9 @@ import {
   PageTypes,
   field,
   user,
-  never,
   SelectOption
 } from '@opencrvs/toolkit/events'
-import { not } from '@opencrvs/toolkit/conditionals'
+import { never, not } from '@opencrvs/toolkit/conditionals'
 
 import {
   createSelectOptions,

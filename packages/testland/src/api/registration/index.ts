@@ -167,9 +167,7 @@ export async function onMosipBirthRegisterHandler(
       'Birth registration will not be forwarded to MOSIP based on custom logic.'
     )
     await sendInformantNotification({ event, token, registrationNumber })
-    return h
-      .response({ registrationNumber: generateRegistrationNumber() })
-      .code(200)
+    return h.response({ registrationNumber }).code(200)
   }
 
   try {
@@ -234,9 +232,7 @@ export async function onMosipDeathRegisterHandler(
 
   if (!shouldForwardDeathRegistrationToMosip(declaration)) {
     await sendInformantNotification({ event, token, registrationNumber })
-    return h
-      .response({ registrationNumber: generateRegistrationNumber() })
-      .code(200)
+    return h.response({ registrationNumber }).code(200)
   }
 
   try {
@@ -374,11 +370,8 @@ async function findBirthRecordByBrn(
 type SealResult = { success: true } | { success: false; reason: string }
 
 /**
- * Sealing acts on a *different* record (the original birth record) than the
- * one this handler was invoked for. The token forwarded to trigger handlers
- * is bound to the triggering (adoption) event's id, so it can never be used
- * to act on another record - hence the dedicated sealing-service token here,
- * rather than the request's own token.
+ * Sealing targets the original birth record, not the adoption record.
+ * The token core sends carries no scopes, so we use the sealing service's own token.
  */
 async function sealOriginalBirthRecord(
   declaration: ReturnType<typeof aggregateActionDeclarations>,

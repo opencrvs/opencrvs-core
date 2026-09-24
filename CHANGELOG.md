@@ -21,24 +21,28 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
-#### Calling action .accept & .reject endpoints require system user token
-
-Previously it was possible for the countryconfig to call events API using user's token. This required user to be assigned to the event, which allowed two entities to perform actions under same identity. User is unassigned from the event when system returns 202, and system must request system user token to perform accept or reject actions.
-
-#### Registration confirmation no longer uses OAuth token exchange
+#### Confirming an asynchronous action now takes credentials the requester does not have
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
 
-Confirming an asynchronous action (the `accept`/`reject` endpoints) now requires the **same scope as the action being confirmed** — e.g. `record.register` for a registration — checked with the same event-access rules as requesting the action. There is no separate confirmation scope.
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients.
+
+This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. Three further rules back it up:
+
+- **`accept`/`reject` require a system client's token.** Previously the country configuration could call the events API with the user's token. That required the user to be assigned to the event, which allowed two entities to act under the same identity. A human token is now refused outright, whatever scopes it carries.
+- **A confirmation is refused while a user holds the assignment.** The user is unassigned from the event when the country configuration returns 202, so this normally does not arise; it surfaces when someone assigns themselves while a confirmation is still pending.
+- **`accept`/`reject` refuse any `actionId` that is not a pending action of the matching type**, so a confirmation cannot be pointed at an arbitrary action to manufacture an accepted one.
+
+**These scopes must not be granted to a user role.** A caller that can both request an action and confirm it needs no country configuration to register a record. Core does not enforce this — grant them only to integrations.
 
 Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
-- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time;
+- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects)** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`
 - **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
 
-`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.register`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+`mosip-api` checks its OpenCRVS system client on startup and exits with code 1 if it is missing `record.action.accept` or `record.read`. It does the same when the client cannot authenticate at all, but **only in production** — elsewhere it logs a warning and retries every 3 seconds indefinitely, so a misconfigured `OPENCRVS_CLIENT_ID` / `OPENCRVS_CLIENT_SECRET` shows up as a hang rather than a crash (both default to an empty string and are not validated at startup). It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
-The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is an internal service token that only proves the request came from core — it carries no scopes, so a country configuration confirming asynchronously must use its own system client's credentials for the `accept`/`reject` call. It lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
 
 #### Document presign requests are no longer authorized by scope alone
 
@@ -111,7 +115,21 @@ The user-notification and system-ready triggers were served under `/triggers/`, 
 
 [#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
 
+#### Attachment uploads must name the record they belong to
+
+`POST /attachments` accepted an optional, free-form `path`. Omitting it wrote the file to the bucket root, where it belonged to no record and nothing would ever delete it. The route now takes an `eventId` and derives the storage key from it, and rejects an upload naming neither `eventId` nor `path`.
+
+The gateway's `DELETE /files/{filePath*}` proxy is removed. Its only consumer was the web client, which no longer deletes files one at a time: a file goes when the record holding it is deleted, or is swept when the record's next action leaves it unreferenced.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+
 ### Deprecations
+
+#### `path` on `POST /attachments`
+
+Send `eventId` instead and let the server derive the key. `path` still works, but a file written outside a record's prefix is reached by neither deletion nor sweep, so it outlives the record it was uploaded for. A future release will remove it.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 
 #### `POST /auth/token` parameters in the query string
 
@@ -255,6 +273,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
+- Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 
 ## 2.0.2
 

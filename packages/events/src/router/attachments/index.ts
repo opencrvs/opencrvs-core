@@ -13,6 +13,7 @@ import * as z from 'zod/v4'
 import { allowedWithAnyOfScopes } from '@events/router/middleware'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { AttachmentInput, uploadFile } from '@events/service/files'
+import { assertEventExists } from '@events/service/events/events'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export const attachmentsRouter = router({
@@ -35,6 +36,10 @@ export const attachmentsRouter = router({
     .output(z.string())
     .use(allowedWithAnyOfScopes(['attachment.upload']))
     .mutation(async ({ input, ctx }) => {
+      if (input.eventId) {
+        await assertEventExists(input.eventId)
+      }
+
       const fileUrl = await uploadFile(input, ctx.token)
 
       await writeAuditLog({
@@ -43,6 +48,7 @@ export const attachmentsRouter = router({
         operation: 'attachments.upload',
         requestData: {
           transactionId: input.transactionId,
+          eventId: input.eventId,
           path: input.path ?? null
         },
         responseSummary: { fileUrl }

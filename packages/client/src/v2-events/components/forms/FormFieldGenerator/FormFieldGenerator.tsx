@@ -23,13 +23,12 @@ import {
   FormState,
   IndexMap,
   mapFormState,
-  PrefixedFilePath,
-  ValidatorContext
+  ValidatorContext,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
 import {
-  AttachmentPath,
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
@@ -57,7 +56,12 @@ export interface FormFieldGeneratorPropsWithoutRef {
   readonlyMode?: boolean
   searchMode?: boolean
   className?: string
-  attachmentPath?: PrefixedFilePath
+  /**
+   * Where the files uploaded into this form are stored. `null` says the form
+   * cannot contain a file field; rendering one anyway throws rather than
+   * writing the file outside every prefix.
+   */
+  attachmentPath: AttachmentPath | null
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -86,7 +90,7 @@ export const FormFieldGenerator = forwardRef<
       className,
       eventConfig,
       searchMode,
-      attachmentPath: attachmentPathProp,
+      attachmentPath,
       readonlyMode,
       id,
       onValidSubmit,
@@ -96,7 +100,6 @@ export const FormFieldGenerator = forwardRef<
     },
     ref
   ) => {
-    const attachmentPath: AttachmentPath = attachmentPathProp ?? ''
     const formikRef = useRef<FormikProps<EventState>>(null)
 
     useImperativeHandle(ref, () => ({
