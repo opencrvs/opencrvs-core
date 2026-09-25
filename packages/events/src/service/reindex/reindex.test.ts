@@ -44,7 +44,6 @@ import { runReindex } from '@events/service/reindex'
 import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getClient } from '@events/storage/postgres/events'
-import { getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
 import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
 import {
   getEventIndexName as getEventIndexNameMock,
