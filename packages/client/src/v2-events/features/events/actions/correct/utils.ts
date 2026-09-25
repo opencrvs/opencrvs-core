@@ -126,22 +126,22 @@ export function getHiddenFieldIdsForForm(
   previousFormValues: EventState,
   validatorContext: ValidatorContext
 ) {
-  const hiddenFieldIds = new Set<string>()
+  const fieldIds = new Set(fields.map((field) => field.id))
 
-  fields.forEach((field) => {
-    const wasVisible = isFieldVisible(
-      field,
-      previousFormValues,
-      validatorContext
+  return Array.from(fieldIds).filter((fieldId) => {
+    const matchingFields = fields.filter((field) => field.id === fieldId)
+
+    const wasVisible = matchingFields.some((field) =>
+      isFieldVisible(field, previousFormValues, validatorContext)
     )
-    const isHidden = !isFieldVisible(field, form, validatorContext)
 
-    if (wasVisible && isHidden) {
-      hiddenFieldIds.add(field.id)
-    }
+    const isVisible = matchingFields.some((field) =>
+      isFieldVisible(field, form, validatorContext)
+    )
+
+    // Null the value only when all configurations for this ID are now hidden.
+    return wasVisible && !isVisible
   })
-
-  return Array.from(hiddenFieldIds)
 }
 
 export function isLastActionCorrectionRequest(event: EventDocument) {
