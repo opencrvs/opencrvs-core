@@ -22,6 +22,7 @@ import { getTemporaryIndexName } from '@events/storage/elasticsearch'
 import { getInMemoryEventConfigurations } from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
 import {
+  cleanupOrphanedIndices,
   cleanupTemporaryIndex,
   finaliseReindexIndex,
   prepareTemporaryIndex
@@ -222,6 +223,11 @@ export async function runReindex(token: TokenWithBearer) {
   await createReindexingStatusEntry(runId, startTimestamp)
 
   const configurations = await getInMemoryEventConfigurations(token)
+
+  // Best-effort: leftover orphans are retried on the next run.
+  await cleanupOrphanedIndices(configurations).catch((err) =>
+    logger.error('Failed to clean up orphaned indices', err)
+  )
 
   /*
    * Create temporary indices for all event types
