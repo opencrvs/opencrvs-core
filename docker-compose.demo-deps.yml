@@ -7,7 +7,7 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 # Named volume rather than a repo-relative bind mount, matching
-# docker-compose.dev-deps.yml — the dependency stack is a machine-wide singleton
+# docker-compose.dev-deps.yml — the dependency singleton is machine-wide
 # and its storage must not depend on which worktree started it.
 volumes:
   elasticsearch:
