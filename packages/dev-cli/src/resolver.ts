@@ -12,6 +12,7 @@ import * as path from 'node:path'
 import {
   BASE_PORTS,
   EnvironmentDescriptor,
+  PORT_STRIDES,
   RegistrySnapshot,
   ServiceName,
   ServicePorts,
@@ -19,12 +20,18 @@ import {
 } from './types'
 
 /**
- * Highest allocatable slot. Slot 6 is invalid because the highest base port,
- * `documents` at 9050, overflows the 16-bit port range: 9050 + 6*10000 > 65535.
+ * Highest allocatable slot. Slot 6 is invalid because the highest base port on
+ * the default stride, `documents` at 9050, overflows the 16-bit port range:
+ * 9050 + 6*10000 > 65535. The MOSIP mocks have higher bases still but a
+ * 100-port stride (see `PORT_STRIDES`), which is exactly why they do not lower
+ * this ceiling.
  */
 export const MAX_SLOT = 5
 
-/** Port distance between two adjacent slots. */
+/**
+ * Port distance between two adjacent slots, for every service that does not
+ * override it in `PORT_STRIDES`.
+ */
 export const PORT_STRIDE = 10000
 
 /**
@@ -33,7 +40,7 @@ export const PORT_STRIDE = 10000
  */
 export const PRIMARY_SLOT = 0
 
-export { BASE_PORTS }
+export { BASE_PORTS, PORT_STRIDES }
 
 /** Thrown when every slot in `0..MAX_SLOT` is spoken for. */
 export class SlotAllocationError extends Error {
@@ -60,11 +67,16 @@ export class InvalidEnvironmentNameError extends Error {
  * - `events`             index prefix, from `packages/events` `ES_INDEX_PREFIX` default
  * - `reindexing_status`  from `packages/events` `ES_REINDEXING_STATUS_INDEX` default
  * - `ocrvs`              bucket, from `packages/documents/src/minio/constants.ts`
+ * - `data/sqlite/mosip-api.db` from `packages/mosip-api` `SQLITE_DATABASE_PATH` devDefault
  */
 export const LEGACY_DB_NAME = 'events'
 export const LEGACY_ES_PREFIX = 'events'
 export const LEGACY_ES_REINDEXING_STATUS_INDEX = 'reindexing_status'
 export const LEGACY_BUCKET = 'ocrvs'
+export const LEGACY_MOSIP_DATABASE_FILE = 'data/sqlite/mosip-api.db'
+
+/** Directory holding every environment's mosip-api SQLite file. */
+export const MOSIP_DATABASE_DIR = 'data/sqlite'
 
 /** S3/MinIO caps a bucket name at 63 characters. */
 const MAX_BUCKET_LENGTH = 63
@@ -226,14 +238,19 @@ function identifiersFor(
   isDefaultEnvironment: boolean
 ): Pick<
   EnvironmentDescriptor,
-  'dbName' | 'esPrefix' | 'esReindexingStatusIndex' | 'bucket'
+  | 'dbName'
+  | 'esPrefix'
+  | 'esReindexingStatusIndex'
+  | 'bucket'
+  | 'mosipDatabaseFile'
 > {
   if (isDefaultEnvironment) {
     return {
       dbName: LEGACY_DB_NAME,
       esPrefix: LEGACY_ES_PREFIX,
       esReindexingStatusIndex: LEGACY_ES_REINDEXING_STATUS_INDEX,
-      bucket: LEGACY_BUCKET
+      bucket: LEGACY_BUCKET,
+      mosipDatabaseFile: LEGACY_MOSIP_DATABASE_FILE
     }
   }
 
@@ -248,15 +265,27 @@ function identifiersFor(
      * that file does not compose this one itself.
      */
     esReindexingStatusIndex: `${esPrefix}_${LEGACY_ES_REINDEXING_STATUS_INDEX}`,
-    bucket: bucketNameForEnvironment(raw)
+    bucket: bucketNameForEnvironment(raw),
+    /*
+     * Same directory for every environment — `dev.sh` creates it once — with
+     * the name in the filename, so one `rm` clears one environment's tokens.
+     */
+    mosipDatabaseFile: `${MOSIP_DATABASE_DIR}/mosip-api-${name}.db`
   }
+}
+
+/** How far apart two adjacent slots put this one service. */
+export function strideFor(service: ServiceName): number {
+  return service in PORT_STRIDES
+    ? PORT_STRIDES[service as keyof typeof PORT_STRIDES]
+    : PORT_STRIDE
 }
 
 export function portsForSlot(slot: number): ServicePorts {
   const ports = {} as ServicePorts
 
   for (const service of Object.keys(BASE_PORTS) as ServiceName[]) {
-    ports[service] = BASE_PORTS[service] + slot * PORT_STRIDE
+    ports[service] = BASE_PORTS[service] + slot * strideFor(service)
   }
 
   return ports
@@ -273,7 +302,10 @@ function urlsForPorts(ports: ServicePorts): ServiceUrls {
     countryConfig: `http://localhost:${ports.countryConfig}`,
     countryConfigInternal: `http://localhost:${ports.countryConfig}/`,
     events: `http://localhost:${ports.events}/`,
-    documents: `http://localhost:${ports.documents}`
+    documents: `http://localhost:${ports.documents}`,
+    mosipApi: `http://localhost:${ports.mosipApi}`,
+    mosipMock: `http://localhost:${ports.mosipMock}`,
+    esignetMock: `http://localhost:${ports.esignetMock}`
   }
 }
 

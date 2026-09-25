@@ -226,11 +226,11 @@ app.post('/oauth/token', {
 async function run() {
   await app.ready()
   await app.listen({
-    port: env.PORT,
+    port: env.ESIGNET_MOCK_PORT,
     host: env.HOST
   })
 
-  app.log.info(`E-Signet mock server running at http://${env.HOST}:${env.PORT}`)
+  app.log.info(`E-Signet mock server running at http://${env.HOST}:${env.ESIGNET_MOCK_PORT}`)
 }
 
 void run()

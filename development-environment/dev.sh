@@ -156,14 +156,6 @@ function wait_for_dependencies() {
 #
 ###
 
-# The dependency singleton keeps its data in docker named volumes, so no bind
-# mount directories are needed for it. mosip-api is the one service that still
-# writes to the checkout: it keeps its record-only tokens in SQLite, and
-# better-sqlite3 will not create the directory itself.
-function ensure_service_data_dirs() {
-  mkdir -p data/sqlite
-}
-
 # JWT signing keys are shared machine-wide, so they are generated once and then
 # left alone. Regenerating them on every run would break any other environment
 # already running on this machine as soon as one of its services reloads.
@@ -216,6 +208,17 @@ function provision_environment() {
   pnpm --filter @opencrvs/migration provision --db "$TARGET_DB"
 }
 
+# The dependency singleton keeps its data in docker named volumes, so no bind
+# mount directory is needed for it. mosip-api is the one service that still
+# writes to the checkout: it keeps its record-only tokens in SQLite, one file
+# per environment, and better-sqlite3 will not create the directory itself.
+#
+# Runs after `resolve_environment`, because the path is this environment's —
+# taken from the contract rather than hardcoded here.
+function ensure_service_data_dirs() {
+  mkdir -p "$(dirname "$SQLITE_DATABASE_PATH")"
+}
+
 PROJECT_ROOT=$(cd "$DIR/.."; pwd)
 if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
   echo "Creating $PROJECT_ROOT/.secrets"
@@ -232,8 +235,8 @@ if $dependencies; then
 elif $services; then
   wait_for_dependencies
   ensure_secrets
-  ensure_service_data_dirs
   resolve_environment
+  ensure_service_data_dirs
   print_environment
   provision_environment
   pnpm run start
@@ -265,8 +268,8 @@ fi
 start_dependencies
 wait_for_dependencies
 ensure_secrets
-ensure_service_data_dirs
 resolve_environment
+ensure_service_data_dirs
 print_environment
 provision_environment
 

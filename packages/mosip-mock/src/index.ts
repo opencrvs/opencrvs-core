@@ -67,13 +67,13 @@ async function run() {
 
   await app.ready()
   await app.listen({
-    port: env.PORT,
+    port: env.MOSIP_MOCK_PORT,
     host: env.HOST
   })
 
   const emailStatus = EMAIL_ENABLED ? 'Emails enabled' : 'Emails disabled'
 
-  app.log.info(`MOSIP mock server running at http://${env.HOST}:${env.PORT}`)
+  app.log.info(`MOSIP mock server running at http://${env.HOST}:${env.MOSIP_MOCK_PORT}`)
   app.log.info(emailStatus)
 }
 
