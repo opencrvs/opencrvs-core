@@ -35,16 +35,8 @@ export function isAppShellResponse(response: Response) {
   return (response.headers.get('content-type') ?? '').startsWith('text/html')
 }
 
-/**
- * Sets file to **BROWSER** cache with given filename.
- * Normalizes url to an absolute path (prepends / if missing).
- * @see CACHE_NAME
- */
-export async function cacheFile({ url, file }: { url: string; file: File }) {
-  const normalizedUrl = toFileUrl(url as DocumentPath)
-  const temporaryBlob = new Blob([file], { type: file.type })
+export async function getFileCache() {
   const cacheKeys = await caches.keys()
-
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
   if (!cacheKey) {
@@ -52,12 +44,27 @@ export async function cacheFile({ url, file }: { url: string; file: File }) {
     console.error(
       `Cache ${CACHE_NAME} not found. Is service worker running properly?`
     )
-    return
+    return null
   }
 
-  const cache = await caches.open(cacheKey)
+  return caches.open(cacheKey)
+}
 
-  return cache.put(
+/**
+ * Sets file to **BROWSER** cache with given filename.
+ * Normalizes url to an absolute path (prepends / if missing).
+ * @see CACHE_NAME
+ */
+export async function cacheFile(
+  { url, file }: { url: string; file: File },
+  cache?: Cache
+) {
+  const normalizedUrl = toFileUrl(url as DocumentPath)
+  const temporaryBlob = new Blob([file], { type: file.type })
+
+  const cachetoUse = cache ?? (await getFileCache())
+
+  return cachetoUse?.put(
     normalizedUrl,
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
   )
