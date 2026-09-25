@@ -279,7 +279,7 @@ const destroyVerb: Verb = {
 }
 
 const depsDownVerb: Verb = {
-  summary: 'Stop the shared dependency stack; -v also wipes its volumes.',
+  summary: 'Stop the shared dependency singleton; -v also wipes its volumes.',
   usage: 'deps:down [-v|--volumes]',
   run(argv) {
     const { switches } = parseArgs(argv, {
