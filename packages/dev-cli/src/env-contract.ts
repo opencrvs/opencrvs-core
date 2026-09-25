@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as path from 'node:path'
 import { EnvironmentDescriptor } from './types'
 
 /**
@@ -94,6 +95,12 @@ export function toEnvironmentVariables(
      * `packages/gateway` reads the bare `PORT` key (see
      * packages/gateway/src/environment.ts). GATEWAY_PORT is the name in this
      * contract; PORT is the compatibility alias the gateway actually reads.
+     *
+     * One process environment is handed to the whole `pnpm dev` sweep, so this
+     * alias belongs to the gateway and to nothing else: any other service that
+     * reads a bare `PORT` binds the gateway's port instead of its own. That is
+     * why the MOSIP services below were given named knobs rather than being
+     * left on the `PORT` default they shipped with.
      */
     PORT: String(ports.gateway),
     AUTH_PORT: String(ports.auth),
@@ -108,6 +115,19 @@ export function toEnvironmentVariables(
     CLIENT_STORYBOOK_PORT: String(ports.clientStorybook),
     API_DOCS_PORT: String(ports.apiDocs),
     METABASE_PORT: String(ports.metabase),
+    MOSIP_API_PORT: String(ports.mosipApi),
+    MOSIP_MOCK_PORT: String(ports.mosipMock),
+    ESIGNET_MOCK_PORT: String(ports.esignetMock),
+
+    /*
+     * mosip-api's SQLite file, absolute because lerna runs each package's
+     * `start` script with that package's directory as the working directory,
+     * so a relative path would land somewhere different for every service.
+     */
+    SQLITE_DATABASE_PATH: path.join(
+      descriptor.worktreePath,
+      descriptor.mosipDatabaseFile
+    ),
 
     // Peer addresses.
     CLIENT_APP_URL: urls.client,
@@ -117,7 +137,60 @@ export function toEnvironmentVariables(
     EVENTS_URL: urls.events,
     COUNTRY_CONFIG_URL: urls.countryConfig,
     COUNTRY_CONFIG_URL_INTERNAL: urls.countryConfigInternal,
-    DOCUMENTS_URL: urls.documents
+    DOCUMENTS_URL: urls.documents,
+
+    ...mosipAddresses(urls)
+  }
+}
+
+/**
+ * The MOSIP integration's addresses.
+ *
+ * Kept apart because they are the one part of the contract that is not a bare
+ * host address: `packages/mosip-api`, `packages/mosip-mock`,
+ * `packages/esignet-mock` and `packages/testland` each read a *fully composed
+ * endpoint* — path and all — from its own env var, so slot-shifting the ports
+ * is not enough on its own. Every path below is the one that package's
+ * `devDefault` already spells out; only the origin moves with the slot.
+ *
+ * `mosip-mock` and `esignet-mock` stand in for an external MOSIP deployment, so
+ * a real one is pointed at by overriding these same variables — which is why
+ * the composition lives here rather than in the services.
+ */
+function mosipAddresses(urls: EnvironmentDescriptor['urls']) {
+  const { mosipApi, mosipMock, esignetMock } = urls
+
+  return {
+    // Core, as mosip-api addresses it. Same hosts as GATEWAY_URL / AUTH_URL
+    // above, under the names packages/mosip-api reads.
+    OPENCRVS_GATEWAY_URL: urls.gateway,
+    OPENCRVS_AUTH_URL: urls.auth,
+
+    /*
+     * mosip-api's own callback, read by both ends: mosip-api registers it with
+     * the WebSub hub, mosip-mock calls it. One value, so the two cannot drift
+     * onto different environments.
+     */
+    MOSIP_WEBSUB_CALLBACK_URL: `${mosipApi}/websub/callback`,
+
+    // mosip-api, as packages/testland addresses it.
+    MOSIP_API_USERINFO_URL: `${mosipApi}/esignet/get-oidp-user-info`,
+    MOSIP_INTEROP_URL: mosipApi,
+
+    // mosip-mock: its own identity, then the endpoints mosip-api calls on it.
+    ISSUER_URL: mosipMock,
+    MOSIP_AUTH_URL: `${mosipMock}/v1/authmanager/authenticate/clientidsecretkey`,
+    MOSIP_WEBSUB_HUB_URL: `${mosipMock}/websub/hub`,
+    MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST: `${mosipMock}/.well-known/public-key.json`,
+    IDA_AUTH_DOMAIN_URI: mosipMock,
+    IDA_AUTH_URL: `${mosipMock}/idauthentication/v1/auth`,
+    MOSIP_CREATE_PACKET_URL: `${mosipMock}/commons/v1/packetmanager/createPacket`,
+    MOSIP_PROCESS_PACKET_URL: `${mosipMock}/registrationprocessor/v1/workflowmanager/workflowinstance`,
+
+    // esignet-mock: the endpoints mosip-api and packages/testland call on it.
+    ESIGNET_USERINFO_URL: `${esignetMock}/oidc/userinfo`,
+    ESIGNET_TOKEN_URL: `${esignetMock}/oauth/token`,
+    ESIGNET_REDIRECT_URL: `${esignetMock}/authorize`
   }
 }
 
