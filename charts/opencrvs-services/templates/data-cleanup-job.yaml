@@ -65,16 +65,17 @@ spec:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
         - name: cleanup-minio
-          image: "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z"
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+          imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command: ["/bin/bash", "-c"]
           args:
             - |
               MINIO_BUCKET=${MINIO_BUCKET:-ocrvs}
               echo "Running minio cleanup script..."
-              mc alias set myminio http://$MINIO_HOST:$MINIO_PORT ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin}
-              mc rm --recursive --force myminio/$MINIO_BUCKET
-              mc rb myminio/$MINIO_BUCKET
-              [ "${make_bucket:-true}" == 'true' ] && mc mb myminio/$MINIO_BUCKET
+              mcli alias set myminio http://$MINIO_HOST:$MINIO_PORT ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin}
+              mcli rm --recursive --force myminio/$MINIO_BUCKET
+              mcli rb myminio/$MINIO_BUCKET
+              [ "${make_bucket:-true}" == 'true' ] && mcli mb myminio/$MINIO_BUCKET
               echo "Cleanup complete!"
           env:
             - name: MINIO_HOST
