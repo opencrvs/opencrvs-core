@@ -68,14 +68,10 @@ major version of OpenCRVS.
 
 Options:
   --docker-swarm   Keep the 'infrastructure/' directory where it is and
-                   leave 'Dockerfile.assets' and the Tilt setup alone. Use
-                   this if your country deploys OpenCRVS via Docker Swarm.
-                   When omitted, 'infrastructure/' moves to 'assets/' and
-                   the Dockerfiles and Tilt setup are replaced with the
-                   template's (default).
-
-The upgrade also switches the country config from yarn to pnpm. Run
-'rm -rf node_modules && pnpm install' once it has finished.
+                   only copy what the assets image needs into 'assets/'.
+                   Use this if your country deploys OpenCRVS via Docker
+                   Swarm. When omitted, 'infrastructure/' moves to
+                   'assets/' (default).
   -h, --help       Show this message.
 `.trim()
 

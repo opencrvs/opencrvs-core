@@ -8,15 +8,14 @@
 
 `SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
 
-#### pnpm, `assets/` and the Tilt setup — the upgrade script moves you over, then reinstall
+#### `assets/` and the Tilt setup — the upgrade script moves you over
 
-A country configuration scaffolded for 2.1 (`npm create @opencrvs/countryconfig`) uses pnpm, keeps its Metabase and Postgres scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout:
+A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
 
-- converts `yarn.lock` to `pnpm-lock.yaml` with `pnpm import`, so every dependency stays on the version `yarn.lock` pinned, sets `packageManager` and rewrites `yarn <script>` in the `package.json` scripts;
-- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment/reindex.sh` to `assets/`, where the assets image keeps them, and deletes the Swarm-only `infrastructure/postgres/on-deploy.sh`;
-- replaces `Dockerfile`, `Dockerfile.assets`, `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`/`countryconfig_image_tag`, and adds the `start:tilt` script the Tiltfile runs.
+- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
 
-With `--docker-swarm`, `infrastructure/` stays put and only `Dockerfile` is replaced. Afterwards run `rm -rf node_modules && pnpm install`, review `git diff` for local changes to the replaced files, and switch the places the upgrade lists (CI workflows, scripts, docs) from yarn to pnpm.
+With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
 
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 

@@ -65,17 +65,7 @@ jobs:
           ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
           # remove unused files
           rm -rf src/api/notification/testData.ts
-      - name: Reinstall opencrvs-farajaland dependencies with pnpm
-        working-directory: opencrvs-farajaland
-        run: |
-          # The upgrade switches farajaland from yarn to pnpm
-          test -f pnpm-lock.yaml && test ! -f yarn.lock
-          rm -rf node_modules
-          # farajaland is its own pnpm project, not part of core's workspace
-          pnpm install --frozen-lockfile --ignore-workspace
-          # Stand in for the yarn link above, which the reinstall removed
-          rm -rf node_modules/@opencrvs/toolkit
-          ln -s "$GITHUB_WORKSPACE/packages/toolkit" node_modules/@opencrvs/toolkit
+          yarn --force
       - name: Test opencrvs-farajaland compilation
-        run: pnpm test:compilation
+        run: yarn test:compilation
         working-directory: opencrvs-farajaland
