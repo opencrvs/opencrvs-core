@@ -144,7 +144,13 @@ while true; do
       fi
       ;;
     completed)
+      SKIPPED=$(echo "$RUN" | jq -r '.progress.skipped // 0')
       echo "  Reindex completed — ${PROCESSED} events processed."
+      if [ "${SKIPPED}" -gt 0 ]; then
+        echo "  WARNING: ${SKIPPED} records were skipped because they could not be read:"
+        echo "$RUN" | jq -r '.progress.errors[]? | "    - " + .'
+        echo "  The skipped event ids are in the events service logs. Please fix the errors and run the reindex again."
+      fi
       exit 0
       ;;
     failed)

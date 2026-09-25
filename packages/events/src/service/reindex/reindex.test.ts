@@ -41,6 +41,7 @@ import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { getClient } from '@events/storage/postgres/events'
 import { getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
 
 // Mock reindex endpoint so there are no side effects
@@ -443,6 +444,35 @@ test('runReindex records completed status in reindexing_status index', async () 
   expect(history[0].error_message).toBeNull()
   expect(history[0].completed_at).not.toBeNull()
   expect(history[0].progress.processed).toBeGreaterThanOrEqual(0)
+})
+
+test('runReindex skips events that cannot be read and reports them in its status', async () => {
+  mswServer.use(postHandler)
+
+  // An event without actions cannot be turned into a document
+  await getClient()
+    .insertInto('events')
+    .values({
+      eventType: event.type,
+      transactionId: getUUID(),
+      trackingId: getUUID(),
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt
+    })
+    .execute()
+
+  await runReindex(reindexToken)
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history[0].status).toBe('completed')
+  // All three events share one chunk, so the whole chunk is skipped
+  expect(history[0].progress.skipped).toBe(3)
+  expect(history[0].progress.processed).toBe(0)
+  expect(history[0].progress.errors).toHaveLength(1)
 })
 
 test('runReindex records failed status when country config returns 500', async () => {

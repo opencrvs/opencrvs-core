@@ -48,3 +48,38 @@ test('streams every declared event once, one batch per chunk of ids', async () =
       .sort()
   ).toEqual([...declaredIds].sort())
 })
+
+test('rejects when a chunk cannot be fetched, instead of skipping it', async () => {
+  const { user, eventsDb } = await setupTestCase()
+  const rng = createPrng(4313)
+
+  for (let i = 0; i < 3; i++) {
+    await seedEvent(eventsDb, {
+      actions: [ActionType.DECLARE],
+      eventConfig: tennisClubMembershipEvent,
+      user,
+      rng
+    })
+  }
+  const { eventId } = await seedEvent(eventsDb, {
+    actions: [ActionType.DECLARE],
+    eventConfig: tennisClubMembershipEvent,
+    user,
+    rng
+  })
+  // An event without actions cannot be turned into a document
+  await eventsDb
+    .deleteFrom('eventActions')
+    .where('eventId', '=', eventId)
+    .execute()
+
+  async function drain() {
+    const batches: EventDocument[][] = []
+    for await (const batch of streamEventDocuments(2)) {
+      batches.push(batch)
+    }
+    return batches
+  }
+
+  await expect(drain()).rejects.toThrow()
+})

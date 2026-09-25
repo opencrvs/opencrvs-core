@@ -114,21 +114,26 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
 }
 
 /*
- * Never rejects, so a prefetched chunk cannot go unhandled while the one before
- * it is still being yielded.
+ * A failed fetch rejects, so the reindex fails instead of silently skipping the
+ * chunk. The rejection is marked handled up front, so a prefetched chunk cannot
+ * crash the process while the one before it is still being yielded. It is
+ * rethrown once the chunk is awaited.
  */
-async function fetchChunk(ids: UUID[]): Promise<EventDocument[]> {
-  try {
-    return await getEventsByIdsInTrx(getClient(), ids)
-  } catch (err) {
+function fetchChunk(
+  ids: UUID[],
+  fetchEvents: (eventIds: UUID[]) => Promise<EventDocument[]>
+): Promise<EventDocument[]> {
+  const fetched = fetchEvents(ids).catch((err: unknown) => {
     logger.error({
       message: 'Failed to fetch event documents',
       eventIds: ids,
       error: (err as Error).message,
       stack: (err as Error).stack
     })
-    return []
-  }
+    throw err
+  })
+  fetched.catch(() => undefined)
+  return fetched
 }
 
 async function* yieldChunk(fetched: Promise<EventDocument[]>) {
@@ -164,12 +169,17 @@ async function* readIdChunks(batchSize: number) {
  *
  * Each chunk's documents are fetched while the chunk before it is yielded, so
  * Postgres works while the indexing side does rather than taking turns with it.
+ * `fetchEvents` lets the caller decide how a failed fetch is retried or skipped.
  */
-export async function* streamEventDocuments(batchSize = STREAM_BATCH_SIZE) {
+export async function* streamEventDocuments(
+  batchSize = STREAM_BATCH_SIZE,
+  fetchEvents: (eventIds: UUID[]) => Promise<EventDocument[]> = async (ids) =>
+    getEventsByIdsInTrx(getClient(), ids)
+) {
   let fetching: Promise<EventDocument[]> | undefined
 
   for await (const ids of readIdChunks(batchSize)) {
-    const next = fetchChunk(ids)
+    const next = fetchChunk(ids, fetchEvents)
     if (fetching) {
       yield* yieldChunk(fetching)
     }

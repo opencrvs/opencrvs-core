@@ -9,11 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { getUUID, logger, TokenWithBearer } from '@opencrvs/commons'
+import { getUUID, logger, TokenWithBearer, UUID } from '@opencrvs/commons'
 import { EventConfig, EventDocument } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 
-import { streamEventDocuments } from '@events/storage/postgres/events/events'
+import {
+  getEventsByIdsInTrx,
+  streamEventDocuments
+} from '@events/storage/postgres/events/events'
+import { getClient } from '@events/storage/postgres/events'
 import { getTemporaryIndexName } from '@events/storage/elasticsearch'
 import { getInMemoryEventConfigurations } from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
@@ -83,7 +87,8 @@ async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
   configurations: EventConfig[],
-  onBatchProcessed?: (count: number) => Promise<void>
+  onBatchProcessed?: (count: number) => Promise<void>,
+  onChunkSkipped?: (count: number, errorMessage: string) => void
 ) {
   const indexNameOverrides = new Map(
     configurations.map((config) => [
@@ -94,6 +99,26 @@ async function reindexSearch(
 
   const inFlight = new Set<Promise<void>>()
   let failure: Error | undefined
+
+  /*
+   * A chunk that still cannot be read after retrying is skipped, so one bad
+   * record does not fail the whole reindex. The skip is reported in the run's
+   * progress, so the records can be fixed and reindexed.
+   */
+  async function fetchEvents(ids: UUID[]): Promise<EventDocument[]> {
+    try {
+      return await withRetry(async () => getEventsByIdsInTrx(getClient(), ids))
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err)
+      logger.error({
+        message: 'Skipping events that could not be read',
+        eventIds: ids,
+        error: errorMessage
+      })
+      onChunkSkipped?.(ids.length, errorMessage)
+      return []
+    }
+  }
 
   async function writeBatch(batch: EventDocument[]) {
     const start = new Date()
@@ -118,31 +143,33 @@ async function reindexSearch(
    * Postgres while this one is written to Elasticsearch and country config.
    * Only blocks once REINDEX_CONCURRENCY batches are already in flight.
    */
-  for await (const batch of streamEventDocuments()) {
-    if (failure) {
-      // Let in-flight batches settle
-      await Promise.all(inFlight)
-      throw failure
+  try {
+    for await (const batch of streamEventDocuments(undefined, fetchEvents)) {
+      if (failure) {
+        break
+      }
+
+      // The stored promise never rejects, so a failure cannot go unhandled while
+      // nothing is awaiting it. It surfaces on the next batch, or once drained.
+      const pending: Promise<void> = writeBatch(batch)
+        .catch((err: unknown) => {
+          failure = failure ?? (err as Error)
+        })
+        .finally(() => {
+          inFlight.delete(pending)
+        })
+
+      inFlight.add(pending)
+
+      if (inFlight.size >= REINDEX_CONCURRENCY) {
+        await Promise.race(inFlight)
+      }
     }
-
-    // The stored promise never rejects, so a failure cannot go unhandled while
-    // nothing is awaiting it. It surfaces on the next batch, or once drained.
-    const pending: Promise<void> = writeBatch(batch)
-      .catch((err: unknown) => {
-        failure = failure ?? (err as Error)
-      })
-      .finally(() => {
-        inFlight.delete(pending)
-      })
-
-    inFlight.add(pending)
-
-    if (inFlight.size >= REINDEX_CONCURRENCY) {
-      await Promise.race(inFlight)
-    }
+  } finally {
+    // Let in-flight batches settle, also when reading from Postgres fails
+    await Promise.all(inFlight)
   }
 
-  await Promise.all(inFlight)
   if (failure) {
     throw failure
   }
@@ -176,33 +203,55 @@ export async function runReindex(token: TokenWithBearer) {
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
+  let totalSkipped = 0
+  const skipErrors = new Set<string>()
   let lastProgressWriteAt = 0
-  try {
-    await reindexSearch(timestamp, token, configurations, async (batchSize) => {
-      const currentSecond = Math.floor(Date.now() / 1000) - startSecond
-      const processedThisSecond = processedCounts[currentSecond] || 0
-      processedCounts[currentSecond] = processedThisSecond + batchSize
-      totalProcessed += batchSize
-      const perSecond =
-        processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
-      logger.info(
-        `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
-      )
 
-      /*
-       * Batches complete concurrently, and the status document is a single
-       * document, so writing it per batch makes Elasticsearch reject the
-       * interleaved updates with a version conflict. Claiming the window before
-       * the await lets exactly one caller through, and the final count is
-       * written once every batch has been processed.
-       */
-      const now = Date.now()
-      if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
-        return
-      }
-      lastProgressWriteAt = now
-      await updateReindexingProgress(runId, totalProcessed)
-    })
+  function getProgress() {
+    return {
+      processed: totalProcessed,
+      skipped: totalSkipped,
+      errors: [...skipErrors]
+    }
+  }
+
+  function onChunkSkipped(count: number, errorMessage: string) {
+    totalSkipped += count
+    skipErrors.add(errorMessage)
+  }
+
+  try {
+    await reindexSearch(
+      timestamp,
+      token,
+      configurations,
+      async (batchSize) => {
+        const currentSecond = Math.floor(Date.now() / 1000) - startSecond
+        const processedThisSecond = processedCounts[currentSecond] || 0
+        processedCounts[currentSecond] = processedThisSecond + batchSize
+        totalProcessed += batchSize
+        const perSecond =
+          processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
+        logger.info(
+          `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
+        )
+
+        /*
+         * Batches complete concurrently, and the status document is a single
+         * document, so writing it per batch makes Elasticsearch reject the
+         * interleaved updates with a version conflict. Claiming the window before
+         * the await lets exactly one caller through, and the final count is
+         * written once every batch has been processed.
+         */
+        const now = Date.now()
+        if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
+          return
+        }
+        lastProgressWriteAt = now
+        await updateReindexingProgress(runId, getProgress())
+      },
+      onChunkSkipped
+    )
   } catch (err) {
     logger.error('Reindex failed, cleaning up temporary indexes', err)
     const errorMessage = err instanceof Error ? err.message : String(err)
@@ -217,7 +266,12 @@ export async function runReindex(token: TokenWithBearer) {
     }
     throw err
   }
-  await updateReindexingProgress(runId, totalProcessed)
+  await updateReindexingProgress(runId, getProgress())
+  if (totalSkipped > 0) {
+    logger.error(
+      `Reindex skipped ${totalSkipped} records that could not be read: ${[...skipErrors].join('; ')}`
+    )
+  }
 
   await Promise.all(
     configurations.map(async (config) =>
