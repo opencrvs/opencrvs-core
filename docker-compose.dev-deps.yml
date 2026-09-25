@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-# The dependency stack is a machine-wide singleton (docker compose project
+# The dependency singleton is machine-wide (docker compose project
 # `opencrvs-deps`), shared by every local environment. Storage therefore lives in
 # docker **named volumes** rather than repo-relative bind mounts, so it is
 # independent of which git worktree started it, and `down -v` is the single wipe

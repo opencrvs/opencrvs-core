@@ -11,7 +11,7 @@
 import { CommandRunner, CommandSpec, runCommand } from './exec'
 
 /**
- * The dependency stack is a machine-wide singleton, run as one docker compose
+ * The dependency singleton is machine-wide, run as one docker compose
  * project so that every worktree addresses the same containers no matter which
  * directory started them. The project name and the file list must match
  * `compose:deps` in the root `package.json` exactly — a different `-p` or a
@@ -63,7 +63,7 @@ export interface RunDepsDownInput extends DepsDownOptions {
 }
 
 /**
- * Stop the shared dependency stack.
+ * Stop the shared dependency singleton.
  *
  * Volume wiping is loud rather than silent, because `-v` deletes the Postgres,
  * Elasticsearch and MinIO volumes shared by *every* environment on the machine
@@ -76,11 +76,11 @@ export function runDepsDown(input: RunDepsDownInput = {}): number {
 
   out(
     input.volumes === true
-      ? `Stopping the "${DEPS_PROJECT}" stack and deleting its named volumes. ` +
-          'Every local environment on this machine loses its database, ' +
-          'Elasticsearch indices and uploaded documents.'
-      : `Stopping the "${DEPS_PROJECT}" stack. Volumes are kept, so every ` +
-          'environment’s data survives.'
+      ? `Stopping the "${DEPS_PROJECT}" compose project and deleting its ` +
+          'named volumes. Every local environment on this machine loses ' +
+          'its database, Elasticsearch indices and uploaded documents.'
+      : `Stopping the "${DEPS_PROJECT}" compose project. Volumes are kept, ` +
+          'so every environment’s data survives.'
   )
 
   run(spec)

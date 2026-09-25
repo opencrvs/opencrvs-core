@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -7,13 +8,12 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-#!/usr/bin/env bash
 set -euo pipefail
 
 print_usage_and_exit () {
   echo 'Usage: pnpm e2e:dev [--env <name>]'
   echo
-  echo "Runs the Playwright suite against ONE local environment's stack. With"
+  echo "Runs the Playwright suite against ONE local environment. With"
   echo "no --env, that is the environment this git worktree owns. Run"
   echo "'pnpm env:list' to see which environments exist."
   echo
@@ -25,12 +25,12 @@ print_usage_and_exit () {
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)
 cd "$DIR"
 
-# Which environment's stack the browser drives. `packages/dev-cli` owns the
+# Which environment the browser drives. `packages/dev-cli` owns the
 # port arithmetic; `packages/testland/e2e/constants.ts` reads the resulting
 # URLs straight out of the contract this exports. Without it Playwright would
 # fall back to slot 0's literals and quietly create declarations, users and
 # corrections in another environment's database — a passing run against the
-# wrong stack, which is why the documented entry point goes through here.
+# wrong environment, which is why the documented entry point goes through here.
 # See development-environment/environment.sh.
 source "$DIR/development-environment/environment.sh"
 opencrvs_env_load "$@" || print_usage_and_exit
