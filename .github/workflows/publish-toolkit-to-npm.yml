@@ -286,6 +286,8 @@ jobs:
           requireFromTmp('@opencrvs/toolkit/api')
           requireFromTmp('@opencrvs/toolkit/events')
           NODE
+          # build.sh skips the template files when packages/countryconfig-template is missing
+          test -f "$TMP_DIR/node_modules/@opencrvs/toolkit/dist/templates/countryconfig-template/Tiltfile"
 
       - name: Publish to npm
         if: needs.plan.outputs.version-exists == 'false'
