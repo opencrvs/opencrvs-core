@@ -73,6 +73,16 @@ fi
 # Build CLI
 npx esbuild src/cli.ts --bundle --platform=node --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 cp -R src/environment/templates dist/templates
+# Template files copied into country configs by the upgrade-tilt and
+# migrate-infrastructure-to-assets codemods. Image builds that use the toolkit as
+# a library (testland, mosip-api) do not copy the template in and do not need them.
+TEMPLATE_DIR=../countryconfig-template
+if [ -d "$TEMPLATE_DIR" ]; then
+  mkdir -p dist/templates/countryconfig-template
+  cp -R $TEMPLATE_DIR/Tiltfile $TEMPLATE_DIR/.tiltignore $TEMPLATE_DIR/tilt $TEMPLATE_DIR/assets $TEMPLATE_DIR/Dockerfile.assets dist/templates/countryconfig-template/
+else
+  echo "$TEMPLATE_DIR not found, 'opencrvs upgrade' will not be able to copy the template files"
+fi
 chmod +x ./dist/cli.js
 
 echo "Build completed successfully."

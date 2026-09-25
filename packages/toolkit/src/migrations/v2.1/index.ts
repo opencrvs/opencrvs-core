@@ -12,9 +12,11 @@ import { main as addExplicitCorrectionFlags } from './add-explicit-correction-fl
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
 import { main as addTranslations } from './add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
+import { main as migrateInfrastructureToAssets } from './migrate-infrastructure-to-assets'
 import { main as removeMetabasePackageInstalls } from './remove-metabase-package-installs'
 import { main as removeSentry } from './remove-sentry'
 import { main as renameTriggerPaths } from './rename-trigger-paths'
+import { main as upgradeTilt } from './upgrade-tilt'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -28,4 +30,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await removeSentry()
   await enableTelemetry()
   await removeMetabasePackageInstalls()
+  // After the Metabase fix, so the merge starts from the patched scripts
+  await migrateInfrastructureToAssets(dockerSwarm)
+  await upgradeTilt()
 }
