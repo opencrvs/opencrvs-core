@@ -503,7 +503,10 @@ function ReviewComponent({
     ? reviewFields.filter(
         (field) =>
           !FieldTypesToHideInReview.some((t) => t === field.type) &&
-          isFieldDisplayedOnReview(field, annotation, validatorContext)
+          isFieldDisplayedOnReview(field, annotation, {
+            ...validatorContext,
+            baseFormState: form
+          })
       )
     : []
 
