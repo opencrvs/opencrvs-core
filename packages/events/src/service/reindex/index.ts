@@ -83,12 +83,42 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   throw new Error(`Max retries exceeded. This should never happen`)
 }
 
+interface SkippedEvent {
+  id: UUID
+  error: string
+}
+
+/*
+ * Splits a chunk that cannot be read in half until only the records that fail
+ * on their own are left, so the rest of the chunk can still be indexed.
+ */
+async function fetchReadableEvents(
+  ids: UUID[]
+): Promise<{ events: EventDocument[]; skipped: SkippedEvent[] }> {
+  try {
+    return { events: await getEventsByIdsInTrx(getClient(), ids), skipped: [] }
+  } catch (err) {
+    if (ids.length === 1) {
+      const error = err instanceof Error ? err.message : String(err)
+      return { events: [], skipped: [{ id: ids[0], error }] }
+    }
+
+    const middle = Math.ceil(ids.length / 2)
+    const first = await fetchReadableEvents(ids.slice(0, middle))
+    const second = await fetchReadableEvents(ids.slice(middle))
+    return {
+      events: [...first.events, ...second.events],
+      skipped: [...first.skipped, ...second.skipped]
+    }
+  }
+}
+
 async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
   configurations: EventConfig[],
   onBatchProcessed?: (count: number) => Promise<void>,
-  onChunkSkipped?: (count: number, errorMessage: string) => void
+  onEventsSkipped?: (skipped: SkippedEvent[]) => void
 ) {
   const indexNameOverrides = new Map(
     configurations.map((config) => [
@@ -101,7 +131,7 @@ async function reindexSearch(
   let failure: Error | undefined
 
   /*
-   * A chunk that still cannot be read after retrying is skipped, so one bad
+   * Records that still cannot be read after retrying are skipped, so one bad
    * record does not fail the whole reindex. The skip is reported in the run's
    * progress, so the records can be fixed and reindexed.
    */
@@ -109,14 +139,22 @@ async function reindexSearch(
     try {
       return await withRetry(async () => getEventsByIdsInTrx(getClient(), ids))
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err)
-      logger.error({
-        message: 'Skipping events that could not be read',
-        eventIds: ids,
-        error: errorMessage
-      })
-      onChunkSkipped?.(ids.length, errorMessage)
-      return []
+      const { events, skipped } = await fetchReadableEvents(ids)
+
+      // Every record failing on its own points at the database, not the data
+      if (skipped.length === ids.length) {
+        throw err
+      }
+
+      for (const { id, error } of skipped) {
+        logger.error({
+          message: 'Skipping event that could not be read',
+          eventId: id,
+          error
+        })
+      }
+      onEventsSkipped?.(skipped)
+      return events
     }
   }
 
@@ -203,21 +241,19 @@ export async function runReindex(token: TokenWithBearer) {
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
-  let totalSkipped = 0
-  const skipErrors = new Set<string>()
+  const skippedEvents: SkippedEvent[] = []
   let lastProgressWriteAt = 0
 
   function getProgress() {
     return {
       processed: totalProcessed,
-      skipped: totalSkipped,
-      errors: [...skipErrors]
+      skipped: skippedEvents.length,
+      errors: skippedEvents.map(({ id, error }) => `${id}: ${error}`)
     }
   }
 
-  function onChunkSkipped(count: number, errorMessage: string) {
-    totalSkipped += count
-    skipErrors.add(errorMessage)
+  function onEventsSkipped(skipped: SkippedEvent[]) {
+    skippedEvents.push(...skipped)
   }
 
   try {
@@ -250,7 +286,7 @@ export async function runReindex(token: TokenWithBearer) {
         lastProgressWriteAt = now
         await updateReindexingProgress(runId, getProgress())
       },
-      onChunkSkipped
+      onEventsSkipped
     )
   } catch (err) {
     logger.error('Reindex failed, cleaning up temporary indexes', err)
@@ -267,9 +303,9 @@ export async function runReindex(token: TokenWithBearer) {
     throw err
   }
   await updateReindexingProgress(runId, getProgress())
-  if (totalSkipped > 0) {
+  if (skippedEvents.length > 0) {
     logger.error(
-      `Reindex skipped ${totalSkipped} records that could not be read: ${[...skipErrors].join('; ')}`
+      `Reindex skipped ${skippedEvents.length} records that could not be read`
     )
   }
 

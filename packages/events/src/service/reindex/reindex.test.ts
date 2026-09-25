@@ -450,7 +450,7 @@ test('runReindex skips events that cannot be read and reports them in its status
   mswServer.use(postHandler)
 
   // An event without actions cannot be turned into a document
-  await getClient()
+  const unreadable = await getClient()
     .insertInto('events')
     .values({
       eventType: event.type,
@@ -459,7 +459,8 @@ test('runReindex skips events that cannot be read and reports them in its status
       createdAt: event.createdAt,
       updatedAt: event.updatedAt
     })
-    .execute()
+    .returning('id')
+    .executeTakeFirstOrThrow()
 
   await runReindex(reindexToken)
 
@@ -469,10 +470,26 @@ test('runReindex skips events that cannot be read and reports them in its status
   const history = await client.event.reindex.status()
 
   expect(history[0].status).toBe('completed')
-  // All three events share one chunk, so the whole chunk is skipped
-  expect(history[0].progress.skipped).toBe(3)
-  expect(history[0].progress.processed).toBe(0)
+  // The rest of the chunk is still indexed, the draft is filtered out
+  expect(history[0].progress.processed).toBe(1)
+  expect(history[0].progress.skipped).toBe(1)
   expect(history[0].progress.errors).toHaveLength(1)
+  expect(history[0].progress.errors[0]).toContain(unreadable.id)
+})
+
+test('runReindex fails when no event in a chunk can be read', async () => {
+  mswServer.use(postHandler)
+
+  await getClient().deleteFrom('eventActions').execute()
+
+  await expect(runReindex(reindexToken)).rejects.toThrow()
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history[0].status).toBe('failed')
 })
 
 test('runReindex records failed status when country config returns 500', async () => {
