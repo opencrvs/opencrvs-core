@@ -22,7 +22,6 @@ const formConfig: FormConfig = {
   pages: []
 }
 
-// Shown only when the declaration says there are two parents
 const secondParentSignature = {
   id: 'review.secondParentSignature',
   type: FieldType.SIGNATURE,

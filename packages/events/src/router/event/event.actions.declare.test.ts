@@ -290,7 +290,6 @@ describe('Declare action', () => {
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
 
-    // applicant.dobUnknown is true → SHOW conditional met → review.signature is visible
     const declaration = {
       'applicant.dobUnknown': true,
       'applicant.age': 30,
