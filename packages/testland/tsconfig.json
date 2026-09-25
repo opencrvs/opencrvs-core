@@ -5,10 +5,10 @@
       "@e2e/*": ["./e2e/*"]
     },
     "target": "es6",
-    "module": "Node16",
+    "module": "NodeNext",
     "outDir": "build/dist",
     "sourceMap": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
     "rootDir": ".",
     "lib": ["esnext.asynciterable", "es6", "es2017", "es2019", "es2022", "dom"],
     "forceConsistentCasingInFileNames": true,
