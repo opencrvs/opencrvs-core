@@ -121,7 +121,7 @@ spec:
             - --console-address
             - :3536
             - /data
-          image: ghcr.io/opencrvs/minio:RELEASE.2025-06-13T11-33-47Z
+          image: ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z
           name: minio
           env:
             - name: MINIO_BROWSER_REDIRECT_URL
