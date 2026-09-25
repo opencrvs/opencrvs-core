@@ -12,7 +12,13 @@ import { bool, cleanEnv, str, port, url } from 'envalid'
 import { join } from 'node:path'
 
 export const env = cleanEnv(process.env, {
-  PORT: port({ default: 2024 }),
+  /*
+   * Named rather than the bare `PORT` this service used to read. `pnpm dev`
+   * hands one process environment to every service it starts, and `PORT` in it
+   * is the gateway's (see packages/dev-cli/src/env-contract.ts), so reading
+   * `PORT` here made mosip-api try to bind the gateway's port.
+   */
+  MOSIP_API_PORT: port({ default: 2024 }),
   HOST: str({ default: '0.0.0.0', devDefault: 'localhost' }),
   LOCALE: str({ devDefault: 'en' }),
   SQLITE_DATABASE_PATH: str({
