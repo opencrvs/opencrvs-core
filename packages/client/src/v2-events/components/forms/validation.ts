@@ -96,7 +96,7 @@ export function validationErrorsInActionFormExist({
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     annotation ?? {},
-    context
+    { ...context, baseFormState: formWithoutHiddenFields }
   )
 
   const hasValidationErrors = formConfig.pages

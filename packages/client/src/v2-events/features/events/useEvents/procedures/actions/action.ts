@@ -336,7 +336,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       actionConfiguration || annotationFields.length > 0
         ? deepDropNulls(
             omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
-              baseFormState: originalDeclaration
+              // Review fields can be conditional on the declaration being submitted
+              baseFormState: { ...originalDeclaration, ...params.declaration }
             })
           )
         : {}

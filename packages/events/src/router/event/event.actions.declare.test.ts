@@ -214,42 +214,42 @@ describe('Declare action', () => {
     }
   })
 
-  test('Skips required review field validation when review field is conditionally hidden', async () => {
-    // Build a modified event where review.signature is required but only shown when applicant.dobUnknown is truthy
-    const modifiedEvent = {
-      ...tennisClubMembershipEvent,
-      actions: tennisClubMembershipEvent.actions.map((action) => {
-        if (action.type !== ActionType.DECLARE) {
-          return action
+  // review.signature is required, but only shown when applicant.dobUnknown is truthy
+  const eventWithConditionalSignature = {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) => {
+      if (action.type !== ActionType.DECLARE) {
+        return action
+      }
+      return {
+        ...action,
+        review: {
+          ...action.review,
+          fields: action.review.fields.map((f) =>
+            f.id !== 'review.signature'
+              ? f
+              : {
+                  ...f,
+                  required: true,
+                  conditionals: [
+                    {
+                      type: ConditionalType.SHOW,
+                      conditional: not(
+                        conditionalField('applicant.dobUnknown').isFalsy()
+                      )
+                    }
+                  ]
+                }
+          )
         }
-        return {
-          ...action,
-          review: {
-            ...action.review,
-            fields: action.review.fields.map((f) =>
-              f.id !== 'review.signature'
-                ? f
-                : {
-                    ...f,
-                    required: true,
-                    conditionals: [
-                      {
-                        type: ConditionalType.SHOW,
-                        conditional: not(
-                          conditionalField('applicant.dobUnknown').isFalsy()
-                        )
-                      }
-                    ]
-                  }
-            )
-          }
-        }
-      })
-    }
+      }
+    })
+  }
 
+  test('Skips required review field validation when review field is conditionally hidden', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
-        return HttpResponse.json([modifiedEvent])
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([eventWithConditionalSignature])
       })
     )
 
@@ -273,6 +273,46 @@ describe('Declare action', () => {
     const data = generator.event.actions.declare(event.id, {
       declaration,
       annotation: {} // no signature provided – required check must be skipped for hidden field
+    })
+
+    await expect(
+      client.event.actions.declare.request(data)
+    ).resolves.not.toThrow()
+  })
+
+  test('Accepts a review field whose visibility depends on the declaration', async () => {
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([eventWithConditionalSignature])
+      })
+    )
+
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    // applicant.dobUnknown is true → SHOW conditional met → review.signature is visible
+    const declaration = {
+      'applicant.dobUnknown': true,
+      'applicant.age': 30,
+      'applicant.name': { firstname: 'John', surname: 'Doe' },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: { state: 'state', district2: 'district2' }
+      }
+    } satisfies ActionUpdate
+
+    const data = generator.event.actions.declare(event.id, {
+      declaration,
+      annotation: {
+        'review.signature': {
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+          originalFilename: 'abcd.png',
+          type: 'image/png'
+        }
+      }
     })
 
     await expect(
