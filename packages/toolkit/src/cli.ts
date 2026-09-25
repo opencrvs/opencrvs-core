@@ -67,10 +67,11 @@ Upgrade the country config in the current working directory to the next
 major version of OpenCRVS.
 
 Options:
-  --docker-swarm   Keep and merge the 'infrastructure/' directory with
-                   upstream changes. Use this if your country deploys
-                   OpenCRVS via Docker Swarm. When omitted, the
-                   'infrastructure/' directory is deleted (default).
+  --docker-swarm   Keep the 'infrastructure/' directory where it is and
+                   only copy what the assets image needs into 'assets/'.
+                   Use this if your country deploys OpenCRVS via Docker
+                   Swarm. When omitted, 'infrastructure/' moves to
+                   'assets/' (default).
   -h, --help       Show this message.
 `.trim()
 
