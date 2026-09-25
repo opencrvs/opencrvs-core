@@ -90,21 +90,23 @@ function getDeclarationActionCreationMetadata(
 }
 
 /** Actions which are considered event updates, i.e. actions which should update the 'updatedAt' fields */
-const updateActions = ActionTypes.extract([
-  ActionType.CREATE,
-  ActionType.NOTIFY,
-  ActionType.EDIT,
-  ActionType.DECLARE,
-  ActionType.REGISTER,
-  ActionType.REJECT,
-  ActionType.ARCHIVE,
-  ActionType.UNARCHIVE,
-  ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION,
-  ActionType.APPROVE_CORRECTION,
-  ActionType.REJECT_CORRECTION,
-  ActionType.CUSTOM
-])
+const updateActions = new Set<ActionType>(
+  ActionTypes.extract([
+    ActionType.CREATE,
+    ActionType.NOTIFY,
+    ActionType.EDIT,
+    ActionType.DECLARE,
+    ActionType.REGISTER,
+    ActionType.REJECT,
+    ActionType.ARCHIVE,
+    ActionType.UNARCHIVE,
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
+    ActionType.CUSTOM
+  ]).options
+)
 
 /**
  * Returns the creation metadata of the last update action (Requested or Accepted).
@@ -133,7 +135,7 @@ export function getActionUpdateMetadata(actions: Action[]) {
   ] as const
 
   return actions
-    .filter(({ type }) => updateActions.safeParse(type).success)
+    .filter(({ type }) => updateActions.has(type))
     .reduce<Pick<ActionBase, (typeof metadataFields)[number]>>(
       (_, action) => {
         if (action.originalActionId) {

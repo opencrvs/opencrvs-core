@@ -454,9 +454,8 @@ export function deepMerge<
   /**
    * Cloning is essential since mergeWith mutates the first argument.
    */
-  const currentDocumentClone = cloneDeep(currentDocument)
   return mergeWith(
-    cloneDeep(currentDocumentClone),
+    cloneDeep(currentDocument),
     actionDocument,
     (previousValue, incomingValue) => {
       if (incomingValue === undefined) {
@@ -944,6 +943,45 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
       applyActionDeclaration(declaration, event, action, allAcceptedActions),
     {}
   )
+}
+
+/**
+ * Returns the declaration after each of `event.actions`, which must be in chronological order.
+ * Index `i` equals `aggregateActionDeclarations` of the first `i + 1` actions, in linear time.
+ */
+export function getDeclarationAfterEachAction(
+  event: EventDocument
+): EventState[] {
+  const acceptedActions: ActionDocument[] = []
+  let declaration: EventState = {}
+
+  return event.actions.map((action, index) => {
+    if (!isAcceptedAction(action)) {
+      return declaration
+    }
+
+    // Linked actions resolve against the prefix, as they do when aggregating it
+    const eventUntilAction = {
+      ...event,
+      actions: event.actions.slice(0, index + 1)
+    }
+    const acceptedAction = {
+      ...action,
+      declaration: getCompleteActionDeclaration({}, eventUntilAction, action)
+    }
+    acceptedActions.push(acceptedAction)
+
+    if (!EXCLUDED_ACTIONS.some((type) => type === action.type)) {
+      declaration = applyActionDeclaration(
+        declaration,
+        eventUntilAction,
+        acceptedAction,
+        acceptedActions
+      )
+    }
+
+    return declaration
+  })
 }
 
 /**

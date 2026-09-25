@@ -43,9 +43,11 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import { TrpcUserContext } from '../../context'
 import {
+  collectLocationIds,
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
@@ -412,11 +414,19 @@ export async function indexEventsInBulk(
 
   const hiearchyResolutionStarted = new Date()
 
-  const indexedDocs = await Promise.all(
-    batch.map(async (doc) => {
-      const config = getEventConfigById(configs, doc.type)
-      const eventIndex = eventToEventIndex(doc, config)
+  const indexableEvents = batch.map((doc) => {
+    const config = getEventConfigById(configs, doc.type)
+    return { doc, config, eventIndex: eventToEventIndex(doc, config) }
+  })
 
+  await primeAdministrativeHierarchyCache(
+    indexableEvents.flatMap(({ config, eventIndex }) =>
+      collectLocationIds(config, eventIndex)
+    )
+  )
+
+  const indexedDocs = await Promise.all(
+    indexableEvents.map(async ({ doc, config, eventIndex }) => {
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
       return [

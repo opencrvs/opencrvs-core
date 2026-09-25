@@ -43,6 +43,7 @@ import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
 import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { getClient } from '@events/storage/postgres/events'
 import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
 import {
   getEventIndexName as getEventIndexNameMock,
@@ -449,6 +450,52 @@ test('runReindex records completed status in reindexing_status index', async () 
   expect(history[0].error_message).toBeNull()
   expect(history[0].completed_at).not.toBeNull()
   expect(history[0].progress.processed).toBeGreaterThanOrEqual(0)
+})
+
+test('runReindex skips events that cannot be read and reports them in its status', async () => {
+  mswServer.use(postHandler)
+
+  // An event without actions cannot be turned into a document
+  const unreadable = await getClient()
+    .insertInto('events')
+    .values({
+      eventType: event.type,
+      transactionId: getUUID(),
+      trackingId: getUUID(),
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt
+    })
+    .returning('id')
+    .executeTakeFirstOrThrow()
+
+  await runReindex(reindexToken)
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history[0].status).toBe('completed')
+  // The rest of the chunk is still indexed, the draft is filtered out
+  expect(history[0].progress.processed).toBe(1)
+  expect(history[0].progress.skipped).toBe(1)
+  expect(history[0].progress.errors).toHaveLength(1)
+  expect(history[0].progress.errors[0]).toContain(unreadable.id)
+})
+
+test('runReindex fails when no event in a chunk can be read', async () => {
+  mswServer.use(postHandler)
+
+  await getClient().deleteFrom('eventActions').execute()
+
+  await expect(runReindex(reindexToken)).rejects.toThrow()
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history[0].status).toBe('failed')
 })
 
 test('runReindex records failed status when country config returns 500', async () => {
