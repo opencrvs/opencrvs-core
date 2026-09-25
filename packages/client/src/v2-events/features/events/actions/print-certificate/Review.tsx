@@ -163,9 +163,8 @@ export function Review() {
   const { getEvent, onlineActions } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
   const validatorContext = useValidatorContext(fullEvent)
-  const actions = getAcceptedActions(fullEvent)
 
-  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+  const userIds = getUserIdsFromActions(getAcceptedActions(fullEvent))
 
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -193,7 +192,8 @@ export function Review() {
     throw new Error(`User with id ${userDetails.id} not found in users list`)
   }
 
-  const actionsWithAnOptimisticPrintAction = actions.concat({
+  // Pass the full action list (not only accepted actions) to the certificate
+  const actionsWithAnOptimisticPrintAction = fullEvent.actions.concat({
     type: ActionType.PRINT_CERTIFICATE,
     id: getUUID(),
     transactionId: getUUID(),
