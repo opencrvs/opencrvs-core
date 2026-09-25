@@ -42,7 +42,10 @@ jobs:
         id: validate
         uses: ./.github/actions/validate-branch
         with:
-          pattern: '^[a-z][a-z0-9\/\-]{1,44}$'
+          # Dots are allowed so that `release/x.y.z` branches validate. The
+          # stack name is slugified downstream (`[^\w\s-]` is stripped), so a
+          # dot in the branch name never reaches an environment name.
+          pattern: '^[a-z][a-z0-9/.-]{1,44}$'
 
       - name: Check for e2e labels
         id: set_skip_flag
@@ -263,12 +266,16 @@ jobs:
 
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
-                'core-branch': '${{ env.BRANCH_NAME }}',
+                // e2e checks out Helm charts from the public opencrvs-core repo, where
+                // a private repository's branches don't exist. There, use the branch
+                // the PR targets instead.
+                'core-branch': '${{ github.event.repository.private && github.base_ref || env.BRANCH_NAME }}',
                 stack: '${{ steps.generate_stack.outputs.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 branch: e2eBranch,
                 'actor': '${{ github.actor }}',
                 reset: 'true',
+                registry: '${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}',
               },
             });
 
@@ -371,8 +378,8 @@ jobs:
             const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
             // Check if the comment already exists
             const comments = await github.rest.issues.listComments({
-              owner: 'opencrvs',
-              repo: 'opencrvs-core',
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               issue_number: prNumber
             });
 
@@ -380,8 +387,8 @@ jobs:
             if (!existingComment) {
               // Add PR comment if it doesn't exist
               await github.rest.issues.createComment({
-                owner: 'opencrvs',
-                repo: 'opencrvs-core',
+                owner: context.repo.owner,
+                repo: context.repo.repo,
                 issue_number: prNumber,
                 body: deployMessage
               });
