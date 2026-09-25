@@ -56,12 +56,21 @@ def setup_opencrvs(
         deps_configuration_file = './tilt/examples/dependencies/values.yaml'
         opencrvs_configuration_file = './tilt/examples/opencrvs-services/values.yaml'
 
+    # Country specific overrides, layered on top of the examples above.
+    # tilt/examples/ is replaced on every upgrade, tilt/helm/ is left alone.
+    deps_values = [deps_configuration_file]
+    if os.path.exists('./tilt/helm/dependencies/values.yaml'):
+        deps_values.append('./tilt/helm/dependencies/values.yaml')
+    opencrvs_values = [opencrvs_configuration_file]
+    if os.path.exists('./tilt/helm/opencrvs-services/values.yaml'):
+        opencrvs_values.append('./tilt/helm/opencrvs-services/values.yaml')
+
     # Deploy dependencies
     print("🚀 Deploying dependencies: mongo, minio, elasticsearch...")
     dependencies_chart_path = '{}/charts/dependencies'.format(opencrvs_chart_repo)
     k8s_yaml(helm(dependencies_chart_path,
         namespace=dependencies_namespace,
-        values=[deps_configuration_file],
+        values=deps_values,
         set=["monitoring.enabled={}".format(monitoring_enabled).lower()]
     ))
     opencrvs_chart_path = '{}/charts/opencrvs-services'.format(opencrvs_chart_repo)
@@ -81,7 +90,7 @@ def setup_opencrvs(
     k8s_yaml(
         helm(opencrvs_chart_path,
              namespace=opencrvs_namespace,
-             values=[opencrvs_configuration_file],
+             values=opencrvs_values,
              set=[
                 "platform.tag={}".format(core_images_tag),
                 "countryconfig.image.name={}".format(countryconfig_image_name),

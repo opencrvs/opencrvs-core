@@ -25,6 +25,4 @@ spec:
       volumes:
       {{- include "elasticsearch-reindex.volumes" . | nindent 8 }}
 
-{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
-
 {{- end }}
