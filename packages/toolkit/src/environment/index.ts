@@ -68,3 +68,14 @@ export async function runEnvironmentSwarmToK8s() {
   validateRepositoryStructure()
   await import('./swarm-to-k8s.js')
 }
+
+// Work on the local machine only, so they can run outside of a repository
+export async function runEnvironmentAddK8sContext(args: string[]) {
+  const { runAddK8sContext } = await import('./add-k8s-context.js')
+  await runAddK8sContext(args)
+}
+
+export async function runEnvironmentConfigureShell(args: string[]) {
+  const { runConfigureShell } = await import('./configure-shell.js')
+  await runConfigureShell(args)
+}

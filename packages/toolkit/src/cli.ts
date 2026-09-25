@@ -11,6 +11,8 @@
 /* eslint-disable no-console */
 import { runUpgrade } from './migrations/v2.1'
 import {
+  runEnvironmentAddK8sContext,
+  runEnvironmentConfigureShell,
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,
   runEnvironmentUpdateWorkflows,
@@ -110,6 +112,8 @@ Subcommands:
   update-workflows  Update workflow environment options
   users             Manage environment users
   swarm-to-k8s      Migrate Docker Swarm configuration to Kubernetes
+  add-k8s-context   Add a Kubernetes cluster context to your local kubeconfig
+  configure-shell   Install Kubernetes aliases for bash and zsh
     `.trim()
     )
     process.exit(0)
@@ -131,6 +135,14 @@ Subcommands:
       return runEnvironmentCommand(
         'Swarm to Kubernetes migration',
         runEnvironmentSwarmToK8s
+      )
+    case 'add-k8s-context':
+      return runEnvironmentCommand('Kubernetes context setup', () =>
+        runEnvironmentAddK8sContext(args.slice(2))
+      )
+    case 'configure-shell':
+      return runEnvironmentCommand('shell setup', () =>
+        runEnvironmentConfigureShell(args.slice(2))
       )
     default:
       console.error(`Unknown subcommand: environment ${subcommand}`)
