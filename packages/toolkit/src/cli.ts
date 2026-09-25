@@ -67,10 +67,15 @@ Upgrade the country config in the current working directory to the next
 major version of OpenCRVS.
 
 Options:
-  --docker-swarm   Keep and merge the 'infrastructure/' directory with
-                   upstream changes. Use this if your country deploys
-                   OpenCRVS via Docker Swarm. When omitted, the
-                   'infrastructure/' directory is deleted (default).
+  --docker-swarm   Keep the 'infrastructure/' directory where it is and
+                   leave 'Dockerfile.assets' and the Tilt setup alone. Use
+                   this if your country deploys OpenCRVS via Docker Swarm.
+                   When omitted, 'infrastructure/' moves to 'assets/' and
+                   the Dockerfiles and Tilt setup are replaced with the
+                   template's (default).
+
+The upgrade also switches the country config from yarn to pnpm. Run
+'rm -rf node_modules && pnpm install' once it has finished.
   -h, --help       Show this message.
 `.trim()
 

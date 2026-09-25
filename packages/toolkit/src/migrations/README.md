@@ -24,6 +24,16 @@ config picks it up on upgrade.
 `countryconfig.csv` is left alone. It holds copy the country config declares
 itself, which an upgrade has no business rewriting.
 
+## Files copied from the template
+
+`v2.1/checkout-template-files.ts` replaces a country config's Dockerfiles,
+`Tiltfile` and `tilt/` with those of `packages/countryconfig-template`. They
+ship inside the toolkit (`build.sh` copies them to
+`dist/templates/countryconfig`), so a change to them in the template reaches
+countries on their next upgrade without a codemod. Keep them working for a
+country config without `.pnpmfile.cjs` — `withoutPnpmfile` strips the
+references to it, and its test fails when it no longer can.
+
 ## Adding a step
 
 1. **Create** `v2.0/<your-step-name>.ts` — export `async function main()` that
