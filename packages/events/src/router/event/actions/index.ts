@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,7 +14,7 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, RejectedCorrectionAction, UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -40,7 +41,12 @@ import {
 import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
+import { setBearerForToken } from '@events/router/middleware'
+import {
+  systemOnlyProcedure,
+  userAndSystemProcedure,
+  userOnlyProcedure
+} from '@events/router/trpc'
 
 import {
   getEventById,
@@ -51,7 +57,9 @@ import {
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
+import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { validateActionPayloadStructure } from '@events/router/middleware/validate/utils'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -164,12 +172,14 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
+export type ConfirmableActionType = keyof typeof ACTION_PROCEDURE_CONFIG
+
 /**
  * Maps action types to their corresponding audit log operation names (tRPC paths).
  * Only includes action types that should be audit-logged.
  */
 const AUDIT_LOG_OPERATION_MAP: Partial<
-  Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
+  Record<ConfirmableActionType, EventActionAuditLog['operation']>
 > = {
   [ActionType.NOTIFY]: 'event.actions.notify.request',
   [ActionType.DECLARE]: 'event.actions.declare.request',
@@ -248,6 +258,8 @@ export async function defaultRequestHandler(
     event
   )
 
+  const eventActionToken = await getServiceToken()
+
   const eventWithRequestedAction = await addAction(input, {
     eventId: event.id,
     user,
@@ -262,7 +274,7 @@ export async function defaultRequestHandler(
     input.type,
     input.transactionId,
     eventWithRequestedAction,
-    token
+    setBearerForToken(eventActionToken)
   )
 
   // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
@@ -310,25 +322,48 @@ export async function defaultRequestHandler(
       ? ActionStatus.Accepted
       : ActionStatus.Rejected
 
-  const schema =
-    responseStatus === ActionConfirmationResponse.Success
-      ? SyncActionConfirmationSchema.extend(
-          (actionConfirmationResponseSchema ?? z.object({})).shape
-        )
-      : z.object({})
+  let parsedBody: z.infer<typeof SyncActionConfirmationSchema> | undefined
 
-  const maybeParsed = schema.safeParse(responseBody ?? {})
+  if (responseStatus === ActionConfirmationResponse.Success) {
+    const maybeParsed = SyncActionConfirmationSchema.safeParse(
+      responseBody ?? {}
+    )
+    // Parse separately to keep type information.
+    if (!maybeParsed.success) {
+      logger.error(fromZodError(maybeParsed.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
 
-  if (!maybeParsed.success) {
-    logger.error(fromZodError(maybeParsed.error))
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message:
-        'Invalid payload received from country config action confirmation API'
+    const maybeCustom = (
+      actionConfirmationResponseSchema ?? z.object({})
+    ).safeParse(responseBody ?? {})
+
+    if (!maybeCustom.success) {
+      logger.error(fromZodError(maybeCustom.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
+
+    parsedBody = { ...maybeParsed.data, ...maybeCustom.data }
+
+    validateActionPayloadStructure({
+      eventConfig: configuration,
+      input: {
+        type: input.type,
+        annotation: parsedBody.annotation,
+        declaration: parsedBody.declaration,
+        customActionType:
+          input.type === ActionType.CUSTOM ? input.customActionType : undefined
+      }
     })
   }
-
-  const parsedBody = maybeParsed.data
 
   logger.debug(
     {
@@ -382,7 +417,7 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
  * @param actionType - The action type for which we want to create router handlers.
  */
 export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+  actionType: ConfirmableActionType
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
@@ -394,22 +429,13 @@ export function getDefaultActionProcedures(
     ? userAndSystemProcedure
     : userOnlyProcedure
 
-  // Confirming an action (accept/reject) requires the same scope as requesting
-  // it. Custom actions have no static scope in ACTION_SCOPE_MAP — their access
-  // is granted through `record.custom-action` (see `customActionProcedures`), so
-  // that is what their confirmation is checked against too.
-  const confirmationScopes =
-    actionType === ActionType.CUSTOM
-      ? ['record.custom-action' as const]
-      : ACTION_SCOPE_MAP[actionType]
-
   return {
     request: userTypeBasedProcedure
       .meta(meta)
       .use(middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType]))
       .input(actionConfig.inputSchema.strict())
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction)
+      .use(middleware.validateRequestAction)
       .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
@@ -417,13 +443,14 @@ export function getDefaultActionProcedures(
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
         const event = ctx.event
+
         const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type
         })
 
         if (existingAction) {
-          return event
+          return ctx.event
         }
 
         if (duplicates.detected) {
@@ -458,7 +485,7 @@ export function getDefaultActionProcedures(
         return result
       }),
 
-    accept: userAndSystemProcedure
+    accept: systemOnlyProcedure
       .input(
         actionConfig.inputSchema
           .extend(AsyncActionInput.shape)
@@ -467,28 +494,17 @@ export function getDefaultActionProcedures(
               .shape
           )
       )
-      .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.canAccessEventWithScopes(['record.action.accept']))
+      .use(middleware.requireConfirmableAction(actionType))
       .use(middleware.requireAssignment)
+      .use(middleware.validateAcceptAction)
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
-        const originalAction = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
+        const { token, user, event, confirmationAction } = ctx
+        const { actionId } = input
         const configuration = await getEventConfigurationById({
           token,
           eventType: event.type
         })
-
-        // Original action is not found
-        if (!originalAction) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Action not found.'
-          })
-        }
 
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
@@ -537,23 +553,15 @@ export function getDefaultActionProcedures(
           }
         )
       }),
-    reject: userAndSystemProcedure
+
+    reject: systemOnlyProcedure
       .input(AsyncActionInput)
-      .use(middleware.canAccessEventWithScopes(confirmationScopes))
+      .use(middleware.canAccessEventWithScopes(['record.action.reject']))
+      .use(middleware.requireConfirmableAction(actionType))
       .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
-        const { eventId, actionId } = input
-
-        const event = await getEventById(eventId)
-        const action = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
-
-        // Action is not found
-        if (!action) {
-          throw new Error(`Action not found.`)
-        }
+        const { event, confirmationAction, originalAction } = ctx
+        const { actionId } = input
 
         if (confirmationAction) {
           // Action is already accepted
@@ -570,16 +578,16 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
-        // when calling REJECT_CORRECTION.reject we need to know the original REQUEST_CORRECTION action id for reference.
-        const originalCorrectionRequestId =
-          action.type === ActionType.REJECT_CORRECTION
-            ? RejectedCorrectionAction.parse(action).requestId
-            : undefined
-
         return addAsyncRejectAction(
           {
             ...input,
-            requestId: originalCorrectionRequestId,
+            // `event_actions_check` wants a `requestId` on corrections & a reason on REJECT.
+            requestId:
+              'requestId' in originalAction
+                ? originalAction.requestId
+                : undefined,
+            content:
+              'content' in originalAction ? originalAction.content : undefined,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false

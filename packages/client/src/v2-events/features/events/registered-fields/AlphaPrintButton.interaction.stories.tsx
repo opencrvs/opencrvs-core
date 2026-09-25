@@ -85,6 +85,7 @@ function createAlphaPrintButtonStoryParameters(
         }),
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={[
               {
                 id: 'storybook.name',
@@ -181,6 +182,7 @@ export const WithTemporaryEventId: StoryObj<{}> = {
         }),
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={[
               {
                 id: 'storybook.name',

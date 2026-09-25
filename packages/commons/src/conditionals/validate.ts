@@ -31,7 +31,7 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ITokenPayload } from '../authentication'
+import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -116,7 +116,7 @@ export type ClientFunctionContext = {
   $form: EventState | ActionUpdate
   $now: string
   $online: boolean
-  $user?: ITokenPayload
+  $user?: UserValidatorContext
   $event?: EventDocument
   $leafAdminStructureLocationIds: Array<{ id: UUID }>
   user?: SystemVariables['user']
@@ -509,11 +509,26 @@ export function getEventValidatorContext(
   return { document, state: getCurrentEventState(document, config) }
 }
 
+export type UserValidatorContext = {
+  // In system-wide context internal service tokens do not have UUID.
+  sub: string
+  scope: EncodedScope[]
+  role?: string
+  userType: TokenUserType
+}
+/** deprecated */
 export type ValidatorContext = {
-  user?: ITokenPayload
+  user?: UserValidatorContext
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
   baseFormState?: EventState
   event?: EventValidatorContext
+}
+
+export type StrictValidatorContext = {
+  user: UserValidatorContext
+  leafAdminStructureLocationIds: Array<{ id: UUID }>
+  baseFormState?: EventState
+  event: EventValidatorContext
 }
 
 function isFieldConditionMet(

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -40,8 +41,13 @@ import {
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
+import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
-import { getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
+import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
+import {
+  getEventIndexName as getEventIndexNameMock,
+  getTemporaryIndexName
+} from '@events/storage/__mocks__/elasticsearch'
 
 // Mock reindex endpoint so there are no side effects
 vi.mock('@events/service/reindex', async (importOriginal) => {
@@ -484,4 +490,147 @@ test('reindex per-type write alias is re-pointed on every subsequent reindex', a
 
   expect(indexAfterSecond).not.toEqual(indexAfterFirst)
   expect(indexAfterSecond).toMatch(new RegExp(`^${writeAliasName}_\\d+$`))
+})
+
+test('does not stop runReindex when the cleanup itself fails', async () => {
+  const esClient = getOrCreateClient()
+  const clientSpy = vi
+    .spyOn(elasticsearchMocks, 'getOrCreateClient')
+    .mockReturnValue(esClient)
+  // The cleanup makes the first getAlias call in runReindex.
+  const getAliasSpy = vi
+    .spyOn(esClient.indices, 'getAlias')
+    .mockRejectedValueOnce(new Error('simulated getAlias failure'))
+
+  await expect(runReindex(reindexToken)).resolves.not.toThrow()
+  expect(getAliasSpy).toHaveBeenCalled()
+
+  getAliasSpy.mockRestore()
+  clientSpy.mockRestore()
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+  expect(history[0].status).toBe('completed')
+})
+
+describe('cleanupOrphanedIndices', () => {
+  const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000
+
+  // The default test mock names indices `<type>_<id>`; switch to production's
+  // `<prefix>_<type>` shape so the names match what a real cluster holds.
+  function useProductionIndexNames() {
+    const prefix = getEventAliasName()
+    getEventIndexNameMock.mockImplementation(
+      (type: string) => `${prefix}_${type}`
+    )
+  }
+
+  test('deletes an old temp index with no alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now() - TWO_DAYS_MS}`
+    await esClient.indices.create({ index: orphanIndex })
+
+    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: orphanIndex })).toBe(false)
+  })
+
+  test('leaves a recent temp index alone, as it may belong to an in-progress reindex', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const inProgressIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now()}`
+    await esClient.indices.create({ index: inProgressIndex })
+
+    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: inProgressIndex })).toBe(true)
+  })
+
+  test('leaves an old temp index that is still behind an alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const liveIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now() - TWO_DAYS_MS}`
+    await esClient.indices.create({
+      index: liveIndex,
+      aliases: { [getEventAliasName()]: {} }
+    })
+
+    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: liveIndex })).toBe(true)
+  })
+
+  test('leaves a bare live index (no timestamp suffix) untouched even without an alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    // A bare live index has no alias before its first-ever reindex.
+    const liveIndexName = getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)
+    await esClient.indices.create({ index: liveIndexName })
+
+    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
+  })
+
+  test('leaves the bare live index of an event type whose id ends in digits', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    // `<prefix>_marriage_2025` ends in `_<digits>`, so a loose suffix match
+    // would mistake it for a temp index.
+    const configuration = { ...tennisClubMembershipEvent, id: 'marriage_2025' }
+    const liveIndexName = getEventIndexNameMock(configuration.id)
+    await esClient.indices.create({ index: liveIndexName })
+
+    await cleanupOrphanedIndices([configuration])
+
+    expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
+  })
+
+  test('ignores indices of event types that are not configured', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const foreignIndex = `${getEventIndexNameMock('not-configured')}_${Date.now() - TWO_DAYS_MS}`
+    await esClient.indices.create({ index: foreignIndex })
+
+    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: foreignIndex })).toBe(true)
+  })
+
+  test('logs and continues when deleting an orphaned index fails', async () => {
+    const esClient = getOrCreateClient()
+    // Each getOrCreateClient() call opens a new connection, so make it reuse
+    // esClient -- otherwise cleanupOrphanedIndices would get its own client,
+    // and the delete spy below wouldn't see its calls.
+    vi.spyOn(elasticsearchMocks, 'getOrCreateClient').mockReturnValue(esClient)
+    useProductionIndexNames()
+
+    const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now() - TWO_DAYS_MS}`
+    await esClient.indices.create({ index: orphanIndex })
+
+    const deleteSpy = vi
+      .spyOn(esClient.indices, 'delete')
+      .mockRejectedValueOnce(new Error('simulated delete failure'))
+
+    // A failed delete must not throw out of cleanupOrphanedIndices -- it's a
+    // best-effort step that shouldn't be able to block the reindex it precedes.
+    await expect(
+      cleanupOrphanedIndices([tennisClubMembershipEvent])
+    ).resolves.not.toThrow()
+
+    expect(deleteSpy).toHaveBeenCalledWith({ index: orphanIndex })
+    deleteSpy.mockRestore()
+
+    // Deletion failed, so the index is still there.
+    expect(await esClient.indices.exists({ index: orphanIndex })).toBe(true)
+  })
 })

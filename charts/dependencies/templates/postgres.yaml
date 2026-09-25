@@ -158,6 +158,8 @@ spec:
               mountPath: /run/postgresql
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
+            - name: dshm
+              mountPath: /dev/shm
           {{- if (eq (include "postgres.use_pgBackRest" .) "true") }}
             - name: pgbackrest-config
               mountPath: /etc/pgbackrest
@@ -178,6 +180,10 @@ spec:
                 path: ensure-deb-utils.sh
         - name: postgres-run
           emptyDir: {}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: {{ .Values.postgres.shm_size | default "256Mi" }}
         - name: data
       {{- if eq $storageType "pvc" }}
           persistentVolumeClaim:

@@ -44,13 +44,11 @@ vi.mock('node-fetch', () => {
 vi.mock('@opencrvs/toolkit/api', () => ({
   createClient: vi.fn(() => ({
     locations: {
-      list: {
-        query: vi.fn().mockResolvedValue([
-          {
-            id: '9e069dda-0d83-4f67-a4f2-9adbf5658e2e',
-            name: 'Windmill village registrar office'
-          }
-        ])
+      get: {
+        query: vi.fn().mockResolvedValue({
+          id: '9e069dda-0d83-4f67-a4f2-9adbf5658e2e',
+          name: 'Windmill village registrar office'
+        })
       }
     }
   }))
@@ -65,6 +63,7 @@ vi.mock('nanoid', () => {
 })
 
 import fetch from 'node-fetch'
+import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 import { informantNotificationTestData } from './testData'
 import { createServer } from '../../index'
 
@@ -85,11 +84,31 @@ describe('User notification - sms', () => {
           payload: eventDocument,
           auth: {
             strategy: 'jwt',
-            credentials: {},
+            // Action confirmation requests are only accepted from core's
+            // service token (see the onPostAuth guard in ../../index).
+            credentials: { sub: SERVICE_USER_ID },
             artifacts: { token: 'mock-token' }
           }
         })
         expect((fetch as any).mock.calls[1][1].body).toMatchSnapshot()
       })
   )
+
+  it('rejects an action confirmation request that is not from the service token', async () => {
+    const { eventType, actionType, eventDocument } =
+      informantNotificationTestData[0]
+
+    const response = await server.server.inject({
+      method: 'POST',
+      url: `/trigger/events/${eventType}/actions/${actionType}`,
+      payload: eventDocument,
+      auth: {
+        strategy: 'jwt',
+        credentials: { sub: 'f8b1a0c2-3d4e-4f5a-8b6c-7d8e9f0a1b2c' },
+        artifacts: { token: 'mock-token' }
+      }
+    })
+
+    expect(response.statusCode).toBe(403)
+  })
 })

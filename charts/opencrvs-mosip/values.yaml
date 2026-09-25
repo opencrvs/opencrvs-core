@@ -6,6 +6,7 @@ storage_type: host_path
 
 platform:
   tag: 'v2.1.0'
+  imagePullPolicy: Always
 
 # Deployment rollout strategy, applied to all three MOSIP mock/test services
 # below unless overridden per-service under <service>.strategy (e.g.

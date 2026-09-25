@@ -50,12 +50,15 @@ spec:
       app: esignet-mock
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: esignet-mock
     spec:
       containers:
         - name: esignet-mock
           image: {{ include "mosip.image" (dict "root" $ "service" .Values.esignet_mock) }}
+          imagePullPolicy: {{ .Values.esignet_mock.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: CLIENT_APP_URL
               value: https://register.{{ .Values.hostname }}

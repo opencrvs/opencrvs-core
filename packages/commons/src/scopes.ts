@@ -51,7 +51,9 @@ export const RecordScopeTypeV2 = z.enum([
   'record.request-correction',
   'record.correct',
   'record.unassign-others',
-  'record.custom-action'
+  'record.custom-action',
+  'record.action.accept',
+  'record.action.reject'
 ])
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
@@ -238,6 +240,18 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
     )
 })
 
+export const ActionConfirmationScopeType = RecordScopeTypeV2.extract([
+  'record.action.accept',
+  'record.action.reject'
+])
+export type ActionConfirmationScopeType = z.infer<
+  typeof ActionConfirmationScopeType
+>
+
+const ActionConfirmationScopeOptions = AllRecordScopeOptions.describe(
+  'Options for confirming (accepting or rejecting) an action.'
+)
+
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -259,6 +273,10 @@ export const RecordScopeV2 = z
     z.object({
       type: z.literal('record.print-certified-copies'),
       options: ScopeOptionsPrintCertifiedCopies.optional()
+    }),
+    z.object({
+      type: ActionConfirmationScopeType,
+      options: ActionConfirmationScopeOptions.optional()
     })
   ])
   .describe(
