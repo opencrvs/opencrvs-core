@@ -73,6 +73,10 @@ fi
 # Build CLI
 npx esbuild src/cli.ts --bundle --platform=node --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 cp -R src/environment/templates dist/templates
+# Template files copied into country configs by the upgrade-tilt and
+# migrate-infrastructure-to-assets codemods
+mkdir -p dist/templates/countryconfig-template
+cp -R ../countryconfig-template/Tiltfile ../countryconfig-template/.tiltignore ../countryconfig-template/tilt ../countryconfig-template/assets ../countryconfig-template/Dockerfile.assets dist/templates/countryconfig-template/
 chmod +x ./dist/cli.js
 
 echo "Build completed successfully."
