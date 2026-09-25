@@ -21,7 +21,8 @@ import {
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  ValidatorContext
+  ValidatorContext,
+  deepMerge
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -257,11 +258,13 @@ export async function makeCorrectionOnRequest({
     eventConfiguration
   ).declaration
 
+  const declarationWithCorrections = deepMerge(originalDeclaration, declaration)
+
   const annotation =
     actionConfiguration && declarationMixedUpAnnotation
       ? omitHiddenAnnotationFields(
           actionConfiguration,
-          originalDeclaration,
+          declarationWithCorrections,
           declarationMixedUpAnnotation,
           context
         )
