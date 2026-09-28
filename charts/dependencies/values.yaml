@@ -362,8 +362,9 @@ minio:
   # Enable or disable MinIO deployment.
   enabled: true
   image:
-    repository: quay.io/minio/minio
-    tag: RELEASE.2025-06-13T11-33-47Z
+    # Mirrored copy of the upstream image, which MinIO removed from quay.io.
+    repository: ghcr.io/opencrvs/minio
+    tag: release.2025-06-13t11-33-47z
   port: 3535
   network_policy:
     ingress_mode: private
