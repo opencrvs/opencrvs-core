@@ -19,7 +19,12 @@ import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 import { WorkboxPlugin } from 'workbox-core/types'
 import { MINIO_REGEX } from '@opencrvs/commons/client'
-import { isAppShellResponse } from '@client/v2-events/cache'
+
+// "App shell" = the SPA's index.html, served for any unmatched route. True
+// if a document's URL got poisoned with that HTML instead of the real file.
+function isAppShellResponse(response: Response) {
+  return (response.headers.get('content-type') ?? '').startsWith('text/html')
+}
 
 self.__WB_DISABLE_DEV_LOGS = true
 

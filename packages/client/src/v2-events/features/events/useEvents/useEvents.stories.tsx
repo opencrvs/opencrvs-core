@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import superjson from 'superjson'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { within } from 'storybook/test'
 import { waitFor, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -36,6 +36,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { storage } from '@client/storage'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEvents } from './useEvents'
 
@@ -68,10 +69,12 @@ const router = {
          * Explicitly call the hook to trigger draft fetching
          */
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        queryClient.invalidateQueries({
-          queryKey: trpcOptionsProxy.event.draft.list.queryKey()
-        })
+        useEffect(() => {
+          void queryClient.invalidateQueries({
+            queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+          })
+        }, [])
+
         useDrafts().getRemoteDraftByEventId(createdEvent.id)
 
         return (
@@ -102,6 +105,13 @@ const spies = {
 }
 
 const handlers = {
+  user: [
+    trpcMsw.user.get.query(() => {
+      const generator = testDataGenerator()
+
+      return generator.user.localRegistrar().v2
+    })
+  ],
   drafts: [
     trpcMsw.event.draft.list.query(() => {
       spies.draftList++
@@ -154,6 +164,7 @@ export const GetEventHook: Story = {
 
       const cacheKeys = await caches.keys()
       const cacheKey = cacheKeys.find((key) => key === CACHE_NAME)
+
       if (cacheKey) {
         await caches.delete(cacheKey)
       }
@@ -181,14 +192,9 @@ export const GetEventHook: Story = {
 
     await step('Waits for test content to appear', async () => {
       const canvas = within(canvasElement)
-      await waitFor(
-        async () => {
-          return expect(canvas.getByText('Test content')).toBeInTheDocument()
-        },
-        {
-          timeout: 5000
-        }
-      )
+      await waitFor(async () => {
+        return expect(canvas.getByText('Test content')).toBeInTheDocument()
+      })
     })
 
     await step('Retrieves draft list', async () => {
