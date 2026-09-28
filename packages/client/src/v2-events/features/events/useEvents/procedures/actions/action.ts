@@ -24,6 +24,7 @@ import {
   getActionFormFields,
   omitHiddenFields,
   deepDropNulls,
+  deepMerge,
   getCurrentEventState,
   getEventValidatorContext
 } from '@opencrvs/commons/client'
@@ -317,6 +318,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? getCurrentEventState(localFullEvent, eventConfiguration).declaration
       : {}
 
+    const submittedDeclaration = deepMerge(
+      originalDeclaration,
+      params.declaration ?? {}
+    )
+
     const annotationFields = [
       ...(actionConfiguration
         ? getActionAnnotationFields(actionConfiguration)
@@ -336,7 +342,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       actionConfiguration || annotationFields.length > 0
         ? deepDropNulls(
             omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
-              baseFormState: originalDeclaration
+              baseFormState: submittedDeclaration
             })
           )
         : {}

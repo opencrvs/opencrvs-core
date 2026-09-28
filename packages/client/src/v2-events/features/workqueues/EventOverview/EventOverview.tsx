@@ -11,6 +11,7 @@
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   EventDocument,
   getCurrentEventState,
   dangerouslyGetCurrentEventStateWithDrafts,
@@ -31,7 +32,11 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
-import { useDuplicatesAvailable } from '../../events/actions/dedup/useDuplicatesAvailable'
+import {
+  DuplicatesAvailability,
+  useDuplicatesAvailable
+} from '../../events/actions/dedup/useDuplicatesAvailable'
+import { useUserAllowedActions } from '../Actions/useUserAllowedActions'
 import { EventSummary } from './components/EventSummary'
 import { useEventOverviewInfo } from './components/useEventOverviewInfo'
 
@@ -178,26 +183,35 @@ function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { eventIndex, fullEvent, shouldShowFullOverview } =
     useEventOverviewInfo(params.eventId)
-  const areDuplicatesAvailable = useDuplicatesAvailable(eventIndex)
-  const isDownloaded = fullEvent !== undefined
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
+  const hasDuplicateReviewScope = isActionAllowed(ActionType.MARK_AS_DUPLICATE)
+  const duplicatesAvailability = useDuplicatesAvailable(
+    eventIndex,
+    hasDuplicateReviewScope
+  )
+
   /*
-   * Until the record is downloaded the matches have not been fetched either, so
-   * their absence says nothing about whether the user may review them.
+   * Mid-check neither banner would be honest, so show none. Without an answer
+   * the plain warning stands: only a refusal justifies blaming jurisdiction.
    */
-  const canNotReviewDuplicate = isDownloaded && !areDuplicatesAvailable
+  const duplicateWarning = (
+    <DuplicateWarning
+      duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+        ({ trackingId }) => trackingId
+      )}
+    />
+  )
+
+  const duplicateBanner = {
+    [DuplicatesAvailability.UNDETERMINED]: duplicateWarning,
+    [DuplicatesAvailability.CHECKING]: null,
+    [DuplicatesAvailability.AVAILABLE]: duplicateWarning,
+    [DuplicatesAvailability.UNAVAILABLE]: <DuplicateReviewUnavailable />
+  }[duplicatesAvailability]
 
   return (
     <>
-      {eventIndex.potentialDuplicates.length > 0 &&
-        (canNotReviewDuplicate ? (
-          <DuplicateReviewUnavailable />
-        ) : (
-          <DuplicateWarning
-            duplicateTrackingIds={eventIndex.potentialDuplicates.map(
-              ({ trackingId }) => trackingId
-            )}
-          />
-        ))}
+      {eventIndex.potentialDuplicates.length > 0 && duplicateBanner}
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (

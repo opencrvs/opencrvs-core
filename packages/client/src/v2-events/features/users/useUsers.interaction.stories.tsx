@@ -25,7 +25,7 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { precacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 
 const generator = testDataGenerator()
 
@@ -141,7 +141,7 @@ export const CachesUsersOnEventDownload: Story = {
     },
 
     async () => {
-      await cacheUsersFromEventDocument(eventWithFiveUsers)
+      await precacheUsersFromEventDocument(eventWithFiveUsers)
     }
   ],
 
