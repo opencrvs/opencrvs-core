@@ -19,6 +19,12 @@ How the migration runs during the v2.0.0 upgrade:
 - **Helm/Kubernetes deployments**: automatically, as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on `helm upgrade`. If you disabled `data_migration_legacy`, re-enable it while on v2.0.0 before going to 2.1.0.
 - **Docker Swarm deployments** (Countryconfig/Farajaland `docker-compose.deploy.yml`): also automatically — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs the `legacy-data-migration` service the first time you deploy v2.0.0. If that service was pruned/removed before it ran, restore it from the v2.0.0 tag and run it manually while still on v2.0.0.
 
+#### 2FA is enabled for staging
+
+`yarn environment:init` now enables 2FA by environment type, not name: `staging`, `production` and custom "Staging/Production" environments get `TWO_FA_ENABLED: true`. Before re-running it for staging, make sure SMTP (or SMS) is configured there.
+
+[#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
+
 ### Breaking changes
 
 #### Confirming an asynchronous action now takes credentials the requester does not have

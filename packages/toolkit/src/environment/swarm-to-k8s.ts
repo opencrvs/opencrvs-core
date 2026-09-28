@@ -100,10 +100,7 @@ import {
   copyChartsValues(environment, {
     env: environment,
     environment_type: environment_type,
-    // FIXME: In general that should be environment_type,
-    // Hardcode like this blocks us from being generic:
-    // https://github.com/opencrvs/opencrvs-core/issues/11171
-    two_fa_enabled: environment !== 'production' ? false : true,
+    two_fa_enabled: environment_type === 'production',
     backup_enabled: environment === 'production' ? 'true' : 'false',
     restore_enabled: environment === 'staging' ? 'true' : 'false',
     restore_environment_name: environment === 'staging' ? 'production' : '',
