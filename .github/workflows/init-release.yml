@@ -134,6 +134,31 @@ jobs:
 
           npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
           yarn version --new-version "$VERSION" --no-git-tag-version
+
+          # Bump helm chart version
+          find charts/ -name Chart.yaml -exec sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" {} \;
+          # Update core and countryconfig image in opencrvs services chart
+          sed -i.bak -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+          # Update utilities image in Dependencies helm chart
+          sed -i.bak -E '
+          /^utilities:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/dependencies/values.yaml
+          rm charts/dependencies/values.yaml.bak
+
           git add .
           git commit -m "chore: update version to $VERSION"
 
