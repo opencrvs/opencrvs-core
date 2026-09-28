@@ -23,6 +23,7 @@ import {
   getDeclaration,
   getDeclarationFields,
   isFieldDisplayedOnReview,
+  omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -152,6 +153,12 @@ function DeclarationComparisonTableComponent({
         eventConfiguration
       ).declaration
 
+  const visibleLatestDeclaration = omitHiddenPaginatedFields(
+    declarationConfig,
+    latestDeclaration,
+    validatorContext
+  )
+
   // Collect all changed review fields once
   const changedAnnotationFields = reviewFormFields
     .map((f) => {
@@ -205,12 +212,16 @@ function DeclarationComparisonTableComponent({
               )
           )
           .filter((field) =>
-            isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
+            isFieldDisplayedOnReview(
+              field,
+              visibleLatestDeclaration,
+              validatorContext
+            )
           )
           .filter((f) =>
             hasFieldChanged(
               f,
-              latestDeclaration,
+              visibleLatestDeclaration,
               previousDeclaration,
               validatorContext
             )

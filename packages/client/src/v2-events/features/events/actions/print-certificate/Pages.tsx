@@ -18,6 +18,7 @@ import {
 import {
   eventAttachmentPath,
   getCurrentEventState,
+  getDeclarationValidatorContext,
   getPrintCertificatePages
 } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -82,10 +83,11 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
-  const pagesValidatorContext = {
-    ...validatorContext,
-    baseFormState: eventIndex.declaration
-  }
+  const pagesValidatorContext = getDeclarationValidatorContext(
+    configuration,
+    eventIndex.declaration,
+    validatorContext
+  )
 
   const onPageChange = (nextPageId: string) =>
     navigate(

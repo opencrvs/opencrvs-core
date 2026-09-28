@@ -23,10 +23,9 @@ import {
   EventDocument,
   EventState,
   getCurrentEventState,
-  getDeclaration,
+  getDeclarationValidatorContext,
   isFieldVisible,
   isPageVisible,
-  omitHiddenPaginatedFields,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
@@ -122,7 +121,6 @@ function getRequestActionDetails(
 function buildCorrectionDetails(
   correctionFormPages: PageConfig[],
   annotation: ActionUpdate,
-  correctedDeclaration: EventState,
   intl: IntlShape,
   submitterName: string,
   locations: Map<UUID, ClientLocation>,
@@ -130,13 +128,8 @@ function buildCorrectionDetails(
   anchor: PlainDate,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
-  const correctionContext = {
-    ...validatorContext,
-    baseFormState: correctedDeclaration
-  }
-
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation, correctionContext))
+    .filter((page) => isPageVisible(page, annotation, validatorContext))
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -154,7 +147,7 @@ function buildCorrectionDetails(
         ]
       }
       return page.fields
-        .filter((f) => isFieldVisible(f, annotation, correctionContext))
+        .filter((f) => isFieldVisible(f, annotation, validatorContext))
         .filter((f) => !isEmptyValue(f, annotation[f.id]))
         .map((field) => ({
           label: field.label,
@@ -253,15 +246,10 @@ export function CorrectionDetails({
   const correctionDetails = buildCorrectionDetails(
     correctionFormPages,
     annotation,
-    omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
-      form,
-      validatorContext
-    ),
     intl,
     submitterName,
     locations,
-    validatorContext,
+    getDeclarationValidatorContext(eventConfiguration, form, validatorContext),
     anchor,
     correctionRequestAction
   )

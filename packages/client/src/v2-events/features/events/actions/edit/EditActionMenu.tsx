@@ -23,6 +23,7 @@ import {
   EventStatus,
   getActionConfig,
   getAcceptedActions,
+  getDeclarationValidatorContext,
   getActionFormFields,
   runFieldValidations,
   flattenFormState,
@@ -122,6 +123,11 @@ function EditActionModal({
   const validatorContext = useValidatorContext()
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
+  const declarationValidatorContext = getDeclarationValidatorContext(
+    eventConfiguration,
+    declaration,
+    validatorContext
+  )
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
@@ -129,7 +135,7 @@ function EditActionModal({
         field,
         form: modalValues,
         value: modalValues[field.id],
-        context: validatorContext
+        context: declarationValidatorContext
       })
     ).flatMap(([, errs]) => errs)
   )
@@ -154,7 +160,11 @@ function EditActionModal({
           onClick={() =>
             close({
               confirmed: true,
-              values: omitHiddenFields(fields, modalValues, validatorContext)
+              values: omitHiddenFields(
+                fields,
+                modalValues,
+                declarationValidatorContext
+              )
             })
           }
         >
@@ -183,7 +193,7 @@ function EditActionModal({
           eventConfig={eventConfiguration}
           fields={fields}
           id="edit-action-modal-form"
-          validatorContext={{ ...validatorContext, baseFormState: declaration }}
+          validatorContext={declarationValidatorContext}
         />
       )}
     </Dialog>

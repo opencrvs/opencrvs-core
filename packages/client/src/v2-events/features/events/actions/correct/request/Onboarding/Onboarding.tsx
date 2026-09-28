@@ -18,7 +18,7 @@ import {
 import {
   ActionType,
   eventAttachmentPath,
-  getCurrentEventState
+  getDeclarationValidatorContext
 } from '@opencrvs/commons/client'
 import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -26,6 +26,7 @@ import { Pages as PagesComponent } from '@client/v2-events/features/events/compo
 import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -50,6 +51,9 @@ export function Onboarding() {
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
+  const correctedDeclaration = useEventFormData((state) =>
+    state.getFormValues()
+  )
 
   const event = events.getEvent.getFromCache(eventId)
   const validatorContext = useValidatorContext(event)
@@ -72,7 +76,6 @@ export function Onboarding() {
   }
 
   const formPages = actionConfiguration.correctionForm.pages
-  const eventIndex = getCurrentEventState(event, configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -94,10 +97,11 @@ export function Onboarding() {
     return null
   }
 
-  const pagesValidatorContext = {
-    ...validatorContext,
-    baseFormState: eventIndex.declaration
-  }
+  const pagesValidatorContext = getDeclarationValidatorContext(
+    configuration,
+    correctedDeclaration,
+    validatorContext
+  )
 
   const onPageChange = (nextPageId: string) =>
     navigate(

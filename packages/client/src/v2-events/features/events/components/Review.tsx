@@ -32,7 +32,7 @@ import {
   FieldType,
   FieldUpdateValue,
   FormConfig,
-  getDeclaration,
+  getDeclarationValidatorContext,
   isFieldDisplayedOnReview,
   isPageVisible,
   omitHiddenFields,
@@ -712,14 +712,11 @@ function AcceptActionModal({
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
 
-  const dialogValidatorContext = {
-    ...validatorContext,
-    baseFormState: omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
-      declaration,
-      validatorContext
-    )
-  }
+  const dialogValidatorContext = getDeclarationValidatorContext(
+    eventConfiguration,
+    declaration,
+    validatorContext
+  )
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(

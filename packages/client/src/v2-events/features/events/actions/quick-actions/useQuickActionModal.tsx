@@ -29,6 +29,7 @@ import {
   runFieldValidations,
   UUID,
   getCurrentEventState,
+  getDeclarationValidatorContext,
   EventConfig,
   omitHiddenFields,
   EventIndex,
@@ -114,6 +115,11 @@ function QuickActionModal({
   const modalValues = dialogForm.formValues
   const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
   const event = getCurrentEventState(eventDocument, eventConfiguration)
+  const declarationValidatorContext = getDeclarationValidatorContext(
+    eventConfiguration,
+    event.declaration,
+    validatorContext
+  )
 
   const errorsOnField = (config.fields ?? []).flatMap((field) =>
     flattenFormState(
@@ -121,7 +127,7 @@ function QuickActionModal({
         field,
         form: modalValues,
         value: modalValues[field.id],
-        context: validatorContext
+        context: declarationValidatorContext
       })
     ).flatMap(([, errs]) => errs)
   )
@@ -130,7 +136,7 @@ function QuickActionModal({
     const visibleFields = omitHiddenFields(
       config.fields ?? [],
       modalValues,
-      validatorContext
+      declarationValidatorContext
     )
 
     close({ result: true, values: visibleFields })
@@ -195,10 +201,7 @@ function QuickActionModal({
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}
           // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
-          validatorContext={{
-            ...validatorContext,
-            baseFormState: event.declaration
-          }}
+          validatorContext={declarationValidatorContext}
         />
       </Stack>
     </Dialog>

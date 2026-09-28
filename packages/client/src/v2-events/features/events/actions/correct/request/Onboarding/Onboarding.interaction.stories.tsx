@@ -12,11 +12,19 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { waitFor, within, userEvent, expect } from 'storybook/test'
 import {
   ActionType,
+  ActionUpdate,
+  ConditionalType,
+  EventConfig,
+  field,
   FieldType,
   PageTypes,
   TENNIS_CLUB_MEMBERSHIP,
   generateEventConfig,
-  generateTranslationConfig
+  generateEventDocument,
+  generateEventDraftDocument,
+  generateTranslationConfig,
+  not,
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import {
@@ -225,5 +233,120 @@ export const UploadedDocumentPersistsAcrossPageNavigation: Story = {
         await expect(Boolean(img?.complete && img.naturalWidth > 0)).toBe(true)
       })
     })
+  }
+}
+
+// The age note is only relevant when the applicant's age is declared
+const eventConfigWithAgeNote = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type !== ActionType.REQUEST_CORRECTION
+      ? action
+      : {
+          ...action,
+          correctionForm: {
+            ...action.correctionForm,
+            pages: [
+              {
+                id: 'correction-notes',
+                type: PageTypes.enum.FORM,
+                requireCompletionToContinue: false,
+                title: generateTranslationConfig('Notes'),
+                fields: [
+                  {
+                    id: 'correction.reason',
+                    type: FieldType.TEXT,
+                    label: generateTranslationConfig('Reason for correction')
+                  },
+                  {
+                    id: 'correction.ageNote',
+                    type: FieldType.TEXT,
+                    label: generateTranslationConfig('Note on age'),
+                    conditionals: [
+                      {
+                        type: ConditionalType.SHOW,
+                        conditional: not(field('applicant.age').isFalsy())
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+  )
+} satisfies EventConfig
+
+function declaredEvent(declaration: ActionUpdate) {
+  return generateEventDocument({
+    configuration: eventConfigWithAgeNote,
+    actions: [
+      { type: ActionType.CREATE },
+      { type: ActionType.DECLARE, declarationOverrides: declaration },
+      { type: ActionType.REGISTER, declarationOverrides: declaration }
+    ]
+  })
+}
+
+const eventWithoutAge = declaredEvent({ 'applicant.dobUnknown': false })
+
+export const ShowsCorrectionFieldRevealedByCorrectedDeclaration: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    offline: {
+      configs: [eventConfigWithAgeNote],
+      events: [eventWithoutAge],
+      drafts: [
+        generateEventDraftDocument({
+          eventId: eventWithoutAge.id,
+          actionType: ActionType.REQUEST_CORRECTION,
+          declaration: { 'applicant.dobUnknown': true, 'applicant.age': 30 }
+        })
+      ]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+        eventId: eventWithoutAge.id,
+        pageId: 'correction-notes'
+      })
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(
+      await canvas.findByText('Note on age', {}, { timeout: 15000 })
+    ).toBeInTheDocument()
+  }
+}
+
+// applicant.age is hidden while applicant.dobUnknown is false, but the stored declaration still holds its value
+const eventWithHiddenAge = declaredEvent({
+  'applicant.dobUnknown': false,
+  'applicant.dob': '1990-01-01',
+  'applicant.age': 30
+})
+
+export const HiddenDeclarationValueDoesNotShowCorrectionField: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    offline: {
+      configs: [eventConfigWithAgeNote],
+      events: [eventWithHiddenAge]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+        eventId: eventWithHiddenAge.id,
+        pageId: 'correction-notes'
+      })
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Reason for correction', {}, { timeout: 15000 })
+    await expect(canvas.queryByText('Note on age')).not.toBeInTheDocument()
   }
 }
