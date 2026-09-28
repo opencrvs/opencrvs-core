@@ -101,8 +101,20 @@ paths:
                           type: integer
                           minimum: -9007199254740991
                           maximum: 9007199254740991
+                        skipped:
+                          default: 0
+                          type: integer
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
+                        errors:
+                          default: []
+                          type: array
+                          items:
+                            type: string
                       required:
                         - processed
+                        - skipped
+                        - errors
                       additionalProperties: false
                     error_message:
                       anyOf:
