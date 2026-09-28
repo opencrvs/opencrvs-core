@@ -22,6 +22,7 @@ import {
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  FieldConfig,
   getDeclarationFields,
   isAgeFieldType,
   isNameFieldType,
@@ -37,6 +38,31 @@ import {
 } from '@opencrvs/commons'
 import { getAdministrativeHierarchyById } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
+
+/**
+ * The declaration fields of a config do not change, so the lookup is built once per
+ * config rather than once per event. Indexing resolves this map for every event in
+ * every batch, where rebuilding it was a fifth of the per-event cost.
+ */
+const declarationFieldConfigsByEventConfig = new WeakMap<
+  EventConfig,
+  Partial<Record<string, FieldConfig>>
+>()
+
+function getDeclarationFieldConfigs(
+  eventConfig: EventConfig
+): Partial<Record<string, FieldConfig>> {
+  const cached = declarationFieldConfigsByEventConfig.get(eventConfig)
+  if (cached) {
+    return cached
+  }
+
+  const fieldConfigs = Object.fromEntries(
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
+  )
+  declarationFieldConfigsByEventConfig.set(eventConfig, fieldConfigs)
+  return fieldConfigs
+}
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -200,14 +226,12 @@ export function getEventIndexWithoutLocationHierarchy(
     )
   }
 
-  const fieldConfigs = Object.fromEntries(
-    getDeclarationFields(eventConfig).map((f) => [f.id, f])
-  )
+  const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
 
   // Process declaration fields
   for (const [key, value] of Object.entries(event.declaration)) {
     const fieldConfig = fieldConfigs[key]
-    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
       continue
     }
 
@@ -301,15 +325,13 @@ export async function getEventIndexWithAdministrativeHierarchy(
       )
   }
 
-  const fieldConfigs = Object.fromEntries(
-    getDeclarationFields(eventConfig).map((f) => [f.id, f])
-  )
+  const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
 
   // Process declaration fields
   for (const [k, value] of Object.entries(event.declaration)) {
     const key = decodeFieldId(k)
     const fieldConfig = fieldConfigs[key]
-    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
       continue
     }
 
@@ -338,6 +360,53 @@ export async function getEventIndexWithAdministrativeHierarchy(
   }
 
   return tempEvent
+}
+
+/**
+ * Lists every location id {@link getEventIndexWithAdministrativeHierarchy} would
+ * resolve for this event, so a caller can prime the hierarchy cache for a whole
+ * batch in one query instead of paying a round trip per field.
+ *
+ * Mirrors that function's traversal rather than sharing it, so the two can drift.
+ * A missed id is only a missed prefetch — the resolver still falls back to its own
+ * lookup — so drift costs a round trip, never correctness.
+ */
+export function collectLocationIds(
+  eventConfig: EventConfig,
+  event: EventIndex
+): string[] {
+  const ids: (string | null | undefined)[] = [
+    event.createdAtLocation,
+    event.placeOfEvent,
+    event.updatedAtLocation,
+    event.legalStatuses.NOTIFIED?.createdAtLocation,
+    event.legalStatuses.DECLARED?.createdAtLocation,
+    event.legalStatuses.REGISTERED?.createdAtLocation
+  ]
+
+  const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
+
+  for (const [k, value] of Object.entries(event.declaration)) {
+    const fieldConfig = fieldConfigs[decodeFieldId(k)]
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const parsed = AddressFieldValue.safeParse(value)
+      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        ids.push(parsed.data.administrativeArea)
+        continue
+      }
+    }
+
+    const uuid = UUID.safeParse(value)
+    if (uuid.success) {
+      ids.push(uuid.data)
+    }
+  }
+
+  return _.compact(ids)
 }
 
 export function decodeEventIndex(
