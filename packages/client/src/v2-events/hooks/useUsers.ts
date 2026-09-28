@@ -33,7 +33,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFiles } from '../cache'
+import { precacheFile, precacheFiles } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -111,13 +111,20 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         ] as (typeof params)[0]['queryKey']
       })
 
-      const freshUserAvatars = freshUsers
-        .map((fu) =>
-          fu.type === TokenUserType.enum.user ? fu.avatar : undefined
-        )
-        .filter((avatar): avatar is DocumentPath => !!avatar)
-
-      await precacheFiles(freshUserAvatars)
+      // Use all settled in order to finish all queries in failure states.
+      // Technically this could be replaced with precacheFiles but during review, we deemed it more safe to keep the existing functionality.
+      // If the reason above is not up to date, feel free to refactor.
+      await Promise.allSettled(
+        freshUsers.map(async (user) => {
+          if (user.type === TokenUserType.enum.system) {
+            return user
+          }
+          if (user.avatar) {
+            await precacheFile(user.avatar)
+          }
+          return user
+        })
+      )
 
       for (const user of freshUsers) {
         cachedUserMap.set(user.id as string, user)
