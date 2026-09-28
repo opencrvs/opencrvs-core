@@ -73,16 +73,10 @@ mswServer.listen()
 
 const createValidJwt = () =>
   jwt.sign(createJwtPayload(), privateKey, { algorithm: 'RS256' })
-// Well-formed, but signed with a key OpenCRVS doesn't publish
-const INVALID_JWT = jwt.sign(
-  createJwtPayload(),
-  generateKeyPairSync('rsa', {
-    modulusLength: 2048,
-    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-    publicKeyEncoding: { type: 'spki', format: 'pem' }
-  }).privateKey,
-  { algorithm: 'RS256' }
-)
+// Well-formed, but its signature belongs to another payload (each has a unique `sub`)
+const [jwtHeader, jwtPayload] = createValidJwt().split('.')
+const [, , otherJwtSignature] = createValidJwt().split('.')
+const INVALID_JWT = `${jwtHeader}.${jwtPayload}.${otherJwtSignature}`
 
 test('validates JWTs', async (t) => {
   const { database } = initSqlite(':memory:')
