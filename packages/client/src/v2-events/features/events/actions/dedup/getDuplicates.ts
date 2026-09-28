@@ -22,13 +22,14 @@ export async function prefetchPotentialDuplicates(eventId: string) {
       eventId
     })
 
+    for (const eventDocument of potentialDuplicates) {
+      setEventData(eventDocument.id, eventDocument)
+    }
+
     const filenames = getFilesFromEventDocuments(potentialDuplicates)
     const userIds = getUserIdsFromEventDocuments(potentialDuplicates)
 
-    for (const eventDocument of potentialDuplicates) {
-      await Promise.all([precacheFiles(filenames), precacheUsers(userIds)])
-      setEventData(eventDocument.id, eventDocument)
-    }
+    await Promise.all([precacheFiles(filenames), precacheUsers(userIds)])
   } catch (error) {
     // The user is not authorized to see duplicates — otherwise, rethrow.
     if (!isExpectedAccessError(error)) {
