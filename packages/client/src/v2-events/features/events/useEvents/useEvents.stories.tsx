@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import superjson from 'superjson'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { within } from 'storybook/test'
 import { waitFor, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -69,9 +69,12 @@ const router = {
          * Explicitly call the hook to trigger draft fetching
          */
 
-        void queryClient.invalidateQueries({
-          queryKey: trpcOptionsProxy.event.draft.list.queryKey()
-        })
+        useEffect(() => {
+          void queryClient.invalidateQueries({
+            queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+          })
+        }, [])
+
         useDrafts().getRemoteDraftByEventId(createdEvent.id)
 
         return (
@@ -161,6 +164,7 @@ export const GetEventHook: Story = {
 
       const cacheKeys = await caches.keys()
       const cacheKey = cacheKeys.find((key) => key === CACHE_NAME)
+
       if (cacheKey) {
         await caches.delete(cacheKey)
       }
@@ -188,14 +192,9 @@ export const GetEventHook: Story = {
 
     await step('Waits for test content to appear', async () => {
       const canvas = within(canvasElement)
-      await waitFor(
-        async () => {
-          return expect(canvas.getByText('Test content')).toBeInTheDocument()
-        },
-        {
-          timeout: 5000
-        }
-      )
+      await waitFor(async () => {
+        return expect(canvas.getByText('Test content')).toBeInTheDocument()
+      })
     })
 
     await step('Retrieves draft list', async () => {
