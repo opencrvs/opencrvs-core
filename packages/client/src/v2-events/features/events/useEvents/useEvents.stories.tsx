@@ -36,6 +36,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { storage } from '@client/storage'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEvents } from './useEvents'
 
@@ -101,6 +102,13 @@ const spies = {
 }
 
 const handlers = {
+  user: [
+    trpcMsw.user.get.query(() => {
+      const generator = testDataGenerator()
+
+      return generator.user.localRegistrar().v2
+    })
+  ],
   drafts: [
     trpcMsw.event.draft.list.query(() => {
       spies.draftList++
