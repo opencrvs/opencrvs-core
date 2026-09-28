@@ -29,7 +29,7 @@ export const certKeyPath = join(
   '../../test/cert.key'
 )
 
-export const TEST_TOKEN_EXP = Math.floor(
+const TEST_TOKEN_EXP = Math.floor(
   new Date('2100-01-01T00:00:00Z').getTime() / 1000
 )
 
