@@ -103,13 +103,15 @@ export default defineConfig(({ mode }) => {
         Object.keys(result.metafile.inputs).forEach((file) =>
           this.addWatchFile(resolve(file))
         )
-        const signer: { exports: typeof import('./src/tests/sign-test-tokens') } =
-          { exports: {} as typeof import('./src/tests/sign-test-tokens') }
-        new Function('require', 'module', 'exports', result.outputFiles[0].text)(
-          createRequire(signerPath),
-          signer,
-          signer.exports
-        )
+        const signer: {
+          exports: typeof import('./src/tests/sign-test-tokens')
+        } = { exports: {} as typeof import('./src/tests/sign-test-tokens') }
+        new Function(
+          'require',
+          'module',
+          'exports',
+          result.outputFiles[0].text
+        )(createRequire(signerPath), signer, signer.exports)
         return `export default ${JSON.stringify(signer.exports.signTestUserTokens())}`
       }
     }

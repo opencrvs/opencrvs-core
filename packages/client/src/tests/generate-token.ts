@@ -21,6 +21,9 @@ export const TEST_TOKEN_EXP = Math.floor(
   new Date('2100-01-01T00:00:00Z').getTime() / 1000
 )
 
+/** Fixed so tokens are deterministic; matches the `Date.now` mock in setupTests. */
+const TEST_TOKEN_IAT = 1487076708
+
 export function generateToken({
   scope,
   userType,
@@ -37,7 +40,7 @@ export function generateToken({
 }) {
   if (subject) {
     return jwt.sign(
-      { scope, userType, role, exp },
+      { scope, userType, role, iat: TEST_TOKEN_IAT, exp },
       readFileSync('./test/cert.key'),
       {
         subject,
@@ -49,7 +52,7 @@ export function generateToken({
   }
 
   return jwt.sign(
-    { scope, exp },
+    { scope, iat: TEST_TOKEN_IAT, exp },
     readFileSync('./test/cert.key'),
     {
       algorithm: 'RS256',

@@ -536,7 +536,6 @@ export function testDataGenerator(rngSeed?: number) {
       }
     }),
     scopes: userScopes
-    }
   }
 
   return { event: eventPayloadGenerator(prng), user }

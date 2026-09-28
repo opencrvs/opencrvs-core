@@ -2,24 +2,42 @@
 
 exports[`authUtils tests > getAuthorizedToken > when token is in local storage > when it's valid > returns the token 1`] = `
 {
-  "aud": [
-    "gateway",
+  "aud": "opencrvs:gateway-user",
+  "exp": 4102444800,
+  "iat": 1487076708,
+  "iss": "opencrvs:auth-service",
+  "role": "FIELD_AGENT",
+  "scope": [
+    "type=workqueue&ids=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
+    "type=record.search",
+    "type=record.create",
+    "type=record.read",
+    "type=record.notify",
+    "type=record.declare",
+    "type=record.edit",
   ],
-  "exp": 1543195227,
-  "iat": 1533195228,
-  "role": "admin",
-  "sub": "1",
+  "sub": "8f8b431b-ef47-4068-b678-ef2dd93e9208",
+  "userType": "user",
 }
 `;
 
 exports[`authUtils tests > getAuthorizedToken > when token is in url > when it's valid > returns the token 1`] = `
 {
-  "aud": [
-    "gateway",
+  "aud": "opencrvs:gateway-user",
+  "exp": 4102444800,
+  "iat": 1487076708,
+  "iss": "opencrvs:auth-service",
+  "role": "FIELD_AGENT",
+  "scope": [
+    "type=workqueue&ids=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
+    "type=record.search",
+    "type=record.create",
+    "type=record.read",
+    "type=record.notify",
+    "type=record.declare",
+    "type=record.edit",
   ],
-  "exp": 1543195227,
-  "iat": 1533195228,
-  "role": "admin",
-  "sub": "1",
+  "sub": "8f8b431b-ef47-4068-b678-ef2dd93e9208",
+  "userType": "user",
 }
 `;

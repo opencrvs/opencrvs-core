@@ -23,6 +23,7 @@ import { storage } from '@client/storage'
 import { getCmd, getModel } from 'redux-loop'
 import { vi, Mock } from 'vitest'
 import type { ITokenPayload } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 
 storage.removeItem = vi.fn()
 
@@ -47,9 +48,7 @@ describe('profileReducer tests', () => {
   })
 
   it('CHECK_AUTH_COMPLETE with a decodable token sets authenticated and schedules setInitialUserDetails', () => {
-    // fieldAgent JWT from testDataGenerator (no exp claim → getTokenPayload still decodes → authenticated:true)
-    const token =
-      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlIiwidHlwZT1yZWNvcmQucmVhZCIsInR5cGU9cmVjb3JkLm5vdGlmeSIsInR5cGU9cmVjb3JkLmRlY2xhcmUiLCJ0eXBlPXJlY29yZC5lZGl0Il0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJGSUVMRF9BR0VOVCIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiOGY4YjQzMWItZWY0Ny00MDY4LWI2NzgtZWYyZGQ5M2U5MjA4In0.XS7EAFINQTq0wTiRTjed9QUmzKiQhI7Ntv-OjeMtsEi2uij7WhURIToMjfl75_GWz9MWtAFGofqtlpenK51fv3wa-VrXgbD4Ku_C-yceLc81JZhWuM-X_gadwfiGr7A4hfLmFpp7kk0VjCeO9zAAnfnnXDBM_Fujow2Nhq2FY_NV94c-uFJsZTo3bRu5jtRTwh7U6Svpg187k5fKltmCrq3WL5vtktSwKAzagidGeBtbPIJ28U-zlWA9OX_N1Ct4bVAgq69ILQvoh_fvbzOtFp6qOF_zbT_EcJ5vGx85k1M1B7bsr5j6Edusu1XnLx-ZSeUdRPXzVssQNYiw4ZdkduR5Z7Q-29ajt0Rka_LOH3VjiFFbUkUH0_bOwBrilPCrftsrKSF4wBtWp3e0h3mDRACr1pZASYAuJXNi4qFGIGTVNaTfw2fYNCCSEkfLDs2BhM1M71IKH3Q8qtYVG36yzB51l6v3IRrEiLEdsMyiU-NOYIzWb8bLGdzW4M4nw5f-qBLHurI9uzbN7D88UzayU0dSCxylkRC_srHlrjfoGwY9z2U7hpJnbBi5pjwwSQ6nTDrpl_Xey5_kJhmELV-1F8gEwL_ZkFL_IX9sAJ2gHyYYYJshfyrk3W4C_yYktwGg7I1PlMghNhQ-pG9j-idUptxFSG12L6NWb9hnm6fCAgc'
+    const token = testDataGenerator().user.token.fieldAgent
     const result = profileReducer(
       initialState,
       actions.checkAuthComplete(token)

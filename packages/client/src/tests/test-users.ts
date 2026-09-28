@@ -158,12 +158,7 @@ export const userScopes = {
     encodeScope({
       type: 'record.create',
       options: {
-        event: [
-          'birth',
-          'death',
-          'tennis-club-membership',
-          'child-onboarding'
-        ]
+        event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
       }
     }),
     encodeScope({ type: 'record.read' }),
@@ -342,12 +337,7 @@ export const userScopes = {
     encodeScope({
       type: 'record.create',
       options: {
-        event: [
-          'birth',
-          'death',
-          'tennis-club-membership',
-          'child-onboarding'
-        ],
+        event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding'],
         placeOfEvent: JurisdictionFilter.enum.administrativeArea
       }
     }),
