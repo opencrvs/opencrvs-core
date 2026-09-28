@@ -13,9 +13,10 @@ import { createPublicKey } from 'node:crypto'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import testUserTokens from 'virtual:test-tokens'
+import { certKeyPath } from './generate-token'
 import { testUserTokenClaims } from './test-users'
 
-const publicKey = createPublicKey(readFileSync('./test/cert.key'))
+const publicKey = createPublicKey(readFileSync(certKeyPath))
 
 describe('virtual:test-tokens', () => {
   it('has a token for every test user', () => {

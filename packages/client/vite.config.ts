@@ -16,7 +16,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
 import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 // Vite 8 loads the config as ESM, where `require` is not defined globally.
 const require = createRequire(import.meta.url)
@@ -97,6 +97,10 @@ export default defineConfig(({ mode }) => {
           format: 'cjs',
           packages: 'external',
           alias: { '@opencrvs/commons/client': '@opencrvs/commons' },
+          // The signer's modules share its directory, so its URL resolves their relative paths.
+          define: {
+            'import.meta.url': JSON.stringify(pathToFileURL(signerPath).href)
+          },
           metafile: true,
           write: false
         })
