@@ -9,105 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TestUserRole, TokenUserType } from '@opencrvs/commons/client'
-import { testDataGenerator } from './test-data-generators'
-import { generateToken } from './util'
+import { createPublicKey } from 'node:crypto'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
+import testUserTokens from 'virtual:test-tokens'
+import { testUserTokenClaims } from './test-users'
 
-it('Generates tokens', () => {
-  const generator = testDataGenerator()
-  const token = {
-    fieldAgent: generateToken({
-      scope: generator.user.scopes.fieldAgent,
-      subject: generator.user.id.fieldAgent,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.FIELD_AGENT
-    }),
-    registrationAgent: generateToken({
-      scope: generator.user.scopes.registrationAgent,
-      subject: generator.user.id.registrationAgent,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.REGISTRATION_AGENT
-    }),
-    localRegistrar: generateToken({
-      scope: generator.user.scopes.localRegistrar,
-      subject: generator.user.id.localRegistrar,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.LOCAL_REGISTRAR
-    }),
-    localSystemAdmin: generateToken({
-      scope: generator.user.scopes.localSystemAdmin,
-      subject: generator.user.id.localSystemAdmin,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
-    }),
-    nationalSystemAdmin: generateToken({
-      scope: generator.user.scopes.nationalSystemAdmin,
-      subject: generator.user.id.nationalSystemAdmin,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN
-    }),
-    communityLeader: generateToken({
-      scope: generator.user.scopes.communityLeader,
-      subject: generator.user.id.communityLeader,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.COMMUNITY_LEADER
-    }),
-    communityLeaderRegisteredInLocation: generateToken({
-      scope: generator.user.scopes.communityLeaderRegisteredInLocation,
-      subject: generator.user.id.communityLeader,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.COMMUNITY_LEADER
-    }),
-    communityLeaderRegisteredInAdministrativeArea: generateToken({
-      scope:
-        generator.user.scopes.communityLeaderRegisteredInAdministrativeArea,
-      subject: generator.user.id.communityLeader,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.COMMUNITY_LEADER
-    }),
-    communityLeaderMultipleSearchScopes: generateToken({
-      scope: generator.user.scopes.communityLeaderMultipleSearchScopes,
-      subject: generator.user.id.communityLeader,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.COMMUNITY_LEADER
-    }),
-    provincialRegistrar: generateToken({
-      scope: generator.user.scopes.provincialRegistrar,
-      subject: generator.user.id.provincialRegistrar,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.PROVINCIAL_REGISTRAR
-    }),
-    testAdmin: generateToken({
-      scope: generator.user.scopes.testAdmin,
-      subject: generator.user.id.fieldAgent,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.FIELD_AGENT
-    }),
-    communityLeaderSearchAllAndLocation: generateToken({
-      scope: generator.user.scopes.communityLeaderSearchAllAndLocation,
-      subject: generator.user.id.communityLeader,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.enum.COMMUNITY_LEADER
-    })
-  }
-  expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
-  expect(token.registrationAgent).toMatchSnapshot('registrationAgent token')
-  expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
-  expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
-  expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
-  expect(token.communityLeader).toMatchSnapshot('communityLeader token')
-  expect(token.communityLeaderRegisteredInLocation).toMatchSnapshot(
-    'communityLeaderRegisteredInLocation token'
-  )
-  expect(token.communityLeaderRegisteredInAdministrativeArea).toMatchSnapshot(
-    'communityLeaderRegisteredInAdministrativeArea token'
-  )
-  expect(token.communityLeaderMultipleSearchScopes).toMatchSnapshot(
-    'communityLeaderMultipleSearchScopes token'
-  )
-  expect(token.provincialRegistrar).toMatchSnapshot('provincialRegistrar token')
-  expect(token.testAdmin).toMatchSnapshot('testAdmin token')
-  expect(token.communityLeaderSearchAllAndLocation).toMatchSnapshot(
-    'communityLeaderSearchAllAndLocation token'
+const publicKey = createPublicKey(readFileSync('./test/cert.key'))
+
+describe('virtual:test-tokens', () => {
+  it('has a token for every test user', () => {
+    expect(Object.keys(testUserTokens).sort()).toEqual(
+      Object.keys(testUserTokenClaims).sort()
+    )
+  })
+
+  it.each(Object.entries(testUserTokenClaims))(
+    '%s token is signed and carries its claims',
+    (key, { scope, subject, userType, role }) => {
+      const payload = jwt.verify(
+        testUserTokens[key as keyof typeof testUserTokens],
+        publicKey,
+        {
+          algorithms: ['RS256'],
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+
+      expect(payload).toMatchObject({ scope, sub: subject, userType, role })
+    }
   )
 })

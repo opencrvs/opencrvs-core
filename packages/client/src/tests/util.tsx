@@ -25,7 +25,6 @@ import {
   shallow
 } from 'enzyme'
 import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import { join } from 'path'
 import * as React from 'react'
 import { IntlShape } from 'react-intl'
@@ -409,41 +408,4 @@ export {
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
 
-const TEST_TOKEN_EXP = Math.floor(
-  new Date('2100-01-01T00:00:00Z').getTime() / 1000
-)
-
-export function generateToken({
-  scope,
-  userType,
-  role,
-  subject
-}: {
-  scope: string[]
-  subject?: string
-  userType?: TokenUserType
-  role?: TestUserRole
-}) {
-  if (subject) {
-    return jwt.sign(
-      { scope, userType, role, exp: TEST_TOKEN_EXP },
-      readFileSync('./test/cert.key'),
-      {
-        subject,
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-  }
-
-  return jwt.sign(
-    { scope, exp: TEST_TOKEN_EXP },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:gateway-user'
-    }
-  )
-}
+export { generateToken } from './generate-token'

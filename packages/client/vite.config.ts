@@ -9,12 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createRequire } from 'node:module'
-import { loadEnv } from 'vite'
+import { loadEnv, type Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // Vite 8 loads the config as ESM, where `require` is not defined globally.
 const require = createRequire(import.meta.url)
@@ -60,6 +62,55 @@ export default defineConfig(({ mode }) => {
         return html.replace(/%(.*?)%/g, function (_, p1) {
           return env[p1]
         })
+      }
+    }
+  }
+
+  /*
+   * Serves `virtual:test-tokens`: test user JWTs signed in Node, so that test
+   * data used by Storybook in the browser needs no `jsonwebtoken`.
+   * Only test and story code imports it, so app builds never load it.
+   */
+  const testTokensPlugin = (): Plugin => {
+    const virtualId = 'virtual:test-tokens'
+    const resolvedVirtualId = '\0' + virtualId
+    return {
+      name: 'test-tokens',
+      resolveId(source) {
+        if (source === virtualId) return resolvedVirtualId
+      },
+      async load(id) {
+        if (id !== resolvedVirtualId) return
+        const signerPath = fileURLToPath(
+          new URL('./src/tests/sign-test-tokens.ts', import.meta.url)
+        )
+        /*
+         * Bundled to CJS because Node cannot load the ESM build of
+         * `@opencrvs/commons/client` (extensionless imports); the CJS root
+         * entry exports the same symbols.
+         */
+        const { build } = await import('esbuild')
+        const result = await build({
+          entryPoints: [signerPath],
+          bundle: true,
+          platform: 'node',
+          format: 'cjs',
+          packages: 'external',
+          alias: { '@opencrvs/commons/client': '@opencrvs/commons' },
+          metafile: true,
+          write: false
+        })
+        Object.keys(result.metafile.inputs).forEach((file) =>
+          this.addWatchFile(resolve(file))
+        )
+        const signer: { exports: typeof import('./src/tests/sign-test-tokens') } =
+          { exports: {} as typeof import('./src/tests/sign-test-tokens') }
+        new Function('require', 'module', 'exports', result.outputFiles[0].text)(
+          createRequire(signerPath),
+          signer,
+          signer.exports
+        )
+        return `export default ${JSON.stringify(signer.exports.signTestUserTokens())}`
       }
     }
   }
@@ -124,6 +175,7 @@ React instance. Without dedupe, Vite 8 can bundle a second React copy.
     plugins: [
       loginRedirectPlugin(),
       htmlPlugin(),
+      testTokensPlugin(),
       react(),
       tsconfigPaths({
         projects: ['./tsconfig.build.json']
