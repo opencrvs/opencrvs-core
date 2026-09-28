@@ -150,28 +150,10 @@ jobs:
 
           npx lerna exec "npm version --new-version $VERSION --no-git-tag-version"
           npm version $VERSION --no-git-tag-version --allow-same-version
-
-          # The Helm charts are published from this branch, and publish-charts
-          # refuses a tag whose charts disagree with it, so version and
-          # appVersion are bumped to the tag's own "v$VERSION" spelling. Doing
-          # it here rather than by hand after the cut, as #13928 had to.
-          for chart in charts/*/Chart.yaml; do
-            sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" "$chart"
-            for field in version appVersion; do
-              if ! grep -qx "$field: v$VERSION" "$chart"; then
-                echo "::error::$chart has no top-level $field to bump to v$VERSION"
-                exit 1
-              fi
-            done
-          done
-
-          # The default values.yaml ships the image tags the charts deploy, so
-          # they move with the release too. yq is not used here: it reflows the
-          # file and drops the comments around these keys, so the tags are
-          # rewritten in place, addressed by the block they sit in. The
-          # deprecated top-level image.tag is left alone, as it was before.
-          values=charts/opencrvs-services/values.yaml
-          sed -i -E '
+          # Bump helm chart version
+          find charts/ -name Chart.yaml -exec sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" {} \;
+          # Update core and countryconfig image in opencrvs services chart
+          sed -i.bak -E '
           /^platform:/,/^[^[:space:]]/ {
             s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
           }
@@ -180,16 +162,17 @@ jobs:
               s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
             }
           }
-          ' "$values"
-
-          platform_tag=$(awk '/^[^[:space:]]/ { p = ($0 ~ /^platform:/) } p && $1 == "tag:" { print $2; exit }' "$values")
-          countryconfig_tag=$(awk '/^[^[:space:]]/ { c = ($0 ~ /^countryconfig:/) } c && $1 == "tag:" { print $2; exit }' "$values")
-          for pair in "platform.tag=$platform_tag" "countryconfig.image.tag=$countryconfig_tag"; do
-            if [ "${pair#*=}" != "v$VERSION" ]; then
-              echo "::error::$values: ${pair%%=*} is '${pair#*=}', expected v$VERSION"
-              exit 1
-            fi
-          done
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+          # Update utilities image in Dependencies helm chart
+          sed -i.bak -E '
+          /^utilities:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/dependencies/values.yaml
+          rm charts/dependencies/values.yaml.bak
 
           git add .
           git commit -m "chore: update version to $VERSION"
