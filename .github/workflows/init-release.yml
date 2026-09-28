@@ -284,18 +284,38 @@ jobs:
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
           TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
         run: |
-          trigger() { # repo, token
-            GH_TOKEN="$2" gh workflow run init-release.yml \
-              --repo "opencrvs/$1" \
+          failed=()
+
+          trigger() { # repo, token, extra -f inputs...
+            local repo="$1" token="$2"
+            shift 2
+
+            # A dispatch is rejected outright for an input the downstream
+            # workflow does not declare, so every repo is still attempted and
+            # the step fails once, at the end, naming the ones that did not go.
+            if ! GH_TOKEN="$token" gh workflow run init-release.yml \
+              --repo "opencrvs/$repo" \
               --ref "${{ github.ref_name }}" \
               -f version="$VERSION" \
-              -f target_branch="${{ steps.target.outputs.target_branch }}"
-            echo "Triggered init-release in $1"
+              "$@"; then
+              failed+=("$repo")
+              return
+            fi
+            echo "Triggered init-release in $repo"
           }
 
-          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN"
+          # infrastructure's init-release declares only `version`; countryconfig
+          # and testland also take the target branch worked out above.
+          TARGET_BRANCH=(-f target_branch="${{ steps.target.outputs.target_branch }}")
+
+          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN" "${TARGET_BRANCH[@]}"
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
-          trigger opencrvs-testland "$TESTLAND_TOKEN"
+          trigger opencrvs-testland "$TESTLAND_TOKEN" "${TARGET_BRANCH[@]}"
+
+          if [ ${#failed[@]} -gt 0 ]; then
+            echo "::error::init-release could not be dispatched to: ${failed[*]}"
+            exit 1
+          fi
 
       - name: Create the release branch in the e2e repo
         env:
