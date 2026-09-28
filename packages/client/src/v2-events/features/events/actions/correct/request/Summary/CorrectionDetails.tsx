@@ -18,12 +18,15 @@ import { Text } from '@opencrvs/components/lib/Text'
 import {
   Action,
   ActionType,
+  ActionUpdate,
   ClientLocation,
   EventDocument,
   EventState,
   getCurrentEventState,
+  getDeclaration,
   isFieldVisible,
   isPageVisible,
+  omitHiddenPaginatedFields,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
@@ -118,8 +121,8 @@ function getRequestActionDetails(
 
 function buildCorrectionDetails(
   correctionFormPages: PageConfig[],
-  annotation: EventState,
-  form: EventState,
+  annotation: ActionUpdate,
+  correctedDeclaration: EventState,
   intl: IntlShape,
   submitterName: string,
   locations: Map<UUID, ClientLocation>,
@@ -127,8 +130,13 @@ function buildCorrectionDetails(
   anchor: PlainDate,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
+  const correctionContext = {
+    ...validatorContext,
+    baseFormState: correctedDeclaration
+  }
+
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation, validatorContext))
+    .filter((page) => isPageVisible(page, annotation, correctionContext))
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -146,13 +154,8 @@ function buildCorrectionDetails(
         ]
       }
       return page.fields
-        .filter((f) =>
-          isFieldVisible(f, annotation, {
-            ...validatorContext,
-            baseFormState: form
-          })
-        )
-        .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
+        .filter((f) => isFieldVisible(f, annotation, correctionContext))
+        .filter((f) => !isEmptyValue(f, annotation[f.id]))
         .map((field) => ({
           label: field.label,
           id: field.id,
@@ -213,7 +216,7 @@ export function CorrectionDetails({
 }: {
   event: EventDocument
   form: EventState
-  annotation: EventState
+  annotation: ActionUpdate
   requesting: boolean
   correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
@@ -250,7 +253,11 @@ export function CorrectionDetails({
   const correctionDetails = buildCorrectionDetails(
     correctionFormPages,
     annotation,
-    form,
+    omitHiddenPaginatedFields(
+      getDeclaration(eventConfiguration),
+      form,
+      validatorContext
+    ),
     intl,
     submitterName,
     locations,

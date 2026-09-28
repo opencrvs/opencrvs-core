@@ -49,7 +49,7 @@ export function RequestCorrection({
 
   return (
     <CorrectionDetails
-      annotation={deepMerge(eventIndex.declaration, action.annotation)}
+      annotation={action.annotation}
       event={eventBeforeCorrectionRequest}
       form={deepMerge(eventIndex.declaration, action.declaration)}
       requesting={!action.annotation.isImmediateCorrection}
