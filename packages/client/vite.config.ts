@@ -15,7 +15,7 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 // Vite 8 loads the config as ESM, where `require` is not defined globally.
@@ -74,10 +74,21 @@ export default defineConfig(({ mode }) => {
   const testTokensPlugin = (): Plugin => {
     const virtualId = 'virtual:test-tokens'
     const resolvedVirtualId = '\0' + virtualId
+    /*
+     * Files the tokens are built from. `addWatchFile` in `load` only makes the
+     * dev server watch them; `hotUpdate` below is what reloads the tokens.
+     */
+    const sourceFiles = new Set<string>()
     return {
       name: 'test-tokens',
       resolveId(source) {
         if (source === virtualId) return resolvedVirtualId
+      },
+      hotUpdate({ file, modules }) {
+        if (!sourceFiles.has(file)) return
+        const tokensModule =
+          this.environment.moduleGraph.getModuleById(resolvedVirtualId)
+        return tokensModule ? [...modules, tokensModule] : modules
       },
       async load(id) {
         if (id !== resolvedVirtualId) return
@@ -89,6 +100,20 @@ export default defineConfig(({ mode }) => {
          * `@opencrvs/commons/client` (extensionless imports); the CJS root
          * entry exports the same symbols.
          */
+        const signerRequire = createRequire(signerPath)
+        /*
+         * `packages: 'external'` leaves commons to Node's require cache, which
+         * outlives a commons rebuild. Evict it so each load signs with the
+         * current build, and watch it below so a rebuild triggers a reload.
+         */
+        const commonsBuildDir = dirname(require.resolve('@opencrvs/commons'))
+        const findCachedCommonsFiles = () =>
+          Object.keys(signerRequire.cache).filter((file) =>
+            file.startsWith(commonsBuildDir)
+          )
+        findCachedCommonsFiles().forEach((file) => {
+          delete signerRequire.cache[file]
+        })
         const { build } = await import('esbuild')
         const result = await build({
           entryPoints: [signerPath],
@@ -104,9 +129,6 @@ export default defineConfig(({ mode }) => {
           metafile: true,
           write: false
         })
-        Object.keys(result.metafile.inputs).forEach((file) =>
-          this.addWatchFile(resolve(file))
-        )
         const signer: {
           exports: typeof import('./src/tests/sign-test-tokens')
         } = { exports: {} as typeof import('./src/tests/sign-test-tokens') }
@@ -114,9 +136,26 @@ export default defineConfig(({ mode }) => {
           'require',
           'module',
           'exports',
+          '__filename',
+          '__dirname',
           result.outputFiles[0].text
-        )(createRequire(signerPath), signer, signer.exports)
-        return `export default ${JSON.stringify(signer.exports.signTestUserTokens())}`
+        )(
+          signerRequire,
+          signer,
+          signer.exports,
+          signerPath,
+          dirname(signerPath)
+        )
+        const tokens = signer.exports.signTestUserTokens()
+        sourceFiles.clear()
+        Object.keys(result.metafile.inputs)
+          .map((file) => resolve(file))
+          .concat(findCachedCommonsFiles())
+          .forEach((file) => {
+            sourceFiles.add(file)
+            this.addWatchFile(file)
+          })
+        return `export default ${JSON.stringify(tokens)}`
       }
     }
   }
