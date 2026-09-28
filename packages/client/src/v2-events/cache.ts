@@ -30,12 +30,6 @@ export function toFileUrl(path: DocumentPath): string {
   return path.startsWith('/') ? path : `/${path}`
 }
 
-// "App shell" = the SPA's index.html, served for any unmatched route. True
-// if a document's URL got poisoned with that HTML instead of the real file.
-export function isAppShellResponse(response: Response) {
-  return (response.headers.get('content-type') ?? '').startsWith('text/html')
-}
-
 export async function fetchFileFromUrl(
   externalUrl: string,
   filename: string
