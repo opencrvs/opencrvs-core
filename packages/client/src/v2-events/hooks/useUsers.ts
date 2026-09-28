@@ -33,7 +33,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFiles } from '../features/files/useFileUpload'
+import { precacheFiles } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -111,17 +111,13 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         ] as (typeof params)[0]['queryKey']
       })
 
-      await Promise.allSettled(
-        freshUsers.map(async (user) => {
-          if (user.type === TokenUserType.enum.system) {
-            return user
-          }
-          if (user.avatar) {
-            await precacheFiles([user.avatar])
-          }
-          return user
-        })
-      )
+      const freshUserAvatars = freshUsers
+        .map((fu) =>
+          fu.type === TokenUserType.enum.user ? fu.avatar : undefined
+        )
+        .filter((avatar): avatar is DocumentPath => !!avatar)
+
+      await precacheFiles(freshUserAvatars)
 
       for (const user of freshUsers) {
         cachedUserMap.set(user.id as string, user)

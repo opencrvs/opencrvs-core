@@ -18,14 +18,14 @@ import {
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
+import { cacheFilesFromEventDocument } from '@client/v2-events/features/files/cache'
 import {
   useTRPC,
   trpcOptionsProxy,
   queryClient,
   trpcClient
 } from '@client/v2-events/trpc'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { precacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
@@ -67,8 +67,8 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
     const eventDocument = EventDocument.parse(response)
 
     await Promise.all([
-      cacheFiles(eventDocument),
-      cacheUsersFromEventDocument(eventDocument)
+      cacheFilesFromEventDocument(eventDocument),
+      precacheUsersFromEventDocument(eventDocument)
     ])
 
     return eventDocument
@@ -79,8 +79,8 @@ async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
   const eventDocument = await trpcClient.event.get.query({ eventId: id })
 
   await Promise.all([
-    cacheFiles(eventDocument),
-    cacheUsersFromEventDocument(eventDocument)
+    cacheFilesFromEventDocument(eventDocument),
+    precacheUsersFromEventDocument(eventDocument)
   ])
 
   return eventDocument

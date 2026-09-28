@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DocumentPath } from '@opencrvs/commons/client'
+import { DocumentPath, FullDocumentPath } from '@opencrvs/commons/client'
+import { isExpectedAccessError, trpcClient } from '@client/v2-events/trpc'
 
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
@@ -35,7 +36,31 @@ export function isAppShellResponse(response: Response) {
   return (response.headers.get('content-type') ?? '').startsWith('text/html')
 }
 
-export async function getFileCache() {
+export async function fetchFileFromUrl(
+  externalUrl: string,
+  filename: string
+): Promise<File | undefined> {
+  const res = await fetch(externalUrl)
+
+  if (!res.ok) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Failed to fetch file from URL: ${externalUrl}. Status: ${res.status} ${res.statusText}`
+    )
+
+    return undefined
+  }
+
+  const blob = await res.blob()
+
+  return new File([blob], filename, { type: blob.type })
+}
+
+/**
+ *
+ * @returns global file cache.
+ */
+export async function findFileCache() {
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -62,7 +87,7 @@ export async function cacheFile(
   const normalizedUrl = toFileUrl(url as DocumentPath)
   const temporaryBlob = new Blob([file], { type: file.type })
 
-  const cachetoUse = cache ?? (await getFileCache())
+  const cachetoUse = cache ?? (await findFileCache())
 
   return cachetoUse?.put(
     normalizedUrl,
@@ -76,20 +101,11 @@ export async function cacheFile(
  * @see CACHE_NAME
  */
 export async function removeCached(filename: DocumentPath) {
-  const normalizedUrl = filename.startsWith('/') ? filename : `/${filename}`
-  const cacheKeys = await caches.keys()
-  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
+  const normalizedUrl = toFileUrl(filename)
 
-  if (!cacheKey) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
-    )
-    return
-  }
+  const cache = await findFileCache()
 
-  const cache = await caches.open(cacheKey)
-  return cache.delete(normalizedUrl, {
+  return cache?.delete(normalizedUrl, {
     ignoreSearch: true
   })
 }
@@ -117,4 +133,70 @@ export async function getCache(cacheName: string) {
   }
 
   return caches.open(cacheKey)
+}
+
+function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  return trpcClient.event.file.getPresignedUrl.query({ filePath })
+}
+
+/**
+ *
+ * returns already cached file urls in absolute format.
+ */
+async function getCachedUrls(cache: Cache) {
+  const requests = await cache.keys()
+  return new Set(requests.map((req) => req.url))
+}
+
+/**
+ * precaches file and always fetches the presigned url. Useful in manual retries.
+ * @see precacheFiles for "intelligent" fetching.
+ */
+export async function precacheFile(
+  path: DocumentPath | FullDocumentPath,
+  cache?: Cache
+) {
+  try {
+    const presignedUrl = (await getPresignedUrl(path)).presignedURL
+    const file = await fetchFileFromUrl(presignedUrl, path)
+
+    if (file) {
+      await cacheFile({ url: path, file }, cache)
+    }
+  } catch (error) {
+    if (!isExpectedAccessError(error)) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to precache file', error)
+    }
+  }
+}
+
+function toAbsoluteUrl(url: string) {
+  return new URL(url, window.location.origin).href
+}
+
+/**
+ * Precache files that are not found in cache already, avoiding unnecessary calls and inserts.
+ * @see precacheFile for undiscriminated fetching and re-caching.
+ */
+export async function precacheFiles(
+  paths: (DocumentPath | FullDocumentPath)[]
+) {
+  if (paths.length === 0) {
+    return
+  }
+
+  const cache = await findFileCache()
+
+  if (!cache) {
+    return
+  }
+
+  const cachedUrls = await getCachedUrls(cache)
+
+  const missingFiles = paths.filter(
+    (path) => !cachedUrls.has(toAbsoluteUrl(path))
+  )
+
+  await Promise.all(missingFiles.map(async (path) => precacheFile(path, cache)))
 }

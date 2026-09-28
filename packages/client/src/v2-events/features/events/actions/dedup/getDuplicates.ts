@@ -10,8 +10,8 @@
  */
 
 import { isExpectedAccessError, trpcClient } from '@client/v2-events/trpc'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { cacheFilesFromEventDocument } from '@client/v2-events/features/files/cache'
+import { precacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { setEventData } from '../../useEvents/api'
 
 export async function prefetchPotentialDuplicates(eventId: string) {
@@ -21,8 +21,8 @@ export async function prefetchPotentialDuplicates(eventId: string) {
     })
     for (const eventDocument of potentialDuplicates) {
       await Promise.all([
-        cacheFiles(eventDocument),
-        cacheUsersFromEventDocument(eventDocument)
+        cacheFilesFromEventDocument(eventDocument),
+        precacheUsersFromEventDocument(eventDocument)
       ])
       setEventData(eventDocument.id, eventDocument)
     }

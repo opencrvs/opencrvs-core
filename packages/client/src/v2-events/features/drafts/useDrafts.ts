@@ -36,8 +36,8 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
+import { precacheFiles } from '@client/v2-events/cache'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFiles } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"

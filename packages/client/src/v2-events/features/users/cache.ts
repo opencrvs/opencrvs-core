@@ -13,7 +13,7 @@ import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument } from './utils'
 
-export async function cacheUsersFromEventDocument(
+export async function precacheUsersFromEventDocument(
   eventDocument: EventDocument
 ) {
   const userIds = findUserIdsFromDocument(eventDocument)

@@ -14,18 +14,12 @@ import { v4 as uuid } from 'uuid'
 import {
   AttachmentPath,
   DocumentPath,
-  FullDocumentPath,
   joinValues
 } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
-import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import { cacheFile, getFileCache } from '@client/v2-events/cache'
+import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import {
-  isExpectedAccessError,
-  queryClient,
-  trpcClient
-} from '@client/v2-events/trpc'
+import { queryClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -68,67 +62,6 @@ async function uploadFile({
 }
 
 const UPLOAD_MUTATION_KEY = 'uploadFile'
-
-function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  return trpcClient.event.file.getPresignedUrl.query({ filePath })
-}
-
-/**
- *
- * returns already cached file urls in absolute format.
- */
-async function getCachedUrls(cache: Cache) {
-  const requests = await cache.keys()
-  return new Set(requests.map((req) => req.url))
-}
-
-export async function precacheFile(
-  path: DocumentPath | FullDocumentPath,
-  cache?: Cache
-) {
-  try {
-    const presignedUrl = (await getPresignedUrl(path)).presignedURL
-    const file = await fetchFileFromUrl(presignedUrl, path)
-
-    if (file) {
-      await cacheFile({ url: path, file }, cache)
-    }
-  } catch (error) {
-    if (!isExpectedAccessError(error)) {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to precache file', error)
-    }
-  }
-}
-
-function toAbsoluteUrl(url: string) {
-  return new URL(url, window.location.origin).href
-}
-
-/**
- * Precache files that are not found in cache already.
- */
-export async function precacheFiles(
-  paths: (DocumentPath | FullDocumentPath)[]
-) {
-  if (paths.length === 0) {
-    return
-  }
-
-  const cache = await getFileCache()
-
-  if (!cache) {
-    return
-  }
-
-  const cachedUrls = await getCachedUrls(cache)
-
-  const missingFiles = paths.filter(
-    (path) => !cachedUrls.has(toAbsoluteUrl(path as DocumentPath))
-  )
-
-  await Promise.all(missingFiles.map(async (path) => precacheFile(path, cache)))
-}
 
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
