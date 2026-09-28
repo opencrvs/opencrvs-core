@@ -140,7 +140,13 @@ test.describe.serial('3. Workqueue flow - 3', () => {
 
       await selectAction(page, 'Reject')
       await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
+      const rejectResponse = page.waitForResponse(
+        (res) => res.url().includes('event.actions.reject') && res.ok()
+      )
+
       await page.getByRole('button', { name: 'Send For Update' }).click()
+
+      await rejectResponse
 
       await assertRecordInWorkqueue({
         page,
@@ -329,7 +335,13 @@ test.describe.serial('3. Workqueue flow - 3', () => {
 
       await selectAction(page, 'Reject')
       await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
+      const rejectResponse = page.waitForResponse(
+        (res) => res.url().includes('event.actions.reject') && res.ok()
+      )
+
       await page.getByRole('button', { name: 'Send For Update' }).click()
+
+      await rejectResponse
 
       await assertRecordInWorkqueue({
         page,
@@ -448,9 +460,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await openRecordByTitle(page, childName)
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
-      await selectAction(page, 'Register')
-      await fillRegisterDialogRequiredFields(page)
-      await page.getByRole('button', { name: 'Confirm' }).click()
+      await triggerDeclarationAction(page, 'Register')
 
       await assertRecordInWorkqueue({
         page,
