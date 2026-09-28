@@ -65,6 +65,10 @@ minio:
   #            please check README.md
   auth_mode: disabled
   users_secret: minio-opencrvs-users
+  # Image used as client to run OpenCRVS configuration scripts
+  image:
+    repository: ghcr.io/opencrvs/minio-mc
+    tag: 'release.2025-05-21t01-59-54z'
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local

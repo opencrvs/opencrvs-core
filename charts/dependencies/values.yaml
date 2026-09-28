@@ -265,6 +265,10 @@ elastalert:
 minio:
   # Enable or disable MinIO deployment.
   enabled: true
+  image:
+    # Mirrored copy of the upstream image, which MinIO removed from quay.io.
+    repository: ghcr.io/opencrvs/minio
+    tag: release.2025-06-13t11-33-47z
 
   # Use default credentials (username: minioadmin, password: minioadmin).
   # Highly discouraged for production environments—see official docs:
