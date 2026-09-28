@@ -53,8 +53,7 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       throw new Error('queryFn is not a function')
     }
 
-    const response = await queryOptions.queryFn(...params)
-    const drafts = response.map((draft) => Draft.parse(draft))
+    const drafts = await queryOptions.queryFn(...params)
 
     await Promise.all(
       drafts.map(async (draft) => {
