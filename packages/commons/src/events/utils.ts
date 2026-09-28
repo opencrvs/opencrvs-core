@@ -361,6 +361,25 @@ export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
 }
 
 /**
+ * Validator context for fields that depend on the declaration, such as review, dialog and correction fields.
+ * Values of hidden declaration fields are removed first, as validation removes them.
+ */
+export function getDeclarationValidatorContext(
+  eventConfig: EventConfig,
+  declaration: EventState,
+  context: ValidatorContext
+): ValidatorContext {
+  return {
+    ...context,
+    baseFormState: omitHiddenPaginatedFields(
+      getDeclaration(eventConfig),
+      declaration,
+      context
+    )
+  }
+}
+
+/**
  *
  * @returns a draft for the event that has been created since the last non-read action.
  */

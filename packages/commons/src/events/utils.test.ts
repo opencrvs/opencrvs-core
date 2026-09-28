@@ -32,6 +32,7 @@ import {
   getCompleteActionContent,
   getDeclaration,
   getDeclarationFields,
+  getDeclarationValidatorContext,
   getMixedPath,
   getPendingAction,
   omitHiddenPaginatedFields
@@ -689,6 +690,25 @@ describe('omitHiddenPaginatedFields', () => {
     const result = omitHiddenPaginatedFields(formConfig, values, {})
 
     expect(result).toMatchObject({ 'shared.field': 'value' })
+  })
+})
+
+describe('getDeclarationValidatorContext', () => {
+  it('uses the declaration without the values of hidden fields as the base form state', () => {
+    const context = getDeclarationValidatorContext(
+      tennisClubMembershipEvent,
+      {
+        'applicant.dobUnknown': true,
+        'applicant.age': 30,
+        'applicant.dob': '1990-01-01'
+      },
+      { leafAdminStructureLocationIds: [] }
+    )
+
+    expect(context).toEqual({
+      leafAdminStructureLocationIds: [],
+      baseFormState: { 'applicant.dobUnknown': true, 'applicant.age': 30 }
+    })
   })
 })
 

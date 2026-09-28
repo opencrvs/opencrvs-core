@@ -14,11 +14,14 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
+  ConditionalType,
   encodeScope,
+  field,
   EventStatus,
   getCurrentEventState,
   getOrThrow,
   getUUID,
+  not,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -31,7 +34,10 @@ import {
   TEST_SYSTEM_ID,
   CONFIRMATION_SCOPES
 } from '@events/tests/utils'
-import { mswServer } from '@events/tests/msw'
+import {
+  mswServer,
+  tennisClubMembershipEventWithCustomAction
+} from '@events/tests/msw'
 import { env } from '@events/environment'
 import { EventNotFoundError } from '../../service/events/events'
 
@@ -273,6 +279,55 @@ describe('event.actions.custom', () => {
     const event = await client.event.get({ eventId: customPayload.eventId })
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
+  })
+
+  test('accepts a dialog field shown by the declaration', async () => {
+    const eventWithDeclarationConditionalField = {
+      ...tennisClubMembershipEventWithCustomAction,
+      actions: tennisClubMembershipEventWithCustomAction.actions.map(
+        (action) =>
+          action.type !== ActionType.CUSTOM
+            ? action
+            : {
+                ...action,
+                form: [
+                  ...action.form,
+                  {
+                    id: 'senior-pass.note',
+                    type: 'TEXTAREA',
+                    label: {
+                      defaultMessage: 'Senior pass note',
+                      description: 'Label for the senior pass note',
+                      id: 'event.tennis-club-membership.custom.senior-pass-note.label'
+                    },
+                    conditionals: [
+                      {
+                        type: ConditionalType.SHOW,
+                        conditional: not(field('senior-pass.id').isFalsy())
+                      }
+                    ]
+                  }
+                ]
+              }
+      )
+    }
+
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+        HttpResponse.json([eventWithDeclarationConditionalField])
+      )
+    )
+
+    const { client, payload } = await initialiseTest([
+      `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+    ])
+
+    await expect(
+      client.event.actions.custom.request({
+        ...payload,
+        annotation: { ...payload.annotation, 'senior-pass.note': 'Verified' }
+      })
+    ).resolves.not.toThrow()
   })
 
   // @todo - un-skip after implementing validation for error field input

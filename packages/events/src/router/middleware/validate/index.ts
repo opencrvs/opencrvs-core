@@ -38,6 +38,7 @@ import {
   isFieldVisible,
   isPageVisible,
   omitHiddenFields,
+  getDeclarationValidatorContext,
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
@@ -257,10 +258,15 @@ function validateActionAnnotation({
   ]
 
   const errors = [
-    ...getFieldErrors(formFields, annotation, {
-      ...context,
-      baseFormState: context.baseFormState ?? context.event.state.declaration
-    }),
+    ...getFieldErrors(
+      formFields,
+      annotation,
+      getDeclarationValidatorContext(
+        eventConfig,
+        context.baseFormState ?? context.event.state.declaration,
+        context
+      )
+    ),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -275,14 +281,22 @@ function validateCustomAction({
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
-  context: ValidatorContext
+  context: StrictValidatorContext
   customActionType: string
 }) {
   const customActionFields = getCustomActionFields(
     eventConfig,
     customActionType
   )
-  return getFieldErrors(customActionFields, annotation, context)
+  return getFieldErrors(
+    customActionFields,
+    annotation,
+    getDeclarationValidatorContext(
+      eventConfig,
+      context.event.state.declaration,
+      context
+    )
+  )
 }
 
 export function validateNotifyAction({
