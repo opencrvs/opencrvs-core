@@ -137,6 +137,17 @@ jobs:
 
           # Bump helm chart version
           find charts/ -name Chart.yaml -exec sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" {} \;
+          # A sed failure inside find -exec does not fail the step, so each field is
+          # read back: a chart left unbumped must stop the release rather than
+          # publish a wrong number.
+          for chart in charts/*/Chart.yaml; do
+            for field in version appVersion; do
+              if ! grep -qx "$field: v$VERSION" "$chart"; then
+                echo "::error::$chart: $field was not bumped to v$VERSION"
+                exit 1
+              fi
+            done
+          done
           # Update core and countryconfig image in opencrvs services chart
           sed -i.bak -E '
           /^platform:/,/^[^[:space:]]/ {
@@ -149,6 +160,16 @@ jobs:
           }
           ' charts/opencrvs-services/values.yaml
           rm charts/opencrvs-services/values.yaml.bak
+          # Read the two tags back, so a pattern that stopped matching fails the run
+          # instead of silently leaving the previous release's tag in place.
+          platform_tag=$(awk '/^[^[:space:]]/ { p = ($0 ~ /^platform:/) } p && $1 == "tag:" { print $2; exit }' charts/opencrvs-services/values.yaml)
+          countryconfig_tag=$(awk '/^[^[:space:]]/ { c = ($0 ~ /^countryconfig:/) } c && $1 == "tag:" { print $2; exit }' charts/opencrvs-services/values.yaml)
+          for pair in "platform.tag=$platform_tag" "countryconfig.image.tag=$countryconfig_tag"; do
+            if [ "${pair#*=}" != "v$VERSION" ]; then
+              echo "::error::charts/opencrvs-services/values.yaml: ${pair%%=*} is '${pair#*=}', expected v$VERSION"
+              exit 1
+            fi
+          done
           # Update utilities image in Dependencies helm chart
           sed -i.bak -E '
           /^utilities:/,/^[^[:space:]]/ {
