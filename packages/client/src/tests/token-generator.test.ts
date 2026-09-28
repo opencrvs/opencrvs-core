@@ -13,7 +13,11 @@ import { createPublicKey } from 'node:crypto'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import testUserTokens from 'virtual:test-tokens'
-import { certKeyPath } from './generate-token'
+import {
+  certKeyPath,
+  TEST_TOKEN_AUDIENCE,
+  TEST_TOKEN_ISSUER
+} from './generate-token'
 import { testUserTokenClaims } from './test-users'
 
 const publicKey = createPublicKey(readFileSync(certKeyPath))
@@ -33,12 +37,43 @@ describe('virtual:test-tokens', () => {
         publicKey,
         {
           algorithms: ['RS256'],
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:gateway-user'
+          issuer: TEST_TOKEN_ISSUER,
+          audience: TEST_TOKEN_AUDIENCE
         }
       )
 
       expect(payload).toMatchObject({ scope, sub: subject, userType, role })
     }
   )
+
+  /*
+   * Spelled out rather than read from `testUserTokenClaims`, so a wrong
+   * subject, role or scope in the claims fails here.
+   */
+  it('signs the expected user, role and key scopes', () => {
+    expect(jwt.decode(testUserTokens.legacyDefault)).toMatchObject({
+      sub: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+      role: 'FIELD_AGENT',
+      userType: 'user',
+      scope: []
+    })
+    expect(jwt.decode(testUserTokens.fieldAgent)).toMatchObject({
+      sub: '8f8b431b-ef47-4068-b678-ef2dd93e9208',
+      role: 'FIELD_AGENT',
+      userType: 'user',
+      scope: expect.arrayContaining([
+        'type=record.create',
+        'type=record.declare'
+      ])
+    })
+    expect(jwt.decode(testUserTokens.fieldAgent)).not.toMatchObject({
+      scope: expect.arrayContaining(['type=record.register'])
+    })
+    expect(jwt.decode(testUserTokens.localRegistrar)).toMatchObject({
+      sub: 'aa13a268-ae48-4a30-9450-554aebaab203',
+      role: 'LOCAL_REGISTRAR',
+      userType: 'user',
+      scope: expect.arrayContaining(['type=record.register'])
+    })
+  })
 })

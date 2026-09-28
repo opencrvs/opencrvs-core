@@ -33,6 +33,9 @@ export const TEST_TOKEN_EXP = Math.floor(
   new Date('2100-01-01T00:00:00Z').getTime() / 1000
 )
 
+export const TEST_TOKEN_ISSUER = 'opencrvs:auth-service'
+export const TEST_TOKEN_AUDIENCE = 'opencrvs:gateway-user'
+
 /** Fixed so tokens are deterministic; matches the `Date.now` mock in setupTests. */
 const TEST_TOKEN_IAT = 1487076708
 
@@ -57,8 +60,8 @@ export function generateToken({
       {
         subject,
         algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
+        issuer: TEST_TOKEN_ISSUER,
+        audience: TEST_TOKEN_AUDIENCE
       }
     )
   }
@@ -68,8 +71,8 @@ export function generateToken({
     readFileSync(certKeyPath),
     {
       algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:gateway-user'
+      issuer: TEST_TOKEN_ISSUER,
+      audience: TEST_TOKEN_AUDIENCE
     }
   )
 }
