@@ -64,7 +64,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
      */
     const response = await queryOptions.queryFn(...params)
 
-    const eventDocument = EventDocument.parse(response)
+    const eventDocument = response
 
     await Promise.all([
       cacheFilesFromEventDocument(eventDocument),

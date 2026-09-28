@@ -68,8 +68,7 @@ const router = {
          * Explicitly call the hook to trigger draft fetching
          */
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
           queryKey: trpcOptionsProxy.event.draft.list.queryKey()
         })
         useDrafts().getRemoteDraftByEventId(createdEvent.id)

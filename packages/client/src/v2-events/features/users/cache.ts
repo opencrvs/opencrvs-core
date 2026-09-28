@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument } from '@opencrvs/commons/client'
+import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument } from './utils'
 
@@ -20,6 +20,17 @@ export async function precacheUsersFromEventDocument(
   if (userIds.length === 0) {
     return
   }
+
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+  await queryClient.fetchQuery(options)
+}
+
+export async function precacheUsers(userIds: UUID[]) {
+  if (userIds.length === 0) {
+    return
+  }
+
   const { queryFn, ...options } =
     trpcOptionsProxy.user.list.queryOptions(userIds)
   await queryClient.fetchQuery(options)

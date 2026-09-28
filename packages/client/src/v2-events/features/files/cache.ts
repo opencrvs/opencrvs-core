@@ -60,6 +60,14 @@ export function getFilepathsFromActionDocument(
   return _.uniq(filepaths)
 }
 
+export function getFilesFromEventDcouments(events: EventDocument[]) {
+  return events.flatMap((event) => {
+    const actions = getAcceptedActions(event)
+
+    return getFilepathsFromActionDocument(actions)
+  })
+}
+
 export async function cacheFilesFromEventDocument(event: EventDocument) {
   const actions = getAcceptedActions(event)
   const fileNames = getFilepathsFromActionDocument(actions)

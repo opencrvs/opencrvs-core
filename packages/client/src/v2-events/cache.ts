@@ -198,5 +198,9 @@ export async function precacheFiles(
     (path) => !cachedUrls.has(toAbsoluteUrl(path))
   )
 
+  if (missingFiles.length === 0) {
+    return
+  }
+
   await Promise.all(missingFiles.map(async (path) => precacheFile(path, cache)))
 }
