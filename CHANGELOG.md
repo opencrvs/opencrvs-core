@@ -2,6 +2,10 @@
 
 ## 1.9.19 Release Candidate
 
+### Security
+
+- The `user.actions` endpoint in the events service now returns only audit metadata: action type, timestamp, acting user, event ID and tracking ID. It was authorised only by a user-management permission, yet returned the full record declaration of every action the target user had taken, so roles holding `user.read:all`, `user.read:my-office` or `user.read:my-jurisdiction` could read records they had no permission to open. The user audit history view is unchanged. [GHSA-hmgw-v78r-jjc4](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-hmgw-v78r-jjc4) (High)
+
 ### Bug fixes
 
 - MinIO removed its images from quay.io and Docker Hub, so the MinIO server image could no longer be pulled. It now comes from an OpenCRVS-hosted copy of the same release, `ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z`. [#13909](https://github.com/opencrvs/opencrvs-core/pull/13909)
