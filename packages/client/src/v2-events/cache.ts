@@ -60,7 +60,7 @@ export async function fetchFileFromUrl(
  *
  * @returns global file cache.
  */
-export async function findFileCache() {
+async function findFileCache() {
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
