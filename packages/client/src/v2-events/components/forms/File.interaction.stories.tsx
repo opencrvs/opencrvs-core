@@ -404,9 +404,13 @@ startxref
   }
 }
 
-export const FileInputButtonMaxImage: Story = {
-  name: 'File input without option with maxImageSize configuration',
-  parameters: {
+const PASSPORT_TARGET_SIZE = { width: 350, height: 450 }
+
+/**
+ * A file field configured to crop uploads down to `targetSize`.
+ */
+function maxImageSizeParameters(targetSize: { width: number; height: number }) {
+  return {
     layout: 'centered',
     reactRouter: {
       router: {
@@ -420,12 +424,7 @@ export const FileInputButtonMaxImage: Story = {
                 configuration: {
                   maxFileSize: 1 * 1024 * 1024,
                   acceptedFileTypes: ['image/jpeg'],
-                  maxImageSize: {
-                    targetSize: {
-                      width: 200,
-                      height: 200
-                    }
-                  },
+                  maxImageSize: { targetSize },
                   fileName: {
                     defaultMessage: 'Uploaded photo',
                     description: 'The title for the file input',
@@ -448,38 +447,88 @@ export const FileInputButtonMaxImage: Story = {
       },
       initialPath: '/event/123-kalsnk-213'
     }
-  },
+  }
+}
+
+/**
+ * Uploads an image larger than the configured target size, which opens the
+ * crop & resize editor.
+ */
+async function uploadOversizedImage(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement)
+  await canvas.findByText('Upload your captured photo')
+
+  await userEvent.click(await canvas.findByRole('button', { name: /upload/i }))
+
+  const input = canvasElement.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement
+
+  await userEvent.upload(
+    input,
+    await createImageFile('largeImage.jpg', 400, 400)
+  )
+  await canvas.findByText('Crop & resize image')
+}
+
+async function applyCrop(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement)
+
+  await userEvent.click(await canvas.findByRole('button', { name: 'Apply' }))
+  await canvas.findByRole('button', { name: 'Uploaded photo' })
+}
+
+export const FileInputButtonMaxImage: Story = {
+  name: 'File input without option with maxImageSize configuration',
+  parameters: maxImageSizeParameters({ width: 200, height: 200 }),
   play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-    await canvas.findByText('Upload your captured photo')
-
-    const fileInput = await canvas.findByRole('button', {
-      name: /upload/i
-    })
-
-    const input = canvasElement.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement
-
     await step(
       'Opens up image resizing when image exceeds maxImageSize',
+      async () => uploadOversizedImage(canvasElement)
+    )
+
+    await step('Clicking apply button adds the cropped image', async () =>
+      applyCrop(canvasElement)
+    )
+  }
+}
+
+export const FileInputCropWindowMatchesTargetSize: Story = {
+  name: 'File input crop window matches the configured output aspect ratio',
+  parameters: maxImageSizeParameters(PASSPORT_TARGET_SIZE),
+  play: async ({ canvasElement, step }) => {
+    await step(
+      'Opens up image resizing when image exceeds maxImageSize',
+      async () => uploadOversizedImage(canvasElement)
+    )
+
+    await step(
+      'Crop window is rectangular and matches the configured aspect ratio',
       async () => {
-        await userEvent.click(fileInput)
+        await waitFor(async () => {
+          const cropWindow = canvasElement.querySelector(
+            '[data-testid="cropper"]'
+          ) as HTMLElement | null
 
-        const largeImageFile = await createImageFile('largeImage.jpg', 400, 400)
+          await expect(cropWindow).not.toBeNull()
+          await expect(
+            cropWindow?.classList.contains('reactEasyCrop_CropAreaRound')
+          ).toBe(false)
 
-        await userEvent.upload(input, largeImageFile)
-        await canvas.findByText('Crop & resize image')
+          const { width, height } = (
+            cropWindow as HTMLElement
+          ).getBoundingClientRect()
+
+          await expect(width / height).toBeCloseTo(
+            PASSPORT_TARGET_SIZE.width / PASSPORT_TARGET_SIZE.height,
+            2
+          )
+        })
       }
     )
 
-    await step('Clicking apply button adds the cropped image', async () => {
-      const applyButton = await canvas.findByRole('button', {
-        name: 'Apply'
-      })
-      await userEvent.click(applyButton)
-
-      await canvas.findByRole('button', { name: 'Uploaded photo' })
-    })
+    await step('Clicking apply button adds the cropped image', async () =>
+      applyCrop(canvasElement)
+    )
   }
 }

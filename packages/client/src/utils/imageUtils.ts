@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Area } from 'react-easy-crop'
+import type { Area, Size } from 'react-easy-crop'
 import {
   ALLOWED_IMAGE_TYPE,
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
@@ -121,10 +121,31 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
         resolve(null)
         return
       }
-      resolve(new File([blob], 'image.jpeg', { type: 'image/jpeg' }));
-    });
-  });
+      resolve(new File([blob], 'image.jpeg', { type: 'image/jpeg' }))
+    })
+  })
   return file
+}
+
+export type TargetSize = NonNullable<
+  FileConfig['configuration']['maxImageSize']
+>['targetSize']
+
+/**
+ * Crop window matching the aspect ratio of the configured output, with its
+ * longer side fixed to `baseSize` so the window always fits the square
+ * container it is rendered in. Falls back to a square window when no output
+ * size is configured.
+ */
+export function getCropWindowSize(
+  baseSize: number,
+  targetSize?: TargetSize
+): Size {
+  const aspect = targetSize ? targetSize.width / targetSize.height : 1
+
+  return aspect >= 1
+    ? { width: baseSize, height: baseSize / aspect }
+    : { width: baseSize * aspect, height: baseSize }
 }
 
 export async function getCroppedImageWithTargetSize(

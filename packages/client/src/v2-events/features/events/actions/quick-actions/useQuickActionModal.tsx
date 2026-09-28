@@ -101,13 +101,18 @@ function QuickActionModal({
   eventConfiguration: EventConfig
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
   const { getEvent } = useEvents()
   const [modalValues, setModalValues] = React.useState<
     Record<string, FieldUpdateValue>
   >({})
   const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
   const event = getCurrentEventState(eventDocument, eventConfiguration)
+  /*
+   * Pass the record itself, as every other form renderer does. Configured
+   * fields evaluate their conditionals against it, and the print button
+   * prints it.
+   */
+  const validatorContext = useValidatorContext(eventDocument)
 
   const ConfirmButton =
     config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton

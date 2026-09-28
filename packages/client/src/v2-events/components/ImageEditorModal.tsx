@@ -17,7 +17,12 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Button, Link } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { useModal } from '@client/hooks/useModal'
-import { getCroppedImageWithTargetSize, IImage } from '@client/utils/imageUtils'
+import {
+  getCroppedImageWithTargetSize,
+  getCropWindowSize,
+  IImage,
+  TargetSize
+} from '@client/utils/imageUtils'
 import { ImageLoader } from '@client/views/Settings/ImageLoader'
 import { Slider } from './Slider'
 
@@ -51,7 +56,6 @@ const Error = styled.div`
   color: ${({ theme }) => theme.colors.negative};
 `
 const DefaultImage = styled.div<{ width: number; height: number }>`
-  border-radius: 50%;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
   margin: auto;
@@ -65,10 +69,7 @@ interface ImageEditorModalProps {
   onClose: (result: IImage | null) => void
   imgSrc: IImage
   error: string
-  targetSize?: {
-    height: number
-    width: number
-  }
+  targetSize?: TargetSize
 }
 
 const DEFAULT_SIZE: Size = {
@@ -86,7 +87,10 @@ const DEFAULT_AREA: Area = {
   ...DEFAULT_CROP
 }
 
-function useCropSize(breakpoint: number) {
+/**
+ * Length of the crop window's longer side, shrunk on narrow viewports.
+ */
+function useCropBaseSize(breakpoint: number) {
   const [value, setValue] = React.useState<number>(360)
 
   React.useEffect(() => {
@@ -106,7 +110,7 @@ function useCropSize(breakpoint: number) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { width: value, height: value }
+  return value
 }
 
 function ImageEditorModal({
@@ -142,7 +146,10 @@ function ImageEditorModal({
     }
   }
 
-  const cropSize = useCropSize(theme.grid.breakpoints.md)
+  const baseSize = useCropBaseSize(theme.grid.breakpoints.md)
+  // The crop window is sized after the configured output, so that what the
+  // user frames is what gets written out.
+  const cropSize = getCropWindowSize(baseSize, targetSize)
   return (
     <ResponsiveModal
       autoHeight
@@ -182,9 +189,9 @@ function ImageEditorModal({
         <>
           <Container>
             <Cropper
-              aspect={1}
+              aspect={cropSize.width / cropSize.height}
               crop={crop}
-              cropShape="round"
+              cropShape="rect"
               cropSize={cropSize}
               image={imgSrc.data}
               objectFit="vertical-cover"
