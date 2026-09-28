@@ -1,4 +1,12 @@
 {{- if .Values.dashboards.enabled }}
+{{- $metabase_host := printf "Host(`%s`)" (include "render-external-subdomain" (dict "service_name" "metabase" "Values" .Values)) }}
+{{- /*
+  The client's Performance page embeds public dashboards for every user, so
+  the paths they load - the page, its static assets, the public API, custom
+  region maps and the settings the page refreshes on load - follow
+  application_allowlist. Everything else is the Metabase admin console.
+*/}}
+{{- $public_dashboard_paths := "(PathPrefix(`/public/`) || PathPrefix(`/app/`) || PathPrefix(`/api/public/`) || PathPrefix(`/api/geojson/`) || Path(`/api/session/properties`))" }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -13,7 +21,18 @@ spec:
     - web
   {{- end }}
   routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "metabase" "Values" .Values) }}`)'
+  - match: '{{ $metabase_host }} && {{ $public_dashboard_paths }}'
+    kind: Rule
+    services:
+    - name: dashboards
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.dashboards.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
+  - match: '{{ $metabase_host }} && !{{ $public_dashboard_paths }}'
     kind: Rule
     services:
     - name: dashboards
