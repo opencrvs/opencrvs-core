@@ -2,6 +2,14 @@
 
 ## 2.0.4 Release Candidate
 
+### Bug fixes
+
+- MinIO removed its images from quay.io and Docker Hub, so the MinIO server and client images could no longer be pulled. They now come from OpenCRVS-hosted copies: `ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z` for the server and `ghcr.io/opencrvs/minio-mc:release.2025-05-21t01-59-54z` for the client used by the data cleanup job. [#13893](https://github.com/opencrvs/opencrvs-core/pull/13893)
+
+  **Deployment notes:**
+
+  - If you pull images through a private registry, mirror the two new images there before upgrading.
+
 ## 2.0.3
 
 ### Bug fixes
