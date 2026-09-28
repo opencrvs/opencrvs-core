@@ -9,31 +9,44 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { isExpectedAccessError, trpcClient } from '@client/v2-events/trpc'
+import { trpcClient } from '@client/v2-events/trpc'
 import { getFilesFromEventDocuments } from '@client/v2-events/features/files/cache'
 import { precacheUsers } from '@client/v2-events/features/users/cache'
 import { getUserIdsFromEventDocuments } from '@client/v2-events/features/users/utils'
 import { precacheFiles } from '@client/v2-events/cache'
 import { setEventData } from '../../useEvents/api'
 
-export async function prefetchPotentialDuplicates(eventId: string) {
-  try {
-    const potentialDuplicates = await trpcClient.event.getDuplicates.query({
-      eventId
-    })
+export function potentialDuplicatesQueryKey(eventId: string) {
+  return ['event', 'potentialDuplicates', eventId] as const
+}
 
-    for (const eventDocument of potentialDuplicates) {
-      setEventData(eventDocument.id, eventDocument)
-    }
+function fetchPotentialDuplicates(eventId: string) {
+  return trpcClient.event.getDuplicates.query({ eventId })
+}
 
-    const filenames = getFilesFromEventDocuments(potentialDuplicates)
-    const userIds = getUserIdsFromEventDocuments(potentialDuplicates)
+type PotentialDuplicates = Awaited<ReturnType<typeof fetchPotentialDuplicates>>
 
-    await Promise.all([precacheFiles(filenames), precacheUsers(userIds)])
-  } catch (error) {
-    // The user is not authorized to see duplicates — otherwise, rethrow.
-    if (!isExpectedAccessError(error)) {
-      throw error
-    }
+async function cachePotentialDuplicates(
+  potentialDuplicates: PotentialDuplicates
+) {
+  for (const eventDocument of potentialDuplicates) {
+    setEventData(eventDocument.id, eventDocument)
   }
+
+  const filenames = getFilesFromEventDocuments(potentialDuplicates)
+  const userIds = getUserIdsFromEventDocuments(potentialDuplicates)
+
+  await Promise.all([precacheFiles(filenames), precacheUsers(userIds)])
+}
+
+/**
+ * Fetches the potential duplicate records for `eventId` and populates the
+ * cache for each one (files, users, event document), so downstream code
+ * (e.g. duplicate review) can read them from cache.
+ */
+export async function fetchAndCachePotentialDuplicates(eventId: string) {
+  const potentialDuplicates = await fetchPotentialDuplicates(eventId)
+  await cachePotentialDuplicates(potentialDuplicates)
+
+  return potentialDuplicates
 }
