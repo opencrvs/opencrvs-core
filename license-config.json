@@ -71,6 +71,7 @@
     "packages/events/src/storage/postgres/events/schema/**/*.ts",
     "packages/events/.kanelrc.js",
     "packages/dashboards/data/metabase/*",
+    "packages/testland/assets/metabase/data/**",
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
