@@ -35,6 +35,7 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   omitHiddenFields,
+  omitHiddenPaginatedFields,
   runFieldValidations,
   FieldTypesToHideInReview,
   ValidatorContext,
@@ -499,14 +500,26 @@ function ReviewComponent({
   const hasAnnotationFieldsToShow =
     annotation !== undefined && reviewFields && reviewFields.length > 0
 
+  const annotationValidatorContext = hasAnnotationFieldsToShow
+    ? {
+        ...validatorContext,
+        baseFormState: omitHiddenPaginatedFields(
+          formConfig,
+          form,
+          validatorContext
+        )
+      }
+    : validatorContext
+
   const displayedAnnotationFields = hasAnnotationFieldsToShow
     ? reviewFields.filter(
         (field) =>
           !FieldTypesToHideInReview.some((t) => t === field.type) &&
-          isFieldDisplayedOnReview(field, annotation, {
-            ...validatorContext,
-            baseFormState: form
-          })
+          isFieldDisplayedOnReview(
+            field,
+            annotation,
+            annotationValidatorContext
+          )
       )
     : []
 
@@ -551,10 +564,7 @@ function ReviewComponent({
                       formValues={annotation}
                       id={'review'}
                       readonlyMode={readonlyMode}
-                      validatorContext={{
-                        ...validatorContext,
-                        baseFormState: form
-                      }}
+                      validatorContext={annotationValidatorContext}
                       onFormChange={onAnnotationChange}
                       onTouchedChange={setTouched}
                     />

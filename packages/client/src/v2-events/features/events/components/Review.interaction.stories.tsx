@@ -13,9 +13,12 @@ import { expect, within } from 'storybook/test'
 import React from 'react'
 import { noop } from 'lodash'
 import {
+  ConditionalType,
   DocumentPath,
+  field,
   FieldConfig,
   FieldType,
+  not,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -60,6 +63,22 @@ const reviewSignatureField: FieldConfig = {
   configuration: {
     maxFileSize: 5 * 1024 * 1024
   }
+}
+
+const ageEvidenceField: FieldConfig = {
+  id: 'review.ageEvidence',
+  type: FieldType.TEXT,
+  label: {
+    id: 'review.ageEvidence.label',
+    defaultMessage: 'Evidence of age',
+    description: 'Label for age evidence field'
+  },
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(field('applicant.age').isFalsy())
+    }
+  ]
 }
 
 const meta: Meta<typeof Review.Body> = {
@@ -152,5 +171,66 @@ export const DraftAnnotationEmptyHidesSection: Story = {
     const canvas = within(canvasElement)
     const annotationHeadings = canvas.queryAllByText('Comment')
     void expect(annotationHeadings).toHaveLength(0)
+  }
+}
+
+export const DeclarationConditionalAnnotationShown: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  args: {
+    readonlyMode: true,
+    form: { 'applicant.dobUnknown': true, 'applicant.age': 30 },
+    reviewFields: [ageEvidenceField],
+    annotation: { 'review.ageEvidence': 'Birth certificate' }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(
+      await canvas.findByText('Birth certificate')
+    ).toBeInTheDocument()
+  }
+}
+
+// applicant.age is hidden while applicant.dobUnknown is false, but the form still holds its value
+const hiddenAgeArgs = {
+  form: { 'applicant.dobUnknown': false, 'applicant.age': 30 },
+  reviewFields: [ageEvidenceField]
+}
+
+export const HiddenDeclarationValueDoesNotShowAnnotation: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  args: {
+    readonlyMode: true,
+    ...hiddenAgeArgs,
+    annotation: { 'review.ageEvidence': 'Birth certificate' }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Member declaration')
+    await expect(
+      canvas.queryByText('Birth certificate')
+    ).not.toBeInTheDocument()
+  }
+}
+
+export const HiddenDeclarationValueDoesNotShowAnnotationInput: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  args: {
+    ...hiddenAgeArgs,
+    annotation: {},
+    onAnnotationChange: noop
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Member declaration')
+    await expect(canvas.queryByText('Evidence of age')).not.toBeInTheDocument()
   }
 }
