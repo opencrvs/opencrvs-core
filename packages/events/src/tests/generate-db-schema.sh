@@ -24,7 +24,9 @@ else
   HOST=172.17.0.1
 fi
 
-# the `grep` command removes psql meta-commands (\restrict, \unrestrict) —
+# reference_data, analytics and the extensions are created by the country
+# config, not by core's migrations.
+#
 # added by pg_dump 17 as security bookmarks; valid only in psql, not in the
 # pg Node.js driver.
 docker run --rm postgres:17.6 pg_dump \
@@ -32,5 +34,7 @@ docker run --rm postgres:17.6 pg_dump \
   -s \
   --exclude-schema=analytics \
   --exclude-schema=reference_data \
+  --exclude-extension=pgcrypto \
+  --exclude-extension=pg_trgm \
   | grep -v '^\\' \
   > "$(dirname "$0")/postgres-migrations.sql"
