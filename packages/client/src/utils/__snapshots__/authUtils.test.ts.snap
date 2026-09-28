@@ -7,16 +7,8 @@ exports[`authUtils tests > getAuthorizedToken > when token is in local storage >
   "iat": 1487076708,
   "iss": "opencrvs:auth-service",
   "role": "FIELD_AGENT",
-  "scope": [
-    "type=workqueue&ids=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
-    "type=record.search",
-    "type=record.create",
-    "type=record.read",
-    "type=record.notify",
-    "type=record.declare",
-    "type=record.edit",
-  ],
-  "sub": "8f8b431b-ef47-4068-b678-ef2dd93e9208",
+  "scope": [],
+  "sub": "b77b78af-a259-4bc1-85d5-b1e8c1382273",
   "userType": "user",
 }
 `;
@@ -28,16 +20,8 @@ exports[`authUtils tests > getAuthorizedToken > when token is in url > when it's
   "iat": 1487076708,
   "iss": "opencrvs:auth-service",
   "role": "FIELD_AGENT",
-  "scope": [
-    "type=workqueue&ids=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
-    "type=record.search",
-    "type=record.create",
-    "type=record.read",
-    "type=record.notify",
-    "type=record.declare",
-    "type=record.edit",
-  ],
-  "sub": "8f8b431b-ef47-4068-b678-ef2dd93e9208",
+  "scope": [],
+  "sub": "b77b78af-a259-4bc1-85d5-b1e8c1382273",
   "userType": "user",
 }
 `;

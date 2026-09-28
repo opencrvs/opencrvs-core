@@ -31,7 +31,9 @@ export const userIds = {
   localSystemAdmin: 'bb8c53ab-87a6-4491-9eff-2a429ee02a3a' as UUID,
   nationalSystemAdmin: 'b18b1cd4-85e3-4caf-b60f-537cb790f208' as UUID,
   communityLeader: 'c877dda0-0362-4af6-a88d-5ab8f358030e' as UUID,
-  provincialRegistrar: 'f11558f2-ff57-4382-9875-d58f4206b47f' as UUID
+  provincialRegistrar: 'f11558f2-ff57-4382-9875-d58f4206b47f' as UUID,
+  /** `userDetails` in tests/util.tsx */
+  legacyDefault: 'b77b78af-a259-4bc1-85d5-b1e8c1382273' as UUID
 }
 
 /**
@@ -434,6 +436,13 @@ export const userScopes = {
  * per key, so a new key here is all it takes to add a token.
  */
 export const testUserTokenClaims = {
+  /** Default token of legacy tests: `userDetails`, with no scopes. */
+  legacyDefault: {
+    scope: [],
+    subject: userIds.legacyDefault,
+    userType: TokenUserType.enum.user,
+    role: TestUserRole.enum.FIELD_AGENT
+  },
   fieldAgent: {
     scope: userScopes.fieldAgent,
     subject: userIds.fieldAgent,

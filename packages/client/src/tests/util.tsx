@@ -14,7 +14,7 @@ import { AppStore, createStore, IStoreState } from '@client/store'
 import { EventType } from '@client/utils/gateway-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { TestUserRole, TokenUserType, UUID } from '@opencrvs/commons/client'
+import { TestUserRole, UUID } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import {
@@ -35,11 +35,12 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
 import testUserTokens from 'virtual:test-tokens'
+import { userIds } from './test-users'
 
 /**
- * Default token for legacy tests; its role matches `userDetails` below.
+ * Default token for legacy tests: the `userDetails` user below, with no scopes.
  */
-export const validToken = testUserTokens.fieldAgent
+export const validToken = testUserTokens.legacyDefault
 
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
@@ -134,7 +135,7 @@ export const selectOption = (
 }
 
 export const userDetails: UserDetails = {
-  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273' as UUID,
+  id: userIds.legacyDefault,
   type: 'user',
   status: 'active',
   name: { firstname: 'Shakib', surname: 'Al Hasan' },
