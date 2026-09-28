@@ -165,6 +165,32 @@ jobs:
             done
           done
 
+          # The default values.yaml ships the image tags the charts deploy, so
+          # they move with the release too. yq is not used here: it reflows the
+          # file and drops the comments around these keys, so the tags are
+          # rewritten in place, addressed by the block they sit in. The
+          # deprecated top-level image.tag is left alone, as it was before.
+          values=charts/opencrvs-services/values.yaml
+          sed -i -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' "$values"
+
+          platform_tag=$(awk '/^[^[:space:]]/ { p = ($0 ~ /^platform:/) } p && $1 == "tag:" { print $2; exit }' "$values")
+          countryconfig_tag=$(awk '/^[^[:space:]]/ { c = ($0 ~ /^countryconfig:/) } c && $1 == "tag:" { print $2; exit }' "$values")
+          for pair in "platform.tag=$platform_tag" "countryconfig.image.tag=$countryconfig_tag"; do
+            if [ "${pair#*=}" != "v$VERSION" ]; then
+              echo "::error::$values: ${pair%%=*} is '${pair#*=}', expected v$VERSION"
+              exit 1
+            fi
+          done
+
           git add .
           git commit -m "chore: update version to $VERSION"
 
