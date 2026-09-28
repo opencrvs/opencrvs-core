@@ -29,7 +29,7 @@ import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
-export const STREAM_BATCH_SIZE = 300
+const STREAM_BATCH_SIZE = 1000
 
 function toEventDocument(
   { eventType, ...event }: Events,
@@ -113,52 +113,80 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
-async function* processBatch(batch: UUID[]) {
-  const db = getClient()
-  const ids = batch
-
-  let eventDocs: EventDocument[] = []
-  try {
-    eventDocs = await getEventsByIdsInTrx(db, ids)
-  } catch (err) {
+/*
+ * A failed fetch rejects, so the reindex fails instead of silently skipping the
+ * chunk. The rejection is marked handled up front, so a prefetched chunk cannot
+ * crash the process while the one before it is still being yielded. It is
+ * rethrown once the chunk is awaited.
+ */
+function fetchChunk(
+  ids: UUID[],
+  fetchEvents: (eventIds: UUID[]) => Promise<EventDocument[]>
+): Promise<EventDocument[]> {
+  const fetched = fetchEvents(ids).catch((err: unknown) => {
     logger.error({
       message: 'Failed to fetch event documents',
       eventIds: ids,
       error: (err as Error).message,
       stack: (err as Error).stack
     })
-    return
+    throw err
+  })
+  fetched.catch(() => undefined)
+  return fetched
+}
+
+async function* yieldChunk(fetched: Promise<EventDocument[]>) {
+  const declared = (await fetched).filter(
+    (event) => getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+  )
+
+  if (declared.length) {
+    yield declared
   }
+}
 
-  for (const event of eventDocs) {
-    // filter out records without any DECLARE action
-    if (getStatusFromActions(event.actions) === EventStatus.enum.CREATED) {
-      continue
+async function* readIdChunks(batchSize: number) {
+  const eventsStream = getClient().selectFrom('events').select('id').stream()
+  let ids: UUID[] = []
+
+  for await (const row of eventsStream) {
+    ids.push(row.id)
+    if (ids.length === batchSize) {
+      yield ids
+      ids = []
     }
-
-    yield event
+  }
+  if (ids.length) {
+    yield ids
   }
 }
 
 /*
- * Returns a stream of events directly from Postgres.
+ * Returns a stream of events directly from Postgres, one batch per chunk of ids.
  * Useful for cases where you want every event to be processed in bulk,
  * for example, reindexing to ElasticSearch.
+ *
+ * Each chunk's documents are fetched while the chunk before it is yielded, so
+ * Postgres works while the indexing side does rather than taking turns with it.
+ * `fetchEvents` lets the caller decide how a failed fetch is retried or skipped.
  */
-export async function* streamEventDocuments() {
-  const db = getClient()
-  const eventsStream = db.selectFrom('events').select('id').stream()
-  let batch: UUID[] = []
+export async function* streamEventDocuments(
+  batchSize = STREAM_BATCH_SIZE,
+  fetchEvents: (eventIds: UUID[]) => Promise<EventDocument[]> = async (ids) =>
+    getEventsByIdsInTrx(getClient(), ids)
+) {
+  let fetching: Promise<EventDocument[]> | undefined
 
-  for await (const row of eventsStream) {
-    batch.push(row.id)
-    if (batch.length === STREAM_BATCH_SIZE) {
-      yield* processBatch(batch)
-      batch = []
+  for await (const ids of readIdChunks(batchSize)) {
+    const next = fetchChunk(ids, fetchEvents)
+    if (fetching) {
+      yield* yieldChunk(fetching)
     }
+    fetching = next
   }
-  if (batch.length) {
-    yield* processBatch(batch)
+  if (fetching) {
+    yield* yieldChunk(fetching)
   }
 }
 

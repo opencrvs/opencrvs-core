@@ -183,7 +183,7 @@ export const ApproveActionStateTransitions: StoryObj = {
             ]
           })),
           tRPCMsw.event.get.query(() => currentDoc),
-          tRPCMsw.event.getDuplicates.query(() => []),
+          tRPCMsw.event.getDuplicates.query(() => [mockDuplicateEvent]),
           tRPCMsw.event.actions.assignment.assign.mutation(() => {
             currentDoc = eventAssignedWithFlag
 
