@@ -82,7 +82,7 @@ const failingPostHandler = http.post(
 
 // Mock getEventConfigurations to return a single event config
 const singleEventConfigHandler = http.get(
-  `${env.COUNTRY_CONFIG_URL}/events`,
+  `${env.COUNTRY_CONFIG_URL}/config/events`,
   () => HttpResponse.json([tennisClubMembershipEvent])
 )
 
