@@ -25,8 +25,7 @@ import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanVie
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
-import { toFileUrl } from '@client/v2-events/cache'
-import { precacheFile } from '@client/v2-events/features/files/useFileUpload'
+import { toFileUrl, precacheFile } from '@client/v2-events/cache'
 import { PreviewErrorBox } from './PreviewErrorBox'
 
 const ViewerWrapper = styled.div`

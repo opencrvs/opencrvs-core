@@ -215,16 +215,18 @@ function validateDeclarationUpdateAction({
       ]
     : []
 
+  const annotationContext = { ...context, baseFormState: cleanedDeclaration }
+
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     deepDropNulls(annotation ?? {}),
-    context
+    annotationContext
   )
 
   const annotationErrors = getFieldErrors(
     reviewFields,
     visibleAnnotationFields,
-    { ...context, baseFormState: cleanedDeclaration }
+    annotationContext
   )
 
   return [...declarationErrors, ...annotationErrors]

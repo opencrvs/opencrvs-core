@@ -43,7 +43,10 @@ function createTtlConfigCache<T>(
       return fetcher(token)
     }
 
-    if (value !== null && Date.now() - fetchedAt < env.EVENT_CONFIG_CACHE_TTL_MS) {
+    if (
+      value !== null &&
+      Date.now() - fetchedAt < env.EVENT_CONFIG_CACHE_TTL_MS
+    ) {
       return value
     }
 
@@ -80,7 +83,7 @@ function createTtlConfigCache<T>(
   }
 }
 
-export async function getEventConfigurations(token: TokenWithBearer) {
+async function getEventConfigurations(token: TokenWithBearer) {
   const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
