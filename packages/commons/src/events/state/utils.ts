@@ -133,7 +133,9 @@ export function getActionUpdateMetadata(actions: Action[]) {
   ] as const
 
   return actions
-    .filter(({ type }) => updateActions.safeParse(type).success)
+    .filter(({ type }) =>
+      updateActions.options.some((option) => option === type)
+    )
     .reduce<Pick<ActionBase, (typeof metadataFields)[number]>>(
       (_, action) => {
         if (action.originalActionId) {
