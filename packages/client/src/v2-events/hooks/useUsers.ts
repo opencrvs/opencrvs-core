@@ -33,7 +33,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFiles } from '../cache'
+import { precacheFile, precacheFiles } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -120,7 +120,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
             return user
           }
           if (user.avatar) {
-            await precacheFiles([user.avatar])
+            await precacheFile(user.avatar)
           }
           return user
         })
