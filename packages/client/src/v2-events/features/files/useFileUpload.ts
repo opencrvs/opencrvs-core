@@ -14,18 +14,12 @@ import { v4 as uuid } from 'uuid'
 import {
   AttachmentPath,
   DocumentPath,
-  FullDocumentPath,
   joinValues
 } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
-import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import {
-  isExpectedAccessError,
-  queryClient,
-  trpcClient
-} from '@client/v2-events/trpc'
+import { queryClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -68,27 +62,6 @@ async function uploadFile({
 }
 
 const UPLOAD_MUTATION_KEY = 'uploadFile'
-
-function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  return trpcClient.event.file.getPresignedUrl.query({ filePath })
-}
-
-/** Caches a file's contents locally. Never rejects — one file failing shouldn't fail the whole batch. */
-export async function precacheFile(path: DocumentPath | FullDocumentPath) {
-  try {
-    const presignedUrl = (await getPresignedUrl(path)).presignedURL
-    const file = await fetchFileFromUrl(presignedUrl, path)
-
-    if (file) {
-      await cacheFile({ url: path, file })
-    }
-  } catch (error) {
-    if (!isExpectedAccessError(error)) {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to precache file', error)
-    }
-  }
-}
 
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
