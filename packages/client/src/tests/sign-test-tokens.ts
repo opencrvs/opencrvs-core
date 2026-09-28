@@ -14,7 +14,7 @@ import { testUserTokenClaims } from './test-users'
 export type TestUserTokens = Record<keyof typeof testUserTokenClaims, string>
 
 /**
- * Node-only. Called by the client vite config to build `virtual:test-tokens`.
+ * Node-only. Called by `test-tokens-plugin.ts` to build `virtual:test-tokens`.
  */
 export function signTestUserTokens() {
   return Object.fromEntries(

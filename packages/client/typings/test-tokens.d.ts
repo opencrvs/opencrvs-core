@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /**
- * Test user JWTs signed in Node by the `test-tokens` plugin in vite.config.ts,
- * so browser code (Storybook) can use them without `jsonwebtoken`.
+ * Test user JWTs signed in Node by src/tests/test-tokens-plugin.ts, so
+ * browser code (Storybook) can use them without `jsonwebtoken`.
  */
 declare module 'virtual:test-tokens' {
   const tokens: import('../src/tests/sign-test-tokens').TestUserTokens

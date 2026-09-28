@@ -92,7 +92,7 @@ module.exports = [
   },
   ...legacyConfig,
   {
-    // Vite virtual modules (see vite.config.ts) have no file to resolve
+    // Vite virtual modules (see src/tests/test-tokens-plugin.ts) have no file to resolve
     rules: { 'import/no-unresolved': ['error', { ignore: ['^virtual:'] }] }
   }
 ]

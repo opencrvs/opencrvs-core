@@ -21,8 +21,8 @@ import type { TestUserRole, TokenUserType } from '@opencrvs/commons/client'
 
 /*
  * Resolved from this module rather than the working directory, so tests and
- * Storybook work wherever they are started from. The test-tokens plugin in
- * vite.config.ts defines `import.meta.url` for its CJS bundle of this file.
+ * Storybook work wherever they are started from. `test-tokens-plugin.ts`
+ * defines `import.meta.url` for its CJS bundle of this file.
  */
 export const certKeyPath = join(
   dirname(fileURLToPath(import.meta.url)),
