@@ -30,7 +30,8 @@ const expiredToken = generateToken({
   subject: userIds.fieldAgent,
   userType: TokenUserType.enum.user,
   role: TestUserRole.enum.FIELD_AGENT,
-  exp: Math.floor(new Date('2018-07-05T00:00:00Z').getTime() / 1000)
+  // Before the 2017-02-14 fake `Date.now` in setupTests
+  exp: Math.floor(new Date('2017-01-01T00:00:00Z').getTime() / 1000)
 })
 
 const realLocation = window.location
