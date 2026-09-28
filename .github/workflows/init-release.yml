@@ -150,6 +150,21 @@ jobs:
 
           npx lerna exec "npm version --new-version $VERSION --no-git-tag-version"
           npm version $VERSION --no-git-tag-version --allow-same-version
+
+          # The Helm charts are published from this branch, and publish-charts
+          # refuses a tag whose charts disagree with it, so version and
+          # appVersion are bumped to the tag's own "v$VERSION" spelling. Doing
+          # it here rather than by hand after the cut, as #13928 had to.
+          for chart in charts/*/Chart.yaml; do
+            sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" "$chart"
+            for field in version appVersion; do
+              if ! grep -qx "$field: v$VERSION" "$chart"; then
+                echo "::error::$chart has no top-level $field to bump to v$VERSION"
+                exit 1
+              fi
+            done
+          done
+
           git add .
           git commit -m "chore: update version to $VERSION"
 
@@ -198,11 +213,11 @@ jobs:
             git checkout -b "$BRANCH" "origin/$TARGET"
 
             if ! git merge --no-edit "origin/$RELEASE_BRANCH"; then
-              # Both channels bump the version fields and the CHANGELOG, so those
-              # always conflict and always resolve the same way: the target keeps
-              # its own. Anything else needs a human.
+              # Both channels bump the version fields, the chart versions and the
+              # CHANGELOG, so those always conflict and always resolve the same
+              # way: the target keeps its own. Anything else needs a human.
               conflicts=$(git diff --name-only --diff-filter=U)
-              unexpected=$(echo "$conflicts" | grep -Ev '(^|/)package\.json$|^CHANGELOG\.md$' || true)
+              unexpected=$(echo "$conflicts" | grep -Ev '(^|/)package\.json$|^CHANGELOG\.md$|^charts/[^/]+/Chart\.yaml$' || true)
 
               if [ -n "$unexpected" ]; then
                 git merge --abort
