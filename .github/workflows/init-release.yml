@@ -286,31 +286,23 @@ jobs:
         run: |
           failed=()
 
-          trigger() { # repo, token, extra -f inputs...
-            local repo="$1" token="$2"
-            shift 2
-
-            # A dispatch is rejected outright for an input the downstream
-            # workflow does not declare, so every repo is still attempted and
-            # the step fails once, at the end, naming the ones that did not go.
-            if ! GH_TOKEN="$token" gh workflow run init-release.yml \
-              --repo "opencrvs/$repo" \
+          trigger() { # repo, token
+            # Attempt every repo and fail once at the end, so one repo
+            # rejecting the dispatch does not leave the rest untried.
+            if ! GH_TOKEN="$2" gh workflow run init-release.yml \
+              --repo "opencrvs/$1" \
               --ref "${{ github.ref_name }}" \
               -f version="$VERSION" \
-              "$@"; then
-              failed+=("$repo")
+              -f target_branch="${{ steps.target.outputs.target_branch }}"; then
+              failed+=("$1")
               return
             fi
-            echo "Triggered init-release in $repo"
+            echo "Triggered init-release in $1"
           }
 
-          # infrastructure's init-release declares only `version`; countryconfig
-          # and testland also take the target branch worked out above.
-          TARGET_BRANCH=(-f target_branch="${{ steps.target.outputs.target_branch }}")
-
-          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN" "${TARGET_BRANCH[@]}"
+          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN"
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
-          trigger opencrvs-testland "$TESTLAND_TOKEN" "${TARGET_BRANCH[@]}"
+          trigger opencrvs-testland "$TESTLAND_TOKEN"
 
           if [ ${#failed[@]} -gt 0 ]; then
             echo "::error::init-release could not be dispatched to: ${failed[*]}"
