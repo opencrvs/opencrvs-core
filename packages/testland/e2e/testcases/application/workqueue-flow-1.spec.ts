@@ -13,7 +13,6 @@ import { test, expect, type Page } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
-  fillRegisterDialogRequiredFields,
   formatName,
   goToSection,
   login,
@@ -349,7 +348,7 @@ test.describe.serial('1. Workqueue flow - 1', () => {
 
     await waitForActionResponses(
       page,
-      ['event.actions.printCertficate'],
+      ['event.actions.printCertificate'],
       async () =>
         await page
           .getByRole('button', {
