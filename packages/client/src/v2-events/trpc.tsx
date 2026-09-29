@@ -199,8 +199,8 @@ function throttlePersister(persister: Persister): Persister {
         console.error('Failed to persist query cache', error)
       }
     },
-    2000, // arbitrary
-    { leading: false, trailing: true } // No need to do it twice, after the timeout is fine.
+    1000, // same default as for tanstacks own library.
+    { leading: false, trailing: true }
   )
 
   // If tab is about to be closed, persist immediately.
@@ -269,6 +269,7 @@ export function TRPCProvider({
             }
             return query.state.status === 'success'
           },
+
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
