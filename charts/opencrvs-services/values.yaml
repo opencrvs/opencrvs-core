@@ -147,18 +147,21 @@ ingress:
   ssl_enabled: true
   # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
   tls_resolver: ''
-  # Restrict the Metabase dashboards console to specific source IP ranges,
-  # using Traefik's ipAllowList middleware. It is an admin console and is
-  # otherwise reachable by anyone who can resolve its hostname. Leave
-  # empty to leave it publicly reachable (not recommended for production
-  # - see "Hardening" in README.md).
+  # Restrict the Metabase admin console to specific source IP ranges,
+  # using Traefik's ipAllowList middleware. It is otherwise reachable by
+  # anyone who can resolve its hostname. The public dashboards embedded in
+  # the Performance page are not covered: every user needs them, so they
+  # follow application_allowlist below. Leave empty to leave the console
+  # publicly reachable (not recommended for production - see "Hardening"
+  # in README.md).
   # Example:
   #   admin_console_allowlist:
   #     - 203.0.113.0/24
   #     - 198.51.100.42/32
   admin_console_allowlist: []
   # Restrict the whole OpenCRVS application (client, login, gateway,
-  # countryconfig) to specific source IP ranges, using Traefik's
+  # countryconfig and the public Metabase dashboards embedded in the
+  # Performance page) to specific source IP ranges, using Traefik's
   # ipAllowList middleware. Unlike admin_console_allowlist above, this
   # gates every public entry point, not just admin consoles - useful for
   # deployments that want to allow only the deploying country's own IP
