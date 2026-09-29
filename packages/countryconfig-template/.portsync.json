@@ -9,9 +9,9 @@
       "$comment": "Derived by matching tree hashes: ed3ae6ed11 recorded no source revision. That is why this file exists."
     },
     "lastPorted": {
-      "branch": "release/2.0.1",
-      "commit": "936ac67aec2554dd8312bfdb597582a2ad4242e0",
-      "date": "2026-08-28"
+      "branch": "release/2.0.3",
+      "commit": "765684c37f097021a2273c921839877f4e22a60c",
+      "date": "2026-09-29"
     }
   },
   "procedure": [
