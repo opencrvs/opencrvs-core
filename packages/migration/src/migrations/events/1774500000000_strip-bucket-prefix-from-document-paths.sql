@@ -39,6 +39,3 @@ SET declaration = regexp_replace(
     )::jsonb
 WHERE declaration::text LIKE '%"/${MINIO_BUCKET}/%'
    OR annotation::text LIKE '%"/${MINIO_BUCKET}/%';
-
--- Down Migration
--- No-op
