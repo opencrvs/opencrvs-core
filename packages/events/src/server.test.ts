@@ -23,7 +23,6 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionStatus,
   ActionType,
-  BearerTokenByUserType,
   encodeScope,
   getTokenPayload,
   getUUID,
@@ -343,7 +342,14 @@ describe('upstream error handling', () => {
   })
   test('propagates a TRPC error returned by the upstream service', async () => {
     await expect(
-      createEvent(BearerTokenByUserType.localRegistrar)
+      createEvent(
+        createTestToken({
+          userId: getUUID(),
+          scopes: [encodeScope({ type: 'record.create' })],
+          userType: TokenUserType.enum.user,
+          role: TestUserRole.enum.LOCAL_REGISTRAR
+        })
+      )
     ).rejects.toMatchObject({ message: 'fetch failed' })
   })
 })

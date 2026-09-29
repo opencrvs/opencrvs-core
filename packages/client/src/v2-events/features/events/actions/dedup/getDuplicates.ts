@@ -10,8 +10,10 @@
  */
 
 import { trpcClient } from '@client/v2-events/trpc'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { getFilesFromEventDocuments } from '@client/v2-events/features/files/cache'
+import { precacheUsers } from '@client/v2-events/features/users/cache'
+import { getUserIdsFromEventDocuments } from '@client/v2-events/features/users/utils'
+import { precacheFiles } from '@client/v2-events/cache'
 import { setEventData } from '../../useEvents/api'
 
 export function potentialDuplicatesQueryKey(eventId: string) {
@@ -28,12 +30,13 @@ async function cachePotentialDuplicates(
   potentialDuplicates: PotentialDuplicates
 ) {
   for (const eventDocument of potentialDuplicates) {
-    await Promise.all([
-      cacheFiles(eventDocument),
-      cacheUsersFromEventDocument(eventDocument)
-    ])
     setEventData(eventDocument.id, eventDocument)
   }
+
+  const filenames = getFilesFromEventDocuments(potentialDuplicates)
+  const userIds = getUserIdsFromEventDocuments(potentialDuplicates)
+
+  await Promise.all([precacheFiles(filenames), precacheUsers(userIds)])
 }
 
 /**
@@ -44,5 +47,6 @@ async function cachePotentialDuplicates(
 export async function fetchAndCachePotentialDuplicates(eventId: string) {
   const potentialDuplicates = await fetchPotentialDuplicates(eventId)
   await cachePotentialDuplicates(potentialDuplicates)
+
   return potentialDuplicates
 }

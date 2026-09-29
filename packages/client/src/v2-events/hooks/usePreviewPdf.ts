@@ -12,8 +12,7 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { DocumentPath } from '@opencrvs/commons/client'
-import { toFileUrl } from '@client/v2-events/cache'
-import { precacheFile } from '@client/v2-events/features/files/useFileUpload'
+import { toFileUrl, precacheFile } from '@client/v2-events/cache'
 
 async function loadPdfJs() {
   if (!('document' in globalThis)) {

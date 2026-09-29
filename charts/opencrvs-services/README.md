@@ -249,12 +249,12 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>ingress.admin_console_allowlist</td>
             <td>[]</td>
-            <td>Source IP ranges (CIDR) allowed to reach the Metabase dashboards console, enforced via a Traefik <code>ipAllowList</code> middleware. Leave empty to leave it publicly reachable - see "Hardening" in this README.</td>
+            <td>Source IP ranges (CIDR) allowed to reach the Metabase admin console, enforced via a Traefik <code>ipAllowList</code> middleware. Does not restrict the public dashboards embedded in the Performance page - use <code>application_allowlist</code> below to restrict those. Leave empty to leave the console publicly reachable - see "Hardening" in this README.</td>
         </tr>
         <tr>
             <td>ingress.application_allowlist</td>
             <td>[]</td>
-            <td>Source IP ranges (CIDR) allowed to reach the whole application (client, login, gateway, countryconfig), enforced via a Traefik <code>ipAllowList</code> middleware. Unlike <code>admin_console_allowlist</code>, this gates every public entry point, not just admin consoles. <code>admin_console_allowlist</code> is always merged in. Leave empty to leave the application publicly reachable - see "Hardening" in this README.</td>
+            <td>Source IP ranges (CIDR) allowed to reach the whole application (client, login, gateway, countryconfig and the public Metabase dashboards embedded in the Performance page), enforced via a Traefik <code>ipAllowList</code> middleware. Unlike <code>admin_console_allowlist</code>, this gates every public entry point, not just admin consoles. <code>admin_console_allowlist</code> is always merged in. Leave empty to leave the application publicly reachable - see "Hardening" in this README.</td>
         </tr>
         <tr>
             <td>service_type</td>
@@ -698,7 +698,7 @@ Only `countryconfig` defines an extra egress rule (`network_policy.egress_mode: 
 
 ### Restricting application access
 
-`network_policy` only governs traffic between pods inside the cluster — it has no effect on public traffic arriving through Traefik. For deployments that want to allow only a known set of source IP ranges (e.g. the deploying country's own IP space) to reach the application at all — cutting off most automated/opportunistic attacks without requiring a VPN — set `ingress.application_allowlist` to those CIDR ranges. This attaches a Traefik `ipAllowList` middleware to every public route (`client`, `login`, `gateway`, `countryconfig`) and requires no additional infrastructure:
+`network_policy` only governs traffic between pods inside the cluster — it has no effect on public traffic arriving through Traefik. For deployments that want to allow only a known set of source IP ranges (e.g. the deploying country's own IP space) to reach the application at all — cutting off most automated/opportunistic attacks without requiring a VPN — set `ingress.application_allowlist` to those CIDR ranges. This attaches a Traefik `ipAllowList` middleware to every public route (`client`, `login`, `gateway`, `countryconfig` and the public Metabase dashboards) and requires no additional infrastructure:
 
 ```yaml
 ingress:
@@ -712,13 +712,15 @@ This is a plain IP allowlist, not geo-aware — it admits any request from the l
 
 ### Restricting admin consoles
 
-Similarly, the Metabase dashboards console (and, in the dependencies chart, the MinIO console and Kibana) are admin consoles reachable by anyone who can resolve their hostname. Set `ingress.admin_console_allowlist` to the CIDR ranges that should be allowed to reach these consoles (e.g. office/VPN egress IPs) — this can stay narrower than `application_allowlist`, since admin consoles usually only need to be reachable by ops staff rather than the whole country:
+Similarly, the Metabase admin console (and, in the dependencies chart, the MinIO console and Kibana) are admin consoles reachable by anyone who can resolve their hostname. Set `ingress.admin_console_allowlist` to the CIDR ranges that should be allowed to reach these consoles (e.g. office/VPN egress IPs) — this can stay narrower than `application_allowlist`, since admin consoles usually only need to be reachable by ops staff rather than the whole country:
 
 ```yaml
 ingress:
   admin_console_allowlist:
     - 203.0.113.0/24
 ```
+
+The public dashboards on the Metabase host are left untouched, since the Performance page embeds them for every user: `/public/`, `/app/` (static assets), `/api/public/`, `/api/geojson/` (custom region maps) and `/api/session/properties` follow `application_allowlist` instead, and everything else on the host is the admin console.
 
 Set the same key in the dependencies chart's `values.yaml` to also restrict the MinIO console and Kibana (the MinIO S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
 
