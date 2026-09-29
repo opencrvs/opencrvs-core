@@ -8,7 +8,8 @@
       "types": [
         "./src/*.tsx",
         "./src/*.ts",
-        "./src/*/index.ts"
+        "./src/*/index.ts",
+        "./src/*/index.tsx"
       ],
       "default": "./src/*"
     }
