@@ -14,7 +14,7 @@ name: Docs sync check
 # Slack (#opencrvs-developer).
 #
 # Required repository secrets:
-#   ANTHROPIC_API_KEY  - Claude API access
+#   CLAUDE_CODE_OAUTH_TOKEN - Claude access
 #   DOCS_REPO_TOKEN    - fine-grained PAT (or GitHub App token) with
 #                        contents:write + pull-requests:write on opencrvs/documentation.
 #                        The default GITHUB_TOKEN cannot access another repository.
@@ -50,7 +50,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SLACK_CHANNEL: C02LU432JGK
+  SLACK_CHANNEL: C08FCLKER8X
   DOCS_REPO: opencrvs/documentation
 
 jobs:
@@ -59,16 +59,22 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v6
+
       - name: Post test message to Slack
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           if [ -z "$SLACK_BOT_TOKEN" ]; then
             echo "::error::SLACK_BOT_TOKEN secret is not set"; exit 1
           fi
           AUTH="$(curl -sS -X POST https://slack.com/api/auth.test -H "Authorization: Bearer $SLACK_BOT_TOKEN")"
           echo "auth.test: $(echo "$AUTH" | jq -c '{ok, team, user, error}')"
-          TEXT=":white_check_mark: Test message from the *Docs sync check* workflow in ${{ github.repository }} (run <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_id }}>). Slack notifications are wired up correctly."
+          AUTHOR="$(bash .github/scripts/slack-mention.sh "${{ github.sha }}")"
+          echo "Would notify: $AUTHOR"
+          TEXT=":white_check_mark: Test message from the *Docs sync check* workflow in ${{ github.repository }} (latest commit by $AUTHOR, run <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_id }}>). Slack notifications are wired up correctly."
           RESPONSE="$(jq -n --arg channel "$SLACK_CHANNEL" --arg text "$TEXT" \
               '{channel: $channel, text: $text, unfurl_links: false}' |
             curl -sS -X POST https://slack.com/api/chat.postMessage \
@@ -247,8 +253,12 @@ jobs:
           CORE_BRANCH: ${{ github.ref_name }}
           CORE_SHA: ${{ github.sha }}
           CORE_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          TEXT=":books: Claude opened a documentation PR after a merge to \`$CORE_BRANCH\` in opencrvs-core (<https://github.com/$CORE_REPO/commit/$CORE_SHA|${CORE_SHA:0:9}>): <$PR_URL|$PR_TITLE>. Please review."
+          AUTHOR="$(bash .github/scripts/slack-mention.sh "$CORE_SHA")"
+          echo "Notifying: $AUTHOR"
+          TEXT=":books: $AUTHOR, your merge to \`$CORE_BRANCH\` in opencrvs-core (<https://github.com/$CORE_REPO/commit/$CORE_SHA|${CORE_SHA:0:9}>) needs documentation updates. Claude opened a PR: <$PR_URL|$PR_TITLE>. Please review."
           RESPONSE="$(jq -n --arg channel "$SLACK_CHANNEL" --arg text "$TEXT" \
               '{channel: $channel, text: $text, unfurl_links: false}' |
             curl -sS -X POST https://slack.com/api/chat.postMessage \
