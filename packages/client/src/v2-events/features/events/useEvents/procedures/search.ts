@@ -57,8 +57,6 @@ function byIdInput(eventId: string): SearchInput {
 }
 
 export const searchKeys = {
-  /** Generic builder for the hook layer, which receives the scope as a param. */
-  scoped: (input: SearchInput, scope: SearchScope) => scopedKey(input, scope),
   workqueue: (input: SearchInput, slug: string) =>
     scopedKey(input, ['workqueue', slug]),
   byId: (eventId: string) => scopedKey(byIdInput(eventId), ['id', eventId]),
@@ -68,7 +66,6 @@ export const searchKeys = {
    * key so they partial-match every entry beneath them.
    */
   filters: {
-    all: () => [['event', 'search']] as const,
     allWorkqueues: () => [['event', 'search', 'workqueue']] as const,
     workqueue: (slug: string) =>
       [['event', 'search', 'workqueue', slug]] as const,
@@ -77,30 +74,32 @@ export const searchKeys = {
 }
 
 /**
- * CRITICAL: @trpc/tanstack-react-query's generated queryFn re-derives the
- * procedure path from the RUNTIME query key (getClientArgs does
- * `path = queryKey[0]; path.join('.')`). A scoped key would call procedure
- * `event.search.workqueue.<slug>` → server NOT_FOUND.
+ * Query options for a scoped `event.search` entry. tRPC's own queryFn is left
+ * out: it would derive the procedure path from the scoped key, so the default
+ * queryFn below serves every scoped key instead.
+ */
+export function scopedSearchOptions(input: SearchInput, scope: SearchScope) {
+  const { queryFn: _queryFn, ...options } =
+    trpcOptionsProxy.event.search.queryOptions(input)
+  return { ...options, queryKey: scopedKey(input, scope) }
+}
+
+/** Query options for the by-id `event.search` entry of an event. */
+export function byIdSearchOptions(eventId: string) {
+  return scopedSearchOptions(byIdInput(eventId), ['id', eventId])
+}
+
+/**
+ * tRPC's queryFn derives the procedure path from the runtime key, so a scoped
+ * key would call `event.search.workqueue.<slug>`. This default rebuilds the
+ * unscoped key before delegating to tRPC.
  *
- * This default queryFn strips the scope back off by re-building a clean
- * unscoped key from the {input} element and delegating to tRPC's own queryFn.
- * Query defaults match by partial key, so this applies to every scoped key.
- *
- * Consequence: hooks spreading queryOptions() must strip its explicit queryFn
- * (an explicit queryFn beats this default) — see the searchEvent /
- * searchEventById hooks in useEvents.ts.
- *
- * NOTE: this calls queryClient.setQueryDefaults directly (mirroring the
- * networkMode:'online' the procedures/utils helper adds) rather than importing
- * that helper. Importing the helper would create the cycle
- * api → search → utils → api (api.ts imports searchKeys from this module),
- * whose module-load-time setQueryDefaults call resolves to `undefined` under
- * the bundler. Depending only on `trpc` keeps this call cycle-free.
+ * Calls queryClient.setQueryDefaults directly: the procedures/utils helper
+ * would close the import cycle api → search → utils → api.
  */
 queryClient.setQueryDefaults(trpcOptionsProxy.event.search.queryKey(), {
-  // With a persister, networkMode defaults to 'offlineFirst', which would run
-  // the query offline and fail against an unreachable tRPC server. 'online'
-  // makes it wait for connectivity — same as the procedures/utils helper.
+  // As in the procedures/utils helper: wait for connectivity rather than the
+  // persister's 'offlineFirst'.
   networkMode: 'online',
   queryFn: (ctx: QueryFunctionContext) => {
     // The {input, type} element is always present for event.search keys.

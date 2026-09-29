@@ -40,12 +40,7 @@ setQueryDefaults(trpcOptionsProxy.workqueue.count, {
       )
       await Promise.all(
         changedSlugs
-          // Skip slugs whose workqueue search is already marked stale: the
-          // standard write path (refetchAffectedSearchQueries) has blanket-
-          // invalidated them and will refetch the mounted queue itself, so
-          // invalidating here would refetch it a second time. Assign/unassign
-          // and the 20 s poll do not pre-invalidate, so the count-diff still
-          // fires for them.
+          // A stale queue is already being refetched by the write path.
           .filter((slug) => !hasInvalidatedWorkqueueSearchQuery(slug))
           .map(invalidateWorkqueueSearchQueries)
       )

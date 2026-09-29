@@ -11,7 +11,6 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import {
   ActionType,
-  QueryType,
   SearchQuery,
   UUID,
   getCurrentEventState,
@@ -34,7 +33,11 @@ import { useEventCustomAction } from './procedures/actions/customAction'
 import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
-import { searchKeys, SearchScope } from './procedures/search'
+import {
+  byIdSearchOptions,
+  scopedSearchOptions,
+  SearchScope
+} from './procedures/search'
 
 function getEventWithDraftOrThrow(
   id: string,
@@ -89,14 +92,8 @@ export function useEvents() {
         scope: SearchScope,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
-        // Strip queryFn so the setQueryDefaults shim (procedures/search.ts)
-        // applies and re-derives a clean unscoped procedure path from the
-        // scoped key.
-        const { queryFn: _queryFn, ...queryOptions } =
-          trpc.event.search.queryOptions(query)
         return useQuery({
-          ...queryOptions,
-          queryKey: searchKeys.scoped(query, scope),
+          ...scopedSearchOptions(query, scope),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -107,11 +104,8 @@ export function useEvents() {
         scope: SearchScope,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
-        const { queryFn: _queryFn, ...queryOptions } =
-          trpc.event.search.queryOptions(query)
         return useSuspenseQuery({
-          ...queryOptions,
-          queryKey: searchKeys.scoped(query, scope),
+          ...scopedSearchOptions(query, scope),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -120,23 +114,11 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
-        const searchInput = {
-          query: {
-            type: 'and',
-            clauses: [{ id }]
-          } satisfies QueryType
-        }
         const maybeDraft = getRemoteDraftByEventId(id)
 
-        // ES-first via the setQueryDefaults shim (queryFn stripped), then fall
-        // back locally. The fallback is pure/sync (draft + config already in
-        // memory), so it fits `select` rather than a queryFn override: keep ES
-        // data when present, else synthesize from the local draft.
-        const { queryFn: _queryFn, ...queryOptions } =
-          trpc.event.search.queryOptions(searchInput)
+        // Falls back to the local draft when the server has no record yet.
         return useQuery({
-          ...queryOptions,
-          queryKey: searchKeys.byId(id),
+          ...byIdSearchOptions(id),
           enabled: !findLocalEventIndex(id),
           refetchOnMount: 'always',
           staleTime: 0,
@@ -158,19 +140,10 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
-        const searchInput = {
-          query: {
-            type: 'and',
-            clauses: [{ id }]
-          } satisfies QueryType
-        }
         const maybeDraft = getRemoteDraftByEventId(id)
 
-        const { queryFn: _queryFn, ...queryOptions } =
-          trpc.event.search.queryOptions(searchInput)
         return useSuspenseQuery({
-          ...queryOptions,
-          queryKey: searchKeys.byId(id),
+          ...byIdSearchOptions(id),
           refetchOnMount: 'always',
           staleTime: 0,
           select: (data) => {
