@@ -219,24 +219,6 @@ function requireEvent(
   return event
 }
 
-/**
- * The print button prints the record it is rendered for. Rendering one without
- * an event in context leaves nothing to print, so the field is misconfigured
- * rather than merely empty.
- */
-function requireEvent(
-  event: EventDocument | undefined,
-  fieldId: string
-): EventDocument {
-  if (!event) {
-    throw new Error(
-      `Field ${fieldId} prints a record, but the form around it was rendered without an event`
-    )
-  }
-
-  return event
-}
-
 function resolveOptions(
   options: SelectOption[],
   form: EventState,
@@ -947,7 +929,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
-        event={requireEvent(validatorContext.event, name)}
+        event={requireEvent(validatorContext.event?.document, name)}
         id={name}
         template={field.config.configuration.template}
         onChange={(val) => onFieldValueChange(name, val)}
