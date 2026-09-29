@@ -363,6 +363,22 @@ export async function runSetupEnvironment() {
       ]
     })
   }
+
+  log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
+
+  const two_fa_enabled = await confirm({
+    message: 'Enable two-factor authentication (2FA)?',
+    default: process.env.TWO_FA_ENABLED
+      ? process.env.TWO_FA_ENABLED === 'true'
+      : environment_type === 'production'
+  })
+
+  if (!two_fa_enabled && environment_type === 'production') {
+    warn(
+      '2FA is disabled on a production environment. Logins will accept the fixed test code 000000, exposing real citizen data. Only do this if you know what you are doing.'
+    )
+  }
+
   const environment_exists = existingEnvironments
     .map((e) => e.trim())
     .includes(environment)
@@ -1341,10 +1357,7 @@ export async function runSetupEnvironment() {
   copyChartsValues(environment, {
     env: environment,
     environment_type: environment_type,
-    // FIXME: In general that should be environment_type,
-    // Hardcode like this blocks us from being generic:
-    // https://github.com/opencrvs/opencrvs-core/issues/11171
-    two_fa_enabled: environment !== 'production' ? false : true,
+    two_fa_enabled,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',
