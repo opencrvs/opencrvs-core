@@ -31,6 +31,10 @@ on:
       base:
         description: 'Commit to diff against (defaults to HEAD~1)'
         required: false
+      dry_run:
+        description: 'Only show the documentation diff in the log; do not open a PR or post to Slack'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -142,7 +146,13 @@ jobs:
             --allowedTools "Read,Grep,Glob,Edit,Write,TodoWrite,Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git status:*),Bash(ls:*)" \
             --output-format json \
             --json-schema '{"type":"object","properties":{"docs_changed":{"type":"boolean"},"pr_title":{"type":"string","description":"Short PR title, no prefix"},"summary":{"type":"string","description":"Markdown bullet list of what was changed in the docs and why, referencing core commits/PRs"}},"required":["docs_changed","summary"]}' \
-            > "$RUNNER_TEMP/claude-result.json"
+            > "$RUNNER_TEMP/claude-result.json" 2> "$RUNNER_TEMP/claude-stderr.txt" || {
+              echo "::error::claude CLI failed"
+              echo "--- stdout ---"; cat "$RUNNER_TEMP/claude-result.json"
+              echo "--- stderr ---"; cat "$RUNNER_TEMP/claude-stderr.txt"
+              exit 1
+            }
+          jq '{subtype, is_error, num_turns, total_cost_usd, result}' "$RUNNER_TEMP/claude-result.json" || cat "$RUNNER_TEMP/claude-result.json"
 
           jq -c '.structured_output // {}' "$RUNNER_TEMP/claude-result.json" > "$RUNNER_TEMP/structured.json"
           {
@@ -159,11 +169,19 @@ jobs:
           CORE_SHA: ${{ github.sha }}
           CORE_BRANCH: ${{ github.ref_name }}
           CORE_REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run }}
         working-directory: documentation
         run: |
           # The workflow, not Claude, decides whether there is a diff.
           if [ -z "$(git status --porcelain)" ]; then
             echo "Documentation is up to date, nothing to do."
+            exit 0
+          fi
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run: documentation changes Claude would propose:"
+            git status --short
+            git diff
             exit 0
           fi
 
