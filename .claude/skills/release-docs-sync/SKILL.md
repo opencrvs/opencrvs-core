@@ -36,7 +36,7 @@ Read `v<version>.0/SUMMARY.md`. It is the table of contents and the map of what 
 
 Go through `changelog.md` one entry at a time. For each entry:
 
-1. Use [references/docs-repo-map.md](references/docs-repo-map.md) to find the page(s) that should mention it.
+1. Find the page(s) that should mention it in the documentation repository.
 2. Read those pages at the branch head. Grep the whole `v<version>.0/` tree too, because removed things (env vars, scopes, endpoints, `validUntil`, MongoDB, token exchange, …) tend to linger on pages you wouldn't expect.
 3. Classify: **covered** (docs already accurate), **outdated** (docs describe the old behaviour), **missing** (nothing describes it), or **n/a** (internal change, bug fix with no documented behaviour, test/CI).
 
@@ -73,5 +73,3 @@ Finish with:
 - A table of every changelog entry → status (covered / updated / added / n/a / **needs input**) → page.
 - Manual follow-ups: OpenAPI specs in GitBook, screenshots that need re-capturing, questions for feature owners.
 - The command for the user to run when ready: `git -C <docs> push -u origin release-docs-<version>`, then `gh pr create --repo opencrvs/documentation`.
-
-Update [references/docs-repo-map.md](references/docs-repo-map.md) when a change landed on a page the map didn't point to, so the next release starts from a better map.
