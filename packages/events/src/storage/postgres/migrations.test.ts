@@ -13,65 +13,17 @@ import path from 'node:path'
 import { Client } from 'pg'
 import { inject } from 'vitest'
 import {
+  copyMigrations,
   createDatabase,
   dropDatabase,
-  initializeSchemaAccess
+  initializeSchemaAccess,
+  runMigrations
 } from '@events/tests/postgres'
-
-const MIGRATIONS_DIR = path.resolve(
-  __dirname,
-  '../../../../migration/src/migrations/events'
-)
-
-// run-migrations.sh fills these in with envsubst before running the SQL files
-const SQL_PLACEHOLDERS: Record<string, string> = {
-  EVENTS_DB_USER: 'events_app',
-  MINIO_BUCKET: 'ocrvs'
-}
 
 // node-pg-migrate throws this when a migration has no down migration: a SQL
 // file without a `-- Down Migration` section, or a JS file exporting
 // `down = false`. Those migrations are one-way on purpose.
 const ONE_WAY_MIGRATION_ERROR = 'User has disabled down migration'
-
-/**
- * Copies the migrations with the SQL placeholders filled in. The copy sits
- * inside this package so the JS migrations still resolve their imports.
- */
-function copyMigrations() {
-  const cacheDir = path.resolve(__dirname, '../../../node_modules/.cache')
-  fs.mkdirSync(cacheDir, { recursive: true })
-  const root = fs.mkdtempSync(path.join(cacheDir, 'migrations-'))
-
-  // The JS migrations are ES modules. The package.json sits a level above the
-  // migrations, as node-pg-migrate treats every file in its directory as one.
-  fs.writeFileSync(path.join(root, 'package.json'), '{ "type": "module" }')
-  const dir = path.join(root, 'events')
-  fs.mkdirSync(dir)
-
-  const files = fs
-    .readdirSync(MIGRATIONS_DIR)
-    .filter((file) => /\.(sql|js)$/.test(file))
-    .sort()
-
-  for (const file of files) {
-    const content = fs.readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8')
-
-    fs.writeFileSync(
-      path.join(dir, file),
-      file.endsWith('.sql')
-        ? content.replace(/\$\{(\w+)\}/g, (placeholder, name: string) => {
-            if (!(name in SQL_PLACEHOLDERS)) {
-              throw new Error(`No test value for ${placeholder} in ${file}`)
-            }
-            return SQL_PLACEHOLDERS[name]
-          })
-        : content
-    )
-  }
-
-  return { root, dir, files }
-}
 
 function getClient(database: string) {
   return new Client({
@@ -89,10 +41,8 @@ describe('events migrations', () => {
     await createDatabase(cluster, database)
     await cluster.end()
 
-    // Same setup as packages/migration/src/migrations/postgres/0001_init.sql
     const client = getClient(database)
     await client.connect()
-    await client.query('CREATE SCHEMA app AUTHORIZATION events_migrator')
     await initializeSchemaAccess(client)
     await client.end()
   })
@@ -107,20 +57,15 @@ describe('events migrations', () => {
   })
 
   test('each migration can be rolled back and applied again, unless it is one-way', async () => {
-    const { runner } = await import('node-pg-migrate')
-
     const migrate = async (direction: 'up' | 'down') => {
-      const migrated = await runner({
-        databaseUrl: `postgres://events_migrator:migrator_password@${inject('POSTGRES_URI')}/${database}`,
-        dir: migrations.dir,
+      const [migrated] = await runMigrations(
+        inject('POSTGRES_URI'),
+        database,
+        migrations.dir,
         direction,
-        count: 1,
-        schema: 'app',
-        migrationsTable: 'pgmigrations',
-        checkOrder: false,
-        log: () => undefined
-      })
-      return migrated.at(0)?.name
+        1
+      )
+      return migrated
     }
 
     const step = async (

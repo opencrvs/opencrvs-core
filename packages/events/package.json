@@ -15,8 +15,7 @@
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
     "build:types": "tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
-    "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
-    "generate-db-schema": "bash src/tests/generate-db-schema.sh"
+    "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.17.0",
@@ -95,6 +94,11 @@
     "src/**/*.ts": [
       "prettier --write",
       "eslint -c eslint.config.js --fix"
+    ]
+  },
+  "nx": {
+    "implicitDependencies": [
+      "@opencrvs/migration"
     ]
   }
 }

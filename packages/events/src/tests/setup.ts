@@ -27,12 +27,7 @@ import {
 } from '@events/storage/__mocks__/elasticsearch'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
-import {
-  createDatabase,
-  dropDatabase,
-  initializeSchemaAccess,
-  migrate
-} from './postgres'
+import { createDatabase, dropDatabase, TEMPLATE_DATABASE } from './postgres'
 
 vi.mock('@events/storage/elasticsearch')
 
@@ -120,18 +115,9 @@ async function resetPostgresServer() {
 
   const clusterInitializer = getClusterClient()
   await clusterInitializer.connect()
-  await createDatabase(clusterInitializer, targetDb)
-  // Set before migrating so a failed migration still leaves a droppable name.
+  await createDatabase(clusterInitializer, targetDb, TEMPLATE_DATABASE)
   currentDb = targetDb
   await clusterInitializer.end()
-
-  const databaseInitializer = new Client({
-    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/${targetDb}`
-  })
-  await databaseInitializer.connect()
-  await migrate(databaseInitializer)
-  await initializeSchemaAccess(databaseInitializer)
-  await databaseInitializer.end()
 
   await resetEventsPostgresServer()
   getPool(EVENTS_APP_POSTGRES_URI)

@@ -78,13 +78,3 @@ jobs:
             echo "::error::Generated database types are out of date. Run \`pnpm generate-db-types\` in packages/events and commit the result."
             exit 1
           fi
-
-      - name: Generate test database schema
-        run: pnpm --dir packages/events generate-db-schema
-
-      - name: Fail if test database schema differs
-        run: |
-          if ! git diff --exit-code -- packages/events/src/tests/postgres-migrations.sql; then
-            echo "::error::Test database schema is out of date. Run \`pnpm generate-db-schema\` in packages/events and commit the result."
-            exit 1
-          fi
