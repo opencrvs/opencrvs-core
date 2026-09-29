@@ -19,8 +19,6 @@ export NODE_OPTIONS=--dns-result-order=ipv4first
 run_pg_migrations() {
   MIGRATIONS_PATH="$1"
   local database_url="$2"
-  local schema="$3"
-  local migrations_table="${4:-pgmigrations}"
 
   BACKUP_PATH="$MIGRATIONS_PATH/backup"
 
@@ -59,29 +57,18 @@ run_pg_migrations() {
     mv "$MIGRATIONS_PATH/$migration_file.tmp" "$MIGRATIONS_PATH/$migration_file"
   done
 
-  # --no-check-order is required, not optional. Release branches carry migrations
-  # whose timestamps sort after work that was authored earlier on develop but ships
-  # later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
-  # node-pg-migrate's order check zips the ledger's run order against the on-disk
-  # name order positionally, so any such branch trips it. Once a database has run
-  # migrations out of name order the ledger stays non-canonical, so this flag has
-  # to remain from here on.
+  # check-order is off in node-pg-migrate.json and must stay off. Release branches
+  # carry migrations whose timestamps sort after work that was authored earlier on
+  # develop but ships later (1783382400000 shipped in v1.9.16; 30 develop migrations
+  # sort before it). node-pg-migrate's order check zips the ledger's run order
+  # against the on-disk name order positionally, so any such branch trips it. Once
+  # a database has run migrations out of name order the ledger stays
+  # non-canonical, so the order check has to remain off from here on.
   # --- Run migrations ---
-  # --no-check-order is required, not optional. Release branches carry migrations
-  # whose timestamps sort after work that was authored earlier on develop but ships
-  # later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
-  # node-pg-migrate's order check zips the ledger's run order against the on-disk
-  # name order positionally, so any such branch trips it. Once a database has run
-  # migrations out of name order the ledger stays non-canonical, so this flag has
-  # to remain from here on.
-  echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
+  echo "Running migrations in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
     pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate up \
-    --schema="$schema" \
-    --no-check-order \
-    --migrations-dir="$MIGRATIONS_PATH" \
-    --migrations-table="$migrations_table" \
-    --no-check-order
+    --config-file "$SCRIPT_PATH/node-pg-migrate.json"
 
   # If migration succeeds, remove trap before exit so cleanup still happens normally
   trap - EXIT
@@ -94,5 +81,4 @@ export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 # Run events migrations
 run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
-  "$EVENTS_POSTGRES_URL" \
-  "app"
+  "$EVENTS_POSTGRES_URL"
