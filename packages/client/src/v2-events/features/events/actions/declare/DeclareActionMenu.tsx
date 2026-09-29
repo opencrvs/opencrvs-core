@@ -196,6 +196,7 @@ function useDeclarationActions(event: EventDocument) {
               onConfirm: actionLabels[actionType]
             }}
             declaration={declaration}
+            event={event}
             eventConfiguration={eventConfiguration}
             eventType={intl.formatMessage(eventConfiguration.label)}
             fields={action.fields}
