@@ -12,24 +12,29 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
+import { Button, DropdownMenu, Icon } from '@opencrvs/components'
 import {
   EventConfig,
+  EventIndex,
   getOrThrow,
   ActionType,
-  ClientSpecificAction
+  ClientSpecificAction,
+  todayISO
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getUsersFullName } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUsersFullName,
+  resolveLocationName
+} from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
 import { ActionMenuItem } from '../../Actions/utils'
 
@@ -41,6 +46,7 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.EDIT,
   ActionType.REJECT,
   ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
   ActionType.DELETE,
   ActionType.MARK_AS_DUPLICATE,
   ActionType.PRINT_CERTIFICATE,
@@ -88,16 +94,18 @@ export function sortActions(
 function ActionMenuItems({
   items,
   eventConfiguration,
+  eventIndex,
   backTo,
   onAction
 }: {
   items: ActionMenuItem[]
   eventConfiguration: EventConfig
+  eventIndex: EventIndex
   backTo?: string
   onAction?: () => void
 }) {
   const sortedActions = sortActions(items, eventConfiguration)
-  const intl = useIntl()
+  const intl = useIntlFormatMessageWithFlattenedParams()
 
   if (sortedActions.length === 0) {
     return (
@@ -120,7 +128,7 @@ function ActionMenuItems({
         }}
       >
         <Icon color="currentColor" name={action.icon} size="small" />
-        {intl.formatMessage(action.label)}
+        {intl.formatMessage(action.label, flattenEventIndex(eventIndex))}
       </DropdownMenu.Item>
     )
   })
@@ -170,8 +178,11 @@ export function ActionMenu({
     : ''
 
   const assignedOffice = assignedToUser?.primaryOfficeId
-  const assignedOfficeName =
-    (assignedOffice && locations.get(assignedOffice)?.name) || ''
+  // Assigned office is a present-tense surface — today's name.
+  const assignedOfficeName = resolveLocationName(
+    assignedOffice ? locations.get(assignedOffice) : undefined,
+    todayISO()
+  )
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 
@@ -184,13 +195,13 @@ export function ActionMenu({
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
             size="medium"
+            type="primary"
           >
-            {intl.formatMessage(messages.action)}
-          </PrimaryButton>
+            {intl.formatMessage(messages.action)} <CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {assignedToOther && (
@@ -207,6 +218,7 @@ export function ActionMenu({
           <ActionMenuItems
             backTo={backTo}
             eventConfiguration={eventConfiguration}
+            eventIndex={eventIndex}
             items={actionMenuItems}
             onAction={onAction}
           />

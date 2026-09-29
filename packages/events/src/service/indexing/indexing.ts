@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { estypes } from '@elastic/elasticsearch'
 import * as z from 'zod/v4'
 import {
@@ -30,15 +32,18 @@ import {
   SelectDateRangeField
 } from '@opencrvs/commons/events'
 import {
+  dropSecuredDeclarationFields,
   EventIndexWithAdministrativeHierarchy,
   logger,
-  RecordScopeV2
+  RecordScopeV2,
+  TokenWithBearer
 } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import { TrpcUserContext } from '../../context'
 import {
   decodeEventIndex,
@@ -49,7 +54,6 @@ import {
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   AGE_DOB_QUERY_KEY,
-  removeSecuredFields,
   IndexedAgeFieldValue,
   resolveRecordActionScopeToIds,
   valueFromTotal,
@@ -57,6 +61,7 @@ import {
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
+  withFlagsFilter,
   withJurisdictionFilters
 } from './query'
 
@@ -301,6 +306,20 @@ export async function createIndex(
           legalStatuses: {
             type: 'object',
             properties: {
+              [EventStatus.enum.NOTIFIED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
               [EventStatus.enum.DECLARED]: {
                 type: 'object',
                 properties: {
@@ -465,12 +484,14 @@ export async function findRecordsByQuery({
   search,
   eventConfigs,
   user,
-  acceptedScopes
+  acceptedScopes,
+  token
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
   user: TrpcUserContext
   acceptedScopes: RecordScopeV2[]
+  token: TokenWithBearer
 }) {
   const esClient = getOrCreateClient()
   const { query, limit, offset } = search
@@ -478,8 +499,13 @@ export async function findRecordsByQuery({
     resolveRecordActionScopeToIds(scope, user)
   )
 
-  const esQuery = withJurisdictionFilters({
-    query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+  const validatorContext = await getValidatorContext({ token })
+
+  const esQuery = withFlagsFilter({
+    query: withJurisdictionFilters({
+      query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+      scopesV2: resolvedScopes
+    }),
     scopesV2: resolvedScopes
   })
 
@@ -514,9 +540,11 @@ export async function findRecordsByQuery({
       const eventIndexWithoutLocationHierarchy =
         getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
 
-      return removeSecuredFields(
+      return dropSecuredDeclarationFields(
         eventConfig,
-        eventIndexWithoutLocationHierarchy
+        eventIndexWithoutLocationHierarchy,
+        // @TODO: This is not a full context. It will require fetching every EventDocument. https://github.com/opencrvs/opencrvs-core/issues/13530
+        validatorContext
       )
     })
 
@@ -558,8 +586,11 @@ export async function getEventCount({
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({
-      query,
+    withFlagsFilter({
+      query: withJurisdictionFilters({
+        query,
+        scopesV2: resolvedScopes
+      }),
       scopesV2: resolvedScopes
     })
   )

@@ -7,18 +7,27 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
+# The pnpm version is pinned by the packageManager field in package.json
+RUN corepack enable pnpm
+
+# Lets pnpm replace a production node_modules with a dev install without prompting
+ENV CI=true
+
 USER node
 
 WORKDIR /app
 
 COPY --chown=node:node *.json .
-COPY --chown=node:node yarn.lock .
+COPY --chown=node:node .pnpmfile.cjs pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=node:node patches /app/patches
+# postinstall runs development-environment/link-ts6-api.js
+COPY --chown=node:node development-environment/link-ts6-api.js /app/development-environment/link-ts6-api.js
 
-RUN yarn install --production --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile
 
 COPY --chown=node:node packages/commons /app/packages/commons
 
 WORKDIR /app/packages/commons
 
-RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN pnpm install --frozen-lockfile
+RUN pnpm build

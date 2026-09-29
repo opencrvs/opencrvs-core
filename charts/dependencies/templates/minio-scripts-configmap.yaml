@@ -1,6 +1,8 @@
 {{- if or .Values.backup.enabled .Values.restore.enabled }}
 apiVersion: v1
 data:
+    backup-functions.sh: |
+{{ .Files.Get "files/common/backup-functions.sh" | indent 8 }}
 {{- range $path, $file := .Files.Glob "files/minio/*" }}
     {{ base $path }}: |
 {{ toString $file | indent 8 }}

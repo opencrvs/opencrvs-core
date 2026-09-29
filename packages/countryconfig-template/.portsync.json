@@ -1,0 +1,23 @@
+{
+  "$comment": "Provenance for this package, which is a copy of a country configuration repository maintained outside core. Update lastPorted whenever changes are brought across, and record a `Ported-from: <sha> (<repo>)` trailer on each commit that does so.",
+  "source": {
+    "repository": "https://github.com/opencrvs/opencrvs-countryconfig",
+    "seededFrom": {
+      "branch": "develop",
+      "commit": "2429dbad2e31a04fd69388215e07e57f6ebb7baa",
+      "coreCommit": "ed3ae6ed11ad778eedb1f4113c56afd3e73375ac",
+      "$comment": "Derived by matching tree hashes: ed3ae6ed11 recorded no source revision. That is why this file exists."
+    },
+    "lastPorted": {
+      "branch": "release/2.0.1",
+      "commit": "936ac67aec2554dd8312bfdb597582a2ad4242e0",
+      "date": "2026-08-28"
+    }
+  },
+  "procedure": [
+    "1. Candidate set: `git log --no-merges origin/develop..<release-branch>` in the source repo, NOT a diff against seededFrom. A release branch also carries content reverted on develop, so a directional tree diff reports those reversions as changes to port. Restricting to commits absent from develop excludes them by construction.",
+    "2. Classify every candidate: already in core (landed independently), not applicable to this version, or genuine. Check core for the change itself, not for the commit.",
+    "3. Apply genuine commits with `git -C <source> format-patch <sha> -1 --stdout -- src | git apply --directory=packages/<pkg> -3`, one core commit each, keeping the original message and adding a Ported-from trailer. Hand-write the commit where core has diverged.",
+    "4. Update lastPorted above, then run typecheck, lint and tests for the package."
+  ]
+}

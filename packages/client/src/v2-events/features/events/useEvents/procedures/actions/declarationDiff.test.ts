@@ -9,8 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionType,
   AddressType,
+  ConditionalType,
+  EventConfig,
   EventState,
+  eventQueryDataGenerator,
+  flag,
+  generateEventDocument,
   getDeclarationFields,
   tennisClubMembershipEvent,
   ValidatorContext
@@ -132,6 +138,53 @@ describe('getChangedDeclarationDiff', () => {
     )
 
     expect(result).toEqual({})
+  })
+
+  it('nulls a field that was filled but is now hidden by a sibling toggle', () => {
+    const previousFormValues: EventState = {
+      'recommender.none': false,
+      'recommender.name': filledName,
+      'recommender.id': 'R-123'
+    }
+    const form: EventState = {
+      'recommender.none': true,
+      // The client keeps hidden fields in form state; they must not leak back.
+      'recommender.name': filledName,
+      'recommender.id': 'R-123'
+    }
+
+    const result = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
+    )
+
+    expect(result).toEqual({
+      'recommender.none': true,
+      'recommender.name': null,
+      'recommender.id': null
+    })
+  })
+
+  it('does not null a now-hidden field that had no previous value', () => {
+    const previousFormValues: EventState = {
+      'recommender.none': false
+    }
+    const form: EventState = {
+      'recommender.none': true
+    }
+
+    const result = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
+    )
+
+    expect(result).toEqual({ 'recommender.none': true })
   })
 })
 
@@ -406,6 +459,69 @@ describe('getCleanedDeclarationDiff', () => {
       })
 
       expect(result).toEqual({ 'recommender.none': false })
+    })
+  })
+
+  describe('flag() gated fields', () => {
+    const flaggedFieldId = 'applicant.email'
+
+    const configWithFlaggedField = {
+      ...eventConfiguration,
+      declaration: {
+        ...eventConfiguration.declaration,
+        pages: eventConfiguration.declaration.pages.map((page) => ({
+          ...page,
+          fields: page.fields.map((pageField) =>
+            pageField.id === flaggedFieldId
+              ? {
+                  ...pageField,
+                  conditionals: [
+                    { type: ConditionalType.SHOW, conditional: flag('sealed') }
+                  ]
+                }
+              : pageField
+          )
+        }))
+      }
+    } as EventConfig
+
+    const document = generateEventDocument({
+      configuration: eventConfiguration,
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+    })
+
+    function cleanDiffForFlags(flags: string[]) {
+      return getCleanedDeclarationDiff({
+        eventConfiguration: configWithFlaggedField,
+        originalDeclaration: {},
+        declarationDiff: { [flaggedFieldId]: 'jane@example.com' },
+        validatorContext: {
+          event: { document, state: eventQueryDataGenerator({ flags }) }
+        }
+      })
+    }
+
+    it('keeps the value when the event carries the flag', () => {
+      expect(cleanDiffForFlags(['sealed'])).toEqual({
+        [flaggedFieldId]: 'jane@example.com'
+      })
+    })
+
+    it('strips the value when the event does not carry the flag', () => {
+      expect(cleanDiffForFlags([])).toEqual({})
+    })
+
+    it('strips the value when the context carries no event', () => {
+      // Regression guard: callers used to hand over the event document without
+      // its aggregated state, which behaved exactly like this case.
+      expect(
+        getCleanedDeclarationDiff({
+          eventConfiguration: configWithFlaggedField,
+          originalDeclaration: {},
+          declarationDiff: { [flaggedFieldId]: 'jane@example.com' },
+          validatorContext: {}
+        })
+      ).toEqual({})
     })
   })
 })

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, within } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
@@ -101,7 +101,7 @@ export const CheckedCheckboxShouldAppearOnReview: StoryObj<typeof Review.Body> =
 
       await expect(canvas.queryByText('No recommender')).toBeInTheDocument()
       await expect(
-        canvas.queryByTestId('row-value-recommender.none')
+        canvas.queryByTestId('recommender.none-value')
       ).toHaveTextContent('Yes')
     }
   }
@@ -134,7 +134,7 @@ export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<
 
     await expect(await canvas.findByText('No recommender')).toBeInTheDocument()
     await expect(
-      (await canvas.findByTestId('row-value-recommender.none')).textContent
+      (await canvas.findByTestId('recommender.none-value')).textContent
     ).toEqual('No')
   }
 }

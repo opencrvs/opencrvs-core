@@ -33,8 +33,8 @@ export async function writeAuditLog(params: AuditLogParams) {
     .execute()
 }
 
-interface UserAuditLogQuery {
-  subjectId: string
+interface ClientAuditLogQuery {
+  clientId: string
   skip?: number
   count?: number
   timeStart?: string
@@ -43,22 +43,22 @@ interface UserAuditLogQuery {
 }
 
 /**
- * Reads all audit log entries performed by a given user.
+ * Reads all audit log entries performed by a given client.
  */
-export async function queryUserAuditLog({
-  subjectId,
+export async function queryClientAuditLog({
+  clientId,
   skip = 0,
   count = 10,
   timeStart,
   timeEnd,
   excludeOperations
-}: UserAuditLogQuery) {
+}: ClientAuditLogQuery) {
   const db = getClient()
 
   let query = db
     .selectFrom('auditLog')
     .selectAll()
-    .where('clientId', '=', subjectId)
+    .where('clientId', '=', clientId)
 
   if (timeStart) {
     query = query.where('createdAt', '>=', timeStart)
@@ -81,7 +81,7 @@ export async function queryUserAuditLog({
   let countQuery = db
     .selectFrom('auditLog')
     .select(({ fn }) => [fn.count<string>('id').as('count')])
-    .where('clientId', '=', subjectId)
+    .where('clientId', '=', clientId)
 
   if (excludeOperations.length > 0) {
     countQuery = countQuery.where('operation', 'not in', excludeOperations)

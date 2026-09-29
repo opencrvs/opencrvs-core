@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Meta } from '@storybook/react'
+import { Meta } from '@storybook/react-vite'
 import React from 'react'
 import { Icon } from '../Icon'
 import { LeftNavigation } from './LeftNavigation'

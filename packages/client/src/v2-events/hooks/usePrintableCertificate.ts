@@ -14,7 +14,8 @@ import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
-  AdministrativeArea,
+  ClientAdministrativeArea,
+  ClientLocation,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
@@ -22,9 +23,9 @@ import {
   FieldType,
   getAcceptedActions,
   getCurrentEventState,
+  getDeclarationFields,
   isMinioUrl,
   LanguageConfig,
-  Location,
   PrintCertificateAction,
   UserOrSystemSummary,
   UUID
@@ -47,8 +48,7 @@ async function replaceMinioUrlWithBase64(
   // Clone to avoid mutating the original declaration
   const declarationClone = cloneDeep(declaration)
 
-  const fileFieldIds = config.declaration.pages
-    .flatMap((page) => page.fields)
+  const fileFieldIds = getDeclarationFields(config)
     .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
@@ -75,8 +75,8 @@ export const usePrintableCertificate = ({
 }: {
   event: EventDocument
   config: EventConfig
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   users: UserOrSystemSummary[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig

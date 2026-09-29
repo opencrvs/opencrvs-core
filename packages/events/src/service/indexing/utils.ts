@@ -22,6 +22,7 @@ import {
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  getDeclarationFields,
   isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
@@ -181,6 +182,12 @@ export function getEventIndexWithoutLocationHierarchy(
   event.updatedAtLocation = takeLast(event.updatedAtLocation)
   event.placeOfEvent = takeLast(event.placeOfEvent)
 
+  if (event.legalStatuses.NOTIFIED) {
+    event.legalStatuses.NOTIFIED.createdAtLocation = takeLast(
+      event.legalStatuses.NOTIFIED.createdAtLocation
+    )
+  }
+
   if (event.legalStatuses.DECLARED) {
     event.legalStatuses.DECLARED.createdAtLocation = takeLast(
       event.legalStatuses.DECLARED.createdAtLocation
@@ -194,7 +201,7 @@ export function getEventIndexWithoutLocationHierarchy(
   }
 
   const fieldConfigs = Object.fromEntries(
-    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
 
   // Process declaration fields
@@ -273,6 +280,13 @@ export async function getEventIndexWithAdministrativeHierarchy(
     )
   }
 
+  if (event.legalStatuses.NOTIFIED?.createdAtLocation) {
+    tempEvent.legalStatuses.NOTIFIED.createdAtLocation =
+      await buildAdministrativeHierarchyById(
+        event.legalStatuses.NOTIFIED.createdAtLocation
+      )
+  }
+
   if (event.legalStatuses.DECLARED?.createdAtLocation) {
     tempEvent.legalStatuses.DECLARED.createdAtLocation =
       await buildAdministrativeHierarchyById(
@@ -288,7 +302,7 @@ export async function getEventIndexWithAdministrativeHierarchy(
   }
 
   const fieldConfigs = Object.fromEntries(
-    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
 
   // Process declaration fields
@@ -342,21 +356,6 @@ export function decodeEventIndex(
         )
       }),
       {}
-    )
-  }
-}
-
-export function removeSecuredFields(
-  eventConfig: EventConfig,
-  event: EventIndex
-): EventIndex {
-  return {
-    ...event,
-    declaration: Object.fromEntries(
-      Object.entries(event.declaration).filter(
-        ([fieldId]) =>
-          getDeclarationFieldById(eventConfig, fieldId).secured !== true
-      )
     )
   }
 }
@@ -474,6 +473,9 @@ export function resolveRecordActionScopeToIds(
     options: {
       event: options?.event,
       placeOfEvent: getLocationIdsFromScopeOptions(options?.placeOfEvent, user),
+      notifiedIn: getLocationIdsFromScopeOptions(options?.notifiedIn, user),
+      notifiedBy:
+        options?.notifiedBy === UserFilter.enum.user ? user.id : undefined,
       createdBy:
         options?.createdBy === UserFilter.enum.user ? user.id : undefined,
       createdIn: getLocationIdsFromScopeOptions(options?.createdIn, user),
@@ -482,7 +484,9 @@ export function resolveRecordActionScopeToIds(
         options?.declaredBy === UserFilter.enum.user ? user.id : undefined,
       registeredIn: getLocationIdsFromScopeOptions(options?.registeredIn, user),
       registeredBy:
-        options?.registeredBy === UserFilter.enum.user ? user.id : undefined
+        options?.registeredBy === UserFilter.enum.user ? user.id : undefined,
+      // `flags` requires no user-context resolution, so it's passed through unchanged.
+      flags: options?.flags
     }
   })
 

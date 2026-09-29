@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "baseUrl": "src",
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,12 +13,13 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "src",

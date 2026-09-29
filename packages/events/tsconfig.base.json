@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "strict": true,
     "paths": {
-      "@events/*": ["./*"]
+      "@events/*": ["./src/*"]
     },
     "target": "es6",
     "module": "node16",

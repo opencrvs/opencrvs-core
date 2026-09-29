@@ -53,7 +53,7 @@ function toEventDocument(
  *
  * @returns all events with the given ids in one query.
  */
-async function getEventsByIdsInTrx(
+export async function getEventsByIdsInTrx(
   trx: Kysely<Schema>,
   eventIds: UUID[]
 ): Promise<EventDocument[]> {

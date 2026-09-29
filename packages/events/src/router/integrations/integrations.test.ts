@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getUUID, UUID, encodeScope } from '@opencrvs/commons'
+import { UUID, encodeScope, getUUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { createSystemTestClient } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 const SYSTEM_ID = getUUID()
 const scope = encodeScope({ type: 'integration.create' })
@@ -19,8 +23,8 @@ const scope = encodeScope({ type: 'integration.create' })
 describe('integrations', () => {
   describe('integrations.create', () => {
     test('creates a system client and returns credentials', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       const result = await client.integrations.create({
         name: 'My Test Integration',
@@ -36,8 +40,8 @@ describe('integrations', () => {
     })
 
     test('inserts a row into system_clients table', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       const result = await client.integrations.create({
         name: 'DB Check Integration',
@@ -58,14 +62,33 @@ describe('integrations', () => {
       expect(rows[0].secretHash).toBeTruthy()
       expect(rows[0].salt).toBeTruthy()
       expect(rows[0].shaSecret).toBeTruthy()
+      expect(rows[0].createdBy).toBe(user.id)
+    })
+
+    test('records no creator when the caller is a system client', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+
+      const result = await client.integrations.create({
+        name: 'System Created Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      const rows = await db
+        .selectFrom('systemClients')
+        .selectAll()
+        .where('id', '=', result.clientId as UUID)
+        .execute()
+
+      expect(rows).toHaveLength(1)
       // A system caller — the startup bootstrap token — has no users(id)
       // behind it, and created_by is a foreign key into users
       expect(rows[0].createdBy).toBeNull()
     })
 
     test('writes an audit log entry', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       const result = await client.integrations.create({
         name: 'Audit Integration',
@@ -76,7 +99,7 @@ describe('integrations', () => {
       const logs = await db
         .selectFrom('auditLog')
         .selectAll()
-        .where('clientId', '=', systemId)
+        .where('clientId', '=', user.id)
         .where('operation', '=', 'integrations.create')
         .execute()
 
@@ -162,8 +185,8 @@ describe('integrations', () => {
 
   describe('integrations.list', () => {
     test('returns empty array when no clients exist', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       const result = await client.integrations.list()
 
@@ -171,8 +194,8 @@ describe('integrations', () => {
     })
 
     test('lists created integration clients', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       await client.integrations.create({
         name: 'Integration A',
@@ -200,8 +223,8 @@ describe('integrations', () => {
     })
 
     test('filters by status', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       await client.integrations.create({
         name: 'Active Integration',
@@ -235,8 +258,8 @@ describe('integrations', () => {
 
   describe('integrations.authenticate', () => {
     test('authenticates a system client and returns system details', async () => {
-      const systemId = SYSTEM_ID
-      const client = createSystemTestClient(systemId, [scope])
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
 
       const created = await client.integrations.create({
         name: 'Auth Integration',

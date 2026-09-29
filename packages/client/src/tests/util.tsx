@@ -11,9 +11,9 @@
 import { App, routesConfig } from '@client/App'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
-import { EventType } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway-types'
 import { UserDetails } from '@client/utils/userUtils'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import { TestUserRole, TokenUserType, UUID } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
@@ -37,7 +37,7 @@ import { vi } from 'vitest'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
 
 export const validToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
+  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6NDEwMjQ0NDgwMCwiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
@@ -97,7 +97,7 @@ export const resizeWindow = (width: number, height: number) => {
 
 export const selectOption = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
+  wrapper: ReactWrapper<any, any, any>,
   selector: string,
   option: string
 ): ReactWrapper => {
@@ -409,6 +409,10 @@ export {
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
 
+const TEST_TOKEN_EXP = Math.floor(
+  new Date('2100-01-01T00:00:00Z').getTime() / 1000
+)
+
 export function generateToken({
   scope,
   userType,
@@ -422,7 +426,7 @@ export function generateToken({
 }) {
   if (subject) {
     return jwt.sign(
-      { scope, userType, role },
+      { scope, userType, role, exp: TEST_TOKEN_EXP },
       readFileSync('./test/cert.key'),
       {
         subject,
@@ -433,9 +437,13 @@ export function generateToken({
     )
   }
 
-  return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  })
+  return jwt.sign(
+    { scope, exp: TEST_TOKEN_EXP },
+    readFileSync('./test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:gateway-user'
+    }
+  )
 }

@@ -12,20 +12,24 @@
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import {
+  AttachmentPath,
   DocumentPath,
   FullDocumentPath,
-  joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import { cacheFile, removeCached } from '@client/v2-events/cache'
+import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient } from '@client/v2-events/trpc'
+import {
+  isExpectedAccessError,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
-  path: string
+  path: AttachmentPath
   meta: {
     transactionId: string
     referenceId: string
@@ -37,6 +41,7 @@ async function uploadFile({
   path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
+  await ensureFreshAccessToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
@@ -62,91 +67,29 @@ async function uploadFile({
   return { url: await response.text() }
 }
 
-/**
- * NOTE: This function is used to delete a file from the server.
- * There are two worrying cases:
- * 1. User deletes a file but does not save the changes when they leave. We try to access the file later and it is not there.
- * 2. Documents service includes "fail-safe" for users other than the creator of the file. If a user tries to delete a file that they do not own, it will fail (silently). Given the above scenario, the file would still be there.
- *
- */
-async function deleteFile({ filename }: { filename: string }): Promise<void> {
-  /*
-   * The path is derived from the event id, which is still temporary when the file is
-   * attached before the event has synced (e.g. offline). Actions referring to the file
-   * are sent with the canonical id, so the file must be stored under it, too.
-   */
-  const filePath = resolveTemporaryIdInPath(filename)
+const UPLOAD_MUTATION_KEY = 'uploadFile'
 
-  const response = await fetch('/api/files/' + filePath, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  if (!response.ok) {
-    if (response.status === 403) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Unable to hard-delete the file ${filename}. Only the creator can remove it.`
-      )
-    }
-
-    if (response.status === 404) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Unable to hard-delete the file ${filename}. File not found.`
-      )
-    }
-
-    throw new Error('File deletion failed', { cause: response.status })
-  }
-
-  return
+function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  return trpcClient.event.file.getPresignedUrl.query({ filePath })
 }
 
-export const UPLOAD_MUTATION_KEY = 'uploadFile'
-const DELETE_MUTATION_KEY = 'deleteFile'
-
-async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  const url = joinUrlPaths('/api/presigned-url', filePath)
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  const res = await response.json()
-  return res
-}
-
+/** Caches a file's contents locally. Never rejects — one file failing shouldn't fail the whole batch. */
 export async function precacheFile(path: DocumentPath | FullDocumentPath) {
-  const presignedUrl = (await getPresignedUrl(path)).presignedURL
+  try {
+    const presignedUrl = (await getPresignedUrl(path)).presignedURL
+    const file = await fetchFileFromUrl(presignedUrl, path)
 
-  const file = await fetchFileFromUrl(presignedUrl, path)
-
-  if (file) {
-    await cacheFile({ url: path, file })
+    if (file) {
+      await cacheFile({ url: path, file })
+    }
+  } catch (error) {
+    if (!isExpectedAccessError(error)) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to precache file', error)
+    }
   }
 }
 
-queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
-  // @ts-ignore
-  retry: (_, error) => {
-    if (error.cause === 403) {
-      return false
-    }
-    if (error.cause === 404) {
-      return false
-    }
-
-    return true
-  },
-  retryDelay: 5000,
-  mutationFn: deleteFile
-})
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
@@ -164,7 +107,7 @@ interface Options {
 }
 
 export function useFileUpload(
-  path: string,
+  path: AttachmentPath,
   uniqueIdentifier: string,
   options: Options = {}
 ) {
@@ -194,18 +137,7 @@ export function useFileUpload(
     }
   })
 
-  const del = useMutation({
-    mutationFn: deleteFile,
-    mutationKey: [DELETE_MUTATION_KEY, uniqueIdentifier],
-    onSuccess: (data, { filename }) => {
-      void removeCached(filename as DocumentPath)
-    }
-  })
-
   return {
-    deleteFile: (filename: string) => {
-      return del.mutate({ filename })
-    },
     /**
      * Uploads a file with an optional identifier.
      *

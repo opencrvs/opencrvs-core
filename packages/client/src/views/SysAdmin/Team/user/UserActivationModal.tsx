@@ -10,7 +10,7 @@
  */
 import { buttonMessages } from '@client/i18n/messages'
 import { User } from '@opencrvs/commons/client'
-import { ResponsiveModal } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import React from 'react'
 import { useIntl } from 'react-intl'
@@ -64,10 +64,9 @@ export function UserActivationModal({
     })
 
   return (
-    <ResponsiveModal
+    <Dialog
       id={`${updatedStatus}-user-modal`}
-      show={true}
-      handleClose={onClose}
+      onClose={onClose}
       title={intl.formatMessage(actionConfig.title, {
         name
       })}
@@ -89,12 +88,10 @@ export function UserActivationModal({
           {intl.formatMessage(actionConfig.cta)}
         </Button>
       ]}
-      responsive={false}
-      autoHeight={true}
     >
       {intl.formatMessage(actionConfig.subtitle, {
         name
       })}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

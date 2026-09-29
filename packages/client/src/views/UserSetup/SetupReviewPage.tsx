@@ -17,24 +17,32 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages,
-  userMessages
+  errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import {
+  isSecurityQuestionKey,
+  securityQuestionMessages
+} from '@client/views/UserSetup/SecurityQuestionView'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getOrThrow } from '@opencrvs/commons/client'
-import { ErrorText } from '@opencrvs/components/lib/'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Loader } from '@opencrvs/components/lib/Loader'
-import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
+import { getOrThrow, todayISO } from '@opencrvs/commons/client'
+import { resolveLocationName } from '@client/v2-events/utils'
+import {
+  ErrorText,
+  Button,
+  Content,
+  Icon,
+  AppBar,
+  Frame,
+  Loader,
+  DataRow,
+  IDataProps
+} from '@opencrvs/components'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -84,14 +92,18 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const email = (userDetails && (userDetails.email as string)) || ''
   const role = formatUserRole(userDetails?.role, intl)
 
-  const primaryOffice = location.data?.name ?? ''
+  // Present-tense surface — resolve the office's name as of today (the client
+  // cache strips the flattened `name`; see `toClientLocation`).
+  const primaryOffice = resolveLocationName(location.data, todayISO())
 
   const answeredQuestions: IDataProps[] = []
   setupData.securityQuestionAnswers &&
     setupData.securityQuestionAnswers.forEach((e) => {
       answeredQuestions.push({
         id: `Question_${e.questionKey}`,
-        label: intl.formatMessage(userMessages[e.questionKey]),
+        label: isSecurityQuestionKey(e.questionKey)
+          ? intl.formatMessage(securityQuestionMessages[e.questionKey])
+          : e.questionKey,
         value: e.answer,
         action: {
           id: `Question_Action_${e.questionKey}`,
@@ -142,13 +154,43 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     ...answeredQuestions
   ]
 
+  const title = intl.formatMessage(messages.userSetupRevieTitle)
+
   return (
-    <ActionPageLight
-      title={intl.formatMessage(messages.userSetupRevieTitle)}
-      hideBackground
-      goBack={() => {
-        goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
-      }}
+    <Frame
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+      header={
+        <AppBar
+          desktopLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+              }
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          mobileLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+              }
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          desktopTitle={title}
+          mobileTitle={title}
+        />
+      }
     >
       {activateUserUserMutation.isPending ? (
         <Content>
@@ -195,6 +237,6 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
           </div>
         </Content>
       )}
-    </ActionPageLight>
+    </Frame>
   )
 }

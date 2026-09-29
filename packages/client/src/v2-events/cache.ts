@@ -29,6 +29,12 @@ export function toFileUrl(path: DocumentPath): string {
   return path.startsWith('/') ? path : `/${path}`
 }
 
+// "App shell" = the SPA's index.html, served for any unmatched route. True
+// if a document's URL got poisoned with that HTML instead of the real file.
+export function isAppShellResponse(response: Response) {
+  return (response.headers.get('content-type') ?? '').startsWith('text/html')
+}
+
 /**
  * Sets file to **BROWSER** cache with given filename.
  * Normalizes url to an absolute path (prepends / if missing).

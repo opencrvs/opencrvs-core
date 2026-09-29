@@ -19,6 +19,7 @@ import {
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
+  AttachmentPath,
   ValidatorContext,
   isNameFieldType,
   FieldConfig
@@ -54,7 +55,7 @@ interface PagesProps {
   validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
-  attachmentPath: string
+  attachmentPath: AttachmentPath
   isCorrection?: boolean
 }
 
@@ -136,16 +137,6 @@ export function Pages({
     onSubmit()
   }
 
-  function onPreviousPage() {
-    const previousPageIdx = pageIdx - 1
-    const previousPage =
-      previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
-
-    if (previousPage) {
-      return onPageChange(previousPage.id)
-    }
-  }
-
   async function onClearPage() {
     const confirmed = await openClearFormConfirmation()
 
@@ -210,11 +201,9 @@ export function Pages({
     : undefined
 
   const wizardProps = {
-    currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
     showReviewButton: !hideBackToReview,
     onNextPage,
-    onPreviousPage,
     onSubmit: handleSubmit
   }
   const fields = (

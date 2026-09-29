@@ -11,19 +11,20 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
+import styled from 'styled-components'
+import { Dialog, Icon, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
+  ActionUpdate,
   EventDocument,
   getAcceptedActions,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { joinValues } from '@opencrvs/commons/client'
-import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
+import { SystemUpdatedFields } from './components/SystemUpdatedFields'
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
@@ -45,23 +46,35 @@ const messages = defineMessages({
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
+  },
+  awaitingConfirmationBanner: {
+    defaultMessage:
+      'This action has been initiated, but is still awaiting confirmation from an external system.',
+    description:
+      'Banner shown in the action detail dialog when the action is still awaiting external confirmation',
+    id: 'events.history.awaitingConfirmationBanner'
   }
 })
 
-function prepareComments(history: EventHistoryActionDocument) {
+function prepareComments(history: ActionDocument) {
   const comments: { comment: string }[] = []
 
-  if (
-    history.type === ActionType.REJECT ||
-    history.type === ActionType.ARCHIVE
-  ) {
+  if (history.type === ActionType.REJECT) {
+    comments.push({ comment: history.content.reason })
+  }
+
+  /**
+   * Archiving does not collect a reason on its own, so there is nothing to show
+   * unless the record was archived through the "mark as duplicate" flow.
+   */
+  if (history.type === ActionType.ARCHIVE && history.content?.reason) {
     comments.push({ comment: history.content.reason })
   }
 
   return comments
 }
 
-function prepareReason(history: EventHistoryActionDocument) {
+function prepareReason(history: ActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
@@ -72,7 +85,7 @@ function prepareReason(history: EventHistoryActionDocument) {
 }
 
 function prepareDuplicateOf(
-  history: EventHistoryActionDocument,
+  history: ActionDocument,
   fullHistory: ActionDocument[]
 ): string | null {
   if (history.type !== ActionType.MARK_AS_DUPLICATE) {
@@ -95,6 +108,32 @@ function prepareDuplicateOf(
   )
 }
 
+const BannerWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  background-color: ${({ theme }) => theme.colors.orangeLight};
+  padding: 8px 20px;
+  border-radius: 4px 4px 0 0;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.orangeDarker};
+`
+
+const StyledText = styled(Text)`
+  margin-left: 8px;
+`
+
+function AwaitingConfirmationBanner() {
+  const intl = useIntl()
+  return (
+    <BannerWrapper>
+      <Icon name="PauseCircle" size="small" />
+      <StyledText color="orangeDarker" element="span" variant="bold14">
+        {intl.formatMessage(messages.awaitingConfirmationBanner)}
+      </StyledText>
+    </BannerWrapper>
+  )
+}
+
 /**
  * Detailed view of single Action, showing the history of the event.
  */
@@ -104,47 +143,44 @@ export function EventHistoryDialog({
   close,
   fullEvent,
   validatorContext,
-  title
+  title,
+  isAwaitingConfirmation,
+  systemUpdates
 }: {
-  action: EventHistoryActionDocument
+  action: ActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
   validatorContext: ValidatorContext
   title: string
+  isAwaitingConfirmation: boolean
+  systemUpdates?: ActionUpdate
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
-
   const comments = prepareComments(action)
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)
 
+  const subtitle = `${userName} — ${format(
+    new Date(action.createdAt),
+    intl.formatMessage(messages['event.history.modal.timeFormat'])
+  )}`
+
   return (
-    <ResponsiveModal
-      autoHeight
+    <Dialog
+      isOpen
       actions={[]}
-      handleClose={close}
+      banner={
+        isAwaitingConfirmation ? <AwaitingConfirmationBanner /> : undefined
+      }
       id="event-history-modal"
-      responsive={true}
-      show={true}
+      subtitle={subtitle}
       title={title}
+      variant="large"
       width={1024}
+      onClose={close}
     >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg19">
-          {joinValues(
-            [
-              userName,
-              format(
-                new Date(action.createdAt),
-                intl.formatMessage(messages['event.history.modal.timeFormat'])
-              )
-            ],
-            ' — '
-          )}
-        </Text>
-      </Stack>
       {Boolean(duplicateOf) && (
         <Table
           columns={[
@@ -154,11 +190,7 @@ export function EventHistoryDialog({
               width: 100
             }
           ]}
-          content={[
-            {
-              duplicateOf
-            }
-          ]}
+          content={[{ duplicateOf }]}
           noResultText=" "
         />
       )}
@@ -193,6 +225,13 @@ export function EventHistoryDialog({
         fullEvent={fullEvent}
         validatorContext={validatorContext}
       />
-    </ResponsiveModal>
+      {systemUpdates && (
+        <SystemUpdatedFields
+          declaration={systemUpdates}
+          fullEvent={fullEvent}
+          validatorContext={validatorContext}
+        />
+      )}
+    </Dialog>
   )
 }

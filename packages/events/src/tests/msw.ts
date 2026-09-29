@@ -14,7 +14,7 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { ActionType, ConditionalType, field } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-const tennisClubMembershipEventWithCustomAction = {
+export const tennisClubMembershipEventWithCustomAction = {
   ...tennisClubMembershipEvent,
   actions: tennisClubMembershipEvent.actions.concat([
     {
@@ -65,9 +65,6 @@ const tennisClubMembershipEventWithCustomAction = {
   ])
 }
 
-/** Token the mocked auth service hands out for anonymous (userless) callers. */
-export const ANONYMOUS_TOKEN = 'anonymous-token'
-
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
     `${env.DOCUMENTS_URL}/presigned-urls`,
@@ -114,8 +111,19 @@ const handlers = [
   http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
-  http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
+  http.get(`${env.DOCUMENTS_URL}/list-files/:prefix*`, () => {
     return HttpResponse.json([])
+  }),
+  // event.file.getPresignedUrl.test.ts
+  http.get(`${env.DOCUMENTS_URL}/presigned-url/:filePath*`, () => {
+    return HttpResponse.json({
+      presignedURL:
+        'http://localhost:3535/ocrvs/mock-presigned-url.png?X-Amz-Signature=test'
+    })
+  }),
+  // event.delete.test.ts
+  http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, () => {
+    return HttpResponse.json({ deleted: 0 })
   }),
   http.post(
     `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,
@@ -128,22 +136,15 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
-  http.post(`${env.COUNTRY_CONFIG_URL}/triggers/user/:event`, () =>
+  http.post(`${env.COUNTRY_CONFIG_URL}/trigger/user/:event`, () =>
     HttpResponse.json({})
   ),
-  // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
-  // query params such as `subject_token`, `subject_token_type` omitted for simplicity
-  http.post(`${env.AUTH_URL}/token`, () =>
-    HttpResponse.json({
-      access_token: 'some-token'
-    })
+  http.post(`${env.COUNTRY_CONFIG_URL}/trigger/telemetry`, () =>
+    HttpResponse.json({ status: 'forwarded' }, { status: 202 })
   ),
-  // The announcement worker fetches this before dispatching a broadcast, since
-  // no user is involved. Without a handler the call escapes to a real auth
-  // service, so the test only passes on machines where one happens to be
-  // running.
-  http.get(`${env.AUTH_URL}/internal/anonymous-token`, () =>
-    HttpResponse.json({ token: ANONYMOUS_TOKEN })
+  // Core sends its internal service token to the country config when requesting action confirmation
+  http.get(`${env.AUTH_URL}/internal/service-token`, () =>
+    HttpResponse.json({ token: 'service-token' })
   )
 ]
 

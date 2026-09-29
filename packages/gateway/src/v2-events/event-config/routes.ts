@@ -19,9 +19,12 @@ export const trpcProxy = [
     handler: (req, h) => {
       logger.info(`Proxying request to ${req.params.path}`)
 
+      // Prevent open redirect / SSRF attacks by ensuring the proxied URL is within env.EVENTS_URL
+      const uri = new URL(env.EVENTS_URL)
+      uri.pathname = req.params.path
+
       return h.proxy({
-        uri:
-          new URL(req.params.path, env.EVENTS_URL).toString() + req.url.search,
+        uri: uri.toString() + req.url.search,
         passThrough: true
       })
     },

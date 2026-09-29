@@ -48,6 +48,6 @@ export async function svgUploadHandler(
       .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
       .code(200)
   } catch (error) {
-    return h.response(error).code(400)
+    return h.response(error as Error).code(400)
   }
 }

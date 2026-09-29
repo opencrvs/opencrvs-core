@@ -1,0 +1,39 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: Slack deploy service checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: slack-deploy-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: slack/deploy
+    steps:
+      - uses: actions/checkout@v6
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check (deno check)
+        run: deno check .
+      - name: Lint (deno lint)
+        run: deno lint

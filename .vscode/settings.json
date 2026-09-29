@@ -8,6 +8,7 @@
     "typescriptreact"
   ],
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "deno.enablePaths": ["./slack/deploy"],
   "eslint.workingDirectories": [
     {
       "pattern": "./packages/*/",

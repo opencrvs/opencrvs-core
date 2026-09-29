@@ -9,18 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-
-import selectEvent from 'react-select-event'
 import {
   ActionType,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { Pages } from '../components/Pages'
@@ -127,7 +126,7 @@ export const DeclareForm: Story = {
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
 
-    const backButton = await canvas.findByText('Back')
+    const backButton = await canvas.findByRole('button', { name: 'Back' })
     await userEvent.click(backButton)
 
     await expect(
@@ -165,7 +164,7 @@ export const CountryDomestic: Story = {
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
 
-    const backButton = await canvas.findByText('Back')
+    const backButton = await canvas.findByRole('button', { name: 'Back' })
     await userEvent.click(backButton)
 
     await expect(
@@ -189,7 +188,7 @@ export const CountryInternational: Story = {
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
 
-    const backButton = await canvas.findByText('Back')
+    const backButton = await canvas.findByRole('button', { name: 'Back' })
     await userEvent.click(backButton)
 
     await expect(canvasElement.querySelector('#state_error')).toHaveTextContent(

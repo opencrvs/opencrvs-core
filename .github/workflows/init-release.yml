@@ -38,7 +38,7 @@ env:
 
 jobs:
   release_workflow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       # Runs before the checkout, so it cannot read the repository.
       - name: Determine the base branch
@@ -63,6 +63,22 @@ jobs:
           ref: ${{ steps.base.outputs.base_branch }}
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Nx needs node_modules to compute the project graph; without an
+      # install, `npx lerna` falls back to fetching an unpinned latest
+      # lerna/nx from the registry, which can fail to parse this repo's
+      # pnpm-lock.yaml.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       # An older channel climbs one channel at a time, so the target is the next
       # unreleased patch of x.<y+1>, or of <x+1>.0 when x.<y+1> never shipped.
@@ -132,8 +148,8 @@ jobs:
 
           git checkout -b "$RELEASE_BRANCH"
 
-          npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
-          yarn version --new-version "$VERSION" --no-git-tag-version
+          npx lerna exec "npm version --new-version $VERSION --no-git-tag-version"
+          npm version $VERSION --no-git-tag-version --allow-same-version
           git add .
           git commit -m "chore: update version to $VERSION"
 

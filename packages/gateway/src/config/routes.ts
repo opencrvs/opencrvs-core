@@ -56,32 +56,6 @@ export const getRoutes = () => {
         }
       }
     },
-    {
-      method: 'GET',
-      path: '/presigned-url/{filePath*}',
-      handler: async (req, h) => {
-        return h.proxy({
-          uri: `${DOCUMENTS_URL}/presigned-url/${req.params.filePath}`,
-          passThrough: true
-        })
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/files/{filePath*}',
-      handler: async (req, h) => {
-        return h.proxy({
-          uri: `${DOCUMENTS_URL}/files/${req.params.filePath}`,
-          passThrough: true
-        })
-      },
-      options: {
-        payload: {
-          output: 'data',
-          parse: false
-        }
-      }
-    },
     // application config routes (moved from config service)
     {
       method: 'GET',
@@ -117,7 +91,7 @@ export const getRoutes = () => {
     rateLimitedAuthProxy.verifyUser,
     rateLimitedAuthProxy.verifyCode,
     rateLimitedAuthProxy.resendAuthenticationCode,
-    rateLimitedAuthProxy.verifyNumber,
+    rateLimitedAuthProxy.verifyRecoveryToken,
     rateLimitedAuthProxy.verifySecurityAnswer,
     rateLimitedAuthProxy.sendUserName,
     rateLimitedAuthProxy.changePassword,

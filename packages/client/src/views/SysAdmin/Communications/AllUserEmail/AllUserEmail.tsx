@@ -19,7 +19,7 @@ import {
   TextInput,
   Button,
   Icon,
-  ResponsiveModal
+  Dialog
 } from '@opencrvs/components'
 import styled from 'styled-components'
 import { useMutation } from '@tanstack/react-query'
@@ -116,11 +116,10 @@ const AllUserEmail = () => {
           </Button>
         </Form>
       </Content>
-      <ResponsiveModal
+      <Dialog
         title={intl.formatMessage(messages.emailAllUsersModalTitle)}
-        show={isConfirmationModalOpen}
-        handleClose={hideModal}
-        autoHeight
+        isOpen={isConfirmationModalOpen}
+        onClose={hideModal}
         actions={[
           <Button key="cancel" type="tertiary" onClick={hideModal}>
             {intl.formatMessage(buttonMessages.cancel)}
@@ -131,7 +130,7 @@ const AllUserEmail = () => {
         ]}
       >
         {intl.formatMessage(messages.emailAllUsersModalSupportingCopy)}
-      </ResponsiveModal>
+      </Dialog>
     </>
   )
 }

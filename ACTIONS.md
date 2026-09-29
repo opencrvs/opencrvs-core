@@ -8,17 +8,19 @@ Core actions, as the name suggests, are defined within the core and are availabl
 
 - `CREATE`
 - `READ`
-- `ASSIGN` & `UNASSIGN`
-- `DELETE`
-- `NOTIFY`
+- `ASSIGN`\*† & `UNASSIGN`\*†
+- `DELETE`\*
+- `NOTIFY`\*
 - `DECLARE`\*, `VALIDATE`\* & `REGISTER`\*
 - `REJECT`\*
-- `ARCHIVE`
+- `ARCHIVE`\*
 - `PRINT_CERTIFICATE`\*
-- `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION` & `REJECT_CORRECTION`
-- `DUPLICATE_DETECTED`, `MARK_AS_DUPLICATE` & `MARK_AS_NOT_DUPLICATE`
+- `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION`\* & `REJECT_CORRECTION`\*
+- `DUPLICATE_DETECTED`\*\*, `MARK_AS_DUPLICATE`\* & `MARK_AS_NOT_DUPLICATE`\*
 
-_\* are configurable core actions, this is related to the action configurations section below_
+_\* are configurable core actions, this is related to the action configurations section below._
+_\*\* `DUPLICATE_DETECTED` only supports `flags` — it's system-generated and never shown as a button._
+_† `ASSIGN`/`UNASSIGN` support everything except `flags` (excluded as "meta actions")._
 
 Core actions can also change the event’s status, which custom actions cannot do.  
 In v2.0, the available event statuses are:
@@ -36,6 +38,8 @@ Custom actions are non-core actions that are defined only in the country configu
 
 All custom actions are configurable.
 
+Custom actions are not available while an event is still in `CREATED` state, i.e. a draft. A draft is not indexed and is only reachable through its creator's drafts workqueue, and executing any action on an event deletes its drafts — so a custom action, which cannot change the status, would leave the event in `CREATED` with its declaration data destroyed and no way to find it again. The action is hidden in the client and rejected with HTTP 409 by the backend.
+
 <!-- TODO: add screenshot of custom action dialog here -->
 
 ## Action configurations
@@ -43,6 +47,8 @@ All custom actions are configurable.
 All custom actions and certain core actions are configurable.
 
 Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
+
+> [!NOTE] > `NOTIFY` has a special fallback behaviour: if no `NOTIFY` action config is defined, it inherits the `DECLARE` action config (label, flags, icon, conditionals). When a `NOTIFY` config is present, it is used independently — flag operations on `NOTIFY` do not affect `DECLARE` and vice versa. The `review` field on `NOTIFY` config is optional; when omitted, the `DECLARE` review page is used.
 
 Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 

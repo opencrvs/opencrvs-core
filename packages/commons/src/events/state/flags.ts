@@ -162,15 +162,12 @@ const INHERENT_FLAG_RULES: InherentFlagRule[] = [
   },
   {
     // INCOMPLETE mirrors the NOTIFIED status: set by NOTIFY, cleared by any
-    // other status-changing action (see getStatusFromActions).
+    // other status-changing action (see getStatusFromActions). ARCHIVE/UNARCHIVE
+    // are deliberately excluded so the flag freezes across an archive/unarchive
+    // round trip and comes back exactly as it was.
     flag: InherentFlags.INCOMPLETE,
     setOn: [ActionType.NOTIFY],
-    resetOn: [
-      ActionType.CREATE,
-      ActionType.DECLARE,
-      ActionType.REGISTER,
-      ActionType.ARCHIVE
-    ]
+    resetOn: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
   },
   {
     flag: InherentFlags.REJECTED,
@@ -283,7 +280,7 @@ export function resolveEventCustomFlags(
     const annotation = aggregateActionAnnotations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
-    const flagsWithMetConditions = actionConfig.flags.filter(
+    const flagsWithMetConditions = (actionConfig.flags ?? []).filter(
       ({ conditional }) =>
         // If conditional is not provided, the flag is resolved
         conditional ? isFlagConditionMet(conditional, form, action) : true

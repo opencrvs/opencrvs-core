@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Story, Meta } from '@storybook/react'
+import { Story, Meta } from '@storybook/react-vite'
 import { Spinner, ISpinner } from './Spinner'
 import React from 'react'
 

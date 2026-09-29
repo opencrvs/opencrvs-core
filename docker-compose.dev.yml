@@ -40,7 +40,6 @@ services:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      - MONGO_URL=mongodb://mongo1/user-mgnt
       - NODE_ENV=development
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true

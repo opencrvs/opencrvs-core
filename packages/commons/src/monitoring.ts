@@ -9,31 +9,128 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable @typescript-eslint/no-var-requires */
-import pkgUp = require('pkg-up')
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
+import {
+  defaultResource,
+  resourceFromAttributes
+} from '@opentelemetry/resources'
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
+import { NodeSDK } from '@opentelemetry/sdk-node'
+import { readFileSync } from 'fs'
+import * as os from 'os'
+import * as pkgUp from 'pkg-up'
+
+const ignoredIncomingPaths = ['/health/ready', '/ping']
+
+function getRequestPath(url = '') {
+  return url.split('?')[0]
+}
+
+function isDynamicPathSegment(segment: string) {
+  return (
+    segment.includes('.') ||
+    /^\d+$/.test(segment) ||
+    /^[0-9a-f]{24}$/i.test(segment) ||
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      segment
+    )
+  )
+}
+
+function getTracePath(url = '') {
+  const path = getRequestPath(url)
+
+  if (!path || path === '/') {
+    return '/'
+  }
+
+  return path
+    .replace(/\/+/g, '/')
+    .split('/')
+    .map((segment, index) =>
+      index > 0 && isDynamicPathSegment(segment) ? '#' : segment
+    )
+    .join('/')
+}
+
+function getHttpSpanName(method = 'GET', url = '') {
+  return `${method} ${getTracePath(url)}`
+}
+
+function getServiceName(packageJsonPath: string) {
+  const packageName = JSON.parse(readFileSync(packageJsonPath, 'utf8')).name
+
+  return (
+    process.env.OTEL_SERVICE_NAME ||
+    packageName?.replace('@', '').replace('/', '_') ||
+    'opencrvs'
+  )
+}
+
+function getResource(packageJsonPath: string) {
+  return defaultResource().merge(
+    resourceFromAttributes({
+      'service.name': getServiceName(packageJsonPath),
+      'host.name': os.hostname(),
+      'container.id': process.env.HOSTNAME || '',
+      'k8s.node.name': process.env.OTEL_NODE_NAME || ''
+    })
+  )
+}
+
+function initSdk(packageJsonPath: string) {
+  const sdk = new NodeSDK({
+    resource: getResource(packageJsonPath),
+    traceExporter: new OTLPTraceExporter(),
+    metricReaders: [
+      new PeriodicExportingMetricReader({
+        exporter: new OTLPMetricExporter()
+      })
+    ],
+    instrumentations: [
+      getNodeAutoInstrumentations({
+        '@opentelemetry/instrumentation-hapi': {
+          enabled: false
+        },
+        '@opentelemetry/instrumentation-host-metrics': {
+          enabled: true,
+          metricGroups: [
+            'process.cpu',
+            'process.memory',
+            'system.cpu',
+            'system.memory'
+          ]
+        },
+        '@opentelemetry/instrumentation-http': {
+          ignoreIncomingRequestHook: (request) =>
+            ignoredIncomingPaths.includes(getRequestPath(request.url)),
+          requestHook: (span, request) => {
+            span.updateName(
+              getHttpSpanName(
+                request.method,
+                'url' in request ? request.url : ''
+              )
+            )
+          }
+        }
+      })
+    ]
+  })
+
+  sdk.start()
+
+  process.on('SIGTERM', () => {
+    sdk.shutdown().finally(() => process.exit(0))
+  })
+}
 
 function init() {
   if (process.env.NODE_ENV === 'production') {
     const path = pkgUp.sync()
 
-    require('elastic-apm-node').start({
-      // Override service name from package.json
-      // Allowed characters: a-z, A-Z, 0-9, -, _, and space
-      serviceName:
-        process.env.APN_SERVICE_NAME ||
-        require(path!).name.replace('@', '').replace('/', '_'),
-      // Set custom APM Server URL (default: http://localhost:8200)
-      serverUrl: process.env.APN_SERVICE_URL || 'http://localhost:8200',
-      // Docker swarm provides this environment variale
-      // FIXME: containerId is not used by APM in k8s
-      containerId: process.env.HOSTNAME,
-      hostname: process.env.APN_NODE_NAME || require('os').hostname(),
-      environment:
-        process.env.APN_ENVIRONMENT || process.env.NODE_ENV || 'development',
-      transactionIgnoreUrls: ['/health/ready', '/ping'],
-      ignoreUrls: ['/health/ready', '/ping']
-    })
+    initSdk(path!)
   }
 }
 init()

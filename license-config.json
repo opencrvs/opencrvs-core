@@ -1,6 +1,16 @@
 {
   "ignore": [
     "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs|sql)",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    ".nxignore",
+    "packages/testland/reqs-gathering-templates",
+    "packages/countryconfig-template/pnpm-lock.yaml",
+    "packages/countryconfig-template/.nvmrc",
+    "packages/countryconfig-template/.tiltignore",
+    "packages/countryconfig-template/Tiltfile",
+    "packages/countryconfig-template/.husky",
+    "packages/countryconfig-template/tilt/examples/traefik/values-minikube.yaml",
     ".husky",
     "**/*.ipynb",
     "**/.wireit",
@@ -32,10 +42,7 @@
     "**/*Dockerfile*",
     "**/packages/components/lib",
     "**/packages/*/build",
-    "packages/gateway/src/graphql/schema.d.ts",
-    "packages/gateway/src/graphql/schema.graphql",
     "packages/client/index.html",
-    "packages/client/src/tests/schema.graphql",
     "packages/login/index.html",
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
@@ -49,7 +56,16 @@
     "packages/client/dev-dist",
     "packages/toolkit/.npmignore",
     "packages/toolkit/tsconfig.tsbuildinfo",
+    ".nx/**",
+    ".swc/**",
+    "**/.swc/**",
+    "**/.tsc-tests/**",
+    ".playwright-cli/**",
+    "**/playwright-report/**",
+    "**/*.webm",
+    "packages/toolkit/tsconfig.build.tsbuildinfo",
     "packages/toolkit/create-countryconfig/index.js",
+    "packages/toolkit/src/environment/templates/**",
     "packages/commons/src/events/EventConfig.mermaid",
     "packages/commons/src/events/EventUpdateFlow.mermaid",
     "packages/events/src/storage/postgres/events/schema/**/*.ts",
@@ -58,12 +74,19 @@
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
+    ".nx",
     "packages/api-docs/public-key.pem",
-    ".codex/config.toml"
+    ".codex/config.toml",
+    "packages/mosip/.npmignore",
+    "packages/mosip-api/docs/example-certs",
+    "packages/mosip-api/certs",
+    "packages/mosip-mock/src/mock-only-private-key.pem",
+    "packages/esignet-mock/src/dev-secrets",
+    "packages/esignet-mock/src/mock-authorizer/index.html"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
-    "sh|yml|yaml|toml|conf|txt|dotfile|graphql": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1|prettierignore": {
       "eachLine": {
         "prepend": "# "
       }
@@ -72,7 +95,7 @@
       "prepend": "<!--",
       "append": "-->"
     },
-    "ts|tsx|js|css": {
+    "ts|tsx|js|mjs|css": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {

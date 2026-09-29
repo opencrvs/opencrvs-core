@@ -124,7 +124,7 @@ export function ListItemAction(props: IListItemActionProps) {
                 disabled={action.disabled}
               >
                 <>
-                  {action.icon} {action.label}
+                  {action.icon?.()} {action.label}
                 </>
               </ListItemSingleAction>
             )

@@ -67,16 +67,21 @@ const StyledPrefix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.grey400};
   user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 `
 
 const StyledPostfix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.grey400};
   user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 `
 
 const StyledInput = styled.input<ICustomProps>`
   width: 100%;
+  min-width: 0;
   padding-left: ${({ hasPrefix }) => (hasPrefix ? '8px' : '0')};
   padding-right: ${({ hasPostfix }) => (hasPostfix ? '4px' : '0')};
   height: 46px;

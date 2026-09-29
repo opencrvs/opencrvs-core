@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import superjson from 'superjson'
 import React from 'react'
-import { within } from '@storybook/testing-library'
-import { waitFor, expect } from '@storybook/test'
+import { within } from 'storybook/test'
+import { waitFor, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import {
@@ -120,11 +120,11 @@ const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:filePath*', (req) => {
+    trpcMsw.event.file.getPresignedUrl.query((input) => {
       spies.presignFile++
-      return HttpResponse.json({
-        presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-      })
+      return {
+        presignedURL: `http://localhost:3535/ocrvs/${input.filePath}`
+      }
     }),
     http.get('http://localhost:3535/ocrvs/:id', () => {
       spies.fetchFile++

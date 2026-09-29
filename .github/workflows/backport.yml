@@ -1,0 +1,33 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Automatic backport action
+
+on:
+  pull_request_target:
+    types: ['labeled', 'closed']
+
+jobs:
+  backport:
+    name: Backport PR
+    if: github.event.pull_request.merged == true && !(contains(github.event.pull_request.labels.*.name, 'backport'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Backport Action
+        uses: sorenlouv/backport-github-action@v12
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          auto_backport_label_prefix: backport-to-
+
+      - name: Info log
+        if: ${{ success() }}
+        run: cat ~/.backport/backport.info.log
+
+      - name: Debug log
+        if: ${{ failure() }}
+        run: cat ~/.backport/backport.debug.log

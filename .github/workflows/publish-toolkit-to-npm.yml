@@ -9,35 +9,31 @@
 
 name: Publish toolkit to NPM registry
 run-name: >-
-  Publish ${{ inputs.version || github.event.release.tag_name || 'a release candidate' }}
-  from ${{ inputs.ref || github.event.release.tag_name }}
+  Publish ${{ inputs.version || 'a release candidate' }} from ${{ inputs.ref }}
 on:
   workflow_dispatch:
     inputs:
       ref:
         description: 'Branch or tag to build and publish from'
-        default: release/2.0.2
         required: true
       version:
         description: >-
           npm version to publish as. Empty derives from package.json version
-          and tags as `next` or `vX.Y-next`. Hints: 2.0.3 gives `latest`
-          or `v2.0-latest`, 2.0.3-beta.1 gives `beta`, 2.0.3-rc.3 gives `rc`.
+          and tags as `next` or `vX.Y-next`. Hints: 2.1.0 gives `latest`
+          or `v2.1-latest`, 2.2.0-beta.1 gives `beta`, 2.1.0-rc.3 gives `rc`.
         default: ''
         required: false
       dist_tag:
         description: Optional npm dist-tag override.
         default: ''
         required: false
-  release:
-    types: [published]
 
 permissions:
   contents: read
 
 jobs:
   plan:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       sha: ${{ steps.check-version.outputs.sha }}
       toolkit-version: ${{ steps.check-version.outputs.toolkit-version }}
@@ -47,7 +43,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.ref || github.event.release.tag_name }}
+          ref: ${{ inputs.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -58,9 +54,8 @@ jobs:
       - name: Check version and derive npm dist-tag
         id: check-version
         env:
-          REF_INPUT: ${{ inputs.ref || github.event.release.tag_name }}
+          REF_INPUT: ${{ inputs.ref }}
           VERSION_INPUT: ${{ inputs.version }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
           DIST_TAG_INPUT: ${{ inputs.dist_tag }}
         run: |
           set -euo pipefail
@@ -69,14 +64,6 @@ jobs:
           # publish job checks out that sha rather than `ref` - a branch
           # tip that might have moved in between.
           RESOLVED_SHA="$(git rev-parse HEAD)"
-
-          # A published GitHub release names the version it releases, so it is
-          # treated exactly like an explicit `version` input from here on: it
-          # takes the released-version dist-tag rules below, never the rc ones.
-          if [ -z "$VERSION_INPUT" ] && [ -n "$RELEASE_TAG" ]; then
-            VERSION_INPUT="${RELEASE_TAG#v}"
-            echo "Publishing from release tag $RELEASE_TAG"
-          fi
 
           if [ -n "$VERSION_INPUT" ]; then
             TOOLKIT_VERSION="$VERSION_INPUT"
@@ -104,7 +91,7 @@ jobs:
           #
           #   beta, alpha  a `version` input carrying a prerelease suffix takes
           #                its dist-tag from that suffix's first identifier, so
-          #                2.0.3-beta publishes under `beta`. Not part of the
+          #                2.1.0-beta publishes under `beta`. Not part of the
           #                leading-line rule and deliberately outside it - a
           #                prerelease is never allowed to resolve to any of the
           #                four tags above
@@ -113,7 +100,7 @@ jobs:
           # `next` or `vX.Y-next`, which is why both stay forbidden as a
           # prerelease identifier below.
           #
-          # The tag is computed once and used for both packages, with
+          # The tag is computed once and used for all three packages, with
           # @opencrvs/toolkit as the reference for npm state.
 
           if ! [[ "$TOOLKIT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z.-]+))?$ ]]; then
@@ -176,8 +163,8 @@ jobs:
             NPM_TAG="$DIST_TAG_INPUT"
             echo "Dist-tag overridden by workflow input"
           elif [ -n "$VERSION_INPUT" ] && [ -n "$VERSION_PRERELEASE" ]; then
-            # An explicit prerelease version: 2.0.3-beta, 2.0.3-rc.1,
-            # 2.0.3-alpha.2. The dist-tag is the first dot-separated identifier
+            # An explicit prerelease version: 2.1.0-beta, 2.1.0-rc.1,
+            # 2.1.0-alpha.2. The dist-tag is the first dot-separated identifier
             # of the prerelease suffix, so those give `beta`, `rc` and `alpha`.
             NPM_TAG="${VERSION_PRERELEASE%%.*}"
             if [ -z "$NPM_TAG" ] || [ "$NPM_TAG" = latest ] || [ "$NPM_TAG" = next ]; then
@@ -232,7 +219,7 @@ jobs:
   # before anything reaches npm.
   publish:
     needs: plan
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     environment: npm-publish
     permissions:
       id-token: write
@@ -246,6 +233,9 @@ jobs:
         with:
           ref: ${{ needs.plan.outputs.sha }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -258,12 +248,12 @@ jobs:
 
       - name: Install dependencies
         if: needs.plan.outputs.version-exists == 'false'
-        run: yarn install
+        run: pnpm install --frozen-lockfile
         working-directory: packages/toolkit
 
       - name: Build
         if: needs.plan.outputs.version-exists == 'false'
-        run: yarn build:all
+        run: pnpm build:all
         working-directory: packages/toolkit
 
       - name: Update package.json version
@@ -323,3 +313,57 @@ jobs:
         if: steps.check-create-version.outputs.version-exists == 'false'
         run: npm publish --provenance --access public --tag "$NPM_TAG"
         working-directory: packages/toolkit/create-countryconfig
+
+      - name: Check if mosip version exists on npm
+        id: check-mosip-version
+        run: |
+          if npm view "@opencrvs/mosip@$TOOLKIT_VERSION" > /dev/null 2>&1; then
+            echo "Version $TOOLKIT_VERSION already exists on npm."
+            echo "version-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $TOOLKIT_VERSION does not exist on npm."
+            echo "version-exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install mosip dependencies
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: pnpm install --frozen-lockfile
+        working-directory: packages/mosip
+
+      # Built through the workspace graph so @opencrvs/toolkit is built first:
+      # mosip's sources import types from it, and the toolkit build above is
+      # skipped when its version is already on npm.
+      - name: Build mosip country-config helpers
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: pnpm exec nx run @opencrvs/mosip:build
+        working-directory: packages/mosip
+
+      - name: Update mosip package.json version
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: |
+          jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+        working-directory: packages/mosip
+
+      # The workspace link to @opencrvs/toolkit is a devDependency used only for
+      # types, so it does not appear in the published manifest. Packing verifies
+      # the build output is actually present and requirable before publishing.
+      - name: Smoke test packed mosip in clean project
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: |
+          TARBALL_NAME=$(npm pack --silent)
+          TMP_DIR=$(mktemp -d)
+          npm init -y --prefix "$TMP_DIR" > /dev/null
+          npm install --prefix "$TMP_DIR" --omit=dev "$PWD/$TARBALL_NAME"
+          TMP_DIR="$TMP_DIR" node - <<'NODE'
+          const { createRequire } = require('node:module')
+          const requireFromTmp = createRequire(process.env.TMP_DIR + '/package.json')
+
+          requireFromTmp('@opencrvs/mosip')
+          requireFromTmp('@opencrvs/mosip/api')
+          NODE
+        working-directory: packages/mosip
+
+      - name: Publish mosip to npm
+        if: steps.check-mosip-version.outputs.version-exists == 'false'
+        run: npm publish --provenance --access public --tag "$NPM_TAG"
+        working-directory: packages/mosip
