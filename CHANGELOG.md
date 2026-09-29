@@ -21,6 +21,12 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### Two-factor authentication (2FA) now follows the environment's purpose, not its name
+
+`environment:init` previously enabled 2FA only for an environment named exactly `production`; every other environment — including `staging`, which hosts a daily restore of real production data, and production environments with a custom name such as `prod` — was generated with `TWO_FA_ENABLED: false`, so logins accepted the fixed test code `000000`.
+
+2FA now derives from the environment's **type/purpose**: it defaults **on** for production environments (`staging`, `production`, and any custom environment whose purpose is "Staging/Production") and **off** for non-production ones (`development`, `qa`, and custom "Development/QA/Testing" environments). `environment:init` now also asks explicitly — "Enable two-factor authentication (2FA)?" — with the correct answer pre-selected; set `TWO_FA_ENABLED` to pre-answer it in non-interactive runs.
+
 #### Confirming an asynchronous action now takes credentials the requester does not have
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
