@@ -59,6 +59,13 @@ overrides:
   'react-signature-canvas>react': '18.3.1'
   'react-signature-canvas>react-dom': '18.3.1'
 
+# The root eslint.config.js, which package configs extend, loads eslint,
+# its plugins and `globals` from the root. pnpm 10 no longer hoists them there
+# by default (pnpm 9 did, for `*eslint*`).
+publicHoistPattern:
+  - '*eslint*'
+  - 'globals'
+
 # Replaces patch-package (patches/ dir); diff paths are package-root-relative.
 patchedDependencies:
   pdfmake@0.2.7: patches/pdfmake@0.2.7.patch

@@ -8,19 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import {
-  countActionsByUserId,
-  getActionsByUserId,
-  UserActionsQuery
-} from '@events/storage/postgres/events/actions'
-
-export async function getUserActions(query: UserActionsQuery) {
-  const actions = await getActionsByUserId(query)
-  const total = await countActionsByUserId(query)
-
-  return {
-    results: actions,
-    total
-  }
+/**
+ * Test user JWTs signed in Node by src/tests/test-tokens-plugin.ts, so
+ * browser code (Storybook) can use them without `jsonwebtoken`.
+ */
+declare module 'virtual:test-tokens' {
+  const tokens: import('../src/tests/sign-test-tokens').TestUserTokens
+  export default tokens
 }

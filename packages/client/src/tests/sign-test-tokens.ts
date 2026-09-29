@@ -8,18 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { generateToken } from './generate-token'
+import { testUserTokenClaims } from './test-users'
 
-import _ from 'lodash'
-import { EventDocument } from '@opencrvs/commons/client'
+export type TestUserTokens = Record<keyof typeof testUserTokenClaims, string>
 
-export function getUserIdsFromEventDocument(eventDocument: EventDocument) {
-  return _.uniq(eventDocument.actions.map((action) => action.createdBy))
-}
-
-export function getUserIdsFromEventDocuments(eventDocuments: EventDocument[]) {
-  return _.uniq(
-    eventDocuments.flatMap((eventDocument) =>
-      eventDocument.actions.map((action) => action.createdBy)
-    )
-  )
+/**
+ * Node-only. Called by `test-tokens-plugin.ts` to build `virtual:test-tokens`.
+ */
+export function signTestUserTokens() {
+  return Object.fromEntries(
+    Object.entries(testUserTokenClaims).map(([key, claims]) => [
+      key,
+      generateToken(claims)
+    ])
+  ) as TestUserTokens
 }
