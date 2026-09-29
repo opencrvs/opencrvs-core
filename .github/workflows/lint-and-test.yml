@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # nx affected needs history to resolve the base SHA
           fetch-depth: 0
@@ -181,7 +181,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Check package.json and scripts
         id: check-scripts
         run: |
