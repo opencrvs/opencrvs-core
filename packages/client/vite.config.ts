@@ -15,6 +15,7 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
+import { testTokensPlugin } from './src/tests/test-tokens-plugin'
 
 // Vite 8 loads the config as ESM, where `require` is not defined globally.
 const require = createRequire(import.meta.url)
@@ -124,6 +125,7 @@ React instance. Without dedupe, Vite 8 can bundle a second React copy.
     plugins: [
       loginRedirectPlugin(),
       htmlPlugin(),
+      testTokensPlugin(),
       react(),
       tsconfigPaths({
         projects: ['./tsconfig.build.json']
