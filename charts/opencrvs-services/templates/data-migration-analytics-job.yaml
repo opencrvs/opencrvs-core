@@ -6,13 +6,13 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "3"
   labels:
-    app: data-migration-analytics
+    app: deployment-jobs
   name: data-migration-analytics
 spec:
   template:
     metadata:
       labels:
-        app: data-migration-analytics
+        app: deployment-jobs
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}

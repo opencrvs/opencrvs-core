@@ -10,7 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Button } from '@opencrvs/components/lib/Button'
-import { AvatarSmall } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { constantsMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -212,10 +212,11 @@ export function DownloadButton({
         {canAssign ? (
           <Download isFailed={isFailed} />
         ) : (
-          <AvatarSmall
+          <Avatar
             key={user?.avatar || 'default'}
-            avatar={user?.avatar || undefined}
             name={user && getUsersFullName(user.name)}
+            size="sm"
+            src={user?.avatar}
           />
         )}
       </DownloadAction>

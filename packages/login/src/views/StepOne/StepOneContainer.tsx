@@ -28,6 +28,7 @@ import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_FORBIDDEN_CREDENTIALS,
   ERROR_CODE_INVALID_CREDENTIALS,
+  ERROR_CODE_OFFICE_INACTIVE,
   ERROR_CODE_PHONE_NUMBER_VALIDATE,
   ERROR_CODE_RATE_LIMIT
 } from '@login/utils/authUtils'
@@ -54,6 +55,8 @@ const getErrorMessage = (intl: IntlShape, errorCode: number) => {
       return intl.formatMessage(messages.submissionError)
     case ERROR_CODE_FORBIDDEN_CREDENTIALS:
       return intl.formatMessage(messages.forbiddenCredentialError)
+    case ERROR_CODE_OFFICE_INACTIVE:
+      return intl.formatMessage(messages.officeInactiveError)
     case ERROR_CODE_PHONE_NUMBER_VALIDATE:
       return intl.formatMessage(messages.phoneNumberFormat)
     case ERROR_CODE_RATE_LIMIT:

@@ -14,7 +14,7 @@ import { AppStore, createStore, IStoreState } from '@client/store'
 import { EventType } from '@client/utils/gateway-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { TestUserRole, TokenUserType, UUID } from '@opencrvs/commons/client'
+import { TestUserRole, UUID } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import {
@@ -25,7 +25,6 @@ import {
   shallow
 } from 'enzyme'
 import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import { join } from 'path'
 import * as React from 'react'
 import { IntlShape } from 'react-intl'
@@ -35,9 +34,13 @@ import { waitForElement } from './wait-for-element'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
+import testUserTokens from 'virtual:test-tokens'
+import { userIds } from './test-users'
 
-export const validToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6NDEwMjQ0NDgwMCwiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
+/**
+ * Default token for legacy tests: the `userDetails` user below, with no scopes.
+ */
+export const validToken = testUserTokens.legacyDefault
 
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
@@ -132,7 +135,7 @@ export const selectOption = (
 }
 
 export const userDetails: UserDetails = {
-  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273' as UUID,
+  id: userIds.legacyDefault,
   type: 'user',
   status: 'active',
   name: { firstname: 'Shakib', surname: 'Al Hasan' },
@@ -409,41 +412,4 @@ export {
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
 
-const TEST_TOKEN_EXP = Math.floor(
-  new Date('2100-01-01T00:00:00Z').getTime() / 1000
-)
-
-export function generateToken({
-  scope,
-  userType,
-  role,
-  subject
-}: {
-  scope: string[]
-  subject?: string
-  userType?: TokenUserType
-  role?: TestUserRole
-}) {
-  if (subject) {
-    return jwt.sign(
-      { scope, userType, role, exp: TEST_TOKEN_EXP },
-      readFileSync('./test/cert.key'),
-      {
-        subject,
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-  }
-
-  return jwt.sign(
-    { scope, exp: TEST_TOKEN_EXP },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:gateway-user'
-    }
-  )
-}
+export { generateToken } from './generate-token'

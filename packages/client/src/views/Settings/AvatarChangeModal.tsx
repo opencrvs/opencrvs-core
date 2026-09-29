@@ -27,7 +27,11 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile } from '@client/v2-events/cache'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { DocumentPath } from '@opencrvs/commons/client'
+import {
+  DocumentPath,
+  UUID,
+  userAttachmentPath
+} from '@opencrvs/commons/client'
 
 const Container = styled.div`
   align-self: center;
@@ -141,12 +145,12 @@ function AvatarChangeModalComp({
   error,
   onErrorChanged: setError,
   onConfirmAvatarChange,
-  onAvatarChanged
-}: IProps) {
+  onAvatarChanged,
+  userId
+}: IProps & { userId: UUID }) {
   const intl = useIntl()
   const theme = useTheme() as ITheme
   const isOnline = useOnlineStatus()
-  const userDetails = useSelector(getUserDetails)
   const { changeAvatar: changeAvatarMutation } = useUsers()
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
   const [zoom, setZoom] = React.useState<number>(1)
@@ -169,42 +173,35 @@ function AvatarChangeModalComp({
   }
 
   const { uploadFileAsync } = useFileUpload(
-    `users/${userDetails?.id}`,
-    userDetails?.id || '',
+    userAttachmentPath(userId),
+    userId,
     {}
   )
   const handleApply = async () => {
     const croppedImage = await getCroppedImage(imgSrc, croppedArea)
 
-    if (!userDetails) {
-      throw new Error(
-        'User details not in the scope of avatar change modal. This should never happen'
-      )
-    }
-
     if (!croppedImage) {
       setError(intl.formatMessage(messages.avatarProcessingError))
       return
     }
-    const { url } = await uploadFileAsync(croppedImage, userDetails.id)
-    if (userDetails && userDetails.id && croppedImage) {
-      changeAvatarMutation.mutate(
-        {
-          userId: userDetails.id,
-          avatar: url
-        },
-        {
-          onSuccess: (data) => {
-            cacheFile({ url, file: croppedImage })
+    const { url } = await uploadFileAsync(croppedImage, userId)
 
-            dispatch(modifyUserDetails({ avatar: url as DocumentPath }))
-            onAvatarChanged(url)
-            reset()
-          }
+    changeAvatarMutation.mutate(
+      {
+        userId,
+        avatar: url
+      },
+      {
+        onSuccess: () => {
+          cacheFile({ url, file: croppedImage })
+
+          dispatch(modifyUserDetails({ avatar: url as DocumentPath }))
+          onAvatarChanged(url)
+          reset()
         }
-      )
-      onConfirmAvatarChange()
-    }
+      }
+    )
+    onConfirmAvatarChange()
   }
 
   return (
@@ -287,4 +284,12 @@ function AvatarChangeModalComp({
   )
 }
 
-export const AvatarChangeModal = AvatarChangeModalComp
+export function AvatarChangeModal(props: IProps) {
+  const userDetails = useSelector(getUserDetails)
+
+  if (!userDetails) {
+    return null
+  }
+
+  return <AvatarChangeModalComp {...props} userId={userDetails.id} />
+}

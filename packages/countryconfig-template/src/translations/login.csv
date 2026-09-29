@@ -9,7 +9,6 @@ constants.skipToMainContent,Label for a keyboard accessibility link which skips 
 error.networkError,The error that appears when there is no internet connection,Unable to connect to server,Impossible de se connecter au serveur
 error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
 label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
-login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.clearForm,,Clear form,Effacer le formulaire
 login.codeSubmissionError,The error that appears when the user entered sms code is unauthorised,Incorrect verification code. Please try again,"Désolé, ce code n'a pas fonctionné."
 login.fieldMissing,The error if user doesn't fill all the field,Enter your username and password,Nom d'utilisateur/mot de passe requis
@@ -22,11 +21,13 @@ login.manager.registerAppDescription,,"Manage declarations, registrations and ce
 login.manager.registerAppTitle,,OpenCRVS,Page d'accueil OpenCRVS
 login.mobileLabel,,Mobile number,Numéro de téléphone mobile
 login.mobilePlaceholder,,07123456789,7123456789
+login.officeInactiveError,The error that appears when the user's assigned office is inactive,Your assigned office has been made inactive. Please contact your administrator to be reassigned,Votre bureau assigné a été désactivé. Veuillez contacter votre administrateur pour être réaffecté.
 login.optionalLabel,Optional label,Optional,Optionel
 login.passwordLabel,The label that appears on the password input,Password,Mot de passe
 login.resend,Text for button that resends SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer le {notificationMethod, select, sms {SMS} email {Email} other {}}"
 login.resentEMAIL,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {email},Nous venons de vous envoyer un autre code à {email}.
 login.resentSMS,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {number},Nous venons de vous envoyer un autre code à {number}.
+login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.stepOneInstruction,The instruction that appears in step one of the form,Please enter your username and password.,Veuillez entrer votre nom d'utilisateur et votre mot de passe.
 login.stepOneText,The instruction that appears in step one of the login form,Login to Farajaland CRVS,Connectez-vous à Farajaland CRVS
 login.stepTwoInstruction.email,The instruction that appears in step two of the form that lets users know that code has been sent to email,An authentication code has been sent to {email}. This code will be valid for 10 minutes,Un code d'authentification a été envoyé à {email}. Ce code sera valable 10 minutes
@@ -62,6 +63,7 @@ resetCredentials.option.password,Option used for password,Password reset,Mon mot
 resetCredentials.option.username,Option used for username,Username reminder,Mon nom d'utilisateur
 resetCredentials.phoneNumberConfirmation.form.body.header,Form body header used in the body of phone number confirmation step,Enter your phone number,Quel est votre numéro de téléphone ?
 resetCredentials.phoneNumberConfirmation.form.body.subheader,,,C'est le numéro associé à votre compte.
+resetCredentials.recovery.activeAccountNote,Note shown on the forgotten-item and recovery-instructions-sent pages explaining that account recovery only works for active accounts,"Note: Username reminder and password reset are only available for active accounts. If you are still completing onboarding or have a pending password reset, please finish that first, then try again. If the problem persists, contact your system administrator.","Remarque : le rappel du nom d'utilisateur et la réinitialisation du mot de passe ne sont disponibles que pour les comptes actifs. Si vous êtes en train de terminer votre intégration ou si une réinitialisation de mot de passe est en cours, veuillez d'abord la finaliser, puis réessayez. Si le problème persiste, contactez votre administrateur système."
 resetCredentials.recoveryInstructionsSent.body,"Body message for the recovery instructions sent page. Must not assert delivery, since the account may not exist.","If we found an account, you'll receive instructions for {forgottenItem, select, username {retrieving your username} other {resetting your password}}. The link expires in 1 hour.","Si nous trouvons un compte correspondant, vous recevrez les instructions pour {forgottenItem, select, username {récupérer votre nom d'utilisateur} other {réinitialiser votre mot de passe}}. Le lien expire dans 1 heure."
 resetCredentials.recoveryInstructionsSent.title.email,Title for the recovery instructions sent page when notifications are delivered by email,Check your email,Vérifiez votre e-mail
 resetCredentials.recoveryInstructionsSent.title.phone,Title for the recovery instructions sent page when notifications are delivered by SMS,Check your phone,Vérifiez votre téléphone

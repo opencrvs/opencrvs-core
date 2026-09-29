@@ -21,12 +21,6 @@ Handlebars.registerHelper('data_label_idx', function (value) {
   return parseInt(value) + 2
 })
 
-export function getUsers(data: any): any {
-  if (!data?.all?.vars?.users) {
-    return { users: [] }
-  }
-  return data.all.vars.users
-}
 // START: TEMPORAL SECTION FOR TRANSITION FROM DOCKER SWARM TO K8s
 // Extract users from the old inventory
 // Docker swarm format to new
@@ -35,6 +29,9 @@ export function extractAndModifyUsers(data: any): any {
     return { users: [] }
   }
   const users = data.all.vars.users.map((user: any) => {
+    if (user.role) {
+      return user
+    }
     const { sudoer, ...rest } = user
     return {
       ...rest,

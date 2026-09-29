@@ -15,9 +15,9 @@ import { TriggerEvent, TriggerPayload } from './UserNotifications'
 
 /*
  * Every event carries an Authorization header. Interactive flows forward the
- * acting user's token; the background announcement worker fetches an anonymous
- * token first (see getAnonymousToken in the events service). This lets country
- * configs require authentication on all `/triggers/user/*` routes.
+ * acting user's token; the background announcement worker fetches a service
+ * token first (see getServiceToken in the events service). This lets country
+ * configs require authentication on all `/trigger/user/*` routes.
  */
 export async function triggerUserEventNotification<T extends TriggerEvent>({
   event,
@@ -31,7 +31,7 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   authHeader: { Authorization: string }
 }): Promise<Response> {
   const response = await fetch(
-    joinUrl(countryConfigUrl, `triggers/user/${event}`),
+    joinUrl(countryConfigUrl, `trigger/user/${event}`),
     {
       method: 'POST',
       body: JSON.stringify(payload),

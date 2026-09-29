@@ -23,6 +23,7 @@ import {
   SearchQueryParams
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import { TabSearch } from './TabSearch'
 import {
   checkScopeForEventSearch,
@@ -51,15 +52,25 @@ export function AdvancedSearch() {
   const allEvents = useEventConfigurations()
   const location = useLocation()
 
-  const searchParams = SearchQueryParams.parse(
-    deserializeSearchParams(location.search)
-  )
+  /*
+   * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
+   * union of every field-value shape, and some members are objects whose keys
+   * are all optional. Those match any object and strip it to `{}`. An address
+   * filter is held as a FIELD_GROUP value, so it would not survive.
+   *
+   * Safe to skip: `parseFieldSearchParams` below keeps only the keys that name
+   * a field of the event being searched.
+   */
+  const searchParams = deserializeSearchParams(
+    location.search
+  ) as SearchQueryParams
 
   const advancedSearchEvents = allEvents.filter(
     (event) =>
       event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
   )
 
+  const adminStructure = useAdminStructure()
   const [formValuesByTabId, setFormValuesByTabId] = useState<
     Record<string, EventState>
   >(() => {
@@ -69,7 +80,11 @@ export function AdvancedSearch() {
     )
     for (const event of advancedSearchEvents) {
       if (currentEvent && currentEvent.id === event.id) {
-        const parsedParams = parseFieldSearchParams(event, searchParams)
+        const parsedParams = parseFieldSearchParams(
+          event,
+          searchParams,
+          adminStructure
+        )
         initialState[event.id] = parsedParams
       } else {
         initialState[event.id] = {}

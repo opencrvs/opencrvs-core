@@ -24,7 +24,7 @@ import {
 } from '@opencrvs/components/lib/DateField'
 import { StringifierContext } from './RegisteredField'
 
-const messages = defineMessages({
+export const messages = defineMessages({
   dateFormat: {
     defaultMessage: 'd MMMM y',
     id: 'configuration.dateFormat',

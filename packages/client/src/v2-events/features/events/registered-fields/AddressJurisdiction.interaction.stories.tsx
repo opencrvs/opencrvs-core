@@ -110,6 +110,7 @@ function scopeReferenceStory(
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              attachmentPath={null}
               eventConfig={tennisClubMembershipEvent}
               fields={addressFields()}
               formValues={declaration}

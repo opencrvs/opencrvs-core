@@ -21,6 +21,9 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/email`)'
     kind: Rule
     services:
@@ -62,6 +65,7 @@ metadata:
   name: countryconfig
 spec:
   replicas: {{ .Values.countryconfig.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: countryconfig
@@ -105,6 +109,8 @@ spec:
               value: "http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070"
             - name: AUTH_URL
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
+            - name: EVENTS_URL
+              value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
           {{- if not (eq .Values.postgres.auth_mode "managed") }}
             - name: ANALYTICS_DATABASE_URL
               valueFrom:
@@ -132,6 +138,8 @@ spec:
           name: public-key
 
 {{- include "service-account-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "countryconfig" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 

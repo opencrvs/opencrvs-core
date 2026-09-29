@@ -16,7 +16,7 @@
  * them; a country configuration picks the change up (and any now-incompatible
  * payload surfaces as a TypeScript error) simply by upgrading `@opencrvs/toolkit`.
  */
-const TELEMETRY_URL = 'https://status.opencrvs.dev/v1/telemetry'
+const TELEMETRY_URL = 'https://status.opencrvs.org/v1/telemetry'
 
 /** Payload contract version. Part of the service's idempotency key. */
 const SCHEMA_VERSION = '1.0'

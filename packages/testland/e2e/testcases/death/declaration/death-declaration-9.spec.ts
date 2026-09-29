@@ -16,12 +16,16 @@ import {
   goToSection,
   login,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { ensureAssignedToUser, expectInUrl, selectAction } from '../../../utils'
-import { REQUIRED_VALIDATION_ERROR } from '../../birth/helpers'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction
+} from '@e2e/support/utils'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('9. Death declaration case - 9', () => {
   let page: Page

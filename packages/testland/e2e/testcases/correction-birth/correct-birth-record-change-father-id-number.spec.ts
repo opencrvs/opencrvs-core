@@ -15,22 +15,22 @@ import {
   login,
   logout,
   uploadImageToSection
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration as createDeclarationV2,
   Declaration as DeclarationV2
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import { format, subDays, subYears } from 'date-fns'
-import { CREDENTIALS } from '../../constants'
-import { formatV2ChildName } from '../birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial("Correct record - Change father's ID number", () => {
   let declaration: DeclarationV2

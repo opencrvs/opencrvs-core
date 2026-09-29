@@ -20,6 +20,7 @@ import {
   EventDocument,
   EventDocumentOnlyLastAction,
   EventIndex,
+  ActionType,
   findLastAssignmentAction,
   getCurrentEventState,
   User
@@ -104,6 +105,33 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
+function setLocalEventIndexById(id: string, eventIndex: EventIndex) {
+  queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id }]
+      }
+    }),
+    () => ({ results: [eventIndex], total: 1 })
+  )
+}
+
+/**
+ * Makes an event resolvable by id from the local cache, leaving every other
+ * cached search alone — for an event that has been synced rather than acted on,
+ * where the workqueue searches are still the server's to fill.
+ *
+ * Does nothing when the event's configuration is not cached.
+ */
+export function seedLocalEventIndex(id: string, event: EventDocument) {
+  const config = findLocalEventConfig(event.type)
+
+  if (config) {
+    setLocalEventIndexById(id, getCurrentEventState(event, config))
+  }
+}
+
 export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
 
@@ -117,16 +145,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   /*
    * Ensure there exists a local cached search query for this event
    */
-
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    }),
-    () => ({ results: [updatedEventIndex], total: 1 })
-  )
+  setLocalEventIndexById(id, updatedEventIndex)
 
   /**
    * Keeps the cache in sync when an event is updated.
@@ -167,7 +186,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
 }
 
 export function findLocalEventDocument(eventId: string) {
-  return getQueryData(trpcOptionsProxy.event.get, { eventId, waitFor: false })
+  return getQueryData(trpcOptionsProxy.event.get, { eventId })
 }
 
 /*
@@ -210,11 +229,11 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 }
 
 export function setEventData(id: string, data: EventDocument) {
-  updateLocalEventIndex(id, data)
   queryClient.setQueryData(
-    trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
+    trpcOptionsProxy.event.get.queryKey({ eventId: id }),
     data
   )
+
   updateDraftsWithEvent(id, data)
 }
 
@@ -266,18 +285,8 @@ async function deleteEventData(updatedEvent: EventDocument) {
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
 
   queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey({
-      eventId: id,
-      waitFor: false
-    })
+    queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
   })
-  /*
-   * 'view-event' is a separately-keyed cache entry used by the Record tab. It is not
-   * automatically cleared when 'event.get' is removed, and the IndexedDB persister keeps
-   * it alive across page reloads. Explicitly removing it here keeps both caches in sync
-   * so the Record tab always reflects the latest server state after an action is submitted.
-   */
-  queryClient.removeQueries({ queryKey: [['view-event', id]] })
 
   /* When event is created, We derive local cache for search query from that (event with no declaration data).
    * If we delete only the event.get, we will have stale data until event is explicitly searched again.
@@ -286,34 +295,52 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
-  await queryClient.resetQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    })
-  })
-
-  await removeCachedFiles(updatedEvent)
-}
-
-export function updateLocalEvent(data: EventDocument) {
-  setEventData(data.id, data)
+  await Promise.all([
+    queryClient.resetQueries({
+      queryKey: trpcOptionsProxy.event.search.queryKey({
+        query: {
+          type: 'and',
+          clauses: [{ id }]
+        }
+      })
+    }),
+    removeCachedFiles(updatedEvent)
+  ])
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
+  await Promise.all([invalidateWorkqueues(), refetchAllSearchQueries()])
+}
 
-  await invalidateWorkqueues()
+export async function onMarkNotDuplicate(data: EventDocument) {
+  setEventData(data.id, data)
+  await refetchSearchQuery(data.id)
+}
 
-  return refetchAllSearchQueries()
+/**
+ * Write a new assignee onto every cached search result for an event.
+ *
+ * Only the assignment is patched, never the whole row: the server redacts a
+ * sealed record's index while leaving the document readable, so rebuilding the
+ * row from the local document would put the real title back on screen.
+ */
+function setLocalEventIndexAssignment(id: string, assignedTo: string | null) {
+  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey]) => {
+    queryClient.setQueryData<inferOutput<typeof trpcOptionsProxy.event.search>>(
+      queryKey,
+      (oldData) =>
+        oldData && {
+          ...oldData,
+          results: oldData.results.map((eventIndex) =>
+            eventIndex.id === id ? { ...eventIndex, assignedTo } : eventIndex
+          )
+        }
+    )
+  })
 }
 
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
-  await invalidateWorkqueues()
-  await refetchSearchQuery(updatedEvent.id)
-
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
   const localEvent = findLocalEventDocument(updatedEvent.id)
 
@@ -327,6 +354,22 @@ export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
     ...updatedEvent,
     actions: localActions.concat(updatedEvent.actions)
   })
+
+  /*
+   * Nothing below refreshes the workqueue rows: `invalidateWorkqueues` only
+   * invalidates `workqueue.count` and `refetchSearchQuery` only the by-id
+   * entry, while the count-diff (procedures/count.ts) never fires for an
+   * assignment, which moves no record between workqueues.
+   */
+  setLocalEventIndexAssignment(
+    updatedEvent.id,
+    lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
+  )
+
+  await Promise.all([
+    invalidateWorkqueues(),
+    refetchSearchQuery(updatedEvent.id)
+  ])
 }
 
 export async function refetchDraftsList() {
@@ -342,7 +385,8 @@ export async function cleanUpOnUnassign(
   await deleteEventData(updatedEvent)
   // Assuming unassign needs to be done online, we'll just refetch the query.
   // NOTE: local event cannot be used to recreate EventIndex cache. Record might be sealed, which causes inconsistencies in UI.
-  await refetchSearchQuery(updatedEvent.id)
-
-  await invalidateWorkqueues()
+  await Promise.all([
+    refetchSearchQuery(updatedEvent.id),
+    invalidateWorkqueues()
+  ])
 }

@@ -60,8 +60,12 @@ describe('authenticate handler receives a request', () => {
         role: 'NATIONAL_SYSTEM_ADMIN',
         status: 'active',
         mobile: '+345345343',
-        email: 'test@test.org'
+        email: 'test@test.org',
+        primaryOfficeId: '1'
       })
+      jest
+        .spyOn(authService, 'assertOfficeIsActive')
+        .mockResolvedValue(undefined)
 
       const authRes: { result?: AuthenticateResponse } =
         await server.server.inject({
@@ -111,8 +115,10 @@ describe('authenticate handler receives a request', () => {
     jest.spyOn(authService, 'authenticate').mockReturnValue({
       userId: '1',
       role: 'NATIONAL_SYSTEM_ADMIN',
-      mobile: '+345345343'
+      mobile: '+345345343',
+      primaryOfficeId: '1'
     })
+    jest.spyOn(authService, 'assertOfficeIsActive').mockResolvedValue(undefined)
 
     const authRes: { result?: { nonce: string } } = await server.server.inject({
       method: 'POST',

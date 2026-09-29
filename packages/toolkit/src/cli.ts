@@ -27,9 +27,9 @@ Usage: opencrvs <command>
 Commands:
   environment            Manage deployment environments
   upgrade                Upgrade an existing environment
-  check-translations     Check translation files for completeness
   verify-endpoints       Verify the locally-running country config exposes the
-                         expected endpoints and keeps secured ones locked down
+                         expected endpoints, keeps secured ones locked down and
+                         serves the translations core requires
 
 Run 'opencrvs <command> --help' for more information on a command.
 `.trim()
@@ -39,9 +39,14 @@ Usage: opencrvs verify-endpoints [country-config-url]
 
 Run this after 'opencrvs upgrade', with the upgraded country config running
 locally, to confirm it still behaves correctly. It checks over HTTP that:
-  - required public endpoints exist (respond 2xx), and
+  - required public endpoints exist (respond 2xx),
   - user-notification trigger endpoints are either absent or reject
-    unauthenticated requests (never processed without a token).
+    unauthenticated requests (never processed without a token), and
+  - '/content/client' and '/content/login' serve every message id the country
+    config template of this version carries.
+
+Checking the translations reads the template off GitHub. When GitHub cannot be
+reached the other checks still run and that one is skipped with a warning.
 
 Arguments:
   [country-config-url]   Optional. Domain or URL of the country config
@@ -82,8 +87,6 @@ function main() {
       return handleEnvironment()
     case 'upgrade':
       return handleUpgrade()
-    case 'check-translations':
-      return handleCheckTranslations()
     case 'verify-endpoints':
       return handleVerifyEndpoints()
     default:
@@ -178,12 +181,6 @@ async function handleUpgrade() {
     console.error('Upgrade failed:', error)
     process.exit(1)
   }
-}
-
-function handleCheckTranslations() {
-  console.log('Checking translations...')
-  console.warn('This command is not implemented yet!')
-  process.exit(1)
 }
 
 async function handleVerifyEndpoints() {

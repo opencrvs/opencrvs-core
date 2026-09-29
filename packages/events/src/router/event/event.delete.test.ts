@@ -10,6 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -78,6 +79,32 @@ test('stored events can be deleted', async () => {
   await expect(client.event.get({ eventId: event.id })).rejects.toThrow(
     `Event not found with ID: ${event.id}`
   )
+})
+
+test("deleting a record deletes everything under the record's prefix", async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const deletedPrefixes: string[] = []
+
+  mswServer.use(
+    http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, ({ request }) => {
+      deletedPrefixes.push(
+        new URL(request.url).pathname.replace('/prefix/', '')
+      )
+      return HttpResponse.json({ deleted: 0 })
+    })
+  )
+
+  await client.event.delete({ eventId: event.id })
+
+  /*
+   * Deletion works on the prefix rather than on a walk over the fields of the
+   * event document, so a file that no action ever referenced goes too.
+   */
+  expect(deletedPrefixes).toEqual([`events/${event.id}/`])
 })
 
 test('declared event can not be deleted', async () => {

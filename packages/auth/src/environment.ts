@@ -22,7 +22,6 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  SENTRY_DSN: str({ default: undefined }),
   TWO_FA_ENABLED: bool({
     devDefault: false,
     default: true,
@@ -35,6 +34,5 @@ export const env = cleanEnv(process.env, {
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS: num({ default: 3600 }), // 1 hour
-  CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_RECOVERY_LINK_EXPIRY_SECONDS: num({ default: 3600 }) // 1 hour (account recovery link)
 })

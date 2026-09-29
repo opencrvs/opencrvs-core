@@ -19,11 +19,14 @@ import {
   searchFromSearchBar,
   triggerDeclarationAction,
   uploadImage
-} from '../../helpers'
-import { ensureAssignedToUser } from '../../utils'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { fillDate, formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/helpers'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { fillDate, formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test('Registering an adoption seals the original birth record', async ({
   browser
@@ -74,7 +77,7 @@ test('Registering an adoption seals the original birth record', async ({
 
   await test.step('Looking up a non-existent BRN shows no match', async () => {
     await page.locator('#search').fill('NOTAREALBRN1')
-    await page.getByRole('button', { name: 'Search', exact: true }).click()
+    await page.locator('#search').press('Enter')
 
     await expect(page.getByTestId('search-input-error')).toContainText(
       'No birth record found with this BRN'
@@ -86,7 +89,7 @@ test('Registering an adoption seals the original birth record', async ({
     // no need to go through the "Clear" confirmation (only shown once a
     // record has actually been linked).
     await page.locator('#search').fill(birthRegistrationNumber)
-    await page.getByRole('button', { name: 'Search', exact: true }).click()
+    await page.locator('#search').press('Enter')
 
     await expect(page.getByTestId('search-input-error')).toContainText(
       'Birth record found'

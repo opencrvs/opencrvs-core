@@ -11,6 +11,7 @@
 
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import * as Joi from 'joi'
+import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { sendTelemetry, TelemetryReport } from '@opencrvs/toolkit/telemetry'
 import { env } from '@countryconfig/environment'
 import { logger } from '@countryconfig/logger'
@@ -55,7 +56,8 @@ export function logTelemetryStartupStatus() {
 
   // Matches the handler's `domain` stamping: a wildcard/empty DOMAIN is not
   // reported.
-  const domain = env.DOMAIN && env.DOMAIN !== '*' ? env.DOMAIN : '(not reported)'
+  const domain =
+    env.DOMAIN && env.DOMAIN !== '*' ? env.DOMAIN : '(not reported)'
 
   logger.info(
     'Telemetry is enabled — anonymous, aggregate usage metrics will be ' +
@@ -77,15 +79,15 @@ export function logTelemetryStartupStatus() {
  * telemetry is enabled or of the country code / domain / environment reported.
  */
 export async function telemetryHandler(request: Request, h: ResponseToolkit) {
-  // Only accept OpenCRVS *system* tokens (the events service's anonymous
-  // token has userType 'system'). A logged-in user's token is a 'user' token,
-  // so a user cannot submit telemetry with their own credentials — and the
-  // anonymous-token endpoint is not reachable through the public gateway.
-  const credentials = request.auth.credentials as
-    | { userType?: string }
-    | undefined
-  if (credentials?.userType !== 'system') {
-    logger.warn('Telemetry: rejected a request that is not from a system token')
+  // Only accept core's service token (the events service authenticates its
+  // unattended telemetry POST with it; identified by its fixed `sub`). A
+  // logged-in user's token has a different subject, so a user cannot submit
+  // telemetry with their own credentials — and the service-token endpoint is
+  // not reachable through the public gateway.
+  if (!isServiceToken(request.auth.credentials)) {
+    logger.warn(
+      'Telemetry: rejected a request that is not from the service token'
+    )
     return h.response({ error: 'forbidden' }).code(403)
   }
 

@@ -9,48 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { AgeValue } from '@opencrvs/commons/client'
-import {
-  TextInput as TextInputComponent,
-  ITextInputProps as TextInputProps
-} from '@opencrvs/components'
+import { AgeValue, AGE_MAX_VALUE } from '@opencrvs/commons/client'
+import { ITextInputProps as TextInputProps } from '@opencrvs/components'
+import { Number } from './Number'
 
-interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
+interface AgeInputProps
+  extends Omit<TextInputProps, 'max' | 'min' | 'onChange'> {
   asOfDateRef: string
   onChange(val: AgeValue | undefined): void
   value: number | undefined
 }
 
-const AGE_MAX_CHARACTERS = 3
-
-function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
-  const [inputValue, setInputValue] = React.useState(
-    value && isNaN(value) ? undefined : value
-  )
-
-  React.useEffect(() => {
-    setInputValue(value ?? undefined)
-  }, [value])
-
+function AgeInput({ asOfDateRef, onChange, ...props }: AgeInputProps) {
   return (
-    <TextInputComponent
+    <Number.Input
       {...props}
+      integer
       data-testid={`age__${props.id}`}
-      maxLength={AGE_MAX_CHARACTERS}
-      value={inputValue}
-      onBlur={(e) => {
-        props.onChange(
-          inputValue ? { age: inputValue, asOfDateRef } : undefined
-        )
-        props.onBlur?.(e)
-      }}
-      onChange={(e) => {
-        const parsedValue = parseInt(e.target.value, 10)
-
-        isNaN(parsedValue)
-          ? setInputValue(undefined)
-          : setInputValue(parsedValue)
-      }}
+      max={AGE_MAX_VALUE}
+      min={0}
+      onChange={(age) =>
+        onChange(age === undefined ? undefined : { age, asOfDateRef })
+      }
     />
   )
 }

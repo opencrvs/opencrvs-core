@@ -44,17 +44,21 @@ metadata:
   name: esignet-mock
 spec:
   replicas: 1
+  {{- include "strategy-helper" (dict "service_name" "esignet_mock" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: esignet-mock
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: esignet-mock
     spec:
       containers:
         - name: esignet-mock
-          image: {{ .Values.esignet_mock.image.repository }}:{{ .Values.esignet_mock.image.tag }}
+          image: {{ include "mosip.image" (dict "root" $ "service" .Values.esignet_mock) }}
+          imagePullPolicy: {{ .Values.esignet_mock.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: CLIENT_APP_URL
               value: https://register.{{ .Values.hostname }}

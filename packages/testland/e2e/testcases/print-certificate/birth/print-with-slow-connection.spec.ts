@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, type Page, expect } from '@playwright/test'
-import { CREDENTIALS } from '../../../constants'
-import { login, getToken } from '../../../helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { login, getToken } from '@e2e/support/helpers'
 import {
   createDeclaration,
   Declaration
-} from '../../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import {
   selectRequesterType,
   selectCertificationType,
   navigateToCertificatePrintAction
-} from './helpers'
-import { expectInUrl } from '../../../utils'
-import { mockNetworkConditions } from '../../../mock-network-conditions'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
+import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 
 test.describe
   .serial('User should not be able to press print button twice', () => {

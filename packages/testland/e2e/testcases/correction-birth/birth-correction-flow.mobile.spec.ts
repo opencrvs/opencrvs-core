@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { getToken, login, logout } from '../../helpers'
+import { getToken, login, logout } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import {
   ensureAssignedToUser,
   expectInUrl,
@@ -23,10 +23,11 @@ import {
   selectAction,
   type,
   waitForCorrectionAction
-} from '../../utils'
-import { formatV2ChildName } from '../birth/helpers'
-import { setMobileViewport } from '../../mobile-helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { setMobileViewport } from '@e2e/support/mobile-helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 test.describe.serial('Birth correction flow - Mobile', () => {
   let declaration: Declaration
@@ -78,7 +79,7 @@ test.describe.serial('Birth correction flow - Mobile', () => {
   test('Fill in the supporting documents form', async () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
     const path = require('path')
-    const attachmentPath = path.join(__dirname, '../test-data/image.png')
+    const attachmentPath = path.join(ASSETS_DIR, 'image.png')
     const inputFile = await page.locator(
       'input[name="documents____supportingDocs"][type="file"]'
     )

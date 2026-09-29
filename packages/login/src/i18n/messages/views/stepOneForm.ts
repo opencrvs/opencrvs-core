@@ -95,6 +95,13 @@ const messagesToDefine: IStepOneFormMessages = {
     defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
+  },
+  officeInactiveError: {
+    id: 'login.officeInactiveError',
+    defaultMessage:
+      'Your assigned office has been made inactive. Please contact your administrator to be reassigned',
+    description:
+      "The error that appears when the user's assigned office is inactive"
   }
 }
 

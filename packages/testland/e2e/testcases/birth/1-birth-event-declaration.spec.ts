@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { login, triggerDeclarationAction } from '../../helpers'
+import { login, triggerDeclarationAction } from '@e2e/support/helpers'
 import path from 'path'
 import { faker } from '@faker-js/faker'
-import { expectInUrl, selectAction } from '../../utils'
-import { trackAndDeleteCreatedEvents } from '../test-data/eventDeletion'
+import { expectInUrl, selectAction } from '@e2e/support/utils'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 const child = {
   name: {
@@ -386,7 +387,7 @@ test.describe.serial('1. Birth event declaration', () => {
 
         await page
           .locator('input[data-testid="documents____proofOfMother"]')
-          .setInputFiles(path.join(__dirname, 'test_img.png'))
+          .setInputFiles(path.join(ASSETS_DIR, 'image.png'))
 
         await expect(
           page.locator('#document_BIRTH_CERTIFICATE_link')

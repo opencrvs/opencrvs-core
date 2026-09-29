@@ -10,9 +10,10 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import path from 'path'
-import { continueForm, login, loginWithNewUser } from '../../helpers'
+import { continueForm, login, loginWithNewUser } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 test.describe.serial('1. Create user -1', () => {
   let page: Page
@@ -22,7 +23,7 @@ test.describe.serial('1. Create user -1', () => {
     email: faker.internet.email(),
     role: 'Registrar'
   }
-  const signaturePath = path.resolve(__dirname, '../../assets/sign1.png')
+  const signaturePath = path.join(ASSETS_DIR, 'sign1.png')
   const username = `${userinfo.firstName[0]}.${userinfo.surname}`.toLowerCase()
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
@@ -117,5 +118,51 @@ test('Browser back on the user creation form returns to the team page', async ({
     // Back on the team page: the "add user" action is available again and the creation form is gone.
     await expect(page.locator('#add-user').first()).toBeVisible()
     await expect(page.getByText('User details')).toBeHidden()
+  })
+})
+
+test('Creating a Registration Officer routes to the signature upload page', async ({
+  page
+}) => {
+  const user = {
+    firstName: faker.person.firstName('male'),
+    surname: faker.person.lastName('male'),
+    email: faker.internet.email()
+  }
+  const signaturePath = path.join(ASSETS_DIR, 'sign1.png')
+
+  await test.step('National system admin opens the new-user form at a location', async () => {
+    await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+    await page.getByRole('button', { name: 'Team' }).click()
+    await expect(
+      page.locator('#location-range-picker-action').getByText('HQ Office')
+    ).toBeVisible()
+
+    await page.getByRole('button', { name: /HQ Office/ }).click()
+    await page.getByTestId('locationSearchInput').fill('Klow')
+    await page.getByText(/Klow Village Hospital/).click()
+
+    await page.click('#add-user')
+    await expect(page.getByText('User details')).toBeVisible()
+  })
+
+  await test.step('Fill user details with role Registration Officer', async () => {
+    await page.locator('#surname').fill(user.surname)
+    await page.locator('#firstname').fill(user.firstName)
+    await page.locator('#email').fill(user.email)
+    await page.locator('#role').click()
+    await page.getByText('Registration Officer', { exact: true }).click()
+    await continueForm(page)
+  })
+
+  await test.step('The signature upload page is shown', async () => {
+    await expect(page.getByText("User's signature")).toBeVisible()
+    await page.setInputFiles('input[type="file"]', signaturePath)
+    await continueForm(page)
+  })
+
+  await test.step('The user can be created', async () => {
+    await page.getByRole('button', { name: 'Create user' }).click()
+    await expect(page.locator('#header')).toContainText('Klow Village Hospital')
   })
 })

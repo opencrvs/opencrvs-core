@@ -239,6 +239,7 @@ const AttachmentUploadEntrySchema = AuditLogEntryBase.extend({
   operation: z.literal('attachments.upload'),
   requestData: z.object({
     transactionId: z.string(),
+    eventId: z.string().optional(),
     path: z.string().nullable()
   }),
   responseSummary: z.object({ fileUrl: z.string() })

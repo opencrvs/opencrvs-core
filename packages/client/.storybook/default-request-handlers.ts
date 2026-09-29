@@ -48,7 +48,7 @@ async function ensureCacheExists(cacheName: string) {
 const FAKE_CACHE_NAME = 'workbox-runtime'
 ensureCacheExists(FAKE_CACHE_NAME)
 
-const tRPCMsw = createTRPCMsw<AppRouter>({
+export const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
       url: '/api/events'
@@ -364,9 +364,6 @@ export const handlers = {
       const formData = await req.request.formData()
 
       return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
-    }),
-    http.delete('/api/files/:filePath*', async (request) => {
-      return HttpResponse.text('OK')
     }),
     http.get('/files/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
@@ -2247,27 +2244,6 @@ export const handlers = {
         })
       }
     )
-  ],
-  avatars: [
-    http.get('https://eu.ui-avatars.com/api/', ({ request }) => {
-      const url = new URL(request.url)
-      const name = url.searchParams.get('name') || 'Unknown'
-
-      // Extract initials from name
-      const initials = name
-        .split(' ')
-        .map((word) => word.charAt(0).toUpperCase())
-        .join('')
-        .slice(0, 2)
-
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 64 64" version="1.1"><rect fill="#DEE5F2" cx="32" width="64" height="64" cy="32" r="32"/><text x="50%" y="50%" style="color: #222; line-height: 1;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;" alignment-baseline="middle" text-anchor="middle" font-size="28" font-weight="400" dy=".1em" dominant-baseline="middle" fill="#222">${initials}</text></svg>`
-
-      return new HttpResponse(svg, {
-        headers: {
-          'Content-Type': 'image/svg+xml'
-        }
-      })
-    })
   ],
   workqueues: [
     tRPCMsw.workqueue.count.query((input: { slug: string }[]) => {

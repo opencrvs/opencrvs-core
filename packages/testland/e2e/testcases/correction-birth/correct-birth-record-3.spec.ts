@@ -16,23 +16,23 @@ import {
   goBackToReview,
   login,
   uploadImage
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { random } from 'lodash'
 import {
   createDeclaration as createDeclarationV2,
   Declaration as DeclarationV2
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import { format, subDays, subYears } from 'date-fns'
-import { formatV2ChildName } from '../birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { IdType } from '@countryconfig/events/utils'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 
 test.describe.serial(' Correct record - 3', () => {
   let declaration: DeclarationV2

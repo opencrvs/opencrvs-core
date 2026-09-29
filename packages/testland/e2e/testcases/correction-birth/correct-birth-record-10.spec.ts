@@ -17,24 +17,27 @@ import {
   goBackToReview,
   login,
   uploadImage
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { format, subDays } from 'date-fns'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   type,
   waitForCorrectionAction
-} from '../../utils'
-import { formatV2ChildName, REQUIRED_VALIDATION_ERROR } from '../birth/helpers'
+} from '@e2e/support/utils'
+import {
+  formatV2ChildName,
+  REQUIRED_VALIDATION_ERROR
+} from '@e2e/support/birth/helpers'
 import { getMixedPath } from '@opencrvs/toolkit/events'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe('10. Correct record', () => {
   let declaration: Declaration
@@ -249,7 +252,10 @@ test.describe('10. Correct record', () => {
           `/events/request-correction/${eventId}/pages/child?from=review&backTo=/workqueue/pending-certification#child____gender`
         )
 
-        await page.getByTestId('select__child____gender').locator('svg').click()
+        await page
+          .getByTestId('select__child____gender')
+          .locator('.react-select__dropdown-indicator')
+          .click()
         await page.getByText('Male', { exact: true }).click()
 
         await page.getByRole('button', { name: 'Go to review' }).click()

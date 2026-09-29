@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { login } from '../../helpers'
+import { login } from '@e2e/support/helpers'
 
 test.describe.serial('Advanced Search - Birth Event Declaration', () => {
   let page: Page

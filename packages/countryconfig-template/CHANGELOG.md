@@ -4,8 +4,80 @@
 
 ### Breaking changes
 
+- Add `EVENTS_URL=http://events:5555/` to the `countryconfig` service. It has no production default, so the service will not start without it, whether or not any integrations are configured. Read by `src/api/integration/handler.ts`, which registers the integrations listed in `INTEGRATIONS` — empty by default. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 - Removed InfluxDB from deployment infrastructure (service, backup/restore, provisioning).
 - The employee seeder seeds `<ENVIRONMENT_NAME>-employees.csv` from `src/data-seeding/employees/source/` when that file exists, otherwise `default-employees.csv`. It uses the `ENVIRONMENT_NAME` env var (also the telemetry environment label); add per-environment files such as `production-employees.csv` to seed different users per environment — no code change needed. The previous `EMPLOYEES_CSV` env var and the `OPENCRVS_ENVIRONMENT`-based `prod-employees.csv` selection have been removed [#11171](https://github.com/opencrvs/opencrvs-core/issues/11171).
+
+### Bug fixes
+
+- Deaths abroad are no longer filed under the deceased's home district. `eventDetails.deathLocationId` (the event's `placeOfEvent`) fell back to `deceased.address` — the usual residence, always filled in — so a death abroad with no facility or "Other" address was assigned to the home district and the declaring embassy lost its record. The fallback now uses a new hidden field `eventDetails.deathLocationResidence`, populated only when the place of death is the usual residence. [#13651](https://github.com/opencrvs/opencrvs-core/issues/13651)
+
+  Apply both edits in `src/events/death/forms/pages/eventDetails.ts`:
+
+  1. Add the hidden field `eventDetails.deathLocationResidence` just before `eventDetails.deathLocationId`:
+
+  ```ts
+  {
+    id: 'eventDetails.deathLocationResidence',
+    type: FieldType.ALPHA_HIDDEN,
+    required: false,
+    label: placeOfDeathMessageDescriptors.DECEASED_USUAL_RESIDENCE,
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('eventDetails.placeOfDeath').isEqualTo(
+          PlaceOfDeath.DECEASED_USUAL_RESIDENCE
+        )
+      }
+    ],
+    parent: [field('eventDetails.placeOfDeath'), field('deceased.address')],
+    value: field('deceased.address').get('administrativeArea')
+  },
+  ```
+
+  2. Point the last `deathLocationId` fallback at it:
+
+  ```diff
+   value: [
+     field('eventDetails.deathLocation'),
+     field('eventDetails.deathLocationOther').get('administrativeArea'),
+  -  field('deceased.address').get('administrativeArea')
+  +  field('eventDetails.deathLocationResidence')
+   ]
+  ```
+
+  No new translation key — it reuses `DECEASED_USUAL_RESIDENCE`. If your form has diverged, port the intent: the fallback must not contribute a location unless the place of death is the usual residence.
+
+  Existing records are not corrected — this affects only declarations filled in after the upgrade; re-indexing won't change stored `deathLocationId`, only a correction that re-saves the form will. Present since 2.0.0, so audit your data if embassy offices are in use.
+
+## 2.0.3 Release Candidate
+
+## 2.0.2
+
+## 1.9.18
+
+## 1.9.17
+
+### Breaking changes
+
+- Sentry has been removed from OpenCRVS core, so this configuration no longer wires it up. `SENTRY_DSN` is gone from `src/environment.ts` and `src/constants.ts`, along with the `hapi-sentry` plugin and its `onRequest` scope extension in `src/index.ts`, the `SENTRY` field in `src/client-config.ts`, `src/client-config.prod.ts`, `src/login-config.ts` and `src/login-config.prod.ts`, and `IApplicationConfig.SENTRY` in `src/utils/index.ts`. Any `SENTRY_DSN` still set in your environment is ignored. Crash reporting is no longer built in — deployments that relied on Sentry for alerting should put their own error tracking in place. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+## 2.0.1 Release
+
+### Security fixes
+
+- Every `/trigger/user/*` route now requires authentication, inheriting the default `jwt` strategy instead of setting `auth: false`. Previously anyone able to reach the country config service could trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. Requires OpenCRVS core 2.0.1 or later, which sends an `Authorization` header on every one of these requests — including `all-user-notification`, which core now dispatches with an anonymous token. Run `npx @opencrvs/toolkit verify-endpoints` against a locally-running country config to confirm the required public endpoints still respond and the secured ones reject unauthenticated requests. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
+
+### Improvements
+
+- `analytics.locations.location_type` is now nullable, matching core's data model where the field is optional; the constraint is dropped on existing databases during deploy. [#1503](https://github.com/opencrvs/opencrvs-countryconfig/pull/1503)
+
+## 1.9.16
+
+### New features
+
+- **Clear button on form pages**: set `showClearButton: true` on a page to show a "Clear" button beside its title, which resets the page's fields after a confirmation. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
+- **Direct authentication for integrations**: integrations listed in `INTEGRATIONS` in `src/api/integration/handler.ts` are registered with the events service on startup through the `GET /trigger/system/ready` endpoint, and authenticate with their own credentials rather than the requesting user's token. Credentials are generated by OpenCRVS, never stored in the country configuration, and revealed to a National System Admin under Configurations → Integrations. The list ships empty, so an unmodified configuration is unaffected. Because these actions have no role, `analytics.event_actions.created_by_role` is now nullable; the constraint is dropped on existing databases during deploy. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 
 ## 2.0.0
 

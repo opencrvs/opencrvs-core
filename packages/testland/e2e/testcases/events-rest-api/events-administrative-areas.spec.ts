@@ -10,9 +10,12 @@
  */
 import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
-import { getToken } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { fetchClientAPI, NON_EXISTING_UUID } from './helpers'
+import { getToken } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  fetchClientAPI,
+  NON_EXISTING_UUID
+} from '@e2e/support/events-rest-api/helpers'
 
 // The rest of the create/update/withdraw invariants (idempotency, forward-only
 // effectiveFrom, stale lastVersionId, externalId uniqueness) are shared code

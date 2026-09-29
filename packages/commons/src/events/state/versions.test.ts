@@ -275,8 +275,6 @@ describe('getEventStateAtVersion', () => {
       )
     ).toThrow()
   })
-<<<<<<< HEAD
-=======
 
   test('snapshots a record whose creation action is not the earliest', () => {
     /*
@@ -318,5 +316,4 @@ describe('getEventStateAtVersion', () => {
         .declaration['applicant.email']
     ).toBe('declared@example.com')
   })
->>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
 })

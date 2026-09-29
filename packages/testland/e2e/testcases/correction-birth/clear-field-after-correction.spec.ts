@@ -9,26 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { getToken, login, switchEventTab } from '../../helpers'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 import {
   formatV2ChildName,
   getAdministrativeAreas,
   getIdByName
-} from '../birth/helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import { AddressType } from '@opencrvs/toolkit/events'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 test('Cleared field values are removed after correcting a registered birth record', async ({
   page
@@ -108,7 +109,7 @@ test('Cleared field values are removed after correcting a registered birth recor
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
     const path = require('path')
-    const attachmentPath = path.join(__dirname, '../test-data/image.png')
+    const attachmentPath = path.join(ASSETS_DIR, 'image.png')
     const inputFile = page.locator(
       'input[name="documents____supportingDocs"][type="file"]'
     )

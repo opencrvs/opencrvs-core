@@ -15,27 +15,30 @@ import {
   getToken,
   login,
   uploadImage
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS, SAFE_INPUT_CHANGE_TIMEOUT_MS } from '../../constants'
+import {
+  CREDENTIALS,
+  SAFE_INPUT_CHANGE_TIMEOUT_MS
+} from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   type,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
   selectCertificationType,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
-import { formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe.serial('Correct record - 2', () => {
   let declaration: Declaration

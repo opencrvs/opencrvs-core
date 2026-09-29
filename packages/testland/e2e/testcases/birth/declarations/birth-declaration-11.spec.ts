@@ -16,9 +16,9 @@ import {
   goToSection,
   login,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe.serial('11. Birth declaration case - 11', () => {
   let page: Page

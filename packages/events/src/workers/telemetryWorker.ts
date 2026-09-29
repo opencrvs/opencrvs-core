@@ -47,7 +47,7 @@ export function startTelemetryWorker(): void {
   // The worker always runs; whether a report is forwarded to the status service
   // is decided by countryconfig, so the events service stays unaware of whether
   // telemetry is enabled.
-  const tick = () =>
+  const tick = async () =>
     runTelemetryTick().catch((err) => {
       logger.error(
         `Telemetry worker: unhandled error in tick: ${

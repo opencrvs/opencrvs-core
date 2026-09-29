@@ -49,8 +49,17 @@ export async function readCSVToJSON<T>(filename: string) {
 
 type CSVRow = { id: string; description: string } & Record<string, string>
 
+/**
+ * Most descriptions contain a comma, and a row printed for someone to paste
+ * into the file has to survive being pasted.
+ */
+function toCSVValue(value: string) {
+  return /["\n,]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
+}
+
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
+const ci = process.argv.includes('--ci')
 
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
@@ -69,51 +78,112 @@ function readTranslations() {
   )
 }
 
-function findObjectLiteralsWithIdAndDefaultMessage(
+/**
+ * The value of `node`'s `name` property, when the source gives it as a fixed
+ * string. Reading the 'id' property of each of these:
+ *
+ *   { id: 'foo' }             -> 'foo'
+ *   { id: `foo` }             -> 'foo'      backticks, nothing substituted in
+ *   { id: `x.${country}` }    -> undefined  differs every time it runs
+ *   { defaultMessage: 'foo' } -> undefined  no id property at all
+ */
+function staticStringOf(
+  node: ts.ObjectLiteralExpression,
+  name: string
+): string | undefined {
+  const property = node.properties.find(
+    (p) => ts.isPropertyAssignment(p) && p.name.getText() === name
+  )
+
+  if (!property || !ts.isPropertyAssignment(property)) {
+    return undefined
+  }
+
+  const { initializer } = property
+
+  return ts.isStringLiteral(initializer) ||
+    ts.isNoSubstitutionTemplateLiteral(initializer)
+    ? initializer.text
+    : undefined
+}
+
+function hasProperty(node: ts.ObjectLiteralExpression, name: string) {
+  return node.properties.some(
+    (p) => ts.isPropertyAssignment(p) && p.name.getText() === name
+  )
+}
+
+/** Anything shaped like a react-intl message: `{ id, defaultMessage, ... }`. */
+function isMessageDescriptor(
+  node: ts.Node
+): node is ts.ObjectLiteralExpression {
+  return (
+    ts.isObjectLiteralExpression(node) &&
+    hasProperty(node, 'id') &&
+    hasProperty(node, 'defaultMessage')
+  )
+}
+
+/**
+ * Every message declared in one file.
+ *
+ * The properties are read one at a time rather than by evaluating the object
+ * as a whole. Evaluating it would drop the whole message the moment any one
+ * property was interpolated, and `description` often is — harmlessly, since
+ * nothing reads it at runtime. The key would then stop being checked, with
+ * nothing to say so.
+ */
+function messagesDeclaredIn(
   filePath: string,
   sourceCode: string
 ): MessageDescriptor[] {
   const sourceFile = ts.createSourceFile(
-    'temp.ts',
+    filePath,
     sourceCode,
     ts.ScriptTarget.Latest,
     true
   )
-  const matches: MessageDescriptor[] = []
+  const messages: MessageDescriptor[] = []
 
-  function visit(node: ts.Node) {
-    if (!ts.isObjectLiteralExpression(node)) {
-      ts.forEachChild(node, visit)
-      return
-    }
-    const idProperty = node.properties.find(
-      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'id'
-    )
-    const defaultMessageProperty = node.properties.find(
-      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'defaultMessage'
-    )
+  function collect(node: ts.ObjectLiteralExpression) {
+    const id = staticStringOf(node, 'id')
 
-    if (!(idProperty && defaultMessageProperty)) {
-      ts.forEachChild(node, visit)
-      return
-    }
-
-    const objectText = node.getText(sourceFile) // The source code representation of the object
-
-    try {
-      const func = new Function(`return (${objectText});`)
-      const objectValue = func()
-      matches.push(objectValue)
-    } catch (error) {
+    if (id === undefined) {
       console.log(chalk.yellow.bold('Warning'))
       console.error(
         `Found a dynamic message identifier in file ${filePath}.`,
         'Message identifiers should never be dynamic and should always be hardcoded instead.',
         'This enables us to confidently verify that a country configuration has all required keys.',
         '\n',
-        objectText,
+        node.getText(sourceFile),
         '\n'
       )
+      return
+    }
+
+    const defaultMessage = staticStringOf(node, 'defaultMessage')
+
+    if (defaultMessage === undefined) {
+      console.log(chalk.yellow.bold('Warning'))
+      console.error(
+        `Found a dynamic default message for ${id} in file ${filePath}.`,
+        'The key is still checked, but --write cannot fill in its English copy.',
+        '\n',
+        node.getText(sourceFile),
+        '\n'
+      )
+    }
+
+    messages.push({
+      id,
+      defaultMessage: defaultMessage ?? '',
+      description: staticStringOf(node, 'description') ?? ''
+    })
+  }
+
+  function visit(node: ts.Node) {
+    if (isMessageDescriptor(node)) {
+      collect(node)
     }
 
     ts.forEachChild(node, visit)
@@ -121,7 +191,7 @@ function findObjectLiteralsWithIdAndDefaultMessage(
 
   visit(sourceFile)
 
-  return matches
+  return messages
 }
 
 async function extractMessages() {
@@ -155,13 +225,18 @@ async function extractMessages() {
   console.log()
 
   const files = await promisify(glob)('src/**/*.@(tsx|ts)', {
-    ignore: ['**/*.test.@(tsx|ts)', 'src/tests/**/*.*']
+    ignore: [
+      '**/*.test.@(tsx|ts)',
+      'src/tests/**/*.*',
+      'src/setupTests.ts',
+      '**/*.stories.@(tsx|ts)'
+    ]
   })
 
   const messagesParsedFromApp: MessageDescriptor[] = files
     .map((f) => {
       const contents = fs.readFileSync(f).toString()
-      return findObjectLiteralsWithIdAndDefaultMessage(f, contents)
+      return messagesDeclaredIn(f, contents)
     })
     .flat()
 
@@ -174,9 +249,12 @@ async function extractMessages() {
   )
 
   if (outdated) {
+    // Membership, not truthiness: a message with an empty description is still
+    // a message, and reporting it as outdated sends people deleting live keys.
+    const extractedIds = new Set(messagesParsedFromApp.map(({ id }) => id))
     const extraKeys = translations
       .map(({ id }) => id)
-      .filter((key) => !reactIntlDescriptions[key])
+      .filter((key) => !extractedIds.has(key))
 
     console.log(chalk.yellow.bold('Potentially outdated translations'))
     console.log(
@@ -188,10 +266,39 @@ async function extractMessages() {
 
   if (missingKeys.length > 0) {
     console.log(chalk.red.bold('Missing translations'))
-    console.log(`You are missing the following content keys from your country configuration package:\n
+
+    if (ci) {
+      // CSV-shaped, so the workflow can lift the block straight into the job
+      // summary and a reviewer can paste it into the file.
+      const defaultsToBeAdded = missingKeys.map(
+        (key): CSVRow => ({
+          id: key,
+          description: reactIntlDescriptions[key],
+          ...Object.fromEntries(
+            knownLanguages.map((lang) => [
+              lang,
+              lang === 'en'
+                ? messagesParsedFromApp
+                    .find(({ id }) => id === key)
+                    ?.defaultMessage?.toString() || ''
+                : ''
+            ])
+          )
+        })
+      )
+      const message = defaultsToBeAdded
+        .map((row) => Object.values(row).map(toCSVValue).join(','))
+        .join('\n')
+      console.log(`You are missing the following content keys from your country configuration package:\n
+${chalk.white(message)}\n
+ Add them to this file and run again:
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/login.csv`)}`)
+    } else {
+      console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(missingKeys.join('\n'))}\n
 Translate the keys and add them to this file:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/login.csv`)}`)
+    }
 
     if (write) {
       console.log(
@@ -237,12 +344,22 @@ ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/login.csv`)}`)
       })
 
       await writeTranslations(sortBy(allTranslations, (row) => row.id))
+
+      console.log(`
+${chalk.green('Added')} ${missingKeys.length} key(s). The non-English copy is still yours to write.`)
+
+      // The rows are in the file, so there is nothing left to fail on. Exiting
+      // non-zero here reads as a failed run and sends people running the very
+      // same command a second time.
+      return
     } else {
       console.log(`
 ${chalk.green('Tip 🪄')}: ${chalk.white(
-        `If you want this command to add the missing English keys for you, run it with the ${chalk.bold(
-          '--write'
-        )} flag. Note that you still need to add non-English translations to the file.`
+        `If you want this command to add the missing English keys for you, run ${chalk.bold(
+          'pnpm extract:translations --write'
+        )} in ${chalk.bold(
+          'packages/login'
+        )}. Note that you still need to add non-English translations to the file.`
       )}`)
     }
 

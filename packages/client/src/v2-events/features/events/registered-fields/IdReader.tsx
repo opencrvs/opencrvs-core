@@ -55,6 +55,7 @@ function IdReaderInput({
   return (
     <SubComponentStack>
       <FormFieldGenerator
+        attachmentPath={null}
         fields={methods}
         id={id}
         validatorContext={validatorContext}

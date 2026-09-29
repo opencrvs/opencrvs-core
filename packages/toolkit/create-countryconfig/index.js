@@ -13,6 +13,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const { execSync } = require('child_process')
 const readline = require('readline/promises')
 const degit = require('degit').default
 
@@ -21,11 +22,132 @@ const CORE_REPOSITORY = 'opencrvs/opencrvs-core'
 const COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH =
   'packages/countryconfig-template'
 
+const CORE_REPO_URL = 'https://github.com/' + CORE_REPOSITORY + '.git'
+const INFRASTRUCTURE_REPO_URL =
+  'https://github.com/' + INFRASTRUCTURE_REPOSITORY + '.git'
+
+const { version } = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8')
+)
+
 function joinValues(values, separator) {
   return values
     .filter((value) => !!value)
     .join(separator)
     .trim()
+}
+
+function tagExists(repoUrl, tag) {
+  try {
+    execSync(
+      'git ls-remote --exit-code --tags ' + repoUrl + ' refs/tags/' + tag,
+      { stdio: 'pipe' }
+    )
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+function branchExists(repoUrl, branch) {
+  try {
+    execSync(
+      'git ls-remote --exit-code --heads ' + repoUrl + ' refs/heads/' + branch,
+      { stdio: 'pipe' }
+    )
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+/**
+ * Release tags (e.g. "v2.1.0"), highest first. Delegates the version-aware
+ * ordering to git itself rather than hand-parsing semver, then filters down
+ * to strict "vX.Y.Z" tags - `--sort=-version:refname` alone still leaves in
+ * non-release refs (e.g. "vtesting", "v2.0.0-beta") and peeled annotated-tag
+ * lines ("refs/tags/v2.0.0^{}").
+ */
+function listReleaseTags(repoUrl) {
+  const output = execSync(
+    'git ls-remote --tags --sort=-version:refname ' + repoUrl,
+    { encoding: 'utf-8' }
+  )
+
+  return output
+    .split('\n')
+    .map((line) => line.split('\t')[1])
+    .filter(Boolean)
+    .map((ref) => ref.replace('refs/tags/', ''))
+    .filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag))
+}
+
+/**
+ * The highest release tag present in *both* repositories - used as the
+ * fallback when the version-specific tag can't be found in one or both, so
+ * scaffolding still lands on a real, matched release rather than develop.
+ */
+function getLatestCommonReleaseTag() {
+  const infrastructureTags = new Set(listReleaseTags(INFRASTRUCTURE_REPO_URL))
+  return (
+    listReleaseTags(CORE_REPO_URL).find((tag) => infrastructureTags.has(tag)) ||
+    null
+  )
+}
+
+/**
+ * Resolves the ref that both repositories are cloned from. A single ref
+ * clones both, so every candidate must exist in *both* - a tag present in
+ * only one of them can't be used.
+ *
+ * The exact "v<version>" tag wins whenever it exists: it pins a commit, so
+ * a release, an explicit `@X.Y.Z` pin, or a blessed prerelease (npm `@beta`,
+ * published from that tag) reproduces however late it's scaffolded.
+ *
+ * Otherwise a prerelease falls back to a branch, since a rolling release
+ * candidate (npm `@next`) is never tagged: "release/X.Y.Z" of the base
+ * version when that release has been cut, otherwise develop. A release
+ * falls back to the highest tag common to both repositories - never a
+ * mismatched pairing of the two at different releases - or errors.
+ */
+function resolveRef() {
+  const versionTag = 'v' + version
+  if (
+    tagExists(CORE_REPO_URL, versionTag) &&
+    tagExists(INFRASTRUCTURE_REPO_URL, versionTag)
+  ) {
+    return versionTag
+  }
+
+  if (version.includes('-')) {
+    const releaseBranch = 'release/' + version.split('-')[0]
+    if (
+      branchExists(CORE_REPO_URL, releaseBranch) &&
+      branchExists(INFRASTRUCTURE_REPO_URL, releaseBranch)
+    ) {
+      return releaseBranch
+    }
+    return 'develop'
+  }
+
+  const latestCommonTag = getLatestCommonReleaseTag()
+  if (latestCommonTag) {
+    console.warn(
+      '\nWarning: tag "' +
+        versionTag +
+        '" was not found in both repositories; falling back to the latest ' +
+        'available release, ' +
+        latestCommonTag +
+        '.'
+    )
+    return latestCommonTag
+  }
+
+  console.error(
+    '\nError: no matching release tag was found in both the core and ' +
+      'infrastructure repositories.'
+  )
+  process.exit(1)
 }
 
 /**
@@ -34,13 +156,43 @@ function joinValues(values, separator) {
  * @param {*} param0 repository - The repository to clone (e.g., 'opencrvs/opencrvs-core').
  * @param {*} param0 repositorySubPath - The subpath within the repository to clone (optional). Otherwise the entire repository will be cloned.
  * @param {*} param0 branch - The branch to clone (optional). Defaults to the default branch if not specified.
+ * @param {*} param0 keepHistory - Keep the repository's git history instead of degit's usual history-free copy (optional, defaults to false). The cloned "origin" remote is replaced with "upstream", leaving the directory ready for the user to add their own fork/repo as "origin". Not supported together with repositorySubPath, since a plain git clone can't fetch a single subdirectory.
  *
  * @param {*} targetDir - The target directory where the repository will be cloned.
  */
 async function cloneRepository(
-  { repository, repositorySubPath, branch },
+  { repository, repositorySubPath, branch, keepHistory = false },
   targetDir
 ) {
+  if (keepHistory && repositorySubPath) {
+    throw new Error(
+      'cloneRepository: keepHistory is not supported together with repositorySubPath.'
+    )
+  }
+
+  if (keepHistory) {
+    const repoUrl = `https://github.com/${repository}.git`
+    console.log(
+      `Cloning repository from ${repoUrl}#${branch} to ${targetDir}...`
+    )
+
+    execSync('git clone --branch ' + branch + ' ' + repoUrl + ' ' + targetDir, {
+      stdio: 'inherit'
+    })
+
+    console.log(
+      `Copied files from ${repoUrl}#${branch} to ${targetDir} succesfully.`
+    )
+
+    console.log(`Replacing 'origin' remote with 'upstream' in ${targetDir}...`)
+    execSync('git remote remove origin', { cwd: targetDir, stdio: 'inherit' })
+    execSync('git remote add upstream ' + repoUrl, {
+      cwd: targetDir,
+      stdio: 'inherit'
+    })
+    return
+  }
+
   const repositoryPath = joinValues([repository, repositorySubPath], '/')
   const fullPath = joinValues([repositoryPath, branch], '#')
 
@@ -271,6 +423,8 @@ async function main() {
   ensureTargetDirectoryDoesNotExist(countryconfigDirName)
   ensureTargetDirectoryDoesNotExist(infrastructureDirName)
 
+  const ref = resolveRef()
+
   // Gather all answers up front so the operator isn't interrupted mid-clone.
   const organisation = await promptOrganisation()
   const countryCode = await promptCountryCode()
@@ -280,7 +434,8 @@ async function main() {
     await cloneRepository(
       {
         repository: CORE_REPOSITORY,
-        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH
+        repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH,
+        branch: ref
       },
       countryconfigTargetPath
     )
@@ -293,7 +448,7 @@ async function main() {
 
   try {
     await cloneRepository(
-      { repository: INFRASTRUCTURE_REPOSITORY },
+      { repository: INFRASTRUCTURE_REPOSITORY, branch: ref, keepHistory: true },
       infrastructureTargetPath
     )
   } catch (err) {
@@ -319,7 +474,12 @@ async function main() {
   console.log('  tilt up\n')
   console.log('To get started with the infrastructure:\n')
   console.log('  cd ' + infrastructureDirName)
-  console.log('  git init\n')
+  console.log('  git remote add origin <your-infrastructure-repo-url>')
+  console.log('  git push -u origin ' + ref + '\n')
+  console.log(
+    'The "upstream" remote points at the official infrastructure repository, ' +
+      'so you can pull future releases with `git fetch upstream`.\n'
+  )
 }
 
 main()

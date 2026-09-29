@@ -151,12 +151,6 @@ export function getEventStateAtVersion(
     throw new Error(`Event ${event.id} has no action ${actionId}`)
   }
 
-<<<<<<< HEAD
-  return getCurrentEventState(
-    { ...event, actions: sorted.slice(0, index + 1) },
-    config
-  )
-=======
   const prefix = sorted.slice(0, index + 1)
 
   /*
@@ -174,5 +168,4 @@ export function getEventStateAtVersion(
     creation && !prefix.includes(creation) ? [creation, ...prefix] : prefix
 
   return getCurrentEventState({ ...event, actions }, config)
->>>>>>> a75b70c0146729d5b82f9efd643891a87d36afd9
 }

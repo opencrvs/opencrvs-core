@@ -2,11 +2,11 @@
 
 ### Run against localhost
 
-`yarn e2e-dev`
+`pnpm e2e-dev`
 
 ### Run against a deployed environment
 
-`NODE_TLS_REJECT_UNAUTHORIZED=0 DOMAIN=<your-env>.opencrvs.dev yarn e2e`
+`NODE_TLS_REJECT_UNAUTHORIZED=0 DOMAIN=<your-env>.opencrvs.dev pnpm e2e`
 
 ## How to write a test
 

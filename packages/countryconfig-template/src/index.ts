@@ -8,22 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/*
+ * `require` rather than `import`, and in this order, on purpose: import
+ * statements are hoisted, so app-module-path has to register the module alias
+ * and dotenv has to populate process.env before anything that depends on
+ * either is resolved or evaluated. './monitoring' is imported for its side
+ * effect, which has to happen before the application starts.
+ */
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-unassigned-import */
 require('app-module-path').addPath(require('path').join(__dirname))
 require('dotenv').config()
 import './monitoring'
+/* eslint-enable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-unassigned-import */
 
 import path from 'path'
 import * as Hapi from '@hapi/hapi'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 import * as inert from '@hapi/inert'
-import * as Sentry from 'hapi-sentry'
 import fetch from 'node-fetch'
 import {
   CLIENT_APP_URL,
   DOMAIN,
   LOGIN_URL,
-  SENTRY_DSN,
   COUNTRY_CONFIG_HOST,
   COUNTRY_CONFIG_PORT,
   AUTH_URL,
@@ -55,6 +62,7 @@ import { rolesHandler } from './data-seeding/roles/handler'
 import { usersHandler } from './data-seeding/employees/handler'
 import { applicationConfigHandler } from './api/application/handler'
 import { handlebarsHandler } from './certificate/handlebars/handler'
+import { systemReadyHandler } from './api/integration/handler'
 import { fontsHandler } from './api/fonts/handler'
 import {
   getEventsHandler,
@@ -69,6 +77,7 @@ import {
 } from '@opencrvs/toolkit/events'
 
 import { onRegisterHandler } from './api/registration'
+import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { workqueueconfigHandler } from './api/workqueue/handler'
 import getUserNotificationRoutes from './config/routes/userNotificationRoutes'
 import {
@@ -101,19 +110,6 @@ export default function getPlugins() {
         prettyPrint: false,
         logPayload: false,
         instance: logger
-      }
-    })
-  }
-
-  if (SENTRY_DSN) {
-    plugins.push({
-      plugin: Sentry,
-      options: {
-        client: {
-          environment: process.env.NODE_ENV,
-          dsn: SENTRY_DSN
-        },
-        catchLogErrors: true
       }
     })
   }
@@ -267,8 +263,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    // eslint-disable-next-line no-unused-vars
-    handler: (request: any, h: any) => {
+    handler: () => {
       // Perform any health checks and return true or false for success prop
       return {
         success: true
@@ -582,24 +577,37 @@ export async function createServer() {
 
   server.route({
     method: 'GET',
-    path: '/triggers/system/ready',
-    handler: (_request, h) => {
-      // Not implemented by default
-      // You can use this endpoint to for instance set up integration clients
-      return h.response().code(501)
-    },
+    path: '/trigger/system/ready',
+    handler: systemReadyHandler,
     options: {
-      tags: ['api', 'triggers'],
-      description: 'System ready endpoint'
+      tags: ['api', 'integration'],
+      description:
+        'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
     }
   })
 
-  server.ext({
-    type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
-      request.sentryScope?.setExtra('payload', request.payload)
-      return h.continue
+  /*
+   * Core uses a special 'service token' to prove the request originated from core.
+   * The token is only a proof of origin and carries no scopes.
+   *
+   * Action confirmation requests check here that the token is present.
+   */
+  server.ext('onPostAuth', (request, h) => {
+    const isActionConfirmationRequest =
+      request.method === 'post' &&
+      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
+
+    if (
+      isActionConfirmationRequest &&
+      !isServiceToken(request.auth.credentials)
+    ) {
+      logger.warn(
+        'Action confirmation: rejected a request that is not from the core service token'
+      )
+      return h.response({ error: 'forbidden' }).code(403).takeover()
     }
+
+    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {

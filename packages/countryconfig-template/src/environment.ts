@@ -19,9 +19,9 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_PORT: port({ default: 3040 }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
-  SENTRY_DSN: str({ default: undefined }),
   TWO_FA_ENABLED: bool({ default: true }),
   OPENCRVS_ENVIRONMENT: str({ devDefault: 'development' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   ANALYTICS_DATABASE_URL: url({
     devDefault:
       'postgres://events_analytics:analytics_password@localhost:5432/events',

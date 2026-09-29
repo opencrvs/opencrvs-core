@@ -23,6 +23,7 @@ vi.mock('@countryconfig/environment', async (importOriginal) => {
   return { ...actual, env: { ...actual.env, TELEMETRY_ENABLED: false } }
 })
 
+import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 import { sendTelemetry } from '@opencrvs/toolkit/telemetry'
 import { telemetryHandler } from './handler'
 
@@ -35,7 +36,7 @@ const responseToolkit = {
 describe('telemetry trigger handler', () => {
   it('does not forward anything when telemetry is disabled', async () => {
     const request = {
-      auth: { credentials: { userType: 'system' } },
+      auth: { credentials: { sub: SERVICE_USER_ID } },
       payload: {
         reported_at: '2026-08-13T00:00:00.000Z',
         metrics: { 'events.total': 1 }

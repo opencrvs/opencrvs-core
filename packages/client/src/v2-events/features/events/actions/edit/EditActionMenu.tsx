@@ -31,7 +31,9 @@ import {
   FieldUpdateValue,
   EventState,
   EventConfig,
-  isActionEnabled
+  isActionEnabled,
+  AttachmentPath,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -105,8 +107,10 @@ function EditActionModal({
   close,
   fields = [],
   eventConfiguration,
-  declaration
+  declaration,
+  attachmentPath
 }: {
+  attachmentPath: AttachmentPath
   title: MessageDescriptor
   supportingCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
@@ -175,6 +179,7 @@ function EditActionModal({
       {fields.length > 0 && (
         <FormFieldGenerator
           {...dialogForm}
+          attachmentPath={attachmentPath}
           eventConfig={eventConfiguration}
           fields={fields}
           id="edit-action-modal-form"
@@ -272,6 +277,7 @@ function useEditActions(event: EventDocument) {
             (close) => {
               return (
                 <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
                   eventConfiguration={eventConfiguration}
@@ -310,6 +316,7 @@ function useEditActions(event: EventDocument) {
             (close) => {
               return (
                 <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
                   eventConfiguration={eventConfiguration}
@@ -350,6 +357,7 @@ function useEditActions(event: EventDocument) {
             (close) => {
               return (
                 <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
                   eventConfiguration={eventConfiguration}

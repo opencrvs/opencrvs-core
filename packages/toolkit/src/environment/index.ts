@@ -42,7 +42,8 @@ function validateRepositoryStructure(repositoryRoot = process.cwd()) {
 export async function runEnvironmentInit() {
   validateRepositoryStructure()
   assertNoOldInventoryLayout()
-  await import('./setup-environment.js')
+  const { runSetupEnvironment } = await import('./setup-environment.js')
+  await runSetupEnvironment()
 }
 
 export async function runEnvironmentUpgrade() {

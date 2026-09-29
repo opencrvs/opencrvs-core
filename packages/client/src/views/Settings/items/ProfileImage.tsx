@@ -64,7 +64,9 @@ export function useProfileImage(): SettingsRow {
     id: 'profile-image',
     item: {
       label: intl.formatMessage(userMessages.profileImage),
-      value: <Avatar avatar={userDetails?.avatar} name={englishName} />,
+      value: (
+        <Avatar name={englishName} size="lg" src={userDetails?.avatar} />
+      ),
       actions: (
         <ImageLoader
           onImageLoaded={handleImageLoaded}

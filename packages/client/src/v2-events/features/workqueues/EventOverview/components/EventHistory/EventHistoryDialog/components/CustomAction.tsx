@@ -71,25 +71,20 @@ export function CustomActionContent({
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const originalAction =
-    event.actions.find(
-      (a): a is CustomAction => a.id === action.originalActionId
-    ) ?? undefined
 
-  if (!originalAction) {
-    throw new Error('Original action not found. This should never happen.')
-  }
   const customActionFields = getCustomActionFields(
     eventConfiguration,
     action.customActionType
   )
+
   // These are form values, so their locations resolve at the record's form
   // anchor (date of event, falling back to creation) — not the action date.
   const anchor = recordAnchorDate(
     getCurrentEventState(event, eventConfiguration)
   )
+
   const content = prepareContent(
-    originalAction,
+    action,
     customActionFields,
     eventConfiguration,
     validatorContext,

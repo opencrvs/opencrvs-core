@@ -115,12 +115,19 @@ export async function deleteDraftsByEventId(eventId: UUID) {
     .execute()
 }
 
+/**
+ * @returns the id of every event that lost a draft, so the caller can decide
+ * what is left of those events.
+ */
 export async function deleteDraftsByUserIdInTrx(
   trx: Kysely<Schema>,
   userId: string
 ) {
-  return trx
+  const deleted = await trx
     .deleteFrom('eventActionDrafts')
     .where('createdBy', '=', userId)
+    .returning('eventId')
     .execute()
+
+  return deleted.map(({ eventId }) => eventId)
 }

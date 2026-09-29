@@ -152,8 +152,8 @@ export const documents = defineFormPage({
       type: FieldType.PARAGRAPH,
       label: {
         defaultMessage: 'The following documents are required',
-        description: 'The following documents are required',
-        id: 'form.field.label.proofOfBirth.fileName'
+        description: 'Helper text shown above the death supporting documents',
+        id: 'event.death.action.declare.form.section.documents.helper'
       }
     },
     {

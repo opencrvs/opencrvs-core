@@ -62,12 +62,13 @@ describe('canAccessEventWithScope()', () => {
     type: 'birth',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    createdBy: generateUuid(rng),
     status: 'DECLARED' as const,
     trackingId: generateUuid(rng),
     declaration: {},
     flags: [],
     potentialDuplicates: [],
+    createdBy: createdById,
+    createdAtLocation: [provinceUuid, districtUuid, officeUuid],
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       NOTIFIED: undefined,
@@ -116,11 +117,13 @@ describe('canAccessEventWithScope()', () => {
 
   const locationOptions = [
     { placeOfEvent: 'location' },
+    { createdIn: 'location' },
     { declaredIn: 'location' },
     { registeredIn: 'location' }
   ] satisfies RecordScopeV2['options'][]
 
   const userOptions = [
+    { createdBy: 'user' },
     { declaredBy: 'user' },
     { registeredBy: 'user' }
   ] satisfies RecordScopeV2['options'][]
@@ -302,6 +305,158 @@ describe('canAccessEventWithScope()', () => {
         ).toBe(true)
       }
     )
+
+    test('should access an event they created even when it was declared by another user (createdBy:user)', () => {
+      // The user created the record, but a different user re-declared it, so
+      // DECLARED.createdBy no longer points to them. createdBy is based on the
+      // immutable CREATE author, so it should still grant access...
+      const reDeclaredByAnotherUser = {
+        ...declaredEvent,
+        createdBy: userContext.id,
+        legalStatuses: {
+          DECLARED: {
+            acceptedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            createdBy: generateUuid(rng),
+            createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+          },
+          NOTIFIED: undefined,
+          REGISTERED: undefined
+        }
+      } satisfies EventIndexWithAdministrativeHierarchy
+
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { createdBy: 'user' } },
+          userContext
+        )
+      ).toBe(true)
+
+      // ...whereas a declaredBy:user scope would not, since the latest DECLARE
+      // was authored by someone else.
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { declaredBy: 'user' } },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    describe('createdIn', () => {
+      const undeclaredEvent = {
+        type: 'birth',
+        id: generateUuid(rng),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'CREATED' as const,
+        trackingId: generateUuid(rng),
+        declaration: {},
+        flags: [],
+        potentialDuplicates: [],
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid],
+        placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+        legalStatuses: {
+          DECLARED: undefined,
+          NOTIFIED: undefined,
+          REGISTERED: undefined
+        }
+      } satisfies EventIndexWithAdministrativeHierarchy
+
+      const colleagueAtSameOffice = {
+        type: 'user',
+        id: generateUuid(rng),
+        primaryOfficeId: officeUuid,
+        administrativeAreaId: districtUuid,
+        role: TestUserRole.enum.FIELD_AGENT
+      } satisfies UserContext
+
+      test.each([
+        { createdIn: 'location' },
+        { createdIn: 'administrativeArea' }
+      ] satisfies RecordScopeV2['options'][])(
+        'grants access to an event that has not been declared yet with scope %j',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(true)
+        }
+      )
+
+      test.each([
+        { declaredIn: 'location' },
+        { declaredIn: 'administrativeArea' },
+        { declaredBy: 'user' }
+      ] satisfies RecordScopeV2['options'][])(
+        'declared-based scope %j does not match an event that has not been declared yet',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(false)
+        }
+      )
+
+      test('grants access to a colleague at the same office, unlike createdBy', () => {
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdBy: 'user' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(false)
+      })
+
+      test('is not reassigned when another office declares the event', () => {
+        const declaredByAnotherOffice = {
+          ...undeclaredEvent,
+          status: 'DECLARED' as const,
+          legalStatuses: {
+            DECLARED: {
+              acceptedAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              createdBy: generateUuid(rng),
+              createdAtLocation: [generateUuid(rng)]
+            },
+            NOTIFIED: undefined,
+            REGISTERED: undefined
+          }
+        } satisfies EventIndexWithAdministrativeHierarchy
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            userContext
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { declaredIn: 'location' } },
+            userContext
+          )
+        ).toBe(false)
+      })
+    })
   })
 
   describe('flags option', () => {
@@ -464,6 +619,9 @@ describe('canAccessEventWithScope()', () => {
     const singleOptions = [
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
+      { createdBy: 'user' },
+      { createdIn: 'location' },
+      { createdIn: 'administrativeArea' },
       { notifiedIn: 'location' },
       { notifiedIn: 'administrativeArea' },
       { notifiedBy: 'user' },
@@ -494,6 +652,7 @@ describe('canAccessEventWithScope()', () => {
     // so access can only be granted by the "no administrative area" branch.
     const eventInAnotherArea = {
       ...registeredEvent,
+      createdAtLocation: [generateUuid(rng)],
       placeOfEvent: [generateUuid(rng)],
       legalStatuses: {
         NOTIFIED: {
@@ -520,6 +679,7 @@ describe('canAccessEventWithScope()', () => {
 
     const adminAreaOptions = [
       { placeOfEvent: 'administrativeArea' },
+      { createdIn: 'administrativeArea' },
       { notifiedIn: 'administrativeArea' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'administrativeArea' }

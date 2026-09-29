@@ -22,6 +22,7 @@ import {
   EventState,
   getActionAnnotationFields,
   getCurrentEventState,
+  getDeclarationFields,
   Location
 } from '@opencrvs/toolkit/events'
 
@@ -61,8 +62,8 @@ function pickDeclarationAnalyticsFields(
   declaration: EventState,
   eventConfig: EventConfig
 ) {
-  const analyticsFields = eventConfig.declaration.pages.flatMap((page) =>
-    page.fields.filter((field) => field.analytics === true)
+  const analyticsFields = getDeclarationFields(eventConfig).filter(
+    (field) => field.analytics === true
   )
 
   return pickBy(declaration, (_, key) =>

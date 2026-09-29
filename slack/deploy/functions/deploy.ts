@@ -10,12 +10,16 @@
  */
 import { DefineFunction, Schema, SlackFunction } from 'deno-slack-sdk/mod.ts'
 
-// The deploy workflow lives in the infrastructure repo and runs from its
-// default branch. `WORKFLOW` is the workflow file name as accepted by the
-// GitHub REST API's workflow-dispatch endpoint.
+// The deploy workflows live in the infrastructure repo and run from its default
+// branch. Each `file` is a workflow file name as accepted by the GitHub REST
+// API's workflow-dispatch endpoint. Both take the same `environment` +
+// `core-image-tag` inputs, so a single dispatch payload drives both.
 const REPO = 'opencrvs/opencrvs-testland-infrastructure'
-const WORKFLOW = 'deploy-opencrvs.yml'
 const INFRA_REF = 'develop'
+const WORKFLOWS = [
+  { name: 'OpenCRVS', file: 'deploy-opencrvs.yml' },
+  { name: 'MOSIP', file: 'deploy-mosip.yml' }
+] as const
 
 // Shortcut/link trigger URL, shown as a footer so people can re-run the deploy
 // straight from the result message. Override per-environment with a TRIGGER_URL
@@ -93,12 +97,13 @@ function githubHeaders(token: string): HeadersInit {
  */
 async function findRunUrl(
   token: string,
-  since: string
+  since: string,
+  workflow: string
 ): Promise<string | null> {
   const query = `event=workflow_dispatch&per_page=5&created=${encodeURIComponent(
     `>=${since}`
   )}`
-  const url = `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?${query}`
+  const url = `https://api.github.com/repos/${REPO}/actions/workflows/${workflow}/runs?${query}`
 
   for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
     await new Promise((resolve) => setTimeout(resolve, POLL_DELAY_MS))
@@ -115,8 +120,35 @@ async function findRunUrl(
   return null
 }
 
+/** Dispatches one infra workflow via the REST API. */
+async function dispatchWorkflow(
+  token: string,
+  workflow: string,
+  inputs: Record<string, string>
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO}/actions/workflows/${workflow}/dispatches`,
+    {
+      method: 'POST',
+      headers: githubHeaders(token),
+      body: JSON.stringify({ ref: INFRA_REF, inputs })
+    }
+  )
+  if (!res.ok) {
+    const detail = await res.text()
+    return {
+      ok: false,
+      reason: `GitHub responded ${res.status}: ${detail || res.statusText}`
+    }
+  }
+  return { ok: true }
+}
+
 // deno-lint-ignore no-explicit-any
 type Blocks = Array<Record<string, any>>
+
+/** Per-workflow outcome: a run link when dispatched, or an error reason. */
+type WorkflowResult = { name: string; runLink?: string; error?: string }
 
 // Small greyed footer linking back to the trigger, so a deploy can be re-run
 // straight from the result message.
@@ -137,10 +169,17 @@ function startedBlocks(args: {
   environment: string
   tag: string
   coreImageTag: string
-  runLink: string
+  results: WorkflowResult[]
   triggerUrl: string
 }): Blocks {
-  const { user, environment, tag, coreImageTag, runLink, triggerUrl } = args
+  const { user, environment, tag, coreImageTag, results, triggerUrl } = args
+  const progress = results
+    .map((r) =>
+      r.runLink
+        ? `:mag: *${r.name}* — <${r.runLink}|Follow the deployment progress →>`
+        : `:x: *${r.name}* — failed to start: ${r.error}`
+    )
+    .join('\n')
   return [
     {
       type: 'header',
@@ -163,7 +202,7 @@ function startedBlocks(args: {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `:mag: <${runLink}|Follow the deployment progress →>`
+        text: progress
       }
     },
     {
@@ -222,29 +261,33 @@ export default SlackFunction(
       return { outputs: {} }
     }
 
-    // Timestamp (whole seconds) a little before the dispatch, so the run this
-    // creates falls within the `created>=` poll window.
+    // Timestamp (whole seconds) a little before the dispatch, so the runs these
+    // create fall within the `created>=` poll window.
     const since = new Date(Date.now() - 30_000)
       .toISOString()
       .replace(/\.\d+Z$/, 'Z')
 
-    const dispatchRes = await fetch(
-      `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
-      {
-        method: 'POST',
-        headers: githubHeaders(token),
-        body: JSON.stringify({
-          ref: INFRA_REF,
-          inputs: {
-            environment,
-            'core-image-tag': coreImageTag
-          }
-        })
-      }
+    const dispatchInputs = { environment, 'core-image-tag': coreImageTag }
+
+    // Dispatch every infra workflow and resolve each run URL. Done in parallel
+    // so the second workflow doesn't wait on the first one's run-URL poll.
+    const results: WorkflowResult[] = await Promise.all(
+      WORKFLOWS.map(async ({ name, file }) => {
+        const dispatch = await dispatchWorkflow(token, file, dispatchInputs)
+        if (!dispatch.ok) {
+          return { name, error: dispatch.reason }
+        }
+        const runUrl = await findRunUrl(token, since, file)
+        return {
+          name,
+          runLink:
+            runUrl ?? `https://github.com/${REPO}/actions/workflows/${file}`
+        }
+      })
     )
 
-    if (!dispatchRes.ok) {
-      const detail = await dispatchRes.text()
+    // Nothing dispatched — a hard failure (bad token, missing permissions).
+    if (results.every((r) => r.error)) {
       await post(
         `Deployment to ${environment} failed to start`,
         errorBlocks({
@@ -252,26 +295,26 @@ export default SlackFunction(
           environment,
           coreImageTag,
           triggerUrl,
-          reason: `GitHub responded ${dispatchRes.status}: ${
-            detail || dispatchRes.statusText
-          }`
+          reason: results.map((r) => `${r.name}: ${r.error}`).join('\n')
         })
       )
       return { outputs: {} }
     }
 
-    const runUrl = await findRunUrl(token, since)
-    const runLink =
-      runUrl ?? `https://github.com/${REPO}/actions/workflows/${WORKFLOW}`
+    const summary = results
+      .map((r) =>
+        r.runLink ? `${r.name}: ${r.runLink}` : `${r.name}: failed to start`
+      )
+      .join(' · ')
 
     await post(
-      `${environment} deployment started by <@${user}> (core: ${coreImageTag}) — ${runLink}`,
+      `${environment} deployment started by <@${user}> (core: ${coreImageTag}) — ${summary}`,
       startedBlocks({
         user,
         environment,
         tag,
         coreImageTag,
-        runLink,
+        results,
         triggerUrl
       })
     )

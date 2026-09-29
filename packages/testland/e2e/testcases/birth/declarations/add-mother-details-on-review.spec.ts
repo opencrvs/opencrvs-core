@@ -21,12 +21,12 @@ import {
   switchEventTab,
   validateActionMenuButton,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { REQUIRED_VALIDATION_ERROR } from '../helpers'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Add mother details on review', () => {
   let page: Page
@@ -328,9 +328,7 @@ test.describe.serial('Add mother details on review', () => {
       await expect(page.getByTestId('mother.age-value')).toHaveText(
         declaration.mother.age.toString()
       )
-      await expect(page.getByTestId('mother.idType-value')).toHaveText(
-        'None'
-      )
+      await expect(page.getByTestId('mother.idType-value')).toHaveText('None')
     })
 
     test('Assert audit trail', async () => {

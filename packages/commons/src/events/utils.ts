@@ -42,6 +42,7 @@ import {
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   isConditionMet,
+  isFieldSecured,
   isFieldVisible,
   ValidatorContext
 } from '../conditionals/validate'
@@ -63,6 +64,7 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+import { EventIndex } from './EventIndex'
 
 /* eslint-disable max-lines */
 
@@ -452,9 +454,8 @@ export function deepMerge<
   /**
    * Cloning is essential since mergeWith mutates the first argument.
    */
-  const currentDocumentClone = cloneDeep(currentDocument)
   return mergeWith(
-    cloneDeep(currentDocumentClone),
+    cloneDeep(currentDocument),
     actionDocument,
     (previousValue, incomingValue) => {
       if (incomingValue === undefined) {
@@ -768,7 +769,7 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 
   if (pendingActions.length !== 1) {
     throw new Error(
-      `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
+      `Expected exactly one pending action, but found ${pendingActions.length ? pendingActions.map(({ id }) => id).join(', ') : 'none'}`
     )
   }
 
@@ -882,44 +883,131 @@ const EXCLUDED_ACTIONS = [
   ActionType.REJECT_CORRECTION
 ]
 
+/**
+ * Applies a single action's declaration on top of the running declaration,
+ * following the correction-specific merge rules.
+ *
+ * Shared by `aggregateActionDeclarations` (folding accepted actions) and
+ * `getDeclarationWithPendingAction` (applying the pending action), so both use
+ * identical correction-aware logic.
+ *
+ * @param acceptedActions - The event's accepted actions, used to resolve the
+ *   correction request an APPROVE_CORRECTION refers to via `requestId`.
+ */
+function applyActionDeclaration(
+  declaration: EventState,
+  event: EventDocument,
+  action: ActionDocument,
+  acceptedActions: ActionDocument[]
+): EventState {
+  /*
+   * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+   * details in the correction. To do this, we find the original request that this
+   * approval is for and merge its details with the current data of the record.
+   */
+  if (action.type === ActionType.APPROVE_CORRECTION) {
+    const requestAction = acceptedActions.find(
+      ({ id }) => id === action.requestId
+    )
+
+    if (!requestAction) {
+      return declaration
+    }
+
+    const declarationWithApprovedCorrection = getCompleteActionDeclaration(
+      declaration,
+      event,
+      requestAction
+    )
+
+    // Apply async confirmation payload after the approved request so external
+    // integrations can finalize fields (e.g. child.nid) at approve time.
+    return getCompleteActionDeclaration(
+      declarationWithApprovedCorrection,
+      event,
+      action
+    )
+  }
+
+  return getCompleteActionDeclaration(declaration, event, action)
+}
+
 export function aggregateActionDeclarations(event: EventDocument): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  return aggregatedActions.reduce((declaration, action) => {
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = allAcceptedActions.find(
-        ({ id }) => id === action.requestId
-      )
+  return aggregatedActions.reduce<EventState>(
+    (declaration, action) =>
+      applyActionDeclaration(declaration, event, action, allAcceptedActions),
+    {}
+  )
+}
 
-      if (!requestAction) {
-        return declaration
-      }
+/**
+ * Returns the declaration after each of `event.actions`, which must be in chronological order.
+ * Index `i` equals `aggregateActionDeclarations` of the first `i + 1` actions, in linear time.
+ */
+export function getDeclarationAfterEachAction(
+  event: EventDocument
+): EventState[] {
+  const acceptedActions: ActionDocument[] = []
+  let declaration: EventState = {}
 
-      const declarationWithApprovedCorrection = getCompleteActionDeclaration(
+  return event.actions.map((action, index) => {
+    if (!isAcceptedAction(action)) {
+      return declaration
+    }
+
+    // Linked actions resolve against the prefix, as they do when aggregating it
+    const eventUntilAction = {
+      ...event,
+      actions: event.actions.slice(0, index + 1)
+    }
+    const acceptedAction = {
+      ...action,
+      declaration: getCompleteActionDeclaration({}, eventUntilAction, action)
+    }
+    acceptedActions.push(acceptedAction)
+
+    if (!EXCLUDED_ACTIONS.some((type) => type === action.type)) {
+      declaration = applyActionDeclaration(
         declaration,
-        event,
-        requestAction
-      )
-
-      // Apply async confirmation payload after the approved request so external
-      // integrations can finalize fields (e.g. child.nid) at approve time.
-      return getCompleteActionDeclaration(
-        declarationWithApprovedCorrection,
-        event,
-        action
+        eventUntilAction,
+        acceptedAction,
+        acceptedActions
       )
     }
 
-    return getCompleteActionDeclaration(declaration, event, action)
-  }, {})
+    return declaration
+  })
+}
+
+/**
+ * Returns the event's declaration state as it will be once the single pending
+ * action is accepted — i.e. the aggregate of all accepted declarations with the
+ * pending action's changes applied on top.
+ *
+ * Country configuration confirmation handlers (and notifications) need the
+ * up-to-date declaration at confirmation time, before core has accepted the
+ * action. Reaching for `aggregateActionDeclarations` alone is not enough for
+ * corrections: when confirming an APPROVE_CORRECTION the changed fields live on
+ * the linked REQUEST_CORRECTION, not on the pending action's own (empty)
+ * declaration. This helper applies the same correction-aware merge that
+ * `aggregateActionDeclarations` uses for already-accepted approvals, so callers
+ * do not have to reimplement the `requestId`/`originalActionId` resolution.
+ */
+export function getDeclarationWithPendingAction(
+  event: EventDocument
+): EventState {
+  const pendingAction = getPendingAction(event.actions)
+  return applyActionDeclaration(
+    aggregateActionDeclarations(event),
+    event,
+    pendingAction,
+    getAcceptedActions(event)
+  )
 }
 
 export function aggregateActionAnnotations(event: EventDocument): EventState {
@@ -930,4 +1018,39 @@ export function aggregateActionAnnotations(event: EventDocument): EventState {
 
     return deepMerge(ann, sortedAction.annotation)
   }, {} as EventState)
+}
+
+/**
+ * 2.1. onwards secured fields have accepted conditionals.
+ * Secured fields are not present in EventIndex payload.
+ * When we derive @see EventIndex from @see EventDocument, we will have all the fields present.
+ *
+ * To keep the views consistent, and not to change if event.get gets triggered, we need to clean out the secured fields.
+ *
+ * @returns EventIndex without values that evaluate to secured: true.
+ */
+export function dropSecuredDeclarationFields(
+  eventConfig: EventConfig,
+  eventIndex: EventIndex,
+  validatorContext: ValidatorContext
+): EventIndex {
+  const declarationFields = getDeclarationFields(eventConfig)
+  const securedFieldIds = new Set(
+    declarationFields
+      .filter((declarationField) =>
+        isFieldSecured(declarationField, eventIndex, validatorContext)
+      )
+      .map((declarationField) => declarationField.id)
+  )
+
+  const declaration = Object.fromEntries(
+    Object.entries(eventIndex.declaration).filter(
+      ([fieldId]) => !securedFieldIds.has(fieldId)
+    )
+  )
+
+  return {
+    ...eventIndex,
+    declaration
+  }
 }

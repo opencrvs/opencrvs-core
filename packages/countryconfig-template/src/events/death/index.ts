@@ -108,28 +108,6 @@ export const deathEvent = defineConfig({
         ]
       },
       {
-        fieldId: 'deceased.address',
-        emptyValueMessage: {
-          defaultMessage: 'No place of death',
-          description:
-            'This is shown when there is no death location information',
-          id: 'event.death.summary.eventDetails.placeOfDeath.empty'
-        },
-        label: {
-          defaultMessage: 'Place of death',
-          description: 'Label for place of death',
-          id: 'event.death.summary.eventDetails.placeOfDeath.label'
-        },
-        conditionals: [
-          {
-            type: ConditionalType.SHOW,
-            conditional: field('eventDetails.placeOfDeath').isEqualTo(
-              PlaceOfDeath.DECEASED_USUAL_RESIDENCE
-            )
-          }
-        ]
-      },
-      {
         fieldId: 'eventDetails.deathLocationOther',
         emptyValueMessage: {
           defaultMessage: 'No place of death',
