@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
         with:
           # nx affected needs history to resolve the base SHA
           fetch-depth: 0
@@ -181,7 +181,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -295,7 +295,7 @@ jobs:
           message-id: packages/commons-test-coverage
           message: ${{ env.PR_COMMENT_BODY }}
 
-countryconfig-template:
+  countryconfig-template:
     name: Test countryconfig-template
     # Excluded from the workspace and from nx (see .nxignore), so it never
     # shows up in the matrix above and gets its own job. It installs in
@@ -309,84 +309,6 @@ countryconfig-template:
         working-directory: packages/countryconfig-template
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-
-      - name: Runs dependency installation
-        run: pnpm install --no-frozen-lockfile --ignore-workspace
-
-      # Disabled: this package has never been typechecked in CI and does
-      # not currently compile — 9 pre-existing errors in its own src/
-      # (missing hapi-sentry types, hapi handler signature variance in
-      # index.ts, unknown-typed catch bindings). Fix those, then flip the
-      # `if` to remove the skip.
-      - name: Typecheck
-        if: false
-        run: pnpm test:compilation
-
-      - name: Run linting
-        run: pnpm lint
-
-      - name: Run Unit Test
-        run: pnpm test
-
-  prepare-client-tests:
-    name: Prepare client tests
-    needs: setup
-    if: contains(needs.setup.outputs.matrix, 'packages/client')
-    runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-    defaults:
-      run:
-        working-directory: packages/countryconfig-template
-    steps:
-      - name: Checking out git repo
-        uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Runs dependency installation
-        run: pnpm install --no-frozen-lockfile --ignore-workspace
-
-      # Disabled: this package has never been typechecked in CI and does
-      # not currently compile — 9 pre-existing errors in its own src/
-      # (missing hapi-sentry types, hapi handler signature variance in
-      # index.ts, unknown-typed catch bindings). Fix those, then flip the
-      # `if` to remove the skip.
-      - name: Typecheck
-        if: false
-        run: pnpm test:compilation
-
-      - name: Run linting
-        run: pnpm lint
-
-      - name: Run Unit Test
-        run: pnpm test
-
-  prepare-client-tests:
-    name: Prepare client tests
-    needs: setup
-    if: contains(needs.setup.outputs.matrix, 'packages/client')
-    runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-    steps:
-      - name: Checking out git repo
         uses: actions/checkout@v7
 
       - name: Setup pnpm
@@ -397,44 +319,43 @@ countryconfig-template:
         with:
           node-version-file: .nvmrc
 
-      - name: Extract dependencies for client
-        id: extract-dependencies
-        run: |
-          DEPENDENCIES=$(node -e "
-            const { execSync } = require('child_process');
-            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
-            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+      - name: Runs dependency installation
+        run: pnpm install --no-frozen-lockfile --ignore-workspace
 
-            const getDependencies = (pkg) =>
-              json[pkg].workspaceDependencies.concat(
-                json[pkg].workspaceDependencies.flatMap(getDependencies)
-              );
+      # Disabled: this package has never been typechecked in CI and does
+      # not currently compile — 9 pre-existing errors in its own src/
+      # (missing hapi-sentry types, hapi handler signature variance in
+      # index.ts, unknown-typed catch bindings). Fix those, then flip the
+      # `if` to remove the skip.
+      - name: Typecheck
+        if: false
+        run: pnpm test:compilation
 
-            console.log(
-              getDependencies('packages/client').join(' ')
-            );
-          ")
-          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
-          echo "Found dependencies: $DEPENDENCIES"
+      - name: Run linting
+        run: pnpm lint
 
-      - name: Remove other package directories
-        run: |
-          for dir in packages/*; do
-            if echo "packages/client $DEPENDENCIES" | grep -q -w "$dir"; then
-              echo "Skipping $dir"
-            else
-              echo "Removing $dir"
-              rm -rf "$dir"
-            fi
-          done
+      - name: Run Unit Test
+        run: pnpm test
 
-      - name: Restore Yarn cache
-        uses: actions/cache/restore@v5
-        id: yarn-cache
+  prepare-client-tests:
+    name: Prepare client tests
+    needs: setup
+    if: contains(needs.setup.outputs.matrix, 'packages/client')
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
         with:
-          path: |
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          node-version-file: .nvmrc
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -849,9 +770,6 @@ countryconfig-template:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
