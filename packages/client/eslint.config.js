@@ -90,5 +90,9 @@ module.exports = [
     /** To enforce relative imports, files propert needs to be defined. It cannot be shared through monorepo config at root. */
     rules: { 'import/no-relative-parent-imports': 'error' }
   },
-  ...legacyConfig
+  ...legacyConfig,
+  {
+    // Vite virtual modules (see src/tests/test-tokens-plugin.ts) have no file to resolve
+    rules: { 'import/no-unresolved': ['error', { ignore: ['^virtual:'] }] }
+  }
 ]
