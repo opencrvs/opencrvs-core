@@ -14,6 +14,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import {
   addLocalEventConfig,
   deleteLocalEvent,
+  findLocalEventIndex,
   onAssign,
   onMarkNotDuplicate
 } from './api'
@@ -136,6 +137,32 @@ describe('per-action invalidation policy (handler map)', () => {
       ).toBe(false)
     })
 
+    it('DELETE: onSuccess settles only after the drafts list has refetched', async () => {
+      let finishDraftsRefetch: () => void = () => undefined
+      const refetchSpy = vi
+        .spyOn(queryClient, 'refetchQueries')
+        .mockReturnValue(
+          new Promise<void>((resolve) => (finishDraftsRefetch = resolve))
+        )
+      const onSuccess = getOnSuccess(
+        trpcOptionsProxy.event.delete.mutationKey()
+      )
+
+      let settled = false
+      const done = Promise.resolve(
+        onSuccess?.({ id: tennisClubMembershipEventDocument.id })
+      ).then(() => (settled = true))
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      expect(refetchSpy).toHaveBeenCalledWith({
+        queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+      })
+      expect(settled).toBe(false)
+
+      finishDraftsRefetch()
+      await done
+      expect(settled).toBe(true)
+    })
+
     it('DRAFT_SAVE: onSuccess refreshes only the draft list, no search/workqueue', async () => {
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
       const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
@@ -161,6 +188,20 @@ describe('per-action invalidation policy (handler map)', () => {
         queryKey: trpcOptionsProxy.event.draft.list.queryKey()
       })
     })
+  })
+
+  it('CREATE offline: onMutate makes the record resolvable by its temporary id', () => {
+    const transactionId = 'tmp-offline-create'
+    const onMutate = queryClient.getMutationDefaults(
+      trpcOptionsProxy.event.create.mutationKey()
+    ).onMutate as (variables: unknown) => unknown
+
+    onMutate({ transactionId, type: tennisClubMembershipEvent.id })
+
+    expect(findLocalEventIndex(transactionId)?.id).toBe(transactionId)
+    expect(
+      queryClient.getQueryData(searchKeys.byId(transactionId))?.results
+    ).toHaveLength(1)
   })
 
   describe('workqueue-affecting actions use the standard path', () => {

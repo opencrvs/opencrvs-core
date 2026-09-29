@@ -296,6 +296,36 @@ describe('onAssign — scoped invalidation only (ASSIGN)', () => {
   })
 })
 
+describe('onAssign on a sealed record', () => {
+  beforeEach(() => {
+    queryClient.clear()
+    addLocalEventConfig(tennisClubMembershipEvent)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('patches only the assignee, never rebuilding the redacted row from the local document', async () => {
+    vi.spyOn(queryClient, 'refetchQueries').mockResolvedValue()
+    const redactedRow = {
+      id: assignedEvent.id,
+      declaration: {},
+      assignedTo: null
+    } as unknown as EventIndex
+    const workqueueKey = searchKeys.workqueue(workqueueInput, 'ready')
+    queryClient.setQueryData(workqueueKey, { results: [redactedRow], total: 1 })
+    setEventData(assignedEvent.id, tennisClubMembershipEventDocument)
+
+    await onAssign(assignedEvent)
+
+    const assignment = assignedEvent.actions[0] as { assignedTo: string }
+    expect(queryClient.getQueryData(workqueueKey)?.results).toEqual([
+      { ...redactedRow, assignedTo: assignment.assignedTo }
+    ])
+  })
+})
+
 describe('hasInvalidatedWorkqueueSearchQuery (count-diff dedup guard)', () => {
   beforeEach(() => {
     queryClient.clear()
