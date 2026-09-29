@@ -31,7 +31,7 @@ import { useEventConfiguration } from '../useEventConfiguration'
  */
 export function useCanDirectlyRegister(event: EventDocument) {
   const userDetails = useSelector(getUserDetails)
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
@@ -88,9 +88,9 @@ export function useCanDirectlyRegister(event: EventDocument) {
     return false
   }
 
-  return isActionAvailable(
-    registerActionConfig,
-    eventIndexAfterDeclare,
-    validatorContext
-  )
+  // Evaluate against the would-be event, so `$event` conditionals on REGISTER see the pending DECLARE
+  return isActionAvailable(registerActionConfig, eventIndexAfterDeclare, {
+    ...validatorContext,
+    event: { document: eventAfterDeclare, state: eventIndexAfterDeclare }
+  })
 }
