@@ -14,8 +14,9 @@ build
 CLAUDE.local.md
 .claude/*
 !.claude/settings.json
+!.claude/skills/
+!.claude/hooks/
 .claude-working/
-.claude
 CLAUDE.md
 .DS_Store
 .env*
