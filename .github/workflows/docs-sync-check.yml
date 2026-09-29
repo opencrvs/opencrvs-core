@@ -11,15 +11,22 @@ name: Docs sync check
 # On every merge to develop/master, ask Claude whether opencrvs/documentation
 # still matches the code. Most runs need no change and end silently. When docs
 # need updating, a PR is opened against opencrvs/documentation and announced in
-# Slack (#opencrvs-developer).
+# Slack, mentioning the author of the merged commit.
 #
 # Required repository secrets:
 #   CLAUDE_CODE_OAUTH_TOKEN - Claude access
 #   DOCS_REPO_TOKEN    - fine-grained PAT (or GitHub App token) with
 #                        contents:write + pull-requests:write on opencrvs/documentation.
 #                        The default GITHUB_TOKEN cannot access another repository.
-#   SLACK_BOT_TOKEN    - bot token (xoxb-...) of the Claude Slack app with the
-#                        chat:write scope, invited to the channel.
+#   SLACK_BOT_TOKEN    - Slack bot token (xoxb-...). Needs chat:write, plus
+#                        users:read.email to @-mention the commit author (without
+#                        it the author's name is used). The bot must be a member
+#                        of the channel set in SLACK_CHANNEL below.
+#
+# Manual runs (Actions tab -> Docs sync check -> Run workflow):
+#   base        commit to diff against, to test on a wider range than HEAD~1
+#   dry_run     show Claude's proposed docs diff in the log, no PR and no Slack
+#   slack_test  only post a test message to Slack, skip the docs check
 
 on:
   push:
