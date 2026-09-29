@@ -35,6 +35,10 @@ on:
         description: 'Only show the documentation diff in the log; do not open a PR or post to Slack'
         type: boolean
         default: false
+      slack_test:
+        description: 'Only post a test message to Slack, skipping the docs check entirely'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -50,7 +54,32 @@ env:
   DOCS_REPO: opencrvs/documentation
 
 jobs:
+  slack-test:
+    if: ${{ inputs.slack_test }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Post test message to Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          if [ -z "$SLACK_BOT_TOKEN" ]; then
+            echo "::error::SLACK_BOT_TOKEN secret is not set"; exit 1
+          fi
+          AUTH="$(curl -sS -X POST https://slack.com/api/auth.test -H "Authorization: Bearer $SLACK_BOT_TOKEN")"
+          echo "auth.test: $(echo "$AUTH" | jq -c '{ok, team, user, error}')"
+          TEXT=":white_check_mark: Test message from the *Docs sync check* workflow in ${{ github.repository }} (run <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_id }}>). Slack notifications are wired up correctly."
+          RESPONSE="$(jq -n --arg channel "$SLACK_CHANNEL" --arg text "$TEXT" \
+              '{channel: $channel, text: $text, unfurl_links: false}' |
+            curl -sS -X POST https://slack.com/api/chat.postMessage \
+              -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+              -H 'Content-type: application/json; charset=utf-8' \
+              --data @-)"
+          echo "chat.postMessage: $(echo "$RESPONSE" | jq -c '{ok, channel, error, needed, provided}')"
+          echo "$RESPONSE" | jq -e '.ok' >/dev/null || exit 1
+
   check-docs:
+    if: ${{ !inputs.slack_test }}
     runs-on: ubuntu-26.04
     timeout-minutes: 30
     steps:
