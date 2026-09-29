@@ -17,10 +17,10 @@ import {
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { scopedSearchOptions } from '@client/v2-events/features/events/useEvents/procedures/search'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 import { useEvents } from '../features/events/useEvents/useEvents'
-import { searchKeys } from '../features/events/useEvents/procedures/search'
-import { queryClient, useTRPC } from '../trpc'
+import { queryClient } from '../trpc'
 import { useUsers } from './useUsers'
 
 function getDeserializedQuery(
@@ -88,7 +88,6 @@ export function useWorkqueues() {
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
   const workqueues = useCountryConfigWorkqueueConfigurations()
-  const trpc = useTRPC()
 
   const prefetch = useCallback(async () => {
     return Promise.all(
@@ -99,9 +98,11 @@ export function useWorkqueues() {
           limit: 10,
           sort: [{ field: 'updatedAt', direction: 'desc' as const }]
         }
-        const { queryFn: _queryFn, ...options } =
-          trpc.event.search.queryOptions(searchInput)
-        const queryKey = searchKeys.workqueue(searchInput, workqueueConfig.slug)
+        const options = scopedSearchOptions(searchInput, [
+          'workqueue',
+          workqueueConfig.slug
+        ])
+        const { queryKey } = options
 
         const data = queryClient.getQueryData(queryKey)
         const isFetching = queryClient.isFetching({ queryKey }) > 0
@@ -110,13 +111,10 @@ export function useWorkqueues() {
           return
         }
 
-        return queryClient.prefetchQuery({
-          ...options,
-          queryKey
-        })
+        return queryClient.prefetchQuery(options)
       })
     )
-  }, [workqueues, user, trpc])
+  }, [workqueues, user])
 
   return {
     prefetch

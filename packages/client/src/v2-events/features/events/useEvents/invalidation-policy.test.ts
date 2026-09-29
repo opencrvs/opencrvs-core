@@ -28,7 +28,7 @@ import { searchKeys } from './procedures/search'
 import './procedures/create'
 import './procedures/delete'
 import './procedures/actions/action'
-import '../../drafts/useDrafts'
+import '@client/v2-events/features/drafts/useDrafts'
 /* eslint-enable import/no-unassigned-import */
 
 const allWorkqueuesKey = JSON.stringify(searchKeys.filters.allWorkqueues())
@@ -178,9 +178,9 @@ describe('per-action invalidation policy (handler map)', () => {
       expect(onSuccess).toBe(deleteLocalEvent)
     })
 
-    it('REGISTER: onSuccess stales workqueues + refetches count + byId', async () => {
+    it('REGISTER: onSuccess stales workqueues + refetches count + resets byId', async () => {
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
-      const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
+      const resetSpy = vi.spyOn(queryClient, 'resetQueries')
 
       const onSuccess = getOnSuccess(
         trpcOptionsProxy.event.actions.register.request.mutationKey()
@@ -199,7 +199,7 @@ describe('per-action invalidation policy (handler map)', () => {
         expect(invalidateSpy).toHaveBeenCalledWith({
           queryKey: trpcOptionsProxy.workqueue.count.queryKey()
         })
-        expect(refetchSpy).toHaveBeenCalledWith({
+        expect(resetSpy).toHaveBeenCalledWith({
           queryKey: searchKeys.filters.byId(
             tennisClubMembershipEventDocument.id
           )

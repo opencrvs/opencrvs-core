@@ -172,10 +172,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
     return optimisticDraft
   },
   onSuccess: async () => {
-    // No search/workqueue refresh: draft saves are never indexed server-side
-    // (the draft service does not call indexEvent), so they cannot change any
-    // event.search / workqueue result. The draft is client-state surfaced via
-    // event.draft.list, so only that list is refreshed.
+    // Drafts are never indexed, so no search can change.
     await refetchDraftsList()
   },
   retryDelay: 10000

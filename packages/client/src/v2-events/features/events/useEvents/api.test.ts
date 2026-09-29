@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { QueryObserver } from '@tanstack/react-query'
 import {
   tennisClubMembershipEvent,
   ActionType,
@@ -49,26 +50,40 @@ describe('deleteLocalEvent', () => {
     queryClient.clear()
   })
 
-  it('clears event.get cache entry', async () => {
+  it('clears the event document and its by-id search entry', async () => {
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id }),
       eventDocument
     )
-
-    setEventData(eventDocument.id, eventDocument)
+    queryClient.setQueryData(searchKeys.byId(id), {
+      results: [{ id } as EventIndex],
+      total: 1
+    })
 
     await deleteLocalEvent(eventDocument)
 
     expect(
       queryClient.getQueryData(
-        trpcOptionsProxy.event.search.queryKey({
-          query: {
-            type: 'and',
-            clauses: [{ id }]
-          }
-        })
+        trpcOptionsProxy.event.get.queryKey({ eventId: id })
       )
     ).toBeUndefined()
+    expect(queryClient.getQueryData(searchKeys.byId(id))).toBeUndefined()
+  })
+
+  it('fetches a mounted by-id entry once, not once per reset and refetch', async () => {
+    const queryFn = vi.fn().mockResolvedValue(EMPTY_RESULT)
+    const observer = new QueryObserver(queryClient, {
+      queryKey: searchKeys.byId(id),
+      queryFn
+    })
+    const unsubscribe = observer.subscribe(() => undefined)
+    await vi.waitFor(() => expect(queryFn).toHaveBeenCalledTimes(1))
+    queryFn.mockClear()
+
+    await deleteLocalEvent(eventDocument)
+
+    expect(queryFn).toHaveBeenCalledTimes(1)
+    unsubscribe()
   })
 })
 
@@ -201,8 +216,9 @@ describe('deleteLocalEvent — routes writes through the standard path', () => {
     vi.restoreAllMocks()
   })
 
-  it('stales workqueues + refetches byId + count + mounted workqueues', async () => {
+  it('stales workqueues + resets byId + refetches count + mounted workqueues', async () => {
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
+    const resetSpy = vi.spyOn(queryClient, 'resetQueries')
     const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
 
     await deleteLocalEvent(tennisClubMembershipEventDocument)
@@ -214,7 +230,7 @@ describe('deleteLocalEvent — routes writes through the standard path', () => {
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: trpcOptionsProxy.workqueue.count.queryKey()
     })
-    expect(refetchSpy).toHaveBeenCalledWith({
+    expect(resetSpy).toHaveBeenCalledWith({
       queryKey: searchKeys.filters.byId(tennisClubMembershipEventDocument.id)
     })
     expect(refetchSpy).toHaveBeenCalledWith({

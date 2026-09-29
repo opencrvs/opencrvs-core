@@ -234,11 +234,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   retry: retryUnlessConflict,
   retryDelay,
   onMutate: updateEventOptimistically(ActionType.MARK_AS_NOT_DUPLICATE),
-  // Clearing the potential-duplicate flag changes queue membership (the record
-  // leaves the "potential duplicates" queue), so it needs the standard search
-  // refresh like its sibling MARK_AS_DUPLICATE. But unlike MARK_AS_DUPLICATE
-  // there is no follow-up UNASSIGN — the record stays assigned to the user —
-  // so the local event document is kept, not evicted (deleteLocalEvent).
   onSuccess: onMarkNotDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }

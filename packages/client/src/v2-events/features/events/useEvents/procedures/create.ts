@@ -125,11 +125,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     updateLocalEventIndex(response.id, response)
     updateLocalEventIndex(context.transactionId, response)
 
-    // No search/workqueue refresh: a CREATE leaves the event in CREATED status,
-    // which is never indexed server-side (isEventIndexable excludes it), so it
-    // cannot appear in any event.search / workqueue result. The draft and outbox
-    // views that surface a just-created record are client-state (event.draft.list
-    // and the pending-mutation-derived outbox), not derived from these queries.
+    // A CREATED event is never indexed, so no search can change.
   },
   meta: { actionType: ActionType.CREATE }
 })
