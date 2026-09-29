@@ -20,6 +20,8 @@ import {
   JurisdictionFilter,
   UserOrSystemSummary,
   logger,
+  maskEmail,
+  maskSms,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -46,7 +48,6 @@ import {
   updatePasswordHash,
   updateUserById
 } from '@events/storage/postgres/events/users'
-import { getUserActions } from '@events/service/events/user/actions'
 import {
   queryClientAuditLog,
   writeAuditLog
@@ -71,7 +72,6 @@ import {
   generateAndSendVerificationCode,
   generateNonce
 } from '@events/service/verifyCode'
-import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadUserAudit } from '../middleware'
 
 // Used for changing password, since the initial password does not necessarily have to comply with the password rules.
@@ -162,7 +162,7 @@ export async function handleCreateUser(
     })
     if (existingWithMobile.length > 0) {
       logger.error(
-        `Phone number ${input.mobile} is already in use by another user`
+        `Phone number ${maskSms(input.mobile)} is already in use by another user`
       )
       throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
     }
@@ -177,7 +177,9 @@ export async function handleCreateUser(
       sortBy: 'createdAt'
     })
     if (existingWithEmail.length > 0) {
-      logger.error(`Email ${input.email} is already in use by another user`)
+      logger.error(
+        `Email ${maskEmail(input.email)} is already in use by another user`
+      )
       throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
     }
   }
@@ -334,7 +336,7 @@ export const userRouter = router({
           existingWithMobile[0].id !== input.id
         ) {
           logger.error(
-            `Phone number ${input.mobile} is already in use by another user`
+            `Phone number ${maskSms(input.mobile)} is already in use by another user`
           )
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
         }
@@ -351,7 +353,9 @@ export const userRouter = router({
           existingWithEmail.length > 0 &&
           existingWithEmail[0].id !== input.id
         ) {
-          logger.error(`Email ${input.email} is already in use by another user`)
+          logger.error(
+            `Email ${maskEmail(input.email)} is already in use by another user`
+          )
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
@@ -372,12 +376,6 @@ export const userRouter = router({
     .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
-  actions: userOnlyProcedure
-    .input(UserActionsQuery)
-    .use(userCanReadUserAudit)
-    .query(async ({ input }) => {
-      return getUserActions(input)
-    }),
   roles: router({
     list: userOnlyProcedure.query(async () => getRoles())
   }),
@@ -541,7 +539,7 @@ export const userRouter = router({
         userWithDuplicateNumber[0].id !== input.userId
       ) {
         logger.error(
-          `Phone number ${input.phoneNumber} is already in use by another user`
+          `Phone number ${maskSms(input.phoneNumber)} is already in use by another user`
         )
         throw new TRPCError({
           code: 'CONFLICT',
@@ -605,7 +603,9 @@ export const userRouter = router({
         userWithDuplicateEmail.length > 0 &&
         userWithDuplicateEmail[0].id !== input.userId
       ) {
-        logger.error(`Email ${input.email} is already in use by another user`)
+        logger.error(
+          `Email ${maskEmail(input.email)} is already in use by another user`
+        )
         throw new TRPCError({
           code: 'CONFLICT',
           message: 'Email is already in use'
