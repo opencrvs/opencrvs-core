@@ -16,21 +16,24 @@ import {
   getToken,
   goToSection,
   triggerDeclarationAction
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   fillChildDetails,
   openBirthDeclaration,
   REQUIRED_VALIDATION_ERROR
-} from '../birth/helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { selectAction, type } from '../../utils'
+} from '@e2e/support/birth/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { selectAction, type } from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe('Form state', () => {
   test.describe

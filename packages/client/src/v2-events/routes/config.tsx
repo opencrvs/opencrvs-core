@@ -13,9 +13,17 @@ import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import { onlineManager } from '@tanstack/react-query'
-import { ActionType } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  isSelectableAtAnchor,
+  todayISO
+} from '@opencrvs/commons/client'
 import { APPLICATION_VERSION } from '@client/utils/constants'
+import { errorMessages, buttonMessages } from '@client/i18n/messages'
+import { buildLoginUrl } from '@client/components/VersionMismatchModal'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -32,7 +40,10 @@ import { EventSelectionIndex } from '@client/v2-events/features/events/index'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
-import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
+import {
+  throwStructuredError,
+  TRPCErrorBoundary
+} from '@client/v2-events/routes/TRPCErrorBoundary'
 import {
   queryClient,
   trpcOptionsProxy,
@@ -94,6 +105,31 @@ function PrefetchQueries() {
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
   }, [prefetch])
+
+  return null
+}
+
+// How often to re-check whether the logged-in user's office has gone inactive.
+const OFFICE_STATUS_POLL_INTERVAL_MS = 5 * 60 * 1000
+
+function OfficeStatusWatcher({ officeId }: { officeId: string }) {
+  const intl = useIntl()
+  const { getLocation } = useLocations()
+  const { data: office } = getLocation.useQuery(officeId, {
+    refetchInterval: OFFICE_STATUS_POLL_INTERVAL_MS
+  })
+
+  if (office && !isSelectableAtAnchor(office.versions, todayISO())) {
+    throwStructuredError({
+      title: intl.formatMessage(errorMessages.officeInactive),
+      message: intl.formatMessage(errorMessages.officeInactiveDescription),
+      redirection: {
+        label: intl.formatMessage(buttonMessages.backToLogin),
+        path: buildLoginUrl(intl.locale)
+      },
+      variant: 'notice'
+    })
+  }
 
   return null
 }
@@ -200,6 +236,7 @@ export const routesConfig = {
             <Debug />
             <Toaster />
             <PrefetchQueries />
+            <OfficeStatusWatcher officeId={currentUser.primaryOfficeId} />
           </TRPCProvider>
         </TRPCErrorBoundary>
       </NavigationHistoryProvider>

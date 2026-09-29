@@ -41,19 +41,19 @@ const declaration = {
   }
 }
 
+const prng = createPrng(1231232)
+
 const actionBase = {
   createdAt: '2021-01-01',
   createdBy: 'John Doe',
   createdByRole: 'User',
   createdByUserType: 'user' as const,
   status: 'Accepted' as const,
-  transactionId: '123',
+  transactionId: generateUuid(prng),
   declaration: {},
-  requestId: '123',
+  requestId: generateUuid(prng),
   annotation: {}
 } as const
-
-const prng = createPrng(1231232)
 
 const requestCorrectionAction = {
   ...actionBase,
@@ -100,7 +100,7 @@ const fullEvent = {
 }
 
 const argbase = {
-  userName: 'Jhon Doe',
+  userName: 'Jane Doe',
   fullEvent,
   validatorContext: getTestValidatorContext(),
   action: {
@@ -112,9 +112,10 @@ const meta: Meta<typeof EventHistoryDialog> = {
   title: 'Components/EventHistoryDialog',
   component: EventHistoryDialog,
   args: {
-    userName: 'Jhon Doe',
+    userName: 'Jane Doe',
     fullEvent,
-    validatorContext: getTestValidatorContext()
+    validatorContext: getTestValidatorContext(),
+    isAwaitingConfirmation: false
   }
 }
 
@@ -299,8 +300,6 @@ export const RegisteredWithDialogFormValues: Story = {
   }
 }
 
-const generator = testDataGenerator()
-
 export const Rejected: Story = {
   args: {
     ...argbase,
@@ -334,7 +333,7 @@ export const Archived: Story = {
     const canvas = within(canvasElement)
     // Wait for the dialog to render before asserting on absence.
     await expect(
-      canvas.findByText('Jhon Doe', { exact: false })
+      canvas.findByText('Jane Doe', { exact: false })
     ).resolves.toBeInTheDocument()
     await expect(canvas.queryByText('Comment')).not.toBeInTheDocument()
   }

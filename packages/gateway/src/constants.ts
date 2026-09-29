@@ -11,9 +11,6 @@
 
 import { env } from '@gateway/environment'
 
-export const AVATAR_API =
-  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
-
 export const NATIVE_LANGUAGE = (() => {
   const languages = env.LANGUAGES.split(',')
   return languages.find((language) => language !== 'en')
@@ -36,11 +33,9 @@ export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const EVENTS_URL = env.EVENTS_URL
 export const DISABLE_RATE_LIMIT = env.DISABLE_RATE_LIMIT
-export const SENTRY_DSN = env.SENTRY_DSN
 export const PRODUCTION = env.isProd
 export const CHECK_INVALID_TOKEN = env.CHECK_INVALID_TOKEN
 export const DEFAULT_COUNTRY = env.COUNTRY
-export const CONFIG_TOKEN_EXPIRY_SECONDS = env.CONFIG_TOKEN_EXPIRY_SECONDS
 export const CONFIG_SMS_CODE_EXPIRY_SECONDS = env.CONFIG_SMS_CODE_EXPIRY_SECONDS
 export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS =
   env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS

@@ -19,6 +19,10 @@ const insecureOrigins = subdomains.map(
 )
 
 const ignoreHTTPSErrors = process.env.CI ? true : false
+
+const optInSuites = [
+  { envVar: 'DASHBOARD_E2E', pattern: /testcases\/dashboard\// }
+]
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -59,11 +63,13 @@ export default defineConfig({
   },
 
   /*
-   * Dashboard specs only run when DASHBOARD_E2E=true (set by farajaland's
-   * deploy-and-e2e workflow); everywhere else they are excluded by default.
+   * Opt-in suites: excluded by default, only collected when their env var is
+   * set to 'true'.
+   * DASHBOARD_E2E is set by farajaland's deploy-and-e2e workflow.
    */
-  testIgnore:
-    process.env.DASHBOARD_E2E === 'true' ? undefined : /testcases\/dashboard\//,
+  testIgnore: optInSuites
+    .filter(({ envVar }) => process.env[envVar] !== 'true')
+    .map(({ pattern }) => pattern),
 
   /* Configure projects for major browsers */
   projects: [

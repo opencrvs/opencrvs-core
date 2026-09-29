@@ -16,14 +16,14 @@ import {
   login,
   logout,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import {
   getRowByTitle,
   openRecordByTitle
-} from '../../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 /**
  * Regression test for https://github.com/opencrvs/opencrvs-core/issues/12803

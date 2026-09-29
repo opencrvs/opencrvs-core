@@ -22,9 +22,9 @@ import {
 } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { isUniqueViolation } from '@events/storage/postgres/unique-violation'
 import {
   appendVersionChecked,
-  isUniqueViolation,
   VersionAppendOutcome,
   withdrawVersionChecked,
   WithdrawnVersion

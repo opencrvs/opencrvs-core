@@ -11,6 +11,19 @@ opencrvs upgrade [--docker-swarm]
 
 Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/version-upgrades#step-2-update-code-and-test-locally
 
+## Translations are already handled
+
+`add-translations.ts` copies `client.csv` and `login.csv` from the country
+config template of the version being upgraded to, adding whatever rows a
+country config is missing. **Do not write a codemod for a new translation key,
+and do not add it to a list anywhere here.** Adding it to
+`packages/countryconfig-template/src/translations/` is enough — which the
+`check-missing-translation` workflow makes you do anyway — and every country
+config picks it up on upgrade.
+
+`countryconfig.csv` is left alone. It holds copy the country config declares
+itself, which an upgrade has no business rewriting.
+
 ## Adding a step
 
 1. **Create** `v2.0/<your-step-name>.ts` — export `async function main()` that
@@ -39,4 +52,4 @@ yarn
 ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade && rm -rf src/api/notification/testData.ts && git reset src/analytics && yarn test:compilation
 ```
 
-We also have a CI check which runs the codemod script in [`.github/workflows/codemod.yml`](../../../../.github/workflows/codemod.yml)
+We also have a CI check which runs the codemod script in [`.github/workflows/test-upgrade-script.yml`](../../../../.github/workflows/test-upgrade-script.yml)

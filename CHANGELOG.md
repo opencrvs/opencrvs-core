@@ -4,6 +4,10 @@
 
 ### Upgrade guidance
 
+#### Sentry — nothing to do, the upgrade script removes it
+
+`SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
 **Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
@@ -17,9 +21,50 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### Two-factor authentication (2FA) now follows the environment's purpose, not its name
+
+`environment:init` previously enabled 2FA only for an environment named exactly `production`; every other environment — including `staging`, which hosts a daily restore of real production data, and production environments with a custom name such as `prod` — was generated with `TWO_FA_ENABLED: false`, so logins accepted the fixed test code `000000`.
+
+2FA now derives from the environment's **type/purpose**: it defaults **on** for production environments (`staging`, `production`, and any custom environment whose purpose is "Staging/Production") and **off** for non-production ones (`development`, `qa`, and custom "Development/QA/Testing" environments). `environment:init` now also asks explicitly — "Enable two-factor authentication (2FA)?" — with the correct answer pre-selected; set `TWO_FA_ENABLED` to pre-answer it in non-interactive runs.
+
+#### Confirming an asynchronous action now takes credentials the requester does not have
+
+The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
+
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients.
+
+This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. Three further rules back it up:
+
+- **`accept`/`reject` require a system client's token.** Previously the country configuration could call the events API with the user's token. That required the user to be assigned to the event, which allowed two entities to act under the same identity. A human token is now refused outright, whatever scopes it carries.
+- **A confirmation is refused while a user holds the assignment.** The user is unassigned from the event when the country configuration returns 202, so this normally does not arise; it surfaces when someone assigns themselves while a confirmation is still pending.
+- **`accept`/`reject` refuse any `actionId` that is not a pending action of the matching type**, so a confirmation cannot be pointed at an arbitrary action to manufacture an accepted one.
+
+**These scopes must not be granted to a user role.** A caller that can both request an action and confirm it needs no country configuration to register a record. Core does not enforce this — grant them only to integrations.
+
+Integrations that confirm registrations (e.g. MOSIP) must therefore:
+
+- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects)** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`
+- **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
+
+`mosip-api` checks its OpenCRVS system client on startup and exits with code 1 if it is missing `record.action.accept` or `record.read`. It does the same when the client cannot authenticate at all, but **only in production** — elsewhere it logs a warning and retries every 3 seconds indefinitely, so a misconfigured `OPENCRVS_CLIENT_ID` / `OPENCRVS_CLIENT_SECRET` shows up as a hang rather than a crash (both default to an empty string and are not validated at startup). It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is an internal service token that only proves the request came from core — it carries no scopes, so a country configuration confirming asynchronously must use its own system client's credentials for the `accept`/`reject` call. It lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
+
+#### Document presign requests are no longer authorized by scope alone
+
+`GET /presigned-url/{filePath*}` on the gateway proxied straight to documents-service, which validates only that a JWT is genuinely signed — not that its scopes grant access to the record the document belongs to. Any authenticated user, regardless of scope, could obtain a valid presigned URL for any document whose path they knew.
+
+The route has been removed. Presigning a document tied to a record now goes through events-service's `event.file.getPresignedUrl`, which requires `record.read` on the event derived from the path (`events/{eventId}/...`) before asking documents-service to sign it. `users/{userId}/...` paths (avatars, signatures) and bare `{uuid}.ext` legacy paths (pre-2.0 uploads, or any upload where `path` is omitted) still presign without a record check, since they carry no record binding to check against.
+
+[#12962](https://github.com/opencrvs/opencrvs-core/issues/12962)
+
 #### `validUntil` removed from location APIs
 
 The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.
+
+#### `POST /locations` / `POST /administrative-areas` no longer upsert
+
+In 2.0.1, `POST /locations` and `POST /administrative-areas` upserted a record by id — creating it if new, or overwriting its fields if it already existed. In 2.1.0 these same routes are create-only: posting an id that already exists with different values now returns a `CONFLICT` error instead of overwriting it. Updating an existing location or administrative area requires the new `PUT /locations/{id}` / `PUT /administrative-areas/{id}` endpoints, which append a version rather than overwrite in place. Integrators using the 2.0.1 upsert endpoint to update existing records must switch to `PUT`.
 
 #### MongoDB removed
 
@@ -44,8 +89,75 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 
 [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
 
+#### The MOSIP integration now ships with core
+
+The MOSIP integration used to be released from its own `opencrvs/mosip` repository, on its own schedule. It now lives in core as `packages/mosip-api`, `packages/mosip`, `packages/mosip-mock` and `packages/esignet-mock`, and is released with every core release. This removes a circular release dependency: the integration was pinned to an `@opencrvs/toolkit` release candidate published by core, while core's reference country config depended on `@opencrvs/mosip` from npm.
+
+**The `opencrvs/mosip` repository is archived.** Open issues and pull requests should move to `opencrvs/opencrvs-core`.
+
+For the integration's own release history prior to this move, see [`packages/mosip-api/CHANGELOG.md`](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/mosip-api/CHANGELOG.md).
+
+#### Backup/restore host moved out of the SSH secret into a plain variable
+
+`BACKUP_HOST` / `PGBACKREST_REPO1_HOST` for the minio and postgres backup/restore charts used to be read from the `host` key of the backup-server SSH credentials secret. Since a hostname isn't sensitive, it's now read from `.Values.backup.host` / `.Values.restore.host` instead, populated from the `BACKUP_HOST` / `RESTORE_HOST` GitHub environment variables.
+
+- **Restore fails if `RESTORE_HOST` is not defined.** Environments that had restore configured before this change carried the host inside the SSH secret; on upgrade, if `RESTORE_HOST` isn't set the restore job has no host to connect to.
+- **Operators must run `yarn environment:init` for every environment that uses backup or restore (e.g. staging)** before deploying this change, so `BACKUP_HOST`/`RESTORE_HOST` get populated as GitHub environment variables.
+
+[#13502](https://github.com/opencrvs/opencrvs-core/pull/13502)
+
+#### Country config triggers are all served under `/trigger`
+
+The user-notification and system-ready triggers were served under `/triggers/`, while the event action and telemetry triggers used `/trigger/`. All of them now use the singular prefix:
+
+| Before                        | After                        |
+| ----------------------------- | ---------------------------- |
+| `POST /triggers/user/{event}` | `POST /trigger/user/{event}` |
+| `GET /triggers/system/ready`  | `GET /trigger/system/ready`  |
+
+`POST /trigger/events/{event}/actions/{action}` and `POST /trigger/telemetry` are unchanged.
+
+**Country configs must rename these routes.** `opencrvs upgrade` does it for you: the `rename-trigger-paths` codemod rewrites the `path` of every matching Hapi route under `src/`, then lists every `/triggers/` reference it could not rewrite — a path built at runtime, a route config it did not recognise — for you to rename by hand.
+
+[#13562](https://github.com/opencrvs/opencrvs-core/issues/13562)
+
+#### Attachment uploads must name the record they belong to
+
+`POST /attachments` accepted an optional, free-form `path`. Omitting it wrote the file to the bucket root, where it belonged to no record and nothing would ever delete it. The route now takes an `eventId` and derives the storage key from it, and rejects an upload naming neither `eventId` nor `path`.
+
+The gateway's `DELETE /files/{filePath*}` proxy is removed. Its only consumer was the web client, which no longer deletes files one at a time: a file goes when the record holding it is deleted, or is swept when the record's next action leaves it unreferenced.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+
+### Deprecations
+
+#### `path` on `POST /attachments`
+
+Send `eventId` instead and let the server derive the key. `path` still works, but a file written outside a record's prefix is reached by neither deletion nor sweep, so it outlives the record it was uploaded for. A future release will remove it.
+
+[#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+
+#### `POST /auth/token` parameters in the query string
+
+The token endpoint reads its parameters from the request body _or_ the URL. Sending them in the URL puts the client secret into gateway and proxy access logs, Sentry breadcrumbs, and every intermediary on the way (CWE-598). RFC 6749 §2.3.1 requires them in the body, and **a future release will read them only from there** — so integrations still authenticating via the URL should move now. This affects both grants: `client_credentials` (`client_id`, `client_secret`) and `urn:opencrvs:oauth:grant-type:token-exchange` (`subject_token`, `subject_token_type`, `requested_token_type`, `event_id`, `action_id`).
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Client IDs and secrets themselves keep working — only how they are transmitted changes.
+
+Until the removal, behaviour depends on the environment, so the change surfaces in development rather than in production:
+
+- **Production (`NODE_ENV=production`) keeps working**, but each such request logs an error naming the parameters, so operators can find the callers left to migrate. **Rotate any secret sent this way** — it may still be in retained logs.
+- **Every other deployment rejects the request** with `400 invalid_request` naming the parameters to move, so integrations testing against dev or staging fail immediately.
+
 ### Improvements
 
+- User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
 - Moved Ansible inventory files into environment-specific folders so each environment is self-contained and portable [#13181](https://github.com/opencrvs/opencrvs-core/pull/13181)
@@ -56,7 +168,11 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 - Keep filebeat index for 30 days by default [#13005](https://github.com/opencrvs/opencrvs-core/issues/13005)
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
 - Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
+- `pnpm dev` now runs the MOSIP stack alongside the rest of core, so local registrations exercise the same MOSIP path as a real deployment. The testland `NO_MOSIP` escape hatch is gone — it only ever short-circuited local development, and production already defaulted to `false`.
 - Record review, event summaries, team lists, settings and the duplicate comparison now draw their label-and-value rows from one shared component, so they present consistently and screen readers announce each value together with its row and column heading [#4024](https://github.com/opencrvs/opencrvs-core/issues/4024)
+- Added Service account support for Managed Kubernetes [#13324](https://github.com/opencrvs/opencrvs-core/issues/13324)
+- Implement Network policies to OpenCRVS pods [#13284](https://github.com/opencrvs/opencrvs-core/issues/13284)
+- Restrict access to OpenCRVS and admin tools (Kibana, MinIO, Metabase) by IP address and/or subnets [#13338](https://github.com/opencrvs/opencrvs-core/issues/13338)
 
 ### New features
 
@@ -72,6 +188,10 @@ Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.rea
 
 Added a `status` scope option for record scopes (`record.edit`, `record.reject`, `record.archive`, `record.search`, etc.) — e.g. `{ type: 'record.edit', options: { status: ['DECLARED'] } }` restricts the scope to records currently in one of the given `EventStatus` values.
 
+#### Flag-based scope filtering
+
+Added a `flags` scope option for record scopes (`record.search`, `record.read`, `record.request-correction`, `record.correct`, `record.unassign-others`, `record.review-duplicates`, `record.custom-action`, `record.print-certified-copies`) — e.g. `{ type: 'record.search', options: { flags: { noneOf: ['REJECTED'] } } }` restricts the scope to records whose current flags satisfy the given `anyOf`/`noneOf`/`allOf` condition.
+
 #### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
 
 `getActionConfig()` used to alias `APPROVE_CORRECTION` and `REJECT_CORRECTION` to whatever was configured on `REQUEST_CORRECTION` (label, flags, conditionals). Each now resolves to its own independent config. If your country config relies on `REQUEST_CORRECTION`'s `conditionals` or `flags` also applying to approve/reject, add explicit `APPROVE_CORRECTION`/`REJECT_CORRECTION` entries with the same values.
@@ -80,17 +200,25 @@ Added a `status` scope option for record scopes (`record.edit`, `record.reject`,
 
 `DELETE`, `ASSIGN`, `UNASSIGN`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, and `DUPLICATE_DETECTED` can now be configured in `ActionConfig`, supporting `label`, `icon`, and `conditionals` (and `flags`, except on `ASSIGN`/`UNASSIGN`, which are meta actions excluded from flag resolution). See [ACTIONS.md](/ACTIONS.md).
 
+#### `UNARCHIVE` core action
+
+Added `ActionType.UNARCHIVE`, a new core action that restores an `ARCHIVED` record to its pre-archive status, guarded by a new `record.unarchive` scope. See "`ARCHIVE` no longer clears the `INCOMPLETE` flag" above for its flag-handling behavior. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
+
 #### Configurable form fields on core action confirmation dialogs
 
 The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)
 
-#### `listHistoricalNames` / `activeOnly` location field config options
+#### `activeOnly` location field config option
 
-`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept two optional booleans: `listHistoricalNames` lists every name a location has ever had (across its `versions[]`) as a separate, selectable option — so records saved under an outdated name stay findable — and `activeOnly` offers only currently-active locations, excluding inactivated ones. Advanced search sets these itself for its location/address filters (offices and health institutions list all names and keep inactive entries; address filters list all names but drop inactive admin structures), so no country configuration is required for that behaviour; they are documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `activeOnly`, which offers only currently-active locations, excluding inactivated ones. Advanced search sets it itself for its address filters, so no country configuration is required for that behaviour; it is documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
 
 #### `anchorToDateOfEvent` location field config option
 
 `LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves the field's displayed/selectable versions against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). It does not by itself exclude inactive versions — combine with `activeOnly` for that; when both are set, `activeOnly`'s active/inactive check is evaluated at the event-date anchor rather than today, so a location that has since become inactive can still be selected for a historical record, and one not yet active as at the event's date is excluded even if it's active today. A selection is automatically cleared if the date-of-event later changes such that it resolves to a different version than before. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
+
+#### `separator` / `hideEmptyFields` field group config options
+
+`FIELD_GROUP` field configs accept an optional `configuration` object with two settings that control how the group renders as output (record review, audit history, search criteria pills). `separator` joins the subfield values into a single line — e.g. `', '` — instead of the default one-per-line. `hideEmptyFields` leaves subfields without a value out of that output; pair it with a separator so the separator does not double up around the gaps. A group that sets neither renders exactly as before: one subfield per line, blanks included. [#13423](https://github.com/opencrvs/opencrvs-core/issues/13423)
 
 #### Integration audit log retrieval
 
@@ -98,15 +226,147 @@ An integration's audit log can now be read through the `integrations.audit` endp
 
 A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
 
+#### Daily usage telemetry
+
+OpenCRVS can now share a small **daily usage summary** with the OpenCRVS status service — aggregate counts only (registrations, pending declarations, certificates printed, active users, uptime), never personal or record data. It is collected at most once per UTC day and only ever sent from production instances.
+
+Enable it on the countryconfig service with `TELEMETRY_ENABLED=true`, and identify your instance with `COUNTRY_CODE`, `ORGANISATION`, and `ENVIRONMENT_NAME`. While disabled, countryconfig logs a startup notice explaining what would be shared and how to opt in.
+
+- **New country configs** — `create-countryconfig` asks for your organisation, ISO alpha-3 country code, and whether to enable telemetry, then writes them as the env defaults.
+- **Existing country configs** — `opencrvs upgrade` wires telemetry into a v2.0 config (the `/trigger/telemetry` handler, its route, and the new env vars). It asks whether to enable it and, if so, requires your country code and organisation.
+- **Toolkit** — `@opencrvs/toolkit/telemetry` exposes `sendTelemetry(report)`, which owns the status service URL and payload schema so upgrades stay type-safe.
+
+#### Pre-flight validation for the data seed job
+
+The data seed job now validates the whole of the seed-data before it writes anything, and reports every problem it finds in one pass instead of stopping at the first bad record.
+
+Validated up front: duplicate email, mobile and username within the seed-data; every mobile number against the country config's configured phone pattern (a pattern that is not a usable expression is itself reported); every user's primary office against the location seed-data the job has already fetched, which is both earlier and more accurate than a database lookup; and the location hierarchy's parent-existence and location-to-administrative-area checks. The five checks that already existed and each aborted the run on its own — user and role schema parse failures, an unknown role, duplicate role ids, and the requirement that at least one initial user carry the `config.update-all` scope — are folded into the same report, so a typo'd role name and a duplicate email now read alike.
+
+Problems identify an initial user by its position in the seed-data and its username, and a validation failure always ends with `nothing was seeded`:
+
+```
+4 problems found; nothing was seeded.
+  initial user 44 (k.mweene): email "k.mweene@x.com" duplicates initial user 12 — emails must be unique
+```
+
+Duplicate usernames are a hard error rather than a rename. The service renumbers colliding usernames when it creates a user, which is right for self-service creation but wrong at seed time.
+
+Seed-data is held to a stricter shape, so mistakes surface here rather than part-way through a write. An initial user's username must satisfy the same rule the service applies when it creates one, and a username, password or name that is present but empty is a problem rather than something the database objects to later. A location version's `effectiveFrom` must be a plain date. Unrecognised keys on a location, a location version or an initial user are reported instead of being dropped in silence — a misspelled `verisons` previously cost a location its whole history without a word.
+
+Validation narrows the failure window but cannot close it, so a write that still fails — a constraint violation, a network fault, configuration drift between validating and writing — now names the failing initial user and states that the database holds incomplete seed-data:
+
+```
+Seeding failed while creating initial users.
+
+  initial user 44 (k.mweene): DUPLICATE_EMAIL — email "k.mweene@example.org" is already in use
+
+The database now holds incomplete seed-data. Clear the database before you seed again.
+```
+
+Re-running after a partial failure requires clearing the data first. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
+
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
+- Keep a status badge's label on a single line. A badge narrower than its text broke the label mid-word, e.g. `Active` rendering as `Activ` / `e` in the team members list [#13572](https://github.com/opencrvs/opencrvs-core/issues/13572)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
 - Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
 - Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
+- Stop reporting an email or mobile number as already in use when it is merely contained in an existing one. Duplicate and existence checks on users matched substrings, so creating a user with the email `a@x.com` was rejected as a duplicate of an existing `ba@x.com`. Email, mobile and username now match whole values; email and username stay case-insensitive in effect. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
+- Return a conflict naming the offending field, instead of an internal server error, when a write trips a unique constraint on a user's email, mobile or username. The application-level duplicate checks are broader than the constraints, so this is reachable only when two requests race — but the cause was masked in production and reached the caller as `Internal server error`. Covers creating a user as well as changing an existing user's email, phone number or name. [#11207](https://github.com/opencrvs/opencrvs-core/issues/11207)
+- Stop the gateway's `/events/{path*}` proxy from forwarding requests outside the events service. [#13587](https://github.com/opencrvs/opencrvs-core/issues/13587)
+- Stop the "Send username reminder?" and "Reset password?" confirmation modals from rendering a blank gap where the recipient's email or phone number used to be. The user search endpoint returns a user summary that no longer carries `email`/`mobile`, so the `{recipient}` placeholder never resolved. Both messages now name only the delivery method. **Country configurations must update `sysAdHome.sendUsernameReminderInviteModalMessage` and `sysAdHome.user.resetPasswordModal.message` in `client.csv` to drop `{recipient}`** — a translation that still references it will fail to format. [#13578](https://github.com/opencrvs/opencrvs-core/issues/13578)
+- Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
+- Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
+- Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+- Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
 
-## 2.0.0
+## 2.0.2
+
+### Breaking changes
+
+- Sentry is gone from the v2 line, as it already was from 1.9.17. `ClientConfig` and `LoginConfig` no longer accept a `SENTRY` field, so **a country config that still sets it fails to compile** on 2.0.2 and later. Delete `SENTRY` from `src/client-config.ts`, `src/client-config.prod.ts`, `src/login-config.ts` and `src/login-config.prod.ts`, and drop `SENTRY_DSN` from your environment. Going straight to 2.1.0? `npx @opencrvs/toolkit upgrade` does all of this for you. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+### Improvements
+
+- The dependencies Helm chart's datastore Services now support a configurable `service_type` [#13690](https://github.com/opencrvs/opencrvs-core/pull/13690)
+
+### Bug fixes
+
+- Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
+- Minio DockerHub image has been deprecated. Replace minio/mc image with quay.io/minio/mc [#13797](https://github.com/opencrvs/opencrvs-core/issues/13797)
+
+## 1.9.18
+
+## 1.9.17
+
+### Improvements
+
+- Removed Sentry from OpenCRVS entirely. The client and login apps no longer initialise Sentry, report exceptions to it, or show its "report a problem" dialog on a crash, and the ten backend services no longer register `hapi-sentry`. The `@sentry/*`, `redux-sentry-middleware` and `hapi-sentry` dependencies are gone. `script-src` no longer allow-lists `https://sentry.io/api/embed/error-page/`, so it names no third-party host and the login app loads scripts from `'self'` only. React error boundaries now render the apps' own error pages. [#13460](https://github.com/opencrvs/opencrvs-core/issues/13460)
+
+  **Deployment notes:**
+
+  - `SENTRY_DSN` is no longer read by any service, and the browser no longer reads `window.config.SENTRY`. Both can be dropped from your environment and country configuration; leaving them set has no effect.
+  - **Crash reporting is no longer built in.** Browser and server errors now go to logs and the browser console only. Deployments that relied on Sentry for alerting should put their own error tracking in place.
+
+- Operations that read or delete an event's action history no longer scan the whole `event_actions` table. On a database with 120,000 actions, removing one event's actions dropped from 57 ms to 2 ms, and the gap widens as records accumulate — most noticeable in record deletion and search reindexing. [#13482](https://github.com/opencrvs/opencrvs-core/issues/13482)
+
+  **Deployment notes:**
+
+  - The migration adds three indexes to the events database. Writes to `event_actions` and `event_action_drafts` pause while each one builds; reads are unaffected and paused writes complete on their own, but on a large database expect the migration step to take longer than usual.
+
+## 2.0.1 Release
+
+### Security fixes
+
+- Every `/trigger/user/*` user-notification request sent to the country config now carries an `Authorization` header, so country configurations can require authentication on those routes. Previously the `all-user-notification` route was called without a token and country configurations shipped all of these routes with `auth: false`, letting anyone who could reach the service trigger 2FA codes, password-reset credentials and notification emails or SMS to arbitrary recipients. The background announcement worker now authenticates with an anonymous token, and the username-retrieval flow mints a system token instead of forwarding an `Authorization` header it never receives. [#13501](https://github.com/opencrvs/opencrvs-core/pull/13501)
+
+  **Deployment notes:**
+
+  - Country configurations must remove `auth: false` from every route in `src/config/routes/userNotificationRoutes.ts`. Until they do, the endpoints stay open — the core change alone does not close them. The routes then inherit the default `jwt` strategy, which accepts tokens with the `opencrvs:countryconfig-user` audience; every core caller now sends one.
+  - Run `npx @opencrvs/toolkit verify-endpoints` against a locally-running country config to confirm the required public endpoints still respond and the secured ones reject unauthenticated requests. It exits non-zero if any check fails.
+
+### Improvements
+
+- Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+- Added `createdIn` as a config parameter to filter records by the office or administrative area they were created in. Unlike `declaredIn` it is populated before the record is declared, and it is never reassigned by a later declaration [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+- Expose `POST /locations` and `POST /administrative-areas` REST endpoints to create or update a single location or administrative area, for correcting individual data-seeding errors. Bulk seeding is unaffected and still uses the existing `locations.set`/`administrativeAreas.set` tRPC mutations. [#13336](https://github.com/opencrvs/opencrvs-core/pull/13336)
+- The MOSIP charts now pass `OPENCRVS_AUTH_URL` to mosip-api and pin the mosip-api, mosip-mock and esignet-mock images to `2.0.1`. Implementations running the MOSIP integration should redeploy the `opencrvs-mosip` chart. [#13362](https://github.com/opencrvs/opencrvs-core/pull/13362)
+- Make the Deployment rollout strategy configurable, and default it to `Recreate`, for OpenCRVS services [#11994](https://github.com/opencrvs/opencrvs-core/issues/11994)
+
+### Bug fixes
+
+- Fields guarded by a custom conditional are now saved when declaring, editing or registering a record. Previously they were stored as empty because the event was missing from the validator context. [#13167](https://github.com/opencrvs/opencrvs-core/issues/13167)
+- Location fields restricted with `allowedLocations` now enable every dropdown for users whose scope grants `placeOfEvent: 'all'`, instead of behaving as if it were `administrativeArea`. [#13209](https://github.com/opencrvs/opencrvs-core/issues/13209)
+- Declarations created offline with supporting documents no longer stay stuck in the Outbox after reconnecting, where the upload failed with "File not found". [#13303](https://github.com/opencrvs/opencrvs-core/issues/13303)
+- Re-enable ARM-based images in the Tiltfile so local developers can run OpenCRVS on Apple silicon. [#13285](https://github.com/opencrvs/opencrvs-core/pull/13285)
+
+## 1.9.16
+
+### New features
+
+- Third-party integrations (such as MOSIP) can now authenticate with their own client ID and secret instead of borrowing the requesting user's session. Integrations are registered on startup from the country configuration, so they keep working across service restarts and the audit trail attributes actions to the integration (e.g. "Registered — MOSIP") rather than to a person. Opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
+
+- Form pages can now show a "Clear" button that resets every field on the page to its default value after a confirmation dialog, and select fields can be cleared without picking another option. Opt in per page with `showClearButton: true`. Country configurations need the `buttons.clear`, `clearForm.title.clearFormConfirm` and `clearForm.desc.clearFormConfirm` translation keys. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
+
+### Improvements
+
+- Hardened the Content Security Policy served by the client and login apps, following a vulnerability scan. The login app no longer allows `unsafe-eval` or wildcard-domain scripts, both apps now send `frame-ancestors`, `base-uri` and `form-action`, `img-src` no longer permits plain-HTTP images, and PDF previews disable pdf.js code generation. The client still requires `unsafe-eval` to compile configuration at runtime; the reasoning is documented next to the policy in `packages/client/nginx.conf`. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
+
+  **Deployment notes:**
+
+  - Images served over plain HTTP are now blocked in both apps. Serve those assets over HTTPS.
+  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain. It is substituted verbatim, so an explicit space-separated origin list can be used instead; the minimum set is documented next to the policy in `packages/client/nginx.conf`. The login app no longer uses the wildcard at all — every origin it contacts is proxied same-origin through its own nginx.
+  - Reverse-proxy TLS cipher suites are outside OpenCRVS core. Proxies without explicit TLS options often fall back to a TLS 1.2 list offering CBC suites with HMAC-SHA-1; restricting to AEAD suites satisfies guidance such as ANSSI-BP-035.
+
+### Bug fixes
+
+- Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set a pending user's password and security answers, allowing account takeover. Enforced in both the gateway and user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)
+- Changing a password now requires the caller to be the account owner, and the current password is always required. Administrators still reset passwords through "Reset password", which is unchanged.
+- On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
+
+## 2.0.0 Release
 
 ### Upgrade guidance
 
@@ -248,7 +508,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Filebeat processing [#11232](https://github.com/opencrvs/opencrvs-core/issues/11232)
 - The app now recovers automatically when the network changes (e.g. Ethernet → WiFi) or become online -> offline -> online again during app initialisation is halfway. If connectivity drops while the app is still loading and is then restored, the app reloads itself to finish loading, instead of getting stuck on the "Installing application…" screen and requiring a manual refresh. [#12898](https://github.com/opencrvs/opencrvs-core/issues/12898)
 
-## 1.9.15 Release Candidate
+## 1.9.15
 
 ### Improvements
 

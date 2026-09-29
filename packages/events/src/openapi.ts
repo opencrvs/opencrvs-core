@@ -39,10 +39,17 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
           schema: {
             type: 'object',
             properties: {
+              eventId: {
+                type: 'string',
+                format: 'uuid',
+                description:
+                  'The record the attachment belongs to. The storage key is derived from it, so the file is deleted with the record.'
+              },
               path: {
                 type: 'string',
+                deprecated: true,
                 description:
-                  'Optional path in S3 where the file should be stored'
+                  'Deprecated. Send eventId instead and let the server derive the key.'
               },
               transactionId: {
                 type: 'string',

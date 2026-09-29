@@ -38,6 +38,31 @@ spec:
   ipAllowList:
     sourceRange:
       - 255.255.255.255
+{{- if .Values.ingress.admin_console_allowlist }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: admin-console-ip-allowlist
+spec:
+  ipAllowList:
+    sourceRange:
+      {{- toYaml .Values.ingress.admin_console_allowlist | nindent 6 }}
+{{- end }}
+{{- if .Values.ingress.application_allowlist }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: application-ip-allowlist
+spec:
+  ipAllowList:
+    # Admin console IPs are trusted for the whole application by definition,
+    # so they are merged in here - otherwise an operator allowed into the
+    # admin consoles could be locked out of the application itself.
+    sourceRange:
+      {{- concat .Values.ingress.application_allowlist (.Values.ingress.admin_console_allowlist | default list) | uniq | toYaml | nindent 6 }}
+{{- end }}
 # TODO: re-implement
 # ---
 # apiVersion: traefik.io/v1alpha1

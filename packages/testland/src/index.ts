@@ -20,12 +20,10 @@ import * as Hapi from '@hapi/hapi'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 import * as inert from '@hapi/inert'
-import * as Sentry from 'hapi-sentry'
 import * as H2o2 from '@hapi/h2o2'
 import fetch from 'node-fetch'
 import {
   GATEWAY_URL,
-  SENTRY_DSN,
   COUNTRY_CONFIG_HOST,
   COUNTRY_CONFIG_PORT,
   AUTH_URL,
@@ -46,14 +44,25 @@ import clientConfigProd from './client-config.prod'
 import loginConfig from './login-config'
 import loginConfigProd from './login-config.prod'
 import { emailHandler, emailSchema } from './api/notification/handler'
+import {
+  telemetryHandler,
+  telemetrySchema,
+  logTelemetryStartupStatus,
+  TELEMETRY_DISABLED_NOTICE
+} from './api/telemetry/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
+import {
+  dashboardProxyPageHandler,
+  primaryOfficeHandler
+} from '@countryconfig/api/dashboards/registrations-proxy'
 import { locationsHandler } from './data-seeding/locations/handler'
 import { certificateHandler } from './api/certificates/handler'
 import { rolesHandler } from './data-seeding/roles/handler'
 import { usersHandler } from './data-seeding/employees/handler'
 import { applicationConfigHandler } from './api/application/handler'
 import { handlebarsHandler } from './certificate/handlebars/handler'
+import { systemReadyHandler } from './api/integration/handler'
 import { fontsHandler } from './api/fonts/handler'
 import {
   getEventsHandler,
@@ -75,6 +84,7 @@ import {
   onMosipDeathRegisterHandler,
   onRegisterHandler
 } from './api/registration'
+import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { env } from './environment'
 
 import { workqueueconfigHandler } from './api/workqueue/handler'
@@ -115,19 +125,6 @@ export default function getPlugins() {
         prettyPrint: false,
         logPayload: false,
         instance: logger
-      }
-    })
-  }
-
-  if (SENTRY_DSN) {
-    plugins.push({
-      plugin: Sentry,
-      options: {
-        client: {
-          environment: process.env.NODE_ENV,
-          dsn: SENTRY_DSN
-        },
-        catchLogErrors: true
       }
     })
   }
@@ -371,6 +368,33 @@ export async function createServer() {
       auth: false,
       tags: ['api'],
       description: 'Serves map geojson'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/dashboards/registrations-proxy',
+    handler: dashboardProxyPageHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'dashboards'],
+      description:
+        'Proxy page for the registrations dashboard: resolves the logged-in user primary office and redirects to Metabase scoped to that office'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/dashboards/primary-office',
+    handler: primaryOfficeHandler,
+    options: {
+      // The user's own access token is read from the Authorization header and
+      // forwarded to the events service; the default countryconfig JWT strategy
+      // would reject it (wrong audience), so auth is handled by that forward.
+      auth: false,
+      tags: ['api', 'dashboards'],
+      description:
+        'Returns the primary office id of the user the request is authenticated as'
     }
   })
 
@@ -665,25 +689,54 @@ export async function createServer() {
   server.route(getVerifiableCredentialRoutes())
 
   server.route({
-    method: 'GET',
-    path: '/triggers/system/ready',
-    handler: (_request, h) => {
-      // Not implemented by default
-      // You can use this endpoint to for instance set up integration clients
-      return h.response().code(501)
-    },
+    method: 'POST',
+    path: '/trigger/telemetry',
+    handler: telemetryHandler,
     options: {
+      // Authenticated with the default JWT strategy; the handler additionally
+      // requires an OpenCRVS system token (see the handler).
       tags: ['api', 'triggers'],
-      description: 'System ready endpoint'
+      validate: {
+        payload: telemetrySchema
+      },
+      description:
+        'Receives a usage report from the events service and forwards it to the status service when telemetry is enabled'
     }
   })
 
-  server.ext({
-    type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
-      request.sentryScope?.setExtra('payload', request.payload)
-      return h.continue
+  server.route({
+    method: 'GET',
+    path: '/trigger/system/ready',
+    handler: systemReadyHandler,
+    options: {
+      tags: ['api', 'integration'],
+      description:
+        'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
     }
+  })
+
+  /*
+   * Core uses a special 'service token' to prove the request originated from core.
+   * The token is only a proof of origin and carries no scopes.
+   *
+   * Action confirmation requests check here that the token is present.
+   */
+  server.ext('onPostAuth', (request, h) => {
+    const isActionConfirmationRequest =
+      request.method === 'post' &&
+      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
+
+    if (
+      isActionConfirmationRequest &&
+      !isServiceToken(request.auth.credentials)
+    ) {
+      logger.warn(
+        'Action confirmation: rejected a request that is not from the core service token'
+      )
+      return h.response({ error: 'forbidden' }).code(403).takeover()
+    }
+
+    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {
@@ -833,6 +886,12 @@ export async function createServer() {
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
     )
+
+    if (!env.TELEMETRY_ENABLED) {
+      logger.info(TELEMETRY_DISABLED_NOTICE)
+    }
+
+    logTelemetryStartupStatus()
   }
 
   return { server, start, stop }

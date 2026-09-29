@@ -8,22 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EMPLOYEES_CSV } from '@countryconfig/constants'
+import { ENVIRONMENT_NAME } from '@countryconfig/constants'
 import { readCSVToJSON } from '@countryconfig/utils'
 import { Request, ResponseToolkit } from '@hapi/hapi'
-import { basename, join } from 'path'
+import { existsSync } from 'fs'
+import { join } from 'path'
 
 const EMPLOYEES_SOURCE_DIR = './src/data-seeding/employees/source'
+const DEFAULT_EMPLOYEES_CSV = 'default-employees.csv'
+
+/**
+ * Employees CSV to seed for the given environment: `<environment>-employees.csv`
+ * when that file exists in the source directory, otherwise
+ * `default-employees.csv`. Add a `production-employees.csv` (etc.) to the source
+ * directory to seed a different set of users per environment — no code change
+ * needed.
+ */
+export function employeesCsvForEnvironment(environmentName: string): string {
+  const environmentFile = `${environmentName}-employees.csv`
+  return existsSync(join(EMPLOYEES_SOURCE_DIR, environmentFile))
+    ? environmentFile
+    : DEFAULT_EMPLOYEES_CSV
+}
 
 export async function usersHandler(_: Request, h: ResponseToolkit) {
-  if (basename(EMPLOYEES_CSV) !== EMPLOYEES_CSV) {
-    throw new Error(
-      `EMPLOYEES_CSV must be a file name inside ${EMPLOYEES_SOURCE_DIR}, not a path. Received: ${EMPLOYEES_CSV}`
-    )
-  }
-
   const users: unknown[] = await readCSVToJSON(
-    join(EMPLOYEES_SOURCE_DIR, EMPLOYEES_CSV)
+    join(EMPLOYEES_SOURCE_DIR, employeesCsvForEnvironment(ENVIRONMENT_NAME))
   )
   return h.response(users)
 }

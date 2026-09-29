@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, type Page, expect } from '@playwright/test'
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe('Side menu navigation', () => {
   let page: Page
@@ -127,6 +127,15 @@ test.describe('Side menu navigation', () => {
       // Only one button available (X)
       await page.locator('#page-title').getByRole('button').click()
     }
+  })
+
+  test('Check Provincial Registrar navigation items', async () => {
+    await login(page, CREDENTIALS.PROVINCIAL_REGISTRAR)
+
+    await expect(
+      page.getByRole('button', { name: 'Assigned to you' })
+    ).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByRole('button', { name: 'Recent' })).toBeVisible()
   })
 
   test('Check National System Admin navigation items', async () => {

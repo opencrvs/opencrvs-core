@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CREDENTIALS } from '../../constants'
-import { login } from '../../helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 
 test('Email and phone changed from settings are reflected in user details', async ({

@@ -3,6 +3,13 @@ mode: deployment
 image:
   repository: otel/opentelemetry-collector-k8s
 
+networkPolicy:
+  enabled: true
+presets:
+  kubernetesObjects:
+    networking:
+      enabled: true
+
 resources:
   requests:
     cpu: 100m

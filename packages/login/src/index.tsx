@@ -10,12 +10,10 @@
  */
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import * as Sentry from '@sentry/react'
 
 import { App, routesConfig } from '@login/App'
 import { storage } from '@login/storage'
 import { createStore } from './store'
-import { BrowserTracing } from '@sentry/tracing'
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
@@ -32,20 +30,6 @@ WebFont.load({
   }
 })
 storage.configStorage('OpenCRVS')
-if (
-  window.location.hostname !== 'localhost' &&
-  window.location.hostname !== '127.0.0.1'
-) {
-  // setup error reporting using sentry
-  if (window.config.SENTRY) {
-    Sentry.init({
-      environment: process.env.HOSTNAME,
-      dsn: window.config.SENTRY,
-      integrations: [new BrowserTracing()],
-      tracesSampleRate: 1.0
-    })
-  }
-}
 const { store } = createStore()
 
 const container = document.getElementById('root')

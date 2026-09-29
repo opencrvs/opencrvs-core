@@ -17,7 +17,6 @@ import {
   isSelectableAtAnchor,
   JurisdictionFilter,
   resolveJurisdictionReference,
-  resolveVersion,
   todayISO,
   UUID,
   PlainDate
@@ -36,7 +35,11 @@ import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/us
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   buildHistoricalLocationNameOptions,
-  resolveLocationName
+  findLocationOption,
+  LocationOption,
+  resolveLocationName,
+  resolveLocationValue,
+  toLocationId
 } from '@client/v2-events/utils'
 import { LocationSearch } from './LocationSearch'
 
@@ -138,6 +141,7 @@ interface AdministrativeAreaInputProps
   onChange: (val: string | null) => void
   value?: string | null
   anchor: PlainDate
+  searchMode?: boolean
 }
 
 function AdministrativeAreaInput({
@@ -147,6 +151,7 @@ function AdministrativeAreaInput({
   partOf,
   onChange,
   anchor,
+  searchMode = false,
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
@@ -161,8 +166,12 @@ function AdministrativeAreaInput({
   // used to resolve `anchor` (event date vs today) — the two are orthogonal.
   const excludeInactive = Boolean(configuration.activeOnly)
 
+  // A parent picked under one of its historical names is version-pinned;
+  // children are still nested under the area itself.
+  const partOfId = toLocationId(partOf) ?? null
+
   const administrativeAreas = useAvailableAdministrativeAreas(
-    partOf,
+    partOfId,
     jurisdictionFilter,
     excludeInactive,
     anchor
@@ -174,30 +183,31 @@ function AdministrativeAreaInput({
     useAdministrativeAreas()
   const allAdministrativeAreas =
     getAdministrativeAreasForStaleCheck.useSuspenseQuery()
+
   useClearStaleSelectionOnAnchorChange({
     enabled: Boolean(configuration.anchorToDateOfEvent),
-    value,
+    value: toLocationId(value),
     anchor,
     entities: allAdministrativeAreas,
     onClear: () => onChange(null)
   })
 
-  // When the field config opts in (advanced search sets this), list every
-  // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option, resolved at the field's anchor.
-  const options = useMemo(
+  // Advanced search lists every historical name, so a record filed under a
+  // since-changed name stays findable. A declaration form shows a single
+  // current-name option, resolved at the field's anchor.
+  const options: LocationOption[] = useMemo(
     () =>
-      configuration.listHistoricalNames
+      searchMode
         ? buildHistoricalLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
             label: resolveLocationName(o, anchor),
             value: o.id
           })),
-    [administrativeAreas, configuration.listHistoricalNames, anchor]
+    [administrativeAreas, searchMode, anchor]
   )
 
   const selectedLocation = useMemo(
-    () => options.find((o) => o.value === value) ?? null,
+    () => findLocationOption(options, value),
     [options, value]
   )
 
@@ -228,30 +238,28 @@ function AdministrativeAreaOutput({
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const administrativeAreaId = UUID.safeParse(value?.toString()).data
+  // A search value is version-pinned — echo back the name that was actually
+  // selected, not whatever the area is called today.
+  const selection = resolveLocationValue(value, administrativeAreas, anchor)
 
-  const resolved =
-    administrativeAreaId &&
-    resolveVersion(
-      administrativeAreas.get(administrativeAreaId)?.versions ?? [],
-      anchor
-    )
-
-  return resolved ? resolved.name : ''
+  return selection ? selection.version.name : ''
 }
 
 function stringify(
   value: string,
   context: { locations: Map<UUID, ClientLocation>; anchor: PlainDate }
 ) {
-  const locationId = UUID.safeParse(value).data
-  const location = locationId && context.locations.get(locationId)
+  const selection = resolveLocationValue(
+    value,
+    context.locations,
+    context.anchor
+  )
 
-  if (!location) {
+  if (!selection) {
     return EMPTY_TOKEN
   }
 
-  return resolveVersion(location.versions, context.anchor).name
+  return selection.version.name
 }
 
 function isAdministrativeAreaEmpty(value: Stringifiable) {

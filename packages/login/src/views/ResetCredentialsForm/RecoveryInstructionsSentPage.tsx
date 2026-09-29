@@ -18,6 +18,7 @@ import {
   Container,
   LogoContainer
 } from '@login/views/ResetCredentialsForm/Commons'
+import styled from 'styled-components'
 import React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -27,8 +28,13 @@ import { selectCountryLogo } from '@login/login/selectors'
 import { IStoreState } from '@login/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
+import { ActiveAccountNote } from '@login/views/ResetCredentialsForm/ForgottenItemForm'
 
 type Props = IntlShapeProps & { logo: string | undefined }
+
+const WideContainer = styled(Container)`
+  width: min(495px, 90%);
+`
 
 /*
  * Terminal screen, shown whether or not the account exists. No resend button
@@ -53,7 +59,7 @@ const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
       )}
     >
       <Frame.LayoutCentered>
-        <Container id="recovery-instructions-sent-page">
+        <WideContainer id="recovery-instructions-sent-page">
           <Stack direction="column" alignItems="stretch" gap={24}>
             <LogoContainer>
               <CountryLogo src={logo} />
@@ -77,6 +83,7 @@ const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
                   forgottenItem
                 })}
               </Text>
+              <ActiveAccountNote intl={intl} />
             </Stack>
 
             <Button
@@ -88,7 +95,7 @@ const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
               {intl.formatMessage(messages.backToLoginButtonLabel)}
             </Button>
           </Stack>
-        </Container>
+        </WideContainer>
       </Frame.LayoutCentered>
     </Frame>
   )

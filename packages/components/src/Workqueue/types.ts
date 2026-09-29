@@ -62,6 +62,7 @@ export interface IDynamicValues {
     | null
     | undefined
     | Record<string, unknown>
+    | ((event: React.MouseEvent) => void)
 }
 
 export interface IActionObject {

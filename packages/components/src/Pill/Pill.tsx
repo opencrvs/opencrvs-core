@@ -79,6 +79,7 @@ const StyledPill = styled.span<{
   padding: 0 0.8em;
   align-items: center;
   border-radius: 100px;
+  white-space: nowrap;
 `
 
 export function Pill({

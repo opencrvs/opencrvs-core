@@ -167,7 +167,7 @@ export const SaveAndExit: Story = {
         const continueButton = await canvas.findByText('Continue')
         await userEvent.click(continueButton)
 
-        const backButton = await canvas.findByText('Back')
+        const backButton = await canvas.findByRole('button', { name: 'Back' })
         await userEvent.click(backButton)
 
         await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
@@ -283,7 +283,7 @@ export const DraftShownInForm: Story = {
         const continueButton = await canvas.findByText('Continue')
         await userEvent.click(continueButton)
 
-        const backButton = await canvas.findByText('Back')
+        const backButton = await canvas.findByRole('button', { name: 'Back' })
         await userEvent.click(backButton)
 
         await expect(await canvas.findByTestId('text__firstname')).toHaveValue(

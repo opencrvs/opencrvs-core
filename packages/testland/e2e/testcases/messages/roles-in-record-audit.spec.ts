@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CREDENTIALS } from '../../constants'
-import { getToken, login, switchEventTab } from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { ensureAssignedToUser } from '../../utils'
-import { formatV2ChildName } from '../birth/helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 const testCases = [
   {

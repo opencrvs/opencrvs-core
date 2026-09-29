@@ -87,7 +87,8 @@ describe('triggerUserEventNotification', () => {
     const response = await triggerUserEventNotification({
       event: TriggerEvent.ALL_USER_NOTIFICATION,
       payload: { recipient, subject: 'subj', body: 'body' },
-      countryConfigUrl: 'http://countryconfig'
+      countryConfigUrl: 'http://countryconfig',
+      authHeader: { Authorization: 'Bearer x' }
     })
 
     expect(errorSpy).toHaveBeenCalledTimes(1)

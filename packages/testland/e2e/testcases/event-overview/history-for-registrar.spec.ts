@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, Page } from '@playwright/test'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { getToken, login, switchEventTab } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser } from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
-import { formatV2ChildName } from '../birth/helpers'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe
   .serial('History rows when Registrar registers a birth from scratch', () => {
@@ -61,10 +64,12 @@ test.describe
     await expect(rows).toHaveCount(expectedActions.length)
 
     for (let i = 0; i < expectedActions.length; i++) {
-      const actionCell = rows.nth(i).locator('span').first()
-      await expect(actionCell).toHaveText(expectedActions[i])
+      const actionButton = rows
+        .nth(i)
+        .getByRole('button', { name: expectedActions[i], exact: true })
+      await expect(actionButton).toBeVisible()
 
-      await actionCell.getByRole('button').click()
+      await actionButton.click()
 
       const modal = page.getByTestId('event-history-modal')
 

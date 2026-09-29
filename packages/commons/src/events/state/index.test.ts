@@ -979,7 +979,7 @@ describe('correction requests', () => {
           },
           {
             declaration: {},
-            requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
+            requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
             type: 'APPROVE_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',

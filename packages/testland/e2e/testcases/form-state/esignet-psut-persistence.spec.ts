@@ -21,9 +21,9 @@ import {
   goToSection,
   login,
   triggerDeclarationAction
-} from '../../helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { openBirthDeclaration } from '../birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { openBirthDeclaration } from '@e2e/support/birth/helpers'
 
 const MOCK_NID = '1234567898'
 const EXPECTED_SUB = `12345678901234567890123456${MOCK_NID}`

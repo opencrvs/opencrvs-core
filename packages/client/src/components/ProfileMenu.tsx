@@ -21,7 +21,7 @@ import {
   ToggleMenu
 } from '@opencrvs/components/lib/ToggleMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { AvatarSmall } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
 import { getLanguage } from '@client/i18n/selectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -102,9 +102,10 @@ const ProfileMenuComponent = ({
         id="ProfileMenu"
         ariaLabel="Profile"
         toggleButton={
-          <AvatarSmall
+          <Avatar
             name={getUserName(userDetails)}
-            avatar={userDetails?.avatar}
+            size="sm"
+            src={userDetails?.avatar}
           />
         }
         menuHeader={getMenuHeader(userDetails)}

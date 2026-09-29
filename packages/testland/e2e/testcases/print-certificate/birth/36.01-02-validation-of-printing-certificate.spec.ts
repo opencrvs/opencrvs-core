@@ -10,15 +10,15 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login, getToken } from '../../../helpers'
-import { CREDENTIALS } from '../../../constants'
+import { login, getToken } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../../test-data/birth-declaration'
-import { navigateToCertificatePrintAction } from './helpers'
-import { expectInUrl } from '../../../utils'
-import { REQUIRED_VALIDATION_ERROR } from '../../birth/helpers'
+} from '@e2e/support/test-data/birth-declaration'
+import { navigateToCertificatePrintAction } from '@e2e/support/print-certificate/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 
 test.describe.serial('Print certificate', () => {
   let page: Page

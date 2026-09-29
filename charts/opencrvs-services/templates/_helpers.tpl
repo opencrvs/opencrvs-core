@@ -82,6 +82,52 @@ resources:
     cpu: {{ $service.cpuLimit | default $global.cpuLimit | quote }}
 {{- end }}
 
+{{/*
+
+strategy-helper
+---
+Renders the Deployment's `.spec.strategy` block.
+
+type: Recreate       -> all existing pods are terminated before any
+                         replacement pods are created. Guarantees old pods
+                         are gone before new ones start, at the cost of a
+                         brief outage for that service during rollout.
+type: RollingUpdate   -> pods are swapped gradually according to maxSurge /
+                         maxUnavailable (set either to tune it; omit both to
+                         fall back to Kubernetes' own defaults).
+
+Global default lives under `strategy:`, overridable per-service under
+<service>.strategy (same lookup pattern as resources-helper/pdb-helper).
+
+Parameters:
+- .service_name: The name of the microservice, used to key into per-service
+  overrides.
+- .Values: The top-level Values object for the Helm chart.
+*/}}
+{{- define "strategy-helper" -}}
+{{- $service_name := .service_name }}
+{{- $service_key_name := ( $service_name | replace "-" "_" ) }}
+{{- $global := .Values.strategy | default dict }}
+{{- $service_values := index .Values $service_key_name | default dict }}
+{{- $service_strategy := $service_values.strategy | default dict }}
+{{- $type := $service_strategy.type | default $global.type | default "RollingUpdate" }}
+strategy:
+  type: {{ $type }}
+{{- if eq $type "RollingUpdate" }}
+{{- $maxSurge := $service_strategy.maxSurge | default $global.maxSurge }}
+{{- $maxUnavailable := $service_strategy.maxUnavailable | default $global.maxUnavailable }}
+{{- if or $maxSurge $maxUnavailable }}
+  rollingUpdate:
+    {{- if $maxSurge }}
+    maxSurge: {{ $maxSurge }}
+    {{- end }}
+    {{- if $maxUnavailable }}
+    maxUnavailable: {{ $maxUnavailable }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "pdb-helper" -}}
 {{- if .Values.pdb.enabled }}
 {{- $service_name := .service_name }}

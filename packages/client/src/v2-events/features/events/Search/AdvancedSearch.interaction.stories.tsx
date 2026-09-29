@@ -594,9 +594,14 @@ export const JurisdictionScope_Location: Story = {
           canvasElement,
           canvas
         )
+        // `queryAllByRole` is synchronous, so on its own it snapshots the
+        // listbox while it is still being populated and reads a partial
+        // count. Wait for the count to settle before asserting on it.
+        await waitFor(async () =>
+          expect(within(listbox).queryAllByRole('listitem')).toHaveLength(1)
+        )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options).toHaveLength(1)
         await expect(options[0]).toHaveTextContent('Ibombo District Office')
       }
     )
@@ -639,11 +644,16 @@ export const JurisdictionScope_AdministrativeArea: Story = {
           canvasElement,
           canvas
         )
+        // `queryAllByRole` is synchronous, so on its own it snapshots the
+        // listbox while it is still being populated and reads a partial
+        // count. Wait for the count to settle before asserting on it.
+        await waitFor(async () =>
+          expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
+            locationsUnderAdministration.length
+          )
+        )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(
-          locationsUnderAdministration.length
-        )
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))
@@ -696,9 +706,16 @@ export const JurisdictionScope_All: Story = {
           canvasElement,
           canvas
         )
+        // `queryAllByRole` is synchronous, so on its own it snapshots the
+        // listbox while it is still being populated and reads a partial
+        // count. Wait for the count to settle before asserting on it.
+        await waitFor(async () =>
+          expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
+            allLocations.length
+          )
+        )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(allLocations.length)
         allLocations.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))
@@ -729,9 +746,16 @@ export const JurisdictionScope_AllBeatsLocation: Story = {
           canvasElement,
           canvas
         )
+        // `queryAllByRole` is synchronous, so on its own it snapshots the
+        // listbox while it is still being populated and reads a partial
+        // count. Wait for the count to settle before asserting on it.
+        await waitFor(async () =>
+          expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
+            allLocations.length
+          )
+        )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(allLocations.length)
         allLocations.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))
@@ -871,11 +895,16 @@ export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
           canvasElement,
           canvas
         )
+        // `queryAllByRole` is synchronous, so on its own it snapshots the
+        // listbox while it is still being populated and reads a partial
+        // count. Wait for the count to settle before asserting on it.
+        await waitFor(async () =>
+          expect(within(listbox).queryAllByRole('listitem')).toHaveLength(
+            locationsUnderAdministration.length
+          )
+        )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(
-          locationsUnderAdministration.length
-        )
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import {
   getToken,
   login,
@@ -16,22 +16,58 @@ import {
   searchFromSearchBar,
   uploadImage,
   waitForActionResponses
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser, selectAction } from '../../utils'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+
+/**
+ * Sealed records all display the same generic REDACTED_RECORD_TITLE, so if
+ * fuzzy name matching happens to return more than one sealed record, they
+ * can't be told apart by title alone - fall back to the tracking ID, which
+ * is unique, before opening.
+ */
+async function searchSealedRecordByNameOrTrackingId(
+  page: Page,
+  searchText: string,
+  trackingId: string
+) {
+  await page.locator('#searchText').fill(searchText)
+  await page.locator('#searchIconButton').click()
+  const searchResult = await page.locator('#content-name').textContent()
+  expect(searchResult).toMatch(/Search result for “([^”]+)”/)
+
+  const resultCount = await page.locator('[id^="row_"]').count()
+  if (resultCount > 1) {
+    await page.locator('#searchText').fill(trackingId)
+    await page.locator('#searchIconButton').click()
+  }
+
+  await openRecordByTitle(page, REDACTED_RECORD_TITLE)
+}
 
 test('Sealing a record hides it from local registrars and blocks all actions', async ({
   browser
 }) => {
+  // openRecordByTitle's own collision-retry loop can take up to 60s under
+  // load, and this flow's earlier steps alone can take ~75s - the default
+  // 90s budget doesn't leave that loop room to actually do its job.
+  test.setTimeout(180_000)
+
   const page = await browser.newPage()
   let childName: string
   let eventId: string
+  let trackingId: string
   await test.step('Registrar (k.mweene) registers a birth record', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
     const res = await createDeclaration(token)
     eventId = res.eventId
+    trackingId = res.trackingId as string
     childName = formatV2ChildName(res.declaration as Declaration)
   })
 
@@ -66,7 +102,7 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
     // Sealing strips the declaration from the search index for everyone, so
     // the record is still found by name but listed without one. The full
     // record stays available to this role through the Record tab.
-    await searchFromSearchBar(page, childName, true, REDACTED_RECORD_TITLE)
+    await searchSealedRecordByNameOrTrackingId(page, childName, trackingId)
     await expect(page.getByTestId('flags-value')).toContainText('Sealed')
     await expect(
       page.getByRole('button', { name: 'Record', exact: true })
@@ -80,18 +116,43 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
     expect(pageTitle).toEqual(REDACTED_RECORD_TITLE)
   })
 
-  await test.step('Redacted fields are immediately updated based on assignment status', async () => {
+  await test.step('Summary titles stays redacted after assignment', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_GENERAL)
 
     const overviewTitleAssigned = await page
       .locator('#content-name')
       .textContent()
-    expect(overviewTitleAssigned).toEqual(childName)
+    expect(overviewTitleAssigned).toEqual(REDACTED_RECORD_TITLE)
 
     const pageTitleAssigned = await page.locator('#page-title h1').textContent()
 
-    expect(pageTitleAssigned).toEqual(childName)
+    expect(pageTitleAssigned).toEqual(REDACTED_RECORD_TITLE)
+  })
 
+  await test.step('Going back and forth between summary and record views should not reveal redacted titles', async () => {
+    await page
+      .getByRole('button', {
+        name: 'Record'
+      })
+      .click()
+
+    await page
+      .getByRole('button', {
+        name: 'Summary'
+      })
+      .click()
+
+    const overviewTitleAssigned = await page
+      .locator('#content-name')
+      .textContent()
+    expect(overviewTitleAssigned).toEqual(REDACTED_RECORD_TITLE)
+
+    const pageTitleAssigned = await page.locator('#page-title h1').textContent()
+
+    expect(pageTitleAssigned).toEqual(REDACTED_RECORD_TITLE)
+  })
+
+  await test.step('Summary titles stay redacted after assignment', async () => {
     await selectAction(page, 'Unassign')
     await waitForActionResponses(
       page,
@@ -117,11 +178,20 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
     // `record.search` is not restricted by the `sealed` flag for this role,
     // only `record.read` is - so the record still surfaces in search results,
     // with its declaration stripped.
-    await searchFromSearchBar(page, childName, true, REDACTED_RECORD_TITLE)
+    await searchSealedRecordByNameOrTrackingId(page, childName, trackingId)
   })
 
-  await test.step('Registrar sees the record is already sealed', async () => {
+  await test.step('Registrar sees the record is already sealed, with titles redacted', async () => {
     await expect(page.getByTestId('flags-value')).toContainText('Sealed')
+
+    const overviewTitleAssigned = await page
+      .locator('#content-name')
+      .textContent()
+    expect(overviewTitleAssigned).toEqual(REDACTED_RECORD_TITLE)
+
+    const pageTitleAssigned = await page.locator('#page-title h1').textContent()
+
+    expect(pageTitleAssigned).toEqual(REDACTED_RECORD_TITLE)
   })
 
   await test.step('Registrar cannot open the full record', async () => {

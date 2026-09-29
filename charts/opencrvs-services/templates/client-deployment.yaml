@@ -21,6 +21,9 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}
@@ -38,6 +41,7 @@ metadata:
   name: client
 spec:
   replicas: {{ .Values.client.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "client" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: client
@@ -50,6 +54,7 @@ spec:
         service_name: opencrvs_client
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.client) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "client" "Values" .Values) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.client) }}
           imagePullPolicy: {{ .Values.client.image.pullPolicy | default .Values.platform.imagePullPolicy }}
@@ -96,6 +101,10 @@ spec:
             name: {{ $config_name }}
       {{- end }}
       {{- end }}
+
+{{- include "service-account-helper" (dict "service_name" "client" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "client" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "client" "Values" .Values) }}
 

@@ -14,6 +14,7 @@ import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import { useSelector } from 'react-redux'
 import {
   deepDropNulls,
+  DocumentPath,
   System,
   TokenUserType,
   UserOrSystem,
@@ -32,7 +33,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFile } from '../features/files/useFileUpload'
+import { precacheFile, precacheFiles } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -60,12 +61,11 @@ setQueryDefaults<
       return user
     }
 
-    if (user.signature) {
-      await precacheFile(user.signature)
-    }
-    if (user.avatar) {
-      await precacheFile(user.avatar)
-    }
+    const files = [user.avatar, user.signature].filter(
+      (file): file is DocumentPath => !!file
+    )
+
+    await precacheFiles(files)
 
     return deepDropNulls({
       ...user,
@@ -111,6 +111,9 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         ] as (typeof params)[0]['queryKey']
       })
 
+      // Use all settled in order to finish all queries in failure states.
+      // Technically this could be replaced with precacheFiles but during review, we deemed it more safe to keep the existing functionality.
+      // If the reason above is not up to date, feel free to refactor.
       await Promise.allSettled(
         freshUsers.map(async (user) => {
           if (user.type === TokenUserType.enum.system) {

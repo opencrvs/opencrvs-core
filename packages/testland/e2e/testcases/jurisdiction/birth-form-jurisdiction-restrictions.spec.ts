@@ -10,9 +10,9 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { openBirthDeclaration } from '../birth/helpers'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { openBirthDeclaration } from '@e2e/support/birth/helpers'
 
 test.describe('Birth form - child place of birth jurisdiction restrictions', () => {
   let page: Page

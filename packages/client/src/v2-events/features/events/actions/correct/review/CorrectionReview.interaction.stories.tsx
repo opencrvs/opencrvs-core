@@ -342,3 +342,143 @@ export const ApproveCorrectionModal: Story = {
     await userEvent.click(canvas.getByTestId('close-dialog'))
   }
 }
+
+// Regression test for ocrvs-13664: reviewing a correction request must show
+// the requester of the request currently pending review, not one carried
+// over from an earlier, already-approved correction on the same record.
+
+const repeatedCorrectionEventId = 'c2d3e4f5-6789-4bcd-8def-123456789abc' as UUID
+const firstCorrectionRequestId = 'd3e4f5a6-7890-4cde-9fab-23456789abcd' as UUID
+const secondCorrectionRequestId = 'e4f5a6b7-8901-4def-abcd-3456789abcde' as UUID
+
+const repeatedCorrectionActionDefaults = {
+  createdBy: generator.user.id.localRegistrar,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
+const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
+  type: TENNIS_CLUB_MEMBERSHIP,
+  id: repeatedCorrectionEventId,
+  trackingId: generateTrackingId(() => 0.1),
+  createdAt: '2025-01-23T05:30:00.000Z',
+  updatedAt: '2025-01-25T05:35:00.000Z',
+  actions: [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        ...repeatedCorrectionActionDefaults,
+        createdAt: '2025-01-23T05:30:00.000Z'
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        ...repeatedCorrectionActionDefaults,
+        createdAt: '2025-01-23T05:31:00.000Z'
+      },
+      declarationOverrides: {
+        'applicant.name': { firstname: 'Riku', surname: 'Rouvila' },
+        'applicant.dob': '2025-01-23',
+        'recommender.name': { firstname: 'Euan', surname: 'Millar' }
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        ...repeatedCorrectionActionDefaults,
+        createdAt: '2025-01-23T05:32:00.000Z'
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REQUEST_CORRECTION,
+      defaults: {
+        ...repeatedCorrectionActionDefaults,
+        id: firstCorrectionRequestId,
+        createdAt: '2025-01-24T05:33:00.000Z',
+        annotation: {
+          'correction.requester.relationship': 'ANOTHER_AGENT',
+          'correction.identity-check.verified': 'VERIFIED',
+          'correction.request.supportingDocuments': ''
+        }
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        ...repeatedCorrectionActionDefaults,
+        createdAt: '2025-01-24T05:34:00.000Z',
+        requestId: firstCorrectionRequestId,
+        // Mirrors what the app persists on approve: the full review-time
+        // annotation, including the first request's requester field.
+        annotation: {
+          'correction.requester.relationship': 'ANOTHER_AGENT',
+          'correction.identity-check.verified': 'VERIFIED',
+          'correction.request.supportingDocuments': ''
+        }
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REQUEST_CORRECTION,
+      defaults: {
+        ...repeatedCorrectionActionDefaults,
+        id: secondCorrectionRequestId,
+        createdAt: '2025-01-25T05:35:00.000Z',
+        annotation: {
+          'correction.requester.relationship': 'INFORMANT',
+          'correction.identity-check.verified': 'VERIFIED',
+          'correction.request.supportingDocuments': ''
+        }
+      }
+    })
+  ]
+}
+
+export const RepeatedCorrectionRequestShowsLatestRequester: Story = {
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    offline: {
+      events: [tennisClubMembershipEventWithRepeatedCorrectionRequests]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Outlet />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath({
+        eventId: repeatedCorrectionEventId
+      })
+    }
+  },
+
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: /approve/i })
+      ).toBeInTheDocument()
+    })
+
+    await expect(canvas.getByText('Informant')).toBeInTheDocument()
+    await expect(
+      canvas.queryByText('Another registration agent or field agent')
+    ).not.toBeInTheDocument()
+  }
+}

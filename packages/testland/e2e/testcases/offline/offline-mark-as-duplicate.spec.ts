@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { getToken, login } from '../../helpers'
+import { getToken, login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { createDeclaration } from '../test-data/birth-declaration-with-mother-father'
-import { formatV2ChildName } from '../birth/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-mother-father'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { ensureAssignedToUser, selectAction } from '../../utils'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { createClient } from '@opencrvs/toolkit/api'
 import { v4 as uuidv4 } from 'uuid'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Mark as duplicate while offline', async ({ page }) => {
   const details = {

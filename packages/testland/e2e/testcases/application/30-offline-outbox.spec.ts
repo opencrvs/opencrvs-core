@@ -17,10 +17,10 @@ import {
   getRandomDate,
   goToSection,
   login
-} from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
-import { fillDate, generateBirthInputs } from '../birth/helpers'
+import { fillDate, generateBirthInputs } from '@e2e/support/birth/helpers'
 
 test.describe
   .serial('30: Validate user can send multiple complete and incomplete records offline', () => {
