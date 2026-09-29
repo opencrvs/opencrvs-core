@@ -1517,6 +1517,8 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
@@ -1620,6 +1622,8 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
@@ -2595,9 +2599,10 @@ components:
                     type: string
                     description: Identifier of the summary field.
                   value:
-                    description: Field value template supporting variables from configuration and
-                      EventMetadata (e.g. "{informant.phoneNo}
-                      {informant.email}").
+                    description: Field value template supports variables from configuration (e.g.
+                      "{informant.phoneNo} {informant.email}") and EventMetadata
+                      (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date,
+                      ::dd MMMM yyyy}").
                     $ref: "#/components/schemas/TranslationConfig"
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
@@ -2700,11 +2705,9 @@ components:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
         flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
+          description: READ is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -2735,44 +2738,11 @@ components:
           description: Configuration of the review page for read-only view.
       required:
         - label
-        - flags
         - type
         - review
       additionalProperties: false
       description: Configuration for the read action — defines the record-tab content
         displayed on the event overview page.
-    ActionFlagConfig:
-      type: object
-      properties:
-        id:
-          anyOf:
-            - anyOf:
-                - type: string
-                - type: string
-                  enum:
-                    - incomplete
-                    - rejected
-                    - correction-requested
-                    - potential-duplicate
-                    - edit-in-progress
-            - type: string
-              description: Custom flag identifier defined by the country config.
-        operation:
-          type: string
-          enum:
-            - add
-            - remove
-          description: Operation to perform on the flag.
-        conditional:
-          description: When conditional is met, the operation is performed on the flag. If
-            not provided, the operation is performed unconditionally.
-          $ref: "#/components/schemas/Conditional"
-      required:
-        - id
-        - operation
-      additionalProperties: false
-      description: Add or remove operation applied to a flag when the parent action is
-        accepted. Optionally gated by a conditional.
     FieldConfig:
       oneOf:
         - $ref: "#/components/schemas/FieldGroup"
@@ -3027,6 +2997,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3041,8 +3013,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.confirm-registration
-                                - record.reject-registration
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3050,6 +3020,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
+                                - createdIn
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -3068,8 +3040,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3306,6 +3276,8 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - record.action.accept
+                                - record.action.reject
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -3320,8 +3292,6 @@ components:
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
-                                - record.confirm-registration
-                                - record.reject-registration
                                 - workqueue
                                 - dashboard.view
                             $option:
@@ -3329,6 +3299,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - createdBy
+                                - createdIn
                                 - notifiedIn
                                 - notifiedBy
                                 - declaredIn
@@ -3347,8 +3319,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
                 activeOnly:
                   type: boolean
                 anchorToDateOfEvent:
@@ -3550,6 +3520,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        configuration:
+          type: object
+          properties:
+            separator:
+              description: Joins the subfield values when the group is rendered as output,
+                e.g. ", ". Defaults to one subfield per line.
+              type: string
+            hideEmptyFields:
+              description: Leaves subfields without a value out of the output. Pair it with a
+                separator so the separator does not double up around the gaps.
+              default: false
+              type: boolean
+          additionalProperties: false
       required:
         - id
         - label
@@ -3983,6 +3966,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -3997,8 +3982,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -4006,6 +3989,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -4024,11 +4009,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option. Propagated to the embedded admin-area
-                selectors.
-              type: boolean
             activeOnly:
               description: Offer only admin areas that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9132,6 +9112,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9146,8 +9128,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9155,6 +9135,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9173,10 +9155,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -9621,6 +9599,8 @@ components:
                             - record.correct
                             - record.unassign-others
                             - record.custom-action
+                            - record.action.accept
+                            - record.action.reject
                             - bypassratelimit
                             - record.reindex
                             - user.data-seeding
@@ -9635,8 +9615,6 @@ components:
                             - performance.read
                             - performance.read-dashboards
                             - performance.vital-statistics-export
-                            - record.confirm-registration
-                            - record.reject-registration
                             - workqueue
                             - dashboard.view
                         $option:
@@ -9644,6 +9622,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - createdBy
+                            - createdIn
                             - notifiedIn
                             - notifiedBy
                             - declaredIn
@@ -9662,10 +9642,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: List every historical name a location has had as a separate,
-                selectable option.
-              type: boolean
             activeOnly:
               description: Offer only locations that are active at the resolved anchor date
                 (today, or the date of event when anchorToDateOfEvent is set);
@@ -13939,6 +13915,38 @@ components:
         - type
       additionalProperties: false
       description: Configuration for deleting a draft record.
+    ActionFlagConfig:
+      type: object
+      properties:
+        id:
+          anyOf:
+            - anyOf:
+                - type: string
+                - type: string
+                  enum:
+                    - incomplete
+                    - rejected
+                    - correction-requested
+                    - potential-duplicate
+                    - edit-in-progress
+            - type: string
+              description: Custom flag identifier defined by the country config.
+        operation:
+          type: string
+          enum:
+            - add
+            - remove
+          description: Operation to perform on the flag.
+        conditional:
+          description: When conditional is met, the operation is performed on the flag. If
+            not provided, the operation is performed unconditionally.
+          $ref: "#/components/schemas/Conditional"
+      required:
+        - id
+        - operation
+      additionalProperties: false
+      description: Add or remove operation applied to a flag when the parent action is
+        accepted. Optionally gated by a conditional.
     NotifyActionConfig:
       type: object
       properties:
@@ -14439,6 +14447,10 @@ components:
               description: If true, all required fields must be filled before continuing to
                 the next page
               type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
+              type: boolean
             fields:
               type: array
               items:
@@ -14471,6 +14483,10 @@ components:
               default: false
               description: If true, all required fields must be filled before continuing to
                 the next page
+              type: boolean
+            showClearButton:
+              description: If true, a "Clear" button is shown at the top of the page allowing
+                the user to reset all fields on the page to their default state
               type: boolean
             fields:
               type: array
@@ -14838,6 +14854,11 @@ components:
                 description: If true, all required fields must be filled before continuing to
                   the next page
                 type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
+                type: boolean
               fields:
                 type: array
                 items:
@@ -15137,6 +15158,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -15151,8 +15174,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.confirm-registration
-                                  - record.reject-registration
                                   - workqueue
                                   - dashboard.view
                               $option:
@@ -15160,6 +15181,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
+                                  - createdIn
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
@@ -15452,6 +15475,8 @@ components:
                                   - record.correct
                                   - record.unassign-others
                                   - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
                                   - bypassratelimit
                                   - record.reindex
                                   - user.data-seeding
@@ -15466,8 +15491,6 @@ components:
                                   - performance.read
                                   - performance.read-dashboards
                                   - performance.vital-statistics-export
-                                  - record.confirm-registration
-                                  - record.reject-registration
                                   - workqueue
                                   - dashboard.view
                               $option:
@@ -15475,6 +15498,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - createdBy
+                                  - createdIn
                                   - notifiedIn
                                   - notifiedBy
                                   - declaredIn
@@ -17001,6 +17026,8 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
@@ -17106,6 +17133,8 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         content:
           type: object
           properties:
