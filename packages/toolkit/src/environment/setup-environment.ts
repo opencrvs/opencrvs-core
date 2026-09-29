@@ -10,7 +10,6 @@
  */
 
 import { Octokit } from '@octokit/core'
-import dotenv from 'dotenv'
 import kleur from 'kleur'
 import prompts, { PromptObject } from 'prompts'
 
@@ -22,6 +21,11 @@ async function confirm(options: any): Promise<boolean> {
 async function select<Value = string>(options: any): Promise<Value> {
   const inquirer = await import('@inquirer/prompts')
   return inquirer.select(options)
+}
+
+async function input(options: any): Promise<string> {
+  const inquirer = await import('@inquirer/prompts')
+  return inquirer.input(options)
 }
 
 import {
@@ -43,11 +47,12 @@ import {
 } from './github'
 
 import { derivedVariables } from './derived-variables'
-import { generateLongPassword, findExistingValue, storeSecrets } from './utils'
+import { generateLongPassword, findExistingValue } from './utils'
 
 import { error, info, log, success, warn } from './logger'
 import { generateInventory, copyChartsValues } from './templates'
 import { generateSSHKeyPair } from './ssh-keygen'
+import { updateWorkflowEnvironments } from './update-workflows'
 import {
   dockerhubQuestions,
   githubQuestions,
@@ -160,7 +165,6 @@ function getAnswers(existingValues: (Secret | Variable)[]): Answers {
 }
 
 async function promptAndStoreAnswer(
-  environment: string,
   questions: Array<QuestionDescriptor<any>>,
   existingValues: Array<Secret | Variable>
 ) {
@@ -260,8 +264,6 @@ async function promptAndStoreAnswer(
 
   ALL_ANSWERS.push(result)
 
-  storeSecrets(environment, getAnswers(existingValues))
-
   const existingValuesForQuestions = questions
     // Only variables can have previous values we can use
     .filter((question) => question.valueType === 'VARIABLE')
@@ -292,7 +294,7 @@ ALL_QUESTIONS.push(
   ...derivedVariables,
   ...metabaseAdminQuestions
 )
-;(async () => {
+export async function runSetupEnvironment() {
   log('\n', kleur.bold().underline('Github'), '\n')
   const { githubOrganisation, githubRepository } = await prompts(
     githubQuestions.map(questionToPrompt),
@@ -303,11 +305,7 @@ ALL_QUESTIONS.push(
     }
   )
 
-  const { githubToken } = await promptAndStoreAnswer(
-    '',
-    githubTokenQuestion,
-    []
-  )
+  const { githubToken } = await promptAndStoreAnswer(githubTokenQuestion, [])
 
   const octokit = new Octokit({
     auth: githubToken
@@ -365,16 +363,29 @@ ALL_QUESTIONS.push(
       ]
     })
   }
+
+  log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
+
+  const two_fa_enabled = await confirm({
+    message:
+      'Enable two-factor authentication (2FA)? This should be enabled for any environment that hosts PII data.',
+    default: process.env.TWO_FA_ENABLED
+      ? process.env.TWO_FA_ENABLED === 'true'
+      : environment_type === 'production'
+  })
+
+  if (!two_fa_enabled && ['production', 'staging'].includes(environment_type)) {
+    warn(
+      '2FA is disabled on a production-like environment. Logins will accept the fixed test code 000000, exposing real citizen data. Only do this if you know what you are doing.'
+    )
+  }
+
   const environment_exists = existingEnvironments
     .map((e) => e.trim())
     .includes(environment)
   if (!environment) {
     process.exit(1)
   }
-  // Read users .env file based on the environment name they gave above, e.g. .env.production
-  dotenv.config({
-    path: `${process.cwd()}/.env.${environment}`
-  })
 
   await createEnvironment(
     octokit,
@@ -443,20 +454,15 @@ ALL_QUESTIONS.push(
           'WARNING! You are setting up a production environment.\n Make sure you have read the deployment guide carefully before proceeding.\n'
         )
     )
-    await promptAndStoreAnswer(
-      environment,
-      githubOtherQuestions,
-      existingValues
-    )
+    await promptAndStoreAnswer(githubOtherQuestions, existingValues)
   }
 
   log('\n', kleur.bold().underline('Docker Hub'))
-  await promptAndStoreAnswer(environment, dockerhubQuestions, existingValues)
+  await promptAndStoreAnswer(dockerhubQuestions, existingValues)
 
   log('\n', kleur.bold().underline('Kubernetes & Runtime'))
 
   const infrastructure = await promptAndStoreAnswer(
-    environment,
     infrastructureQuestions,
     existingValues
   )
@@ -526,7 +532,7 @@ ALL_QUESTIONS.push(
       kleur.bold().green('✔'),
       kleur.bold().yellow(' Disk encryption is enabled')
     )
-    await promptAndStoreAnswer(environment, diskQuestions, existingValues)
+    await promptAndStoreAnswer(diskQuestions, existingValues)
   } else {
     if (!enableEncryption && !encryption_key_defined && environment_exists) {
       log(
@@ -572,6 +578,9 @@ ALL_QUESTIONS.push(
     'ENVIRONMENT',
     existingValues
   )?.value
+  let restoreHost =
+    findExistingValue('RESTORE_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues)
+      ?.value || ''
   let restoreType =
     findExistingValue(
       'RESTORE_ENVIRONMENT_MODE',
@@ -596,7 +605,6 @@ ALL_QUESTIONS.push(
   let backupHostPublicKey = ''
   if (configureBackup) {
     const backupAnswers = await promptAndStoreAnswer(
-      environment,
       backupQuestions,
       existingValues
     )
@@ -656,16 +664,16 @@ ALL_QUESTIONS.push(
         }
       ]
     })
+    restoreHost = await input({
+      message: 'What is the host/IP address of the restore backup server?',
+      default: restoreHost
+    })
   } else {
     log(kleur.bold().green('✔'), kleur.bold().yellow('Restore is disabled'))
   }
 
   log('\n', kleur.bold().underline('Monitoring'))
-  await promptAndStoreAnswer(
-    environment,
-    databaseAndMonitoringQuestions,
-    existingValues
-  )
+  await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
   const sentryDSNExists = findExistingValue(
     'SENTRY_DSN',
     'SECRET',
@@ -675,7 +683,7 @@ ALL_QUESTIONS.push(
 
   log('\n', kleur.bold().underline('Sentry'))
   if (sentryDSNExists) {
-    await promptAndStoreAnswer(environment, sentryQuestions, existingValues)
+    await promptAndStoreAnswer(sentryQuestions, existingValues)
   } else {
     const { useSentry } = await prompts([
       {
@@ -687,19 +695,15 @@ ALL_QUESTIONS.push(
     ])
 
     if (useSentry) {
-      await promptAndStoreAnswer(environment, sentryQuestions, existingValues)
+      await promptAndStoreAnswer(sentryQuestions, existingValues)
     }
   }
 
   log('\n', kleur.bold().underline('METABASE ADMIN'))
-  await promptAndStoreAnswer(
-    environment,
-    metabaseAdminQuestions,
-    existingValues
-  )
+  await promptAndStoreAnswer(metabaseAdminQuestions, existingValues)
 
   log('\n', kleur.bold().underline('SMTP'))
-  await promptAndStoreAnswer(environment, emailQuestions, existingValues)
+  await promptAndStoreAnswer(emailQuestions, existingValues)
 
   const allAnswers = ALL_ANSWERS.reduce((acc, answer) => {
     return { ...acc, ...answer }
@@ -1015,6 +1019,27 @@ ALL_QUESTIONS.push(
         existingValues
       ),
       scope: 'ENVIRONMENT' as const
+    },
+    {
+      type: 'VARIABLE' as const,
+      name: 'RESTORE_HOST',
+      value: answerOrExisting(
+        restoreHost,
+        findExistingValue(
+          'RESTORE_HOST',
+          'VARIABLE',
+          'ENVIRONMENT',
+          existingValues
+        ),
+        (val) => val || ''
+      ),
+      didExist: findExistingValue(
+        'RESTORE_HOST',
+        'VARIABLE',
+        'ENVIRONMENT',
+        existingValues
+      ),
+      scope: 'ENVIRONMENT' as const
     }
   ]
 
@@ -1070,8 +1095,6 @@ ALL_QUESTIONS.push(
         (variable.type !== 'VARIABLE' ||
           variable.value !== variable.didExist?.value)
     )
-
-  storeSecrets(environment, updates)
 
   /*
    * List out all updates to the variables and confirm with the user
@@ -1210,6 +1233,15 @@ ALL_QUESTIONS.push(
     process.exit(0)
   }
 
+  log(
+    kleur
+      .bold()
+      .red(
+        "⚠️  COPY THESE NOW INTO A PASSWORD MANAGER — YOU WON'T SEE THEM AGAIN"
+      )
+  )
+  log('')
+
   const saveChanges = await confirm({
     message: 'Do you want to continue?',
     default: true
@@ -1326,17 +1358,20 @@ ALL_QUESTIONS.push(
   copyChartsValues(environment, {
     env: environment,
     environment_type: environment_type,
-    // FIXME: In general that should be environment_type,
-    // Hardcode like this blocks us from being generic:
-    // https://github.com/opencrvs/opencrvs-core/issues/11171
-    two_fa_enabled: environment !== 'production' ? false : true,
-    backup_enabled: configureBackup ? true : false,
+    two_fa_enabled,
+    traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',
     restore_type: restoreType,
-    traefik_mode: traefikConfOption,
-    backup_type: backupType
+    restore_host: restoreHost || '',
+    backup_enabled: configureBackup ? true : false,
+    backup_type: backupType,
+    backup_host: backupHost || ''
   })
+
+  log('\n', kleur.bold().underline('Updating workflow files'))
+  await updateWorkflowEnvironments()
+
   let addon_message =
     kubeWorkerNodes.length > 0 || configureBackup
       ? '--------------------------------------------------------------------------------------------\n' +
@@ -1375,6 +1410,10 @@ ${addon_message}
 ${kleur.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')}
 ${kleur.yellow('Please KINDLY read hints above')}
     `)
-  log('\nAll variables stored in', kleur.cyan(`.env.${environment}`))
-  log(kleur.bold().yellow('DO NOT COMMIT THIS FILE TO GIT!'))
-})()
+  log(
+    '\nAll secrets and variables were printed above.',
+    kleur
+      .bold()
+      .yellow('Store them in a password manager — they are not saved to disk.')
+  )
+}

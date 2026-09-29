@@ -17,6 +17,7 @@ import {
   runEnvironmentUpgrade,
   runEnvironmentUsers
 } from './environment'
+import { runVerifyEndpoints } from './verify/endpoints'
 
 const args = process.argv.slice(2)
 
@@ -26,9 +27,37 @@ Usage: opencrvs <command>
 Commands:
   environment            Manage deployment environments
   upgrade                Upgrade an existing environment
-  check-translations     Check translation files for completeness
+  verify-endpoints       Verify the locally-running country config exposes the
+                         expected endpoints, keeps secured ones locked down and
+                         serves the translations core requires
 
 Run 'opencrvs <command> --help' for more information on a command.
+`.trim()
+
+const VERIFY_ENDPOINTS_USAGE = `
+Usage: opencrvs verify-endpoints [country-config-url]
+
+Run this after 'opencrvs upgrade', with the upgraded country config running
+locally, to confirm it still behaves correctly. It checks over HTTP that:
+  - required public endpoints exist (respond 2xx),
+  - user-notification trigger endpoints are either absent or reject
+    unauthenticated requests (never processed without a token), and
+  - '/content/client' and '/content/login' serve every message id the country
+    config template of this version carries.
+
+Checking the translations reads the template off GitHub. When GitHub cannot be
+reached the other checks still run and that one is skipped with a warning.
+
+Arguments:
+  [country-config-url]   Optional. Domain or URL of the country config
+                         service. Defaults to 'http://localhost:3040', the
+                         port country config listens on locally. A bare
+                         domain is assumed to use https.
+
+Options:
+  -h, --help             Show this message.
+
+Exits with a non-zero status if any check fails.
 `.trim()
 
 const UPGRADE_USAGE = `
@@ -58,8 +87,8 @@ function main() {
       return handleEnvironment()
     case 'upgrade':
       return handleUpgrade()
-    case 'check-translations':
-      return handleCheckTranslations()
+    case 'verify-endpoints':
+      return handleVerifyEndpoints()
     default:
       console.error(`Unknown command: ${command}\n`)
       console.log(USAGE)
@@ -154,10 +183,34 @@ async function handleUpgrade() {
   }
 }
 
-function handleCheckTranslations() {
-  console.log('Checking translations...')
-  console.warn('This command is not implemented yet!')
-  process.exit(1)
+async function handleVerifyEndpoints() {
+  const verifyArgs = args.slice(1)
+
+  if (verifyArgs.includes('--help') || verifyArgs.includes('-h')) {
+    console.log(VERIFY_ENDPOINTS_USAGE)
+    process.exit(0)
+  }
+
+  const positional = verifyArgs.filter((arg) => !arg.startsWith('-'))
+
+  if (positional.length > 1) {
+    console.error(
+      `Unexpected extra argument(s): ${positional.slice(1).join(', ')}\n`
+    )
+    console.log(VERIFY_ENDPOINTS_USAGE)
+    process.exit(1)
+  }
+
+  try {
+    // Defaults to http://localhost:3040 when no target is given.
+    await runVerifyEndpoints(positional[0])
+  } catch (error) {
+    console.error(
+      'Endpoint verification failed:',
+      error instanceof Error ? error.message : error
+    )
+    process.exit(1)
+  }
 }
 
 main()

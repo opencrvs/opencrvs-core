@@ -47,8 +47,9 @@ describe('User notification - Email', () => {
     it(event, async () => {
       await server.server.inject({
         method: 'POST',
-        url: `/triggers/user/${event}`,
-        payload
+        url: `/trigger/user/${event}`,
+        payload,
+        auth: { strategy: 'jwt', credentials: {} }
       })
       expect(sendMailMock).toHaveBeenCalledTimes(1)
       expect(sendMailMock.mock.calls[0][0]).toMatchSnapshot()
@@ -86,11 +87,12 @@ describe('User notification - Email - recovery link URL escaping', () => {
     async (event) => {
       await server.server.inject({
         method: 'POST',
-        url: `/triggers/user/${event}`,
+        url: `/trigger/user/${event}`,
         payload: {
           recipient,
           token: hostileToken
-        }
+        },
+        auth: { strategy: 'jwt', credentials: {} }
       })
 
       expect(sendMailMock).toHaveBeenCalledTimes(1)

@@ -250,7 +250,8 @@ export const deathEvent = defineConfig({
       flags: [
         {
           id: 'attestation-required',
-          operation: 'add'
+          operation: 'add',
+          conditional: user.hasRole('HOSPITAL_CLERK')
         }
       ]
     },
@@ -469,7 +470,8 @@ export const deathEvent = defineConfig({
         defaultMessage:
           'Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.',
         description: 'The description for reject modal'
-      }
+      },
+      flags: [{ id: 'validated', operation: 'remove' }]
     },
     {
       type: ActionType.REGISTER,

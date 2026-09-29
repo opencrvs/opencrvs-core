@@ -10,20 +10,21 @@
  */
 
 import {
+  ActionType,
   defineFormPage,
   TranslationConfig,
   ConditionalType,
   and,
+  event,
   FieldType,
   AddressType,
   or,
   PageTypes,
   field,
   user,
-  never,
   SelectOption
 } from '@opencrvs/toolkit/events'
-import { not } from '@opencrvs/toolkit/conditionals'
+import { never, not } from '@opencrvs/toolkit/conditionals'
 
 import {
   createSelectOptions,
@@ -540,6 +541,22 @@ export const child = defineFormPage({
           id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
         }
       }
+    },
+    {
+      id: 'child.registrationNote',
+      type: FieldType.TEXTAREA,
+      required: false,
+      label: {
+        defaultMessage: 'Registration note',
+        description: 'This is the label for the field',
+        id: 'event.birth.action.declare.form.section.child.field.registrationNote.label'
+      },
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: event.hasAction(ActionType.DECLARE)
+        }
+      ]
     }
   ]
 })

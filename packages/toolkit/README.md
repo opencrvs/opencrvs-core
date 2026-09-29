@@ -55,19 +55,9 @@ Toolkit "re-exports" TRPC router to allow for easy client interaction.
 
 Toolkit "re-exports" common definitions (e.g. events, conditionals) and make them available through npm.
 
-### Releasing and buiding
+### Publishing
 
-#### While developing
-
-1. Update version number in `package.json`
-2. `yarn build:all`
-3. `npm publish`
-
-#### Through version control
-
-1. Update version number in `package.json`
-2. Create a pull request
-3. Once merged, github action will get triggered.
+Publish via [Publish toolkit to NPM registry](https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml).
 
 #### Gotchas, good to know
 

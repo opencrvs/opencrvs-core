@@ -28,7 +28,12 @@ import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS
 } from '@opencrvs/commons/client'
+import {
+  VersionedLocation,
+  toNamedVersions
+} from '@client/v2-events/VersionedLocation'
 import * as selectEvent from '@client/v2-events/select-event'
+import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -304,6 +309,21 @@ export const RenamedAndInactiveFacilitiesStayFilterable: Story = {
   }
 }
 
+/**
+ * The address filter renders as a FIELD_GROUP under the address field's own id
+ * (@see withSearchLocationBehaviour), so every level is addressed through the
+ * group rather than by its bare level id.
+ */
+const ADDRESS_GROUP = 'child.birthLocation.privateHome'.replaceAll('.', '____')
+
+/**
+ * An attribute selector, not `#id` — the group prefix and the level are joined
+ * by a dot, which a CSS id selector would read as a class.
+ */
+function levelSelector(level: string, suffix: string) {
+  return `[id="searchable-select-${ADDRESS_GROUP}.${level}"] ${suffix}`
+}
+
 async function openAddressProvinceDropdown(
   canvasElement: HTMLElement,
   canvas: ReturnType<typeof within>
@@ -320,18 +340,20 @@ async function openAddressProvinceDropdown(
 
   // Admin-structure dropdowns only appear once the domestic country (the
   // configured home country, Bangladesh in storybook) is selected.
-  const country = await canvas.findByTestId('location__country')
+  const country = await canvas.findByTestId(
+    `location__${ADDRESS_GROUP}.country`
+  )
   await selectEvent.select(country, 'Bangladesh')
 
   // The province dropdown only appears once the domestic country is applied.
   // It has no associated label or testid, so wait for its input by id.
   await waitFor(() => {
-    if (!canvasElement.querySelector('#searchable-select-province input')) {
+    if (!canvasElement.querySelector(levelSelector('province', 'input'))) {
       throw new Error('Province input not rendered yet')
     }
   })
   const provinceInput = canvasElement.querySelector(
-    '#searchable-select-province input'
+    levelSelector('province', 'input')
   )
 
   if (!provinceInput) {
@@ -371,5 +393,151 @@ export const InactiveAdminAreaHiddenFromAddressFilter: Story = {
         ).toBeNull()
       }
     )
+  }
+}
+
+/**
+ * The facility's two names, each pinned to the version that introduced it —
+ * exactly what a dropdown row hands to the form when it is picked.
+ */
+const [OLD_NAME, CURRENT_NAME] = toNamedVersions(RENAMED_FACILITY)
+
+const searchMswConfig = {
+  handlers: {
+    ...mswConfig.handlers,
+    events: [
+      ...mswConfig.handlers.events,
+      tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
+    ]
+  }
+}
+
+function searchResultPath(birthLocation: VersionedLocation) {
+  return `${ROUTES.V2.SEARCH_RESULT.buildPath({
+    eventType: ChildOnboardingEvent.id
+  })}?${serializeSearchParams({
+    'child.placeOfBirth': 'child.placeOfBirth-SELECT-2',
+    'child.birthLocation': birthLocation,
+    eventType: ChildOnboardingEvent.id
+  })}`
+}
+
+/**
+ * Picking the old name of a renamed facility has to stick: the filter keeps
+ * showing the name that was clicked, not whichever of the location's names
+ * happens to come first in its history.
+ */
+export const SelectingAnOldNameKeepsItInTheFilter: Story = {
+  parameters: {
+    ...storyParams,
+    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Select the facility under its old name', async () => {
+      const listbox = await openHealthFacilityDropdown(canvasElement, canvas)
+      await userEvent.click(
+        await within(listbox).findByText('Old Riverside Health Post')
+      )
+    })
+
+    await step(
+      'The filter shows the old name, not the current one',
+      async () => {
+        await waitFor(async () => {
+          await expect(
+            canvasElement.querySelector(
+              '#searchable-select-child____birthLocation .react-select__single-value'
+            )
+          ).toHaveTextContent('Old Riverside Health Post')
+        })
+      }
+    )
+  }
+}
+
+/**
+ * The current name is equally sticky — selecting it must not fall back to the
+ * facility's oldest name.
+ */
+export const SelectingTheCurrentNameKeepsItInTheFilter: Story = {
+  parameters: {
+    ...storyParams,
+    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Select the facility under its current name', async () => {
+      const listbox = await openHealthFacilityDropdown(canvasElement, canvas)
+      await userEvent.click(
+        await within(listbox).findByText('New Riverside Health Post')
+      )
+    })
+
+    await step('The filter shows the current name', async () => {
+      await waitFor(async () => {
+        await expect(
+          canvasElement.querySelector(
+            '#searchable-select-child____birthLocation .react-select__single-value'
+          )
+        ).toHaveTextContent('New Riverside Health Post')
+      })
+    })
+  }
+}
+
+/**
+ * The search criteria pill on the results page echoes the name that was
+ * selected — an old-name filter reads back as the old name, even though the
+ * facility is called something else today.
+ */
+export const ResultsPillEchoesTheSelectedOldName: Story = {
+  parameters: {
+    ...storyParams,
+    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea,
+    msw: searchMswConfig,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: searchResultPath(OLD_NAME.selection)
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Criteria pill shows the old name', async () => {
+      await canvas.findByText(
+        'Health Institution: Old Riverside Health Post, Ibombo, Central, Farajaland',
+        {},
+        { timeout: 5000 }
+      )
+    })
+  }
+}
+
+/** The mirror case: a current-name filter reads back as the current name. */
+export const ResultsPillEchoesTheSelectedCurrentName: Story = {
+  parameters: {
+    ...storyParams,
+    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea,
+    msw: searchMswConfig,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: searchResultPath(CURRENT_NAME.selection)
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Criteria pill shows the current name', async () => {
+      await canvas.findByText(
+        'Health Institution: New Riverside Health Post, Ibombo, Central, Farajaland',
+        {},
+        { timeout: 5000 }
+      )
+    })
   }
 }

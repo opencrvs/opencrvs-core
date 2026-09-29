@@ -28,7 +28,6 @@
     "envalid": "^8.0.0",
     "fp-ts": "^2.12.3",
     "hapi-pino": "^9.0.0",
-    "hapi-sentry": "^3.1.0",
     "io-ts": "^2.2.18",
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
@@ -37,7 +36,7 @@
     "redis": "^6.1.0",
     "superjson": "1.9.0-0",
     "tsconfig-paths": "^3.13.0",
-    "zod": "^4.2.1"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@swc-contrib/mut-cjs-exports": "^14.15.0",

@@ -91,6 +91,7 @@ export const AdministrativeAreaWithCommunityLeader: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={fields}
             formValues={declaration}
             id="my-form"
@@ -152,6 +153,7 @@ export const AdministrativeAreaWithLocalRegistrar: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={fields}
             formValues={declaration}
             id="my-form"
@@ -215,6 +217,7 @@ export const AdministrativeAreaWithProvincialRegistrar: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={fields}
             formValues={declaration}
             id="my-form"

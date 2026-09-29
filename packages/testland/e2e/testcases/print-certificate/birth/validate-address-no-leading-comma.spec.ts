@@ -14,13 +14,16 @@ import {
   Declaration,
   createDeclaration,
   getDeclaration
-} from '../../test-data/birth-declaration'
-import { getSignatureFile, uploadFile } from '../../test-data/utils'
-import { login, getToken, searchFromSearchBar } from '../../../helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../../constants'
-import { selectCertificationType, selectRequesterType } from './helpers'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { formatV2ChildName } from '../../birth/helpers'
+} from '@e2e/support/test-data/birth-declaration'
+import { getSignatureFile, uploadFile } from '@e2e/support/test-data/utils'
+import { login, getToken, searchFromSearchBar } from '@e2e/support/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import {
+  selectCertificationType,
+  selectRequesterType
+} from '@e2e/support/print-certificate/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { createClient } from '@opencrvs/toolkit/api'
 

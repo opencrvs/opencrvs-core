@@ -18,7 +18,8 @@ import {
 import {
   ActionType,
   getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -99,6 +100,7 @@ export function Review() {
       <ReviewComponent.Body
         anchor={anchor}
         annotation={annotation}
+        attachmentPath={eventAttachmentPath(eventId)}
         form={form}
         formConfig={formConfig}
         reviewFields={reviewConfig.fields}

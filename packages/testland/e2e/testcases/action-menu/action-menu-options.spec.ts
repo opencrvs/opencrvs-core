@@ -10,12 +10,15 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login, getToken, searchFromSearchBar } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
+import { login, getToken, searchFromSearchBar } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { formatV2ChildName } from '../birth/helpers'
-import { ensureAssignedToUser, selectAction } from '../../utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 
 async function getActionMenuOptions(page: Page, declaration: Declaration) {
   await searchFromSearchBar(page, formatV2ChildName(declaration))

@@ -33,16 +33,14 @@ import {
   UserName,
   fetchJSON,
   joinUrl,
-  Roles
+  Roles,
+  InactiveOfficeError,
+  isSelectableAtAnchor,
+  Location
 } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import {
-  EncodedScope,
-  encodeScope,
-  TokenUserType,
-  TokenWithBearer
-} from '@opencrvs/commons/authentication'
+import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -124,6 +122,7 @@ export interface IAuthentication {
   status: string
   email?: string
   role: string
+  primaryOfficeId: string
 }
 
 export interface ISystemAuthentication {
@@ -153,7 +152,26 @@ export async function authenticate(
     role: body.role,
     status: body.status,
     mobile: body.mobile,
-    email: body.email
+    email: body.email,
+    primaryOfficeId: body.primaryOfficeId
+  }
+}
+
+/**
+ * Throws {@link InactiveOfficeError} if the given office is inactive.
+ */
+function isOfficeActiveToday(location: Pick<Location, 'versions'>) {
+  const today = new Date().toISOString().slice(0, 10)
+  return isSelectableAtAnchor(location.versions, today)
+}
+
+export async function assertOfficeIsActive(officeId: string) {
+  const location = await internalClient.locations.getById.query(
+    officeId as UUID
+  )
+
+  if (!isOfficeActiveToday(location)) {
+    throw new InactiveOfficeError()
   }
 }
 
@@ -227,51 +245,6 @@ export async function createRefreshToken(
   return signRefreshToken(userId, userType, familyId, jti)
 }
 
-type ActionConfirmationInput = {
-  eventId: UUID
-  actionId: UUID
-}
-
-type LegacyRecordValidationInput = {
-  recordId: UUID
-}
-
-export async function createTokenForActionConfirmation(
-  input: ActionConfirmationInput | LegacyRecordValidationInput,
-  userId: UUID,
-  userType: TokenUserType,
-  extraScopes: EncodedScope[] = []
-) {
-  return sign(
-    {
-      scope: [
-        encodeScope({ type: 'record.confirm-registration' }),
-        encodeScope({ type: 'record.reject-registration' }),
-        ...extraScopes
-      ],
-      eventId: 'eventId' in input ? input.eventId : undefined,
-      actionId: 'actionId' in input ? input.actionId : undefined,
-      recordId: 'recordId' in input ? input.recordId : undefined,
-      userType
-    },
-    cert,
-    {
-      subject: userId,
-      algorithm: 'RS256',
-      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
-      audience: [
-        'opencrvs:gateway-user',
-        'opencrvs:events-user',
-        'opencrvs:user-mgnt-user',
-        'opencrvs:auth-user',
-        'opencrvs:countryconfig-user',
-        'opencrvs:documents-user'
-      ],
-      issuer: JWT_ISSUER
-    }
-  )
-}
-
 export async function storeUserInformation(
   nonce: string,
   userFullName: UserName,
@@ -326,16 +299,27 @@ export async function generateAndSendVerificationCode(
   )
 }
 
-const tokenPayload = t.type({
-  sub: t.string,
-  scope: t.array(t.string),
-  // @TODO: Does role need to be here?
-  // role: t.string,
-  iat: t.number,
-  exp: t.number,
-  aud: t.array(t.string),
-  userType: t.string
-})
+/**
+ * NOTE: this schema uses io-ts (`t`), not Zod as used elsewhere in the codebase.
+ * In io-ts, `t.type` fields are all required and `t.partial` fields are all
+ * optional, so a mix of required + optional fields is expressed by intersecting
+ * the two. Here `userType` is optional (via `t.partial`) — legacy tokens minted
+ * before the claim existed omit it and are treated as `user` downstream.
+ */
+const tokenPayload = t.intersection([
+  t.type({
+    sub: t.string,
+    scope: t.array(t.string),
+    // @TODO: Does role need to be here?
+    // role: t.string,
+    iat: t.number,
+    exp: t.number,
+    aud: t.array(t.string)
+  }),
+  t.partial({
+    userType: t.union([t.literal('user'), t.literal('system')])
+  })
+])
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
   scope: EncodedScope[]
@@ -397,23 +381,24 @@ export function getPublicKey() {
 }
 
 export async function recordUserAuditEvent(
-  tokenWithBearer: TokenWithBearer,
-  input: UserAuditLog
+  userId: string,
+  entry: UserAuditLog
 ): Promise<void> {
   try {
-    await eventsClient.user.audit.record.mutate(input, {
-      context: { headers: { Authorization: tokenWithBearer } }
-    })
+    await internalClient.user.audit.record.mutate({ clientId: userId, entry })
   } catch (err) {
     logger.error('Failed to record user audit event', err)
   }
 }
 
 export async function recordAnonymousUserAuditEvent(
-  input: UserAuditLog
+  entry: UserAuditLog
 ): Promise<void> {
   try {
-    await internalClient.user.audit.record.mutate(input)
+    await internalClient.user.audit.record.mutate({
+      clientId: entry.requestData.subjectId,
+      entry
+    })
   } catch (err) {
     logger.error('Failed to record anonymous user audit event', err)
   }

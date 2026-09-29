@@ -7,9 +7,7 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-get_abs_filename() {
-  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
-}
+set -e
 
 write=false
 outdated=false
@@ -24,35 +22,33 @@ for i in "$@"; do
       write=true
       shift
       ;;
-    -*|--*)
+    -*)
       echo "Unknown option $i"
       exit 1
       ;;
     *)
+      # lint-staged appends the staged filenames; the check always covers the
+      # whole package, so they are ignored.
       ;;
   esac
 done
 
-if [ -z "$COUNTRY_CONFIG_PATH" ] ; then
-  echo 'The Environment variable COUNTRY_CONFIG_PATH must be set in your Terminal, '
-  echo 'so we can check that your country configuration has all necessary translations.'
-  echo 'If you cd into your country configuration repo and run the command pwd, then this will display for you.'
-  echo 'Then run export COUNTRY_CONFIG_PATH=<your country config path> in this window and try to commit again please..'
-  exit 1
-elif [[ ! -d "${COUNTRY_CONFIG_PATH}" ]]; then
-  echo "COUNTRY_CONFIG_PATH does not look like a real directory path."
-  echo "Country config path you tried using: $(get_abs_filename $COUNTRY_CONFIG_PATH)"
-  exit 1
-fi
-
+flag=""
 if $outdated; then
-  pnpm exec tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH --outdated
-  exit 0
+  flag=--outdated
+elif $write; then
+  flag=--write
+elif [ "$CI" = true ]; then
+  flag=--ci
 fi
 
-if $write; then
-  pnpm exec tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH --write
-  exit 0
-fi
+packages="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-pnpm exec tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH
+status=0
+
+for target in countryconfig-template testland; do
+  echo "Checking $target..."
+  pnpm exec tsx src/extract-translations.ts "$packages/$target" $flag || status=1
+done
+
+exit $status

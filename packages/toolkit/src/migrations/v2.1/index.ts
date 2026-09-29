@@ -10,6 +10,11 @@
  */
 import { main as addExplicitCorrectionFlags } from './add-explicit-correction-flags'
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
+import { main as addTranslations } from './add-translations'
+import { main as enableTelemetry } from './enable-telemetry'
+import { main as removeMetabasePackageInstalls } from './remove-metabase-package-installs'
+import { main as removeSentry } from './remove-sentry'
+import { main as renameTriggerPaths } from './rename-trigger-paths'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -17,5 +22,10 @@ import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifi
  */
 export async function runUpgrade(dockerSwarm: boolean) {
   await addExplicitCorrectionFlags()
+  await renameTriggerPaths()
   await addRecoveryLinkNotifications()
+  await addTranslations()
+  await removeSentry()
+  await enableTelemetry()
+  await removeMetabasePackageInstalls()
 }

@@ -26,7 +26,10 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { setEventData } from '@client/v2-events/features/events/useEvents/api'
+import {
+  setEventData,
+  updateLocalEventIndex
+} from '@client/v2-events/features/events/useEvents/api'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
 
@@ -209,6 +212,7 @@ export const deleteLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -276,6 +280,10 @@ export const deleteIsHiddenWhenConditionalIsNotMet: StoryObj<
   },
   beforeEach: () => {
     setEventData(
+      createdEventDocumentWithLockedFlag.id,
+      createdEventDocumentWithLockedFlag
+    )
+    updateLocalEventIndex(
       createdEventDocumentWithLockedFlag.id,
       createdEventDocumentWithLockedFlag
     )

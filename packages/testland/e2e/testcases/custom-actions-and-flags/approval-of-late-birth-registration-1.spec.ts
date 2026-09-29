@@ -18,19 +18,19 @@ import {
   switchEventTab,
   validateActionMenuButton,
   getToken
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
-import { ensureAssignedToUser, selectAction } from '../../utils'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { format, subDays } from 'date-fns'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import {
   createDeclaration,
   Declaration,
   getDeclaration
-} from '../test-data/birth-declaration'
+} from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { formatV2ChildName } from '../birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 const recentDate = subDays(new Date(), 2)
 const recentDateString = format(recentDate, 'yyyy-MM-dd')

@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { getToken, login } from '../../../helpers'
-import { CREDENTIALS } from '../../../constants'
+import { getToken, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../../test-data/death-declaration'
+} from '@e2e/support/test-data/death-declaration'
 import {
   navigateToCertificatePrintAction,
   selectCertificationType,
   selectRequesterType
-} from './helpers'
-import { expectInUrl } from '../../../utils'
-import { printAndExpectPopup } from '../birth/helpers'
+} from '@e2e/support/print-certificate/death/helpers'
+import { expectInUrl } from '@e2e/support/utils'
+import { printAndExpectPopup } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('10.0 Validate "Review" page', () => {
   let page: Page

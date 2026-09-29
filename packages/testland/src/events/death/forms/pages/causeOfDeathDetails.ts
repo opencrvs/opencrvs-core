@@ -121,7 +121,16 @@ function createSymptomFields(letter: CauseLetter) {
     const autocompleteField: any = {
       id: basePath,
       type: FieldType.AUTOCOMPLETE,
-      analytics: true,
+      /*
+       * Cause-of-death fields are deliberately not marked `analytics: true`.
+       *
+       * No dashboard widget uses them today, and including them would push the
+       * analytics `declaration` column past Metabase's 100-key limit for JSON
+       * unfolding — which breaks every widget built on that column, not just the
+       * death ones. Supporting them properly needs additional work (splitting the
+       * column or the table). We'll cross that bridge when the widgets arrive.
+       */
+      analytics: false,
       label: getLabelForCause(letter, index, basePath),
       configuration: {
         url: `${COUNTRY_CONFIG_URL}/causes-of-death?terms=`,
@@ -153,7 +162,16 @@ function createSymptomFields(letter: CauseLetter) {
       id: `${basePath}.other`,
       type: FieldType.TEXTAREA,
       required: false,
-      analytics: true,
+      /*
+       * Cause-of-death fields are deliberately not marked `analytics: true`.
+       *
+       * No dashboard widget uses them today, and including them would push the
+       * analytics `declaration` column past Metabase's 100-key limit for JSON
+       * unfolding — which breaks every widget built on that column, not just the
+       * death ones. Supporting them properly needs additional work (splitting the
+       * column or the table). We'll cross that bridge when the widgets arrive.
+       */
+      analytics: false,
       label: {
         defaultMessage:
           'Enter the diagnosis or condition not found in the list above',
@@ -268,7 +286,16 @@ export function createCauseOfDeathFields(letter: CauseLetter) {
       id: `${base}.interval`,
       type: FieldType.NUMBER_WITH_UNIT,
       required: false,
-      analytics: true,
+      /*
+       * Cause-of-death fields are deliberately not marked `analytics: true`.
+       *
+       * No dashboard widget uses them today, and including them would push the
+       * analytics `declaration` column past Metabase's 100-key limit for JSON
+       * unfolding — which breaks every widget built on that column, not just the
+       * death ones. Supporting them properly needs additional work (splitting the
+       * column or the table). We'll cross that bridge when the widgets arrive.
+       */
+      analytics: false,
       helperText: {
         defaultMessage: 'Interval between onset and death',
         description: 'This is the label for the field',

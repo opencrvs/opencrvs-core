@@ -16,23 +16,26 @@ import {
   goBackToReview,
   login,
   uploadImageToSection
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration as createDeclarationV2,
   Declaration as DeclarationV2
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import { format, subDays, subYears } from 'date-fns'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { IdType } from '@countryconfig/events/utils'
 import { random } from 'lodash'
-import { formatV2ChildName, REQUIRED_VALIDATION_ERROR } from '../birth/helpers'
+import {
+  formatV2ChildName,
+  REQUIRED_VALIDATION_ERROR
+} from '@e2e/support/birth/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 
 test.describe.serial('Correct record - 4', () => {
   let declaration: DeclarationV2
@@ -404,9 +407,7 @@ test.describe.serial('Correct record - 4', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page
-            .getByTestId('father.idType-value')
-            .getByRole('deletion')
+          await page.getByTestId('father.idType-value').getByRole('deletion')
         ).toHaveText('National ID')
 
         await expect(
@@ -700,9 +701,7 @@ test.describe.serial('Correct record - 4', () => {
       await expectInUrl(page, 'review')
 
       await expect(
-        await page
-          .getByTestId('child.placeOfBirth-value')
-          .getByRole('deletion')
+        await page.getByTestId('child.placeOfBirth-value').getByRole('deletion')
       ).toHaveText('Residential address')
 
       await expect(
@@ -881,14 +880,9 @@ test.describe.serial('Correct record - 4', () => {
 
     await page.getByRole('button', { name: 'Correct record' }).click()
 
-    await waitForCorrectionAction(
-      page,
-      'approve',
-      async () => {
-        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-      },
-      { waitForUnassign: true, eventId }
-    )
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
 
     await expectInUrl(page, `events/${eventId}`)
 
@@ -922,16 +916,13 @@ test.describe.serial('Correct record - 4', () => {
     ).toBeVisible()
   })
   test('4.9 Validate record corrected modal', async () => {
-    const correctionRequestedRow = page.locator(
-      '#listTable-task-history #row_6'
-    )
+    const correctionRequestedRow = page
+      .locator('#listTable-task-history [id^="row_"]')
+      .filter({ hasText: 'Record corrected' })
     await correctionRequestedRow.getByText('Record corrected').click()
 
-    const date = await correctionRequestedRow.locator('span').nth(1).innerText()
-
     const requester = await correctionRequestedRow
-      .locator('span')
-      .nth(2)
+      .getByTestId('user-name')
       .innerText()
 
     /*
@@ -948,7 +939,11 @@ test.describe.serial('Correct record - 4', () => {
       page.getByRole('heading', { name: 'Record corrected' })
     ).toBeVisible()
 
-    await expect(page.getByText(requester + ' — ' + date)).toBeVisible()
+    await expect(
+      page
+        .getByTestId('event-history-modal')
+        .getByText(requester + ' — ', { exact: false })
+    ).toBeVisible()
 
     await expect(page.getByText('Requester' + 'Legal guardian')).toBeVisible()
     await expect(

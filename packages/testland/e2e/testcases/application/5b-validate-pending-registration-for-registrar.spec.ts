@@ -10,16 +10,19 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login, getToken, validateActionMenuButton } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
+import { login, getToken, validateActionMenuButton } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
-import { formatV2ChildName } from '../birth/helpers'
-import { ensureAssignedToUser, expectInUrl } from '../../utils'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { ensureAssignedToUser, expectInUrl } from '@e2e/support/utils'
 import {
   getRowByTitle,
   openRecordByTitle
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe
   .serial('5(b) Validate "Pending registration"-workqueue for Registrar', () => {

@@ -20,8 +20,6 @@ import {
 import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import { loginReducer, LoginState } from '@login/login/reducer'
 import { intlReducer, IntlState } from '@login/i18n/reducer'
-import * as Sentry from '@sentry/react'
-import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {
   login: LoginState
@@ -42,9 +40,6 @@ export const createStore = () => {
 
   const enhancer = compose(
     install(),
-    // @ts-ignore types are not correct for this module yet
-    applyMiddleware(createSentryMiddleware(Sentry)),
-
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
       : (f: any) => f

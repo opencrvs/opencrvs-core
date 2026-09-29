@@ -15,6 +15,7 @@ import {
   encodeScope,
   getScopeOptionValue,
   JurisdictionFilter,
+  Scope,
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
@@ -114,6 +115,26 @@ describe('getScopeOptionValue()', () => {
     )
 
     expect(result).toEqual(JurisdictionFilter.enum.location)
+  })
+  it('should return undefined for createdBy when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.create', options: {} },
+      'createdBy'
+    )
+
+    expect(result).toBeUndefined()
+  })
+
+  it('should return set value for createdBy', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.create',
+        options: { createdBy: 'user' as const }
+      },
+      'createdBy'
+    )
+
+    expect(result).toEqual('user')
   })
 
   it('should return "all" for notifiedIn when not set', () => {
@@ -366,6 +387,69 @@ describe('2.0 scopes', () => {
           registeredIn: 'administrativeArea',
           registeredBy: 'user'
         }
+      }
+    ])
+  })
+
+  it('Keeps the createdBy option for every record scope category', () => {
+    // createdBy is a base option (scopeOptionsPlaceEvent), so unlike declaredBy
+    // /notifiedBy it must be retained for placeEvent scope types too, not just
+    // the declared/full ones.
+    const oneScopePerCategory = [
+      ScopesWithPlaceEventOptions.options[0], // record.create
+      ScopesWithDeclaredOptions.options[0], // record.edit
+      ScopesWithFullOptions.options[0] // record.search
+    ]
+
+    const encoded = oneScopePerCategory.map((type) =>
+      encodeScope({
+        type,
+        options: { event: ['birth'], createdBy: 'user' as const }
+      })
+    )
+
+    expect(encoded.map(decodeScope)).toEqual([
+      {
+        type: 'record.create',
+        options: { event: ['birth'], createdBy: 'user' }
+      },
+      {
+        type: 'record.edit',
+        options: { event: ['birth'], createdBy: 'user' }
+      },
+      {
+        type: 'record.search',
+        options: { event: ['birth'], createdBy: 'user' }
+      }
+    ])
+  })
+
+  it('Keeps the createdIn option for every record scope category', () => {
+    const oneScopePerCategory = [
+      ScopesWithPlaceEventOptions.options[0], // record.create
+      ScopesWithDeclaredOptions.options[0], // record.edit
+      ScopesWithFullOptions.options[0] // record.search
+    ]
+
+    const encoded = oneScopePerCategory.map((type) =>
+      encodeScope({
+        type,
+        options: { event: ['birth'], createdIn: 'location' as const }
+      })
+    )
+
+    expect(encoded.map(decodeScope)).toEqual([
+      {
+        type: 'record.create',
+        options: { event: ['birth'], createdIn: 'location' }
+      },
+      {
+        type: 'record.edit',
+        options: { event: ['birth'], createdIn: 'location' }
+      },
+      {
+        type: 'record.search',
+        options: { event: ['birth'], createdIn: 'location' }
       }
     ])
   })
@@ -751,6 +835,31 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
         accessLevel: 'administrativeArea',
         role: ['FIELD_AGENT']
       }
+    })
+  })
+})
+
+describe('action confirmation scopes', () => {
+  test('parses with or without the usual record-scope options', () => {
+    expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(true)
+    expect(
+      Scope.safeParse({
+        type: 'record.action.reject',
+        options: { event: ['birth'] }
+      }).success
+    ).toBe(true)
+  })
+
+  test('survives the encode/decode round trip used in tokens', () => {
+    const encoded = encodeScope({
+      type: 'record.action.accept',
+      options: { event: ['birth'] }
+    })
+
+    expect(encoded).toBe('type=record.action.accept&event[]=birth')
+    expect(decodeScope(encoded)).toEqual({
+      type: 'record.action.accept',
+      options: { event: ['birth'] }
     })
   })
 })

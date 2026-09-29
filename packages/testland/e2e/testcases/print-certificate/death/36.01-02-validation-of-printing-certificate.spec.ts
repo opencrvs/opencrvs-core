@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { getToken, joinValuesWith, login } from '../../../helpers'
-import { CREDENTIALS } from '../../../constants'
+import { getToken, joinValuesWith, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
-} from '../../test-data/death-declaration'
-import { navigateToCertificatePrintAction } from '../death/helpers'
-import { REQUIRED_VALIDATION_ERROR } from '../../birth/helpers'
-import { expectInUrl } from '../../../utils'
+} from '@e2e/support/test-data/death-declaration'
+import { navigateToCertificatePrintAction } from '@e2e/support/print-certificate/death/helpers'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
 import { faker } from '@faker-js/faker'
 
 test.describe.serial('Certified copies', () => {

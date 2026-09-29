@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { getToken, login } from '../../helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { getToken, login } from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getLocations } from '../birth/helpers'
+import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
 
 test('Resetting password of user should update the users status to pending', async ({
   browser

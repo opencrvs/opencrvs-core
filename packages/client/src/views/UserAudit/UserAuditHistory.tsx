@@ -61,7 +61,13 @@ const DEFAULT_LIST_SIZE = 10
 const OPERATIONS_TO_HIDE = [
   'event.search',
   'event.actions.assign.request',
-  'event.actions.unassign.request'
+  'event.actions.unassign.request',
+  'locations.create',
+  'locations.update',
+  'locations.withdrawVersion',
+  'administrativeAreas.create',
+  'administrativeAreas.update',
+  'administrativeAreas.withdrawVersion'
 ]
 
 const TableDiv = styled.div`
@@ -81,6 +87,10 @@ const RecentActionsHolder = styled.div`
 
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
+`
+
+const LinkLeftAligned = styled(Link)`
+  text-align: left;
 `
 
 interface IBaseProp {
@@ -267,9 +277,12 @@ function UserAuditHistoryComponent(props: Props) {
     return orderBy(
       results.map((entry) => ({
         actionDescription: (
-          <Link font="bold14" onClick={() => toggleActionDetails(entry)}>
+          <LinkLeftAligned
+            font="bold14"
+            onClick={() => toggleActionDetails(entry)}
+          >
             {getActionMessage(entry)}
-          </Link>
+          </LinkLeftAligned>
         ),
         actionDescriptionString: getActionMessage(entry),
         trackingId: (() => {

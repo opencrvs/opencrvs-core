@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { getToken, login, switchEventTab } from '../../helpers'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   formatV2ChildName,
   getAdministrativeAreas,
   getIdByName
-} from '../birth/helpers'
+} from '@e2e/support/birth/helpers'
 import {
   createDeclaration,
   Declaration
-} from '../test-data/birth-declaration-with-mother-father'
-import { ensureAssignedToUser, selectAction } from '../../utils'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { AddressType } from '@opencrvs/toolkit/events'
 import { format, subDays, subYears } from 'date-fns'
 

@@ -11,6 +11,7 @@
 import React from 'react'
 import {
   ActionDocument,
+  ActionStatus,
   ActionType,
   EventDocument,
   ValidatorContext

@@ -127,4 +127,32 @@ describe('user.changeEmail', () => {
       })
     ).rejects.toMatchObject({ code: 'CONFLICT' })
   })
+
+  test("allows an email that is only a substring of another user's email", async () => {
+    const { users } = await setupTestCase()
+    const client1 = createTestClient(users[0])
+    const client2 = createTestClient(users[1])
+
+    const longerEmail = 'bshared@test.example'
+    const nonce1 = await requestEmailChange(client1, longerEmail)
+    await client1.user.changeEmail({
+      userId: users[0].id,
+      email: longerEmail,
+      nonce: nonce1,
+      verifyCode: VERIFY_CODE
+    })
+
+    // 'shared@test.example' is a substring of 'bshared@test.example'
+    const shorterEmail = 'shared@test.example'
+    const nonce2 = await requestEmailChange(client2, shorterEmail)
+    await client2.user.changeEmail({
+      userId: users[1].id,
+      email: shorterEmail,
+      nonce: nonce2,
+      verifyCode: VERIFY_CODE
+    })
+
+    const updatedUser = await client2.user.get(users[1].id)
+    expect(updatedUser).toMatchObject({ email: shorterEmail })
+  })
 })

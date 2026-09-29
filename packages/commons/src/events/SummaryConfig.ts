@@ -67,7 +67,7 @@ const ReferenceField = BaseField.extend({
 const Field = BaseField.extend({
   id: z.string().describe('Identifier of the summary field.'),
   value: TranslationConfig.describe(
-    'Field value template supporting variables from configuration and EventMetadata (e.g. "{informant.phoneNo} {informant.email}").'
+    'Field value template supports variables from configuration (e.g. "{informant.phoneNo} {informant.email}") and EventMetadata (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}").'
   ),
   label: TranslationConfig
 }).describe('Custom field defined for the summary view.')

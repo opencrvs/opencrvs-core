@@ -10,94 +10,9 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { encodeScope, getUUID, TokenUserType } from '@opencrvs/commons'
-import { getClient } from '@events/storage/postgres/events'
+import { encodeScope, TokenUserType } from '@opencrvs/commons'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import {
-  createSystemTestClient,
-  createTestClient,
-  setupTestCase
-} from '@events/tests/utils'
-
-describe('user.audit.record', () => {
-  test('system client records an audit entry', async () => {
-    const systemId = getUUID()
-    const subjectId = getUUID()
-    const client = createSystemTestClient(systemId)
-
-    await client.user.audit.record({
-      operation: 'user.deactivate',
-      requestData: {
-        subjectId,
-        reason: 'suspicious activity'
-      }
-    })
-
-    const db = getClient()
-    const logs = await db
-      .selectFrom('auditLog')
-      .selectAll()
-      .where('clientId', '=', systemId)
-      .execute()
-
-    expect(logs).toHaveLength(1)
-    expect(logs[0].operation).toBe('user.deactivate')
-    expect(logs[0].clientType).toBe(TokenUserType.enum.system)
-    expect(logs[0].requestData).toEqual({
-      subjectId,
-      reason: 'suspicious activity'
-    })
-  })
-
-  test('user client records an audit entry', async () => {
-    const { user } = await setupTestCase()
-    const client = createTestClient(user)
-
-    const subjectId = getUUID()
-
-    await client.user.audit.record({
-      operation: 'user.reactivate',
-      requestData: {
-        subjectId,
-        reason: 'reinstated after review'
-      }
-    })
-
-    const db = getClient()
-    const logs = await db
-      .selectFrom('auditLog')
-      .selectAll()
-      .where('clientId', '=', user.id)
-      .execute()
-
-    expect(logs).toHaveLength(1)
-    expect(logs[0].operation).toBe('user.reactivate')
-    expect(logs[0].clientType).toBe(TokenUserType.enum.user)
-    expect(logs[0].requestData).toEqual({
-      subjectId,
-      reason: 'reinstated after review'
-    })
-  })
-
-  test('stores responseSummary as null', async () => {
-    const systemId = getUUID()
-    const client = createSystemTestClient(systemId)
-
-    await client.user.audit.record({
-      operation: 'user.logged_in',
-      requestData: { subjectId: getUUID() }
-    })
-
-    const db = getClient()
-    const [log] = await db
-      .selectFrom('auditLog')
-      .selectAll()
-      .where('clientId', '=', systemId)
-      .execute()
-
-    expect(log.responseSummary).toBeNull()
-  })
-})
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe('user.audit.list', () => {
   test('returns empty list when no entries exist for user', async () => {

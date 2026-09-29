@@ -57,10 +57,7 @@ spec:
                       name: {{ .Values.backup.backup_server_secret }}
                       key: user
                 - name: BACKUP_HOST
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ .Values.backup.backup_server_secret }}
-                      key: host
+                  value: {{ default .Values.backup.host .Values.minio.backup.host }}
                 - name: BACKUP_REMOTE_DIR
                   value: "{{ .Values.minio.backup_server_dir | default .Values.backup.backup_server_dir }}"
               {{- include "render-env-vars" (dict "service_name" "backup" "Values" .Values) | nindent 4 }}
@@ -93,6 +90,9 @@ kind: Job
 {{- end }}
 metadata:
   name: minio-backup
+  labels:
+    app: backup-runner
+    job-type: backup
 spec:
   {{ if .Values.backup.cronjob }}
   schedule: {{ default .Values.backup.schedule .Values.minio.backup.schedule }}
@@ -103,6 +103,10 @@ spec:
     spec:
   {{- end }}
       template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: backup
         spec:
           {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
           serviceAccountName: backup-runner

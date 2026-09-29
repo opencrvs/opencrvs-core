@@ -10,13 +10,13 @@
  */
 import { expect, test } from '@playwright/test'
 
-import { login } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import {
   expectBirthsTabSelected,
   expectNoBrokenCards,
   populateDashboardRecords
-} from './utils'
+} from '@e2e/support/dashboard/utils'
 
 // Every card on the Births tab, in dashboard grid order. The markdown intro
 // card ("Registrations Dashboard") has no title element.
@@ -50,12 +50,9 @@ test('Registrations dashboard cards render and survive filtering', async ({
   })
 
   await test.step('Location filter does not break any card', async () => {
-    await frame.getByRole('button', { name: 'Location' }).click()
-    await frame.getByText('Ibombo District Office', { exact: true }).click()
-    await frame.getByRole('button', { name: 'Add filter' }).click()
-
     await expect(
-      frame.getByText('Location: Ibombo District Office')
+      frame.getByText('Location: Ibombo District Office'),
+      'Location filter is already applied'
     ).toBeVisible()
     await expectNoBrokenCards(frame, EXPECTED_CARD_TITLES, UNTITLED_CARDS)
   })
