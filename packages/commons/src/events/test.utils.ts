@@ -23,6 +23,10 @@ import {
   ActionUpdate
 } from './ActionDocument'
 import {
+  getEventValidatorContext,
+  ValidatorContext
+} from '../conditionals/validate'
+import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
@@ -40,7 +44,7 @@ import {
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
-import { EventConfig } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
@@ -59,7 +63,8 @@ import { ActionConfig } from './ActionConfig'
 import {
   LocationVersion,
   SetLocationPayload,
-  SetAdministrativeAreaPayload
+  SetAdministrativeAreaPayload,
+  ClientAdministrativeArea
 } from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
@@ -71,10 +76,16 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { FieldValue, PlainDate } from './FieldValue'
-import { TokenUserType } from '../authentication'
+import {
+  EncodedScope,
+  encodeScope,
+  ITokenPayload,
+  TokenUserType
+} from '../authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
+import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -530,7 +541,13 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             DeclareActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -557,7 +574,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             NotifyActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => {
@@ -582,7 +604,10 @@ export function eventPayloadGenerator(
           transactionId: input.transactionId ?? getUUID(),
           declaration,
           eventId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }
       },
       edit: (
@@ -590,7 +615,13 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             EditActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -608,31 +639,40 @@ export function eventPayloadGenerator(
       assign: (
         eventId: string,
         input: Partial<
-          Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+          Pick<AssignActionInput, 'transactionId' | 'assignedTo' | 'waitFor'>
         > = {}
       ) => ({
         type: ActionType.ASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: input.assignedTo ?? getUUID(),
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       unassign: (
         eventId: string,
-        input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+        input: Partial<
+          Pick<UnassignActionInput, 'transactionId' | 'waitFor'>
+        > = {}
       ) => ({
         type: ActionType.UNASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: null,
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       archive: (
         eventId: string,
         input: Partial<
           Pick<
             ArchiveActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -648,7 +688,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             UnarchiveActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -664,7 +709,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             RejectDeclarationActionInput,
-            'transactionId' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -688,6 +738,9 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'registrationNumber'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -715,7 +768,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             RegisterActionInput,
-            'transactionId' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -738,7 +796,13 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               RequestCorrectionActionInput,
-              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+              | 'transactionId'
+              | 'declaration'
+              | 'annotation'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -762,7 +826,10 @@ export function eventPayloadGenerator(
               rng
             ),
           eventId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         approve: (
           eventId: string,
@@ -770,7 +837,12 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               ApproveCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              | 'transactionId'
+              | 'annotation'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -786,7 +858,10 @@ export function eventPayloadGenerator(
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         reject: (
           eventId: string,
@@ -794,7 +869,13 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment' | 'content'
+              | 'transactionId'
+              | 'annotation'
+              | 'content'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           >
         ) => ({
@@ -810,8 +891,11 @@ export function eventPayloadGenerator(
             ),
           eventId,
           requestId,
+          content: input.content ?? { reason: 'too late' },
           keepAssignment: input.keepAssignment,
-          content: input.content ?? { reason: '' }
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         })
       },
       duplicate: {
@@ -1185,15 +1269,6 @@ export const generateTranslationConfig = (
   id: message.trim().replace(/\s+/g, '_').toLowerCase()
 })
 
-export const BearerTokenByUserType = {
-  fieldAgent:
-    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci1yZXZpZXciLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInR5cGU9cmVjb3JkLnNlYXJjaCZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcsRk9PVEJBTExfQ0xVQl9NRU1CRVJTSElQIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyIsInR5cGU9cmVjb3JkLnJlYWQmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nIiwicmVjb3JkLmRlY2xhcmVbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5ub3RpZnlbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5kZWNsYXJlZC5lZGl0W2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkZJRUxEX0FHRU5UIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2N2VmN2Y4M2Q2YTljYjkyZTllZGFhOTkifQ.E8WIcdgqh_VCYgeOCXBupL9nZgiKtplHQfmwsxoONYfhGEQHilffsFV5nX610McorETRQRQ7ZNY-6v9YaAJVFfHiHTBB4US6D3qS6yI7HicUR2Evh9N10rNm81kXquum58kEqOIfrMkr-CGqIrVS15Qz0LAPGyCq_5t1arEXOL_Lonc54GFV-Q2fhR5hh9oZ3Aconen0V4tbX9MX7iCJ3qjDraeGVrhnjG5yLtl2e7TjpU2kN8nltxokyvUiiRh71Vl786yF9ULb_UWjJXoQPO0SnVyfZti936piAuLhEXhlK-qsUBB8kmz7qScgrt8dZQMoVBuwxSfStMLGkCHu-OwzeryACRd8Iei0SR9mq4rqpX1NAQBwMGUYJqYoWYGjDjUMa11pTDiWsSw0H5R4i7LnGQP7H5wbM57t09vxX8XL9msBrCD7-vtTvjafvYSpekVwI8hZP-w8Bzb0QuL9y_bf6Hae0AJDyZ1y1NXAvUbyRvgSs5wbGldu6CB9k9ZPN7KS4aPaYlWzNhF0_D-U4zU1fRTFOxd_x5DyciYTRPMpL69WieNtlRYwk4QgN-AGXxuYlJ2mK716rw9QXSGDepEYvKU2rBVkZEgBPbIO_J6Hrg30mEnQqhrsrHVwhZ3FDdONJOcqy3ELkdWjUjMnXOORcgQTYnaTjOTKvpJlbts',
-  registrationAgent:
-    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tZWRpdCIsInJlY29yZC5kZWNsYXJhdGlvbi1yZWluc3RhdGUiLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInVzZXIucmVhZDpvbmx5LW15LWF1ZGl0Iiwic2VhcmNoLmJpcnRoIiwic2VhcmNoLmRlYXRoIiwic2VhcmNoLm1hcnJpYWdlIiwid29ya3F1ZXVlW2lkPWFsbC1ldmVudHN8YXNzaWduZWQtdG8teW91fHJlY2VudHxyZXF1aXJlcy1jb21wbGV0aW9ufHJlcXVpcmVzLXVwZGF0ZXN8aW4tcmV2aWV3fHNlbnQtZm9yLWFwcHJvdmFsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwidHlwZT1yZWNvcmQuc2VhcmNoJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyxGT09UQkFMTF9DTFVCX01FTUJFUlNISVAiLCJ0eXBlPXJlY29yZC5jcmVhdGUmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nIiwidHlwZT1yZWNvcmQucmVhZCZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmciLCJyZWNvcmQuZGVjbGFyZVtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIiwicmVjb3JkLmRlY2xhcmVkLnJlamVjdFtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIiwicmVjb3JkLmRlY2xhcmVkLmVkaXRbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5kZWNsYXJlZC5hcmNoaXZlW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQucmVnaXN0ZXJlZC5wcmludC1jZXJ0aWZpZWQtY29waWVzW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQucmVnaXN0ZXJlZC5yZXF1ZXN0LWNvcnJlY3Rpb25bZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiUkVHSVNUUkFUSU9OX0FHRU5UIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2N2VmN2Y4M2Q2YTljYjkyZTllZGFhYTEifQ.SQ6gC8Fpmm9LBgUc0Ae-ABiEx8MeBHAXBZhIImbL_i6u81zD25-5Tbfxj_75ZzzeZYCDj8npO-a6BwQqzejgACrK_U3CPhMTrO9z4lTSHJRjIQBWnuhwEhJyPH4zxHflT5xOIsGfhYK-Ois41E9qdeRj8XhDVdbSFt3NZbog9odcXOlUml0OgX34Y_2bHYnHiUEowoUAQMTJGT2DVrQo2Z5uf1XPr3rD67WafZucttlDwW_Xo75QtT9Bvvt-ORL0xGtn0XOftHXLbD0IzdCckFZDXo0FK6FNixxj0DazM1Mi69A-BjdmB1WGTrtrnhYMlJpWn9-aJl51CIpRS0vhL2qsSq3rKjtY6K3M1sbyOGZ5HVS8xPxo2ZVfbWmBX1jiJGN9heoXnoPq3yuAa_fS2_kwAfEeFwv7OiYGc_HiSDJnY2fALVtE9Szx_LJjDmjYDpTAdg0YFMOafrl6Cl9zMBMSi8P8Lv7ZNIKOq0x8sak4-fsgpfdYlMJGRP4Am97lhQG3Tod2ca43iS0YmudszhVlbP3Sv-dx4OSbQ1EqWvaajKZQ9cvqAESH_UIbH_2cYnsnUkQoJJa-j4EBLpibDsWt36dlmgPxBoKpO3ib5FFNEXNY6ac-obfkZmWw33ihCY8sFMkfaddvg_01O_fFHPFVzJ3GnUmHTO8t2mFVi3Q',
-  localRegistrar:
-    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tZWRpdCIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1yZWluc3RhdGUiLCJyZWNvcmQuY29uZmlybS1yZWdpc3RyYXRpb24iLCJyZWNvcmQucmVqZWN0LXJlZ2lzdHJhdGlvbiIsInBlcmZvcm1hbmNlLnJlYWQiLCJwZXJmb3JtYW5jZS5yZWFkLWRhc2hib2FyZHMiLCJwcm9maWxlLmVsZWN0cm9uaWMtc2lnbmF0dXJlIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInNlYXJjaC5iaXJ0aCIsInNlYXJjaC5kZWF0aCIsInNlYXJjaC5tYXJyaWFnZSIsIndvcmtxdWV1ZVtpZD1hbGwtZXZlbnRzfGFzc2lnbmVkLXRvLXlvdXxyZWNlbnR8cmVxdWlyZXMtY29tcGxldGlvbnxyZXF1aXJlcy11cGRhdGVzfGluLXJldmlldy1hbGx8aW4tZXh0ZXJuYWwtdmFsaWRhdGlvbnxyZWFkeS10by1wcmludHxyZWFkeS10by1pc3N1ZV0iLCJ0eXBlPXJlY29yZC5zZWFyY2gmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nLEZPT1RCQUxMX0NMVUJfTUVNQkVSU0hJUCIsInVzZXIucmVhZDpvbmx5LW15LWF1ZGl0IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyIsInR5cGU9cmVjb3JkLnJlYWQmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nIiwicmVjb3JkLmRlY2xhcmVbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5kZWNsYXJlZC5yZWplY3RbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5kZWNsYXJlZC5hcmNoaXZlW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQucmVnaXN0ZXJbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5kZWNsYXJlZC5lZGl0W2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQucmVnaXN0ZXJlZC5wcmludC1jZXJ0aWZpZWQtY29waWVzW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQucmVnaXN0ZXJlZC5jb3JyZWN0W2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQudW5hc3NpZ24tb3RoZXJzW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQuZGVjbGFyZWQucmV2aWV3LWR1cGxpY2F0ZXNbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5jdXN0b20tYWN0aW9uW2V2ZW50PXRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY3VzdG9tQWN0aW9uVHlwZT1BcHByb3ZlXSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiTE9DQUxfUkVHSVNUUkFSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2ODIxYzE3NWRjZTRkNzg4NmQ0ZTgyMTAifQ.HqPFpOLxTlhr9QARUgWuWpiSxbNVxOiW7tGzz_EoGlZWckoxy23i9Cp0oyjF-GCJbGTT2zfdWROAzvcuD43l1wFiYRMy8rOP3o0PH_k5eAijuMfI1Y9oXuMsZZaMBaDqrx4hHAF5uyitJ8qeAKXGF8ifryKFRdC2iSPrlBhjvKJwT-aaj4MThT_rNFrsVHlW1n-hJ78nyhUKTbgb4qmY92rxVxfJzW1vDy2bhxiJCIoPtluCvUjq6fGJOcaw9f4VuLqnt7b4fke7LN-av-eExPAXijDHyYr5L2vNIQ_4AjKQse6PM_t_7qUbOAzdkfySDsSNFLwjsy0cX8xovPJFr2E1S20-NmA6moiMghi34proGzDBs8750Wk724hSTwuFrvj3cT1nekCgkVa41b7b5E88ys5d6A48fkracYUrn0DwPs3Fbm8d6Z2kMnNAELQ_xPbBAkN8-ySwxS1dhTKtAG3gXbbIOG2jpnVQaugZaaCSZTCFA26Tw5x9wYOtR_GCeGI1lU2zd8_zjxlJA8g5zs186sPkkyWRy_J_xP2KIKfK4vBQ4FpcCDeoUh6B5sT4Bq_38PwzsC2gshzl4Np9oh9bVWbZC5Z7SLqE4TJzXDOWaoKRt6wFEfZhJjG7MYnAD2PD0YzTWyPKFn4sqZI7-zNajHfUDC-yXyIiiohQNkI'
-}
-
 export const generateWorkqueues = (
   slug: string = 'all-events'
 ): WorkqueueConfig[] =>
@@ -1227,12 +1302,15 @@ export const generateEventConfig = ({
   id,
   fields,
   placeOfEventId,
-  dateOfEventId
+  dateOfEventId,
+  actions = []
 }: {
   id: string
   fields: FieldConfig[]
   placeOfEventId?: string
   dateOfEventId?: string
+  /** Extra actions appended to the default READ + DECLARE pair, e.g. a REQUEST_CORRECTION action with its own correctionForm. */
+  actions?: EventConfigInput['actions']
 }): EventConfig => {
   return defineConfig({
     id,
@@ -1269,7 +1347,87 @@ export const generateEventConfig = ({
           title: generateTranslationConfig('Review Declare Action'),
           fields: []
         }
-      }
+      },
+      ...actions
     ]
   })
+}
+
+/**
+ * Get the leaf administrative area IDs from a list of administrative areas.
+ *
+ * A leaf administrative area is defined as an administrative area that does not have any children in the provided list.
+ * AdministrativeArea  might have a CRVS_OFFICE as children, but is still considered to be a leaf administrative area.
+ *
+ * @param administrativeAreas - The list of administrative areas to search.
+ * @returns The list of leaf administrative area IDs.
+ */
+export function getLeafAdministrativeAreaIds(
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+): Array<{ id: UUID }> {
+  const nonLeafAdministrativeAreaIds = new Set<string>()
+
+  for (const [, location] of administrativeAreas) {
+    if (location.parentId) {
+      nonLeafAdministrativeAreaIds.add(location.parentId)
+    }
+  }
+
+  const result: { id: UUID }[] = []
+  for (const [id] of administrativeAreas) {
+    if (!nonLeafAdministrativeAreaIds.has(id)) {
+      result.push({ id })
+    }
+  }
+
+  return result
+}
+
+/**
+ *
+ * @returns TokenPayload. Useful for building test setup for ValidatorContext
+ */
+function generateUserTokenPayload({
+  role,
+  scope
+}: {
+  role?: TestUserRole
+  scope?: EncodedScope[]
+}): ITokenPayload {
+  return {
+    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
+    sub: generateUuid(),
+    algorithm: 'RS256',
+    exp: '1787221786',
+    role: role ?? TestUserRole.enum.FIELD_AGENT,
+    scope: scope ?? [
+      encodeScope({
+        type: 'record.read'
+      })
+    ],
+    userType: TokenUserType.enum.user
+  }
+}
+
+export function generateTestValidatorContext(
+  userRole?: TestUserRole,
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): ValidatorContext {
+  const user = generateUserTokenPayload({ role: userRole })
+
+  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
+    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+  )
+
+  if (!eventWithConfig) {
+    return { user, leafAdminStructureLocationIds }
+  }
+
+  const { event, eventConfig } = eventWithConfig
+
+  return {
+    user,
+    leafAdminStructureLocationIds,
+    event: getEventValidatorContext(event, eventConfig)
+  }
 }

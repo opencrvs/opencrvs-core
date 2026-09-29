@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { joinValuesWith, login, triggerDeclarationAction } from '../../helpers'
+import {
+  joinValuesWith,
+  login,
+  triggerDeclarationAction
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { expectInUrl, type } from '../../utils'
+import { expectInUrl, type } from '@e2e/support/utils'
 
 test.describe
   .serial("Advanced Search - Birth Event Declaration - Informant's details", () => {

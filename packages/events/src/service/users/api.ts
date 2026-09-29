@@ -12,6 +12,7 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { Kysely } from 'kysely'
+import { uniq } from 'lodash'
 import {
   CreateUserInput,
   CreateUserInputInternal,
@@ -22,10 +23,12 @@ import {
   UpdateUserInput,
   User,
   UserOrSystem,
+  eventAttachmentPath,
   isUUID,
   logger,
   triggerUserEventNotification
 } from '@opencrvs/commons'
+import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 import {
   getSystemByLegacyId,
@@ -51,6 +54,8 @@ import {
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import * as eventsRepo from '@events/storage/postgres/events/events'
+import { deleteFilesByPrefix } from '@events/service/files'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '@events/storage/postgres/events/schema/Database'
 import { getRoles } from '../config/config'
@@ -86,6 +91,7 @@ export type SearchUsersPayload = {
 async function findAvailableUsername(
   newUsername: string,
   existingUsername?: string,
+  trx?: Kysely<Schema>,
   i = 0
 ): Promise<string> {
   const candidate = i === 0 ? newUsername : `${newUsername}${i}`
@@ -93,9 +99,9 @@ async function findAvailableUsername(
     return candidate
   }
 
-  const taken = await isUsernameTaken(candidate)
+  const taken = await isUsernameTaken(candidate, trx)
   return taken
-    ? findAvailableUsername(newUsername, existingUsername, i + 1)
+    ? findAvailableUsername(newUsername, existingUsername, trx, i + 1)
     : candidate
 }
 
@@ -184,7 +190,8 @@ async function handleUsernameUpdate(
 
   const newUsername = await findAvailableUsername(
     newUsernameCandidate,
-    oldUsername
+    oldUsername,
+    trx
   )
 
   await updateUsernameByIdInTrx(trx, userId, newUsername)
@@ -205,6 +212,40 @@ async function handleUsernameUpdate(
   })
 }
 
+/**
+ * Moving a user to another office or another role drops the drafts they were
+ * working on. A CREATED event has no submitted action, so once its draft is
+ * gone there is nothing left in it and it's also removed with the draft.
+ *
+ * @returns the ids of the events that were deleted, so the caller can sweep
+ * their attachments once the transaction has committed.
+ */
+async function deleteDraftsAndOrphanedEventsInTrx(
+  trx: Kysely<Schema>,
+  userId: UUID
+) {
+  const draftedEventIds = uniq(
+    await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+  )
+
+  if (draftedEventIds.length === 0) {
+    return []
+  }
+
+  const orphaned = (await eventsRepo.getEventsByIdsInTrx(trx, draftedEventIds))
+    .filter(
+      (event) =>
+        getStatusFromActions(event.actions) === EventStatus.enum.CREATED
+    )
+    .map(({ id }) => id)
+
+  for (const eventId of orphaned) {
+    await eventsRepo.deleteEventByIdInTrx(eventId, trx)
+  }
+
+  return orphaned
+}
+
 export async function updateUser(
   input: UpdateUserInput,
   token: string
@@ -218,6 +259,8 @@ export async function updateUser(
     primaryOfficeId: incomingOfficeId,
     ...otherFields
   } = input
+
+  let orphanedEventIds: UUID[] = []
 
   const dbUser = await db.transaction().execute(async (trx) => {
     const existingUser = await getUserByIdInTrx(trx, userId)
@@ -237,8 +280,13 @@ export async function updateUser(
       officeId: incomingOfficeId
     })
 
-    if (incomingOfficeId && incomingOfficeId !== existingUser.officeId) {
-      await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+    const officeChanged =
+      incomingOfficeId && incomingOfficeId !== existingUser.officeId
+    const roleChanged =
+      otherFields.role && otherFields.role !== existingUser.role
+
+    if (officeChanged || roleChanged) {
+      orphanedEventIds = await deleteDraftsAndOrphanedEventsInTrx(trx, userId)
     }
 
     if (incomingName) {
@@ -253,6 +301,16 @@ export async function updateUser(
 
     return getUserByIdInTrx(trx, userId)
   })
+
+  /*
+   * Swept after the commit: the objects live outside Postgres, so a rollback
+   * could not put them back.
+   */
+  await Promise.all(
+    orphanedEventIds.map(async (eventId) =>
+      deleteFilesByPrefix(eventAttachmentPath(eventId), token)
+    )
+  )
 
   if (!dbUser) {
     throw new TRPCError({
@@ -297,7 +355,7 @@ async function sendCredentialsNotification(
   }
 }
 
-export const ResolvedCreateUserInput = CreateUserInput.extend({
+const ResolvedCreateUserInput = CreateUserInput.extend({
   ...CreateUserInputInternal.shape,
   // Ensure defaults are resolved.
   password: z.string(),
@@ -550,7 +608,8 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
 
-  if (!user) {
+  // Recovery is only offered for active accounts.
+  if (!user || user.status !== 'active') {
     // Don't reveal whether the account exists
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }

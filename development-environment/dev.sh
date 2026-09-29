@@ -59,6 +59,9 @@ dirs=(
   "data/minio"
   "data/backups"
   "data/postgres"
+  # mosip-api keeps its record-only tokens in SQLite. Its dev default path
+  # points here and better-sqlite3 will not create the directory itself.
+  "data/sqlite"
 )
 
 for dir in "${dirs[@]}"; do
@@ -70,6 +73,13 @@ for dir in "${dirs[@]}"; do
     echo "$dir already exists"
   fi
 done
+
+PROJECT_ROOT=$(cd "$DIR/.."; pwd)
+if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
+  echo "Creating $PROJECT_ROOT/.secrets"
+  mkdir -p "$PROJECT_ROOT/.secrets"
+  pnpm dev:secrets:gen
+fi
 
 if $dependencies; then
   concurrently "pnpm run compose:deps"
@@ -111,7 +121,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050 2024 20240 20260)
 for x in "${openCRVSPorts[@]}"
 do
    :

@@ -27,10 +27,17 @@ metadata:
     app: postgres
   name: postgres
 spec:
+  {{- $service_type := default .Values.service_type .Values.postgres.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
   clusterIP: None
+  {{- end }}
   ports:
     - port: 5432
       targetPort: 5432
+      {{- if .Values.postgres.node_port }}
+      nodePort: {{ .Values.postgres.node_port }}
+      {{- end }}
   selector:
     app: postgres
 ---
@@ -124,10 +131,7 @@ spec:
                   name: {{ default .Values.postgres.backup.server_secret .Values.backup.backup_server_secret }}
                   key: user
             - name: PGBACKREST_REPO1_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: {{ default .Values.postgres.backup.server_secret .Values.backup.backup_server_secret }}
-                  key: host
+              value: {{ default .Values.backup.host .Values.postgres.backup.host }}
             - name: PGBACKREST_REPO1_TYPE
               value: posix
             - name: PGBACKREST_REPO1_CIPHER_TYPE
@@ -154,6 +158,8 @@ spec:
               mountPath: /run/postgresql
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
+            - name: dshm
+              mountPath: /dev/shm
           {{- if (eq (include "postgres.use_pgBackRest" .) "true") }}
             - name: pgbackrest-config
               mountPath: /etc/pgbackrest
@@ -174,6 +180,10 @@ spec:
                 path: ensure-deb-utils.sh
         - name: postgres-run
           emptyDir: {}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: {{ .Values.postgres.shm_size | default "256Mi" }}
         - name: data
       {{- if eq $storageType "pvc" }}
           persistentVolumeClaim:
@@ -199,4 +209,7 @@ spec:
               - key: ssh_key
                 path: id_rsa
       {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "postgres"  "Values" .Values) }}
+
 {{- end }}

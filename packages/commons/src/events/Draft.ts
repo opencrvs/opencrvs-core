@@ -35,7 +35,14 @@ export const Draft = z
   )
 
 export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
-  type: ActionTypes.exclude([ActionTypes.enum.DELETE]),
+  /*
+   * A draft can name a file that no action references. Such a file stays until
+   * the record is deleted or the record's next action sweeps its prefix.
+   * DECLARE is available only where one of those is still coming: a created
+   * record, which can still be deleted, and a record part way through an edit,
+   * which is about to be declared or registered.
+   */
+  type: z.literal(ActionTypes.enum.DECLARE),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

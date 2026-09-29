@@ -10,7 +10,11 @@
  */
 import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
-import { createIntegrationContext, EVENT_TYPE, fetchClientAPI } from './helpers'
+import {
+  createIntegrationContext,
+  EVENT_TYPE,
+  fetchClientAPI
+} from '@e2e/support/events-rest-api/helpers'
 
 test.describe('GET /api/events/events/{eventId}', () => {
   let clientToken: string

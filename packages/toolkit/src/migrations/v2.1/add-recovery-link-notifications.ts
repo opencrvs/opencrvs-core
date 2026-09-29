@@ -34,7 +34,7 @@
  *     `convertPayloadToVariable` switch, building the recovery URL from the
  *     token in the payload
  *   - `src/config/routes/userNotificationRoutes.ts`: adds the two
- *     `POST /triggers/user/*` routes core posts to
+ *     `POST /trigger/user/*` routes core posts to
  *   - `src/api/notification/email-templates/other/*.html`: writes the two
  *     email bodies
  *   - `src/translations/notification.csv`: adds the two SMS messages
@@ -56,8 +56,9 @@ import {
   SyntaxKind,
   VariableDeclaration
 } from 'ts-morph'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, writeFileSync } from 'fs'
 import path from 'path'
+import { addRows, readCsvFile, writeCsvFile } from '../../csv'
 
 const EMAIL_TEMPLATES_FILE = 'src/api/notification/email-templates/index.ts'
 const SMS_SERVICE_FILE = 'src/api/notification/sms-service.ts'
@@ -515,11 +516,11 @@ function updateRoutes(project: Project, cwd: string) {
   }
 
   for (const event of RECOVERY_EVENTS) {
-    if (routesArray.getText().includes(`/triggers/user/${event.id}`)) continue
+    if (routesArray.getText().includes(`/trigger/user/${event.id}`)) continue
 
     routesArray.addElement(`{
   method: 'POST',
-  path: '/triggers/user/${event.id}',
+  path: '/trigger/user/${event.id}',
   handler: makeNotificationHandler('${event.id}'),
   options: {
     auth: false,
@@ -527,7 +528,7 @@ function updateRoutes(project: Project, cwd: string) {
     description: '${event.routeDescription}'
   }
 }`)
-    console.log(`  ✓ ${ROUTES_FILE}: POST /triggers/user/${event.id}`)
+    console.log(`  ✓ ${ROUTES_FILE}: POST /trigger/user/${event.id}`)
   }
 }
 
@@ -633,51 +634,26 @@ function writeEmailTemplates(cwd: string) {
 }
 
 /**
- * Appends the rows the CSV is missing, keeping the file's own ordering: rows
- * go in sorted position when the file is already sorted by id, otherwise at
- * the end.
+ * Appends the rows the CSV is missing, keeping the file's own ordering.
  */
 function addCsvRows(cwd: string, relativePath: string, rows: string[]) {
   const csvPath = path.join(cwd, relativePath)
+  const file = readCsvFile(csvPath)
 
-  if (!existsSync(csvPath)) {
+  if (!file) {
     warnSkipped(`${relativePath} not found; translations not added`)
     return
   }
 
-  const original = readFileSync(csvPath, 'utf8')
-  const newline = original.includes('\r\n') ? '\r\n' : '\n'
-  const hadTrailingNewline = /\r?\n$/.test(original)
-  const lines = original.replace(/\r?\n$/, '').split(/\r?\n/)
+  const added = addRows(file, rows)
 
-  const idOf = (line: string) => line.slice(0, line.indexOf(','))
-  const header = lines[0]
-  const body = lines.slice(1)
-  const isSorted = body.every(
-    (line, index) => index === 0 || idOf(body[index - 1]) <= idOf(line)
-  )
+  if (added.length === 0) return
 
-  let added = 0
-  for (const row of rows) {
-    const id = idOf(row)
-    if (body.some((line) => idOf(line) === id)) continue
-
-    const insertAt = isSorted ? body.findIndex((line) => idOf(line) > id) : -1
-    if (insertAt === -1) {
-      body.push(row)
-    } else {
-      body.splice(insertAt, 0, row)
-    }
-    added++
+  for (const id of added) {
     console.log(`  ✓ ${relativePath}: ${id}`)
   }
 
-  if (added === 0) return
-
-  writeFileSync(
-    csvPath,
-    [header, ...body].join(newline) + (hadTrailingNewline ? newline : '')
-  )
+  writeCsvFile(csvPath, file)
 }
 
 // ─── Entry point ─────────────────────────────────────────────────────────────

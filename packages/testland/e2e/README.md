@@ -2,15 +2,19 @@
 
 ### Run against localhost
 
-`yarn e2e-dev`
+`pnpm e2e-dev`
 
 ### Run against a deployed environment
 
-`NODE_TLS_REJECT_UNAUTHORIZED=0 DOMAIN=<your-env>.opencrvs.dev yarn e2e`
+`NODE_TLS_REJECT_UNAUTHORIZED=0 DOMAIN=<your-env>.opencrvs.dev pnpm e2e`
 
 ## How to write a test
 
 [See how to write a test that is not flaky](./HOW-TO-WRITE-A-TEST.md)
+
+## How E2E CI sharding works
+
+[See how CI shards are planned and run](./SHARDING.md)
 
 ## How to debug E2E tests on CI
 

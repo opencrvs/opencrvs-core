@@ -56,7 +56,6 @@ services:
       - HOST=0.0.0.0
       - REDIS_HOST=redis
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
-      - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - EVENTS_URL=http://events:5555/
       - AUTH_URL=http://auth:4040

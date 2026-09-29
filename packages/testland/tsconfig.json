@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "paths": {
-      "@countryconfig/*": ["./src/*"]
+      "@countryconfig/*": ["./src/*"],
+      "@e2e/*": ["./e2e/*"]
     },
     "target": "es6",
     "module": "Node16",

@@ -34,7 +34,6 @@ export const VerificationWizardModal: Story = {
   render: function Component() {
     return (
       <VerificationWizard
-        currentPage={0}
         pageConfig={{
           id: 'verification',
           fields: [],
@@ -72,7 +71,6 @@ export const VerificationWizardModal: Story = {
         }}
         pageTitle="Verification Wizard"
         onNextPage={onNextPageSpy}
-        onPreviousPage={noop}
         onSubmit={noop}
       />
     )

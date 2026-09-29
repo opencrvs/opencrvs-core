@@ -138,3 +138,46 @@ describe.each([ActionType.ASSIGN, ActionType.UNASSIGN])(
     })
   }
 )
+
+describe('READ action config', () => {
+  const review = {
+    title: {
+      defaultMessage: 'Review',
+      description: 'Review title',
+      id: 'events.actionConfig.test.review'
+    },
+    fields: []
+  }
+
+  it('accepts a minimal config without flags', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.READ,
+      label,
+      review
+    })
+
+    expect(res.success).toBe(true)
+  })
+
+  it('rejects flags, since it is a meta action excluded from flag resolution', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.READ,
+      label,
+      review,
+      flags: [{ id: 'custom-flag', operation: 'add' }]
+    })
+
+    expect(res.success).toBe(false)
+  })
+
+  it('rejects conditionals, as before', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.READ,
+      label,
+      review,
+      conditionals: [{ type: 'SHOW', conditional: true }]
+    })
+
+    expect(res.success).toBe(false)
+  })
+})

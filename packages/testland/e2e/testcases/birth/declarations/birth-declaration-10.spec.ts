@@ -17,11 +17,11 @@ import {
   login,
   switchEventTab,
   triggerDeclarationAction
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { REQUIRED_VALIDATION_ERROR } from '../helpers'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('10. Birth declaration case - 10', () => {
   let page: Page
@@ -121,17 +121,17 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
-      await expect(
-        page.getByTestId('child.placeOfBirth-value')
-      ).toContainText(REQUIRED_VALIDATION_ERROR)
+      await expect(page.getByTestId('child.placeOfBirth-value')).toContainText(
+        REQUIRED_VALIDATION_ERROR
+      )
 
       /*
        * Expected result: should include
        * - Informant's relation to child
        */
-      await expect(
-        page.getByTestId('informant.relation-value')
-      ).toContainText(declaration.informantType)
+      await expect(page.getByTestId('informant.relation-value')).toContainText(
+        declaration.informantType
+      )
 
       /*
        * Expected result: should require
@@ -243,17 +243,17 @@ test.describe.serial('10. Birth declaration case - 10', () => {
        * - Child's Place of birth type
        * - Child's Place of birth details
        */
-      await expect(
-        page.getByTestId('child.placeOfBirth-value')
-      ).toContainText(REQUIRED_VALIDATION_ERROR)
+      await expect(page.getByTestId('child.placeOfBirth-value')).toContainText(
+        REQUIRED_VALIDATION_ERROR
+      )
 
       /*
        * Expected result: should include
        * - Informant's relation to child
        */
-      await expect(
-        page.getByTestId('informant.relation-value')
-      ).toContainText(declaration.informantType)
+      await expect(page.getByTestId('informant.relation-value')).toContainText(
+        declaration.informantType
+      )
 
       /*
        * Expected result: should require

@@ -33,7 +33,8 @@ import {
   omitHiddenFields,
   EventIndex,
   isValidIcon,
-  flattenFormState
+  flattenFormState,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -189,6 +190,7 @@ function QuickActionModal({
         )}
         <FormFieldGenerator
           {...dialogForm}
+          attachmentPath={eventAttachmentPath(eventId)}
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}

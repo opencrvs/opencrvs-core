@@ -13,15 +13,9 @@ import { defineMessages, useIntl } from 'react-intl'
 import { Button } from '@opencrvs/components/src/Button'
 import { Content } from '@opencrvs/components/src/Content'
 import { Frame } from '@opencrvs/components/src/Frame'
-import { Icon } from '@opencrvs/components/src/Icon'
 import { Stack } from '@opencrvs/components/src/Stack'
 
 export const messages = defineMessages({
-  back: {
-    defaultMessage: 'Back',
-    description: 'Back button text',
-    id: 'buttons.back'
-  },
   goToReview: {
     defaultMessage: 'Go to review',
     description: 'Go to review button text',
@@ -30,25 +24,24 @@ export const messages = defineMessages({
 })
 
 export type FormWizardProps = PropsWithChildren<{
-  currentPage: number
   /** Callback when the user clicks the "Continue" button */
   onNextPage: () => void
-  onPreviousPage?: () => void
 
   /** Callback when the user submits the form wizard */
   onSubmit: () => void
   pageTitle: string
   showReviewButton?: boolean
+  /** Buttons rendered in the top right corner of the page header */
+  topActionButtons?: React.ReactElement[]
 }>
 
 export const FormWizard = ({
   children,
-  currentPage,
   onSubmit,
   pageTitle,
   onNextPage,
-  onPreviousPage,
   showReviewButton,
+  topActionButtons,
   continueButtonText = 'Continue'
 }: FormWizardProps & {
   continueButtonText?: string
@@ -57,16 +50,12 @@ export const FormWizard = ({
 
   return (
     <Frame.LayoutForm>
-      <Frame.SectionFormBackAction>
-        {currentPage > 0 && (
-          <Button size="small" type="tertiary" onClick={onPreviousPage}>
-            <Icon name="ArrowLeft" size="medium" />
-            {intl.formatMessage(messages.back)}
-          </Button>
-        )}
-      </Frame.SectionFormBackAction>
       <Frame.Section>
-        <Content showTitleOnMobile={true} title={pageTitle}>
+        <Content
+          showTitleOnMobile={true}
+          title={pageTitle}
+          topActionButtons={topActionButtons}
+        >
           <Stack alignItems="stretch" direction="column" gap={16}>
             {children}
 

@@ -16,23 +16,23 @@ import {
   goBackToReview,
   login,
   uploadImage
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 import { random } from 'lodash'
 import {
   createDeclaration as createDeclarationV2,
   Declaration as DeclarationV2
-} from '../test-data/birth-declaration-with-mother-father'
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import { format, subDays, subYears } from 'date-fns'
-import { formatV2ChildName } from '../birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { IdType } from '@countryconfig/events/utils'
 import {
   ensureAssignedToUser,
   expectInUrl,
   selectAction,
   waitForCorrectionAction
-} from '../../utils'
+} from '@e2e/support/utils'
 
 test.describe.serial(' Correct record - 3', () => {
   let declaration: DeclarationV2
@@ -422,9 +422,7 @@ test.describe.serial(' Correct record - 3', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page
-            .getByTestId('mother.idType-value')
-            .getByRole('deletion')
+          await page.getByTestId('mother.idType-value').getByRole('deletion')
         ).toHaveText('National ID')
 
         await expect(
@@ -436,9 +434,7 @@ test.describe.serial(' Correct record - 3', () => {
 
       test('3.4.5 Change passport', async () => {
         await expect(
-          await page
-            .getByTestId('mother.passport-value')
-            .getByText('Required')
+          await page.getByTestId('mother.passport-value').getByText('Required')
         ).toBeVisible()
 
         await page.getByTestId('change-button-mother.passport').click()
@@ -468,9 +464,7 @@ test.describe.serial(' Correct record - 3', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page
-            .getByTestId('mother.passport-value')
-            .getByRole('deletion')
+          await page.getByTestId('mother.passport-value').getByRole('deletion')
         ).toHaveText('-')
 
         await expect(
@@ -543,9 +537,7 @@ test.describe.serial(' Correct record - 3', () => {
         await expectInUrl(page, 'review')
 
         await expect(
-          await page
-            .getByTestId('mother.address-value')
-            .getByText('Farajaland')
+          await page.getByTestId('mother.address-value').getByText('Farajaland')
         ).toBeVisible()
 
         await expect(
@@ -758,9 +750,7 @@ test.describe.serial(' Correct record - 3', () => {
 
       for (const part of addressParts) {
         await expect(
-          page
-            .getByTestId('child.birthLocation.other-value')
-            .getByText(part)
+          page.getByTestId('child.birthLocation.other-value').getByText(part)
         ).toBeVisible()
       }
 
@@ -1116,16 +1106,9 @@ test.describe.serial(' Correct record - 3', () => {
     test('3.8.3 Approve correction', async () => {
       await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
-      await waitForCorrectionAction(
-        page,
-        'approve',
-        async () => {
-          await page
-            .getByRole('button', { name: 'Confirm', exact: true })
-            .click()
-        },
-        { waitForUnassign: true, eventId }
-      )
+      await waitForCorrectionAction(page, 'approve', async () => {
+        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+      })
 
       await expectInUrl(page, `events/${eventId}`)
     })

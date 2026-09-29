@@ -137,13 +137,13 @@ export function EventSummary({
   eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validationContext = useValidatorContext(eventDocument)
+  const validatorContext = useValidatorContext(eventDocument)
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
     .filter((declarationField) =>
-      isFieldSecured(declarationField, eventIndex, validationContext)
+      isFieldSecured(declarationField, eventIndex, validatorContext)
     )
     .map(({ id }) => id)
 
@@ -151,22 +151,12 @@ export function EventSummary({
     (banner) =>
       !banner.conditionals ||
       banner.conditionals.length === 0 ||
-      areConditionsMet(
-        banner.conditionals,
-        event,
-        validationContext,
-        eventIndex
-      )
+      areConditionsMet(banner.conditionals, event, validatorContext, eventIndex)
   )
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
-      !areConditionsMet(
-        field.conditionals,
-        event,
-        validationContext,
-        eventIndex
-      )
+      !areConditionsMet(field.conditionals, event, validatorContext, eventIndex)
     ) {
       return null
     }
@@ -184,7 +174,7 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
-        secured: isFieldSecured(config, eventIndex, validationContext),
+        secured: isFieldSecured(config, eventIndex, validatorContext),
         value: (
           <Output
             anchor={recordAnchorDate(eventIndex)}

@@ -131,16 +131,18 @@ const fetchToken = async (
   clientSecret: string,
   apiBaseUrl: string
 ): Promise<TokenResponse> => {
-  const authenticateResponse = await fetch(
-    `${apiBaseUrl}/auth/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-correlation-id': `${clientId}-${Date.now()}`
-      }
-    }
-  )
+  const authenticateResponse = await fetch(`${apiBaseUrl}/auth/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'x-correlation-id': `${clientId}-${Date.now()}`
+    },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: 'client_credentials'
+    })
+  })
 
   const res: TokenResponse = await authenticateResponse.json()
 

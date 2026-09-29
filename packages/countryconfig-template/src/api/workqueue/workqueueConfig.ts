@@ -19,17 +19,6 @@ import {
   user
 } from '@opencrvs/toolkit/events'
 
-// Example of a column that is used in the workqueue config
-// eslint-disable-next-line no-unused-vars
-const DATE_OF_EVENT_COLUMN = {
-  label: {
-    id: 'workqueues.dateOfEvent',
-    defaultMessage: 'Date of Event',
-    description: 'Label for workqueue column: dateOfEvent'
-  },
-  value: event.field('dateOfEvent')
-}
-
 const createdInMyAdminArea = {
   createdAtLocation: {
     type: 'within',

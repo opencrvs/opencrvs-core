@@ -22,15 +22,17 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventWithArchiveAndUnarchive
 } from '../../events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
 
+const generator = testDataGenerator()
+
 const meta: Meta<typeof EventOverviewIndex> = {
   title: 'EventOverview/Interaction',
-  component: EventOverviewIndex,
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR
   },
@@ -162,6 +164,18 @@ export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
       initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventWithArchiveAndUnarchive.id
       })
+    },
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.list.query(() => {
+            return [generator.user.localRegistrar().summary]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return generator.user.localRegistrar().v2
+          })
+        ]
+      }
     }
   },
   play: async ({ canvasElement, step }) => {

@@ -21,6 +21,9 @@ spec:
     middlewares:
       - name: sts-and-basic-response-headers
       - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/email`)'
     kind: Rule
     services:
@@ -62,6 +65,7 @@ metadata:
   name: countryconfig
 spec:
   replicas: {{ .Values.countryconfig.replicas | default 1 }}
+  {{- include "strategy-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 2 }}
   selector:
     matchLabels:
       app: countryconfig
@@ -74,6 +78,7 @@ spec:
         service_name: opencrvs_countryconfig
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "countryconfig" "Values" .Values) | nindent 6 }}
       containers:
         - name: countryconfig
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
@@ -93,12 +98,19 @@ spec:
               value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
             - name: DOMAIN
               value: {{ .Values.hostname | quote }}
+            # Forward the events service's usage telemetry to the status service.
+            # The reported domain comes from DOMAIN (above) and the environment
+            # label from OPENCRVS_ENVIRONMENT.
+            - name: TELEMETRY_ENABLED
+              value: "true"
             - name: SUBDOMAIN_SEPARATOR
               value: {{ .Values.subdomain_separator | quote }}
             - name: GATEWAY_URL
               value: "http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070"
             - name: AUTH_URL
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
+            - name: EVENTS_URL
+              value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
           {{- if not (eq .Values.postgres.auth_mode "managed") }}
             - name: ANALYTICS_DATABASE_URL
               valueFrom:
@@ -124,6 +136,10 @@ spec:
                 path: public-key.pem
             name: {{ .Release.Name }}-cert-tls
           name: public-key
+
+{{- include "service-account-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
+
+{{- include "network-policy-rules" (dict "service_name" "countryconfig" "Values" .Values) }}
 
 {{- include "service-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 

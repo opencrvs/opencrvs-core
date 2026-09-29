@@ -10,16 +10,19 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login, getToken } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
+import { login, getToken } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
 
 import {
   navigateToCertificatePrintAction,
   selectCertificationType,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
-import { expectInUrl } from '../../utils'
+} from '@e2e/support/print-certificate/birth/helpers'
+import { expectInUrl } from '@e2e/support/utils'
 
 test.describe.serial('Navigating in and out of action', () => {
   let page: Page

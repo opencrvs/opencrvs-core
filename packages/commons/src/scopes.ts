@@ -51,7 +51,9 @@ export const RecordScopeTypeV2 = z.enum([
   'record.request-correction',
   'record.correct',
   'record.unassign-others',
-  'record.custom-action'
+  'record.custom-action',
+  'record.action.accept',
+  'record.action.reject'
 ])
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
@@ -78,11 +80,7 @@ const PlainScopeType = z.enum([
   // Performance dashboard
   'performance.read',
   'performance.read-dashboards',
-  'performance.vital-statistics-export',
-
-  // Scopes used exclusively by countryconfig integration token
-  'record.confirm-registration',
-  'record.reject-registration'
+  'performance.vital-statistics-export'
 ])
 
 const scopeByEvent = z
@@ -114,7 +112,9 @@ const userRole = z
 const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: JurisdictionFilter.optional()
+    placeOfEvent: JurisdictionFilter.optional(),
+    createdBy: UserFilter.optional(),
+    createdIn: JurisdictionFilter.optional()
   })
   .describe('Options applicable to all record scopes.')
 
@@ -180,7 +180,9 @@ export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
 const ResolvedScopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: UUID.nullish()
+    placeOfEvent: UUID.nullish(),
+    createdBy: z.string().optional(),
+    createdIn: UUID.nullish()
   })
   .describe(
     'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'
@@ -238,6 +240,18 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
     )
 })
 
+export const ActionConfirmationScopeType = RecordScopeTypeV2.extract([
+  'record.action.accept',
+  'record.action.reject'
+])
+export type ActionConfirmationScopeType = z.infer<
+  typeof ActionConfirmationScopeType
+>
+
+const ActionConfirmationScopeOptions = AllRecordScopeOptions.describe(
+  'Options for confirming (accepting or rejecting) an action.'
+)
+
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -259,6 +273,10 @@ export const RecordScopeV2 = z
     z.object({
       type: z.literal('record.print-certified-copies'),
       options: ScopeOptionsPrintCertifiedCopies.optional()
+    }),
+    z.object({
+      type: ActionConfirmationScopeType,
+      options: ActionConfirmationScopeOptions.optional()
     })
   ])
   .describe(

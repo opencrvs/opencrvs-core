@@ -19,6 +19,10 @@ spec:
     - name: kibana
       namespace: {{ .Release.Namespace }}
       port: 5601
+    {{- if .Values.ingress.admin_console_allowlist }}
+    middlewares:
+      - name: admin-console-ip-allowlist
+    {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}
@@ -26,20 +30,25 @@ spec:
   tls:
     secretName: {{ .Values.ingress.tls_secret_name }}
   {{- end }}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: kibana
 spec:
-  type: ClusterIP
+  type: {{ .Values.service_type | default "ClusterIP" }}
   ports:
     - port: 5601
       targetPort: 5601
       protocol: TCP
       name: http
+      {{- if .Values.kibana.node_port }}
+      nodePort: {{ .Values.kibana.node_port }}
+      {{- end }}
   selector:
     app: kibana
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -150,4 +159,6 @@ spec:
           configMap:
             name: elasticsearch-scripts
             defaultMode: 0755
+
+{{ include "network-policy-rules" (dict "service_name" "kibana"  "Values" .Values) }}
 {{- end }}

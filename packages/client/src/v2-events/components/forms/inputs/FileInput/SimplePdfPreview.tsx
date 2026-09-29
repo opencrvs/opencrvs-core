@@ -10,7 +10,12 @@
  */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
+import { useIntl } from 'react-intl'
+import { DocumentPath } from '@opencrvs/commons/client'
+import { Button } from '@opencrvs/components/lib/Button'
+import { buttonMessages } from '@client/i18n/messages'
 import { usePreviewPdf } from '@client/v2-events/hooks/usePreviewPdf'
+import { PreviewErrorBox } from './PreviewErrorBox'
 
 const ViewerContainer = styled.div`
   width: 100%;
@@ -46,18 +51,6 @@ const LoadingOverlay = styled.div`
   z-index: 10;
 `
 
-const ErrorBox = styled.div`
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  padding: 16px;
-  border-radius: 8px;
-  z-index: 20;
-  ${({ theme }) => theme.fonts.bold12};
-`
-
 const SpinnerAnimation = keyframes`
   to { transform: rotate(360deg); }
 `
@@ -73,13 +66,14 @@ const Spinner = styled.div`
 `
 
 export function SimplePdfPreview({
-  pdfUrl,
+  path,
   title
 }: {
-  pdfUrl: string
+  path: DocumentPath
   title?: string
 }) {
-  const { containerRef, loading, error } = usePreviewPdf(pdfUrl)
+  const intl = useIntl()
+  const { containerRef, loading, error, retry } = usePreviewPdf(path)
 
   return (
     <ViewerContainer ref={containerRef} aria-label={title}>
@@ -89,7 +83,14 @@ export function SimplePdfPreview({
           {'Loading...'}
         </LoadingOverlay>
       )}
-      {error && <ErrorBox>{error}</ErrorBox>}
+      {error && (
+        <PreviewErrorBox>
+          {error}
+          <Button id="preview_retry" type="secondary" onClick={retry}>
+            {intl.formatMessage(buttonMessages.retry)}
+          </Button>
+        </PreviewErrorBox>
+      )}
     </ViewerContainer>
   )
 }

@@ -19,7 +19,8 @@ import {
   ActionDocument,
   getAcceptedActions,
   getCurrentEventState,
-  findPendingCorrectionAction
+  findPendingCorrectionAction,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -77,6 +78,7 @@ export function Review() {
     <FormLayout route={ROUTES.V2.EVENTS.REVIEW_CORRECTION}>
       <ReviewComponent.Body
         anchor={recordAnchorDate(eventIndex)}
+        attachmentPath={eventAttachmentPath(eventId)}
         banner={
           <ReviewCorrection
             correctionRequestAction={correctionRequestAction}

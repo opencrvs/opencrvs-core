@@ -8,20 +8,19 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
 # Overwriting https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
-namespaceOverride: 'traefik'
+namespaceOverride: "traefik"
 logs:
   general:
-    # "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
-    level: 'INFO'
-    # format: "common" # For local environment
-    format: 'json' # For server environment
+    level: "INFO"
+    format: "common"
   access:
-    # -- To enable access logs
     enabled: true
 ingressRoute:
   dashboard:
     enabled: false
-# Be explicit that we only use CRDs, not ingress/gw support
+
+tlsStore: {}
+
 providers:
   kubernetesCRD:
     enabled: true
@@ -37,5 +36,3 @@ ports:
   web:
     port: 8000
     protocol: TCP
-
-tlsStore: {}

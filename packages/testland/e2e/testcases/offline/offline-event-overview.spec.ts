@@ -11,12 +11,15 @@
 import { expect, Page, test } from '@playwright/test'
 
 import { ActionType } from '@opencrvs/toolkit/events'
-import { getToken, login } from '../../helpers'
-import { mockNetworkConditions } from '../../mock-network-conditions'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { CREDENTIALS } from '../../constants'
-import { formatV2ChildName } from '../birth/helpers'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { getToken, login } from '@e2e/support/helpers'
+import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Can view non-downloaded event online', () => {
   let page: Page
@@ -137,6 +140,20 @@ test.describe.serial('Can view downloaded event offline', () => {
       .click()
 
     await page.getByRole('button', { name: 'Assign', exact: true }).click()
+
+    const getResponse = page.waitForResponse(
+      (res) => res.url().includes('event.get') && res.ok()
+    )
+
+    const assignResponse = page.waitForResponse(
+      (res) => res.url().includes('event.actions.assignment.assign') && res.ok()
+    )
+
+    const searchResponse = page.waitForResponse(
+      (res) => res.url().includes('event.search') && res.ok()
+    )
+
+    await Promise.all([getResponse, assignResponse, searchResponse])
 
     await expect(row.getByLabel('User avatar')).toBeVisible({ timeout: 20000 })
   })

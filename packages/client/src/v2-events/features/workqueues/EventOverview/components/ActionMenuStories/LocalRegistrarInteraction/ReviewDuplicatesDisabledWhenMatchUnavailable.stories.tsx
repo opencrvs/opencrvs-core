@@ -11,6 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
@@ -109,7 +110,13 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-function parameters({ offlineEvents }: { offlineEvents: EventDocument[] }) {
+function parameters({
+  offlineEvents,
+  getDuplicates
+}: {
+  offlineEvents: EventDocument[]
+  getDuplicates: () => EventDocument[]
+}) {
   return {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
@@ -127,7 +134,8 @@ function parameters({ offlineEvents }: { offlineEvents: EventDocument[] }) {
               getCurrentEventState(eventUnderReview, tennisClubMembershipEvent)
             ]
           })),
-          tRPCMsw.event.get.query(() => eventUnderReview)
+          tRPCMsw.event.get.query(() => eventUnderReview),
+          tRPCMsw.event.getDuplicates.query(getDuplicates)
         ]
       }
     }
@@ -147,7 +155,7 @@ async function openActionMenu(canvasElement: HTMLElement) {
  * "you cannot review" banner.
  */
 export const WarningShownBeforeDownload: StoryObj = {
-  parameters: parameters({ offlineEvents: [] }),
+  parameters: parameters({ offlineEvents: [], getDuplicates: () => [] }),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -171,7 +179,12 @@ export const WarningShownBeforeDownload: StoryObj = {
  * must not be clickable.
  */
 export const ReviewDisabledWhenMatchUnavailable: StoryObj = {
-  parameters: parameters({ offlineEvents: [eventUnderReview] }),
+  parameters: parameters({
+    offlineEvents: [eventUnderReview],
+    getDuplicates: () => {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+  }),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -214,7 +227,10 @@ export const ReviewDisabledWhenMatchUnavailable: StoryObj = {
 
 /** Control: with the match cached, the same entry is clickable. */
 export const ReviewEnabledWhenMatchAvailable: StoryObj = {
-  parameters: parameters({ offlineEvents: [eventUnderReview, matchedEvent] }),
+  parameters: parameters({
+    offlineEvents: [eventUnderReview, matchedEvent],
+    getDuplicates: () => [matchedEvent]
+  }),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 

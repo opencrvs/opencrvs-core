@@ -22,11 +22,14 @@ export interface IDialogProps {
   children?: React.ReactNode
   actions: JSX.Element[]
   onClose?: () => void
+  subtitle?: React.ReactNode
   /**
    * Width of the dialog in pixels (for large variant).
    */
   width?: number
   variant?: 'small' | 'large'
+  /** Banner element displayed at the top of the dialog */
+  banner?: React.ReactNode
 }
 
 const DialogWrapper = styled.div`
@@ -77,12 +80,27 @@ const DialogHeader = styled.div`
   padding: 12px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
-  min-height: 40px;
-`
-const DialogTitle = styled.div`
-  display: flex;
   align-items: center;
+  gap: 16px;
+  min-height: 40px;
+  flex-shrink: 0;
+`
+const DialogHeaderContent = styled.div`
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
+`
+const DialogTitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+`
+const DialogSubtitle = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
 `
 
 const DialogContent = styled.div`
@@ -109,13 +127,15 @@ const DialogFooter = styled.div`
 export function Dialog({
   id,
   title,
+  subtitle,
   onClose,
   isOpen = true,
   children,
   actions,
   variant = 'small',
   width,
-  titleIcon
+  titleIcon,
+  banner
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
@@ -149,13 +169,17 @@ export function Dialog({
             role="dialog"
             data-testid={id}
           >
+            {banner}
             <DialogHeader>
-              <DialogTitle>
+              <DialogHeaderContent>
                 {titleIcon}
-                <Text variant="h2" element="h2" color="grey600">
-                  {title}
-                </Text>
-              </DialogTitle>
+                <DialogTitleBlock>
+                  <Text variant="h2" element="h2" color="grey600">
+                    {title}
+                  </Text>
+                  {subtitle && <DialogSubtitle>{subtitle}</DialogSubtitle>}
+                </DialogTitleBlock>
+              </DialogHeaderContent>
               {onClose && (
                 <Button
                   id="close-dialog"

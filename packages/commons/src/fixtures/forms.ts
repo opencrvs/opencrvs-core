@@ -700,6 +700,21 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
   },
   fields: [
     {
+      id: 'annotation.hidden',
+      type: FieldType.TEXT,
+      label: {
+        id: 'annotation.hidden.label',
+        defaultMessage: 'Show not be visible',
+        description: 'Catch for rendering'
+      },
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: never()
+        }
+      ]
+    },
+    {
       id: 'review.comment',
       type: FieldType.TEXTAREA,
       label: {
@@ -759,7 +774,23 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         defaultMessage: 'Who is applying for the membership?',
         description: 'This is the title of the section'
       },
+      showClearButton: true,
       fields: [
+        {
+          id: 'declaration.hidden',
+          type: FieldType.TEXT,
+          label: {
+            id: 'declaration.hidden.label',
+            defaultMessage: 'Show not be visible',
+            description: 'Catch for rendering'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: never()
+            }
+          ]
+        },
         {
           id: 'applicant.name',
           type: FieldType.NAME,
