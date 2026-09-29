@@ -39,3 +39,5 @@ SET declaration = regexp_replace(
     )::jsonb
 WHERE declaration::text LIKE '%"/${MINIO_BUCKET}/%'
    OR annotation::text LIKE '%"/${MINIO_BUCKET}/%';
+
+-- One-way: which paths had the bucket prefix is not recorded, so it cannot be added back.

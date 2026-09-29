@@ -62,3 +62,5 @@ WHERE ea.status = 'Accepted'
     'REQUEST_CORRECTION','APPROVE_CORRECTION','REJECT_CORRECTION',
     'MARK_AS_DUPLICATE','MARK_AS_NOT_DUPLICATE','CUSTOM'
   );
+
+-- One-way: backfilled audit rows cannot be told apart from ones written later.

@@ -5,3 +5,5 @@ ALTER TYPE action_type RENAME VALUE 'DETECT_DUPLICATE' TO 'DUPLICATE_DETECTED';
 ALTER TYPE action_type RENAME VALUE 'MARKED_AS_DUPLICATE' TO 'MARK_AS_DUPLICATE';
 
 ALTER TYPE action_type ADD VALUE 'MARK_AS_NOT_DUPLICATE';
+
+-- One-way: the down migration was broken and was removed instead of being fixed.

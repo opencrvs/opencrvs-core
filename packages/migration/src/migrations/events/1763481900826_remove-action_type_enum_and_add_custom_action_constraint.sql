@@ -67,3 +67,5 @@ ADD CONSTRAINT event_actions_check CHECK (
     )
   )
 );
+
+-- One-way: the down migration was broken and was removed instead of being fixed.
