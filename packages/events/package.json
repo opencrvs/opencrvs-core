@@ -76,6 +76,7 @@
     "kanel-kysely": "^0.7.1",
     "kysely-codegen": "^0.18.5",
     "lint-staged": "^15.0.0",
+    "node-pg-migrate": "^8.0.3",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
     "testcontainers": "^10.15.0",
