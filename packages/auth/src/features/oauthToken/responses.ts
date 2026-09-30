@@ -22,24 +22,6 @@ export const invalidRequest = (h: Hapi.ResponseToolkit) =>
     .header('Cache-Control', 'no-store')
     .code(400)
 
-export const queryParametersDeprecated = (
-  h: Hapi.ResponseToolkit,
-  params: string[]
-) =>
-  h
-    .response({
-      error: 'invalid_request',
-      error_description:
-        `Send OAuth parameters in a form-encoded request body, not in the query ` +
-        `string (got ${params.join(', ')} in the URL). The query string leaks ` +
-        `secrets into access logs and will stop being read; production still ` +
-        `accepts it, non-production no longer does.`,
-      error_uri:
-        'Refer to https://documentation.opencrvs.org/technical/guides/configuration/integrations/authenticate-a-client'
-    })
-    .header('Cache-Control', 'no-store')
-    .code(400)
-
 export const invalidGrantType = (h: Hapi.ResponseToolkit) =>
   h
     .response({
