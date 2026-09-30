@@ -45,6 +45,8 @@ test.describe.serial('Draft created on another device syncs in full', () => {
       timeout: 30000
     })
     await expect(page.locator('#content-name')).toHaveText('Assigned to you')
+
+    page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
   })
 

@@ -106,6 +106,8 @@ test('Birth declaration made offline with a supporting document syncs after reco
   await expect(page.locator('#firstname')).toBeVisible()
   await page.goto(CLIENT_URL)
 
+  page.waitForTimeout(5000)
+
   await mockNetworkConditions(page, 'offline')
 
   await page.click('#header-new-event')

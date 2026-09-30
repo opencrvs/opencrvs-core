@@ -87,6 +87,7 @@ test.describe.serial('Can partially view non-downloaded event offline', () => {
   })
 
   test('Go offline', async () => {
+    page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
   })
 
@@ -159,6 +160,7 @@ test.describe.serial('Can view downloaded event offline', () => {
   })
 
   test('Go offline', async () => {
+    page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
   })
 

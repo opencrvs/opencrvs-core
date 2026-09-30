@@ -95,7 +95,7 @@ test('A PDF attached offline can be previewed offline', async ({ page }) => {
    * which is the whole point of the test.
    */
   let workerRequestedOverNetwork = false
-
+  page.waitForTimeout(5000)
   await page.context().route('**/pdfjs/pdf.worker.min.mjs', (route) => {
     workerRequestedOverNetwork = true
     return route.abort('internetdisconnected')

@@ -26,7 +26,7 @@ import {
   createTRPCContext,
   createTRPCOptionsProxy
 } from '@trpc/tanstack-react-query'
-import { partition } from 'lodash'
+import { partition, throttle } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
@@ -177,6 +177,47 @@ function createIDBPersister(storageIdentifier: string) {
   } satisfies Persister
 }
 
+/**
+ * TL;DR: Throttle cache writes because it is expensive and blocking operation.
+ *
+ * For offline use, we persist all the queries to IndexedDb.
+ * Since we cache all the queries, even if one of them is (re)fetched, it means that the full cache is (re)serialized.
+ * With sufficient amount of events, every page change takes a long time, since each query does this, in a row.
+ * As a side-effect, we won't be able to cache files while we wait for indexed db.
+ *
+ * As we use custom persister, we won't be able to do a drop-in replacement createAsyncStoragePersister library from tan-stack, which would use throttling by default.
+ *
+ * SOLUTION: Throttle cache writes, so queries invoked by the same event are cached more or less together, and do not block other operations.
+ */
+function throttlePersister(persister: Persister): Persister {
+  const persistThrottled = throttle(
+    async (client: PersistedClient) => {
+      try {
+        await persister.persistClient(client)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to persist query cache', error)
+      }
+    },
+    250, // tanstack defaults to 1000
+    { leading: false, trailing: true }
+  )
+
+  // If tab is about to be closed, persist immediately.
+  window.addEventListener('pagehide', () => persistThrottled.flush())
+
+  return {
+    ...persister,
+    persistClient: async (client) => {
+      persistThrottled(client)
+    },
+    removeClient: async () => {
+      persistThrottled.cancel()
+      await persister.removeClient()
+    }
+  }
+}
+
 export const trpcClient = getTrpcClient()
 
 export const queryClient = getQueryClient()
@@ -209,11 +250,16 @@ export function TRPCProvider({
 }) {
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
+  const persister = React.useMemo(
+    () => throttlePersister(createIDBPersister(storeIdentifier)),
+    [storeIdentifier]
+  )
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
-        persister: createIDBPersister(storeIdentifier),
+        persister,
         buster: `persisted-indexed-db-v${CACHE_VERSION}-${userCacheKey}`,
         maxAge: Infinity,
         dehydrateOptions: {
@@ -223,6 +269,7 @@ export function TRPCProvider({
             }
             return query.state.status === 'success'
           },
+
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
