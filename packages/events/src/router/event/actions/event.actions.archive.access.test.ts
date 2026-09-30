@@ -21,7 +21,8 @@ import {
   createSystemTestClient,
   createTestClient,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -31,6 +32,11 @@ const FORBIDDEN_ERROR = 'FORBIDDEN'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
   encodeScope({ type: 'record.archive' })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Archive action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
@@ -123,7 +129,7 @@ describe('Archive action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.archive.accept({
+        confirmationClient.event.actions.archive.accept({
           ...actionPayload,
           content: {
             reason: 'not good'
@@ -134,7 +140,7 @@ describe('Archive action', () => {
 
     test('Prevents system rejecting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.archive.reject(actionPayload)
+        confirmationClient.event.actions.archive.reject(actionPayload)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
   })

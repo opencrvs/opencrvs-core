@@ -33,6 +33,4 @@ spec:
             {{- include "postgres-on-deploy.volumes" . | nindent 10 }}
             {{- include "elasticsearch-reindex.volumes" . | nindent 10 }}
 
-{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
-
 {{- end }}

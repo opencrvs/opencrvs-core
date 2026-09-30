@@ -355,7 +355,7 @@ async function sendCredentialsNotification(
   }
 }
 
-export const ResolvedCreateUserInput = CreateUserInput.extend({
+const ResolvedCreateUserInput = CreateUserInput.extend({
   ...CreateUserInputInternal.shape,
   // Ensure defaults are resolved.
   password: z.string(),

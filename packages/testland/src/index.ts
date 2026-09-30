@@ -84,6 +84,7 @@ import {
   onMosipDeathRegisterHandler,
   onRegisterHandler
 } from './api/registration'
+import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { env } from './environment'
 
 import { workqueueconfigHandler } from './api/workqueue/handler'
@@ -712,6 +713,30 @@ export async function createServer() {
       description:
         'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
     }
+  })
+
+  /*
+   * Core uses a special 'service token' to prove the request originated from core.
+   * The token is only a proof of origin and carries no scopes.
+   *
+   * Action confirmation requests check here that the token is present.
+   */
+  server.ext('onPostAuth', (request, h) => {
+    const isActionConfirmationRequest =
+      request.method === 'post' &&
+      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
+
+    if (
+      isActionConfirmationRequest &&
+      !isServiceToken(request.auth.credentials)
+    ) {
+      logger.warn(
+        'Action confirmation: rejected a request that is not from the core service token'
+      )
+      return h.response({ error: 'forbidden' }).code(403).takeover()
+    }
+
+    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {

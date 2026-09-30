@@ -269,3 +269,8 @@ export function isExpectedAccessError(error: unknown) {
     [401, 403, 404].includes(error.data?.httpStatus)
   )
 }
+
+/** True when a tRPC call was refused outright, as opposed to merely failing. */
+export function isForbiddenError(error: unknown) {
+  return error instanceof TRPCClientError && error.data?.httpStatus === 403
+}

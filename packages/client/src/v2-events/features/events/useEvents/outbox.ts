@@ -72,7 +72,7 @@ export function useOutbox() {
 
         const { eventId, declaration } = parsedVariables.data
         const event = queryClient.getQueryData(
-          trpc.event.get.queryKey({ eventId, waitFor: false })
+          trpc.event.get.queryKey({ eventId })
         )
 
         if (!event) {

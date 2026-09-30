@@ -36,8 +36,8 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
+import { precacheFiles } from '@client/v2-events/cache'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFile } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"
@@ -53,20 +53,17 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       throw new Error('queryFn is not a function')
     }
 
-    const response = await queryOptions.queryFn(...params)
-    const drafts = response.map((draft) => Draft.parse(draft))
+    const drafts = await queryOptions.queryFn(...params)
 
     await Promise.all(
       drafts.map(async (draft) => {
         if (!findLocalEventDocument(draft.eventId)) {
           await queryClient.prefetchQuery({
             queryKey: trpcOptionsProxy.event.get.queryKey({
-              eventId: draft.eventId,
-              waitFor: false
+              eventId: draft.eventId
             }),
             queryFn: trpcOptionsProxy.event.get.queryOptions({
-              eventId: draft.eventId,
-              waitFor: false
+              eventId: draft.eventId
             }).queryFn
           })
         }
@@ -90,9 +87,8 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
         }
 
         const filenames = getFilepathsFromActionDocument([draft.action])
-        await Promise.all(
-          filenames.map(async (filename) => precacheFile(filename))
-        )
+
+        await precacheFiles(filenames)
       })
     )
 

@@ -7,6 +7,12 @@
 # null in values.override.yaml.
 ##################################################################################
 
+network_policy:
+  ingress_mode: deny
+  egress_mode: deny
+  allowed_namespaces:
+    - opencrvs-{{env}}
+
 # Default: storage_type: host_path
 # host_path option is backward compatible with Docker Swarm,
 # configured to use sub-directories within /data folder

@@ -182,7 +182,7 @@ function ReadonlyView() {
   }
 
   const isCachedAsAssigned = queryClient.getQueryData(
-    trpc.event.get.queryKey({ eventId, waitFor: false })
+    trpc.event.get.queryKey({ eventId })
   )
 
   // React Query pauses queries when the browser is offline, so the suspense

@@ -343,6 +343,32 @@ describe('3rd party integration confirmation behaviour', () => {
     expect(currentState.assignedTo).toEqual(undefined)
   })
 
+  test('Records a rejected action when integration responds with 400', async () => {
+    mockActionApi(ActionType.ARCHIVE, 400)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.archive.request(
+      generator.event.actions.archive(event.id)
+    )
+
+    expect(
+      response.actions.find(
+        (action) =>
+          action.type === ActionType.ARCHIVE &&
+          action.status === ActionStatus.Rejected
+      )
+    ).toBeDefined()
+  })
+
   test('Keeps assignment when integration responds with 500', async () => {
     mockActionApi(ActionType.ARCHIVE, 500)
 

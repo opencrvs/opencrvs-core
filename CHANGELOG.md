@@ -8,6 +8,15 @@
 
 `SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
 
+#### `assets/` and the Tilt setup — the upgrade script moves you over
+
+A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
+
+- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
+
+With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
+
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
 **Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
@@ -21,24 +30,34 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
-#### Calling action .accept & .reject endpoints require system user token
+#### Two-factor authentication (2FA) now follows the environment's purpose, not its name
 
-Previously it was possible for the countryconfig to call events API using user's token. This required user to be assigned to the event, which allowed two entities to perform actions under same identity. User is unassigned from the event when system returns 202, and system must request system user token to perform accept or reject actions.
+`environment:init` previously enabled 2FA only for an environment named exactly `production`; every other environment — including `staging`, which hosts a daily restore of real production data, and production environments with a custom name such as `prod` — was generated with `TWO_FA_ENABLED: false`, so logins accepted the fixed test code `000000`.
 
-#### Registration confirmation no longer uses OAuth token exchange
+2FA now derives from the environment's **type/purpose**: it defaults **on** for production environments (`staging`, `production`, and any custom environment whose purpose is "Staging/Production") and **off** for non-production ones (`development`, `qa`, and custom "Development/QA/Testing" environments). `environment:init` now also asks explicitly — "Enable two-factor authentication (2FA)?" — with the correct answer pre-selected; set `TWO_FA_ENABLED` to pre-answer it in non-interactive runs.
+
+#### Confirming an asynchronous action now takes credentials the requester does not have
 
 The `/token` OAuth **token-exchange** grant (`urn:opencrvs:oauth:grant-type:token-exchange`) has been removed, along with the `record.confirm-registration` and `record.reject-registration` scopes it minted. Any authenticated user could exchange their token for a confirmation token targeting an arbitrary event/action, so a low-privilege user (e.g. a field agent) could drive the registration confirm/reject flow on records they should not control.
 
-Confirming an asynchronous action (the `accept`/`reject` endpoints) now requires the **same scope as the action being confirmed** — e.g. `record.register` for a registration — checked with the same event-access rules as requesting the action. There is no separate confirmation scope.
+Confirming an asynchronous action (the `accept`/`reject` endpoints) now takes its **own scope** — the new `record.action.accept` and `record.action.reject` — rather than the scope of the action being confirmed. The action's own scope (e.g. `record.register`) no longer grants confirmation to anyone, including system clients.
+
+This restores the requester/confirmer separation: without it, whoever holds `record.register` could request a registration and immediately `accept` it themselves, choosing the registration number and overriding the reviewed declaration, without the country configuration being involved. Three further rules back it up:
+
+- **`accept`/`reject` require a system client's token.** Previously the country configuration could call the events API with the user's token. That required the user to be assigned to the event, which allowed two entities to act under the same identity. A human token is now refused outright, whatever scopes it carries.
+- **A confirmation is refused while a user holds the assignment.** The user is unassigned from the event when the country configuration returns 202, so this normally does not arise; it surfaces when someone assigns themselves while a confirmation is still pending.
+- **`accept`/`reject` refuse any `actionId` that is not a pending action of the matching type**, so a confirmation cannot be pointed at an arbitrary action to manufacture an accepted one.
+
+**These scopes must not be granted to a user role.** A caller that can both request an action and confirm it needs no country configuration to register a record. Core does not enforce this — grant them only to integrations.
 
 Integrations that confirm registrations (e.g. MOSIP) must therefore:
 
-- **be issued an OpenCRVS system client that holds the action's scope** (e.g. `record.register`) on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time;
+- **be issued an OpenCRVS system client that holds `record.action.accept` (and `record.action.reject`, if it rejects)** on the Integrations page, and authenticate the callback with their own `client_credentials` token — they no longer exchange the token issued at registration time. These replace the action scopes confirmation used to be checked against, so a client that only confirms no longer needs `record.register` or `record.correct`
 - **include `eventId` in the MOSIP interop payload** (`MosipInteropPayloadSchema`). It previously travelled inside the exchanged token; countryconfig must now populate it when calling `mosip-api`'s `/events/registration`.
 
-`mosip-api` now **requires `OPENCRVS_CLIENT_ID` and `OPENCRVS_CLIENT_SECRET`** and fails fast on startup (exit code 1) if the system client cannot authenticate or is missing `record.register`. It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
+`mosip-api` checks its OpenCRVS system client on startup and exits with code 1 if it is missing `record.action.accept` or `record.read`. It does the same when the client cannot authenticate at all, but **only in production** — elsewhere it logs a warning and retries every 3 seconds indefinitely, so a misconfigured `OPENCRVS_CLIENT_ID` / `OPENCRVS_CLIENT_SECRET` shows up as a hang rather than a crash (both default to an empty string and are not validated at startup). It no longer stores confirmation tokens in its SQLite database (only the `eventId` ↔ MOSIP transaction correlation); the legacy `token` column is migrated automatically on first start.
 
-The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` is removed.
+The auth env var `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` (added in 1.9.12) has been **removed**. The token core sends to the country configuration is an internal service token that only proves the request came from core — it carries no scopes, so a country configuration confirming asynchronously must use its own system client's credentials for the `accept`/`reject` call. It lives for `CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS` like core's other service-to-service tokens, so there is no separate knob to configure. Anyone who set the old variable can drop it.
 
 #### Document presign requests are no longer authorized by scope alone
 
@@ -270,6 +289,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 - Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+- Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
 
 ## 2.0.2
 

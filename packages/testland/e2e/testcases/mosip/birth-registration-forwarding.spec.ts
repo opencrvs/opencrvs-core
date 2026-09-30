@@ -12,49 +12,51 @@ import { expect, test } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { omit } from 'lodash'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
-import { getToken } from '@e2e/support/helpers'
+import { getToken, login } from '@e2e/support/helpers'
 import {
   createDeclaration,
-  getDeclaration,
-  type Declaration
+  getDeclaration
 } from '@e2e/support/test-data/birth-declaration'
+import {
+  navigateToCertificatePrintAction,
+  selectCertificationType,
+  selectRequesterType
+} from '@e2e/support/print-certificate/birth/helpers'
 
 async function getEventById(eventId: string, token: string) {
   const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
   return client.event.get.query({ eventId })
 }
 
-test.describe.serial('Birth registration forwarding to MOSIP', () => {
-  let token: string
-  let declaration: Declaration
-  let eventId: string
+test('Birth registration forwarding to MOSIP attributes the certificate to the registrar', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async () => {
-    token = await getToken(CREDENTIALS.REGISTRAR)
+  const { declaration, eventId } =
+    await test.step('register a birth via the MOSIP forwarding flow (accepted asynchronously)', async () => {
+      const declarationForMosipForwarding = await getDeclaration({
+        token,
+        partialDeclaration: {
+          'mother.verified': 'authenticated'
+        }
+      })
 
-    const declarationForMosipForwarding = await getDeclaration({
-      token,
-      partialDeclaration: {
-        'mother.verified': 'authenticated'
-      }
+      const res = await createDeclaration(
+        token,
+        omit(declarationForMosipForwarding, ['mother.idType', 'mother.nid'])
+      )
+
+      // No registration number synchronously — MOSIP accepts it asynchronously.
+      expect(res.registrationNumber).toBeUndefined()
+      expect(
+        (res.declaration as Record<string, unknown>)['mother.verified']
+      ).toBe('authenticated')
+
+      return { declaration: res.declaration, eventId: res.eventId }
     })
 
-    const res = await createDeclaration(
-      token,
-      omit(declarationForMosipForwarding, ['mother.idType', 'mother.nid'])
-    )
-
-    declaration = res.declaration
-    eventId = res.eventId
-
-    expect(res.registrationNumber).toBeUndefined()
-  })
-
-  test('register action is requested then accepted through MOSIP flow', async () => {
-    expect((declaration as Record<string, unknown>)['mother.verified']).toBe(
-      'authenticated'
-    )
-
+  await test.step('register action is requested then accepted through MOSIP flow', async () => {
     await expect
       .poll(
         async () => {
@@ -86,5 +88,27 @@ test.describe.serial('Birth registration forwarding to MOSIP', () => {
         }
       )
       .toBe(true)
+  })
+
+  await test.step('log in as the registrar', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+  })
+
+  await test.step('open the birth certificate preview', async () => {
+    await page.getByRole('button', { name: 'Pending certification' }).click()
+    await navigateToCertificatePrintAction(
+      page,
+      declaration,
+      CREDENTIALS.REGISTRAR
+    )
+    await selectCertificationType(page, 'Birth Certificate')
+    await selectRequesterType(page, 'Print and issue to Informant (Mother)')
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Verified' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  })
+
+  await test.step('"Registered by" shows the registrar who requested the registration', async () => {
+    await expect(page.locator('#print')).toContainText('Kennedy Mweene')
   })
 })

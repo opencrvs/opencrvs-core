@@ -186,7 +186,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
 }
 
 export function findLocalEventDocument(eventId: string) {
-  return getQueryData(trpcOptionsProxy.event.get, { eventId, waitFor: false })
+  return getQueryData(trpcOptionsProxy.event.get, { eventId })
 }
 
 /*
@@ -230,7 +230,7 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 
 export function setEventData(id: string, data: EventDocument) {
   queryClient.setQueryData(
-    trpcOptionsProxy.event.get.queryKey({ eventId: id, waitFor: false }),
+    trpcOptionsProxy.event.get.queryKey({ eventId: id }),
     data
   )
 
@@ -285,10 +285,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
 
   queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey({
-      eventId: id,
-      waitFor: false
-    })
+    queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
   })
 
   /* When event is created, We derive local cache for search query from that (event with no declaration data).

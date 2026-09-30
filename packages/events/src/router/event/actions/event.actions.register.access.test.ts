@@ -24,7 +24,8 @@ import {
   createTestClient,
   seedEvent,
   setupTestCase,
-  TEST_SYSTEM_ID
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 
 const ASSIGNED_ERROR = 'User is assigned to this event'
@@ -32,6 +33,11 @@ const FORBIDDEN_ERROR = 'FORBIDDEN'
 const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
   encodeScope({ type: 'record.register' })
 ])
+
+const confirmationClient = createSystemTestClient(
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
+)
 
 describe('Register action', () => {
   test('Prevents system requesting the action when it is assigned to a user', async () => {
@@ -93,7 +99,7 @@ describe('Register action', () => {
 
     test('Prevents system accepting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.register.accept({
+        confirmationClient.event.actions.register.accept({
           ...actionPayload,
           registrationNumber: '12HZND4'
         })
@@ -102,7 +108,7 @@ describe('Register action', () => {
 
     test('Prevents system rejecting the action when it is assigned to a user', async () => {
       await expect(
-        systemClient.event.actions.register.reject(actionPayload)
+        confirmationClient.event.actions.register.reject(actionPayload)
       ).rejects.toThrow(ASSIGNED_ERROR)
     })
   })

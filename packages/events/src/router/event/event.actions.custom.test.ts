@@ -27,7 +27,9 @@ import {
   setupTestCase,
   UNSTABLE_EVENT_FIELDS,
   createTestClient,
-  createCountryConfigClient
+  createSystemTestClient,
+  TEST_SYSTEM_ID,
+  CONFIRMATION_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -323,11 +325,9 @@ describe('event.actions.custom', () => {
     })
 
     test('should successfully accept a previously requested action', async () => {
-      const { client, payload, user } = await initialiseTest([
+      const { client, payload } = await initialiseTest([
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
-
-      const eventId = payload.eventId
 
       mockCustomActionApi(202)
 
@@ -340,10 +340,9 @@ describe('event.actions.custom', () => {
         'Could not find id for custom action'
       )
 
-      const countryConfigClient = createCountryConfigClient(
-        user,
-        eventId,
-        originalActionId
+      const countryConfigClient = createSystemTestClient(
+        TEST_SYSTEM_ID,
+        CONFIRMATION_SCOPES
       )
 
       const response = await countryConfigClient.event.actions.custom.accept({
@@ -355,6 +354,48 @@ describe('event.actions.custom', () => {
       expect(
         sanitizeForSnapshot(response, UNSTABLE_EVENT_FIELDS)
       ).toMatchSnapshot()
+    })
+
+    test('rejects confirming a pending custom action as a different custom action type', async () => {
+      const { client, payload, generator } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      mockCustomActionApi(202)
+
+      const requestResponse = await client.event.actions.custom.request(payload)
+
+      const originalActionId = getOrThrow(
+        requestResponse.actions.find(
+          (action) => action.type === ActionType.CUSTOM
+        )?.id,
+        'Could not find id for custom action'
+      )
+
+      const createAction = requestResponse.actions.filter(
+        (action) => action.type === ActionType.CREATE
+      )
+
+      const assignmentInput = generator.event.actions.assign(payload.eventId, {
+        assignedTo: createAction[0].createdBy
+      })
+      await client.event.actions.assignment.assign(assignmentInput)
+
+      const countryConfigClient = createSystemTestClient(
+        TEST_SYSTEM_ID,
+        CONFIRMATION_SCOPES
+      )
+
+      // The pending action is CUSTOM_ACTION_TYPE; confirming it under a
+      // different customActionType must be refused rather than silently recorded.
+      await expect(
+        countryConfigClient.event.actions.custom.accept({
+          ...payload,
+          customActionType: 'A_DIFFERENT_CUSTOM_ACTION',
+          transactionId: getUUID(),
+          actionId: originalActionId
+        })
+      ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
     })
   })
 
@@ -442,6 +483,24 @@ describe('event.actions.custom', () => {
       expect(currentState.flags).toEqual(['custom:requested'])
       expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
       expect(currentState.assignedTo).toEqual(undefined)
+    })
+
+    test('Records a rejected action when integration responds with 400', async () => {
+      mockActionApi(ActionType.CUSTOM, 400)
+
+      const { client, payload } = await initialiseTest([
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      ])
+
+      const response = await client.event.actions.custom.request(payload)
+
+      expect(
+        response.actions.find(
+          (action) =>
+            action.type === ActionType.CUSTOM &&
+            action.status === ActionStatus.Rejected
+        )
+      ).toBeDefined()
     })
 
     test('Keeps assignment when integration responds with 500', async () => {

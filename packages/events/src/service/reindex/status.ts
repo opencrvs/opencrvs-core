@@ -20,8 +20,13 @@ import {
 // ---------------------------------------------------------------------------
 
 const ReindexingProgressSchema = z.object({
-  processed: z.number().int()
+  processed: z.number().int(),
+  // Runs recorded before skipping was introduced have neither field
+  skipped: z.number().int().default(0),
+  errors: z.array(z.string()).default([])
 })
+
+export type ReindexingProgress = z.infer<typeof ReindexingProgressSchema>
 
 export const ReindexingStatusSchema = z.object({
   id: z.string().uuid(),
@@ -56,7 +61,9 @@ async function ensureReindexingStatusIndexExists(): Promise<void> {
             progress: {
               type: 'object',
               properties: {
-                processed: { type: 'integer' }
+                processed: { type: 'integer' },
+                skipped: { type: 'integer' },
+                errors: { type: 'text' }
               }
             },
             error_message: { type: 'text' },
@@ -91,7 +98,7 @@ export async function createReindexingStatusEntry(
       id,
       timestamp,
       status: 'running',
-      progress: { processed: 0 },
+      progress: { processed: 0, skipped: 0, errors: [] },
       error_message: null,
       completed_at: null
     },
@@ -101,16 +108,14 @@ export async function createReindexingStatusEntry(
 
 export async function updateReindexingProgress(
   id: string,
-  processed: number
+  progress: ReindexingProgress
 ): Promise<void> {
   const client = getOrCreateClient()
 
   await client.update({
     index: getReindexingStatusIndexName(),
     id,
-    doc: {
-      progress: { processed }
-    }
+    doc: { progress }
   })
 }
 

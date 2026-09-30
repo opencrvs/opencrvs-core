@@ -15,8 +15,10 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
+  Action,
   ActionDocument,
   ActionInputWithType,
+  ActionStatus,
   ActionType,
   DeleteActionInput,
   getAssignedUserFromActions,
@@ -25,7 +27,6 @@ import {
   WorkqueueCountInput,
   UUID,
   EventDocument,
-  getTokenPayload,
   getCurrentEventState,
   EventInput,
   RecordScopeTypeV2,
@@ -159,17 +160,8 @@ export const EventIdParam = z.object({
   eventId: UUID,
   customActionType: z.string().optional()
 })
-export const EventIdParamWithWaitFor = EventIdParam.extend({
-  waitFor: z
-    .boolean()
-    .default(true)
-    .describe(
-      'Whether the action should wait for the event to be indexed before returning. Defaults to true. Setting this to false completes faster but might lead to stale data in the client if the client tries to read the event immediately after performing the action. Use with care.'
-    )
-})
 
 export type EventIdParam = z.infer<typeof EventIdParam>
-export type EventIdParamWithWaitFor = z.infer<typeof EventIdParamWithWaitFor>
 
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
@@ -260,7 +252,6 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     TrpcContext & { eventId: UUID; eventType: string },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
-    const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
@@ -276,13 +267,6 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
     if (!input) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
-    }
-
-    if (grantedEventId && grantedEventId !== input.eventId) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Token does not grant access to this event'
-      })
     }
 
     const event = await getEventById(input.eventId)
@@ -309,6 +293,89 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
         acceptedScopes,
         eventId: input.eventId,
         eventType: event.type
+      }
+    })
+  }
+
+  return fn
+}
+
+const ActionConfirmationParams = z.object({
+  eventId: UUID,
+  actionId: UUID,
+  // Present on custom-action `accept` (see `CustomActionInput`); absent on
+  // `reject`, which records no custom action type. Verified against the pending
+  // action below so a confirmer cannot accept one custom action as another.
+  customActionType: z.string().optional()
+})
+
+/**
+ * Resolves the action an accept/reject call names, and refuses anything other
+ * than the pending action of the matching type.
+ *
+ * Passes the event and the two actions on in context so the handler does not
+ * fetch and scan them a second time.
+ */
+export function requireConfirmableAction(actionType: ActionType) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & {
+      event: EventDocument
+      originalAction: Action
+      confirmationAction?: Action
+    },
+    unknown
+  > = async ({ ctx, next, getRawInput }) => {
+    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const event = await getEventById(input.eventId)
+    const originalAction = event.actions.find(({ id }) => id === input.actionId)
+
+    if (!originalAction) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Action not found.' })
+    }
+
+    if (originalAction.status !== ActionStatus.Requested) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is not awaiting confirmation.`
+      })
+    }
+
+    if (originalAction.type !== actionType) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is of type ${originalAction.type}, cannot be confirmed as ${actionType}.`
+      })
+    }
+
+    // For custom actions the type above is always CUSTOM, so it does not distinguish one custom action from another.
+    // The accepted action records the caller's `customActionType` we can use instead.
+    if (
+      originalAction.type === ActionType.CUSTOM &&
+      input.customActionType !== undefined &&
+      input.customActionType !== originalAction.customActionType
+    ) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Action ${originalAction.id} is custom action ${originalAction.customActionType}, cannot be confirmed as ${input.customActionType}.`
+      })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        event,
+        originalAction,
+        confirmationAction: event.actions.find(
+          ({ originalActionId }) => originalActionId === input.actionId
+        )
       }
     })
   }
