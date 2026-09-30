@@ -94,4 +94,6 @@ data:
             items:
               - key: ssh_key
                 path: .ssh/id_rsa
+
+{{ include "network-policy-rules" (dict "service_name" "postgres-restore-runner" "Values" .Values) }}
 {{- end }}
