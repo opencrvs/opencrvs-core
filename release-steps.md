@@ -4,11 +4,12 @@
 flowchart TD
     subgraph PRE["Prerequisites — both repos"]
         P1[Verify no open PRs pending for release]
-        P2["release/X.Y.Z branch exists in opencrvs-core+infrastructure repos\nPR'd to master and develop"]
-        P3[CI passing on all PRs]
-        P4["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
-        P5[CountryConfig already using latest pre-release toolkit version]
-        P1 --> P2 --> P3 --> P4 --> P5
+        P2["Run init-release workflow\nhttps://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml"]
+        P3["release/X.Y.Z branch exists in opencrvs-core + infrastructure\nPR'd to develop"]
+        P4[CI passing on all PRs]
+        P5["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
+        P6[countryconfig already using latest pre-release toolkit version]
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6
     end
 
     subgraph CORE["opencrvs-core"]
@@ -29,26 +30,16 @@ flowchart TD
     end
 
     subgraph IF["Infrastructure"]
-        IF1["Update reference to helm chart `version` in workflows"]
-        IF2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
-        IF3[Create draft release]
-        IF4[Paste CHANGELOG.md to GitHub release]
-        IF5["Paste copy items to release notes\n(generate with notebook)"]
-        IF6[Publish GitHub release]
-        IF1 --> IF2 --> IF3 --> IF4 --> IF5 --> IF6
-    end
-
-    subgraph POST["Post-release"]
-        POST1[Merge both release branches into master + develop simultaneously]
-        POST2["Create release/X.Y.Z+1 from release/X.Y.Z in both repos"]
-        POST3["Commit version bump on new release branches"]
-        POST4["PR new branches into master + develop in both repos\n⚠️ init-release.yml may help with POST2–POST4 (unverified)"]
-        POST1 --> POST2 --> POST3 --> POST4
+        IF1["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
+        IF2[Create draft release]
+        IF3[Paste CHANGELOG.md to GitHub release]
+        IF4["Paste copy items to release notes\n(generate with notebook)"]
+        IF5[Publish GitHub release]
+        IF1 --> IF2 --> IF3 --> IF4 --> IF5
     end
 
     PRE --> CORE
     CORE --> IF
-    IF --> POST
 ```
 
 ## Links
