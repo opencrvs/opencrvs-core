@@ -393,16 +393,17 @@ jobs:
           NODE_ENV: production
         run: pnpm run build-storybook --webpack-stats-json
 
+      # Tarred rather than handing upload-artifact the tree: its file search
+      # took ~3 minutes to find ~4k files, most likely by walking pnpm's
+      # symlinked node_modules despite the exclude. Tar also keeps file modes.
+      - name: Archive filesystem
+        run: tar --exclude=.git --exclude=node_modules --exclude=./.nx -cf "$RUNNER_TEMP/client.tar" .
+
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v7
         with:
           name: client
-          include-hidden-files: true
-          path: |
-            .
-            !**/.git
-            !**/node_modules
-            !.nx
+          path: ${{ runner.temp }}/client.tar
 
   lint-client:
     name: Lint client
@@ -414,7 +415,10 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -469,7 +473,10 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -520,7 +527,10 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -564,7 +574,10 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
