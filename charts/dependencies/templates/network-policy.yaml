@@ -135,8 +135,15 @@ metadata:
   name: {{ $app }}-allow-{{ $type }}-server-egress
 spec:
   podSelector:
-    matchLabels:
-      app: {{ $app }}
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - {{ $app }}
+          {{- /* Differential postgres restore runs pgBackRest in a separate runner pod */}}
+          {{- if and (eq $app "postgres") (eq $type "restore") (eq $.Values.postgres.restore.type "differential") }}
+          - postgres-restore-runner
+          {{- end }}
   policyTypes:
     - Egress
   egress:
