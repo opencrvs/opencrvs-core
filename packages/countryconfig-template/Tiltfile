@@ -18,29 +18,54 @@ core_charts_dir = ".opencrvs-core-charts"
 
 core_repo_url = 'https://github.com/opencrvs/opencrvs-core.git'
 
-print("Cloning OpenCRVS Helm charts from {}...".format(core_repo_url))
-local("""
-  rm -rf {core_charts_dir}
-  git clone \
-    --depth 1 \
-    --filter=blob:none \
-    --sparse \
-    --branch {core_ref} \
-    {core_repo_url} \
-    {core_charts_dir}
-
-  cd {core_charts_dir}
-  git sparse-checkout set charts
-""".format(
-  core_ref=core_ref,
-  core_charts_dir=core_charts_dir,
-  core_repo_url=core_repo_url
-))
+# Tilt re-evaluates this file on every reload, so clone only once per ref.
+# Delete the directory (or change OPENCRVS_CORE_REF) to fetch the charts again.
+core_charts_marker = "{}/.tilt-ref-{}".format(core_charts_dir, core_ref.replace("/", "_"))
+if not os.path.exists(core_charts_marker):
+  print("Cloning OpenCRVS Helm charts ({}) from {}...".format(core_ref, core_repo_url))
+  # set -e and git -C: a failed clone must never leave git running in the country config repository
+  local("""
+    set -e
+    rm -rf {core_charts_dir}
+    git clone \
+      --depth 1 \
+      --filter=blob:none \
+      --sparse \
+      --branch {core_ref} \
+      {core_repo_url} \
+      {core_charts_dir}
+    git -C {core_charts_dir} sparse-checkout set charts
+    touch {core_charts_marker}
+  """.format(
+    core_ref=core_ref,
+    core_charts_dir=core_charts_dir,
+    core_repo_url=core_repo_url,
+    core_charts_marker=core_charts_marker
+  ))
+else:
+  print("Using OpenCRVS Helm charts ({}) from {}".format(core_ref, core_charts_dir))
 
 if not os.path.exists('{core_charts_dir}/charts/dependencies'.format(core_charts_dir=core_charts_dir)) or not os.path.exists('{core_charts_dir}/charts/opencrvs-services'.format(core_charts_dir=core_charts_dir)):
   fail('Something went wrong while cloning infrastructure repository!')
 
 load('./tilt/opencrvs.tilt', 'setup_opencrvs')
+
+# FIXME: in future releases remove this check and require pnpm only, as yarn is deprecated
+# Package manager follows the lockfile, so country configs still on yarn keep working
+if os.path.exists('pnpm-lock.yaml'):
+  package_manager = 'pnpm'
+  startup_command = 'start:tilt'
+  lockfile = 'pnpm-lock.yaml'
+elif os.path.exists('yarn.lock'):
+  package_manager = 'yarn'
+  startup_command = 'start:prod'
+  lockfile = 'yarn.lock'
+else:
+  fail('No pnpm-lock.yaml or yarn.lock found, install dependencies before running Tilt')
+
+dependency_files = ['./' + lockfile]
+if os.path.exists('.pnpmfile.cjs'):
+  dependency_files.append('./.pnpmfile.cjs')
 
 # Build countryconfig image
 docker_build(
@@ -48,18 +73,16 @@ docker_build(
   ".",
   dockerfile="Dockerfile",
   network="host",
-  entrypoint=["pnpm", "start:tilt"],
+  entrypoint=[package_manager, startup_command],
   only=[
     './src',
     './package.json',
-    './pnpm-lock.yaml',
-    './.pnpmfile.cjs',
     './tsconfig.json',
     './Dockerfile'
-  ],
+  ] + dependency_files,
   live_update=[
     # Fallback to full rebuild if dependencies change
-    fall_back_on(['package.json', 'pnpm-lock.yaml', 'Dockerfile']),
+    fall_back_on(['package.json', lockfile, 'Dockerfile']),
     # Sync source code changes
     sync('./src', '/usr/src/app/src'),
   ]

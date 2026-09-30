@@ -1,12 +1,40 @@
 # Changelog
 
-## 2.1.0 Release Candidate
+## 2.2.0 Release Candidate
+
+### Breaking changes
+
+#### `POST /auth/token` no longer accepts parameters in the query string
+
+The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) has been removed. Sending `client_secret` in the URL leaks it into access logs and Sentry breadcrumbs (CWE-598). Parameters are now read only from the request body (form-encoded or JSON), and the gateway no longer forwards the query string. Requests that still use the URL fail with `unsupported_grant_type`.
+
+Integrations using the `client_credentials` grant must send `grant_type`, `client_id` and `client_secret` in the body:
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
+
+## 2.1.0
 
 ### Upgrade guidance
 
 #### Sentry — nothing to do, the upgrade script removes it
 
 `SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
+#### `assets/` and the Tilt setup — the upgrade script moves you over
+
+A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
+
+- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
+
+With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
 
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 

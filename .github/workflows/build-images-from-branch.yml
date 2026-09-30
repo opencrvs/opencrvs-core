@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: ${{ (inputs.build_arm == true && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) || fromJSON('["ubuntu-26.04"]') }}
+        runner: ${{ ((inputs.build_arm == true || startsWith(github.ref, 'refs/tags/')) && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) || fromJSON('["ubuntu-26.04"]') }}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v6
@@ -180,7 +180,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: ${{
-          (inputs.build_arm == true && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) ||
+          ((inputs.build_arm == true || startsWith(github.ref, 'refs/tags/')) && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) ||
           fromJSON('["ubuntu-26.04"]')
           }}
         service: ${{ fromJSON(needs.base.outputs.services) }}
@@ -282,7 +282,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: ${{
-          (inputs.build_arm == true && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) ||
+          ((inputs.build_arm == true || startsWith(github.ref, 'refs/tags/')) && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) ||
           fromJSON('["ubuntu-26.04"]')
           }}
     runs-on: ${{ matrix.runner }}
@@ -376,7 +376,7 @@ jobs:
 
       - name: Create and push multi-arch manifest
         env:
-          BUILD_ARM: ${{ inputs.build_arm == true }}
+          BUILD_ARM: ${{ inputs.build_arm == true || startsWith(github.ref, 'refs/tags/') }}
         run: |
           REPO="$CONTAINER_REGISTRY/ocrvs-testland"
 
