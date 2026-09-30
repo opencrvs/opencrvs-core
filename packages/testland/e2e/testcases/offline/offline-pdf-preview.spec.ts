@@ -96,14 +96,15 @@ test('A PDF attached offline can be previewed offline', async ({ page }) => {
    */
   let workerRequestedOverNetwork = false
 
+  // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
+  // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
+  await page.waitForTimeout(5000)
+
   await page.context().route('**/pdfjs/pdf.worker.min.mjs', (route) => {
     workerRequestedOverNetwork = true
     return route.abort('internetdisconnected')
   })
 
-  // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
-  // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
-  await page.waitForTimeout(2000)
   await mockNetworkConditions(page, 'offline')
 
   await test.step('Start a birth declaration and continue past every page', async () => {

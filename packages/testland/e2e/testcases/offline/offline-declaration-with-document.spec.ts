@@ -107,8 +107,8 @@ test('Birth declaration made offline with a supporting document syncs after reco
   await page.goto(CLIENT_URL)
 
   // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
-  // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
-  await page.waitForTimeout(2000)
+  // Wait for ten seconds (we are simulating slow connection) to allow for caching to complete and resemble 'real life' scenario.
+  await page.waitForTimeout(10000)
 
   await mockNetworkConditions(page, 'offline')
 
