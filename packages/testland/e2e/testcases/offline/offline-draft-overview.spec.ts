@@ -57,6 +57,9 @@ test.describe.serial('Can Open Draft offline', () => {
   })
 
   test('Open the draft offline', async () => {
+    // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
+    // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
+    await page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
     await page.getByRole('button', { name: 'Drafts' }).click()
     await expect(page.locator('#content-name')).toHaveText('Drafts')

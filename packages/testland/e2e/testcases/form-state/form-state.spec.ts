@@ -183,12 +183,11 @@ test.describe('Form state', () => {
     test('Form changes in correction are persisted after reload', async () => {
       const updatedMotherName = faker.person.firstName('female')
       expect(declaration).toBeDefined()
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration!,
-        CREDENTIALS.REGISTRAR
-      )
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Print')
+
       await selectRequesterType(page, 'Print and issue to Informant (Mother)')
       await continueForm(page)
       await page.getByRole('button', { name: 'Verified' }).click()

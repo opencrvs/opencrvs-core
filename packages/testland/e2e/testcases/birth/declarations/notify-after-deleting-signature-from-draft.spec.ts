@@ -87,7 +87,7 @@ test('Community leader notifies a birth after deleting a previously persisted si
     const draftResponse = page.waitForResponse(
       (res) => res.url().includes('event.draft.create') && res.ok()
     )
-    await page.getByRole('button', { name: 'Save & Exit' }).click()
+
     await page.getByRole('button', { name: 'Confirm' }).click()
     await draftResponse
   })

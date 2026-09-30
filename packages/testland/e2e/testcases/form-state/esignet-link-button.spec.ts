@@ -11,17 +11,22 @@
 import { Page, expect, test } from '@playwright/test'
 import { goToSection, login } from '@e2e/support/helpers'
 import { openBirthDeclaration } from '@e2e/support/birth/helpers'
+import { CLIENT_URL } from '@e2e/support/constants'
 
 async function authenticateInformantWithESignet(page: Page) {
   await page.locator('#informant____verify').click()
 
   // Only tested with mosip-mock so far
   // https://github.com/opencrvs/mosip/blob/release-v1.8.0/packages/esignet-mock/src/index.ts#L166
-  await expect(page).toHaveURL(/authorize/)
+  await page.waitForURL(/authorize/)
   // https://github.com/opencrvs/mosip/blob/release-v1.8.0/docs/mock-identities.json#L24
   await page.locator('#id-input').fill('1234567892')
   await page.locator('#authenticate').click()
-  await expect(page).not.toHaveURL(/authorize/)
+
+  // Wait until we are back on the app, not just away from eSignet
+  await page.waitForURL((url) => url.origin === new URL(CLIENT_URL).origin, {
+    waitUntil: 'load'
+  })
 }
 
 test.describe
