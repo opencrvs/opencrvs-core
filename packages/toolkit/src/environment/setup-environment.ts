@@ -653,6 +653,7 @@ export async function runSetupEnvironment() {
     })
     restoreType = await select({
       message: `Select ${kleur.yellow().bold(restoreEnvironmentName)} environment backup mode`,
+      default: restoreType,
       choices: [
         {
           name: 'Full dump (daily full database backup)',
@@ -1035,6 +1036,19 @@ export async function runSetupEnvironment() {
       ),
       didExist: findExistingValue(
         'RESTORE_HOST',
+        'VARIABLE',
+        'ENVIRONMENT',
+        existingValues
+      ),
+      scope: 'ENVIRONMENT' as const
+    },
+    {
+      type: 'VARIABLE' as const,
+      name: 'RESTORE_ENVIRONMENT_MODE',
+      // Only persist the mode when restore is configured
+      value: restoreEnvironmentName ? restoreType : '',
+      didExist: findExistingValue(
+        'RESTORE_ENVIRONMENT_MODE',
         'VARIABLE',
         'ENVIRONMENT',
         existingValues

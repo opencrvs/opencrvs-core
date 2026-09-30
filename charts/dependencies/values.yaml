@@ -227,6 +227,27 @@ postgres:
     # Host:
     # host: backup server hostname or IP
 
+# Network policy for the pgBackRest runner pod created by the differential
+# postgres-restore job. Like postgres, it installs pgbackrest/openssh-client
+# at runtime, so it needs package repository egress.
+postgres_restore_runner:
+  network_policy:
+    # Must match the runner pod label in postgres-restore-job-configmap.yaml
+    app_label: postgres-restore-runner
+    rules:
+      - name: allow-package-repo-egress
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 443
+
 # Elasticsearch Configuration
 elasticsearch:
   # Enable Elasticsearch deployment.
