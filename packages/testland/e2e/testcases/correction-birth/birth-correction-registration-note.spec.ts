@@ -16,13 +16,13 @@ import {
   getToken,
   login,
   searchFromSearchBar,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  waitForActionResponses
 } from '@e2e/support/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
-  selectAction,
-  waitForCorrectionAction
+  selectAction
 } from '@e2e/support/utils'
 import {
   fillChildDetails,
@@ -33,7 +33,6 @@ import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration-with-mother-father'
-import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 const REGISTRATION_NOTE = '#child____registrationNote'
 
@@ -144,12 +143,16 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
     await expectInUrl(page, `/events/request-correction/${eventId}/summary`)
 
-    await page.getByRole('button', { name: 'Correct' }).click()
+    await page.getByRole('button', { name: 'Correct record' }).click()
     await expect(page.getByText('Correct record?')).toBeVisible()
 
-    await waitForCorrectionAction(page, 'approve', async () => {
-      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-    })
+    await waitForActionResponses(
+      page,
+      ['event.actions.correction.request', 'event.actions.correction.approve'],
+      async () => {
+        await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+      }
+    )
 
     await expectInUrl(page, `/events/${eventId}`)
   })
