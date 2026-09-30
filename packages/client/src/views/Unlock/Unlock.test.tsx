@@ -65,10 +65,10 @@ describe('Unlock page loads Properly', () => {
       Promise.resolve(indexedDB[key])
     )
 
-    storage.setItem = vi.fn<[string]>(
+    storage.setItem = vi.fn(
       // @ts-ignore
       async (key: string, value: string) => (indexedDB[key] = value)
-    )
+    ) as unknown as typeof storage.setItem
 
     const { store } = createStore()
     ;({ component: testComponent } = await createTestComponent(
@@ -174,10 +174,10 @@ describe('Pin locked session', () => {
       Promise.resolve(indexedDB[key])
     )
 
-    storage.setItem = vi.fn<[string]>(
+    storage.setItem = vi.fn(
       // @ts-ignore
       async (key: string, value: string) => (indexedDB[key] = value)
-    )
+    ) as unknown as typeof storage.setItem
 
     const { store } = createStore()
     ;({ component: testComponent } = await createTestComponent(

@@ -131,7 +131,7 @@ export function validateActionFlags(
   // Validate that all referenced action flags are configured in the event flags array.
   const configuredFlagIds = event.flags.map((flag) => flag.id)
   const actionFlagIds = event.actions.flatMap((action) =>
-    action.flags.map((flag) => flag.id)
+    (action.flags ?? []).map((flag) => flag.id)
   )
 
   for (const actionFlagId of actionFlagIds) {

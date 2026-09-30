@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import { Icon, Button as UiButton, Text } from '@opencrvs/components'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import { ButtonConfiguration } from '@opencrvs/commons/client'
+
 export function throwIfUnsupportedIcon(icon: string) {
   if (icon in SupportedIcons) {
     return icon as keyof typeof SupportedIcons

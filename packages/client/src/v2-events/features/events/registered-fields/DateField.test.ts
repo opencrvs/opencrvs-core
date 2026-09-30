@@ -10,10 +10,18 @@
  */
 
 import { createIntl } from 'react-intl'
+import { toPlainDate } from '@opencrvs/commons/client'
 import { DateField } from './DateField'
 
 const intl = createIntl({ locale: 'en' })
-const context = { intl, locations: new Map(), administrativeAreas: new Map() }
+// Date fields don't resolve locations, so the anchor is inert here — but the
+// shared stringifier context requires it.
+const context = {
+  intl,
+  locations: new Map(),
+  administrativeAreas: new Map(),
+  anchor: toPlainDate('2021-01-01')
+}
 
 describe.each([
   { name: 'stringify', fn: DateField.stringify },

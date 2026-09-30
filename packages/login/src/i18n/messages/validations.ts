@@ -8,38 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MessageDescriptor, defineMessages } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IValidationMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  required: MessageDescriptor
-  minLength: MessageDescriptor
-  numberRequired: MessageDescriptor
-  phoneNumberFormat: MessageDescriptor
-  emailAddressFormat: MessageDescriptor
-  mobilePhoneRegex: MessageDescriptor
-  mobileNumberFormat: MessageDescriptor
-  requiredSymbol: MessageDescriptor
-}
-
-const messagesToDefine: IValidationMessages = {
-  required: {
-    id: 'validations.required',
-    defaultMessage: 'Required',
-    description: 'The error message that appears on required fields'
-  },
-  minLength: {
-    id: 'validations.minLength',
-    defaultMessage: 'Must be {min} characters or more',
-    description:
-      'The error message that appears on fields with a minimum length'
-  },
-  numberRequired: {
-    id: 'validations.numberRequired',
-    defaultMessage: 'Must be number',
-    description:
-      'The error message that appears on fields where the value must be number'
-  },
+export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
@@ -50,25 +21,5 @@ const messagesToDefine: IValidationMessages = {
     id: 'validations.emailAddressFormat',
     defaultMessage: 'Must be a valid email address',
     description: 'The error message that appears on email address'
-  },
-  mobilePhoneRegex: {
-    id: 'validations.mobilePhoneRegex',
-    defaultMessage: '07[0-9]{9,10}',
-    description:
-      'The regular expression to use when validating a local mobile phone number'
-  },
-  mobileNumberFormat: {
-    id: 'validations.mobileNumberFormat',
-    defaultMessage: '07123456789',
-    description:
-      'The format of the mobile number that appears in an error message'
-  },
-  requiredSymbol: {
-    id: 'validations.requiredSymbol',
-    defaultMessage: '',
-    description:
-      'A blank error message. Used for highlighting a required field without showing an error'
   }
-}
-
-export const messages: IValidationMessages = defineMessages(messagesToDefine)
+})

@@ -54,7 +54,7 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
 /**
  * Given action type and actions, returns the action creation metadata for the event.
  * Since we do not consistently store the request action, we need to check if it exists.
- * * @returns details of the user who created the first **Declaration** action of that type.
+ * @returns details of the user who created the latest **Declaration** action of that type.
  *
  */
 function getDeclarationActionCreationMetadata(
@@ -90,20 +90,23 @@ function getDeclarationActionCreationMetadata(
 }
 
 /** Actions which are considered event updates, i.e. actions which should update the 'updatedAt' fields */
-const updateActions = ActionTypes.extract([
-  ActionType.CREATE,
-  ActionType.NOTIFY,
-  ActionType.EDIT,
-  ActionType.DECLARE,
-  ActionType.REGISTER,
-  ActionType.REJECT,
-  ActionType.ARCHIVE,
-  ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION,
-  ActionType.APPROVE_CORRECTION,
-  ActionType.REJECT_CORRECTION,
-  ActionType.CUSTOM
-])
+const updateActions = new Set<ActionType>(
+  ActionTypes.extract([
+    ActionType.CREATE,
+    ActionType.NOTIFY,
+    ActionType.EDIT,
+    ActionType.DECLARE,
+    ActionType.REGISTER,
+    ActionType.REJECT,
+    ActionType.ARCHIVE,
+    ActionType.UNARCHIVE,
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
+    ActionType.CUSTOM
+  ]).options
+)
 
 /**
  * Returns the creation metadata of the last update action (Requested or Accepted).
@@ -132,7 +135,7 @@ export function getActionUpdateMetadata(actions: Action[]) {
   ] as const
 
   return actions
-    .filter(({ type }) => updateActions.safeParse(type).success)
+    .filter(({ type }) => updateActions.has(type))
     .reduce<Pick<ActionBase, (typeof metadataFields)[number]>>(
       (_, action) => {
         if (action.originalActionId) {
@@ -152,6 +155,10 @@ export function getActionUpdateMetadata(actions: Action[]) {
  */
 export function getLegalStatuses(actions: Action[]) {
   return {
+    [EventStatus.enum.NOTIFIED]: getDeclarationActionCreationMetadata(
+      ActionType.NOTIFY,
+      actions
+    ),
     [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
       actions

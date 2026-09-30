@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, within } from '@storybook/test'
-import * as selectEvent from 'react-select-event'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -23,6 +22,7 @@ import {
   AddressType,
   TestUserRole
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -91,6 +91,7 @@ export const AdministrativeAreaWithCommunityLeader: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={fields}
             formValues={declaration}
             id="my-form"
@@ -152,6 +153,7 @@ export const AdministrativeAreaWithLocalRegistrar: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={fields}
             formValues={declaration}
             id="my-form"
@@ -215,6 +217,7 @@ export const AdministrativeAreaWithProvincialRegistrar: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={fields}
             formValues={declaration}
             id="my-form"

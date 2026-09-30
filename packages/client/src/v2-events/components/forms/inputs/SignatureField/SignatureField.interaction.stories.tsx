@@ -10,12 +10,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { within, expect, waitFor } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { within, expect, waitFor } from 'storybook/test'
 import superjson from 'superjson'
 import React from 'react'
 import styled from 'styled-components'
-import { userEvent } from '@storybook/testing-library'
+import { userEvent } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import {
@@ -25,14 +25,15 @@ import {
   generateEventDocument,
   generateTranslationConfig,
   MimeType,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
   type FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { TestImage } from '@client/v2-events/features/events/fixtures'
+import { storybookEventId, TestImage } from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import { SignatureField } from './SignatureField'
@@ -127,6 +128,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.signature',
@@ -252,6 +254,7 @@ export const UploadButtonsArmLockBypass: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.signature',
@@ -395,6 +398,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              attachmentPath={eventAttachmentPath(storybookEventId)}
               fields={[
                 {
                   id: 'storybook.signature',
@@ -428,14 +432,11 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               )
             }),
 
-            http.get('/:id', async (request) => {
-              const { id } = request.params
-              const response = await fetch(signaturePngBase64)
-              const binary = new Uint8Array(await response.arrayBuffer())
+            ...['/:id', '/events/:eventId/:filename'].map((path) =>
+              http.get(path, async () => {
+                const response = await fetch(signaturePngBase64)
+                const binary = new Uint8Array(await response.arrayBuffer())
 
-              // condition here is just to differentiate that the same mock serves two different requests.
-              // It is hard to differentiate at path level after we removed /ocrvs/ from the url.
-              if (id && typeof id === 'string' && id.startsWith('signature')) {
                 spies.getImage++
                 return new HttpResponse(binary, {
                   headers: {
@@ -443,16 +444,8 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
                     'Cache-Control': 'no-cache'
                   }
                 })
-              } else {
-                spies.getImage++
-                return new HttpResponse(binary, {
-                  headers: {
-                    'Content-Type': MimeType.enum['image/png'],
-                    'Cache-Control': 'no-cache'
-                  }
-                })
-              }
-            })
+              })
+            )
           ]
         }
       }
@@ -543,6 +536,7 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
         element: (
           <StyledFormFieldGenerator
             ref={noDuplicateErrorFormRef}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={[
               {
                 id: 'storybook.signature',

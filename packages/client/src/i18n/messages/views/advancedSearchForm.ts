@@ -17,23 +17,10 @@ interface IAdvancedSearchMessages
   eventDetails: MessageDescriptor
   motherDetails: MessageDescriptor
   fatherDetails: MessageDescriptor
-  placeOfRegistrationlabel: MessageDescriptor
-  placeOfRegistrationHelperText: MessageDescriptor
-  dateOfRegistration: MessageDescriptor
-  statusOfRecordLabel: MessageDescriptor
-  timePeriodLabel: MessageDescriptor
-  timePeriodHelperText: MessageDescriptor
   deceasedDetails: MessageDescriptor
   informantDetails: MessageDescriptor
   recordStatusAny: MessageDescriptor
-  recordStatusInprogress: MessageDescriptor
-  recordStatusInReview: MessageDescriptor
-  recordStatusRequireUpdate: MessageDescriptor
   recordStatusRegistered: MessageDescriptor
-  recordStatusCertified: MessageDescriptor
-  recordStatusAchived: MessageDescriptor
-  recordStatusCorrectionRequested: MessageDescriptor
-  recordStatusValidated: MessageDescriptor
   timePeriodLast7Days: MessageDescriptor
   timePeriodLast30Days: MessageDescriptor
   timePeriodLast90Days: MessageDescriptor
@@ -68,36 +55,6 @@ const messagesToDefine: IAdvancedSearchMessages = {
     description: 'The title of Father details accordion',
     id: 'advancedSearch.form.fatherDetails'
   },
-  placeOfRegistrationlabel: {
-    defaultMessage: 'Place of registration',
-    description: 'Label for input Place of registration',
-    id: 'advancedSearch.form.placeOfRegistration'
-  },
-  placeOfRegistrationHelperText: {
-    defaultMessage: 'Search for a province, district or registration office',
-    description: 'Helper text for input Place of registration',
-    id: 'advancedSearch.form.placeOfRegistrationHelperText'
-  },
-  dateOfRegistration: {
-    defaultMessage: 'Date of registration',
-    description: 'Label for input date of registration',
-    id: 'advancedSearch.form.dateOfRegistration'
-  },
-  statusOfRecordLabel: {
-    defaultMessage: 'Status of record',
-    description: 'Label for input Status of record',
-    id: 'advancedSearch.form.statusOfRecordLabel'
-  },
-  timePeriodLabel: {
-    defaultMessage: 'Time period',
-    description: 'Label for input Time period',
-    id: 'advancedSearch.form.timePeriodLabel'
-  },
-  timePeriodHelperText: {
-    defaultMessage: 'Period of time since the record status changed',
-    description: 'Helper text for input Time period',
-    id: 'advancedSearch.form.timePeriodHelperText'
-  },
   deceasedDetails: {
     defaultMessage: 'Deceased details',
     description: 'The title of Deceased details accordion',
@@ -113,45 +70,10 @@ const messagesToDefine: IAdvancedSearchMessages = {
     description: 'Option for form field: status of record',
     id: 'advancedSearch.form.recordStatusAny'
   },
-  recordStatusInprogress: {
-    defaultMessage: 'In progress',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusInprogress'
-  },
-  recordStatusInReview: {
-    defaultMessage: 'In review',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusInReview'
-  },
-  recordStatusRequireUpdate: {
-    defaultMessage: 'Requires updates',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusRequireUpdate'
-  },
   recordStatusRegistered: {
     defaultMessage: 'Registered',
     description: 'Option for form field: status of record',
     id: 'advancedSearch.form.recordStatusRegistered'
-  },
-  recordStatusCertified: {
-    defaultMessage: 'Certified',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusCertified'
-  },
-  recordStatusAchived: {
-    defaultMessage: 'Archived',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusAchived'
-  },
-  recordStatusCorrectionRequested: {
-    defaultMessage: 'Correction requested',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusCorrectionRequested'
-  },
-  recordStatusValidated: {
-    defaultMessage: 'Validated',
-    description: 'Option for form field: status of record',
-    id: 'advancedSearch.form.recordStatusValidated'
   },
   hide: {
     defaultMessage: 'Hide',

@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { within, waitFor, expect } from '@storybook/test'
+import { within, waitFor, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
@@ -25,7 +25,7 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { precacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 
 const generator = testDataGenerator()
 
@@ -141,7 +141,7 @@ export const CachesUsersOnEventDownload: Story = {
     },
 
     async () => {
-      await cacheUsersFromEventDocument(eventWithFiveUsers)
+      await precacheUsersFromEventDocument(eventWithFiveUsers)
     }
   ],
 

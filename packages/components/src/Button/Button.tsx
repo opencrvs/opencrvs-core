@@ -15,7 +15,7 @@ import { Spinner } from '../Spinner'
 import * as styles from './Button.styles'
 
 type ButtonSize = 'small' | 'medium' | 'large'
-type ButtonType =
+export type ButtonType =
   | 'primary'
   | 'secondary'
   | 'tertiary'
@@ -54,14 +54,27 @@ export type ButtonProps = (AnchorButtonProps | NativeButtonProps) & {
 
 type StyledButtonProps = Omit<ButtonProps, 'type'> & {
   variant: ButtonType
+  /**
+   * Injected by `DropdownMenu.Trigger` (via `asChild`) so the button can act as
+   * the CSS anchor the dropdown content positions itself against.
+   */
+  dropdownName?: string
 }
 const StyledButton = styled.button.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     // https://styled-components.com/docs/api#shouldforwardprop
+    // `popovertarget` is a native HTML attribute that styled-components' default
+    // validator does not recognise; forward it explicitly so the button can act
+    // as a `DropdownMenu.Trigger` (which wires it up via the Popover API).
+    ['popovertarget'].includes(prop) ||
     // Leave some props unpassed to DOM
-    !['loading'].includes(prop) && defaultValidatorFn(prop)
+    (!['loading'].includes(prop) && defaultValidatorFn(prop))
 })<StyledButtonProps>`
   ${styles.base}
+
+  ${(props) =>
+    props.dropdownName &&
+    `anchor-name: --Dropdown-Anchor-${props.dropdownName};`}
 
   ${(props) => props.size === 'small' && styles.small(props)}
   ${(props) => props.size === 'medium' && styles.medium}

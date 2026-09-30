@@ -9,10 +9,6 @@
 volumes:
   metricbeat:
 services:
-  mongo1:
-    image: mongo:4.4
-    restart: unless-stopped
-
   redis:
     image: redis:8
     restart: unless-stopped
@@ -23,10 +19,6 @@ services:
     environment:
       - discovery.type=single-node
 
-  influxdb:
-    image: influxdb:1.8.10
-    restart: unless-stopped
-
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
+    image: ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z
     restart: unless-stopped

@@ -18,7 +18,8 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState
+  getCurrentEventState,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -30,6 +31,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { EditActionMenu } from './EditActionMenu'
 import { EditPageBanner } from './EditPageBanner'
 
@@ -87,7 +89,9 @@ export function Review() {
         route={ROUTES.V2.EVENTS.EDIT}
       >
         <ReviewComponent.Body
+          anchor={recordAnchorDate(currentEventState)}
           annotation={annotation}
+          attachmentPath={eventAttachmentPath(eventId)}
           form={form}
           formConfig={formConfig}
           previousFormValues={previousFormValues}

@@ -12,8 +12,12 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
-import { recordUserAuditEvent } from '@auth/features/authenticate/service'
-import { getUserIdFromToken } from '@opencrvs/commons'
+import {
+  recordUserAuditEvent,
+  verifyRefreshToken
+} from '@auth/features/authenticate/service'
+import { getUserIdFromToken, logger } from '@opencrvs/commons'
+import { revokeFamily } from '@auth/features/refresh/family'
 
 interface IInvalidateTokenPayload {
   token: string
@@ -26,10 +30,19 @@ export default async function invalidateTokenHandler(
   const { token } = request.payload as IInvalidateTokenPayload
   const userId = getUserIdFromToken(token)
   if (userId) {
-    recordUserAuditEvent(`Bearer ${token}`, {
+    void recordUserAuditEvent(userId, {
       operation: 'user.logged_out',
       requestData: { subjectId: userId }
     })
+  }
+
+  const refreshDecoded = verifyRefreshToken(token)
+  if (refreshDecoded._tag === 'Right') {
+    try {
+      await revokeFamily(refreshDecoded.right.familyId)
+    } catch (err) {
+      logger.error(`Failed to revoke refresh token family on logout: ${err}`)
+    }
   }
 
   try {

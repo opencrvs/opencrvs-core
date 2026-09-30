@@ -1,7 +1,6 @@
 {{/*
 Service account backup-runner is shared between backup and restore CronJobs
 */}}
-{{- if (eq (include "postgres.use_pgBackRest" .) "true") }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -40,4 +39,3 @@ subjects:
   - kind: ServiceAccount
     name: backup-runner
     namespace: {{ .Release.Namespace }}
-{{- end }}

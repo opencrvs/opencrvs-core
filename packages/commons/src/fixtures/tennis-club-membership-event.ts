@@ -78,6 +78,21 @@ export const tennisClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Notify health worker',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.notify.label'
+      },
+      flags: [
+        {
+          id: 'health-worker-notified',
+          operation: 'add' as const
+        }
+      ]
+    },
+    {
       type: ActionType.REJECT,
       label: {
         defaultMessage: 'Reject',
@@ -335,6 +350,17 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Escalated',
         description:
           'This is the label to show in audit history for the escalate action'
+      }
+    }
+  ],
+  flags: [
+    {
+      id: 'health-worker-notified',
+      requiresAction: false,
+      label: {
+        id: 'event.tennis-club-membership.flag.health-worker-notified.label',
+        defaultMessage: 'Health worker notified',
+        description: 'Label for the health-worker-notified flag'
       }
     }
   ],

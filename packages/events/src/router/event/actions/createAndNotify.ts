@@ -20,6 +20,7 @@ import {
 import {
   ActionType,
   EventDocument,
+  getEventValidatorContext,
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
@@ -186,12 +187,15 @@ export function createAndNotifyProcedure() {
         }
 
         // Step 3: Validate notify fields against the event configuration.
-        const validatorContext = await getValidatorContext(token)
+        const validatorContext = await getValidatorContext({
+          token,
+          event: getEventValidatorContext(event, eventConfig)
+        })
         const notifyErrors = validateNotifyAction({
           eventConfig,
           declaration: declaration,
           annotation,
-          context: { ...validatorContext, event }
+          context: validatorContext
         })
         throwWhenNotEmpty(notifyErrors)
 

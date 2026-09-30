@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { ComponentStory, Meta } from '@storybook/react'
+import { ComponentStory, Meta } from '@storybook/react-vite'
 import { Dialog } from './Dialog'
 import { Button } from '../Button'
 import { Text } from '../Text'

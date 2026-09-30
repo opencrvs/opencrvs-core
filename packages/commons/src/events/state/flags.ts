@@ -23,6 +23,8 @@ import { EventConfig } from '../EventConfig'
 import {
   aggregateActionAnnotations,
   aggregateActionDeclarations,
+  deepMerge,
+  getDeclarationAfterEachAction,
   getAcceptedActions,
   getActionConfig,
   isActionConfigType
@@ -162,15 +164,12 @@ const INHERENT_FLAG_RULES: InherentFlagRule[] = [
   },
   {
     // INCOMPLETE mirrors the NOTIFIED status: set by NOTIFY, cleared by any
-    // other status-changing action (see getStatusFromActions).
+    // other status-changing action (see getStatusFromActions). ARCHIVE/UNARCHIVE
+    // are deliberately excluded so the flag freezes across an archive/unarchive
+    // round trip and comes back exactly as it was.
     flag: InherentFlags.INCOMPLETE,
     setOn: [ActionType.NOTIFY],
-    resetOn: [
-      ActionType.CREATE,
-      ActionType.DECLARE,
-      ActionType.REGISTER,
-      ActionType.ARCHIVE
-    ]
+    resetOn: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
   },
   {
     flag: InherentFlags.REJECTED,
@@ -259,7 +258,14 @@ export function resolveEventCustomFlags(
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
+  const declarations = getDeclarationAfterEachAction({ ...event, actions })
+  let annotation: EventState = {}
+
   return actions.reduce<CustomFlag[]>((acc, action, idx) => {
+    if (action.annotation) {
+      annotation = deepMerge(annotation, action.annotation)
+    }
+
     let actionConfig
     if (isActionConfigType(action.type)) {
       actionConfig = getActionConfig({
@@ -274,16 +280,9 @@ export function resolveEventCustomFlags(
       return acc
     }
 
-    const eventUpToThisAction = {
-      ...event,
-      actions: actions.slice(0, idx + 1)
-    }
+    const form = { ...declarations[idx], ...annotation }
 
-    const declaration = aggregateActionDeclarations(eventUpToThisAction)
-    const annotation = aggregateActionAnnotations(eventUpToThisAction)
-    const form = { ...declaration, ...annotation }
-
-    const flagsWithMetConditions = actionConfig.flags.filter(
+    const flagsWithMetConditions = (actionConfig.flags ?? []).filter(
       ({ conditional }) =>
         // If conditional is not provided, the flag is resolved
         conditional ? isFlagConditionMet(conditional, form, action) : true

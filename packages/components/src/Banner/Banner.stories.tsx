@@ -11,7 +11,7 @@
 import React from 'react'
 import { Banner, IBannerProps } from './Banner'
 import { Text } from '../Text'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '../Button'
 import { Pill } from '../Pill'
 import { Icon } from '../Icon'

@@ -20,18 +20,20 @@ import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   ActionType,
+  aggregateActionAnnotations,
   applyDraftToEventIndex,
+  deepDropNulls,
+  deepMerge,
   EventState,
-  getActionAnnotationFields,
   getDeclaration,
   getOrThrow,
   getCurrentEventState,
   UUID,
   getAssignmentStatus,
-  AssignmentStatus
+  AssignmentStatus,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { getAnnotationForActionType } from '@client/v2-events/features/events/components/Action/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -40,6 +42,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useOnlineStatus } from '@client/utils'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
@@ -101,27 +104,15 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const formConfig = getDeclaration(configuration)
 
   const annotation = useMemo((): EventState | undefined => {
-    // Collect annotations from all past non-READ actions that have annotation fields
-    const pastActionsWithAnnotation = configuration.actions
-      .filter((a) => a.type !== ActionType.READ)
-      .filter((a) => getActionAnnotationFields(a).length > 0)
-      .reduce<EventState>(
-        (acc, actionConfig) => ({
-          ...acc,
-          ...getAnnotationForActionType({
-            event,
+    const merged = aggregateActionAnnotations(event)
+    const withDraft =
+      draft?.action.annotation != null
+        ? deepMerge(merged, draft.action.annotation)
+        : merged
+    const cleaned = deepDropNulls(withDraft)
 
-            actionType: actionConfig.type,
-            draft
-          })
-        }),
-        {}
-      )
-
-    return Object.keys(pastActionsWithAnnotation).length > 0
-      ? pastActionsWithAnnotation
-      : undefined
-  }, [configuration.actions, event, draft])
+    return Object.keys(cleaned).length > 0 ? cleaned : undefined
+  }, [event, draft])
 
   useEffect(() => {
     return () => {
@@ -146,7 +137,9 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   return (
     <ReviewComponent.Body
       readonlyMode
+      anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
+      attachmentPath={eventAttachmentPath(eventId)}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
@@ -182,13 +175,14 @@ function ReadonlyView() {
   const trpc = useTRPC()
 
   if (!canAccessEventWithScopes()) {
-    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
+    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
+      replace: true
+    })
     return null
   }
 
-  const isCachedAsView = queryClient.getQueryData([['view-event', eventId]])
   const isCachedAsAssigned = queryClient.getQueryData(
-    trpc.event.get.queryKey({ eventId, waitFor: false })
+    trpc.event.get.queryKey({ eventId })
   )
 
   // React Query pauses queries when the browser is offline, so the suspense
@@ -196,7 +190,7 @@ function ReadonlyView() {
   // the user opens a record they have not previously downloaded.
   // Render a clear message instead — useOnlineStatus re-renders this when
   // the connection returns, so the content loads automatically.
-  if (!isOnline && !isCachedAsView && !isCachedAsAssigned) {
+  if (!isOnline && !isCachedAsAssigned) {
     return <OfflineRecordMessage />
   }
 

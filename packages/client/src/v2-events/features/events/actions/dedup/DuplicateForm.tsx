@@ -20,8 +20,16 @@ import {
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EventIndex, getUUID } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventIndex,
+  getActionConfig,
+  getUUID,
+  isActionEnabled,
+  isActionVisible
+} from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
@@ -55,6 +63,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const { eventConfiguration: configuration } = useEventConfiguration(
     eventIndex.type
   )
+  const validatorContext = useValidatorContext()
 
   const [modal, openModal] = useModal()
 
@@ -64,10 +73,47 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     .map((duplicate) => duplicate.trackingId)
     .join(', ')
 
-  const notADuplicateButton = (
+  const markAsNotDuplicateActionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType: ActionType.MARK_AS_NOT_DUPLICATE
+  })
+
+  const notADuplicateVisible = markAsNotDuplicateActionConfig
+    ? isActionVisible(
+        markAsNotDuplicateActionConfig,
+        eventIndex,
+        validatorContext
+      )
+    : true
+  const notADuplicateEnabled = markAsNotDuplicateActionConfig
+    ? isActionEnabled(
+        markAsNotDuplicateActionConfig,
+        eventIndex,
+        validatorContext
+      )
+    : true
+
+  // `archiveOnDuplicate` is a client-side combinator that fires the core
+  // MARK_AS_DUPLICATE action (then ARCHIVE) — see custom-api/index.ts.
+  // Configured labels/icons only affect the action menu entry that navigates
+  // here; this core-owned review page keeps hardcoded button labels/icons,
+  // while the configs' conditionals still gate visibility/enabling.
+  const markAsDuplicateActionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType: ActionType.MARK_AS_DUPLICATE
+  })
+  const markAsDuplicateVisible = markAsDuplicateActionConfig
+    ? isActionVisible(markAsDuplicateActionConfig, eventIndex, validatorContext)
+    : true
+  const markAsDuplicateEnabled = markAsDuplicateActionConfig
+    ? isActionEnabled(markAsDuplicateActionConfig, eventIndex, validatorContext)
+    : true
+
+  const notADuplicateButton = notADuplicateVisible && (
     <Button
       key="btn-not-a-duplicate"
       fullWidth
+      disabled={!notADuplicateEnabled}
       id="not-a-duplicate"
       type="positive"
       onClick={async () => {
@@ -95,10 +141,11 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     </Button>
   )
 
-  const markAsDuplicateButton = (
+  const markAsDuplicateButton = markAsDuplicateVisible && (
     <Button
       key="btn-mark-as-duplicate"
       fullWidth
+      disabled={!markAsDuplicateEnabled}
       id="mark-as-duplicate"
       type="negative"
       onClick={async () => {
@@ -135,7 +182,10 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     <>
       <div>
         <SubPageContent
-          bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
+          bottomActionButtons={[
+            notADuplicateButton,
+            markAsDuplicateButton
+          ].filter((button): button is React.ReactElement => Boolean(button))}
           bottomActionDirection="row"
           showTitleOnMobile={true}
           subtitle={intl.formatMessage(

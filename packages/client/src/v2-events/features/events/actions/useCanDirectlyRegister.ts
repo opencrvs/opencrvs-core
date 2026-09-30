@@ -41,6 +41,20 @@ export function useCanDirectlyRegister(event: EventDocument) {
     return false
   }
 
+  const currentEventIndex = getCurrentEventState(event, eventConfiguration)
+  const declareActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.DECLARE
+  })
+
+  // If 'Declare' action conditions are not met, we should not allow the direct register
+  if (
+    !declareActionConfig ||
+    !isActionAvailable(declareActionConfig, currentEventIndex, validatorContext)
+  ) {
+    return false
+  }
+
   const eventAfterDeclare = {
     ...event,
     actions: event.actions.concat({

@@ -11,7 +11,7 @@
 
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { Button, ResponsiveModal } from '@opencrvs/components'
+import { Button, Dialog } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { duplicateMessages } from './ReviewDuplicate'
 
@@ -27,7 +27,8 @@ export function MarkAsNotDuplicateModal({
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
+    <Dialog
+      isOpen
       actions={[
         <Button
           key="not-duplicateRegistration-cancel"
@@ -46,11 +47,7 @@ export function MarkAsNotDuplicateModal({
           {intl.formatMessage(buttonMessages.confirm)}
         </Button>
       ]}
-      autoHeight={true}
-      handleClose={() => close(false)}
       id="not-duplicate-modal"
-      responsive={false}
-      show={true}
       title={intl.formatMessage(
         duplicateMessages.notDuplicateContentConfirmationTitle,
         {
@@ -58,7 +55,11 @@ export function MarkAsNotDuplicateModal({
           trackingId
         }
       )}
-      titleHeightAuto={true}
-    />
+      onClose={() => close(false)}
+    >
+      {intl.formatMessage(
+        duplicateMessages.notDuplicateContentConfirmationDescription
+      )}
+    </Dialog>
   )
 }

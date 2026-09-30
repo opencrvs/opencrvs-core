@@ -22,7 +22,11 @@ import {
   storeToken,
   getToken,
   isTokenStillValid,
-  removeToken
+  removeToken,
+  removeAccessToken,
+  getRefreshToken,
+  storeRefreshToken,
+  ensureFreshAccessToken
 } from '@client/utils/authUtils'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
@@ -91,32 +95,58 @@ export const profileReducer: LoopReducer<
           { sequence: true }
         )
       )
-    case actions.CHECK_AUTH:
-      const token = getToken()
-
-      // Remove token and language from url if these exists
-      if (window.location.search.includes('token=')) {
+    case actions.CHECK_AUTH: {
+      const refreshToken = getRefreshToken()
+      // A refresh token in the URL is an explicit (re)authentication handoff —
+      // possibly for a different user than the one whose access token is still
+      // in localStorage.
+      const refreshTokenFromUrl =
+        window.location.search.includes('refreshToken=')
+      // strip token params from the url if present
+      if (
+        window.location.search.includes('token=') ||
+        window.location.search.includes('refreshToken=')
+      ) {
         window.history.replaceState(null, '', window.location.pathname)
       }
-
+      return loop(
+        state,
+        Cmd.run(
+          async () => {
+            if (refreshToken) {
+              storeRefreshToken(refreshToken)
+            }
+            // On an explicit URL handoff, discard any still-fresh access token
+            // so it can't short-circuit the refresh — the access token must be
+            // minted from the just-handed refresh token (which may be a
+            // different user).
+            if (refreshTokenFromUrl) {
+              removeAccessToken()
+            }
+            // mints + stores an access token from the refresh token
+            // (no-op if a fresh access token already exists)
+            await ensureFreshAccessToken()
+            return getToken()
+          },
+          {
+            successActionCreator: (token: string) =>
+              actions.checkAuthComplete(token),
+            failActionCreator: () => actions.redirectToAuthentication(true)
+          }
+        )
+      )
+    }
+    case actions.CHECK_AUTH_COMPLETE: {
+      const token = action.payload.token
       const payload = getTokenPayload(token)
-
       if (!payload) {
         return loop(
-          {
-            ...state,
-            authenticated: false
-          },
+          { ...state, authenticated: false },
           Cmd.action(actions.redirectToAuthentication(true))
         )
       }
-
       return loop(
-        {
-          ...state,
-          authenticated: true,
-          tokenPayload: payload
-        },
+        { ...state, authenticated: true, tokenPayload: payload },
         Cmd.list([
           Cmd.run(() => {
             if (isTokenStillValid(payload)) {
@@ -126,6 +156,7 @@ export const profileReducer: LoopReducer<
           Cmd.action(actions.setInitialUserDetails())
         ])
       )
+    }
     case actions.SET_USER_DETAILS:
       const userDetails = action.payload
       return loop(

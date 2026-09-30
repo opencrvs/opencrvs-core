@@ -10,3 +10,4 @@
  */
 
 export * from './UserNotifications'
+export * from './dispatch'

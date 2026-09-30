@@ -52,6 +52,7 @@ export interface IButtonProps
   dropdownName?: string
 }
 
+/** @deprecated Use components/src/Button instead  */
 export function Button({
   icon,
   children,

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineConditional } from '../conditionals/conditionals'
+import { defineConditional, flag, status } from '../conditionals/conditionals'
 import {
   createEventFieldConfig,
   NonSearchableEventMetadataTimeFieldIdInput,
@@ -17,6 +17,8 @@ import {
 } from '../event-config/event-configuration'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
+import { EventStatus } from './EventMetadata'
+import { Flag } from './Flag'
 import {
   WorkqueueColumnKeys,
   WorkqueueColumnValue
@@ -170,7 +172,17 @@ const event = Object.assign(eventFn, {
     return {
       $event: field
     }
-  }
+  },
+  /**
+   * Checks if the event currently has the given status.
+   * @param eventStatus - The status to check for.
+   */
+  hasStatus: (eventStatus: EventStatus) => status(eventStatus),
+  /**
+   * Checks if the event currently carries the given flag.
+   * @param flagValue - The flag to check for.
+   */
+  hasFlag: (flagValue: Flag) => flag(flagValue)
 })
 
 export { event }

@@ -10,23 +10,23 @@
  */
 import { logout } from './Sidebar'
 
+const originalLocation = window.location
 // Mocking within storybook is impossible. The logout function is tested in unit test style instead.
 const assignMock = vi.fn()
 
 beforeAll(() => {
-  // @ts-ignore
-  delete window.location
-  // @ts-ignore
-  window.location = {
+  vi.stubGlobal('location', {
+    ...originalLocation,
     assign: assignMock,
     replace: vi.fn(),
     href: '',
     origin: 'http://localhost'
-  }
+  })
 })
 
 afterAll(() => {
   vi.restoreAllMocks()
+  window.location = originalLocation as string & Location
 })
 
 afterEach(() => {

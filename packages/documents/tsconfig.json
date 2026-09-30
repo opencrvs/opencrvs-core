@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": { "@documents/*": ["./*"] },
+    "paths": { "@documents/*": ["./src/*"] },
     "target": "es6",
-    "module": "commonjs",
+    "module": "node16",
     "outDir": "build/dist",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "isolatedModules": true,
+    "moduleResolution": "node16",
     "rootDir": ".",
     "lib": ["esnext.asynciterable", "es6", "es2019"],
     "forceConsistentCasingInFileNames": true,
@@ -17,8 +17,8 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["jest"]
   },
-  "include": ["src/**/*.ts", "typings", "tslint-rules"],
+  "include": ["src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

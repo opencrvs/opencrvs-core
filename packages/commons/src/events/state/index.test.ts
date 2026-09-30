@@ -979,7 +979,7 @@ describe('correction requests', () => {
           },
           {
             declaration: {},
-            requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
+            requestId: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
             type: 'APPROVE_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -1611,5 +1611,90 @@ describe('test status of a record when actions are not in order', () => {
     expect(
       getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
     ).toBe(EventStatus.enum.DECLARED)
+  })
+})
+
+describe('archive/unarchive status resolution', () => {
+  test('status is ARCHIVED while archived and not yet unarchived', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.ARCHIVE }
+      ]
+    })
+
+    expect(getCurrentEventState(event, tennisClubMembershipEvent).status).toBe(
+      EventStatus.enum.ARCHIVED
+    )
+  })
+
+  test('restores NOTIFIED status after unarchiving a notified record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.NOTIFY },
+        { type: ActionType.ARCHIVE },
+        { type: ActionType.UNARCHIVE }
+      ]
+    })
+
+    expect(getCurrentEventState(event, tennisClubMembershipEvent).status).toBe(
+      EventStatus.enum.NOTIFIED
+    )
+  })
+
+  test('restores DECLARED status after unarchiving a declared record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.ARCHIVE },
+        { type: ActionType.UNARCHIVE }
+      ]
+    })
+
+    expect(getCurrentEventState(event, tennisClubMembershipEvent).status).toBe(
+      EventStatus.enum.DECLARED
+    )
+  })
+
+  test('handles repeated archive/unarchive cycles, always restoring the last real status', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.NOTIFY },
+        { type: ActionType.ARCHIVE },
+        { type: ActionType.UNARCHIVE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.ARCHIVE },
+        { type: ActionType.UNARCHIVE }
+      ]
+    })
+
+    expect(getCurrentEventState(event, tennisClubMembershipEvent).status).toBe(
+      EventStatus.enum.DECLARED
+    )
+  })
+
+  test('a rejected-then-archived record keeps the REJECTED flag after being unarchived', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.REJECT },
+        { type: ActionType.ARCHIVE },
+        { type: ActionType.UNARCHIVE }
+      ]
+    })
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    expect(state.status).toBe(EventStatus.enum.DECLARED)
+    expect(state.flags).toContain(InherentFlags.REJECTED)
   })
 })

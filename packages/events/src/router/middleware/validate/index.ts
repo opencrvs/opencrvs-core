@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,20 +20,17 @@ import {
   ActionType,
   ActionUpdate,
   AnnotationActionType,
-  ApproveCorrectionActionInput,
   DeclarationActions,
   DeclarationUpdateActionType,
   DeclarationUpdateActions,
   EventConfig,
-  EventDocument,
-  EventState,
   FieldConfig,
-  RejectCorrectionActionInput,
   annotationActions,
   deepDropNulls,
   deepMerge,
   errorMessages,
   findRecordActionPages,
+  getActionFormFields,
   getActionReviewFields,
   getCurrentEventState,
   getDeclaration,
@@ -48,7 +46,8 @@ import {
   getCustomActionFields,
   EventInput,
   UUID,
-  getDeclarationFieldById
+  getDeclarationFieldById,
+  StrictValidatorContext
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -57,11 +56,12 @@ import { getEventById } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcContext } from '@events/context'
 import {
-  getValidatorContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
   throwWhenNotEmpty,
-  omitUncorrectableFields
+  omitUncorrectableFields,
+  getStrictValidatorContext,
+  validateActionPayloadStructure
 } from './utils'
 
 export function getFieldErrors(
@@ -121,18 +121,16 @@ export function getFieldErrors(
 
 function validateDeclarationUpdateAction({
   eventConfig,
-  event,
   actionType,
   declarationUpdate,
   annotation,
   context
 }: {
   eventConfig: EventConfig
-  event: EventDocument
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
   annotation?: ActionUpdate
-  context: ValidatorContext
+  context: StrictValidatorContext
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -141,10 +139,7 @@ function validateDeclarationUpdateAction({
 
   const declarationConfig = getDeclaration(eventConfig)
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
-  const previousDeclaration = getCurrentEventState(
-    event,
-    eventConfig
-  ).declaration
+  const previousDeclaration = context.event.state.declaration
 
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
@@ -207,21 +202,31 @@ function validateDeclarationUpdateAction({
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
-  // 6. Validate against action review fields, if applicable
+  // 6. Validate against action review fields and dialog form fields, if applicable.
+  // Dialog form fields are validated with `required` relaxed: combined flows
+  // (e.g. declare+register) only collect the final action's dialog fields, so
+  // intermediate actions legitimately arrive without their own.
   const reviewFields = declarationActionParse.success
-    ? getActionReviewFields(eventConfig, declarationActionParse.data)
+    ? [
+        ...getActionReviewFields(eventConfig, declarationActionParse.data),
+        ...getActionFormFields(eventConfig, declarationActionParse.data).map(
+          (formField) => ({ ...formField, required: false })
+        )
+      ]
     : []
+
+  const annotationContext = { ...context, baseFormState: cleanedDeclaration }
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     deepDropNulls(annotation ?? {}),
-    context
+    annotationContext
   )
 
   const annotationErrors = getFieldErrors(
     reviewFields,
     visibleAnnotationFields,
-    { ...context, baseFormState: cleanedDeclaration }
+    annotationContext
   )
 
   return [...declarationErrors, ...annotationErrors]
@@ -231,14 +236,12 @@ function validateActionAnnotation({
   eventConfig,
   actionType,
   annotation = {},
-  declaration = {},
   context
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
-  declaration: EventState
-  context: ValidatorContext
+  context: StrictValidatorContext
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
@@ -248,14 +251,15 @@ function validateActionAnnotation({
     context
   )
 
-  const formFields = pages.flatMap(({ fields }) =>
-    fields.flatMap((field) => field)
-  )
+  const formFields = [
+    ...pages.flatMap(({ fields }) => fields.flatMap((field) => field)),
+    ...getActionFormFields(eventConfig, actionType)
+  ]
 
   const errors = [
     ...getFieldErrors(formFields, annotation, {
       ...context,
-      baseFormState: declaration
+      baseFormState: context.baseFormState ?? context.event.state.declaration
     }),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
@@ -297,7 +301,10 @@ export function validateNotifyAction({
     fields.flatMap((field) => field)
   )
 
-  const reviewFields = getActionReviewFields(eventConfig, ActionType.DECLARE)
+  const reviewFields = [
+    ...getActionReviewFields(eventConfig, ActionType.DECLARE),
+    ...getActionFormFields(eventConfig, ActionType.NOTIFY)
+  ]
 
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
@@ -355,19 +362,6 @@ export function validateNotifyAction({
   return [...annotationErrors, ...declarationErrors]
 }
 
-function throwIfRequestActionNotFound(
-  storedEvent: EventDocument,
-  input: ApproveCorrectionActionInput | RejectCorrectionActionInput
-) {
-  const correctionRequestAction = storedEvent.actions.find(
-    (a) => a.id === input.requestId && a.type === ActionType.REQUEST_CORRECTION
-  )
-
-  if (!correctionRequestAction) {
-    throw new RequestNotFoundError(input.requestId)
-  }
-}
-
 /*
  * For request correction, we need to validate that the payload does not contain fields that are configured as not correctable,
  * i.e. configured with the 'uncorrectable' flag set to true.
@@ -400,97 +394,153 @@ function validateCorrectableFields({
   return errors
 }
 
-export const validateAction: MiddlewareFunction<
+/** Applies action specific rules for the input and throws on error. */
+function validateAction({
+  input,
+  eventConfig,
+  context
+}: {
+  input: ActionInputWithType
+  eventConfig: EventConfig
+  context: StrictValidatorContext
+}): void {
+  if (input.type === ActionType.NOTIFY || input.type === ActionType.EDIT) {
+    throwWhenNotEmpty(
+      validateNotifyAction({
+        eventConfig,
+        annotation: input.annotation,
+        declaration: input.declaration,
+        context
+      })
+    )
+
+    return
+  }
+
+  if (input.type === ActionType.REQUEST_CORRECTION) {
+    throwWhenNotEmpty(
+      validateCorrectableFields({
+        eventConfig,
+        declarationUpdate: input.declaration
+      })
+    )
+  }
+
+  if (
+    input.type === ActionType.APPROVE_CORRECTION ||
+    input.type === ActionType.REJECT_CORRECTION
+  ) {
+    const correctionRequestAction = context.event.document.actions.find(
+      (a) =>
+        a.id === input.requestId && a.type === ActionType.REQUEST_CORRECTION
+    )
+
+    if (!correctionRequestAction) {
+      throw new RequestNotFoundError(input.requestId)
+    }
+  }
+
+  if (input.type === ActionType.CUSTOM) {
+    throwWhenNotEmpty(
+      validateCustomAction({
+        eventConfig,
+        annotation: input.annotation,
+        context,
+        customActionType: input.customActionType
+      })
+    )
+
+    return
+  }
+
+  const declarationUpdateAction = DeclarationUpdateActions.safeParse(input.type)
+
+  if (declarationUpdateAction.success) {
+    throwWhenNotEmpty(
+      validateDeclarationUpdateAction({
+        eventConfig,
+        declarationUpdate: input.declaration,
+        annotation: input.annotation,
+        actionType: declarationUpdateAction.data,
+        context
+      })
+    )
+
+    return
+  }
+
+  const annotationActionParse = annotationActions.safeParse(input.type)
+
+  if (annotationActionParse.success) {
+    throwWhenNotEmpty(
+      validateActionAnnotation({
+        eventConfig,
+        annotation: input.annotation,
+        actionType: annotationActionParse.data,
+        context
+      })
+    )
+
+    return
+  }
+
+  throw new Error('Trying to validate unsupported action type')
+}
+
+export const validateRequestAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   unknown,
   unknown,
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
-  const actionType = input.type
-
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
     eventType: event.type,
     token: ctx.token
   })
 
-  const context = { ...(await getValidatorContext(ctx.token)), event }
+  const eventState = getCurrentEventState(event, eventConfig)
 
-  const declaration = getCurrentEventState(event, eventConfig).declaration
+  const context = await getStrictValidatorContext({
+    token: ctx.token,
+    event: { document: event, state: eventState }
+  })
 
-  if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
-    const errors = validateNotifyAction({
-      eventConfig,
-      annotation: input.annotation,
-      declaration: input.declaration,
-      context
-    })
+  validateAction({
+    input,
+    eventConfig,
+    context
+  })
 
-    throwWhenNotEmpty(errors)
-    return next()
-  }
+  return next()
+}
 
-  if (actionType === ActionType.REQUEST_CORRECTION) {
-    const errors = validateCorrectableFields({
-      eventConfig,
-      declarationUpdate: input.declaration
-    })
+/**
+ * Guard for validating .accept action.
+ * accept is called by system user when response could not be returned immediately.
+ *
+ * Accept should only be called by system user type, and limited in use.
+ */
+export const validateAcceptAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  unknown,
+  unknown,
+  ActionInputWithType
+> = async ({ input, next, ctx }) => {
+  const event = await getEventById(input.eventId)
+  const eventConfig = await getEventConfigurationById({
+    eventType: event.type,
+    token: ctx.token
+  })
 
-    throwWhenNotEmpty(errors)
-  }
+  validateActionPayloadStructure({
+    input,
+    eventConfig
+  })
 
-  if (
-    actionType === ActionType.APPROVE_CORRECTION ||
-    actionType === ActionType.REJECT_CORRECTION
-  ) {
-    throwIfRequestActionNotFound(event, input)
-  }
-
-  if (actionType === ActionType.CUSTOM) {
-    const errors = validateCustomAction({
-      eventConfig,
-      annotation: input.annotation,
-      context,
-      customActionType: input.customActionType
-    })
-
-    throwWhenNotEmpty(errors)
-    return next()
-  }
-
-  const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
-
-  if (declarationUpdateAction.success) {
-    const errors = validateDeclarationUpdateAction({
-      eventConfig,
-      event,
-      declarationUpdate: input.declaration,
-      annotation: input.annotation,
-      actionType: declarationUpdateAction.data,
-      context
-    })
-
-    throwWhenNotEmpty(errors)
-    return next()
-  }
-
-  const annotationActionParse = annotationActions.safeParse(actionType)
-
-  if (annotationActionParse.success) {
-    const errors = validateActionAnnotation({
-      eventConfig,
-      annotation: input.annotation,
-      actionType: annotationActionParse.data,
-      declaration,
-      context
-    })
-
-    throwWhenNotEmpty(errors)
-    return next()
-  }
-
-  throw new Error('Trying to validate unsupported action type')
+  return next()
 }
 
 // When performing actions via REST API, we need to ensure that a valid 'createdAtLocation' is provided in the payload.

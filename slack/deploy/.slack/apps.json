@@ -1,0 +1,10 @@
+{
+  "apps": {
+    "TAHM19588": {
+      "app_id": "A0BKCPK349J",
+      "team_domain": "opencrvsworkspace",
+      "team_id": "TAHM19588"
+    }
+  },
+  "default": "opencrvsworkspace"
+}

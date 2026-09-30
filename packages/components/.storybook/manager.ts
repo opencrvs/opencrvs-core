@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { addons } from '@storybook/manager-api'
+import { addons } from 'storybook/manager-api'
 import theme from './theme'
 import WebFont from 'webfontloader'
 

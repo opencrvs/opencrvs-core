@@ -15,27 +15,23 @@ import {
   getStoredUserInformation,
   generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
-import { getRetrievalStepInformation } from '@auth/features/retrievalSteps/verifyUser/service'
 import { NotificationEvent } from '@auth/features/verifyCode/service'
 
 interface IResendNotificationPayload {
   nonce: string
   notificationEvent: NotificationEvent
-  retrievalFlow?: boolean
 }
 
 export default async function resendNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { nonce, retrievalFlow, notificationEvent } =
+  const { nonce, notificationEvent } =
     request.payload as IResendNotificationPayload
 
   let userInformation
   try {
-    userInformation = retrievalFlow
-      ? await getRetrievalStepInformation(nonce)
-      : await getStoredUserInformation(nonce)
+    userInformation = await getStoredUserInformation(nonce)
   } catch (err) {
     return unauthorized()
   }
@@ -56,8 +52,7 @@ export default async function resendNotificationHandler(
 
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
-  notificationEvent: Joi.string().required(),
-  retrievalFlow: Joi.boolean().optional()
+  notificationEvent: Joi.string().required()
 })
 export const responseSchma = Joi.object({
   nonce: Joi.string()

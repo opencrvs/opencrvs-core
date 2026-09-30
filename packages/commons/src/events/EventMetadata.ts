@@ -14,19 +14,9 @@ import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { Flag } from './Flag'
+import { EventStatus } from './EventStatus'
 
-/**
- * Event statuses recognized by the system
- */
-export const EventStatus = z.enum([
-  'CREATED',
-  'NOTIFIED',
-  'DECLARED',
-  'REGISTERED',
-  'ARCHIVED'
-])
-
-export type EventStatus = z.infer<typeof EventStatus>
+export { EventStatus } from './EventStatus'
 
 export const ZodDate = z.iso.date()
 export const ZodDateTime = z.string().datetime()
@@ -70,6 +60,7 @@ export type RegistrationCreationMetadata = z.infer<
 >
 
 export const LegalStatuses = z.object({
+  [EventStatus.enum.NOTIFIED]: ActionCreationMetadata.nullish(),
   [EventStatus.enum.DECLARED]: ActionCreationMetadata.nullish(),
   [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish()
 })
@@ -254,6 +245,8 @@ export const eventMetadataLabelMap: Record<
 export const EventMetadataDateFieldIdInput = z.enum([
   'createdAt',
   'updatedAt',
+  'legalStatuses.NOTIFIED.createdAt',
+  'legalStatuses.NOTIFIED.acceptedAt',
   'legalStatuses.DECLARED.createdAt',
   'legalStatuses.DECLARED.acceptedAt',
   'legalStatuses.REGISTERED.createdAt',
@@ -267,6 +260,8 @@ export type EventMetadataDateFieldIdInput = z.infer<
 export const EventMetadataDateFieldId = z.enum([
   'event.createdAt',
   'event.updatedAt',
+  'event.legalStatuses.NOTIFIED.createdAt',
+  'event.legalStatuses.NOTIFIED.acceptedAt',
   'event.legalStatuses.DECLARED.createdAt',
   'event.legalStatuses.DECLARED.acceptedAt',
   'event.legalStatuses.REGISTERED.createdAt',

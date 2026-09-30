@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "outDir": "lib/",
     "module": "ESNext",
     "target": "es6",
@@ -9,7 +8,7 @@
     "allowJs": false,
     "declaration": true,
     "jsx": "react",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
@@ -19,8 +18,12 @@
     "strictNullChecks": true,
     "noUnusedLocals": false,
     "skipLibCheck": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.tsx", "src/**/*.ts", ".storybook"],
-  "exclude": ["node_modules", "lib"]
+  // Stories are excluded from the build: their inferred Storybook types are
+  // not portable for declaration emit under pnpm's symlinked node_modules
+  // (TS2883), and nothing imports them from lib/. Storybook reads src/.
+  "exclude": ["node_modules", "lib", "src/**/*.stories.tsx"]
 }

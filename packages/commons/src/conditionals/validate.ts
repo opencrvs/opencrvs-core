@@ -31,7 +31,7 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ITokenPayload } from '../authentication'
+import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -46,6 +46,7 @@ import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
+import { getCurrentEventState } from '../events/state'
 
 const ajv = new Ajv({
   $data: true,
@@ -99,9 +100,9 @@ function resolveDataPath(
   return current
 }
 
-/** Returns today's date as an ISO date string (YYYY-MM-DD). */
-export function todayISO(): string {
-  return formatISO(new Date(), { representation: 'date' })
+/** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
+export function todayISO(): PlainDate {
+  return formatISO(new Date(), { representation: 'date' }) as PlainDate
 }
 
 /**
@@ -115,7 +116,7 @@ export type ClientFunctionContext = {
   $form: EventState | ActionUpdate
   $now: string
   $online: boolean
-  $user?: ITokenPayload
+  $user?: UserValidatorContext
   $event?: EventDocument
   $leafAdminStructureLocationIds: Array<{ id: UUID }>
   user?: SystemVariables['user']
@@ -169,11 +170,12 @@ export function buildClientFunctionContext(input: {
 }): ClientFunctionContext {
   return {
     $form: input.form,
+    $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event,
+    $event: input.validatorContext?.event?.document,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -451,18 +453,82 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
   context: ValidatorContext,
-  _event: EventIndex
+  event: EventIndex
 ) {
+  // Overrides `$flags`/`$status` with the real event data (same as `isActionConditionMet`)
+  // so `flag(...)`/`status(...)` conditionals work for data-display fields, e.g. in EventSummary.
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(values, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    validate(condition.conditional, clientFunctionContext)
   )
 }
 
+/**
+ * Given a field's `secured` property (a boolean, or a JSONSchema conditional
+ * evaluated against the event, e.g. `flag('sealed')`), returns whether the
+ * field is currently secured for the given event.
+ */
+export function isFieldSecured(
+  field: Pick<FieldConfig, 'secured'>,
+  event: EventIndex,
+  context: ValidatorContext
+): boolean {
+  if (typeof field.secured !== 'object' || field.secured === null) {
+    return Boolean(field.secured)
+  }
+
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
+  return validate(field.secured as JSONSchema, clientFunctionContext)
+}
+
+export type EventValidatorContext = {
+  document: EventDocument
+  state: EventIndex
+}
+
+export function getEventValidatorContext(
+  document: EventDocument,
+  config: EventConfig
+): EventValidatorContext {
+  return { document, state: getCurrentEventState(document, config) }
+}
+
+export type UserValidatorContext = {
+  // In system-wide context internal service tokens do not have UUID.
+  sub: string
+  scope: EncodedScope[]
+  role?: string
+  userType: TokenUserType
+}
+/** deprecated */
 export type ValidatorContext = {
-  user?: ITokenPayload
+  user?: UserValidatorContext
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  event?: EventDocument
   baseFormState?: EventState
+  event?: EventValidatorContext
+}
+
+export type StrictValidatorContext = {
+  user: UserValidatorContext
+  leafAdminStructureLocationIds: Array<{ id: UUID }>
+  baseFormState?: EventState
+  event: EventValidatorContext
 }
 
 function isFieldConditionMet(
@@ -870,79 +936,127 @@ export function runFieldValidations({
   return [...fieldValidationResult, ...customValidationResults]
 }
 
+/**
+ * Narrows a single validator JSON schema down to the part that applies to
+ * `fieldId`, or returns `null` when the schema says nothing about that field.
+ */
+function extractFieldSchema(
+  fieldId: FieldConfig['id'],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  jsonSchema: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any | null {
+  if (!jsonSchema.properties) {
+    /*
+     * `and(...)` compiles to `{ type: 'object', allOf: [...] }` with no
+     * top-level `properties`. Every member of an `allOf` has to hold on its
+     * own, so dropping the ones that do not mention `fieldId` leaves the
+     * meaning of the rest intact.
+     *
+     * `or(...)` (`anyOf`) and `not(...)` are deliberately NOT narrowed:
+     * `or(firstnameValid, surnameValid)` passes as a whole while firstname
+     * alone fails, so narrowing it would invent an error on a valid form.
+     */
+    if (Array.isArray(jsonSchema.allOf)) {
+      const members = jsonSchema.allOf
+        .map((member: unknown) => extractFieldSchema(fieldId, member))
+        .filter((member: unknown) => member !== null)
+        // The plain branch below stamps an `$id` on every member, but only the
+        // outermost schema is allowed to carry one.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map(({ $id, ...member }: any) => member)
+
+      if (members.length === 0) {
+        return null
+      }
+
+      return {
+        ...jsonSchema,
+        /*
+         * `validate()` looks schemas up from Ajv's cache by `$id`, so a
+         * narrowed schema must not reuse the id its un-narrowed parent was
+         * compiled under.
+         */
+        ...(typeof jsonSchema.$id === 'string'
+          ? { $id: `${jsonSchema.$id}.${fieldId}` }
+          : {}),
+        allOf: members
+      }
+    }
+
+    return null
+  }
+
+  const $form = jsonSchema.properties.$form
+
+  /*
+   * Not every schema with `properties` is a `$form` conditional: members of an
+   * `and(...)` built from `user.hasScope(...)`, `user.isOnline()` or an
+   * `$event` conditional have `properties` without a `$form` under it. Those
+   * say nothing about `fieldId`.
+   */
+  if (!$form?.properties) {
+    return null
+  }
+
+  /*
+   * If you are working with nested "composite fields" like address or name,
+   * It is useful to change the validation to only include the specific fields without the parent layer
+   * for the full form field so
+   *
+   * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
+   * {a: Validator, b: Validator}
+   */
+  if ($form.properties?.[fieldId]?.type === 'object') {
+    return {
+      ...jsonSchema,
+      // See the `$id` note in the `allOf` branch above: Ajv caches by `$id`,
+      // so a narrowed schema must not reuse its parent's id.
+      ...(typeof jsonSchema.$id === 'string'
+        ? { $id: `${jsonSchema.$id}.${fieldId}` }
+        : {}),
+      properties: {
+        $form: {
+          type: 'object',
+          properties: $form.properties?.[fieldId]?.properties || {},
+          required: $form.properties?.[fieldId]?.required || []
+        }
+      }
+    }
+  }
+
+  if (!$form.properties?.[fieldId]) {
+    return null
+  }
+
+  return {
+    ...jsonSchema,
+    $id: jsonSchema.$id + '.' + fieldId,
+    properties: {
+      $form: {
+        type: 'object',
+        properties: {
+          [fieldId]: $form.properties?.[fieldId]
+        },
+        required: $form.required?.includes(fieldId) ? [fieldId] : []
+      }
+    }
+  }
+}
+
 export function getValidatorsForField(
   fieldId: FieldConfig['id'],
   validations: NonNullable<FieldConfig['validation']>
 ): NonNullable<FieldConfig['validation']> {
   return validations
     .map(({ validator, message }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const jsonSchema = validator as any
-      /*
-       * It’s possible the validator is an or(...) / and(...) / similar combinator.
-       * From these it's tricky to extract field-specific validation:
-       *
-       * Currently we assume a plain object validator:
-       *   { firstname: aValidator, middlename: bValidator, lastname: cValidator }
-       * so "lastname" → cValidator directly.
-       *
-       * But with something like:
-       *   (firstname: aValidator) OR (middlename: bValidator) OR (lastname: cValidator)
-       * or even more nested logical combinations, there’s no clear properties structure
-       * (similar to JSON Schema `anyOf` not exposing `properties`).
-       *
-       * Handling all those cases is left unimplemented for now due to complexity/time.
-       */
-      if (!jsonSchema.properties) {
+      const narrowed = extractFieldSchema(fieldId, validator)
+
+      if (narrowed === null) {
         return null
       }
 
-      const $form = jsonSchema.properties.$form
-
-      /*
-       * If you are working with nested "composite fields" like address or name,
-       * It is useful to change the validation to only include the specific fields without the parent layer
-       * for the full form field so
-       *
-       * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
-       * {a: Validator, b: Validator}
-       */
-      if ($form.properties?.[fieldId]?.type === 'object') {
-        return {
-          message,
-          validator: {
-            ...jsonSchema,
-            properties: {
-              $form: {
-                type: 'object',
-                properties: $form.properties?.[fieldId]?.properties || {},
-                required: $form.properties?.[fieldId]?.required || []
-              }
-            }
-          }
-        }
-      }
-
-      if (!$form.properties?.[fieldId]) {
-        return null
-      }
-
-      return {
-        message,
-        validator: {
-          ...jsonSchema,
-          $id: jsonSchema.$id + '.' + fieldId,
-          properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: $form.properties?.[fieldId]
-              },
-              required: $form.required?.includes(fieldId) ? [fieldId] : []
-            }
-          }
-        }
-      }
+      return { message, validator: narrowed }
     })
     .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
 }

@@ -8,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
 import superjson from 'superjson'
-import { within } from '@testing-library/dom'
 import {
   ActionType,
   createPrng,
@@ -77,7 +76,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     await canvas.findByText("Applicant's name")
 
     await expect(
-      await canvas.findByTestId('row-value-applicant.name')
+      await canvas.findByTestId('applicant.name-value')
     ).toHaveTextContent('Riku This value is from a draft')
 
     await canvas.findByText(

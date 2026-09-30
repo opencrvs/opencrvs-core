@@ -1,0 +1,29 @@
+{{/*
+This chart has no default-deny NetworkPolicy of its own, but its pods are
+typically deployed into the same namespace as the opencrvs-services chart,
+whose "*-default-deny" policy uses podSelector: {} and therefore matches
+every pod in the namespace, these included. This rule exempts
+esignet-mock/mosip-api/mosip-mock from that default-deny by explicitly
+allowing all ingress and egress for them.
+*/}}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mosip-allow-all
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - esignet-mock
+          - mosip-api
+          - mosip-mock
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - {}
+  egress:
+    - {}

@@ -12,7 +12,6 @@ import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
 import { ScopeType, decodeScope, Scope, EncodedScope } from './scopes'
-import { UUID } from './uuid'
 export * from './scopes'
 
 /**
@@ -53,8 +52,6 @@ export interface ITokenPayload {
   scope: EncodedScope[]
   role?: string
   userType: TokenUserType
-  eventId?: UUID
-  actionId?: UUID
 }
 
 /**
@@ -101,6 +98,35 @@ export const getUserIdFromToken = (token: string): string | null => {
   } catch {
     return null
   }
+}
+
+/**
+ * Fixed subject (`sub`) of the service token that core's auth service mints at `GET /internal/service-token`.
+ * Core uses it for service-to-service calls where no user is involved.
+ *
+ * Must be a well-formed UUID so a service verifying the token can resolve it as
+ * a `SystemContext` as with `INTEGRATION_CREATOR_USER_ID` / `REINDEX_USER_ID`.
+ *
+ * See packages/auth/src/features/serviceToken/handler.ts
+ */
+export const SERVICE_USER_ID = '00000000-0000-4000-8000-000000000002'
+
+/**
+ * True when a decoded token payload (e.g. Hapi's `request.auth.credentials`)
+ * belongs to core's service token, identified by its fixed subject. A country
+ * configuration uses this to accept core's own service-to-service calls (e.g.
+ * telemetry, all-user broadcasts) while rejecting any logged-in user's token.
+ *
+ * Accepts `unknown` so loosely-typed framework credentials can be passed
+ * directly without a cast; anything that is not an object with the matching
+ * `sub` yields `false`.
+ */
+export function isServiceToken(credentials: unknown): boolean {
+  return (
+    typeof credentials === 'object' &&
+    credentials !== null &&
+    (credentials as { sub?: unknown }).sub === SERVICE_USER_ID
+  )
 }
 
 export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {

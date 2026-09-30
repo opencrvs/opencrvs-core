@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, expect, waitFor, screen } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, expect, waitFor, screen } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
@@ -121,7 +121,8 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
 
     // Declare (Update) must be enabled — community leader can open the declare form
     // even though they only hold record.notify, not record.declare.
-    const declareItem = await screen.findByText('Declare')
+    // tennisClubMembershipEvent configures DECLARE's label as "Send an application".
+    const declareItem = await screen.findByText('Send an application')
     await waitFor(async () => {
       await expect(declareItem.hasAttribute('disabled')).toBe(false)
     })

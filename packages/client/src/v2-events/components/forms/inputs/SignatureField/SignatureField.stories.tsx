@@ -9,10 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
+import { noop } from 'lodash'
+import { eventAttachmentPath } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
+import { storybookEventId } from '@client/v2-events/features/events/fixtures'
 import { SignatureField } from './SignatureField'
 
 const meta: Meta<typeof SignatureField> = {
@@ -31,7 +33,7 @@ const meta: Meta<typeof SignatureField> = {
         path: '/event/:eventId',
         element: (
           <SignatureField.Input
-            filePath={''}
+            filePath={eventAttachmentPath(storybookEventId)}
             maxFileSize={5 * 1024 * 1024}
             modalTitle={'Upload Signature'}
             name={'Upload Signature'}

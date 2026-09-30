@@ -53,7 +53,7 @@ describe('triggerSystemReady', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1)
     const [url, options] = mockFetch.mock.calls[0]
-    expect(String(url)).toContain('/triggers/system/ready')
+    expect(String(url)).toContain('/trigger/system/ready')
     expect(options?.headers).toMatchObject({
       Authorization: 'Bearer bootstrap-token'
     })

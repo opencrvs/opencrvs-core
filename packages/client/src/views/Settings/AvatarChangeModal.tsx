@@ -9,14 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Button, ITheme, Dialog } from '@opencrvs/components'
 import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
@@ -25,14 +21,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
 
-import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
 import { useOnlineStatus } from '@client/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile } from '@client/v2-events/cache'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { DocumentPath } from '@opencrvs/commons/client'
+import {
+  DocumentPath,
+  UUID,
+  userAttachmentPath
+} from '@opencrvs/commons/client'
 
 const Container = styled.div`
   align-self: center;
@@ -146,12 +145,12 @@ function AvatarChangeModalComp({
   error,
   onErrorChanged: setError,
   onConfirmAvatarChange,
-  onAvatarChanged
-}: IProps) {
+  onAvatarChanged,
+  userId
+}: IProps & { userId: UUID }) {
   const intl = useIntl()
   const theme = useTheme() as ITheme
   const isOnline = useOnlineStatus()
-  const userDetails = useSelector(getUserDetails)
   const { changeAvatar: changeAvatarMutation } = useUsers()
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
   const [zoom, setZoom] = React.useState<number>(1)
@@ -174,65 +173,66 @@ function AvatarChangeModalComp({
   }
 
   const { uploadFileAsync } = useFileUpload(
-    `users/${userDetails?.id}`,
-    userDetails?.id || '',
+    userAttachmentPath(userId),
+    userId,
     {}
   )
   const handleApply = async () => {
     const croppedImage = await getCroppedImage(imgSrc, croppedArea)
 
-    if (!userDetails) {
-      throw new Error(
-        'User details not in the scope of avatar change modal. This should never happen'
-      )
-    }
-
     if (!croppedImage) {
       setError(intl.formatMessage(messages.avatarProcessingError))
       return
     }
-    const { url } = await uploadFileAsync(croppedImage, userDetails.id)
-    if (userDetails && userDetails.id && croppedImage) {
-      changeAvatarMutation.mutate(
-        {
-          userId: userDetails.id,
-          avatar: url
-        },
-        {
-          onSuccess: (data) => {
-            cacheFile({ url, file: croppedImage })
+    const { url } = await uploadFileAsync(croppedImage, userId)
 
-            dispatch(modifyUserDetails({ avatar: url as DocumentPath }))
-            onAvatarChanged(url)
-            reset()
-          }
+    changeAvatarMutation.mutate(
+      {
+        userId,
+        avatar: url
+      },
+      {
+        onSuccess: () => {
+          cacheFile({ url, file: croppedImage })
+
+          dispatch(modifyUserDetails({ avatar: url as DocumentPath }))
+          onAvatarChanged(url)
+          reset()
         }
-      )
-      onConfirmAvatarChange()
-    }
+      }
+    )
+    onConfirmAvatarChange()
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangeAvatarModal"
+      variant="large"
       width={1080}
-      autoHeight
-      show={showChangeAvatar}
+      isOpen={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
+        <Button
+          type="tertiary"
+          key="cancel"
+          id="modal_cancel"
+          onClick={handleCancel}
+          size="large"
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
+          type="primary"
           key="apply"
           id="apply_change"
           disabled={!isOnline || !!error}
           onClick={handleApply}
+          size="large"
         >
           {intl.formatMessage(buttonMessages.apply)}
-        </PrimaryButton>
+        </Button>
       ]}
-      handleClose={handleCancel}
+      onClose={handleCancel}
     >
       <Description>
         {!error && intl.formatMessage(messages.resizeAvatar)}
@@ -280,8 +280,16 @@ function AvatarChangeModalComp({
           />
         </>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
-export const AvatarChangeModal = AvatarChangeModalComp
+export function AvatarChangeModal(props: IProps) {
+  const userDetails = useSelector(getUserDetails)
+
+  if (!userDetails) {
+    return null
+  }
+
+  return <AvatarChangeModalComp {...props} userId={userDetails.id} />
+}

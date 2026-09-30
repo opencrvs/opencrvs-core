@@ -16,12 +16,14 @@ import {
   mockUserResponse,
   getItem,
   userDetails,
-  mockRegistrarUserResponse
+  mockRegistrarUserResponse,
+  flushPromises
 } from '@client/tests/util'
 import { storage } from '@client/storage'
 import { getCmd, getModel } from 'redux-loop'
 import { vi, Mock } from 'vitest'
 import type { ITokenPayload } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 
 storage.removeItem = vi.fn()
 
@@ -34,20 +36,39 @@ describe('profileReducer tests', () => {
     store = createStore().store
   })
 
-  it('sets user as logged out on bad token', async () => {
-    const expectedState = {
-      ...initialState,
-      authenticated: false
-    }
+  it('CHECK_AUTH_COMPLETE with an undecodable token redirects to authentication', () => {
+    const result = profileReducer(
+      initialState,
+      actions.checkAuthComplete('bad.token.here')
+    )
+    expect(getModel(result)).toMatchObject({ authenticated: false })
+    expect(getCmd(result)).toMatchObject({
+      actionToDispatch: { type: actions.REDIRECT_TO_AUTHENTICATION }
+    })
+  })
 
-    const action = {
-      type: actions.CHECK_AUTH,
-      payload: {
-        badToken: '12345'
-      }
+  it('CHECK_AUTH_COMPLETE with a decodable token sets authenticated and schedules setInitialUserDetails', () => {
+    const token = testDataGenerator().user.token.fieldAgent
+    const result = profileReducer(
+      initialState,
+      actions.checkAuthComplete(token)
+    )
+    expect(getModel(result)).toMatchObject({ authenticated: true })
+    expect(getModel(result).tokenPayload).not.toBeNull()
+    const cmd = getCmd(result) as {
+      cmds: Array<{ actionToDispatch?: { type: string } }>
     }
-    store.dispatch(action)
-    expect(store.getState().profile).toEqual(expectedState)
+    expect(
+      cmd.cmds.some(
+        (c) => c.actionToDispatch?.type === actions.SET_INITIAL_USER_DETAILS
+      )
+    ).toBe(true)
+  })
+
+  it('CHECK_AUTH schedules an async Cmd.run', () => {
+    const result = profileReducer(initialState, actions.checkAuth())
+    const cmd = getCmd(result) as { func?: unknown }
+    expect(typeof cmd.func).toBe('function')
   })
 
   it('sets user details', async () => {
@@ -125,6 +146,7 @@ describe('profileReducer tests', () => {
       }
     }
     store.dispatch(action)
+    await flushPromises()
     expect(store.getState().profile.authenticated).toEqual(false)
     expect(store.getState().profile.userDetailsFetched).toEqual(false)
     expect(store.getState().profile.tokenPayload).toEqual(null)

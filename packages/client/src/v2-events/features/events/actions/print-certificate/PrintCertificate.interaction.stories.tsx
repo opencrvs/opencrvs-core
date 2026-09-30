@@ -12,11 +12,11 @@
 /* eslint-disable max-lines */
 
 import React from 'react'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
-import { within, userEvent, expect, waitFor, fireEvent } from '@storybook/test'
+import { within, userEvent, expect, waitFor, fireEvent } from 'storybook/test'
 import { Outlet } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import {
@@ -26,7 +26,9 @@ import {
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  never
+  never,
+  generateActionDocument,
+  EventDocumentOnlyLastAction
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -562,21 +564,15 @@ export const RedirectAfterPrint: Story = {
       handlers: {
         event: [
           tRPCMsw.event.actions.assignment.unassign.mutation(() => {
-            Object.assign(
-              eventDocument,
-              generateEventDocument({
-                configuration: tennisClubMembershipEvent,
-                actions: [
-                  { type: ActionType.CREATE, user },
-                  { type: ActionType.ASSIGN, user },
-                  { type: ActionType.DECLARE, user },
-                  { type: ActionType.REGISTER, user },
-                  { type: ActionType.PRINT_CERTIFICATE, user },
-                  { type: ActionType.UNASSIGN, user }
-                ]
-              })
-            )
-            return eventDocument
+            return EventDocumentOnlyLastAction.parse({
+              ...eventDocument,
+              actions: [
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.UNASSIGN
+                })
+              ]
+            })
           }),
           tRPCMsw.event.actions.printCertificate.request.mutation(() => {
             Object.assign(

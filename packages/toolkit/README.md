@@ -14,6 +14,22 @@ src/
 
 ## Getting started
 
+### Manage GitHub environments
+
+All commands should be executed within infrastructure repository.
+
+Run `opencrvs environment init` from the root of a infrastructure
+repository to create new GitHub environment. Command requires valid GitHub token.
+
+Other environment operations are available as separate commands:
+
+```sh
+opencrvs environment update-workflows
+opencrvs environment upgrade
+opencrvs environment users
+opencrvs environment swarm-to-k8s
+```
+
 ### Development using yarn link
 
 ```
@@ -39,19 +55,9 @@ Toolkit "re-exports" TRPC router to allow for easy client interaction.
 
 Toolkit "re-exports" common definitions (e.g. events, conditionals) and make them available through npm.
 
-### Releasing and buiding
+### Publishing
 
-#### While developing
-
-1. Update version number in `package.json`
-2. `yarn build:all`
-3. `npm publish`
-
-#### Through version control
-
-1. Update version number in `package.json`
-2. Create a pull request
-3. Once merged, github action will get triggered.
+Publish via [Publish toolkit to NPM registry](https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml).
 
 #### Gotchas, good to know
 

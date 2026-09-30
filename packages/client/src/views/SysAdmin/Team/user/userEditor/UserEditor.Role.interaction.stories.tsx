@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { within, expect, waitFor, userEvent } from '@storybook/test'
+import { within, expect, waitFor, userEvent } from 'storybook/test'
 import { TestUserRole, UUID } from '@opencrvs/commons/client'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'

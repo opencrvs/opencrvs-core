@@ -340,6 +340,39 @@ const messagesToDefine = {
     id: 'integrations.scopes',
     defaultMessage: 'Scopes',
     description: 'Heading for the scopes list in the client details dialog'
+  },
+  refreshSecret: {
+    id: 'integrations.refreshSecret',
+    defaultMessage: 'Refresh secret',
+    description:
+      'Label for the refresh secret action menu item and confirmation button'
+  },
+  refreshSecretText: {
+    id: 'integrations.refreshSecretText',
+    defaultMessage:
+      'This will generate a new client secret and immediately invalidate the current one. Are you sure you want to continue?',
+    description: 'Prompt shown before refreshing an integration client secret'
+  },
+  refreshSecretWarning: {
+    id: 'integrations.refreshSecretWarning',
+    defaultMessage:
+      'The integration will stop working until the new secret is configured in the integrating client.',
+    description:
+      'Warning alert shown in the refresh client secret confirmation dialog'
+  },
+  refreshSecretSuccessText: {
+    id: 'integrations.refreshSecretSuccessText',
+    defaultMessage:
+      "Copy the new client secret now. For security it won't be shown again. The integration will stop working until this secret is configured in the integrating client.",
+    description:
+      'Message shown alongside the newly generated client secret after a refresh'
+  },
+  clientSecretHiddenNote: {
+    id: 'integrations.clientSecretHiddenNote',
+    defaultMessage:
+      'The client secret is only shown once, when created. To refresh it, select "Refresh secret" from the client\'s action menu.',
+    description:
+      'Note shown in place of the client secret in the reveal keys dialog'
   }
 }
 
