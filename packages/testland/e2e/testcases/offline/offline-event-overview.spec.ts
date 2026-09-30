@@ -160,7 +160,6 @@ test.describe.serial('Can view downloaded event offline', () => {
   })
 
   test('Go offline', async () => {
-    page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
   })
 
