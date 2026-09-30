@@ -24,7 +24,6 @@ import {
   getOrThrow,
   isActionEnabled,
   isActionVisible,
-  ITokenPayload,
   ValidatorContext,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
@@ -37,12 +36,8 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.ARCHIVED
 ]
 
-function getAvailableAssignmentActions(
-  event: EventIndex,
-  authentication: ITokenPayload
-) {
-  filterActionsByFlags
-  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+function getAvailableAssignmentActions(event: EventIndex, userId: string) {
+  const assignmentStatus = getAssignmentStatus(event, userId)
   const eventStatus = event.status
 
   let actions: ActionTypes[] = []
@@ -68,7 +63,8 @@ function resolveInternalActionConditions({
   isDownloaded,
   assignmentStatus,
   isAssigning,
-  isDeclareDraftOpen
+  isDeclareDraftOpen,
+  areDuplicatesAvailable
 }: {
   assignmentStatus: AssignmentStatus
   actionType: WorkqueueActionType | ActionMenuActionType
@@ -76,6 +72,7 @@ function resolveInternalActionConditions({
   isDownloaded: boolean
   isAssigning: boolean
   isDeclareDraftOpen: boolean
+  areDuplicatesAvailable: boolean
 }): {
   enabled: boolean
   visible: boolean
@@ -102,7 +99,10 @@ function resolveInternalActionConditions({
       return { enabled: isDownloadedAndAssignedToUser, visible: true }
     case ActionType.MARK_AS_DUPLICATE:
       return {
-        enabled: isDownloadedAndAssignedToUser && !isAssigning,
+        enabled:
+          isDownloadedAndAssignedToUser &&
+          !isAssigning &&
+          areDuplicatesAvailable,
         visible: true
       }
     case ActionType.DECLARE:
@@ -131,7 +131,8 @@ export function resolveActionConditionals({
   eventConfiguration,
   isOnline,
   isDownloaded,
-  isAssigning
+  isAssigning,
+  areDuplicatesAvailable = true
 }: {
   event: EventIndex
   actionType: WorkqueueActionType | ActionMenuActionType
@@ -142,6 +143,7 @@ export function resolveActionConditionals({
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
+  areDuplicatesAvailable?: boolean
 }): {
   enabled: boolean
   visible: boolean
@@ -152,7 +154,7 @@ export function resolveActionConditionals({
   )
 
   const availableEventActions = getAvailableActionsForEvent(event)
-  const availableAssignActions = getAvailableAssignmentActions(event, user)
+  const availableAssignActions = getAvailableAssignmentActions(event, user.sub)
   // 1. Gather all available actions for the event, including assignment actions
   const allAvailableActions = [
     ...availableEventActions,
@@ -194,7 +196,8 @@ export function resolveActionConditionals({
     assignmentStatus,
     isDownloaded,
     isAssigning,
-    isDeclareDraftOpen
+    isDeclareDraftOpen,
+    areDuplicatesAvailable
   })
 
   return {

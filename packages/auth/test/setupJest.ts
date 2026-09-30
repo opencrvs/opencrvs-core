@@ -32,6 +32,14 @@ const mock = {
       const keyExists = !!database[key]
       delete database[key]
       return keyExists ? 1 : 0
+    }),
+    // GETDEL: returns the value and removes the key, or null if absent.
+    // Read and delete stay in one synchronous body so that, as with the real
+    // command, no caller can observe the value between the two.
+    getDel: jest.fn().mockImplementation(async (key) => {
+      const value = database[key] ?? null
+      delete database[key]
+      return value
     })
   }
 }

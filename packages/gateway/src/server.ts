@@ -101,11 +101,11 @@ export async function createServer() {
     if (request.response instanceof RateLimitError) {
       return reply
         .response({
-          statusCode: 402,
+          statusCode: 429,
           error: 'Rate limit exceeded',
           message: request.response.message
         })
-        .code(402)
+        .code(429)
     }
 
     return reply.continue

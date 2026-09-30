@@ -8,74 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IUserSetupMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  confirmPassword: MessageDescriptor
-  hasCases: MessageDescriptor
-  hasNumber: MessageDescriptor
-  header: MessageDescriptor
-  instruction: MessageDescriptor
-  labelAssignedOffice: MessageDescriptor
-  labelEnglishName: MessageDescriptor
-  match: MessageDescriptor
-  minLength: MessageDescriptor
-  mismatch: MessageDescriptor
-  newPassword: MessageDescriptor
-  passwordRequired: MessageDescriptor
-  setupCompleteTitle: MessageDescriptor
-  userSetupInstruction: MessageDescriptor
-  userSetupIntroduction: MessageDescriptor
-  userSetupRevieTitle: MessageDescriptor
-  userSetupReviewHeader: MessageDescriptor
-  userSetupWelcomeTitle: MessageDescriptor
-  validationMsg: MessageDescriptor
-  waiting: MessageDescriptor
-  assignedOffice: MessageDescriptor
-  phoneNumber: MessageDescriptor
-  userName: MessageDescriptor
-  nid: MessageDescriptor
-  startDate: MessageDescriptor
-  auditSectionTitle: MessageDescriptor
-  auditActionColumnTitle: MessageDescriptor
-  auditTrackingIDColumnTitle: MessageDescriptor
-  auditDateColumnTitle: MessageDescriptor
-  noAuditFound: MessageDescriptor
-  inProgressAuditAction: MessageDescriptor
-  declaredAuditAction: MessageDescriptor
-  validatedAuditAction: MessageDescriptor
-  updatedAuditAction: MessageDescriptor
-  registeredAuditAction: MessageDescriptor
-  rejectedAuditAction: MessageDescriptor
-  certifiedAuditAction: MessageDescriptor
-  assignedAuditAction: MessageDescriptor
-  unAssignedAuditAction: MessageDescriptor
-  requestedCorrectionAuditAction: MessageDescriptor
-  approvedCorrectionAuditAction: MessageDescriptor
-  rejectedCorrectedAuditAction: MessageDescriptor
-  archivedAuditAction: MessageDescriptor
-  loggedInAuditAction: MessageDescriptor
-  loggedOutAuditAction: MessageDescriptor
-  phoneNumberChangedAuditAction: MessageDescriptor
-  emailAddressChangedAuditAction: MessageDescriptor
-  passwordChangedAuditAction: MessageDescriptor
-  reactivateAuditAction: MessageDescriptor
-  deactivateAuditAction: MessageDescriptor
-  createUserAuditAction: MessageDescriptor
-  editUserAuditAction: MessageDescriptor
-  passwordResetAuditAction: MessageDescriptor
-  usernameReminderByAdmin: MessageDescriptor
-  passwordResetByAdmin: MessageDescriptor
-  resendInviteAuditAction: MessageDescriptor
-  userNameReminderAuditAction: MessageDescriptor
-  viewedAuditAction: MessageDescriptor
-  reInstatedInProgressAuditAction: MessageDescriptor
-  markedAsDuplicate: MessageDescriptor
-  markedAsNotDuplicate: MessageDescriptor
-}
-
-const messagesToDefine: IUserSetupMessages = {
+export const messages = defineMessages({
   confirmPassword: {
     defaultMessage: 'Confirm new password',
     description: 'Confirm password label',
@@ -182,26 +117,6 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Assigned registration office',
     description: 'Title for assigned office field',
     id: 'user.profile.assignedOffice'
-  },
-  phoneNumber: {
-    defaultMessage: 'Phone number',
-    description: 'Title for phoneNumber field',
-    id: 'user.profile.phoneNumber'
-  },
-  userName: {
-    defaultMessage: 'Username',
-    description: 'Title for userName field',
-    id: 'user.profile.userName'
-  },
-  nid: {
-    defaultMessage: 'National ID',
-    description: 'Title for nid',
-    id: 'user.profile.nid'
-  },
-  startDate: {
-    defaultMessage: 'Start date',
-    description: 'Title for startDate field',
-    id: 'user.profile.startDate'
   },
   auditSectionTitle: {
     defaultMessage: 'History',
@@ -398,7 +313,31 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Downloaded record',
     description: 'Description for download audit action',
     id: 'user.profile.auditList.download'
+  },
+  createIntegrationAuditAction: {
+    defaultMessage: 'Created integration',
+    description: 'Description for create integration audit action',
+    id: 'user.profile.auditList.createIntegration'
+  },
+  refreshSecretAuditAction: {
+    defaultMessage: 'Refreshed client secret',
+    description:
+      'Description for refresh integration client secret audit action',
+    id: 'user.profile.auditList.refreshSecret'
+  },
+  activateIntegrationAuditAction: {
+    defaultMessage: 'Activated integration',
+    description: 'Description for activate integration audit action',
+    id: 'user.profile.auditList.activateIntegration'
+  },
+  deactivateIntegrationAuditAction: {
+    defaultMessage: 'Deactivated integration',
+    description: 'Description for deactivate integration audit action',
+    id: 'user.profile.auditList.deactivateIntegration'
+  },
+  deleteIntegrationAuditAction: {
+    defaultMessage: 'Deleted integration',
+    description: 'Description for delete integration audit action',
+    id: 'user.profile.auditList.deleteIntegration'
   }
-}
-
-export const messages: IUserSetupMessages = defineMessages(messagesToDefine)
+})

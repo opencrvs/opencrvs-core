@@ -31,7 +31,9 @@ import {
   FieldUpdateValue,
   EventState,
   EventConfig,
-  isActionEnabled
+  isActionEnabled,
+  AttachmentPath,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -105,8 +107,13 @@ function EditActionModal({
   close,
   fields = [],
   eventConfiguration,
-  declaration
+  declaration,
+  attachmentPath,
+  event
 }: {
+  attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   title: MessageDescriptor
   supportingCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
@@ -115,7 +122,7 @@ function EditActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
 
@@ -175,6 +182,7 @@ function EditActionModal({
       {fields.length > 0 && (
         <FormFieldGenerator
           {...dialogForm}
+          attachmentPath={attachmentPath}
           eventConfig={eventConfiguration}
           fields={fields}
           id="edit-action-modal-form"
@@ -272,8 +280,10 @@ function useEditActions(event: EventDocument) {
             (close) => {
               return (
                 <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
@@ -310,8 +320,10 @@ function useEditActions(event: EventDocument) {
             (close) => {
               return (
                 <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
@@ -350,8 +362,10 @@ function useEditActions(event: EventDocument) {
             (close) => {
               return (
                 <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,

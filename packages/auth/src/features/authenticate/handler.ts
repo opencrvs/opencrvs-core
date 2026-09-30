@@ -12,6 +12,7 @@ import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import {
   IAuthentication,
   authenticate,
+  assertOfficeIsActive,
   createToken,
   createRefreshToken,
   generateAndSendVerificationCode,
@@ -22,10 +23,10 @@ import {
   NotificationEvent,
   generateNonce
 } from '@auth/features/verifyCode/service'
-import { forbidden, unauthorized } from '@hapi/boom'
+import { forbidden, locked, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { maskEmail, maskSms } from '@opencrvs/commons'
+import { InactiveOfficeError, maskEmail, maskSms } from '@opencrvs/commons'
 
 interface IAuthPayload {
   username: string
@@ -54,6 +55,18 @@ export default async function authenticateHandler(
   } catch (err) {
     throw unauthorized()
   }
+
+  try {
+    await assertOfficeIsActive(result.primaryOfficeId)
+  } catch (err) {
+    if (err instanceof InactiveOfficeError) {
+      throw locked(
+        'Your assigned office has been made inactive. Please contact your administrator to be reassigned'
+      )
+    }
+    throw err
+  }
+
   if (result.status === 'deactivated') {
     throw forbidden()
   }

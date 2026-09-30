@@ -10,9 +10,9 @@
  */
 import { test, expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { getToken, login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
-import { createDeclaration } from '../test-data/birth-declaration-with-mother-father'
+import { getToken, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-mother-father'
 
 test("BRN search on deceased's details finds and fills from a registered birth record", async ({
   page
@@ -46,7 +46,7 @@ test("BRN search on deceased's details finds and fills from a registered birth r
     // The birth may take a moment to be indexed for search; retry the search
     // until the matching record is found.
     await expect(async () => {
-      await page.getByRole('button', { name: 'Search', exact: true }).click()
+      await page.locator('#search').press('Enter')
       await expect(page.getByTestId('search-input-error')).toHaveText(
         'Birth record found',
         { timeout: 5000 }

@@ -46,6 +46,8 @@ const StyledLink = styled.button<{
   background: transparent;
   text-decoration: none;
   display: inline;
+  /* Buttons center their text by default, which misaligns links that wrap to multiple lines */
+  text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;

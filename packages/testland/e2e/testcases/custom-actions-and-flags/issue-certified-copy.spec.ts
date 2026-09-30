@@ -9,19 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { getToken, login, searchFromSearchBar } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import {
   ensureAssignedToUser,
   navigateToWorkqueue,
   selectAction
-} from '../../utils'
-import { Declaration, createDeclaration } from '../test-data/birth-declaration'
-import { REQUIRED_VALIDATION_ERROR, formatV2ChildName } from '../birth/helpers'
+} from '@e2e/support/utils'
+import {
+  Declaration,
+  createDeclaration
+} from '@e2e/support/test-data/birth-declaration'
+import {
+  REQUIRED_VALIDATION_ERROR,
+  formatV2ChildName
+} from '@e2e/support/birth/helpers'
 import {
   openRecordByTitle,
   printAndExpectPopup
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Issue Certified Copy', () => {
   let page: Page

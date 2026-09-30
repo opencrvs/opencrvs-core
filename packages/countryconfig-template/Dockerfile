@@ -5,8 +5,9 @@ RUN corepack enable pnpm
 WORKDIR /usr/src/app
 ENV NPM_CONFIG_LOGLEVEL=warn
 
-# Install dependencies
-COPY package.json pnpm-lock.yaml ./
+# Install dependencies. .pnpmfile.cjs too: the lockfile records its checksum,
+# so a frozen install without it fails on ERR_PNPM_LOCKFILE_CONFIG_MISMATCH.
+COPY package.json pnpm-lock.yaml .pnpmfile.cjs ./
 
 RUN pnpm install --frozen-lockfile
 
@@ -22,6 +23,10 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 
 # Copy application files
 COPY package.json pnpm-lock.yaml tsconfig.json ./
+# Download pnpm into the image. `corepack enable` only installs a shim that
+# fetches pnpm from registry.npmjs.org the first time it runs, i.e. on every
+# container start, which fails wherever that egress is restricted.
+RUN corepack install
 COPY src ./src
 
 EXPOSE 3040

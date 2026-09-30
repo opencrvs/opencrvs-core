@@ -11,9 +11,8 @@
 import * as React from 'react'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
+  DynamicHeightLinkButton,
+  SettingsRow
 } from '@client/views/Settings/items/components'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
@@ -22,12 +21,11 @@ import {
   buttonMessages,
   userMessages
 } from '@client/i18n/messages'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { useOnlineStatus } from '@client/utils'
 import { ChangeEmailModal } from '@client/views/Settings/ChangeEmailModal/ChangeEmailModal'
 
-export function EmailAddress() {
+export function useEmailAddress(): SettingsRow {
   const intl = useIntl()
   const isOnline = useOnlineStatus()
   const email = useSelector<IStoreState, string>(
@@ -48,35 +46,34 @@ export function EmailAddress() {
     toggleSuccessNotification()
   }
 
-  return (
-    <>
-      <ListViewItemSimplified
-        label={
-          <LabelContainer>
-            {intl.formatMessage(constantsMessages.labelEmail)}
-          </LabelContainer>
-        }
-        value={<ValueContainer>{email}</ValueContainer>}
-        actions={
-          <DynamicHeightLinkButton
-            data-testid="change-email-address"
-            onClick={toggleChangeEmailModal}
-            disabled={!isOnline}
-          >
-            {intl.formatMessage(buttonMessages.change)}
-          </DynamicHeightLinkButton>
-        }
-      />
-      <ChangeEmailModal
-        show={showModal}
-        onClose={toggleChangeEmailModal}
-        onSuccess={handleSuccess}
-      />
-      {showSuccessNotification && (
-        <Toast type="success" onClose={toggleSuccessNotification}>
-          <FormattedMessage {...userMessages.emailAddressUpdated} />
-        </Toast>
-      )}
-    </>
-  )
+  return {
+    id: 'email-address',
+    item: {
+      label: intl.formatMessage(constantsMessages.labelEmail),
+      value: email,
+      actions: (
+        <DynamicHeightLinkButton
+          data-testid="change-email-address"
+          onClick={toggleChangeEmailModal}
+          disabled={!isOnline}
+        >
+          {intl.formatMessage(buttonMessages.change)}
+        </DynamicHeightLinkButton>
+      )
+    },
+    overlay: (
+      <>
+        <ChangeEmailModal
+          show={showModal}
+          onClose={toggleChangeEmailModal}
+          onSuccess={handleSuccess}
+        />
+        {showSuccessNotification && (
+          <Toast type="success" onClose={toggleSuccessNotification}>
+            <FormattedMessage {...userMessages.emailAddressUpdated} />
+          </Toast>
+        )}
+      </>
+    )
+  }
 }

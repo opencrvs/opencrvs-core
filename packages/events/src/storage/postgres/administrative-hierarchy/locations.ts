@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { Kysely, RawBuilder, sql } from 'kysely'
 import { chunk } from 'lodash'
 import {
@@ -27,12 +29,42 @@ import Schema from '../events/schema/Database'
 // "bind message has ... parameter formats but 0 parameters"
 const INSERT_MAX_CHUNK_SIZE = 1000
 
-// Process-level cache for administrative hierarchies. Invalidated whenever
+// Process-level caches for administrative hierarchies. Invalidated whenever
 // locations or administrative areas are written.
 const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
+let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
 export function clearAdministrativeHierarchyCache() {
   administrativeHierarchyByIdCache.clear()
+  leafLevelAdministrativeAreaIdsCache = null
+}
+
+/**
+ * A leaf administrative level is defined as an administrative area which does not have any other administrative areas as children.
+ * Administrative areas that have locations as children are still considered leaf levels.
+ *
+ * @returns List of leaf level administrative area ids.
+ */
+export async function getLeafLevelAdministrativeAreaIds() {
+  if (!leafLevelAdministrativeAreaIdsCache) {
+    const db = getClient()
+
+    leafLevelAdministrativeAreaIdsCache = db
+      .selectFrom('administrativeAreas as a1')
+      .select(['a1.id'])
+      .where(({ not, exists, selectFrom }) =>
+        not(
+          exists(
+            selectFrom('administrativeAreas as a2')
+              .select('a2.id')
+              .whereRef('a2.parentId', '=', 'a1.id')
+          )
+        )
+      )
+      .execute()
+  }
+
+  return leafLevelAdministrativeAreaIdsCache
 }
 
 /**
@@ -182,7 +214,6 @@ export async function setLocations(locations: SetLocationRow[]) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
-  clearAdministrativeHierarchyCache()
 }
 
 /** The fully resolved values of a location create request. */
@@ -223,8 +254,6 @@ export async function createLocation(location: CreateLocationRow) {
       versions: buildInitialVersions(location)
     })
     .execute()
-
-  clearAdministrativeHierarchyCache()
 }
 
 /**
@@ -483,6 +512,24 @@ export function getAdministrativeHierarchyByIdCte(
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
 
+/*
+ * Guarded on identity so it cannot drop an entry a later write already replaced.
+ */
+function evictAdministrativeHierarchy(id: string, hierarchy: Promise<UUID[]>) {
+  if (administrativeHierarchyByIdCache.get(id) === hierarchy) {
+    administrativeHierarchyByIdCache.delete(id)
+  }
+}
+
+/*
+ * A cached rejection would outlive the failure and poison every later lookup,
+ * including the reindex retry, so a failed entry evicts itself.
+ */
+function cacheAdministrativeHierarchy(id: string, hierarchy: Promise<UUID[]>) {
+  void hierarchy.catch(() => evictAdministrativeHierarchy(id, hierarchy))
+  administrativeHierarchyByIdCache.set(id, hierarchy)
+}
+
 export async function getAdministrativeHierarchyById(
   id: string
 ): Promise<UUID[]> {
@@ -499,10 +546,102 @@ export async function getAdministrativeHierarchyById(
 
   const promise = db
     .executeQuery(query.compile(db))
-    .then((result) => (result.rows.length > 0 ? result.rows[0].ids : []))
+    .then((result) => result.rows[0]?.ids ?? [])
 
-  administrativeHierarchyByIdCache.set(id, promise)
+  cacheAdministrativeHierarchy(id, promise)
   return promise
+}
+
+/**
+ * Resolves the administrative hierarchies of many ids in one query and stores them
+ * in the same cache {@link getAdministrativeHierarchyById} reads from.
+ *
+ * That function issues one recursive CTE per id, and indexing resolves a location for
+ * every location-typed field of every event, so a batch turns into thousands of round
+ * trips queueing on the connection pool. Priming up front leaves them all cache hits.
+ *
+ * Ids resolving to nothing are cached as an empty hierarchy, the same as the
+ * single-id lookup returns, so a batch does not retry them one by one next call.
+ *
+ * Entries are cached before the query resolves, so a {@link clearAdministrativeHierarchyCache}
+ * landing mid-flight drops them rather than being undone by a late write.
+ */
+export async function primeAdministrativeHierarchyCache(
+  ids: string[]
+): Promise<void> {
+  const uncached = [
+    ...new Set(
+      ids.filter((id) => id && !administrativeHierarchyByIdCache.has(id))
+    )
+  ]
+
+  if (uncached.length === 0) {
+    return
+  }
+
+  const db = getClient()
+  const seeds = sql.val(uncached)
+  /*
+   * The single-id CTE walks one chain, so every row implicitly belongs to the id
+   * asked for. Resolving many at once merges the chains wherever they share an
+   * ancestor, so each row carries the id it started from and the recursive term
+   * propagates it unchanged.
+   */
+  const query = sql<{ seedId: UUID; ids: UUID[] }>`
+    WITH RECURSIVE area_chain AS (
+        -- 1a: Start from the locations among the seeds
+        SELECT l.id AS seed_id, l.id, l.administrative_area_id AS parent_id, 0 AS depth
+        FROM app.locations l
+        WHERE l.id = ANY(${seeds}::uuid[])
+
+        UNION ALL
+
+        -- 1b: Seeds that are not locations start from the administrative area directly
+        SELECT aa.id AS seed_id, aa.id, aa.parent_id, 0 AS depth
+        FROM app.administrative_areas aa
+        WHERE aa.id = ANY(${seeds}::uuid[])
+        AND NOT EXISTS (SELECT 1 FROM app.locations l WHERE l.id = aa.id)
+
+        UNION ALL
+
+        -- 2: Walk up, carrying the seed each chain started from
+        SELECT ac.seed_id, aa.id, aa.parent_id, ac.depth + 1
+        FROM area_chain ac
+        JOIN app.administrative_areas aa ON aa.id = ac.parent_id
+    )
+    SELECT seed_id, array_agg(id ORDER BY depth DESC) AS ids
+    FROM area_chain
+    GROUP BY seed_id;
+  `
+
+  const hierarchyBySeedId = db
+    .executeQuery(query.compile(db))
+    .then(
+      (result) =>
+        new Map<string, UUID[]>(result.rows.map((row) => [row.seedId, row.ids]))
+    )
+
+  const entries = uncached.map((id) => {
+    const hierarchy = hierarchyBySeedId.then(
+      (bySeedId) => bySeedId.get(id) ?? []
+    )
+    cacheAdministrativeHierarchy(id, hierarchy)
+    return [id, hierarchy] as const
+  })
+
+  try {
+    await hierarchyBySeedId
+  } catch (error) {
+    /*
+     * An entry evicts itself only a microtask after this rejection reaches the
+     * caller, which is long enough for a concurrently indexing batch to read one.
+     * Evicting here instead means no caller ever observes a poisoned entry.
+     */
+    for (const [id, hierarchy] of entries) {
+      evictAdministrativeHierarchy(id, hierarchy)
+    }
+    throw error
+  }
 }
 
 export async function isLocationUnderAdministrativeArea({

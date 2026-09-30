@@ -20,12 +20,15 @@ import {
   triggerDeclarationAction,
   switchEventTab,
   validateActionMenuButton
-} from '../../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
-import { CREDENTIALS } from '../../../constants'
-import { ensureAssignedToUser, selectAction } from '../../../utils'
-import { assertRecordInWorkqueue, REQUIRED_VALIDATION_ERROR } from '../helpers'
-import { openRecordByTitle } from '../../print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import {
+  assertRecordInWorkqueue,
+  REQUIRED_VALIDATION_ERROR
+} from '@e2e/support/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Change informant on review', () => {
   let page: Page
@@ -297,13 +300,13 @@ test.describe.serial('Change informant on review', () => {
     test('Go back to review, expect to see validation errors for father information', async () => {
       await page.getByRole('button', { name: 'Go to review' }).click()
 
-      await expect(page.getByTestId('row-value-father.name')).toContainText(
+      await expect(page.getByTestId('father.name-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
-      await expect(page.getByTestId('row-value-father.dob')).toContainText(
+      await expect(page.getByTestId('father.dob-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
-      await expect(page.getByTestId('row-value-father.idType')).toContainText(
+      await expect(page.getByTestId('father.idType-value')).toContainText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -350,7 +353,7 @@ test.describe.serial('Change informant on review', () => {
     test('Assert record form', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_VILLAGE)
       await switchEventTab(page, 'Record')
-      await expect(page.getByTestId('row-value-father.name')).toHaveText(
+      await expect(page.getByTestId('father.name-value')).toHaveText(
         declaration.father.name.firstNames +
           ' ' +
           declaration.father.name.familyName

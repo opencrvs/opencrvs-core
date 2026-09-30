@@ -10,7 +10,13 @@
  */
 
 import * as z from 'zod/v4'
-import { getUUID } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import {
+  DocumentPath,
+  EventDocumentOnlyLastAction,
+  getUUID,
+  UUID
+} from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -32,10 +38,8 @@ import {
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import {
-  EventIdParam,
-  EventIdParamWithWaitFor
-} from '@events/router/middleware'
+import { EventIdParam } from '@events/router/middleware'
+import { MiddlewareOptions } from '@events/router/middleware/utils'
 import {
   userOnlyProcedure,
   router,
@@ -65,9 +69,12 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles } from '@events/service/files'
+import { presignFile, sweepUnreferencedFiles } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { getDuplicateEvents } from '../../service/deduplication/deduplication'
+import {
+  assertCanReviewDuplicatesOf,
+  getDuplicateEvents
+} from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
@@ -201,10 +208,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .input(EventIdParamWithWaitFor)
+    .input(EventIdParam)
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
@@ -213,7 +220,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
-          waitFor: input.waitFor,
+          waitFor: true, // unused for READ, but required by the shared type
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),
@@ -247,6 +254,8 @@ export const eventRouter = router({
     .use(middleware.requireAssignment)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
+
+      await assertCanReviewDuplicatesOf(event, ctx)
 
       return getDuplicateEvents(event, ctx)
     }),
@@ -283,6 +292,7 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
+
         await throwConflictIfActionNotAllowed(
           eventId,
           type,
@@ -318,9 +328,54 @@ export const eventRouter = router({
           event.actions.push(actionFromDraft.data)
         }
 
-        await cleanupUnreferencedFiles(event, ctx.token)
+        await sweepUnreferencedFiles(event, ctx.token)
 
         return currentDraft
+      })
+  }),
+  file: router({
+    getPresignedUrl: userAndSystemProcedure
+      // eventId lives inside events/{eventId}/... paths already — a separate
+      // field would be redundant, and meaningless for users/ or bare-uuid paths
+      .input(z.object({ filePath: DocumentPath }))
+      .output(z.object({ presignedURL: z.string() }))
+      .query(async ({ input, ctx }) => {
+        const { filePath } = input
+        const [firstSegment, secondSegment] = filePath.split('/')
+
+        /*
+         * Record ownership isn't known to documents-service, so it's checked
+         * here instead. `events/{eventId}/...` is record-bound; `users/{userId}/...`
+         * and bare `{uuid}.{ext}` (pre-2.0 legacy) aren't.
+         */
+        if (firstSegment === 'events') {
+          const eventId = UUID.safeParse(secondSegment).data
+
+          if (!eventId) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `Invalid event id in file path: ${filePath}`
+            })
+          }
+
+          /*
+           * No eventId input exists here for .use() to parse — it comes from
+           * the path above. The middleware is invoked directly instead, with
+           * just the fields it reads: ctx, getRawInput, next.
+           */
+          await middleware.canAccessEventWithScopes(['record.read'])({
+            ctx,
+            getRawInput: () => ({ eventId }),
+            next: (opts: unknown) => opts
+          } as unknown as MiddlewareOptions)
+        } else if (firstSegment !== 'users' && filePath.includes('/')) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Unrecognized file path: ${filePath}`
+          })
+        }
+
+        return presignFile(filePath, ctx.token)
       })
   }),
   actions: router({
@@ -339,11 +394,13 @@ export const eventRouter = router({
     assignment: router({
       assign: userOnlyProcedure
         .input(AssignActionInput)
+        .output(EventDocumentOnlyLastAction)
         .use(middleware.canAccessEventWithScopes(['record.read']))
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
+
           await writeAuditLog({
             clientId: user.id,
             clientType: user.type,
@@ -360,7 +417,8 @@ export const eventRouter = router({
         }),
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
-        .use(middleware.validateAction)
+        .output(EventDocumentOnlyLastAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
           const result = await unassignRecord({ input, user, token })
@@ -393,10 +451,13 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
@@ -426,10 +487,13 @@ export const eventRouter = router({
         .input(MarkNotDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
@@ -481,7 +545,8 @@ export const eventRouter = router({
         search: input,
         eventConfigs,
         user: ctx.user,
-        acceptedScopes: ctx.acceptedScopes
+        acceptedScopes: ctx.acceptedScopes,
+        token: ctx.token
       })
 
       if (ctx.user.type === 'system') {

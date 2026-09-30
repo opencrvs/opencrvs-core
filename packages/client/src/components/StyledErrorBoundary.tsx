@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Button, PageWrapper, Box } from '@opencrvs/components'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
+import { ErrorBoundary } from '@client/components/ErrorBoundary'
 
 const ErrorContainer = styled(Box)`
   display: flex;
@@ -36,10 +36,6 @@ const ErrorMessage = styled.div`
 
 type IFullProps = React.PropsWithChildren<IntlShapeProps>
 
-const development = ['127.0.0.1', 'localhost'].includes(
-  window.location.hostname
-)
-
 const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
   const [authError, setAuthError] = useState(false)
 
@@ -52,8 +48,7 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
   }
 
   return (
-    <Sentry.ErrorBoundary
-      showDialog={!development}
+    <ErrorBoundary
       onError={onError}
       fallback={
         <PageWrapper>
@@ -81,7 +76,7 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
       }
     >
       {children}
-    </Sentry.ErrorBoundary>
+    </ErrorBoundary>
   )
 }
 

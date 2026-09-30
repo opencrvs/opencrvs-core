@@ -19,7 +19,6 @@ import { Text } from '@opencrvs/components/lib/Text'
 
 import * as actions from '@login/login/actions'
 import { IVerifyCodeNumbers, resetSubmissionError } from '@login/login/actions'
-import { ceil } from 'lodash'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { Box } from '@login/../../components/lib/Box'

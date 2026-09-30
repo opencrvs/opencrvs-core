@@ -17,17 +17,17 @@ import {
   ActionType,
   AddressType
 } from '@opencrvs/toolkit/events'
-import { getToken, login } from '../../helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { createDeclaration } from '../test-data/birth-declaration-with-mother-father'
+import { getToken, login } from '@e2e/support/helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-mother-father'
 import {
   formatV2ChildName,
   getAdministrativeAreas,
   getLocations,
   getIdByName
-} from '../birth/helpers'
-import { ensureAssignedToUser, selectAction } from '../../utils'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+} from '@e2e/support/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 /**
  * Regression test for opencrvs-core#12848.

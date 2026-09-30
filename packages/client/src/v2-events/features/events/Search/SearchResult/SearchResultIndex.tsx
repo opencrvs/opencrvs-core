@@ -16,7 +16,7 @@ import {
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
 import {
-  SearchQueryParams,
+  EventState,
   mandatoryColumns,
   ActionType
 } from '@opencrvs/commons/client'
@@ -24,6 +24,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
@@ -39,25 +40,35 @@ export const SearchResultIndex = () => {
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
+  const adminStructure = useAdminStructure()
 
   const fields = useMemo(() => {
-    const sections = resolveAdvancedSearchConfig(eventConfig)
+    const sections = resolveAdvancedSearchConfig(eventConfig, adminStructure)
     return sections.flatMap((section) => section.fields)
-  }, [eventConfig])
+  }, [eventConfig, adminStructure])
 
   /*
    * SelectDateRangeValue's are converted to DateTime values which would
    * return a new value on every render, hence we need to memoize.
    */
   const formValues = useMemo(() => {
-    const searchParams = SearchQueryParams.parse(
-      deserializeSearchParams(location.search)
-    )
+    /*
+     * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
+     * union of every field-value shape, and some members are objects whose keys
+     * are all optional. Those match any object and strip it to `{}`. An address
+     * filter is held as a FIELD_GROUP value, so it would not survive.
+     *
+     * Safe to skip: the filter below drops any key that is not a known field,
+     * and every value that reaches a query is checked by the branch that
+     * consumes it.
+     */
+    const searchParams = deserializeSearchParams(location.search)
+
     return Object.fromEntries(
       Object.entries(searchParams).filter(([key]) =>
         fields.some((field) => field.id === key)
       )
-    )
+    ) as EventState
   }, [location.search, fields])
 
   const searchQuery = useMemo(
@@ -65,7 +76,8 @@ export const SearchResultIndex = () => {
       buildSearchQuery(
         formValues,
         fields,
-        eventConfig.advancedSearch.flatMap((section) => section.fields)
+        eventConfig.advancedSearch.flatMap((section) => section.fields),
+        eventConfig
       ),
     [formValues, eventConfig, fields]
   )

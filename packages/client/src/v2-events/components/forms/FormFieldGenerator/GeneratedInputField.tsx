@@ -80,9 +80,10 @@ import {
   isImageViewFieldType,
   isAutocompleteFieldType,
   isUserRoleFieldType,
-  todayISO
+  todayISO,
+  AttachmentPath,
+  EventDocument
 } from '@opencrvs/commons/client'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import { countries } from '@client/utils/countries'
 import {
@@ -125,6 +126,7 @@ import { Loader } from '@client/v2-events/features/events/registered-fields/Load
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import { liveAnchorDate } from '@client/v2-events/utils'
 import {
@@ -154,8 +156,13 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   name: string
   fieldDefinition: T
   eventConfig?: EventConfig
-  /** non-native onChange. Updates Formik state by updating the value and its dependencies */
-  onFieldValueChange: (name: string, value: FieldValue | undefined) => void
+  /** non-native onChange. Updates Formik state by updating the value and its dependencies.
+   * `null` explicitly clears the value when the declaration is submitted (PATCH semantics),
+   * whereas `undefined` keeps the previously persisted value untouched. */
+  onFieldValueChange: (
+    name: string,
+    value: FieldValue | null | undefined
+  ) => void
   /** Optional callback that is called whenever any field value changes.
    * This is useful for cases where the parent component needs to know about
    * changes in the form state.
@@ -170,9 +177,46 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBlur: (formikFieldId: string, newTouched?: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
+  searchMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
-  attachmentPath: string
+  attachmentPath: AttachmentPath | null
+}
+
+/**
+ * A file field has to know which prefix its uploads belong to. Rendering one
+ * without an attachment path meant uploading to the bucket root, where the file
+ * belongs to no record and no deletion or sweep can reach it.
+ */
+function requireAttachmentPath(
+  attachmentPath: AttachmentPath | null,
+  fieldId: string
+): AttachmentPath {
+  if (attachmentPath === null) {
+    throw new Error(
+      `Field ${fieldId} uploads files, but the form around it was rendered without an attachmentPath`
+    )
+  }
+
+  return attachmentPath
+}
+
+/**
+ * The print button prints the record it is rendered for. Rendering one without
+ * an event in context leaves nothing to print, so the field is misconfigured
+ * rather than merely empty.
+ */
+function requireEvent(
+  event: EventDocument | undefined,
+  fieldId: string
+): EventDocument {
+  if (!event) {
+    throw new Error(
+      `Field ${fieldId} prints a record, but the form around it was rendered without an event`
+    )
+  }
+
+  return event
 }
 
 function resolveOptions(
@@ -221,7 +265,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
     ocrvsFullForm,
     disabled,
     attachmentPath,
-    readonlyMode
+    readonlyMode,
+    searchMode
   } = props
   const intl = useIntl()
   const [input, meta] = useField<FieldValue>(name)
@@ -289,11 +334,15 @@ export const GeneratedInputField = <T extends FieldConfig>(
   /**
    * Combines the field definition with the current value and input field props
    * USED FOR: rendering the correct input field based on the FieldConfig guards
+   *
+   * A null value marks a field explicitly cleared by the user (kept in the
+   * form state so the value gets removed on submit). Input components only
+   * handle missing values as undefined, so normalize before rendering.
    */
   const field = {
     inputFieldProps,
     config: fieldDefinition,
-    value: input.value
+    value: input.value ?? undefined
   }
   if (isFieldGroupFieldType(field)) {
     const groupTouched =
@@ -309,10 +358,26 @@ export const GeneratedInputField = <T extends FieldConfig>(
       // only forward error if it is coming from the group custom validations
       error: typeof error === 'string' ? error : ''
     }
+
+    /*
+     * A group's subfields reference each other by their own ids — `partOf` on an
+     * admin level, or the SHOW conditional on a street field waiting for a
+     * district. e.g: `not(field('district').isUndefined())`.
+     * Those ids do not exist in the outer form, where the whole group
+     * sits under a single key, so the group's own values are laid over it to
+     * give the subfields the scope they expect.
+     */
+    const groupValue: Record<string, FieldValue> = field.value ?? {}
+
+    const groupScope = {
+      ...ocrvsFullForm,
+      ...groupValue
+    }
+
     return (
       <InputField {...parentInputFieldProps}>
         {field.config.fields.map((subfield) => {
-          if (!isFieldVisible(subfield, ocrvsFullForm, validatorContext)) {
+          if (!isFieldVisible(subfield, groupScope, validatorContext)) {
             return null
           }
           const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
@@ -326,6 +391,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
                 {...props}
                 fieldDefinition={subfield}
                 name={subfieldFullName}
+                ocrvsFullForm={groupScope}
               />
             </FormItem>
           )
@@ -590,11 +656,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
           intl.formatMessage(field.config.configuration.prefix)
         }
       >
-        <TextArea
+        <TextArea.Input
           {...inputProps}
           maxLength={field.config.configuration?.maxLength}
           value={field.value}
-          onChange={(e) => onFieldValueChange(name, e.target.value)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>
     )
@@ -612,7 +678,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           disabled={disabled}
           error={inputFieldProps.error}
-          filePath={attachmentPath}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           label={uploadedFileNameLabel}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
@@ -735,7 +801,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <SignatureField.Input
           {...field.config}
           disabled={disabled}
-          filePath={attachmentPath}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           maxFileSize={field.config.configuration.maxFileSize}
           modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           name={name}
@@ -761,6 +827,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           configuration={field.config.configuration}
           eventType={eventConfig?.id}
           partOf={typeof partOf === 'string' ? partOf : null}
+          searchMode={searchMode}
           value={field.value}
         />
       </InputField>
@@ -776,6 +843,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={field.config.configuration?.locationTypes}
+          searchMode={searchMode}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -834,7 +902,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...inputProps}
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           error={inputFieldProps.error}
-          filePath={attachmentPath}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
           options={resolvedOptions}
@@ -861,9 +929,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
+        event={requireEvent(validatorContext.event?.document, name)}
         id={name}
         template={field.config.configuration.template}
-        value={field.value}
         onChange={(val) => onFieldValueChange(name, val)}
       />
     )
@@ -932,9 +1000,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Search.Input
           key={name}
           configuration={field.config.configuration}
+          disabled={inputProps.disabled}
           form={ocrvsFullForm}
           helperText={fieldDefinition.helperText}
           label={inputLabel}
+          placeholder={inputProps.placeholder}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />

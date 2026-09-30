@@ -10,8 +10,7 @@
  */
 
 import csv2json from 'csv2json'
-import { createReadStream } from 'fs'
-import fs from 'fs'
+import fs, { createReadStream } from 'fs'
 import { build } from 'esbuild'
 import { memoize } from 'lodash'
 import { join } from 'path'
@@ -31,7 +30,6 @@ export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
-  SENTRY: string
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string

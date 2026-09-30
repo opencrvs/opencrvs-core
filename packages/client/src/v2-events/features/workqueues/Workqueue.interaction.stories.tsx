@@ -20,6 +20,7 @@ import {
   ActionType,
   createPrng,
   encodeScope,
+  EventDocumentOnlyLastAction,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
@@ -120,16 +121,15 @@ export const PaginationAfterDownload: Story = {
         ],
         event: [
           tRPCMsw.event.actions.assignment.assign.mutation(() => {
-            return {
+            return EventDocumentOnlyLastAction.parse({
               ...downloadEvent,
               actions: [
-                ...downloadEvent.actions,
                 generateActionDocument({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.ASSIGN
                 })
               ]
-            }
+            })
           }),
           tRPCMsw.event.getDuplicates.query(() => {
             return []

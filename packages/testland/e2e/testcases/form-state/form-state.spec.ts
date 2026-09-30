@@ -16,21 +16,24 @@ import {
   getToken,
   goToSection,
   triggerDeclarationAction
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   fillChildDetails,
   openBirthDeclaration,
   REQUIRED_VALIDATION_ERROR
-} from '../birth/helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { selectAction, type } from '../../utils'
+} from '@e2e/support/birth/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { selectAction, type } from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe('Form state', () => {
   test.describe
@@ -79,7 +82,7 @@ test.describe('Form state', () => {
       await goToSection(page, 'review')
 
       // Child name fields should be empty
-      await expect(page.getByTestId('row-value-child.name')).toHaveText(
+      await expect(page.getByTestId('child.name-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
       // Comment should be empty and sign button should be visible
@@ -140,11 +143,11 @@ test.describe('Form state', () => {
 
       await selectAction(page, 'Update')
 
-      await expect(page.getByTestId('row-value-child.name')).not.toHaveText(
+      await expect(page.getByTestId('child.name-value')).not.toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
 
-      await expect(page.getByTestId('row-value-informant.email')).toHaveText(
+      await expect(page.getByTestId('informant.email-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
       // Comment should be empty and sign button should be visible

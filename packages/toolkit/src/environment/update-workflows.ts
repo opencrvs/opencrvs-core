@@ -99,6 +99,10 @@ async function updateWorkflows(
   const { workflows } = config
 
   for (const workflowPath of workflows) {
+    if (!existsSync(workflowPath)) {
+      log(`  ↷ Skipped ${workflowPath} (not found in this repository)`)
+      continue
+    }
     try {
       const fileContents = readFileSync(workflowPath, 'utf8')
 

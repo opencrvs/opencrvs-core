@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { getToken, login } from '../../helpers'
+import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { getToken, login } from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getLocations } from '../birth/helpers'
+import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
 
 test("Can update newly created user's location and role", async ({
   browser
@@ -91,17 +91,18 @@ test("Can update newly created user's location and role", async ({
   })
 
   await test.step('Verify user details', async () => {
-    await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+    await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
       'Ezhi District Hospital, Ezhi, Central, Farajaland'
     )
-    await expect(page.getByTestId('row-value-role')).toHaveText(
-      'Hospital Official'
-    )
+    await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
   })
 
   await test.step('Confirm user update', async () => {
     await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.locator('#confirm_office_change').click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Confirm' })
+      .click()
     await expect(page.locator('#content-name')).toHaveText(fullName)
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Ezhi District Hospital'

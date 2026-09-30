@@ -30,3 +30,8 @@ export const initializeSchemaAccess = async (client: Client) => {
   await client.query(`REVOKE CREATE ON SCHEMA public FROM events_migrator`)
   await client.query(`GRANT USAGE ON SCHEMA app TO events_app`)
 }
+
+export const dropDatabase = async (client: Client, databaseName: string) =>
+  // FORCE terminates any backends still connected to the database, so the
+  // drop cannot fail on a connection a test left open.
+  client.query(`DROP DATABASE IF EXISTS "${databaseName}" WITH (FORCE)`)

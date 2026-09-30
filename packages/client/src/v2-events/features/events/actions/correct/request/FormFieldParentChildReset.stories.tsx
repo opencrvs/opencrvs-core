@@ -357,32 +357,32 @@ export const FormFieldParentChildReset: Story = {
       )
 
       await expect(
-        within(canvas.getByTestId('row-value-recommender.relation')).getByText(
+        within(canvas.getByTestId('recommender.relation-value')).getByText(
           'Coach',
           { selector: 'del' }
         )
       ).toHaveTextContent('Coach')
       await expect(
-        canvas.getByTestId('row-value-recommender.relation')
+        canvas.getByTestId('recommender.relation-value')
       ).toHaveTextContent('Friend')
 
       await expect(
-        within(canvas.getByTestId('row-value-recommender.name')).getByText(
+        within(canvas.getByTestId('recommender.name-value')).getByText(
           'Mohammed Rahim',
           { selector: 'del' }
         )
       ).toHaveTextContent('Mohammed Rahim')
       await expect(
-        canvas.getByTestId('row-value-recommender.name')
+        canvas.getByTestId('recommender.name-value')
       ).toHaveTextContent('John Doe')
 
       await expect(
-        within(canvas.getByTestId('row-value-recommender.age')).getByText('-', {
+        within(canvas.getByTestId('recommender.age-value')).getByText('-', {
           selector: 'del'
         })
       ).toHaveTextContent('-')
       await expect(
-        canvas.getByTestId('row-value-recommender.age')
+        canvas.getByTestId('recommender.age-value')
       ).toHaveTextContent('36')
 
       await waitFor(async () => {

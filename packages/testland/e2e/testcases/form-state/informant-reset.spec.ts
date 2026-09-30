@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Page, expect, test } from '@playwright/test'
-import { goToSection, login } from '../../helpers'
-import { openBirthDeclaration } from '../birth/helpers'
-import { CREDENTIALS } from '../../constants'
+import { goToSection, login } from '@e2e/support/helpers'
+import { openBirthDeclaration } from '@e2e/support/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe('Informant details resets when relation is changed', () => {
   test.describe.serial('Birth', async () => {

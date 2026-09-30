@@ -84,6 +84,20 @@ export const userNotificationTestData: TriggerEventPayloadPair[] = [
     }
   },
   {
+    event: TriggerEvent.PASSWORD_RESET_LINK,
+    payload: {
+      recipient,
+      token: 'recovery-token-password'
+    }
+  },
+  {
+    event: TriggerEvent.USERNAME_REMINDER_LINK,
+    payload: {
+      recipient,
+      token: 'recovery-token-username'
+    }
+  },
+  {
     event: 'resend-invite',
     payload: {
       recipient,

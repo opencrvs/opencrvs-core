@@ -23,9 +23,9 @@ export const COUNTRY_CONFIG_PORT = env.COUNTRY_CONFIG_PORT
 export const AUTH_URL = env.AUTH_URL
 export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 
-export const SENTRY_DSN = env.SENTRY_DSN
-
 export const PRODUCTION = env.isProd
 export const TWO_FA_ENABLED = env.TWO_FA_ENABLED
 export const OPENCRVS_ENVIRONMENT = env.OPENCRVS_ENVIRONMENT
+export const ENVIRONMENT_NAME = env.ENVIRONMENT_NAME
 export const ANALYTICS_DATABASE_URL = env.ANALYTICS_DATABASE_URL
+export const EVENTS_URL = env.EVENTS_URL

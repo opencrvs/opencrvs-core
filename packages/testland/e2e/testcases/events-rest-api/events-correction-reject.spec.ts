@@ -15,7 +15,7 @@ import {
   createIntegrationContext,
   createRegisteredEvent,
   fetchClientAPI
-} from './helpers'
+} from '@e2e/support/events-rest-api/helpers'
 
 test.describe('POST /api/events/events/{eventId}/correction/reject', () => {
   let clientToken: string

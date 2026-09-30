@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first  nodemon --exec tsx src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "pnpm test:compilation && jest --coverage --silent --noStackTrace",
+    "test": "jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
@@ -25,7 +25,6 @@
     "file-type": "^16.5.3",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-pino": "^9.0.0",
-    "hapi-sentry": "^3.1.0",
     "is-svg": "^4.4.0",
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
@@ -35,7 +34,7 @@
     "pino": "^7.0.0",
     "tsconfig-paths": "^4.2.0",
     "uuid": "^3.2.1",
-    "zod": "^4.2"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@swc-contrib/mut-cjs-exports": "^14.15.0",

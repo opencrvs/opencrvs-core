@@ -15,6 +15,7 @@ import { UUID } from './uuid'
 import { getScopes } from './authentication'
 import { Role } from './roles'
 import { ContainsFlags } from './events/Flag'
+import { EventStatus } from './events/EventStatus'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -50,7 +51,9 @@ export const RecordScopeTypeV2 = z.enum([
   'record.request-correction',
   'record.correct',
   'record.unassign-others',
-  'record.custom-action'
+  'record.custom-action',
+  'record.action.accept',
+  'record.action.reject'
 ])
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
@@ -77,11 +80,7 @@ const PlainScopeType = z.enum([
   // Performance dashboard
   'performance.read',
   'performance.read-dashboards',
-  'performance.vital-statistics-export',
-
-  // Scopes used exclusively by countryconfig integration token
-  'record.confirm-registration',
-  'record.reject-registration'
+  'performance.vital-statistics-export'
 ])
 
 const scopeByEvent = z
@@ -91,6 +90,16 @@ const scopeByEvent = z
     z.array(z.string()).optional()
   )
   .describe('Event type, e.g. birth, death')
+
+const scopeByStatus = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(EventStatus).optional()
+  )
+  .describe(
+    'Restricts the scope to records currently in one of these statuses.'
+  )
 
 const userRole = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
@@ -103,7 +112,9 @@ const userRole = z
 const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: JurisdictionFilter.optional()
+    placeOfEvent: JurisdictionFilter.optional(),
+    createdBy: UserFilter.optional(),
+    createdIn: JurisdictionFilter.optional()
   })
   .describe('Options applicable to all record scopes.')
 
@@ -112,7 +123,8 @@ const scopeOptionsDeclaredOrNotified = scopeOptionsPlaceEvent
     notifiedIn: JurisdictionFilter.optional(),
     notifiedBy: UserFilter.optional(),
     declaredIn: JurisdictionFilter.optional(),
-    declaredBy: UserFilter.optional()
+    declaredBy: UserFilter.optional(),
+    status: scopeByStatus
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 
@@ -168,7 +180,9 @@ export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
 const ResolvedScopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: UUID.nullish()
+    placeOfEvent: UUID.nullish(),
+    createdBy: z.string().optional(),
+    createdIn: UUID.nullish()
   })
   .describe(
     'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'
@@ -202,7 +216,6 @@ export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.reject',
   'record.archive',
   'record.unarchive',
-  'record.review-duplicates',
   'record.register'
 ])
 
@@ -211,7 +224,8 @@ export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.read',
   'record.request-correction',
   'record.correct',
-  'record.unassign-others'
+  'record.unassign-others',
+  'record.review-duplicates'
 ])
 
 const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
@@ -225,6 +239,18 @@ const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
       'Template IDs for certified copies. Controls which certificate templates are returned to the client via the config service. Certificate printing is a client-side operation — this option is not validated when the printCertificate action is submitted.'
     )
 })
+
+export const ActionConfirmationScopeType = RecordScopeTypeV2.extract([
+  'record.action.accept',
+  'record.action.reject'
+])
+export type ActionConfirmationScopeType = z.infer<
+  typeof ActionConfirmationScopeType
+>
+
+const ActionConfirmationScopeOptions = AllRecordScopeOptions.describe(
+  'Options for confirming (accepting or rejecting) an action.'
+)
 
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
@@ -247,6 +273,10 @@ export const RecordScopeV2 = z
     z.object({
       type: z.literal('record.print-certified-copies'),
       options: ScopeOptionsPrintCertifiedCopies.optional()
+    }),
+    z.object({
+      type: ActionConfirmationScopeType,
+      options: ActionConfirmationScopeOptions.optional()
     })
   ])
   .describe(

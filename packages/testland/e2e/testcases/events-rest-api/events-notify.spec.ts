@@ -21,28 +21,32 @@ import {
   triggerDeclarationAction,
   switchEventTab,
   validateActionMenuButton
-} from '../../helpers'
-import { ensureAssignedToUser, expectInUrl, selectAction } from '../../utils'
+} from '@e2e/support/helpers'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction
+} from '@e2e/support/utils'
 import {
   getAdministrativeAreas,
   getIdByName,
   formatV2ChildName,
   REQUIRED_VALIDATION_ERROR
-} from '../birth/helpers'
-import { getDeclaration } from '../test-data/birth-declaration'
+} from '@e2e/support/birth/helpers'
+import { getDeclaration } from '@e2e/support/test-data/birth-declaration'
 import {
   openRecordByTitle,
   printAndExpectPopup,
   selectRequesterType
-} from '../print-certificate/birth/helpers'
+} from '@e2e/support/print-certificate/birth/helpers'
 import {
   createIntegrationContext,
   EVENT_TYPE,
   fetchClientAPI,
   NON_EXISTING_UUID
-} from './helpers'
+} from '@e2e/support/events-rest-api/helpers'
 
-import { CREDENTIALS } from '../../constants'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe('POST /api/events/events/{eventId}/notify', () => {
   let clientToken: string
@@ -503,7 +507,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     await page.locator('#close-dialog').click()
 
     await page.getByRole('button', { name: 'Record', exact: true }).click()
-    await expect(page.getByTestId('row-value-child.name')).toHaveText(
+    await expect(page.getByTestId('child.name-value')).toHaveText(
       formatName(childName)
     )
   })
@@ -648,11 +652,11 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Edit')
 
-      await expect(page.getByTestId('row-value-child.name')).toHaveText(
+      await expect(page.getByTestId('child.name-value')).toHaveText(
         formatV2ChildName({ 'child.name': childName })
       )
 
-      await expect(page.getByTestId('row-value-child.dob')).toHaveText(
+      await expect(page.getByTestId('child.dob-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
 
@@ -680,7 +684,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await page.getByTestId('text__surname').fill(newChildName.surname)
       await page.getByRole('button', { name: 'Go to review' }).click()
 
-      await expect(page.getByTestId('row-value-child.dob')).not.toHaveText(
+      await expect(page.getByTestId('child.dob-value')).not.toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
     })

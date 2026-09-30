@@ -14,6 +14,14 @@ import { rateLimitedRoute } from '@gateway/rate-limit'
 import { ServerRoute } from '@hapi/hapi'
 
 export const catchAllProxy = {
+  authInternal: {
+    method: '*',
+    path: '/auth/internal/{suffix}',
+    handler: (_, h) => h.response().code(404),
+    options: {
+      auth: false
+    }
+  },
   auth: {
     method: 'POST',
     path: '/auth/{suffix}',
@@ -35,9 +43,9 @@ export const authProxy = {
   token: {
     method: 'POST',
     path: '/auth/token',
-    handler: (req, h) =>
+    handler: (_, h) =>
       h.proxy({
-        uri: AUTH_URL + `/token${req.url.search}`
+        uri: AUTH_URL + '/token'
       }),
     options: {
       auth: false,
@@ -144,17 +152,23 @@ export const rateLimitedAuthProxy = {
       }
     }
   },
-  // Password/username retrieval flow. Every step keys on the nonce minted by
-  // verifyUser, so brute-force and SMS flooding are capped per retrieval attempt.
-  verifyNumber: {
+  // Exchanges the emailed recovery link's single-use token for a nonce and
+  // security question.
+  verifyRecoveryToken: {
     method: 'POST',
-    path: '/auth/verifyNumber',
+    path: '/auth/verifyRecoveryToken',
     handler: rateLimitedRoute(
-      // OTP brute-force vector — the retrieval-flow twin of verifyCode.
-      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      // Keyed on the token, the same shape as `authenticate` keying on the
+      // username it is given: one bucket per link, so hammering a single
+      // recovery link is capped and no caller can spend another's budget.
+      //
+      // This does not bound token guessing — each guess lands in a fresh
+      // bucket — but a 128-bit token is infeasible to guess with or without a
+      // cap, and single use is enforced by `getDel` in auth.
+      { requestsPerMinute: 10, pathForKey: 'token' },
       (_, h) =>
         h.proxy({
-          uri: AUTH_URL + '/verifyNumber'
+          uri: AUTH_URL + '/verifyRecoveryToken'
         })
     ),
     options: {

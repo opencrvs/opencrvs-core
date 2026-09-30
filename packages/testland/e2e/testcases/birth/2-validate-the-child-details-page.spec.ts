@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, Page } from '@playwright/test'
-import { goToSection, login } from '../../helpers'
-import { REQUIRED_VALIDATION_ERROR } from './helpers'
-import { trackAndDeleteCreatedEvents } from '../test-data/eventDeletion'
+import { goToSection, login } from '@e2e/support/helpers'
+import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
+import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletion'
+import { type } from '@e2e/support/utils'
 
 const loginAndBeginBirthDeclaration = async ({ page }: { page: Page }) => {
   await login(page)
@@ -49,9 +50,7 @@ test.describe.serial("2. Validate the child's details page", () => {
 
     test.describe('2.1.1 Enter Non-English characters', async () => {
       test('Using name: Richard the 3rd', async () => {
-        await page.locator('#firstname').fill('Richard the 3rd')
-        await page.getByRole('heading', { name: 'Birth' })
-
+        await type(page, '#firstname', 'Richard the 3rd')
         /*
          * Expected result: should accept the input and not throw any error
          */
@@ -59,19 +58,17 @@ test.describe.serial("2. Validate the child's details page", () => {
       })
 
       test('Using name: John_Peter', async () => {
-        await page.locator('#firstname').fill('John_Peter')
-        await page.getByRole('heading', { name: 'Birth' })
-
+        await type(page, '#firstname', 'John_Peter')
         /*
-         * Expected result: should accept the input and not throw any error
+         * Expected result: should throw error:
+         * - Input contains invalid characters. An underscore is not one of the
+         *   characters `isValidEnglishName` allows.
          */
-        await expect(page.locator('#firstname_error')).toBeHidden()
+        await expect(page.locator('#firstname_error')).toBeVisible()
       })
 
       test('Using name: John-Peter', async () => {
-        await page.locator('#firstname').fill('John-Peter')
-        await page.getByRole('heading', { name: 'Birth' })
-
+        await type(page, '#firstname', 'John-Peter')
         /*
          * Expected result: should accept the input and not throw any error
          */
@@ -79,43 +76,34 @@ test.describe.serial("2. Validate the child's details page", () => {
       })
 
       test("Using name: O'Neill", async () => {
-        await page.locator('#firstname').fill("O'Neill")
-        await page.getByRole('heading', { name: 'Birth' })
-
+        await type(page, '#firstname', "O'Neill")
         /*
          * Expected result: should accept the input and not throw any error
          */
         await expect(page.locator('#firstname_error')).toBeHidden()
       })
 
-      // @TODO: This validation is not implemented in Events V2 yet
-      test.skip('Using name: &er$on', async () => {
-        await page.locator('#firstname').fill('&er$on')
-        await page.getByRole('heading', { name: 'Birth' })
-
+      test('Using name: &er$on', async () => {
+        await type(page, '#firstname', '&er$on')
         /*
-         * Expected result: should accept the input and not throw any error
+         * Expected result: should throw error:
+         * - Input contains invalid characters.
          */
         await expect(page.locator('#firstname_error')).toBeVisible()
       })
 
-      // @TODO: This validation is not implemented in Events V2 yet
-      test.skip('Using name: X Æ A-Xii', async () => {
-        await page.locator('#firstname').fill('X Æ A-Xii')
-        await page.getByRole('heading', { name: 'Birth' })
-
-        /*
-         * Expected result: should throw error:
-         * - Input contains invalid characters. Please use only letters (a-z), numbers (0-9), hyphens (-), and underscores (_)
-         */
-        await expect(page.locator('#firstname_error')).toBeVisible()
+      /*
+       * `isValidEnglishName` accepts this today -- Æ is Script=Latin,
+       * so the rule has nothing to complain about.
+       */
+      test('Using name: X Æ A-Xii', async () => {
+        await type(page, '#firstname', 'X Æ A-Xii')
+        await expect(page.locator('#firstname_error')).toBeHidden()
       })
     })
 
     test('2.1.2 Enter less than 33 English characters', async () => {
-      await page.locator('#firstname').fill('Rakibul Islam')
-      await page.getByRole('heading', { name: 'Birth' })
-
+      await type(page, '#firstname', 'Rakibul Islam')
       /*
        * Expected result: should accept the input and not throw any error
        */
@@ -124,9 +112,7 @@ test.describe.serial("2. Validate the child's details page", () => {
 
     test('2.1.4 Enter more than 32 English characters', async () => {
       const LONG_NAME = 'Ovuvuevuevue Enyetuenwuevue Ugbemugbem Osas'
-      await page.locator('#firstname').fill(LONG_NAME)
-      await page.getByRole('heading', { name: 'Birth' })
-
+      await type(page, '#firstname', LONG_NAME)
       /*
        * Expected result: should clip the name to first 32 character
        */
@@ -144,7 +130,7 @@ test.describe.serial("2. Validate the child's details page", () => {
        */
       await expect(
         page
-          .locator('[data-testid="row-value-child.name"]')
+          .locator('[data-testid="child.name-value"]')
           .getByText(REQUIRED_VALIDATION_ERROR)
       ).toBeVisible()
     })
@@ -176,7 +162,7 @@ test.describe.serial("2. Validate the child's details page", () => {
        */
       await expect(
         page
-          .locator('[data-testid="row-value-child.gender"]')
+          .locator('[data-testid="child.gender-value"]')
           .getByText(REQUIRED_VALIDATION_ERROR)
       ).toBeVisible()
     })
@@ -195,8 +181,6 @@ test.describe.serial("2. Validate the child's details page", () => {
       await page.getByPlaceholder('dd').fill(dd)
       await page.getByPlaceholder('mm').fill(mm)
       await page.getByPlaceholder('yyyy').fill(yyyy)
-      await page.getByRole('heading', { name: 'Birth' })
-
       /*
        * Expected result: should accept the date
        */
@@ -208,8 +192,6 @@ test.describe.serial("2. Validate the child's details page", () => {
       await page.getByPlaceholder('dd').fill('0')
       await page.getByPlaceholder('mm').fill('0')
       await page.getByPlaceholder('yyyy').fill('0')
-      await page.getByRole('heading', { name: 'Birth' })
-
       /*
        * Expected result: should not accept the invalid date and show error:
        * - Must be a valid birth date
@@ -228,8 +210,6 @@ test.describe.serial("2. Validate the child's details page", () => {
       await page.getByPlaceholder('dd').fill(dd)
       await page.getByPlaceholder('mm').fill(mm)
       await page.getByPlaceholder('yyyy').fill(yyyy)
-      await page.getByRole('heading', { name: 'Birth' })
-
       /*
        * Expected result: should not accept the future date and show error:
        * - Must be a valid birth date
@@ -249,7 +229,7 @@ test.describe.serial("2. Validate the child's details page", () => {
        */
       await expect(
         page
-          .locator('[data-testid="row-value-child.dob"]')
+          .locator('[data-testid="child.dob-value"]')
           .getByText(REQUIRED_VALIDATION_ERROR)
       ).toBeVisible()
     })
@@ -273,7 +253,6 @@ test.describe.serial("2. Validate the child's details page", () => {
       await page.getByPlaceholder('dd').fill(dd)
       await page.getByPlaceholder('mm').fill(mm)
       await page.getByPlaceholder('yyyy').fill(yyyy)
-      await page.getByRole('heading', { name: 'Birth' })
     })
 
     test('2.5.1 Enter date after delayed registration time period', async () => {
@@ -284,8 +263,6 @@ test.describe.serial("2. Validate the child's details page", () => {
       await page.getByPlaceholder('dd').fill(dd)
       await page.getByPlaceholder('mm').fill(mm)
       await page.getByPlaceholder('yyyy').fill(yyyy)
-      await page.getByRole('heading', { name: 'Birth' })
-
       /*
        * Expected result: should show field:
        * - Reason for delayed registration
@@ -325,7 +302,7 @@ test.describe.serial("2. Validate the child's details page", () => {
       await expect(
         page
           .getByRole('row', { name: 'Reason for delayed' })
-          .locator('[data-testid="row-value-child.reason"]')
+          .locator('[data-testid="child.reason-value"]')
       ).toHaveText(REQUIRED_VALIDATION_ERROR)
     })
   })
@@ -409,7 +386,7 @@ test.describe.serial("2. Validate the child's details page", () => {
        * - Required
        */
       await expect(
-        page.locator('[data-testid="row-value-child.placeOfBirth"]')
+        page.locator('[data-testid="child.placeOfBirth-value"]')
       ).toHaveText(REQUIRED_VALIDATION_ERROR)
     })
   })

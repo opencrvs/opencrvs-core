@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   createPIN,
   getToken,
@@ -18,10 +18,10 @@ import {
   loginWithNewUser,
   NEW_USER_PASSWORD,
   waitForAuthenticatedLanding
-} from '../../helpers'
+} from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
-import { getIdByName, getLocations } from '../birth/helpers'
+import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
 
 test('Phone number changed from settings is stored as entered', async ({
   browser
@@ -68,8 +68,7 @@ test('Phone number changed from settings is stored as entered', async ({
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await waitForAuthenticatedLanding(page)
+    await waitForAuthenticatedLanding(page, refreshToken)
     await createPIN(page)
     await page.goto(CLIENT_URL)
   })
@@ -92,12 +91,9 @@ test('Phone number changed from settings is stored as entered', async ({
   })
 
   await test.step('New number is shown as entered on the settings page', async () => {
-    await expect(
-      page
-        .locator('[data-testid="list-view-value"]')
-        .filter({ hasText: newPhoneNumber })
-        .first()
-    ).toBeVisible()
+    await expect(page.getByTestId('phone-number-value')).toHaveText(
+      newPhoneNumber
+    )
   })
 
   await test.step('Phone number is correct when viewed by national system admin', async () => {
@@ -122,7 +118,7 @@ test('Phone number changed from settings is stored as entered', async ({
     await adminPage.getByText('Edit details').click()
     await expect(adminPage.getByText('Confirm details')).toBeVisible()
 
-    await expect(adminPage.getByTestId('row-value-phoneNumber')).toHaveText(
+    await expect(adminPage.getByTestId('phoneNumber-value')).toHaveText(
       newPhoneNumber
     )
 

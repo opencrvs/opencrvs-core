@@ -41,7 +41,9 @@ const otherTemplates = {
   updateUserNameNotification: 'updateUserNameNotification',
   resetUserPasswordNotification: 'resetUserPasswordNotification',
   resetUserPasswordByAdminNotification: 'resetUserPasswordByAdminNotification',
-  resendInviteNotification: 'resendInviteNotification'
+  resendInviteNotification: 'resendInviteNotification',
+  resetPasswordLinkNotification: 'resetPasswordLinkNotification',
+  retrieveUsernameLinkNotification: 'retrieveUsernameLinkNotification'
 }
 
 export type SMSTemplateType =
@@ -131,6 +133,8 @@ const TriggerToSMSTemplate = {
   ['username-reminder']: 'retieveUserNameNotification',
   ['reset-password']: 'resetUserPasswordNotification',
   ['reset-password-by-admin']: 'resetUserPasswordByAdminNotification',
+  ['password-reset-link']: 'resetPasswordLinkNotification',
+  ['username-reminder-link']: 'retrieveUsernameLinkNotification',
   ['resend-invite']: 'resendInviteNotification',
   ['2fa']: 'authenticationCodeNotification',
   ['all-user-notification']: 'allUserNotification',

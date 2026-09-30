@@ -139,6 +139,53 @@ describe('getChangedDeclarationDiff', () => {
 
     expect(result).toEqual({})
   })
+
+  it('nulls a field that was filled but is now hidden by a sibling toggle', () => {
+    const previousFormValues: EventState = {
+      'recommender.none': false,
+      'recommender.name': filledName,
+      'recommender.id': 'R-123'
+    }
+    const form: EventState = {
+      'recommender.none': true,
+      // The client keeps hidden fields in form state; they must not leak back.
+      'recommender.name': filledName,
+      'recommender.id': 'R-123'
+    }
+
+    const result = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
+    )
+
+    expect(result).toEqual({
+      'recommender.none': true,
+      'recommender.name': null,
+      'recommender.id': null
+    })
+  })
+
+  it('does not null a now-hidden field that had no previous value', () => {
+    const previousFormValues: EventState = {
+      'recommender.none': false
+    }
+    const form: EventState = {
+      'recommender.none': true
+    }
+
+    const result = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
+    )
+
+    expect(result).toEqual({ 'recommender.none': true })
+  })
 })
 
 describe('getCleanedDeclarationDiff', () => {

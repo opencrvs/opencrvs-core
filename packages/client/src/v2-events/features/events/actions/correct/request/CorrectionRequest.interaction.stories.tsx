@@ -338,7 +338,7 @@ export const AddressStaysUnchangedInSummaryWhenNotEdited: Story = {
 
       await canvas.findByText("Applicant's address")
 
-      const cell = canvas.getByTestId('row-value-applicant.address')
+      const cell = canvas.getByTestId('applicant.address-value')
 
       await expect(cell).toHaveTextContent(
         'FarajalandCentralIsangoExample TownExample Residential AreaExample Street55123456'
@@ -362,7 +362,7 @@ export const AddressStaysUnchangedInSummaryWhenNotEdited: Story = {
     await step('Validate review content stays the same', async () => {
       await canvas.findByText("Applicant's address")
 
-      const cell = canvas.getByTestId('row-value-applicant.address')
+      const cell = canvas.getByTestId('applicant.address-value')
 
       await expect(cell).toHaveTextContent(
         'FarajalandCentralIsangoExample TownExample Residential AreaExample Street55123456'

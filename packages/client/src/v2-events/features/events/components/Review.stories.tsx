@@ -33,10 +33,14 @@ import {
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
   tennisClubMembershipEvent,
-  toPlainDate
+  toPlainDate,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  tennisClubMembershipEventDocument
+} from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
   getTestValidatorContext,
@@ -200,6 +204,7 @@ export const ReviewWithValidationErrors: Story = {
     async function handleRejection() {
       await openModal<RejectActionModalResult | null>((close) => (
         <Review.ActionModal.Reject
+          attachmentPath={eventAttachmentPath(storybookEventId)}
           close={close}
           eventConfiguration={tennisClubMembershipEvent}
         />
@@ -528,8 +533,8 @@ const annotationConditionalTextField: FieldConfig = {
 
 /**
  * During record creation the annotation fields (e.g. signature, comment) are shown
- * as editable inputs via FormFieldGenerator. The readonly ListReview section is not
- * shown because there are no previously submitted annotation values to display.
+ * as editable inputs via FormFieldGenerator. The readonly list of annotations is
+ * not shown because there are no previously submitted annotation values to display.
  *
  * Requires reactRouter with /event/:eventId so SignatureField.Input can upload files.
  */
@@ -542,6 +547,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
           <Review.Body
             anchor={toPlainDate('2025-01-01')}
             annotation={{}}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             readonlyMode={false}
@@ -558,7 +564,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
   }
 }
 
-export const ReadonlyAnnotationListReview: Story = {
+export const ReadonlyAnnotationList: Story = {
   args: {
     readonlyMode: true,
     reviewFields: [annotationTextField],
@@ -672,6 +678,7 @@ export const AcceptModalWithFormFields: Story = {
     return (
       <Review.ActionModal.Accept
         action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
         close={fn()}
         copy={{
           title: generateTranslationConfig('Declare this event?'),
@@ -697,6 +704,46 @@ export const AcceptModalWithFormFields: Story = {
   }
 }
 
+/**
+ * A print button configured in the action dialog prints the record the action
+ * is taken on. The dialog has to hand that record over: without it the button
+ * throws and the page falls back to the error screen.
+ */
+export const AcceptModalWithPrintButton: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
+        close={fn()}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        event={tennisClubMembershipEventDocument}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[
+          {
+            id: 'modal-print',
+            type: FieldType.ALPHA_PRINT_BUTTON,
+            conditionals: [],
+            label: generateTranslationConfig('Print'),
+            configuration: { template: 'simple-certificate' }
+          }
+        ]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const printButton = await canvas.findByTestId('modal-print')
+    await expect(printButton).toBeEnabled()
+  }
+}
+
 const acceptModalRequiredFieldClose =
   fn<(result: AcceptActionModalResult | null) => void>()
 
@@ -710,6 +757,7 @@ export const AcceptModalWithRequiredField: Story = {
     return (
       <Review.ActionModal.Accept
         action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
         close={acceptModalRequiredFieldClose}
         copy={{
           title: generateTranslationConfig('Declare this event?'),
@@ -763,6 +811,7 @@ export const RejectModalWithFormFields: Story = {
   render: function Component() {
     return (
       <Review.ActionModal.Reject
+        attachmentPath={eventAttachmentPath(storybookEventId)}
         close={rejectModalWithFormFieldsClose}
         eventConfiguration={tennisClubMembershipEvent}
         fields={[modalCommentsField, modalCategoryField]}

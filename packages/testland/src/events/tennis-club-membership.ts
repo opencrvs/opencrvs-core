@@ -515,6 +515,7 @@ const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         defaultMessage: 'Who is recommending the applicant?',
         description: 'This is the title of the section'
       },
+      showClearButton: true,
       fields: [
         {
           id: 'recommender.none',

@@ -11,13 +11,15 @@
 
 import { serviceRouter } from '@events/router/trpc'
 import { internalUserRouter } from './internal'
+import { internalLocationRouter } from './internal/locations'
 
 /**
  * Internal routes that are not exposed to external clients but can be used for internal communication between services or for administrative purposes.
  * These routes should require a special authentication and should be protected accordingly.
  */
 export const internalRouter = serviceRouter({
-  user: internalUserRouter
+  user: internalUserRouter,
+  locations: internalLocationRouter
 })
 
 /** @knipignore */

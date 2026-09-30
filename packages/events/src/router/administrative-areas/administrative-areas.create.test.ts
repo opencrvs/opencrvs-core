@@ -16,6 +16,7 @@ import {
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { setAdministrativeAreas } from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
+import { getLeafLevelAdministrativeAreaIds } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -181,4 +182,22 @@ test('replays create idempotently against a seeded multi-element history', async
     .execute()
 
   expect(auditEntries).toHaveLength(0)
+})
+
+test('invalidates the leaf-level administrative area cache', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const before = await getLeafLevelAdministrativeAreaIds()
+
+  const created = await client.administrativeAreas.create({
+    name: 'New Leaf District',
+    externalId: 'leaf-cache-create-pcode',
+    parentId: null
+  })
+
+  const after = await getLeafLevelAdministrativeAreaIds()
+
+  expect(after).not.toBe(before)
+  expect(after.map((row) => row.id)).toContain(created.id)
 })

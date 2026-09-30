@@ -10,13 +10,13 @@
  */
 import { expect, test } from '@playwright/test'
 
-import { login } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import {
   expectBirthsTabSelected,
   expectNoBrokenCards,
   populateDashboardRecords
-} from './utils'
+} from '@e2e/support/dashboard/utils'
 
 // The Births tab has a single record-table card and no untitled cards
 const EXPECTED_CARD_TITLES = ['Birth records (no PII)']

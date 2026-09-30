@@ -17,15 +17,15 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
@@ -36,8 +36,7 @@ jobs:
           max_attempts: 3
           command: pnpm install --frozen-lockfile
       - name: Generate OpenAPI
-        run: bash build.sh
-        working-directory: packages/api-docs
+        run: pnpm nx run @opencrvs/api-docs:build
 
       - name: Deploy to GitHub Pages
         working-directory: packages/api-docs

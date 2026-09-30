@@ -44,6 +44,14 @@ export type LocationTypeV1 = z.infer<typeof LocationTypeV1>
 export const LocationStatus = z.enum(['active', 'inactive'])
 export type LocationStatus = z.infer<typeof LocationStatus>
 
+/** Thrown when a user's assigned office is inactive and must not be allowed to authenticate. */
+export class InactiveOfficeError extends Error {
+  constructor(message = 'Assigned office is inactive') {
+    super(message)
+    this.name = 'InactiveOfficeError'
+  }
+}
+
 /**
  * A single element of the `versions` history of a location or administrative
  * area. Versions are sorted ascending by `effectiveFrom` ('0001-01-01' is used
@@ -383,7 +391,7 @@ function matchesFlagsFilter(
  *
  */
 export function canAccessEventWithScope(
-  event: Partial<EventIndexWithAdministrativeHierarchy>,
+  event: EventIndexWithAdministrativeHierarchy,
   scope: RecordScopeV2,
   user: UserContext | SystemContext,
   customActionType?: string
@@ -418,8 +426,41 @@ export function canAccessEventWithScope(
     return false
   }
 
+  if (opts?.createdBy === UserFilter.enum.user && event.createdBy !== user.id) {
+    return false
+  }
+
+  if (
+    opts?.createdIn === JurisdictionFilter.enum.location &&
+    !matchesJurisdictionFilter(
+      event.createdAtLocation,
+      JurisdictionFilter.enum.location,
+      user
+    )
+  ) {
+    return false
+  }
+
+  if (
+    opts?.createdIn === JurisdictionFilter.enum.administrativeArea &&
+    !matchesJurisdictionFilter(
+      event.createdAtLocation,
+      JurisdictionFilter.enum.administrativeArea,
+      user
+    )
+  ) {
+    return false
+  }
+
   if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
+
+    if (
+      options?.status &&
+      (!event.status || !options.status.includes(event.status))
+    ) {
+      return false
+    }
 
     if (options?.notifiedBy === UserFilter.enum.user) {
       if (event.legalStatuses?.NOTIFIED?.createdBy !== user.id) {
@@ -601,7 +642,7 @@ export function canAccessOtherUserWithScopes({
  * One of the scopes must allow access for the event to be accessible.
  */
 export function userCanAccessEventWithScopes(
-  event: Partial<EventIndexWithAdministrativeHierarchy>,
+  event: EventIndexWithAdministrativeHierarchy,
   scopes: RecordScopeV2[],
   user: UserContext | SystemContext,
   customActionType?: string

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { getToken, login } from '../../helpers'
-import { createDeclaration } from '../test-data/birth-declaration-with-father-brother'
-import { CREDENTIALS } from '../../constants'
-import { getMonthFormatted } from './helper'
-import { assertTexts, expectInUrl, type } from '../../utils'
+import { getToken, login } from '@e2e/support/helpers'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { getMonthFormatted } from '@e2e/support/advanced-search/helper'
+import { assertTexts, expectInUrl, type } from '@e2e/support/utils'
 
 test.describe
   .serial("Advanced Search - Birth Event Declaration - Informant's details", () => {

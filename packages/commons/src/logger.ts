@@ -10,6 +10,42 @@
  */
 import pino, { LogFn, Logger } from 'pino'
 
+/**
+ * pino only merges a trailing argument into the structured log record when
+ * the first argument is itself an object. Callers in this codebase mostly
+ * use the `logger.error('message', err)` string-first form, so pino was
+ * silently dropping the extra argument. This normalizes that form into
+ * pino's native `[mergingObject, message]` shape so it always gets logged.
+ */
+export function normalizeLogArgs(args: unknown[]): unknown[] {
+  const [first, ...rest] = args
+  if (typeof first !== 'string' || rest.length === 0) {
+    return args
+  }
+
+  const mergingObject: Record<string, unknown> = {}
+  const primitives: unknown[] = []
+
+  for (const arg of rest) {
+    if (arg instanceof Error) {
+      // Error's message/stack aren't enumerable, so extract them explicitly.
+      mergingObject.err = pino.stdSerializers.err(arg)
+    } else if (arg !== null && typeof arg === 'object') {
+      // Plain objects get merged as top-level structured fields.
+      Object.assign(mergingObject, arg)
+    } else {
+      // Primitives (string/number/boolean) get appended to the message text.
+      primitives.push(arg)
+    }
+  }
+
+  const message = primitives.length ? `${first} ${primitives.join(' ')}` : first
+
+  return Object.keys(mergingObject).length
+    ? [mergingObject, message]
+    : [message]
+}
+
 function filterHealthCheckLogs(this: Logger, args: unknown[], method: LogFn) {
   const logger = this as any
   for (const arg of args) {
@@ -19,10 +55,17 @@ function filterHealthCheckLogs(this: Logger, args: unknown[], method: LogFn) {
       }
     }
   }
-  return method.apply(this, args as Parameters<LogFn>)
+  return method.apply(this, normalizeLogArgs(args) as Parameters<LogFn>)
 }
 
-export const logger =
+export function buildLoggerOptions(): pino.LoggerOptions {
+  return {
+    serializers: { err: pino.stdSerializers.err },
+    hooks: { logMethod: filterHealthCheckLogs }
+  }
+}
+
+export const logger: Logger =
   process.env.NODE_ENV === 'production'
     ? pino({
         level: 'info',
@@ -31,7 +74,7 @@ export const logger =
           'req.remoteAddress',
           "req.headers['x-real-ip']"
         ],
-        hooks: { logMethod: filterHealthCheckLogs }
+        ...buildLoggerOptions()
       })
     : pino({
         level: 'debug',
@@ -42,7 +85,7 @@ export const logger =
             ignore: 'pid,hostname'
           }
         },
-        hooks: { logMethod: filterHealthCheckLogs }
+        ...buildLoggerOptions()
       })
 
 const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL

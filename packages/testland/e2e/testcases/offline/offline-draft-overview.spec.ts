@@ -10,10 +10,10 @@
  */
 import { expect, Page, test } from '@playwright/test'
 
-import { formatName, login } from '../../helpers'
-import { mockNetworkConditions } from '../../mock-network-conditions'
+import { formatName, login } from '@e2e/support/helpers'
+import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 import { faker } from '@faker-js/faker'
-import { openRecordByTitle } from '../print-certificate/birth/helpers'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe.serial('Can Open Draft offline', () => {
   let page: Page

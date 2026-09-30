@@ -24,6 +24,10 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { buttonMessages } from '@client/i18n/messages'
 import {
+  DuplicatesAvailability,
+  useDuplicatesAvailable
+} from '@client/v2-events/features/events/actions/dedup/useDuplicatesAvailable'
+import {
   useAssignmentActions,
   useEventActionsOnClick
 } from './useEventActionsOnClick'
@@ -47,7 +51,6 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const drafts = getDisplayableDrafts()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
-  const validatorContext = useValidatorContext()
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
 
@@ -56,7 +59,14 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const validatorContext = useValidatorContext(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
+  // Don't offer a review that may turn out to have nothing to show.
+  const areDuplicatesAvailable =
+    useDuplicatesAvailable(
+      event,
+      isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
+    ) === DuplicatesAvailability.AVAILABLE
 
   const resolveAction = useCallback(
     <T extends WorkqueueActionType | ClientSpecificAction>(
@@ -76,7 +86,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         eventConfiguration,
         isOnline,
         isDownloaded,
-        isAssigning
+        isAssigning,
+        areDuplicatesAvailable
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
@@ -105,6 +116,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isOnline,
       isDownloaded,
       isAssigning,
+      areDuplicatesAvailable,
       onClick
     ]
   )
@@ -124,7 +136,6 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const validatorContext = useValidatorContext()
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
   const events = useEvents()
@@ -132,6 +143,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const validatorContext = useValidatorContext(cachedEvent.data)
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveConditionals = useCallback(

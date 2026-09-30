@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Area } from 'react-easy-crop'
+import type { Area, Size } from 'react-easy-crop'
 import {
   ALLOWED_IMAGE_TYPE,
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
 } from '@client/utils/constants'
 import { ImageMimeType } from '@opencrvs/commons/client'
 import type { File as FileConfig } from '@opencrvs/commons/client'
+import { fetchFileFromUrl } from '@client/v2-events/cache'
 
 export type IImage = {
   type: string
@@ -121,10 +122,31 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
         resolve(null)
         return
       }
-      resolve(new File([blob], 'image.jpeg', { type: 'image/jpeg' }));
-    });
-  });
+      resolve(new File([blob], 'image.jpeg', { type: 'image/jpeg' }))
+    })
+  })
   return file
+}
+
+export type TargetSize = NonNullable<
+  FileConfig['configuration']['maxImageSize']
+>['targetSize']
+
+/**
+ * Crop window matching the aspect ratio of the configured output, with its
+ * longer side fixed to `baseSize` so the window always fits the square
+ * container it is rendered in. Falls back to a square window when no output
+ * size is configured.
+ */
+export function getCropWindowSize(
+  baseSize: number,
+  targetSize?: TargetSize
+): Size {
+  const aspect = targetSize ? targetSize.width / targetSize.height : 1
+
+  return aspect >= 1
+    ? { width: baseSize, height: baseSize / aspect }
+    : { width: baseSize * aspect, height: baseSize }
 }
 
 export async function getCroppedImageWithTargetSize(
@@ -182,26 +204,6 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
 
 export const bytesToMB = (bytes: number) =>
   Number(Number(bytes / (1024 * 1024)).toFixed(2))
-
-export async function fetchFileFromUrl(
-  externalUrl: string,
-  filename: string
-): Promise<File | undefined> {
-  const res = await fetch(externalUrl)
-
-  if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Failed to fetch file from URL: ${externalUrl}. Status: ${res.status} ${res.statusText}`
-    )
-
-    return undefined
-  }
-
-  const blob = await res.blob()
-
-  return new File([blob], filename, { type: blob.type })
-}
 
 async function getImageFromFile(
   file: File

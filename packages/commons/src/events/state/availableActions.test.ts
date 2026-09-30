@@ -26,6 +26,15 @@ describe('getAvailableActionsForEvent()', () => {
     })
   }
 
+  it(`should not allow CUSTOM for "${EventStatus.enum.CREATED}" status, since a custom action would destroy the draft`, () => {
+    expect(
+      getAvailableActionsForEvent({
+        status: EventStatus.enum.CREATED,
+        flags: []
+      } as unknown as EventIndex)
+    ).not.toContain(ActionType.CUSTOM)
+  })
+
   const REJECTABLE_STATUSES = [
     EventStatus.enum.NOTIFIED,
     EventStatus.enum.DECLARED

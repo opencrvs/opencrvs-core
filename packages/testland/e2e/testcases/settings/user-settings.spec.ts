@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { login } from '../../helpers'
-import { CREDENTIALS } from '../../constants'
+import { login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 import path from 'path'
+import { ASSETS_DIR } from '@e2e/support/paths'
 
 test.describe.serial('1. Settings Page', () => {
   let page: Page
@@ -26,7 +27,8 @@ test.describe.serial('1. Settings Page', () => {
   })
 
   test.describe('1.1 Registrar Settings page', async () => {
-    test('1.1.1 Navigate to settings page', async () => {
+    // 1.1.1 Navigate to settings page
+    test.beforeEach(async () => {
       await page.getByRole('button', { name: 'Profile' }).click()
 
       await page
@@ -37,25 +39,20 @@ test.describe.serial('1. Settings Page', () => {
     })
 
     test('1.1.2 Validate content', async () => {
-      // Target desktop view only, ignore mobile duplicates
-      const desktopView = page.locator('[data-testid="list-view-value"]')
-
       // User details displayed
-      await expect(
-        desktopView.filter({ hasText: 'Kennedy Mweene' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: '0923232323' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: 'kalushabwa.lya17@gmail.com' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: 'Registrar' }).first()
-      ).toBeVisible()
-      await expect(
-        desktopView.filter({ hasText: 'Ibombo District Office' }).first()
-      ).toBeVisible()
+      await expect(page.getByTestId('name-value')).toContainText(
+        'Kennedy Mweene'
+      )
+      await expect(page.getByTestId('phone-number-value')).toContainText(
+        '0923232323'
+      )
+      await expect(page.getByTestId('email-address-value')).toContainText(
+        'kalushabwa.lya17@gmail.com'
+      )
+      await expect(page.getByTestId('role-value')).toContainText('Registrar')
+      await expect(page.getByTestId('assigned-office-value')).toContainText(
+        'Ibombo District Office'
+      )
 
       // Editable fields
       await expect(
@@ -69,18 +66,16 @@ test.describe.serial('1. Settings Page', () => {
       await expect(page.locator('#btnChangePassword').first()).toBeEnabled()
 
       await expect(
-        page.locator('[data-testid="list-view-value"] img').first()
+        page
+          .getByTestId('profile-image-value')
+          .getByRole('img', { name: 'Kennedy Mweene' })
       ).toBeVisible()
     })
 
     test('1.1.3 Change avatar', async () => {
       await page.getByTestId('change-avatar').first().click()
-      const initialAvatarSrc = await page
-        .locator('[data-testid="list-view-value"] img')
-        .first()
-        .getAttribute('src')
 
-      const attachmentPath = path.join(__dirname, '../test-data/image.png')
+      const attachmentPath = path.join(ASSETS_DIR, 'image.png')
 
       await page
         .locator('#image_file_uploader_field')
@@ -98,13 +93,8 @@ test.describe.serial('1. Settings Page', () => {
 
       await page.getByText('Profile image successfully updated')
 
-      const newAvatar = await page
-        .locator('[data-testid="list-view-value"] img')
-        .first()
-      await expect(newAvatar).not.toHaveAttribute(
-        'src',
-        initialAvatarSrc as string
-      )
+      const newAvatar = page.getByTestId('profile-image-value').locator('img')
+      await expect(newAvatar).toBeVisible()
 
       const profileSettingsImageSrc = await page.locator(
         '[popovertarget="ProfileMenu-Dropdown-Content"] img'

@@ -10,13 +10,13 @@
  */
 import { defineLoginConfig } from '@opencrvs/toolkit/application-config'
 import { applicationConfig } from '@countryconfig/api/application/application-config'
+import { env } from './environment'
 
 export default defineLoginConfig({
   // Country code in uppercase ALPHA-3 format
-  COUNTRY: 'FAR',
+  COUNTRY: env.COUNTRY_CODE,
   LANGUAGES: ['en', 'fr'],
   LOGIN_BACKGROUND: { backgroundColor: '36304E' },
-  SENTRY: '',
   USER_NOTIFICATION_DELIVERY_METHOD:
     applicationConfig.USER_NOTIFICATION_DELIVERY_METHOD,
   INFORMANT_NOTIFICATION_DELIVERY_METHOD:

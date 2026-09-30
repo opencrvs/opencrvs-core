@@ -13,10 +13,14 @@ set -e
 
 rm -rf dist
 
-npx tsc --build
+# tsconfig.build.json excludes the test files, which dist publishes otherwise.
+npx tsc --build tsconfig.build.json
 
 # Build common events
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
+
+# Build telemetry client (self-contained; .d.ts comes from tsc --build above)
+npx esbuild src/telemetry/index.ts --bundle --platform=node --format=cjs --outdir=./dist/telemetry --allow-overwrite --packages=external
 mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 mkdir -p ./dist/commons/events/state
@@ -31,6 +35,10 @@ cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/commons/conditiona
 npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
 cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
 
+# Build common authentication
+npx esbuild src/authentication/index.ts --bundle --format=cjs --outdir=./dist/authentication --allow-overwrite --packages=external
+cp -r ../commons/build/dist/common/authentication.d.ts ./dist/authentication/index.d.ts
+
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
 mkdir -p ./dist/commons/api
@@ -41,7 +49,7 @@ npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/ev
 cp -r ../commons/build/dist/common/events/deduplication.d.ts ./dist/events/deduplication.d.ts
 
 # Build common notifications
-npx esbuild src/notification/index.ts --bundle --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
+npx esbuild src/notification/index.ts --bundle --platform=node --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
 mkdir -p ./dist/commons/notification
 cp -r ../commons/build/dist/common/notification/*.d.ts ./dist/commons/notification
 
@@ -51,7 +59,7 @@ mkdir -p ./dist/commons/application-config
 cp -r ../commons/build/dist/common/application-config.d.ts ./dist/commons/application-config/index.d.ts
 
 # Build migration CLI
-npx esbuild src/migrations/v2.1/index.ts --bundle --format=cjs --outdir=./dist/migrations/v2.1 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+npx esbuild src/migrations/v2.1/index.ts --bundle --platform=node --format=cjs --outdir=./dist/migrations/v2.1 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 chmod +x ./dist/migrations/v2.1/index.js
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -63,8 +71,18 @@ else
 fi
 
 # Build CLI
-npx esbuild src/cli.ts --bundle --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+npx esbuild src/cli.ts --bundle --platform=node --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 cp -R src/environment/templates dist/templates
+# Template files copied into country configs by the upgrade-tilt and
+# migrate-infrastructure-to-assets codemods. Image builds that use the toolkit as
+# a library (testland, mosip-api) do not copy the template in and do not need them.
+TEMPLATE_DIR=../countryconfig-template
+if [ -d "$TEMPLATE_DIR" ]; then
+  mkdir -p dist/templates/countryconfig-template
+  cp -R $TEMPLATE_DIR/Tiltfile $TEMPLATE_DIR/.tiltignore $TEMPLATE_DIR/tilt $TEMPLATE_DIR/assets $TEMPLATE_DIR/Dockerfile.assets dist/templates/countryconfig-template/
+else
+  echo "$TEMPLATE_DIR not found, 'opencrvs upgrade' will not be able to copy the template files"
+fi
 chmod +x ./dist/cli.js
 
 echo "Build completed successfully."

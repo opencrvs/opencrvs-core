@@ -15,9 +15,11 @@ import {
   UUID,
   getActionConfig,
   getActionFormFields,
-  ActionType
+  ActionType,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
   Review as ReviewComponent,
@@ -41,7 +43,9 @@ export function useRejectionModal(eventId: UUID, eventType: string) {
     const modalResult = await openModal<RejectActionModalResult | null>(
       (close) => (
         <ReviewComponent.ActionModal.Reject
+          attachmentPath={eventAttachmentPath(eventId)}
           close={close}
+          event={findLocalEventDocument(eventId)}
           eventConfiguration={eventConfiguration}
           fields={fields}
           supportingCopy={supportingCopy}

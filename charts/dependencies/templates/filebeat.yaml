@@ -114,4 +114,6 @@ subjects:
   - kind: ServiceAccount
     name: filebeat
     namespace: {{ .Release.Namespace }}
+
+{{ include "network-policy-rules" (dict "service_name" "filebeat" "Values" .Values) }}
 {{- end }}

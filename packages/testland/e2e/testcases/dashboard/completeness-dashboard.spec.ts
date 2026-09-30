@@ -10,9 +10,12 @@
  */
 import { expect, test } from '@playwright/test'
 
-import { login } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { expectBirthsTabSelected, expectNoBrokenCards } from './utils'
+import { login } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import {
+  expectBirthsTabSelected,
+  expectNoBrokenCards
+} from '@e2e/support/dashboard/utils'
 
 // Every card on the Births tab, in dashboard grid order. The markdown intro
 // card has no title element.

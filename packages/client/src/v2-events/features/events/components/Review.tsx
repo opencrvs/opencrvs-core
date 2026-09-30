@@ -19,7 +19,7 @@ import {
   Accordion,
   Button,
   Link,
-  ListReview,
+  List,
   Dialog,
   Stack,
   Text,
@@ -32,16 +32,20 @@ import {
   FieldType,
   FieldUpdateValue,
   FormConfig,
+  getDeclaration,
   isFieldDisplayedOnReview,
   isPageVisible,
   omitHiddenFields,
+  omitHiddenPaginatedFields,
   runFieldValidations,
   FieldTypesToHideInReview,
   ValidatorContext,
   flattenFormState,
   IndexMap,
   FormState,
-  PlainDate
+  PlainDate,
+  AttachmentPath,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -364,7 +368,7 @@ function FormReview({
                 labelForShowAction="Show"
                 name={'Accordion_' + page.id}
               >
-                <ListReview id={'Section_' + page.id}>
+                <List id={'Section_' + page.id}>
                   {displayedFields.map((field) => {
                     const {
                       id,
@@ -382,18 +386,16 @@ function FormReview({
                     const showSectionHeading = type === FieldType.HEADING
 
                     return (
-                      <>
+                      <React.Fragment key={id}>
                         {showSectionHeading ? (
-                          <ListReview.Header
+                          <List.Heading
                             fontVariant={
                               field.configuration.styles?.fontVariant
                             }
                             label={intl.formatMessage(label)}
-                            value={null}
                           />
                         ) : (
-                          <ListReview.Row
-                            key={id}
+                          <List.Item
                             actions={
                               !shouldHideEditLink && (
                                 <Link
@@ -412,15 +414,16 @@ function FormReview({
                                 </Link>
                               )
                             }
+                            data-testid={id}
                             id={id}
                             label={intl.formatMessage(label)}
                             value={errorDisplay || valueDisplay}
                           />
                         )}
-                      </>
+                      </React.Fragment>
                     )
                   })}
-                </ListReview>
+                </List>
               </Accordion>
             </DeclarationDataContainer>
           )
@@ -450,9 +453,12 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
-  anchor
+  anchor,
+  attachmentPath
 }: {
   children?: React.ReactNode
+  /** Where files uploaded from the annotation fields on this page are stored. */
+  attachmentPath: AttachmentPath
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
@@ -496,11 +502,27 @@ function ReviewComponent({
   const hasAnnotationFieldsToShow =
     annotation !== undefined && reviewFields && reviewFields.length > 0
 
+  // Values of hidden fields must not drive what the review page shows, as validation strips them
+  const visibleForm = omitHiddenPaginatedFields(
+    formConfig,
+    form,
+    validatorContext
+  )
+
+  const annotationValidatorContext = {
+    ...validatorContext,
+    baseFormState: visibleForm
+  }
+
   const displayedAnnotationFields = hasAnnotationFieldsToShow
     ? reviewFields.filter(
         (field) =>
           !FieldTypesToHideInReview.some((t) => t === field.type) &&
-          isFieldDisplayedOnReview(field, annotation, validatorContext)
+          isFieldDisplayedOnReview(
+            field,
+            annotation,
+            annotationValidatorContext
+          )
       )
     : []
 
@@ -512,7 +534,7 @@ function ReviewComponent({
           <ReviewHeader title={title} />
           <FormReview
             anchor={anchor}
-            form={form}
+            form={visibleForm}
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
@@ -539,15 +561,13 @@ function ReviewComponent({
                     name="annotation"
                   >
                     <FormFieldGenerator
+                      attachmentPath={attachmentPath}
                       fields={reviewFields}
                       formTouched={touched}
                       formValues={annotation}
                       id={'review'}
                       readonlyMode={readonlyMode}
-                      validatorContext={{
-                        ...validatorContext,
-                        baseFormState: form
-                      }}
+                      validatorContext={annotationValidatorContext}
                       onFormChange={onAnnotationChange}
                       onTouchedChange={setTouched}
                     />
@@ -573,11 +593,12 @@ function ReviewComponent({
                       labelForShowAction="Show"
                       name="annotation"
                     >
-                      <ListReview id="annotation">
+                      <List id="annotation">
                         {displayedAnnotationFields.map((field) => (
-                          <ListReview.Row
+                          <List.Item
                             key={field.id}
                             actions={null}
+                            data-testid={field.id}
                             id={field.id}
                             label={intl.formatMessage(field.label)}
                             value={
@@ -589,7 +610,7 @@ function ReviewComponent({
                             }
                           />
                         ))}
-                      </ListReview>
+                      </List>
                     </Accordion>
                   </DeclarationDataContainer>
                 </ReviewContainter>
@@ -671,8 +692,13 @@ function AcceptActionModal({
   eventType,
   fields = [],
   eventConfiguration,
-  declaration
+  declaration,
+  attachmentPath,
+  event
 }: {
+  attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
@@ -686,9 +712,18 @@ function AcceptActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
+
+  const dialogValidatorContext = {
+    ...validatorContext,
+    baseFormState: omitHiddenPaginatedFields(
+      getDeclaration(eventConfiguration),
+      declaration,
+      validatorContext
+    )
+  }
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
@@ -696,7 +731,7 @@ function AcceptActionModal({
         field,
         form: modalValues,
         value: modalValues[field.id],
-        context: validatorContext
+        context: dialogValidatorContext
       })
     ).flatMap(([, errs]) => errs)
   )
@@ -722,7 +757,11 @@ function AcceptActionModal({
           type="primary"
           onClick={() => {
             close({
-              values: omitHiddenFields(fields, modalValues, validatorContext)
+              values: omitHiddenFields(
+                fields,
+                modalValues,
+                dialogValidatorContext
+              )
             })
           }}
         >
@@ -746,13 +785,11 @@ function AcceptActionModal({
         {fields.length > 0 && (
           <FormFieldGenerator
             {...dialogForm}
+            attachmentPath={attachmentPath}
             eventConfig={eventConfiguration}
             fields={fields}
             id={`accept-action-modal-form-${action}`}
-            validatorContext={{
-              ...validatorContext,
-              baseFormState: declaration
-            }}
+            validatorContext={dialogValidatorContext}
           />
         )}
       </Stack>
@@ -769,8 +806,13 @@ function RejectActionModal({
   close,
   supportingCopy,
   fields = [],
-  eventConfiguration
+  eventConfiguration,
+  attachmentPath,
+  event
 }: {
+  attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   close: (result: RejectActionModalResult | null) => void
   supportingCopy?: MessageDescriptor
   fields?: FieldConfig[]
@@ -780,7 +822,7 @@ function RejectActionModal({
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
@@ -843,6 +885,7 @@ function RejectActionModal({
         {fields.length > 0 && (
           <FormFieldGenerator
             {...dialogForm}
+            attachmentPath={attachmentPath}
             eventConfig={eventConfiguration}
             fields={fields}
             id="reject-action-modal-form"

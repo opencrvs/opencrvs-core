@@ -14,19 +14,9 @@ import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { Flag } from './Flag'
+import { EventStatus } from './EventStatus'
 
-/**
- * Event statuses recognized by the system
- */
-export const EventStatus = z.enum([
-  'CREATED',
-  'NOTIFIED',
-  'DECLARED',
-  'REGISTERED',
-  'ARCHIVED'
-])
-
-export type EventStatus = z.infer<typeof EventStatus>
+export { EventStatus } from './EventStatus'
 
 export const ZodDate = z.iso.date()
 export const ZodDateTime = z.string().datetime()

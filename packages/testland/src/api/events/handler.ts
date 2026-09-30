@@ -19,13 +19,11 @@ import { createMosipInteropClient } from '@opencrvs/mosip/api'
 import {
   Action,
   ActionType,
-  aggregateActionDeclarations,
-  deepMerge,
-  getPendingAction,
+  getDeclarationWithPendingAction,
   RegisterAction,
   NameFieldValue
 } from '@opencrvs/toolkit/events'
-import { MOSIP_INTEROP_URL, NO_MOSIP } from '@countryconfig/constants'
+import { MOSIP_INTEROP_URL } from '@countryconfig/constants'
 import {
   getBirthInformantSection,
   getInformantPsut,
@@ -63,20 +61,11 @@ export async function onBirthActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  // Used in local development to disable MOSIP registration dependency
-  if (NO_MOSIP) {
-    return h.response({}).code(200)
-  }
-
   const token = request.auth.artifacts.token as string
   const event = request.payload
   await sendInformantNotification({ event, token })
 
-  const pendingAction = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+  const declaration = getDeclarationWithPendingAction(event)
 
   const mosipInteropClient = createMosipInteropClient(
     MOSIP_INTEROP_URL,
@@ -144,19 +133,15 @@ export async function onBirthCorrectionActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  // Used in local development to disable MOSIP registration dependency
-  if (NO_MOSIP) {
-    return h.response({}).code(200)
-  }
-
   const token = request.auth.artifacts.token as string
   const event = request.payload
   await sendInformantNotification({ event, token })
-  const pendingAction = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+
+  // The correction's changed values (e.g. a newly verified parent ID that must
+  // trigger child UIN creation) live on the pending APPROVE_CORRECTION's linked
+  // REQUEST_CORRECTION. `getDeclarationWithPendingAction` resolves them the same
+  // way `aggregateActionDeclarations` does for an already-accepted approval.
+  const declaration = getDeclarationWithPendingAction(event)
 
   const childHasNid = Boolean(declaration['child.nid'])
   const shouldForwardToMosip =
@@ -194,6 +179,7 @@ export async function onBirthCorrectionActionHandler(
   try {
     if (!childHasNid) {
       await mosipInteropClient.register({
+        eventId: event.id,
         trackingId: event.trackingId,
         requestFields: {
           birthCertificateNumber,
@@ -268,20 +254,11 @@ export async function onDeathActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  // Used in local development to disable MOSIP registration dependency
-  if (NO_MOSIP) {
-    return h.response({}).code(200)
-  }
-
   const token = request.auth.artifacts.token as string
   const event = request.payload
   await sendInformantNotification({ event, token })
 
-  const pendingAction = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    pendingAction.declaration
-  )
+  const declaration = getDeclarationWithPendingAction(event)
 
   const mosipInteropClient = createMosipInteropClient(
     MOSIP_INTEROP_URL,

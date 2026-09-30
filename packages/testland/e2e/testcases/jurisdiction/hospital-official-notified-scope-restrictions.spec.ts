@@ -9,10 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect } from '@playwright/test'
-import { getToken, login, searchFromSearchBar } from '../../helpers'
-import { CLIENT_URL, CREDENTIALS } from '../../constants'
-import { createDeclaration, Declaration } from '../test-data/birth-declaration'
-import { formatV2ChildName } from '../birth/helpers'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { ActionType } from '@opencrvs/toolkit/events'
 
 test('Hospital Official can only see and edit records notified from their own office', async ({

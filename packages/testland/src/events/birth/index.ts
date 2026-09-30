@@ -474,8 +474,16 @@ export const birthEvent = defineConfig({
       flags: [
         { id: 'validated', operation: 'remove' },
         { id: 'approval-required-for-late-registration', operation: 'remove' },
-        { id: 'escalated-to-provincial-registrar', operation: 'remove' },
-        { id: 'escalated-to-registrar-general', operation: 'remove' }
+        {
+          id: 'escalated-to-provincial-registrar',
+          operation: 'remove',
+          conditional: user.hasRole('PROVINCIAL_REGISTRAR')
+        },
+        {
+          id: 'escalated-to-registrar-general',
+          operation: 'remove',
+          conditional: user.hasRole('NATIONAL_REGISTRAR')
+        }
       ],
       dialogCopy: {
         notify: {
@@ -722,7 +730,18 @@ export const birthEvent = defineConfig({
                 description:
                   'Option label for provincial registrar in escalate to field'
               },
-              value: 'PROVINCIAL_REGISTRAR'
+              value: 'PROVINCIAL_REGISTRAR',
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: not(
+                    or(
+                      user.hasRole('EMBASSY_OFFICIAL'),
+                      user.hasRole('PROVINCIAL_REGISTRAR')
+                    )
+                  )
+                }
+              ]
             },
             {
               label: {
@@ -925,7 +944,7 @@ export const birthEvent = defineConfig({
         defaultMessage: 'Reinstate registration',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.birth.action.revoke-registration.label'
+        id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
       supportingCopy: {
@@ -1126,6 +1145,17 @@ export const birthEvent = defineConfig({
       correctionForm: CORRECTION_FORM
     },
     {
+      type: ActionType.REJECT_CORRECTION,
+      label: {
+        id: 'v2.events.correction.reject.label',
+        defaultMessage: 'Reject correction',
+        description: 'Label for the reject correction action'
+      },
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
+      ]
+    },
+    {
       type: ActionType.APPROVE_CORRECTION,
       label: {
         defaultMessage: 'Approve correction',
@@ -1268,7 +1298,7 @@ export const birthEvent = defineConfig({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: not(flag('sealed'))
+          conditional: and(status('REGISTERED'), not(flag('sealed')))
         }
       ],
       flags: [{ id: 'sealed', operation: 'add' }],
@@ -1291,7 +1321,7 @@ export const birthEvent = defineConfig({
       auditHistoryLabel: {
         defaultMessage: 'Unsealed',
         description: 'The label to show in audit history for the seal action',
-        id: 'event.birth.custom.action.seal.audit-history-label'
+        id: 'event.birth.custom.action.unseal.audit-history-label'
       },
       form: [
         {

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import React, { PropsWithChildren } from 'react'
@@ -27,17 +27,12 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useFileUpload } from './useFileUpload'
 
 const uploadedPaths: string[] = []
-const deletedPaths: string[] = []
 
 const server = setupServer(
   http.post('/api/upload', async ({ request }) => {
     const formData = await request.formData()
     uploadedPaths.push(String(formData.get('path')))
     return HttpResponse.text(String(formData.get('path')))
-  }),
-  http.delete('/api/files/*', ({ request }) => {
-    deletedPaths.push(new URL(request.url).pathname.replace('/api/files/', ''))
-    return new HttpResponse(null, { status: 204 })
   })
 )
 
@@ -53,7 +48,6 @@ afterEach(() => {
   server.resetHandlers()
   queryClient.clear()
   uploadedPaths.length = 0
-  deletedPaths.length = 0
 })
 afterAll(() => server.close())
 
@@ -106,27 +100,5 @@ describe('uploading a file for an event that only has a temporary id', () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     expect(uploadedPaths).toEqual([])
-  })
-
-  test('deletes the file from the canonical event path', async () => {
-    const event = generateEventDocument({
-      configuration: tennisClubMembershipEvent,
-      actions: [{ type: ActionType.CREATE }]
-    })
-    const temporaryId = createTemporaryId()
-
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(temporaryId, event)
-
-    const { result } = renderHook(
-      () => useFileUpload(`events/${temporaryId}/`, 'my-field'),
-      { wrapper }
-    )
-
-    result.current.deleteFile(`events/${temporaryId}/proof.png`)
-
-    await waitFor(() =>
-      expect(deletedPaths).toEqual([`events/${event.id}/proof.png`])
-    )
   })
 })

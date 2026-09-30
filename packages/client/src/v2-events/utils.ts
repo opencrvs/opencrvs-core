@@ -35,6 +35,12 @@ import {
   resolveVersion,
   ZodDate
 } from '@opencrvs/commons/client'
+import {
+  findSelectedVersion,
+  parseVersionedLocation,
+  toNamedVersions,
+  VersionedEntity
+} from '@client/v2-events/VersionedLocation'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
   if (typeof name === 'string') {
@@ -43,24 +49,88 @@ export function getUsersFullName(name: UserOrSystem['name']) {
 
   return joinValues([name.firstname, name.surname])
 }
+export interface LocationOption {
+  value: string
+  label: string
+}
 
 /**
- * Builds advanced-search filter options for a set of locations: one row per
- * distinct name the location has ever carried (across all its versions), so a
- * record saved under an outdated name stays findable. Rows are in version order
- * and every row resolves to the same location id. Ordinary forms list a single
- * current-name option instead of calling this.
+ * Builds advanced-search filter options: one row per distinct name a location or
+ * administrative area has ever carried, each pinned to the version that carried
+ * it (@see VersionedLocation). Both selectors call this.
+ *
+ * Ordinary forms list a single current-name option instead of calling this.
  */
-export function buildHistoricalLocationNameOptions<
-  T extends { id: UUID; versions: LocationVersion[] }
->(items: T[]): { value: UUID; label: string }[] {
-  return items.flatMap((item) => {
-    const distinctNames = [
-      ...new Set(item.versions.map((version) => version.name))
-    ]
+export function buildHistoricalLocationNameOptions<T extends VersionedEntity>(
+  items: T[]
+): LocationOption[] {
+  return items.flatMap((item) =>
+    toNamedVersions(item).map(({ name, selection }) => ({
+      value: selection,
+      label: name
+    }))
+  )
+}
 
-    return distinctNames.map((name) => ({ value: item.id, label: name }))
-  })
+/**
+ * Narrows a value to the plain id every non-display surface expects
+ */
+export function toLocationId(value: string): string
+export function toLocationId(value: unknown): string | undefined
+export function toLocationId(value: unknown): string | undefined {
+  const parsed = parseVersionedLocation(value)
+
+  if (parsed) {
+    return parsed.locationId
+  }
+
+  return typeof value === 'string' ? value : undefined
+}
+
+/**
+ * The option a location or administrative-area field value is currently on.
+ * A pinned value identifies its row by version.
+ */
+export function findLocationOption(
+  options: LocationOption[],
+  value: string | null | undefined
+): LocationOption | null {
+  if (!value) {
+    return null
+  }
+
+  const locationId = toLocationId(value)
+
+  return (
+    options.find((option) => option.value === value) ??
+    options.find((option) => toLocationId(option.value) === locationId) ??
+    null
+  )
+}
+
+/**
+ * The entity a location or administrative-area field value names, and the
+ * version to display for it:
+ * the pinned one for a search value, the one in effect at `anchor` for a
+ * declaration's bare id. Undefined when the value names neither.
+ */
+export function resolveLocationValue<T extends VersionedEntity>(
+  value: unknown,
+  entities: Map<UUID, T>,
+  anchor: PlainDate
+): { entity: T; version: LocationVersion } | undefined {
+  const pinned = findSelectedVersion(value, entities)
+
+  if (pinned) {
+    return pinned
+  }
+
+  const id = UUID.safeParse(toLocationId(value)).data
+  const entity = id && entities.get(id)
+
+  return entity
+    ? { entity, version: resolveVersion(entity.versions, anchor) }
+    : undefined
 }
 
 /** Utility to get all keys from union */

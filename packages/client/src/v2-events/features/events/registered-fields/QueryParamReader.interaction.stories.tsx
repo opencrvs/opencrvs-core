@@ -191,6 +191,7 @@ const forwardedParams: FieldConfig[] = [
 function Form(args: Args) {
   return (
     <FormFieldGenerator
+      attachmentPath={null}
       fields={args.fields}
       id="test-event-form"
       validatorContext={getTestValidatorContext()}

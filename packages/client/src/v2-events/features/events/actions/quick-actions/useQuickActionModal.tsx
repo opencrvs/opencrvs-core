@@ -33,7 +33,8 @@ import {
   omitHiddenFields,
   EventIndex,
   isValidIcon,
-  flattenFormState
+  flattenFormState,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -107,12 +108,17 @@ function QuickActionModal({
   eventConfiguration: EventConfig
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
   const { getEvent } = useEvents()
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
   const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
   const event = getCurrentEventState(eventDocument, eventConfiguration)
+  /*
+   * Pass the record itself, as every other form renderer does. Configured
+   * fields evaluate their conditionals against it, and the print button
+   * prints it.
+   */
+  const validatorContext = useValidatorContext(eventDocument)
 
   const errorsOnField = (config.fields ?? []).flatMap((field) =>
     flattenFormState(
@@ -189,6 +195,7 @@ function QuickActionModal({
         )}
         <FormFieldGenerator
           {...dialogForm}
+          attachmentPath={eventAttachmentPath(eventId)}
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}

@@ -113,6 +113,18 @@ describe('user.requestEmailChange', () => {
       ).rejects.toMatchObject({ code: 'CONFLICT' })
     })
 
+    test("does not throw CONFLICT when the requested email is only a substring of another user's", async () => {
+      const { users } = await setupTestCase()
+      const client2 = createTestClient(users[1])
+
+      // A substring of user1's seeded `user-${id}@test.example`
+      const nearMiss = `${users[0].id}@test.example`
+
+      await expect(
+        client2.user.requestEmailChange({ email: nearMiss })
+      ).resolves.toHaveProperty('nonce')
+    })
+
     test('does not throw CONFLICT when the email belongs to the requesting user', async () => {
       const { users } = await setupTestCase()
       const client1 = createTestClient(users[0])
