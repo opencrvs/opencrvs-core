@@ -83,7 +83,6 @@ import {
   todayISO,
   AttachmentPath
 } from '@opencrvs/commons/client'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import { countries } from '@client/utils/countries'
 import {
@@ -126,6 +125,7 @@ import { Loader } from '@client/v2-events/features/events/registered-fields/Load
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import { liveAnchorDate } from '@client/v2-events/utils'
 import {
@@ -637,11 +637,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
           intl.formatMessage(field.config.configuration.prefix)
         }
       >
-        <TextArea
+        <TextArea.Input
           {...inputProps}
           maxLength={field.config.configuration?.maxLength}
           value={field.value}
-          onChange={(e) => onFieldValueChange(name, e.target.value)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>
     )
