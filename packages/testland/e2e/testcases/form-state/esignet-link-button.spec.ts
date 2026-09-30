@@ -24,9 +24,7 @@ async function authenticateInformantWithESignet(page: Page) {
   await page.locator('#authenticate').click()
 
   // Wait until we are back on the app, not just away from eSignet
-  await page.waitForURL((url) => url.origin === new URL(CLIENT_URL).origin, {
-    waitUntil: 'load'
-  })
+  await page.waitForURL((url) => url.origin === new URL(CLIENT_URL).origin)
 }
 
 test.describe
