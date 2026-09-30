@@ -134,6 +134,39 @@ jobs:
 
           npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
           yarn version --new-version "$VERSION" --no-git-tag-version
+
+          # Bump helm chart version
+          find charts/ -name Chart.yaml -exec sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" {} \;
+          # Update core and countryconfig image in opencrvs services chart
+          sed -i.bak -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+          # Read the two tags back: a pattern that stopped matching must fail the
+          # run, not leave the previous release's tag in place.
+          platform_tag=$(awk '/^[^[:space:]]/ { p = ($0 ~ /^platform:/) } p && $1 == "tag:" { print $2; exit }' charts/opencrvs-services/values.yaml)
+          countryconfig_tag=$(awk '/^[^[:space:]]/ { c = ($0 ~ /^countryconfig:/) } c && $1 == "tag:" { print $2; exit }' charts/opencrvs-services/values.yaml)
+          if [ "$platform_tag" != "v$VERSION" ] || [ "$countryconfig_tag" != "v$VERSION" ]; then
+            echo "::error::charts/opencrvs-services/values.yaml: image tags are '$platform_tag' and '$countryconfig_tag', expected v$VERSION"
+            exit 1
+          fi
+          # Update utilities image in Dependencies helm chart
+          sed -i.bak -E '
+          /^utilities:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/dependencies/values.yaml
+          rm charts/dependencies/values.yaml.bak
+
           git add .
           git commit -m "chore: update version to $VERSION"
 

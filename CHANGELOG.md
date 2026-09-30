@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.4
+
+### Security
+
+- Removed the unused `user.actions` endpoint from the events service. It was authorised only by a user-management permission, yet returned the full record declarations of every action the target user had taken, so administrators and other roles holding `user.read` could read records they had no permission to open. The endpoint has had no consumer since the v1 gateway bridge was removed, so removing it changes nothing in the application. [GHSA-hmgw-v78r-jjc4](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-hmgw-v78r-jjc4) (High)
+- The events service no longer writes users' email addresses and phone numbers to the logs in full. When a user was created or updated with an email or phone number already in use, the value was logged verbatim; it is now masked. [GHSA-55j9-g2xv-4qrw](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-55j9-g2xv-4qrw) (Low)
+
+  **Deployment notes:**
+
+  - Existing log stores may still hold unmasked emails and phone numbers from before the upgrade. Scrub them according to your retention policy.
+
+### Bug fixes
+
+- MinIO removed its images from quay.io and Docker Hub, so the MinIO server and client images could no longer be pulled. They now come from OpenCRVS-hosted copies: `ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z` for the server and `ghcr.io/opencrvs/minio-mc:release.2025-05-21t01-59-54z` for the client used by the data cleanup job. [#13893](https://github.com/opencrvs/opencrvs-core/pull/13893)
+
+  **Deployment notes:**
+
+  - If you pull images through a private registry, mirror the two new images there before upgrading.
+
 ## 2.0.3
 
 ### Bug fixes
