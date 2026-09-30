@@ -10,7 +10,7 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 import { CREDENTIALS } from '@e2e/support/constants'
-import { getToken, login } from '@e2e/support/helpers'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
 import {
   createDeclaration,
   Declaration
@@ -52,6 +52,7 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
   })
 
   test('3.0.2 Navigate to certificate print action', async () => {
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Print')
   })
