@@ -182,6 +182,7 @@ This section allows you to configure the postgres deployment within your infrast
 | restore.schedule | string | `0 3 * * *` | Restore cronjob schedule, if not defined then value from `restore.schedule` is used |
 | restore.cronjob | boolean | `true` | Run restore as cronjob, setting to `false` allows to run one time job, e/g manual restore, or disaster recovery scenario |
 | node_port | int | `n/a` | Fixed NodePort to expose port `5432` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
+| shm_size | string | `256Mi` | Size of `/dev/shm`, mounted as a memory-backed `emptyDir`. Postgres uses it for parallel query workers; the container runtime's default (typically 64Mi) is easily exhausted, causing "could not resize shared memory segment" errors unrelated to disk space. |
 
 ## Elasticsearch
 
@@ -209,8 +210,8 @@ This section allows you to configure the deployment and authentication settings 
 | Key                     | Type   | Default value                   | Description                                                                                                                                                        |
 | ----------------------- | ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | enabled                 | bool   | true                            | Enable or disable minio service                                                                                                                                    |
-| image.repository        | string | `quay.io/minio/minio`           | MinIO Docker image repository.                                                                                                                                     |
-| image.tag               | string | `RELEASE.2025-06-13T11-33-47Z`  | MinIO Docker image tag.                                                                                                                                            |
+| image.repository        | string | `ghcr.io/opencrvs/minio`        | MinIO Docker image repository.                                                                                                                                     |
+| image.tag               | string | `release.2025-06-13t11-33-47z`  | MinIO Docker image tag.                                                                                                                                            |
 | use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                                                 |
 | storage_type            | string | `global storage_type`           | Optional MinIO-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
 | pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                             |

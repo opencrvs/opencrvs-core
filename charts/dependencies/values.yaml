@@ -138,6 +138,12 @@ postgres:
   # Fixed NodePort to expose port 5432 on, only used when `service_type` is `NodePort`.
   # node_port: 30432
 
+  # Size of /dev/shm, mounted as a memory-backed emptyDir. Postgres uses it for
+  # parallel query workers' shared memory; the container runtime's default
+  # (typically 64Mi) is easily exhausted by a handful of concurrent workers,
+  # causing "could not resize shared memory segment" errors unrelated to disk space.
+  shm_size: '256Mi'
+
   # Storage configuration:
   # Path to persistent data on the VM (when storage_type is host_path).
   host_data_path: /data/postgres
@@ -356,8 +362,9 @@ minio:
   # Enable or disable MinIO deployment.
   enabled: true
   image:
-    repository: quay.io/minio/minio
-    tag: RELEASE.2025-06-13T11-33-47Z
+    # Mirrored copy of the upstream image, which MinIO removed from quay.io.
+    repository: ghcr.io/opencrvs/minio
+    tag: release.2025-06-13t11-33-47z
   port: 3535
   network_policy:
     ingress_mode: private

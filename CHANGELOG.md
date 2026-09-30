@@ -1,23 +1,6 @@
 # Changelog
 
-## 2.1.0 Release Candidate
-
-### Upgrade guidance
-
-#### Sentry — nothing to do, the upgrade script removes it
-
-`SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
-
-#### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
-
-**Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
-
-**Upgrading from 1.9.x: you cannot skip straight to 2.1.0.** You must first upgrade to **v2.0.0**, which performs the one-time migration of MongoDB collections into PostgreSQL, and only then upgrade to 2.1.0. This release deletes the migration tooling (the legacy-data migration, its `mongo_fdw` SQL, and the `data-migration-legacy` Helm job/dependency chart/Swarm compose service), so v2.0.0 is the only release that can migrate your data.
-
-How the migration runs during the v2.0.0 upgrade:
-
-- **Helm/Kubernetes deployments**: automatically, as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on `helm upgrade`. If you disabled `data_migration_legacy`, re-enable it while on v2.0.0 before going to 2.1.0.
-- **Docker Swarm deployments** (Countryconfig/Farajaland `docker-compose.deploy.yml`): also automatically — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs the `legacy-data-migration` service the first time you deploy v2.0.0. If that service was pruned/removed before it ran, restore it from the v2.0.0 tag and run it manually while still on v2.0.0.
+## 2.2.0 Release Candidate
 
 ### Breaking changes
 
@@ -35,6 +18,42 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 ```
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
+
+## 2.1.0 Release Candidate
+
+### Upgrade guidance
+
+#### Sentry — nothing to do, the upgrade script removes it
+
+`SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
+#### `assets/` and the Tilt setup — the upgrade script moves you over
+
+A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
+
+- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
+
+With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
+
+#### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
+
+**Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
+
+**Upgrading from 1.9.x: you cannot skip straight to 2.1.0.** You must first upgrade to **v2.0.0**, which performs the one-time migration of MongoDB collections into PostgreSQL, and only then upgrade to 2.1.0. This release deletes the migration tooling (the legacy-data migration, its `mongo_fdw` SQL, and the `data-migration-legacy` Helm job/dependency chart/Swarm compose service), so v2.0.0 is the only release that can migrate your data.
+
+How the migration runs during the v2.0.0 upgrade:
+
+- **Helm/Kubernetes deployments**: automatically, as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on `helm upgrade`. If you disabled `data_migration_legacy`, re-enable it while on v2.0.0 before going to 2.1.0.
+- **Docker Swarm deployments** (Countryconfig/Farajaland `docker-compose.deploy.yml`): also automatically — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs the `legacy-data-migration` service the first time you deploy v2.0.0. If that service was pruned/removed before it ran, restore it from the v2.0.0 tag and run it manually while still on v2.0.0.
+
+### Breaking changes
+
+#### Two-factor authentication (2FA) now follows the environment's purpose, not its name
+
+`environment:init` previously enabled 2FA only for an environment named exactly `production`; every other environment — including `staging`, which hosts a daily restore of real production data, and production environments with a custom name such as `prod` — was generated with `TWO_FA_ENABLED: false`, so logins accepted the fixed test code `000000`.
+
+2FA now derives from the environment's **type/purpose**: it defaults **on** for production environments (`staging`, `production`, and any custom environment whose purpose is "Staging/Production") and **off** for non-production ones (`development`, `qa`, and custom "Development/QA/Testing" environments). `environment:init` now also asks explicitly — "Enable two-factor authentication (2FA)?" — with the correct answer pre-selected; set `TWO_FA_ENABLED` to pre-answer it in non-interactive runs.
 
 #### Confirming an asynchronous action now takes credentials the requester does not have
 
@@ -289,6 +308,7 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Remove a user's in-progress drafts when their **role** changes, not only when their office changes. A draft is written against the role that authored it — form fields, available actions and flags can all be conditional on the role — so after a role change the old drafts stayed in the Drafts workqueue with no action the new role could take. The confirmation dialog shown before saving the user now covers a role change as well as an office move. **Country configurations must replace `form.field.label.changeOfficeWarningTitle` and `form.field.label.changeOfficeWarningBody` in `client.csv` with `form.field.label.removeDraftsWarningTitle` and `form.field.label.removeDraftsWarningBody`.** [#13763](https://github.com/opencrvs/opencrvs-core/issues/13763)
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 - Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
+- Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
 
 ## 2.0.2
 

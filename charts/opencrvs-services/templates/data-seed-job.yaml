@@ -50,6 +50,4 @@ spec:
       restartPolicy: "Never"
   backoffLimit: 0
 
-{{ include "network-policy-rules" (dict "service_name" "deployment-jobs" "Values" .Values) }}
-
 {{- end }}

@@ -32,7 +32,7 @@ exports[`event.actions.custom > Asynchronous confirmation flow > should save act
     },
     {
       "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
+        "review.comment": "review.comment-TEXTAREA-1",
         "review.signature": {
           "originalFilename": "abcd.png",
           "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
@@ -195,7 +195,7 @@ exports[`event.actions.custom > Asynchronous confirmation flow > should successf
     },
     {
       "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
+        "review.comment": "review.comment-TEXTAREA-1",
         "review.signature": {
           "originalFilename": "abcd.png",
           "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
@@ -364,7 +364,7 @@ exports[`event.actions.custom > returns HTTP409 if trying to execute an action w
     },
     {
       "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
+        "review.comment": "review.comment-TEXTAREA-1",
         "review.signature": {
           "originalFilename": "abcd.png",
           "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
@@ -495,7 +495,7 @@ exports[`event.actions.custom > successfully executes action 1`] = `
     },
     {
       "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
+        "review.comment": "review.comment-TEXTAREA-1",
         "review.signature": {
           "originalFilename": "abcd.png",
           "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
@@ -673,7 +673,7 @@ exports[`event.actions.custom > test non required field 1`] = `
     },
     {
       "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
+        "review.comment": "review.comment-TEXTAREA-1",
         "review.signature": {
           "originalFilename": "abcd.png",
           "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
