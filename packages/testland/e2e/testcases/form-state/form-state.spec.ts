@@ -15,11 +15,13 @@ import {
   drawSignature,
   getToken,
   goToSection,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  searchFromSearchBar
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   fillChildDetails,
+  formatV2ChildName,
   openBirthDeclaration,
   REQUIRED_VALIDATION_ERROR
 } from '@e2e/support/birth/helpers'
@@ -28,7 +30,7 @@ import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
-import { selectAction, type } from '@e2e/support/utils'
+import { ensureAssignedToUser, selectAction, type } from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
@@ -220,14 +222,13 @@ test.describe('Form state', () => {
 
     test('Form states and annotations are not persisted', async () => {
       expect(declaration).toBeDefined()
-
       await page.goto(CLIENT_URL)
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration!,
-        CREDENTIALS.REGISTRAR
-      )
+
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Print')
+
       await selectRequesterType(page, 'Print and issue to someone else')
 
       await page.getByTestId('text__firstname').fill(faker.person.firstName())
