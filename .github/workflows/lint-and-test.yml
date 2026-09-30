@@ -545,9 +545,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        # Playwright is required since @storybook/test-runner depends on it
+        # Playwright is required since @storybook/test-runner depends on it.
+        # The test runner only uses Chromium unless --browsers says otherwise.
         working-directory: packages/client
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps chromium
 
       # `storybook-static/` is restored from the artifact built in
       # `prepare-client-tests`, so we don't need to build Storybook
