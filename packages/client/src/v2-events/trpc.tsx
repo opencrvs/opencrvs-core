@@ -199,7 +199,7 @@ function throttlePersister(persister: Persister): Persister {
         console.error('Failed to persist query cache', error)
       }
     },
-    1000, // same default as for tanstacks own library.
+    500, // tanstack defaults to 1000
     { leading: false, trailing: true }
   )
 
