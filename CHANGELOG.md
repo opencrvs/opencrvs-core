@@ -19,7 +19,7 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
 
-## 2.1.0 Release Candidate
+## 2.1.0
 
 ### Upgrade guidance
 
