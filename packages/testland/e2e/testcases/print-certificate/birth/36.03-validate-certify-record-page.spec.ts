@@ -17,12 +17,16 @@ import {
 } from '@e2e/support/test-data/birth-declaration'
 import {
   printAndExpectPopup,
-  navigateToCertificatePrintAction,
   selectCertificationType,
   selectRequesterType,
   openRecordByTitle
 } from '@e2e/support/print-certificate/birth/helpers'
-import { ensureAssignedToUser, expectInUrl, type } from '@e2e/support/utils'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction,
+  type
+} from '@e2e/support/utils'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test.describe.serial('3.0 Validate "Certify record" page', () => {
@@ -48,12 +52,8 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
   })
 
   test('3.0.2 Navigate to certificate print action', async () => {
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await navigateToCertificatePrintAction(
-      page,
-      declaration,
-      CREDENTIALS.REGISTRAR
-    )
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await selectAction(page, 'Print')
   })
 
   test('3.1 should navigate to Verify their identity page', async () => {
