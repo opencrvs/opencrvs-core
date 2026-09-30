@@ -8,6 +8,15 @@
 
 `SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
 
+#### `assets/` and the Tilt setup — the upgrade script moves you over
+
+A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
+
+- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
+
+With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
+
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
 **Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
