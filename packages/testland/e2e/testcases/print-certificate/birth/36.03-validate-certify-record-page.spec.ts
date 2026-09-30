@@ -154,9 +154,6 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     if (!trackingId) {
       throw new Error('Tracking ID is undefined')
     }
-    await type(page, '#searchText', trackingId)
-    await page.locator('#searchIconButton').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
     await page.getByRole('button', { name: 'Audit' }).click()

@@ -14,6 +14,7 @@ import {
   formatName,
   getToken,
   login,
+  searchFromSearchBar,
   uploadImage
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
@@ -77,12 +78,11 @@ test.describe.serial('Correct record - 2', () => {
 
   test('2.1 Certificate preview', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await navigateToCertificatePrintAction(
-      page,
-      declaration,
-      CREDENTIALS.REGISTRATION_OFFICER
-    )
+
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await selectAction(page, 'Print')
 
     await selectCertificationType(page, 'Birth Certificate')
     await selectRequesterType(page, 'Print and issue to Informant (Mother)')
@@ -170,7 +170,7 @@ test.describe.serial('Correct record - 2', () => {
 
       await expectInUrl(
         page,
-        `/events/request-correction/${eventId}/pages/informant?from=review&backTo=/workqueue/pending-certification#informant____relation`
+        `/events/request-correction/${eventId}/pages/informant?from=review#informant____relation`
       )
 
       await page.locator('#informant____relation').click()
@@ -217,7 +217,7 @@ test.describe.serial('Correct record - 2', () => {
 
       await expectInUrl(
         page,
-        `/events/request-correction/${eventId}/pages/child?from=review&backTo=/workqueue/pending-certification#child____placeOfBirth`
+        `/events/request-correction/${eventId}/pages/child?from=review#child____placeOfBirth`
       )
 
       await page.locator('#child____placeOfBirth').click()
@@ -282,7 +282,7 @@ test.describe.serial('Correct record - 2', () => {
     await page.getByRole('button', { name: 'Confirm' }).click()
     await correctionRequest
 
-    await expectInUrl(page, `/workqueue/pending-certification`)
+    await expectInUrl(page, `/events/${eventId}`)
   })
 
   test.describe('2.8 Correction Review', async () => {
