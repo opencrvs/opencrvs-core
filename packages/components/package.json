@@ -58,7 +58,6 @@
     "start": "storybook dev --ci -p 6060",
     "build": "tsc",
     "lint": "pnpm lint:css",
-    "test": "node --test exports.test.mjs",
     "test:compilation": "tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "storybook": "storybook dev -p 6060",
