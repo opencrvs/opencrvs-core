@@ -3,12 +3,13 @@
 ```mermaid
 flowchart TD
     subgraph PRE["Prerequisites — both repos"]
+        P0["Run init-release workflow\nhttps://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml"]
         P1[Verify no open PRs pending for release]
         P2["release/X.Y.Z branch exists in Core + CountryConfig\nPR'd to master and develop"]
         P3[CI passing on all PRs]
         P4["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
         P5[CountryConfig already using latest pre-release toolkit version]
-        P1 --> P2 --> P3 --> P4 --> P5
+        P0 --> P1 --> P2 --> P3 --> P4 --> P5
     end
 
     subgraph CORE["opencrvs-core"]
@@ -40,10 +41,6 @@ flowchart TD
 
     subgraph POST["Post-release"]
         POST1[Merge both release branches into master + develop simultaneously]
-        POST2["Create release/X.Y.Z+1 from release/X.Y.Z in both repos"]
-        POST3["Commit version bump on new release branches"]
-        POST4["PR new branches into master + develop in both repos\n⚠️ init-release.yml may help with POST2–POST4 (unverified)"]
-        POST1 --> POST2 --> POST3 --> POST4
     end
 
     PRE --> CORE
