@@ -310,6 +310,21 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 - Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
 
+## 2.0.3
+
+### Bug fixes
+
+- The image crop window now matches the `targetSize` configured on a file field. It was always a circle, so a non-square target stretched the saved image and gave the user no way to frame it accurately. [#12034](https://github.com/opencrvs/opencrvs-core/issues/12034)
+
+  ```ts
+  configuration: {
+    maxImageSize: { targetSize: { width: 350, height: 450 } }
+  }
+  ```
+
+- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
+
 ## 2.0.2
 
 ### Breaking changes

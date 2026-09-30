@@ -974,12 +974,12 @@ export const countryMessages: Record<
   },
   HKG: {
     id: 'countries.HKG',
-    defaultMessage: '"China, Hong Kong Special Administrative Region"',
+    defaultMessage: 'China, Hong Kong Special Administrative Region',
     description: 'ISO Country: HKG'
   },
   MAC: {
     id: 'countries.MAC',
-    defaultMessage: '"China, Macao Special Administrative Region"',
+    defaultMessage: 'China, Macao Special Administrative Region',
     description: 'ISO Country: MAC'
   },
   CXR: {
@@ -1358,8 +1358,8 @@ export const countryMessages: Record<
     description: 'ISO Country: KGZ'
   },
   LAO: {
-    id: 'countries.KGZ',
-    defaultMessage: "Lao People's Democratic Republic Republic",
+    id: 'countries.LAO',
+    defaultMessage: "Lao People's Democratic Republic",
     description: 'ISO Country: LAO'
   },
   LVA: {
@@ -1840,7 +1840,7 @@ export const countryMessages: Record<
   },
   MKD: {
     id: 'countries.MKD',
-    defaultMessage: 'The former Yugoslav Republic of Macedonia',
+    defaultMessage: 'North Macedonia',
     description: 'ISO Country: MKD'
   },
   TLS: {
@@ -1875,7 +1875,7 @@ export const countryMessages: Record<
   },
   TUR: {
     id: 'countries.TUR',
-    defaultMessage: 'Turkey',
+    defaultMessage: 'Türkiye',
     description: 'ISO Country: TUR'
   },
   TKM: {
