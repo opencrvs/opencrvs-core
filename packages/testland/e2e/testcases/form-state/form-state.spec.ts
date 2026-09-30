@@ -180,8 +180,7 @@ test.describe('Form state', () => {
       await login(page)
     })
 
-    test('Form changes in correction are persisted after reload', async () => {
-      const updatedMotherName = faker.person.firstName('female')
+    test('Open correction through Print action', async () => {
       expect(declaration).toBeDefined()
       await searchFromSearchBar(page, formatV2ChildName(declaration))
 
@@ -193,6 +192,9 @@ test.describe('Form state', () => {
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
       await page.getByRole('button', { name: 'No, make correction' }).click()
+    })
+
+    test('Select informant', async () => {
       await page.locator('#requester____type').click()
       await page.getByText('Informant (Mother)', { exact: true }).click()
 
@@ -207,6 +209,11 @@ test.describe('Form state', () => {
         .click()
 
       await page.getByRole('button', { name: 'Continue', exact: true }).click()
+    })
+
+    test('Form changes in correction are persisted after reload', async () => {
+      const updatedMotherName = faker.person.firstName('female')
+
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
       await page

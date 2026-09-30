@@ -12,7 +12,12 @@ import { expect, test } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { CREDENTIALS } from '@e2e/support/constants'
-import { getToken, login, triggerDeclarationAction } from '@e2e/support/helpers'
+import {
+  getToken,
+  login,
+  searchFromSearchBar,
+  triggerDeclarationAction
+} from '@e2e/support/helpers'
 import {
   ensureAssignedToUser,
   expectInUrl,
@@ -67,8 +72,8 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
   })
 
   await test.step('Registration note is available once the record is declared', async () => {
-    await page.getByRole('button', { name: 'Pending registration' }).click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
+
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Edit')
 
@@ -87,11 +92,13 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
   })
 
   await test.step('Open a correction on the registered record', async () => {
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
+
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Correct')
+  })
 
+  await test.step('Select informant', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Informant (Mother)', { exact: true }).click()
 
@@ -103,6 +110,9 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
       .click()
 
     await page.getByRole('button', { name: 'Continue' }).click()
+  })
+
+  await test.step('Go to review', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
 
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -141,11 +151,10 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
       await page.getByRole('button', { name: 'Confirm', exact: true }).click()
     })
 
-    await expectInUrl(page, `/workqueue/pending-certification`)
+    await expectInUrl(page, `/events/${eventId}`)
   })
 
   await test.step('Record corrected modal shows the registration note change', async () => {
-    await openRecordByTitle(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
     await page.getByRole('button', { name: 'Audit' }).click()
