@@ -83,7 +83,13 @@ test('Community leader notifies a birth after deleting a previously persisted si
   await test.step('Save & Exit to persist the signature in a draft', async () => {
     await page.getByRole('button', { name: 'Action' }).click()
     await page.getByText('Save & Exit', { exact: true }).click()
+
+    const draftResponse = page.waitForResponse(
+      (res) => res.url().includes('event.draft.create') && res.ok()
+    )
+    await page.getByRole('button', { name: 'Save & Exit' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
+    await draftResponse
   })
 
   await test.step('Reopen the draft from the Drafts workqueue', async () => {

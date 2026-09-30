@@ -205,7 +205,14 @@ test.describe.serial("Correct record - Change father's ID number", () => {
       .getByRole('button', { name: 'Submit correction request' })
       .click()
 
+    const correctionResponse = page.waitForResponse(
+      (res) =>
+        res.url().includes('event.actions.correction.request') && res.ok()
+    )
+
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    await correctionResponse
   })
 
   test('Logout', async () => {
