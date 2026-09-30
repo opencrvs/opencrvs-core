@@ -4,7 +4,7 @@
 flowchart TD
     subgraph PRE["Prerequisites — both repos"]
         P1[Verify no open PRs pending for release]
-        P2["release/X.Y.Z branch exists in Core + CountryConfig\nPR'd to master and develop"]
+        P2["release/X.Y.Z branch exists in opencrvs-core+infrastructure repos\nPR'd to master and develop"]
         P3[CI passing on all PRs]
         P4["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
         P5[CountryConfig already using latest pre-release toolkit version]
@@ -17,7 +17,7 @@ flowchart TD
         C3["Approve the run in the npm-publish environment\nany @opencrvs/developers member, including you"]
         C4[Verify toolkit version visible on npm]
         C5["Bump @opencrvs/toolkit to X.Y.Z in\npackages/countryconfig-template/package.json\n⚠️ pnpm i --ignore-workspace to update its lockfile"]
-        C6[Commit the pin bump]
+        C6[Commit the version bump]
         C7["git tag vX.Y.Z\ngit push origin tag vX.Y.Z\n⚠️ Tag as soon as C6 is committed — from C2 until\nthis tag exists, create-countryconfig@X.Y.Z\nscaffolds from the previous release tag"]
         C8["⚡ Pipeline triggered automatically\n(docker images)"]
         C9["Verify docker images published\nCompare size vs previous — report unusual increases"]

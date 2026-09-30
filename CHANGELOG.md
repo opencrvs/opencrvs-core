@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 Release Candidate
+## 2.1.0
 
 ### Upgrade guidance
 
