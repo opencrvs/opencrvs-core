@@ -166,6 +166,7 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
       name: 'Record corrected',
       exact: true
     })
+
     const nextPage = page.getByRole('button', { name: 'Next page' })
 
     await expect(async () => {
