@@ -37,7 +37,10 @@ import {
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { storybookEventId, tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  tennisClubMembershipEventDocument
+} from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
   getTestValidatorContext,
@@ -698,6 +701,46 @@ export const AcceptModalWithFormFields: Story = {
       name: 'Confirm'
     })
     await expect(confirmButton).toBeEnabled()
+  }
+}
+
+/**
+ * A print button configured in the action dialog prints the record the action
+ * is taken on. The dialog has to hand that record over: without it the button
+ * throws and the page falls back to the error screen.
+ */
+export const AcceptModalWithPrintButton: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
+        close={fn()}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        event={tennisClubMembershipEventDocument}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[
+          {
+            id: 'modal-print',
+            type: FieldType.ALPHA_PRINT_BUTTON,
+            conditionals: [],
+            label: generateTranslationConfig('Print'),
+            configuration: { template: 'simple-certificate' }
+          }
+        ]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const printButton = await canvas.findByTestId('modal-print')
+    await expect(printButton).toBeEnabled()
   }
 }
 
