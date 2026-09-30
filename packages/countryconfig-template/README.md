@@ -10,16 +10,17 @@
 
 - [What is this module for?](#what-is-this-module-for)
 - [How do I run the module alongside the OpenCRVS core?](#how-do-i-run-the-module-alongside-the-opencrvs-core)
-- [Userful information](#userful-information)
-- [What is in the Countryconfig configuration module repository?](#what-is-in-the-countryconfig-configuration-module-repository)
+- [Useful information](#useful-information)
+- [What is in the country configuration repository?](#what-is-in-the-country-configuration-repository)
+- [Action Confirmation](#action-confirmation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <br>
 <br>
 
-**This repository uses the fictional country "Farajaland" as an example country configuration for [OpenCRVS](https://github.com/opencrvs/opencrvs-core). You should fork this repository to create your own country configuration using @opencrvs/toolkit**
+**This repository uses the fictional country "Farajaland" as an example country configuration for [OpenCRVS](https://github.com/opencrvs/opencrvs-core). Create your own country configuration from this template with `npm create @opencrvs/countryconfig`.**
 
-<a href="https://documentation.opencrvs.org/setup/3.-installation/3.2-set-up-your-own-country-configuration">Read our documentation</a> to learn how to set up your own country configuration using this repo as an example.
+<a href="https://documentation.opencrvs.org/technical/guides/configuration">Read our documentation</a> to learn how to set up your own country configuration using this repo as an example.
 
 # What is this module for?
 
@@ -135,11 +136,11 @@ Thats it! 🎉
 The Tiltfile supports the following environment variables.
 
 - `OPENCRVS_CORE_IMAGE_TAG`: Defines the OpenCRVS Core Docker image tag used by the Helm chart.
-- `OPENCRVS_CORE_REF`: Defines the OpenCRVS Core Git branch or tag used to fetch Helm charts, use any release/2.0.X branch or tag from https://github.com/opencrvs/opencrvs-core
+- `OPENCRVS_CORE_REF`: Defines the OpenCRVS Core Git branch or tag used to fetch Helm charts, use any release/2.1.X branch or tag from https://github.com/opencrvs/opencrvs-core
 
-The Tiltfile performs a sparse checkout of the OpenCRVS Core repository and only downloads the charts directory. You still be able to modify changes and create PRs in Core repository.
+The Tiltfile performs a sparse checkout of the OpenCRVS Core repository and only downloads the charts directory. You will still be able to make changes and create PRs in Core repository.
 
-# Userful information
+# Useful information
 
 ## How the Tilt setup works
 
@@ -206,89 +207,54 @@ Remove minikube cluster:
 minikube delete
 ```
 
-# What is in the Countryconfig configuration module repository?
+# What is in the country configuration repository?
 
-One of the key dependencies and enablers for OpenCRVS is country configuration and a reference data source. This source is bespoke for every implementing nation. If you would like to create your own country implementation, we recommend that you duplicate this repository and use it as a template. So what does it contain?
+One of the key dependencies and enablers for OpenCRVS is country configuration and a reference data source. This source is bespoke for every implementing nation. So what does it contain?
 
-- The [src](src) folder contains the code required to run the countryconfig microservice apis, configure your registration form and seed your country implementation with reference data. Essentially this repository could be re-written from NodeJS into Java or another language as long as the service provided the same API endpoints and served the same files as listed below. For more information please [read this section of the documentation.](https://documentation.opencrvs.org/setup/3.-installation/3.2-set-up-your-own-country-configuration)
-
+- The [src](src) folder contains the code for the countryconfig service. Essentially this service could be re-written in another language as long as it provided the same API endpoints and served the same files as listed below.
+  - [src/events](src/events) defines the configurable events (birth, death and an example tennis club membership), including their forms, actions and certificates.
+  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, roles and employees.
+  - [src/api](src/api) contains the handlers for the endpoints below, e.g. action confirmation, registration numbers, notifications, workqueues and integrations.
+  - [src/analytics](src/analytics) contains the analytics database setup. See [ANALYTICS.md](ANALYTICS.md).
 - The [tilt](tilt) folder and [Tiltfile](Tiltfile) define the local Kubernetes development environment. Tilt is responsible for deploying OpenCRVS dependencies and Core services using Helm charts, building the local countryconfig image, configuring live updates and exposing operational tasks such as database cleanup and data seeding through the Tilt UI.
 
-- Postman collections demonstrate how to interoperate with OpenCRVS. You can build any custom integration into OpenCRVS in this repository if you need to.
+## Endpoints
 
-- Business critical API and hosted file endpoints (Data seeding)
+OpenCRVS Core calls the following endpoints. After upgrading, you can check that your country configuration still exposes them by running `npx opencrvs verify-endpoints` from `@opencrvs/toolkit`. For request and response formats, see the [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation.
 
-**Data seeding**
+**Configuration and reference data**
 
-When the OpenCRVS Core servers start up with un-seeded databases they call the following endpoints in order to populate the databases accordingly:
+- `GET /config/application`: general application settings
+- `GET /config/events`: event configurations
+- `GET /config/workqueues`: workqueue configurations
+- `GET /config/roles`: user roles and their scopes
+- `GET /config/locations`: administrative areas and offices, used for data seeding
+- `GET /config/users`: default users, used for data seeding (requires authentication)
+- `GET /certificates` & `GET /certificates/{id}`: certificate templates (requires authentication)
 
-1. `GET /application-config`
+**Client assets**
 
-   - Configures general application settings
+- `GET /client-config.js` & `GET /login-config.js`: configuration files the client and login apps need in order to initialise
+- `GET /content/{application}`: language content as JSON
+- `GET /content/country-logo`: the country logo
+- `GET /content/map.geojson`: a map of the country in GeoJSON
+- `GET /handlebars.js`: custom Handlebars helpers used in certificates
+- `GET /fonts/{filename}`: fonts used in certificates
+- `GET /static/{param*}`: static files for the client
 
-2. `GET /users`
+**Triggers (require authentication)**
 
-   - Configures at a minimum, a default National System Admin user for the application. More users can be created for demonstration purposes or in a batch. The passwords entered are required to be changed by the user on first login.
+- `POST /trigger/events/{event}/actions/{action}`: called when an action is performed on an event. This is where you can integrate with external systems, or generate registration numbers on `REGISTER`. See [Action Confirmation](#action-confirmation).
+- `POST /trigger/user/{event}`: user notifications such as `user-created`, `reset-password` or `2fa`, to be sent to users by SMS, email or another method
+- `GET /trigger/system/ready`: called by the events service on startup to register integrations
+- `POST /trigger/telemetry`: receives usage reports from the events service
 
-3. `GET /roles`
+**Other**
 
-   - Seeds the internal role titles used by your civil registration orgnisation mapping to the available OpenCRVS user types.
+- `POST /reindex`: receives events from Core when it reindexes, to populate the analytics database
+- `GET /ping`: health check endpoint used for monitoring
 
-4. `GET /locations`
-
-   - Seeds the administrative structure of your country following the Humdata standard
-
-5. `GET /statistics`
-
-   - Applies historical population and crude birth rates disaggregated by gender to your administrative structure. This data ensures that your registration completeness rates are accuratley calculated.
-
-6. `GET /certificates`
-
-   - Configures the available event certificate SVG files. These files can be updated in future via the National System Administrator user interface.
-
-**Business critical APIs**
-
-1. `GET /forms`
-
-   - Configures versioned registration forms for OpenCRVS vital events as JSON.
-
-2. `GET /content/{application}`
-
-   - Returns all language content as JSON
-
-3. `POST /notification`
-
-   - Receives notification payloads from OpenCRVS Core in order to transmit messages to staff and customers based on SMS, Email or other customisable method.
-
-4. `GET /crude-death-rate` (Deprecation warning!)
-
-   - OpenCRVS "metrics" microservice receives a global crude death rate constant from this endpoint in order to calculate death registration completeness rates. Unlike for crude birth rate, most countries do not have a statistic by administrative area disaggregated by gender for death rate. This API endpoint can be considered as tehcnical debt and will likely be replaced by a config setting in the `GET /application-config` response.
-
-5. `POST /event-registration`
-
-   - This synchronous API exists as it is the final step before legal registration of an event. Some countries desire to create multiple identifiers for citizens at the point of registration using external systems. Some countries wish to integrate with another legacy system just before registration. A synchronous 3rd party system can be integrated at this point. Some countries wish to customise the registration number format. The registration number can be created at this point. Some countries use sequential numbering for registration numbers. While it is possible to create that functionality here, we strongly discourage that approach and advise our unique alphanumeric ID format using the Tracking ID. The reason is, under times of high traffic, it is likely that sequential number generation can slow the performance of the service. In a such a case a queue could be implemented here.
-
-6. `GET /validators.js` & `GET /conditionals.js`
-
-   - Registration form JSON "Validators" and "Conditionals" refer to in-built OpenCRVS Core JavaScript form validation and conditional methods. Custom methods can be exposed to OpenCRVS Core via these endpoints.
-
-7. `GET /login-config.js` & `GET /client-config.js`
-
-   - JS configuration settings files that the clients require in order to initialise, set up languages, track any errors and find essential services. 2 files for development and production environments must be available in each case.
-
-8. `GET /content/country-logo`
-
-   - The country logo is loaded into HTML emails so must be hosted
-
-9. `GET /content/map.geojson`
-
-   - A map of the country in GeoJSON must be hosted as it is loaded into OpenCRVS Core Metabase Dashboards as a UI component
-
-10. `GET /ping`
-
-- A service health check endpoint used for 3rd party application stack monitoring
-
-**<a href="https://documentation.opencrvs.org">Read our documentation</a> in order to learn how to make your own country configuration!**
+**<a href="https://documentation.opencrvs.org/technical/guides/configuration">Read our documentation</a> in order to learn how to make your own country configuration!**
 
 # Action Confirmation
 
