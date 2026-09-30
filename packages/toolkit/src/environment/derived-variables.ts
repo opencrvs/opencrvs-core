@@ -144,6 +144,20 @@ export const derivedVariables = [
     scope: 'ENVIRONMENT'
   },
   {
+    name: 'RESTORE_ENVIRONMENT_MODE',
+    valueLabel: 'RESTORE_ENVIRONMENT_MODE',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'RESTORE_HOST',
+    valueLabel: 'RESTORE_HOST',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
     name: 'NOTIFICATION_TRANSPORT',
     valueLabel: 'NOTIFICATION_TRANSPORT',
     valueType: 'VARIABLE',
