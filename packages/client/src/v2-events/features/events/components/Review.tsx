@@ -44,7 +44,8 @@ import {
   IndexMap,
   FormState,
   PlainDate,
-  AttachmentPath
+  AttachmentPath,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -692,9 +693,12 @@ function AcceptActionModal({
   fields = [],
   eventConfiguration,
   declaration,
-  attachmentPath
+  attachmentPath,
+  event
 }: {
   attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
@@ -708,7 +712,7 @@ function AcceptActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
 
@@ -803,9 +807,12 @@ function RejectActionModal({
   supportingCopy,
   fields = [],
   eventConfiguration,
-  attachmentPath
+  attachmentPath,
+  event
 }: {
   attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   close: (result: RejectActionModalResult | null) => void
   supportingCopy?: MessageDescriptor
   fields?: FieldConfig[]
@@ -815,7 +822,7 @@ function RejectActionModal({
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(

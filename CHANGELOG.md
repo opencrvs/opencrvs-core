@@ -1,6 +1,25 @@
 # Changelog
 
-## 2.1.0 Release Candidate
+## 2.2.0 Release Candidate
+
+### Breaking changes
+
+#### `POST /auth/token` no longer accepts parameters in the query string
+
+The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) has been removed. Sending `client_secret` in the URL leaks it into access logs and Sentry breadcrumbs (CWE-598). Parameters are now read only from the request body (form-encoded or JSON), and the gateway no longer forwards the query string. Requests that still use the URL fail with `unsupported_grant_type`.
+
+Integrations using the `client_credentials` grant must send `grant_type`, `client_id` and `client_secret` in the body:
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
+
+## 2.1.0
 
 ### Upgrade guidance
 
@@ -290,6 +309,21 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 - Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 - Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
+
+## 2.0.3
+
+### Bug fixes
+
+- The image crop window now matches the `targetSize` configured on a file field. It was always a circle, so a non-square target stretched the saved image and gave the user no way to frame it accurately. [#12034](https://github.com/opencrvs/opencrvs-core/issues/12034)
+
+  ```ts
+  configuration: {
+    maxImageSize: { targetSize: { width: 350, height: 450 } }
+  }
+  ```
+
+- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 

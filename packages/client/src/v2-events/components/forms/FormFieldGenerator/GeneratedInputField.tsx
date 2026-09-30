@@ -81,9 +81,9 @@ import {
   isAutocompleteFieldType,
   isUserRoleFieldType,
   todayISO,
-  AttachmentPath
+  AttachmentPath,
+  EventDocument
 } from '@opencrvs/commons/client'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import { countries } from '@client/utils/countries'
 import {
@@ -126,6 +126,7 @@ import { Loader } from '@client/v2-events/features/events/registered-fields/Load
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import { liveAnchorDate } from '@client/v2-events/utils'
 import {
@@ -198,6 +199,24 @@ function requireAttachmentPath(
   }
 
   return attachmentPath
+}
+
+/**
+ * The print button prints the record it is rendered for. Rendering one without
+ * an event in context leaves nothing to print, so the field is misconfigured
+ * rather than merely empty.
+ */
+function requireEvent(
+  event: EventDocument | undefined,
+  fieldId: string
+): EventDocument {
+  if (!event) {
+    throw new Error(
+      `Field ${fieldId} prints a record, but the form around it was rendered without an event`
+    )
+  }
+
+  return event
 }
 
 function resolveOptions(
@@ -637,11 +656,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
           intl.formatMessage(field.config.configuration.prefix)
         }
       >
-        <TextArea
+        <TextArea.Input
           {...inputProps}
           maxLength={field.config.configuration?.maxLength}
           value={field.value}
-          onChange={(e) => onFieldValueChange(name, e.target.value)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>
     )
@@ -910,9 +929,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
+        event={requireEvent(validatorContext.event?.document, name)}
         id={name}
         template={field.config.configuration.template}
-        value={field.value}
         onChange={(val) => onFieldValueChange(name, val)}
       />
     )
