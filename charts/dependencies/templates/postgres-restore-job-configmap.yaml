@@ -24,6 +24,14 @@ data:
         command: ["/bin/sh", "-c"]
         args:
           - |
+            # pgbackrest runs as postgres user, secret volume files are owned by root.
+            # Copy the key before installing pgbackrest: the restore job starts
+            # as soon as `pgbackrest version` succeeds.
+            mkdir -p /var/lib/postgresql/.ssh
+            cp /root/.ssh/id_rsa /var/lib/postgresql/.ssh/id_rsa
+            chown -R postgres:postgres /var/lib/postgresql/.ssh
+            chmod 700 /var/lib/postgresql/.ssh
+            chmod 400 /var/lib/postgresql/.ssh/id_rsa
             missing=""
             for utility in pgbackrest ssh; do
               command -v "$utility" >/dev/null 2>&1 || missing="$missing $utility"
