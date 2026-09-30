@@ -102,8 +102,8 @@ test('A PDF attached offline can be previewed offline', async ({ page }) => {
   })
 
   // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
-  // Wait for a second to allow for caching to complete and resemble 'real life' scenario.
-  await page.waitForTimeout(1000)
+  // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
+  await page.waitForTimeout(2000)
   await mockNetworkConditions(page, 'offline')
 
   await test.step('Start a birth declaration and continue past every page', async () => {

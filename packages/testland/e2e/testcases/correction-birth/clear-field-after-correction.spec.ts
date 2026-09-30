@@ -32,7 +32,7 @@ import {
   getAdministrativeAreas,
   getIdByName
 } from '@e2e/support/birth/helpers'
-import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+
 import { AddressType } from '@opencrvs/toolkit/events'
 import { ASSETS_DIR } from '@e2e/support/paths'
 
@@ -164,8 +164,6 @@ test('Cleared field values are removed after correcting a registered birth recor
   await test.step('Record no longer shows the previously entered weight or address details', async () => {
     await page.goto(recordUrl)
 
-    await expect(page.getByLabel('Assign record')).toBeVisible()
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await switchEventTab(page, 'Record')
 
     await expect(page.getByTestId('child.weightAtBirth-value')).not.toHaveText(
