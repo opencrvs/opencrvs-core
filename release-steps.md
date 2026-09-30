@@ -3,13 +3,13 @@
 ```mermaid
 flowchart TD
     subgraph PRE["Prerequisites — both repos"]
-        P0["Run init-release workflow\nhttps://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml"]
         P1[Verify no open PRs pending for release]
-        P2["release/X.Y.Z branch exists in Core + CountryConfig\nPR'd to master and develop"]
-        P3[CI passing on all PRs]
-        P4["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
-        P5[CountryConfig already using latest pre-release toolkit version]
-        P0 --> P1 --> P2 --> P3 --> P4 --> P5
+        P2["Run init-release workflow\nhttps://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml"]
+        P3["release/X.Y.Z branch exists in Core + CountryConfig\nPR'd to master and develop"]
+        P4[CI passing on all PRs]
+        P5["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
+        P6[CountryConfig already using latest pre-release toolkit version]
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6
     end
 
     subgraph CORE["opencrvs-core"]
