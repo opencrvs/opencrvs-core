@@ -15,6 +15,14 @@ on:
     branches:
       - develop
 
+# A new commit on a PR cancels the run for the previous one. Develop pushes
+# fall back to `run_id`, a group of their own, so they are never cancelled:
+# build-deps publishes the nx cache and nx-set-shas bases on the last
+# successful run. Concurrency groups are repo-wide, hence the workflow prefix.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   setup:
     name: Setup tests
