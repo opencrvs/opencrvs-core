@@ -56,7 +56,7 @@ export default defineConfig({
     /* Capture screenshot on failure */
     screenshot: 'only-on-failure',
     /* Collect trace when the test failed. See https://playwright.dev/docs/trace-viewer */
-    trace: 'retain-on-first-failure',
+    trace: 'on-first-retry',
     // Ignore HTTPS errors (like untrusted or self-signed certificates) during Playwright tests on CI
     // This is useful for Let's Encrypt staging certificates that aren't publicly trusted.
     ignoreHTTPSErrors
