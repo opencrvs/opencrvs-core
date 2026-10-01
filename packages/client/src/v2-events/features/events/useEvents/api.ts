@@ -28,7 +28,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
-import { searchKeys } from './procedures/search'
+import { isSearchRequestedAfter, searchKeys } from './procedures/search'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getQueryData<T extends DecorateQueryProcedure<any>>(
@@ -52,7 +52,7 @@ export function addUserToQueryData(user: User) {
   )
 }
 
-async function invalidateWorkqueues() {
+async function invalidateWorkqueueCounts() {
   await queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.workqueue.count.queryKey()
   })
@@ -241,22 +241,20 @@ export async function refetchSearchQuery(eventId: string) {
 
 /**
  * Refreshes the workqueues after a workqueue-affecting write, alongside
- * `refreshById`. Workqueue searches are staled without a fetch first, so the
- * workqueue.count count-diff (procedures/count.ts) skips them and each mounted
- * queue is refetched once, at the end. Unmounted queues refresh on next mount.
+ * `refreshById`. Every workqueue search is marked out of date and the mounted
+ * ones refetch, in parallel with the counts, so the refresh costs one round
+ * trip. Unmounted queues refresh on next mount.
  */
 async function refetchWorkqueueSearchQueries(
   refreshById: () => Promise<unknown>
 ) {
-  await queryClient.invalidateQueries({
-    queryKey: searchKeys.filters.allWorkqueues(),
-    refetchType: 'none'
-  })
-  await Promise.all([refreshById(), invalidateWorkqueues()])
-  await queryClient.refetchQueries({
-    queryKey: searchKeys.filters.allWorkqueues(),
-    type: 'active'
-  })
+  await Promise.all([
+    refreshById(),
+    invalidateWorkqueueCounts(),
+    queryClient.invalidateQueries({
+      queryKey: searchKeys.filters.allWorkqueues()
+    })
+  ])
 }
 
 /** Standard refresh path for a workqueue-affecting write. */
@@ -266,12 +264,12 @@ export async function refetchAffectedSearchQueries(...eventIds: string[]) {
   )
 }
 
-/** True if a cached search of workqueue `slug` is marked stale. */
-export function hasInvalidatedWorkqueueSearchQuery(slug: string) {
+/** True if a search of workqueue `slug` went out after search request `after`. */
+export function isWorkqueueRequestedAfter(slug: string, after: number) {
   return queryClient
     .getQueryCache()
     .findAll({ queryKey: searchKeys.filters.workqueue(slug) })
-    .some((query) => query.state.isInvalidated)
+    .some(({ queryHash }) => isSearchRequestedAfter(queryHash, after))
 }
 
 /**

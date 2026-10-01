@@ -14,9 +14,10 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { WorkqueueCountInput } from '@opencrvs/commons/client'
 import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
 import {
-  hasInvalidatedWorkqueueSearchQuery,
-  invalidateWorkqueueSearchQueries
+  invalidateWorkqueueSearchQueries,
+  isWorkqueueRequestedAfter
 } from '../api'
+import { lastSearchRequest } from './search'
 import { setQueryDefaults } from './utils'
 
 setQueryDefaults(trpcOptionsProxy.workqueue.count, {
@@ -32,6 +33,7 @@ setQueryDefaults(trpcOptionsProxy.workqueue.count, {
     const previousCounts =
       queryClient.getQueryData<Record<string, number>>(queryKey)
 
+    const searchesBefore = lastSearchRequest()
     const response = await queryFn(params[0])
 
     if (previousCounts) {
@@ -40,8 +42,8 @@ setQueryDefaults(trpcOptionsProxy.workqueue.count, {
       )
       await Promise.all(
         changedSlugs
-          // A stale queue is already being refetched by the write path.
-          .filter((slug) => !hasInvalidatedWorkqueueSearchQuery(slug))
+          // A queue requested after the counts already reflects the change.
+          .filter((slug) => !isWorkqueueRequestedAfter(slug, searchesBefore))
           .map(invalidateWorkqueueSearchQueries)
       )
     }

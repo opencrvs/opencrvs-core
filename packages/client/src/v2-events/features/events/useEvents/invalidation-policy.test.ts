@@ -234,8 +234,7 @@ describe('per-action invalidation policy (handler map)', () => {
 
       await waitFor(() => {
         expect(invalidateSpy).toHaveBeenCalledWith({
-          queryKey: searchKeys.filters.allWorkqueues(),
-          refetchType: 'none'
+          queryKey: searchKeys.filters.allWorkqueues()
         })
         expect(invalidateSpy).toHaveBeenCalledWith({
           queryKey: trpcOptionsProxy.workqueue.count.queryKey()
