@@ -220,7 +220,7 @@ One of the key dependencies and enablers for OpenCRVS is country configuration a
 
 ## Endpoints
 
-OpenCRVS Core calls the following endpoints. After upgrading, you can check that your country configuration still exposes them by running `npx opencrvs verify-endpoints` from `@opencrvs/toolkit`. For request and response formats, see the [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation.
+OpenCRVS Core calls the following endpoints. After upgrading, you can check that your country configuration still exposes them by running `npx @opencrvs/toolkit verify-endpoints`. For request and response formats, see the [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation.
 
 **Configuration and reference data**
 
