@@ -78,13 +78,13 @@ Testland contains the Playwright end-to-end tests for OpenCRVS. See [e2e/README.
 
 Testland is deployed to Kubernetes using the [OpenCRVS Helm charts](https://github.com/opencrvs/opencrvs-core/tree/develop/charts). Core CI builds this package into the `ghcr.io/opencrvs/ocrvs-testland` image (and its `ocrvs-testland:<tag>-assets` companion image), tagged with the same version as the Core images.
 
-The environments (QA, QA hotfix, e2e, migration staging and production, and non-prod) and the workflows that deploy, seed and reset them live in [opencrvs-testland-infrastructure](https://github.com/opencrvs/opencrvs-testland-infrastructure).
+The environments (QA, QA hotfix, e2e, migration staging and migration production), and the workflows that provision the non-prod cluster hosting them and deploy, seed and reset them, live in [opencrvs-testland-infrastructure](https://github.com/opencrvs/opencrvs-testland-infrastructure).
 
 # What is in this package?
 
 - The [src](src) folder contains the code for the countryconfig service.
   - [src/events](src/events) defines the configurable events (birth, death, adoption and an example tennis club membership), including their forms and actions.
-  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, roles, employees and other reference data.
+  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities, roles, employees and other reference data.
   - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations. The `/config/roles`, `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
   - [src/analytics](src/analytics) contains the code that loads events and locations into the analytics database. The database itself is set up by [assets/postgres/setup-analytics.sh](assets/postgres/setup-analytics.sh). See [ANALYTICS.md](ANALYTICS.md).
   - [src/verifiable-credentials](src/verifiable-credentials), [src/government-portal-api](src/government-portal-api) and [src/qa-tools](src/qa-tools) contain the Testland-only integrations and tools.
@@ -93,7 +93,7 @@ The environments (QA, QA hotfix, e2e, migration staging and production, and non-
 
 ## Endpoints
 
-OpenCRVS Core calls the following endpoints. You can run `npx @opencrvs/toolkit verify-endpoints` against a running country configuration. It checks that the public endpoints respond, that the secured ones reject unauthenticated requests, and that the translations Core needs are present. The [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation describes the event configuration and action trigger formats.
+OpenCRVS Core calls the following endpoints. You can run `npx @opencrvs/toolkit verify-endpoints` against a running country configuration. It checks that the public endpoints respond, that the secured ones are either absent or reject unauthenticated requests, that each event's action triggers are secured, and that the translations Core needs are present. The [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation describes the event configuration and action trigger formats.
 
 **Configuration and reference data**
 
@@ -101,7 +101,7 @@ OpenCRVS Core calls the following endpoints. You can run `npx @opencrvs/toolkit 
 - `GET /config/events`: event configurations
 - `GET /config/workqueues`: workqueue configurations
 - `GET /config/roles`: user roles and their scopes
-- `GET /config/locations`: administrative areas and offices, used for data seeding
+- `GET /config/locations`: administrative areas, offices and health facilities, used for data seeding
 - `GET /config/users`: default users, used for data seeding (requires authentication)
 - `GET /certificates` & `GET /certificates/{id}`: certificate templates (requires authentication)
 
@@ -136,11 +136,11 @@ These endpoints are examples and are not required by OpenCRVS Core.
 - `GET /dashboards/registrations-proxy` & `GET /dashboards/primary-office`: scope the Metabase registrations dashboard to the user's primary office
 - `POST /trigger/events/birth/actions/{action}` & `POST /trigger/events/death/actions/{action}`: send informant notifications and verify identities with MOSIP
 - `POST /trigger/events/birth/actions/REGISTER` & `POST /trigger/events/death/actions/REGISTER`: generate the registration number and forward the registration to MOSIP where applicable
-- `POST /trigger/events/birth/actions/APPROVE_CORRECTION`: example handler for birth correction approvals
-- `POST /trigger/events/adoption/actions/REGISTER`: seals the original birth record of the adopted child
+- `POST /trigger/events/birth/actions/APPROVE_CORRECTION`: sends informant notifications and forwards corrected birth registrations to MOSIP
+- `POST /trigger/events/adoption/actions/REGISTER`: seals the original birth record of the adopted child, then generates the registration number and sends the informant notification. The registration is rejected if sealing fails.
 - `/verifiable-credentials/*` and `/_demo-issuer/*`: verifiable credential issuance examples
 - `/api/upload` & `/api/events/*`: government portal API example
-- `GET /locations` & `GET /administrative-areas`: QA tool pages for the location write APIs, with `GET /{locations|administrative-areas}/search`, `POST`, `PUT /{id}` and `DELETE /{id}/versions/{versionId}` routes that proxy those writes to the gateway
+- `GET /locations` & `GET /administrative-areas`: QA tool pages for the location write APIs, with `GET /{locations|administrative-areas}/search`, `POST`, `PUT /{id}` and `DELETE /{id}/versions/{versionId}` routes that proxy search and writes to the gateway
 - `/graphql`: proxies requests to the Core gateway
 - `GET /{param*}`: serves the [public](public) folder, a page for printing all registrations
 

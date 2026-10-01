@@ -138,7 +138,7 @@ The Tiltfile supports the following environment variables.
 - `OPENCRVS_CORE_IMAGE_TAG`: Defines the OpenCRVS Core Docker image tag used by the Helm chart.
 - `OPENCRVS_CORE_REF`: Defines the OpenCRVS Core Git branch or tag used to fetch Helm charts, use any release/2.1.X branch or tag from https://github.com/opencrvs/opencrvs-core
 - `LOCAL_K8S`: `minikube` or `orbstack`. Detected from your kubectl context by default; on `minikube` Traefik is deployed with a NodePort values file.
-- `TRAEFIK_VALUES_FILE`: Replaces the default Traefik values file(s) with your own.
+- `TRAEFIK_VALUES_FILE`: Name of a file in `tilt/examples/traefik/` to use instead of the default Traefik values file(s). Give the file name only. Note that `tilt/examples/` is replaced on every upgrade.
 
 The Tiltfile performs a sparse checkout of the OpenCRVS Core repository and only downloads the charts directory. You will still be able to make changes and create PRs in Core repository.
 
@@ -215,14 +215,14 @@ One of the key dependencies and enablers for OpenCRVS is country configuration a
 
 - The [src](src) folder contains the code for the countryconfig service. Essentially this service could be re-written in another language as long as it provided the same API endpoints and served the same files as listed below.
   - [src/events](src/events) defines the configurable events (birth, death and an example tennis club membership), including their forms and actions.
-  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, roles and employees.
+  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities, roles and employees.
   - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations. The `/config/roles`, `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
   - [src/analytics](src/analytics) contains the code that loads events and locations into the analytics database. The database itself is set up by [assets/postgres/setup-analytics.sh](assets/postgres/setup-analytics.sh). See [ANALYTICS.md](ANALYTICS.md).
 - The [tilt](tilt) folder and [Tiltfile](Tiltfile) define the local Kubernetes development environment. Tilt is responsible for deploying OpenCRVS dependencies and Core services using Helm charts, building the local countryconfig image, configuring live updates and exposing operational tasks such as database cleanup and data seeding through the Tilt UI.
 
 ## Endpoints
 
-OpenCRVS Core calls the following endpoints. After upgrading, you can run `npx @opencrvs/toolkit verify-endpoints` against a running country configuration. It checks that the public endpoints respond, that the secured ones reject unauthenticated requests, and that the translations Core needs are present. The [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation describes the event configuration and action trigger formats.
+OpenCRVS Core calls the following endpoints. After upgrading, you can run `npx @opencrvs/toolkit verify-endpoints` against a running country configuration. It checks that the public endpoints respond, that the secured ones are either absent or reject unauthenticated requests, that each event's action triggers are secured, and that the translations Core needs are present. The [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation describes the event configuration and action trigger formats.
 
 **Configuration and reference data**
 
@@ -230,7 +230,7 @@ OpenCRVS Core calls the following endpoints. After upgrading, you can run `npx @
 - `GET /config/events`: event configurations
 - `GET /config/workqueues`: workqueue configurations
 - `GET /config/roles`: user roles and their scopes
-- `GET /config/locations`: administrative areas and offices, used for data seeding
+- `GET /config/locations`: administrative areas, offices and health facilities, used for data seeding
 - `GET /config/users`: default users, used for data seeding (requires authentication)
 - `GET /certificates` & `GET /certificates/{id}`: certificate templates (requires authentication)
 
