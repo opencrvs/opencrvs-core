@@ -12,13 +12,15 @@ import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { serialize } from 'superjson'
 import { vi } from 'vitest'
+import { QueryObserver } from '@tanstack/react-query'
+import { EventIndex } from '@opencrvs/commons/client'
 import {
   queryClient,
   trpcOptionsProxy,
   purgeLegacySearchQueries
 } from '@client/v2-events/trpc'
-import { invalidateWorkqueueSearchQueries } from './api'
-import { searchKeys } from './procedures/search'
+import { findLocalEventIndex, invalidateWorkqueueSearchQueries } from './api'
+import { byIdSearchOptions, searchKeys } from './procedures/search'
 
 const EMPTY_RESULT = { results: [], total: 0 }
 
@@ -149,5 +151,26 @@ describe('purgeLegacySearchQueries', () => {
     expect(queryClient.getQueryData(legacyKey)).toBeUndefined()
     expect(queryClient.getQueryData(scopedKey)).toEqual(EMPTY_RESULT)
     expect(mutationCache.getAll().length).toBe(mutationsBefore)
+  })
+})
+
+describe('by-id lookup of a record the server has not indexed', () => {
+  const eventId = '44444444-4444-4444-4444-444444444444'
+  const drafted = { results: [{ id: eventId } as EventIndex], total: 1 }
+
+  it('caches the local fallback, so the record resolves from the cache', async () => {
+    const observer = new QueryObserver(
+      queryClient,
+      byIdSearchOptions(eventId, () => drafted)
+    )
+    const unsubscribe = observer.subscribe(() => undefined)
+
+    await vi.waitFor(() =>
+      expect(observer.getCurrentResult().data).toEqual(drafted)
+    )
+    expect(queryClient.getQueryData(searchKeys.byId(eventId))).toEqual(drafted)
+    expect(findLocalEventIndex(eventId)?.id).toBe(eventId)
+    expect(procSpy).toHaveBeenCalledWith('event.search')
+    unsubscribe()
   })
 })
