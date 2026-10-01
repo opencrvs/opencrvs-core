@@ -53,6 +53,8 @@ test.describe.serial('Can Open Draft offline', () => {
     await page.getByRole('button', { name: 'Confirm' }).click()
 
     await draftResponse
+
+    page.waitForTimeout(5000)
   })
 
   test('Open the draft offline', async () => {
