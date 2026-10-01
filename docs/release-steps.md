@@ -50,8 +50,9 @@ Once both releases are published, merge the merge-back PR that `init-release` op
 
 1. Merge the merge-back PR into `develop` in **opencrvs-core**.
 2. Merge the merge-back PR into `develop` in **infrastructure**.
+3. Upgrade the demo environment — [opencrvs-farajaland](https://github.com/opencrvs/opencrvs-farajaland) — to the newly released version, if it should track this release.
 
-Finally, send a message to Slack! [(example)](https://opencrvsworkspace.slack.com/archives/C06BERMKNH2/p1790763502585439)
+Finally, send a release message to Slack!
 
 ## Links
 
