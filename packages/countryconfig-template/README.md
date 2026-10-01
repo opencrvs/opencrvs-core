@@ -124,7 +124,7 @@ Then run the data seed task from the Tilt UI:
 
 1. Open http://localhost:10350
 2. Find the `2.Data-tasks` section
-3. Run the `seed-data` or `clean-&-seed` resource
+3. Run the `data-seed` or `clean-&-seed` resource
 4. Wait until the job completes
 
 Open OpenCRVS: http://opencrvs.localhost
@@ -167,7 +167,7 @@ kubectl get pods -n opencrvs-dev
 
 Tilt builds the countryconfig image locally and watches selected files for changes.
 
-Source code changes under `srv/` are synced into the running container using Tilt live update.
+Source code changes under `src/` are synced into the running container using Tilt live update.
 
 Changes to dependency or image build files trigger a full rebuild instead, for example:
 
@@ -212,9 +212,9 @@ minikube delete
 One of the key dependencies and enablers for OpenCRVS is country configuration and a reference data source. This source is bespoke for every implementing nation. So what does it contain?
 
 - The [src](src) folder contains the code for the countryconfig service. Essentially this service could be re-written in another language as long as it provided the same API endpoints and served the same files as listed below.
-  - [src/events](src/events) defines the configurable events (birth, death and an example tennis club membership), including their forms, actions and certificates.
+  - [src/events](src/events) defines the configurable events (birth, death and an example tennis club membership), including their forms and actions.
   - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, roles and employees.
-  - [src/api](src/api) contains the handlers for the endpoints below, e.g. action confirmation, registration numbers, notifications, workqueues and integrations.
+  - [src/api](src/api) contains the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations.
   - [src/analytics](src/analytics) contains the analytics database setup. See [ANALYTICS.md](ANALYTICS.md).
 - The [tilt](tilt) folder and [Tiltfile](Tiltfile) define the local Kubernetes development environment. Tilt is responsible for deploying OpenCRVS dependencies and Core services using Helm charts, building the local countryconfig image, configuring live updates and exposing operational tasks such as database cleanup and data seeding through the Tilt UI.
 
