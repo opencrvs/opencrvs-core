@@ -9,8 +9,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable max-lines */
 
+/* eslint-disable max-lines */
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
