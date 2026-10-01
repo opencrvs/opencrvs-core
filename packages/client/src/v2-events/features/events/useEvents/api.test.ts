@@ -21,7 +21,6 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import {
   addLocalEventConfig,
   deleteLocalEvent,
-  hasInvalidatedWorkqueueSearchQuery,
   onAssign,
   refetchAffectedSearchQueries,
   setEventData,
@@ -142,10 +141,8 @@ describe('updateLocalEventIndex', () => {
 })
 
 /*
- * The standard refresh path shared by every workqueue-affecting write
- * (REGISTER/ARCHIVE/DECLARE/… via deleteLocalEvent, and MARK_AS_NOT_DUPLICATE):
- * by-id refetch + workqueue staleness + workqueue.count refetch + a single
- * mounted-workqueue refetch, ordered to dedup against the count-diff.
+ * The standard refresh path shared by every workqueue-affecting write: the
+ * by-id refetch, the counts and every workqueue, all at once.
  */
 describe('refetchAffectedSearchQueries — standard write path', () => {
   const eventId = '33333333-3333-3333-3333-333333333333'
@@ -162,44 +159,18 @@ describe('refetchAffectedSearchQueries — standard write path', () => {
     vi.restoreAllMocks()
   })
 
-  it('stales workqueues (no refetch), refetches byId + count, then refetches mounted workqueues', async () => {
+  it('invalidates every workqueue and the counts, and refetches the byId entry', async () => {
     await refetchAffectedSearchQueries(eventId)
 
-    // step 1: blanket staleness with no refetch
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues(),
-      refetchType: 'none'
+      queryKey: searchKeys.filters.allWorkqueues()
     })
-    // step 2: by-id refetch
     expect(refetchSpy).toHaveBeenCalledWith({
       queryKey: searchKeys.filters.byId(eventId)
     })
-    // step 2: workqueue.count refetch
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: trpcOptionsProxy.workqueue.count.queryKey()
     })
-    // step 3: mounted workqueues refetched once
-    expect(refetchSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues(),
-      type: 'active'
-    })
-  })
-
-  it('marks workqueues stale before refetching the count (so the count-diff dedups)', async () => {
-    await refetchAffectedSearchQueries(eventId)
-
-    const key = JSON.stringify(trpcOptionsProxy.workqueue.count.queryKey())
-    const staleCallIndex = invalidateSpy.mock.calls.findIndex(
-      (call: unknown[]) =>
-        (call[0] as { refetchType?: string })?.refetchType === 'none'
-    )
-    const countCallIndex = invalidateSpy.mock.calls.findIndex(
-      (call: unknown[]) =>
-        JSON.stringify((call[0] as { queryKey?: unknown })?.queryKey) === key
-    )
-
-    expect(staleCallIndex).toBeGreaterThanOrEqual(0)
-    expect(countCallIndex).toBeGreaterThan(staleCallIndex)
   })
 })
 
@@ -216,26 +187,20 @@ describe('deleteLocalEvent — routes writes through the standard path', () => {
     vi.restoreAllMocks()
   })
 
-  it('stales workqueues + resets byId + refetches count + mounted workqueues', async () => {
+  it('invalidates every workqueue and the counts, and resets the byId entry', async () => {
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
     const resetSpy = vi.spyOn(queryClient, 'resetQueries')
-    const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
 
     await deleteLocalEvent(tennisClubMembershipEventDocument)
 
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues(),
-      refetchType: 'none'
+      queryKey: searchKeys.filters.allWorkqueues()
     })
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: trpcOptionsProxy.workqueue.count.queryKey()
     })
     expect(resetSpy).toHaveBeenCalledWith({
       queryKey: searchKeys.filters.byId(tennisClubMembershipEventDocument.id)
-    })
-    expect(refetchSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues(),
-      type: 'active'
     })
   })
 })
@@ -264,25 +229,20 @@ describe('onAssign — standard write path (ASSIGN)', () => {
     vi.restoreAllMocks()
   })
 
-  it('stales workqueues, refetches byId + count, then refetches mounted workqueues', async () => {
+  it('invalidates every workqueue and the counts, and refetches the byId entry', async () => {
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
     const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
 
     await onAssign(assignedEvent)
 
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues(),
-      refetchType: 'none'
+      queryKey: searchKeys.filters.allWorkqueues()
     })
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: trpcOptionsProxy.workqueue.count.queryKey()
     })
     expect(refetchSpy).toHaveBeenCalledWith({
       queryKey: searchKeys.filters.byId(assignedEvent.id)
-    })
-    expect(refetchSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues(),
-      type: 'active'
     })
   })
 })
@@ -314,36 +274,5 @@ describe('onAssign on a sealed record', () => {
     expect(queryClient.getQueryData(workqueueKey)?.results).toEqual([
       { ...redactedRow, assignedTo: assignment.assignedTo }
     ])
-  })
-})
-
-describe('hasInvalidatedWorkqueueSearchQuery (count-diff dedup guard)', () => {
-  beforeEach(() => {
-    queryClient.clear()
-  })
-
-  afterAll(() => {
-    queryClient.clear()
-  })
-
-  it('reports a slug as invalidated only after its workqueue search is staled — so the count-diff skips it but still fires for others', async () => {
-    queryClient.setQueryData(
-      searchKeys.workqueue(workqueueInput, 'ready'),
-      EMPTY_RESULT
-    )
-    queryClient.setQueryData(
-      searchKeys.workqueue(workqueueInput, 'sent'),
-      EMPTY_RESULT
-    )
-
-    expect(hasInvalidatedWorkqueueSearchQuery('ready')).toBe(false)
-
-    await queryClient.invalidateQueries({
-      queryKey: searchKeys.filters.workqueue('ready'),
-      refetchType: 'none'
-    })
-
-    expect(hasInvalidatedWorkqueueSearchQuery('ready')).toBe(true)
-    expect(hasInvalidatedWorkqueueSearchQuery('sent')).toBe(false)
   })
 })

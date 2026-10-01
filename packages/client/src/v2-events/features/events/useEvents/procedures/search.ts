@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { QueryFunctionContext } from '@tanstack/react-query'
+import { hashKey, QueryFunctionContext } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import { QueryType } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -74,12 +74,26 @@ export const searchKeys = {
   }
 }
 
+let searchRequests = 0
+const lastRequestByQuery = new Map<string, number>()
+
+/** The number of the latest `event.search` request sent. Numbers only grow. */
+export function lastSearchRequest() {
+  return searchRequests
+}
+
+/** True if a request for the query `queryHash` was sent after request `after`. */
+export function isSearchRequestedAfter(queryHash: string, after: number) {
+  return (lastRequestByQuery.get(queryHash) ?? 0) > after
+}
+
 /**
  * tRPC's queryFn derives the procedure path from the runtime key, so a scoped
  * key would call `event.search.workqueue.<slug>`. This rebuilds the unscoped
  * key before delegating to tRPC.
  */
 async function fetchScopedSearch(ctx: QueryFunctionContext) {
+  lastRequestByQuery.set(hashKey(ctx.queryKey), ++searchRequests)
   // The {input, type} element is always present for event.search keys.
   const { input } = ctx.queryKey[1] as { input: SearchInput }
   const options = trpcOptionsProxy.event.search.queryOptions(input)

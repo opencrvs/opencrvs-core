@@ -49,18 +49,29 @@ const countInput: WorkqueueCountInput = [{ slug: SLUG, query }]
 /** What the server currently returns for the workqueue. */
 let queueOnServer: EventIndex[] = []
 let queueFetches = 0
+/** Response delays, to choose which of the queue and the counts lands first. */
+let delays = { search: 0, count: 0 }
+let inFlight = 0
+let maxInFlight = 0
 
-function respond(data: unknown) {
+async function respond(data: unknown, delay: number) {
+  inFlight++
+  maxInFlight = Math.max(maxInFlight, inFlight)
+  await new Promise((resolve) => setTimeout(resolve, delay))
+  inFlight--
   return HttpResponse.json({ result: { data: serialize(data), type: 'data' } })
 }
 
 const server = setupServer(
-  http.get('/api/events/event.search', () => {
+  http.get('/api/events/event.search', async () => {
     queueFetches++
-    return respond({ results: queueOnServer, total: queueOnServer.length })
+    return respond(
+      { results: queueOnServer, total: queueOnServer.length },
+      delays.search
+    )
   }),
-  http.get('/api/events/workqueue.count', () =>
-    respond({ [SLUG]: queueOnServer.length })
+  http.get('/api/events/workqueue.count', async () =>
+    respond({ [SLUG]: queueOnServer.length }, delays.count)
   )
 )
 
@@ -85,11 +96,25 @@ async function mountWorkqueue(rows: EventIndex[]) {
     expect(count.getCurrentResult().data).toEqual({ [SLUG]: rows.length })
   })
   queueFetches = 0
+  maxInFlight = 0
 
   return {
     rows: () => queue.getCurrentResult().data?.results,
+    /** What the sidebar's 20 s poll does: refetch the counts. */
+    pollCounts: async () => count.refetch(),
+    /** What the queue's own poll does. */
+    pollQueue: async () => queue.refetch(),
     unmount: () => unsubscribe.forEach((fn) => fn())
   }
+}
+
+/** The overview's lookup of `record`, as mounted on its page. */
+function mountLookup() {
+  const lookup = new QueryObserver(queryClient, {
+    ...byIdSearchOptions(record.id, () => ({ results: [], total: 0 })),
+    refetchInterval: false
+  })
+  return lookup.subscribe(() => undefined)
 }
 
 function onSuccessOf(mutationKey: MutationKey) {
@@ -154,6 +179,7 @@ beforeEach(() => {
   } as unknown as CacheStorage
   queryClient.clear()
   addLocalEventConfig(tennisClubMembershipEvent)
+  delays = { search: 0, count: 0 }
 })
 
 afterEach(() => {
@@ -251,6 +277,67 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
     await new Promise((resolve) => setTimeout(resolve, 50))
 
     expect(queueFetches).toBe(0)
+    workqueue.unmount()
+  })
+
+  it.each<[string, { search: number; count: number }]>([
+    ['the counts answer first', { search: 100, count: 10 }],
+    ['the queue answers first', { search: 10, count: 100 }]
+  ])(
+    'the queue and the counts are fetched together, the queue once, when %s',
+    async (_order, responseDelays) => {
+      const workqueue = await mountWorkqueue([row])
+      delays = responseDelays
+
+      queueOnServer = []
+      await onSuccessOf(actions.register.request.mutationKey())(record)
+
+      await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
+      await new Promise((resolve) => setTimeout(resolve, 150))
+      expect(maxInFlight).toBe(2)
+      expect(queueFetches).toBe(1)
+      workqueue.unmount()
+    }
+  )
+
+  it("the record's lookup goes out together with the queue and the counts", async () => {
+    const workqueue = await mountWorkqueue([row])
+    const unmountLookup = mountLookup()
+    await vi.waitFor(() => expect(queueFetches).toBe(1))
+    delays = { search: 50, count: 50 }
+    maxInFlight = 0
+
+    await onSuccessOf(actions.register.request.mutationKey())(record)
+
+    await vi.waitFor(() => expect(maxInFlight).toBe(3))
+    unmountLookup()
+    workqueue.unmount()
+  })
+})
+
+describe('the sidebar poll keeps the queue on screen in step with its count', () => {
+  it('refreshes the queue when its count changes', async () => {
+    const workqueue = await mountWorkqueue([row])
+
+    queueOnServer = []
+    await workqueue.pollCounts()
+
+    await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
+    expect(queueFetches).toBe(1)
+    workqueue.unmount()
+  })
+
+  it('refreshes the queue when its own poll went out before the change', async () => {
+    const workqueue = await mountWorkqueue([row])
+    delays = { search: 100, count: 10 }
+
+    const stalePoll = workqueue.pollQueue()
+    await vi.waitFor(() => expect(inFlight).toBe(1))
+    queueOnServer = []
+    await workqueue.pollCounts()
+    await stalePoll
+
+    await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
     workqueue.unmount()
   })
 })
