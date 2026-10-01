@@ -1,5 +1,4 @@
 /*
- *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 /* eslint-disable max-lines */
+
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
@@ -380,16 +379,16 @@ export const eventRouter = router({
         if (firstSegment === 'events') {
           const eventId = UUID.safeParse(secondSegment).data
 
-          logger.error(
-            `draft.create: Invalid event id in file path: ${filePath} ${JSON.stringify(
-              {
-                eventId,
-                user: ctx.user.id
-              }
-            )}`
-          )
-
           if (!eventId) {
+            logger.error(
+              `getPersignedUrl: Invalid event id in file path: ${filePath} ${JSON.stringify(
+                {
+                  eventId,
+                  user: ctx.user.id
+                }
+              )}`
+            )
+
             throw new TRPCError({
               code: 'BAD_REQUEST',
               message: `getPersignedUrl: Invalid event id in file path: ${filePath}, ${JSON.stringify(

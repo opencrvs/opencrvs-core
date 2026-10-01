@@ -209,7 +209,7 @@ function throttlePersister(persister: Persister): Persister {
   return {
     ...persister,
     persistClient: async (client) => {
-      persistThrottled(client)
+      await persistThrottled(client)
     },
     removeClient: async () => {
       persistThrottled.cancel()

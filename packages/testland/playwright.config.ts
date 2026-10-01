@@ -41,7 +41,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Don't retry. Fix the flaky ones. */
-  retries: process.env.CI ? 3 : 0,
+  retries: process.env.CI ? 0 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -56,7 +56,7 @@ export default defineConfig({
     /* Capture screenshot on failure */
     screenshot: 'only-on-failure',
     /* Collect trace when the test failed. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'on',
     // Ignore HTTPS errors (like untrusted or self-signed certificates) during Playwright tests on CI
     // This is useful for Let's Encrypt staging certificates that aren't publicly trusted.
     ignoreHTTPSErrors
