@@ -518,6 +518,10 @@ jobs:
     name: Run storybook interaction tests
     needs: prepare-client-tests
     runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [1, 2]
 
     steps:
       - name: Download filesystem artifact
@@ -555,7 +559,7 @@ jobs:
         run: |
           pnpm exec concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "pnpm exec http-server storybook-static --port 6006 --silent" \
-            "pnpm exec wait-on tcp:127.0.0.1:6006 && pnpm test-storybook"
+            "pnpm exec wait-on tcp:127.0.0.1:6006 && pnpm test-storybook --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}"
 
   test-client:
     name: Test client
