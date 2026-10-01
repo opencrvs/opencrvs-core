@@ -39,10 +39,10 @@ Testland is a package in the OpenCRVS Core monorepo and is started together with
 From the root of the opencrvs-core repository, run:
 
 ```bash
-pnpm check:environment
+bash development-environment/check-environment.sh
 ```
 
-It checks the tools needed to run OpenCRVS Core locally and tells you what is missing.
+It checks the tools needed to run OpenCRVS Core locally, fixes what it safely can (e.g. enables Corepack) and tells you what is missing. Once pnpm is set up, you can also run it as `pnpm check:environment`.
 
 ## Start OpenCRVS
 
