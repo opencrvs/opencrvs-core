@@ -15,8 +15,7 @@ on:
     branches:
       - develop
 
-# A new commit on a PR cancels the run for the previous one. Develop pushes
-# fall back to `run_id`, a group of their own, so they are never cancelled.
+# Cancel superseded PR runs. Develop pushes get a unique group via run_id.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
@@ -37,8 +36,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
         with:
-          # nx affected needs history to resolve the base SHA. Commits and
-          # trees are enough for that, so skip file contents outside HEAD.
+          # nx affected needs history to resolve the base SHA, but not file contents
           fetch-depth: 0
           filter: blob:none
 
@@ -89,7 +87,7 @@ jobs:
       - name: Get list of affected packages
         id: set-matrix
         run: |
-          # --no-renames: rename detection would download file contents
+          # --no-renames: rename detection would fetch blobs missing from the blobless clone
           if git diff --name-only --no-renames "$NX_BASE" "$NX_HEAD" \
             | grep -qE '^\.github/(workflows/lint-and-test\.yml|scripts/changed-files-affect-storybook\.mjs)$'; then
             echo "CI configuration changed — selecting every project"
@@ -394,9 +392,7 @@ jobs:
           NODE_ENV: production
         run: pnpm run build-storybook --webpack-stats-json
 
-      # Tarred rather than handing upload-artifact the tree: its file search
-      # took ~3 minutes to find ~4k files, most likely by walking pnpm's
-      # symlinked node_modules despite the exclude. Tar also keeps file modes.
+      # upload-artifact took ~3 min to scan the tree. A tarball is fast and keeps file modes.
       - name: Archive filesystem
         run: tar --exclude=.git --exclude=node_modules --exclude=./.nx -cf "$RUNNER_TEMP/client.tar" .
 
@@ -546,8 +542,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        # Playwright is required since @storybook/test-runner depends on it.
-        # The test runner only uses Chromium unless --browsers says otherwise.
+        # @storybook/test-runner depends on Playwright and only runs Chromium by default
         working-directory: packages/client
         run: pnpm exec playwright install --with-deps chromium
 
