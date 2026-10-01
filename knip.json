@@ -2,6 +2,7 @@
   "ignore": [
     "packages/testland/**",
     "packages/countryconfig-template/**",
+    "packages/toolkit/src/migrations/v2.1/**",
     "packages/client/src/utils/gateway-types.ts",
     "packages/client/src/forms/register/mappings/**/*.ts",
     "packages/client/src/utils/validate.ts",
