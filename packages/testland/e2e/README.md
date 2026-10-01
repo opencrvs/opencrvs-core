@@ -8,6 +8,21 @@
 
 `NODE_TLS_REJECT_UNAUTHORIZED=0 DOMAIN=<your-env>.opencrvs.dev pnpm e2e`
 
+## Shared authentication
+
+Signing in happens once per run, not once per spec. The `setup` project
+(`e2e/auth.setup.ts`) signs in, creates the PIN and persists the session under
+`playwright/.auth/`. `login()` then seeds that state into the browser before
+the app boots, so it starts authenticated and unlocked - no token handoff and
+no PIN screen. See [Playwright's authentication
+guide](https://playwright.dev/docs/auth) and `e2e/support/auth.ts`.
+
+Access and refresh tokens are still minted per test: a logout through the UI
+invalidates them server-side, so a shared pair would sign every other test out.
+
+`login()` falls back to signing in through the app when the state is missing,
+so deleting `playwright/.auth/` is always a safe way to start over.
+
 ## How to write a test
 
 [See how to write a test that is not flaky](./HOW-TO-WRITE-A-TEST.md)

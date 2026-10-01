@@ -29,6 +29,22 @@ const optInSuites = [
  */
 // require('dotenv').config();
 
+const chromeOptions = {
+  ...devices['Desktop Chrome'],
+  ignoreHTTPSErrors,
+  launchOptions: {
+    args: process.env.CI
+      ? [
+          '--ignore-certificate-errors',
+          '--ignore-ssl-errors',
+          '--allow-running-insecure-content',
+          '--disable-web-security',
+          ...insecureOrigins
+        ]
+      : []
+  }
+}
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -54,9 +70,15 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
     /* Capture screenshot on failure */
-    screenshot: 'on',
-    /* Collect trace when the test failed. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
+    screenshot: 'only-on-failure',
+    /*
+     * Trace the first retry of a failing test - `retries` is 3 on CI, so a
+     * failure is still retried with tracing on and the trace ends up in the
+     * uploaded report. Tracing every action snapshots the DOM of a large
+     * React app on each one, which is far too expensive to leave on for the
+     * runs that pass. See https://playwright.dev/docs/trace-viewer
+     */
+    trace: 'on-first-retry',
     // Ignore HTTPS errors (like untrusted or self-signed certificates) during Playwright tests on CI
     // This is useful for Let's Encrypt staging certificates that aren't publicly trusted.
     ignoreHTTPSErrors
@@ -73,23 +95,20 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    /*
+     * Signs in once and persists the session every spec reuses, see
+     * https://playwright.dev/docs/auth and `e2e/auth.setup.ts`.
+     */
+    {
+      name: 'setup',
+      testDir: './e2e',
+      testMatch: /auth\.setup\.ts/,
+      use: chromeOptions
+    },
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        ignoreHTTPSErrors,
-        launchOptions: {
-          args: process.env.CI
-            ? [
-                '--ignore-certificate-errors',
-                '--ignore-ssl-errors',
-                '--allow-running-insecure-content',
-                '--disable-web-security',
-                ...insecureOrigins
-              ]
-            : []
-        }
-      }
+      dependencies: ['setup'],
+      use: chromeOptions
     }
   ]
 })
