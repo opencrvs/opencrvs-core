@@ -15,7 +15,7 @@ Run the phases in order: **Prerequisites** → **opencrvs-core -repo** → **inf
 
 1. Verify `CHANGELOG.md` and `package.json` match the release version.
 2. Dispatch [`publish-toolkit-to-npm` workflow](https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml) — `ref: release/X.Y.Z`, `version: X.Y.Z`.
-3. Approve the run in the `npm-publish` environment (any `@opencrvs/developers` member, including you).
+3. Approve the run in the `npm-publish` environment (any `@opencrvs/developers` member).
 4. Verify the toolkit version is visible on npm.
 5. Bump `@opencrvs/toolkit` to `X.Y.Z` in `packages/countryconfig-template/package.json`.
    > ⚠️ Run `pnpm install` to update lockfile. Relies on the toolkit already being published to npm in section 2.
