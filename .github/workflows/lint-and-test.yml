@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # nx affected needs history to resolve the base SHA
           fetch-depth: 0
@@ -181,7 +181,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -219,7 +219,7 @@ jobs:
 
       - name: Use Node.js from .nvmrc
         if: steps.check-scripts.outputs.skip != 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -309,13 +309,13 @@ jobs:
         working-directory: packages/countryconfig-template
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
@@ -412,7 +412,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -467,7 +467,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -518,7 +518,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -562,7 +562,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -699,13 +699,13 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.base_ref }}
           path: base
 
       - name: Checkout the PR branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
           path: pr
@@ -716,7 +716,7 @@ jobs:
           package_json_file: pr/package.json
 
       - name: Use Node.js from .nvmrc from base branch
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: base/.nvmrc
 
@@ -725,7 +725,7 @@ jobs:
         working-directory: base
 
       - name: Use Node.js from .nvmrc from PR branch
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: pr/.nvmrc
 
@@ -769,13 +769,13 @@ jobs:
     if: github.event_name == 'pull_request' && contains(needs.setup.outputs.matrix, 'packages/toolkit')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm

@@ -6,20 +6,27 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Docs sync check
+name: Ensure documentation is up to date
 
 # On every merge to develop/master, ask Claude whether opencrvs/documentation
 # still matches the code. Most runs need no change and end silently. When docs
 # need updating, a PR is opened against opencrvs/documentation and announced in
-# Slack (#opencrvs-developer).
+# Slack, mentioning the author of the merged commit.
 #
 # Required repository secrets:
-#   ANTHROPIC_API_KEY  - Claude API access
+#   CLAUDE_CODE_OAUTH_TOKEN - Claude access
 #   DOCS_REPO_TOKEN    - fine-grained PAT (or GitHub App token) with
 #                        contents:write + pull-requests:write on opencrvs/documentation.
 #                        The default GITHUB_TOKEN cannot access another repository.
-#   SLACK_BOT_TOKEN    - bot token (xoxb-...) of the Claude Slack app with the
-#                        chat:write scope, invited to the channel.
+#   SLACK_BOT_TOKEN    - Slack bot token (xoxb-...). Needs chat:write, plus
+#                        users:read.email to @-mention the commit author (without
+#                        it the author's name is used). The bot must be a member
+#                        of the channel set in SLACK_CHANNEL below.
+#
+# Manual runs (Actions tab -> Ensure documentation is up to date -> Run workflow):
+#   base        commit to diff against, to test on a wider range than HEAD~1
+#   dry_run     show Claude's proposed docs diff in the log, no PR and no Slack
+#   slack_test  only post a test message to Slack, skip the docs check
 
 on:
   push:
@@ -31,6 +38,14 @@ on:
       base:
         description: 'Commit to diff against (defaults to HEAD~1)'
         required: false
+      dry_run:
+        description: 'Only show the documentation diff in the log; do not open a PR or post to Slack'
+        type: boolean
+        default: false
+      slack_test:
+        description: 'Only post a test message to Slack, skipping the docs check entirely'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -42,11 +57,42 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SLACK_CHANNEL: C02LU432JGK
+  SLACK_CHANNEL: C08FCLKER8X
   DOCS_REPO: opencrvs/documentation
 
 jobs:
+  slack-test:
+    if: ${{ inputs.slack_test }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Post test message to Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          if [ -z "$SLACK_BOT_TOKEN" ]; then
+            echo "::error::SLACK_BOT_TOKEN secret is not set"; exit 1
+          fi
+          AUTH="$(curl -sS -X POST https://slack.com/api/auth.test -H "Authorization: Bearer $SLACK_BOT_TOKEN")"
+          echo "auth.test: $(echo "$AUTH" | jq -c '{ok, team, user, error}')"
+          AUTHOR="$(bash .github/scripts/slack-mention.sh "${{ github.sha }}")"
+          echo "Would notify: $AUTHOR"
+          TEXT=":white_check_mark: Test message from the *Ensure documentation is up to date* workflow in ${{ github.repository }} (latest commit by $AUTHOR, run <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_id }}>). Slack notifications are wired up correctly."
+          RESPONSE="$(jq -n --arg channel "$SLACK_CHANNEL" --arg text "$TEXT" \
+              '{channel: $channel, text: $text, unfurl_links: false}' |
+            curl -sS -X POST https://slack.com/api/chat.postMessage \
+              -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+              -H 'Content-type: application/json; charset=utf-8' \
+              --data @-)"
+          echo "chat.postMessage: $(echo "$RESPONSE" | jq -c '{ok, channel, error, needed, provided}')"
+          echo "$RESPONSE" | jq -e '.ok' >/dev/null || exit 1
+
   check-docs:
+    if: ${{ !inputs.slack_test }}
     runs-on: ubuntu-26.04
     timeout-minutes: 30
     steps:
@@ -85,7 +131,7 @@ jobs:
       - name: Ask Claude whether the docs are still up to date
         id: claude
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           BASE: ${{ steps.range.outputs.base }}
           CORE_BRANCH: ${{ github.ref_name }}
         run: |
@@ -142,7 +188,13 @@ jobs:
             --allowedTools "Read,Grep,Glob,Edit,Write,TodoWrite,Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git status:*),Bash(ls:*)" \
             --output-format json \
             --json-schema '{"type":"object","properties":{"docs_changed":{"type":"boolean"},"pr_title":{"type":"string","description":"Short PR title, no prefix"},"summary":{"type":"string","description":"Markdown bullet list of what was changed in the docs and why, referencing core commits/PRs"}},"required":["docs_changed","summary"]}' \
-            > "$RUNNER_TEMP/claude-result.json"
+            > "$RUNNER_TEMP/claude-result.json" 2> "$RUNNER_TEMP/claude-stderr.txt" || {
+              echo "::error::claude CLI failed"
+              echo "--- stdout ---"; cat "$RUNNER_TEMP/claude-result.json"
+              echo "--- stderr ---"; cat "$RUNNER_TEMP/claude-stderr.txt"
+              exit 1
+            }
+          jq '{subtype, is_error, num_turns, total_cost_usd, result}' "$RUNNER_TEMP/claude-result.json" || cat "$RUNNER_TEMP/claude-result.json"
 
           jq -c '.structured_output // {}' "$RUNNER_TEMP/claude-result.json" > "$RUNNER_TEMP/structured.json"
           {
@@ -159,11 +211,19 @@ jobs:
           CORE_SHA: ${{ github.sha }}
           CORE_BRANCH: ${{ github.ref_name }}
           CORE_REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run }}
         working-directory: documentation
         run: |
           # The workflow, not Claude, decides whether there is a diff.
           if [ -z "$(git status --porcelain)" ]; then
             echo "Documentation is up to date, nothing to do."
+            exit 0
+          fi
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run: documentation changes Claude would propose:"
+            git status --short
+            git diff
             exit 0
           fi
 
@@ -180,7 +240,7 @@ jobs:
           git commit -m "docs: $TITLE" -m "Automated update for https://github.com/$CORE_REPO/commit/$CORE_SHA"
           git push --force origin "$BRANCH"
 
-          BODY="$(printf '%s\n\n---\nAutomated by the [Docs sync check](https://github.com/%s/actions/runs/%s) workflow after a merge to `%s` in [%s](https://github.com/%s/commit/%s). Please review carefully before merging.' \
+          BODY="$(printf '%s\n\n---\nAutomated by the [Ensure documentation is up to date](https://github.com/%s/actions/runs/%s) workflow after a merge to `%s` in [%s](https://github.com/%s/commit/%s). Please review carefully before merging.' \
             "$SUMMARY" "$CORE_REPO" "$GITHUB_RUN_ID" "$CORE_BRANCH" "$CORE_REPO" "$CORE_REPO" "$CORE_SHA")"
 
           URL="$(gh pr list --repo "$DOCS_REPO" --head "$BRANCH" --json url -q '.[0].url')"
@@ -200,8 +260,12 @@ jobs:
           CORE_BRANCH: ${{ github.ref_name }}
           CORE_SHA: ${{ github.sha }}
           CORE_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          TEXT=":books: Claude opened a documentation PR after a merge to \`$CORE_BRANCH\` in opencrvs-core (<https://github.com/$CORE_REPO/commit/$CORE_SHA|${CORE_SHA:0:9}>): <$PR_URL|$PR_TITLE>. Please review."
+          AUTHOR="$(bash .github/scripts/slack-mention.sh "$CORE_SHA")"
+          echo "Notifying: $AUTHOR"
+          TEXT=":books: $AUTHOR, your merge to \`$CORE_BRANCH\` in opencrvs-core (<https://github.com/$CORE_REPO/commit/$CORE_SHA|${CORE_SHA:0:9}>) needs documentation updates. Claude opened a PR: <$PR_URL|$PR_TITLE>. Please review."
           RESPONSE="$(jq -n --arg channel "$SLACK_CHANNEL" --arg text "$TEXT" \
               '{channel: $channel, text: $text, unfurl_links: false}' |
             curl -sS -X POST https://slack.com/api/chat.postMessage \

@@ -1,12 +1,43 @@
 # Changelog
 
-## 2.1.0 Release Candidate
+## 2.2.0 Release Candidate
+
+### Breaking changes
+
+#### `POST /auth/token` no longer accepts parameters in the query string
+
+The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) has been removed. Sending `client_secret` in the URL leaks it into access logs and Sentry breadcrumbs (CWE-598). Parameters are now read only from the request body (form-encoded or JSON), and the gateway no longer forwards the query string. Requests that still use the URL fail with `unsupported_grant_type`.
+
+Integrations using the `client_credentials` grant must send `grant_type`, `client_id` and `client_secret` in the body:
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
+
+### Bug fixes
+- Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
+
+## 2.1.0
 
 ### Upgrade guidance
 
 #### Sentry — nothing to do, the upgrade script removes it
 
 `SENTRY` in your client and login configs no longer compiles (see 2.0.2). `npx @opencrvs/toolkit upgrade` deletes it for you, along with the rest of the Sentry wiring: `SENTRY_DSN` in `src/environment.ts` and `src/constants.ts`, the `hapi-sentry` plugin and its `onRequest` hook in `src/index.ts`, `IApplicationConfig.SENTRY`, the `hapi-sentry` dependency and `typings/hapi-sentry.d.ts`. Anything it cannot find is listed when it finishes, for you to remove by hand.
+
+#### `assets/` and the Tilt setup — the upgrade script moves you over
+
+A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
+
+- moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
+
+With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
 
 #### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
@@ -281,6 +312,40 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 - Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 - Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
+
+## 2.0.4
+
+### Security
+
+- Removed the unused `user.actions` endpoint from the events service. It was authorised only by a user-management permission, yet returned the full record declarations of every action the target user had taken, so administrators and other roles holding `user.read` could read records they had no permission to open. The endpoint has had no consumer since the v1 gateway bridge was removed, so removing it changes nothing in the application. [GHSA-hmgw-v78r-jjc4](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-hmgw-v78r-jjc4) (High)
+- The events service no longer writes users' email addresses and phone numbers to the logs in full. When a user was created or updated with an email or phone number already in use, the value was logged verbatim; it is now masked. [GHSA-55j9-g2xv-4qrw](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-55j9-g2xv-4qrw) (Low)
+
+  **Deployment notes:**
+
+  - Existing log stores may still hold unmasked emails and phone numbers from before the upgrade. Scrub them according to your retention policy.
+
+### Bug fixes
+
+- MinIO removed its images from quay.io and Docker Hub, so the MinIO server and client images could no longer be pulled. They now come from OpenCRVS-hosted copies: `ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z` for the server and `ghcr.io/opencrvs/minio-mc:release.2025-05-21t01-59-54z` for the client used by the data cleanup job. [#13893](https://github.com/opencrvs/opencrvs-core/pull/13893)
+
+  **Deployment notes:**
+
+  - If you pull images through a private registry, mirror the two new images there before upgrading.
+
+## 2.0.3
+
+### Bug fixes
+
+- The image crop window now matches the `targetSize` configured on a file field. It was always a circle, so a non-square target stretched the saved image and gave the user no way to frame it accurately. [#12034](https://github.com/opencrvs/opencrvs-core/issues/12034)
+
+  ```ts
+  configuration: {
+    maxImageSize: { targetSize: { width: 350, height: 450 } }
+  }
+  ```
+
+- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 
