@@ -14,6 +14,7 @@ import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   EventDocumentOnlyLastAction,
+  getMixedPath,
   getUUID,
   UUID
 } from '@opencrvs/commons'
@@ -290,6 +291,23 @@ export const eventRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { eventId, type } = input
 
+        const signaturePath = getMixedPath(
+          input,
+          'annotation.review.signature.path'
+        ) as string | undefined
+
+        if (signaturePath && signaturePath.includes('tmp-')) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `draft.create: Invalid event id in file path: ${signaturePath} ${JSON.stringify(
+              {
+                eventId,
+                user: ctx.user.id
+              }
+            )}`
+          })
+        }
+
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
 
@@ -354,7 +372,12 @@ export const eventRouter = router({
           if (!eventId) {
             throw new TRPCError({
               code: 'BAD_REQUEST',
-              message: `Invalid event id in file path: ${filePath}`
+              message: `getPersignedUrl: Invalid event id in file path: ${filePath}, ${JSON.stringify(
+                {
+                  eventId,
+                  user: `${ctx.user.id}`
+                }
+              )}`
             })
           }
 
