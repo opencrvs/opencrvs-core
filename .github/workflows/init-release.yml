@@ -10,19 +10,20 @@
 # Starts a release. Run it manually with a semver version.
 #
 # A "channel" is the <major>.<minor> a version belongs to: 1.9.17 is on 1.9,
-# 2.0.3 on 2.0. master tracks the channel that last shipped.
+# 2.0.3 on 2.0. The newest channel is the highest one with a published
+# release, and develop carries its work.
 #
 # The release branch is cut from the previous patch, or from develop for a
 # minor or major, and gets the version bump and CHANGELOG commits. Where it
 # merges depends on its channel:
 #
-#   master's channel  release/<version> -> master, plus a merge-back into
-#                     develop
-#   an older channel  no PR to master. One merge-back PR into the next
-#                     unreleased patch of the nearest channel above: 1.9.17
-#                     merges into release/2.0.2 when 2.0.1 is the newest
-#                     published 2.0. The hotfix reaches master through that
-#                     channel's own release.
+#   the newest channel  one merge-back PR into develop, carrying the version
+#                       bump and the CHANGELOG entry
+#   an older channel    one merge-back PR into the next unreleased patch of
+#                       the nearest channel above: 1.9.17 merges into
+#                       release/2.0.2 when 2.0.1 is the newest published 2.0.
+#                       The hotfix reaches develop through that channel's own
+#                       release.
 name: Release - Start a new release
 on:
   workflow_dispatch:
@@ -90,20 +91,32 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           IFS='.' read -r x y _ <<< "$VERSION"
-          IFS='.' read -r mx my _ <<< "$(git show origin/master:package.json | jq -r .version)"
-          echo "master is on $mx.$my"
+
+          # every published release as "<major> <minor> <patch>". Major and
+          # minor stay separate fields so they compare as numbers — as one
+          # string, awk reads "1.10" and "1.1" as the same value.
+          published=$(gh release list --limit 200 --exclude-drafts --exclude-pre-releases \
+            --json tagName --jq '.[].tagName' \
+            | sed -n 's/^v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)$/\1 \2 \3/p')
+
+          # The newest channel, which used to be read off master's package.json.
+          # A release on an older channel never merges up past the channel above
+          # it, so the highest published <major>.<minor> is the newest channel.
+          read -r mx my <<< "$(echo "$published" \
+            | awk 'NR == 1 { mx = $1; my = $2 }
+                   $1 > mx || ($1 == mx && $2 > my) { mx = $1; my = $2 }
+                   END { print mx, my }')"
+
+          if [ -z "$mx" ]; then
+            echo "::error::No published release found, so the newest channel cannot be determined."
+            exit 1
+          fi
+          echo "the newest published channel is $mx.$my"
 
           if [ "$x" -gt "$mx" ] || { [ "$x" -eq "$mx" ] && [ "$y" -ge "$my" ]; }; then
-            target=master
+            target=develop
             merge_back=develop
           else
-            # every published release as "<major> <minor> <patch>". Major and
-            # minor stay separate fields so they compare as numbers — as one
-            # string, awk reads "1.10" and "1.1" as the same value.
-            published=$(gh release list --limit 200 --exclude-drafts --exclude-pre-releases \
-              --json tagName --jq '.[].tagName' \
-              | sed -n 's/^v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)$/\1 \2 \3/p')
-
             for candidate in "$x $((y + 1))" "$((x + 1)) 0"; do
               read -r cx cy <<< "$candidate"
               patch=$(echo "$published" | awk -v a="$cx" -v b="$cy" '$1 == a && $2 == b { print $3 }' | sort -n | tail -1)
@@ -129,6 +142,7 @@ jobs:
           # 1.9.17 into 2.0.2 -> merge-back/release-1917-into-202.
           slug="${merge_back#release/}"
           echo "$VERSION -> $target, merging back into $merge_back"
+          echo "newest_channel=$mx.$my" >> $GITHUB_OUTPUT
           echo "target_branch=$target" >> $GITHUB_OUTPUT
           echo "merge_back_target=$merge_back" >> $GITHUB_OUTPUT
           echo "mergeback_branch=merge-back/release-${VERSION//./}-into-${slug//./}" >> $GITHUB_OUTPUT
@@ -284,6 +298,7 @@ jobs:
         run: |
           BRANCH="${{ steps.target.outputs.mergeback_branch }}"
           TARGET="${{ steps.target.outputs.merge_back_target }}"
+          NEWEST_CHANNEL="${{ steps.target.outputs.newest_channel }}"
           RESOLVED="${{ steps.merge_back.outputs.auto_resolved }}"
 
           # base, head, title, body. An already-open PR is left alone, so a
@@ -304,17 +319,20 @@ jobs:
           fi
 
           if [ "$TARGET" = "develop" ]; then
-            create_pr master "$RELEASE_BRANCH" "Release v$VERSION" "$BODY"
             TITLE="chore: merge release v$VERSION back to develop"
-            NOTE="Merge release branch back to develop to include version bump and changelog updates."
+            NOTE="$BODY
+
+          ---
+
+          > Merge the release branch back into \`develop\` to include the version bump and changelog updates."
           else
-            echo "$VERSION is on an older channel than master, so no release PR to master."
+            echo "$VERSION is on an older channel than $NEWEST_CHANNEL, so it does not merge straight into develop."
             TITLE="chore: merge release v$VERSION into $TARGET"
             NOTE="$BODY
 
           ---
 
-          > **Note:** \`$VERSION\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release."
+          > **Note:** \`$VERSION\` is on an older channel than \`$NEWEST_CHANNEL\`, so it does not merge straight into \`develop\`. This PR carries the release up into \`$TARGET\`, and it reaches \`develop\` through that channel's own release."
 
             if [ -n "$RESOLVED" ]; then
               NOTE="$NOTE
