@@ -5,7 +5,7 @@ Run the phases in order: **Prerequisites** → **opencrvs-core -repo** → **inf
 ## 1. Prerequisites — both repos
 
 1. Verify no open PRs are pending for the release.
-2. Dispatch [`init-release` workflow](https://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml).
+2. Dispatch [`init-release` workflow](https://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml). Dispatch it only in **opencrvs-core** — it automatically triggers the companion `init-release` in **infrastructure**, countryconfig and testland.
 3. Confirm the `release/X.Y.Z` branch exists in **opencrvs-core** and **infrastructure**, and is PR'd to `develop`.
 4. CI is passing on all PRs.
 5. `CHANGELOG.md` and `package.json` reflect the release version (committed at branch creation).
