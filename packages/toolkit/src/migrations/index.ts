@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { main as addE2ETests } from './add-e2e-tests'
 import { main as addTranslations } from './persistent/add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as addNotifyConfig } from './add-notify-config'
@@ -40,6 +41,7 @@ export async function runUpgrade(toolkitVersion: string) {
   await addTranslations(`${major}.${minor}`)
   await replaceIncompleteFlag()
   await upgradeTilt()
+  await addE2ETests()
   // Last, so a failed upgrade leaves the version it upgrades from in place
   await updateToolkitDependency(toolkitVersion)
 }
