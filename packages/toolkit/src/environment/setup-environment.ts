@@ -66,7 +66,8 @@ import {
   sentryQuestions,
   emailQuestions,
   metabaseAdminQuestions,
-  backupQuestions
+  backupQuestions,
+  e2eQuestions
 } from './questions'
 
 import {
@@ -292,7 +293,8 @@ ALL_QUESTIONS.push(
   ...emailQuestions,
   ...sentryQuestions,
   ...derivedVariables,
-  ...metabaseAdminQuestions
+  ...metabaseAdminQuestions,
+  ...e2eQuestions
 )
 export async function runSetupEnvironment() {
   log('\n', kleur.bold().underline('Github'), '\n')
@@ -413,6 +415,71 @@ export async function runSetupEnvironment() {
     ...existingRepositorySecrets,
     ...existingEnvironmentSecrets
   ]
+
+  log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
+
+  const existingTwoFaEnabled = findExistingValue(
+    'TWO_FA_ENABLED',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+
+  const twoFaDefault = process.env.TWO_FA_ENABLED || existingTwoFaEnabled?.value
+  const two_fa_enabled = await confirm({
+    message:
+      'Enable two-factor authentication (2FA)? This should be enabled for any environment that hosts PII data.',
+    default: twoFaDefault
+      ? twoFaDefault === 'true'
+      : environment_type === 'production'
+  })
+
+  if (!two_fa_enabled && ['production', 'staging'].includes(environment_type)) {
+    warn(
+      '2FA is disabled on a production-like environment. Logins will accept the fixed test code 000000, exposing real citizen data. Only do this if you know what you are doing.'
+    )
+  }
+
+  log('\n', kleur.bold().underline('End-to-end (E2E) tests'))
+
+  const existingE2EEnabled = findExistingValue(
+    'E2E_ENABLED',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  // E2E tests create records, so they are never offered on environments that host PII data
+  const e2e_enabled =
+    environment_type !== 'production' &&
+    (await confirm({
+      message:
+        'Would you like to configure e2e tests for this environment? Tests run after every deployment and create test records.',
+      default: process.env.E2E_ENABLED
+        ? process.env.E2E_ENABLED === 'true'
+        : existingE2EEnabled?.value === 'true'
+    }))
+
+  if (environment_type === 'production') {
+    log(
+      kleur.bold().green('✔'),
+      kleur
+        .bold()
+        .grey(
+          existingE2EEnabled?.value === 'true'
+            ? 'Environment hosts PII data, E2E_ENABLED will be set to false'
+            : 'Environment hosts PII data, skipping e2e tests configuration'
+        )
+    )
+  }
+
+  if (e2e_enabled) {
+    if (two_fa_enabled) {
+      warn(
+        'E2E tests usually sign in with the fixed 2FA code 000000, which is only accepted when 2FA is disabled.'
+      )
+    }
+    await promptAndStoreAnswer(e2eQuestions, existingValues)
+  }
 
   if (
     existingEnvironmentVariables.length > 0 ||
@@ -780,6 +847,14 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
     didExist: existingTwoFaEnabled,
     // Always stored, so the next run defaults to the current answer
     value: two_fa_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  derivedUpdates.push({
+    name: 'E2E_ENABLED',
+    type: 'VARIABLE' as const,
+    didExist: existingE2EEnabled,
+    // Only store 'false' to switch off an environment that previously had e2e enabled
+    value: e2e_enabled ? 'true' : existingE2EEnabled ? 'false' : null,
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)

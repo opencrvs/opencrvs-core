@@ -45,6 +45,10 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
+### New features
+
+- `environment:init` asks whether to configure e2e tests for the environment. The question is skipped for environments that host PII data (staging and production), where e2e tests stay disabled. When enabled, it stores `E2E_ENABLED=true` on the GitHub environment and, if missing, asks for the country config repository and stores it as the `COUNTRYCONFIG_REPOSITORY` repository variable. The infrastructure `deploy-opencrvs.yml` workflow then runs the country config's Playwright tests through `e2e.yml` after each deployment. `countryconfig-template` includes a sample Playwright suite in `e2e/` (`pnpm e2e`, or the `e2e-tests` trigger button in the Tilt UI), and `opencrvs upgrade` (now the v2.1 → v2.2 codemods) adds it to country configs that have no `e2e/` directory. The upgrade also replaces `Tiltfile` and the core owned files under `tilt/` with the template's, as in v2.1, keeping `countryconfig_image_name` and `tilt/helm/` overrides; review local changes with `git diff -- Tiltfile tilt/`. The v2.1-only `--docker-swarm` upgrade option has been removed. [#13345](https://github.com/opencrvs/opencrvs-core/issues/13345)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)

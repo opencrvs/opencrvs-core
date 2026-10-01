@@ -1,7 +1,8 @@
 # Country config migrations (codemods)
 
 Codemods run by `opencrvs upgrade` against a country config repo to upgrade it
-to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.0/`.
+to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.2/`,
+and `opencrvs upgrade` runs the latest one (see `src/cli.ts`).
 
 Run from inside a country config checkout:
 

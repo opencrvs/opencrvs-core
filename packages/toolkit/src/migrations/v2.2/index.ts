@@ -11,11 +11,16 @@
 import { main as addTranslations } from '../add-translations'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 
+import { main as addE2ETests } from './add-e2e-tests'
+import { main as upgradeTilt } from './upgrade-tilt'
+
 /**
- * Run the upgrade process for the country config in the current working
- * directory.
+ * Run the v2.1 -> v2.2 upgrade process for the country config in the current
+ * working directory.
  */
 export async function runUpgrade() {
   await readDeclarationThroughHelper()
   await addTranslations('2.2')
+  await upgradeTilt()
+  await addE2ETests()
 }

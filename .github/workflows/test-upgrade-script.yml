@@ -66,6 +66,9 @@ jobs:
           # remove unused files
           rm -rf src/api/notification/testData.ts
           yarn --force
+      - name: Check the sample e2e suite was added
+        working-directory: opencrvs-farajaland
+        run: test -f e2e/login.e2e.ts && test -f playwright.config.ts
       - name: Test opencrvs-farajaland compilation
         run: yarn test:compilation
         working-directory: opencrvs-farajaland
