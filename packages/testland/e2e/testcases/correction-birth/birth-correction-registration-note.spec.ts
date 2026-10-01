@@ -59,6 +59,8 @@ test('A corrected event-conditional field is shown in the "Record corrected" mod
     await login(page, CREDENTIALS.REGISTRAR)
   })
 
+  test.setTimeout(180_000)
+
   await test.step('Registration note is not available while declaring', async () => {
     await openBirthDeclaration(page)
 

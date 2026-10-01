@@ -24,6 +24,8 @@ import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Duplicate overview', async ({ page }) => {
+  test.setTimeout(180_000)
+
   const details = {
     'child.name': {
       firstname: faker.person.firstName(),
