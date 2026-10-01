@@ -8,7 +8,7 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 name: Ensure documentation is up to date
 
-# On every merge to develop/master, ask Claude whether opencrvs/documentation
+# On every merge to develop, ask Claude whether opencrvs/documentation
 # still matches the code. Most runs need no change and end silently. When docs
 # need updating, a PR is opened against opencrvs/documentation and announced in
 # Slack, mentioning the author of the merged commit.
@@ -32,7 +32,6 @@ on:
   push:
     branches:
       - develop
-      - master
   workflow_dispatch:
     inputs:
       base:
