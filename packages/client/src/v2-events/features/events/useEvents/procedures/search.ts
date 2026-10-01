@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { QueryFunctionContext } from '@tanstack/react-query'
-import { inferInput } from '@trpc/tanstack-react-query'
+import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import { QueryType } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
@@ -19,6 +19,7 @@ import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
  * are optional here, matching what searchEventById passes.
  */
 export type SearchInput = inferInput<typeof trpcOptionsProxy.event.search>
+type SearchOutput = inferOutput<typeof trpcOptionsProxy.event.search>
 
 /**
  * The scope segment(s) spliced into the tRPC key path element (queryKey[0]) to
@@ -74,9 +75,24 @@ export const searchKeys = {
 }
 
 /**
+ * tRPC's queryFn derives the procedure path from the runtime key, so a scoped
+ * key would call `event.search.workqueue.<slug>`. This rebuilds the unscoped
+ * key before delegating to tRPC.
+ */
+async function fetchScopedSearch(ctx: QueryFunctionContext) {
+  // The {input, type} element is always present for event.search keys.
+  const { input } = ctx.queryKey[1] as { input: SearchInput }
+  const options = trpcOptionsProxy.event.search.queryOptions(input)
+  if (!options.queryFn) {
+    throw new Error('queryFn is not defined for event.search')
+  }
+  return options.queryFn({ ...ctx, queryKey: options.queryKey })
+}
+
+/**
  * Query options for a scoped `event.search` entry. tRPC's own queryFn is left
  * out: it would derive the procedure path from the scoped key, so the default
- * queryFn below serves every scoped key instead.
+ * queryFn below serves the entry unless the caller supplies its own.
  */
 export function scopedSearchOptions(input: SearchInput, scope: SearchScope) {
   const { queryFn: _queryFn, ...options } =
@@ -84,31 +100,32 @@ export function scopedSearchOptions(input: SearchInput, scope: SearchScope) {
   return { ...options, queryKey: scopedKey(input, scope) }
 }
 
-/** Query options for the by-id `event.search` entry of an event. */
-export function byIdSearchOptions(eventId: string) {
-  return scopedSearchOptions(byIdInput(eventId), ['id', eventId])
+/**
+ * Query options for the by-id `event.search` entry of an event. When the
+ * server has no record yet, `fallback` builds the result instead, and it is
+ * cached like a server result.
+ */
+export function byIdSearchOptions(
+  eventId: string,
+  fallback: () => SearchOutput
+) {
+  return {
+    ...scopedSearchOptions(byIdInput(eventId), ['id', eventId]),
+    queryFn: async (ctx: QueryFunctionContext) => {
+      const result = await fetchScopedSearch(ctx)
+      return result.total > 0 ? result : fallback()
+    }
+  }
 }
 
 /**
- * tRPC's queryFn derives the procedure path from the runtime key, so a scoped
- * key would call `event.search.workqueue.<slug>`. This default rebuilds the
- * unscoped key before delegating to tRPC.
- *
- * Calls queryClient.setQueryDefaults directly: the procedures/utils helper
- * would close the import cycle api → search → utils → api.
+ * The default queryFn for every scoped `event.search` key. Calls
+ * queryClient.setQueryDefaults directly: the procedures/utils helper would
+ * close the import cycle api → search → utils → api.
  */
 queryClient.setQueryDefaults(trpcOptionsProxy.event.search.queryKey(), {
   // As in the procedures/utils helper: wait for connectivity rather than the
   // persister's 'offlineFirst'.
   networkMode: 'online',
-  queryFn: (ctx: QueryFunctionContext) => {
-    // The {input, type} element is always present for event.search keys.
-    const { input } = ctx.queryKey[1] as { input: SearchInput }
-    const options = trpcOptionsProxy.event.search.queryOptions(input)
-    if (!options.queryFn) {
-      throw new Error('queryFn is not defined for event.search')
-    }
-    // Feed tRPC a clean, unscoped key so it derives the correct procedure path.
-    return options.queryFn({ ...ctx, queryKey: options.queryKey })
-  }
+  queryFn: fetchScopedSearch
 })

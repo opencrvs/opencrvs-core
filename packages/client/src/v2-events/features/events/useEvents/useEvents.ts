@@ -77,6 +77,16 @@ export function useEvents() {
   const eventConfigs = useEventConfigurations()
   const { getRemoteDraftByEventId } = useDrafts()
 
+  /** The result for a record the server has not indexed yet, from its draft. */
+  function buildDraftedResult(id: string, maybeDraft: Draft | undefined) {
+    const { event, draft, configuration } = getEventWithDraftOrThrow(
+      id,
+      eventConfigs,
+      maybeDraft
+    )
+    return buildDraftedEventResult(event, draft, configuration)
+  }
+
   return {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
@@ -116,23 +126,11 @@ export function useEvents() {
       useQuery: (id: string) => {
         const maybeDraft = getRemoteDraftByEventId(id)
 
-        // Falls back to the local draft when the server has no record yet.
         return useQuery({
-          ...byIdSearchOptions(id),
+          ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
           enabled: !findLocalEventIndex(id),
           refetchOnMount: 'always',
           staleTime: 0,
-          select: (data) => {
-            if (data.total > 0) {
-              return data
-            }
-            const { event, draft, configuration } = getEventWithDraftOrThrow(
-              id,
-              eventConfigs,
-              maybeDraft
-            )
-            return buildDraftedEventResult(event, draft, configuration)
-          },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? { results: [eventIndex], total: 1 } : undefined
@@ -143,20 +141,9 @@ export function useEvents() {
         const maybeDraft = getRemoteDraftByEventId(id)
 
         return useSuspenseQuery({
-          ...byIdSearchOptions(id),
+          ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
           refetchOnMount: 'always',
           staleTime: 0,
-          select: (data) => {
-            if (data.total > 0) {
-              return data
-            }
-            const { event, draft, configuration } = getEventWithDraftOrThrow(
-              id,
-              eventConfigs,
-              maybeDraft
-            )
-            return buildDraftedEventResult(event, draft, configuration)
-          },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? { results: [eventIndex], total: 1 } : undefined

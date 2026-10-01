@@ -207,8 +207,9 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
   ])(
     '%s from the overview: one lookup fetch, no queue fetch',
     async (_action, mutationKey, response) => {
+      queueOnServer = [row]
       const lookup = new QueryObserver(queryClient, {
-        ...byIdSearchOptions(record.id),
+        ...byIdSearchOptions(record.id, () => ({ results: [], total: 0 })),
         refetchInterval: false
       })
       const unsubscribe = lookup.subscribe(() => undefined)
