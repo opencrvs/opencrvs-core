@@ -1,5 +1,7 @@
 # Changelog
 
+## 2.1.1 Release Candidate
+
 ## 2.2.0 Release Candidate
 
 ### Breaking changes
