@@ -221,6 +221,9 @@ The toolkit and the country configuration template work with any container regis
 
 1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
 2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
+#### Setup e2e tests
+
+`environment:init` asks whether to configure e2e tests for the environment. The question is skipped for environments that host PII data (staging and production), where e2e tests stay disabled. When enabled, it stores `E2E_ENABLED=true` on the GitHub environment and, if missing, asks for the country config repository and stores it as the `COUNTRYCONFIG_REPOSITORY` repository variable. The infrastructure `deploy-opencrvs.yml` workflow then runs the country config's Playwright tests through `e2e.yml` after each deployment. `countryconfig-template` includes a sample Playwright suite in `e2e/` (`pnpm e2e`, or the `e2e-tests` trigger button in the Tilt UI), and `opencrvs upgrade` (now the v2.1 → v2.2 codemods) adds it to country configs that have no `e2e/` directory. [#13345](https://github.com/opencrvs/opencrvs-core/issues/13345)
 
 ### Improvements
 

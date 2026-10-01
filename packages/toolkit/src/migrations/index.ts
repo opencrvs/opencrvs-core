@@ -8,12 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { main as addE2ETests } from './add-e2e-tests'
 import { main as addTranslations } from './persistent/add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as addNotifyConfig } from './add-notify-config'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
 import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
+import { main as upgradeTilt } from './upgrade-tilt'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -31,6 +33,8 @@ export async function runUpgrade(toolkitVersion: string) {
   await readDeclarationThroughHelper()
   await addTranslations(`${major}.${minor}`)
   await replaceIncompleteFlag()
+  await upgradeTilt()
+  await addE2ETests()
   // Last, so a failed upgrade leaves the version it upgrades from in place
   await updateToolkitDependency(toolkitVersion)
 }
