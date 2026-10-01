@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Test v2.0 -> v2.1 Upgrade Script
+name: Test v2.1 -> v2.2 Upgrade Script
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ on:
     inputs:
       farajaland-branch:
         description: farajaland branch name
-        default: release/v2.0.0
+        default: release/v2.1.0
         required: true
       ref:
         description: Commit SHA / branch / tag to checkout (optional)
@@ -24,7 +24,7 @@ jobs:
   test-upgrade-script:
     runs-on: ubuntu-26.04
     env:
-      FARAJALAND_BRANCH: ${{ github.event.inputs.farajaland-branch || 'release/v2.0.0' }}
+      FARAJALAND_BRANCH: ${{ github.event.inputs.farajaland-branch || 'release/v2.1.0' }}
       # yarn 1.22 refuses to run inside a workspace whose package.json pins
       # packageManager: pnpm; the farajaland side of this job still uses yarn
       SKIP_YARN_COREPACK_CHECK: 1
@@ -66,6 +66,9 @@ jobs:
           # remove unused files
           rm -rf src/api/notification/testData.ts
           yarn --force
+      - name: Check the sample e2e suite was added
+        working-directory: opencrvs-farajaland
+        run: test -f e2e/login.e2e.ts && test -f playwright.config.ts
       - name: Test opencrvs-farajaland compilation
         run: yarn test:compilation
         working-directory: opencrvs-farajaland
