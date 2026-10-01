@@ -14,6 +14,7 @@ import { setupServer } from 'msw/node'
 import { serialize } from 'superjson'
 import {
   ActionType,
+  EventDocument,
   EventDocumentOnlyLastAction,
   EventIndex,
   QueryType,
@@ -23,7 +24,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { addLocalEventConfig } from './api'
-import { scopedSearchOptions } from './procedures/search'
+import { byIdSearchOptions, scopedSearchOptions } from './procedures/search'
 
 // Importing these registers each procedure's query and mutation defaults.
 /* eslint-disable import/no-unassigned-import */
@@ -103,11 +104,22 @@ function onSuccessOf(mutationKey: MutationKey) {
 
 const { actions } = trpcOptionsProxy.event
 
+/** The assign mutation answers with only the event's last action. */
+const assigned = EventDocumentOnlyLastAction.parse({
+  ...record,
+  actions: record.actions
+    .filter((action) => action.type === ActionType.ASSIGN)
+    .slice(-1)
+})
+
 /**
  * Every write that can move a record between workqueues. PRINT_CERTIFICATE has
  * no onSuccess of its own: the queue follows from the UNASSIGN that ends it.
  */
-const workqueueAffecting: Array<[string, MutationKey]> = [
+const workqueueAffecting: Array<
+  [string, MutationKey, (EventDocument | EventDocumentOnlyLastAction)?]
+> = [
+  ['ASSIGN', actions.assignment.assign.mutationKey(), assigned],
   ['DECLARE', actions.declare.request.mutationKey()],
   ['NOTIFY', actions.notify.request.mutationKey()],
   ['REGISTER', actions.register.request.mutationKey()],
@@ -152,11 +164,11 @@ afterEach(() => {
 describe('a mounted workqueue follows the server without waiting for the poll', () => {
   it.each(workqueueAffecting)(
     '%s: the record leaves the queue in one refetch',
-    async (_action, mutationKey) => {
+    async (_action, mutationKey, response = record) => {
       const workqueue = await mountWorkqueue([row])
 
       queueOnServer = []
-      await onSuccessOf(mutationKey)(record)
+      await onSuccessOf(mutationKey)(response)
 
       await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
       expect(queueFetches).toBe(1)
@@ -164,29 +176,21 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
     }
   )
 
-  /*
-   * UNASSIGN is left out: like ASSIGN it refreshes queues only through the
-   * count-diff, so it sees membership changes that move a count.
-   */
-  it.each(
-    workqueueAffecting.filter(([action]) => !action.startsWith('UNASSIGN'))
-  )('%s: a same-count swap reaches the queue', async (_action, mutationKey) => {
-    const workqueue = await mountWorkqueue([row])
+  it.each(workqueueAffecting)(
+    '%s: a same-count swap reaches the queue',
+    async (_action, mutationKey, response = record) => {
+      const workqueue = await mountWorkqueue([row])
 
-    queueOnServer = [otherRow]
-    await onSuccessOf(mutationKey)(record)
+      queueOnServer = [otherRow]
+      await onSuccessOf(mutationKey)(response)
 
-    await vi.waitFor(() => expect(workqueue.rows()).toEqual([otherRow]))
-    workqueue.unmount()
-  })
+      await vi.waitFor(() => expect(workqueue.rows()).toEqual([otherRow]))
+      expect(queueFetches).toBe(1)
+      workqueue.unmount()
+    }
+  )
 
   it('ASSIGN: the record enters an assigned-to-me queue', async () => {
-    const assigned = EventDocumentOnlyLastAction.parse({
-      ...record,
-      actions: record.actions
-        .filter((action) => action.type === ActionType.ASSIGN)
-        .slice(-1)
-    })
     const workqueue = await mountWorkqueue([])
 
     queueOnServer = [row]
@@ -196,6 +200,30 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
     expect(queueFetches).toBe(1)
     workqueue.unmount()
   })
+
+  it.each<[string, MutationKey, EventDocument | EventDocumentOnlyLastAction]>([
+    ['ASSIGN', actions.assignment.assign.mutationKey(), assigned],
+    ['UNASSIGN', actions.assignment.unassign.mutationKey(), record]
+  ])(
+    '%s from the overview: one lookup fetch, no queue fetch',
+    async (_action, mutationKey, response) => {
+      const lookup = new QueryObserver(queryClient, {
+        ...byIdSearchOptions(record.id),
+        refetchInterval: false
+      })
+      const unsubscribe = lookup.subscribe(() => undefined)
+      await vi.waitFor(() =>
+        expect(lookup.getCurrentResult().data).toBeDefined()
+      )
+      queueFetches = 0
+
+      await onSuccessOf(mutationKey)(response)
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      expect(queueFetches).toBe(1)
+      unsubscribe()
+    }
+  )
 
   it.each<[string, () => unknown]>([
     [

@@ -251,7 +251,7 @@ const assignedEvent = EventDocumentOnlyLastAction.parse({
     .slice(-1)
 })
 
-describe('onAssign — scoped invalidation only (ASSIGN)', () => {
+describe('onAssign — standard write path (ASSIGN)', () => {
   beforeEach(() => {
     global.caches = {
       keys: vi.fn().mockResolvedValue([])
@@ -264,35 +264,26 @@ describe('onAssign — scoped invalidation only (ASSIGN)', () => {
     vi.restoreAllMocks()
   })
 
-  /*
-   * The by-id refetch is not ours to skip: an assignment redraws the assignee
-   * avatar, and a sealed record's index is redacted server-side, so the row has
-   * to come back from the server rather than be rebuilt from the local
-   * document. What stays scoped is the workqueue side — an assignment moves no
-   * record between queues, so the workqueue searches are never blanket-staled.
-   */
-  it('refetches workqueue.count and the byId entry, but never blanket-stales workqueues', async () => {
+  it('stales workqueues, refetches byId + count, then refetches mounted workqueues', async () => {
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
     const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
 
     await onAssign(assignedEvent)
 
     expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: searchKeys.filters.allWorkqueues(),
+      refetchType: 'none'
+    })
+    expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: trpcOptionsProxy.workqueue.count.queryKey()
     })
     expect(refetchSpy).toHaveBeenCalledWith({
       queryKey: searchKeys.filters.byId(assignedEvent.id)
     })
-    expect(invalidateSpy).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        queryKey: searchKeys.filters.allWorkqueues()
-      })
-    )
-    expect(refetchSpy).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        queryKey: searchKeys.filters.allWorkqueues()
-      })
-    )
+    expect(refetchSpy).toHaveBeenCalledWith({
+      queryKey: searchKeys.filters.allWorkqueues(),
+      type: 'active'
+    })
   })
 })
 
