@@ -141,6 +141,10 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Setup e2e tests
+
+`environment:init` asks whether to configure e2e tests for the environment. The question is skipped for environments that host PII data (staging and production), where e2e tests stay disabled. When enabled, it stores `E2E_ENABLED=true` on the GitHub environment and, if missing, asks for the country config repository and stores it as the `COUNTRYCONFIG_REPOSITORY` repository variable. The infrastructure `deploy-opencrvs.yml` workflow then runs the country config's Playwright tests through `e2e.yml` after each deployment. `countryconfig-template` includes a sample Playwright suite in `e2e/` (`pnpm e2e`, or the `e2e-tests` trigger button in the Tilt UI), and `opencrvs upgrade` (now the v2.1 → v2.2 codemods) adds it to country configs that have no `e2e/` directory. [#13345](https://github.com/opencrvs/opencrvs-core/issues/13345)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
