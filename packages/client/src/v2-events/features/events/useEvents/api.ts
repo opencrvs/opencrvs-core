@@ -359,21 +359,12 @@ export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
     actions: localActions.concat(updatedEvent.actions)
   })
 
-  /*
-   * Nothing below refreshes the workqueue rows: `invalidateWorkqueues` only
-   * invalidates `workqueue.count` and `refetchSearchQuery` only the by-id
-   * entry, while the count-diff (procedures/count.ts) never fires for an
-   * assignment, which moves no record between workqueues.
-   */
   setLocalEventIndexAssignment(
     updatedEvent.id,
     lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
   )
 
-  await Promise.all([
-    invalidateWorkqueues(),
-    refetchSearchQuery(updatedEvent.id)
-  ])
+  await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
 export async function refetchDraftsList() {
@@ -386,11 +377,6 @@ export async function cleanUpOnUnassign(
   updatedEvent: EventDocumentOnlyLastAction
 ) {
   // If unassign is performed when it's assigned someone else, user does not necessarily have the event.get cached.
-  await deleteEventData(updatedEvent)
-  // Assuming unassign needs to be done online, we'll just refetch the query.
   // NOTE: local event cannot be used to recreate EventIndex cache. Record might be sealed, which causes inconsistencies in UI.
-  await Promise.all([
-    refetchSearchQuery(updatedEvent.id),
-    invalidateWorkqueues()
-  ])
+  await deleteLocalEvent(updatedEvent)
 }

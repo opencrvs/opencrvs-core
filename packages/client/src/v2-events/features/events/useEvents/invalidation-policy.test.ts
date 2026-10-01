@@ -249,8 +249,8 @@ describe('per-action invalidation policy (handler map)', () => {
     })
   })
 
-  describe('assignment actions stay scoped', () => {
-    it('ASSIGN is wired to onAssign (count-only, no blanket)', () => {
+  describe('assignment actions', () => {
+    it('ASSIGN is wired to onAssign', () => {
       const onSuccess = getOnSuccess(
         trpcOptionsProxy.event.actions.assignment.assign.mutationKey()
       )
