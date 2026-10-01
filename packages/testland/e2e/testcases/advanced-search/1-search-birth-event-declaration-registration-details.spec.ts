@@ -14,6 +14,8 @@ import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with
 import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import { assertTexts, selectLocationOption, type } from '@e2e/support/utils'
+import { format, subDays } from 'date-fns'
+import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 
 async function expectSearchParams(
   page: Page,
@@ -38,12 +40,19 @@ test.describe
     page = await browser.newPage()
     const token = await getToken(CREDENTIALS.REGISTRAR)
 
+    const toDate = format(new Date(), 'yyyy-MM-dd')
+    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+    const fromDate = format(
+      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+      'yyyy-MM-dd'
+    )
+
     await createDeclaration(token, {
       'mother.dob': '1995-09-12',
       'child.dob': faker.date
         // DOB must be at least 18 years after mother.dob to pass validation
         // Upper bound ensures the record appears on the first page of search results
-        .between({ from: '2025-09-10', to: '2025-11-28' })
+        .between({ from: fromDate, to: toDate })
         .toISOString()
         .split('T')[0],
       'child.gender': 'female'
