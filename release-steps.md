@@ -1,46 +1,57 @@
 # Technical Releasing
 
-```mermaid
-flowchart TD
-    subgraph PRE["Prerequisites — both repos"]
-        P1[Verify no open PRs pending for release]
-        P2["Run init-release workflow\nhttps://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml"]
-        P3["release/X.Y.Z branch exists in opencrvs-core + infrastructure\nPR'd to develop"]
-        P4[CI passing on all PRs]
-        P5["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
-        P6[countryconfig already using latest pre-release toolkit version]
-        P1 --> P2 --> P3 --> P4 --> P5 --> P6
-    end
+Run the phases in order: **Prerequisites** → **opencrvs-core -repo** → **infrastructure -repo**. Within each phase, complete the steps top to bottom.
 
-    subgraph CORE["opencrvs-core"]
-        C1["Verify CHANGELOG.md + package.json match release version"]
-        C2["Dispatch 'Publish toolkit to NPM registry'\nref: release/X.Y.Z, version: X.Y.Z"]
-        C3["Approve the run in the npm-publish environment\nany @opencrvs/developers member, including you"]
-        C4[Verify toolkit version visible on npm]
-        C5["Bump @opencrvs/toolkit to X.Y.Z in\npackages/countryconfig-template/package.json\n⚠️ pnpm i --ignore-workspace to update its lockfile"]
-        C6[Commit the version bump]
-        C7["git tag vX.Y.Z\ngit push origin tag vX.Y.Z\n⚠️ Tag as soon as C6 is committed — from C2 until\nthis tag exists, create-countryconfig@X.Y.Z\nscaffolds from the previous release tag"]
-        C8["⚡ Pipeline triggered automatically\n(docker images)"]
-        C9["Verify docker images published\nCompare size vs previous — report unusual increases"]
-        C10[Create draft release in GitHub]
-        C11[Paste CHANGELOG.md to GitHub release]
-        C12["Paste copy items to release notes\n(generate with notebook)"]
-        C13[Publish GitHub release]
-        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9 --> C10 --> C11 --> C12 --> C13
-    end
+## 1. Prerequisites — both repos
 
-    subgraph IF["Infrastructure"]
-        IF1["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
-        IF2[Create draft release]
-        IF3[Paste CHANGELOG.md to GitHub release]
-        IF4["Paste copy items to release notes\n(generate with notebook)"]
-        IF5[Publish GitHub release]
-        IF1 --> IF2 --> IF3 --> IF4 --> IF5
-    end
+1. Verify no open PRs are pending for the release.
+2. Dispatch [`init-release` workflow](https://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml).
+3. Confirm the `release/X.Y.Z` branch exists in **opencrvs-core** and **infrastructure**, and is PR'd to `develop`.
+4. CI is passing on all PRs.
+5. `CHANGELOG.md` and `package.json` reflect the release version (committed at branch creation).
+6. countryconfig is already using the latest pre-release toolkit version.
 
-    PRE --> CORE
-    CORE --> IF
-```
+## 2. opencrvs-core -repo
+
+1. Verify `CHANGELOG.md` and `package.json` match the release version.
+2. Dispatch [`publish-toolkit-to-npm` workflow](https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml) — `ref: release/X.Y.Z`, `version: X.Y.Z`.
+3. Approve the run in the `npm-publish` environment (any `@opencrvs/developers` member, including you).
+4. Verify the toolkit version is visible on npm.
+5. Bump `@opencrvs/toolkit` to `X.Y.Z` in `packages/countryconfig-template/package.json`.
+   > ⚠️ Run `pnpm install` to update lockfile. Relies on the toolkit already being published to npm in section 2.
+6. Commit the version bump.
+7. Tag the release:
+   ```bash
+   git tag vX.Y.Z
+   git push origin tag vX.Y.Z
+   ```
+   > ⚠️ Tag as soon as step 6 is committed — from step 2 until this tag exists, `create-countryconfig@X.Y.Z` scaffolds from the previous release tag.
+8. The [`build-images-from-branch` pipeline](https://github.com/opencrvs/opencrvs-core/actions/workflows/build-images-from-branch.yml) triggers automatically. Ensure it succeeds.
+9. Verify the docker images published — compare sizes against the previous release with `compare-image-sizes.sh` (in the repo root) and report unusual increases:
+   ```bash
+   ./compare-image-sizes.sh v<previous> vX.Y.Z   # e.g. ./compare-image-sizes.sh v2.1.0 v2.2.0
+   ```
+   Requires `crane` and `jq`.
+10. Create the release on GitHub [here](https://github.com/opencrvs/opencrvs-core/releases)
+
+## 3. infrastructure -repo
+
+1. Bump `@opencrvs/toolkit` to `X.Y.Z` in `package.json` (repo root), then commit.
+2. Tag the release:
+   ```bash
+   git tag vX.Y.Z
+   git push origin tag vX.Y.Z
+   ```
+3. Create the release on GitHub [here](https://github.com/opencrvs/infrastructure/releases)
+
+## 4. Finalize — sync develop
+
+Once both releases are published, merge the merge-back PR that `init-release` opened in each repo (its branch is named `merge-back/…`, targeting `develop`).
+
+1. Merge the merge-back PR into `develop` in **opencrvs-core**.
+2. Merge the merge-back PR into `develop` in **infrastructure**.
+
+Finally, send a message to Slack! [(example)](https://opencrvsworkspace.slack.com/archives/C06BERMKNH2/p1790763502585439)
 
 ## Links
 
