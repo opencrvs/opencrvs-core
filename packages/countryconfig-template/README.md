@@ -137,6 +137,8 @@ The Tiltfile supports the following environment variables.
 
 - `OPENCRVS_CORE_IMAGE_TAG`: Defines the OpenCRVS Core Docker image tag used by the Helm chart.
 - `OPENCRVS_CORE_REF`: Defines the OpenCRVS Core Git branch or tag used to fetch Helm charts, use any release/2.1.X branch or tag from https://github.com/opencrvs/opencrvs-core
+- `LOCAL_K8S`: `minikube` or `orbstack`. Detected from your kubectl context by default; on `minikube` Traefik is deployed with a NodePort values file.
+- `TRAEFIK_VALUES_FILE`: Replaces the default Traefik values file(s) with your own.
 
 The Tiltfile performs a sparse checkout of the OpenCRVS Core repository and only downloads the charts directory. You will still be able to make changes and create PRs in Core repository.
 
@@ -214,13 +216,13 @@ One of the key dependencies and enablers for OpenCRVS is country configuration a
 - The [src](src) folder contains the code for the countryconfig service. Essentially this service could be re-written in another language as long as it provided the same API endpoints and served the same files as listed below.
   - [src/events](src/events) defines the configurable events (birth, death and an example tennis club membership), including their forms and actions.
   - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, roles and employees.
-  - [src/api](src/api) contains the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations.
-  - [src/analytics](src/analytics) contains the analytics database setup. See [ANALYTICS.md](ANALYTICS.md).
+  - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations. The `/config/roles`, `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
+  - [src/analytics](src/analytics) contains the code that loads events and locations into the analytics database. The database itself is set up by [assets/postgres/setup-analytics.sh](assets/postgres/setup-analytics.sh). See [ANALYTICS.md](ANALYTICS.md).
 - The [tilt](tilt) folder and [Tiltfile](Tiltfile) define the local Kubernetes development environment. Tilt is responsible for deploying OpenCRVS dependencies and Core services using Helm charts, building the local countryconfig image, configuring live updates and exposing operational tasks such as database cleanup and data seeding through the Tilt UI.
 
 ## Endpoints
 
-OpenCRVS Core calls the following endpoints. After upgrading, you can check that your country configuration still exposes them by running `npx @opencrvs/toolkit verify-endpoints`. For request and response formats, see the [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation.
+OpenCRVS Core calls the following endpoints. After upgrading, you can run `npx @opencrvs/toolkit verify-endpoints` against a running country configuration. It checks that the public endpoints respond, that the secured ones reject unauthenticated requests, and that the translations Core needs are present. The [Country-config APIs](https://documentation.opencrvs.org/technical/apis/country-config-apis) documentation describes the event configuration and action trigger formats.
 
 **Configuration and reference data**
 
@@ -245,7 +247,7 @@ OpenCRVS Core calls the following endpoints. After upgrading, you can check that
 **Triggers (require authentication)**
 
 - `POST /trigger/events/{event}/actions/{action}`: called when an action is performed on an event. This is where you can integrate with external systems, or generate registration numbers on `REGISTER`. See [Action Confirmation](#action-confirmation).
-- `POST /trigger/user/{event}`: user notifications such as `user-created`, `reset-password` or `2fa`, to be sent to users by SMS, email or another method
+- `POST /trigger/user/*`: one route per user notification, such as `/trigger/user/user-created`, `/trigger/user/reset-password` or `/trigger/user/2fa`, to be sent to users by SMS, email or another method
 - `GET /trigger/system/ready`: called by the events service on startup to register integrations
 - `POST /trigger/telemetry`: receives usage reports from the events service
 
@@ -253,6 +255,7 @@ OpenCRVS Core calls the following endpoints. After upgrading, you can check that
 
 - `POST /reindex`: receives events from Core when it reindexes, to populate the analytics database
 - `GET /ping`: health check endpoint used for monitoring
+- `POST /email`: sends an email, used internally e.g. for monitoring alerts and deployment notifications. It is blocked from outside the cluster in deployed environments.
 
 **<a href="https://documentation.opencrvs.org/technical/guides/configuration">Read our documentation</a> in order to learn how to make your own country configuration!**
 
