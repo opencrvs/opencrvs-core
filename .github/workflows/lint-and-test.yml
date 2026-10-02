@@ -95,6 +95,10 @@ jobs:
           else
             PROJECTS=$(pnpm exec nx show projects --affected --exclude @opencrvs/create-countryconfig --json)
           fi
+          # The events tests build their databases from packages/migration. An nx
+          # implicit dependency would break checkouts without packages/migration
+          # (e.g. the e2e repo), so migration changes select events here instead.
+          PROJECTS=$(echo "$PROJECTS" | jq -c 'if index("@opencrvs/migration") then (. + ["@opencrvs/events"] | unique) else . end')
           PACKAGES=$(echo "$PROJECTS" | jq -c 'map("packages/" + ltrimstr("@opencrvs/"))')
           echo "Selected packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT

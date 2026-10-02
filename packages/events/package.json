@@ -95,10 +95,5 @@
       "prettier --write",
       "eslint -c eslint.config.js --fix"
     ]
-  },
-  "nx": {
-    "implicitDependencies": [
-      "@opencrvs/migration"
-    ]
   }
 }
