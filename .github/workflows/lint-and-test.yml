@@ -644,6 +644,9 @@ jobs:
           path: packages/events/.vitest-reports/*
           include-hidden-files: true
           retention-days: 1
+          # A re-run shard must replace its earlier report, or the coverage job
+          # can merge the stale one and fail on its errors again
+          overwrite: true
 
   events-coverage:
     name: Events test coverage
