@@ -15,6 +15,11 @@ on:
     branches:
       - develop
 
+# Cancel superseded PR runs. Develop pushes get a unique group via run_id.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   setup:
     name: Setup tests
@@ -29,10 +34,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
-          # nx affected needs history to resolve the base SHA
+          # nx affected needs history to resolve the base SHA, but not file contents
           fetch-depth: 0
+          filter: blob:none
 
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
@@ -81,13 +87,18 @@ jobs:
       - name: Get list of affected packages
         id: set-matrix
         run: |
-          if git diff --name-only "$NX_BASE" "$NX_HEAD" \
+          # --no-renames: rename detection would fetch blobs missing from the blobless clone
+          if git diff --name-only --no-renames "$NX_BASE" "$NX_HEAD" \
             | grep -qE '^\.github/(workflows/lint-and-test\.yml|scripts/changed-files-affect-storybook\.mjs)$'; then
             echo "CI configuration changed — selecting every project"
             PROJECTS=$(pnpm exec nx show projects --exclude @opencrvs/create-countryconfig --json)
           else
             PROJECTS=$(pnpm exec nx show projects --affected --exclude @opencrvs/create-countryconfig --json)
           fi
+          # The events tests build their databases from packages/migration. An nx
+          # implicit dependency would break checkouts without packages/migration
+          # (e.g. the e2e repo), so migration changes select events here instead.
+          PROJECTS=$(echo "$PROJECTS" | jq -c 'if index("@opencrvs/migration") then (. + ["@opencrvs/events"] | unique) else . end')
           PACKAGES=$(echo "$PROJECTS" | jq -c 'map("packages/" + ltrimstr("@opencrvs/"))')
           echo "Selected packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
@@ -181,7 +192,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -219,7 +230,7 @@ jobs:
 
       - name: Use Node.js from .nvmrc
         if: steps.check-scripts.outputs.skip != 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -309,13 +320,13 @@ jobs:
         working-directory: packages/countryconfig-template
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
@@ -385,16 +396,15 @@ jobs:
           NODE_ENV: production
         run: pnpm run build-storybook --webpack-stats-json
 
+      # upload-artifact took ~3 min to scan the tree. A tarball is fast and keeps file modes.
+      - name: Archive filesystem
+        run: tar --exclude=.git --exclude=node_modules --exclude=./.nx -cf "$RUNNER_TEMP/client.tar" .
+
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v7
         with:
           name: client
-          include-hidden-files: true
-          path: |
-            .
-            !**/.git
-            !**/node_modules
-            !.nx
+          path: ${{ runner.temp }}/client.tar
 
   lint-client:
     name: Lint client
@@ -406,13 +416,16 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -461,13 +474,16 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -506,19 +522,26 @@ jobs:
     name: Run storybook interaction tests
     needs: prepare-client-tests
     runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [1, 2]
 
     steps:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -527,9 +550,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        # Playwright is required since @storybook/test-runner depends on it
+        # @storybook/test-runner depends on Playwright and only runs Chromium by default
         working-directory: packages/client
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps chromium
 
       # `storybook-static/` is restored from the artifact built in
       # `prepare-client-tests`, so we don't need to build Storybook
@@ -540,7 +563,7 @@ jobs:
         run: |
           pnpm exec concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "pnpm exec http-server storybook-static --port 6006 --silent" \
-            "pnpm exec wait-on tcp:127.0.0.1:6006 && pnpm test-storybook"
+            "pnpm exec wait-on tcp:127.0.0.1:6006 && pnpm test-storybook --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}"
 
   test-client:
     name: Test client
@@ -556,13 +579,16 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: client
-          path: .
+          path: ${{ runner.temp }}
+
+      - name: Extract filesystem
+        run: tar -xf "$RUNNER_TEMP/client.tar"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -622,6 +648,9 @@ jobs:
           path: packages/events/.vitest-reports/*
           include-hidden-files: true
           retention-days: 1
+          # A re-run shard must replace its earlier report, or the coverage job
+          # can merge the stale one and fail on its errors again
+          overwrite: true
 
   events-coverage:
     name: Events test coverage
@@ -699,13 +728,13 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.base_ref }}
           path: base
 
       - name: Checkout the PR branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
           path: pr
@@ -716,7 +745,7 @@ jobs:
           package_json_file: pr/package.json
 
       - name: Use Node.js from .nvmrc from base branch
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: base/.nvmrc
 
@@ -725,7 +754,7 @@ jobs:
         working-directory: base
 
       - name: Use Node.js from .nvmrc from PR branch
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: pr/.nvmrc
 
@@ -769,13 +798,13 @@ jobs:
     if: github.event_name == 'pull_request' && contains(needs.setup.outputs.matrix, 'packages/toolkit')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm

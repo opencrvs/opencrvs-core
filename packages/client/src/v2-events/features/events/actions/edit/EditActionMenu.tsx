@@ -108,9 +108,12 @@ function EditActionModal({
   fields = [],
   eventConfiguration,
   declaration,
-  attachmentPath
+  attachmentPath,
+  event
 }: {
   attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   title: MessageDescriptor
   supportingCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
@@ -119,7 +122,7 @@ function EditActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
 
@@ -280,6 +283,7 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
@@ -319,6 +323,7 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
@@ -360,6 +365,7 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,

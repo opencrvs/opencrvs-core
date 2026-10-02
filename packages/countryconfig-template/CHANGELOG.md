@@ -50,7 +50,11 @@
 
   Existing records are not corrected — this affects only declarations filled in after the upgrade; re-indexing won't change stored `deathLocationId`, only a correction that re-saves the form will. Present since 2.0.0, so audit your data if embassy offices are in use.
 
-## 2.0.3 Release Candidate
+## 2.0.3
+
+### Bug fixes
+
+- Corrected the country translations; one country could not be selected at all. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 

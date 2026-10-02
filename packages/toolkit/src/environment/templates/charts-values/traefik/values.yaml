@@ -48,14 +48,14 @@ providers:
 service:
   enabled: true
   single: false
-  type: NodePort
+  spec:
+    type: ClusterIP
 
 ports:
   web:
     port: 8000
     hostPort: 80
     protocol: TCP
-    nodePort: 30080
     http:
       redirections:
         entryPoint:
@@ -67,7 +67,6 @@ ports:
     port: 8443
     hostPort: 443
     protocol: TCP
-    nodePort: 30443
     {{#if lets_encrypt}}
     http:
       tls:

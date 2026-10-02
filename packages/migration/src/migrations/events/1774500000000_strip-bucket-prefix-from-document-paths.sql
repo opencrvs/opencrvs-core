@@ -40,5 +40,4 @@ SET declaration = regexp_replace(
 WHERE declaration::text LIKE '%"/${MINIO_BUCKET}/%'
    OR annotation::text LIKE '%"/${MINIO_BUCKET}/%';
 
--- Down Migration
--- No-op
+-- One-way: which paths had the bucket prefix is not recorded, so it cannot be added back.

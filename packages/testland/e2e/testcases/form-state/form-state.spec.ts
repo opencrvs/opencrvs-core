@@ -15,11 +15,13 @@ import {
   drawSignature,
   getToken,
   goToSection,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  searchFromSearchBar
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   fillChildDetails,
+  formatV2ChildName,
   openBirthDeclaration,
   REQUIRED_VALIDATION_ERROR
 } from '@e2e/support/birth/helpers'
@@ -28,7 +30,7 @@ import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
-import { selectAction, type } from '@e2e/support/utils'
+import { ensureAssignedToUser, selectAction, type } from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
@@ -178,20 +180,21 @@ test.describe('Form state', () => {
       await login(page)
     })
 
-    test('Form changes in correction are persisted after reload', async () => {
-      const updatedMotherName = faker.person.firstName('female')
+    test('Open correction through Print action', async () => {
       expect(declaration).toBeDefined()
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration!,
-        CREDENTIALS.REGISTRAR
-      )
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Print')
+
       await selectRequesterType(page, 'Print and issue to Informant (Mother)')
       await continueForm(page)
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
       await page.getByRole('button', { name: 'No, make correction' }).click()
+    })
+
+    test('Select informant', async () => {
       await page.locator('#requester____type').click()
       await page.getByText('Informant (Mother)', { exact: true }).click()
 
@@ -206,6 +209,11 @@ test.describe('Form state', () => {
         .click()
 
       await page.getByRole('button', { name: 'Continue', exact: true }).click()
+    })
+
+    test('Form changes in correction are persisted after reload', async () => {
+      const updatedMotherName = faker.person.firstName('female')
+
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
       await page
@@ -220,14 +228,13 @@ test.describe('Form state', () => {
 
     test('Form states and annotations are not persisted', async () => {
       expect(declaration).toBeDefined()
-
       await page.goto(CLIENT_URL)
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration!,
-        CREDENTIALS.REGISTRAR
-      )
+
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Print')
+
       await selectRequesterType(page, 'Print and issue to someone else')
 
       await page.getByTestId('text__firstname').fill(faker.person.firstName())
