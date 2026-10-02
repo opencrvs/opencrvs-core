@@ -91,6 +91,9 @@ async function resetESServer() {
 // drop a full run leaves behind ~8MB per test, filling up the CI runner.
 let currentDb: string | null = null
 
+// Postgres error code for a connection terminated by an administrator command
+const ADMIN_SHUTDOWN = '57P01'
+
 function getClusterClient() {
   return new Client({
     connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/postgres`
@@ -134,7 +137,13 @@ async function resetPostgresServer() {
   await databaseInitializer.end()
 
   await resetEventsPostgresServer()
-  getPool(EVENTS_APP_POSTGRES_URI)
+  // DROP DATABASE ... WITH (FORCE) terminates connections a test left open.
+  // Without a listener the pool re-throws that as an uncaught error.
+  getPool(EVENTS_APP_POSTGRES_URI).on('error', (error) => {
+    if ((error as { code?: string }).code !== ADMIN_SHUTDOWN) {
+      throw error
+    }
+  })
 }
 
 beforeEach(async () => Promise.all([resetPostgresServer(), resetESServer()]))

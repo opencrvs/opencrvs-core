@@ -13,12 +13,11 @@ import { test, expect, type Page } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
-  fillRegisterDialogRequiredFields,
   formatName,
-  getRandomDate,
   goToSection,
   login,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  waitForActionResponses
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
@@ -288,9 +287,8 @@ test.describe.serial('1. Workqueue flow - 1', () => {
       await openRecordByTitle(page, formatName(declaration.child.name))
 
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-      await selectAction(page, 'Register')
-      await fillRegisterDialogRequiredFields(page)
-      await page.getByRole('button', { name: 'Confirm' }).click()
+
+      await triggerDeclarationAction(page, 'Register')
 
       await assertRecordInWorkqueue({
         page,
@@ -347,12 +345,18 @@ test.describe.serial('1. Workqueue flow - 1', () => {
         name: 'Yes, print certificate'
       })
       .click()
-    await page
-      .getByRole('button', {
-        name: 'Print',
-        exact: true
-      })
-      .click()
+
+    await waitForActionResponses(
+      page,
+      ['event.actions.printCertificate'],
+      async () =>
+        await page
+          .getByRole('button', {
+            name: 'Print',
+            exact: true
+          })
+          .click()
+    )
 
     await assertRecordInWorkqueue({
       page,

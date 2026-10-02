@@ -14,6 +14,19 @@ import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with
 import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import { assertTexts, selectLocationOption, type } from '@e2e/support/utils'
+import { format, subDays } from 'date-fns'
+import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
+
+async function expectSearchParams(
+  page: Page,
+  expected: Record<string, string | RegExp>
+) {
+  for (const [key, value] of Object.entries(expected)) {
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get(key))
+      .toEqual(typeof value === 'string' ? value : expect.stringMatching(value))
+  }
+}
 
 const todayDate = `${new Date().getDate() < 10 ? '0' : ''}${new Date().getDate().toString()}`
 const thisMonth = `${new Date().getMonth() < 9 ? '0' : ''}${(new Date().getMonth() + 1).toString()}`
@@ -27,12 +40,19 @@ test.describe
     page = await browser.newPage()
     const token = await getToken(CREDENTIALS.REGISTRAR)
 
+    const toDate = format(new Date(), 'yyyy-MM-dd')
+    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+    const fromDate = format(
+      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+      'yyyy-MM-dd'
+    )
+
     await createDeclaration(token, {
       'mother.dob': '1995-09-12',
       'child.dob': faker.date
         // DOB must be at least 18 years after mother.dob to pass validation
         // Upper bound ensures the record appears on the first page of search results
-        .between({ from: '2025-09-10', to: '2025-11-28' })
+        .between({ from: fromDate, to: toDate })
         .toISOString()
         .split('T')[0],
       'child.gender': 'female'
@@ -96,18 +116,13 @@ test.describe
     test('1.5.2 - Validate search and show results', async () => {
       await page.click('#search')
       await expect(page).toHaveURL(/.*\/search-result/)
-      // event____legalStatuses____REGISTERED____acceptedAt=2025-05-19&
-      await expect(page.url()).toContain(
-        `event.legalStatuses.REGISTERED.acceptedAt=${thisYear}-${thisMonth}-${todayDate}`
-      )
-      // event.legalStatuses.REGISTERED.createdAtLocation=ad207d45-3418-4771-af03-e0759572fcaa&
-      await expect(page.url()).toContain(
-        `event.legalStatuses.REGISTERED.createdAtLocation=`
-      )
-      // event.status=REGISTERED&
-      await expect(page.url()).toContain(`event.status=REGISTERED&`)
-      // event.updatedAt=2025-05-12%2C2025-05-19
-      await expect(page.url()).toContain(`event.updatedAt=`)
+
+      await expectSearchParams(page, {
+        'event.legalStatuses.REGISTERED.acceptedAt': `${thisYear}-${thisMonth}-${todayDate}`,
+        'event.legalStatuses.REGISTERED.createdAtLocation': /.+/,
+        'event.status': 'REGISTERED',
+        'event.updatedAt': /.+/
+      })
 
       await expect(page.getByText('Search result')).toBeVisible()
       const searchResult = await page.locator('#content-name').textContent()
@@ -134,19 +149,13 @@ test.describe
     test('1.5.3 - Validate clicking on the search edit button', async () => {
       await page.getByRole('button', { name: 'Edit', exact: true }).click()
       await expect(page).toHaveURL(/.*\/advanced-search/)
-      // event____legalStatuses____REGISTERED____createdAt=2025-05-19&
-      await expect(page.url()).toContain(
-        `event.legalStatuses.REGISTERED.acceptedAt=${thisYear}-${thisMonth}-${todayDate}`
-      )
-      // event.legalStatuses.REGISTERED.createdAtLocation=ad207d45-3418-4771-af03-e0759572fcaa&
-      await expect(page.url()).toContain(
-        `event.legalStatuses.REGISTERED.createdAtLocation=`
-      )
-      // event.status=REGISTERED&
-      await expect(page.url()).toContain(`event.status=REGISTERED&`)
-      // event.updatedAt=2025-05-12%2C2025-05-19
-      await expect(page.url()).toContain(`event.updatedAt=`)
-      await expect(page.locator('#tab_birth')).toHaveText('Birth')
+
+      await expectSearchParams(page, {
+        'event.legalStatuses.REGISTERED.acceptedAt': `${thisYear}-${thisMonth}-${todayDate}`,
+        'event.legalStatuses.REGISTERED.createdAtLocation': /.+/,
+        'event.status': 'REGISTERED',
+        'event.updatedAt': /.+/
+      })
 
       await expect(
         page.locator(

@@ -824,7 +824,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Reject')
       await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
+      const rejectResponse = page.waitForResponse(
+        (res) => res.url().includes('event.actions.reject') && res.ok()
+      )
+
       await page.getByRole('button', { name: 'Send For Update' }).click()
+
+      await rejectResponse
     })
 
     test('Navigate to event via search', async () => {
