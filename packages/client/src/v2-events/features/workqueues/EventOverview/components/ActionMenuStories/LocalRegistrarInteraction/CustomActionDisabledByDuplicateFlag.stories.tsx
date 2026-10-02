@@ -254,9 +254,15 @@ export const ApproveActionStateTransitions: StoryObj = {
         await userEvent.click(
           await canvas.findByRole('button', { name: 'Action' })
         )
-        await userEvent.click(
-          await canvas.findByText('Review potential duplicates')
+        // Enabled only once the record is downloaded and duplicates are
+        // fetched, which can land after Unassign appears
+        const reviewItem = await canvas.findByText(
+          'Review potential duplicates'
         )
+        await waitFor(async () => {
+          await expect(reviewItem.closest('li')).not.toHaveAttribute('disabled')
+        })
+        await userEvent.click(reviewItem)
 
         // On ReviewDuplicate page — click Not a duplicate
         await userEvent.click(
