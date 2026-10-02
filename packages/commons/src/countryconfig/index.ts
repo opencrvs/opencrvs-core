@@ -14,7 +14,7 @@ import { ActionTypes, EventConfig, EventDocument } from '../events'
 import { ZodOpenApiPathsObject } from 'zod-openapi'
 
 export const countryConfigApi: ZodOpenApiPathsObject = {
-  '/events': {
+  '/config/events': {
     get: {
       tags: ['Events'],
       description: 'Get event configurations',

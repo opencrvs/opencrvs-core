@@ -17,7 +17,7 @@ const document = createDocument({
   openapi: '3.1.0',
   info: {
     title: 'Countryconfig implementation requirements',
-    version: '2.0.0',
+    version: '2.1.0',
     description: 'Country specific configuration server for OpenCRVS'
   },
   paths: countryConfigApi
