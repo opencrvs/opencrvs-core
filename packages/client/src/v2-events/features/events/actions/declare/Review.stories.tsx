@@ -365,10 +365,10 @@ export const ReviewShowsFilesFromDraft: Story = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filePath*', (req) => {
-            return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-            })
+          tRPCMsw.event.file.getPresignedUrl.query(({ filePath }) => {
+            return {
+              presignedURL: `http://localhost:3535/ocrvs/${filePath}`
+            }
           }),
           http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
