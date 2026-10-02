@@ -362,6 +362,7 @@ const DESCRIPTIONS: Record<Outcome, string> = {
     'changed locally but not moved: the chart runs its own on-deploy script, port your changes there'
 }
 
+/*
 async function main(dockerSwarm = false) {
   const cwd = process.cwd()
   console.log('Moving infrastructure/ into assets/...\n')
@@ -446,3 +447,4 @@ async function main(dockerSwarm = false) {
 }
 
 export { main }
+*/

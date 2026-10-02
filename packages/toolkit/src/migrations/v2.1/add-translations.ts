@@ -141,6 +141,7 @@ async function listRefs() {
   }
 }
 
+/*
 async function main() {
   const cwd = process.cwd()
 
@@ -171,3 +172,4 @@ async function main() {
 }
 
 export { main }
+*/
