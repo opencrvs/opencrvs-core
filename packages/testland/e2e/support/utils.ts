@@ -213,6 +213,29 @@ export async function type(page: Page, locator: string, text: string) {
   await page.locator(locator).blur()
 }
 
+/**
+ * The client saves form edits to IndexedDB asynchronously, so reloading right
+ * after typing can lose them. Call this before `page.reload()`.
+ */
+export async function waitForLocalDraftToContain(page: Page, text: string) {
+  const readLocalDraft = () =>
+    page.evaluate(
+      () =>
+        new Promise<string>((resolve) => {
+          const db = indexedDB.open('OpenCRVS')
+          db.onsuccess = () => {
+            const draft = db.result
+              .transaction('keyvaluepairs')
+              .objectStore('keyvaluepairs')
+              .get('local-drafts')
+            draft.onsuccess = () => resolve(String(draft.result ?? ''))
+          }
+        })
+    )
+
+  await expect.poll(readLocalDraft).toContain(text)
+}
+
 export const assertTexts = async ({
   root,
   texts,
