@@ -111,7 +111,7 @@ jobs:
 
           claude_args: |
             --max-turns 70
-            --model claude-opus-4-8
+            --model claude-opus-5-5
             --allowedTools "Read,Grep,Glob,TodoWrite"
             --json-schema '{"type":"object","properties":{"findings":{"type":"array","items":{"type":"object","properties":{"file":{"type":"string"},"line":{"type":["integer","null"]},"severity":{"type":"string","enum":["critical","high","medium","low"]},"cwe":{"type":["string","null"]},"title":{"type":"string"},"explanation":{"type":"string"},"fix":{"type":"string"},"confidence":{"type":"string","enum":["high","medium","low"]}},"required":["file","severity","title","explanation","fix"]}}},"required":["findings"]}'
 
