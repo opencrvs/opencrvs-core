@@ -15,8 +15,7 @@
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
     "build:types": "tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
-    "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
-    "generate-db-schema": "bash src/tests/generate-db-schema.sh"
+    "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.17.0",
@@ -76,6 +75,7 @@
     "kanel-kysely": "^0.7.1",
     "kysely-codegen": "^0.18.5",
     "lint-staged": "^15.0.0",
+    "node-pg-migrate": "^8.0.3",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
     "testcontainers": "^10.15.0",
