@@ -71,7 +71,7 @@ jobs:
       # SHA of the last successful run of this workflow, so commits whose
       # run failed are re-included in the next run's affected set.
       - name: Derive SHAs for nx affected
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
         with:
           main-branch-name: develop
 

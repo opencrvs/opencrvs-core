@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { configDefaults, defineConfig } from 'vitest/config'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import { main as addE2ETests } from './add-e2e-tests'
+import { main as upgradeTilt } from './upgrade-tilt'
 
-export default defineConfig({
-  plugins: [tsconfigPaths()],
-  test: {
-    // Playwright e2e tests are run with `pnpm e2e`
-    exclude: [...configDefaults.exclude, 'e2e/**']
-  }
-})
+/**
+ * Run the v2.1 -> v2.2 upgrade process for the country config in the current
+ * working directory.
+ */
+export async function runUpgrade() {
+  await upgradeTilt()
+  await addE2ETests()
+}
