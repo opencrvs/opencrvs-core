@@ -10,7 +10,12 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 
-import { login, getToken, triggerDeclarationAction } from '@e2e/support/helpers'
+import {
+  login,
+  getToken,
+  triggerDeclarationAction,
+  waitForActionResponses
+} from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
@@ -63,7 +68,13 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
 
     await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
 
+    const rejectResponse = page.waitForResponse(
+      (res) => res.url().includes('event.actions.reject') && res.ok()
+    )
+
     await page.getByRole('button', { name: 'Send For Update' }).click()
+
+    await rejectResponse
   })
 
   test('4.1 Go to "Pending updates"-workqueue', async () => {

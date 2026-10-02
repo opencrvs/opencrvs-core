@@ -40,7 +40,8 @@ async function getEventById(eventId: string, token: string) {
 test('Correcting a birth with a verified parent ID creates the child UIN (#13734)', async ({
   page
 }) => {
-  test.setTimeout(180_000)
+  // Even the one line awaits expect this to take 120 seconds.
+  test.setTimeout(240_000)
   let token: string
   let declaration: Declaration
   let eventId: string
