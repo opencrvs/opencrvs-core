@@ -351,15 +351,12 @@ jobs:
       # run was started on, and take the target branch worked out above rather
       # than deriving it themselves.
       #
-      # countryconfig is not triggered: it now lives in this repository as
-      # packages/countryconfig-template, so the release branch above covers it.
-      #
-      # TODO: testland only cuts release branches on the 1.9.x line. Drop it
-      # from this list once this branch reaches develop.
+      # countryconfig and testland are not triggered: they now live in this
+      # repository as packages/countryconfig-template and packages/testland, so
+      # the release branch above covers them.
       - name: Trigger the companion workflows
         env:
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
-          TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
         run: |
           trigger() { # repo, token
             GH_TOKEN="$2" gh workflow run init-release.yml \
@@ -371,7 +368,6 @@ jobs:
           }
 
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
-          trigger opencrvs-testland "$TESTLAND_TOKEN"
 
       - name: Create the release branch in the e2e repo
         env:
