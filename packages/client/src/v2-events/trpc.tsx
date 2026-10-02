@@ -226,6 +226,18 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
   client: trpcClient
 })
 
+/**
+ * Drops unscoped `event.search` entries restored from IndexedDB, which would
+ * never be collected (gcTime is Infinity). Bumping CACHE_VERSION instead would
+ * also discard the offline outbox.
+ */
+export function purgeLegacySearchQueries(client: QueryClient) {
+  client.removeQueries({
+    queryKey: [['event', 'search']],
+    predicate: (query) => (query.queryKey[0] as string[]).length < 3
+  })
+}
+
 export function TRPCProvider({
   children,
   waitForClientRestored = true,
@@ -285,6 +297,8 @@ export function TRPCProvider({
         }
       }}
       onSuccess={async () => {
+        purgeLegacySearchQueries(queryClient)
+
         setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 

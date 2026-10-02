@@ -18,9 +18,9 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import {
   addLocalEventConfig,
   deleteLocalEvent,
-  setEventData,
   updateLocalEventIndex
 } from './api'
+import { searchKeys } from './procedures/search'
 
 describe('deleteLocalEvent', () => {
   const eventDocument = tennisClubMembershipEventDocument
@@ -38,26 +38,24 @@ describe('deleteLocalEvent', () => {
     queryClient.clear()
   })
 
-  it('clears event.get cache entry', async () => {
+  it('clears the event document and its by-id search entry', async () => {
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id }),
       eventDocument
     )
-
-    setEventData(eventDocument.id, eventDocument)
+    queryClient.setQueryData(searchKeys.byId(id), {
+      results: [{ id } as EventIndex],
+      total: 1
+    })
 
     await deleteLocalEvent(eventDocument)
 
     expect(
       queryClient.getQueryData(
-        trpcOptionsProxy.event.search.queryKey({
-          query: {
-            type: 'and',
-            clauses: [{ id }]
-          }
-        })
+        trpcOptionsProxy.event.get.queryKey({ eventId: id })
       )
     ).toBeUndefined()
+    expect(queryClient.getQueryData(searchKeys.byId(id))).toBeUndefined()
   })
 })
 
@@ -71,13 +69,14 @@ describe('updateLocalEventIndex', () => {
     queryClient.clear()
   })
 
-  it('preserves total count in cached queries after update', () => {
+  it('updates the row in a scoped workqueue entry and preserves its total', () => {
     const eventDocument = tennisClubMembershipEventDocument
 
     // Prepare a cached query simulating a workqueue result
-    const queryKey = trpcOptionsProxy.event.search.queryKey({
-      query: { type: 'and', clauses: [{ status: 'PENDING' }] }
-    })
+    const queryKey = searchKeys.workqueue(
+      { query: { type: 'and', clauses: [{ status: 'PENDING' }] } },
+      'recent'
+    )
 
     queryClient.setQueryData(queryKey, {
       total: 13,

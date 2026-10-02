@@ -28,6 +28,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
+import { isSearchRequestedAfter, searchKeys } from './procedures/search'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getQueryData<T extends DecorateQueryProcedure<any>>(
@@ -51,7 +52,7 @@ export function addUserToQueryData(user: User) {
   )
 }
 
-async function invalidateWorkqueues() {
+async function invalidateWorkqueueCounts() {
   await queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.workqueue.count.queryKey()
   })
@@ -106,15 +107,10 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
 }
 
 function setLocalEventIndexById(id: string, eventIndex: EventIndex) {
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    }),
-    () => ({ results: [eventIndex], total: 1 })
-  )
+  queryClient.setQueryData(searchKeys.byId(id), () => ({
+    results: [eventIndex],
+    total: 1
+  }))
 }
 
 /**
@@ -239,45 +235,55 @@ export function setEventData(id: string, data: EventDocument) {
 
 export async function refetchSearchQuery(eventId: string) {
   await queryClient.refetchQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: eventId }]
-      }
-    })
+    queryKey: searchKeys.filters.byId(eventId)
   })
 }
-export async function refetchAllSearchQueries() {
-  /*
-   * Invalidate search queries
-   */
-  await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
-      return queryClient.refetchQueries({
-        queryKey
-      })
+
+/**
+ * Refreshes the workqueues after a workqueue-affecting write, alongside
+ * `refreshById`. Every workqueue search is marked out of date and the mounted
+ * ones refetch, in parallel with the counts, so the refresh costs one round
+ * trip. Unmounted queues refresh on next mount.
+ */
+async function refetchWorkqueueSearchQueries(
+  refreshById: () => Promise<unknown>
+) {
+  await Promise.all([
+    refreshById(),
+    invalidateWorkqueueCounts(),
+    queryClient.invalidateQueries({
+      queryKey: searchKeys.filters.allWorkqueues()
     })
+  ])
+}
+
+/** Standard refresh path for a workqueue-affecting write. */
+async function refetchAffectedSearchQueries(...eventIds: string[]) {
+  await refetchWorkqueueSearchQueries(async () =>
+    Promise.all(eventIds.map(refetchSearchQuery))
   )
+}
+
+/** True if a search of workqueue `slug` went out after search request `after`. */
+export function isWorkqueueRequestedAfter(slug: string, after: number) {
+  return queryClient
+    .getQueryCache()
+    .findAll({ queryKey: searchKeys.filters.workqueue(slug) })
+    .some(({ queryHash }) => isSearchRequestedAfter(queryHash, after))
 }
 
 /**
  * Invalidate search queries for a specific workqueue identified by its slug.
- * Queries are tagged with { workqueueSlug } in meta by useWorkqueue → getResult.
+ * Queries are keyed under the ['workqueue', slug] scope via searchKeys.workqueue.
  *
  * For active observers (workqueue page mounted) this triggers an immediate
  * background refetch. For inactive queries it marks them stale so the next
  * mount fetches fresh data — no unnecessary network requests are fired.
  */
 export async function invalidateWorkqueueSearchQueries(slug: string) {
-  const queries = queryClient.getQueryCache().findAll({
-    queryKey: trpcOptionsProxy.event.search.queryKey(),
-    predicate: (query) => query.meta?.workqueueSlug === slug
+  await queryClient.invalidateQueries({
+    queryKey: searchKeys.filters.workqueue(slug)
   })
-  await Promise.all(
-    queries.map(async (query) =>
-      queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
-    )
-  )
 }
 
 async function deleteEventData(updatedEvent: EventDocument) {
@@ -296,26 +302,22 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
   await Promise.all([
-    queryClient.resetQueries({
-      queryKey: trpcOptionsProxy.event.search.queryKey({
-        query: {
-          type: 'and',
-          clauses: [{ id }]
-        }
-      })
-    }),
+    queryClient.resetQueries({ queryKey: searchKeys.filters.byId(id) }),
     removeCachedFiles(updatedEvent)
   ])
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
-  await deleteEventData(updatedEvent)
-  await Promise.all([invalidateWorkqueues(), refetchAllSearchQueries()])
+  await refetchWorkqueueSearchQueries(async () => deleteEventData(updatedEvent))
 }
 
-export async function onMarkNotDuplicate(data: EventDocument) {
-  setEventData(data.id, data)
-  await refetchSearchQuery(data.id)
+/**
+ * The record stays assigned after MARK_AS_NOT_DUPLICATE, so its local document
+ * is patched in place rather than evicted, keeping it available offline.
+ */
+export async function onMarkNotDuplicate(updatedEvent: EventDocument) {
+  setEventData(updatedEvent.id, updatedEvent)
+  await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
 /**
@@ -355,21 +357,12 @@ export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
     actions: localActions.concat(updatedEvent.actions)
   })
 
-  /*
-   * Nothing below refreshes the workqueue rows: `invalidateWorkqueues` only
-   * invalidates `workqueue.count` and `refetchSearchQuery` only the by-id
-   * entry, while the count-diff (procedures/count.ts) never fires for an
-   * assignment, which moves no record between workqueues.
-   */
   setLocalEventIndexAssignment(
     updatedEvent.id,
     lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
   )
 
-  await Promise.all([
-    invalidateWorkqueues(),
-    refetchSearchQuery(updatedEvent.id)
-  ])
+  await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
 export async function refetchDraftsList() {
@@ -382,11 +375,6 @@ export async function cleanUpOnUnassign(
   updatedEvent: EventDocumentOnlyLastAction
 ) {
   // If unassign is performed when it's assigned someone else, user does not necessarily have the event.get cached.
-  await deleteEventData(updatedEvent)
-  // Assuming unassign needs to be done online, we'll just refetch the query.
   // NOTE: local event cannot be used to recreate EventIndex cache. Record might be sealed, which causes inconsistencies in UI.
-  await Promise.all([
-    refetchSearchQuery(updatedEvent.id),
-    invalidateWorkqueues()
-  ])
+  await deleteLocalEvent(updatedEvent)
 }
