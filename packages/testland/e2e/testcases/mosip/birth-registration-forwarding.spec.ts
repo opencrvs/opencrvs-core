@@ -12,7 +12,7 @@ import { expect, test } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { omit } from 'lodash'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
-import { getToken, login } from '@e2e/support/helpers'
+import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
 import {
   createDeclaration,
   getDeclaration
@@ -22,6 +22,8 @@ import {
   selectCertificationType,
   selectRequesterType
 } from '@e2e/support/print-certificate/birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 
 async function getEventById(eventId: string, token: string) {
   const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
@@ -95,12 +97,11 @@ test('Birth registration forwarding to MOSIP attributes the certificate to the r
   })
 
   await test.step('open the birth certificate preview', async () => {
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await navigateToCertificatePrintAction(
-      page,
-      declaration,
-      CREDENTIALS.REGISTRAR
-    )
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await selectAction(page, 'Print')
+
     await selectCertificationType(page, 'Birth Certificate')
     await selectRequesterType(page, 'Print and issue to Informant (Mother)')
     await page.getByRole('button', { name: 'Continue' }).click()

@@ -115,6 +115,12 @@ test('Cleared field values are removed after editing and re-notifying a declarat
     // reopen it directly via the URL captured earlier.
     await page.goto(recordUrl)
 
+    const searchResponse = page.waitForResponse(
+      (res) => res.url().includes('event.search') && res.ok()
+    )
+
+    await searchResponse
+
     await expect(page.getByLabel('Assign record')).toBeVisible()
     await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
     await switchEventTab(page, 'Record')

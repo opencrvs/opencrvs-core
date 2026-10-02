@@ -46,7 +46,14 @@ test('Rejecting a death declaration clears the Validated flag', async ({
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR, { timeout: 15_000 })
     await selectAction(page, 'Reject')
     await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
+
+    const rejectResponse = page.waitForResponse(
+      (res) => res.url().includes('event.actions.reject') && res.ok()
+    )
+
     await page.getByRole('button', { name: 'Send For Update' }).click()
+
+    await rejectResponse
   })
 
   await test.step('Rejected record shows Rejected but no longer Validated', async () => {
