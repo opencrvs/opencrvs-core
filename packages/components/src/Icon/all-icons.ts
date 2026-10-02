@@ -23,6 +23,7 @@ export {
   CaretDown,
   CaretLeft,
   CaretRight,
+  CaretUp,
   ChartBar,
   ChartLine,
   ChatCircle,

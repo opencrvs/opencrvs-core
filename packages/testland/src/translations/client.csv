@@ -1145,6 +1145,29 @@ userSetup.type.system,The description for system type,System,Système
 userSetup.waiting,The message that displays when the user is waiting for the account to be created,Setting up your account,Configuration de votre compte
 v2.event.record.offline.description,Message shown on the Record page when the user is offline and the record has not been cached locally,This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.,Cet enregistrement n’a pas encore été téléchargé et ne peut donc pas être ouvert hors ligne. Veuillez vous reconnecter à Internet pour le consulter.
 v2.event.record.offline.title,Title shown on the Record page when the user is offline,No connection,Pas de connexion
+v2.event.record.title,Heading of the card on the Record tab,Record,
+v2.event.record.version.about.declaration,"What the declaration form is, in the record version menu","The informant's signed statement, with supporting documents",
+v2.event.record.version.about.notification,"What the notification form is, in the record version menu","The first report of the event, from a health facility",
+v2.event.record.version.about.registration,"What the registration form is, in the record version menu",The legal record of the event,
+v2.event.record.version.by.corrected,Provenance of a corrected registration version,"{name, select, __UNKNOWN__ {Corrected {date}} other {Corrected {date} · {name}}}",
+v2.event.record.version.by.declared,Provenance of a declaration version,"{name, select, __UNKNOWN__ {Declared {date}} other {Declared {date} · {name}}}",
+v2.event.record.version.by.edited,Provenance of an edited declaration version,"{name, select, __UNKNOWN__ {Edited {date}} other {Edited {date} · {name}}}",
+v2.event.record.version.by.registered,Provenance of a registration version,"{name, select, __UNKNOWN__ {Registered {date}} other {Registered {date} · {name}}}",
+v2.event.record.version.by.sent,Provenance of a notification version,"{name, select, __UNKNOWN__ {Sent {date}} other {Sent {date} · {name}}}",
+v2.event.record.version.count,Summary line on a collapsed form: how many versions it holds and when it opened,"{count, plural, one {# version} other {# versions}} · {opened}",
+v2.event.record.version.form.declaration,Name of the declaration form in the record version menu,Declaration,
+v2.event.record.version.form.notification,Name of the notification form in the record version menu,Notification,
+v2.event.record.version.form.registration,Name of the registration form in the record version menu,Registration,
+v2.event.record.version.label.afterCorrection,A registration version between the first and the latest,After correction {number},
+v2.event.record.version.label.afterEdit,A declaration version between the first and the latest,After edit {number},
+v2.event.record.version.label.firstDeclared,The oldest version of the declaration form,As first declared,
+v2.event.record.version.label.firstNotified,The oldest version of the notification form,As first notified,
+v2.event.record.version.label.firstRegistered,The oldest version of the registration form,As first registered,
+v2.event.record.version.label.latest,"The newest version of a form, in the record version menu",Latest,
+v2.event.record.version.opened.declared,"When a declaration form opened, for the summary line",declared {date},
+v2.event.record.version.opened.notified,"When a notification form opened, for the summary line",sent {date},
+v2.event.record.version.opened.registered,"When a registration form opened, for the summary line",registered {date},
+v2.event.record.version.trigger,"Prefix on the record version selector, before the selected version",Version:,
 v2.suspense.offline.description,Message shown when a screen cannot load because the user is offline and the data has not been cached locally,"This content has not been downloaded yet, so it cannot be shown offline. It will load automatically once you are back online.",Ce contenu n’a pas encore été téléchargé et ne peut donc pas être affiché hors ligne. Il se chargera automatiquement une fois que vous serez de nouveau en ligne.
 v2.suspense.offline.title,Title shown on a loading screen when the user is offline,No connection,Pas de connexion
 validations.phoneNumberFormat,The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11,Must be a valid 10 digit number that starts with 0(7|9),Doit être un nombre valide de  {num} chiffres qui commence par  {start}
