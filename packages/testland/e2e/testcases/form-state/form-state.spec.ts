@@ -31,7 +31,12 @@ import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
-import { ensureAssignedToUser, selectAction, type } from '@e2e/support/utils'
+import {
+  ensureAssignedToUser,
+  selectAction,
+  type,
+  waitForLocalDraftToContain
+} from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
@@ -225,6 +230,7 @@ test.describe('Form state', () => {
       await continueForm(page)
       await page.getByTestId('change-button-mother.name').click()
       await type(page, '#firstname', updatedMotherName)
+      await waitForLocalDraftToContain(page, updatedMotherName)
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue(updatedMotherName)
     })
@@ -288,6 +294,7 @@ test.describe('Form state', () => {
     })
 
     test('refresh the page and verify fields are populated', async () => {
+      await waitForLocalDraftToContain(page, 'bar')
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue('foo')
       await expect(page.locator('#surname')).toHaveValue('bar')
