@@ -258,7 +258,7 @@ async function refetchWorkqueueSearchQueries(
 }
 
 /** Standard refresh path for a workqueue-affecting write. */
-export async function refetchAffectedSearchQueries(...eventIds: string[]) {
+async function refetchAffectedSearchQueries(...eventIds: string[]) {
   await refetchWorkqueueSearchQueries(async () =>
     Promise.all(eventIds.map(refetchSearchQuery))
   )
