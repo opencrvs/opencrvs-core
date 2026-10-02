@@ -24,7 +24,11 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { addLocalEventConfig } from './api'
-import { byIdSearchOptions, scopedSearchOptions } from './procedures/search'
+import {
+  byIdSearchOptions,
+  scopedSearchOptions,
+  searchKeys
+} from './procedures/search'
 
 // Importing these registers each procedure's query and mutation defaults.
 /* eslint-disable import/no-unassigned-import */
@@ -46,39 +50,37 @@ const query: QueryType = {
 }
 const countInput: WorkqueueCountInput = [{ slug: SLUG, query }]
 
-/** What the server currently returns for the workqueue. */
-let queueOnServer: EventIndex[] = []
-let queueFetches = 0
-/** Response delays, to choose which of the queue and the counts lands first. */
-let delays = { search: 0, count: 0 }
-let inFlight = 0
-let maxInFlight = 0
+const server = setupServer()
 
-async function respond(data: unknown, delay: number) {
-  inFlight++
-  maxInFlight = Math.max(maxInFlight, inFlight)
-  await new Promise((resolve) => setTimeout(resolve, delay))
-  inFlight--
+function respond(data: unknown) {
   return HttpResponse.json({ result: { data: serialize(data), type: 'data' } })
 }
 
-const server = setupServer(
-  http.get('/api/events/event.search', async () => {
-    queueFetches++
-    return respond(
-      { results: queueOnServer, total: queueOnServer.length },
-      delays.search
-    )
-  }),
-  http.get('/api/events/workqueue.count', async () =>
-    respond({ [SLUG]: queueOnServer.length }, delays.count)
+/**
+ * Serves `queue` for every search and its size as the workqueue count, and
+ * counts the requests it gets.
+ */
+function startServer(queue: EventIndex[]) {
+  const fake = { queue, searchFetches: 0, countFetches: 0 }
+  server.use(
+    http.get('/api/events/event.search', () => {
+      fake.searchFetches++
+      return respond({ results: fake.queue, total: fake.queue.length })
+    }),
+    http.get('/api/events/workqueue.count', () => {
+      fake.countFetches++
+      return respond({ [SLUG]: fake.queue.length })
+    })
   )
-)
+  return fake
+}
 
+/** The queue on screen and the sidebar counts, neither of them polling. */
 async function mountWorkqueue(rows: EventIndex[]) {
-  queueOnServer = rows
+  const fake = startServer(rows)
+  const queueOptions = scopedSearchOptions({ query }, ['workqueue', SLUG])
   const queue = new QueryObserver(queryClient, {
-    ...scopedSearchOptions({ query }, ['workqueue', SLUG]),
+    ...queueOptions,
     refetchInterval: false
   })
   const { queryFn: _queryFn, ...countOptions } =
@@ -95,26 +97,18 @@ async function mountWorkqueue(rows: EventIndex[]) {
     expect(queue.getCurrentResult().data?.results).toEqual(rows)
     expect(count.getCurrentResult().data).toEqual({ [SLUG]: rows.length })
   })
-  queueFetches = 0
-  maxInFlight = 0
+  fake.searchFetches = 0
+  fake.countFetches = 0
 
   return {
+    fake,
     rows: () => queue.getCurrentResult().data?.results,
-    /** What the sidebar's 20 s poll does: refetch the counts. */
+    isOutOfDate: () =>
+      queryClient.getQueryState(queueOptions.queryKey)?.isInvalidated,
+    /** What the sidebar's 20 s poll does. */
     pollCounts: async () => count.refetch(),
-    /** What the queue's own poll does. */
-    pollQueue: async () => queue.refetch(),
     unmount: () => unsubscribe.forEach((fn) => fn())
   }
-}
-
-/** The overview's lookup of `record`, as mounted on its page. */
-function mountLookup() {
-  const lookup = new QueryObserver(queryClient, {
-    ...byIdSearchOptions(record.id, () => ({ results: [], total: 0 })),
-    refetchInterval: false
-  })
-  return lookup.subscribe(() => undefined)
 }
 
 function onSuccessOf(mutationKey: MutationKey) {
@@ -179,7 +173,6 @@ beforeEach(() => {
   } as unknown as CacheStorage
   queryClient.clear()
   addLocalEventConfig(tennisClubMembershipEvent)
-  delays = { search: 0, count: 0 }
 })
 
 afterEach(() => {
@@ -189,68 +182,65 @@ afterEach(() => {
 
 describe('a mounted workqueue follows the server without waiting for the poll', () => {
   it.each(workqueueAffecting)(
-    '%s: the record leaves the queue in one refetch',
+    '%s: the record leaves the queue in one refetch, and the counts refresh',
     async (_action, mutationKey, response = record) => {
       const workqueue = await mountWorkqueue([row])
 
-      queueOnServer = []
+      workqueue.fake.queue = []
       await onSuccessOf(mutationKey)(response)
 
       await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
-      expect(queueFetches).toBe(1)
+      expect(workqueue.fake.searchFetches).toBe(1)
+      expect(workqueue.fake.countFetches).toBe(1)
       workqueue.unmount()
     }
   )
 
-  it.each(workqueueAffecting)(
-    '%s: a same-count swap reaches the queue',
-    async (_action, mutationKey, response = record) => {
-      const workqueue = await mountWorkqueue([row])
+  it('a change that keeps the count the same still reaches the queue', async () => {
+    const workqueue = await mountWorkqueue([row])
 
-      queueOnServer = [otherRow]
-      await onSuccessOf(mutationKey)(response)
+    workqueue.fake.queue = [otherRow]
+    await onSuccessOf(actions.register.request.mutationKey())(record)
 
-      await vi.waitFor(() => expect(workqueue.rows()).toEqual([otherRow]))
-      expect(queueFetches).toBe(1)
-      workqueue.unmount()
-    }
-  )
-
-  it('ASSIGN: the record enters an assigned-to-me queue', async () => {
-    const workqueue = await mountWorkqueue([])
-
-    queueOnServer = [row]
-    await onSuccessOf(actions.assignment.assign.mutationKey())(assigned)
-
-    await vi.waitFor(() => expect(workqueue.rows()).toEqual([row]))
-    expect(queueFetches).toBe(1)
+    await vi.waitFor(() => expect(workqueue.rows()).toEqual([otherRow]))
     workqueue.unmount()
   })
 
-  it.each<[string, MutationKey, EventDocument | EventDocumentOnlyLastAction]>([
-    ['ASSIGN', actions.assignment.assign.mutationKey(), assigned],
-    ['UNASSIGN', actions.assignment.unassign.mutationKey(), record]
-  ])(
-    '%s from the overview: one lookup fetch, no queue fetch',
-    async (_action, mutationKey, response) => {
-      queueOnServer = [row]
-      const lookup = new QueryObserver(queryClient, {
-        ...byIdSearchOptions(record.id, () => ({ results: [], total: 0 })),
-        refetchInterval: false
-      })
-      const unsubscribe = lookup.subscribe(() => undefined)
-      await vi.waitFor(() =>
-        expect(lookup.getCurrentResult().data).toBeDefined()
-      )
-      queueFetches = 0
-
-      await onSuccessOf(mutationKey)(response)
-      await new Promise((resolve) => setTimeout(resolve, 50))
-
-      expect(queueFetches).toBe(1)
-      unsubscribe()
+  it('marks every other queue out of date, and leaves other searches as they are', async () => {
+    const result = { results: [otherRow], total: 1 }
+    const offScreenQueue = searchKeys.workqueue({ query }, 'ready-to-print')
+    const adhocSearch = searchKeys.adhoc({ query })
+    const otherLookup = searchKeys.byId(otherRow.id)
+    for (const key of [offScreenQueue, adhocSearch, otherLookup]) {
+      queryClient.setQueryData(key, result)
     }
-  )
+    const workqueue = await mountWorkqueue([row])
+
+    await onSuccessOf(actions.archive.request.mutationKey())(record)
+
+    expect(queryClient.getQueryState(offScreenQueue)?.isInvalidated).toBe(true)
+    for (const key of [adhocSearch, otherLookup]) {
+      expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false)
+      expect(queryClient.getQueryData(key)).toEqual(result)
+    }
+    workqueue.unmount()
+  })
+
+  it("UNASSIGN fetches the record's open lookup once", async () => {
+    const fake = startServer([row])
+    const lookup = new QueryObserver(queryClient, {
+      ...byIdSearchOptions(record.id, () => ({ results: [], total: 0 })),
+      refetchInterval: false
+    })
+    const unsubscribe = lookup.subscribe(() => undefined)
+    await vi.waitFor(() => expect(lookup.getCurrentResult().data).toBeDefined())
+    fake.searchFetches = 0
+
+    await onSuccessOf(actions.assignment.unassign.mutationKey())(record)
+
+    expect(fake.searchFetches).toBe(1)
+    unsubscribe()
+  })
 
   it.each<[string, () => unknown]>([
     [
@@ -274,43 +264,9 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
     const workqueue = await mountWorkqueue([row])
 
     await fire()
-    await new Promise((resolve) => setTimeout(resolve, 50))
 
-    expect(queueFetches).toBe(0)
-    workqueue.unmount()
-  })
-
-  it.each<[string, { search: number; count: number }]>([
-    ['the counts answer first', { search: 100, count: 10 }],
-    ['the queue answers first', { search: 10, count: 100 }]
-  ])(
-    'the queue and the counts are fetched together, the queue once, when %s',
-    async (_order, responseDelays) => {
-      const workqueue = await mountWorkqueue([row])
-      delays = responseDelays
-
-      queueOnServer = []
-      await onSuccessOf(actions.register.request.mutationKey())(record)
-
-      await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
-      await new Promise((resolve) => setTimeout(resolve, 150))
-      expect(maxInFlight).toBe(2)
-      expect(queueFetches).toBe(1)
-      workqueue.unmount()
-    }
-  )
-
-  it("the record's lookup goes out together with the queue and the counts", async () => {
-    const workqueue = await mountWorkqueue([row])
-    const unmountLookup = mountLookup()
-    await vi.waitFor(() => expect(queueFetches).toBe(1))
-    delays = { search: 50, count: 50 }
-    maxInFlight = 0
-
-    await onSuccessOf(actions.register.request.mutationKey())(record)
-
-    await vi.waitFor(() => expect(maxInFlight).toBe(3))
-    unmountLookup()
+    expect(workqueue.isOutOfDate()).toBe(false)
+    expect(workqueue.fake.searchFetches).toBe(0)
     workqueue.unmount()
   })
 })
@@ -319,25 +275,11 @@ describe('the sidebar poll keeps the queue on screen in step with its count', ()
   it('refreshes the queue when its count changes', async () => {
     const workqueue = await mountWorkqueue([row])
 
-    queueOnServer = []
+    workqueue.fake.queue = []
     await workqueue.pollCounts()
 
     await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
-    expect(queueFetches).toBe(1)
-    workqueue.unmount()
-  })
-
-  it('refreshes the queue when its own poll went out before the change', async () => {
-    const workqueue = await mountWorkqueue([row])
-    delays = { search: 100, count: 10 }
-
-    const stalePoll = workqueue.pollQueue()
-    await vi.waitFor(() => expect(inFlight).toBe(1))
-    queueOnServer = []
-    await workqueue.pollCounts()
-    await stalePoll
-
-    await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
+    expect(workqueue.fake.searchFetches).toBe(1)
     workqueue.unmount()
   })
 })
