@@ -92,7 +92,7 @@ export function isSearchRequestedAfter(queryHash: string, after: number) {
  * key would call `event.search.workqueue.<slug>`. This rebuilds the unscoped
  * key before delegating to tRPC.
  */
-async function fetchScopedSearch(ctx: QueryFunctionContext) {
+function fetchScopedSearch(ctx: QueryFunctionContext) {
   lastRequestByQuery.set(hashKey(ctx.queryKey), ++searchRequests)
   // The {input, type} element is always present for event.search keys.
   const { input } = ctx.queryKey[1] as { input: SearchInput }
