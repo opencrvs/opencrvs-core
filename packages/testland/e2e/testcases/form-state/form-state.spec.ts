@@ -15,7 +15,8 @@ import {
   drawSignature,
   getToken,
   goToSection,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  waitForActionResponses
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
@@ -28,7 +29,11 @@ import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
-import { selectAction, type } from '@e2e/support/utils'
+import {
+  selectAction,
+  type,
+  waitForLocalDraftToContain
+} from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
@@ -113,7 +118,9 @@ test.describe('Form state', () => {
       actionableEventChildName = await fillChildDetails(page)
 
       await page.getByRole('button', { name: 'Save & Exit' }).click()
-      await page.getByRole('button', { name: 'Confirm' }).click()
+      await waitForActionResponses(page, ['event.draft.create'], () =>
+        page.getByRole('button', { name: 'Confirm' }).click()
+      )
 
       // Now create another draft and fill in more details, incl. annotation
       await openBirthDeclaration(page)
@@ -214,6 +221,7 @@ test.describe('Form state', () => {
       await continueForm(page)
       await page.getByTestId('change-button-mother.name').click()
       await type(page, '#firstname', updatedMotherName)
+      await waitForLocalDraftToContain(page, updatedMotherName)
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue(updatedMotherName)
     })
@@ -278,6 +286,7 @@ test.describe('Form state', () => {
     })
 
     test('refresh the page and verify fields are populated', async () => {
+      await waitForLocalDraftToContain(page, 'bar')
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue('foo')
       await expect(page.locator('#surname')).toHaveValue('bar')
