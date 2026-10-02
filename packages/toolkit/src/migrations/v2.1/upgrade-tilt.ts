@@ -185,7 +185,7 @@ export function upgradeTilt(cwd: string, templateDir: string) {
   }
 }
 
-/* async function main() {
+async function main() {
   console.log('Upgrading the local Tilt setup...\n')
 
   upgradeTilt(process.cwd(), findTemplateDir())
@@ -196,4 +196,3 @@ export function upgradeTilt(cwd: string, templateDir: string) {
 }
 
 export { main }
-*/
