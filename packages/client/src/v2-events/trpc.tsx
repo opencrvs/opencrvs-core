@@ -204,7 +204,8 @@ function throttlePersister(persister: Persister): Persister {
   )
 
   // If tab is about to be closed, persist immediately.
-  window.addEventListener('pagehide', () => persistThrottled.flush())
+  //
+  window.addEventListener('pagehide', async () => persistThrottled.flush())
 
   return {
     ...persister,
