@@ -14,6 +14,7 @@ import { formatName, login } from '@e2e/support/helpers'
 import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 import { faker } from '@faker-js/faker'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe.serial('Can Open Draft offline', () => {
   let page: Page
@@ -30,7 +31,7 @@ test.describe.serial('Can Open Draft offline', () => {
   })
 
   test('Login', async () => {
-    await login(page)
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL_OTHER)
     await expect(page.getByText('Farajaland CRS')).toBeVisible({
       timeout: 30000
     })
@@ -56,6 +57,9 @@ test.describe.serial('Can Open Draft offline', () => {
   })
 
   test('Open the draft offline', async () => {
+    // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
+    // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
+    await page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
     await page.getByRole('button', { name: 'Drafts' }).click()
     await expect(page.locator('#content-name')).toHaveText('Drafts')
