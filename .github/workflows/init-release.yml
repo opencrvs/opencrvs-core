@@ -351,11 +351,13 @@ jobs:
       # run was started on, and take the target branch worked out above rather
       # than deriving it themselves.
       #
-      # TODO: countryconfig and testland only cut release branches on the 1.9.x
-      # line. Drop them from this list once this branch reaches develop.
+      # countryconfig is not triggered: it now lives in this repository as
+      # packages/countryconfig-template, so the release branch above covers it.
+      #
+      # TODO: testland only cuts release branches on the 1.9.x line. Drop it
+      # from this list once this branch reaches develop.
       - name: Trigger the companion workflows
         env:
-          COUNTRYCONFIG_TOKEN: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
           TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
         run: |
@@ -368,7 +370,6 @@ jobs:
             echo "Triggered init-release in $1"
           }
 
-          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN"
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
           trigger opencrvs-testland "$TESTLAND_TOKEN"
 
