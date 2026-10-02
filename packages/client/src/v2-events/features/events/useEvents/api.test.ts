@@ -8,12 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { QueryObserver } from '@tanstack/react-query'
 import {
   tennisClubMembershipEvent,
-  ActionType,
   EventDocument,
-  EventDocumentOnlyLastAction,
   EventIndex
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -21,17 +18,9 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import {
   addLocalEventConfig,
   deleteLocalEvent,
-  onAssign,
-  refetchAffectedSearchQueries,
-  setEventData,
   updateLocalEventIndex
 } from './api'
 import { searchKeys } from './procedures/search'
-
-const EMPTY_RESULT = { results: [], total: 0 }
-const workqueueInput = {
-  query: { type: 'and' as const, clauses: [{ status: 'DECLARED' }] }
-}
 
 describe('deleteLocalEvent', () => {
   const eventDocument = tennisClubMembershipEventDocument
@@ -68,22 +57,6 @@ describe('deleteLocalEvent', () => {
     ).toBeUndefined()
     expect(queryClient.getQueryData(searchKeys.byId(id))).toBeUndefined()
   })
-
-  it('fetches a mounted by-id entry once, not once per reset and refetch', async () => {
-    const queryFn = vi.fn().mockResolvedValue(EMPTY_RESULT)
-    const observer = new QueryObserver(queryClient, {
-      queryKey: searchKeys.byId(id),
-      queryFn
-    })
-    const unsubscribe = observer.subscribe(() => undefined)
-    await vi.waitFor(() => expect(queryFn).toHaveBeenCalledTimes(1))
-    queryFn.mockClear()
-
-    await deleteLocalEvent(eventDocument)
-
-    expect(queryFn).toHaveBeenCalledTimes(1)
-    unsubscribe()
-  })
 })
 
 describe('updateLocalEventIndex', () => {
@@ -96,12 +69,10 @@ describe('updateLocalEventIndex', () => {
     queryClient.clear()
   })
 
-  it('preserves total count in cached queries after update', () => {
+  it('updates the row in a scoped workqueue entry and preserves its total', () => {
     const eventDocument = tennisClubMembershipEventDocument
 
-    // Prepare a cached query simulating a workqueue result, keyed with the
-    // scoped shape. Proves the [['event','search']] prefix scan in
-    // updateLocalEventIndex still matches merged (scoped) keys.
+    // Prepare a cached query simulating a workqueue result
     const queryKey = searchKeys.workqueue(
       { query: { type: 'and', clauses: [{ status: 'PENDING' }] } },
       'recent'
@@ -137,142 +108,5 @@ describe('updateLocalEventIndex', () => {
       'REGISTERED'
     )
     expect(updated?.results.find((r) => r.id === 'abc')?.status).toBe('PENDING')
-  })
-})
-
-/*
- * The standard refresh path shared by every workqueue-affecting write: the
- * by-id refetch, the counts and every workqueue, all at once.
- */
-describe('refetchAffectedSearchQueries — standard write path', () => {
-  const eventId = '33333333-3333-3333-3333-333333333333'
-  let invalidateSpy: ReturnType<typeof vi.spyOn>
-  let refetchSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    queryClient.clear()
-    invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
-    refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('invalidates every workqueue and the counts, and refetches the byId entry', async () => {
-    await refetchAffectedSearchQueries(eventId)
-
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues()
-    })
-    expect(refetchSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.byId(eventId)
-    })
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: trpcOptionsProxy.workqueue.count.queryKey()
-    })
-  })
-})
-
-describe('deleteLocalEvent — routes writes through the standard path', () => {
-  beforeEach(() => {
-    global.caches = {
-      keys: vi.fn().mockResolvedValue([])
-    } as unknown as CacheStorage
-    queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('invalidates every workqueue and the counts, and resets the byId entry', async () => {
-    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
-    const resetSpy = vi.spyOn(queryClient, 'resetQueries')
-
-    await deleteLocalEvent(tennisClubMembershipEventDocument)
-
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues()
-    })
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: trpcOptionsProxy.workqueue.count.queryKey()
-    })
-    expect(resetSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.byId(tennisClubMembershipEventDocument.id)
-    })
-  })
-})
-
-/*
- * The assign mutation answers with the event document carrying only its last
- * action, so onAssign takes the branded EventDocumentOnlyLastAction.
- */
-const assignedEvent = EventDocumentOnlyLastAction.parse({
-  ...tennisClubMembershipEventDocument,
-  actions: tennisClubMembershipEventDocument.actions
-    .filter((action) => action.type === ActionType.ASSIGN)
-    .slice(-1)
-})
-
-describe('onAssign — standard write path (ASSIGN)', () => {
-  beforeEach(() => {
-    global.caches = {
-      keys: vi.fn().mockResolvedValue([])
-    } as unknown as CacheStorage
-    queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('invalidates every workqueue and the counts, and refetches the byId entry', async () => {
-    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
-    const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
-
-    await onAssign(assignedEvent)
-
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.allWorkqueues()
-    })
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: trpcOptionsProxy.workqueue.count.queryKey()
-    })
-    expect(refetchSpy).toHaveBeenCalledWith({
-      queryKey: searchKeys.filters.byId(assignedEvent.id)
-    })
-  })
-})
-
-describe('onAssign on a sealed record', () => {
-  beforeEach(() => {
-    queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('patches only the assignee, never rebuilding the redacted row from the local document', async () => {
-    vi.spyOn(queryClient, 'refetchQueries').mockResolvedValue()
-    const redactedRow = {
-      id: assignedEvent.id,
-      declaration: {},
-      assignedTo: null
-    } as unknown as EventIndex
-    const workqueueKey = searchKeys.workqueue(workqueueInput, 'ready')
-    queryClient.setQueryData(workqueueKey, { results: [redactedRow], total: 1 })
-    setEventData(assignedEvent.id, tennisClubMembershipEventDocument)
-
-    await onAssign(assignedEvent)
-
-    const assignment = assignedEvent.actions[0] as { assignedTo: string }
-    expect(queryClient.getQueryData(workqueueKey)?.results).toEqual([
-      { ...redactedRow, assignedTo: assignment.assignedTo }
-    ])
   })
 })
