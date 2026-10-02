@@ -16,7 +16,8 @@ import {
   getToken,
   goToSection,
   triggerDeclarationAction,
-  searchFromSearchBar
+  searchFromSearchBar,
+  waitForActionResponses
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
@@ -115,7 +116,9 @@ test.describe('Form state', () => {
       actionableEventChildName = await fillChildDetails(page)
 
       await page.getByRole('button', { name: 'Save & Exit' }).click()
-      await page.getByRole('button', { name: 'Confirm' }).click()
+      await waitForActionResponses(page, ['event.draft.create'], () =>
+        page.getByRole('button', { name: 'Confirm' }).click()
+      )
 
       // Now create another draft and fill in more details, incl. annotation
       await openBirthDeclaration(page)
