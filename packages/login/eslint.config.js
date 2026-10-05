@@ -21,7 +21,7 @@ module.exports = [
     plugins: {
       react
     },
-    files: ['./src/**/*.ts', './src/**/*.tsx'],
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
     rules: {
       'react/no-unescaped-entities': 'off',
       'react/destructuring-assignment': 'off',
@@ -56,6 +56,16 @@ module.exports = [
           project: path.resolve(__dirname, './tsconfig.json')
         }
       }
+    }
+  },
+  {
+    rules: {
+      'import/no-unresolved': 'error',
+      // no-relative-parent-imports judges the resolved path, so it also flags
+      // `@login/*` aliases, the sanctioned way to reach a parent directory.
+      // Ban `../` as written instead.
+      'import/no-relative-parent-imports': 'off',
+      'no-restricted-imports': ['error', { patterns: ['../*'] }]
     }
   }
 ]

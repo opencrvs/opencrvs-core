@@ -22,7 +22,7 @@ import {
   TranslationConfig,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
-import { useWindowSize } from '@opencrvs/components/src/hooks'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
   ColumnContentAlignment,
   SORT_ORDER,

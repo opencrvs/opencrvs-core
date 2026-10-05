@@ -10,10 +10,10 @@
  */
 import React, { PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { Button } from '@opencrvs/components/src/Button'
-import { Content } from '@opencrvs/components/src/Content'
-import { Frame } from '@opencrvs/components/src/Frame'
-import { Stack } from '@opencrvs/components/src/Stack'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Stack } from '@opencrvs/components/lib/Stack'
 
 export const messages = defineMessages({
   goToReview: {
