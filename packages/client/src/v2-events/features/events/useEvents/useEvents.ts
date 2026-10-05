@@ -74,14 +74,14 @@ export function useEvents() {
   const { useRemoteDraftByEventId } = useDrafts()
 
   return {
-    createEvent: useCreateEvent,
+    useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
     useGetEventCountsByWorkqueue,
     deleteEvent: {
       useMutation: useDeleteEvent
     },
-    getOutbox: useOutbox,
+    useOutbox,
     searchEvent: {
       useQuery: (
         query: SearchQuery,
