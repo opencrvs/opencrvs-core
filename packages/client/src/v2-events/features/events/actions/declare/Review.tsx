@@ -43,7 +43,7 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
   const formConfig = getDeclaration(config)

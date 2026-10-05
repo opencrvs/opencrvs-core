@@ -71,7 +71,7 @@ export function useEvents() {
   const getEvent = useGetEvent()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
-  const { getRemoteDraftByEventId } = useDrafts()
+  const { useRemoteDraftByEventId } = useDrafts()
 
   return {
     createEvent: useCreateEvent,
@@ -115,7 +115,7 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
-        const maybeDraft = getRemoteDraftByEventId(id)
+        const maybeDraft = useRemoteDraftByEventId(id)
         const options = trpc.event.search.queryOptions({ query })
 
         return useQuery({
@@ -158,7 +158,7 @@ export function useEvents() {
         } satisfies QueryType
 
         const options = trpc.event.search.queryOptions({ query })
-        const maybeDraft = getRemoteDraftByEventId(id)
+        const maybeDraft = useRemoteDraftByEventId(id)
 
         return useSuspenseQuery({
           ...options,
@@ -205,7 +205,7 @@ export function useEvents() {
       },
       assignment: {
         assign: {
-          isAssigning: (eventId: UUID) => {
+          useIsAssigning: (eventId: UUID) => {
             return useIsMutating(eventId, trpc.event.actions.assignment.assign)
           },
           mutate: async ({
