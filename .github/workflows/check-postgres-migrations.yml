@@ -51,8 +51,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Provision and migrate the events database
-        # The same command `pnpm dev` runs: creates the database, its schemas and
-        # roles, then runs run-migrations.sh, which substitutes env vars into the
+        # run-migrations.sh, which provision runs, substitutes env vars into the
         # SQL migrations with envsubst
         env:
           MINIO_BUCKET: ocrvs

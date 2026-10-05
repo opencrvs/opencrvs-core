@@ -15,7 +15,6 @@ import { resolveEnvironment } from './resolver'
 const primary = resolveEnvironment({
   name: 'opencrvs-core',
   worktreePath: '/home/dev/opencrvs-core',
-  isPrimaryWorktree: true,
   isDefaultEnvironment: true,
   registry: {}
 })
@@ -95,7 +94,6 @@ describe('toEnvironmentVariables', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }
@@ -123,7 +121,6 @@ describe('toEnvironmentVariables', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }
@@ -142,7 +139,6 @@ describe('toEnvironmentVariables', () => {
     const featureA = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }
@@ -221,7 +217,6 @@ describe('toEnvironmentVariables', () => {
       const descriptor = resolveEnvironment({
         name: 'feature-a',
         worktreePath: '/home/dev/wt/feature-a',
-        isPrimaryWorktree: false,
         isDefaultEnvironment: false,
         registry: {
           opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }

@@ -131,7 +131,6 @@ describe('runResolve', () => {
         registry
       })
 
-      expect(descriptor.slot).toBe(0)
       expect(descriptor.dbName).toBe('events_side_quest')
       expect(descriptor.esPrefix).toBe('events_side_quest')
       expect(descriptor.bucket).toBe('side-quest--ocrvs')

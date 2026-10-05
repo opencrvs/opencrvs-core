@@ -72,6 +72,21 @@ describe('planDestroy', () => {
     )
   })
 
+  it('plans an unregistered environment even when every slot is taken', () => {
+    const full = snapshot(
+      Object.fromEntries(
+        [0, 1, 2, 3, 4, 5].map((slot) => [
+          `env_${slot}`,
+          { slot, worktreePath: `/home/dev/wt/env-${slot}` }
+        ])
+      )
+    )
+
+    const plan = planFor({ name: 'ghost', snapshot: full })
+
+    expect(plan.identifiers.dbName).toBe('events_ghost')
+  })
+
   it('keys the plan on the name, never on the slot', () => {
     // `feature_a` freed slot 1 and `later` picked it up. Destroying `feature_a`
     // must still describe `feature_a`'s own data, not slot 1's occupant.

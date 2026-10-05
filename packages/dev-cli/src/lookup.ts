@@ -84,7 +84,6 @@ export function lookupEnvironment(
   return resolveEnvironment({
     name,
     worktreePath: input.worktreePath,
-    isPrimaryWorktree: input.isPrimaryWorktree,
     /*
      * Identical to `runResolve`'s rule, deliberately: the primary checkout with
      * no `--env` is the default environment and owns the unprefixed `events` /

@@ -100,13 +100,13 @@ _Avoid_: instance; stack, or an environment's stack, as a name for one of these.
 The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket, mosip-api SQLite file.
 
 **Slot**:
-A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * stride`) and the Redis logical DB index. Slot 0 is the primary worktree and matches historical single-environment ports.
+A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * stride`) and the Redis logical DB index. Slot 0 is the default environment's alone and matches historical single-environment ports; every other environment, a named one in the primary worktree included, gets 1–5.
 
 **Stride**:
 The port distance between two adjacent slots: `10000` for every service except the MOSIP mocks, whose bases are too high to survive it and which use `100` instead. See `PORT_STRIDES` in `packages/dev-cli/src/types.ts`.
 
 **Primary worktree**:
-The main (non-linked) git checkout. Always maps to slot 0, preserving the original `pnpm dev` behaviour and data.
+The main (non-linked) git checkout. Without `--env` it runs the default environment on slot 0, preserving the original `pnpm dev` behaviour and data; `--env <name>` there gets a slot of its own.
 
 **Registry**:
 The machine-level file (`~/.local/state/opencrvs/envs.json`) mapping each environment `name` to its `slot`.

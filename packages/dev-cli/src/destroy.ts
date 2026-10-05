@@ -11,7 +11,7 @@
 import {
   deriveEnvironmentName,
   LEGACY_DB_NAME,
-  resolveEnvironment,
+  environmentIdentifiers,
   sanitizeEnvironmentName
 } from './resolver'
 import { EnvironmentDescriptor, RegistryEntry, RegistrySnapshot } from './types'
@@ -157,11 +157,9 @@ export function planDestroy(input: PlanDestroyInput): DestroyPlan {
   const registered = entry !== undefined
 
   const isDefaultEnvironment = isDefault(name, entry, input)
-  const identifiers = identifiersFor(
-    input.name,
-    input.snapshot,
-    isDefaultEnvironment
-  )
+  const { dbName, esPrefix, esReindexingStatusIndex, bucket } =
+    environmentIdentifiers(input.name, isDefaultEnvironment)
+  const identifiers = { dbName, esPrefix, esReindexingStatusIndex, bucket }
 
   const notes: string[] = []
 
@@ -239,38 +237,6 @@ function derivedName(worktreePath: string): string | undefined {
 }
 
 /**
- * Identifiers come from `resolveEnvironment` rather than being recomposed
- * here, so destroy can never drift from what resolve created — one derivation,
- * one source of truth.
- *
- * Only the identifier fields of the descriptor are used. The slot it would
- * allocate is irrelevant (destroy reads the recorded slot straight from the
- * registry), so the call is made as if this were the primary worktree: that
- * short-circuits slot allocation and keeps an unregistered name from failing
- * with `SlotAllocationError` just because the registry happens to be full.
- */
-function identifiersFor(
-  rawName: string,
-  registry: RegistrySnapshot,
-  isDefaultEnvironment: boolean
-): EnvironmentIdentifiers {
-  const descriptor = resolveEnvironment({
-    name: rawName,
-    worktreePath: '',
-    isPrimaryWorktree: true,
-    isDefaultEnvironment,
-    registry
-  })
-
-  return {
-    dbName: descriptor.dbName,
-    esPrefix: descriptor.esPrefix,
-    esReindexingStatusIndex: descriptor.esReindexingStatusIndex,
-    bucket: descriptor.bucket
-  }
-}
-
-/**
  * Every other registered environment's index prefix, derived the named way.
  * An entry that is itself the default environment really owns the unprefixed
  * `events` indices, but claiming `events_<its name>` on its behalf is
@@ -289,7 +255,7 @@ export function otherEsPrefixes(
 
   return [...others].map(
     (other) =>
-      identifiersFor(other, registry, /* isDefaultEnvironment */ false).esPrefix
+      environmentIdentifiers(other, /* isDefaultEnvironment */ false).esPrefix
   )
 }
 
@@ -364,16 +330,17 @@ function planRedis({
   }
 
   /*
-   * A named environment living in the primary checkout sits at slot 0 but does
-   * not own DB 0 — the default environment does. Flushing it would wipe the
-   * ordinary checkout's queues, so it is skipped rather than shared.
+   * Only the default environment holds slot 0 now, but a registry written
+   * before that rule can still record a named environment there, sharing DB 0
+   * with the default environment. Flushing it would wipe the ordinary
+   * checkout's queues, so it is skipped.
    */
   if (entry.slot === 0 && !isDefaultEnvironment) {
     return {
       db: undefined,
       skipReason:
         `Redis DB 0 belongs to the default environment, not to "${name}", ` +
-        'even though both sit at slot 0. No DB is flushed.'
+        'even though the registry records it at slot 0. No DB is flushed.'
     }
   }
 

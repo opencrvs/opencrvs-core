@@ -26,7 +26,8 @@ environment `name`.
 
 - An **environment** is identified by a `name` — the sanitized basename of the
   git worktree directory. `--env <name>` overrides. The **primary** (non-linked)
-  checkout maps to **slot 0**, preserving today's behaviour exactly.
+  checkout without `--env` maps to **slot 0**, preserving today's behaviour
+  exactly; slot 0 is never given to any other environment.
 - A machine-level **registry** (`~/.local/state/opencrvs/envs.json`) maps
   `name → slot`, allocating the lowest free slot. Slots ≥ 6 are refused.
 - Host ports are derived: `port = base + slot * 10000`. Slot 0 leaves every port

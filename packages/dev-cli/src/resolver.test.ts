@@ -80,7 +80,6 @@ describe('resolveEnvironment: primary worktree', () => {
     const descriptor = resolveEnvironment({
       name: 'opencrvs-core',
       worktreePath: '/home/dev/opencrvs-core',
-      isPrimaryWorktree: true,
       isDefaultEnvironment: true,
       registry: {}
     })
@@ -93,7 +92,6 @@ describe('resolveEnvironment: primary worktree', () => {
     const descriptor = resolveEnvironment({
       name: 'opencrvs-core',
       worktreePath: '/home/dev/opencrvs-core',
-      isPrimaryWorktree: true,
       isDefaultEnvironment: true,
       registry: {}
     })
@@ -113,7 +111,6 @@ describe('resolveEnvironment: primary worktree', () => {
     const descriptor = resolveEnvironment({
       name: 'opencrvs-core',
       worktreePath: '/home/dev/opencrvs-core',
-      isPrimaryWorktree: true,
       isDefaultEnvironment: true,
       registry: {
         feature_a: entry(1, '/home/dev/wt/feature-a'),
@@ -129,14 +126,11 @@ describe('resolveEnvironment: primary worktree', () => {
     const descriptor = resolveEnvironment({
       name: 'scratch-env',
       worktreePath: '/home/dev/opencrvs-core',
-      isPrimaryWorktree: true,
       // `--env scratch-env` was passed: a named environment is a separate one.
       isDefaultEnvironment: false,
       registry: {}
     })
 
-    expect(descriptor.slot).toBe(0)
-    expect(descriptor.ports).toEqual(TODAYS_PORTS)
     expect(descriptor.dbName).toBe('events_scratch_env')
     expect(descriptor.esPrefix).toBe('events_scratch_env')
     expect(descriptor.esReindexingStatusIndex).toBe(
@@ -145,18 +139,63 @@ describe('resolveEnvironment: primary worktree', () => {
     expect(descriptor.bucket).toBe('scratch-env--ocrvs')
   })
 
+  it('gives a named primary environment its own slot while the default environment holds slot 0', () => {
+    const descriptor = resolveEnvironment({
+      name: 'scratch-env',
+      worktreePath: '/home/dev/opencrvs-core',
+      isDefaultEnvironment: false,
+      registry: primaryRegistered
+    })
+
+    expect(descriptor.slot).toBe(1)
+    expect(descriptor.redisDb).toBe(1)
+    expect(descriptor.ports.gateway).toBe(17070)
+  })
+
+  it('never gives slot 0 to a named primary environment, even when slot 0 is free', () => {
+    const descriptor = resolveEnvironment({
+      name: 'scratch-env',
+      worktreePath: '/home/dev/opencrvs-core',
+      isDefaultEnvironment: false,
+      registry: {}
+    })
+
+    expect(descriptor.slot).toBe(1)
+  })
+
+  it('keeps the default environment on slot 0 when a named environment was recorded there first', () => {
+    const descriptor = resolveEnvironment({
+      name: 'opencrvs-core',
+      worktreePath: '/home/dev/opencrvs-core',
+      isDefaultEnvironment: true,
+      registry: { scratch_env: entry(0, '/home/dev/opencrvs-core') }
+    })
+
+    expect(descriptor.slot).toBe(0)
+    expect(descriptor.ports).toEqual(TODAYS_PORTS)
+  })
+
+  it('moves a named environment off a slot 0 an older registry recorded for it', () => {
+    const descriptor = resolveEnvironment({
+      name: 'scratch-env',
+      worktreePath: '/home/dev/opencrvs-core',
+      isDefaultEnvironment: false,
+      registry: { scratch_env: entry(0, '/home/dev/opencrvs-core') }
+    })
+
+    expect(descriptor.slot).toBe(1)
+  })
+
   it('does not key legacy identifiers off slot 0 — a linked worktree at slot 0 would still derive', () => {
     // A linked worktree can never be the default environment, so even if it
     // somehow held slot 0 it must not claim the shared `events` database.
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: { feature_a: entry(0, '/home/dev/wt/feature-a') }
     })
 
-    expect(descriptor.slot).toBe(0)
     expect(descriptor.dbName).toBe('events_feature_a')
     expect(descriptor.bucket).toBe('feature-a--ocrvs')
   })
@@ -167,7 +206,6 @@ describe('resolveEnvironment: linked worktrees', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: primaryRegistered
     })
@@ -204,7 +242,6 @@ describe('resolveEnvironment: linked worktrees', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {}
     })
@@ -216,7 +253,6 @@ describe('resolveEnvironment: linked worktrees', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-d',
       worktreePath: '/home/dev/wt/feature-d',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       // slot 2 was freed by a destroyed environment
       registry: {
@@ -234,7 +270,6 @@ describe('resolveEnvironment: linked worktrees', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-new',
       worktreePath: '/home/dev/wt/feature-new',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         ...primaryRegistered,
@@ -253,7 +288,6 @@ describe('resolveEnvironment: stability', () => {
     const first = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: primaryRegistered
     })
@@ -268,7 +302,6 @@ describe('resolveEnvironment: stability', () => {
     const second = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry
     })
@@ -280,7 +313,6 @@ describe('resolveEnvironment: stability', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a-recreated',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         ...primaryRegistered,
@@ -306,7 +338,6 @@ describe('resolveEnvironment: slot uniqueness after lazy GC', () => {
     const b = resolveEnvironment({
       name: 'feature-b',
       worktreePath: '/home/dev/wt/feature-b',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry,
       staleNames: ['feature_a']
@@ -320,7 +351,6 @@ describe('resolveEnvironment: slot uniqueness after lazy GC', () => {
     const a = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry
     })
@@ -337,7 +367,6 @@ describe('resolveEnvironment: slot uniqueness after lazy GC', () => {
     const a = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         ...primaryRegistered,
@@ -358,7 +387,6 @@ describe('resolveEnvironment: slot uniqueness after lazy GC', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {
         ...primaryRegistered,
@@ -376,7 +404,6 @@ describe('resolveEnvironment: slot uniqueness after lazy GC', () => {
       resolveEnvironment({
         name: 'feature-a',
         worktreePath: '/home/dev/wt/feature-a',
-        isPrimaryWorktree: false,
         isDefaultEnvironment: false,
         registry: {
           ...primaryRegistered,
@@ -398,7 +425,6 @@ describe('resolveEnvironment: derived identifiers', () => {
     const descriptor = resolveEnvironment({
       name: 'my-feature-branch',
       worktreePath: '/home/dev/wt/my-feature-branch',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: primaryRegistered
     })
@@ -420,7 +446,6 @@ describe('resolveEnvironment: derived identifiers', () => {
     const descriptor = resolveEnvironment({
       name: 'my_feature',
       worktreePath: '/home/dev/wt/my_feature',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: primaryRegistered
     })
@@ -438,7 +463,6 @@ describe('resolveEnvironment: derived identifiers', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: primaryRegistered
     })
@@ -458,7 +482,6 @@ describe('resolveEnvironment: derived identifiers', () => {
       const descriptor = resolveEnvironment({
         name: `env-${slot}`,
         worktreePath: `/home/dev/wt/env-${slot}`,
-        isPrimaryWorktree: slot === 0,
         isDefaultEnvironment: slot === 0,
         registry
       })
@@ -476,7 +499,6 @@ describe('resolveEnvironment: derived identifiers', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: primaryRegistered
     })
@@ -512,7 +534,6 @@ describe('resolveEnvironment: slot ceiling', () => {
       resolveEnvironment({
         name: 'env-f',
         worktreePath: '/home/dev/wt/f',
-        isPrimaryWorktree: false,
         isDefaultEnvironment: false,
         registry: full
       })
@@ -534,7 +555,6 @@ describe('resolveEnvironment: slot ceiling', () => {
     const descriptor = resolveEnvironment({
       name: 'env-c',
       worktreePath: '/home/dev/wt/c',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: full
     })
@@ -627,7 +647,6 @@ describe('the mosip-api SQLite file', () => {
     const descriptor = resolveEnvironment({
       name: 'opencrvs-core',
       worktreePath: '/home/dev/opencrvs-core',
-      isPrimaryWorktree: true,
       isDefaultEnvironment: true,
       registry: {}
     })
@@ -639,7 +658,6 @@ describe('the mosip-api SQLite file', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',
-      isPrimaryWorktree: false,
       isDefaultEnvironment: false,
       registry: {}
     })

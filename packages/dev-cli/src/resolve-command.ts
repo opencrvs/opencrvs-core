@@ -56,7 +56,6 @@ export function runResolve(input: RunResolveInput): RunResolveResult {
   const descriptor = resolveEnvironment({
     name,
     worktreePath: input.worktreePath,
-    isPrimaryWorktree: input.isPrimaryWorktree,
     /*
      * `pnpm dev` in the primary checkout, with no `--env`, is the environment
      * that already exists on the developer's machine, so it keeps today's

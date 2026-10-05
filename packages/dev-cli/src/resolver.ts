@@ -174,26 +174,30 @@ export function deriveEnvironmentName({
   return sanitizeEnvironmentName(raw)
 }
 
+export type EnvironmentDataIdentifiers = Pick<
+  EnvironmentDescriptor,
+  | 'dbName'
+  | 'esPrefix'
+  | 'esReindexingStatusIndex'
+  | 'bucket'
+  | 'mosipDatabaseFile'
+>
+
 export interface ResolveEnvironmentInput {
   /** Raw or already-sanitized name; sanitized again here, idempotently. */
   name: string
   worktreePath: string
   /**
-   * Whether this checkout is the primary (non-linked) git worktree. Detected
-   * in the I/O layer (see `worktree.ts`) and passed in, so this stays pure.
-   */
-  isPrimaryWorktree: boolean
-  /**
    * True only for the primary worktree resolved *without* a `--env` override —
    * the environment a developer gets by running `pnpm dev` the way they always
-   * have. It alone keeps today's `events` / `events` / `ocrvs` identifiers, so
-   * an ordinary checkout never has to re-seed.
+   * have. It alone holds slot 0 and keeps today's `events` / `events` / `ocrvs`
+   * identifiers, so an ordinary checkout never has to re-seed.
    *
    * Deliberately **not** derived from `slot === 0` inside this function:
    *
-   * - The primary worktree given `--env <name>` still sits at slot 0, but
-   *   asking for a named environment means asking for a separate one, so it
-   *   must get the derived `events_<name>` identifiers, not the shared ones.
+   * - The primary worktree given `--env <name>` is a separate environment, so
+   *   it gets a slot of its own and the derived `events_<name>` identifiers,
+   *   not the shared ones.
    * - A linked worktree could hold slot 0 (an entry recorded before slot 0 was
    *   reserved) and must never claim the shared `events` database.
    *
@@ -225,25 +229,23 @@ export function resolveEnvironment(
     name,
     slot,
     worktreePath: input.worktreePath,
-    ...identifiersFor(input.name, name, input.isDefaultEnvironment),
+    ...environmentIdentifiers(input.name, input.isDefaultEnvironment),
     redisDb: slot,
     ports,
     urls: urlsForPorts(ports)
   }
 }
 
-function identifiersFor(
+/**
+ * The data identifiers an environment name maps to. They follow the name, never
+ * the slot, so deriving them never allocates one.
+ */
+export function environmentIdentifiers(
   raw: string,
-  name: string,
   isDefaultEnvironment: boolean
-): Pick<
-  EnvironmentDescriptor,
-  | 'dbName'
-  | 'esPrefix'
-  | 'esReindexingStatusIndex'
-  | 'bucket'
-  | 'mosipDatabaseFile'
-> {
+): EnvironmentDataIdentifiers {
+  const name = sanitizeEnvironmentName(raw)
+
   if (isDefaultEnvironment) {
     return {
       dbName: LEGACY_DB_NAME,
@@ -336,6 +338,16 @@ function liveSlotHolders(
 }
 
 function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
+  /*
+   * Slot 0 is the default environment's, and only its: that is what keeps a
+   * plain `pnpm dev` in the primary checkout on today's ports whichever
+   * environment started first. A named environment recorded at slot 0 by an
+   * older registry moves off it the next time it resolves.
+   */
+  if (input.isDefaultEnvironment) {
+    return PRIMARY_SLOT
+  }
+
   const existing = input.registry[name]
   const holders = liveSlotHolders(name, input)
 
@@ -359,12 +371,12 @@ function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
    * and sharing it — would hand the new occupant of the slot our Redis DB,
    * which is exactly the "leftover data" story 17 rules out.
    */
-  if (existing && !holders.has(existing.slot)) {
+  if (
+    existing &&
+    existing.slot !== PRIMARY_SLOT &&
+    !holders.has(existing.slot)
+  ) {
     return existing.slot
-  }
-
-  if (input.isPrimaryWorktree) {
-    return PRIMARY_SLOT
   }
 
   for (let slot = PRIMARY_SLOT + 1; slot <= MAX_SLOT; slot++) {
@@ -389,8 +401,8 @@ function slotExhaustedMessage(
     `Cannot allocate a slot for environment "${name}": every environment ` +
       `slot (0-${MAX_SLOT}) is in use.`,
     '',
-    'Slot 0 is reserved for the primary (non-linked) checkout; linked',
-    `worktrees use slots 1-${MAX_SLOT}. The ceiling exists because the highest`,
+    'Slot 0 is reserved for the default environment; every other',
+    `environment uses slots 1-${MAX_SLOT}. The ceiling exists because the highest`,
     `base port (documents, ${BASE_PORTS.documents}) overflows the 16-bit port`,
     `range at slot ${MAX_SLOT + 1}.`,
     '',
