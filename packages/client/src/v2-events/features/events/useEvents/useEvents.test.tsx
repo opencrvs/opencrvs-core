@@ -35,6 +35,7 @@ import { createTestStore } from '@client/tests/util'
 import { checkAuth } from '@client/profile/profileActions'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEvents } from './useEvents'
+import { waitUntilEventIsCreated } from './procedures/utils'
 
 const serverSpy = vi.fn()
 
@@ -252,5 +253,40 @@ describe('events that have unsynced actions', () => {
     })
 
     expect(localDraftStore.getState().draft?.eventId).toBe('_REAL_UUID_')
+  })
+
+  test<TestContext>('file paths with the temporary id are resolved when the event id is already real', async ({
+    createEventHook
+  }) => {
+    await createEventHook.result.current.mutateAsync({
+      type: TENNIS_CLUB_MEMBERSHIP,
+      transactionId: 'tmp-test-event'
+    })
+
+    const send =
+      vi.fn<
+        (params: { eventId: string; declaration: object }) => Promise<void>
+      >()
+    send.mockResolvedValue()
+    await waitUntilEventIsCreated(send)({
+      eventId: '_REAL_UUID_',
+      declaration: {
+        'applicant.image': {
+          path: 'events/tmp-test-event/photo.png',
+          originalFilename: 'photo.png',
+          type: 'image/png'
+        }
+      }
+    })
+
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        declaration: {
+          'applicant.image': expect.objectContaining({
+            path: 'events/_REAL_UUID_/photo.png'
+          })
+        }
+      })
+    )
   })
 })
