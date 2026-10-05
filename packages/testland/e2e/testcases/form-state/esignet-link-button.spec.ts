@@ -50,6 +50,8 @@ test.describe
     await page.locator('#informant____relation').click()
     await page.getByText('Brother', { exact: true }).click()
 
+    /** Even if payload includes the UUID url, it might be that automated tests are too fast, and esignet page receives current url with tmp- as redirect uri. */
+    await page.waitForURL((url) => !url.href.includes('tmp-'))
     await authenticateInformantWithESignet(page)
 
     await expect(page.getByText('ID Authenticated')).toBeVisible({
