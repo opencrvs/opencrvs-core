@@ -37,7 +37,7 @@ module.exports = defineConfig([
         {
           // rules-of-hooks only recognises hooks by call-site name, so `{ getFoo: useFoo }` hides a hook from it
           selector:
-            'Property[value.type="Identifier"][value.name=/^use[A-Z]/][key.name!=/^use[A-Z]/]',
+            'ObjectExpression > Property[value.type="Identifier"][value.name=/^use[A-Z]/][key.name!=/^use[A-Z]/]',
           message:
             'Hooks must be exposed under a `use*` key, otherwise rules-of-hooks cannot check their call sites.'
         }
