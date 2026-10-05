@@ -214,7 +214,7 @@ export const infrastructureQuestions = [
     valueLabel: 'KUBE_API_ALLOWED_CIDRS',
     initial: process.env.KUBE_API_ALLOWED_CIDRS || '',
     scope: 'ENVIRONMENT' as const
-  },
+  }
 ]
 
 export const staticSSLCertQuestions = [
@@ -286,11 +286,15 @@ export const diskQuestions = [
   {
     name: 'diskSpace',
     type: 'text' as const,
-    message: `What is the amount of diskspace that should be dedicated to OpenCRVS data and will become the size of an encrypted cryptfs data directory.
-    \n${kleur.red('DO NOT USE ALL DISKSPACE FOR OPENCRVS!')}
-    \nLeave at least 50g available for OS use.`,
+    message: [
+      'How much disk space should be reserved for OpenCRVS data on each node? (e.g. 200g)',
+      'A fixed-size encrypted volume of this size is created on every node and cannot be resized later.',
+      kleur.red('DO NOT USE ALL DISK SPACE FOR OPENCRVS!'),
+      'Each node needs this much free space on its root partition, plus 50g or 10% of this size, whichever is larger.'
+    ].join('\n'),
     valueType: 'VARIABLE' as const,
-    validate: notEmpty,
+    validate: (value: string) =>
+      /^\d+g$/i.test(value.trim()) || 'Enter a size in gigabytes, e.g. 200g',
     valueLabel: 'DISK_SPACE',
     initial: process.env.DISK_SPACE || '200g',
     scope: 'ENVIRONMENT' as const
