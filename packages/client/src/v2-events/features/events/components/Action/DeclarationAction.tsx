@@ -168,7 +168,7 @@ function DeclarationActionComponent({
   event: EventDocument
 }>) {
   const eventId = event.id
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+  const { setLocalDraft, getLocalDraftOrDefault, useRemoteDraftByEventId } =
     useDrafts()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
@@ -177,7 +177,7 @@ function DeclarationActionComponent({
 
   useActionGuard(actionType, event, configuration)
 
-  const remoteDraft = getRemoteDraftByEventId(event.id)
+  const remoteDraft = useRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)

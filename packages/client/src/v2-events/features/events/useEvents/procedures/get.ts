@@ -170,7 +170,7 @@ export function useGetEvent() {
   return {
     useFindEventFromCache,
     useGetOrDownloadEvent,
-    getFromCache: (id: UUID) => {
+    useGetEventFromCache: (id: UUID) => {
       const intl = useIntl()
       const eventConfig = useEventConfigurations()
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({

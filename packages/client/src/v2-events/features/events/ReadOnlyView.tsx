@@ -80,8 +80,8 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     'Authentication is not available but is required'
   )
 
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(event.id)
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(event.id)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

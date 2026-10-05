@@ -332,7 +332,7 @@ const ReviewUserComponent = () => {
 
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
   const isNewUser = isTemporaryId(userId)
-  const { getUser, createUser, updateUser } = useUsers()
+  const { getUser, useCreateUser, useUpdateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const selectedRole = roles.find(
@@ -416,8 +416,8 @@ const ReviewUserComponent = () => {
   }
 
   const formState = userForm ?? EMPTY_FORM
-  const createUserMutation = createUser()
-  const updateUserMutation = updateUser()
+  const createUserMutation = useCreateUser()
+  const updateUserMutation = useUpdateUser()
 
   const handleMutationError = (error: unknown) => {
     if (error instanceof TRPCClientError && error.data?.code === 'CONFLICT') {

@@ -38,7 +38,7 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
 
   const validatorContext = useValidatorContext(event)
   const { eventConfiguration: configuration } = useEventConfiguration(

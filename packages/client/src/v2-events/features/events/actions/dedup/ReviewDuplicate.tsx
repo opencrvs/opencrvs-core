@@ -132,34 +132,15 @@ const TopBar = styled.div`
   z-index: 1;
 `
 
-function ReviewDuplicate() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-
+function ReviewDuplicateBody({ event }: { event: EventDocument }) {
   const intl = useIntl()
-  const navigate = useNavigate()
-  const events = useEvents()
-  const event = events.getEvent.useFindEventFromCache(eventId).data
   const validatorContext = useValidatorContext(event)
-
-  useEffect(() => {
-    if (!event) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Event with id ${eventId} not found in cache. Redirecting to overview.`
-      )
-      return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
-    }
-  }, [event, eventId, navigate])
-
-  if (!event) {
-    return <div />
-  }
-
   const [selectedTab, selectTab] = useState<string>(event.trackingId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const eventState = getCurrentEventState(event, configuration)
 
@@ -200,7 +181,6 @@ function ReviewDuplicate() {
   }
 
   const { title, fields } = actionConfiguration.review
-  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
 
@@ -254,6 +234,30 @@ function ReviewDuplicate() {
       )}
     </Frame>
   )
+}
+
+function ReviewDuplicate() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+
+  const navigate = useNavigate()
+  const events = useEvents()
+  const event = events.getEvent.useFindEventFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return <ReviewDuplicateBody event={event} />
 }
 
 export const ReviewDuplicateIndex = withSuspense(ReviewDuplicate)

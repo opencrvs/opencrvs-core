@@ -21,7 +21,7 @@ import * as actions from '@login/login/actions'
 import { IVerifyCodeNumbers, resetSubmissionError } from '@login/login/actions'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { Box } from '@login/../../components/lib/Box'
+import { Box } from '@opencrvs/components/lib/Box'
 import {
   getResentAuthenticationCode,
   getStepOneDetails,

@@ -47,8 +47,8 @@ import { useUserAllowedActions } from './useUserAllowedActions'
  * Pattern needs to return a resolver function, since a hook should not be mapped through.
  */
 export function useEventActionConfigurationResolver(event: EventIndex) {
-  const { getDisplayableDrafts } = useDrafts()
-  const drafts = getDisplayableDrafts()
+  const { useDisplayableDrafts } = useDrafts()
+  const drafts = useDisplayableDrafts()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
   const { isActionAllowed: isActionAllowedForUser } =
@@ -60,7 +60,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const validatorContext = useValidatorContext(cachedEvent.data)
-  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
+  const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
   // Don't offer a review that may turn out to have nothing to show.
   const areDuplicatesAvailable =
     useDuplicatesAvailable(
@@ -144,7 +144,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const validatorContext = useValidatorContext(cachedEvent.data)
-  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
+  const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
 
   const resolveConditionals = useCallback(
     (

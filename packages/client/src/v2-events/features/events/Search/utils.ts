@@ -11,7 +11,6 @@
 /* eslint-disable max-lines */
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import { parse as parseQuery, stringify } from 'qs'
-import { useSelector } from 'react-redux'
 import { validate as validateEmail } from 'email-validator'
 import {
   EventConfig,
@@ -45,13 +44,13 @@ import {
   ValidatorContext,
   getAcceptedScopesByType,
   scopeUsesFullOptions,
-  user
+  user,
+  EncodedScope
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { generateAddressFields } from '@client/v2-events/features/events/registered-fields/Address'
-import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   IntlErrors,
@@ -1065,11 +1064,12 @@ export function buildQuickSearchQuery(
 }
 
 /**
- * @returns a boolean indicating whether the current user has the scope to search for an event
+ * @returns a boolean indicating whether the given scopes allow searching for an event
  */
-export function checkScopeForEventSearch(eventId: string) {
-  const scopes = useSelector(getScope)
-
+export function checkScopeForEventSearch(
+  eventId: string,
+  scopes: EncodedScope[] | null
+) {
   const searchScopes = getAcceptedScopesByType({
     acceptedScopes: ['record.search'],
     scopes: scopes ?? []
