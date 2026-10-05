@@ -21,6 +21,7 @@ import { vi } from 'vitest'
 import {
   ActionStatus,
   ActionType,
+  createEmptyDraft,
   EventDocument,
   EventInput,
   getUUID,
@@ -32,6 +33,7 @@ import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
 import { createTestStore } from '@client/tests/util'
 import { checkAuth } from '@client/profile/profileActions'
+import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()
@@ -229,5 +231,26 @@ describe('events that have unsynced actions', () => {
     await waitFor(() => {
       expect(getHook.result.current.data).toBeTruthy()
     })
+  })
+
+  test<TestContext>('local draft saved under the temporary id moves to the real id when the event is synced', async ({
+    createEventHook
+  }) => {
+    localDraftStore
+      .getState()
+      .setDraft(
+        createEmptyDraft(
+          '_TEST_TRANSACTION_' as UUID,
+          getUUID(),
+          ActionType.DECLARE
+        )
+      )
+
+    await createEventHook.result.current.mutateAsync({
+      type: TENNIS_CLUB_MEMBERSHIP,
+      transactionId: '_TEST_TRANSACTION_'
+    })
+
+    expect(localDraftStore.getState().draft?.eventId).toBe('_REAL_UUID_')
   })
 })
