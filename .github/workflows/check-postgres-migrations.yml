@@ -50,20 +50,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Initialise events database
-        # Service containers start before checkout, so the init script cannot be
-        # mounted into docker-entrypoint-initdb.d as docker-compose.dev-deps.yml does
-        run: >
-          docker exec -i ${{ job.services.postgres.id }} psql -U postgres -v ON_ERROR_STOP=1
-          < packages/migration/src/migrations/postgres/0001_init.sql
-
-      - name: Run migrations
-        # run-migrations.sh substitutes env vars into the SQL migrations with envsubst
+      - name: Provision and migrate the events database
+        # The same command `pnpm dev` runs: creates the database, its schemas and
+        # roles, then runs run-migrations.sh, which substitutes env vars into the
+        # SQL migrations with envsubst
         env:
           MINIO_BUCKET: ocrvs
         run: |
           command -v envsubst || sudo apt-get install -y gettext-base
-          pnpm --dir packages/migration start
+          pnpm --filter @opencrvs/migration provision --db events
 
       - name: Generate Kanel database types
         run: pnpm --dir packages/events generate-db-types
