@@ -175,3 +175,20 @@ export function validateActionOrder(
     }
   }
 }
+
+export function validateExactlyOneDeclareAction(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const declareActionCount = event.actions.filter(
+    (action) => action.type === ActionType.DECLARE
+  ).length
+
+  if (declareActionCount !== 1) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event must have exactly one ${ActionType.DECLARE} action. Found ${declareActionCount} for event ${event.id}`,
+      path: ['actions']
+    })
+  }
+}

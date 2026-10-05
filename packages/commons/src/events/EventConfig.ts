@@ -25,7 +25,8 @@ import {
   validateActionFlags,
   validatePlaceOfEvent,
   validateDateOfEvent,
-  validateAdvancedSearchConfig
+  validateAdvancedSearchConfig,
+  validateExactlyOneDeclareAction
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -152,6 +153,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigInput> =
       validatePlaceOfEvent(event, ctx)
       validateActionFlags(event, ctx)
       validateActionOrder(event, ctx)
+      validateExactlyOneDeclareAction(event, ctx)
     })
     .meta({
       id: 'EventConfig',

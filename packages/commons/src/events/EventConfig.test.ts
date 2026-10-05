@@ -73,4 +73,48 @@ describe('EventConfig', () => {
       expect(res.success).toBe(true)
     })
   })
+
+  describe('validateExactlyOneDeclareAction()', () => {
+    const declareAction = tennisClubMembershipEvent.actions.find(
+      (action) => action.type === ActionType.DECLARE
+    )
+
+    it('should pass validation when the event has exactly one DECLARE action', () => {
+      const res = EventConfig.safeParse(tennisClubMembershipEvent)
+
+      expect(res.success).toBe(true)
+    })
+
+    it('should fail validation when the event has no DECLARE action', () => {
+      const res = EventConfig.safeParse({
+        ...tennisClubMembershipEvent,
+        actions: tennisClubMembershipEvent.actions.filter(
+          (action) => action.type !== ActionType.DECLARE
+        )
+      })
+
+      expect(res.success).toBe(false)
+      expect(res.error?.issues).toContainEqual(
+        expect.objectContaining({
+          path: ['actions'],
+          message: `Event must have exactly one DECLARE action. Found 0 for event ${tennisClubMembershipEvent.id}`
+        })
+      )
+    })
+
+    it('should fail validation when the event has more than one DECLARE action', () => {
+      const res = EventConfig.safeParse({
+        ...tennisClubMembershipEvent,
+        actions: [...tennisClubMembershipEvent.actions, declareAction]
+      })
+
+      expect(res.success).toBe(false)
+      expect(res.error?.issues).toContainEqual(
+        expect.objectContaining({
+          path: ['actions'],
+          message: `Event must have exactly one DECLARE action. Found 2 for event ${tennisClubMembershipEvent.id}`
+        })
+      )
+    })
+  })
 })

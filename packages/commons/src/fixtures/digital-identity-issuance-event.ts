@@ -231,6 +231,23 @@ export const digitalIdentityEvent = defineConfig({
   summary: { fields: [] },
   actions: [
     {
+      type: ActionType.DECLARE,
+      label: {
+        defaultMessage: 'Declare',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.digital-identity.action.declare.label'
+      },
+      review: {
+        title: {
+          defaultMessage: 'Digital identity issuance',
+          description: 'Title of the review page',
+          id: 'event.digital-identity.action.declare.form.review.title'
+        },
+        fields: []
+      }
+    },
+    {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
         id: 'event.football-club-membership.action.collect-certificate.label',
