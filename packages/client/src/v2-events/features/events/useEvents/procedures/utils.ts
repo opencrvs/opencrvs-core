@@ -77,21 +77,22 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
         ? replaceTemporaryIdInObject(params.annotation)
         : {}
 
+    const paramsWithResolvedFiles = deepMerge(
+      deepMerge(params, { declaration }),
+      {
+        annotation
+      }
+    )
+
     if (!isTemporaryId(eventId)) {
       // Files attached before the event synced keep the temporary id in their path.
-      return canonicalMutationFn({
-        ...params,
-        ...('declaration' in params &&
-          isObject(params.declaration) && { declaration }),
-        ...('annotation' in params &&
-          isObject(params.annotation) && { annotation })
-      })
+      return canonicalMutationFn({ ...paramsWithResolvedFiles, eventId })
     }
 
     const localVersion = getCreatedEvent(eventId)
 
     return canonicalMutationFn({
-      ...deepMerge(deepMerge(params, { declaration }), { annotation }),
+      ...paramsWithResolvedFiles,
       eventId: localVersion.id,
       eventType: localVersion.type
     })
