@@ -57,7 +57,7 @@ export function EditPageBanner() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.PAGES)
   const intl = useIntl()
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 

@@ -126,6 +126,13 @@ export const SearchToolbar = () => {
       scopes
     }).length > 0
 
+  useEffect(() => {
+    // Clear the search term when navigating away from the search results page
+    if (location.pathname !== ROUTES.V2.SEARCH.buildPath({})) {
+      setSearchTerm(undefined)
+    }
+  }, [location.pathname])
+
   if (!hasSearchScope) {
     return null
   }
@@ -150,13 +157,6 @@ export const SearchToolbar = () => {
 
     navigate(`${searchUrl}?${serializedParams}`)
   }
-
-  useEffect(() => {
-    // Clear the search term when navigating away from the search results page
-    if (location.pathname !== ROUTES.V2.SEARCH.buildPath({})) {
-      setSearchTerm(undefined)
-    }
-  }, [location.pathname])
 
   return (
     <SearchBox className={'search-tool'}>

@@ -168,7 +168,7 @@ export function Review() {
     onlineActions,
     actions: { assignment }
   } = useEvents()
-  const fullEvent = getEvent.getFromCache(eventId)
+  const fullEvent = getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)

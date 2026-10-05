@@ -52,7 +52,7 @@ export function UserActivationModal({
 
   const name = getUserName(user)
   const users = useUsers()
-  const updateUser = users.updateUser({
+  const updateUser = users.useUpdateUser({
     onSuccess,
     onError
   })

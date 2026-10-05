@@ -203,7 +203,7 @@ export function useDrafts() {
 
   const pendingDeleteEventIds = usePendingDeleteEventIds()
 
-  function getDisplayableDrafts(
+  function useDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -286,12 +286,12 @@ export function useDrafts() {
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
-    getDisplayableDrafts,
-    getRemoteDraftByEventId: (
+    useDisplayableDrafts,
+    useRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
     ): Draft | undefined => {
-      const eventDrafts = getDisplayableDrafts(additionalOptions).filter(
+      const eventDrafts = useDisplayableDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 

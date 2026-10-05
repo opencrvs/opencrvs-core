@@ -60,20 +60,17 @@ export function useCustomActionConfigs(event: EventIndex): {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
-  const customActionScopes = getAcceptedScopesByType({
-    acceptedScopes: ['record.custom-action'],
-    scopes: scopes ?? []
-  })
-
-  // If no custom action scopes are found, we can return early.
-  if (customActionScopes.length === 0) {
-    return {
-      customActionModal: null,
-      customActionConfigs: []
-    }
-  }
+  const hasCustomActionScope =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.custom-action'],
+      scopes: scopes ?? []
+    }).length > 0
 
   const customActionConfigs = useMemo(() => {
+    if (!hasCustomActionScope) {
+      return []
+    }
+
     // The event's status and flags decide whether custom actions are available
     // at all. The backend enforces the same list, so skipping this check would
     // offer actions that fail with a 409.
@@ -102,6 +99,7 @@ export function useCustomActionConfigs(event: EventIndex): {
         customActionType: action.customActionType
       }))
   }, [
+    hasCustomActionScope,
     eventConfiguration.actions,
     isDownloadedAndAssignedToUser,
     validatorContext,
@@ -110,5 +108,8 @@ export function useCustomActionConfigs(event: EventIndex): {
     canAccessEventWithScopes
   ])
 
-  return { customActionModal, customActionConfigs }
+  return {
+    customActionModal: hasCustomActionScope ? customActionModal : null,
+    customActionConfigs
+  }
 }
