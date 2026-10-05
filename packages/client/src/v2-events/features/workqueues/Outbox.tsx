@@ -24,8 +24,8 @@ export function Outbox() {
   const eventConfigs = useEventConfigurations()
   const intl = useIntl()
 
-  const { getOutbox } = useEvents()
-  const outbox = getOutbox()
+  const { useOutbox } = useEvents()
+  const outbox = useOutbox()
 
   const outboxColumns = defineWorkqueuesColumns([
     {

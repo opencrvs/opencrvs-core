@@ -126,7 +126,7 @@ afterAll(() => server.close())
 interface TestContext {
   eventsHook: RenderHookResult<ReturnType<typeof useEvents>, {}>
   createEventHook: RenderHookResult<
-    ReturnType<ReturnType<typeof useEvents>['createEvent']>,
+    ReturnType<ReturnType<typeof useEvents>['useCreateEvent']>,
     {}
   >
   declareHook: RenderHookResult<
@@ -162,9 +162,12 @@ beforeEach<TestContext>(async (testContext) => {
   await waitFor(() => expect(eventsHook.result.current).not.toBeNull(), {
     timeout: 3000
   })
-  const createHook = renderHook(() => eventsHook.result.current.createEvent(), {
-    wrapper
-  })
+  const createHook = renderHook(
+    () => eventsHook.result.current.useCreateEvent(),
+    {
+      wrapper
+    }
+  )
 
   const declareHookHook = renderHook(
     () => eventsHook.result.current.actions.declare,

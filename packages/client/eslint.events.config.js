@@ -32,6 +32,16 @@ module.exports = defineConfig([
       '@typescript-eslint/no-unused-vars': 'warn',
       'react/destructuring-assignment': 'warn',
       'object-shorthand': 'warn',
+      'no-restricted-syntax': [
+        ...eventsConfig.rules['no-restricted-syntax'],
+        {
+          // rules-of-hooks only recognises hooks by call-site name, so `{ getFoo: useFoo }` hides a hook from it
+          selector:
+            'Property[value.type="Identifier"][value.name=/^use[A-Z]/][key.name!=/^use[A-Z]/]',
+          message:
+            'Hooks must be exposed under a `use*` key, otherwise rules-of-hooks cannot check their call sites.'
+        }
+      ],
       'react/jsx-key': 1,
       'react/jsx-no-literals': 1,
       'react/no-unused-prop-types': 1,
