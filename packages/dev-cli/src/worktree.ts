@@ -17,8 +17,8 @@ export interface Worktree {
   path: string
   /**
    * True for the primary checkout, false for a `git worktree add` checkout and
-   * for a directory that no longer exists. The primary checkout is the one
-   * that gets slot 0.
+   * for a directory that no longer exists. The primary checkout without
+   * `--env` is the default environment, the one that gets slot 0.
    */
   isPrimary: boolean
 }

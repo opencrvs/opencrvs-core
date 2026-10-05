@@ -209,9 +209,9 @@ export function planDestroy(input: PlanDestroyInput): DestroyPlan {
  * the only environment holding the unprefixed `events` / `ocrvs` data, so it
  * is the only one worth refusing to destroy.
  *
- * Slot 0 alone does not identify it. The primary checkout given `--env
- * side-quest` also sits at slot 0 but owns separate, derived data, and a
- * linked worktree may hold slot 0 from before slot 0 was reserved. Hence both
+ * Slot 0 alone does not identify it: a registry written before slot 0 was
+ * reserved for the default environment can record a named environment or a
+ * linked worktree there, and each owns separate, derived data. Hence both
  * conditions: the entry's worktree is the primary checkout *and* the name is
  * the one that worktree's directory derives.
  */

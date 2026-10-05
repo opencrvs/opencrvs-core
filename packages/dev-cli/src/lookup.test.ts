@@ -123,6 +123,18 @@ describe('lookupEnvironment', () => {
     ).toThrow(EnvironmentNotRegisteredError)
   })
 
+  it('never allocates: an unregistered --env in the primary checkout is an error, not a new slot', () => {
+    expect(() =>
+      lookupEnvironment({
+        worktreePath: PRIMARY,
+        isPrimaryWorktree: true,
+        envOverride: 'typo',
+        registry: { opencrvs_core: entry(0, PRIMARY) },
+        staleNames: []
+      })
+    ).toThrow(EnvironmentNotRegisteredError)
+  })
+
   it('says how to fix an unregistered environment', () => {
     expect(() =>
       lookupEnvironment({

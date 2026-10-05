@@ -56,10 +56,11 @@ export interface LookupEnvironmentInput {
  * allocating, and both are read, never chosen:
  *
  * - a registered name keeps the slot the registry recorded;
- * - the primary checkout is slot 0 by definition (`PRIMARY_SLOT`).
+ * - the default environment is slot 0 by definition (`PRIMARY_SLOT`).
  *
- * Anything else — an unregistered environment in a linked worktree — would
- * require picking a free slot, i.e. creating an environment, so it is refused.
+ * Anything else — any other unregistered environment, `--env <name>` in the
+ * primary checkout included — would require picking a free slot, i.e.
+ * creating an environment, so it is refused.
  *
  * "Keeps the slot the registry recorded" is not a plain read, though:
  * `resolveEnvironment` defends slot uniqueness and moves a name off a slot
@@ -77,33 +78,32 @@ export function lookupEnvironment(
     worktreePath: input.worktreePath
   })
 
-  if (input.registry[name] === undefined && !input.isPrimaryWorktree) {
-    throw new EnvironmentNotRegisteredError(notRegisteredMessage(name, input))
+  /*
+   * Identical to `runResolve`'s rule, deliberately: the primary checkout with
+   * no `--env` is the default environment and owns the unprefixed `events` /
+   * `ocrvs` data; naming an environment with `--env` asks for a separate one.
+   * Any divergence here would point a clear or a seed at the wrong data.
+   */
+  const isDefaultEnvironment =
+    input.isPrimaryWorktree && !hasExplicitName(input.envOverride)
+
+  if (input.registry[name] === undefined && !isDefaultEnvironment) {
+    throw new EnvironmentNotRegisteredError(notRegisteredMessage(name))
   }
 
   return resolveEnvironment({
     name,
     worktreePath: input.worktreePath,
-    /*
-     * Identical to `runResolve`'s rule, deliberately: the primary checkout with
-     * no `--env` is the default environment and owns the unprefixed `events` /
-     * `ocrvs` data; naming an environment with `--env` asks for a separate one.
-     * Any divergence here would point a clear or a seed at the wrong data.
-     */
-    isDefaultEnvironment:
-      input.isPrimaryWorktree && !hasExplicitName(input.envOverride),
+    isDefaultEnvironment,
     registry: input.registry,
     staleNames: input.staleNames
   })
 }
 
-function notRegisteredMessage(
-  name: string,
-  input: LookupEnvironmentInput
-): string {
+function notRegisteredMessage(name: string): string {
   return (
-    `Environment "${name}" is not registered, and ${input.worktreePath} is a ` +
-    'linked worktree, so its slot — and therefore its ports and Redis DB — ' +
+    `Environment "${name}" is not registered, and it is not the default ` +
+    'environment, so its slot — and therefore its ports and Redis DB — ' +
     'cannot be known without allocating one. Nothing has been created.\n' +
     'Start it once with `pnpm dev` (which allocates its slot), or name a ' +
     'registered environment with `--env <name>`. `pnpm env:list` shows which ' +

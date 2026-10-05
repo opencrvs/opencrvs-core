@@ -11,7 +11,7 @@
 
 /**
  * Base host ports — the values the repository uses today, i.e. the values a
- * slot-0 (primary worktree) environment must reproduce exactly. Every other
+ * slot-0 (default) environment must reproduce exactly. Every other
  * slot's port is `base + slot * PORT_STRIDE`.
  *
  * Each base is taken from the code that actually binds or addresses it:
