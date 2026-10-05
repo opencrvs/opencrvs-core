@@ -121,15 +121,19 @@ fi
 # Clear PostgreSQL #
 ####################
 
-echo "Resetting schema 'app' in database '$TARGET_DB'..."
+echo "Resetting schemas 'app' and 'analytics' in database '$TARGET_DB'..."
 
 # Dropped only if the database exists: clearing an environment that has never
-# been started is a no-op here, and provisioning below creates it.
+# been started is a no-op here, and provisioning below creates it. `analytics`
+# goes too, or its rows outlive the events they describe. The roles stay: they
+# are shared by every environment on the dependency singleton.
 if [ "$(docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d postgres -tAc \
   "SELECT 1 FROM pg_database WHERE datname = '$TARGET_DB'")" = "1" ]; then
   docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d "$TARGET_DB" \
-    -v ON_ERROR_STOP=1 -c "DROP SCHEMA IF EXISTS app CASCADE"
-  echo "Schema 'app' dropped."
+    -v ON_ERROR_STOP=1 \
+    -c "DROP SCHEMA IF EXISTS app CASCADE" \
+    -c "DROP SCHEMA IF EXISTS analytics CASCADE"
+  echo "Schemas 'app' and 'analytics' dropped."
 else
   echo "Database '$TARGET_DB' does not exist yet; it will be created."
 fi
@@ -139,10 +143,13 @@ fi
 ##################################
 
 # `provision` is idempotent and is the same command `pnpm dev` runs: it creates
-# the database if it is missing, recreates the app/analytics/reference_data
-# schemas with the shared roles, and runs the migrations.
+# the database if it is missing, creates whichever of the app/analytics/
+# reference_data schemas are missing, grants the shared roles, and runs the
+# migrations. It creates `analytics` empty; `setup-analytics` fills in its
+# tables, which a running stack would otherwise only get back on restart.
 echo
 pnpm --filter @opencrvs/migration provision --db "$TARGET_DB"
+POSTGRES_CONTAINER="$POSTGRES_CONTAINER" pnpm --filter @opencrvs/testland setup-analytics
 echo
 
 ##################################
