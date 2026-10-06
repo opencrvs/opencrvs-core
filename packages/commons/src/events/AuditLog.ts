@@ -76,6 +76,8 @@ const EventActionEntrySchema = AuditLogEntryBase.extend({
     'event.actions.correction.request.request',
     'event.actions.correction.approve.request',
     'event.actions.correction.reject.request',
+    'event.actions.revoke_registration.request',
+    'event.actions.reinstate_registration.request',
     'event.actions.mark_as_duplicate.request',
     'event.actions.mark_as_not_duplicate.request'
   ]),
