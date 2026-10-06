@@ -158,8 +158,7 @@ function collectDocuments(
 }
 
 /**
- * The document name rendered as a link that opens the file in a full-screen
- * preview overlay. Read-only — deletion is disabled.
+ * The document name rendered as a link that opens the file in a full-screen preview overlay.
  */
 function DocumentNameCell({
   name,

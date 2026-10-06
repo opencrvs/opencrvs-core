@@ -113,65 +113,46 @@ function EventOverviewTabs() {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
   }
 
+  const tabs = [
+    {
+      label: messages.summary,
+      route: ROUTES.V2.EVENTS.EVENT,
+      display: true
+    },
+    {
+      label: messages.record,
+      route: ROUTES.V2.EVENTS.EVENT.RECORD,
+      display: canAccessEventWithScopes()
+    },
+    {
+      label: messages.documents,
+      route: ROUTES.V2.EVENTS.EVENT.DOCUMENTS,
+      display: canAccessEventWithScopes()
+    },
+    {
+      label: messages.audit,
+      route: ROUTES.V2.EVENTS.EVENT.AUDIT,
+      display: true
+    }
+  ] as const
+
   return (
     <TabContainer gap={16}>
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
-            replace: true
-          })
-        }}
-      >
-        {intl.formatMessage(messages.summary)}
-      </Tab>
-      {canAccessEventWithScopes() && (
-        <>
+      {tabs
+        .filter((tab) => tab.display)
+        .map((tab) => (
           <Tab
-            className={
-              isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
-            }
+            key={tab.route.path}
+            className={isActive(tab.route.path) ? 'active' : ''}
             onClick={() => {
-              navigate(
-                ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
-                  { eventId },
-                  { backTo }
-                ),
-                { replace: true }
-              )
+              navigate(tab.route.buildPath({ eventId }, { backTo }), {
+                replace: true
+              })
             }}
           >
-            {intl.formatMessage(messages.record)}
+            {intl.formatMessage(tab.label)}
           </Tab>
-          <Tab
-            className={
-              isActive(ROUTES.V2.EVENTS.EVENT.DOCUMENTS.path) ? 'active' : ''
-            }
-            onClick={() => {
-              navigate(
-                ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath(
-                  { eventId },
-                  { backTo }
-                ),
-                { replace: true }
-              )
-            }}
-          >
-            {intl.formatMessage(messages.documents)}
-          </Tab>
-        </>
-      )}
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo }),
-            { replace: true }
-          )
-        }}
-      >
-        {intl.formatMessage(messages.audit)}
-      </Tab>
+        ))}
     </TabContainer>
   )
 }
