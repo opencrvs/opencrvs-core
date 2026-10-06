@@ -20184,6 +20184,8 @@ components:
                 - UNARCHIVE
                 - PRINT_CERTIFICATE
                 - REQUEST_CORRECTION
+                - REVOKE_REGISTRATION
+                - REINSTATE_REGISTRATION
           required:
             - type
           additionalProperties: false
