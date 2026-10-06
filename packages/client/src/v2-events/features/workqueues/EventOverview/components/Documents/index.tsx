@@ -30,6 +30,7 @@ import { Pagination, Text } from '@opencrvs/components'
 import { messages as eventOverviewMessages } from '@client/v2-events/layouts/EventOverview'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { getRecordActionLabel } from '@client/v2-events/utils'
 import { ActionByCell, WhenCell } from '../EventHistory'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 
@@ -66,16 +67,11 @@ const messages = defineMessages({
   }
 })
 
-/**
- * One uploaded file, tied to the action that added it. A single FILE field
- * yields one entry; a FILE_WITH_OPTIONS field yields one entry per option file.
- * The document is named after its field's config label, not the uploaded
- * file's name. The whole action is carried so the row can reuse the event
- * history's "by"/"when" cells for the uploader and timestamp.
- */
 interface DocumentEntry {
   id: string
   label: TranslationConfig
+  // For a FILE_WITH_OPTIONS document, we want to show both the field label and the option label
+  optionLabel?: string | TranslationConfig
   action: ActionDocument
 }
 
@@ -121,11 +117,15 @@ function getUploadedDocuments(
         ]
       }
 
-      // File with options: an array of files — one row per option file.
+      // File with options: an array of files — one row per option file, named
+      // after the field plus the option it was uploaded under.
       if (isFileFieldWithOptionType(field)) {
-        return field.value.map((_file, index) => ({
+        return field.value.map((file, index) => ({
           id: `${action.id}:${fieldId}:${index}`,
-          ...base
+          ...base,
+          optionLabel:
+            field.config.options.find((o) => o.value === file.option)?.label ??
+            file.option
         }))
       }
 
@@ -135,8 +135,7 @@ function getUploadedDocuments(
 }
 
 /**
- * Collects every document uploaded to a record as a flat, chronological
- * history of upload events.
+ * Collects every document uploaded to a record as a flat, chronological history of upload events.
  */
 function collectDocuments(
   event: EventDocument,
@@ -163,9 +162,11 @@ function DocumentsContent({ fullEvent }: { fullEvent: EventDocument }) {
   )
 
   const columns = [
+    // Padding column
+    { label: '', width: 2, key: 'padding' },
     {
       label: intl.formatMessage(messages.document),
-      width: 38,
+      width: 36,
       key: 'document'
     },
     {
@@ -185,13 +186,28 @@ function DocumentsContent({ fullEvent }: { fullEvent: EventDocument }) {
     }
   ]
 
-  const documents: ITableRow[] = entries.map((entry) => ({
-    document: intl.formatMessage(entry.label),
-    // TODO: localise the action type (deferred). Raw value for now.
-    recordAction: entry.action.type,
-    addedOn: <WhenCell isoDate={entry.action.createdAt} />,
-    addedBy: <ActionByCell action={entry.action} />
-  }))
+  const documents: ITableRow[] = entries.map((entry) => {
+    const fieldName = intl.formatMessage(entry.label)
+    let document = fieldName
+    if (entry.optionLabel !== undefined) {
+      const optionName =
+        typeof entry.optionLabel === 'string'
+          ? entry.optionLabel
+          : intl.formatMessage(entry.optionLabel)
+      document = `${fieldName} (${optionName})`
+    }
+
+    return {
+      document,
+      recordAction: getRecordActionLabel(
+        entry.action,
+        eventConfiguration,
+        intl
+      ),
+      addedOn: <WhenCell isoDate={entry.action.createdAt} />,
+      addedBy: <ActionByCell action={entry.action} />
+    }
+  })
 
   const displayedDocuments = documents.slice(
     (currentPageNumber - 1) * PAGE_SIZE,

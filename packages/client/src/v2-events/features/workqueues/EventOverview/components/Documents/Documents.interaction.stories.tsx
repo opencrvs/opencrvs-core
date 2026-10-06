@@ -1,0 +1,344 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import type { Meta, StoryObj } from '@storybook/react'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import React from 'react'
+import superjson from 'superjson'
+import { expect, within } from 'storybook/test'
+import {
+  ActionDocument,
+  ActionType,
+  createPrng,
+  DocumentPath,
+  EventConfig,
+  EventDocument,
+  FieldType,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  generateActionDocument,
+  generateRandomDatetime,
+  getCurrentEventState,
+  getUUID,
+  tennisClubMembershipEvent,
+  TestUserRole
+} from '@opencrvs/commons/client'
+import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { EventOverviewIndex } from '../../EventOverview'
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
+
+const refData = testDataGenerator()
+
+const SUPPORTING_DOC_FIELD_ID = 'applicant.supportingDoc'
+const SUPPORTING_DOC_LABEL = 'Supporting document'
+const IDENTITY_DOCS_FIELD_ID = 'applicant.identityDocuments'
+const IDENTITY_DOCS_LABEL = 'Identity documents'
+const DECLARE_ACTION_LABEL = 'Send an application'
+
+const [applicantPage, ...otherPages] =
+  tennisClubMembershipEvent.declaration.pages
+
+/**
+ * The tennis club configuration with two file fields added to the applicant
+ * page: a single FILE and a FILE_WITH_OPTIONS. Serialised the way a country
+ * configuration reaches the client (JSON only, no chainable builder helpers).
+ */
+const eventConfig = JSON.parse(
+  JSON.stringify({
+    ...tennisClubMembershipEvent,
+    declaration: {
+      ...tennisClubMembershipEvent.declaration,
+      pages: [
+        {
+          ...applicantPage,
+          fields: [
+            ...applicantPage.fields,
+            {
+              id: SUPPORTING_DOC_FIELD_ID,
+              type: FieldType.FILE,
+              label: {
+                defaultMessage: SUPPORTING_DOC_LABEL,
+                description: 'Label for the supporting document file field',
+                id: 'event.tennis-club-membership.action.declare.form.field.supportingDoc.label'
+              }
+            },
+            {
+              id: IDENTITY_DOCS_FIELD_ID,
+              type: FieldType.FILE_WITH_OPTIONS,
+              label: {
+                defaultMessage: IDENTITY_DOCS_LABEL,
+                description: 'Label for the identity documents file field',
+                id: 'event.tennis-club-membership.action.declare.form.field.identityDocuments.label'
+              },
+              options: [
+                {
+                  value: 'passport',
+                  label: {
+                    defaultMessage: 'Passport',
+                    description: 'Passport option',
+                    id: 'event.tennis-club-membership.identityDocuments.passport.label'
+                  }
+                },
+                {
+                  value: 'license',
+                  label: {
+                    defaultMessage: 'License',
+                    description: 'License option',
+                    id: 'event.tennis-club-membership.identityDocuments.license.label'
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        ...otherPages
+      ]
+    }
+  })
+) as EventConfig
+
+const actionDefaults = {
+  createdAt: generateRandomDatetime(
+    createPrng(42),
+    new Date('2024-03-01'),
+    new Date('2024-04-01')
+  ),
+  createdBy: refData.user.id.localRegistrar,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
+} satisfies Partial<ActionDocument>
+
+const supportingDocA: FileFieldValue = {
+  path: 'supporting-doc-a.png' as DocumentPath,
+  originalFilename: 'birth-certificate.png',
+  type: 'image/png'
+}
+
+const supportingDocB: FileFieldValue = {
+  path: 'supporting-doc-b.png' as DocumentPath,
+  originalFilename: 'birth-certificate-corrected.png',
+  type: 'image/png'
+}
+
+const identityDocuments: FileFieldWithOptionValue = [
+  {
+    path: 'passport.png' as DocumentPath,
+    originalFilename: 'passport.png',
+    type: 'image/png',
+    option: 'passport'
+  },
+  {
+    path: 'license.png' as DocumentPath,
+    originalFilename: 'license.png',
+    type: 'image/png',
+    option: 'license'
+  }
+]
+
+function assigned() {
+  return generateActionDocument({
+    configuration: eventConfig,
+    action: ActionType.ASSIGN,
+    defaults: {
+      ...actionDefaults,
+      assignedTo: refData.user.id.localRegistrar
+    }
+  })
+}
+
+/**
+ * A record whose documents were uploaded across two actions:
+ *  - DECLARE uploads the supporting document and two identity documents.
+ *  - EDIT replaces the supporting document and removes the identity documents.
+ * So the history holds four upload events (two supporting docs, two identity
+ * docs), and the removal contributes none.
+ */
+const eventWithDocuments: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  actions: [
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.CREATE,
+      defaults: { ...actionDefaults, declaration: {} }
+    }),
+    assigned(),
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.DECLARE,
+      defaults: {
+        ...actionDefaults,
+        declaration: {
+          'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' },
+          'applicant.dob': '1999-11-11',
+          [SUPPORTING_DOC_FIELD_ID]: supportingDocA,
+          [IDENTITY_DOCS_FIELD_ID]: identityDocuments
+        }
+      }
+    }),
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.EDIT,
+      defaults: {
+        ...actionDefaults,
+        declaration: {
+          [SUPPORTING_DOC_FIELD_ID]: supportingDocB,
+          [IDENTITY_DOCS_FIELD_ID]: null
+        }
+      }
+    }),
+    assigned()
+  ]
+}
+
+/** A record with no uploaded documents. */
+const eventWithoutDocuments: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: getUUID(),
+  actions: [
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.CREATE,
+      defaults: { ...actionDefaults, declaration: {} }
+    }),
+    assigned(),
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.DECLARE,
+      defaults: {
+        ...actionDefaults,
+        declaration: {
+          'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' },
+          'applicant.dob': '1999-11-11'
+        }
+      }
+    }),
+    assigned()
+  ]
+}
+
+function handlersFor(event: EventDocument) {
+  return {
+    events: [
+      tRPCMsw.event.config.get.query(() => [eventConfig]),
+      tRPCMsw.event.get.query(() => event),
+      tRPCMsw.event.search.query(() => ({
+        results: [getCurrentEventState(event, eventConfig)],
+        total: 1
+      }))
+    ]
+  }
+}
+
+const meta: Meta<typeof EventOverviewIndex> = {
+  title: 'Documents/Interaction',
+  component: EventOverviewIndex,
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    offline: {
+      configs: [eventConfig],
+      events: [eventWithDocuments, eventWithoutDocuments]
+    }
+  },
+  decorators: [
+    (Story) => (
+      <TRPCProvider>
+        <Story />
+      </TRPCProvider>
+    )
+  ]
+}
+
+export default meta
+type Story = StoryObj<typeof EventOverviewIndex>
+
+/**
+ * Every upload across the record's accepted actions is listed: one row per FILE
+ * upload and one row per option file of a FILE_WITH_OPTIONS field, named after
+ * the field's config label and attributed to the action that added it. The
+ * removal in the edit adds no row.
+ */
+export const ShowsUploadedDocuments: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
+        eventId: eventWithDocuments.id
+      })
+    },
+    msw: { handlers: handlersFor(eventWithDocuments) }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('four upload events are listed', async () => {
+      await expect(await canvas.findByText('Documents (4)')).toBeVisible()
+    })
+
+    await step('documents are named after their field label', async () => {
+      // Supporting document: uploaded in DECLARE, replaced in EDIT -> two rows.
+      await expect(
+        await canvas.findAllByText(SUPPORTING_DOC_LABEL)
+      ).toHaveLength(2)
+    })
+
+    await step('option files are named "<field> (<option>)"', async () => {
+      await expect(
+        await canvas.findByText(`${IDENTITY_DOCS_LABEL} (Passport)`)
+      ).toBeVisible()
+      await expect(
+        await canvas.findByText(`${IDENTITY_DOCS_LABEL} (License)`)
+      ).toBeVisible()
+    })
+
+    await step('the uploading action is shown by its label', async () => {
+      await expect(
+        await canvas.findAllByText(DECLARE_ACTION_LABEL)
+      ).not.toHaveLength(0)
+    })
+  }
+}
+
+/** With no uploads, the empty state is shown and the count is zero. */
+export const EmptyState: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
+        eventId: eventWithoutDocuments.id
+      })
+    },
+    msw: { handlers: handlersFor(eventWithoutDocuments) }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('no documents are listed', async () => {
+      await expect(await canvas.findByText('Documents (0)')).toBeVisible()
+      await expect(
+        await canvas.findByText('No documents found')
+      ).toBeVisible()
+    })
+  }
+}
