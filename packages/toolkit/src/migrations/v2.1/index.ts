@@ -15,6 +15,7 @@ import { main as enableTelemetry } from './enable-telemetry'
 import { main as migrateInfrastructureToAssets } from './migrate-infrastructure-to-assets'
 import { main as removeMetabasePackageInstalls } from './remove-metabase-package-installs'
 import { main as removeSentry } from './remove-sentry'
+import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
 import { main as renameTriggerPaths } from './rename-trigger-paths'
 import { main as upgradeTilt } from './upgrade-tilt'
 
@@ -26,6 +27,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await addExplicitCorrectionFlags()
   await renameTriggerPaths()
   await addRecoveryLinkNotifications()
+  await replaceIncompleteFlag()
   await addTranslations()
   await removeSentry()
   await removeMetabasePackageInstalls()
