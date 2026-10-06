@@ -309,12 +309,12 @@ test.describe
     await page.getByRole('button', { name: 'Audit' }).click()
 
     await expect(
-      page.getByRole('button', { name: 'Correction requested', exact: true })
+      page.getByRole('button', { name: 'Correction approved', exact: true })
     ).toBeVisible()
 
     await page.getByRole('button', { name: 'Next page' }).click()
     await expect(
-      page.getByRole('button', { name: 'Correction approved', exact: true })
+      page.getByRole('button', { name: 'Correction requested', exact: true })
     ).toBeVisible()
   })
 
