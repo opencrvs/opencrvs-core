@@ -158,7 +158,7 @@ describe('Overwriting parent field', () => {
     ]
   })
 
-  const modiedchildOnboardingEvent = withDeclaration(
+  const modifiedChildOnboardingEvent = withDeclaration(
     defineConfig({
       ...ChildOnboardingEvent,
       actions: [
@@ -181,7 +181,7 @@ describe('Overwriting parent field', () => {
   it('should overwrite informant.relation via REQUEST_CORRECTION action', async () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([modiedchildOnboardingEvent])
+        return HttpResponse.json([modifiedChildOnboardingEvent])
       }),
       http.post(
         `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,
@@ -222,7 +222,7 @@ describe('Overwriting parent field', () => {
     )
     await createIndex(
       getEventIndexName(CHILD_ONBOARDING_EVENT),
-      getDeclarationFields(modiedchildOnboardingEvent)
+      getDeclarationFields(modifiedChildOnboardingEvent)
     )
 
     event = await client.event.actions.declare.request(
@@ -238,7 +238,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    let eventState = getCurrentEventState(event, modiedchildOnboardingEvent)
+    let eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.id).toBeDefined()
     expect(eventState.declaration['informant.dobUnknown']).toBe(false)
     expect(eventState.declaration['informant.dob']).toBe('1988-06-12')
@@ -264,7 +264,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    eventState = getCurrentEventState(event, modiedchildOnboardingEvent)
+    eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.declaration['informant.dobUnknown']).toBeFalsy()
     expect(eventState.declaration['informant.relation']).toBe('MOTHER')
   })
