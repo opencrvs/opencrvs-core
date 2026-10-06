@@ -29,6 +29,7 @@ import {
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ITableRow, Table } from '@opencrvs/components/lib/Table'
 import { Link, Pagination, Text } from '@opencrvs/components'
+import { ActionType } from '@opencrvs/commons/client'
 import { messages as eventOverviewMessages } from '@client/v2-events/layouts/EventOverview'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -36,7 +37,6 @@ import { getRecordActionLabel } from '@client/v2-events/utils'
 import { DocumentPreview } from '@client/v2-events/components/forms/inputs/FileInput/DocumentPreview'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionByCell, WhenCell } from '../EventHistory'
-import { useEventOverviewInfo } from '../useEventOverviewInfo'
 
 const PAGE_SIZE = 10
 
@@ -153,9 +153,15 @@ function collectDocuments(
     findAllFields(config).map((field) => [field.id, field])
   )
 
-  return getAcceptedActions(event).flatMap((action) =>
-    getUploadedDocuments(action, fieldById)
-  )
+  // We want to hide documents for reject correction and edit actions.
+  // - Why hide reject correction? We dont want to display documents for a rejected correction, only a correction request or an accepted correction.
+  // - Why hide edit? Edit also applies declare/register action, which displays the documents, so we dont want a duplicate row.
+  return getAcceptedActions(event)
+    .filter(
+      ({ type }) =>
+        type !== ActionType.REJECT_CORRECTION && type !== ActionType.EDIT
+    )
+    .flatMap((action) => getUploadedDocuments(action, fieldById))
 }
 
 /**

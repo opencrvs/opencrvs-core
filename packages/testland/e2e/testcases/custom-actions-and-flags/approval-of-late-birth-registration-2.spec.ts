@@ -239,6 +239,8 @@ test.describe
           'Reason for delayed registration-Late registration reason'
         )
       ).toBeVisible()
+
+      await page.getByTestId('close-dialog').click()
     })
 
     test('Documents tab shows the document added during edit', async () => {
