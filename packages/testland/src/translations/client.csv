@@ -88,6 +88,7 @@ buttons.rejectDeclaration,Reject declaration button text,Reject declaration,Reje
 buttons.replace,Label for replacing the whole section in review form,Change all,Modifier tout
 buttons.retry,The title of retry button for failed declaration,Retry,Réessayer
 buttons.review,Review button text,Review,Reviser
+buttons.revoke,Revoke button text,Revoke,Révoquer
 buttons.save,Save Button Text,Save,Sauvegarder
 buttons.saveAndExit,Save & exit Button Text,Save & Exit,Sauvegarder et quitter
 buttons.saveExit,The label for the save and exit button,Save & Exit,Enregistrer et quitter
@@ -596,7 +597,11 @@ errors.notAssigned,User not assigned error toast message,You've been unassigned 
 errors.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 event.action.notAvailableForEvent,Shown when user tries to perform an action that is not available for the event,The action you're trying to perform is not available for this event anymore,L'action que vous essayez d'effectuer n'est plus disponible pour cet événement
 event.action.outbox-retry.label,Label for retry button for outbox,Retry,Réessayer
+event.action.reinstateRegistration.label,Label for reinstate registration button in dropdown menu,Reinstate registration,Réintégrer l'enregistrement
 event.action.review-correction.label,Label for review correction button in dropdown menu,Review correction request,Revoir la demande de correction
+event.action.revokeRegistration.label,Label for revoke registration button in dropdown menu,Revoke registration,Révoquer l'enregistrement
+event.action.revokeRegistration.modal.supportingCopy,Supporting copy of the revoke registration confirmation modal,The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.,L'enregistrement est retiré et tout certificat délivré à partir de celui-ci n'est plus valide. Ceci est consigné définitivement dans le dossier.
+event.action.revokeRegistration.modal.title,Title of the revoke registration confirmation modal,Revoke this registration,Révoquer cet enregistrement
 event.birth.action.archive.label,Label for archive record button in dropdown menu,Archive,Aarchiver
 event.birth.action.collect-certificate.label,This is shown as the action name anywhere the user can trigger the action from,Print,Imprimer
 event.birth.action.declare.label,This is shown as the action name anywhere the user can trigger the action from,Declare,Declare

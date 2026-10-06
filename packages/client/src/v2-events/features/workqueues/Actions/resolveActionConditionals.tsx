@@ -90,6 +90,8 @@ function resolveInternalActionConditions({
       }
     case ActionType.ARCHIVE:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
     case ActionType.DELETE:
     case ActionType.EDIT:
     case ActionType.REJECT:

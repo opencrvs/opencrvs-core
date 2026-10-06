@@ -53,6 +53,8 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.REQUEST_CORRECTION,
   ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
   ActionType.CUSTOM,
+  ActionType.REVOKE_REGISTRATION,
+  ActionType.REINSTATE_REGISTRATION,
   ActionType.UNASSIGN,
   ActionType.READ
 ]

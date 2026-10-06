@@ -152,7 +152,9 @@ export const WorkqueueActionType = ActionTypes.extract([
   ActionType.ARCHIVE,
   ActionType.UNARCHIVE,
   ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION
+  ActionType.REQUEST_CORRECTION,
+  ActionType.REVOKE_REGISTRATION,
+  ActionType.REINSTATE_REGISTRATION
 ])
 export type WorkqueueActionType = z.infer<typeof WorkqueueActionType>
 

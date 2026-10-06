@@ -146,6 +146,18 @@ function getMockActions(createdBy: string) {
       id: generateUuid(rng),
       type: ActionType.PRINT_CERTIFICATE
     },
+    [ActionType.REVOKE_REGISTRATION]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REVOKE_REGISTRATION
+    },
+    [ActionType.REINSTATE_REGISTRATION]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REINSTATE_REGISTRATION
+    },
     [ActionType.MARK_AS_DUPLICATE]: {
       ...actionProps,
       createdBy,
