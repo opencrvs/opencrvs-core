@@ -187,6 +187,18 @@ export const TEST_USER_DEFAULT_SCOPES = [
     }
   }),
   encodeScope({
+    type: 'record.revoke-registration',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.reinstate-registration',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
     type: 'record.register',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
@@ -512,6 +524,22 @@ function actionToClientAction(
       return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
+        )
+    case ActionType.REVOKE_REGISTRATION:
+      return async (eventId: string) =>
+        client.event.actions.revocation.revoke.request(
+          generator.event.actions.revokeRegistration(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
+        )
+    case ActionType.REINSTATE_REGISTRATION:
+      return async (eventId: string) =>
+        client.event.actions.revocation.reinstate.request(
+          generator.event.actions.reinstateRegistration(eventId, {
             keepAssignment: true,
             waitFor
           })
