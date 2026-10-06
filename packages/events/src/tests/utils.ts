@@ -611,6 +611,7 @@ type SeedAction =
   | typeof ActionType.UNASSIGN
   | typeof ActionType.REQUEST_CORRECTION
   | typeof ActionType.ARCHIVE
+  | typeof ActionType.REVOKE_REGISTRATION
 
 /**
  * Seeds an event with the specified actions directly into the database.
@@ -1082,6 +1083,7 @@ export async function setupScopeTestFixture(
         | typeof ActionType.REQUEST_CORRECTION
         | typeof ActionType.UNASSIGN
         | typeof ActionType.ARCHIVE
+        | typeof ActionType.REVOKE_REGISTRATION
       )[]
     | fc.Arbitrary<
         (
@@ -1089,6 +1091,7 @@ export async function setupScopeTestFixture(
           | typeof ActionType.REQUEST_CORRECTION
           | typeof ActionType.UNASSIGN
           | typeof ActionType.ARCHIVE
+          | typeof ActionType.REVOKE_REGISTRATION
         )[]
       >
 ) {
