@@ -80,7 +80,7 @@ const TabContainer = styled(Stack)`
   width: 100%;
 `
 
-const messages = defineMessages({
+export const messages = defineMessages({
   summary: {
     id: 'events.overview.tabs.summary',
     defaultMessage: 'Summary'
@@ -88,6 +88,10 @@ const messages = defineMessages({
   record: {
     id: 'events.overview.tabs.record',
     defaultMessage: 'Record'
+  },
+  documents: {
+    id: 'events.overview.tabs.documents',
+    defaultMessage: 'Documents'
   },
   audit: {
     id: 'events.overview.tabs.audit',
@@ -122,19 +126,40 @@ function EventOverviewTabs() {
         {intl.formatMessage(messages.summary)}
       </Tab>
       {canAccessEventWithScopes() && (
-        <Tab
-          className={
-            isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
-          }
-          onClick={() => {
-            navigate(
-              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo }),
-              { replace: true }
-            )
-          }}
-        >
-          {intl.formatMessage(messages.record)}
-        </Tab>
+        <>
+          <Tab
+            className={
+              isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
+            }
+            onClick={() => {
+              navigate(
+                ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
+                  { eventId },
+                  { backTo }
+                ),
+                { replace: true }
+              )
+            }}
+          >
+            {intl.formatMessage(messages.record)}
+          </Tab>
+          <Tab
+            className={
+              isActive(ROUTES.V2.EVENTS.EVENT.DOCUMENTS.path) ? 'active' : ''
+            }
+            onClick={() => {
+              navigate(
+                ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath(
+                  { eventId },
+                  { backTo }
+                ),
+                { replace: true }
+              )
+            }}
+          >
+            {intl.formatMessage(messages.documents)}
+          </Tab>
+        </>
       )}
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
