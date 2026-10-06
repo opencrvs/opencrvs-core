@@ -34,6 +34,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getRecordActionLabel } from '@client/v2-events/utils'
 import { DocumentPreview } from '@client/v2-events/components/forms/inputs/FileInput/DocumentPreview'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionByCell, WhenCell } from '../EventHistory'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 
@@ -187,14 +188,14 @@ function DocumentNameCell({
   )
 }
 
-function DocumentsContent({ fullEvent }: { fullEvent: EventDocument }) {
+function DocumentsContent({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const entries = useMemo(
-    () => collectDocuments(fullEvent, eventConfiguration),
-    [fullEvent, eventConfiguration]
+    () => collectDocuments(event, eventConfiguration),
+    [event, eventConfiguration]
   )
 
   const columns = [
@@ -285,11 +286,8 @@ function DocumentsContent({ fullEvent }: { fullEvent: EventDocument }) {
 
 export function Documents() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.DOCUMENTS)
-  const { fullEvent, shouldShowFullOverview } = useEventOverviewInfo(eventId)
+  const events = useEvents()
+  const event = events.getEvent.useGetOrDownloadEvent(eventId)
 
-  if (!shouldShowFullOverview) {
-    return null
-  }
-
-  return <DocumentsContent fullEvent={fullEvent} />
+  return <DocumentsContent event={event} />
 }
