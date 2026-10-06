@@ -23,9 +23,12 @@ data:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            apt update
+            pgdg_codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
+            pgdg_signed_by=$(grep -rh 'apt\.postgresql\.org' /etc/apt/sources.list.d/ | grep -oE 'signed-by=[^] ]+' | head -n 1)
+            echo "deb [${pgdg_signed_by}] https://apt-archive.postgresql.org/pub/repos/apt ${pgdg_codename}-pgdg-archive main" > /etc/apt/sources.list.d/pgdg-archive.list
+            apt update -d
             apt upgrade -y
-            apt install -y pgbackrest={{ .Values.postgres.pgbackrest_version }}* openssh-client
+            apt install -y -q pgbackrest={{ .Values.postgres.pgbackrest_version }}* openssh-client
             cat > /etc/ssh/ssh_config.d/backup.conf <<'EOF'
             StrictHostKeyChecking no
             EOF
