@@ -33,6 +33,7 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
   EventStatus.enum.REGISTERED,
+  EventStatus.enum.REVOKED,
   EventStatus.enum.ARCHIVED
 ]
 
