@@ -18,6 +18,8 @@ import {
   EventDocument,
   FieldConfig,
   FieldUpdateValue,
+  FileFieldValue,
+  FileFieldValueWithOption,
   findAllFields,
   getAcceptedActions,
   isFileFieldType,
@@ -26,11 +28,12 @@ import {
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ITableRow, Table } from '@opencrvs/components/lib/Table'
-import { Pagination, Text } from '@opencrvs/components'
+import { Link, Pagination, Text } from '@opencrvs/components'
 import { messages as eventOverviewMessages } from '@client/v2-events/layouts/EventOverview'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getRecordActionLabel } from '@client/v2-events/utils'
+import { DocumentPreview } from '@client/v2-events/components/forms/inputs/FileInput/DocumentPreview'
 import { ActionByCell, WhenCell } from '../EventHistory'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 
@@ -67,12 +70,14 @@ const messages = defineMessages({
   }
 })
 
+/** Details of a single document which we want to format and display on the table. */
 interface DocumentEntry {
   id: string
-  label: TranslationConfig
-  // For a FILE_WITH_OPTIONS document, we want to show both the field label and the option label
-  optionLabel?: string | TranslationConfig
+  file: FileFieldValue | FileFieldValueWithOption
   action: ActionDocument
+  label: TranslationConfig
+  /** For a FILE_WITH_OPTIONS document, we want to show both the field label and the option label */
+  optionLabel?: TranslationConfig
 }
 
 /**
@@ -112,7 +117,8 @@ function getUploadedDocuments(
         return [
           {
             id: `${action.id}:${fieldId}`,
-            ...base
+            ...base,
+            file: field.value
           }
         ]
       }
@@ -123,9 +129,9 @@ function getUploadedDocuments(
         return field.value.map((file, index) => ({
           id: `${action.id}:${fieldId}:${index}`,
           ...base,
-          optionLabel:
-            field.config.options.find((o) => o.value === file.option)?.label ??
-            file.option
+          file,
+          optionLabel: field.config.options.find((o) => o.value === file.option)
+            ?.label
         }))
       }
 
@@ -148,6 +154,37 @@ function collectDocuments(
 
   return getAcceptedActions(event).flatMap((action) =>
     getUploadedDocuments(action, fieldById)
+  )
+}
+
+/**
+ * The document name rendered as a link that opens the file in a full-screen
+ * preview overlay. Read-only — deletion is disabled.
+ */
+function DocumentNameCell({
+  name,
+  file
+}: {
+  name: string
+  file: FileFieldValue | FileFieldValueWithOption
+}) {
+  const [previewOpen, setPreviewOpen] = useState(false)
+
+  return (
+    <>
+      <Link font="bold14" onClick={() => setPreviewOpen(true)}>
+        {name}
+      </Link>
+      {previewOpen && (
+        <DocumentPreview
+          disableDelete
+          goBack={() => setPreviewOpen(false)}
+          previewImage={file}
+          title={name}
+          onDelete={() => setPreviewOpen(false)}
+        />
+      )}
+    </>
   )
 }
 
@@ -186,19 +223,17 @@ function DocumentsContent({ fullEvent }: { fullEvent: EventDocument }) {
     }
   ]
 
+  // Format the documents for the table.
   const documents: ITableRow[] = entries.map((entry) => {
     const fieldName = intl.formatMessage(entry.label)
-    let document = fieldName
-    if (entry.optionLabel !== undefined) {
-      const optionName =
-        typeof entry.optionLabel === 'string'
-          ? entry.optionLabel
-          : intl.formatMessage(entry.optionLabel)
-      document = `${fieldName} (${optionName})`
-    }
+
+    // If the document has an option label, we want to show both the field label and the option label.
+    const document = entry.optionLabel
+      ? `${fieldName} (${intl.formatMessage(entry.optionLabel)})`
+      : fieldName
 
     return {
-      document,
+      document: <DocumentNameCell file={entry.file} name={document} />,
       recordAction: getRecordActionLabel(
         entry.action,
         eventConfiguration,
