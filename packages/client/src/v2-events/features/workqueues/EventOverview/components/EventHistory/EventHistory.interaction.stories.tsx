@@ -28,7 +28,10 @@ import {
   getCurrentEventState,
   getUUID,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -50,8 +53,9 @@ const refData = testDataGenerator()
 const GATED_FIELD_ID = 'applicant.registrationNumber'
 const GATED_FIELD_LABEL = 'Registration number'
 
-const [applicantPage, ...otherPages] =
-  tennisClubMembershipEvent.declaration.pages
+const [applicantPage, ...otherPages] = getDeclarationPages(
+  tennisClubMembershipEvent
+)
 
 /**
  * A configuration where one declaration field is only shown once the record has
@@ -63,36 +67,40 @@ const [applicantPage, ...otherPages] =
  * schema. They cannot be stored in the offline cache.
  */
 const eventConfig = JSON.parse(
-  JSON.stringify({
-    ...tennisClubMembershipEvent,
-    declaration: {
-      ...tennisClubMembershipEvent.declaration,
-      pages: [
-        {
-          ...applicantPage,
-          fields: [
-            ...applicantPage.fields,
-            {
-              id: GATED_FIELD_ID,
-              type: FieldType.TEXT,
-              label: {
-                defaultMessage: GATED_FIELD_LABEL,
-                description: 'This is the label for the field',
-                id: 'event.tennis-club-membership.action.declare.form.section.who.field.registrationNumber.label'
-              },
-              conditionals: [
-                {
-                  type: ConditionalType.SHOW,
-                  conditional: event.hasAction(ActionType.REGISTER)
-                }
-              ]
-            }
-          ]
-        },
-        ...otherPages
-      ]
-    }
-  })
+  JSON.stringify(
+    withDeclaration(
+      {
+        ...tennisClubMembershipEvent
+      },
+      {
+        ...getDeclaration(tennisClubMembershipEvent),
+        pages: [
+          {
+            ...applicantPage,
+            fields: [
+              ...applicantPage.fields,
+              {
+                id: GATED_FIELD_ID,
+                type: FieldType.TEXT,
+                label: {
+                  defaultMessage: GATED_FIELD_LABEL,
+                  description: 'This is the label for the field',
+                  id: 'event.tennis-club-membership.action.declare.form.section.who.field.registrationNumber.label'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: event.hasAction(ActionType.REGISTER)
+                  }
+                ]
+              }
+            ]
+          },
+          ...otherPages
+        ]
+      }
+    )
+  )
 ) as EventConfig
 
 const actionDefaults = {

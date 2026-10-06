@@ -52,9 +52,10 @@ import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes
+  ActionConfigTypes,
+  DeclareActionConfig
 } from './ActionConfig'
-import { FormConfig } from './FormConfig'
+import { DeclarationFormConfig, FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import {
@@ -73,18 +74,43 @@ export function ageToDate(age: number, asOfDate: PlainDate) {
   return PlainDate.parse(format(subYears(date, age), 'yyyy-MM-dd'))
 }
 
+export function getDeclaration(configuration: EventConfig) {
+  const declareAction = configuration.actions.find(
+    (action): action is DeclareActionConfig =>
+      action.type === ActionType.DECLARE
+  )
+
+  if (!declareAction) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.DECLARE} action to read the declaration from`
+    )
+  }
+
+  return declareAction.declaration
+}
+
+/**
+ * @returns a copy of the configuration with the DECLARE action's declaration replaced.
+ */
+export function withDeclaration(
+  configuration: EventConfig,
+  declaration: DeclarationFormConfig
+): EventConfig {
+  return {
+    ...configuration,
+    actions: configuration.actions.map((action) =>
+      action.type === ActionType.DECLARE ? { ...action, declaration } : action
+    )
+  }
+}
+export function getDeclarationPages(configuration: EventConfig) {
+  return getDeclaration(configuration).pages
+}
+
 export function getDeclarationFields(
   configuration: EventConfig
 ): FieldConfig[] {
-  return configuration.declaration.pages.flatMap(({ fields }) => fields)
-}
-
-export function getDeclarationPages(configuration: EventConfig) {
-  return configuration.declaration.pages
-}
-
-export function getDeclaration(configuration: EventConfig) {
-  return configuration.declaration
+  return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
 }
 
 export function isActionConfigType(

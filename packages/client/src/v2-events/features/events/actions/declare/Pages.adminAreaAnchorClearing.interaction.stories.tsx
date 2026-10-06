@@ -20,7 +20,10 @@ import {
   EventConfig,
   FieldType,
   generateEventDocument,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
@@ -110,12 +113,14 @@ const RENAMED_BUT_ALWAYS_ACTIVE_AREA: AdministrativeArea = {
  * `partOf`, so it lists every root-level area unfiltered) opted into
  * `anchorToDateOfEvent`.
  */
-const anchoredChildOnboardingEvent: EventConfig = {
-  ...ChildOnboardingEvent,
-  dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-  declaration: {
-    ...ChildOnboardingEvent.declaration,
-    pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+const anchoredChildOnboardingEvent: EventConfig = withDeclaration(
+  {
+    ...ChildOnboardingEvent,
+    dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+  },
+  {
+    ...getDeclaration(ChildOnboardingEvent),
+    pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
       page.id === 'child'
         ? {
             ...page,
@@ -140,7 +145,7 @@ const anchoredChildOnboardingEvent: EventConfig = {
         : page
     )
   }
-}
+)
 
 const freshDraftEvent = generateEventDocument({
   configuration: anchoredChildOnboardingEvent,

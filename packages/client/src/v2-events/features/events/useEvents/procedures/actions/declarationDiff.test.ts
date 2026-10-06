@@ -19,7 +19,10 @@ import {
   generateEventDocument,
   getDeclarationFields,
   tennisClubMembershipEvent,
-  ValidatorContext
+  ValidatorContext,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import {
   getChangedDeclarationDiff,
@@ -465,11 +468,13 @@ describe('getCleanedDeclarationDiff', () => {
   describe('flag() gated fields', () => {
     const flaggedFieldId = 'applicant.email'
 
-    const configWithFlaggedField = {
-      ...eventConfiguration,
-      declaration: {
-        ...eventConfiguration.declaration,
-        pages: eventConfiguration.declaration.pages.map((page) => ({
+    const configWithFlaggedField = withDeclaration(
+      {
+        ...eventConfiguration
+      },
+      {
+        ...getDeclaration(eventConfiguration),
+        pages: getDeclarationPages(eventConfiguration).map((page) => ({
           ...page,
           fields: page.fields.map((pageField) =>
             pageField.id === flaggedFieldId
@@ -483,7 +488,7 @@ describe('getCleanedDeclarationDiff', () => {
           )
         }))
       }
-    } as EventConfig
+    ) as EventConfig
 
     const document = generateEventDocument({
       configuration: eventConfiguration,

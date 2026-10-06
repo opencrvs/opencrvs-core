@@ -23,7 +23,10 @@ import {
   ConditionalType,
   field,
   ActionUpdate,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
@@ -44,11 +47,13 @@ const duplicates = [
   }
 ]
 
-const overriddenEventConfig = {
-  ...tennisClubMembershipEvent,
-  declaration: defineDeclarationForm({
-    ...tennisClubMembershipEvent.declaration,
-    pages: tennisClubMembershipEvent.declaration.pages.map((x) => {
+const overriddenEventConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent
+  },
+  defineDeclarationForm({
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: getDeclarationPages(tennisClubMembershipEvent).map((x) => {
       x.fields = x.fields.filter((f) => f.type !== FieldType.EMAIL)
       if (x.id === 'applicant') {
         x.fields.push({
@@ -86,7 +91,7 @@ const overriddenEventConfig = {
       return x
     })
   })
-}
+)
 
 const declarationObj = {
   'applicant.name': {

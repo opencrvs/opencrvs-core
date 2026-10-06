@@ -19,7 +19,10 @@ import {
   FieldType,
   generateEventDocument,
   Location,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
@@ -87,12 +90,14 @@ const INACTIVATED_FACILITY: Location = {
 function buildEventConfig(
   locationConfiguration: Record<string, boolean>
 ): EventConfig {
-  return {
-    ...ChildOnboardingEvent,
-    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-    declaration: {
-      ...ChildOnboardingEvent.declaration,
-      pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+  return withDeclaration(
+    {
+      ...ChildOnboardingEvent,
+      dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+    },
+    {
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
         page.id === 'child'
           ? {
               ...page,
@@ -111,7 +116,7 @@ function buildEventConfig(
           : page
       )
     }
-  }
+  )
 }
 
 function buildStoryParams(eventConfig: EventConfig) {
