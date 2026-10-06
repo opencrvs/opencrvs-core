@@ -1043,5 +1043,15 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         'father.address-value'
       )
     })
+
+    test('3.2.3 Documents tab lists the documents uploaded during declaration', async () => {
+      await switchEventTab(page, 'Documents')
+
+      const documentRows = page.locator('#listTable-documents [id^="row_"]')
+      await expect(documentRows.first()).toBeVisible()
+      await expect(
+        page.locator('#listTable-documents').getByText('Proof of birth')
+      ).toBeVisible()
+    })
   })
 })

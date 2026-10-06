@@ -16,6 +16,7 @@ import {
   login,
   searchFromSearchBar,
   switchEventTab,
+  uploadImage,
   validateActionMenuButton,
   getToken
 } from '@e2e/support/helpers'
@@ -153,6 +154,9 @@ test.describe.serial('Approval of late birth registration', () => {
         'Approving after verifying all late submission details.'
       )
 
+      // Upload a document in the action form so it can be asserted on the Documents tab against the Approve action.
+      await uploadImage(page, page.locator('button[name="approvalNotice"]'))
+
       const approveResponse = page.waitForResponse(
         (response) =>
           response.url().includes('event.actions.custom') && response.ok()
@@ -192,6 +196,20 @@ test.describe.serial('Approval of late birth registration', () => {
       await page.getByRole('button', { name: 'Approved', exact: true }).click()
       await expect(
         page.getByText('Approving after verifying all late submission details.')
+      ).toBeVisible()
+    })
+
+    test('Documents tab shows the document uploaded by the Approve action', async () => {
+      await switchEventTab(page, 'Documents')
+
+      const documentRows = page.locator('#listTable-documents [id^="row_"]')
+      await expect(documentRows).toHaveCount(1)
+      await expect(
+        documentRows.first().getByText('Approval notice')
+      ).toBeVisible()
+      // The "Record action" column shows the action's configured label.
+      await expect(
+        documentRows.first().getByText('Approve', { exact: true })
       ).toBeVisible()
     })
   })

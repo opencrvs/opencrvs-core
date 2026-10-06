@@ -77,4 +77,8 @@ test.describe
       await modal.locator('#close-dialog').click()
     }
   })
+  test('Documents tab shows no documents', async () => {
+    await switchEventTab(page, 'Documents')
+    await expect(page.getByText('No documents found')).toBeVisible()
+  })
 })
