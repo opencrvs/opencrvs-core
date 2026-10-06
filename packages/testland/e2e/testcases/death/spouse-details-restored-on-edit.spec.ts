@@ -193,9 +193,11 @@ test('Spouse details restored on a later edit are reflected in review and audit 
     await switchEventTab(page, 'Summary')
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_VILLAGE)
     await switchEventTab(page, 'Audit')
-    await page.getByRole('button', { name: '2', exact: true }).click()
-
-    await page.getByRole('button', { name: 'Edited', exact: true }).click()
+    // History is latest first, so the second edit is the first 'Edited' row
+    await page
+      .getByRole('button', { name: 'Edited', exact: true })
+      .first()
+      .click()
 
     await expect(
       page.getByText("Spouse's name" + '-' + restoredSpouseName)
