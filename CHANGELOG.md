@@ -2,6 +2,10 @@
 
 ## 1.9.20 Release Candidate
 
+### Bug fixes
+
+- A database query whose value could not be serialised left its Postgres connection permanently unusable and corrupted the next query sent on any connection, so unrelated requests to the events service failed with `invalid message format` until it restarted. The events service now requires `pg` 8.22.0 or later, which recovers from the failed query. [#13904](https://github.com/opencrvs/opencrvs-core/issues/13904)
+
 ## 1.9.19
 
 ### Security
