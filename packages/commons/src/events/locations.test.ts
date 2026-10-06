@@ -515,10 +515,10 @@ describe('canAccessEventWithScope()', () => {
     test('should access event carrying one of the "anyOf" flags', () => {
       expect(
         canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
+          { ...registeredEvent, flags: ['correction-requested'] },
           {
             type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+            options: { flags: { anyOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
@@ -531,7 +531,7 @@ describe('canAccessEventWithScope()', () => {
           { ...registeredEvent, flags: [] },
           {
             type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+            options: { flags: { anyOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
@@ -541,10 +541,10 @@ describe('canAccessEventWithScope()', () => {
     test('should access event carrying all of the "allOf" flags', () => {
       expect(
         canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          { ...registeredEvent, flags: ['correction-requested', 'rejected'] },
           {
             type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+            options: { flags: { allOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
@@ -554,10 +554,10 @@ describe('canAccessEventWithScope()', () => {
     test('should not access event missing one of the "allOf" flags', () => {
       expect(
         canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
+          { ...registeredEvent, flags: ['correction-requested'] },
           {
             type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+            options: { flags: { allOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
