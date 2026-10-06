@@ -23,7 +23,8 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
-  setupTestCase
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import {
   mswServer,
@@ -188,6 +189,62 @@ test(`${ActionType.REQUEST_CORRECTION} can not be performed on a revoked record`
       `Action '${ActionType.REQUEST_CORRECTION}' cannot be performed on an event in '${EventStatus.enum.REVOKED}' state`
     )
   })
+})
+
+test('country-defined flags are unchanged by revoke and reinstate', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({ type: 'record.notify' })
+  ])
+  // The fixture's NOTIFY action adds this country flag and no later action removes it.
+  const countryFlag = 'health-worker-notified'
+
+  const event = await createEvent(client, generator, [])
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(event.id)
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, { assignedTo: user.id })
+  )
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id, { keepAssignment: true })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, { keepAssignment: true })
+  )
+  const registeredEvent = await client.event.actions.register.request(
+    generator.event.actions.register(event.id, { keepAssignment: true })
+  )
+
+  expect(
+    getCurrentEventState(registeredEvent, tennisClubMembershipEvent).flags
+  ).toContain(countryFlag)
+
+  const revokedEvent = await client.event.actions.revocation.revoke.request(
+    generator.event.actions.revokeRegistration(event.id, {
+      keepAssignment: true
+    })
+  )
+  const revokedState = getCurrentEventState(
+    revokedEvent,
+    tennisClubMembershipEvent
+  )
+  expect(revokedState.status).toEqual(EventStatus.enum.REVOKED)
+  expect(revokedState.flags).toContain(countryFlag)
+
+  const reinstatedEvent =
+    await client.event.actions.revocation.reinstate.request(
+      generator.event.actions.reinstateRegistration(event.id, {
+        keepAssignment: true
+      })
+    )
+  const reinstatedState = getCurrentEventState(
+    reinstatedEvent,
+    tennisClubMembershipEvent
+  )
+  expect(reinstatedState.status).toEqual(EventStatus.enum.REGISTERED)
+  expect(reinstatedState.flags).toContain(countryFlag)
 })
 
 test(`${ActionType.REINSTATE_REGISTRATION} is idempotent`, async () => {
