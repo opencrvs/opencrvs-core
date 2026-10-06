@@ -38,13 +38,10 @@ import {
   readCsvFile,
   toCsvLine,
   writeCsvFile
-} from '../../csv'
-import { candidateRefs, fetchTemplate } from '../../translations/template'
+} from '../csv'
+import { candidateRefs, fetchTemplate } from '../translations/template'
 
 const APPLICATIONS = ['client', 'login']
-
-/** The version this folder upgrades a country config to. */
-const TARGET_VERSION = '2.1'
 
 const skipped: string[] = []
 
@@ -77,6 +74,7 @@ export function rowsToAdd(local: CsvFile, template: CsvFile): string[] {
 
 async function updateApplication(
   cwd: string,
+  targetVersion: string,
   refs: string[],
   application: string
 ) {
@@ -92,7 +90,7 @@ async function updateApplication(
 
   if (!fetched) {
     warnSkipped(
-      `No ${application}.csv found in the ${TARGET_VERSION} country config template on GitHub; ${application}.csv not updated`
+      `No ${application}.csv found in the ${targetVersion} country config template on GitHub; ${application}.csv not updated`
     )
     return
   }
@@ -130,28 +128,29 @@ function readTemplate(contents: string): CsvFile {
 }
 
 /** Refs to read the template from. Undefined when GitHub cannot be asked. */
-async function listRefs() {
+async function listRefs(targetVersion: string) {
   try {
-    return await candidateRefs(TARGET_VERSION)
+    return await candidateRefs(targetVersion)
   } catch (error) {
     warnSkipped(
-      `Could not list the ${TARGET_VERSION} refs on GitHub (${(error as Error).message}); translations not added`
+      `Could not list the ${targetVersion} refs on GitHub (${(error as Error).message}); translations not added`
     )
     return undefined
   }
 }
 
-async function main() {
+/** Adds the translations of the `targetVersion` template, e.g. '2.2'. */
+async function main(targetVersion: string) {
   const cwd = process.cwd()
 
   console.log('Adding the translation keys core gained this version...\n')
 
-  const refs = await listRefs()
+  const refs = await listRefs(targetVersion)
 
   if (refs) {
     for (const application of APPLICATIONS) {
       try {
-        await updateApplication(cwd, refs, application)
+        await updateApplication(cwd, targetVersion, refs, application)
       } catch (error) {
         warnSkipped(
           `Could not read ${application}.csv from the country config template on GitHub (${(error as Error).message}); ${application}.csv not updated`
