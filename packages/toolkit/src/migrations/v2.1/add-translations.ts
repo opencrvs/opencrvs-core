@@ -170,4 +170,7 @@ async function main() {
   }
 }
 
+/**
+ * @knipignore
+ */
 export { main }
