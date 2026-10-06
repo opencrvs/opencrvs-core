@@ -11,6 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import { http, HttpResponse } from 'msw'
 import React from 'react'
 import superjson from 'superjson'
 import { expect, within } from 'storybook/test'
@@ -47,6 +48,19 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 const refData = testDataGenerator()
+
+// The Documents tab downloads the event on demand (useGetOrDownloadEvent), which
+// precaches the record's users and fetches each file from a presigned URL. A
+// fake presigned URL and the bytes served from it keep that file precaching off
+// the network, so it resolves instantly instead of hanging the test.
+const PRESIGNED_FILE_URL =
+  'http://localhost:3535/ocrvs/documents-story-file.png'
+const ONE_PX_PNG = Uint8Array.from(
+  atob(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+  ),
+  (c) => c.charCodeAt(0)
+)
 
 const SUPPORTING_DOC_FIELD_ID = 'applicant.supportingDoc'
 const SUPPORTING_DOC_LABEL = 'Supporting document'
@@ -244,7 +258,18 @@ function handlersFor(event: EventDocument) {
       tRPCMsw.event.search.query(() => ({
         results: [getCurrentEventState(event, eventConfig)],
         total: 1
-      }))
+      })),
+      // Resolve the on-demand download's user + file precaching (see
+      // PRESIGNED_FILE_URL) so it never hangs waiting on the network.
+      tRPCMsw.user.list.query(() => [refData.user.localRegistrar().summary]),
+      tRPCMsw.event.file.getPresignedUrl.query(() => ({
+        presignedURL: PRESIGNED_FILE_URL
+      })),
+      http.get(PRESIGNED_FILE_URL, () =>
+        HttpResponse.arrayBuffer(ONE_PX_PNG.buffer, {
+          headers: { 'Content-Type': 'image/png' }
+        })
+      )
     ]
   }
 }
@@ -336,9 +361,7 @@ export const EmptyState: Story = {
 
     await step('no documents are listed', async () => {
       await expect(await canvas.findByText('Documents (0)')).toBeVisible()
-      await expect(
-        await canvas.findByText('No documents found')
-      ).toBeVisible()
+      await expect(await canvas.findByText('No documents found')).toBeVisible()
     })
   }
 }
