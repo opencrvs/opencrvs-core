@@ -82,8 +82,10 @@ type EventConfigSchemaInput = Omit<
 }
 
 /**
- * Input accepted by `defineConfig`. `declaration` may be given either at the top level
- * (kept for backwards compatibility) or on the DECLARE action, but not both.
+ * Input accepted by `defineConfig`.
+ * `declaration` may be given at the top level (kept for backwards compatibility)
+ * or on the DECLARE action.
+ * `defineConfig` checks at runtime that it is given in exactly one of these places.
  */
 export type EventConfigInput = Omit<EventConfigSchemaInput, 'actions'> & {
   declaration?: DeclarationFormConfigInput
