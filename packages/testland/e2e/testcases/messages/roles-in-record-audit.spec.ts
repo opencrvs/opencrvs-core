@@ -73,7 +73,10 @@ test.describe('Roles in Record Audit', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await switchEventTab(page, 'Audit')
 
-      await expect(page.locator('#row_0')).toContainText(expectedAuditRole)
+      // History is latest first, so the creator's action is the last row
+      await expect(
+        page.locator('#listTable-task-history [id^="row_"]').last()
+      ).toContainText(expectedAuditRole)
     })
   }
 })

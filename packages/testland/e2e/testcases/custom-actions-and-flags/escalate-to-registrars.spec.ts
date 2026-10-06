@@ -282,7 +282,6 @@ test.describe.serial('Escalation of birth registration by Registrar', () => {
       })
 
       test('Validate that action and form field value appearing in audit trail', async () => {
-        await page.locator('#next-page-button').first().click()
         await page
           .getByRole('button', { name: 'Escalation feedback', exact: true })
           .click()
@@ -339,7 +338,6 @@ test.describe.serial('Escalation of birth registration by Registrar', () => {
       })
 
       test('Validate that action and form field value appearing in audit trail', async () => {
-        await page.locator('#next-page-button').first().click()
         await page
           .getByRole('button', { name: 'Escalation feedback', exact: true })
           .click()
