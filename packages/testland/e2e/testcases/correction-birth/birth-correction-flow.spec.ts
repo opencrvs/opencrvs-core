@@ -337,8 +337,6 @@ test.describe.serial('Birth correction flow', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await page.getByRole('button', { name: 'Audit' }).click()
 
-      // Go to second page of audit history list
-      await page.getByRole('button', { name: 'Next page' }).click()
       await expect(
         page.getByRole('button', { name: 'Correction approved', exact: true })
       ).toBeVisible()
