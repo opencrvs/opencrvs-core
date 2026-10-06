@@ -14,7 +14,6 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import superjson from 'superjson'
-import { expect, within } from 'storybook/test'
 import {
   ActionDocument,
   ActionType,
@@ -66,7 +65,6 @@ const SUPPORTING_DOC_FIELD_ID = 'applicant.supportingDoc'
 const SUPPORTING_DOC_LABEL = 'Supporting document'
 const IDENTITY_DOCS_FIELD_ID = 'applicant.identityDocuments'
 const IDENTITY_DOCS_LABEL = 'Identity documents'
-const DECLARE_ACTION_LABEL = 'Send an application'
 
 const [applicantPage, ...otherPages] =
   tennisClubMembershipEvent.declaration.pages
@@ -275,7 +273,7 @@ function handlersFor(event: EventDocument) {
 }
 
 const meta: Meta<typeof EventOverviewIndex> = {
-  title: 'Documents/Interaction',
+  title: 'Documents',
   component: EventOverviewIndex,
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
@@ -297,14 +295,15 @@ export default meta
 type Story = StoryObj<typeof EventOverviewIndex>
 
 /**
- * Every upload across the record's accepted actions is listed: one row per FILE
- * upload and one row per option file of a FILE_WITH_OPTIONS field, named after
- * the field's config label and attributed to the action that added it. The
- * removal in the edit adds no row.
+ * Visual story: every upload across the record's accepted actions is listed —
+ * one row per FILE upload and one row per option file of a FILE_WITH_OPTIONS
+ * field (`${IDENTITY_DOCS_LABEL} (Passport)` etc.), named after the field's
+ * config label and attributed to the action that added it. The supporting
+ * document is uploaded in the declaration and replaced in an edit (two rows);
+ * the removed identity documents contribute none.
  */
 export const ShowsUploadedDocuments: Story = {
   parameters: {
-    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
@@ -312,42 +311,12 @@ export const ShowsUploadedDocuments: Story = {
       })
     },
     msw: { handlers: handlersFor(eventWithDocuments) }
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('four upload events are listed', async () => {
-      await expect(await canvas.findByText('Documents (4)')).toBeVisible()
-    })
-
-    await step('documents are named after their field label', async () => {
-      // Supporting document: uploaded in DECLARE, replaced in EDIT -> two rows.
-      await expect(
-        await canvas.findAllByText(SUPPORTING_DOC_LABEL)
-      ).toHaveLength(2)
-    })
-
-    await step('option files are named "<field> (<option>)"', async () => {
-      await expect(
-        await canvas.findByText(`${IDENTITY_DOCS_LABEL} (Passport)`)
-      ).toBeVisible()
-      await expect(
-        await canvas.findByText(`${IDENTITY_DOCS_LABEL} (License)`)
-      ).toBeVisible()
-    })
-
-    await step('the uploading action is shown by its label', async () => {
-      await expect(
-        await canvas.findAllByText(DECLARE_ACTION_LABEL)
-      ).not.toHaveLength(0)
-    })
   }
 }
 
-/** With no uploads, the empty state is shown and the count is zero. */
+/** Visual story: with no uploads, the empty state is shown. */
 export const EmptyState: Story = {
   parameters: {
-    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
@@ -355,13 +324,5 @@ export const EmptyState: Story = {
       })
     },
     msw: { handlers: handlersFor(eventWithoutDocuments) }
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('no documents are listed', async () => {
-      await expect(await canvas.findByText('Documents (0)')).toBeVisible()
-      await expect(await canvas.findByText('No documents found')).toBeVisible()
-    })
   }
 }
