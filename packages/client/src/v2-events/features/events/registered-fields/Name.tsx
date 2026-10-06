@@ -295,5 +295,7 @@ export const Name = {
   Input: NameInput,
   Output: NameOutput,
   stringify,
-  toCertificateVariables
+  toCertificateVariables,
+  // Clearing a page leaves `{ firstname: '', surname: '' }`
+  isEmptyValue: (value: NameFieldValue) => !stringify(value)
 }

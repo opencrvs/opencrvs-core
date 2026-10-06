@@ -2,6 +2,12 @@
 
 ## 1.9.20 Release Candidate
 
+### Bug fixes
+
+- Clearing a form page with the "Clear" button (`showClearButton`) no longer leaves data behind that keeps the page's section expanded on review pages and the record view. A field with a configured default value is now reset to that default; previously it was overwritten with an empty name, which was stored on the record and could stop the record being indexed for search. [#13459](https://github.com/opencrvs/opencrvs-core/issues/13459)
+
+  **Note:** records saved before this fix keep that value, so they may still be missing from search; this release does not repair them.
+
 ## 1.9.19
 
 ### Security

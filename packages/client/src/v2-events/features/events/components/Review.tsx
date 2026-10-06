@@ -45,7 +45,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { Output } from './Output'
+import { Output, isEmptyValue } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
 const ValidationError = styled.span`
@@ -274,6 +274,14 @@ function ReviewHeader({ title }: { title: string }) {
 }
 
 /**
+ * Whether any of the fields displayed on review holds a non-empty value. Hidden
+ * fields must be left out, so a value nobody can see doesn't keep a section open.
+ */
+export function hasAnyDisplayedValue(fields: FieldConfig[], form: EventState) {
+  return fields.some((field) => !isEmptyValue(field, form[field.id]))
+}
+
+/**
  *  Renders review of form data, with the ability to edit the data.
  */
 function FormReview({
@@ -348,7 +356,7 @@ function FormReview({
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          // Only display fields that have a non-undefined/null value or have an validation error
+          // Leave out field types that are never shown on review
           const displayedFields = fields.filter(
             ({ type }) =>
               !FieldTypesToHideInReview.some(
@@ -373,8 +381,9 @@ function FormReview({
           const hasMandatoryFields = page.fields.some(
             (field) => !!field.required
           )
-          const hasAnyCompletedField = page.fields.some(
-            (field) => form[field.id] != null && form[field.id] !== ''
+          const hasAnyCompletedField = hasAnyDisplayedValue(
+            displayedFields,
+            form
           )
 
           return (
