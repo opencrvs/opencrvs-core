@@ -333,7 +333,13 @@ const TwoLineCell = styled.div`
   flex-direction: column;
 `
 
-function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
+export function WhenCell({
+  isoDate,
+  muted
+}: {
+  isoDate: string
+  muted?: boolean
+}) {
   const intl = useIntl()
   const date = new Date(isoDate)
   const dateText = format(
@@ -366,7 +372,7 @@ function SystemByCell() {
   )
 }
 
-function ActionByCell({
+export function ActionByCell({
   action,
   muted
 }: {
