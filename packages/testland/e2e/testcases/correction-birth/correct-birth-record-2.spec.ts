@@ -425,7 +425,6 @@ test.describe.serial('Correct record - 2', () => {
         ).toBeVisible()
 
         await page.locator('#close-dialog').click()
-        await page.getByRole('button', { name: 'Next page' }).click()
       })
 
       test('2.8.4.4 Validate correction rejected modal', async () => {

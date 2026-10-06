@@ -469,8 +469,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const history = extractHistoryActions(fullEvent)
   const allActions = fullEvent.actions as ActionDocument[]
 
+  // The backend returns actions oldest first, so reversing shows latest first
   const visibleHistory = [...history]
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .reverse()
     .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (

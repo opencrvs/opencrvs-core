@@ -54,10 +54,10 @@ test.describe
 
     const expectedActions = [
       'Assigned',
-      'Declared',
-      'Registered',
-      'Unassigned',
       'Viewed',
+      'Unassigned',
+      'Registered',
+      'Declared',
       'Assigned'
     ]
 
