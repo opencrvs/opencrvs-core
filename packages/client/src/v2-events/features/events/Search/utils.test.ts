@@ -116,6 +116,7 @@ describe('buildDataCondition', () => {
         EventStatus.enum.NOTIFIED,
         EventStatus.enum.DECLARED,
         EventStatus.enum.REGISTERED,
+        EventStatus.enum.REVOKED,
         EventStatus.enum.ARCHIVED
       ]
     })
