@@ -16,7 +16,7 @@ import { appRouter } from './router/router'
 
 export const openApiDocument = generateOpenApiDocument(appRouter, {
   title: 'OpenCRVS API',
-  version: '2.1.0',
+  version: '2.2.0',
   baseUrl: 'http://localhost:3000/api/events',
   description:
     'OpenCRVS Events API — for full documentation, see [https://documentation.opencrvs.org](https://documentation.opencrvs.org)',
