@@ -138,7 +138,7 @@ test.describe.serial('Approval of late birth registration', () => {
       ).toBeVisible()
     })
 
-    test('Fill comments field before confirming Approve declaration', async () => {
+    test('Fill comments field and add file before confirming Approve declaration', async () => {
       await selectAction(page, 'Approve')
       await expect(
         page.getByText(
@@ -197,6 +197,7 @@ test.describe.serial('Approval of late birth registration', () => {
       await expect(
         page.getByText('Approving after verifying all late submission details.')
       ).toBeVisible()
+      await page.getByTestId('close-dialog').click()
     })
 
     test('Documents tab shows the document uploaded by the Approve action', async () => {
