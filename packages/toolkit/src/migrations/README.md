@@ -6,7 +6,7 @@ to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.0/
 Run from inside a country config checkout:
 
 ```bash
-opencrvs upgrade [--docker-swarm]
+opencrvs upgrade
 ```
 
 Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/version-upgrades#step-2-update-code-and-test-locally
@@ -30,10 +30,10 @@ itself, which an upgrade has no business rewriting.
 
 ## Adding a step
 
-1. **Create** `v2.0/<your-step-name>.ts` — export `async function main()` that
+1. **Create** `v2.2/<your-step-name>.ts` — export `async function main()` that
    mutates files under `process.cwd()`.
 
-2. **Wire up** in `v2.0/index.ts`:
+2. **Wire up** in `v2.2/index.ts`:
 
    ```ts
    import { main as yourStepName } from './your-step-name'
@@ -47,7 +47,7 @@ itself, which an upgrade has no business rewriting.
 
 ```bash
 cd opencrvs-core/packages/toolkit
-yarn build:all
+pnpm build:all
 yarn link "@opencrvs/toolkit"
 
 cd opencrvs-countryconfig
