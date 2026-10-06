@@ -29,8 +29,12 @@
  *     different type and is left alone.
  *   - Adds `getDeclaration` to the file's `@opencrvs/toolkit/events` import
  *   - Logs, without changing, reads it cannot rewrite safely: optional chains
- *     (`x?.declaration`), assignments to `x.declaration` and destructuring
- *     `{ declaration }` out of an `EventConfig`
+ *     (`x?.declaration`), writes to `x.declaration` (`=`, `??=`, `delete`...)
+ *     and destructuring `{ declaration }` out of an `EventConfig`
+ *   - Logs object literals that spread an `EventConfig` and set `declaration`
+ *     next to it, which `defineConfig` now rejects
+ *   - Leaves a file alone, and logs it, when it already declares its own
+ *     `getDeclaration`
  *   - Saves the modified files in-place
  */
 
@@ -73,13 +77,26 @@ function isDeclarationReadOnEventConfig(node: PropertyAccessExpression) {
   )
 }
 
-function isAssignmentTarget(node: PropertyAccessExpression) {
+function isAssignmentOperator(kind: SyntaxKind) {
+  return kind >= SyntaxKind.FirstAssignment && kind <= SyntaxKind.LastAssignment
+}
+
+/**
+ * Returns true if the node is written to rather than read: the target of `=` or
+ * a compound assignment (`??=`, `||=`...), or the operand of `delete`.
+ * `getDeclaration(x)` is a call, so rewriting any of these does not compile.
+ */
+function isWriteTarget(node: PropertyAccessExpression) {
   const parent = node.getParent()
+
+  if (Node.isDeleteExpression(parent)) {
+    return true
+  }
 
   return (
     Node.isBinaryExpression(parent) &&
     parent.getLeft() === node &&
-    parent.getOperatorToken().getKind() === SyntaxKind.EqualsToken
+    isAssignmentOperator(parent.getOperatorToken().getKind())
   )
 }
 
@@ -111,19 +128,78 @@ function warnDestructuredDeclarations(sourceFile: SourceFile) {
   }
 }
 
-function addGetDeclarationImport(sourceFile: SourceFile) {
-  // A type-only import cannot carry a function, so only a value import is extended
-  const toolkitImport = sourceFile.getImportDeclaration(
+function warnSpreadDeclarations(sourceFile: SourceFile) {
+  for (const literal of sourceFile.getDescendantsOfKind(
+    SyntaxKind.ObjectLiteralExpression
+  )) {
+    const properties = literal.getProperties()
+
+    const spreadsEventConfig = properties.some(
+      (property) =>
+        Node.isSpreadAssignment(property) &&
+        isToolkitEventConfig(property.getExpression().getType())
+    )
+
+    const setsDeclaration = properties.some(
+      (property) =>
+        (Node.isPropertyAssignment(property) ||
+          Node.isShorthandPropertyAssignment(property)) &&
+        property.getName() === DECLARATION_PROPERTY_NAME
+    )
+
+    if (spreadsEventConfig && setsDeclaration) {
+      console.warn(
+        `  [${location(literal)}] Spreads an EventConfig and sets \`${DECLARATION_PROPERTY_NAME}\` next to it. The spread config already has a \`${DECLARATION_PROPERTY_NAME}\` on its DECLARE action, so replace that one by hand.`
+      )
+    }
+  }
+}
+
+/** Finds the value import of the toolkit's events module, if the file has one. */
+function findToolkitImport(sourceFile: SourceFile) {
+  // A type-only import cannot carry a function, and a namespace import cannot
+  // be given named imports, so neither is extended
+  return sourceFile.getImportDeclaration(
     (declaration) =>
       declaration.getModuleSpecifierValue() === TOOLKIT_EVENTS_MODULE &&
-      !declaration.isTypeOnly()
+      !declaration.isTypeOnly() &&
+      !declaration.getNamespaceImport()
   )
+}
+
+/**
+ * Returns the name `getDeclaration` is called by in the file: its local alias
+ * when the file already imports it from the toolkit, `getDeclaration` when the
+ * name is free, or undefined when the file binds `getDeclaration` to
+ * something else.
+ */
+function findGetDeclarationName(sourceFile: SourceFile) {
+  const imported = findToolkitImport(sourceFile)
+    ?.getNamedImports()
+    .find((namedImport) => namedImport.getName() === GET_DECLARATION_NAME)
+
+  if (imported) {
+    return imported.getAliasNode()?.getText() ?? GET_DECLARATION_NAME
+  }
+
+  if (sourceFile.getLocal(GET_DECLARATION_NAME)) {
+    return undefined
+  }
+
+  return GET_DECLARATION_NAME
+}
+
+function addGetDeclarationImport(sourceFile: SourceFile) {
+  const toolkitImport = findToolkitImport(sourceFile)
 
   if (!toolkitImport) {
+    const imports = sourceFile.getImportDeclarations()
+    const lastImport = imports[imports.length - 1]
+
     // Inserted as text so the import keeps the country config's style
     // (single quotes, no semicolon) rather than ts-morph's defaults
     sourceFile.insertStatements(
-      sourceFile.getImportDeclarations().length,
+      lastImport ? lastImport.getChildIndex() + 1 : 0,
       `import { ${GET_DECLARATION_NAME} } from '${TOOLKIT_EVENTS_MODULE}'`
     )
     return
@@ -141,11 +217,7 @@ function addGetDeclarationImport(sourceFile: SourceFile) {
 
   // ts-morph's addNamedImport collapses a multi-line import onto one line, so
   // the import is rewritten keeping one name per line when it had them
-  if (
-    toolkitImport.getDefaultImport() ||
-    toolkitImport.getNamespaceImport() ||
-    namedImports.length === 0
-  ) {
+  if (toolkitImport.getDefaultImport() || namedImports.length === 0) {
     toolkitImport.addNamedImport(GET_DECLARATION_NAME)
     return
   }
@@ -171,6 +243,7 @@ function addGetDeclarationImport(sourceFile: SourceFile) {
  */
 export function rewriteDeclarationReads(sourceFile: SourceFile): number {
   warnDestructuredDeclarations(sourceFile)
+  warnSpreadDeclarations(sourceFile)
 
   const reads = sourceFile
     .getDescendantsOfKind(SyntaxKind.PropertyAccessExpression)
@@ -183,9 +256,9 @@ export function rewriteDeclarationReads(sourceFile: SourceFile): number {
         return false
       }
 
-      if (isAssignmentTarget(node)) {
+      if (isWriteTarget(node)) {
         console.warn(
-          `  [${location(node)}] Skipped assignment to \`${node.getText()}\`. Set \`${DECLARATION_PROPERTY_NAME}\` on the DECLARE action instead.`
+          `  [${location(node)}] Skipped write to \`${node.getText()}\`. Set \`${DECLARATION_PROPERTY_NAME}\` on the DECLARE action instead.`
         )
         return false
       }
@@ -200,12 +273,21 @@ export function rewriteDeclarationReads(sourceFile: SourceFile): number {
     return 0
   }
 
+  const getDeclarationName = findGetDeclarationName(sourceFile)
+
+  if (!getDeclarationName) {
+    console.warn(
+      `  [${location(reads[reads.length - 1])}] Skipped ${reads.length} read(s): the file already declares its own \`${GET_DECLARATION_NAME}\`. Rewrite them to use the toolkit's \`${GET_DECLARATION_NAME}()\` by hand.`
+    )
+    return 0
+  }
+
   for (const read of reads) {
     console.log(
-      `  [${location(read)}] ${read.getText()} -> ${GET_DECLARATION_NAME}(${read.getExpression().getText()})`
+      `  [${location(read)}] ${read.getText()} -> ${getDeclarationName}(${read.getExpression().getText()})`
     )
     read.replaceWithText(
-      `${GET_DECLARATION_NAME}(${read.getExpression().getText()})`
+      `${getDeclarationName}(${read.getExpression().getText()})`
     )
   }
 
