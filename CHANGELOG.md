@@ -19,7 +19,14 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
 
+### New features
+
+#### `REVOKED` status with revoke and reinstate registration actions
+
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+
 ### Bug fixes
+
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 
 ## 2.1.0
