@@ -21,6 +21,10 @@ and do not add it to a list anywhere here.** Adding it to
 `check-missing-translation` workflow makes you do anyway — and every country
 config picks it up on upgrade.
 
+It lives outside the version folders because every upgrade runs it. When you
+start a new version's folder, call it from that folder's `runUpgrade` with the
+version it upgrades to, e.g. `await addTranslations('2.2')`.
+
 `countryconfig.csv` is left alone. It holds copy the country config declares
 itself, which an upgrade has no business rewriting.
 
