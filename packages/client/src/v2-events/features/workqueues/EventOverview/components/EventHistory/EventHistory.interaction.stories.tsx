@@ -68,40 +68,35 @@ const [applicantPage, ...otherPages] = getDeclarationPages(
  */
 const eventConfig = JSON.parse(
   JSON.stringify(
-    withDeclaration(
-      {
-        ...tennisClubMembershipEvent
-      },
-      {
-        ...getDeclaration(tennisClubMembershipEvent),
-        pages: [
-          {
-            ...applicantPage,
-            fields: [
-              ...applicantPage.fields,
-              {
-                id: GATED_FIELD_ID,
-                type: FieldType.TEXT,
-                label: {
-                  defaultMessage: GATED_FIELD_LABEL,
-                  description: 'This is the label for the field',
-                  id: 'event.tennis-club-membership.action.declare.form.section.who.field.registrationNumber.label'
-                },
-                conditionals: [
-                  {
-                    type: ConditionalType.SHOW,
-                    conditional: event.hasAction(ActionType.REGISTER)
-                  }
-                ]
-              }
-            ]
-          },
-          ...otherPages
-        ]
-      }
-    )
+    withDeclaration(tennisClubMembershipEvent, {
+      ...getDeclaration(tennisClubMembershipEvent),
+      pages: [
+        {
+          ...applicantPage,
+          fields: [
+            ...applicantPage.fields,
+            {
+              id: GATED_FIELD_ID,
+              type: FieldType.TEXT,
+              label: {
+                defaultMessage: GATED_FIELD_LABEL,
+                description: 'This is the label for the field',
+                id: 'event.tennis-club-membership.action.declare.form.section.who.field.registrationNumber.label'
+              },
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: event.hasAction(ActionType.REGISTER)
+                }
+              ]
+            }
+          ]
+        },
+        ...otherPages
+      ]
+    })
   )
-) as EventConfig
+) satisfies EventConfig
 
 const actionDefaults = {
   createdAt: generateRandomDatetime(

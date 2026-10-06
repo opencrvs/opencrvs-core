@@ -14,7 +14,6 @@ import {
   AddressType,
   ActionUpdate,
   ConditionalType,
-  EventConfig,
   flag,
   getCurrentEventState,
   withDeclaration,
@@ -137,10 +136,7 @@ describe('declaration updates with a flag-gated field', () => {
       generator.event.actions.register(event.id, { declaration })
     )
 
-    const state = getCurrentEventState(
-      response,
-      eventWithFlagGatedEmail as EventConfig
-    )
+    const state = getCurrentEventState(response, eventWithFlagGatedEmail)
 
     expect(state.declaration['applicant.email']).toBe(email)
   })

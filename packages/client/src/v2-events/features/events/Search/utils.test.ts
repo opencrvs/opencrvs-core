@@ -859,20 +859,15 @@ describe('buildSearchQuery with version-pinned locations', () => {
     ADMIN_STRUCTURE
   )
 
-  const eventConfig = withDeclaration(
-    {
-      ...tennisClubMembershipEvent
-    },
-    {
-      ...getDeclaration(tennisClubMembershipEvent),
-      pages: [
-        {
-          ...getDeclarationPages(tennisClubMembershipEvent)[0],
-          fields: [locationField, addressField]
-        }
-      ]
-    }
-  ) as typeof tennisClubMembershipEvent
+  const eventConfig = withDeclaration(tennisClubMembershipEvent, {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: [
+      {
+        ...getDeclarationPages(tennisClubMembershipEvent)[0],
+        fields: [locationField, addressField]
+      }
+    ]
+  })
 
   const searchConfigs = [
     {

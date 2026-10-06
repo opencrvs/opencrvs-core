@@ -48,9 +48,7 @@ const duplicates = [
 ]
 
 const overriddenEventConfig = withDeclaration(
-  {
-    ...tennisClubMembershipEvent
-  },
+  tennisClubMembershipEvent,
   defineDeclarationForm({
     ...getDeclaration(tennisClubMembershipEvent),
     pages: getDeclarationPages(tennisClubMembershipEvent).map((x) => {

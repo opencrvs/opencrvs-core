@@ -87,23 +87,18 @@ const membershipTypeFieldConfig: FieldConfig = {
   type: 'TEXT'
 }
 
-const eventConfigWithDefaultValue = withDeclaration(
-  {
-    ...tennisClubMembershipEvent
-  },
-  {
-    ...getDeclaration(tennisClubMembershipEvent),
-    pages: getDeclarationPages(tennisClubMembershipEvent).map((page, index) => {
-      if (index === 0) {
-        return {
-          ...page,
-          fields: [...page.fields, membershipTypeFieldConfig]
-        }
+const eventConfigWithDefaultValue = withDeclaration(tennisClubMembershipEvent, {
+  ...getDeclaration(tennisClubMembershipEvent),
+  pages: getDeclarationPages(tennisClubMembershipEvent).map((page, index) => {
+    if (index === 0) {
+      return {
+        ...page,
+        fields: [...page.fields, membershipTypeFieldConfig]
       }
-      return page
-    })
-  }
-)
+    }
+    return page
+  })
+})
 
 export const GoToReviewStoresDefaultValues: Story = {
   name: 'Default values are flushed to form state when going directly to review',

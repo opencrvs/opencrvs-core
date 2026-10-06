@@ -468,27 +468,22 @@ describe('getCleanedDeclarationDiff', () => {
   describe('flag() gated fields', () => {
     const flaggedFieldId = 'applicant.email'
 
-    const configWithFlaggedField = withDeclaration(
-      {
-        ...eventConfiguration
-      },
-      {
-        ...getDeclaration(eventConfiguration),
-        pages: getDeclarationPages(eventConfiguration).map((page) => ({
-          ...page,
-          fields: page.fields.map((pageField) =>
-            pageField.id === flaggedFieldId
-              ? {
-                  ...pageField,
-                  conditionals: [
-                    { type: ConditionalType.SHOW, conditional: flag('sealed') }
-                  ]
-                }
-              : pageField
-          )
-        }))
-      }
-    ) as EventConfig
+    const configWithFlaggedField = withDeclaration(eventConfiguration, {
+      ...getDeclaration(eventConfiguration),
+      pages: getDeclarationPages(eventConfiguration).map((page) => ({
+        ...page,
+        fields: page.fields.map((pageField) =>
+          pageField.id === flaggedFieldId
+            ? {
+                ...pageField,
+                conditionals: [
+                  { type: ConditionalType.SHOW, conditional: flag('sealed') }
+                ]
+              }
+            : pageField
+        )
+      }))
+    })
 
     const document = generateEventDocument({
       configuration: eventConfiguration,

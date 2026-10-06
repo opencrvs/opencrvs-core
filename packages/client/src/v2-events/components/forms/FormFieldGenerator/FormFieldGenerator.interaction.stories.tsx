@@ -790,23 +790,18 @@ const nixConditionalFields = [
 
 // EventConfig with nixConditionalFields in declaration so omitHiddenPaginatedFields
 // can correctly evaluate form.nid / form.verified visibility.
-const nixEventConfig: EventConfig = withDeclaration(
-  {
-    ...tennisClubMembershipEvent
-  },
-  {
-    ...getDeclaration(tennisClubMembershipEvent),
-    pages: [
-      {
-        id: 'nid-test-page',
-        title: generateTranslationConfig('NID page'),
-        fields: nixConditionalFields,
-        requireCompletionToContinue: false,
-        type: 'FORM' as const
-      }
-    ]
-  }
-)
+const nixEventConfig: EventConfig = withDeclaration(tennisClubMembershipEvent, {
+  ...getDeclaration(tennisClubMembershipEvent),
+  pages: [
+    {
+      id: 'nid-test-page',
+      title: generateTranslationConfig('NID page'),
+      fields: nixConditionalFields,
+      requireCompletionToContinue: false,
+      type: 'FORM' as const
+    }
+  ]
+})
 
 const BASE_DECL_EVENT_ID = 'a1b2c3d4-e5f6-7890-abcd-ef0123456789' as UUID
 
@@ -1061,9 +1056,7 @@ const mosipLikeFields = [
 ] satisfies FieldConfig[]
 
 const mosipEventConfig: EventConfig = withDeclaration(
-  {
-    ...tennisClubMembershipEvent
-  },
+  tennisClubMembershipEvent,
   {
     ...getDeclaration(tennisClubMembershipEvent),
     pages: [
