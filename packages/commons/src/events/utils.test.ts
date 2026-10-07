@@ -36,8 +36,7 @@ import {
   getDeclarationFields,
   getMixedPath,
   getPendingAction,
-  omitHiddenPaginatedFields,
-  withDeclaration
+  omitHiddenPaginatedFields
 } from './utils'
 import { TokenUserType } from '../authentication'
 import {
@@ -51,7 +50,8 @@ import {
   eventQueryDataGenerator,
   generateActionDocument,
   generateTranslationConfig,
-  generateTestValidatorContext
+  generateTestValidatorContext,
+  withDeclaration
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
 

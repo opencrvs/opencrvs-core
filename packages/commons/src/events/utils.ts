@@ -55,7 +55,7 @@ import {
   ActionConfigTypes,
   DeclareActionConfig
 } from './ActionConfig'
-import { DeclarationFormConfig, FormConfig } from './FormConfig'
+import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import {
@@ -89,20 +89,6 @@ export function getDeclaration(configuration: EventConfig) {
   return declareAction.declaration
 }
 
-/**
- * @returns a copy of the configuration with the DECLARE action's declaration replaced.
- */
-export function withDeclaration(
-  configuration: EventConfig,
-  declaration: DeclarationFormConfig
-): EventConfig {
-  return {
-    ...configuration,
-    actions: configuration.actions.map((action) =>
-      action.type === ActionType.DECLARE ? { ...action, declaration } : action
-    )
-  }
-}
 export function getDeclarationPages(configuration: EventConfig) {
   return getDeclaration(configuration).pages
 }
