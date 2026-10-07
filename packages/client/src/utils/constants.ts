@@ -36,4 +36,4 @@ export const APPLICATION_VERSION = APP_VERSION
  * WARNING: bumping this discards unsynced mutations (the outbox) too. Only bump
  * as part of an upgrade where staff have been instructed to empty their outbox.
  */
-export const CACHE_VERSION = 1
+export const CACHE_VERSION = 2
