@@ -332,7 +332,7 @@ function DocumentsContent({ event }: { event: EventDocument }) {
 function DocumentsLoading() {
   return (
     <LoadingContainer>
-      <Spinner baseColor="#4C68C1" id="documents-spinner" size={36} />
+      <Spinner baseColor="#4C68C1" data-testid="documents-loading" size={36} />
     </LoadingContainer>
   )
 }
