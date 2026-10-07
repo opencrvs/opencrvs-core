@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { hashKey, QueryFunctionContext } from '@tanstack/react-query'
+import { QueryFunctionContext } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import { QueryType } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -66,27 +66,11 @@ export function byIdSearchKey(eventId: string) {
 }
 
 /**
- * Prefix key matching the entries of workqueue `slug`, or of every workqueue
- * when `slug` is left out. Shorter than a full tagged key, so it partial-matches
- * every entry beneath it.
+ * Prefix key matching the entries of every workqueue. Shorter than a full
+ * tagged key, so it partial-matches every entry beneath it.
  */
-export function workqueueSearchKey(slug?: string) {
-  return [
-    ['event', 'search', 'workqueue', ...(slug === undefined ? [] : [slug])]
-  ] as const
-}
-
-let searchRequests = 0
-const lastRequestByQuery = new Map<string, number>()
-
-/** The number of the latest `event.search` request sent. Numbers only grow. */
-export function lastSearchRequest() {
-  return searchRequests
-}
-
-/** True if a request for the query `queryHash` was sent after request `after`. */
-export function isSearchRequestedAfter(queryHash: string, after: number) {
-  return (lastRequestByQuery.get(queryHash) ?? 0) > after
+export function workqueueSearchKey() {
+  return [['event', 'search', 'workqueue']] as const
 }
 
 /**
@@ -95,7 +79,6 @@ export function isSearchRequestedAfter(queryHash: string, after: number) {
  * key before delegating to tRPC.
  */
 function fetchTaggedSearch(ctx: QueryFunctionContext) {
-  lastRequestByQuery.set(hashKey(ctx.queryKey), ++searchRequests)
   // The {input, type} element is always present for event.search keys.
   const { input } = ctx.queryKey[1] as { input: SearchInput }
   const options = trpcOptionsProxy.event.search.queryOptions(input)

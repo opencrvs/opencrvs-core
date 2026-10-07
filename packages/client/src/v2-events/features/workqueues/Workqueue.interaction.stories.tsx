@@ -34,17 +34,14 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
-import {
-  AppRouter,
-  TRPCProvider,
-  queryClient,
-  trpcOptionsProxy
-} from '@client/v2-events/trpc'
+import { AppRouter, TRPCProvider, queryClient } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { faker } from '@client/tests/test-data-generators'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
+import { refetchGroup } from '@client/v2-events/hooks/useSharedRefetch'
+import { WORKQUEUE_POLL } from '@client/v2-events/hooks/useWorkqueue'
 import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
@@ -692,13 +689,10 @@ export const WorkqueueGoesOfflineWhileLoading: Story = {
 // How it works:
 //   1. MSW count handler returns initialCount (3) on the first call.
 //   2. MSW search handler returns 3 events on the first call.
-//   3. The play function manually invalidates the count cache – simulating
-//      what the 20-second polling would do – and MSW now returns updatedCount (4).
-//   4. The setQueryDefaults interceptor in count.ts detects the change and
-//      calls invalidateWorkqueueSearchQueries('recent'), which invalidates the
-//      tagged ['event','search','workqueue','recent'] cache entry.
-//   5. MSW search handler now returns 4 events.
-//   6. The list shows 4 rows without any user interaction.
+//   3. MSW now returns updatedCount (4) and 4 events, and the play function
+//      fires one tick of WORKQUEUE_POLL – what the 20-second poll does.
+//   4. The tick refetches the counts and the workqueue on screen together.
+//   5. The list shows 4 rows without any user interaction.
 // ---------------------------------------------------------------------------
 
 let autoRefreshDataChanged = false
@@ -931,15 +925,13 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
     await step(
       'After count changes workqueue list auto-refreshes to 4 rows',
       async () => {
+        // A tick joins a fetch already in flight, so let the mount's own
+        // refetch land before the server data changes.
+        await waitFor(async () => expect(queryClient.isFetching()).toBe(0))
         autoRefreshDataChanged = true
 
-        // Force an immediate count refetch – this is what the 20-second polling
-        // interval does naturally. The useEffect in Workqueues detects the
-        // change and triggers invalidateWorkqueueSearchQueries('recent'), which
-        // invalidates the tagged ['event','search','workqueue','recent'] entry.
-        await queryClient.invalidateQueries({
-          queryKey: trpcOptionsProxy.workqueue.count.queryKey()
-        })
+        // One tick of the shared poll, without waiting 20 seconds for it.
+        await refetchGroup(WORKQUEUE_POLL)
 
         // The list must update automatically – no user interaction required.
         await waitFor(

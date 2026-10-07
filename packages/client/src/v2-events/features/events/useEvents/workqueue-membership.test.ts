@@ -80,16 +80,10 @@ function startServer(queue: EventIndex[]) {
 async function mountWorkqueue(rows: EventIndex[]) {
   const fake = startServer(rows)
   const queueOptions = taggedSearchOptions({ query }, ['workqueue', SLUG])
-  const queue = new QueryObserver(queryClient, {
-    ...queueOptions,
-    refetchInterval: false
-  })
+  const queue = new QueryObserver(queryClient, queueOptions)
   const { queryFn: _queryFn, ...countOptions } =
     trpcOptionsProxy.workqueue.count.queryOptions(countInput)
-  const count = new QueryObserver(queryClient, {
-    ...countOptions,
-    refetchInterval: false
-  })
+  const count = new QueryObserver(queryClient, countOptions)
   const unsubscribe = [queue, count].map((observer) =>
     observer.subscribe(() => undefined)
   )
@@ -106,8 +100,6 @@ async function mountWorkqueue(rows: EventIndex[]) {
     rows: () => queue.getCurrentResult().data?.results,
     isOutOfDate: () =>
       queryClient.getQueryState(queueOptions.queryKey)?.isInvalidated,
-    /** What the sidebar's 20 s poll does. */
-    pollCounts: async () => count.refetch(),
     unmount: () => unsubscribe.forEach((fn) => fn())
   }
 }
@@ -268,19 +260,6 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
 
     expect(workqueue.isOutOfDate()).toBe(false)
     expect(workqueue.fake.searchFetches).toBe(0)
-    workqueue.unmount()
-  })
-})
-
-describe('the sidebar poll keeps the queue on screen in step with its count', () => {
-  it('refreshes the queue when its count changes', async () => {
-    const workqueue = await mountWorkqueue([row])
-
-    workqueue.fake.queue = []
-    await workqueue.pollCounts()
-
-    await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
-    expect(workqueue.fake.searchFetches).toBe(1)
     workqueue.unmount()
   })
 })

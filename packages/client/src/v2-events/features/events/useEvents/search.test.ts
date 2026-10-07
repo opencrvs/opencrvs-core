@@ -18,7 +18,7 @@ import {
   trpcOptionsProxy,
   purgeLegacySearchQueries
 } from '@client/v2-events/trpc'
-import { findLocalEventIndex, invalidateWorkqueueSearchQueries } from './api'
+import { findLocalEventIndex } from './api'
 import {
   byIdSearchKey,
   byIdSearchOptions,
@@ -64,7 +64,7 @@ describe('setQueryDefaults shim (procedure path derivation)', () => {
     )
 
     await queryClient.refetchQueries({
-      queryKey: workqueueSearchKey('my-slug')
+      queryKey: workqueueSearchKey()
     })
 
     expect(requests).toEqual(['event.search'])
@@ -80,36 +80,6 @@ describe('setQueryDefaults shim (procedure path derivation)', () => {
     })
 
     expect(requests).toEqual(['event.search'])
-  })
-})
-
-describe('invalidation targeting', () => {
-  const byIdEvent = '22222222-2222-2222-2222-222222222222'
-
-  function seedAll() {
-    queryClient.setQueryData(
-      taggedKey(workqueueInput, ['workqueue', 'A']),
-      EMPTY_RESULT
-    )
-    queryClient.setQueryData(
-      taggedKey(workqueueInput, ['workqueue', 'B']),
-      EMPTY_RESULT
-    )
-    queryClient.setQueryData(taggedKey(workqueueInput, ['adhoc']), EMPTY_RESULT)
-    queryClient.setQueryData(byIdSearchKey(byIdEvent), EMPTY_RESULT)
-  }
-
-  const isStale = (queryKey: readonly unknown[]) =>
-    Boolean(queryClient.getQueryState(queryKey)?.isInvalidated)
-
-  it('invalidateWorkqueueSearchQueries(A) marks only workqueue A stale', async () => {
-    seedAll()
-    await invalidateWorkqueueSearchQueries('A')
-
-    expect(isStale(taggedKey(workqueueInput, ['workqueue', 'A']))).toBe(true)
-    expect(isStale(taggedKey(workqueueInput, ['workqueue', 'B']))).toBe(false)
-    expect(isStale(taggedKey(workqueueInput, ['adhoc']))).toBe(false)
-    expect(isStale(byIdSearchKey(byIdEvent))).toBe(false)
   })
 })
 

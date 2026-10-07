@@ -28,11 +28,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
-import {
-  byIdSearchKey,
-  isSearchRequestedAfter,
-  workqueueSearchKey
-} from './procedures/search'
+import { byIdSearchKey, workqueueSearchKey } from './procedures/search'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getQueryData<T extends DecorateQueryProcedure<any>>(
@@ -264,28 +260,6 @@ async function refetchAffectedSearchQueries(...eventIds: string[]) {
     ...eventIds.map(refetchSearchQuery),
     refetchWorkqueueSearchQueries()
   ])
-}
-
-/** True if a search of workqueue `slug` went out after search request `after`. */
-export function isWorkqueueRequestedAfter(slug: string, after: number) {
-  return queryClient
-    .getQueryCache()
-    .findAll({ queryKey: workqueueSearchKey(slug) })
-    .some(({ queryHash }) => isSearchRequestedAfter(queryHash, after))
-}
-
-/**
- * Invalidate search queries for a specific workqueue identified by its slug.
- * Queries are keyed under the ['workqueue', slug] cache tag via taggedSearchOptions.
- *
- * For active observers (workqueue page mounted) this triggers an immediate
- * background refetch. For inactive queries it marks them stale so the next
- * mount fetches fresh data — no unnecessary network requests are fired.
- */
-export async function invalidateWorkqueueSearchQueries(slug: string) {
-  await queryClient.invalidateQueries({
-    queryKey: workqueueSearchKey(slug)
-  })
 }
 
 async function deleteEventData(updatedEvent: EventDocument) {
