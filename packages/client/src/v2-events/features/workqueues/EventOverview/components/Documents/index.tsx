@@ -229,26 +229,33 @@ function DocumentsContent({ event }: { event: EventDocument }) {
     }
   ]
 
-  // Format the documents for the table.
-  const documents: ITableRow[] = entries.map((entry) => {
+  // Resolve each document's display name (field label, plus the option label for a FILE_WITH_OPTIONS document).
+  const namedEntries = entries.map((entry) => {
     const fieldName = intl.formatMessage(entry.label)
 
-    // If the document has an option label, we want to show both the field label and the option label.
-    const document = entry.optionLabel
-      ? `${fieldName} (${intl.formatMessage(entry.optionLabel)})`
-      : fieldName
+    const document =
+      entry.optionLabel !== undefined
+        ? `${fieldName} (${intl.formatMessage(entry.optionLabel)})`
+        : fieldName
 
-    return {
-      document: <DocumentNameCell file={entry.file} name={document} />,
-      recordAction: getRecordActionLabel(
-        entry.action,
-        eventConfiguration,
-        intl
-      ),
-      addedOn: <WhenCell isoDate={entry.action.createdAt} />,
-      addedBy: <ActionByCell action={entry.action} />
-    }
+    return { entry, document }
   })
+
+  // Newest documents first. Ties (same upload time) are ordered by name.
+  namedEntries.sort((a, b) => {
+    const byNewest = b.entry.action.createdAt.localeCompare(
+      a.entry.action.createdAt
+    )
+    return byNewest !== 0 ? byNewest : a.document.localeCompare(b.document)
+  })
+
+  // Format the documents for the table.
+  const documents: ITableRow[] = namedEntries.map(({ entry, document }) => ({
+    document: <DocumentNameCell file={entry.file} name={document} />,
+    recordAction: getRecordActionLabel(entry.action, eventConfiguration, intl),
+    addedOn: <WhenCell isoDate={entry.action.createdAt} />,
+    addedBy: <ActionByCell action={entry.action} />
+  }))
 
   const displayedDocuments = documents.slice(
     (currentPageNumber - 1) * PAGE_SIZE,

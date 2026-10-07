@@ -248,6 +248,82 @@ const eventWithoutDocuments: EventDocument = {
   ]
 }
 
+// Identity-document files whose option value doubles as the display name
+// (unknown options fall back to their raw value on the Documents tab).
+function identityDocsNamed(names: string[]): FileFieldWithOptionValue {
+  return names.map((name, index) => ({
+    path: `identity-${index}.png` as DocumentPath,
+    originalFilename: `identity-${index}.png`,
+    type: 'image/png',
+    option: name
+  }))
+}
+
+// Uploaded with the declaration (older).
+const declaredIdentityDocs = identityDocsNamed([
+  'Affidavit',
+  'Birth certificate',
+  'Court order',
+  'Hospital record',
+  'Immunization card',
+  'National ID',
+  'Passport',
+  'Residence permit',
+  'School record',
+  'Vaccination record'
+])
+
+// Uploaded later, when the record was registered (newer).
+const registeredIdentityDocs = identityDocsNamed([
+  'Addendum',
+  'Updated certificate'
+])
+
+/**
+ * A record with more documents than fit on one page (12 > the page size of 10),
+ * uploaded across two actions on different days. Exercises the Documents tab's
+ * ordering: newest upload first (the registration docs), and within one upload
+ * time ordered by name. Documents from EDIT actions are intentionally excluded,
+ * so these are spread over DECLARE and REGISTER instead.
+ */
+const eventWithManyDocuments: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: getUUID(),
+  actions: [
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.CREATE,
+      defaults: { ...actionDefaults, declaration: {} }
+    }),
+    assigned(),
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.DECLARE,
+      defaults: {
+        ...actionDefaults,
+        createdAt: '2024-03-01T09:00:00.000Z',
+        declaration: {
+          'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' },
+          'applicant.dob': '1999-11-11',
+          [IDENTITY_DOCS_FIELD_ID]: declaredIdentityDocs
+        }
+      }
+    }),
+    generateActionDocument({
+      configuration: eventConfig,
+      action: ActionType.REGISTER,
+      defaults: {
+        ...actionDefaults,
+        createdAt: '2024-03-10T09:00:00.000Z',
+        declaration: {
+          [IDENTITY_DOCS_FIELD_ID]: registeredIdentityDocs
+        }
+      }
+    }),
+    assigned()
+  ]
+}
+
 function handlersFor(event: EventDocument) {
   return {
     events: [
@@ -279,7 +355,11 @@ const meta: Meta<typeof EventOverviewIndex> = {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     offline: {
       configs: [eventConfig],
-      events: [eventWithDocuments, eventWithoutDocuments]
+      events: [
+        eventWithDocuments,
+        eventWithoutDocuments,
+        eventWithManyDocuments
+      ]
     }
   },
   decorators: [
@@ -324,5 +404,21 @@ export const EmptyState: Story = {
       })
     },
     msw: { handlers: handlersFor(eventWithoutDocuments) }
+  }
+}
+
+/**
+ * Visual story: a record with more documents than fit on one page (12 > the
+ * page size of 10), so the table paginates and the pagination control is shown.
+ */
+export const PaginatedDocuments: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
+        eventId: eventWithManyDocuments.id
+      })
+    },
+    msw: { handlers: handlersFor(eventWithManyDocuments) }
   }
 }
