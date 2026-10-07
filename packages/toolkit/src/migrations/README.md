@@ -1,10 +1,9 @@
 # Country config migrations (codemods)
 
 Codemods run by `opencrvs upgrade` against a country config repo to upgrade it
-to the OpenCRVS version this toolkit is released with. Only the steps for that
-upgrade live here: when work on the next version starts, remove the previous
-version's steps and update the version passed to `addTranslations` in
-`index.ts`.
+to the OpenCRVS version this toolkit is released with: toolkit 2.2.0 upgrades a
+2.1 country config to 2.2. Only the steps for that upgrade live here: when work
+on the next version starts, remove the previous version's steps.
 
 Run from inside a country config checkout:
 
@@ -25,8 +24,8 @@ and do not add it to a list anywhere here.** Adding it to
 config picks it up on upgrade.
 
 Unlike the other steps it is kept from version to version, because every
-upgrade runs it. `runUpgrade` calls it with the version it upgrades to, e.g.
-`await addTranslations('2.2')`.
+upgrade runs it. `runUpgrade` calls it with the major.minor of the toolkit's own
+version, so it needs no change from release to release.
 
 `countryconfig.csv` is left alone. It holds copy the country config declares
 itself, which an upgrade has no business rewriting.

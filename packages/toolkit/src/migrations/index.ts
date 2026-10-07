@@ -15,9 +15,14 @@ import { main as readDeclarationThroughHelper } from './read-declaration-through
 /**
  * Run the upgrade process for the country config in the current working
  * directory.
+ *
+ * @param toolkitVersion the version of the toolkit running the upgrade, e.g.
+ *   `2.2.0` or `2.2.0-rc.1`. The country config is upgraded to its major.minor.
  */
-export async function runUpgrade() {
+export async function runUpgrade(toolkitVersion: string) {
+  const [major, minor] = toolkitVersion.split('.')
+
   await moveDeclarationToDeclareAction()
   await readDeclarationThroughHelper()
-  await addTranslations('2.2')
+  await addTranslations(`${major}.${minor}`)
 }
