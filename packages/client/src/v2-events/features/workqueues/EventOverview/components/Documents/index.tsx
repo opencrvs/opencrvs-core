@@ -233,10 +233,9 @@ function DocumentsContent({ event }: { event: EventDocument }) {
   const namedEntries = entries.map((entry) => {
     const fieldName = intl.formatMessage(entry.label)
 
-    const document =
-      entry.optionLabel !== undefined
-        ? `${fieldName} (${intl.formatMessage(entry.optionLabel)})`
-        : fieldName
+    const document = entry.optionLabel
+      ? `${fieldName} (${intl.formatMessage(entry.optionLabel)})`
+      : fieldName
 
     return { entry, document }
   })
