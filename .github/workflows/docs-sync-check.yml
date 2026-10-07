@@ -160,9 +160,10 @@ jobs:
             2. The documentation is versioned by top-level directory
                (v1.9.0, v2.0.0, v2.1.0, ...). Update only the directory
                matching the `version` in ./package.json (e.g. v2.1.0 for
-               2.1.0). If there is no exact match, use the highest version
-               directory. Never edit other versions, .gitbook/, or
-               sync-markdown-content.sh.
+               2.1.0). For patch versions like 2.0.5, if there is no exact match, use the highest version
+               directory (i.e. 2.0.0). For minor versions like v2.2, if no documentation exists yet,
+               clone the previous minor version's documentation to be the new documentation.
+               Never edit other versions, .gitbook/, or sync-markdown-content.sh.
             3. Search that directory (Grep/Glob) for pages covering the
                changed behaviour: configuration options, environment
                variables, API/endpoints, scopes/permissions, event config
