@@ -2,6 +2,14 @@
 
 ## 2.0.5 Release Candidate
 
+### Bug fixes
+
+- Postgres with differential backup or restore enabled no longer fails to start once its pinned pgBackRest version is superseded. The container installs pgBackRest on every start, and the PostgreSQL apt repository keeps only the latest releases, so after 2.59.0 was dropped from it the `postgres-0` pod and the restore runner could not start. They now also install from the PostgreSQL archive repository, which keeps every release, so the version in `postgres.pgbackrest_version` stays installable and keeps matching the backup server.
+
+  **Deployment notes:**
+
+  - If outbound traffic from the cluster is limited to an allowlist, add `apt-archive.postgresql.org` (HTTPS).
+
 ## 2.0.4
 
 ### Security
