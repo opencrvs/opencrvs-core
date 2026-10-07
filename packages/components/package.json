@@ -32,7 +32,7 @@
     "./lib/theme": "./src/theme.ts",
     "./lib/*": "./src/*/index.ts"
   },
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "OpenCRVS UI Component library",
   "license": "MPL-2.0",
   "private": true,
