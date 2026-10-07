@@ -121,7 +121,9 @@ function ActionMenuItems({
     return (
       <DropdownMenu.Item
         key={
-          'customActionType' in action ? action.customActionType : action.type
+          'customActionType' in action
+            ? `custom.${action.customActionType}`
+            : action.type
         }
         disabled={'disabled' in action ? action.disabled : false}
         onClick={async () => {
