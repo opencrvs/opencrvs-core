@@ -347,6 +347,7 @@ function DocumentsOffline() {
   const intl = useIntl()
   return (
     <Content
+      showTitleOnMobile
       size={ContentSize.SMALL}
       title={intl.formatMessage(messages.offlineTitle)}
     >
