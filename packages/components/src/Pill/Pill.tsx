@@ -25,11 +25,6 @@ export interface IPillProps {
   pillTheme?: IPillTheme
 }
 
-const heightMap: Record<IPillSize, string> = {
-  small: '28px',
-  medium: '36px'
-}
-
 const fontMap: Record<IPillSize, IFont> = {
   small: 'bold14',
   medium: 'bold16'
@@ -73,13 +68,14 @@ const StyledPill = styled.span<{
   `}
   color: var(--color);
   background: var(--background-color);
-  height: ${({ size }) => heightMap[size]};
   ${({ size, theme }) => theme.fonts[fontMap[size]]}
   display: inline-flex;
-  padding: 0 0.8em;
+  padding: 0.2em 0.8em;
   align-items: center;
-  border-radius: 100px;
+  border-radius: 10px;
   white-space: nowrap;
+  text-wrap: wrap;
+  display: inline-flex;
 `
 
 export function Pill({
