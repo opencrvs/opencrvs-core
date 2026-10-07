@@ -33,7 +33,6 @@ import {
 
 // Importing these registers each procedure's query and mutation defaults.
 /* eslint-disable import/no-unassigned-import */
-import './procedures/count'
 import './procedures/create'
 import './procedures/delete'
 import './procedures/actions/action'
@@ -81,9 +80,10 @@ async function mountWorkqueue(rows: EventIndex[]) {
   const fake = startServer(rows)
   const queueOptions = taggedSearchOptions({ query }, ['workqueue', SLUG])
   const queue = new QueryObserver(queryClient, queueOptions)
-  const { queryFn: _queryFn, ...countOptions } =
+  const count = new QueryObserver(
+    queryClient,
     trpcOptionsProxy.workqueue.count.queryOptions(countInput)
-  const count = new QueryObserver(queryClient, countOptions)
+  )
   const unsubscribe = [queue, count].map((observer) =>
     observer.subscribe(() => undefined)
   )
