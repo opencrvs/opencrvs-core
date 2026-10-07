@@ -75,7 +75,6 @@ const StyledPill = styled.span<{
   border-radius: 10px;
   white-space: nowrap;
   text-wrap: wrap;
-  display: inline-flex;
 `
 
 export function Pill({
