@@ -113,8 +113,8 @@ function SidebarComponent({
   const scopes = useSelector(getScope)
   const { getLocation } = useLocations()
 
-  const { getOutbox } = useEvents()
-  const outbox = getOutbox()
+  const { useOutbox } = useEvents()
+  const outbox = useOutbox()
 
   const { useDisplayableDrafts } = useDrafts()
   const drafts = useDisplayableDrafts()

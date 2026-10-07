@@ -80,7 +80,7 @@ function EventSelector() {
   const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
-  const createEvent = events.createEvent()
+  const createEvent = events.useCreateEvent()
   const user = useSelector(getUserDetails)
 
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>

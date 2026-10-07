@@ -495,9 +495,12 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
 
     await page.getByRole('button', { name: 'Audit' }).click()
 
-    await expect(page.locator('#row_0')).toContainText('Notified')
-    await expect(page.locator('#row_0')).toContainText(clientName)
-    await expect(page.locator('#row_0')).toContainText('Health integration')
+    const notifiedRow = page
+      .locator('#listTable-task-history [id^="row_"]')
+      .last()
+    await expect(notifiedRow).toContainText('Notified')
+    await expect(notifiedRow).toContainText(clientName)
+    await expect(notifiedRow).toContainText('Health integration')
 
     await page.getByText('Notified').click()
     const modal = await page.getByTestId('event-history-modal')
@@ -849,9 +852,10 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
 
       await switchEventTab(page, 'Audit')
 
-      await expect(page.locator('#row_0')).toContainText('Notified')
-      await expect(page.locator('#row_0')).toContainText(clientName)
-      await expect(page.locator('#row_3')).toContainText('Rejected')
+      const rows = page.locator('#listTable-task-history [id^="row_"]')
+      await expect(rows.last()).toContainText('Notified')
+      await expect(rows.last()).toContainText(clientName)
+      await expect(rows.filter({ hasText: 'Rejected' })).toHaveCount(1)
     })
   })
 })
