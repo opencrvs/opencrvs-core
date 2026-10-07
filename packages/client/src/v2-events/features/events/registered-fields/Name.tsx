@@ -43,7 +43,7 @@ interface Props {
   value?: NameFieldValue
 }
 
-export function defaultNameFieldValue(
+function defaultNameFieldValue(
   config: NonNullable<NameField['configuration']>['name'] | undefined
 ): NameFieldValue {
   if (config?.middlename) {
