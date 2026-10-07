@@ -242,8 +242,9 @@ export async function refetchSearchQuery(eventId: string) {
 /**
  * Refreshes the workqueues after a workqueue-affecting write. Every workqueue
  * search is marked out of date and the mounted ones refetch, in parallel with
- * the counts. Callers await it alongside their by-id refresh so the whole
- * refresh costs one round trip. Unmounted queues refresh on next mount.
+ * the counts. Callers await it alongside their refresh of the record itself
+ * (a by-id refetch, or deleteEventData's reset) so the whole refresh costs one
+ * round trip. Unmounted queues refresh on next mount.
  */
 async function refetchWorkqueueSearchQueries() {
   await Promise.all([
