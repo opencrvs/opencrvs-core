@@ -126,7 +126,8 @@ export function generateElasticsearchQuery(
     resolveFieldPath(queryInput.fieldId)
   )
   if (isMissingQueryValue(queryValue)) {
-    logger.warn(
+    // Expected for mutually exclusive fields (e.g. dob or age), so not a warning.
+    logger.debug(
       `No value found for field ${queryInput.fieldId} in the current event. Skipping query clause.`
     )
     return null
@@ -234,6 +235,14 @@ export async function searchForDuplicates(
   )
 
   if (!esQuery) {
+    logger.warn(
+      {
+        deduplicationId: configuration.id,
+        eventId: eventIndex.id,
+        eventType: eventIndex.type
+      },
+      'Deduplication rule resolved to no query; no duplicate search was run'
+    )
     return []
   }
 
