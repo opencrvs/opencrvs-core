@@ -2,6 +2,10 @@
 
 ## 2.1.1 Release Candidate
 
+### Improvements
+
+- Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
+
 ## 2.2.0 Release Candidate
 
 ### Breaking changes
