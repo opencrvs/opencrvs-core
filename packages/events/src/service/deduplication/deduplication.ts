@@ -19,7 +19,6 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  PlainDate,
   FieldType,
   extractPotentialDuplicatesFromActions,
   EventDocument

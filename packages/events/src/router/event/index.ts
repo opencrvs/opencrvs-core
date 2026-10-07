@@ -16,8 +16,7 @@ import {
   EventDocumentOnlyLastAction,
   getUUID,
   isActionDocument,
-  maybeUuid,
-  UUID
+  maybeUuid
 } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
