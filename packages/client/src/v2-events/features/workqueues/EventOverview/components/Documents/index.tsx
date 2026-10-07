@@ -50,9 +50,11 @@ const NoDocumentsText = styled(Text)`
   padding: 24px;
 `
 
-const CenteredMessage = styled.div`
-  padding: 24px;
-  text-align: center;
+const LoadingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 `
 
 const messages = defineMessages({
@@ -328,17 +330,10 @@ function DocumentsContent({ event }: { event: EventDocument }) {
  * fallback prevents a false "No documents found" flash before the data arrives.
  */
 function DocumentsLoading() {
-  const intl = useIntl()
   return (
-    <Content
-      noPadding
-      size={ContentSize.LARGE}
-      title={intl.formatMessage(eventOverviewMessages.documents)}
-    >
-      <CenteredMessage data-testid="documents-loading">
-        <Spinner baseColor="#4C68C1" id="documents-spinner" size={24} />
-      </CenteredMessage>
-    </Content>
+    <LoadingContainer>
+      <Spinner baseColor="#4C68C1" id="documents-spinner" size={36} />
+    </LoadingContainer>
   )
 }
 
@@ -352,13 +347,10 @@ function DocumentsOffline() {
   const intl = useIntl()
   return (
     <Content
-      noPadding
       size={ContentSize.SMALL}
       title={intl.formatMessage(messages.offlineTitle)}
     >
-      <CenteredMessage>
-        {intl.formatMessage(messages.offlineDescription)}
-      </CenteredMessage>
+      {intl.formatMessage(messages.offlineDescription)}
     </Content>
   )
 }
