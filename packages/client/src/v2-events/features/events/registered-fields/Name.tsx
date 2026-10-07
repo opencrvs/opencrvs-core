@@ -295,5 +295,7 @@ export const Name = {
   Input: NameInput,
   Output: NameOutput,
   stringify,
-  toCertificateVariables
+  toCertificateVariables,
+  // An all-blank name is empty
+  isEmptyValue: (value: NameFieldValue) => !stringify(value)
 }

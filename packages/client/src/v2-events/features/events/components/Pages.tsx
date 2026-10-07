@@ -19,9 +19,7 @@ import {
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
-  ValidatorContext,
-  isNameFieldType,
-  NameField
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -144,21 +142,8 @@ export function Pages({
     const clearedPageValues = Object.fromEntries(
       page.fields
         .filter((field) => !isNonInteractiveFieldType(field))
-        .map((field) => [
-          field.id,
-          // Handling name field when performing the clear page action.
-          // eslint-disable-next-line no-nested-ternary
-          (getDefaultValue(field, {}) ??
-          isNameFieldType({ config: field, value: formData[field.id] }))
-            ? (field as NameField).configuration?.name?.middlename
-              ? {
-                  firstname: '',
-                  middlename: '',
-                  surname: ''
-                }
-              : { firstname: '', surname: '' }
-            : null
-        ])
+        // A cleared field falls back to its configured default value
+        .map((field) => [field.id, getDefaultValue(field, {}) ?? null])
     )
 
     setFormData({ ...formData, ...clearedPageValues })

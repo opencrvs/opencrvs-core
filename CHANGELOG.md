@@ -6,6 +6,10 @@
 
 - A database query whose value could not be serialised left its Postgres connection permanently unusable and corrupted the next query sent on any connection, so unrelated requests to the events service failed with `invalid message format` until it restarted. The events service now requires `pg` 8.22.0 or later, which recovers from the failed query. [#13904](https://github.com/opencrvs/opencrvs-core/issues/13904)
 
+- Clearing a form page with the "Clear" button (`showClearButton`) no longer leaves data behind that keeps the page's section expanded on review pages and the record view. A field with a configured default value is now reset to that default; previously it was overwritten with an empty name, which was stored on the record and could stop the record being indexed for search. [#13459](https://github.com/opencrvs/opencrvs-core/issues/13459)
+
+  **Note:** records saved before this fix keep that value, so they may still be missing from search; this release does not repair them.
+
 ## 1.9.19
 
 ### Security

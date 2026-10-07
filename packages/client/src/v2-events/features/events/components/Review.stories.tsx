@@ -25,6 +25,7 @@ import {
   FieldType,
   generateEventDocument,
   generateTranslationConfig,
+  never,
   TENNIS_CLUB_DECLARATION_FORM,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -660,5 +661,106 @@ export const AccordionCollapsedWhenNoRequiredFieldsAndNoValues: Story = {
     // Page has no required fields and no values, so accordion should be collapsed
     await expect(await canvas.findByText('Show')).toBeInTheDocument()
     await expect(canvas.queryByText('Hide')).not.toBeInTheDocument()
+  }
+}
+
+/**
+ * Mirrors a household member page: nothing required, a checkbox kept off the
+ * review page and a field it reveals.
+ */
+const memberPageForm = defineDeclarationForm({
+  label: {
+    id: 'accordion.test.member.form.label',
+    defaultMessage: 'Accordion test form with a member page',
+    description: ''
+  },
+  pages: [
+    {
+      id: 'member',
+      title: {
+        id: 'accordion.test.member.title',
+        defaultMessage: 'Member',
+        description: ''
+      },
+      fields: [
+        {
+          id: 'member.name',
+          type: FieldType.NAME,
+          required: false,
+          label: {
+            id: 'accordion.test.member.name.label',
+            defaultMessage: 'Member name',
+            description: ''
+          }
+        },
+        {
+          id: 'member.exactDateUnknown',
+          type: FieldType.CHECKBOX,
+          required: false,
+          conditionals: [
+            {
+              type: ConditionalType.DISPLAY_ON_REVIEW,
+              conditional: never()
+            }
+          ],
+          label: {
+            id: 'accordion.test.member.exactDateUnknown.label',
+            defaultMessage: 'Exact date unknown',
+            description: ''
+          }
+        },
+        {
+          id: 'member.age',
+          type: FieldType.NUMBER,
+          required: false,
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: field('member.exactDateUnknown').isEqualTo(true)
+            }
+          ],
+          label: {
+            id: 'accordion.test.member.age.label',
+            defaultMessage: 'Age',
+            description: ''
+          }
+        }
+      ]
+    }
+  ]
+})
+
+export const AccordionCollapsedWhenPageWasCleared: Story = {
+  name: 'Accordion: collapsed when a cleared page leaves only empty or hidden values',
+  args: {
+    form: {
+      'member.name': { firstname: '', surname: '' },
+      'member.exactDateUnknown': false,
+      'member.age': 34
+    },
+    formConfig: memberPageForm,
+    title: 'Accordion collapse test - cleared page'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Show')).toBeInTheDocument()
+    await expect(canvas.queryByText('Hide')).not.toBeInTheDocument()
+  }
+}
+
+export const AccordionExpandedWhenMemberHasAValue: Story = {
+  name: 'Accordion: expanded when a member field shown on review has a value',
+  args: {
+    form: {
+      'member.name': { firstname: '', surname: 'Lovelace' },
+      'member.exactDateUnknown': false
+    },
+    formConfig: memberPageForm,
+    title: 'Accordion expand test - member with a value'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Hide')).toBeInTheDocument()
+    await expect(canvas.queryByText('Show')).not.toBeInTheDocument()
   }
 }

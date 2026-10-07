@@ -454,6 +454,7 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
   return (
     !field.required &&
     (fieldValue === undefined ||
+      fieldValue === null ||
       fieldValue === '' ||
       (fieldValue &&
         typeof fieldValue === 'object' &&
