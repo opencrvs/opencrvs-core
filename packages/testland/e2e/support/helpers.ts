@@ -455,7 +455,7 @@ export async function expectRowValueWithChangeButton(
 
 export async function switchEventTab(
   page: Page,
-  tab: 'Audit' | 'Record' | 'Summary'
+  tab: 'Audit' | 'Record' | 'Summary' | 'Documents'
 ) {
   await page.getByRole('button', { name: tab, exact: true }).click()
 }

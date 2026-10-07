@@ -42,6 +42,11 @@ export const ROUTES = {
                   backTo: string()
                 }
               }),
+              DOCUMENTS: route('documents', {
+                searchParams: {
+                  backTo: string()
+                }
+              }),
               AUDIT: route('audit', {
                 searchParams: {
                   backTo: string()

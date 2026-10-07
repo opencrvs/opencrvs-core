@@ -10,6 +10,7 @@
  */
 import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
+import { IntlShape } from 'react-intl'
 import {
   ActionDocument,
   EventConfig,
@@ -34,7 +35,9 @@ import {
   getAdministrativeAreaHierarchy,
   resolveVersion,
   ZodDate,
-  isUUID
+  isUUID,
+  getActionConfig,
+  isActionConfigType
 } from '@opencrvs/commons/client'
 import {
   findSelectedVersion,
@@ -152,6 +155,30 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   )
 
   return uniq(userIds)
+}
+
+/**
+ * The human-readable name of an action, taken from its configured 'label' (e.g. "Declare").
+ */
+export function getRecordActionLabel(
+  action: ActionDocument,
+  eventConfiguration: EventConfig,
+  intl: IntlShape
+): string {
+  if (isActionConfigType(action.type)) {
+    const actionConfig = getActionConfig({
+      eventConfiguration,
+      actionType: action.type,
+      customActionType:
+        'customActionType' in action ? action.customActionType : undefined
+    })
+
+    if (actionConfig?.label) {
+      return intl.formatMessage(actionConfig.label)
+    }
+  }
+
+  return action.type
 }
 
 function eventMetadataObjectFromEntries(entries: [string, unknown][]) {

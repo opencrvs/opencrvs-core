@@ -568,6 +568,26 @@ export const birthEvent = defineConfig({
       },
       form: [
         {
+          id: 'approvalNotice',
+          type: FieldType.FILE,
+          required: false,
+          configuration: {
+            maxFileSize: 5 * 1024 * 1024,
+            acceptedFileTypes: [
+              ImageMimeType.enum['image/jpeg'],
+              ImageMimeType.enum['image/png'],
+              ImageMimeType.enum['image/jpg'],
+              DocumentMimeType.enum['application/pdf']
+            ]
+          },
+          label: {
+            defaultMessage: 'Approval notice',
+            description:
+              'Label for the approval notice document field on the late registration approval action',
+            id: 'event.birth.custom.action.approve.field.approvalNotice.label'
+          }
+        },
+        {
           id: 'notes',
           type: 'TEXTAREA',
           label: {
