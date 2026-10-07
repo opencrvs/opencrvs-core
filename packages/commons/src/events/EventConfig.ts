@@ -88,6 +88,7 @@ type EventConfigSchemaInput = Omit<
  * `defineConfig` checks at runtime that it is given in exactly one of these places.
  */
 export type EventConfigInput = Omit<EventConfigSchemaInput, 'actions'> & {
+  /** @deprecated Define `declaration` on the DECLARE action instead. */
   declaration?: DeclarationFormConfigInput
   actions: Array<
     | Exclude<ActionConfigInput, DeclareActionConfigInput>

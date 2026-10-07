@@ -25,6 +25,13 @@ function moveDeclarationToDeclareAction({
   declaration,
   ...config
 }: EventConfigInput) {
+  if (declaration) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Event '${config.id}' defines \`declaration\` at the top level, which is deprecated and will be removed in a future release. Define it on the ${ActionType.DECLARE} action instead.`
+    )
+  }
+
   return {
     ...config,
     actions: config.actions.map((action) =>

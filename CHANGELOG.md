@@ -41,7 +41,7 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 **Country configs must read the form through `getDeclaration`.** `opencrvs upgrade` does it for you: the `read-declaration-through-helper` codemod rewrites every `declaration` read on an `EventConfig` under `src/` and imports `getDeclaration`, then lists every read it could not rewrite — an optional chain, a destructured `declaration`, an assignment — for you to change by hand.
 
-`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, so events defined with it need no other change. It throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
+`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, so events defined with it need no other change. It logs a deprecation warning, though: a future release will remove the top-level `declaration`. It throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 

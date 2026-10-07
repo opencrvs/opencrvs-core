@@ -30,10 +30,21 @@ const actionsWithoutDeclaration: EventConfigInput['actions'] =
   })
 
 describe('defineConfig()', () => {
+  let warn: jest.SpyInstance
+
+  beforeEach(() => {
+    warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    warn.mockRestore()
+  })
+
   it('should keep a declaration given on the DECLARE action', () => {
     const config = defineConfig(tennisClubMembershipEvent)
 
     expect(getDeclaration(config)).toEqual(declaration)
+    expect(warn).not.toHaveBeenCalled()
   })
 
   it('should move a top-level declaration onto the DECLARE action', () => {
@@ -45,6 +56,18 @@ describe('defineConfig()', () => {
 
     expect(getDeclaration(config)).toEqual(declaration)
     expect(config).not.toHaveProperty('declaration')
+  })
+
+  it('should warn that a top-level declaration is deprecated', () => {
+    defineConfig({
+      ...tennisClubMembershipEvent,
+      actions: actionsWithoutDeclaration,
+      declaration
+    })
+
+    expect(warn).toHaveBeenCalledWith(
+      `Event '${tennisClubMembershipEvent.id}' defines \`declaration\` at the top level, which is deprecated and will be removed in a future release. Define it on the DECLARE action instead.`
+    )
   })
 
   it('should throw when declaration is given both at the top level and on the DECLARE action', () => {
