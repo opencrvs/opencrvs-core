@@ -35,8 +35,8 @@ import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 import {
   byIdSearchOptions,
-  scopedSearchOptions,
-  SearchScope
+  taggedSearchOptions,
+  SearchCacheTag
 } from './procedures/search'
 
 function getEventWithDraftOrThrow(
@@ -99,11 +99,11 @@ export function useEvents() {
     searchEvent: {
       useQuery: (
         query: SearchQuery,
-        scope: SearchScope,
+        tag: SearchCacheTag,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useQuery({
-          ...scopedSearchOptions(query, scope),
+          ...taggedSearchOptions(query, tag),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -111,11 +111,11 @@ export function useEvents() {
       },
       useSuspenseQuery: (
         query: SearchQuery,
-        scope: SearchScope,
+        tag: SearchCacheTag,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useSuspenseQuery({
-          ...scopedSearchOptions(query, scope),
+          ...taggedSearchOptions(query, tag),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options

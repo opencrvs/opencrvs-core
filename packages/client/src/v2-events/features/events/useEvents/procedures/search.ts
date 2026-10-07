@@ -22,7 +22,7 @@ export type SearchInput = inferInput<typeof trpcOptionsProxy.event.search>
 type SearchOutput = inferOutput<typeof trpcOptionsProxy.event.search>
 
 /**
- * The scope segment(s) spliced into the tRPC key path element (queryKey[0]) to
+ * The cache tag segment(s) spliced into the tRPC key path element (queryKey[0]) to
  * make `event.search` cache entries granularly targetable:
  *
  *   workqueue:  [['event','search','workqueue', slug], {input, type:'query'}]
@@ -33,19 +33,19 @@ type SearchOutput = inferOutput<typeof trpcOptionsProxy.event.search>
  * longer one, filters like [['event','search','workqueue']] match every
  * workqueue entry, and [['event','search']] still matches everything.
  */
-export type SearchScope = ['workqueue', string] | ['id', string] | ['adhoc']
+export type SearchCacheTag = ['workqueue', string] | ['id', string] | ['adhoc']
 
 /**
- * Takes the plain unscoped tRPC key for `event.search` and splices the scope
+ * Takes the plain untagged tRPC key for `event.search` and splices the tag
  * segments into its path element (queryKey[0]), leaving the {input, type}
  * element untouched so the shim below can re-derive a clean key for tRPC.
  */
-function scopedKey(input: SearchInput, scope: SearchScope) {
+function taggedKey(input: SearchInput, tag: SearchCacheTag) {
   const key = trpcOptionsProxy.event.search.queryKey(input)
   const [path, meta] = key
-  // Splice the scope into the path element; spreading strips readonly. Cast back
+  // Splice the tag into the path element; spreading strips readonly. Cast back
   // to the branded key type so useQuery still infers the correct data type.
-  return [[...path, ...scope], meta] as unknown as typeof key
+  return [[...path, ...tag], meta] as unknown as typeof key
 }
 
 function byIdInput(eventId: string): SearchInput {
@@ -59,11 +59,11 @@ function byIdInput(eventId: string): SearchInput {
 
 export const searchKeys = {
   workqueue: (input: SearchInput, slug: string) =>
-    scopedKey(input, ['workqueue', slug]),
-  byId: (eventId: string) => scopedKey(byIdInput(eventId), ['id', eventId]),
-  adhoc: (input: SearchInput) => scopedKey(input, ['adhoc']),
+    taggedKey(input, ['workqueue', slug]),
+  byId: (eventId: string) => taggedKey(byIdInput(eventId), ['id', eventId]),
+  adhoc: (input: SearchInput) => taggedKey(input, ['adhoc']),
   /**
-   * Prefix keys for invalidation/refetch targeting. Shorter than a full scoped
+   * Prefix keys for invalidation/refetch targeting. Shorter than a full tagged
    * key so they partial-match every entry beneath them.
    */
   filters: {
@@ -88,11 +88,11 @@ export function isSearchRequestedAfter(queryHash: string, after: number) {
 }
 
 /**
- * tRPC's queryFn derives the procedure path from the runtime key, so a scoped
- * key would call `event.search.workqueue.<slug>`. This rebuilds the unscoped
+ * tRPC's queryFn derives the procedure path from the runtime key, so a tagged
+ * key would call `event.search.workqueue.<slug>`. This rebuilds the untagged
  * key before delegating to tRPC.
  */
-function fetchScopedSearch(ctx: QueryFunctionContext) {
+function fetchTaggedSearch(ctx: QueryFunctionContext) {
   lastRequestByQuery.set(hashKey(ctx.queryKey), ++searchRequests)
   // The {input, type} element is always present for event.search keys.
   const { input } = ctx.queryKey[1] as { input: SearchInput }
@@ -104,14 +104,14 @@ function fetchScopedSearch(ctx: QueryFunctionContext) {
 }
 
 /**
- * Query options for a scoped `event.search` entry. tRPC's own queryFn is left
- * out: it would derive the procedure path from the scoped key, so the default
+ * Query options for a tagged `event.search` entry. tRPC's own queryFn is left
+ * out: it would derive the procedure path from the tagged key, so the default
  * queryFn below serves the entry unless the caller supplies its own.
  */
-export function scopedSearchOptions(input: SearchInput, scope: SearchScope) {
+export function taggedSearchOptions(input: SearchInput, tag: SearchCacheTag) {
   const { queryFn: _queryFn, ...options } =
     trpcOptionsProxy.event.search.queryOptions(input)
-  return { ...options, queryKey: scopedKey(input, scope) }
+  return { ...options, queryKey: taggedKey(input, tag) }
 }
 
 /**
@@ -124,16 +124,16 @@ export function byIdSearchOptions(
   fallback: () => SearchOutput
 ) {
   return {
-    ...scopedSearchOptions(byIdInput(eventId), ['id', eventId]),
+    ...taggedSearchOptions(byIdInput(eventId), ['id', eventId]),
     queryFn: async (ctx: QueryFunctionContext) => {
-      const result = await fetchScopedSearch(ctx)
+      const result = await fetchTaggedSearch(ctx)
       return result.total > 0 ? result : fallback()
     }
   }
 }
 
 /**
- * The default queryFn for every scoped `event.search` key. Calls
+ * The default queryFn for every tagged `event.search` key. Calls
  * queryClient.setQueryDefaults directly: the procedures/utils helper would
  * close the import cycle api → search → utils → api.
  */
@@ -141,5 +141,5 @@ queryClient.setQueryDefaults(trpcOptionsProxy.event.search.queryKey(), {
   // As in the procedures/utils helper: wait for connectivity rather than the
   // persister's 'offlineFirst'.
   networkMode: 'online',
-  queryFn: fetchScopedSearch
+  queryFn: fetchTaggedSearch
 })

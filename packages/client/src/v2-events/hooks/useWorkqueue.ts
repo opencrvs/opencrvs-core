@@ -17,7 +17,7 @@ import {
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { scopedSearchOptions } from '@client/v2-events/features/events/useEvents/procedures/search'
+import { taggedSearchOptions } from '@client/v2-events/features/events/useEvents/procedures/search'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { queryClient } from '../trpc'
@@ -98,7 +98,7 @@ export function useWorkqueues() {
           limit: 10,
           sort: [{ field: 'updatedAt', direction: 'desc' as const }]
         }
-        const options = scopedSearchOptions(searchInput, [
+        const options = taggedSearchOptions(searchInput, [
           'workqueue',
           workqueueConfig.slug
         ])

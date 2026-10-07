@@ -69,7 +69,7 @@ describe('updateLocalEventIndex', () => {
     queryClient.clear()
   })
 
-  it('updates the row in a scoped workqueue entry and preserves its total', () => {
+  it('updates the row in a tagged workqueue entry and preserves its total', () => {
     const eventDocument = tennisClubMembershipEventDocument
 
     // Prepare a cached query simulating a workqueue result

@@ -272,7 +272,7 @@ export function isWorkqueueRequestedAfter(slug: string, after: number) {
 
 /**
  * Invalidate search queries for a specific workqueue identified by its slug.
- * Queries are keyed under the ['workqueue', slug] scope via searchKeys.workqueue.
+ * Queries are keyed under the ['workqueue', slug] cache tag via searchKeys.workqueue.
  *
  * For active observers (workqueue page mounted) this triggers an immediate
  * background refetch. For inactive queries it marks them stale so the next

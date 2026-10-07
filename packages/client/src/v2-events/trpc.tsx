@@ -227,7 +227,7 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
 })
 
 /**
- * Drops unscoped `event.search` entries restored from IndexedDB, which would
+ * Drops untagged `event.search` entries restored from IndexedDB, which would
  * never be collected (gcTime is Infinity). Bumping CACHE_VERSION instead would
  * also discard the offline outbox.
  */

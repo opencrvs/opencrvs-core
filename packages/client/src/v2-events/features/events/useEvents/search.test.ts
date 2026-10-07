@@ -51,7 +51,7 @@ const workqueueInput = {
 }
 
 describe('setQueryDefaults shim (procedure path derivation)', () => {
-  it('refetches a scoped workqueue entry through the event.search procedure', async () => {
+  it('refetches a tagged workqueue entry through the event.search procedure', async () => {
     const requests = recordRequests()
     queryClient.setQueryData(
       searchKeys.workqueue(workqueueInput, 'my-slug'),
@@ -109,12 +109,12 @@ describe('invalidation targeting', () => {
 })
 
 describe('purgeLegacySearchQueries', () => {
-  it('removes only old-shape 2-element keys; scoped queries and pending mutations survive', () => {
+  it('removes only old-shape 2-element keys; tagged queries and pending mutations survive', () => {
     const legacyKey = trpcOptionsProxy.event.search.queryKey(workqueueInput)
-    const scopedKey = searchKeys.workqueue(workqueueInput, 'A')
+    const taggedKey = searchKeys.workqueue(workqueueInput, 'A')
 
     queryClient.setQueryData(legacyKey, EMPTY_RESULT)
-    queryClient.setQueryData(scopedKey, EMPTY_RESULT)
+    queryClient.setQueryData(taggedKey, EMPTY_RESULT)
 
     const mutationCache = queryClient.getMutationCache()
     mutationCache.build(queryClient, { mutationKey: [['event', 'create']] })
@@ -123,7 +123,7 @@ describe('purgeLegacySearchQueries', () => {
     purgeLegacySearchQueries(queryClient)
 
     expect(queryClient.getQueryData(legacyKey)).toBeUndefined()
-    expect(queryClient.getQueryData(scopedKey)).toEqual(EMPTY_RESULT)
+    expect(queryClient.getQueryData(taggedKey)).toEqual(EMPTY_RESULT)
     expect(mutationCache.getAll().length).toBe(mutationsBefore)
   })
 })

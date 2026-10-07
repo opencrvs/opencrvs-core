@@ -26,7 +26,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { addLocalEventConfig } from './api'
 import {
   byIdSearchOptions,
-  scopedSearchOptions,
+  taggedSearchOptions,
   searchKeys
 } from './procedures/search'
 
@@ -78,7 +78,7 @@ function startServer(queue: EventIndex[]) {
 /** The queue on screen and the sidebar counts, neither of them polling. */
 async function mountWorkqueue(rows: EventIndex[]) {
   const fake = startServer(rows)
-  const queueOptions = scopedSearchOptions({ query }, ['workqueue', SLUG])
+  const queueOptions = taggedSearchOptions({ query }, ['workqueue', SLUG])
   const queue = new QueryObserver(queryClient, {
     ...queueOptions,
     refetchInterval: false
