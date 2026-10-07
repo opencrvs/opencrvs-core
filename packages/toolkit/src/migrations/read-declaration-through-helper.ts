@@ -14,7 +14,7 @@
  * `getDeclaration()` instead of the top-level `declaration` property.
  *
  * Usage:
- *   ts-node -r tsconfig-paths/register src/migrations/v2.2/read-declaration-through-helper.ts
+ *   ts-node -r tsconfig-paths/register src/migrations/read-declaration-through-helper.ts
  *
  * Why:
  *   As of v2.2 the declaration form lives on the DECLARE action. `defineConfig`

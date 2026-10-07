@@ -1,7 +1,10 @@
 # Country config migrations (codemods)
 
 Codemods run by `opencrvs upgrade` against a country config repo to upgrade it
-to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.0/`.
+to the OpenCRVS version this toolkit is released with. Only the steps for that
+upgrade live here: when work on the next version starts, remove the previous
+version's steps and update the version passed to `addTranslations` in
+`index.ts`.
 
 Run from inside a country config checkout:
 
@@ -21,19 +24,19 @@ and do not add it to a list anywhere here.** Adding it to
 `check-missing-translation` workflow makes you do anyway — and every country
 config picks it up on upgrade.
 
-It lives outside the version folders because every upgrade runs it. When you
-start a new version's folder, call it from that folder's `runUpgrade` with the
-version it upgrades to, e.g. `await addTranslations('2.2')`.
+Unlike the other steps it is kept from version to version, because every
+upgrade runs it. `runUpgrade` calls it with the version it upgrades to, e.g.
+`await addTranslations('2.2')`.
 
 `countryconfig.csv` is left alone. It holds copy the country config declares
 itself, which an upgrade has no business rewriting.
 
 ## Adding a step
 
-1. **Create** `v2.2/<your-step-name>.ts` — export `async function main()` that
+1. **Create** `<your-step-name>.ts` — export `async function main()` that
    mutates files under `process.cwd()`.
 
-2. **Wire up** in `v2.2/index.ts`:
+2. **Wire up** in `index.ts`:
 
    ```ts
    import { main as yourStepName } from './your-step-name'

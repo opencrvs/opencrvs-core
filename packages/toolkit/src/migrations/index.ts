@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { main as addTranslations } from '../add-translations'
+import { main as addTranslations } from './add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 

@@ -14,7 +14,7 @@
  * event's DECLARE action.
  *
  * Usage:
- *   ts-node -r tsconfig-paths/register src/migrations/v2.2/move-declaration-to-declare-action.ts
+ *   ts-node -r tsconfig-paths/register src/migrations/move-declaration-to-declare-action.ts
  *
  * Why:
  *   As of v2.2 the declaration form lives on the DECLARE action. `defineConfig`
