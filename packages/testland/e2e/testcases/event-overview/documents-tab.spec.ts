@@ -35,13 +35,6 @@ import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 const PROOF_OF_BIRTH_LABEL = 'Proof of birth'
 
-// Run this file's tests sequentially in a single worker instead of in parallel.
-// The loading-state test is timing-sensitive — it asserts the spinner is visible
-// during a deliberately delayed event.get — and becomes flaky when it overlaps
-// the other tests contending on the same backend. `mode: 'default'` keeps the
-// tests independent (unlike `serial`, no cascade-skip on failure).
-test.describe.configure({ mode: 'default' })
-
 /**
  * Declares a birth via the API with a proof-of-birth document attached, so the
  * declaration action already carries one document on the Documents tab.
@@ -196,10 +189,14 @@ test('Documents tab shows a loading state while the documents are fetched', asyn
   })
 
   await test.step('Opening the Documents tab shows a loading state before the list', async () => {
-    // Delay the on-demand event download so the loading state is observable.
+    // Hold the on-demand event download until the loading state is asserted.
     // The record is not assigned, so the Documents tab downloads it on open.
+    let releaseEventGet!: () => void
+    const eventGetReleased = new Promise<void>((resolve) => {
+      releaseEventGet = resolve
+    })
     await page.route(/event\.get/, async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+      await eventGetReleased
       await route.continue()
     })
 
@@ -209,7 +206,8 @@ test('Documents tab shows a loading state while the documents are fetched', asyn
     // The empty state must not flash before the fetch resolves.
     await expect(page.getByText('No documents found')).not.toBeVisible()
 
-    await page.unroute(/event\.get/)
+    releaseEventGet()
+    await page.unrouteAll({ behavior: 'wait' })
   })
 
   await test.step('Once fetched, the loading state is replaced by the list', async () => {
