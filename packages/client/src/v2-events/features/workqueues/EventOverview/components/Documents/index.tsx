@@ -233,28 +233,38 @@ function DocumentsContent({ event }: { event: EventDocument }) {
   const namedEntries = entries.map((entry) => {
     const fieldName = intl.formatMessage(entry.label)
 
-    const document = entry.optionLabel
+    const documentName = entry.optionLabel
       ? `${fieldName} (${intl.formatMessage(entry.optionLabel)})`
       : fieldName
 
-    return { entry, document }
+    return { entry, documentName }
   })
 
-  // Newest documents first. Ties (same upload time) are ordered by name.
   namedEntries.sort((a, b) => {
+    // Newest documents first.
     const byNewest = b.entry.action.createdAt.localeCompare(
       a.entry.action.createdAt
     )
-    return byNewest !== 0 ? byNewest : a.document.localeCompare(b.document)
+
+    // Ties (same upload time) are ordered by name.
+    return byNewest !== 0
+      ? byNewest
+      : a.documentName.localeCompare(b.documentName)
   })
 
   // Format the documents for the table.
-  const documents: ITableRow[] = namedEntries.map(({ entry, document }) => ({
-    document: <DocumentNameCell file={entry.file} name={document} />,
-    recordAction: getRecordActionLabel(entry.action, eventConfiguration, intl),
-    addedOn: <WhenCell isoDate={entry.action.createdAt} />,
-    addedBy: <ActionByCell action={entry.action} />
-  }))
+  const documents: ITableRow[] = namedEntries.map(
+    ({ entry, documentName }) => ({
+      document: <DocumentNameCell file={entry.file} name={documentName} />,
+      recordAction: getRecordActionLabel(
+        entry.action,
+        eventConfiguration,
+        intl
+      ),
+      addedOn: <WhenCell isoDate={entry.action.createdAt} />,
+      addedBy: <ActionByCell action={entry.action} />
+    })
+  )
 
   const displayedDocuments = documents.slice(
     (currentPageNumber - 1) * PAGE_SIZE,
