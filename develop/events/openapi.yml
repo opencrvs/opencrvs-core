@@ -2494,9 +2494,6 @@ components:
           type: array
           items:
             type: string
-        declaration:
-          description: Configuration of the form used to gather event data.
-          $ref: "#/components/schemas/DeclarationFormConfig"
         advancedSearch:
           default: []
           description: Configuration of fields available in the advanced search feature.
@@ -2637,7 +2634,6 @@ components:
         - summary
         - label
         - actions
-        - declaration
         - advancedSearch
         - flags
         - analytics
@@ -13911,6 +13907,9 @@ components:
         type:
           type: string
           const: DECLARE
+        declaration:
+          description: Configuration of the form used to gather event data.
+          $ref: "#/components/schemas/DeclarationFormConfig"
         review:
           type: object
           properties:
@@ -13954,6 +13953,7 @@ components:
         - label
         - flags
         - type
+        - declaration
         - review
       additionalProperties: false
       description: Configuration for the declare action. Includes review-page fields.
@@ -14103,6 +14103,58 @@ components:
             - type
           additionalProperties: false
       type: object
+    DeclarationFormConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the form
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the page
+              title:
+                description: Header title of the page
+                $ref: "#/components/schemas/TranslationConfigOutput"
+              requireCompletionToContinue:
+                default: false
+                description: If true, all required fields must be filled before continuing to
+                  the next page
+                type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
+                type: boolean
+              fields:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FieldConfig"
+                description: Fields to be rendered on the page
+              conditional:
+                description: Page will be shown if condition is met. If conditional is not
+                  defined, the page will be always shown.
+                $ref: "#/components/schemas/Conditional"
+              type:
+                default: FORM
+                type: string
+                const: FORM
+            required:
+              - id
+              - title
+              - requireCompletionToContinue
+              - fields
+              - type
+            additionalProperties: false
+      required:
+        - label
+        - pages
+      additionalProperties: false
+      description: Configuration of the declaration form.
     DuplicateDetectedActionConfig:
       type: object
       properties:
@@ -14728,58 +14780,6 @@ components:
       additionalProperties: false
       description: Configuration for a country-defined custom action. An event may
         include any number of these.
-    DeclarationFormConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the form
-          $ref: "#/components/schemas/TranslationConfigOutput"
-        pages:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Unique identifier for the page
-              title:
-                description: Header title of the page
-                $ref: "#/components/schemas/TranslationConfigOutput"
-              requireCompletionToContinue:
-                default: false
-                description: If true, all required fields must be filled before continuing to
-                  the next page
-                type: boolean
-              showClearButton:
-                description: If true, a "Clear" button is shown at the top of the page allowing
-                  the user to reset all fields on the page to their default
-                  state
-                type: boolean
-              fields:
-                type: array
-                items:
-                  $ref: "#/components/schemas/FieldConfig"
-                description: Fields to be rendered on the page
-              conditional:
-                description: Page will be shown if condition is met. If conditional is not
-                  defined, the page will be always shown.
-                $ref: "#/components/schemas/Conditional"
-              type:
-                default: FORM
-                type: string
-                const: FORM
-            required:
-              - id
-              - title
-              - requireCompletionToContinue
-              - fields
-              - type
-            additionalProperties: false
-      required:
-        - label
-        - pages
-      additionalProperties: false
-      description: Configuration of the declaration form.
     AdvancedSearchConfig:
       type: object
       properties:
