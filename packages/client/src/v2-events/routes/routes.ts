@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
+import {
+  boolean,
+  hashValues,
+  route,
+  string
+} from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import * as z from 'zod'
 import {
@@ -41,7 +46,9 @@ export const ROUTES = {
                 searchParams: {
                   backTo: string(),
                   /** Action id of the selected record version. */
-                  version: string()
+                  version: string(),
+                  /** Mark up what changed from the previous version. */
+                  changes: boolean()
                 }
               }),
               AUDIT: route('audit', {

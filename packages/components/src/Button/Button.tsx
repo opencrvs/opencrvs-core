@@ -34,6 +34,11 @@ interface ButtonCustomization {
   fullWidth?: boolean
   /** Button type */
   type: ButtonType
+  /**
+   * Marks a button that holds an on/off state. Sets `aria-pressed` and shows
+   * the on state. Leave unset for a button that simply fires.
+   */
+  pressed?: boolean
 }
 
 interface AnchorButtonProps
@@ -68,13 +73,15 @@ const StyledButton = styled.button.withConfig({
     // as a `DropdownMenu.Trigger` (which wires it up via the Popover API).
     ['popovertarget'].includes(prop) ||
     // Leave some props unpassed to DOM
-    (!['loading'].includes(prop) && defaultValidatorFn(prop))
+    (!['loading', 'pressed'].includes(prop) && defaultValidatorFn(prop))
 })<StyledButtonProps>`
   ${styles.base}
 
   ${(props) =>
     props.dropdownName &&
     `anchor-name: --Dropdown-Anchor-${props.dropdownName};`}
+
+  ${(props) => props.pressed && styles.pressed}
 
   ${(props) => props.size === 'small' && styles.small(props)}
   ${(props) => props.size === 'medium' && styles.medium}
@@ -101,6 +108,7 @@ export const Button = ({
   element = 'button',
   type,
   loading,
+  pressed,
   children,
   ...props
 }: ButtonProps) => {
@@ -110,6 +118,8 @@ export const Button = ({
       fullWidth={fullWidth}
       variant={type}
       loading={loading}
+      pressed={pressed}
+      aria-pressed={pressed}
       as={element}
       data-testid={props.id}
       {...props}

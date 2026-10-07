@@ -197,3 +197,21 @@ export const Disabled: Story = {
     </Stack>
   )
 }
+
+/**
+ * A button that holds an on/off state rather than firing once. The label stays
+ * put and `pressed` carries whether it is on, so the control never has to
+ * describe its own state in words.
+ */
+export const Pressed: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 8 }}>
+      <Button size="small" type="tertiary">
+        Off
+      </Button>
+      <Button pressed size="small" type="tertiary">
+        On
+      </Button>
+    </div>
+  )
+}
