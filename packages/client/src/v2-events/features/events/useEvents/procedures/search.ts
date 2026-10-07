@@ -71,7 +71,9 @@ export function byIdSearchKey(eventId: string) {
  * every entry beneath it.
  */
 export function workqueueSearchKey(slug?: string) {
-  return [['event', 'search', 'workqueue', ...(slug ? [slug] : [])]] as const
+  return [
+    ['event', 'search', 'workqueue', ...(slug === undefined ? [] : [slug])]
+  ] as const
 }
 
 let searchRequests = 0
@@ -124,8 +126,7 @@ export function byIdSearchOptions(
   fallback: () => SearchOutput
 ) {
   return {
-    ...trpcOptionsProxy.event.search.queryOptions(byIdInput(eventId)),
-    queryKey: byIdSearchKey(eventId),
+    ...taggedSearchOptions(byIdInput(eventId), ['id', eventId]),
     queryFn: async (ctx: QueryFunctionContext) => {
       const result = await fetchTaggedSearch(ctx)
       return result.total > 0 ? result : fallback()
