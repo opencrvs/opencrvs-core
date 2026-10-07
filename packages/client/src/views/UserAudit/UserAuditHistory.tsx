@@ -43,7 +43,7 @@ import {
   getAcceptedScopesByType,
   getActionConfig,
   getEventConfigById,
-  UUID
+  maybeUuid
 } from '@opencrvs/commons/client'
 
 /** Audit log entries that carry a full event response summary (eventId, trackingId). */
@@ -223,25 +223,19 @@ function UserAuditHistoryComponent(props: Props) {
     if (entry.operation === 'event.create') {
       return {
         trackingId: entry.responseSummary.trackingId || '-',
-        eventId: UUID.validate(entry.responseSummary.eventId)
-          ? entry.responseSummary.eventId
-          : undefined
+        eventId: maybeUuid(entry.responseSummary.eventId)
       }
     }
     if (entry.operation === 'event.get') {
       return {
         trackingId: entry.responseSummary.trackingId || '-',
-        eventId: UUID.validate(entry.requestData.eventId)
-          ? entry.requestData.eventId
-          : undefined
+        eventId: maybeUuid(entry.requestData.eventId)
       }
     }
     if (isEventActionEntry(entry)) {
       return {
         trackingId: entry.requestData.trackingId || '-',
-        eventId: UUID.validate(entry.requestData.eventId)
-          ? entry.requestData.eventId
-          : undefined
+        eventId: maybeUuid(entry.requestData.eventId)
       }
     }
     return {
