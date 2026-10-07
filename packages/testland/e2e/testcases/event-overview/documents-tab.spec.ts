@@ -12,13 +12,16 @@ import { test, expect } from '@playwright/test'
 import { format, subDays } from 'date-fns'
 import {
   getToken,
-  goToSection,
   login,
   switchEventTab,
   triggerDeclarationAction,
   uploadImage
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  mockNetworkConditions,
+  restoreNetworkConditions
+} from '@e2e/support/mock-network-conditions'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import {
@@ -138,5 +141,79 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
     await expect(
       page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
     ).toHaveCount(1)
+  })
+})
+
+test('Documents tab shows an offline state while offline', async ({ page }) => {
+  const declaration = await declareWithProofOfBirth()
+
+  const documentsOfflineMessage =
+    "This record's documents have not been downloaded yet, so they cannot be opened offline. Please reconnect to the internet to view them."
+
+  await test.step('Navigate to the record and assign', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByText('Pending registration').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+  })
+
+  await test.step('Offline, the Documents tab shows the offline state, not the list', async () => {
+    await mockNetworkConditions(page, 'offline')
+    await switchEventTab(page, 'Documents')
+
+    await expect(page.getByText(documentsOfflineMessage)).toBeVisible()
+    await expect(
+      page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
+    ).not.toBeVisible()
+  })
+
+  await test.step('Back online, the offline state is replaced by the document list', async () => {
+    await restoreNetworkConditions(page)
+
+    await expect(
+      page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
+    ).toBeVisible()
+    await expect(page.getByText(documentsOfflineMessage)).not.toBeVisible()
+  })
+})
+
+test('Documents tab shows a loading state while the documents are fetched', async ({
+  page
+}) => {
+  const declaration = await declareWithProofOfBirth()
+
+  await test.step('Login and open the record (without downloading it)', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByText('Pending registration').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+  })
+
+  await test.step('Opening the Documents tab shows a loading state before the list', async () => {
+    // Hold the on-demand event download until the loading state is asserted.
+    // The record is not assigned, so the Documents tab downloads it on open.
+    let releaseEventGet!: () => void
+    const eventGetReleased = new Promise<void>((resolve) => {
+      releaseEventGet = resolve
+    })
+    await page.route(/event\.get/, async (route) => {
+      await eventGetReleased
+      await route.continue()
+    })
+
+    await switchEventTab(page, 'Documents')
+
+    await expect(page.getByTestId('documents-loading')).toBeVisible()
+    // The empty state must not flash before the fetch resolves.
+    await expect(page.getByText('No documents found')).not.toBeVisible()
+
+    releaseEventGet()
+    await page.unrouteAll({ behavior: 'wait' })
+  })
+
+  await test.step('Once fetched, the loading state is replaced by the list', async () => {
+    await expect(
+      page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
+    ).toBeVisible()
+    await expect(page.getByTestId('documents-loading')).not.toBeVisible()
   })
 })
