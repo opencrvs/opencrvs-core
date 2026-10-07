@@ -19,6 +19,9 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
 
+### Improvements
+- Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
+
 ### Bug fixes
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 

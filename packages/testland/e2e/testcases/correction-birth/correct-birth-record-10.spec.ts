@@ -711,7 +711,6 @@ test.describe('10. Correct record', () => {
         })
 
         test('10.1.6.4.2 Validate correction approved modal', async () => {
-          await page.getByRole('button', { name: 'Next page' }).click()
           await page
             .getByRole('button', { name: 'Correction approved', exact: true })
             .click()

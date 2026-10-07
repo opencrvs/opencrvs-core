@@ -94,7 +94,7 @@ const expectVersionCard = async (
     page.getByText(`${role} • ${office}`, { exact: true })
   ).toBeVisible()
   await expect(page.getByText('Online', { exact: true })).toBeVisible()
-  await expect(page.getByText('OpenCRVS v2.1.0', { exact: true })).toBeVisible()
+  await expect(page.getByText('OpenCRVS v2.2.0', { exact: true })).toBeVisible()
 }
 
 type RegistrarWithDrafts = {

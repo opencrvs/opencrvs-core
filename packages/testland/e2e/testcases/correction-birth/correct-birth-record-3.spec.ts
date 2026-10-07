@@ -1119,7 +1119,6 @@ test.describe.serial(' Correct record - 3', () => {
 
     test('3.8.5 Validate history in record audit', async () => {
       await page.getByRole('button', { name: 'Audit' }).click()
-      await page.getByRole('button', { name: 'Next page' }).click()
 
       /*
        * Expected result: should show in task history
