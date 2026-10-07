@@ -39,7 +39,9 @@ export const ROUTES = {
             {
               RECORD: route('record', {
                 searchParams: {
-                  backTo: string()
+                  backTo: string(),
+                  /** Action id of the selected record version. */
+                  version: string()
                 }
               }),
               AUDIT: route('audit', {
