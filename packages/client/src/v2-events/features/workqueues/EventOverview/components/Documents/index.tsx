@@ -29,6 +29,7 @@ import {
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ITableRow, Table } from '@opencrvs/components/lib/Table'
 import { Link, Pagination, Text } from '@opencrvs/components'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ActionType } from '@opencrvs/commons/client'
 import { messages as eventOverviewMessages } from '@client/v2-events/layouts/EventOverview'
 import { ROUTES } from '@client/v2-events/routes'
@@ -36,6 +37,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { getRecordActionLabel } from '@client/v2-events/utils'
 import { DocumentPreview } from '@client/v2-events/components/forms/inputs/FileInput/DocumentPreview'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useOnlineStatus } from '@client/utils'
 import { ActionByCell, WhenCell } from '../EventHistory'
 
 const PAGE_SIZE = 10
@@ -46,6 +48,11 @@ const TableDiv = styled.div`
 
 const NoDocumentsText = styled(Text)`
   padding: 24px;
+`
+
+const CenteredMessage = styled.div`
+  padding: 24px;
+  text-align: center;
 `
 
 const messages = defineMessages({
@@ -68,6 +75,15 @@ const messages = defineMessages({
   noDocuments: {
     id: 'events.documents.noDocuments',
     defaultMessage: 'No documents found'
+  },
+  offlineTitle: {
+    id: 'events.documents.offline.title',
+    defaultMessage: 'No connection'
+  },
+  offlineDescription: {
+    id: 'events.documents.offline.description',
+    defaultMessage:
+      "This record's documents have not been downloaded yet, so they cannot be opened offline. Please reconnect to the internet to view them."
   }
 })
 
@@ -306,10 +322,66 @@ function DocumentsContent({ event }: { event: EventDocument }) {
   )
 }
 
-export function Documents() {
+/**
+ * Shown while the record is being downloaded on demand. The empty state lives
+ * inside DocumentsContent (rendered only once the event resolves), so this
+ * fallback prevents a false "No documents found" flash before the data arrives.
+ */
+function DocumentsLoading() {
+  const intl = useIntl()
+  return (
+    <Content
+      noPadding
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(eventOverviewMessages.documents)}
+    >
+      <CenteredMessage data-testid="documents-loading">
+        <Spinner baseColor="#4C68C1" id="documents-spinner" size={24} />
+      </CenteredMessage>
+    </Content>
+  )
+}
+
+/**
+ * Supporting documents are large binaries fetched on demand and are not
+ * reliably cached, so the tab needs connectivity even when the record itself is
+ * cached. When offline we show this state instead of the list, loading or empty
+ * states.
+ */
+function DocumentsOffline() {
+  const intl = useIntl()
+  return (
+    <Content
+      noPadding
+      size={ContentSize.SMALL}
+      title={intl.formatMessage(messages.offlineTitle)}
+    >
+      <CenteredMessage>
+        {intl.formatMessage(messages.offlineDescription)}
+      </CenteredMessage>
+    </Content>
+  )
+}
+
+function DocumentsDownloader() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.DOCUMENTS)
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
 
   return <DocumentsContent event={event} />
+}
+
+export function Documents() {
+  const isOnline = useOnlineStatus()
+
+  // Offline takes precedence over the loading and empty states.
+  if (!isOnline) {
+    return <DocumentsOffline />
+  }
+
+  return (
+    <React.Suspense fallback={<DocumentsLoading />}>
+      <DocumentsDownloader />
+    </React.Suspense>
+  )
 }
