@@ -22,6 +22,12 @@ TL;DR:
 - For the actions not covered by `triggerDeclarationAction`.
 - You need to know what you are waiting for.
 
+5. Structure a scenario as a single `test()` with `test.step()` blocks — not `test.describe.serial` with one `test()` per step.
+
+- Use the `{ page }` fixture instead of a shared `let page` + `beforeAll`/`afterAll`.
+- `test.step` names each phase in the report while keeping the whole scenario one atomic test, so a failure doesn't leave later steps as misleading "skipped" in a serial chain.
+- Many older specs still use `test.describe.serial`; follow this pattern for new tests and when touching old ones.
+
 \* When user is redirected after action back to event overview (happens only if you come to the event through search), it takes few seconds for the UI to sync up completely. In these scenarios you might need to explicitly wait for the search cache to update.
 
 The search-cache refetch is a `POST` to `event.search` fired _onSuccess of the
