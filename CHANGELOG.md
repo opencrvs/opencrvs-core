@@ -232,6 +232,13 @@ The toolkit and the country configuration template work with any container regis
 
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 
+## 2.1.1
+
+### Improvements
+
+- Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
+
+
 ## 2.1.0
 
 ### Upgrade guidance
