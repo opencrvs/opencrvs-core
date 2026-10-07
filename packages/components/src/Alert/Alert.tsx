@@ -10,74 +10,54 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Check, Help, Cross, NotificationError, Notification } from '../icons'
-import { Spinner } from '../Spinner'
+import { CheckCircle, Info, Warning, WarningCircle } from '../Icon/all-icons'
 import { Button } from '../Button'
 import { Text } from '../Text'
-import { colors } from '../colors'
+import { Icon } from '../Icon'
+import * as styles from './Alert.styles'
 
-export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
+export type AlertType = 'success' | 'warning' | 'info' | 'error'
 
-const Container = styled.div<{
-  $type?: AlertType
-}>`
-  --color: ${({ $type, theme }) => `
-    ${$type === 'success' ? theme.colors.positive : ''}
-    ${$type === 'loading' ? theme.colors.primary : ''}
-    ${$type === 'info' ? theme.colors.teal : ''}
-    ${$type === 'error' ? theme.colors.negative : ''}
-    ${$type === 'warning' ? theme.colors.orange : ''}
-    ${$type === undefined ? theme.colors.positive : ''}
-  `};
+/** The glyph each type is recognised by. */
+const GLYPHS = {
+  success: CheckCircle,
+  warning: Warning,
+  error: WarningCircle,
+  info: Info
+} satisfies Record<AlertType, unknown>
 
-  display: flex;
-  border-radius: 4px;
-  border: 1.5px solid var(--color);
-  border-left-width: 0px;
-  background: linear-gradient(
-    to right,
-    var(--color) 48px,
-    ${({ theme }) => theme.colors.white} 48px
-  );
+const Container = styled.div<{ $type: AlertType }>`
+  ${styles.base}
+
+  ${(props) => props.$type === 'success' && styles.success}
+  ${(props) => props.$type === 'warning' && styles.warning}
+  ${(props) => props.$type === 'error' && styles.error}
+  ${(props) => props.$type === 'info' && styles.info}
 `
 
 const IconContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 48px;
-  width: 48px;
-  color: ${({ theme }) => theme.colors.white};
+  ${styles.iconArea}
 `
-
+const Content = styled.div`
+  ${styles.content}
+`
+const Title = styled.div`
+  ${styles.title}
+`
+const Message = styled.div`
+  ${styles.message}
+`
+const Actions = styled.div`
+  ${styles.actions}
+`
 const Close = styled(Button)`
-  color: var(--color) !important;
-  margin-top: 4px;
-  margin-right: 4px;
-`
-
-const ActionButton = styled(Button)`
-  margin-top: 8px;
-  margin-right: 8px;
-`
-
-const ButtonText = styled(Text)`
-  color: var(--color) !important;
-  padding: 0 4px;
-`
-
-const NotificationMessage = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  color: var(--color);
-  position: relative;
-  padding: 12px 24px 12px 16px;
-  min-width: 160px;
-  max-width: calc(100% - 48px);
-  flex: 1;
+  ${styles.close}
 `
 
 export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   type: AlertType
+  /** A short statement of the situation, in the type's colour. */
+  title?: string
   onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
@@ -90,57 +70,51 @@ export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export const Alert = ({
   type,
+  title,
   onClose,
   onActionClick,
   actionText,
   children,
   customIcon,
   ...props
-}: IAlertProps) => (
-  <Container $type={type} {...props}>
-    <IconContainer>
-      {!customIcon ? (
-        <>
-          {type === 'success' && <Check />}
-          {type === 'warning' && <Help />}
-          {type === 'error' && <NotificationError />}
-          {type === 'info' && <Notification />}
-          {type === 'loading' && (
-            <Spinner
-              id="in-progress-floating-notification"
-              baseColor={colors.white}
-              size={20}
-            />
-          )}
-        </>
-      ) : (
-        <>{customIcon}</>
+}: IAlertProps) => {
+  const Glyph = GLYPHS[type]
+
+  return (
+    <Container $type={type} {...props}>
+      <IconContainer>{customIcon ?? <Glyph size={24} />}</IconContainer>
+
+      <Content>
+        {title && <Title>{title}</Title>}
+        {children && <Message>{children}</Message>}
+        {onActionClick && actionText && (
+          <Actions>
+            <Button
+              data-testid={
+                props['data-testid'] && `${props['data-testid']}-action`
+              }
+              size="small"
+              type="secondary"
+              onClick={onActionClick}
+            >
+              <Text element="span" variant="bold14">
+                {actionText}
+              </Text>
+            </Button>
+          </Actions>
+        )}
+      </Content>
+
+      {onClose && (
+        <Close
+          data-testid={props['data-testid'] && `${props['data-testid']}-close`}
+          id={props.id + 'Cancel'}
+          type="icon"
+          onClick={onClose}
+        >
+          <Icon color="currentColor" name="X" size="small" />
+        </Close>
       )}
-    </IconContainer>
-
-    <NotificationMessage>{children}</NotificationMessage>
-
-    {onActionClick && (
-      <ActionButton
-        type="tertiary"
-        onClick={onActionClick}
-        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
-      >
-        <ButtonText variant="bold14" element="span">
-          {actionText}
-        </ButtonText>
-      </ActionButton>
-    )}
-
-    {onClose && type !== 'loading' && (
-      <Close
-        type="icon"
-        id={props.id + 'Cancel'}
-        data-testid={props['data-testid'] && `${props['data-testid']}-close`}
-        onClick={onClose}
-      >
-        <Cross color="currentColor" />
-      </Close>
-    )}
-  </Container>
-)
+    </Container>
+  )
+}

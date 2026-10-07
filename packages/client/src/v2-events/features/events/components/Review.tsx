@@ -152,6 +152,14 @@ const ReviewContainter = styled.div<{ $padded?: boolean }>`
   }
 `
 
+/*
+ * The container already pads the body on every side, so this only opens a gap
+ * between the alerts and the first section.
+ */
+const Alerts = styled.div`
+  padding-bottom: 24px;
+`
+
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
@@ -513,6 +521,7 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
+  alert,
   anchor,
   content,
   attachmentPath
@@ -525,6 +534,12 @@ function ReviewComponent({
    * country logo.
    */
   content?: { title: string; actions?: React.ReactElement[] }
+  /**
+   * Alerts shown inside the card, above the first section — they describe what
+   * the card is showing. `banner` is the panel above the card itself, which
+   * the duplicate comparison and the correction review use.
+   */
+  alert?: React.ReactNode
   /** Where files uploaded from the annotation fields on this page are stored. */
   attachmentPath: AttachmentPath
   formConfig: FormConfig
@@ -605,6 +620,7 @@ function ReviewComponent({
           contentTitle={content?.title}
           reviewTitle={title}
         >
+          {alert && <Alerts>{alert}</Alerts>}
           <FormReview
             anchor={anchor}
             form={visibleForm}

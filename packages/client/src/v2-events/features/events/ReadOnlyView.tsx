@@ -50,6 +50,7 @@ import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { useRecordVersions } from '@client/v2-events/features/events/useRecordVersions'
 import { RecordVersionMenu } from '@client/v2-events/features/events/components/RecordVersionMenu'
+import { RecordVersionAlert } from '@client/v2-events/features/events/components/RecordVersionAlert'
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
@@ -159,6 +160,11 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   return (
     <ReviewComponent.Body
       readonlyMode
+      alert={
+        selected ? (
+          <RecordVersionAlert selected={selected} versions={versions} />
+        ) : undefined
+      }
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
       attachmentPath={eventAttachmentPath(eventId)}
