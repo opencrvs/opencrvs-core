@@ -19,7 +19,12 @@ import {
   purgeLegacySearchQueries
 } from '@client/v2-events/trpc'
 import { findLocalEventIndex, invalidateWorkqueueSearchQueries } from './api'
-import { byIdSearchOptions, searchKeys } from './procedures/search'
+import {
+  byIdSearchKey,
+  byIdSearchOptions,
+  taggedKey,
+  workqueueSearchKey
+} from './procedures/search'
 
 const EMPTY_RESULT = { results: [], total: 0 }
 
@@ -54,12 +59,12 @@ describe('setQueryDefaults shim (procedure path derivation)', () => {
   it('refetches a tagged workqueue entry through the event.search procedure', async () => {
     const requests = recordRequests()
     queryClient.setQueryData(
-      searchKeys.workqueue(workqueueInput, 'my-slug'),
+      taggedKey(workqueueInput, ['workqueue', 'my-slug']),
       EMPTY_RESULT
     )
 
     await queryClient.refetchQueries({
-      queryKey: searchKeys.filters.workqueue('my-slug')
+      queryKey: workqueueSearchKey('my-slug')
     })
 
     expect(requests).toEqual(['event.search'])
@@ -68,10 +73,10 @@ describe('setQueryDefaults shim (procedure path derivation)', () => {
   it('refetches a by-id entry seeded locally, through the event.search procedure', async () => {
     const requests = recordRequests()
     const eventId = '11111111-1111-1111-1111-111111111111'
-    queryClient.setQueryData(searchKeys.byId(eventId), EMPTY_RESULT)
+    queryClient.setQueryData(byIdSearchKey(eventId), EMPTY_RESULT)
 
     await queryClient.refetchQueries({
-      queryKey: searchKeys.filters.byId(eventId)
+      queryKey: byIdSearchKey(eventId)
     })
 
     expect(requests).toEqual(['event.search'])
@@ -83,15 +88,15 @@ describe('invalidation targeting', () => {
 
   function seedAll() {
     queryClient.setQueryData(
-      searchKeys.workqueue(workqueueInput, 'A'),
+      taggedKey(workqueueInput, ['workqueue', 'A']),
       EMPTY_RESULT
     )
     queryClient.setQueryData(
-      searchKeys.workqueue(workqueueInput, 'B'),
+      taggedKey(workqueueInput, ['workqueue', 'B']),
       EMPTY_RESULT
     )
-    queryClient.setQueryData(searchKeys.adhoc(workqueueInput), EMPTY_RESULT)
-    queryClient.setQueryData(searchKeys.byId(byIdEvent), EMPTY_RESULT)
+    queryClient.setQueryData(taggedKey(workqueueInput, ['adhoc']), EMPTY_RESULT)
+    queryClient.setQueryData(byIdSearchKey(byIdEvent), EMPTY_RESULT)
   }
 
   const isStale = (queryKey: readonly unknown[]) =>
@@ -101,20 +106,20 @@ describe('invalidation targeting', () => {
     seedAll()
     await invalidateWorkqueueSearchQueries('A')
 
-    expect(isStale(searchKeys.workqueue(workqueueInput, 'A'))).toBe(true)
-    expect(isStale(searchKeys.workqueue(workqueueInput, 'B'))).toBe(false)
-    expect(isStale(searchKeys.adhoc(workqueueInput))).toBe(false)
-    expect(isStale(searchKeys.byId(byIdEvent))).toBe(false)
+    expect(isStale(taggedKey(workqueueInput, ['workqueue', 'A']))).toBe(true)
+    expect(isStale(taggedKey(workqueueInput, ['workqueue', 'B']))).toBe(false)
+    expect(isStale(taggedKey(workqueueInput, ['adhoc']))).toBe(false)
+    expect(isStale(byIdSearchKey(byIdEvent))).toBe(false)
   })
 })
 
 describe('purgeLegacySearchQueries', () => {
   it('removes only old-shape 2-element keys; tagged queries and pending mutations survive', () => {
     const legacyKey = trpcOptionsProxy.event.search.queryKey(workqueueInput)
-    const taggedKey = searchKeys.workqueue(workqueueInput, 'A')
+    const workqueueKey = taggedKey(workqueueInput, ['workqueue', 'A'])
 
     queryClient.setQueryData(legacyKey, EMPTY_RESULT)
-    queryClient.setQueryData(taggedKey, EMPTY_RESULT)
+    queryClient.setQueryData(workqueueKey, EMPTY_RESULT)
 
     const mutationCache = queryClient.getMutationCache()
     mutationCache.build(queryClient, { mutationKey: [['event', 'create']] })
@@ -123,7 +128,7 @@ describe('purgeLegacySearchQueries', () => {
     purgeLegacySearchQueries(queryClient)
 
     expect(queryClient.getQueryData(legacyKey)).toBeUndefined()
-    expect(queryClient.getQueryData(taggedKey)).toEqual(EMPTY_RESULT)
+    expect(queryClient.getQueryData(workqueueKey)).toEqual(EMPTY_RESULT)
     expect(mutationCache.getAll().length).toBe(mutationsBefore)
   })
 })
@@ -143,7 +148,7 @@ describe('by-id lookup of a record the server has not indexed', () => {
     await vi.waitFor(() =>
       expect(observer.getCurrentResult().data).toEqual(drafted)
     )
-    expect(queryClient.getQueryData(searchKeys.byId(eventId))).toEqual(drafted)
+    expect(queryClient.getQueryData(byIdSearchKey(eventId))).toEqual(drafted)
     expect(findLocalEventIndex(eventId)?.id).toBe(eventId)
     expect(requests).toEqual(['event.search'])
     unsubscribe()

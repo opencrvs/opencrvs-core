@@ -27,7 +27,8 @@ import { addLocalEventConfig } from './api'
 import {
   byIdSearchOptions,
   taggedSearchOptions,
-  searchKeys
+  byIdSearchKey,
+  taggedKey
 } from './procedures/search'
 
 // Importing these registers each procedure's query and mutation defaults.
@@ -208,9 +209,9 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
 
   it('marks every other queue out of date, and leaves other searches as they are', async () => {
     const result = { results: [otherRow], total: 1 }
-    const offScreenQueue = searchKeys.workqueue({ query }, 'ready-to-print')
-    const adhocSearch = searchKeys.adhoc({ query })
-    const otherLookup = searchKeys.byId(otherRow.id)
+    const offScreenQueue = taggedKey({ query }, ['workqueue', 'ready-to-print'])
+    const adhocSearch = taggedKey({ query }, ['adhoc'])
+    const otherLookup = byIdSearchKey(otherRow.id)
     for (const key of [offScreenQueue, adhocSearch, otherLookup]) {
       queryClient.setQueryData(key, result)
     }

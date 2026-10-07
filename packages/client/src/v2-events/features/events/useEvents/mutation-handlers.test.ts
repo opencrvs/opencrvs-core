@@ -23,7 +23,7 @@ import {
   findLocalEventIndex,
   setEventData
 } from './api'
-import { searchKeys } from './procedures/search'
+import { byIdSearchKey, taggedKey } from './procedures/search'
 
 // Importing these registers each procedure's mutation defaults.
 /* eslint-disable import/no-unassigned-import */
@@ -70,7 +70,7 @@ it('CREATE: once synced, the record also resolves by its final id', () => {
   )
 
   for (const id of [record.id, transactionId]) {
-    expect(queryClient.getQueryData(searchKeys.byId(id))?.results).toEqual([
+    expect(queryClient.getQueryData(byIdSearchKey(id))?.results).toEqual([
       expect.objectContaining({ id: record.id })
     ])
   }
@@ -88,10 +88,10 @@ it('ASSIGN on a sealed record patches only the assignee onto its cached row', as
     declaration: {},
     assignedTo: null
   } as unknown as EventIndex
-  const workqueueKey = searchKeys.workqueue(
-    { query: { type: 'and', clauses: [] } },
+  const workqueueKey = taggedKey({ query: { type: 'and', clauses: [] } }, [
+    'workqueue',
     'ready'
-  )
+  ])
   queryClient.setQueryData(workqueueKey, { results: [redactedRow], total: 1 })
   setEventData(record.id, record)
 

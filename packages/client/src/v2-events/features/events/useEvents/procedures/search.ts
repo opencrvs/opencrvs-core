@@ -40,7 +40,7 @@ export type SearchCacheTag = ['workqueue', string] | ['id', string] | ['adhoc']
  * segments into its path element (queryKey[0]), leaving the {input, type}
  * element untouched so the shim below can re-derive a clean key for tRPC.
  */
-function taggedKey(input: SearchInput, tag: SearchCacheTag) {
+export function taggedKey(input: SearchInput, tag: SearchCacheTag) {
   const key = trpcOptionsProxy.event.search.queryKey(input)
   const [path, meta] = key
   // Splice the tag into the path element; spreading strips readonly. Cast back
@@ -57,21 +57,21 @@ function byIdInput(eventId: string): SearchInput {
   }
 }
 
-export const searchKeys = {
-  workqueue: (input: SearchInput, slug: string) =>
-    taggedKey(input, ['workqueue', slug]),
-  byId: (eventId: string) => taggedKey(byIdInput(eventId), ['id', eventId]),
-  adhoc: (input: SearchInput) => taggedKey(input, ['adhoc']),
-  /**
-   * Prefix keys for invalidation/refetch targeting. Shorter than a full tagged
-   * key so they partial-match every entry beneath them.
-   */
-  filters: {
-    allWorkqueues: () => [['event', 'search', 'workqueue']] as const,
-    workqueue: (slug: string) =>
-      [['event', 'search', 'workqueue', slug]] as const,
-    byId: (eventId: string) => [['event', 'search', 'id', eventId]] as const
-  }
+/**
+ * Key of the by-id `event.search` entry of an event: the one entry that
+ * resolves it locally.
+ */
+export function byIdSearchKey(eventId: string) {
+  return taggedKey(byIdInput(eventId), ['id', eventId])
+}
+
+/**
+ * Prefix key matching the entries of workqueue `slug`, or of every workqueue
+ * when `slug` is left out. Shorter than a full tagged key, so it partial-matches
+ * every entry beneath it.
+ */
+export function workqueueSearchKey(slug?: string) {
+  return [['event', 'search', 'workqueue', ...(slug ? [slug] : [])]] as const
 }
 
 let searchRequests = 0
@@ -124,7 +124,8 @@ export function byIdSearchOptions(
   fallback: () => SearchOutput
 ) {
   return {
-    ...taggedSearchOptions(byIdInput(eventId), ['id', eventId]),
+    ...trpcOptionsProxy.event.search.queryOptions(byIdInput(eventId)),
+    queryKey: byIdSearchKey(eventId),
     queryFn: async (ctx: QueryFunctionContext) => {
       const result = await fetchTaggedSearch(ctx)
       return result.total > 0 ? result : fallback()

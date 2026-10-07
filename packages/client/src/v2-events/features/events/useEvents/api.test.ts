@@ -20,7 +20,7 @@ import {
   deleteLocalEvent,
   updateLocalEventIndex
 } from './api'
-import { searchKeys } from './procedures/search'
+import { byIdSearchKey, taggedKey } from './procedures/search'
 
 describe('deleteLocalEvent', () => {
   const eventDocument = tennisClubMembershipEventDocument
@@ -43,7 +43,7 @@ describe('deleteLocalEvent', () => {
       trpcOptionsProxy.event.get.queryKey({ eventId: id }),
       eventDocument
     )
-    queryClient.setQueryData(searchKeys.byId(id), {
+    queryClient.setQueryData(byIdSearchKey(id), {
       results: [{ id } as EventIndex],
       total: 1
     })
@@ -55,7 +55,7 @@ describe('deleteLocalEvent', () => {
         trpcOptionsProxy.event.get.queryKey({ eventId: id })
       )
     ).toBeUndefined()
-    expect(queryClient.getQueryData(searchKeys.byId(id))).toBeUndefined()
+    expect(queryClient.getQueryData(byIdSearchKey(id))).toBeUndefined()
   })
 })
 
@@ -73,9 +73,9 @@ describe('updateLocalEventIndex', () => {
     const eventDocument = tennisClubMembershipEventDocument
 
     // Prepare a cached query simulating a workqueue result
-    const queryKey = searchKeys.workqueue(
+    const queryKey = taggedKey(
       { query: { type: 'and', clauses: [{ status: 'PENDING' }] } },
-      'recent'
+      ['workqueue', 'recent']
     )
 
     queryClient.setQueryData(queryKey, {

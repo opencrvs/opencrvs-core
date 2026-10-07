@@ -28,7 +28,11 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
-import { isSearchRequestedAfter, searchKeys } from './procedures/search'
+import {
+  byIdSearchKey,
+  isSearchRequestedAfter,
+  workqueueSearchKey
+} from './procedures/search'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getQueryData<T extends DecorateQueryProcedure<any>>(
@@ -107,7 +111,7 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
 }
 
 function setLocalEventIndexById(id: string, eventIndex: EventIndex) {
-  queryClient.setQueryData(searchKeys.byId(id), () => ({
+  queryClient.setQueryData(byIdSearchKey(id), () => ({
     results: [eventIndex],
     total: 1
   }))
@@ -235,7 +239,7 @@ export function setEventData(id: string, data: EventDocument) {
 
 export async function refetchSearchQuery(eventId: string) {
   await queryClient.refetchQueries({
-    queryKey: searchKeys.filters.byId(eventId)
+    queryKey: byIdSearchKey(eventId)
   })
 }
 
@@ -249,7 +253,7 @@ async function refetchWorkqueueSearchQueries() {
   await Promise.all([
     invalidateWorkqueueCounts(),
     queryClient.invalidateQueries({
-      queryKey: searchKeys.filters.allWorkqueues()
+      queryKey: workqueueSearchKey()
     })
   ])
 }
@@ -266,13 +270,13 @@ async function refetchAffectedSearchQueries(...eventIds: string[]) {
 export function isWorkqueueRequestedAfter(slug: string, after: number) {
   return queryClient
     .getQueryCache()
-    .findAll({ queryKey: searchKeys.filters.workqueue(slug) })
+    .findAll({ queryKey: workqueueSearchKey(slug) })
     .some(({ queryHash }) => isSearchRequestedAfter(queryHash, after))
 }
 
 /**
  * Invalidate search queries for a specific workqueue identified by its slug.
- * Queries are keyed under the ['workqueue', slug] cache tag via searchKeys.workqueue.
+ * Queries are keyed under the ['workqueue', slug] cache tag via taggedSearchOptions.
  *
  * For active observers (workqueue page mounted) this triggers an immediate
  * background refetch. For inactive queries it marks them stale so the next
@@ -280,7 +284,7 @@ export function isWorkqueueRequestedAfter(slug: string, after: number) {
  */
 export async function invalidateWorkqueueSearchQueries(slug: string) {
   await queryClient.invalidateQueries({
-    queryKey: searchKeys.filters.workqueue(slug)
+    queryKey: workqueueSearchKey(slug)
   })
 }
 
@@ -300,7 +304,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
   await Promise.all([
-    queryClient.resetQueries({ queryKey: searchKeys.filters.byId(id) }),
+    queryClient.resetQueries({ queryKey: byIdSearchKey(id) }),
     removeCachedFiles(updatedEvent)
   ])
 }
