@@ -43,7 +43,7 @@ interface Props {
   value?: NameFieldValue
 }
 
-function defaultNameFieldValue(
+export function defaultNameFieldValue(
   config: NonNullable<NameField['configuration']>['name'] | undefined
 ): NameFieldValue {
   if (config?.middlename) {
@@ -296,6 +296,6 @@ export const Name = {
   Output: NameOutput,
   stringify,
   toCertificateVariables,
-  // Clearing a page leaves `{ firstname: '', surname: '' }`
+  // An all-blank name is empty
   isEmptyValue: (value: NameFieldValue) => !stringify(value)
 }

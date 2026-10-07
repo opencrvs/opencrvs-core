@@ -274,14 +274,6 @@ function ReviewHeader({ title }: { title: string }) {
 }
 
 /**
- * Whether any of the fields displayed on review holds a non-empty value. Hidden
- * fields must be left out, so a value nobody can see doesn't keep a section open.
- */
-export function hasAnyDisplayedValue(fields: FieldConfig[], form: EventState) {
-  return fields.some((field) => !isEmptyValue(field, form[field.id]))
-}
-
-/**
  *  Renders review of form data, with the ability to edit the data.
  */
 function FormReview({
@@ -381,9 +373,9 @@ function FormReview({
           const hasMandatoryFields = page.fields.some(
             (field) => !!field.required
           )
-          const hasAnyCompletedField = hasAnyDisplayedValue(
-            displayedFields,
-            form
+          // Only fields shown on review count towards expanding
+          const hasAnyCompletedField = displayedFields.some(
+            (field) => !isEmptyValue(field, form[field.id])
           )
 
           return (

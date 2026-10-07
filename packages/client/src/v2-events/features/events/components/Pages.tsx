@@ -32,6 +32,7 @@ import {
 import { useClearFormModal } from '@client/v2-events/components/ClearFormModal'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '../useEventFormData'
+import { defaultNameFieldValue } from '../registered-fields/Name'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
 
@@ -160,9 +161,7 @@ export function Pages({
         return null
       }
 
-      return candidate.config.configuration?.name?.middlename
-        ? { firstname: '', middlename: '', surname: '' }
-        : { firstname: '', surname: '' }
+      return defaultNameFieldValue(candidate.config.configuration?.name)
     }
 
     const clearedPageValues = Object.fromEntries(

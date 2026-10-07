@@ -666,7 +666,7 @@ export const AccordionCollapsedWhenNoRequiredFieldsAndNoValues: Story = {
 
 /**
  * Mirrors a household member page: nothing required, a checkbox kept off the
- * review page and a field it reveals. See opencrvs-core#13459.
+ * review page and a field it reveals.
  */
 const memberPageForm = defineDeclarationForm({
   label: {
@@ -745,5 +745,22 @@ export const AccordionCollapsedWhenPageWasCleared: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText('Show')).toBeInTheDocument()
     await expect(canvas.queryByText('Hide')).not.toBeInTheDocument()
+  }
+}
+
+export const AccordionExpandedWhenMemberHasAValue: Story = {
+  name: 'Accordion: expanded when a member field shown on review has a value',
+  args: {
+    form: {
+      'member.name': { firstname: '', surname: 'Lovelace' },
+      'member.exactDateUnknown': false
+    },
+    formConfig: memberPageForm,
+    title: 'Accordion expand test - member with a value'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(await canvas.findByText('Hide')).toBeInTheDocument()
+    await expect(canvas.queryByText('Show')).not.toBeInTheDocument()
   }
 }
