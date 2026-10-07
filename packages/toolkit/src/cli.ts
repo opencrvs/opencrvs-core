@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable no-console */
-import { runUpgrade } from './migrations/v2.2'
+import { runUpgrade } from './migrations/v2.1'
 import {
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,
@@ -67,6 +67,11 @@ Upgrade the country config in the current working directory to the next
 major version of OpenCRVS.
 
 Options:
+  --docker-swarm   Keep the 'infrastructure/' directory where it is and
+                   only copy what the assets image needs into 'assets/'.
+                   Use this if your country deploys OpenCRVS via Docker
+                   Swarm. When omitted, 'infrastructure/' moves to
+                   'assets/' (default).
   -h, --help       Show this message.
 `.trim()
 
@@ -157,16 +162,21 @@ async function handleUpgrade() {
     process.exit(0)
   }
 
-  const unknownFlags = upgradeArgs.filter((arg) => arg.startsWith('-'))
+  const KNOWN_FLAGS = new Set(['--docker-swarm'])
+  const unknownFlags = upgradeArgs.filter(
+    (arg) => arg.startsWith('-') && !KNOWN_FLAGS.has(arg)
+  )
   if (unknownFlags.length > 0) {
     console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
     console.log(UPGRADE_USAGE)
     process.exit(1)
   }
 
+  const dockerSwarm = upgradeArgs.includes('--docker-swarm')
+
   console.log('Initiating upgrade...')
   try {
-    await runUpgrade()
+    await runUpgrade(dockerSwarm)
     console.log('Upgrade completed successfully!')
   } catch (error) {
     console.error('Upgrade failed:', error)
