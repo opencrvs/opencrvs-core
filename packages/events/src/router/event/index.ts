@@ -15,6 +15,8 @@ import {
   DocumentPath,
   EventDocumentOnlyLastAction,
   getUUID,
+  isActionDocument,
+  maybeUuid,
   UUID
 } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
@@ -33,8 +35,7 @@ import {
   UnassignActionInput,
   ACTION_SCOPE_MAP,
   MarkAsDuplicateActionInput,
-  MarkNotDuplicateActionInput,
-  ActionDocument
+  MarkNotDuplicateActionInput
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
@@ -319,13 +320,13 @@ export const eventRouter = router({
 
         const event = await getEventById(eventId)
 
-        const actionFromDraft = ActionDocument.safeParse({
+        const actionFromDraft = {
           ...currentDraft.action,
           id: currentDraft.id
-        })
+        }
 
-        if (actionFromDraft.success) {
-          event.actions.push(actionFromDraft.data)
+        if (isActionDocument(actionFromDraft)) {
+          event.actions.push(actionFromDraft)
         }
 
         await sweepUnreferencedFiles(event, ctx.token)
@@ -349,7 +350,7 @@ export const eventRouter = router({
          * and bare `{uuid}.{ext}` (pre-2.0 legacy) aren't.
          */
         if (firstSegment === 'events') {
-          const eventId = UUID.safeParse(secondSegment).data
+          const eventId = maybeUuid(secondSegment)
 
           if (!eventId) {
             throw new TRPCError({

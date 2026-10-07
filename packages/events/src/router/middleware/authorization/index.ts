@@ -43,7 +43,8 @@ import {
   canAccessOtherUserWithScopes,
   UserScopeType,
   CreateUserInput,
-  canAccessUserWithScope
+  canAccessUserWithScope,
+  maybeUuid
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -161,6 +162,10 @@ export const EventIdParam = z.object({
   customActionType: z.string().optional()
 })
 
+function isEventIdParam(param: unknown): param is EventIdParam {
+  return EventIdParam.validate(param)
+}
+
 export type EventIdParam = z.infer<typeof EventIdParam>
 
 export const requireAssignment: MiddlewareFunction<
@@ -263,11 +268,12 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     // Since determining access requires knowing the event type, we need to parse the input before we can check access.
     // default .input(...) throws 400, which is something that we want to return only if the user should have access.
     const rawInput = await getRawInput()
-    const input = EventIdParam.safeParse(rawInput).data
 
-    if (!input) {
+    if (!isEventIdParam(rawInput)) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
     }
+
+    const input = rawInput
 
     const event = await getEventById(input.eventId)
     const eventConfig = getEventConfigById(eventConfigs, event.type)
@@ -309,6 +315,14 @@ const ActionConfirmationParams = z.object({
   customActionType: z.string().optional()
 })
 
+type ActionConfirmationParams = z.infer<typeof ActionConfirmationParams>
+
+function isActionConfirmationParams(
+  params: unknown
+): params is ActionConfirmationParams {
+  return ActionConfirmationParams.validate(params)
+}
+
 /**
  * Resolves the action an accept/reject call names, and refuses anything other
  * than the pending action of the matching type.
@@ -328,11 +342,11 @@ export function requireConfirmableAction(actionType: ActionType) {
     },
     unknown
   > = async ({ ctx, next, getRawInput }) => {
-    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
-
-    if (!input) {
+    const rawInput = await getRawInput()
+    if (!isActionConfirmationParams(rawInput)) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
     }
+    const input = rawInput
 
     const event = await getEventById(input.eventId)
     const originalAction = event.actions.find(({ id }) => id === input.actionId)
@@ -479,10 +493,8 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
     TrpcContext & { id: UUID },
     { id: UUID } | UUID
   > = async ({ next, ctx, input }) => {
-    const parseResult = UUID.safeParse(input)
-    const incomingId: UUID = parseResult.success
-      ? parseResult.data
-      : (input as { id: UUID }).id
+    const maybeId = maybeUuid(input)
+    const incomingId: UUID = maybeId ?? (input as { id: UUID }).id
 
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 

@@ -12,6 +12,7 @@ import { useEffect, useRef } from 'react'
 import {
   isSelectableAtAnchor,
   LocationVersion,
+  maybeUuid,
   PlainDate,
   resolveVersion,
   UUID
@@ -53,7 +54,7 @@ export function useClearStaleSelectionOnAnchorChange<
       return
     }
 
-    const id = UUID.safeParse(value).data
+    const id = maybeUuid(value)
     const entity = id && entities.get(id)
     if (!entity) {
       return

@@ -640,7 +640,7 @@ export function flattenFieldReference(ref: FieldReference) {
 }
 
 export function isWriteAction(actionType: ActionType): boolean {
-  return writeActions.safeParse(actionType).success
+  return writeActions.validate(actionType)
 }
 
 /**

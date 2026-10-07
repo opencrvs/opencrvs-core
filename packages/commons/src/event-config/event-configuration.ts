@@ -26,7 +26,7 @@ function isNonSearchableEventMetadataTimeFieldId(
     | AdvancedSearchEventFieldIdInput
     | NonSearchableEventMetadataTimeFieldIdInput
 ): fieldId is NonSearchableEventMetadataTimeFieldIdInput {
-  return !AdvancedSearchEventFieldIdInput.safeParse(fieldId).success
+  return !AdvancedSearchEventFieldIdInput.validate(fieldId)
 }
 
 export type AdvancedSearchConfig = {

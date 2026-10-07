@@ -223,19 +223,25 @@ function UserAuditHistoryComponent(props: Props) {
     if (entry.operation === 'event.create') {
       return {
         trackingId: entry.responseSummary.trackingId || '-',
-        eventId: UUID.safeParse(entry.responseSummary.eventId)?.data
+        eventId: UUID.validate(entry.responseSummary.eventId)
+          ? entry.responseSummary.eventId
+          : undefined
       }
     }
     if (entry.operation === 'event.get') {
       return {
         trackingId: entry.responseSummary.trackingId || '-',
-        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+        eventId: UUID.validate(entry.requestData.eventId)
+          ? entry.requestData.eventId
+          : undefined
       }
     }
     if (isEventActionEntry(entry)) {
       return {
         trackingId: entry.requestData.trackingId || '-',
-        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+        eventId: UUID.validate(entry.requestData.eventId)
+          ? entry.requestData.eventId
+          : undefined
       }
     }
     return {

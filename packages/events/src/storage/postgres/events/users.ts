@@ -10,7 +10,9 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
+import partition from 'lodash/partition'
 import { UUID } from '@opencrvs/commons/events'
+import { isUUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { getAdministrativeHierarchyByIdCte } from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -428,8 +430,9 @@ export async function getUsersAndSystemsByIds(ids: string[]) {
   if (ids.length === 0) {
     return { users: [], systems: [] }
   }
-  const legacyIds = ids.filter((id) => !UUID.safeParse(id).success)
-  const uuidIds = ids.filter((id) => UUID.safeParse(id).success) as UUID[]
+
+  const [uuidIds, legacyIds] = partition(ids, (id) => isUUID(id))
+
   const db = getClient()
 
   const usersQuery =

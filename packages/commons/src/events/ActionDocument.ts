@@ -297,6 +297,8 @@ export const ActionDocument = z
   })
 
 export type ActionDocument = z.infer<typeof ActionDocument>
+export const isActionDocument = (a: unknown): a is ActionDocument =>
+  ActionDocument.validate(a)
 
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,

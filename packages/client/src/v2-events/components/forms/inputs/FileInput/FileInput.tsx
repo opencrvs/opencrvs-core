@@ -174,13 +174,7 @@ function FileOutput({
 }
 
 function stringify(value: FileFieldValue | undefined) {
-  const parsed = FileFieldValue.safeParse(value)
-
-  if (parsed.success) {
-    return parsed.data.path
-  }
-
-  return ''
+  return FileFieldValue.validate(value) ? value.path : ''
 }
 
 export const File = {

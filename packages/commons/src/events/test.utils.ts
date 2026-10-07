@@ -379,13 +379,11 @@ export function generateActionDeclarationInput(
     locations: SetLocationPayload[]
   }
 ): ActionUpdate {
-  const parsed = DeclarationUpdateActions.safeParse(action)
-
   if (isEmpty(overrides) && typeof overrides === 'object') {
     return {}
   }
 
-  if (parsed.success) {
+  if (DeclarationUpdateActions.validate(action)) {
     const fields = getDeclarationFields(configuration)
 
     const declarationConfig = getDeclaration(configuration)

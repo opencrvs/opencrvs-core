@@ -10,7 +10,7 @@
  */
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionStatus'
-import * as z from 'zod/v4'
+import * as z from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 
@@ -51,7 +51,7 @@ function getActionFlagPattern() {
 
 export const ActionFlag = z
   .string()
-  .refine((value) => getActionFlagPattern().test(value), {
+  .refine((value): boolean => getActionFlagPattern().test(value), {
     message: 'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   })
 
@@ -68,7 +68,7 @@ export const CustomFlag = z
     ).join(', ')}`
   })
   // Don't allow any ActionFlag patterns to be used here
-  .refine((val) => !ActionFlag.safeParse(val).success, {
+  .refine((val): boolean => !ActionFlag.validate(val), {
     message:
       'Custom flag cannot match the ActionFlag pattern (ActionType:ActionStatus).'
   })

@@ -59,6 +59,6 @@ export * from './Flag'
 export * from './event'
 export * from './locations'
 export * from './locationPayloads'
-
+export * from './PlainDate'
 export { UUID } from '../uuid'
 export { DocumentPath } from '../documents'
