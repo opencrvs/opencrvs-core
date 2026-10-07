@@ -30,6 +30,7 @@ import {
   updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 
 import { createTemporaryId } from '@client/v2-events/utils'
 import { setMutationDefaults } from './utils'
@@ -124,6 +125,12 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     // when it was created offline: `setEventData` only writes `event.get`.
     updateLocalEventIndex(response.id, response)
     updateLocalEventIndex(context.transactionId, response)
+
+    // A local draft saved before the event synced still points to the temporary id.
+    const { draft, setDraft } = localDraftStore.getState()
+    if (draft?.eventId === context.transactionId) {
+      setDraft({ ...draft, eventId: response.id })
+    }
 
     // A CREATED event is never indexed, so no search can change.
   },

@@ -48,8 +48,8 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
   const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id, {
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
 
@@ -123,8 +123,8 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
 function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id)
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(eventIndex.id)
 
   const eventWithDrafts = draft
     ? deepDropNulls(

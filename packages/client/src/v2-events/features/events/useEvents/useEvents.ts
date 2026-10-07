@@ -75,7 +75,7 @@ export function useEvents() {
   const getEvent = useGetEvent()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
-  const { getRemoteDraftByEventId } = useDrafts()
+  const { useRemoteDraftByEventId } = useDrafts()
 
   /** The result for a record the server has not indexed yet, from its draft. */
   function buildDraftedResult(id: string, maybeDraft: Draft | undefined) {
@@ -88,14 +88,14 @@ export function useEvents() {
   }
 
   return {
-    createEvent: useCreateEvent,
+    useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
     useGetEventCountsByWorkqueue,
     deleteEvent: {
       useMutation: useDeleteEvent
     },
-    getOutbox: useOutbox,
+    useOutbox,
     searchEvent: {
       useQuery: (
         query: SearchQuery,
@@ -124,7 +124,7 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
-        const maybeDraft = getRemoteDraftByEventId(id)
+        const maybeDraft = useRemoteDraftByEventId(id)
 
         return useQuery({
           ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
@@ -138,7 +138,7 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
-        const maybeDraft = getRemoteDraftByEventId(id)
+        const maybeDraft = useRemoteDraftByEventId(id)
 
         return useSuspenseQuery({
           ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
@@ -166,7 +166,7 @@ export function useEvents() {
       },
       assignment: {
         assign: {
-          isAssigning: (eventId: UUID) => {
+          useIsAssigning: (eventId: UUID) => {
             return useIsMutating(eventId, trpc.event.actions.assignment.assign)
           },
           mutate: async ({

@@ -15,7 +15,7 @@ import { useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
-import { Plus } from '@opencrvs/components/src/icons'
+import { Plus } from '@opencrvs/components/lib/icons'
 import {
   canUserCreateEvent,
   getAcceptedScopesByType

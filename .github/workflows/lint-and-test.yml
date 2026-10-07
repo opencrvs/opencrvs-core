@@ -71,7 +71,7 @@ jobs:
       # SHA of the last successful run of this workflow, so commits whose
       # run failed are re-included in the next run's affected set.
       - name: Derive SHAs for nx affected
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
         with:
           main-branch-name: develop
 
@@ -443,8 +443,8 @@ jobs:
       - name: Build events router types
         run: pnpm exec nx run-many -t build:types -p @opencrvs/events
 
-      # --excludeTaskDependencies: commons/components build outputs come
-      # prebuilt in the artifact, events types were built above
+      # --excludeTaskDependencies: commons build outputs come prebuilt
+      # in the artifact, events types were built above
       - name: Compile
         run: pnpm exec nx run-many -t test:compilation -p @opencrvs/client --excludeTaskDependencies
 
@@ -462,7 +462,7 @@ jobs:
     steps:
       # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
       # by the change-detection `git diff` below). The artifact
-      # extracted on top adds the prebuilt commons/components outputs
+      # extracted on top adds the prebuilt commons outputs
       # and `packages/client/storybook-static/`; source files match the
       # current commit so overwrites are no-ops.
       - name: Checkout PR branch (for git history)

@@ -113,11 +113,11 @@ function SidebarComponent({
   const scopes = useSelector(getScope)
   const { getLocation } = useLocations()
 
-  const { getOutbox } = useEvents()
-  const outbox = getOutbox()
+  const { useOutbox } = useEvents()
+  const outbox = useOutbox()
 
-  const { getDisplayableDrafts } = useDrafts()
-  const drafts = getDisplayableDrafts()
+  const { useDisplayableDrafts } = useDrafts()
+  const drafts = useDisplayableDrafts()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
 

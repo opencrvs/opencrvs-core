@@ -75,7 +75,7 @@ const router = {
           })
         }, [])
 
-        useDrafts().getRemoteDraftByEventId(createdEvent.id)
+        useDrafts().useRemoteDraftByEventId(createdEvent.id)
 
         return (
           <TRPCProvider>

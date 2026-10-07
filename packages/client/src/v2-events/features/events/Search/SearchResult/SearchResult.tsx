@@ -22,7 +22,7 @@ import {
   TranslationConfig,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
-import { useWindowSize } from '@opencrvs/components/src/hooks'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
   ColumnContentAlignment,
   SORT_ORDER,
@@ -97,12 +97,12 @@ export const SearchResultComponent = ({
     )
   }
 
-  const { getOutbox } = useEvents()
-  const { getDisplayableDrafts } = useDrafts()
+  const { useOutbox } = useEvents()
+  const { useDisplayableDrafts } = useDrafts()
   const { getEventTitle } = useEventTitle()
 
-  const outbox = getOutbox()
-  const drafts = getDisplayableDrafts()
+  const outbox = useOutbox()
+  const drafts = useDisplayableDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]

@@ -20,7 +20,7 @@ import {
   BreadCrumb,
   Divider
 } from '@opencrvs/components/lib'
-import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
+import { IBreadCrumbData } from '@opencrvs/components/lib/Breadcrumb'
 import { useParams, useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import styled from 'styled-components'

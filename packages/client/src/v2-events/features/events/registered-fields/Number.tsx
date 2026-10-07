@@ -133,11 +133,12 @@ function NumberInput({
 export const Number = {
   Input: NumberInput,
   Output: ({ value, config }: { value?: number; config: NumberField }) => {
+    const intl = useIntl()
+
     if (value == null) {
       return null
     }
 
-    const intl = useIntl()
     const prefix = config.configuration?.prefix
     const postfix = config.configuration?.postfix
     return (
