@@ -240,16 +240,13 @@ export async function refetchSearchQuery(eventId: string) {
 }
 
 /**
- * Refreshes the workqueues after a workqueue-affecting write, alongside
- * `refreshById`. Every workqueue search is marked out of date and the mounted
- * ones refetch, in parallel with the counts, so the refresh costs one round
- * trip. Unmounted queues refresh on next mount.
+ * Refreshes the workqueues after a workqueue-affecting write. Every workqueue
+ * search is marked out of date and the mounted ones refetch, in parallel with
+ * the counts. Callers await it alongside their by-id refresh so the whole
+ * refresh costs one round trip. Unmounted queues refresh on next mount.
  */
-async function refetchWorkqueueSearchQueries(
-  refreshById: () => Promise<unknown>
-) {
+async function refetchWorkqueueSearchQueries() {
   await Promise.all([
-    refreshById(),
     invalidateWorkqueueCounts(),
     queryClient.invalidateQueries({
       queryKey: searchKeys.filters.allWorkqueues()
@@ -259,9 +256,10 @@ async function refetchWorkqueueSearchQueries(
 
 /** Standard refresh path for a workqueue-affecting write. */
 async function refetchAffectedSearchQueries(...eventIds: string[]) {
-  await refetchWorkqueueSearchQueries(async () =>
-    Promise.all(eventIds.map(refetchSearchQuery))
-  )
+  await Promise.all([
+    ...eventIds.map(refetchSearchQuery),
+    refetchWorkqueueSearchQueries()
+  ])
 }
 
 /** True if a search of workqueue `slug` went out after search request `after`. */
@@ -308,7 +306,10 @@ async function deleteEventData(updatedEvent: EventDocument) {
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
-  await refetchWorkqueueSearchQueries(async () => deleteEventData(updatedEvent))
+  await Promise.all([
+    deleteEventData(updatedEvent),
+    refetchWorkqueueSearchQueries()
+  ])
 }
 
 /**
