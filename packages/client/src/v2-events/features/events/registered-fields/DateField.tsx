@@ -107,6 +107,8 @@ function stringify(
     )
   }
 
+  // Technically it can be any other string
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return String(value ?? '')
 }
 

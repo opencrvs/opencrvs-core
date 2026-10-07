@@ -445,7 +445,7 @@ export function generateQueryForAddressField(
   }
 
   const searchTerm = JSON.parse(search.term)
-  if (isAddressFieldValue(searchTerm)) {
+  if (!isAddressFieldValue(searchTerm)) {
     return { bool: { must: [] } }
   }
 
