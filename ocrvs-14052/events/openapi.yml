@@ -1890,6 +1890,7 @@ components:
         status:
           anyOf:
             - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/NoneOfStatus"
             - $ref: "#/components/schemas/ExactStatus"
         createdAt:
           $ref: "#/components/schemas/DateCondition"
@@ -1941,6 +1942,26 @@ components:
         type:
           type: string
           const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum:
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - REGISTERED
+              - REVOKED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+    NoneOfStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          const: noneOf
         terms:
           type: array
           items:
@@ -2497,9 +2518,6 @@ components:
           type: array
           items:
             type: string
-        declaration:
-          description: Configuration of the form used to gather event data.
-          $ref: "#/components/schemas/DeclarationFormConfig"
         advancedSearch:
           default: []
           description: Configuration of fields available in the advanced search feature.
@@ -2640,7 +2658,6 @@ components:
         - summary
         - label
         - actions
-        - declaration
         - advancedSearch
         - flags
         - analytics
@@ -13929,6 +13946,9 @@ components:
         type:
           type: string
           const: DECLARE
+        declaration:
+          description: Configuration of the form used to gather event data.
+          $ref: "#/components/schemas/DeclarationFormConfig"
         review:
           type: object
           properties:
@@ -13972,6 +13992,7 @@ components:
         - label
         - flags
         - type
+        - declaration
         - review
       additionalProperties: false
       description: Configuration for the declare action. Includes review-page fields.
@@ -14121,6 +14142,58 @@ components:
             - type
           additionalProperties: false
       type: object
+    DeclarationFormConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the form
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the page
+              title:
+                description: Header title of the page
+                $ref: "#/components/schemas/TranslationConfigOutput"
+              requireCompletionToContinue:
+                default: false
+                description: If true, all required fields must be filled before continuing to
+                  the next page
+                type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
+                type: boolean
+              fields:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FieldConfig"
+                description: Fields to be rendered on the page
+              conditional:
+                description: Page will be shown if condition is met. If conditional is not
+                  defined, the page will be always shown.
+                $ref: "#/components/schemas/Conditional"
+              type:
+                default: FORM
+                type: string
+                const: FORM
+            required:
+              - id
+              - title
+              - requireCompletionToContinue
+              - fields
+              - type
+            additionalProperties: false
+      required:
+        - label
+        - pages
+      additionalProperties: false
+      description: Configuration of the declaration form.
     DuplicateDetectedActionConfig:
       type: object
       properties:
@@ -14822,58 +14895,6 @@ components:
       additionalProperties: false
       description: Configuration for a country-defined custom action. An event may
         include any number of these.
-    DeclarationFormConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the form
-          $ref: "#/components/schemas/TranslationConfigOutput"
-        pages:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Unique identifier for the page
-              title:
-                description: Header title of the page
-                $ref: "#/components/schemas/TranslationConfigOutput"
-              requireCompletionToContinue:
-                default: false
-                description: If true, all required fields must be filled before continuing to
-                  the next page
-                type: boolean
-              showClearButton:
-                description: If true, a "Clear" button is shown at the top of the page allowing
-                  the user to reset all fields on the page to their default
-                  state
-                type: boolean
-              fields:
-                type: array
-                items:
-                  $ref: "#/components/schemas/FieldConfig"
-                description: Fields to be rendered on the page
-              conditional:
-                description: Page will be shown if condition is met. If conditional is not
-                  defined, the page will be always shown.
-                $ref: "#/components/schemas/Conditional"
-              type:
-                default: FORM
-                type: string
-                const: FORM
-            required:
-              - id
-              - title
-              - requireCompletionToContinue
-              - fields
-              - type
-            additionalProperties: false
-      required:
-        - label
-        - pages
-      additionalProperties: false
-      description: Configuration of the declaration form.
     AdvancedSearchConfig:
       type: object
       properties:
@@ -17997,47 +18018,6 @@ components:
                     - registrationNumber
                   additionalProperties: false
                 - type: "null"
-            REVOKED:
-              anyOf:
-                - type: object
-                  properties:
-                    createdAt:
-                      type: string
-                      format: date-time
-                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-                      description: The timestamp when the action request was created.
-                    createdBy:
-                      type: string
-                      description: ID of the user who created the action request.
-                    createdAtLocation:
-                      description: Location of the user who created the action request.
-                      anyOf:
-                        - type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                        - type: "null"
-                    createdByUserType:
-                      description: Whether the user is a normal user or a system.
-                      anyOf:
-                        - type: string
-                          enum:
-                            - user
-                            - system
-                        - type: "null"
-                    acceptedAt:
-                      type: string
-                      format: date-time
-                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-                      description: Timestamp when the action request was accepted.
-                    createdByRole:
-                      description: Role of the user at the time of action request creation.
-                      type: string
-                  required:
-                    - createdAt
-                    - createdBy
-                    - acceptedAt
-                  additionalProperties: false
-                - type: "null"
           additionalProperties: false
           description: Metadata related to the legal registration of the event, such as
             who registered it and when.
@@ -19027,6 +19007,7 @@ components:
         status:
           anyOf:
             - $ref: "#/components/schemas/AnyOfStatusOutput"
+            - $ref: "#/components/schemas/NoneOfStatusOutput"
             - $ref: "#/components/schemas/ExactStatusOutput"
         createdAt:
           $ref: "#/components/schemas/DateConditionOutput"
@@ -19079,6 +19060,27 @@ components:
         type:
           type: string
           const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum:
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - REGISTERED
+              - REVOKED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+      additionalProperties: false
+    NoneOfStatusOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          const: noneOf
         terms:
           type: array
           items:
@@ -19396,6 +19398,7 @@ components:
                       status:
                         anyOf:
                           - $ref: "#/components/schemas/AnyOfStatusOutput"
+                          - $ref: "#/components/schemas/NoneOfStatusOutput"
                           - $ref: "#/components/schemas/ExactStatusOutput"
                       createdAt:
                         $ref: "#/components/schemas/DateConditionOutput"
@@ -19787,6 +19790,7 @@ components:
                       status:
                         anyOf:
                           - $ref: "#/components/schemas/AnyOfStatusOutput"
+                          - $ref: "#/components/schemas/NoneOfStatusOutput"
                           - $ref: "#/components/schemas/ExactStatusOutput"
                       createdAt:
                         $ref: "#/components/schemas/DateConditionOutput"
