@@ -43,16 +43,12 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 const SearchParamContainer = styled.div`
-  margin: 16px 0px;
+  margin: 16px 16px 16px 0;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
   color: ${({ theme }) => theme.colors.primaryDark};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    max-height: 200px;
-    overflow-y: scroll;
-  }
 `
 
 function convertPathToLabel(path?: string): string {
