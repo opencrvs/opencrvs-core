@@ -207,6 +207,13 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
         const value = clause[key]
         if (value.type === 'anyOf') {
           must.push({ terms: { status: value.terms } })
+        } else if (value.type === 'noneOf') {
+          must.push({
+            bool: {
+              must_not: { terms: { status: value.terms } },
+              should: undefined
+            }
+          })
         } else {
           must.push({ term: { status: value.term } })
         }

@@ -90,6 +90,15 @@ export const AnyOfStatus = z
     id: 'AnyOfStatus'
   })
 
+export const NoneOfStatus = z
+  .object({
+    type: z.literal('noneOf'),
+    terms: z.array(EventStatus)
+  })
+  .meta({
+    id: 'NoneOfStatus'
+  })
+
 export const Range = z
   .object({
     type: z.literal('range'),
@@ -167,7 +176,7 @@ export const QueryExpression = z
   .object({
     id: z.optional(z.string()),
     eventType: z.string(),
-    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
+    status: z.optional(z.union([AnyOfStatus, NoneOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.DECLARED.createdAtLocation': z.optional(Within).nullable(),
