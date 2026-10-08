@@ -598,6 +598,7 @@ errors.somethingWentWrong,Error toast message for general errors,Something went 
 event.action.notAvailableForEvent,Shown when user tries to perform an action that is not available for the event,The action you're trying to perform is not available for this event anymore,L'action que vous essayez d'effectuer n'est plus disponible pour cet événement
 event.action.outbox-retry.label,Label for retry button for outbox,Retry,Réessayer
 event.action.reinstateRegistration.label,Label for reinstate registration button in dropdown menu,Reinstate registration,Réintégrer l'enregistrement
+event.action.reinstateRegistration.modal.supportingCopy,Supporting copy of the reinstate registration confirmation modal,This will restore a previously revoked registration to active status.,Cela rétablira un enregistrement précédemment révoqué à un statut actif.
 event.action.review-correction.label,Label for review correction button in dropdown menu,Review correction request,Revoir la demande de correction
 event.action.revokeRegistration.label,Label for revoke registration button in dropdown menu,Revoke registration,Révoquer l'enregistrement
 event.action.revokeRegistration.modal.supportingCopy,Supporting copy of the revoke registration confirmation modal,The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.,L'enregistrement est retiré et tout certificat délivré à partir de celui-ci n'est plus valide. Ceci est consigné définitivement dans le dossier.

@@ -14,6 +14,13 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const reinstate: QuickActionConfig = {
   modal: {
+    supportingCopy: {
+      id: 'event.action.reinstateRegistration.modal.supportingCopy',
+      defaultMessage:
+        'This will restore a previously revoked registration to active status.',
+      description:
+        'Supporting copy of the reinstate registration confirmation modal'
+    },
     confirmButtonType: 'primary',
     confirmButtonLabel: buttonMessages.reinstate
   },
