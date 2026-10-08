@@ -36,6 +36,20 @@ const eventConfig: DeepPartial<EventConfig> = {
   actions: [
     {
       type: ActionType.DECLARE,
+      declaration: {
+        label: { id: '', defaultMessage: '', description: '' },
+        pages: [
+          {
+            id: 'first-page',
+            type: PageTypes.enum.FORM,
+            title: { id: '', defaultMessage: '', description: '' },
+            fields: [
+              { id: 'number-field', type: FieldType.NUMBER },
+              { id: 'text-field', type: FieldType.TEXT }
+            ]
+          }
+        ]
+      },
       flags: [
         {
           id: 'too-large-number-flag',
@@ -130,21 +144,7 @@ const eventConfig: DeepPartial<EventConfig> = {
         { id: 'always-added-flag', operation: 'remove' }
       ]
     }
-  ],
-  declaration: {
-    label: { id: '', defaultMessage: '', description: '' },
-    pages: [
-      {
-        id: 'first-page',
-        type: PageTypes.enum.FORM,
-        title: { id: '', defaultMessage: '', description: '' },
-        fields: [
-          { id: 'number-field', type: FieldType.NUMBER },
-          { id: 'text-field', type: FieldType.TEXT }
-        ]
-      }
-    ]
-  }
+  ]
 }
 
 const now = new Date()
@@ -805,26 +805,26 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
       },
       {
         type: ActionType.DECLARE,
-        flags: [{ id: 'declare-only-flag', operation: 'add' }]
+        flags: [{ id: 'declare-only-flag', operation: 'add' }],
+        declaration: {
+          label: { id: '', defaultMessage: '', description: '' },
+          pages: []
+        }
       }
-    ],
-    declaration: {
-      label: { id: '', defaultMessage: '', description: '' },
-      pages: []
-    }
+    ]
   }
 
   const configWithoutNotify: DeepPartial<EventConfig> = {
     actions: [
       {
         type: ActionType.DECLARE,
-        flags: [{ id: 'declare-only-flag', operation: 'add' }]
+        flags: [{ id: 'declare-only-flag', operation: 'add' }],
+        declaration: {
+          label: { id: '', defaultMessage: '', description: '' },
+          pages: []
+        }
       }
-    ],
-    declaration: {
-      label: { id: '', defaultMessage: '', description: '' },
-      pages: []
-    }
+    ]
   }
 
   test('NOTIFY action uses NOTIFY flags when NOTIFY config is present', () => {

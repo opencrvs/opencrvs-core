@@ -14,9 +14,11 @@ import {
   AddressType,
   ActionUpdate,
   ConditionalType,
-  EventConfig,
   flag,
-  getCurrentEventState
+  getCurrentEventState,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -37,29 +39,31 @@ import { env } from '@events/environment'
  */
 const gatingFlag = 'email-unlocked'
 
-const eventWithFlagGatedEmail = {
-  ...tennisClubMembershipEvent,
-  // Custom flags must be declared on the event before an action may reference them.
-  flags: [
-    ...tennisClubMembershipEvent.flags,
-    {
-      id: gatingFlag,
-      requiresAction: false,
-      label: {
-        id: 'event.tennis-club-membership.flag.email-unlocked.label',
-        defaultMessage: 'Email unlocked',
-        description: 'Test flag gating the visibility of applicant.email'
+const eventWithFlagGatedEmail = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    // Custom flags must be declared on the event before an action may reference them.
+    flags: [
+      ...tennisClubMembershipEvent.flags,
+      {
+        id: gatingFlag,
+        requiresAction: false,
+        label: {
+          id: 'event.tennis-club-membership.flag.email-unlocked.label',
+          defaultMessage: 'Email unlocked',
+          description: 'Test flag gating the visibility of applicant.email'
+        }
       }
-    }
-  ],
-  actions: tennisClubMembershipEvent.actions.map((action) =>
-    action.type !== ActionType.DECLARE
-      ? action
-      : { ...action, flags: [{ id: gatingFlag, operation: 'add' }] }
-  ),
-  declaration: {
-    ...tennisClubMembershipEvent.declaration,
-    pages: tennisClubMembershipEvent.declaration.pages.map((page) => ({
+    ],
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type !== ActionType.DECLARE
+        ? action
+        : { ...action, flags: [{ id: gatingFlag, operation: 'add' }] }
+    )
+  },
+  {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: getDeclarationPages(tennisClubMembershipEvent).map((page) => ({
       ...page,
       fields: page.fields.map((pageField) =>
         pageField.id !== 'applicant.email'
@@ -73,7 +77,7 @@ const eventWithFlagGatedEmail = {
       )
     }))
   }
-}
+)
 
 const email = 'jane@example.com'
 
@@ -132,10 +136,7 @@ describe('declaration updates with a flag-gated field', () => {
       generator.event.actions.register(event.id, { declaration })
     )
 
-    const state = getCurrentEventState(
-      response,
-      eventWithFlagGatedEmail as EventConfig
-    )
+    const state = getCurrentEventState(response, eventWithFlagGatedEmail)
 
     expect(state.declaration['applicant.email']).toBe(email)
   })

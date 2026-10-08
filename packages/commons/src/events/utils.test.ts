@@ -50,7 +50,8 @@ import {
   eventQueryDataGenerator,
   generateActionDocument,
   generateTranslationConfig,
-  generateTestValidatorContext
+  generateTestValidatorContext,
+  withDeclaration
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
 
@@ -1273,5 +1274,49 @@ describe('getDeclarationAfterEachAction', () => {
       'applicant.email': null,
       'applicant.dob': '1990-01-01'
     })
+  })
+})
+
+describe('getDeclaration() and withDeclaration()', () => {
+  const declaration = {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: []
+  }
+
+  it('should read the declaration from the DECLARE action', () => {
+    const declareAction = tennisClubMembershipEvent.actions.find(
+      (action) => action.type === ActionType.DECLARE
+    )
+
+    expect(getDeclaration(tennisClubMembershipEvent)).toBe(
+      declareAction?.type === ActionType.DECLARE && declareAction.declaration
+    )
+  })
+
+  it('should throw when the configuration has no DECLARE action', () => {
+    expect(() =>
+      getDeclaration({
+        ...tennisClubMembershipEvent,
+        actions: tennisClubMembershipEvent.actions.filter(
+          (action) => action.type !== ActionType.DECLARE
+        )
+      })
+    ).toThrow(
+      `Event '${tennisClubMembershipEvent.id}' has no DECLARE action to read the declaration from`
+    )
+  })
+
+  it('should replace the declaration on the DECLARE action only', () => {
+    const config = withDeclaration(tennisClubMembershipEvent, declaration)
+
+    expect(getDeclaration(config)).toBe(declaration)
+    expect(
+      config.actions.filter((action) => action.type !== ActionType.DECLARE)
+    ).toEqual(
+      tennisClubMembershipEvent.actions.filter(
+        (action) => action.type !== ActionType.DECLARE
+      )
+    )
+    expect(getDeclaration(tennisClubMembershipEvent).pages).not.toHaveLength(0)
   })
 })

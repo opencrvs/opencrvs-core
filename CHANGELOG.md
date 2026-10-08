@@ -2,6 +2,16 @@
 
 ## 2.2.0 Release Candidate
 
+### Upgrade guidance
+
+#### Outbox: empty it before you deploy
+
+2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
+
+Before the deploy, instruct every user, working offline in particular, to connect and wait until their outbox is empty. Anything still queued afterwards must be entered again. Users who had OpenCRVS open during the deploy should reload the page; until they do, the old version can fail to show records.
+
+[#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
 ### Breaking changes
 
 #### `POST /auth/token` no longer accepts parameters in the query string
@@ -19,11 +29,27 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
 
+#### Event `declaration` moved onto the `DECLARE` action
+
+An event's declaration form was defined at the top level of `EventConfig`. It now lives on the event's `DECLARE` action, and every event must have exactly one `DECLARE` action:
+
+| Before                         | After                              |
+| ------------------------------ | ---------------------------------- |
+| `birthEvent.declaration.pages` | `getDeclaration(birthEvent).pages` |
+
+Core 2.2 reads event configurations only in the new shape, so **a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading entirely**: no event can be opened, declared or searched. Upgrade core and the country config together.
+
+**Country configs must read the form through `getDeclaration`.** `opencrvs upgrade` does it for you: the `read-declaration-through-helper` codemod rewrites every `declaration` read on an `EventConfig` under `src/` and imports `getDeclaration`, then lists every read it could not rewrite — an optional chain, a destructured `declaration`, an assignment — for you to change by hand.
+
+`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, so events defined with it need no other change. It logs a deprecation warning, though: a future release will remove the top-level `declaration`. It throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
+
+[#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
 #### The `incomplete` flag is removed
 
 `InherentFlags.INCOMPLETE` mirrored the `NOTIFIED` status, so it has been removed [#13985](https://github.com/opencrvs/opencrvs-core/issues/13985). References to `InherentFlags.INCOMPLETE` no longer compile. References written as the string `'incomplete'` (for example in encoded scope strings such as `record.read[flags=incomplete]`) still parse, but match nothing. Switch to the `NOTIFIED` status instead (`status` in workqueues and scope options, `event.status` in conditionals).
 
-`npx @opencrvs/toolkit upgrade` makes this change for workqueue queries, and lists any other `InherentFlags.INCOMPLETE` reference for you to update by hand:
+`opencrvs upgrade` does it for workqueue queries: the `replace-incomplete-flag` codemod rewrites them as below, then lists every other `InherentFlags.INCOMPLETE` reference for you to change by hand:
 
 ```diff
  query: {
@@ -35,9 +61,11 @@ Existing credentials keep working. Rotate any secret that has been sent in a URL
 Unlike the flag, an archived notification no longer matches, since its status is `ARCHIVED`. Remove the `flags.builtin.incomplete.label` translation, and reindex after upgrading. The `NOTIFIED` status now reads "Notified" in workqueues and search too, not "In progress".
 
 ### Improvements
+
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
 
 ### Bug fixes
+
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 
 ## 2.1.0

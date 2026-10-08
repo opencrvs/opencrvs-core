@@ -1043,5 +1043,36 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         'father.address-value'
       )
     })
+
+    test('3.2.3 Documents tab lists the documents uploaded during declaration', async () => {
+      await switchEventTab(page, 'Documents')
+
+      const documentRows = page.locator('#listTable-documents [id^="row_"]')
+      await expect(documentRows.first()).toBeVisible()
+      await expect(
+        page.locator('#listTable-documents').getByText('Proof of birth')
+      ).toBeVisible()
+    })
+
+    test('3.2.4 Documents tab allows previewing of document', async () => {
+      await page
+        .locator('#listTable-documents')
+        .getByText('Proof of birth')
+        .click()
+
+      const img = page.locator('img')
+      await expect(img).toBeVisible()
+      const src = await img.getAttribute('src')
+
+      // Expect the src to be a valid URL to the uploaded file
+      await expect(src).toMatch(
+        /^\/events\/[0-9a-fA-F-]+\/[0-9a-fA-F-]+\.jfif$/
+      )
+    })
+
+    test('3.2.5 Closing preview takes us back to documents tab', async () => {
+      await page.getByTestId('preview_close').click()
+      await expect(page.getByText('Documents (15)')).toBeVisible()
+    })
   })
 })

@@ -8,20 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { main as addTranslations } from '../add-translations'
+import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 
-import * as yaml from 'yaml'
-import { createDocument } from 'zod-openapi'
-import { countryConfigApi } from '.'
-
-const document = createDocument({
-  openapi: '3.1.0',
-  info: {
-    title: 'Countryconfig implementation requirements',
-    version: '2.2.0',
-    description: 'Country specific configuration server for OpenCRVS'
-  },
-  paths: countryConfigApi
-})
-
-// eslint-disable-next-line no-console
-console.log(yaml.stringify(document))
+/**
+ * Run the upgrade process for the country config in the current working
+ * directory.
+ */
+export async function runUpgrade() {
+  await readDeclarationThroughHelper()
+  await addTranslations('2.2')
+}
