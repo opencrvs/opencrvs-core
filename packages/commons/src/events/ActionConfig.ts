@@ -85,6 +85,14 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
+    /** Notification form configuration, which must include a subset of the declaration form fields. The values submitted on the notification form will be used as pre-filled values during declaration. If notificationForm is not defined, we fallback to the declare form.  */
+    notificationForm: DeclarationFormConfig.optional().describe(
+      'Notification form configuration, which must include a subset of the declaration form fields. The values submitted on the notification form will be used as pre-filled values during declaration. If notificationForm is not defined, we fallback to the declare form.'
+    ),
+    /** Review page configuration for the notify action. */
+    review: DeclarationReviewConfig.optional().describe(
+      'Review page configuration for the notify action.'
+    ),
     form: actionConfirmationForm
   }).shape
 )
