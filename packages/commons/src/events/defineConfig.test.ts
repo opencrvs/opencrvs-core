@@ -89,21 +89,6 @@ describe('defineConfig()', () => {
     )
   })
 
-  it('should throw when there is more than one DECLARE action', () => {
-    expect(() =>
-      defineConfig({
-        ...tennisClubMembershipEvent,
-        actions: [
-          ...tennisClubMembershipEvent.actions,
-          tennisClubMembershipEvent.actions[declareActionIndex]
-        ],
-        declaration
-      })
-    ).toThrow(
-      `Event must have exactly one DECLARE action. Found 2 for event ${tennisClubMembershipEvent.id}`
-    )
-  })
-
   it('should throw when the event has no DECLARE action', () => {
     expect(() =>
       defineConfig({
@@ -114,7 +99,139 @@ describe('defineConfig()', () => {
         declaration
       })
     ).toThrow(
-      `Event must have exactly one DECLARE action. Found 0 for event ${tennisClubMembershipEvent.id}`
+      `Event must have a DECLARE action. Found none for event ${tennisClubMembershipEvent.id}`
     )
+  })
+
+  describe('action versions', () => {
+    const declareAction = tennisClubMembershipEvent.actions[declareActionIndex]
+    const declareActionWithoutDeclaration =
+      actionsWithoutDeclaration[declareActionIndex]
+    const actionCount = tennisClubMembershipEvent.actions.length
+
+    it('should accept an action given as versions with different effectiveFrom values', () => {
+      const config = defineConfig({
+        ...tennisClubMembershipEvent,
+        actions: [
+          ...tennisClubMembershipEvent.actions.filter(
+            (action) => action.type !== ActionType.DECLARE
+          ),
+          { ...declareAction, effectiveFrom: '2020-01-01' },
+          { ...declareAction, effectiveFrom: '2025-01-01' }
+        ]
+      })
+
+      expect(
+        config.actions
+          .filter((action) => action.type === ActionType.DECLARE)
+          .map((action) => action.effectiveFrom)
+      ).toEqual(['2020-01-01', '2025-01-01'])
+    })
+
+    it('should accept an action given as one version without effectiveFrom', () => {
+      const config = defineConfig(tennisClubMembershipEvent)
+
+      expect(config.actions[declareActionIndex].effectiveFrom).toBeUndefined()
+    })
+
+    it('should accept a version without effectiveFrom alongside dated versions', () => {
+      expect(() =>
+        defineConfig({
+          ...tennisClubMembershipEvent,
+          actions: [
+            ...tennisClubMembershipEvent.actions,
+            { ...declareAction, effectiveFrom: '2020-01-01' }
+          ]
+        })
+      ).not.toThrow()
+    })
+
+    it('should throw naming the action and the date when two versions have the same effectiveFrom', () => {
+      expect(() =>
+        defineConfig({
+          ...tennisClubMembershipEvent,
+          actions: [
+            ...tennisClubMembershipEvent.actions,
+            { ...declareAction, effectiveFrom: '2020-01-01' },
+            { ...declareAction, effectiveFrom: '2020-01-01' }
+          ]
+        })
+      ).toThrow(
+        `Action 'DECLARE' of event '${tennisClubMembershipEvent.id}' has more than one version with \`effectiveFrom\` '2020-01-01'. Each version must have a different \`effectiveFrom\`.`
+      )
+    })
+
+    it('should throw when two versions have no effectiveFrom', () => {
+      expect(() =>
+        defineConfig({
+          ...tennisClubMembershipEvent,
+          actions: [...tennisClubMembershipEvent.actions, declareAction]
+        })
+      ).toThrow(
+        `Action 'DECLARE' of event '${tennisClubMembershipEvent.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`
+      )
+    })
+
+    it('should move a top-level declaration onto every version of the DECLARE action', () => {
+      const config = defineConfig({
+        ...tennisClubMembershipEvent,
+        actions: [
+          ...actionsWithoutDeclaration,
+          { ...declareActionWithoutDeclaration, effectiveFrom: '2020-01-01' }
+        ],
+        declaration
+      })
+
+      const declareVersions = config.actions.filter(
+        (action) => action.type === ActionType.DECLARE
+      )
+      expect(declareVersions).toHaveLength(2)
+      declareVersions.forEach((action) =>
+        expect(action.declaration).toEqual(declaration)
+      )
+    })
+
+    it('should throw naming the versions without a declaration when only some versions define one', () => {
+      expect(() =>
+        defineConfig({
+          ...tennisClubMembershipEvent,
+          actions: [
+            ...tennisClubMembershipEvent.actions,
+            { ...declareActionWithoutDeclaration, effectiveFrom: '2020-01-01' }
+          ]
+        })
+      ).toThrow(
+        `Event '${tennisClubMembershipEvent.id}' defines \`declaration\` on some versions of the DECLARE action but not on \`actions[${actionCount}].declaration\` (\`effectiveFrom\` '2020-01-01'). Define it on every version, or remove it from every version and define it once at the top level.`
+      )
+    })
+
+    it('should throw naming the versions with a declaration when a top-level declaration is also given', () => {
+      expect(() =>
+        defineConfig({
+          ...tennisClubMembershipEvent,
+          actions: [
+            ...tennisClubMembershipEvent.actions,
+            { ...declareActionWithoutDeclaration, effectiveFrom: '2020-01-01' }
+          ],
+          declaration
+        })
+      ).toThrow(
+        `Event '${tennisClubMembershipEvent.id}' defines \`declaration\` both at the top level and on versions of the DECLARE action (\`actions[${declareActionIndex}].declaration\` (no \`effectiveFrom\`)). Define it either only at the top level, to share it across every version, or on every version and not at the top level.`
+      )
+    })
+
+    it('should throw naming every version when no version defines a declaration and none is given at the top level', () => {
+      expect(() =>
+        defineConfig({
+          ...tennisClubMembershipEvent,
+          actions: [
+            ...actionsWithoutDeclaration,
+            { ...declareActionWithoutDeclaration, effectiveFrom: '2020-01-01' }
+          ]
+        })
+      ).toThrow(
+        `Event '${tennisClubMembershipEvent.id}' does not define \`declaration\`. Define it either at the top level or on every version of the DECLARE action (\`actions[${declareActionIndex}].declaration\` (no \`effectiveFrom\`), \`actions[${actionCount}].declaration\` (\`effectiveFrom\` '2020-01-01')).`
+      )
+    })
   })
 })
