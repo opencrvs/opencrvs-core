@@ -12,7 +12,12 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { ActionType } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventConfig,
+  FieldConfig,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -140,6 +145,80 @@ export const ClearFormPage: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
+          }),
+          tRPCMsw.event.search.query(() => {
+            return { results: [], total: 0 }
+          })
+        ]
+      }
+    },
+    chromatic: { disableSnapshot: true }
+  }
+}
+
+const EMAIL_DEFAULT = 'a@b.co'
+
+const eventWithEmailDefault: EventConfig = {
+  ...tennisClubMembershipEvent,
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: tennisClubMembershipEvent.declaration.pages.map((page) => ({
+      ...page,
+      fields: page.fields.map((field) =>
+        field.id === 'applicant.email'
+          ? ({ ...field, defaultValue: EMAIL_DEFAULT } as FieldConfig)
+          : field
+      )
+    }))
+  }
+}
+
+export const ClearRestoresDefaults: Story = {
+  name: 'Clear button restores configured default values',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const email = await canvas.findByTestId('text__applicant____email')
+
+    await step('Replace the default email', async () => {
+      await waitFor(async () => expect(email).toHaveValue(EMAIL_DEFAULT))
+      await userEvent.clear(email)
+      await userEvent.type(email, 'x@y.zz')
+      await userEvent.type(await canvas.findByTestId('text__firstname'), 'John')
+    })
+
+    await step('Clear brings the default back', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Clear' })
+      )
+      const modal = within(await canvas.findByRole('dialog'))
+      await userEvent.click(modal.getByRole('button', { name: 'Clear' }))
+
+      await expect(
+        await canvas.findByTestId('text__applicant____email')
+      ).toHaveValue(EMAIL_DEFAULT)
+      await expect(await canvas.findByTestId('text__firstname')).toHaveValue('')
+    })
+  },
+  parameters: {
+    offline: {
+      events: [undeclaredDraftEvent],
+      configs: [eventWithEmailDefault]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
+          }),
+          tRPCMsw.event.config.get.query(() => {
+            return [eventWithEmailDefault]
           }),
           tRPCMsw.event.search.query(() => {
             return { results: [], total: 0 }
