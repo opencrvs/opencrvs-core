@@ -20,7 +20,10 @@ import {
   EventConfig,
   FieldType,
   generateEventDocument,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -85,12 +88,14 @@ const INACTIVATED_AREA: AdministrativeArea = {
 function buildEventConfig(
   adminAreaConfiguration: Record<string, boolean>
 ): EventConfig {
-  return {
-    ...ChildOnboardingEvent,
-    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-    declaration: {
-      ...ChildOnboardingEvent.declaration,
-      pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+  return withDeclaration(
+    {
+      ...ChildOnboardingEvent,
+      dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+    },
+    {
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
         page.id === 'child'
           ? {
               ...page,
@@ -116,7 +121,7 @@ function buildEventConfig(
           : page
       )
     }
-  }
+  )
 }
 
 function buildStoryParams(eventConfig: EventConfig) {
