@@ -70,7 +70,8 @@ const StyledLink = styled.button<{
 
   &:focus-visible {
     background: ${({ theme }) => theme.colors.yellow};
-    box-shadow: 0 -2px ${({ theme }) => theme.colors.yellow},
+    box-shadow:
+      0 -2px ${({ theme }) => theme.colors.yellow},
       0px 2px ${({ theme }) => theme.colors.yellow},
       0 4px ${({ theme }) => theme.colors.copy};
     color: ${({ theme }) => theme.colors.grey600};

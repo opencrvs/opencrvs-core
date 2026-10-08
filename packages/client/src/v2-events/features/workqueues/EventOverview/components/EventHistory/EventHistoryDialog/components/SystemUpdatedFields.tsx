@@ -75,7 +75,11 @@ export function SystemUpdatedFields({
     }
     // Skip fields that already appear in the action's reviewable content.
     if (
-      isFieldDisplayedOnReview(field, currentState.declaration, validatorContext)
+      isFieldDisplayedOnReview(
+        field,
+        currentState.declaration,
+        validatorContext
+      )
     ) {
       return []
     }

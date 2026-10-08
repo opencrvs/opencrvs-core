@@ -103,7 +103,11 @@ export function InfoBox({
   return (
     <Container $background={background} $type={type} data-testid={dataTestId}>
       <IconBlock $background={background} $type={type}>
-        <Icon color={accentColor[type]} name={icon ?? DEFAULT_ICON} size="large" />
+        <Icon
+          color={accentColor[type]}
+          name={icon ?? DEFAULT_ICON}
+          size="large"
+        />
       </IconBlock>
       <Heading>{heading}</Heading>
       {description && <Description>{description}</Description>}

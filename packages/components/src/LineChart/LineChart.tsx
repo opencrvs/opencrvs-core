@@ -204,7 +204,10 @@ class LineChartComponent extends React.Component<IProps> {
               stroke={theme.colors.teal}
               dot={false}
               activeDot={(dotProps: unknown) => (
-                <CustomizedDot {...(dotProps as ICustomisedDot)} theme={theme} />
+                <CustomizedDot
+                  {...(dotProps as ICustomisedDot)}
+                  theme={theme}
+                />
               )}
               strokeWidth={3}
             />
