@@ -14,17 +14,14 @@ import { useIntl } from 'react-intl'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { buttonMessages } from '@client/i18n/messages'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Frame, AppBar, Button, Box } from '@opencrvs/components'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { Box } from '@opencrvs/components/lib/Box'
+import { CountryLogo } from '@opencrvs/components/icons'
 import { useSelector } from 'react-redux'
 
 export const Page = styled.div`

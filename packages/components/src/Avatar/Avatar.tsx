@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { IFont } from '../fonts'
+import { IFont } from '../tokens'
 
 export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
 

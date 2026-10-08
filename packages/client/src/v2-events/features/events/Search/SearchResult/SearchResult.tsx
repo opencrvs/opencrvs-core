@@ -22,12 +22,12 @@ import {
   TranslationConfig,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
-import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
+  useWindowSize,
   ColumnContentAlignment,
   SORT_ORDER,
   Workqueue
-} from '@opencrvs/components/lib/Workqueue'
+} from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'

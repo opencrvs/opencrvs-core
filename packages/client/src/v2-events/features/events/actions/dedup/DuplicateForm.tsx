@@ -17,9 +17,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Content, Button, Icon } from '@opencrvs/components'
 import {
   ActionType,
   EventIndex,

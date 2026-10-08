@@ -14,7 +14,7 @@ import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Link } from '../Link'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 import { useToastVisibility } from './useToastVisibility'
 import { Icon } from '../Icon'
 

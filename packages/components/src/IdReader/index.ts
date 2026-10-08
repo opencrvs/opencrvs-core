@@ -8,6 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './DocumentViewer'
-export * from './components/PanControls'
-export * from './components/PanViewer'
+
+export * from './IdReader'
+export * from './readers/QrReader/QrReader'

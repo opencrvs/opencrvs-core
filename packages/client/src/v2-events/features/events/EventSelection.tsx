@@ -14,14 +14,18 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
-import { Stack } from '@opencrvs/components/lib/Stack'
+import {
+  AppBar,
+  Button,
+  Content,
+  ContentSize,
+  ErrorText,
+  Frame,
+  Icon,
+  RadioGroup,
+  RadioSize,
+  Stack
+} from '@opencrvs/components'
 import { canUserCreateEvent } from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'

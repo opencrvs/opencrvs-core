@@ -10,8 +10,7 @@
  */
 import { buttonMessages } from '@client/i18n/messages'
 import { User } from '@opencrvs/commons/client'
-import { Dialog } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog, Button } from '@opencrvs/components'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useUsers } from '../../../../v2-events/hooks/useUsers'

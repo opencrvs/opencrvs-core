@@ -40,7 +40,6 @@
     "charts",
     "license-header.txt",
     "**/*Dockerfile*",
-    "**/packages/components/lib",
     "**/packages/*/build",
     "packages/client/index.html",
     "packages/login/index.html",

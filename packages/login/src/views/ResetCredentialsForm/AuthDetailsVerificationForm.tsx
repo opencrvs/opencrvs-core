@@ -10,13 +10,16 @@
  */
 import { authApi } from '@login/utils/authApi'
 import { emailAddressFormat, phoneNumberFormat } from '@login/utils/validate'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  InputField,
+  TextInput,
+  Frame,
+  Content,
+  ContentSize,
+  AppBar,
+  Button,
+  Icon
+} from '@opencrvs/components'
 import React, { useEffect, useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'

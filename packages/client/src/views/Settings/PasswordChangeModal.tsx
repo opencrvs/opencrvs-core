@@ -15,7 +15,7 @@ import {
   ErrorMessage,
   PasswordInput
 } from '@opencrvs/components'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { TickOff, TickOn } from '@opencrvs/components/icons'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from 'styled-components'

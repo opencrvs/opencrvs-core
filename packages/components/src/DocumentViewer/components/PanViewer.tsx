@@ -39,7 +39,12 @@ interface IProps {
   onError?: () => void
 }
 
-const PanViewer: React.FC<IProps> = ({ image, zoom, rotation, onError }) => {
+export const PanViewer: React.FC<IProps> = ({
+  image,
+  zoom,
+  rotation,
+  onError
+}) => {
   const [dx] = useState(0)
   const [dy] = useState(0)
 
@@ -62,5 +67,3 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation, onError }) => {
     </React.Fragment>
   )
 }
-
-export default PanViewer

@@ -11,9 +11,7 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Icon, Button, Text } from '@opencrvs/components'
 import { InfoBox as InfoBoxConfig } from '@opencrvs/commons/client'
 
 type InfoBoxType = InfoBoxConfig['type']

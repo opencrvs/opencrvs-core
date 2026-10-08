@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ILocation } from '@client/offline/reducer'
-import { ISearchLocation as SearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { ISearchLocation as SearchLocation } from '@opencrvs/components'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages } from '@client/i18n/messages'
 import { countries } from '@client/utils/countries'

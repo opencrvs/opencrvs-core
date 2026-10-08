@@ -14,7 +14,7 @@ import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/icons'
 import {
   Accordion,
   Button,

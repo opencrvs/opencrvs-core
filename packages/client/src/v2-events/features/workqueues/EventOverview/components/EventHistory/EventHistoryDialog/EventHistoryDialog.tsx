@@ -12,8 +12,7 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
 import styled from 'styled-components'
-import { Dialog, Icon, Table } from '@opencrvs/components'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Dialog, Icon, Table, Text } from '@opencrvs/components'
 import {
   ActionDocument,
   ActionType,

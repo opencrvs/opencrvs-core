@@ -33,7 +33,7 @@ import {
   Frame,
   Icon
 } from '@opencrvs/components'
-import { Check } from '@opencrvs/components/lib/icons'
+import { Check } from '@opencrvs/components/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { constantsMessages } from '@client/i18n/messages'

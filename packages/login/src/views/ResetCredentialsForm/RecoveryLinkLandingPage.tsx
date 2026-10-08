@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { authApi } from '@login/utils/authApi'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  Frame,
+  AppBar,
+  Button,
+  Spinner,
+  Stack,
+  Text
+} from '@opencrvs/components'
+import { CountryLogo } from '@opencrvs/components/icons'
 import {
   Container,
   LogoContainer

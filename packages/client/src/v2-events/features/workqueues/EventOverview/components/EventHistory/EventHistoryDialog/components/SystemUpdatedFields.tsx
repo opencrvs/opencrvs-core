@@ -19,9 +19,7 @@ import {
   isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment } from '@opencrvs/components'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Text } from '@opencrvs/components/lib/Text'
+import { ColumnContentAlignment, Table, Text } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'

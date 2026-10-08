@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import * as Recharts from 'recharts'
-import { ITheme } from '../theme'
+import { ITheme } from '../tokens'
 import styled, { withTheme } from 'styled-components'
 import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
 

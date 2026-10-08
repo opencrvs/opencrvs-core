@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
+import { fonts, IFont, colors, IColor } from '../tokens'
 import styled, { css } from 'styled-components'
 
 export interface LinkProps

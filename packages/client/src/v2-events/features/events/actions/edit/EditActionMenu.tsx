@@ -35,9 +35,14 @@ import {
   AttachmentPath,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Icon, Dialog, Stack, Button } from '@opencrvs/components'
+import {
+  DropdownMenu,
+  Icons,
+  Icon,
+  Dialog,
+  Stack,
+  Button
+} from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -424,7 +429,7 @@ export function EditActionMenu({ event }: { event: EventDocument }) {
             size="medium"
             type="primary"
           >
-            {intl.formatMessage(actionMessages.action)} <CaretDown />
+            {intl.formatMessage(actionMessages.action)} <Icons.CaretDown />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>

@@ -11,7 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Alert } from '@opencrvs/components/lib/Alert'
+import { Alert } from '@opencrvs/components'
 
 const messages = {
   duplicateWarning: {

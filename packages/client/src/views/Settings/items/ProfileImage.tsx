@@ -19,7 +19,7 @@ import {
   DynamicHeightLinkButton,
   SettingsRow
 } from '@client/views/Settings/items/components'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components'
 import * as React from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 

@@ -28,15 +28,18 @@ import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/us
 import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { todayISO, User, UUID } from '@opencrvs/commons/client'
-import { Link } from '@opencrvs/components/lib'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Loader } from '@opencrvs/components/lib/Loader'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { List } from '@opencrvs/components/lib/List'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import {
+  Link,
+  Button,
+  Content,
+  ContentSize,
+  Icon,
+  Loader,
+  Dialog,
+  List,
+  Toast,
+  ToggleMenu
+} from '@opencrvs/components'
 import { stringify } from 'qs'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
