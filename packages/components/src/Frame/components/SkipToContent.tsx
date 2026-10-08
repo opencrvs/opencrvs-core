@@ -12,7 +12,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Link } from '../../Link'
 
-export const SkipToContentContainer = styled(Link)`
+const SkipToContentContainer = styled(Link)`
   left: 0;
   top: 0;
   position: absolute;
