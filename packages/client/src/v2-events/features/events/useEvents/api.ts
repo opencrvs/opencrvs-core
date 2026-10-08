@@ -246,7 +246,7 @@ export async function refetchSearchQuery(eventId: string) {
  * (a by-id refetch, or deleteEventData's reset) so the whole refresh costs one
  * round trip. Unmounted queues refresh on next mount.
  */
-async function refetchWorkqueueSearchQueries() {
+async function invalidateWorkqueueSearchQueries() {
   await Promise.all([
     invalidateWorkqueueCounts(),
     queryClient.invalidateQueries({
@@ -256,10 +256,10 @@ async function refetchWorkqueueSearchQueries() {
 }
 
 /** Standard refresh path for a workqueue-affecting write. */
-async function refetchAffectedSearchQueries(...eventIds: string[]) {
+async function refreshAffectedSearchQueries(...eventIds: string[]) {
   await Promise.all([
     ...eventIds.map(refetchSearchQuery),
-    refetchWorkqueueSearchQueries()
+    invalidateWorkqueueSearchQueries()
   ])
 }
 
@@ -287,7 +287,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await Promise.all([
     deleteEventData(updatedEvent),
-    refetchWorkqueueSearchQueries()
+    invalidateWorkqueueSearchQueries()
   ])
 }
 
@@ -297,7 +297,7 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
  */
 export async function onMarkNotDuplicate(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
-  await refetchAffectedSearchQueries(updatedEvent.id)
+  await refreshAffectedSearchQueries(updatedEvent.id)
 }
 
 /**
@@ -342,7 +342,7 @@ export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
     lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
   )
 
-  await refetchAffectedSearchQueries(updatedEvent.id)
+  await refreshAffectedSearchQueries(updatedEvent.id)
 }
 
 export async function refetchDraftsList() {
