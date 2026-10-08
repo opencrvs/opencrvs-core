@@ -311,6 +311,8 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      // Records revoked with the custom action are still REGISTERED, so the flag filter stays
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
         anyOf: ['pending-first-certificate-issuance'],
         noneOf: ['revoked', InherentFlags.CORRECTION_REQUESTED]
@@ -333,6 +335,8 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      // Records revoked with the custom action are still REGISTERED, so the flag filter stays
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
         anyOf: ['certified-copy-printed-in-advance-of-issuance'],
         noneOf: ['revoked', InherentFlags.CORRECTION_REQUESTED]
@@ -355,6 +359,8 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      // Records revoked with the custom action are still REGISTERED, so the flag filter stays
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
         anyOf: [InherentFlags.CORRECTION_REQUESTED],
         noneOf: ['revoked']
