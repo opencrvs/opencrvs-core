@@ -1712,13 +1712,19 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.READ }
       ]
     })
+    const revokeAction = event.actions[3]
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
+    expect(state.legalStatuses.REVOKED).toMatchObject({
+      createdAt: revokeAction.createdAt,
+      createdBy: revokeAction.createdBy,
+      acceptedAt: revokeAction.createdAt
+    })
     expect(state.legalStatuses.REGISTERED).toBeDefined()
   })
 
-  test('restores REGISTERED status after reinstating', () => {
+  test('restores REGISTERED status and clears the revoked legal status after reinstating', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
@@ -1732,10 +1738,11 @@ describe('revoke/reinstate status resolution', () => {
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REGISTERED)
+    expect(state.legalStatuses.REVOKED).toBeUndefined()
     expect(state.legalStatuses.REGISTERED).toBeDefined()
   })
 
-  test('handles repeated revoke/reinstate cycles', () => {
+  test('handles repeated revoke/reinstate cycles, reporting the latest revoke', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
@@ -1747,9 +1754,13 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.REVOKE_REGISTRATION }
       ]
     })
+    const latestRevokeAction = event.actions[5]
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
+    expect(state.legalStatuses.REVOKED?.createdAt).toBe(
+      latestRevokeAction.createdAt
+    )
   })
 
   test('a revoke that is only requested does not change the status', () => {
@@ -1771,5 +1782,6 @@ describe('revoke/reinstate status resolution', () => {
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REGISTERED)
+    expect(state.legalStatuses.REVOKED).toBeUndefined()
   })
 })

@@ -300,7 +300,7 @@ export function getCurrentEventState(
 
   const declaration = aggregateActionDeclarations(event)
   const status = getStatusFromActions(sortedActions)
-  const legalStatuses = getLegalStatuses(sortedActions)
+  const legalStatuses = getLegalStatuses(sortedActions, status)
 
   const base = deepDropNulls({
     id: event.id,
