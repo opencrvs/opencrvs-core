@@ -235,7 +235,8 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'createdAtLocation':
       case 'updatedAtLocation':
       case 'legalStatuses.DECLARED.createdAtLocation':
-      case 'legalStatuses.REGISTERED.createdAtLocation': {
+      case 'legalStatuses.REGISTERED.createdAtLocation':
+      case 'legalStatuses.REVOKED.createdAtLocation': {
         if (clause[key].type === 'exact') {
           must.push({ term: { [key]: clause[key].term } })
         } else {

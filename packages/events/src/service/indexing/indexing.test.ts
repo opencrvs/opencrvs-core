@@ -443,6 +443,19 @@ const withinRegisteredAtLocationPayload: QueryType = {
   ]
 }
 
+const withinRevokedAtLocationPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatuses.REVOKED.createdAtLocation': {
+        type: 'within',
+        location: RANDOM_UUID
+      },
+      eventType: TENNIS_CLUB_MEMBERSHIP
+    }
+  ]
+}
+
 const anyOfStatusPayload: QueryType = {
   type: 'and',
   clauses: [
@@ -610,6 +623,33 @@ describe('test buildElasticQueryFromSearchPayload', () => {
                 {
                   term: {
                     'legalStatuses.REGISTERED.createdAtLocation': RANDOM_UUID
+                  }
+                },
+                { term: { type: TENNIS_CLUB_MEMBERSHIP } }
+              ],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with legalStatuses.REVOKED.createdAtLocation', async () => {
+    const result = await buildElasticQueryFromSearchPayload(
+      withinRevokedAtLocationPayload,
+      [tennisClubMembershipEvent]
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                {
+                  term: {
+                    'legalStatuses.REVOKED.createdAtLocation': RANDOM_UUID
                   }
                 },
                 { term: { type: TENNIS_CLUB_MEMBERSHIP } }
