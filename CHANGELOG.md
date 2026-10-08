@@ -45,6 +45,21 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
+#### The `incomplete` flag is removed
+
+`InherentFlags.INCOMPLETE` mirrored the `NOTIFIED` status, so it has been removed [#13985](https://github.com/opencrvs/opencrvs-core/issues/13985). References to `InherentFlags.INCOMPLETE` no longer compile. References written as the string `'incomplete'` (for example in encoded scope strings such as `record.read[flags=incomplete]`) still parse, but match nothing. Switch to the `NOTIFIED` status instead (`status` in workqueues and scope options, `event.status` in conditionals).
+
+`opencrvs upgrade` does it for workqueue queries: the `replace-incomplete-flag` codemod rewrites them as below, then lists every other `InherentFlags.INCOMPLETE` reference for you to change by hand:
+
+```diff
+ query: {
+-  flags: { anyOf: [InherentFlags.INCOMPLETE], noneOf: [InherentFlags.REJECTED] },
++  flags: { noneOf: [InherentFlags.REJECTED] },
++  status: { type: 'exact', term: EventStatus.enum.NOTIFIED },
+```
+
+Unlike the flag, an archived notification no longer matches, since its status is `ARCHIVED`. Remove the `flags.builtin.incomplete.label` translation, and reindex after upgrading. The `NOTIFIED` status now reads "Notified" in workqueues and search too, not "In progress".
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)

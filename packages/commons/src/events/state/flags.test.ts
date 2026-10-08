@@ -108,11 +108,6 @@ const eventConfig: DeepPartial<EventConfig> = {
       customActionType: 'VALIDATE_DECLARATION',
       flags: [{ id: InherentFlags.REJECTED, operation: 'remove' }]
     },
-    {
-      type: ActionType.CUSTOM,
-      customActionType: 'COMPLETE_NOTIFICATION',
-      flags: [{ id: InherentFlags.INCOMPLETE, operation: 'remove' }]
-    },
     { type: ActionType.PRINT_CERTIFICATE, flags: [] },
     {
       type: ActionType.MARK_AS_DUPLICATE,
@@ -883,90 +878,5 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, configWithoutNotify)
     expect(flags).toContain('declare-only-flag')
-  })
-})
-
-describe('getEventFlags() – any inherent flag is clearable by action config', () => {
-  test('INCOMPLETE is present for a notified record', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(
-      InherentFlags.INCOMPLETE
-    )
-  })
-
-  test('INCOMPLETE survives an archive/unarchive round trip back to NOTIFIED', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        ActionType.NOTIFY,
-        ActionType.ARCHIVE,
-        ActionType.UNARCHIVE
-      ].map((type, idx) => ({
-        type,
-        declaration: {},
-        createdAt: formatISO(subDays(now, 3 - idx)),
-        status: ActionStatus.Accepted
-      }))
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(
-      InherentFlags.INCOMPLETE
-    )
-  })
-
-  test('INCOMPLETE stays absent when a declared record is archived and unarchived', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        ActionType.DECLARE,
-        ActionType.ARCHIVE,
-        ActionType.UNARCHIVE
-      ].map((type, idx) => ({
-        type,
-        declaration: {},
-        createdAt: formatISO(subDays(now, 3 - idx)),
-        status: ActionStatus.Accepted
-      }))
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).not.toContain(
-      InherentFlags.INCOMPLETE
-    )
-  })
-
-  test('INCOMPLETE is cleared by a custom action whose config removes it', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(subDays(now, 1)),
-          status: ActionStatus.Accepted
-        },
-        {
-          type: ActionType.CUSTOM,
-          customActionType: 'COMPLETE_NOTIFICATION',
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).not.toContain(
-      InherentFlags.INCOMPLETE
-    )
   })
 })

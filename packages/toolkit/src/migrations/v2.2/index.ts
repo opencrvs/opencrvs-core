@@ -10,6 +10,7 @@
  */
 import { main as addTranslations } from '../add-translations'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
+import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -17,5 +18,6 @@ import { main as readDeclarationThroughHelper } from './read-declaration-through
  */
 export async function runUpgrade() {
   await readDeclarationThroughHelper()
+  await replaceIncompleteFlag()
   await addTranslations('2.2')
 }
