@@ -257,6 +257,7 @@ event.birth.action.reinstate-registration.label,This is shown as the action name
 event.birth.action.revoke-registration.audit-history-label,The label to show in audit history for the revoke registration action,Revoked,Révoqué
 event.birth.action.revoke-registration.label,This is shown as the action name anywhere the user can trigger the action from,Revoke registration,Révoqué l'enregistrement
 event.birth.action.revoke-registration.supportingCopy,This is the confirmation text for the reinstate revoke registration action,This will restore a previously revoked registration to active status.,Cela rétablira à l'état actif un enregistrement précédemment révoqué.
+event.birth.custom.action.approve.field.approvalNotice.label,Label for the approval notice document field on the late registration approval action,Approval notice,Avis d'approbation
 event.birth.custom.action.approve.field.collector.label,Label for collector field,Collector,le collectionneur
 event.birth.custom.action.approve.field.notes.label,This is the label for the field for a custom action,Comments,Commentaires
 event.birth.custom.action.escalate.field.escalate-to.label,This is the label for escalate to field,Escalate to,Transmettre à

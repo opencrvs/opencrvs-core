@@ -32,6 +32,7 @@
     "deps:down": "pnpm --filter @opencrvs/dev-cli --silent deps:down",
     "cov:client": "cd packages/client && pnpm open:cov",
     "cov:login": "cd packages/login && pnpm open:cov",
+    "e2e-dev": "cd packages/testland && pnpm e2e-dev",
     "db:clear:all": "bash development-environment/clear-all-data.sh",
     "reindex": "bash development-environment/reindex.sh",
     "e2e:dev": "bash development-environment/e2e.sh",

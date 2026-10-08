@@ -13,6 +13,7 @@ import { AddressType } from '../events/CompositeFieldValue'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { FieldType } from '../index'
+import { getDeclarationPages } from '../events/utils'
 
 const testCases = [
   {
@@ -67,7 +68,7 @@ const testCases = [
 
 testCases.map(({ title, address, success }) => {
   test(title, () => {
-    const addressConfig = tennisClubMembershipEvent.declaration.pages
+    const addressConfig = getDeclarationPages(tennisClubMembershipEvent)
       .flatMap((page) => page.fields)
       .find((f) => f.type === FieldType.ADDRESS)
 

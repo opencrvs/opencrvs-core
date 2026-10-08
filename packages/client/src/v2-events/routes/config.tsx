@@ -73,6 +73,7 @@ import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
 import { PerformanceDashboard } from '../features/performance/Dashboard'
+import { Documents } from '../features/workqueues/EventOverview/components/Documents'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -263,6 +264,10 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
           element: <ReadonlyViewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.path,
+          element: <Documents />
         },
         {
           path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,

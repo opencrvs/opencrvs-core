@@ -27,7 +27,9 @@ import {
   generateUuid,
   generateActionDocument,
   generateTranslationConfig,
-  FieldUpdateValue
+  FieldUpdateValue,
+  withDeclaration,
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -93,11 +95,13 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').isFalsy())
 )
 
-const overriddenEventConfig = {
-  ...tennisClubMembershipEvent,
-  id: 'death', // use an existing event id, so that permissions to it are in scopes
-  declaration: defineDeclarationForm({
-    ...tennisClubMembershipEvent.declaration,
+const overriddenEventConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    id: 'death' // use an existing event id, so that permissions to it are in scopes
+  },
+  defineDeclarationForm({
+    ...getDeclaration(tennisClubMembershipEvent),
     pages: [
       {
         id: 'recommender',
@@ -183,7 +187,7 @@ const overriddenEventConfig = {
       }
     ]
   })
-}
+)
 
 const overridenActions = [
   generateActionDocument({

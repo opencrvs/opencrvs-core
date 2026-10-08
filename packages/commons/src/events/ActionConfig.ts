@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
-import { ActionFormConfig } from './FormConfig'
+import { ActionFormConfig, DeclarationFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
@@ -159,6 +159,9 @@ const DeleteConfig = ActionConfigBase.extend(
 const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
+    declaration: DeclarationFormConfig.describe(
+      'Configuration of the form used to gather event data.'
+    ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     ),
@@ -367,6 +370,7 @@ export const ActionConfig = z
   .meta({ id: 'ActionConfig' })
 
 export type ActionConfig = z.infer<typeof ActionConfig>
+export type DeclareActionConfig = z.infer<typeof DeclareConfig>
 
 // Build a runtime set directly from the schema
 export const actionConfigTypes: Set<ActionConfigTypes> = new Set(

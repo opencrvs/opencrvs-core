@@ -59,6 +59,7 @@ import {
 } from './utils'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
+import { DeclarationFormConfig } from './FormConfig'
 import { ActionConfig } from './ActionConfig'
 import {
   LocationVersion,
@@ -1351,6 +1352,21 @@ export const generateEventConfig = ({
       ...actions
     ]
   })
+}
+
+/**
+ * @returns a copy of the configuration with the DECLARE action's declaration replaced.
+ */
+export function withDeclaration(
+  configuration: EventConfig,
+  declaration: DeclarationFormConfig
+): EventConfig {
+  return {
+    ...configuration,
+    actions: configuration.actions.map((action) =>
+      action.type === ActionType.DECLARE ? { ...action, declaration } : action
+    )
+  }
 }
 
 /**

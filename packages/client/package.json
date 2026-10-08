@@ -34,7 +34,6 @@
     "src/**/*.json": "prettier --write"
   },
   "dependencies": {
-    "@craco/craco": "^6.4.3",
     "@formatjs/icu-messageformat-parser": "2.1.0",
     "@opencrvs/commons": "workspace:*",
     "@opencrvs/components": "workspace:*",

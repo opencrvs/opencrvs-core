@@ -10,7 +10,7 @@
  */
 import { main as addExplicitCorrectionFlags } from './add-explicit-correction-flags'
 import { main as addRecoveryLinkNotifications } from './add-recovery-link-notifications'
-import { main as addTranslations } from './add-translations'
+import { main as addTranslations } from '../add-translations'
 import { main as enableTelemetry } from './enable-telemetry'
 import { main as migrateInfrastructureToAssets } from './migrate-infrastructure-to-assets'
 import { main as removeMetabasePackageInstalls } from './remove-metabase-package-installs'
@@ -26,7 +26,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await addExplicitCorrectionFlags()
   await renameTriggerPaths()
   await addRecoveryLinkNotifications()
-  await addTranslations()
+  await addTranslations('2.1')
   await removeSentry()
   await removeMetabasePackageInstalls()
   // After the Metabase fix, so the merge starts from the patched scripts
