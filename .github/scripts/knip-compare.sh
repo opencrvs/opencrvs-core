@@ -13,16 +13,34 @@
 # not a dependency; pinning it here keeps CI and local runs on one version.
 #
 #   knip-compare.sh <base-dir> <pr-dir>   compare two installed checkouts (CI)
-#   knip-compare.sh [base-ref]            compare HEAD with its merge-base with
-#                                         base-ref (default origin/develop)
+#   knip-compare.sh [remote/branch]       fetch it, then compare HEAD with its
+#                                         merge-base (default origin/develop)
 
 set -euo pipefail
 
 KNIP=knip@6.40.0
 
+reports=$(mktemp -d)
+base_tmp=
+worktree_added=
+cleanup() {
+  if [ -n "$worktree_added" ]; then
+    git -C "$pr_dir" worktree remove --force "$base_tmp" || true
+  fi
+  rm -rf "$reports" ${base_tmp:+"$base_tmp"}
+}
+trap cleanup EXIT
+
+# Writes the normalised knip report for checkout $1 to file $2.
 report() {
   (cd "$1" && pnpm --silent dlx "$KNIP" --tags=-knipignore --no-exit-code --exports --reporter=markdown) |
-    sed -E 's/ +/ /g' | sed -E 's/:[0-9]+:[0-9]+//'
+    sed -E 's/ +/ /g' | sed -E 's/:[0-9]+:[0-9]+//' > "$2"
+  # knip prints this title even when it finds nothing. Without it the totals
+  # below would read 0 and the comparison would pass on a broken run.
+  if [ "$(head -n 1 "$2")" != "# Knip report" ]; then
+    echo "knip produced no report for $1" >&2
+    exit 1
+  fi
 }
 
 total() {
@@ -34,16 +52,18 @@ if [ $# -eq 2 ]; then
   pr_dir=$2
 else
   pr_dir=$(git rev-parse --show-toplevel)
-  base_commit=$(git merge-base HEAD "${1:-origin/develop}")
-  base_dir=$(mktemp -d)
-  trap 'git -C "$pr_dir" worktree remove --force "$base_dir"' EXIT
+  base_ref=${1:-origin/develop}
+  git fetch --quiet "${base_ref%%/*}" "${base_ref#*/}"
+  base_commit=$(git merge-base HEAD "$base_ref")
+  base_tmp=$(mktemp -d)
+  base_dir=$base_tmp
   git -C "$pr_dir" worktree add --quiet --detach "$base_dir" "$base_commit"
+  worktree_added=1
   (cd "$base_dir" && pnpm install --frozen-lockfile --ignore-scripts --prefer-offline --silent)
 fi
 
-reports=$(mktemp -d)
-report "$base_dir" > "$reports/base.md"
-report "$pr_dir" > "$reports/pr.md"
+report "$base_dir" "$reports/base.md"
+report "$pr_dir" "$reports/pr.md"
 base_total=$(total "$reports/base.md")
 pr_total=$(total "$reports/pr.md")
 echo "Unused exports: $base_total on base, $pr_total on this branch."
