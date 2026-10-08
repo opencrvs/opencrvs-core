@@ -13238,6 +13238,10 @@ components:
           $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
+        legalStatuses.REVOKED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - type: "null"
         createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
