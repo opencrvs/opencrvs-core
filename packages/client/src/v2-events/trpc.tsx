@@ -230,6 +230,10 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
  * Drops untagged `event.search` entries restored from IndexedDB, which would
  * never be collected (gcTime is Infinity). Bumping CACHE_VERSION instead would
  * also discard the offline outbox.
+ *
+ * @deprecated - ships in v2.2, can be removed after it. A one-off migration of
+ * the client cache, done once every client has started on v2.2 or later. Remove
+ * with its call in `onSuccess` below and its test in `search.test.ts`.
  */
 export function purgeLegacySearchQueries(client: QueryClient) {
   client.removeQueries({
