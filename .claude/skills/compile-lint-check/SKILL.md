@@ -11,6 +11,8 @@ nx run @opencrvs/{package_name}:test:compilation
 nx run @opencrvs/{package_name}:lint
 ```
 
-Confirm the exact scope via `packages/{package_name}/package.json`'s `"name"` field if unsure. Fall back to `cd packages/{package_name} && npx tsc --noEmit` if `test:compilation` isn't defined; skip lint if `lint` isn't defined.
+Confirm the exact scope via `packages/{package_name}/package.json`'s `"name"` field if unsure. Fall back to `cd packages/{package_name} && pnpm exec tsc --noEmit` if `test:compilation` isn't defined; skip lint if `lint` isn't defined.
+
+When the change adds, removes or moves exports, also run `pnpm knip:compare`: it reproduces CI's knip job, which fails when unused exports grow.
 
 Report 0 errors as clean; otherwise show the failing lines, suggest a fix, and re-run.
