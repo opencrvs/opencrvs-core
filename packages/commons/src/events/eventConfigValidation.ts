@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod/v4'
-import { EventConfig } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import { findAllFields, getDeclarationFields } from './utils'
@@ -173,5 +173,63 @@ export function validateActionOrder(
         })
       }
     }
+  }
+}
+
+/**
+ * Runs on both the `defineConfig` input and the parsed `EventConfig`.
+ *
+ * @returns whether the event has exactly one DECLARE action.
+ */
+export function validateExactlyOneDeclareAction<
+  T extends { id: string; actions: Array<{ type: string }> }
+>(event: T, ctx: z.RefinementCtx<T>): boolean {
+  const declareActionCount = event.actions.filter(
+    (action) => action.type === ActionType.DECLARE
+  ).length
+
+  if (declareActionCount !== 1) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event must have exactly one ${ActionType.DECLARE} action. Found ${declareActionCount} for event ${event.id}`,
+      path: ['actions']
+    })
+    return false
+  }
+
+  return true
+}
+
+/**
+ * `declaration` must be given exactly once: at the top level (kept for backwards
+ * compatibility) or on the DECLARE action.
+ */
+export function validateDeclarationGivenExactlyOnce(
+  config: EventConfigInput,
+  ctx: z.RefinementCtx<EventConfigInput>
+) {
+  const declareActionIndex = config.actions.findIndex(
+    (action) => action.type === ActionType.DECLARE
+  )
+  const declareAction = config.actions[declareActionIndex]
+  const onDeclareAction =
+    declareAction.type === ActionType.DECLARE && !!declareAction.declaration
+  const onTopLevel = !!config.declaration
+  const declareActionPath = `actions[${declareActionIndex}].declaration`
+
+  if (onTopLevel && onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' defines \`declaration\` both at the top level and on the ${ActionType.DECLARE} action (\`${declareActionPath}\`). Define it in only one of these places.`,
+      path: ['declaration']
+    })
+  }
+
+  if (!onTopLevel && !onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' does not define \`declaration\`. Define it either at the top level or on the ${ActionType.DECLARE} action (\`${declareActionPath}\`).`,
+      path: ['declaration']
+    })
   }
 }

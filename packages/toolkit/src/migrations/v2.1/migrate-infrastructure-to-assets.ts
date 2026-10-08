@@ -445,4 +445,7 @@ async function main(dockerSwarm = false) {
   }
 }
 
+/**
+ * @knipignore
+ */
 export { main }

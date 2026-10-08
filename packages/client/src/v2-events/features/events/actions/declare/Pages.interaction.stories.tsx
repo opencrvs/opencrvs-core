@@ -21,7 +21,10 @@ import {
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -403,17 +406,19 @@ const placeOfEventFieldConfig: FieldConfig = {
   type: 'ALPHA_HIDDEN'
 }
 
-const overriddenEventConfig = {
-  ...tennisClubMembershipEvent,
-  label: {
-    defaultMessage: 'Tennis club membership application with Place of Event',
-    description: 'This is what this event is referred as in the system',
-    id: 'event.tennis-club-membership.label'
+const overriddenEventConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    label: {
+      defaultMessage: 'Tennis club membership application with Place of Event',
+      description: 'This is what this event is referred as in the system',
+      id: 'event.tennis-club-membership.label'
+    },
+    placeOfEvent: { $$field: 'eventLocationId', $$subfield: [] }
   },
-  placeOfEvent: { $$field: 'eventLocationId', $$subfield: [] },
-  declaration: {
-    ...tennisClubMembershipEvent.declaration,
-    pages: tennisClubMembershipEvent.declaration.pages.map((page, index) => {
+  {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: getDeclarationPages(tennisClubMembershipEvent).map((page, index) => {
       if (index === 0) {
         return {
           ...page,
@@ -423,7 +428,7 @@ const overriddenEventConfig = {
       return page
     })
   }
-}
+)
 
 export const CanSubmitValidlyFilledForm: Story = {
   parameters: {

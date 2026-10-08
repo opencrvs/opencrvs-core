@@ -27,9 +27,11 @@ import {
   generateActionDocument,
   generateRandomDatetime,
   getCurrentEventState,
+  getDeclaration,
   getUUID,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  withDeclaration
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -66,8 +68,8 @@ const SUPPORTING_DOC_LABEL = 'Supporting document'
 const IDENTITY_DOCS_FIELD_ID = 'applicant.identityDocuments'
 const IDENTITY_DOCS_LABEL = 'Identity documents'
 
-const [applicantPage, ...otherPages] =
-  tennisClubMembershipEvent.declaration.pages
+const tennisClubDeclaration = getDeclaration(tennisClubMembershipEvent)
+const [applicantPage, ...otherPages] = tennisClubDeclaration.pages
 
 /**
  * The tennis club configuration with two file fields added to the applicant
@@ -75,10 +77,9 @@ const [applicantPage, ...otherPages] =
  * configuration reaches the client (JSON only, no chainable builder helpers).
  */
 const eventConfig = JSON.parse(
-  JSON.stringify({
-    ...tennisClubMembershipEvent,
-    declaration: {
-      ...tennisClubMembershipEvent.declaration,
+  JSON.stringify(
+    withDeclaration(tennisClubMembershipEvent, {
+      ...tennisClubDeclaration,
       pages: [
         {
           ...applicantPage,
@@ -87,6 +88,7 @@ const eventConfig = JSON.parse(
             {
               id: SUPPORTING_DOC_FIELD_ID,
               type: FieldType.FILE,
+              configuration: { maxFileSize: 5 * 1024 * 1024 },
               label: {
                 defaultMessage: SUPPORTING_DOC_LABEL,
                 description: 'Label for the supporting document file field',
@@ -96,6 +98,7 @@ const eventConfig = JSON.parse(
             {
               id: IDENTITY_DOCS_FIELD_ID,
               type: FieldType.FILE_WITH_OPTIONS,
+              configuration: { maxFileSize: 5 * 1024 * 1024 },
               label: {
                 defaultMessage: IDENTITY_DOCS_LABEL,
                 description: 'Label for the identity documents file field',
@@ -124,8 +127,8 @@ const eventConfig = JSON.parse(
         },
         ...otherPages
       ]
-    }
-  })
+    })
+  )
 ) as EventConfig
 
 const actionDefaults = {
