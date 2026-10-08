@@ -37,7 +37,6 @@ import {
 } from '@opencrvs/commons/events'
 import { encodeScope } from '@opencrvs/commons'
 import {
-  createEvent,
   createSystemTestClient,
   createTestClient,
   setupTestCase,
@@ -150,100 +149,6 @@ test('legalStatuses.NOTIFIED is indexed with full location hierarchy after a not
   expect(results[0].legalStatuses.NOTIFIED?.createdAtLocation).toEqual(
     childLocation.id
   )
-})
-
-test('legalStatuses.REVOKED is indexed with full location hierarchy while revoked and removed on reinstate', async () => {
-  const { user, generator, seed } = await setupTestCase()
-
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    encodeScope({
-      type: 'record.search',
-      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
-    })
-  ])
-  const esClient = getOrCreateClient()
-
-  const locationRng = createPrng(844)
-
-  const parentAdministrativeArea = {
-    ...generator.administrativeAreas.set(1, locationRng)[0],
-    name: 'Administrative Area'
-  }
-  const childAdministrativeArea = {
-    externalId: null,
-    name: 'Child Administrative Area',
-    id: user.administrativeAreaId as UUID,
-    parentId: parentAdministrativeArea.id
-  }
-  const childLocation = {
-    ...generator.locations.set(1, locationRng)[0],
-    id: user.primaryOfficeId,
-    administrativeAreaId: childAdministrativeArea.id,
-    name: 'Child location',
-    locationType: 'CRVS_OFFICE'
-  } satisfies SetLocationPayload
-
-  await seed.administrativeAreas([
-    parentAdministrativeArea,
-    childAdministrativeArea
-  ])
-  await seed.locations([childLocation])
-
-  const revokedEvent = await createEvent(
-    client,
-    generator,
-    [ActionType.DECLARE, ActionType.REGISTER, ActionType.REVOKE_REGISTRATION],
-    true
-  )
-
-  // ES document must contain the full administrative hierarchy for REVOKED
-  const revokedResponse = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
-    body: { query: { match_all: {} } }
-  })
-
-  expect(revokedResponse.hits.hits).toHaveLength(1)
-  expect(revokedResponse.hits.hits[0]._source).toMatchObject({
-    id: revokedEvent.id,
-    status: 'REVOKED',
-    legalStatuses: {
-      REVOKED: {
-        createdAtLocation: [
-          parentAdministrativeArea.id,
-          childAdministrativeArea.id,
-          childLocation.id
-        ]
-      }
-    }
-  })
-
-  // Search API must return only the leaf-level location (no hierarchy)
-  const { results } = await client.event.search({
-    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
-  })
-
-  expect(results).toHaveLength(1)
-  expect(results[0].legalStatuses.REVOKED?.createdAtLocation).toEqual(
-    childLocation.id
-  )
-
-  await client.event.actions.revocation.reinstate.request(
-    generator.event.actions.reinstateRegistration(revokedEvent.id, {
-      keepAssignment: true,
-      waitFor: true
-    })
-  )
-
-  const reinstatedResponse = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
-    body: { query: { match_all: {} } }
-  })
-
-  const reinstatedSource = reinstatedResponse.hits.hits[0]._source as EventIndex
-  expect(reinstatedSource.status).toBe('REGISTERED')
-  expect(reinstatedSource.legalStatuses.REVOKED).toBeUndefined()
-  expect(reinstatedSource.legalStatuses.REGISTERED).toBeDefined()
 })
 
 test('records are indexed with full location hierarchy', async () => {

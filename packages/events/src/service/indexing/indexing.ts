@@ -350,20 +350,6 @@ export async function createIndex(
                   keyof RegistrationCreationMetadata,
                   estypes.MappingProperty
                 >
-              },
-              [EventStatus.enum.REVOKED]: {
-                type: 'object',
-                properties: {
-                  createdAt: { type: 'date' },
-                  createdBy: { type: 'keyword' },
-                  createdByUserType: { type: 'keyword' },
-                  createdAtLocation: { type: 'keyword' },
-                  createdByRole: { type: 'keyword' },
-                  acceptedAt: { type: 'date' }
-                } satisfies Record<
-                  keyof ActionCreationMetadata,
-                  estypes.MappingProperty
-                >
               }
             }
           },

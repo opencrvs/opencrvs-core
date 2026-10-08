@@ -155,7 +155,7 @@ export function getActionUpdateMetadata(actions: Action[]) {
  * @returns the legal statuses of the event. Event is considered legal if it has been accepted.
  * @see EventIndex for the description of the returned object.
  */
-export function getLegalStatuses(actions: Action[], status: EventStatus) {
+export function getLegalStatuses(actions: Action[]) {
   return {
     [EventStatus.enum.NOTIFIED]: getDeclarationActionCreationMetadata(
       ActionType.NOTIFY,
@@ -168,14 +168,6 @@ export function getLegalStatuses(actions: Action[], status: EventStatus) {
     [EventStatus.enum.REGISTERED]: getDeclarationActionCreationMetadata(
       ActionType.REGISTER,
       actions
-    ),
-    // A later reinstate does not remove the revoke action, so only report it while the record is still revoked.
-    [EventStatus.enum.REVOKED]:
-      status === EventStatus.enum.REVOKED
-        ? getDeclarationActionCreationMetadata(
-            ActionType.REVOKE_REGISTRATION,
-            actions
-          )
-        : null
+    )
   }
 }
