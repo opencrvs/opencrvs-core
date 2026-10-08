@@ -27,7 +27,8 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
-  validateExactlyOneDeclareAction
+  validateHasDeclareAction,
+  validateActionVersions
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -173,7 +174,8 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigSchemaInput> =
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
   _EventConfigBase
     .superRefine((event, ctx) => {
-      if (!validateExactlyOneDeclareAction(event, ctx)) {
+      validateActionVersions(event, ctx)
+      if (!validateHasDeclareAction(event, ctx)) {
         return
       }
       validateAdvancedSearchConfig(event, ctx)
