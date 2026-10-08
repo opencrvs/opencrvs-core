@@ -67,7 +67,7 @@ function contextSources(line: string, continued: boolean) {
  * The Dockerfile without its instructions that copy only from `typings/`, and
  * the ones that copy from it but could not be taken out safely.
  */
-export function removeTypingsCopy(dockerfile: string) {
+function removeTypingsCopy(dockerfile: string) {
   const kept: string[] = []
   const removed: string[] = []
   const unresolved: string[] = []
@@ -97,7 +97,7 @@ export function removeTypingsCopy(dockerfile: string) {
   return { contents: kept.join(''), removed, unresolved }
 }
 
-export function removeTypingsFromDockerfile(cwd: string) {
+function removeTypingsFromDockerfile(cwd: string) {
   const dockerfilePath = path.join(cwd, DOCKERFILE)
   if (!existsSync(dockerfilePath)) return
 
