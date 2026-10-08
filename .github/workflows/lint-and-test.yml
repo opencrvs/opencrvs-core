@@ -762,34 +762,8 @@ jobs:
         run: pnpm install --ignore-scripts
         working-directory: pr
 
-      - name: Run knip on base branch
-        id: knip_base
-        run: |
-          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown | sed -E 's/ +/ /g' | sed -E 's/:[0-9]+:[0-9]+//' > knip_report.md
-          TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
-          echo "Total $TOTAL issue(s) on base branch."
-          echo "total=${TOTAL}" >> $GITHUB_OUTPUT
-        working-directory: base
-
-      - name: Run knip on PR branch
-        id: knip_pr
-        run: |
-          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown | sed -E 's/ +/ /g' | sed -E 's/:[0-9]+:[0-9]+//' > knip_report.md
-          TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
-          echo "Total $TOTAL issue(s) on PR branch."
-          echo "total=${TOTAL}" >> $GITHUB_OUTPUT
-        working-directory: pr
-
-      - name: Compare base and PR totals
-        if: ${{ fromJSON(steps.knip_pr.outputs.total) > fromJSON(steps.knip_base.outputs.total) }}
-        run: |
-          echo "## ⚠️ Total issues have increased in the PR branch." >> $GITHUB_STEP_SUMMARY
-          echo "Differences:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
-          diff base/knip_report.md pr/knip_report.md >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-          exit 1
+      - name: Compare unused exports with the base branch
+        run: pr/.github/scripts/knip-compare.sh base pr
 
   build-toolkit:
     name: Build toolkit
