@@ -436,6 +436,18 @@ test.describe.serial('Correct record - 2', () => {
 
         await page.locator('#close-dialog').click()
       })
+
+      test('2.8.4.5 Documents tab shows the correction supporting document', async () => {
+        await page
+          .getByRole('button', { name: 'Documents', exact: true })
+          .click()
+
+        await expect(
+          page
+            .locator('#listTable-documents')
+            .getByText('Supporting documents (Affidavit)')
+        ).toBeVisible()
+      })
     })
   })
 })

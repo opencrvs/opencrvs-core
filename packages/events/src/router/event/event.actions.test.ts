@@ -28,7 +28,8 @@ import {
   AddressType,
   deepMerge,
   encodeScope,
-  getDeclarationFields
+  getDeclarationFields,
+  withDeclaration
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -219,10 +220,13 @@ describe('Action drafts', () => {
   })
 })
 
-const multiFileConfig = {
-  ...tennisClubMembershipEvent,
-  id: 'death', // using existing event type id here, so that the user has the required scope to it
-  declaration: {
+const multiFileConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    id: 'death', // using existing event type id here, so that the user has the required scope to it
+    advancedSearch: []
+  },
+  {
     label: generateTranslationConfig('File club form'),
     pages: [
       defineFormPage({
@@ -257,9 +261,8 @@ const multiFileConfig = {
         ]
       })
     ]
-  },
-  advancedSearch: []
-} satisfies EventConfig
+  }
+) satisfies EventConfig
 
 beforeEach(async () => {
   return createIndex(

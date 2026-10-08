@@ -2,6 +2,16 @@
 
 ## 2.2.0 Release Candidate
 
+### Upgrade guidance
+
+#### Outbox: empty it before you deploy
+
+2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
+
+Before the deploy, instruct every user, working offline in particular, to connect and wait until their outbox is empty. Anything still queued afterwards must be entered again. Users who had OpenCRVS open during the deploy should reload the page; until they do, the old version can fail to show records.
+
+[#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
 ### Breaking changes
 
 #### `POST /auth/token` no longer accepts parameters in the query string
@@ -18,6 +28,22 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 ```
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
+
+#### Event `declaration` moved onto the `DECLARE` action
+
+An event's declaration form was defined at the top level of `EventConfig`. It now lives on the event's `DECLARE` action, and every event must have exactly one `DECLARE` action:
+
+| Before                         | After                              |
+| ------------------------------ | ---------------------------------- |
+| `birthEvent.declaration.pages` | `getDeclaration(birthEvent).pages` |
+
+Core 2.2 reads event configurations only in the new shape, so **a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading entirely**: no event can be opened, declared or searched. Upgrade core and the country config together.
+
+**Country configs must read the form through `getDeclaration`.** `opencrvs upgrade` does it for you: the `read-declaration-through-helper` codemod rewrites every `declaration` read on an `EventConfig` under `src/` and imports `getDeclaration`, then lists every read it could not rewrite — an optional chain, a destructured `declaration`, an assignment — for you to change by hand.
+
+`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, so events defined with it need no other change. It logs a deprecation warning, though: a future release will remove the top-level `declaration`. It throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
+
+[#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
 ### New features
 

@@ -59,8 +59,8 @@ mkdir -p ./dist/commons/application-config
 cp -r ../commons/build/dist/common/application-config.d.ts ./dist/commons/application-config/index.d.ts
 
 # Build migration CLI
-npx esbuild src/migrations/v2.1/index.ts --bundle --platform=node --format=cjs --outdir=./dist/migrations/v2.1 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
-chmod +x ./dist/migrations/v2.1/index.js
+npx esbuild src/migrations/v2.2/index.ts --bundle --platform=node --format=cjs --outdir=./dist/migrations/v2.2 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+chmod +x ./dist/migrations/v2.2/index.js
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts

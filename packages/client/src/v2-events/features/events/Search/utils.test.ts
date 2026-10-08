@@ -22,7 +22,10 @@ import {
   AddressType,
   UUID,
   FieldGroup,
-  AdministrativeAreaField
+  AdministrativeAreaField,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/client'
 import { toVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
@@ -857,18 +860,15 @@ describe('buildSearchQuery with version-pinned locations', () => {
     ADMIN_STRUCTURE
   )
 
-  const eventConfig = {
-    ...tennisClubMembershipEvent,
-    declaration: {
-      ...tennisClubMembershipEvent.declaration,
-      pages: [
-        {
-          ...tennisClubMembershipEvent.declaration.pages[0],
-          fields: [locationField, addressField]
-        }
-      ]
-    }
-  } as typeof tennisClubMembershipEvent
+  const eventConfig = withDeclaration(tennisClubMembershipEvent, {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: [
+      {
+        ...getDeclarationPages(tennisClubMembershipEvent)[0],
+        fields: [locationField, addressField]
+      }
+    ]
+  })
 
   const searchConfigs = [
     {

@@ -30,7 +30,10 @@ import {
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages
 } from '@opencrvs/commons/events'
 import { encodeScope } from '@opencrvs/commons'
 import {
@@ -1260,11 +1263,14 @@ describe('placeOfEvent location hierarchy handling', () => {
       }
     })
 
-    modifiedEventConfig = {
-      ...tennisClubMembershipEvent,
-      declaration: {
-        ...tennisClubMembershipEvent.declaration,
-        pages: tennisClubMembershipEvent.declaration.pages.map((page, i) => {
+    modifiedEventConfig = withDeclaration(
+      {
+        ...tennisClubMembershipEvent,
+        placeOfEvent: field('locationId')
+      },
+      {
+        ...getDeclaration(tennisClubMembershipEvent),
+        pages: getDeclarationPages(tennisClubMembershipEvent).map((page, i) => {
           if (i !== 0) {
             return page
           }
@@ -1319,9 +1325,8 @@ describe('placeOfEvent location hierarchy handling', () => {
             ]
           }
         })
-      },
-      placeOfEvent: field('locationId')
-    }
+      }
+    )
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([modifiedEventConfig])
