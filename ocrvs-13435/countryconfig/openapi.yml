@@ -14008,8 +14008,8 @@ components:
         - review
       additionalProperties: false
       description: Configuration for the notify action, including the notification
-        form and its review page. When absent, defineConfig generates it from
-        the DeclareActionConfig.
+        form and its review page. When undefined, it is generated using the
+        DeclareActionConfig.
     DeclarationFormConfig:
       type: object
       properties:
