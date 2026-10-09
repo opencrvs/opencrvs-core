@@ -123,6 +123,7 @@ export function getAnnotationForActionType({
       }),
       declareReviewFieldIds
     )
+
     return { ...notifyAnnotation, ...annotation }
   }
 

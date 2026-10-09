@@ -75,16 +75,21 @@ function generateNotificationFormFallback(
     (action): action is DeclareActionConfigInput =>
       action.type === ActionType.DECLARE
   )
+
   const notifyAction = config.actions.find(
     (action): action is NotifyActionConfigInput =>
       action.type === ActionType.NOTIFY
   )
 
-  if (
-    !declareAction?.declaration ||
-    (notifyAction?.notificationForm && notifyAction.review)
-  ) {
+  // If the NOTIFY action has a notification form and review, return the config as is
+  if (notifyAction?.notificationForm && notifyAction.review) {
     return config
+  }
+
+  if (!declareAction?.declaration) {
+    throw new Error(
+      `Event '${config.id}' has no ${ActionType.DECLARE} form. Configure \`actions[${ActionType.DECLARE}].declaration\`.`
+    )
   }
 
   if (!notifyAction?.notificationForm) {

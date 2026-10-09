@@ -305,7 +305,7 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action, including the notification form and its review page. When absent, defineConfig generates it from the DeclareActionConfig.'
+        'Configuration for the notify action, including the notification form and its review page. When undefined, it is generated using the DeclareActionConfig.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',

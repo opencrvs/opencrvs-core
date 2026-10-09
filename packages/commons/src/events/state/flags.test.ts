@@ -867,24 +867,6 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
     expect(flags).toContain('declare-only-flag')
     expect(flags).not.toContain('notify-only-flag')
   })
-
-  // defineConfig copies the DECLARE flags onto a generated NOTIFY action, see defineConfig.test.ts
-  test('NOTIFY action does not use DECLARE flags when no NOTIFY config is present', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
-    }
-
-    // @ts-expect-error - allow partial actions and event config
-    const flags = resolveEventCustomFlags(event, configWithoutNotify)
-    expect(flags).not.toContain('declare-only-flag')
-  })
 })
 
 describe('getEventFlags() – any inherent flag is clearable by action config', () => {
