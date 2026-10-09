@@ -614,11 +614,11 @@ export async function getEventCount({
 
   return responses.reduce((acc: Record<string, number>, response, index) => {
     const slug = queries[index].slug
-    const validatedResponse = MsearchResponseSchema.safeParse(response)
+
     return {
       ...acc,
-      [slug]: validatedResponse.success
-        ? validatedResponse.data.hits.total.value
+      [slug]: MsearchResponseSchema.validate(response)
+        ? response.hits.total.value
         : 0
     }
   }, {})

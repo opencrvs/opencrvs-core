@@ -33,6 +33,7 @@ import {
   ClientLocation,
   getAdministrativeAreaHierarchy,
   isSelectableAtAnchor,
+  maybeUuid,
   todayISO,
   UUID
 } from '@opencrvs/commons/client'
@@ -116,7 +117,7 @@ export function AdministrativeLevels() {
     }
   }
 
-  const dataLocations = getNewLevel(UUID.safeParse(locationId).data ?? null)
+  const dataLocations = getNewLevel(maybeUuid(locationId) ?? null)
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 
@@ -161,7 +162,7 @@ export function AdministrativeLevels() {
                 <List.Item
                   key={level.id}
                   label={
-                    ClientAdministrativeArea.safeParse(level).success ? (
+                    ClientAdministrativeArea.validate(level) ? (
                       <Link
                         onClick={(e) => {
                           setCurrentPageNumber(1)
