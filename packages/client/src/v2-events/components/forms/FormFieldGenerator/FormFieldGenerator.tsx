@@ -158,7 +158,10 @@ export const FormFieldGenerator = forwardRef<
       }
     }))
     const intl = useIntl()
-    const { getInitialValues } = useFormInitialValues()
+    // Advanced search must only hold values the user entered
+    const { getInitialValues } = useFormInitialValues({
+      skipDefaultValues: searchMode
+    })
     const initialPageValues = getInitialValues(
       pageFields,
       formValues ?? {},
