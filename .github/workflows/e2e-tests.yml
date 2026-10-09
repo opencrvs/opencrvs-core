@@ -1,0 +1,252 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: E2E tests
+run-name: 'E2E tests against ${{ inputs.domain }}'
+
+# Runs the testland Playwright suite against an already deployed environment.
+# Environments are deployed (and cleaned up) by opencrvs/e2e, see
+# deploy-to-feature-environment.yml.
+on:
+  workflow_call:
+    inputs:
+      domain:
+        description: Domain of the deployed environment, e.g. my-branch.e2e-k8s.opencrvs.dev
+        type: string
+        required: true
+      ref:
+        description: Commit to take the tests from. Defaults to the triggering ref.
+        type: string
+        required: false
+        default: ''
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: Domain of the deployed environment, e.g. my-branch.e2e-k8s.opencrvs.dev
+        type: string
+        required: true
+
+jobs:
+  plan:
+    name: Plan shards by estimated weight
+    runs-on: ubuntu-26.04
+    outputs:
+      matrix: ${{ steps.compute.outputs.matrix }}
+    steps:
+      # Only e2e/compute-shard-plan.ts + its inputs are needed here — no
+      # toolkit/commons/events build, so this can run alongside cache-node-js
+      # instead of waiting on it.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          sparse-checkout: |
+            packages/testland
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - id: compute
+        working-directory: packages/testland
+        run: |
+          matrix=$(npx --yes tsx@4 e2e/compute-shard-plan.ts --shards=30 --prefix=e2e/testcases/)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  cache-node-js:
+    name: Cache Node.js dependencies
+    runs-on: ubuntu-26.04
+    steps:
+      # testland resolves @opencrvs/toolkit as a workspace package, so toolkit
+      # and its build inputs (commons, events) must be checked out and built
+      # from the same ref — otherwise the install would fall back to the
+      # npm-published toolkit and tests would not see the PR's toolkit changes.
+      # patches/ carries the workspace's pnpm patchedDependencies files, which
+      # pnpm requires to exist on every install.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          sparse-checkout: |
+            development-environment
+            patches
+            packages/testland
+            packages/toolkit
+            packages/commons
+            packages/events
+
+      # pnpm version is pinned by the packageManager field in package.json.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      # Cone-mode sparse checkout always includes root files, so the monorepo
+      # root .nvmrc is available even though packages/testland has none.
+      - name: Set up Node.js from .nvmrc
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # The root workspace install materializes dependencies under the
+      # repo-root node_modules, so that (plus each package's local
+      # node_modules) is what has to be cached — not just packages/testland.
+      # Build outputs are not cached; the toolkit chain is built once below and
+      # shared with the shards as an artifact.
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v6
+        id: cache
+        with:
+          path: |
+            node_modules
+            packages/testland/node_modules
+            packages/toolkit/node_modules
+            packages/commons/node_modules
+            packages/events/node_modules
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-e2e-node-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-node-
+
+      - name: Install Dependencies
+        uses: nick-fields/retry@v4
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: pnpm install --frozen-lockfile
+
+      - uses: nick-fields/retry@v4
+        name: Install Playwright Browsers
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: cd packages/testland && npx playwright install --with-deps
+
+      - name: Build toolkit (with commons and events)
+        run: pnpm --dir packages/toolkit build:all
+
+      # With several paths the artifact root is their common ancestor
+      # (packages/), so shards download it into packages/.
+      - name: Upload toolkit build
+        uses: actions/upload-artifact@v7
+        with:
+          name: toolkit-build
+          path: |
+            packages/commons/build
+            packages/events/build
+            packages/toolkit/dist
+          retention-days: 1
+
+  test:
+    needs: [plan, cache-node-js]
+    # A failed cache warm-up is not fatal: every shard installs on a cache miss.
+    if: "!cancelled() && needs.plan.result == 'success'"
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      # `plan` bin-packs shards by estimated weight (packages/testland/e2e/shard-weights.json)
+      # and orders them heaviest-first, so no static weight list or max-parallel cap is needed.
+      matrix:
+        include: ${{ fromJson(needs.plan.outputs.matrix) }}
+    name: shard-${{ matrix.shard }}
+    steps:
+      # TODO: the setup steps below (pnpm, Node, cache, install) repeat
+      # cache-node-js. Move them into a composite action (e.g.
+      # .github/actions/e2e-setup) used by both jobs. The checkout has to stay
+      # in each job, with the action's directory added to the sparse list.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          sparse-checkout: |
+            development-environment
+            patches
+            packages/testland
+            packages/toolkit
+            packages/commons
+            packages/events
+
+      # pnpm version is pinned by the packageManager field in package.json.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js from .nvmrc
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v6
+        id: cache
+        with:
+          path: |
+            node_modules
+            packages/testland/node_modules
+            packages/toolkit/node_modules
+            packages/commons/node_modules
+            packages/events/node_modules
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-e2e-node-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-node-
+
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm install --frozen-lockfile
+      # Built once in cache-node-js. If that job failed, fall back to building here.
+      - name: Download toolkit build
+        id: toolkit-build
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: toolkit-build
+          path: packages
+      - name: Build toolkit (with commons and events)
+        if: steps.toolkit-build.outcome != 'success'
+        run: pnpm --dir packages/toolkit build:all
+      - uses: nick-fields/retry@v4
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: cd packages/testland && npx playwright install --with-deps
+      - name: Run Playwright Tests
+        working-directory: packages/testland
+        run: |
+          export NODE_EXTRA_CA_CERTS=/tmp/letsencrypt-stg-root-x1.pem
+          curl -s -o $NODE_EXTRA_CA_CERTS https://letsencrypt.org/certs/staging/letsencrypt-stg-root-x1.pem
+          npx playwright test ${{ join(matrix.files, ' ') }}
+        env:
+          DOMAIN: ${{ inputs.domain }}
+      - id: ctrf_check
+        if: '!cancelled()'
+        working-directory: packages/testland
+        run: |
+          [ -d ctrf ] && \
+           echo "ctrf=true" >> $GITHUB_OUTPUT || \
+           echo "ctrf=false" >> $GITHUB_OUTPUT
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './packages/testland/ctrf/*.json'
+          github-report: true
+          summary-report: true
+          test-report: true
+        if: "!cancelled() && steps.ctrf_check.outputs.ctrf == 'true'"
+      # Small (KBs, no screenshots/traces) — separate from the html report
+      # artifact below so opencrvs/e2e's refresh-shard-weights.yml doesn't need
+      # to touch that one.
+      - name: Upload ctrf report
+        uses: actions/upload-artifact@v7
+        if: "!cancelled() && steps.ctrf_check.outputs.ctrf == 'true'"
+        with:
+          name: ctrf-report-shard-${{ matrix.shard }}-${{ github.run_id }}
+          path: packages/testland/ctrf/*.json
+          retention-days: 7
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v7
+        if: '!cancelled()'
+        with:
+          name: playwright-report-shard-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages/testland/playwright-report/
+          retention-days: 30
