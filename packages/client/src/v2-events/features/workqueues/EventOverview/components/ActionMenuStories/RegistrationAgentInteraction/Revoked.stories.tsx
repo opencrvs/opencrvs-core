@@ -20,16 +20,16 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
-  Scenario
+  Scenario,
+  AssertType
 } from '../ActionMenu.common'
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/LocalRegistrar/Registered'
+  title: 'ActionMenu/RegistrationAgent/Revoked'
 } as Meta<typeof ActionMenu>
 
-const registeredScenariosForLocalRegistrar: Scenario[] = [
+const revokedScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     recordDownloaded: false,
@@ -38,14 +38,15 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
       ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION,
       ActionType.UNASSIGN
     ],
     expected: {
       ...getHiddenActions(),
+      ['Print certificate']: AssertType.HIDDEN,
+      ['Request correction']: AssertType.HIDDEN,
       ['Assign']: AssertType.ENABLED,
-      ['Print certificate']: AssertType.DISABLED,
-      ['Request correction']: AssertType.DISABLED,
-      ['Revoke registration']: AssertType.DISABLED
+      ['Reinstate registration']: AssertType.HIDDEN
     }
   },
   {
@@ -55,14 +56,17 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.REGISTER
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
     ],
     expected: {
       ...getHiddenActions(),
+      ['Print certificate']: AssertType.HIDDEN,
+      ['Request correction']: AssertType.HIDDEN,
       ['Unassign']: AssertType.ENABLED,
-      ['Print certificate']: AssertType.ENABLED,
-      ['Request correction']: AssertType.ENABLED,
-      ['Revoke registration']: AssertType.ENABLED
+      ['Reinstate registration']: AssertType.HIDDEN
     }
   },
   {
@@ -73,24 +77,24 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
       ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...getHiddenActions(),
-      ['Unassign']: AssertType.ENABLED,
-      ['Print certificate']: AssertType.DISABLED,
-      ['Request correction']: AssertType.DISABLED,
-      ['Revoke registration']: AssertType.DISABLED
+      ['Print certificate']: AssertType.HIDDEN,
+      ['Request correction']: AssertType.HIDDEN,
+      ['Reinstate registration']: AssertType.HIDDEN
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  registeredScenariosForLocalRegistrar,
-  TestUserRole.enum.LOCAL_REGISTRAR
+  revokedScenariosForRegistrationAgent,
+  TestUserRole.enum.REGISTRATION_AGENT
 )
 
 export const Unassigned = stories['Unassigned']
-export const AssignedToSelf = stories['AssignedToSelf']
 export const AssignedToOthers = stories['AssignedToOthers']
+export const AssignedToSelf = stories['AssignedToSelf']

@@ -203,6 +203,12 @@ export function useEvents() {
         approve: useEventAction(trpc.event.actions.correction.approve.request),
         reject: useEventAction(trpc.event.actions.correction.reject.request)
       },
+      revocation: {
+        revoke: useEventAction(trpc.event.actions.revocation.revoke.request),
+        reinstate: useEventAction(
+          trpc.event.actions.revocation.reinstate.request
+        )
+      },
       assignment: {
         assign: {
           useIsAssigning: (eventId: UUID) => {

@@ -145,6 +145,31 @@ setMutationDefaults(trpcOptionsProxy.event.actions.unarchive.request, {
   meta: { actionType: ActionType.UNARCHIVE }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.revocation.revoke.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.revocation.revoke.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.REVOKE_REGISTRATION }
+})
+
+setMutationDefaults(
+  trpcOptionsProxy.event.actions.revocation.reinstate.request,
+  {
+    mutationFn: createEventActionMutationFn(
+      trpcOptionsProxy.event.actions.revocation.reinstate.request
+    ),
+    retry: retryUnlessConflict,
+    retryDelay,
+    onSuccess: deleteLocalEvent,
+    onError: errorToastOnConflict,
+    meta: { actionType: ActionType.REINSTATE_REGISTRATION }
+  }
+)
+
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.printCertificate.request

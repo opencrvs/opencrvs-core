@@ -54,6 +54,12 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 `defineConfig` still accepts events without a notification form, so these events behave as before. It generates a missing `NOTIFY` action and `review` from the `DECLARE` action with every field optional, and logs a warning when `notificationForm` is missing. A missing notification form is not added to the configuration: the `DECLARE` form with every field optional is used in its place (`getNotificationForm`). A future release will remove this fallback. An event configuration built without `defineConfig` must give `review` on its `NOTIFY` action.
 
+### New features
+
+#### `REVOKED` status with revoke and reinstate registration actions
+
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)

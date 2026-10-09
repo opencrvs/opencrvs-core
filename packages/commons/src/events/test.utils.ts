@@ -40,7 +40,9 @@ import {
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   UnarchiveActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  RevokeRegistrationActionInput,
+  ReinstateRegistrationActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
@@ -705,6 +707,48 @@ export function eventPayloadGenerator(
         eventId,
         ...input
       }),
+      revokeRegistration: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            RevokeRegistrationActionInput,
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.REVOKE_REGISTRATION,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
+        ...input
+      }),
+      reinstateRegistration: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            ReinstateRegistrationActionInput,
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.REINSTATE_REGISTRATION,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
+        ...input
+      }),
       reject: (
         eventId: string,
         input: Partial<
@@ -1005,6 +1049,8 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {
