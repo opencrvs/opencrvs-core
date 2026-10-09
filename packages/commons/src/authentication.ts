@@ -140,3 +140,7 @@ export const TokenWithBearer = z
   .regex(/^Bearer\s/) as z.ZodType<`Bearer ${string}`>
 export type TokenWithBearer = z.infer<typeof TokenWithBearer>
 export type Token = Nominal<string, 'TokenWithoutBearer'>
+
+export function isTokenWithBearer(value: unknown): value is TokenWithBearer {
+  return TokenWithBearer.validate(value)
+}

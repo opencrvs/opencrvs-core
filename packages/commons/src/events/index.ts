@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod/compile' // enables compile-by-default. Perf boost.
+
 export * from './AuditLog'
 export * from './Constants'
 export * from './ActionConfig'
@@ -59,6 +62,6 @@ export * from './Flag'
 export * from './event'
 export * from './locations'
 export * from './locationPayloads'
-
+export * from './PlainDate'
 export { UUID } from '../uuid'
 export { DocumentPath } from '../documents'

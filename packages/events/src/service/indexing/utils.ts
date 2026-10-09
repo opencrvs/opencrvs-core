@@ -15,7 +15,6 @@ import {
   AddressType,
   ageToDate,
   AgeValue,
-  PlainDate,
   EventConfig,
   EventIndex,
   EventState,
@@ -34,7 +33,11 @@ import {
   JurisdictionFilter,
   RecordScopeV2,
   UserFilter,
-  ResolvedRecordScopeV2
+  ResolvedRecordScopeV2,
+  isPlainDate,
+  isUUID,
+  isDomesticAddressFieldValue,
+  isAddressFieldValue
 } from '@opencrvs/commons'
 import { getAdministrativeHierarchyById } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
@@ -100,13 +103,11 @@ function addIndexFieldsToValue(
     } satisfies IndexedNameFieldValue
   }
   if (isAgeFieldType(field) && field.value) {
-    const maybeAsOfDate = PlainDate.safeParse(
-      declaration[field.value.asOfDateRef]
-    )
-    if (maybeAsOfDate.success) {
+    const date = declaration[field.value.asOfDateRef]
+    if (isPlainDate(date)) {
       return {
         ...field.value,
-        [AGE_DOB_QUERY_KEY]: ageToDate(field.value.age, maybeAsOfDate.data)
+        [AGE_DOB_QUERY_KEY]: ageToDate(field.value.age, date)
       } satisfies IndexedAgeFieldValue
     }
   }
@@ -350,12 +351,8 @@ export async function getEventIndexWithAdministrativeHierarchy(
     }
 
     // All other location types are assigned to location hierarchy
-    const uuid = UUID.safeParse(value)
-
-    if (uuid.success) {
-      tempEvent.declaration[k] = await buildAdministrativeHierarchyById(
-        uuid.data
-      )
+    if (isUUID(value)) {
+      tempEvent.declaration[k] = await buildAdministrativeHierarchyById(value)
     }
   }
 
@@ -393,16 +390,14 @@ export function collectLocationIds(
     }
 
     if (fieldConfig.type === FieldType.ADDRESS) {
-      const parsed = AddressFieldValue.safeParse(value)
-      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
-        ids.push(parsed.data.administrativeArea)
+      if (isDomesticAddressFieldValue(value)) {
+        ids.push(value.administrativeArea)
         continue
       }
     }
 
-    const uuid = UUID.safeParse(value)
-    if (uuid.success) {
-      ids.push(uuid.data)
+    if (isUUID(value)) {
+      ids.push(value)
     }
   }
 
@@ -449,12 +444,12 @@ export function generateQueryForAddressField(
     return { bool: { must: [] } }
   }
 
-  const address = AddressFieldValue.safeParse(JSON.parse(search.term))
-  if (address.error) {
+  const searchTerm = JSON.parse(search.term)
+  if (!isAddressFieldValue(searchTerm)) {
     return { bool: { must: [] } }
   }
 
-  const { country, addressType, streetLevelDetails } = address.data
+  const { country, addressType, streetLevelDetails } = searchTerm
   const mustMatches = []
 
   const declarationKey = declarationReference(encodeFieldId(fieldId))
@@ -464,11 +459,11 @@ export function generateQueryForAddressField(
     })
   }
   if (addressType === AddressType.DOMESTIC) {
-    const administrativeArea = address.data.administrativeArea
-    if (administrativeArea) {
+    if (searchTerm.administrativeArea) {
       mustMatches.push({
         term: {
-          [`${declarationKey}.administrativeArea`]: administrativeArea
+          [`${declarationKey}.administrativeArea`]:
+            searchTerm.administrativeArea
         }
       })
     }

@@ -214,13 +214,7 @@ function SignatureOutput({ value }: { value?: FileFieldValue }) {
 }
 
 function toCertificateVariables(value: FileFieldValue | undefined) {
-  const parsed = FileFieldValue.safeParse(value)
-
-  if (parsed.success) {
-    return toFileUrl(parsed.data.path)
-  }
-
-  return ''
+  return FileFieldValue.validate(value) ? toFileUrl(value.path) : ''
 }
 
 export const SignatureField = {

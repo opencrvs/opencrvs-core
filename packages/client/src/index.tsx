@@ -10,6 +10,8 @@
  */
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod/compile' // enables compile-by-default. Perf boost.
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'

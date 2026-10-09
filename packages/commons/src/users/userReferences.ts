@@ -40,10 +40,7 @@ function isJurisdictionFilter(
   if (typeof jurisdiction !== 'string') {
     return false
   }
-
-  // Do this instead of using safeParse for performance reasons.
-  const allowedJurisdictionFilters: string[] = JurisdictionFilter.options
-  return allowedJurisdictionFilters.includes(jurisdiction)
+  return JurisdictionFilter.validate(jurisdiction)
 }
 
 /**
