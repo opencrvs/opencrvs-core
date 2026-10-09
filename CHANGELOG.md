@@ -6,6 +6,8 @@
 
 - A deduplication rule that matches on a number field with the value `0`, or on an unticked checkbox, now matches as configured. The clause was treated as having no value and dropped, and inside an `and` that switched off the whole rule. An empty text value still counts as no value. [#13897](https://github.com/opencrvs/opencrvs-core/issues/13897)
 
+- Deduplication no longer logs a warning for every clause whose field is empty on a record, which is expected when a rule offers alternatives such as date of birth or age; those lines are now debug level. When a whole rule resolves to no query, so no duplicate search runs, the events service logs one warning naming the rule, the event and its type. [#13898](https://github.com/opencrvs/opencrvs-core/issues/13898)
+
 ## 1.9.20
 
 ### Bug fixes
