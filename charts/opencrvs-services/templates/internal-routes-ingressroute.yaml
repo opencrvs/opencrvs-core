@@ -11,8 +11,12 @@ spec:
   {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
     - web
   {{- end }}
+  {{- /* "internal" where every letter may also arrive percent-encoded, e.g. %69nternal */}}
+  {{- $internal := "(i|%69)(n|%6[eE])(t|%74)(e|%65)(r|%72)(n|%6[eE])(a|%61)(l|%6[cC])" }}
+  {{- /* Double-encoded paths (%2569nternal%2f...) are decoded once by the gateway and again by auth, so reject any encoded "%" */}}
+  {{- $double_encoded := "%25[0-9a-fA-F][0-9a-fA-F]" }}
   routes:
-  - match: '{{ include "render-opencrvs-host-matchers" . }} && PathRegexp(`^/(.*/)?internal(/.*)?$`)'
+  - match: '{{ include "render-opencrvs-host-matchers" . }} && PathRegexp(`^/(.*(/|%2[fF]))?{{ $internal }}(/|%2[fF]|$)|{{ $double_encoded }}`)'
     kind: Rule
     priority: 1000
     services:
