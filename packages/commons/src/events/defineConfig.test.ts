@@ -12,8 +12,7 @@ import { defineConfig } from './defineConfig'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType } from './ActionType'
 import { FieldType } from './FieldType'
-import { ActionConfig } from './ActionConfig'
-import { FieldConfig } from './FieldConfig'
+import { FieldConfig, FieldConfigInput } from './FieldConfig'
 import {
   getActionConfig,
   getDeclaration,
@@ -148,7 +147,9 @@ describe('defineConfig()', () => {
       return rest
     })()
 
-    const actionsWithNotify = (notifyAction: ActionConfig) =>
+    const actionsWithNotify = (
+      notifyAction: EventConfigInput['actions'][number]
+    ): EventConfigInput['actions'] =>
       tennisClubMembershipEvent.actions.map((action) =>
         action.type === ActionType.NOTIFY ? notifyAction : action
       )
@@ -205,7 +206,7 @@ describe('defineConfig()', () => {
             defaultMessage: 'Draw signature',
             description: 'Title of the signature modal'
           }
-        } satisfies FieldConfig
+        } satisfies FieldConfigInput
       ]
     }
 
@@ -234,7 +235,7 @@ describe('defineConfig()', () => {
       expect(warn).not.toHaveBeenCalled()
     })
 
-    it('should not generate a review when a notification form is configured without one', () => {
+    it('should generate the review from the DECLARE review, without warning, when only the notification form is configured', () => {
       const config = defineConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithNotify({
@@ -243,7 +244,13 @@ describe('defineConfig()', () => {
         })
       })
 
-      expect(getNotifyAction(config).review).toBeUndefined()
+      const { review } = getNotifyAction(config)
+      expect(getNotificationForm(config)).toMatchObject(notificationForm)
+      expect(review.title).toEqual(declareAction.review.title)
+      expect(review.fields.map(({ id }) => id)).toEqual(
+        declareAction.review.fields.map(({ id }) => id)
+      )
+      expectAllOptional(review.fields)
       expect(warn).not.toHaveBeenCalled()
     })
 
@@ -310,11 +317,11 @@ describe('defineConfig()', () => {
       )
       expectAllOptional(notificationFields)
 
-      expect(notifyAction.review?.title).toEqual(declareAction.review.title)
-      expect(notifyAction.review?.fields.map(({ id }) => id)).toEqual(
+      expect(notifyAction.review.title).toEqual(declareAction.review.title)
+      expect(notifyAction.review.fields.map(({ id }) => id)).toEqual(
         declareAction.review.fields.map(({ id }) => id)
       )
-      expectAllOptional(notifyAction.review?.fields ?? [])
+      expectAllOptional(notifyAction.review.fields)
     })
 
     it('should make required fields, their validations and field group subfields optional', () => {
@@ -406,7 +413,7 @@ describe('defineConfig()', () => {
       expect(getNotificationFields(config).map(({ id }) => id)).toEqual(
         getDeclarationFields(config).map(({ id }) => id)
       )
-      expectAllOptional(notifyAction.review?.fields ?? [])
+      expectAllOptional(notifyAction.review.fields)
     })
 
     it('should keep a configured NOTIFY review when only the notification form is missing', () => {

@@ -235,8 +235,8 @@ export function validateDeclarationGivenExactlyOnce(
 }
 
 /**
- * Validation which ensures that *if* a separate notificationForm is defined:
- *  - it only includes fields with ids that are also in the declaration form
+ * Validation which ensures that the NOTIFY notificationForm:
+ *  - only includes fields with ids that are also in the declaration form
  *  - the field types match the ones on the declaration form
  *
  * This is because the notification form is used as pre-filled values during declaration.
@@ -249,7 +249,7 @@ export function validateNotificationForm(
   const declarationFields = getDeclarationFields(event)
 
   event.actions.forEach((action, actionIndex) => {
-    if (action.type !== ActionType.NOTIFY || !action.notificationForm) {
+    if (action.type !== ActionType.NOTIFY) {
       return
     }
 

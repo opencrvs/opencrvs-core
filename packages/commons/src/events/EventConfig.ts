@@ -60,8 +60,14 @@ type DeclareActionConfigInput = Extract<
   { type: typeof ActionType.DECLARE }
 >
 
+type NotifyActionConfigInput = Extract<
+  ActionConfigInput,
+  { type: typeof ActionType.NOTIFY }
+>
+
 /**
- * Input accepted by `EventConfig.parse`. `declaration` lives only on the DECLARE action.
+ * Input accepted by `EventConfig.parse`. `declaration` lives only on the DECLARE action,
+ * and NOTIFY carries its `notificationForm` and `review`.
  */
 type EventConfigSchemaInput = Omit<
   EventConfig,
@@ -87,14 +93,24 @@ type EventConfigSchemaInput = Omit<
  * `declaration` may be given at the top level (kept for backwards compatibility)
  * or on the DECLARE action.
  * `defineConfig` checks at runtime that it is given in exactly one of these places.
+ *
+ * The NOTIFY action, and its `notificationForm` and `review`, are optional.
+ * `defineConfig` generates whatever is missing from the DECLARE action.
  */
 export type EventConfigInput = Omit<EventConfigSchemaInput, 'actions'> & {
   /** @deprecated Define `declaration` on the DECLARE action instead. */
   declaration?: DeclarationFormConfigInput
   actions: Array<
-    | Exclude<ActionConfigInput, DeclareActionConfigInput>
+    | Exclude<
+        ActionConfigInput,
+        DeclareActionConfigInput | NotifyActionConfigInput
+      >
     | (Omit<DeclareActionConfigInput, 'declaration'> & {
         declaration?: DeclarationFormConfigInput
+      })
+    | (Omit<NotifyActionConfigInput, 'notificationForm' | 'review'> & {
+        notificationForm?: NotifyActionConfigInput['notificationForm']
+        review?: NotifyActionConfigInput['review']
       })
   >
 }

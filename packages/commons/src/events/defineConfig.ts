@@ -12,9 +12,10 @@
 import * as z from 'zod/v4'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType } from './ActionType'
-import { FieldType } from './FieldType'
-import { FieldConfigInput } from './FieldConfig'
-import { DeclarationFormConfigInput } from './FormConfig'
+import {
+  generateNotificationForm,
+  generateNotifyReview
+} from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
@@ -58,42 +59,11 @@ type NotifyActionConfigInput = Extract<
 >
 
 /**
- * Makes a field (and the fields of a field group) optional, and removes its validations.
- * The notification form generated from the declaration accepts what NOTIFY accepts today:
- * structural checks only.
- */
-function toOptionalField(field: FieldConfigInput): FieldConfigInput {
-  const { validation: _validation, ...rest } = field
-
-  if (rest.type === FieldType.FIELD_GROUP) {
-    return {
-      ...rest,
-      required: false,
-      fields: rest.fields.map(toOptionalField)
-    }
-  }
-
-  return { ...rest, required: false }
-}
-
-function toOptionalForm(
-  form: DeclarationFormConfigInput
-): DeclarationFormConfigInput {
-  return {
-    ...form,
-    pages: form.pages.map((page) => ({
-      ...page,
-      fields: page.fields.map(toOptionalField)
-    }))
-  }
-}
-
-/**
- * Fallback for events without a configured notification form.
+ * Fallback for events without a configured notification form or NOTIFY review.
  *
  * - Without a NOTIFY action, one is created from the DECLARE action.
- * - Without `notificationForm`, it is generated from the declaration, and `review` (when not configured)
- *   from the DECLARE review, with every field optional.
+ * - Without `notificationForm`, it is generated from the declaration with every field optional, and a warning is logged.
+ * - Without `review`, it is generated from the DECLARE review with every field optional.
  *
  * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
  * Expects the `declaration` to already be on the DECLARE action.
@@ -110,21 +80,25 @@ function generateNotificationFormFallback(
       action.type === ActionType.NOTIFY
   )
 
-  if (notifyAction?.notificationForm || !declareAction?.declaration) {
+  if (
+    !declareAction?.declaration ||
+    (notifyAction?.notificationForm && notifyAction.review)
+  ) {
     return config
   }
 
-  // eslint-disable-next-line no-console
-  console.warn(
-    `Event '${config.id}' has no ${ActionType.NOTIFY} form. Generated one from the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
-  )
+  if (!notifyAction?.notificationForm) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Event '${config.id}' has no ${ActionType.NOTIFY} form. Generated one from the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
+    )
+  }
 
   const generated = {
-    notificationForm: toOptionalForm(declareAction.declaration),
-    review: notifyAction?.review ?? {
-      ...declareAction.review,
-      fields: declareAction.review.fields.map(toOptionalField)
-    }
+    notificationForm:
+      notifyAction?.notificationForm ??
+      generateNotificationForm(declareAction.declaration),
+    review: notifyAction?.review ?? generateNotifyReview(declareAction.review)
   }
 
   if (notifyAction) {

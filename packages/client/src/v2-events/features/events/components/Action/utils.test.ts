@@ -34,7 +34,9 @@ function generateEvent(
   return {
     ...event,
     actions: event.actions.map((action, index) =>
-      index === 0 ? action : { ...action, ...actions[index - 1] }
+      index === 0
+        ? action
+        : { ...action, annotation: actions[index - 1].annotation }
     )
   }
 }

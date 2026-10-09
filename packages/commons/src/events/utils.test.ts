@@ -1224,11 +1224,6 @@ describe('getDeclarationAfterEachAction', () => {
 })
 
 describe('getDeclaration() and withDeclaration()', () => {
-  const declaration = {
-    ...getDeclaration(tennisClubMembershipEvent),
-    pages: []
-  }
-
   it('should read the declaration from the DECLARE action', () => {
     const declareAction = tennisClubMembershipEvent.actions.find(
       (action) => action.type === ActionType.DECLARE
@@ -1252,13 +1247,24 @@ describe('getDeclaration() and withDeclaration()', () => {
     )
   })
 
-  it('should replace the declaration on the DECLARE action, and drop the notification form', () => {
-    const config = withDeclaration(tennisClubMembershipEvent, declaration)
+  it('should replace the declaration on the DECLARE action, and generate the notification form from it', () => {
+    const firstPageOnly = {
+      ...getDeclaration(tennisClubMembershipEvent),
+      pages: getDeclaration(tennisClubMembershipEvent).pages.slice(0, 1)
+    }
+    const config = withDeclaration(tennisClubMembershipEvent, firstPageOnly)
     const isOtherAction = (action: ActionConfig) =>
       action.type !== ActionType.DECLARE && action.type !== ActionType.NOTIFY
+    const notificationFields = getNotificationFields(config)
 
-    expect(getDeclaration(config)).toBe(declaration)
-    expect(getNotificationForm(config)).toBeUndefined()
+    expect(getDeclaration(config)).toBe(firstPageOnly)
+    expect(notificationFields.map(({ id }) => id)).toEqual(
+      firstPageOnly.pages[0].fields.map(({ id }) => id)
+    )
+    expect(notificationFields.length).toBeLessThan(
+      getNotificationFields(tennisClubMembershipEvent).length
+    )
+    expect(notificationFields.every(({ required }) => !required)).toBe(true)
     expect(config.actions.filter(isOtherAction)).toEqual(
       tennisClubMembershipEvent.actions.filter(isOtherAction)
     )
@@ -1280,7 +1286,7 @@ describe('getNotificationForm() / getNotificationFields()', () => {
       notifyAction.notificationForm
     )
     expect(getNotificationFields(tennisClubMembershipEvent)).toEqual(
-      notifyAction.notificationForm?.pages.flatMap(({ fields }) => fields)
+      notifyAction.notificationForm.pages.flatMap(({ fields }) => fields)
     )
   })
 

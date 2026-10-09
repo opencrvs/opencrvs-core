@@ -430,28 +430,16 @@ describe('core action dialog form validation', () => {
     }
   }
 
-  // The fixture already ships a NOTIFY action (without a `form`).
-  // `getActionFormFields`/`getActionConfig` resolve the NOTIFY action via
-  // `Array.find`, i.e. the *first* matching entry, so the fixture's own NOTIFY
-  // action must be replaced (not merely appended after) or it would shadow
-  // the one under test here.
+  // The fixture already ships a NOTIFY action (without a `form`), so the dialog
+  // field is added to it rather than to a second NOTIFY action, which would be
+  // shadowed by the first one.
   const eventConfigWithNotifyForm = {
     ...tennisClubMembershipEvent,
-    actions: [
-      ...tennisClubMembershipEvent.actions.filter(
-        (action) => action.type !== ActionType.NOTIFY
-      ),
-      {
-        type: ActionType.NOTIFY,
-        label: {
-          id: 'event.tennis-club-membership.action.notify.label',
-          defaultMessage: 'Notify',
-          description: 'Notify action label'
-        },
-        flags: [],
-        form: [dialogField]
-      }
-    ]
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.NOTIFY
+        ? { ...action, form: [dialogField] }
+        : action
+    )
   }
 
   it('accepts NOTIFY annotation values matching the NOTIFY dialog form', () => {
