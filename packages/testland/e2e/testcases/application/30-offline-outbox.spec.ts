@@ -16,7 +16,8 @@ import {
   formatName,
   getRandomDate,
   goToSection,
-  login
+  login,
+  waitForActionResponses
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
@@ -62,7 +63,14 @@ test.describe
     await page.getByLabel('Birth').click()
     await goToSection(page, 'review')
     await page.getByTestId('exit-button').click()
-    await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    // Exit's delete must settle, including its drafts refetch, before going
+    // offline, or 30.4 finds it in the outbox.
+    await waitForActionResponses(page, ['event.delete'], () =>
+      page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    )
+    await expect(page.getByRole('button', { name: 'Outbox' })).toHaveText(
+      'Outbox'
+    )
 
     await page.context().setOffline(true)
   })
