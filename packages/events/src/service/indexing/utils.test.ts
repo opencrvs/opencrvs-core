@@ -52,6 +52,15 @@ describe('EventIndex utils', () => {
     })
   })
 
+  test('encodes a cleared name field as null', () => {
+    const encoded = encodeEventIndex(
+      eventQueryDataGenerator({ declaration: { 'applicant.name': null } }),
+      eventConfig
+    )
+
+    expect(encoded.declaration).toEqual({ applicant____name: null })
+  })
+
   test('removes secured data while keeping the others', () => {
     const eventIndexWithSecuredData = eventQueryDataGenerator({
       declaration: {

@@ -2,6 +2,10 @@
 
 ## 1.9.21 Release Candidate
 
+### Bug fixes
+
+- Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
+
 ## 1.9.20
 
 ### Bug fixes
