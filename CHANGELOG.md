@@ -45,6 +45,12 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
+### New features
+
+#### `REVOKED` status with revoke and reinstate registration actions
+
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)

@@ -446,6 +446,14 @@ export const eventRouter = router({
       ),
       reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     }),
+    revocation: router({
+      revoke: router(
+        getDefaultActionProcedures(ActionType.REVOKE_REGISTRATION)
+      ),
+      reinstate: router(
+        getDefaultActionProcedures(ActionType.REINSTATE_REGISTRATION)
+      )
+    }),
     duplicate: router({
       markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
