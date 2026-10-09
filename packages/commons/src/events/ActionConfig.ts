@@ -201,6 +201,20 @@ const UnarchiveConfig = ActionConfigBase.extend(
   }).shape
 )
 
+const RevokeRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REVOKE_REGISTRATION),
+    form: actionConfirmationForm
+  }).shape
+)
+
+const ReinstateRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REINSTATE_REGISTRATION),
+    form: actionConfirmationForm
+  }).shape
+)
+
 const EditActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.EDIT),
@@ -363,6 +377,15 @@ export const ActionConfig = z
     UnarchiveConfig.meta({
       id: 'UnarchiveActionConfig',
       description: 'Configuration for unarchiving a record.'
+    }),
+    RevokeRegistrationConfig.meta({
+      id: 'RevokeRegistrationActionConfig',
+      description: 'Configuration for revoking a registered record.'
+    }),
+    ReinstateRegistrationConfig.meta({
+      id: 'ReinstateRegistrationActionConfig',
+      description:
+        'Configuration for reinstating a revoked record back to registered.'
     }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',

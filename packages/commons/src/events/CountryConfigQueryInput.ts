@@ -49,6 +49,7 @@ export const SerializedQueryExpression = z
       z.optional(SerializableWithin),
     'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REVOKED.createdAtLocation': z.optional(SerializableWithin),
     createdAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),

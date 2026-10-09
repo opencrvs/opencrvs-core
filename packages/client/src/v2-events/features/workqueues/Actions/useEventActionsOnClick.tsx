@@ -87,6 +87,10 @@ export function useEventActionsOnClick(event: EventIndex) {
           return onQuickAction(ActionType.ARCHIVE, backTo)
         case ActionType.UNARCHIVE:
           return onQuickAction(ActionType.UNARCHIVE, backTo)
+        case ActionType.REVOKE_REGISTRATION:
+          return onQuickAction(ActionType.REVOKE_REGISTRATION, backTo)
+        case ActionType.REINSTATE_REGISTRATION:
+          return onQuickAction(ActionType.REINSTATE_REGISTRATION, backTo)
         case ActionType.PRINT_CERTIFICATE:
           clearEphemeralFormState()
           return navigate(
