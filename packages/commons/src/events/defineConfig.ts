@@ -12,10 +12,7 @@
 import * as z from 'zod/v4'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType } from './ActionType'
-import {
-  generateNotificationForm,
-  generateNotifyReview
-} from './notificationFormFallback'
+import { generateNotifyReview } from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
@@ -95,9 +92,12 @@ function generateNotificationFormFallback(
   }
 
   const generated = {
-    notificationForm:
-      notifyAction?.notificationForm ??
-      generateNotificationForm(declareAction.declaration),
+    // EXPERIMENT: generate an empty notification form, to check whether the size of the
+    // generated form causes the e2e slowdown. Not to be merged.
+    notificationForm: notifyAction?.notificationForm ?? {
+      label: declareAction.declaration.label,
+      pages: []
+    },
     review: notifyAction?.review ?? generateNotifyReview(declareAction.review)
   }
 
