@@ -58,6 +58,10 @@ on:
         type: boolean
         default: false
         required: false
+
+env:
+  TARGET_REPO: ${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}
+
 jobs:
   base:
     strategy:
@@ -66,12 +70,12 @@ jobs:
         runner: ${{ ((inputs.build_arm == true || startsWith(github.ref, 'refs/tags/')) && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) || fromJSON('["ubuntu-26.04"]') }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: ${{ github.event.inputs.branch_tag_name }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -186,12 +190,12 @@ jobs:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_tag_name }}'
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -228,6 +232,7 @@ jobs:
             build-args: |
               VERSION=${{ needs.base.outputs.version }}
               BRANCH=${{ needs.base.outputs.branch }}
+              BASE_IMAGE=${{ env.TARGET_REPO }}/ocrvs-base
             provenance: false
             push: true
             context: .
@@ -400,7 +405,7 @@ jobs:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: |
             trivy.yaml
@@ -441,7 +446,7 @@ jobs:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: |
             trivy.yaml
