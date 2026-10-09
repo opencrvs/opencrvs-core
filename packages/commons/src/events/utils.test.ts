@@ -1274,23 +1274,51 @@ describe('getDeclaration() and withDeclaration()', () => {
 })
 
 describe('getNotificationForm() / getNotificationFields()', () => {
-  it('returns the notification form and its fields', () => {
-    const notifyAction = tennisClubMembershipEvent.actions.find(
-      (action) => action.type === ActionType.NOTIFY
-    )
-    if (notifyAction?.type !== ActionType.NOTIFY) {
-      throw new Error('Expected the NOTIFY action')
-    }
+  const firstPage = getDeclaration(tennisClubMembershipEvent).pages[0]
+  const configuredForm = {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: [{ ...firstPage, fields: firstPage.fields.slice(0, 2) }]
+  }
 
-    expect(getNotificationForm(tennisClubMembershipEvent)).toBe(
-      notifyAction.notificationForm
-    )
-    expect(getNotificationFields(tennisClubMembershipEvent)).toEqual(
-      notifyAction.notificationForm.pages.flatMap(({ fields }) => fields)
+  const withNotificationForm = (
+    notificationForm: typeof configuredForm
+  ): EventConfig => ({
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.NOTIFY
+        ? { ...action, notificationForm }
+        : action
     )
   })
 
-  it('returns no form and no fields when the event has no NOTIFY action', () => {
+  it('returns the configured notification form and its fields', () => {
+    const config = withNotificationForm(configuredForm)
+
+    expect(getNotificationForm(config)).toBe(configuredForm)
+    expect(getNotificationFields(config)).toEqual(firstPage.fields.slice(0, 2))
+  })
+
+  it('derives the notification form from the declaration, with every field optional, when none is configured', () => {
+    const notificationFields = getNotificationFields(tennisClubMembershipEvent)
+
+    expect(notificationFields.map(({ id }) => id)).toEqual(
+      getDeclarationFields(tennisClubMembershipEvent).map(({ id }) => id)
+    )
+    expect(notificationFields.every(({ required }) => !required)).toBe(true)
+    expect(
+      getDeclarationFields(tennisClubMembershipEvent).some(
+        ({ required }) => required
+      )
+    ).toBe(true)
+  })
+
+  it('derives the notification form once per configuration', () => {
+    expect(getNotificationForm(tennisClubMembershipEvent)).toBe(
+      getNotificationForm(tennisClubMembershipEvent)
+    )
+  })
+
+  it('derives the notification form from the declaration when the event has no NOTIFY action', () => {
     const config = {
       ...tennisClubMembershipEvent,
       actions: tennisClubMembershipEvent.actions.filter(
@@ -1298,19 +1326,40 @@ describe('getNotificationForm() / getNotificationFields()', () => {
       )
     }
 
-    expect(getNotificationForm(config)).toBeUndefined()
-    expect(getNotificationFields(config)).toEqual([])
+    expect(getNotificationFields(config).map(({ id }) => id)).toEqual(
+      getDeclarationFields(config).map(({ id }) => id)
+    )
   })
 })
 
 describe('findAllFields()', () => {
-  it('includes the notification form fields', () => {
-    const allFields = findAllFields(tennisClubMembershipEvent)
-    const notificationFields = getNotificationFields(tennisClubMembershipEvent)
+  it('includes the fields of a configured notification form', () => {
+    const notificationForm = {
+      ...getDeclaration(tennisClubMembershipEvent),
+      pages: getDeclaration(tennisClubMembershipEvent).pages.slice(0, 1)
+    }
+    const config: EventConfig = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.NOTIFY
+          ? { ...action, notificationForm }
+          : action
+      )
+    }
+    const allFields = findAllFields(config)
 
-    expect(notificationFields.length).toBeGreaterThan(0)
-    for (const notificationField of notificationFields) {
+    for (const notificationField of getNotificationFields(config)) {
       expect(allFields).toContain(notificationField)
+    }
+  })
+
+  it('does not repeat the declaration fields when no notification form is configured', () => {
+    const allFields = findAllFields(tennisClubMembershipEvent)
+
+    for (const notificationField of getNotificationFields(
+      tennisClubMembershipEvent
+    )) {
+      expect(allFields).not.toContain(notificationField)
     }
   })
 })

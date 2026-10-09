@@ -53,7 +53,9 @@ describe('defineConfig()', () => {
     const config = defineConfig(tennisClubMembershipEvent)
 
     expect(getDeclaration(config)).toEqual(declaration)
-    expect(warn).not.toHaveBeenCalled()
+    expect(warn).not.toHaveBeenCalledWith(
+      expect.stringContaining('defines `declaration` at the top level')
+    )
   })
 
   it('should move a top-level declaration onto the DECLARE action', () => {
@@ -128,7 +130,7 @@ describe('defineConfig()', () => {
   })
 
   describe('notification form fallback', () => {
-    const notificationFormWarning = `Event '${tennisClubMembershipEvent.id}' has no NOTIFY form. Generated one from the DECLARE form with all fields optional. Configure \`actions[NOTIFY].notificationForm\`. This fallback will be removed in a future release.`
+    const notificationFormWarning = `Event '${tennisClubMembershipEvent.id}' has no NOTIFY form. Using the DECLARE form with all fields optional. Configure \`actions[NOTIFY].notificationForm\`. This fallback will be removed in a future release.`
 
     const declareAction = tennisClubMembershipEvent.actions[declareActionIndex]
     if (declareAction.type !== ActionType.DECLARE) {
@@ -303,7 +305,16 @@ describe('defineConfig()', () => {
       expect(config.actions[notifyIndex + 1].type).toBe(ActionType.DECLARE)
     })
 
-    it('should generate the notification form and review from the DECLARE action, with every field optional', () => {
+    it('should not put a notification form in the config when none is configured', () => {
+      const config = defineConfig({
+        ...tennisClubMembershipEvent,
+        actions: actionsWithoutNotify
+      })
+
+      expect(getNotifyAction(config)).not.toHaveProperty('notificationForm')
+    })
+
+    it('should derive the notification form from the declaration, and generate the review from the DECLARE review, with every field optional', () => {
       const config = defineConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify
@@ -378,19 +389,13 @@ describe('defineConfig()', () => {
       const notificationGroup = findById(notificationFields, 'applicant.group')
 
       expect(findById(notificationFields, 'applicant.nickname')).toMatchObject({
-        required: false,
-        validation: []
+        required: false
       })
       expect(notificationGroup).toMatchObject({
         required: false,
-        fields: [
-          {
-            id: 'applicant.group.nickname',
-            required: false,
-            validation: []
-          }
-        ]
+        fields: [{ id: 'applicant.group.nickname', required: false }]
       })
+      expectAllOptional(notificationFields)
 
       // The declaration itself is untouched
       expect(
@@ -429,7 +434,7 @@ describe('defineConfig()', () => {
       expect(getNotificationForm(config)).toBeDefined()
     })
 
-    it('should warn once when generating the notification form', () => {
+    it('should warn once when no notification form is configured', () => {
       defineConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify
@@ -439,16 +444,14 @@ describe('defineConfig()', () => {
       expect(warn).toHaveBeenCalledWith(notificationFormWarning)
     })
 
-    it('should produce a config that parses unchanged and needs no fallback when defined again', () => {
+    it('should produce a config that parses unchanged and is stable when defined again', () => {
       const config = defineConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify
       })
-      warn.mockClear()
 
       expect(EventConfig.parse(config)).toEqual(config)
       expect(defineConfig(config)).toEqual(config)
-      expect(warn).not.toHaveBeenCalled()
     })
   })
 })
