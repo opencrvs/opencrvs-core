@@ -43,7 +43,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
-import { Output } from './Output'
+import { Output, isEmptyValue } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
 
@@ -327,8 +327,9 @@ function FormReview({
           const hasMandatoryFields = page.fields.some(
             (field) => !!field.required
           )
-          const hasAnyCompletedField = page.fields.some(
-            (field) => form[field.id] != null && form[field.id] !== ''
+          // Only fields shown on review count towards expanding
+          const hasAnyCompletedField = displayedFields.some(
+            (field) => !isEmptyValue(field, form[field.id])
           )
 
           return (
