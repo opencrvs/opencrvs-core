@@ -6,6 +6,7 @@
     "./icons": "./src/icons/index.ts",
     "./legacy": "./src/buttons/index.ts"
   },
+  "sideEffects": false,
   "version": "2.2.0",
   "description": "OpenCRVS UI Component library",
   "license": "MPL-2.0",
@@ -31,12 +32,13 @@
   "scripts": {
     "start": "storybook dev --ci -p 6060",
     "build": "tsc",
-    "lint": "pnpm lint:css",
+    "lint": "pnpm lint:css && pnpm lint:ts && pnpm lint:public-surface",
     "test:compilation": "tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
+    "lint:ts": "eslint src",
+    "lint:public-surface": "node check-public-surface.mjs",
     "storybook": "storybook dev -p 6060",
-    "build-storybook": "NODE_OPTIONS=--max_old_space_size=6144 storybook build -o build --disable-telemetry",
-    "recreate-src-index-ts": "bash recreate-src-index-ts.sh"
+    "build-storybook": "NODE_OPTIONS=--max_old_space_size=6144 storybook build -o build --disable-telemetry"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -74,18 +76,5 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "ts-dedent": "^2.2.0",
     "eslint-plugin-storybook": "10.5.3"
-  },
-  "eslintConfig": {
-    "extends": "react-app",
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
   }
 }

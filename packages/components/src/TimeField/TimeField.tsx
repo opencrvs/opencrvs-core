@@ -10,8 +10,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, TextInput } from '../TextInput/TextInput'
-import { ISelectProps, Select } from '../Select/Select'
+import { ITextInputProps, TextInput } from '../TextInput'
+import { ISelectProps, Select } from '../Select'
 
 export interface IProps {
   id: string
