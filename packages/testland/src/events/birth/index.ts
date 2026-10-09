@@ -1019,6 +1019,15 @@ export const birthEvent = defineConfig({
           'This is the confirmation text for the revoke registration action',
         id: 'event.birth.action.revoke-registration.supportingCopy'
       },
+      flags: [
+        { id: 'pending-first-certificate-issuance', operation: 'remove' },
+        { id: 'escalated-to-registrar-general', operation: 'remove' },
+        { id: 'escalated-to-provincial-registrar', operation: 'remove' },
+        {
+          id: 'certified-copy-printed-in-advance-of-issuance',
+          operation: 'remove'
+        }
+      ],
       // Records revoked with the custom action are still REGISTERED
       conditionals: [
         { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
