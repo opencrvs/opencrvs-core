@@ -510,10 +510,12 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isDateRangeFieldType(field)) {
-    const parsed = DateRangeFieldValue.safeParse(field.value)
+    const parsed = DateRangeFieldValue.validate(field.value)
+      ? field.value
+      : undefined
     return (
       <InputField {...field.inputFieldProps}>
-        <DateRangeField.Input {...inputProps} value={parsed.data} />
+        <DateRangeField.Input {...inputProps} value={parsed} />
       </InputField>
     )
   }

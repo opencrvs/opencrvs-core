@@ -324,13 +324,12 @@ function SearchInput({
       return
     }
 
-    const maybeResponse = SearchResponse.safeParse(val)
-    if (maybeResponse.error) {
+    if (!SearchResponse.validate(val)) {
       setHttpState(val)
       return
     }
 
-    const response = maybeResponse.data
+    const response = val
 
     const data = { ...response.data, input: value?.data?.input }
 

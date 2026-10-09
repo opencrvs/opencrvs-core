@@ -37,9 +37,9 @@ import {
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getEventFlags } from './flags'
-import { getUUID, UUID } from '../../uuid'
+import { getUUID, maybeUuid, UUID } from '../../uuid'
 import { DocumentPath } from '../../documents'
-import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
+import { isDomesticAddressFieldValue } from '../CompositeFieldValue'
 import { isFieldReference } from '../../conditionals/conditionals'
 
 export function getStatusFromActions(actions: Array<Action>) {
@@ -187,29 +187,25 @@ export function resolveDateOfEvent(
   // Otherwise, we extract it from the event index using the event reference.
   // i.e. event('legalStatuses.REGISTERED.acceptedAt') will look for the acceptedAt field in the legalStatuses object
   // in the event metadata in EventIndex, whereas field('child.dob') will look for the dob field in the declaration.
-  const parsedDate = isFieldReference(config.dateOfEvent)
-    ? ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
-    : ZodDateTime.safeParse(
-        getMixedPath(eventIndex, config.dateOfEvent.$$event)
-      )
+  if (isFieldReference(config.dateOfEvent)) {
+    const fieldDate = declaration[config.dateOfEvent.$$field]
+    return ZodDate.validate(fieldDate)
+      ? extractDateString(fieldDate)
+      : undefined
+  }
 
-  return parsedDate.success ? extractDateString(parsedDate.data) : undefined
+  const eventDate: unknown = getMixedPath(
+    eventIndex,
+    config.dateOfEvent.$$event
+  )
+
+  return ZodDateTime.validate(eventDate)
+    ? extractDateString(eventDate)
+    : undefined
 }
 
 export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
   'createdAtLocation' satisfies keyof EventMetadata
-
-/**
- *
- * @param value value to parse
- * @param oldValue fallback value, its needed when the value is invalid but we want
- * to keep the previous valid value, since this can be used mutliple times in one flow
- * @returns successfully parsed UUID or fallback value
- */
-function getParsedUUID(value: unknown, oldValue?: UUID) {
-  const parsed = UUID.safeParse(value)
-  return parsed.success ? parsed.data : oldValue
-}
 
 export function resolvePlaceOfEvent(
   eventMetadata: {
@@ -218,30 +214,18 @@ export function resolvePlaceOfEvent(
   declaration: EventState,
   config: EventConfig
 ): UUID | undefined | null {
-  let placeOfEvent: UUID | undefined | null = getParsedUUID(
+  let placeOfEvent: UUID | undefined | null = maybeUuid(
     eventMetadata[DEFAULT_PLACE_OF_EVENT_PROPERTY]
   )
 
   if (config.placeOfEvent) {
-    const addressFieldValue = AddressFieldValue.safeParse(
-      declaration[config.placeOfEvent.$$field]
-    )
-    if (
-      addressFieldValue.success &&
-      addressFieldValue.data.addressType === AddressType.DOMESTIC &&
-      addressFieldValue.data.administrativeArea
-    ) {
-      placeOfEvent = getParsedUUID(
-        addressFieldValue.data.administrativeArea,
-        placeOfEvent
-      )
-    } else {
-      placeOfEvent = getParsedUUID(
-        declaration[config.placeOfEvent.$$field],
-        placeOfEvent
-      )
-    }
+    const addressFieldValue = declaration[config.placeOfEvent.$$field]
+
+    placeOfEvent = isDomesticAddressFieldValue(addressFieldValue)
+      ? (maybeUuid(addressFieldValue.administrativeArea) ?? placeOfEvent)
+      : (maybeUuid(declaration[config.placeOfEvent.$$field]) ?? placeOfEvent)
   }
+
   return placeOfEvent
 }
 

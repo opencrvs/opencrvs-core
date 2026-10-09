@@ -337,10 +337,8 @@ function DocumentWithOptionOutput({
 }
 
 function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
-  const parsed = FileFieldWithOptionValue.safeParse(value)
-
-  if (parsed.success) {
-    return parsed.data.reduce(
+  if (FileFieldWithOptionValue.validate(value)) {
+    return value.reduce(
       (acc, file) => ({
         ...acc,
         [file.option]: file.path

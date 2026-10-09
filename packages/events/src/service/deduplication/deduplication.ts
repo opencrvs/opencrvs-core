@@ -19,7 +19,6 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  PlainDate,
   FieldType,
   extractPotentialDuplicatesFromActions,
   EventDocument
@@ -28,6 +27,7 @@ import {
   getAcceptedScopesFromToken,
   getCurrentEventState,
   getEventConfigById,
+  isPlainDate,
   logger,
   userCanAccessEventWithScopes
 } from '@opencrvs/commons'
@@ -182,14 +182,14 @@ export function generateElasticsearchQuery(
       }
     }
     case 'dateRange': {
-      const dateValue = PlainDate.safeParse(queryValue)
-      if (!dateValue.success) {
+      if (!isPlainDate(queryValue)) {
         logger.warn(
           queryValue,
           `Invalid query value for found for dateRange matching ${queryInput.fieldId}. Expected date in YYYY-MM-DD format`
         )
         return null
       }
+
       const pivot =
         queryInput.options.pivot ??
         Math.floor((queryInput.options.days * 2) / 3)
@@ -199,10 +199,10 @@ export function generateElasticsearchQuery(
             {
               range: {
                 [queryKey]: {
-                  gte: DateTime.fromISO(dateValue.data)
+                  gte: DateTime.fromISO(queryValue)
                     .minus({ days: queryInput.options.days })
                     .toISO(),
-                  lte: DateTime.fromISO(dateValue.data)
+                  lte: DateTime.fromISO(queryValue)
                     .plus({ days: queryInput.options.days })
                     .toISO()
                 }
@@ -214,7 +214,7 @@ export function generateElasticsearchQuery(
               distance_feature: {
                 field: queryKey,
                 pivot: `${pivot}d`,
-                origin: dateValue.data
+                origin: queryValue
               }
             }
           ]

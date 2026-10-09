@@ -31,7 +31,8 @@ import {
   UUID,
   CreateUserInput,
   UpdateUserInput,
-  userAttachmentPath
+  userAttachmentPath,
+  maybeUuid
 } from '@opencrvs/commons/client'
 import {
   AppBar,
@@ -195,9 +196,10 @@ const EditUserComponent = () => {
   const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const targetUser = userQuery.data
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
-  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const maybeLocationId = maybeUuid(userForm?.primaryOfficeId)
+
   const { getConfig } = useUserEditConfig(
-    maybeLocationId.success ? maybeLocationId.data : undefined,
+    maybeLocationId,
     selectedRole,
     additionalFields
   )
@@ -372,9 +374,10 @@ const ReviewUserComponent = () => {
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
-  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const maybeLocationId = maybeUuid(userForm?.primaryOfficeId)
+
   const { getConfig } = useUserEditConfig(
-    maybeLocationId.success ? maybeLocationId.data : undefined,
+    maybeLocationId,
     selectedRole,
     additionalFields
   )

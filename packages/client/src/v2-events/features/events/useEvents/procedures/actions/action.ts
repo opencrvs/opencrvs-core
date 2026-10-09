@@ -18,15 +18,14 @@ import { TRPCClientError } from '@trpc/client'
 import { useSyncExternalStore } from 'react'
 import {
   ActionType,
-  ActionStatus,
   EventDocument,
   getActionAnnotationFields,
-  getActionFormFields,
   omitHiddenFields,
   deepDropNulls,
   deepMerge,
   getCurrentEventState,
-  getEventValidatorContext
+  getEventValidatorContext,
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -328,12 +327,19 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       )
     }
 
-    // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
-    const actionConfiguration = eventConfiguration.actions.find((action) =>
-      actionType === ActionType.NOTIFY
-        ? action.type === ActionType.DECLARE
-        : action.type === actionType
-    )
+    if (!actionType) {
+      throw new Error(
+        `No event action type found. This should never happen, ${JSON.stringify(
+          mutationOptions
+        )}`
+      )
+    }
+
+    const actionConfig = getActionConfig({
+      eventConfiguration,
+      actionType,
+      customActionType: undefined
+    })
 
     const localFullEvent =
       fullEvent ??
@@ -348,29 +354,21 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       params.declaration ?? {}
     )
 
-    const annotationFields = [
-      ...(actionConfiguration
-        ? getActionAnnotationFields(actionConfiguration)
-        : []),
-      // NOTIFY dialog fields come from the NOTIFY config itself; the DECLARE
-      // fallback above only covers review fields.
-      ...(actionType === ActionType.NOTIFY
-        ? getActionFormFields(eventConfiguration, ActionType.NOTIFY)
-        : [])
-    ]
+    const annotationFields = actionConfig
+      ? getActionAnnotationFields(actionConfig)
+      : []
 
     // Action types with no config entry at all (ASSIGN, UNASSIGN, duplicate
     // and correction actions, ...) get their annotation cleared, as before.
     // Types with a config entry keep pass-through semantics even with zero
     // configured fields — EDIT's annotation carries review-page values.
-    const annotation =
-      actionConfiguration || annotationFields.length > 0
-        ? deepDropNulls(
-            omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
-              baseFormState: submittedDeclaration
-            })
-          )
-        : {}
+    const annotation = actionConfig
+      ? deepDropNulls(
+          omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
+            baseFormState: submittedDeclaration
+          })
+        )
+      : {}
 
     const localEventDocument = findLocalEventDocument(eventId)
 

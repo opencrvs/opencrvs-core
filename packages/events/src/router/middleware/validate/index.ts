@@ -30,6 +30,8 @@ import {
   deepMerge,
   errorMessages,
   findRecordActionPages,
+  getActionAnnotationFields,
+  getActionConfig,
   getActionFormFields,
   getActionReviewFields,
   getCurrentEventState,
@@ -200,18 +202,17 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  const declarationActionParse = DeclarationActions.safeParse(actionType)
-
   // 6. Validate against action review fields and dialog form fields, if applicable.
   // Dialog form fields are validated with `required` relaxed: combined flows
   // (e.g. declare+register) only collect the final action's dialog fields, so
   // intermediate actions legitimately arrive without their own.
-  const reviewFields = declarationActionParse.success
+  const reviewFields = DeclarationActions.validate(actionType)
     ? [
-        ...getActionReviewFields(eventConfig, declarationActionParse.data),
-        ...getActionFormFields(eventConfig, declarationActionParse.data).map(
-          (formField) => ({ ...formField, required: false })
-        )
+        ...getActionReviewFields(eventConfig, actionType),
+        ...getActionFormFields(eventConfig, actionType).map((formField) => ({
+          ...formField,
+          required: false
+        }))
       ]
     : []
 
@@ -289,22 +290,40 @@ export function validateNotifyAction({
   eventConfig,
   annotation = {},
   declaration = {},
-  context
+  context,
+  actionType = ActionType.NOTIFY
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
   context: ValidatorContext
+  actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
 }) {
   const declarationConfig = getDeclaration(eventConfig)
   const formFields = declarationConfig.pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
 
-  const reviewFields = [
-    ...getActionReviewFields(eventConfig, ActionType.DECLARE),
-    ...getActionFormFields(eventConfig, ActionType.NOTIFY)
-  ]
+  const notifyConfig = getActionConfig({
+    eventConfiguration: eventConfig,
+    actionType: ActionType.NOTIFY
+  })
+
+  if (!notifyConfig) {
+    throw new Error('Notify action config not found!')
+  }
+
+  const notifyAnnotationFields = getActionAnnotationFields(notifyConfig)
+
+  // NOTIFY annotation comes from its own review and dialog fields.
+  // EDIT keeps the DECLARE review fields, plus the NOTIFY dialog fields for "notify with edits".
+  const reviewFields =
+    actionType === ActionType.NOTIFY
+      ? notifyAnnotationFields
+      : [
+          ...getActionReviewFields(eventConfig, ActionType.DECLARE),
+          ...getActionFormFields(eventConfig, ActionType.NOTIFY)
+        ]
 
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
@@ -410,7 +429,8 @@ function validateAction({
         eventConfig,
         annotation: input.annotation,
         declaration: input.declaration,
-        context
+        context,
+        actionType: input.type
       })
     )
 
@@ -453,15 +473,13 @@ function validateAction({
     return
   }
 
-  const declarationUpdateAction = DeclarationUpdateActions.safeParse(input.type)
-
-  if (declarationUpdateAction.success) {
+  if (DeclarationUpdateActions.validate(input.type)) {
     throwWhenNotEmpty(
       validateDeclarationUpdateAction({
         eventConfig,
         declarationUpdate: input.declaration,
         annotation: input.annotation,
-        actionType: declarationUpdateAction.data,
+        actionType: input.type,
         context
       })
     )
@@ -469,14 +487,12 @@ function validateAction({
     return
   }
 
-  const annotationActionParse = annotationActions.safeParse(input.type)
-
-  if (annotationActionParse.success) {
+  if (annotationActions.validate(input.type)) {
     throwWhenNotEmpty(
       validateActionAnnotation({
         eventConfig,
         annotation: input.annotation,
-        actionType: annotationActionParse.data,
+        actionType: input.type,
         context
       })
     )
