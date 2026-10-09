@@ -819,19 +819,6 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
     ]
   }
 
-  const configWithoutNotify: DeepPartial<EventConfig> = {
-    actions: [
-      {
-        type: ActionType.DECLARE,
-        flags: [{ id: 'declare-only-flag', operation: 'add' }],
-        declaration: {
-          label: { id: '', defaultMessage: '', description: '' },
-          pages: []
-        }
-      }
-    ]
-  }
-
   test('NOTIFY action uses NOTIFY flags when NOTIFY config is present', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
