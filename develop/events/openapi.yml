@@ -1870,6 +1870,7 @@ components:
                   - NOTIFIED
                   - DECLARED
                   - REGISTERED
+                  - REVOKED
                   - ARCHIVED
               updatedAt:
                 type: range
@@ -1910,6 +1911,10 @@ components:
           $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
+        legalStatuses.REVOKED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - type: "null"
         createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
@@ -1949,6 +1954,7 @@ components:
               - NOTIFIED
               - DECLARED
               - REGISTERED
+              - REVOKED
               - ARCHIVED
       required:
         - type
@@ -1966,6 +1972,7 @@ components:
             - NOTIFIED
             - DECLARED
             - REGISTERED
+            - REVOKED
             - ARCHIVED
       required:
         - type
@@ -2911,6 +2918,8 @@ components:
         - $ref: "#/components/schemas/EditActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/UnarchiveActionConfig"
+        - $ref: "#/components/schemas/RevokeRegistrationActionConfig"
+        - $ref: "#/components/schemas/ReinstateRegistrationActionConfig"
         - $ref: "#/components/schemas/CustomActionConfig"
       description: Configuration of an action available for an event. Data collected
         depends on the action type and is accessible through the annotation
@@ -2937,6 +2946,8 @@ components:
           EDIT: "#/components/schemas/EditActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           UNARCHIVE: "#/components/schemas/UnarchiveActionConfig"
+          REVOKE_REGISTRATION: "#/components/schemas/RevokeRegistrationActionConfig"
+          REINSTATE_REGISTRATION: "#/components/schemas/ReinstateRegistrationActionConfig"
           CUSTOM: "#/components/schemas/CustomActionConfig"
     ReadActionConfig:
       type: object
@@ -3235,6 +3246,8 @@ components:
                                 - record.print-certified-copies
                                 - record.request-correction
                                 - record.correct
+                                - record.revoke-registration
+                                - record.reinstate-registration
                                 - record.unassign-others
                                 - record.custom-action
                                 - record.action.accept
@@ -3514,6 +3527,8 @@ components:
                                 - record.print-certified-copies
                                 - record.request-correction
                                 - record.correct
+                                - record.revoke-registration
+                                - record.reinstate-registration
                                 - record.unassign-others
                                 - record.custom-action
                                 - record.action.accept
@@ -4204,6 +4219,8 @@ components:
                             - record.print-certified-copies
                             - record.request-correction
                             - record.correct
+                            - record.revoke-registration
+                            - record.reinstate-registration
                             - record.unassign-others
                             - record.custom-action
                             - record.action.accept
@@ -9350,6 +9367,8 @@ components:
                             - record.print-certified-copies
                             - record.request-correction
                             - record.correct
+                            - record.revoke-registration
+                            - record.reinstate-registration
                             - record.unassign-others
                             - record.custom-action
                             - record.action.accept
@@ -9837,6 +9856,8 @@ components:
                             - record.print-certified-copies
                             - record.request-correction
                             - record.correct
+                            - record.revoke-registration
+                            - record.reinstate-registration
                             - record.unassign-others
                             - record.custom-action
                             - record.action.accept
@@ -13138,6 +13159,7 @@ components:
                         - NOTIFIED
                         - DECLARED
                         - REGISTERED
+                        - REVOKED
                         - ARCHIVED
                     updatedAt:
                       type: range
@@ -14731,6 +14753,82 @@ components:
         - type
       additionalProperties: false
       description: Configuration for unarchiving a record.
+    RevokeRegistrationActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: REVOKE_REGISTRATION
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for revoking a registered record.
+    ReinstateRegistrationActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: REINSTATE_REGISTRATION
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for reinstating a revoked record back to registered.
     CustomActionConfig:
       type: object
       properties:
@@ -15052,6 +15150,8 @@ components:
                                   - record.print-certified-copies
                                   - record.request-correction
                                   - record.correct
+                                  - record.revoke-registration
+                                  - record.reinstate-registration
                                   - record.unassign-others
                                   - record.custom-action
                                   - record.action.accept
@@ -15369,6 +15469,8 @@ components:
                                   - record.print-certified-copies
                                   - record.request-correction
                                   - record.correct
+                                  - record.revoke-registration
+                                  - record.reinstate-registration
                                   - record.unassign-others
                                   - record.custom-action
                                   - record.action.accept
@@ -15555,6 +15657,8 @@ components:
                       - REQUEST_CORRECTION
                       - APPROVE_CORRECTION
                       - REJECT_CORRECTION
+                      - REVOKE_REGISTRATION
+                      - REINSTATE_REGISTRATION
                       - CUSTOM
                 required:
                   - id
@@ -15586,6 +15690,8 @@ components:
         - $ref: "#/components/schemas/MarkAsDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
         - $ref: "#/components/schemas/UnarchiveAction"
+        - $ref: "#/components/schemas/RevokeRegistrationAction"
+        - $ref: "#/components/schemas/ReinstateRegistrationAction"
         - $ref: "#/components/schemas/NotifiedAction"
         - $ref: "#/components/schemas/RegisterAction"
         - $ref: "#/components/schemas/DeclareAction"
@@ -15609,6 +15715,8 @@ components:
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
           UNARCHIVE: "#/components/schemas/UnarchiveAction"
+          REVOKE_REGISTRATION: "#/components/schemas/RevokeRegistrationAction"
+          REINSTATE_REGISTRATION: "#/components/schemas/ReinstateRegistrationAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
           REGISTER: "#/components/schemas/RegisterAction"
           DECLARE: "#/components/schemas/DeclareAction"
@@ -16336,6 +16444,198 @@ components:
         type:
           type: string
           const: UNARCHIVE
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - declaration
+        - status
+        - type
+      additionalProperties: false
+    RevokeRegistrationAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          description: Unique identifier of the action.
+        transactionId:
+          type: string
+          description: Unique identifier of the transaction.
+        createdByUserType:
+          type: string
+          enum:
+            - user
+            - system
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          description: Timestamp indicating when the action was created.
+        createdBy:
+          type: string
+          description: Identifier of the user who created the action.
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+              description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+        annotation:
+          anyOf:
+            - type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+              description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+            - type: "null"
+          description: Action-specific metadata used to annotate the event.
+        status:
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+        originalActionId:
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+        type:
+          type: string
+          const: REVOKE_REGISTRATION
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - declaration
+        - status
+        - type
+      additionalProperties: false
+    ReinstateRegistrationAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          description: Unique identifier of the action.
+        transactionId:
+          type: string
+          description: Unique identifier of the transaction.
+        createdByUserType:
+          type: string
+          enum:
+            - user
+            - system
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          description: Timestamp indicating when the action was created.
+        createdBy:
+          type: string
+          description: Identifier of the user who created the action.
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+              description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+        annotation:
+          anyOf:
+            - type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+              description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+            - type: "null"
+          description: Action-specific metadata used to annotate the event.
+        status:
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+        originalActionId:
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+        type:
+          type: string
+          const: REINSTATE_REGISTRATION
       required:
         - id
         - transactionId
@@ -17568,6 +17868,7 @@ components:
             - NOTIFIED
             - DECLARED
             - REGISTERED
+            - REVOKED
             - ARCHIVED
         legalStatuses:
           type: object
@@ -17698,6 +17999,47 @@ components:
                     - createdBy
                     - acceptedAt
                     - registrationNumber
+                  additionalProperties: false
+                - type: "null"
+            REVOKED:
+              anyOf:
+                - type: object
+                  properties:
+                    createdAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      description: The timestamp when the action request was created.
+                    createdBy:
+                      type: string
+                      description: ID of the user who created the action request.
+                    createdAtLocation:
+                      description: Location of the user who created the action request.
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
+                    createdByUserType:
+                      description: Whether the user is a normal user or a system.
+                      anyOf:
+                        - type: string
+                          enum:
+                            - user
+                            - system
+                        - type: "null"
+                    acceptedAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      description: Timestamp when the action request was accepted.
+                    createdByRole:
+                      description: Role of the user at the time of action request creation.
+                      type: string
+                  required:
+                    - createdAt
+                    - createdBy
+                    - acceptedAt
                   additionalProperties: false
                 - type: "null"
           additionalProperties: false
@@ -18668,6 +19010,7 @@ components:
                   - NOTIFIED
                   - DECLARED
                   - REGISTERED
+                  - REVOKED
                   - ARCHIVED
               updatedAt:
                 type: range
@@ -18709,6 +19052,10 @@ components:
           $ref: "#/components/schemas/AnyOfOutput"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
+        legalStatuses.REVOKED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/WithinOutput"
+            - type: "null"
         createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
@@ -18749,6 +19096,7 @@ components:
               - NOTIFIED
               - DECLARED
               - REGISTERED
+              - REVOKED
               - ARCHIVED
       required:
         - type
@@ -18767,6 +19115,7 @@ components:
             - NOTIFIED
             - DECLARED
             - REGISTERED
+            - REVOKED
             - ARCHIVED
       required:
         - type
@@ -19138,6 +19487,41 @@ components:
                         $ref: "#/components/schemas/AnyOfOutput"
                       legalStatuses.REGISTERED.registrationNumber:
                         $ref: "#/components/schemas/ExactOutput"
+                      legalStatuses.REVOKED.createdAtLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: within
+                          location:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - location
+                        additionalProperties: false
                       createdAtLocation:
                         anyOf:
                           - type: object
@@ -19529,6 +19913,41 @@ components:
                         $ref: "#/components/schemas/AnyOfOutput"
                       legalStatuses.REGISTERED.registrationNumber:
                         $ref: "#/components/schemas/ExactOutput"
+                      legalStatuses.REVOKED.createdAtLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: within
+                          location:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - location
+                        additionalProperties: false
                       createdAtLocation:
                         anyOf:
                           - type: object
@@ -19843,6 +20262,8 @@ components:
                 - UNARCHIVE
                 - PRINT_CERTIFICATE
                 - REQUEST_CORRECTION
+                - REVOKE_REGISTRATION
+                - REINSTATE_REGISTRATION
           required:
             - type
           additionalProperties: false
