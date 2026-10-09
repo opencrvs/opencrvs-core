@@ -190,9 +190,7 @@ event.birth.action.register.supportingCopy,The description for registration acti
 event.birth.action.registrar-feedback.audit-history-label,The label to show in audit history for the registrar feedback sent action,Escalation feedback,Commentaire de transmission
 event.birth.action.registrar-general-feedback.label,This is shown when the registrar general feedback can be triggered from the action from,Registrar general feedback,Retour du registraire général
 event.birth.action.registrar-general-feedback.supportingCopy,This is the confirmation text for the registrar general feedback action,Your feedback will be officially recorded and may influence the final decision on the declaration.,Votre commentaire sera officiellement consigné et pourra influencer la décision finale sur la déclaration.
-event.birth.action.reinstate-registration.audit-history-label,The label to show in audit history for the reinstate registration action,Registration reinstated,Enregistrement rétabli
 event.birth.action.reinstate-registration.label,This is shown as the action name anywhere the user can trigger the action from,Reinstate registration,Rétablir l'enregistrement
-event.birth.action.revoke-registration.audit-history-label,The label to show in audit history for the revoke registration action,Revoked,Révoqué
 event.birth.action.revoke-registration.label,This is shown as the action name anywhere the user can trigger the action from,Revoke registration,Révoqué l'enregistrement
 event.birth.action.revoke-registration.supportingCopy,This is the confirmation text for the reinstate revoke registration action,This will restore a previously revoked registration to active status.,Cela rétablira à l'état actif un enregistrement précédemment révoqué.
 event.birth.custom.action.approve.field.collector.label,Label for collector field,Collector,le collectionneur
@@ -210,7 +208,6 @@ event.birth.flag.certified-copy-printed-in-advance-of-issuance,Flag label for ce
 event.birth.flag.escalated-to-provincial-registrar,Flag label for escalated to provincial registrar,Escalated to Provincial Registrar,Transmis à l'officier d'état civil provincial
 event.birth.flag.escalated-to-registrar-general,Flag label for escalated to registrar general,Escalated to Registrar General,Transmis au directeur général de l'état civil
 event.birth.flag.pending-first-certificate-issuance,Pending first certificate issuance,Pending first certificate issuance,En attente de la délivrance d'une copie certifiée conforme
-event.birth.flag.revoked,Flag label for revoked,Revoked,Révoqué
 event.birth.flag.validated,Flag label for validated,Validated,Validé
 event.birth.label,This is what this event is referred as in the system,Birth,Naissance
 event.birth.summary.child.dob.empty,Label for date of birth not available,No date of birth,Pas de date de naissance
