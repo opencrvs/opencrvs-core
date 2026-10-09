@@ -13972,15 +13972,11 @@ components:
         notificationForm:
           description: Notification form configuration. Its fields must be a subset of the
             declaration form fields, with matching types. The values submitted
-            on the notification form pre-fill the declaration. When not defined,
-            the declare action's notification form is used (with all fields
-            optional).
+            on the notification form pre-fill the declaration. If not defined,
+            it's generated from the declare action's declaration (with all
+            fields optional).
           $ref: "#/components/schemas/DeclarationFormConfig"
         review:
-          description: Review page configuration for the notify action. Values of its
-            fields are stored as the NOTIFY action annotation. When not defined,
-            the declare action's notification form is used (with all fields
-            optional).
           type: object
           properties:
             title:
@@ -13995,6 +13991,9 @@ components:
             - title
             - fields
           additionalProperties: false
+          description: Review page configuration for the notify action. Values of its
+            fields are stored as the NOTIFY action annotation. If not defined,
+            it's generates from the declare action's review.
         form:
           description: Fields rendered on the action confirmation dialog. Submitted values
             are stored in the action annotation and shown in the audit history.
@@ -14005,6 +14004,8 @@ components:
         - label
         - flags
         - type
+        - notificationForm
+        - review
       additionalProperties: false
       description: Configuration for the notify action, including the notification
         form and its review page. When absent, defineConfig generates it from
