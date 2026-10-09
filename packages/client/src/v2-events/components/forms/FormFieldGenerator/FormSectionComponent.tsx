@@ -319,7 +319,9 @@ export function FormSectionComponent({
       return
     }
 
-    const defaultValue = getDefaultValue(listenerField, fieldValues)
+    const defaultValue = searchMode
+      ? undefined
+      : getDefaultValue(listenerField, fieldValues)
 
     set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
 
