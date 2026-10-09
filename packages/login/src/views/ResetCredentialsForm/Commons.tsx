@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
-import { Box } from '@opencrvs/components/lib/Box'
+import { Box } from '@opencrvs/components'
 
 /* Shared by the terminal screens of the recovery flow so they stay identical. */
 export const Container = styled(Box)`

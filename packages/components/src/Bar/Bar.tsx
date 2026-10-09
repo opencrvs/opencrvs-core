@@ -10,11 +10,11 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { IDataPoint } from '../chart-datapoint-types'
-import { ITheme } from '../theme'
+import { IBarDataPoint } from './types'
+import { ITheme } from '../tokens'
 
 export interface IBarChartProps {
-  data: IDataPoint[]
+  data: IBarDataPoint[]
 }
 
 const Container = styled.div`
@@ -56,7 +56,7 @@ const Section = styled.div<{ size: number; colour: string }>`
   z-index: 1;
 `
 
-const calculateSum = (points: IDataPoint[]) =>
+const calculateSum = (points: IBarDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
 export const Bar = withTheme((props: IBarChartProps & { theme: ITheme }) => {

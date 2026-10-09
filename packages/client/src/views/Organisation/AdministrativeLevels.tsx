@@ -12,15 +12,15 @@ import React, { Fragment } from 'react'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
+  Pagination,
   Content,
   Link,
   List,
   BreadCrumb,
-  Divider
-} from '@opencrvs/components/lib'
-import { IBreadCrumbData } from '@opencrvs/components/lib/Breadcrumb'
+  Divider,
+  IBreadCrumbData
+} from '@opencrvs/components'
 import { useParams, useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import styled from 'styled-components'

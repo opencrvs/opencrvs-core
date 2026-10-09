@@ -11,16 +11,15 @@
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import styled from 'styled-components'
 import format from '@client/utils/date-formatting'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { Button } from '@opencrvs/components'
-import { IActionObject } from '@opencrvs/components/lib/common-types'
+import { CircleButton } from '@opencrvs/components/legacy'
+import { Button, IActionObject } from '@opencrvs/components'
 import {
   Calendar,
   CalendarGrey,
   ChevronLeft,
   ChevronRight,
   Cross
-} from '@opencrvs/components/lib/icons'
+} from '@opencrvs/components/icons'
 import addYears from 'date-fns/addYears'
 import endOfDay from 'date-fns/endOfDay'
 import endOfYear from 'date-fns/endOfYear'

@@ -38,24 +38,24 @@ import {
   User,
   UUID
 } from '@opencrvs/commons/client'
-import { Link } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
+  Link,
+  Button,
   BodyContent,
   Content,
-  ContentSize
-} from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { NoWifi } from '@opencrvs/components/lib/icons'
-import { List } from '@opencrvs/components/lib/List'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+  ContentSize,
+  Icon,
+  List,
+  Pagination,
+  Pill,
+  Dialog,
+  Stack,
+  ITheme,
+  Toast,
+  ToggleMenu
+} from '@opencrvs/components'
+import { LinkButton } from '@opencrvs/components/legacy'
+import { NoWifi } from '@opencrvs/components/icons'
 import { parse } from 'qs'
 import { stringify } from 'querystring'
 import React, { useCallback, useState } from 'react'

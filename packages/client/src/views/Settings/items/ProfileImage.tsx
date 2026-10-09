@@ -19,7 +19,7 @@ import {
   DynamicHeightLinkButton,
   SettingsRow
 } from '@client/views/Settings/items/components'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components'
 import * as React from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 
@@ -64,9 +64,7 @@ export function useProfileImage(): SettingsRow {
     id: 'profile-image',
     item: {
       label: intl.formatMessage(userMessages.profileImage),
-      value: (
-        <Avatar name={englishName} size="lg" src={userDetails?.avatar} />
-      ),
+      value: <Avatar name={englishName} size="lg" src={userDetails?.avatar} />,
       actions: (
         <ImageLoader
           onImageLoaded={handleImageLoaded}

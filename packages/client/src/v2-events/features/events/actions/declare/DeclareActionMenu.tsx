@@ -24,10 +24,7 @@ import {
   isValidIcon,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { Button } from '@opencrvs/components'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Icon } from '@opencrvs/components'
+import { Button, DropdownMenu, Icons, Icon } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -277,7 +274,7 @@ export function DeclareActionMenu({ event }: { event: EventDocument }) {
             size="medium"
             type="primary"
           >
-            {intl.formatMessage(messages.action)} <CaretDown />
+            {intl.formatMessage(messages.action)} <Icons.CaretDown />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>

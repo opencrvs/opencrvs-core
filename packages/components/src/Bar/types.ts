@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // todo separate type for estimate and total
-export interface IDataPoint {
+export interface IBarDataPoint {
   value: number
   label: React.ReactNode
   estimate?: boolean

@@ -11,10 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Link } from '@opencrvs/components/lib/Link/Link'
-import { Icon } from '@opencrvs/components/lib/Icon/Icon'
-import { Button } from '@opencrvs/components/lib/Button/Button'
+import { Spinner, Link, Icon, Button } from '@opencrvs/components'
 import {
   DocumentPath,
   FileFieldValueWithOption,

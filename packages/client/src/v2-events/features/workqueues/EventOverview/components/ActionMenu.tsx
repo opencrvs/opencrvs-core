@@ -12,8 +12,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Button, DropdownMenu, Icon } from '@opencrvs/components'
+import { Icons, Button, DropdownMenu, Icon } from '@opencrvs/components'
 import {
   EventConfig,
   EventIndex,
@@ -200,7 +199,7 @@ export function ActionMenu({
             size="medium"
             type="primary"
           >
-            {intl.formatMessage(messages.action)} <CaretDown />
+            {intl.formatMessage(messages.action)} <Icons.CaretDown />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>

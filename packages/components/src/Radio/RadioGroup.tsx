@@ -122,9 +122,7 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={
-                  props.onChange as (
-                    value: string | number | boolean
-                  ) => void
+                  props.onChange as (value: string | number | boolean) => void
                 }
               />
               {nestedFields &&
@@ -158,9 +156,7 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={
-                  props.onChange as (
-                    value: string | number | boolean
-                  ) => void
+                  props.onChange as (value: string | number | boolean) => void
                 }
               />
             </div>

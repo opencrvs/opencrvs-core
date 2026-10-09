@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import * as Recharts from 'recharts'
-import { ITheme } from '../theme'
+import { ITheme } from '../tokens'
 import styled, { withTheme } from 'styled-components'
 import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
 
@@ -204,7 +204,10 @@ class LineChartComponent extends React.Component<IProps> {
               stroke={theme.colors.teal}
               dot={false}
               activeDot={(dotProps: unknown) => (
-                <CustomizedDot {...(dotProps as ICustomisedDot)} theme={theme} />
+                <CustomizedDot
+                  {...(dotProps as ICustomisedDot)}
+                  theme={theme}
+                />
               )}
               strokeWidth={3}
             />
