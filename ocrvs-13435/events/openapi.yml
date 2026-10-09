@@ -13866,13 +13866,17 @@ components:
           type: string
           const: NOTIFY
         notificationForm:
-          description: Notification form configuration, which must include a subset of the
-            declaration form fields. The values submitted on the notification
-            form will be used as pre-filled values during declaration. If
-            notificationForm is not defined, we fallback to the declare form.
+          description: Notification form configuration. Its fields must be a subset of the
+            declaration form fields, with matching types. The values submitted
+            on the notification form pre-fill the declaration. When not defined,
+            the declare action's notification form is used (with all fields
+            optional).
           $ref: "#/components/schemas/DeclarationFormConfig"
         review:
-          description: Review page configuration for the notify action.
+          description: Review page configuration for the notify action. Values of its
+            fields are stored as the NOTIFY action annotation. When not defined,
+            the declare action's notification form is used (with all fields
+            optional).
           type: object
           properties:
             title:
@@ -13898,9 +13902,9 @@ components:
         - flags
         - type
       additionalProperties: false
-      description: Configuration for the notify action. When present, NOTIFY uses this
-        config independently from DECLARE. When absent, NOTIFY falls back to the
-        DeclareActionConfig.
+      description: Configuration for the notify action, including the notification
+        form and its review page. When absent, defineConfig generates it from
+        the DeclareActionConfig.
     DeclarationFormConfig:
       type: object
       properties:
@@ -14030,9 +14034,8 @@ components:
         - declaration
         - review
       additionalProperties: false
-      description: Configuration for the declare action. Includes review-page fields.
-        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
-        provided.
+      description: Configuration for the declare action. Includes the declaration form
+        and review-page fields.
     DeduplicationConfig:
       type: object
       properties:
