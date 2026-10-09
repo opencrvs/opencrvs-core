@@ -208,6 +208,16 @@ export const messages = defineMessages({
     description: 'Description for declaration archived',
     id: 'user.profile.auditList.archived'
   },
+  registrationRevokedAuditAction: {
+    defaultMessage: 'Registration revoked',
+    description: 'Description for registration revoked',
+    id: 'user.profile.auditList.registrationRevoked'
+  },
+  registrationReinstatedAuditAction: {
+    defaultMessage: 'Registration reinstated',
+    description: 'Description for registration reinstated',
+    id: 'user.profile.auditList.registrationReinstated'
+  },
   loggedInAuditAction: {
     defaultMessage: 'Logged in',
     description: 'Description for user logged in',

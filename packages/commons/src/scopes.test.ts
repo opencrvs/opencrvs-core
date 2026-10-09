@@ -363,6 +363,32 @@ describe('2.0 scopes', () => {
         }
       },
       {
+        type: 'record.revoke-registration',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.reinstate-registration',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
         type: 'record.unassign-others',
         options: {
           event: ['birth', 'death'],

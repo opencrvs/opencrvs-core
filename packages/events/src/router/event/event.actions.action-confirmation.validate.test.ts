@@ -648,6 +648,95 @@ async function requestPendingCustom(
   }
 }
 
+async function requestPendingRevokeRegistration(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.REGISTER],
+    false
+  )
+  const payload = generator.event.actions.revokeRegistration(event.id, {
+    waitFor: false
+  })
+
+  mockActionApi(ActionType.REVOKE_REGISTRATION, status, syncPayload)
+
+  const requested =
+    await client.event.actions.revocation.revoke.request(payload)
+  const actionId = requestedActionId(requested, ActionType.REVOKE_REGISTRATION)
+
+  return {
+    actionId,
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
+      confirmer.event.actions.revocation.revoke.accept({
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId
+      }),
+    reject: async (overridePayload?: Record<string, unknown>) =>
+      confirmer.event.actions.revocation.revoke.reject({
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId,
+        waitFor: false
+      })
+  }
+}
+
+async function requestPendingReinstateRegistration(
+  status: number,
+  syncPayload: Record<string, unknown>
+): Promise<PendingAction> {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await createEvent(
+    client,
+    generator,
+    [ActionType.DECLARE, ActionType.REGISTER, ActionType.REVOKE_REGISTRATION],
+    false
+  )
+  const payload = generator.event.actions.reinstateRegistration(event.id, {
+    waitFor: false
+  })
+
+  mockActionApi(ActionType.REINSTATE_REGISTRATION, status, syncPayload)
+
+  const requested =
+    await client.event.actions.revocation.reinstate.request(payload)
+  const actionId = requestedActionId(
+    requested,
+    ActionType.REINSTATE_REGISTRATION
+  )
+
+  return {
+    actionId,
+    eventId: event.id,
+    accept: async (overridePayload?: Record<string, unknown>) =>
+      confirmer.event.actions.revocation.reinstate.accept({
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId
+      }),
+    reject: async (overridePayload?: Record<string, unknown>) =>
+      confirmer.event.actions.revocation.reinstate.reject({
+        ...withOverride(payload, overridePayload),
+        eventId: event.id,
+        transactionId: getUUID(),
+        actionId,
+        waitFor: false
+      })
+  }
+}
+
 const PENDING_ACTIONS = {
   [ActionType.NOTIFY]: requestPendingNotify,
   [ActionType.DECLARE]: requestPendingDeclare,
@@ -660,6 +749,8 @@ const PENDING_ACTIONS = {
   [ActionType.REQUEST_CORRECTION]: requestPendingRequestCorrection,
   [ActionType.APPROVE_CORRECTION]: requestPendingApproveCorrection,
   [ActionType.REJECT_CORRECTION]: requestPendingRejectCorrection,
+  [ActionType.REVOKE_REGISTRATION]: requestPendingRevokeRegistration,
+  [ActionType.REINSTATE_REGISTRATION]: requestPendingReinstateRegistration,
   [ActionType.CUSTOM]: requestPendingCustom
 } satisfies Record<
   ConfirmableActionType,
@@ -966,7 +1057,9 @@ describe.each(Object.entries(PENDING_ACTIONS))(
       ActionType.REJECT_CORRECTION,
       ActionType.APPROVE_CORRECTION,
       ActionType.ARCHIVE,
-      ActionType.UNARCHIVE
+      ActionType.UNARCHIVE,
+      ActionType.REVOKE_REGISTRATION,
+      ActionType.REINSTATE_REGISTRATION
     ]
 
     // NOTIFY has the DECLARE review fields too: its review is generated from DECLARE's in the fixture

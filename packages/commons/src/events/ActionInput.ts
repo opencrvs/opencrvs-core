@@ -173,6 +173,28 @@ export const UnarchiveActionInput = BaseActionInput.extend(
 )
 export type UnarchiveActionInput = z.infer<typeof UnarchiveActionInput>
 
+export const RevokeRegistrationActionInput = BaseActionInput.extend(
+  z.object({
+    type: z
+      .literal(ActionType.REVOKE_REGISTRATION)
+      .default(ActionType.REVOKE_REGISTRATION)
+  }).shape
+)
+export type RevokeRegistrationActionInput = z.infer<
+  typeof RevokeRegistrationActionInput
+>
+
+export const ReinstateRegistrationActionInput = BaseActionInput.extend(
+  z.object({
+    type: z
+      .literal(ActionType.REINSTATE_REGISTRATION)
+      .default(ActionType.REINSTATE_REGISTRATION)
+  }).shape
+)
+export type ReinstateRegistrationActionInput = z.infer<
+  typeof ReinstateRegistrationActionInput
+>
+
 export const AssignActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.ASSIGN),
@@ -280,6 +302,12 @@ export const ActionInput = z
     }),
     ArchiveActionInput.meta({ id: 'ArchiveActionInput' }),
     UnarchiveActionInput.meta({ id: 'UnarchiveActionInput' }),
+    RevokeRegistrationActionInput.meta({
+      id: 'RevokeRegistrationActionInput'
+    }),
+    ReinstateRegistrationActionInput.meta({
+      id: 'ReinstateRegistrationActionInput'
+    }),
     AssignActionInput.meta({ id: 'AssignActionInput' }),
     UnassignActionInput.meta({ id: 'UnassignActionInput' }),
     PrintCertificateActionInput.meta({ id: 'PrintCertificateActionInput' }),
