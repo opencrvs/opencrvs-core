@@ -40,6 +40,11 @@ import {
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
 
+/** `0` and `false` are values; an empty string means nothing was entered. */
+function isMissingQueryValue(value: unknown) {
+  return value === undefined || value === null || value === ''
+}
+
 /**
  * If the value referenced in a query is missing, the query resolves to null
  * The `and` query resolves to null if any of the sub-queries is null,
@@ -120,7 +125,7 @@ export function generateElasticsearchQuery(
     eventIndex.declaration,
     resolveFieldPath(queryInput.fieldId)
   )
-  if (!queryValue) {
+  if (isMissingQueryValue(queryValue)) {
     logger.warn(
       `No value found for field ${queryInput.fieldId} in the current event. Skipping query clause.`
     )

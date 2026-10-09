@@ -2,6 +2,10 @@
 
 ## 1.9.21 Release Candidate
 
+### Bug fixes
+
+- A deduplication rule that matches on a number field with the value `0`, or on an unticked checkbox, now matches as configured. The clause was treated as having no value and dropped, and inside an `and` that switched off the whole rule. An empty text value still counts as no value. [#13897](https://github.com/opencrvs/opencrvs-core/issues/13897)
+
 ## 1.9.20
 
 ### Bug fixes
