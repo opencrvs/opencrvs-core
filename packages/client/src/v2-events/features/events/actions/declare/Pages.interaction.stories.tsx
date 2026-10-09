@@ -307,6 +307,15 @@ export const DraftShownInForm: Story = {
         userEvent.click(await canvas.findByRole('button', { name: /Drafts/ })),
       { timeout: 5000 }
     )
+    // The drafts list is keyed on the outbox size, so it remounts once the
+    // draft leaves the outbox. Clicking a row before that hits a detached node.
+    await waitFor(
+      async () =>
+        expect(
+          await canvas.findByTestId('navigation_workqueue_outbox')
+        ).toHaveTextContent(/^Outbox$/),
+      { timeout: 5000 }
+    )
     await userEvent.click(await canvas.findByText('Clearly Draft'))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
