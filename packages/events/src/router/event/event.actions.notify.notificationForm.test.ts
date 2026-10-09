@@ -48,10 +48,12 @@ const generatedNotifyAction = (() => {
     eventConfiguration: tennisClubMembershipEvent,
     actionType: ActionType.NOTIFY
   })
-  if (action?.type !== ActionType.NOTIFY || !action.review) {
-    throw new Error('Expected a NOTIFY action with a review')
+
+  if (action?.type !== ActionType.NOTIFY) {
+    throw new Error('Expected a NOTIFY action')
   }
-  return { ...action, review: action.review }
+
+  return action
 })()
 
 function withNotifyReviewFields(
