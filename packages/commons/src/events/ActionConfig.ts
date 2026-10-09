@@ -85,13 +85,11 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
-    /** Notification form configuration, which must include a subset of the declaration form fields. The values submitted on the notification form will be used as pre-filled values during declaration. If notificationForm is not defined, we fallback to the declare form.  */
     notificationForm: DeclarationFormConfig.optional().describe(
-      'Notification form configuration, which must include a subset of the declaration form fields. The values submitted on the notification form will be used as pre-filled values during declaration. If notificationForm is not defined, we fallback to the declare form.'
+      "Notification form configuration. Its fields must be a subset of the declaration form fields, with matching types. The values submitted on the notification form pre-fill the declaration. When not defined, the declare action's notification form is used (with all fields optional)."
     ),
-    /** Review page configuration for the notify action. */
     review: DeclarationReviewConfig.optional().describe(
-      'Review page configuration for the notify action.'
+      "Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation. When not defined, the declare action's notification form is used (with all fields optional)."
     ),
     form: actionConfirmationForm
   }).shape
@@ -307,12 +305,12 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+        'Configuration for the notify action, including the notification form and its review page. When absent, defineConfig generates it from the DeclareActionConfig.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+        'Configuration for the declare action. Includes the declaration form and review-page fields.'
     }),
     DuplicateDetectedConfig.meta({
       id: 'DuplicateDetectedActionConfig',

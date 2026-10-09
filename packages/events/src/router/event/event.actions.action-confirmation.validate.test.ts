@@ -969,10 +969,11 @@ describe.each(Object.entries(PENDING_ACTIONS))(
       ActionType.UNARCHIVE
     ]
 
+    // NOTIFY has the DECLARE review fields too: its review is generated from DECLARE's in the fixture
     /* eslint-disable no-nested-ternary */
     const expectedError = nonAnnotableActions.some((na) => na === type)
       ? nonAnnotableActionError
-      : type === ActionType.DECLARE
+      : type === ActionType.DECLARE || type === ActionType.NOTIFY
         ? declareActionError
         : otherDeclarationActionError
 

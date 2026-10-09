@@ -28,7 +28,6 @@ import {
   FieldConfig,
   getActionAnnotationFields,
   ActionType,
-  getActionFormFields,
   getActionConfig,
   findRecordActionPages,
   isVerificationPage,
@@ -224,16 +223,12 @@ export function validateActionPayloadStructure({
       input.type === ActionType.CUSTOM ? input.customActionType : undefined
   })
 
-  const annotationFields = [
-    ...(actionConfig ? getActionAnnotationFields(actionConfig) : []),
-    ...(input.type === ActionType.NOTIFY
-      ? getActionFormFields(eventConfig, ActionType.NOTIFY)
-      : [])
-  ]
+  const annotationFields = actionConfig
+    ? getActionAnnotationFields(actionConfig)
+    : []
 
   // Clean up annotation for actions that do not have one.
-  const annotation =
-    actionConfig || annotationFields.length > 0 ? (input.annotation ?? {}) : {}
+  const annotation = actionConfig ? (input.annotation ?? {}) : {}
 
   const pages = findRecordActionPages(eventConfig, input.type)
 

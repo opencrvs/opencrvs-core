@@ -1355,6 +1355,8 @@ export const generateEventConfig = ({
 }
 
 /**
+ * The notification form is dropped, since it may refer to fields of the replaced declaration.
+ *
  * @returns a copy of the configuration with the DECLARE action's declaration replaced.
  */
 export function withDeclaration(
@@ -1363,9 +1365,18 @@ export function withDeclaration(
 ): EventConfig {
   return {
     ...configuration,
-    actions: configuration.actions.map((action) =>
-      action.type === ActionType.DECLARE ? { ...action, declaration } : action
-    )
+    actions: configuration.actions.map((action) => {
+      if (action.type === ActionType.DECLARE) {
+        return { ...action, declaration }
+      }
+
+      if (action.type === ActionType.NOTIFY) {
+        const { notificationForm: _notificationForm, ...notifyAction } = action
+        return notifyAction
+      }
+
+      return action
+    })
   }
 }
 

@@ -270,8 +270,12 @@ function DeclarationActionComponent({
       return {}
     }
 
-    return getAnnotationForActionType({ event, actionType: previousActionType })
-  }, [event, actionType])
+    return getAnnotationForActionType({
+      event,
+      eventConfiguration: configuration,
+      actionType: previousActionType
+    })
+  }, [event, configuration, actionType])
 
   useEffect(() => {
     // Use the form values from the zustand state, so that filled form state is not lost
