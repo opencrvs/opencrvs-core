@@ -47,6 +47,19 @@ function validateCIDRs(input: string): true | string {
   return true
 }
 
+
+const GITHUB_REPOSITORY_PATTERN =
+  /^(?:(?:https:\/\/|git@)github\.com[/:])?([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/
+
+/**
+ * Accepts a GitHub URL (https or ssh) or a plain `owner/repo` and returns `owner/repo`,
+ * which is the format expected by `actions/checkout`.
+ */
+function toGithubRepositorySlug(input: string) {
+  const match = input.trim().match(GITHUB_REPOSITORY_PATTERN)
+  return match ? `${match[1]}/${match[2]}` : undefined
+}
+
 export const dockerhubQuestions = [
   {
     name: 'dockerhubOrganisation',
@@ -154,6 +167,24 @@ export const githubTokenQuestion = [
   }
 ]
 
+export const e2eQuestions = [
+  {
+    name: 'countryconfigRepository',
+    type: 'text' as const,
+    message:
+      'What is your country configuration repository? (e.g. https://github.com/opencrvs/opencrvs-farajaland)',
+    valueType: 'VARIABLE' as const,
+    valueLabel: 'COUNTRYCONFIG_REPOSITORY',
+    validate: (value: string) =>
+      toGithubRepositorySlug(value)
+        ? true
+        : 'Please enter a GitHub repository URL or owner/repository',
+    format: (value: string) => toGithubRepositorySlug(value) ?? value,
+    initial: process.env.COUNTRYCONFIG_REPOSITORY,
+    scope: 'REPOSITORY' as const
+  }
+]
+
 export const countryQuestions = [
   {
     name: 'country',
@@ -214,7 +245,7 @@ export const infrastructureQuestions = [
     valueLabel: 'KUBE_API_ALLOWED_CIDRS',
     initial: process.env.KUBE_API_ALLOWED_CIDRS || '',
     scope: 'ENVIRONMENT' as const
-  },
+  }
 ]
 
 export const staticSSLCertQuestions = [
