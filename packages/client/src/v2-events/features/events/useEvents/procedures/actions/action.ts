@@ -263,6 +263,12 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
 })
 
+type Params = Parameters<typeof useMutation>[0]
+
+interface Options extends Params {
+  customActionType?: string
+}
+
 /**
  * A custom hook that wraps a tRPC mutation procedure for event actions.
  *
@@ -304,7 +310,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     ...mutationOptions
   })
 
-  type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
+  type ActionMutationInput = inferInput<P> & {
+    fullEvent?: EventDocument
+    customActionType?: string
+  }
 
   function getMutationPayload(params: ActionMutationInput) {
     const { eventId, fullEvent, event, context, ...restParams } = params
@@ -338,7 +347,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     const actionConfig = getActionConfig({
       eventConfiguration,
       actionType,
-      customActionType: undefined
+      customActionType: params.customActionType
     })
 
     const localFullEvent =
@@ -391,15 +400,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 
   return {
-    mutate: (
-      params: ActionMutationInput,
-      options?: Parameters<typeof useMutation>[0]
-    ) => mutation.mutate(getMutationPayload(params), options),
-
-    mutateAsync: async (
-      params: ActionMutationInput,
-      options?: Parameters<typeof useMutation>[0]
-    ) => mutation.mutateAsync(getMutationPayload(params), options),
+    mutate: (params: ActionMutationInput) =>
+      mutation.mutate(getMutationPayload(params)),
+    mutateAsync: async (params: ActionMutationInput) =>
+      mutation.mutateAsync(getMutationPayload(params)),
     isPending: mutation.isPending
   }
 }
