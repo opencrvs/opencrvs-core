@@ -27,7 +27,8 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
-  validateExactlyOneDeclareAction
+  validateExactlyOneDeclareAction,
+  validateNotificationForm
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -59,8 +60,14 @@ type DeclareActionConfigInput = Extract<
   { type: typeof ActionType.DECLARE }
 >
 
+type NotifyActionConfigInput = Extract<
+  ActionConfigInput,
+  { type: typeof ActionType.NOTIFY }
+>
+
 /**
- * Input accepted by `EventConfig.parse`. `declaration` lives only on the DECLARE action.
+ * Input accepted by `EventConfig.parse`. `declaration` lives only on the DECLARE action,
+ * and NOTIFY carries its `notificationForm` and `review`.
  */
 type EventConfigSchemaInput = Omit<
   EventConfig,
@@ -86,14 +93,24 @@ type EventConfigSchemaInput = Omit<
  * `declaration` may be given at the top level (kept for backwards compatibility)
  * or on the DECLARE action.
  * `defineConfig` checks at runtime that it is given in exactly one of these places.
+ *
+ * The NOTIFY action, and its `notificationForm` and `review`, are optional.
+ * `defineConfig` generates whatever is missing from the DECLARE action.
  */
 export type EventConfigInput = Omit<EventConfigSchemaInput, 'actions'> & {
   /** @deprecated Define `declaration` on the DECLARE action instead. */
   declaration?: DeclarationFormConfigInput
   actions: Array<
-    | Exclude<ActionConfigInput, DeclareActionConfigInput>
+    | Exclude<
+        ActionConfigInput,
+        DeclareActionConfigInput | NotifyActionConfigInput
+      >
     | (Omit<DeclareActionConfigInput, 'declaration'> & {
         declaration?: DeclarationFormConfigInput
+      })
+    | (Omit<NotifyActionConfigInput, 'notificationForm' | 'review'> & {
+        notificationForm?: NotifyActionConfigInput['notificationForm']
+        review?: NotifyActionConfigInput['review']
       })
   >
 }
@@ -173,9 +190,11 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigSchemaInput> =
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
   _EventConfigBase
     .superRefine((event, ctx) => {
+      // This validation is made to early return, since following validations depend on the declare action being present and correctly configured.
       if (!validateExactlyOneDeclareAction(event, ctx)) {
         return
       }
+      validateNotificationForm(event, ctx)
       validateAdvancedSearchConfig(event, ctx)
       validateDateOfEvent(event, ctx)
       validatePlaceOfEvent(event, ctx)

@@ -55,7 +55,8 @@ import {
   ActionConfigTypes,
   DeclareActionConfig
 } from './ActionConfig'
-import { FormConfig } from './FormConfig'
+import { DeclarationFormConfig, FormConfig } from './FormConfig'
+import { deriveNotificationForm } from './notificationFormFallback'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import {
@@ -99,6 +100,60 @@ export function getDeclarationFields(
   return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
 }
 
+/**
+ * @returns the notification form configured on the NOTIFY action, or undefined when none is configured.
+ */
+function getConfiguredNotificationForm(configuration: EventConfig) {
+  const notifyAction = configuration.actions.find(
+    (action) => action.type === ActionType.NOTIFY
+  )
+
+  return notifyAction?.type === ActionType.NOTIFY
+    ? notifyAction.notificationForm
+    : undefined
+}
+
+/**
+ * Derived notification forms are cached per configuration, since deriving one copies the whole declaration.
+ */
+const derivedNotificationForms = new WeakMap<
+  EventConfig,
+  DeclarationFormConfig
+>()
+
+/**
+ * @returns the notification form of the event: the one configured on the NOTIFY action,
+ * or the declaration with every field optional when none is configured.
+ *
+ * The fallback is derived here rather than in `defineConfig`, so that it is not part of the
+ * served event configuration.
+ */
+export function getNotificationForm(
+  configuration: EventConfig
+): DeclarationFormConfig {
+  const configured = getConfiguredNotificationForm(configuration)
+  if (configured) {
+    return configured
+  }
+
+  const cached = derivedNotificationForms.get(configuration)
+  if (cached) {
+    return cached
+  }
+
+  const derived = deriveNotificationForm(getDeclaration(configuration))
+  derivedNotificationForms.set(configuration, derived)
+  return derived
+}
+
+export function getNotificationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return getNotificationForm(configuration).pages.flatMap(
+    ({ fields }) => fields
+  )
+}
+
 export function isActionConfigType(
   type: ActionType
 ): type is ActionConfigTypes {
@@ -107,7 +162,7 @@ export function isActionConfigType(
 }
 
 // @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
-// instead of the current wide `ActionConfig | undefined`. Note NOTIFY's fallback to DECLARE needs special-casing in the return type, since it can resolve to a DeclareConfig.
+// instead of the current wide `ActionConfig | undefined`.
 // Perhaps this function should also throw an error if the action config is not found.
 export function getActionConfig({
   eventConfiguration,
@@ -118,14 +173,6 @@ export function getActionConfig({
   actionType: DisplayableAction
   customActionType?: string
 }): ActionConfig | undefined {
-  // Notify uses its own config when present, otherwise falls back to declare
-  if (actionType === ActionType.NOTIFY) {
-    return (
-      eventConfiguration.actions.find((a) => a.type === ActionType.NOTIFY) ??
-      eventConfiguration.actions.find((a) => a.type === ActionType.DECLARE)
-    )
-  }
-
   return eventConfiguration.actions.find((a) => {
     // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
     if (a.type === ActionType.CUSTOM && customActionType) {
@@ -155,10 +202,6 @@ export function getCustomActionFields(
 
 /**
  * Returns the fields configured for an action's confirmation dialog.
- *
- * Unlike review fields and supporting copy, NOTIFY does NOT fall back to the
- * DECLARE config here: dialog fields always come from the action's own
- * configuration entry.
  */
 export function getActionFormFields(
   eventConfiguration: EventConfig,
@@ -661,6 +704,10 @@ export function isWriteAction(actionType: ActionType): boolean {
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
+    // Only a configured notification form: a derived one repeats the declaration fields.
+    ...(getConfiguredNotificationForm(config)?.pages.flatMap(
+      ({ fields }) => fields
+    ) ?? []),
     ...getAllAnnotationFields(config)
   ])
 }

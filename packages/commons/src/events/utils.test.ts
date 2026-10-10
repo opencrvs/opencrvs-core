@@ -21,10 +21,12 @@ import {
 } from './ActionDocument'
 import { EventDocument } from './EventDocument'
 import { EventConfig } from './EventConfig'
+import { ActionConfig } from './ActionConfig'
 import { ActionType } from './ActionType'
 import {
   aggregateActionDeclarations,
   dropSecuredDeclarationFields,
+  findAllFields,
   findLastAssignmentAction,
   getActionAnnotationFields,
   getActionConfig,
@@ -35,6 +37,8 @@ import {
   getDeclarationAfterEachAction,
   getDeclarationFields,
   getMixedPath,
+  getNotificationFields,
+  getNotificationForm,
   getPendingAction,
   omitHiddenPaginatedFields
 } from './utils'
@@ -955,64 +959,6 @@ describe('getCompleteActionContent', () => {
   })
 })
 
-describe('getActionConfig() – NOTIFY fallback and isolation', () => {
-  const configWithoutNotify = {
-    actions: [
-      {
-        type: ActionType.DECLARE,
-        label: { id: 'declare', defaultMessage: 'Declare', description: '' }
-      }
-    ]
-  }
-
-  const configWithNotify = {
-    actions: [
-      {
-        type: ActionType.NOTIFY,
-        label: { id: 'notify', defaultMessage: 'Notify', description: '' }
-      },
-      {
-        type: ActionType.DECLARE,
-        label: { id: 'declare', defaultMessage: 'Declare', description: '' }
-      }
-    ]
-  }
-
-  const configWithoutEither = { actions: [] }
-
-  it('falls back to DECLARE config when no NOTIFY config is present', () => {
-    const result = getActionConfig({
-      eventConfiguration: configWithoutNotify as unknown as EventConfig,
-      actionType: ActionType.NOTIFY
-    })
-    expect(result?.type).toBe(ActionType.DECLARE)
-  })
-
-  it('returns NOTIFY config when present', () => {
-    const result = getActionConfig({
-      eventConfiguration: configWithNotify as unknown as EventConfig,
-      actionType: ActionType.NOTIFY
-    })
-    expect(result?.type).toBe(ActionType.NOTIFY)
-  })
-
-  it('returns DECLARE config independently when NOTIFY config is also present', () => {
-    const result = getActionConfig({
-      eventConfiguration: configWithNotify as unknown as EventConfig,
-      actionType: ActionType.DECLARE
-    })
-    expect(result?.type).toBe(ActionType.DECLARE)
-  })
-
-  it('returns undefined when neither NOTIFY nor DECLARE config exists', () => {
-    const result = getActionConfig({
-      eventConfiguration: configWithoutEither as unknown as EventConfig,
-      actionType: ActionType.NOTIFY
-    })
-    expect(result).toBeUndefined()
-  })
-})
-
 describe('getActionConfig(): correction actions resolve independently', () => {
   const configWithAllCorrectionActions = {
     actions: [
@@ -1278,11 +1224,6 @@ describe('getDeclarationAfterEachAction', () => {
 })
 
 describe('getDeclaration() and withDeclaration()', () => {
-  const declaration = {
-    ...getDeclaration(tennisClubMembershipEvent),
-    pages: []
-  }
-
   it('should read the declaration from the DECLARE action', () => {
     const declareAction = tennisClubMembershipEvent.actions.find(
       (action) => action.type === ActionType.DECLARE
@@ -1306,17 +1247,119 @@ describe('getDeclaration() and withDeclaration()', () => {
     )
   })
 
-  it('should replace the declaration on the DECLARE action only', () => {
-    const config = withDeclaration(tennisClubMembershipEvent, declaration)
+  it('should replace the declaration on the DECLARE action, and generate the notification form from it', () => {
+    const firstPageOnly = {
+      ...getDeclaration(tennisClubMembershipEvent),
+      pages: getDeclaration(tennisClubMembershipEvent).pages.slice(0, 1)
+    }
+    const config = withDeclaration(tennisClubMembershipEvent, firstPageOnly)
+    const isOtherAction = (action: ActionConfig) =>
+      action.type !== ActionType.DECLARE && action.type !== ActionType.NOTIFY
+    const notificationFields = getNotificationFields(config)
 
-    expect(getDeclaration(config)).toBe(declaration)
-    expect(
-      config.actions.filter((action) => action.type !== ActionType.DECLARE)
-    ).toEqual(
-      tennisClubMembershipEvent.actions.filter(
-        (action) => action.type !== ActionType.DECLARE
-      )
+    expect(getDeclaration(config)).toBe(firstPageOnly)
+    expect(notificationFields.map(({ id }) => id)).toEqual(
+      firstPageOnly.pages[0].fields.map(({ id }) => id)
+    )
+    expect(notificationFields.length).toBeLessThan(
+      getNotificationFields(tennisClubMembershipEvent).length
+    )
+    expect(notificationFields.every(({ required }) => !required)).toBe(true)
+    expect(config.actions.filter(isOtherAction)).toEqual(
+      tennisClubMembershipEvent.actions.filter(isOtherAction)
     )
     expect(getDeclaration(tennisClubMembershipEvent).pages).not.toHaveLength(0)
+    expect(getNotificationForm(tennisClubMembershipEvent)).toBeDefined()
+  })
+})
+
+describe('getNotificationForm() / getNotificationFields()', () => {
+  const firstPage = getDeclaration(tennisClubMembershipEvent).pages[0]
+  const configuredForm = {
+    ...getDeclaration(tennisClubMembershipEvent),
+    pages: [{ ...firstPage, fields: firstPage.fields.slice(0, 2) }]
+  }
+
+  const withNotificationForm = (
+    notificationForm: typeof configuredForm
+  ): EventConfig => ({
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.NOTIFY
+        ? { ...action, notificationForm }
+        : action
+    )
+  })
+
+  it('returns the configured notification form and its fields', () => {
+    const config = withNotificationForm(configuredForm)
+
+    expect(getNotificationForm(config)).toBe(configuredForm)
+    expect(getNotificationFields(config)).toEqual(firstPage.fields.slice(0, 2))
+  })
+
+  it('derives the notification form from the declaration, with every field optional, when none is configured', () => {
+    const notificationFields = getNotificationFields(tennisClubMembershipEvent)
+
+    expect(notificationFields.map(({ id }) => id)).toEqual(
+      getDeclarationFields(tennisClubMembershipEvent).map(({ id }) => id)
+    )
+    expect(notificationFields.every(({ required }) => !required)).toBe(true)
+    expect(
+      getDeclarationFields(tennisClubMembershipEvent).some(
+        ({ required }) => required
+      )
+    ).toBe(true)
+  })
+
+  it('derives the notification form once per configuration', () => {
+    expect(getNotificationForm(tennisClubMembershipEvent)).toBe(
+      getNotificationForm(tennisClubMembershipEvent)
+    )
+  })
+
+  it('derives the notification form from the declaration when the event has no NOTIFY action', () => {
+    const config = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.filter(
+        (action) => action.type !== ActionType.NOTIFY
+      )
+    }
+
+    expect(getNotificationFields(config).map(({ id }) => id)).toEqual(
+      getDeclarationFields(config).map(({ id }) => id)
+    )
+  })
+})
+
+describe('findAllFields()', () => {
+  it('includes the fields of a configured notification form', () => {
+    const notificationForm = {
+      ...getDeclaration(tennisClubMembershipEvent),
+      pages: getDeclaration(tennisClubMembershipEvent).pages.slice(0, 1)
+    }
+    const config: EventConfig = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.NOTIFY
+          ? { ...action, notificationForm }
+          : action
+      )
+    }
+    const allFields = findAllFields(config)
+
+    for (const notificationField of getNotificationFields(config)) {
+      expect(allFields).toContain(notificationField)
+    }
+  })
+
+  it('does not repeat the declaration fields when no notification form is configured', () => {
+    const allFields = findAllFields(tennisClubMembershipEvent)
+
+    for (const notificationField of getNotificationFields(
+      tennisClubMembershipEvent
+    )) {
+      expect(allFields).not.toContain(notificationField)
+    }
   })
 })
