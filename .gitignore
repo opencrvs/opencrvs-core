@@ -47,3 +47,5 @@ deploy_key
 *.local.md
 # swc plugin cache
 .swc/
+# playwright mcp output
+.playwright-mcp/

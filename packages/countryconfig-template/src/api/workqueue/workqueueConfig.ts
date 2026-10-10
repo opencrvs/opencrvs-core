@@ -269,9 +269,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
         anyOf: ['pending-first-certificate-issuance'],
-        noneOf: ['revoked', InherentFlags.CORRECTION_REQUESTED]
+        noneOf: [InherentFlags.CORRECTION_REQUESTED]
       }
     },
     action: { type: ActionType.PRINT_CERTIFICATE },
@@ -291,9 +292,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
         anyOf: ['certified-copy-printed-in-advance-of-issuance'],
-        noneOf: ['revoked', InherentFlags.CORRECTION_REQUESTED]
+        noneOf: [InherentFlags.CORRECTION_REQUESTED]
       }
     },
     action: { type: ActionType.READ },
@@ -313,9 +315,9 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
-        anyOf: [InherentFlags.CORRECTION_REQUESTED],
-        noneOf: ['revoked']
+        anyOf: [InherentFlags.CORRECTION_REQUESTED]
       }
     },
     action: { type: ActionType.READ }
