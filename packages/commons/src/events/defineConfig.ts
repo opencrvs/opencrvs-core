@@ -13,6 +13,10 @@ import * as z from 'zod/v4'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType } from './ActionType'
 import {
+  generateNotificationForm,
+  generateNotifyReview
+} from './notificationFormFallback'
+import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
 } from './eventConfigValidation'
@@ -42,6 +46,93 @@ function moveDeclarationToDeclareAction({
   }
 }
 
+type ActionConfigInput = EventConfigInput['actions'][number]
+
+type DeclareActionConfigInput = Extract<
+  ActionConfigInput,
+  { type: typeof ActionType.DECLARE }
+>
+
+type NotifyActionConfigInput = Extract<
+  ActionConfigInput,
+  { type: typeof ActionType.NOTIFY }
+>
+
+/**
+ * Fallback for events without a configured notification form or NOTIFY review.
+ *
+ * - Without a NOTIFY action, one is created from the DECLARE action.
+ * - Without `notificationForm`, it is generated from the declaration with every field optional, and a warning is logged.
+ * - Without `review`, it is generated from the DECLARE review with every field optional.
+ *
+ * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
+ * Expects the `declaration` to already be on the DECLARE action.
+ */
+function generateNotificationFormFallback(
+  config: Omit<EventConfigInput, 'declaration'>
+) {
+  const declareAction = config.actions.find(
+    (action): action is DeclareActionConfigInput =>
+      action.type === ActionType.DECLARE
+  )
+
+  const notifyAction = config.actions.find(
+    (action): action is NotifyActionConfigInput =>
+      action.type === ActionType.NOTIFY
+  )
+
+  // If the NOTIFY action has a notification form and review, return the config as is
+  if (notifyAction?.notificationForm && notifyAction.review) {
+    return config
+  }
+
+  if (!declareAction?.declaration) {
+    throw new Error(
+      `Event '${config.id}' has no ${ActionType.DECLARE} form. Configure \`actions[${ActionType.DECLARE}].declaration\`.`
+    )
+  }
+
+  if (!notifyAction?.notificationForm) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Event '${config.id}' has no ${ActionType.NOTIFY} form. Generated one from the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
+    )
+  }
+
+  const generated = {
+    notificationForm:
+      notifyAction?.notificationForm ??
+      generateNotificationForm(declareAction.declaration),
+    review: notifyAction?.review ?? generateNotifyReview(declareAction.review)
+  }
+
+  if (notifyAction) {
+    return {
+      ...config,
+      actions: config.actions.map((action) =>
+        action === notifyAction ? { ...notifyAction, ...generated } : action
+      )
+    }
+  }
+
+  const notifyFromDeclare: NotifyActionConfigInput = {
+    type: ActionType.NOTIFY,
+    label: declareAction.label,
+    icon: declareAction.icon,
+    conditionals: declareAction.conditionals,
+    flags: declareAction.flags,
+    supportingCopy: declareAction.dialogCopy?.notify,
+    ...generated
+  }
+
+  return {
+    ...config,
+    actions: config.actions.flatMap((action) =>
+      action === declareAction ? [notifyFromDeclare, action] : [action]
+    )
+  }
+}
+
 const EventConfigDefinition = z
   .custom<EventConfigInput>()
   .superRefine((config, ctx) => {
@@ -50,6 +141,7 @@ const EventConfigDefinition = z
     }
   })
   .transform(moveDeclarationToDeclareAction)
+  .transform(generateNotificationFormFallback)
   .pipe(EventConfig)
 
 export const defineConfig = (config: EventConfigInput) =>

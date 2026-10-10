@@ -88,6 +88,7 @@ import {
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
+import { generateNotificationForm } from './notificationFormFallback'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
@@ -1401,6 +1402,8 @@ export const generateEventConfig = ({
 }
 
 /**
+ * The notification form is generated again from the new declaration, since it may refer to fields of the replaced declaration.
+ *
  * @returns a copy of the configuration with the DECLARE action's declaration replaced.
  */
 export function withDeclaration(
@@ -1409,9 +1412,22 @@ export function withDeclaration(
 ): EventConfig {
   return {
     ...configuration,
-    actions: configuration.actions.map((action) =>
-      action.type === ActionType.DECLARE ? { ...action, declaration } : action
-    )
+    actions: configuration.actions.map((action) => {
+      if (action.type === ActionType.DECLARE) {
+        return { ...action, declaration }
+      }
+
+      if (action.type === ActionType.NOTIFY) {
+        return {
+          ...action,
+          notificationForm: DeclarationFormConfig.parse(
+            generateNotificationForm(declaration)
+          )
+        }
+      }
+
+      return action
+    })
   }
 }
 

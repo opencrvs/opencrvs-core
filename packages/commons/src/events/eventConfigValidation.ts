@@ -233,3 +233,59 @@ export function validateDeclarationGivenExactlyOnce(
     })
   }
 }
+
+/**
+ * Validation which ensures that the NOTIFY notificationForm:
+ *  - only includes fields with ids that are also in the declaration form
+ *  - the field types match the ones on the declaration form
+ *
+ * This is because the notification form is used as pre-filled values during declaration.
+ * For now we have made the design decision to not allow fields that are not present in the declaration form.
+ */
+export function validateNotificationForm(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const declarationFields = getDeclarationFields(event)
+
+  event.actions.forEach((action, actionIndex) => {
+    if (action.type !== ActionType.NOTIFY) {
+      return
+    }
+
+    action.notificationForm.pages.forEach((page, pageIndex) => {
+      page.fields.forEach((field, fieldIndex) => {
+        const path = [
+          'actions',
+          actionIndex,
+          'notificationForm',
+          'pages',
+          pageIndex,
+          'fields',
+          fieldIndex
+        ]
+
+        const matchingFields = declarationFields.filter(
+          ({ id }) => id === field.id
+        )
+
+        if (matchingFields.length === 0) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Notification form field '${field.id}' does not exist in the declaration form of event '${event.id}'. Notification form fields must also be defined in the ${ActionType.DECLARE} action's declaration.`,
+            path
+          })
+          return
+        }
+
+        if (!matchingFields.some(({ type }) => type === field.type)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Notification form field '${field.id}' is of type ${field.type}, but the declaration form field with the same id in event '${event.id}' is of type ${matchingFields[0].type}.`,
+            path
+          })
+        }
+      })
+    })
+  })
+}
