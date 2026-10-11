@@ -36,11 +36,11 @@ function toOptionalField<F extends FieldConfig | FieldConfigInput>(
     return {
       ...rest,
       required: false,
-      fields: rest.fields.map(toOptionalField)
-    }
+      fields: (rest.fields as F[]).map(toOptionalField)
+    } as F
   }
 
-  return { ...rest, required: false }
+  return { ...rest, required: false } as F
 }
 
 /** @returns the declaration form with every field optional. */
