@@ -84,6 +84,10 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.REGISTERED
         case ActionType.NOTIFY:
           return EventStatus.enum.NOTIFIED
+        case ActionType.REVOKE_REGISTRATION:
+          return EventStatus.enum.REVOKED
+        case ActionType.REINSTATE_REGISTRATION:
+          return EventStatus.enum.REGISTERED
         // Already filtered out above; listed here only to satisfy exhaustiveness.
         case ActionType.ARCHIVE:
         case ActionType.UNARCHIVE:
@@ -296,7 +300,7 @@ export function getCurrentEventState(
 
   const declaration = aggregateActionDeclarations(event)
   const status = getStatusFromActions(sortedActions)
-  const legalStatuses = getLegalStatuses(sortedActions)
+  const legalStatuses = getLegalStatuses(sortedActions, status)
 
   const base = deepDropNulls({
     id: event.id,

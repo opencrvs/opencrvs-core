@@ -59,7 +59,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
+    '{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} REVOKE_REGISTRATION {Registration revoked} REINSTATE_REGISTRATION {Registration reinstated} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
