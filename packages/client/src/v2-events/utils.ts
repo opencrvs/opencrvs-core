@@ -10,7 +10,7 @@
  */
 import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { IntlShape } from 'react-intl'
+import { defineMessages, IntlShape } from 'react-intl'
 import {
   ActionDocument,
   EventConfig,
@@ -44,6 +44,7 @@ import {
   toNamedVersions,
   VersionedEntity
 } from '@client/v2-events/VersionedLocation'
+import { findImmediateApproveCorrection } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
   if (typeof name === 'string') {
@@ -156,14 +157,32 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   return uniq(userIds)
 }
 
+const recordActionMessages = defineMessages({
+  requestCorrection: {
+    id: 'events.documents.requestCorrection',
+    defaultMessage: 'Request correction'
+  }
+})
+
 /**
  * The human-readable name of an action, taken from its configured 'label' (e.g. "Declare").
+ *
+ * A direct correction is stored as a correction request that its requester approves immediately, so both share the same action.
+ * Only the direct correction keeps the configured label; `acceptedActions` are the record's actions used to tell the two apart.
  */
 export function getRecordActionLabel(
   action: ActionDocument,
+  acceptedActions: ActionDocument[],
   eventConfiguration: EventConfig,
   intl: IntlShape
 ): string {
+  if (
+    action.type === ActionType.REQUEST_CORRECTION &&
+    !findImmediateApproveCorrection(acceptedActions, action)
+  ) {
+    return intl.formatMessage(recordActionMessages.requestCorrection)
+  }
+
   if (isActionConfigType(action.type)) {
     const actionConfig = getActionConfig({
       eventConfiguration,

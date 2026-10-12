@@ -10,6 +10,7 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import { format, subDays } from 'date-fns'
+import { faker } from '@faker-js/faker'
 import {
   getToken,
   login,
@@ -23,7 +24,13 @@ import {
   mockNetworkConditions,
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction,
+  type,
+  waitForCorrectionAction
+} from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import {
   createDeclaration,
@@ -270,6 +277,114 @@ test('Documents tab lists only the file added to a multi-file document during an
     await expect(
       documentRow(page, "Proof of mother's ID (Passport)")
     ).toHaveCount(1)
+  })
+})
+
+test('Documents tab tells correction request documents apart from direct correction documents', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const { declaration, trackingId } = await createDeclaration(
+    token,
+    undefined,
+    ActionType.REGISTER
+  )
+
+  async function openRecord() {
+    await type(page, '#searchText', trackingId!)
+    await page.locator('#searchIconButton').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+  }
+
+  async function fillCorrectionDetails(supportingDocument: string) {
+    await page.locator('#requester____type').click()
+    await page.getByText('Legal Guardian', { exact: true }).click()
+    await page.locator('#reason____option').click()
+    await page
+      .getByText('Myself or an agent made a mistake (Clerical error)', {
+        exact: true
+      })
+      .click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await page.getByRole('button', { name: 'Verified' }).click()
+
+    await page.getByText('Select', { exact: true }).click()
+    await page.getByText(supportingDocument, { exact: true }).click()
+    await uploadImage(
+      page,
+      page.locator('button[name="documents____supportingDocs"]')
+    )
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await page.locator('#fees____amount').fill('10')
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await page.getByTestId('change-button-child.name').click()
+    await page.getByTestId('text__firstname').fill(faker.person.firstName())
+    await page.getByRole('button', { name: 'Go to review' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+
+  await test.step('Registration Officer requests a correction with an affidavit', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await openRecord()
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await selectAction(page, 'Correct')
+
+    await fillCorrectionDetails('Affidavit')
+
+    const correctionRequest = page.waitForResponse(
+      (res) =>
+        res.url().includes('event.actions.correction.request') && res.ok()
+    )
+    await page
+      .getByRole('button', { name: 'Submit correction request' })
+      .click()
+    await page.getByRole('button', { name: 'Confirm' }).click()
+    await correctionRequest
+  })
+
+  await test.step('Registrar rejects the correction request', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await openRecord()
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await selectAction(page, 'Review correction request')
+
+    await page.getByRole('button', { name: 'Reject', exact: true }).click()
+    await page.locator('#reject-correction-reason').fill('No legal proof')
+    await waitForCorrectionAction(page, 'reject', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
+  })
+
+  await test.step('Registrar corrects the record directly with a court document', async () => {
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await selectAction(page, 'Correct')
+
+    await fillCorrectionDetails('Court Document')
+
+    await page.getByRole('button', { name: 'Correct' }).click()
+    await waitForCorrectionAction(page, 'approve', async () => {
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    })
+    await expectInUrl(page, `/events/`)
+  })
+
+  await test.step('Documents tab labels each document with the correction action that added it', async () => {
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+
+    await switchEventTab(page, 'Documents')
+
+    await expect(
+      documentRow(page, 'Supporting documents (Affidavit)')
+    ).toContainText('Request correction')
+    await expect(
+      documentRow(page, 'Supporting documents (Court Document)')
+    ).toContainText('Correct')
+    await expect(
+      documentRow(page, 'Supporting documents (Court Document)')
+    ).not.toContainText('Request correction')
   })
 })
 

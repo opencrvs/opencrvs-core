@@ -231,6 +231,7 @@ function DocumentsContent({ event }: { event: EventDocument }) {
     () => collectDocuments(event, eventConfiguration),
     [event, eventConfiguration]
   )
+  const acceptedActions = getAcceptedActions(event)
 
   const columns = [
     // Padding column
@@ -286,6 +287,7 @@ function DocumentsContent({ event }: { event: EventDocument }) {
       document: <DocumentNameCell file={entry.file} name={documentName} />,
       recordAction: getRecordActionLabel(
         entry.action,
+        acceptedActions,
         eventConfiguration,
         intl
       ),
