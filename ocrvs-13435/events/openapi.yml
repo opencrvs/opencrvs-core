@@ -1890,6 +1890,7 @@ components:
         status:
           anyOf:
             - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/NoneOfStatus"
             - $ref: "#/components/schemas/ExactStatus"
         createdAt:
           $ref: "#/components/schemas/DateCondition"
@@ -1945,6 +1946,26 @@ components:
         type:
           type: string
           const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum:
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - REGISTERED
+              - REVOKED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+    NoneOfStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          const: noneOf
         terms:
           type: array
           items:
@@ -19057,6 +19078,7 @@ components:
         status:
           anyOf:
             - $ref: "#/components/schemas/AnyOfStatusOutput"
+            - $ref: "#/components/schemas/NoneOfStatusOutput"
             - $ref: "#/components/schemas/ExactStatusOutput"
         createdAt:
           $ref: "#/components/schemas/DateConditionOutput"
@@ -19113,6 +19135,27 @@ components:
         type:
           type: string
           const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum:
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - REGISTERED
+              - REVOKED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+      additionalProperties: false
+    NoneOfStatusOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          const: noneOf
         terms:
           type: array
           items:
@@ -19430,6 +19473,7 @@ components:
                       status:
                         anyOf:
                           - $ref: "#/components/schemas/AnyOfStatusOutput"
+                          - $ref: "#/components/schemas/NoneOfStatusOutput"
                           - $ref: "#/components/schemas/ExactStatusOutput"
                       createdAt:
                         $ref: "#/components/schemas/DateConditionOutput"
@@ -19856,6 +19900,7 @@ components:
                       status:
                         anyOf:
                           - $ref: "#/components/schemas/AnyOfStatusOutput"
+                          - $ref: "#/components/schemas/NoneOfStatusOutput"
                           - $ref: "#/components/schemas/ExactStatusOutput"
                       createdAt:
                         $ref: "#/components/schemas/DateConditionOutput"
