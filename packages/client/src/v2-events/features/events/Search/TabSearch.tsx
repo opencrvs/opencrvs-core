@@ -34,6 +34,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import {
   getAdvancedSearchFieldErrors,
@@ -150,6 +151,7 @@ export function TabSearch({
   const intl = useIntl()
   const navigate = useNavigate()
   const validatorContext = useValidatorContext()
+  const getDefaultValues = useDefaultValue()
   const adminStructure = useAdminStructure()
   const advancedSearchSections = resolveAdvancedSearchConfig(
     currentEvent,
@@ -163,7 +165,18 @@ export function TabSearch({
     )
   }))
 
-  const [formValues, setFormValues] = useState<EventState>(fieldValues)
+  /*
+   *  The counting of nonEmpty values is dependent on default values of hidden
+   *  fields being present, which is why we had to manually include the default
+   *  values here. This is a bug that needs to be addressed later on.
+   */
+  const [formValues, setFormValues] = useState<EventState>(() => {
+    const defaultValues = getDefaultValues(
+      sections.flatMap((sec) => sec.fields),
+      fieldValues
+    )
+    return { ...defaultValues, ...fieldValues }
+  })
 
   const prevEventId = useRef(currentEvent.id)
 

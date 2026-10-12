@@ -85,13 +85,8 @@ export function computeInitialValues(
   return values
 }
 
-export function useFormInitialValues({
-  skipDefaultValues = false
-}: { skipDefaultValues?: boolean } = {}) {
-  const resolveDefaultValue = useDefaultValue()
-  const getDefaultValue = skipDefaultValues
-    ? () => undefined
-    : resolveDefaultValue
+export function useFormInitialValues() {
+  const getDefaultValue = useDefaultValue()
 
   return {
     getInitialValues: (

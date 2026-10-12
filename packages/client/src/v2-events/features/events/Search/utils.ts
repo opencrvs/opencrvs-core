@@ -540,7 +540,11 @@ function applySearchFieldOverridesToFieldConfig(
   const commonConfig = {
     conditionals: searchField.conditionals ?? field.conditionals,
     validation: searchField.validations ?? field.validation,
-    required: false as const
+    required: false as const,
+    // Form defaults apply unless the search field explicitly opts out
+    ...(searchField.useFormDefaultValue === false && {
+      defaultValue: undefined
+    })
   }
   if (field.type === FieldType.DATE && searchField.config.type === 'range') {
     return {

@@ -15,6 +15,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
   ActionType,
+  AdvancedSearchField,
   EventConfig,
   field,
   FieldConfig,
@@ -24,43 +25,57 @@ import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AdvancedSearch } from './index'
 
-const eventWithNameDefault: EventConfig = {
-  ...tennisClubMembershipEvent,
-  actions: tennisClubMembershipEvent.actions.map((action) =>
-    action.type === ActionType.DECLARE
-      ? {
-          ...action,
-          declaration: {
-            ...action.declaration,
-            pages: action.declaration.pages.map((page) => ({
-              ...page,
-              fields: page.fields.map((pageField) =>
-                pageField.id === 'applicant.name'
-                  ? ({
-                      ...pageField,
-                      defaultValue: {
-                        firstname: 'Default',
-                        surname: 'Applicant'
-                      }
-                    } as FieldConfig)
-                  : pageField
-              )
-            }))
+function eventWithNameDefault(searchField: AdvancedSearchField): EventConfig {
+  return {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.DECLARE
+        ? {
+            ...action,
+            declaration: {
+              ...action.declaration,
+              pages: action.declaration.pages.map((page) => ({
+                ...page,
+                fields: page.fields.map((pageField) =>
+                  pageField.id === 'applicant.name'
+                    ? ({
+                        ...pageField,
+                        defaultValue: {
+                          firstname: 'Default',
+                          surname: 'Applicant'
+                        }
+                      } as FieldConfig)
+                    : pageField
+                )
+              }))
+            }
           }
-        }
-      : action
-  ),
-  advancedSearch: [
-    {
-      title: {
-        defaultMessage: "Applicant's details",
-        description: 'Applicant details search field section title',
-        id: 'event.tennis-club-membership.search.applicants'
-      },
-      fields: [field('applicant.name').fuzzy()]
-    }
-  ]
+        : action
+    ),
+    advancedSearch: [
+      {
+        title: {
+          defaultMessage: "Applicant's details",
+          description: 'Applicant details search field section title',
+          id: 'event.tennis-club-membership.search.applicants'
+        },
+        fields: [searchField]
+      }
+    ]
+  }
 }
+
+const eventWithDefaultSkipped = eventWithNameDefault(
+  field('applicant.name', { useFormDefaultValue: false }).fuzzy()
+)
+
+const eventWithDefaultKept = eventWithNameDefault(
+  field('applicant.name').fuzzy()
+)
+
+const eventWithDefaultEnabled = eventWithNameDefault(
+  field('applicant.name', { useFormDefaultValue: true }).fuzzy()
+)
 
 const meta: Meta<typeof AdvancedSearch> = {
   title: 'AdvancedSearch/Interaction',
@@ -90,10 +105,12 @@ export const DoesNotPrefillDefaultValues: Story = {
       initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
     },
     chromatic: { disableSnapshot: true },
-    offline: { configs: [eventWithNameDefault] },
+    offline: { configs: [eventWithDefaultSkipped] },
     msw: {
       handlers: {
-        events: [tRPCMsw.event.config.get.query(() => [eventWithNameDefault])]
+        events: [
+          tRPCMsw.event.config.get.query(() => [eventWithDefaultSkipped])
+        ]
       }
     }
   },
@@ -118,4 +135,58 @@ export const DoesNotPrefillDefaultValues: Story = {
       await expect(canvas.getByTestId('search')).toBeDisabled()
     })
   }
+}
+
+export const PrefillsDefaultValuesWhenNotOptedOut: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+    },
+    chromatic: { disableSnapshot: true },
+    offline: { configs: [eventWithDefaultKept] },
+    msw: {
+      handlers: {
+        events: [tRPCMsw.event.config.get.query(() => [eventWithDefaultKept])]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open applicant section', async () => {
+      const accordion = await canvas.findByTestId(
+        'accordion-event.tennis-club-membership.search.applicants'
+      )
+      await userEvent.click(
+        within(accordion).getByRole('button', { name: 'Show' })
+      )
+    })
+
+    await step('Name inputs show the form defaults', async () => {
+      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+        'Default'
+      )
+      await expect(canvas.getByTestId('text__surname')).toHaveValue('Applicant')
+    })
+  }
+}
+
+export const PrefillsDefaultValuesWhenEnabled: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+    },
+    chromatic: { disableSnapshot: true },
+    offline: { configs: [eventWithDefaultEnabled] },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => [eventWithDefaultEnabled])
+        ]
+      }
+    }
+  },
+  play: PrefillsDefaultValuesWhenNotOptedOut.play
 }
