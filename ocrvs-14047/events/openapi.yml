@@ -15097,6 +15097,10 @@ components:
                     required:
                       - $jurisdiction
                     additionalProperties: false
+                  useFormDefaultValue:
+                    description: Set to false to open the field empty in advanced search instead of
+                      pre-filled with the declaration form's defaultValue.
+                    type: boolean
                   fieldId:
                     type: string
                   fieldType:
@@ -15414,6 +15418,10 @@ components:
                     required:
                       - $jurisdiction
                     additionalProperties: false
+                  useFormDefaultValue:
+                    description: Set to false to open the field empty in advanced search instead of
+                      pre-filled with the declaration form's defaultValue.
+                    type: boolean
                   fieldId:
                     type: string
                     enum:
