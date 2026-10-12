@@ -14,7 +14,7 @@ import { Check, Help, Cross, NotificationError, Notification } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 

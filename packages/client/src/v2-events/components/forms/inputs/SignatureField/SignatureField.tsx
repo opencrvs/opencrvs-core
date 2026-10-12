@@ -13,10 +13,13 @@ import { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { ImageUploader, InputError } from '@opencrvs/components'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  ImageUploader,
+  InputError,
+  Stack,
+  Button,
+  Icon
+} from '@opencrvs/components'
 import {
   DocumentPath,
   FileFieldValue,

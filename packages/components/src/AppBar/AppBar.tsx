@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { grid } from '../grid'
+import { grid } from '../tokens'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from '../hooks'

@@ -43,8 +43,8 @@ import {
   Dialog,
   Text
 } from '@opencrvs/components'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
+import { Check, Cross } from '@opencrvs/components/icons'
+import { CircleButton } from '@opencrvs/components/legacy'
 import { TRPCClientError } from '@trpc/client'
 import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'

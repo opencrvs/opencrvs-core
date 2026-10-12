@@ -21,7 +21,7 @@ import {
   buttonMessages,
   userMessages
 } from '@client/i18n/messages'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { ChangeEmailModal } from '@client/views/Settings/ChangeEmailModal/ChangeEmailModal'
 

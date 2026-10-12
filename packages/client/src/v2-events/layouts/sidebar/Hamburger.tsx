@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { Button } from '@opencrvs/components/lib/Button'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Button, ExpandingMenu, Icon } from '@opencrvs/components'
 import { Sidebar } from './Sidebar'
 
 export function Hamburger() {

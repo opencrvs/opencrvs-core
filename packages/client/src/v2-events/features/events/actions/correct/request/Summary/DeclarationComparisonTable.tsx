@@ -25,7 +25,7 @@ import {
   isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { Table } from '@opencrvs/components/lib/Table'
+import { Table } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
