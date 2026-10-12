@@ -62,7 +62,8 @@ export type RegistrationCreationMetadata = z.infer<
 export const LegalStatuses = z.object({
   [EventStatus.enum.NOTIFIED]: ActionCreationMetadata.nullish(),
   [EventStatus.enum.DECLARED]: ActionCreationMetadata.nullish(),
-  [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish()
+  [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish(),
+  [EventStatus.enum.REVOKED]: ActionCreationMetadata.nullish()
 })
 
 /**
