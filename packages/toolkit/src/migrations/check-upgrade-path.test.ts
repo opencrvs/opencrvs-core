@@ -62,6 +62,16 @@ describe('checkUpgradePath', () => {
     )
   })
 
+  it('blocks skipping across a major without naming a version that may not exist', () => {
+    const check = checkUpgradePath('1.9.0', '2.1.0')
+
+    expect(check.status).toBe('blocked')
+    expect(check).toHaveProperty(
+      'message',
+      expect.not.stringContaining('npx @opencrvs/toolkit@')
+    )
+  })
+
   it('blocks a country config newer than the toolkit', () => {
     const check = checkUpgradePath('2.3.0', '2.2.0')
 

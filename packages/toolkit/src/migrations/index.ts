@@ -11,6 +11,7 @@
 import { main as addTranslations } from './add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
+import { main as updateToolkitDependency } from './update-toolkit-dependency'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -25,4 +26,6 @@ export async function runUpgrade(toolkitVersion: string) {
   await moveDeclarationToDeclareAction()
   await readDeclarationThroughHelper()
   await addTranslations(`${major}.${minor}`)
+  // Last, so a failed upgrade leaves the version it upgrades from in place
+  await updateToolkitDependency(toolkitVersion)
 }

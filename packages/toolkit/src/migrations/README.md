@@ -1,14 +1,21 @@
 # Country config migrations (codemods)
 
 Codemods run by `opencrvs upgrade` against a country config repo to upgrade it
-to the OpenCRVS version this toolkit is released with: toolkit 2.2.0 upgrades a
-2.1 country config to 2.2. Only the steps for that upgrade live here: when work
-on the next version starts, remove the previous version's steps.
+from the previous minor version to the OpenCRVS version this toolkit is released
+with. For example, toolkit 2.2.0 upgrades a 2.1 country config to 2.2.
 
-Run from inside a country config checkout:
+Only the steps for that upgrade live here: when work on the next version starts,
+remove the previous version's steps. Keep the steps every upgrade runs:
+`add-translations` (see below), `update-toolkit-dependency` and
+`check-upgrade-path`.
+
+Run from inside a country config checkout, with the toolkit of the version to
+upgrade to, before changing the country config's `@opencrvs/toolkit`
+dependency: the upgrade checks which version it upgrades from by that
+dependency, and updates it itself once done.
 
 ```bash
-opencrvs upgrade
+npx @opencrvs/toolkit@2.2 upgrade
 ```
 
 Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/version-upgrades#step-2-update-code-and-test-locally

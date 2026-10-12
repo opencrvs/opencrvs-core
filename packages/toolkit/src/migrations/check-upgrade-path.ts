@@ -19,7 +19,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const TOOLKIT_PACKAGE_NAME = '@opencrvs/toolkit'
+export const TOOLKIT_PACKAGE_NAME = '@opencrvs/toolkit'
 
 interface MajorMinor {
   major: number
@@ -117,14 +117,19 @@ export function checkUpgradePath(
     }
   }
 
-  const next = { major: current.major, minor: current.minor + 1 }
   const upgradesFrom =
     target.minor > 0
       ? format({ major: target.major, minor: target.minor - 1 })
       : `the last ${target.major - 1}.x`
+  // Which minor a major ends on is not known here, so the next version is
+  // named only within a major
+  const nextStep =
+    current.major === target.major
+      ? `: run \`npx ${TOOLKIT_PACKAGE_NAME}@${format({ major: current.major, minor: current.minor + 1 })} upgrade\` first`
+      : ''
 
   return {
     status: 'blocked',
-    message: `The country config is on ${format(current)}, but toolkit ${toolkitVersion} only upgrades from ${upgradesFrom}. Upgrade one minor version at a time: run \`npx ${TOOLKIT_PACKAGE_NAME}@${format(next)} upgrade\` first.`
+    message: `The country config is on ${format(current)}, but toolkit ${toolkitVersion} only upgrades from ${upgradesFrom}. Upgrade one minor version at a time${nextStep}.`
   }
 }

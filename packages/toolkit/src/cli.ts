@@ -73,9 +73,13 @@ Upgrade the country config in the current working directory to this toolkit's
 version of OpenCRVS. Upgrade one minor version at a time: toolkit 2.2 upgrades
 a country config on 2.1.
 
+The upgrade tells which version the country config is on by its
+@opencrvs/toolkit dependency, and updates that dependency itself once done.
+Run it without changing the dependency first, e.g.
+
+  npx @opencrvs/toolkit@2.2 upgrade
+
 Options:
-  --force          Upgrade even if the country config is not on the previous
-                   minor version.
   -h, --help       Show this message.
 `.trim()
 
@@ -177,10 +181,7 @@ async function handleUpgrade() {
     process.exit(0)
   }
 
-  const force = upgradeArgs.includes('--force')
-  const unknownFlags = upgradeArgs.filter(
-    (arg) => arg.startsWith('-') && arg !== '--force'
-  )
+  const unknownFlags = upgradeArgs.filter((arg) => arg.startsWith('-'))
   if (unknownFlags.length > 0) {
     console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
     console.log(UPGRADE_USAGE)
@@ -198,12 +199,8 @@ async function handleUpgrade() {
   }
 
   if (upgradePath.status === 'blocked') {
-    if (!force) {
-      console.error(`${upgradePath.message}\n\nPass --force to upgrade anyway.`)
-      process.exit(1)
-    }
-
-    console.warn(`⚠️  Upgrading anyway (--force): ${upgradePath.message}\n`)
+    console.error(upgradePath.message)
+    process.exit(1)
   }
 
   console.log('Initiating upgrade...')

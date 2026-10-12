@@ -210,6 +210,99 @@ export const birthEvent = defineConfig({
 })`)
   })
 
+  it('moves the comments above and beside the declaration with it', () => {
+    const { text } =
+      rewrite(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+export const birthEvent = defineConfig({
+  id: 'birth', // the id
+  // The form a birth is declared with
+  declaration: BIRTH_DECLARATION_FORM, // shared with the review
+  actions: [
+    {
+      type: ActionType.DECLARE,
+      // Shown on the action menu
+      label: 'Declare', // the label
+      review: BIRTH_REVIEW
+    }
+  ]
+})
+`)
+
+    expect(text)
+      .toBe(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+export const birthEvent = defineConfig({
+  id: 'birth', // the id
+  actions: [
+    {
+      type: ActionType.DECLARE,
+      // Shown on the action menu
+      label: 'Declare', // the label
+      // The form a birth is declared with
+      declaration: BIRTH_DECLARATION_FORM, // shared with the review
+      review: BIRTH_REVIEW
+    }
+  ]
+})
+`)
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('moves a commented declaration given last after a label given last', () => {
+    const { text } =
+      rewrite(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+export const birthEvent = defineConfig({
+  id: 'birth',
+  actions: [
+    {
+      type: ActionType.DECLARE,
+      label: 'Declare' // the label
+    }
+  ], // the actions
+  // The form a birth is declared with
+  declaration: BIRTH_DECLARATION_FORM // shared with the review
+})
+`)
+
+    expect(text)
+      .toBe(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+export const birthEvent = defineConfig({
+  id: 'birth',
+  actions: [
+    {
+      type: ActionType.DECLARE,
+      label: 'Declare', // the label
+      // The form a birth is declared with
+      declaration: BIRTH_DECLARATION_FORM // shared with the review
+    }
+  ] // the actions
+})
+`)
+  })
+
+  it('warns that comments are left behind when the DECLARE action is inline', () => {
+    const { text } =
+      rewrite(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+export const birthEvent = defineConfig({
+  id: 'birth',
+  // The form a birth is declared with
+  declaration: BIRTH_DECLARATION_FORM,
+  actions: [{ type: ActionType.DECLARE, label: 'Declare' }]
+})
+`)
+
+    expect(text).toContain(
+      "{ type: ActionType.DECLARE, label: 'Declare', declaration: BIRTH_DECLARATION_FORM }"
+    )
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('comments next to `declaration` were not moved')
+    )
+  })
+
   it('moves the declarations of every config in the file', () => {
     const { changes, text } =
       rewrite(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
@@ -402,6 +495,41 @@ export const birthEvent = defineConfig({
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining('could not find exactly one DECLARE action')
     )
+  })
+
+  it('warns and skips a config not given as an object literal', () => {
+    const source = `import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+const birthConfig = {
+  id: 'birth',
+  declaration: BIRTH_DECLARATION_FORM,
+  actions: [{ type: ActionType.DECLARE, label: 'Declare' }]
+}
+
+export const birthEvent = defineConfig(birthConfig)
+`
+
+    const { changes, text } = rewrite(source)
+
+    expect(changes).toBe(0)
+    expect(text).toBe(source)
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('is not given an object literal')
+    )
+  })
+
+  it('does not warn about a config not given as an object literal without a declaration', () => {
+    rewrite(`import { ActionType, defineConfig } from '@opencrvs/toolkit/events'
+
+const birthConfig = {
+  id: 'birth',
+  actions: [{ type: ActionType.DECLARE, label: 'Declare' }]
+}
+
+export const birthEvent = defineConfig(birthConfig)
+`)
+
+    expect(warn).not.toHaveBeenCalled()
   })
 
   it('warns and skips when there is no DECLARE action', () => {

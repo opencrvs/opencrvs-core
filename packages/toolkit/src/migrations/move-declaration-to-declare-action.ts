@@ -28,10 +28,12 @@
  *   - Moves that `declaration` property, as written, into the object literal
  *     of the DECLARE action in `actions`, after its `label` (or its `type` when
  *     it has no `label`)
- *   - Logs, without changing, configs it cannot rewrite safely: `actions` that
- *     is not an array literal, an action not written inline whose type does
- *     not rule out DECLARE, no DECLARE action or more than one, and a DECLARE
- *     action that already has a `declaration` (which `defineConfig` rejects)
+ *   - Moves the comments on the lines above it and after it with it
+ *   - Logs, without changing, configs it cannot rewrite safely: a config not
+ *     given as an object literal, `actions` that is not an array literal, an
+ *     action not written inline whose type does not rule out DECLARE, no
+ *     DECLARE action or more than one, and a DECLARE action that already has
+ *     a `declaration` (which `defineConfig` rejects)
  *   - Saves the modified files in-place
  */
 
@@ -191,69 +193,213 @@ function indentationOf(node: Node) {
   return /^[ \t]*/.exec(text.slice(lineStart))?.[0] ?? ''
 }
 
+/** The text from the position to the end of its line, without the line break. */
+function restOfLine(text: string, position: number) {
+  const lineEnd = text.indexOf('\n', position)
+
+  return text.slice(position, lineEnd === -1 ? text.length : lineEnd)
+}
+
+function isOnlyComments(text: string) {
+  return /^\s*(?:\/\/.*|\/\*.*?\*\/\s*)*$/.test(text)
+}
+
+/**
+ * Where a property sits in its object literal. A property on lines of its own
+ * owns the comments on the lines above it and the comment after it on its last
+ * line, and they move with it.
+ */
+interface PropertyLayout {
+  ownsLines: boolean
+  /** The first comment above the property, or the property itself. */
+  start: number
+  /** After the comma following the property, or the property when it has none. */
+  end: number
+  hasComma: boolean
+  /** The comment after the property on its last line, with the space before it. */
+  trailingComment: string
+}
+
+function layoutOf(property: Node): PropertyLayout {
+  const text = property.getSourceFile().getFullText()
+  const next = property.getNextSibling()
+  const hasComma = next?.getKind() === SyntaxKind.CommaToken
+  const end = next && hasComma ? next.getEnd() : property.getEnd()
+  const trailing = restOfLine(text, end)
+
+  // A comment on the line the previous property ends on is that property's
+  const lineBreak = text
+    .slice(property.getFullStart(), property.getStart())
+    .indexOf('\n')
+
+  if (lineBreak === -1 || !isOnlyComments(trailing)) {
+    return {
+      ownsLines: false,
+      start: property.getStart(true),
+      end,
+      hasComma,
+      trailingComment: ''
+    }
+  }
+
+  const firstLine = property.getFullStart() + lineBreak + 1
+
+  return {
+    ownsLines: true,
+    start: firstLine + (/^\s*/.exec(text.slice(firstLine))?.[0].length ?? 0),
+    end,
+    hasComma,
+    trailingComment: trailing.trimEnd()
+  }
+}
+
 interface TextEdit {
   start: number
   end: number
   text: string
 }
 
+function insertAt(position: number, text: string): TextEdit {
+  return { start: position, end: position, text }
+}
+
 /**
- * Returns the edit inserting the property into the DECLARE action after its
+ * Returns the edits inserting the property into the DECLARE action after its
  * `label`, or after its `type` when it has no `label`, in the action's own
- * layout: on its own line at the anchor's indentation, or inline when the
- * action is on one line.
+ * layout: on lines of its own at the anchor's indentation, together with its
+ * comments, or inline when the action is on one line.
  */
 function insertIntoDeclareAction(
   declareAction: ObjectLiteralExpression,
   property: PropertyAssignment | ShorthandPropertyAssignment
-): TextEdit {
+): TextEdit[] {
   // `type` is always there: it is how the DECLARE action was found
   const anchor =
     declareAction.getProperty('label') ??
     declareAction.getPropertyOrThrow('type')
 
-  const isMultiLine = declareAction.getText().includes('\n')
+  const text = property.getSourceFile().getFullText()
+  const anchorLayout = layoutOf(anchor)
+  const layout = layoutOf(property)
   const indent = indentationOf(anchor)
-  const separator = isMultiLine ? `,\n${indent}` : ', '
 
-  // Copied as text so the value keeps its formatting and its JSDoc, with
+  // Copied as text so the value keeps its formatting and its comments, with
   // continuation lines re-indented from the property's indentation to the
   // anchor's
   const oldIndent = indentationOf(property)
-  const text = property
-    .getText(true)
-    .split('\n')
-    .map((line, index) =>
-      index > 0 && line.startsWith(oldIndent)
-        ? indent + line.slice(oldIndent.length)
-        : line
-    )
-    .join('\n')
+  const reindent = (lines: string) =>
+    lines
+      .split('\n')
+      .map((line, index) =>
+        index > 0 && line.startsWith(oldIndent)
+          ? indent + line.slice(oldIndent.length)
+          : line
+      )
+      .join('\n')
 
-  return {
-    start: anchor.getEnd(),
-    end: anchor.getEnd(),
-    text: `${separator}${text}`
+  if (anchorLayout.ownsLines) {
+    const moved = reindent(text.slice(layout.start, property.getEnd()))
+    const position =
+      anchorLayout.end + restOfLine(text, anchorLayout.end).length
+    const insertion = `\n${indent}${moved}${anchorLayout.hasComma ? ',' : ''}${layout.trailingComment}`
+
+    if (anchorLayout.hasComma) {
+      return [insertAt(position, insertion)]
+    }
+
+    // The anchor was the last property: it needs a comma now
+    return position === anchor.getEnd()
+      ? [insertAt(position, `,${insertion}`)]
+      : [insertAt(anchor.getEnd(), ','), insertAt(position, insertion)]
   }
+
+  const droppedComments =
+    text.slice(layout.start, property.getStart(true)).trim() !== '' ||
+    layout.trailingComment !== ''
+
+  if (droppedComments) {
+    console.warn(
+      `  [${location(property)}] The comments next to \`${DECLARATION_PROPERTY_NAME}\` were not moved with it. Move them onto the ${DECLARE_ACTION_TYPE} action by hand.`
+    )
+  }
+
+  const isMultiLine = declareAction.getText().includes('\n')
+  const separator = isMultiLine ? `,\n${indent}` : ', '
+
+  return [
+    insertAt(anchor.getEnd(), `${separator}${reindent(property.getText(true))}`)
+  ]
 }
 
 /**
- * Returns the edit removing the property together with its leading line break
- * and comments, and the comma separating it from its neighbours.
+ * Returns the edits removing the property together with the comma separating
+ * it from its neighbours and, when it is on lines of its own, those lines.
  */
 function removeFromConfig(
   property: PropertyAssignment | ShorthandPropertyAssignment
-): TextEdit {
-  const next = property.getNextSibling()
+): TextEdit[] {
+  const text = property.getSourceFile().getFullText()
+  const layout = layoutOf(property)
+  // The comma before the property, past any comments, which ts-morph lists
+  // as siblings
+  const previousComma = property
+    .getPreviousSiblings()
+    .find((sibling) => !isOnlyComments(sibling.getText()))
+    ?.asKind(SyntaxKind.CommaToken)
 
-  if (next?.getKind() === SyntaxKind.CommaToken) {
-    return { start: property.getFullStart(), end: next.getEnd(), text: '' }
+  if (layout.ownsLines) {
+    const lines = {
+      start: text.lastIndexOf('\n', layout.start - 1),
+      end: layout.end + restOfLine(text, layout.end).length,
+      text: ''
+    }
+
+    // The last property: drop the comma before it too
+    return !layout.hasComma && previousComma
+      ? [
+          lines,
+          {
+            start: previousComma.getStart(),
+            end: previousComma.getEnd(),
+            text: ''
+          }
+        ]
+      : [lines]
+  }
+
+  if (layout.hasComma) {
+    return [{ start: property.getFullStart(), end: layout.end, text: '' }]
   }
 
   // The last property: drop the comma before it instead
-  const previous = property.getPreviousSiblingOrThrow()
+  return [
+    {
+      start: (previousComma ?? property).getStart(),
+      end: property.getEnd(),
+      text: ''
+    }
+  ]
+}
 
-  return { start: previous.getStart(), end: property.getEnd(), text: '' }
+/**
+ * Returns the config given to a toolkit `defineConfig` call when it is an
+ * object literal. Logs a config given any other way that may have a top-level
+ * `declaration`, as it cannot be rewritten.
+ */
+function findConfigLiteral(call: CallExpression) {
+  const config = call.getArguments()[0]
+
+  if (!config || Node.isObjectLiteralExpression(config)) {
+    return config
+  }
+
+  if (config.getType().getProperty(DECLARATION_PROPERTY_NAME)) {
+    console.warn(
+      `  [${location(config)}] Skipped: \`${DEFINE_CONFIG_NAME}\` is not given an object literal. If its config has a top-level \`${DECLARATION_PROPERTY_NAME}\`, move it onto the ${DECLARE_ACTION_TYPE} action by hand.`
+    )
+  }
+
+  return undefined
 }
 
 /**
@@ -266,7 +412,7 @@ export function moveDeclarationToDeclareAction(sourceFile: SourceFile): number {
   const configs = sourceFile
     .getDescendantsOfKind(SyntaxKind.CallExpression)
     .filter(isToolkitDefineConfigCall)
-    .map((call) => call.getArguments()[0])
+    .map(findConfigLiteral)
     .filter(Node.isObjectLiteralExpression)
 
   // Collected as text edits and applied together, as editing a node through
@@ -292,8 +438,8 @@ export function moveDeclarationToDeclareAction(sourceFile: SourceFile): number {
     )
 
     edits.push(
-      insertIntoDeclareAction(declareAction, declaration),
-      removeFromConfig(declaration)
+      ...insertIntoDeclareAction(declareAction, declaration),
+      ...removeFromConfig(declaration)
     )
     changes++
   }
