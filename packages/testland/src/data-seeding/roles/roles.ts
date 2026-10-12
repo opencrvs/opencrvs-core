@@ -47,6 +47,7 @@ export const roles: Role[] = [
       { type: 'record.request-correction', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['VALIDATE_DECLARATION', 'ESCALATE'] } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REINSTATE_REVOKE_REGISTRATION'], placeOfEvent: 'administrativeArea' } },
+      { type: 'record.reinstate-registration', options: { event: ['birth'], placeOfEvent: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL'] } },
       { type: 'record.custom-action', options: { event: ['death'], customActionTypes: ['VALIDATE_DECLARATION'] } },
       {
@@ -86,6 +87,7 @@ export const roles: Role[] = [
       { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.correct', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE', 'REINSTATE_REVOKE_REGISTRATION'], placeOfEvent: 'administrativeArea' } },
+      { type: 'record.reinstate-registration', options: { event: ['birth'], placeOfEvent: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL'], registeredIn: 'administrativeArea' } },
       { type: 'record.unassign-others' },
       {
@@ -188,7 +190,9 @@ export const roles: Role[] = [
       { type: 'record.register' },
       { type: 'record.print-certified-copies' },
       { type: 'record.correct' },
-      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['SEAL', 'UNSEAL', 'REGISTRAR_GENERAL_FEEDBACK', 'REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION', 'APPROVE_DECLARATION'] } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['SEAL', 'UNSEAL', 'REGISTRAR_GENERAL_FEEDBACK', 'REINSTATE_REVOKE_REGISTRATION', 'APPROVE_DECLARATION'] } },
+      { type: 'record.revoke-registration', options: { event: ['birth'] } },
+      { type: 'record.reinstate-registration', options: { event: ['birth'] } },
       { type: 'record.custom-action', options: { event: ['death'], customActionTypes: ['APPROVE_DECLARATION'] } },
       { type: 'record.unassign-others' }
     ])
@@ -215,6 +219,7 @@ export const roles: Role[] = [
       { type: 'record.archive', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.unarchive', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['PROVINCIAL_REGISTER_FEEDBACK', 'REINSTATE_REVOKE_REGISTRATION', 'ESCALATE'], placeOfEvent: 'administrativeArea' } },
+      { type: 'record.reinstate-registration', options: { event: ['birth'], placeOfEvent: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth', 'death'], customActionTypes: ['APPROVE_DECLARATION'], declaredIn: 'administrativeArea' } },
       { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.correct', options: { registeredIn: 'administrativeArea' } },
