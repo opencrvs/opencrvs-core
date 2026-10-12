@@ -465,6 +465,15 @@ const anyOfStatusPayload: QueryType = {
   ]
 }
 
+const noneOfStatusPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      status: { type: 'noneOf', terms: ['REVOKED', 'ARCHIVED'] }
+    }
+  ]
+}
+
 const allOfFlagsPayload: QueryType = {
   type: 'and',
   clauses: [
@@ -674,6 +683,33 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [{ terms: { status: ['REGISTERED', 'DECLARED'] } }],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with noneOf status', async () => {
+    const result = await buildElasticQueryFromSearchPayload(
+      noneOfStatusPayload,
+      [tennisClubMembershipEvent]
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    must_not: { terms: { status: ['REVOKED', 'ARCHIVED'] } },
+                    should: undefined
+                  }
+                }
+              ],
               should: undefined
             }
           }
