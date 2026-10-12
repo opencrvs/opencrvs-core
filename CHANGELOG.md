@@ -14,17 +14,24 @@ Before the deploy, instruct every user, working offline in particular, to connec
 
 #### Revocation: moving from a custom action to the core `REVOKED` status (optional)
 
-2.2 adds core `REVOKE_REGISTRATION` and `REINSTATE_REGISTRATION` actions and a `REVOKED` status (see [New features](#revoked-status-with-revoke-and-reinstate-registration-actions)). A country that revokes with a custom action and flag, like the template's `REVOKE_REGISTRATION` / `REINSTATE_REVOKE_REGISTRATION` custom actions and `revoked` flag, can keep doing so. Nothing changes until you move. The steps below use the template's names; if your custom actions or flag are named differently, use your own names wherever they appear.
+2.2 adds core `REVOKE_REGISTRATION` and `REINSTATE_REGISTRATION` actions and a `REVOKED` status (see [New features](#revoked-status-with-revoke-and-reinstate-registration-actions)). Before 2.2, countries that needed revocation built it in their own config: a custom revoke action that adds a country-defined flag to mark the record as revoked, and a custom reinstate action that removes it. Each country names these itself. The template, for example, uses the `REVOKE_REGISTRATION` / `REINSTATE_REVOKE_REGISTRATION` custom actions and a flag with id `revoked`. A country revoking this way can keep doing so. Nothing changes until you move.
 
-**Do not delete the custom revoke action or the `revoked` flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
+Below, "your revoked flag" means the flag your custom revoke adds. The examples use the template's names (`'revoked'`, `'REVOKE_REGISTRATION'`, `'REINSTATE_REVOKE_REGISTRATION'`); replace them with the ids from your own config.
 
-1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `supportingCopy` and `form`. Leave out the custom revoke's `flags`: removing e.g. `pending-first-certificate-issuance` only took the record out of workqueues, which the `REVOKED` status now does, and reinstating then puts it back where it was. Hide the core revoke on records revoked the old way:
+**Do not delete the custom revoke action or your revoked flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
+
+1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `supportingCopy`, `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
 
    ```ts
    {
      type: ActionType.REVOKE_REGISTRATION,
      label: { ... },
      form: [ ... ],
+     // The custom revoke's flag operations, without { id: 'revoked', operation: 'add' }
+     flags: [
+       { id: 'pending-first-certificate-issuance', operation: 'remove' },
+       ...
+     ],
      conditionals: [
        { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
      ]
@@ -36,7 +43,7 @@ Before the deploy, instruct every user, working offline in particular, to connec
    }
    ```
 
-   Add `ActionType.REINSTATE_REGISTRATION` to `actionOrder`. If your custom revoke is named `'REVOKE_REGISTRATION'`, its `actionOrder` entry already places the core revoke; otherwise add `ActionType.REVOKE_REGISTRATION` too. Keep the existing `not(flag('revoked'))` conditionals on print, correction and other actions: core only blocks those on `REVOKED` records.
+   Add `ActionType.REINSTATE_REGISTRATION` to `actionOrder`. If your custom revoke is named `'REVOKE_REGISTRATION'`, its `actionOrder` entry already places the core revoke; otherwise add `ActionType.REVOKE_REGISTRATION` too.
 
 2. **Roles.** Every role that can perform the custom revoke should get `record.revoke-registration` instead: remove the custom revoke from its `record.custom-action` scope, so it can no longer be performed, and add `record.revoke-registration`. Keep the custom reinstate scope, so records revoked the old way can still be reinstated, and add `record.reinstate-registration` next to it. Carry over `event` and `placeOfEvent`:
 
@@ -47,19 +54,23 @@ Before the deploy, instruct every user, working offline in particular, to connec
    +{ type: 'record.reinstate-registration', options: { event: ['birth'] } },
    ```
 
-3. **Workqueues.** Next to every `flags: { noneOf: ['revoked'] }`, exclude the new status as well. Keep the flag filter: records revoked the old way are still `REGISTERED`, so only the flag keeps them out.
+3. **Checks on your revoked flag.** Wherever your config checks your revoked flag, also check the `REVOKED` status. Keep the flag check: records revoked the old way are still `REGISTERED`, so only the flag identifies them. Remove it only if no record carries the flag.
 
-   ```diff
-    query: {
-      ...registeredInMyAdminArea,
-   +  status: { type: 'noneOf', terms: ['REVOKED'] },
-      flags: { anyOf: ['pending-first-certificate-issuance'], noneOf: ['revoked'] }
-    }
-   ```
+   - **Workqueues.** Wherever a workqueue excludes your revoked flag (`flags: { noneOf: ['revoked'] }` in the template), exclude the status as well:
+
+     ```diff
+      query: {
+        ...registeredInMyAdminArea,
+     +  status: { type: 'noneOf', terms: ['REVOKED'] },
+        flags: { anyOf: ['pending-first-certificate-issuance'], noneOf: ['revoked'] }
+      }
+     ```
+
+   - **Action conditionals.** Keep the conditionals that hide print, correction and other actions on your revoked flag (`not(flag('revoked'))` in the template). Core already blocks these on `REVOKED` records, so they need no status check.
 
 4. **Dashboards.** Only if your dashboards report revocations or reinstatements: they are now recorded two ways, so count both. For revokes, `action_type = 'CUSTOM'` with your custom revoke's `custom_action_type` (the template's is `'REVOKE_REGISTRATION'`) and `action_type = 'REVOKE_REGISTRATION'`; for reinstatements, your custom reinstate's `custom_action_type` (the template's is `'REINSTATE_REVOKE_REGISTRATION'`) and `action_type = 'REINSTATE_REGISTRATION'`.
 
-Users will see two kinds of revoked record: ones revoked before the move show as Registered with the Revoked flag, and new ones show the `Revoked` status.
+Users will see two kinds of revoked record: ones revoked before the move show as Registered with your revoked flag, and new ones show the `Revoked` status.
 
 [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
