@@ -144,6 +144,49 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
   })
 })
 
+test('Documents tab lists a document replaced during "Register with edits"', async ({
+  page
+}) => {
+  const declaration = await declareWithProofOfBirth()
+
+  await test.step('Navigate to the record and assign', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByText('Pending registration').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+  })
+
+  await test.step('Edit the declaration, replace the proof of birth and register', async () => {
+    await selectAction(page, 'Edit')
+    await page
+      .getByTestId('accordion-Accordion_documents')
+      .getByRole('button', { name: 'Change all' })
+      .click()
+
+    await uploadImage(
+      page,
+      page.locator('button[name="documents____proofOfBirth"]'),
+      './e2e/assets/image.png'
+    )
+
+    await page.getByRole('button', { name: 'Go to review' }).click()
+    await triggerDeclarationAction(page, 'Register with edits')
+  })
+
+  await test.step('Documents tab shows the original and the replacement', async () => {
+    await page.getByText('Recent').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+
+    await switchEventTab(page, 'Documents')
+
+    // One row from the declaration, one from the edit that replaced it.
+    await expect(
+      page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
+    ).toHaveCount(2)
+  })
+})
+
 test('Documents tab shows an offline state while offline', async ({ page }) => {
   const declaration = await declareWithProofOfBirth()
 
