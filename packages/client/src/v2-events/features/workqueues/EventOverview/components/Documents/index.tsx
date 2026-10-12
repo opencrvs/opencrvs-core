@@ -171,6 +171,9 @@ function collectDocuments(
     findAllFields(config).map((field) => [field.id, field])
   )
 
+  // List each file only once, under the action that first uploaded it.
+  const listedPaths = new Set<string>()
+
   // We want to hide documents for reject correction and edit actions.
   // - Why hide reject correction? We dont want to display documents for a rejected correction, only a correction request or an accepted correction.
   // - Why hide edit? Edit also applies declare/register action, which displays the documents, so we dont want a duplicate row.
@@ -180,6 +183,13 @@ function collectDocuments(
         type !== ActionType.REJECT_CORRECTION && type !== ActionType.EDIT
     )
     .flatMap((action) => getUploadedDocuments(action, fieldById))
+    .filter(({ file }) => {
+      if (listedPaths.has(file.path)) {
+        return false
+      }
+      listedPaths.add(file.path)
+      return true
+    })
 }
 
 /**

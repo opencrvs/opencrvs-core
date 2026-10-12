@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { format, subDays } from 'date-fns'
 import {
   getToken,
   login,
   switchEventTab,
   triggerDeclarationAction,
-  uploadImage
+  uploadImage,
+  uploadImageToSection
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -54,6 +55,38 @@ async function declareWithProofOfBirth(): Promise<Declaration> {
     ActionType.DECLARE
   )
   return res.declaration
+}
+
+/**
+ * Declares a birth via the API with two proof-of-mother's-ID documents
+ * (National ID and Birth Certificate), both under the same FILE_WITH_OPTIONS field.
+ */
+async function declareWithProofOfMother(): Promise<Declaration> {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const nationalId = await uploadFile(getSignatureFile(), token)
+  const birthCertificate = await uploadFile(getSignatureFile(), token)
+  const declarationRequest = await getDeclaration({
+    token,
+    partialDeclaration: {
+      'documents.proofOfMother': [
+        { ...nationalId, option: 'NATIONAL_ID' },
+        { ...birthCertificate, option: 'BIRTH_CERTIFICATE' }
+      ]
+    }
+  })
+  const res = await createDeclaration(
+    token,
+    declarationRequest,
+    ActionType.DECLARE
+  )
+  return res.declaration
+}
+
+/** The row of the Documents tab listing the given document. */
+function documentRow(page: Page, documentName: string) {
+  return page
+    .locator('#listTable-documents [id^="row_"]')
+    .filter({ hasText: documentName })
 }
 
 test('Documents tab lists both the original and the replacement of an edited document', async ({
@@ -184,6 +217,59 @@ test('Documents tab lists a document replaced during "Register with edits"', asy
     await expect(
       page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
     ).toHaveCount(2)
+  })
+})
+
+test('Documents tab lists only the file added to a multi-file document during an edit', async ({
+  page
+}) => {
+  const declaration = await declareWithProofOfMother()
+
+  await test.step('Navigate to the record and assign', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByText('Pending registration').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+  })
+
+  await test.step("Edit the declaration and add a passport to the proof of mother's ID", async () => {
+    await selectAction(page, 'Edit')
+    await page
+      .getByTestId('accordion-Accordion_documents')
+      .getByRole('button', { name: 'Change all' })
+      .click()
+
+    await uploadImageToSection({
+      page,
+      sectionLocator: page.locator('#documents____proofOfMother-form-input'),
+      sectionTitle: 'Passport',
+      buttonLocator: page.locator('button[name="documents____proofOfMother"]')
+    })
+
+    await page.getByRole('button', { name: 'Go to review' }).click()
+    await triggerDeclarationAction(page, 'Declare with edits')
+  })
+
+  await test.step('Documents tab lists each file once, under the action that added it', async () => {
+    await page.getByText('Recent').click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+
+    await switchEventTab(page, 'Documents')
+
+    // The edit resends the whole field, but only the passport is new.
+    await expect(
+      page.locator('#listTable-documents').getByText("Proof of mother's ID")
+    ).toHaveCount(3)
+    await expect(
+      documentRow(page, "Proof of mother's ID (National ID)")
+    ).toHaveCount(1)
+    await expect(
+      documentRow(page, "Proof of mother's ID (Birth Certificate)")
+    ).toHaveCount(1)
+    await expect(
+      documentRow(page, "Proof of mother's ID (Passport)")
+    ).toHaveCount(1)
   })
 })
 
