@@ -741,3 +741,4 @@ workqueues.potentialDuplicate.title,Title of potential duplicate workqueue,Poten
 workqueues.recent.emptyMessage,Empty message for recent workqueue,No recent records,Aucun enregistrement récent
 workqueues.recent.title,Title of recent workqueue,Recent,Récent
 workqueues.requiresApproval.title,Title of pending approval workqueue,Pending approval,En attente d'approbation
+workqueues.revoked.title,Title of revoked workqueue,Revoked,Révoqué
