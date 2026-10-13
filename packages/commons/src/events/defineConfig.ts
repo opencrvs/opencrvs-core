@@ -12,10 +12,7 @@
 import * as z from 'zod/v4'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType } from './ActionType'
-import {
-  generateNotificationForm,
-  generateNotifyReview
-} from './notificationFormFallback'
+import { generateNotifyReview } from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
@@ -62,8 +59,9 @@ type NotifyActionConfigInput = Extract<
  * Fallback for events without a configured notification form or NOTIFY review.
  *
  * - Without a NOTIFY action, one is created from the DECLARE action.
- * - Without `notificationForm`, it is generated from the declaration with every field optional, and a warning is logged.
  * - Without `review`, it is generated from the DECLARE review with every field optional.
+ * - Without `notificationForm`, a warning is logged. The form is not generated here, to keep the
+ *   served configuration small: `getNotificationForm` derives it from the declaration when read.
  *
  * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
  * Expects the `declaration` to already be on the DECLARE action.
@@ -81,8 +79,14 @@ function generateNotificationFormFallback(
       action.type === ActionType.NOTIFY
   )
 
-  // If the NOTIFY action has a notification form and review, return the config as is
-  if (notifyAction?.notificationForm && notifyAction.review) {
+  if (!notifyAction?.notificationForm) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Event '${config.id}' has no ${ActionType.NOTIFY} form. Using the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
+    )
+  }
+
+  if (notifyAction?.review) {
     return config
   }
 
@@ -92,25 +96,13 @@ function generateNotificationFormFallback(
     )
   }
 
-  if (!notifyAction?.notificationForm) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Event '${config.id}' has no ${ActionType.NOTIFY} form. Generated one from the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
-    )
-  }
-
-  const generated = {
-    notificationForm:
-      notifyAction?.notificationForm ??
-      generateNotificationForm(declareAction.declaration),
-    review: notifyAction?.review ?? generateNotifyReview(declareAction.review)
-  }
+  const review = generateNotifyReview(declareAction.review)
 
   if (notifyAction) {
     return {
       ...config,
       actions: config.actions.map((action) =>
-        action === notifyAction ? { ...notifyAction, ...generated } : action
+        action === notifyAction ? { ...notifyAction, review } : action
       )
     }
   }
@@ -122,7 +114,7 @@ function generateNotificationFormFallback(
     conditionals: declareAction.conditionals,
     flags: declareAction.flags,
     supportingCopy: declareAction.dialogCopy?.notify,
-    ...generated
+    review
   }
 
   return {

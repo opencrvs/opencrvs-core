@@ -11,40 +11,42 @@
 
 /*
  * Builds the NOTIFY notification form and review from the DECLARE action, for events that do not configure them.
- * Not exported from the package: only `defineConfig` and test utilities use it.
+ * Not exported from the package: only `defineConfig` and `getNotificationForm` use it.
  */
 
 import * as z from 'zod/v4'
 import { FieldType } from './FieldType'
-import { FieldConfigInput } from './FieldConfig'
-import { DeclarationFormConfigInput } from './FormConfig'
+import { FieldConfig, FieldConfigInput } from './FieldConfig'
+import { DeclarationFormConfig } from './FormConfig'
 import { DeclarationReviewConfig } from './ActionConfig'
 
 type DeclarationReviewConfigInput = z.input<typeof DeclarationReviewConfig>
 
 /**
  * Makes a field (and the fields of a field group) optional, and removes its validations.
- * The notification form generated from the declaration accepts what NOTIFY accepts today:
+ * The notification form derived from the declaration accepts what NOTIFY accepts today:
  * structural checks only.
  */
-function toOptionalField(field: FieldConfigInput): FieldConfigInput {
+function toOptionalField<F extends FieldConfig | FieldConfigInput>(
+  field: F
+): F {
   const { validation: _validation, ...rest } = field
 
-  if (rest.type === FieldType.FIELD_GROUP) {
+  if (rest.type === FieldType.FIELD_GROUP && 'fields' in rest) {
     return {
       ...rest,
       required: false,
-      fields: rest.fields.map(toOptionalField)
-    }
+      fields: (rest.fields as F[]).map(toOptionalField)
+    } as F
   }
 
-  return { ...rest, required: false }
+  return { ...rest, required: false } as F
 }
 
 /** @returns the declaration form with every field optional. */
-export function generateNotificationForm(
-  declaration: DeclarationFormConfigInput
-): DeclarationFormConfigInput {
+export function deriveNotificationForm(
+  declaration: DeclarationFormConfig
+): DeclarationFormConfig {
   return {
     ...declaration,
     pages: declaration.pages.map((page) => ({
