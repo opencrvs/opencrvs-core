@@ -48,7 +48,12 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.APPROVE_CORRECTION,
     ActionType.REJECT_CORRECTION,
     ActionType.CUSTOM,
-    ClientSpecificAction.REVIEW_CORRECTION_REQUEST
+    ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+    ActionType.REVOKE_REGISTRATION
+  ],
+  [EventStatus.enum.REVOKED]: [
+    ActionType.READ,
+    ActionType.REINSTATE_REGISTRATION
   ],
   [EventStatus.enum.ARCHIVED]: [
     ActionType.READ,
@@ -80,6 +85,11 @@ const ACTION_FILTERS: {
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REJECT_CORRECTION]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.REVOKE_REGISTRATION]: (flags) =>
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.REINSTATE_REGISTRATION]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.MARK_AS_DUPLICATE]: (flags) =>
     flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&

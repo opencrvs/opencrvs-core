@@ -86,6 +86,24 @@ function officeAccessible(
   return true
 }
 
+// The nested properties run ~10k cases. Signing a fresh RS256 token for each
+// one dominated the runtime and timed the test out under load, so tokens are
+// cached per scope: they depend on nothing else.
+const tokensByScope = new Map<string, ReturnType<typeof createTestToken>>()
+
+function getTestToken(scope: string) {
+  let token = tokensByScope.get(scope)
+  if (!token) {
+    token = createTestToken({
+      userId: requestingUserId,
+      scopes: [scope],
+      role: TestUserRole.enum.REGISTRATION_AGENT
+    })
+    tokensByScope.set(scope, token)
+  }
+  return token
+}
+
 test(
   'grants access if both existing and updated (location, role) satisfy any user.edit scope',
   { timeout: 120000 },
@@ -175,16 +193,12 @@ test(
                 )
               const expectedAllowed = existingOk && updatedOk
 
-              const token = createTestToken({
-                userId: requestingUserId,
-                scopes: [
-                  encodeScope({
-                    type: 'user.edit',
-                    options: { accessLevel, role: scopeRole }
-                  })
-                ],
-                role: TestUserRole.enum.REGISTRATION_AGENT
-              })
+              const token = getTestToken(
+                encodeScope({
+                  type: 'user.edit',
+                  options: { accessLevel, role: scopeRole }
+                })
+              )
               const next = vi.fn((a) => a)
 
               try {

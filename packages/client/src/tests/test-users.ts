@@ -115,6 +115,8 @@ export const userScopes = {
     encodeScope({ type: 'record.reject' }),
     encodeScope({ type: 'record.archive' }),
     encodeScope({ type: 'record.unarchive' }),
+    encodeScope({ type: 'record.revoke-registration' }),
+    encodeScope({ type: 'record.reinstate-registration' }),
     encodeScope({ type: 'record.register' }),
     encodeScope({ type: 'record.edit' }),
     encodeScope({ type: 'record.print-certified-copies' }),
@@ -169,6 +171,7 @@ export const userScopes = {
     encodeScope({ type: 'record.edit' }),
     encodeScope({ type: 'record.archive' }),
     encodeScope({ type: 'record.unarchive' }),
+    encodeScope({ type: 'record.revoke-registration' }),
     encodeScope({ type: 'record.print-certified-copies' }),
     encodeScope({ type: 'record.request-correction' })
   ],
