@@ -10,25 +10,6 @@
 
 - `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
 
-## 2.2.0 Release Candidate
-
-### Breaking changes
-
-#### `POST /auth/token` no longer accepts parameters in the query string
-
-The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) has been removed. Sending `client_secret` in the URL leaks it into access logs and Sentry breadcrumbs (CWE-598). Parameters are now read only from the request body (form-encoded or JSON), and the gateway no longer forwards the query string. Requests that still use the URL fail with `unsupported_grant_type`.
-
-Integrations using the `client_credentials` grant must send `grant_type`, `client_id` and `client_secret` in the body:
-
-```diff
--curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
-+curl -X POST '<gateway>/auth/token' \
-+  -H 'Content-Type: application/x-www-form-urlencoded' \
-+  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
-```
-
-Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
-
 ## 2.1.0
 
 ### Upgrade guidance
