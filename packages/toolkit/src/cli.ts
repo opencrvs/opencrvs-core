@@ -15,7 +15,7 @@ import { runUpgrade } from './migrations'
 import {
   checkUpgradePath,
   findCountryConfigToolkitVersion
-} from './migrations/check-upgrade-path'
+} from './migrations/persistent/check-upgrade-path'
 import {
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,

@@ -5,9 +5,9 @@ from the previous minor version to the OpenCRVS version this toolkit is released
 with. For example, toolkit 2.2.0 upgrades a 2.1 country config to 2.2.
 
 Only the steps for that upgrade live here: when work on the next version starts,
-remove the previous version's steps. Keep the steps every upgrade runs:
-`add-translations` (see below), `update-toolkit-dependency` and
-`check-upgrade-path`.
+remove the previous version's steps. `persistent/` holds what every upgrade runs
+and is kept from version to version: `add-translations` (see below),
+`update-toolkit-dependency` and `check-upgrade-path`.
 
 Run from inside a country config checkout, with the toolkit of the version to
 upgrade to, before changing the country config's `@opencrvs/toolkit`
@@ -22,7 +22,7 @@ Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/
 
 ## Translations are already handled
 
-`add-translations.ts` copies `client.csv` and `login.csv` from the country
+`persistent/add-translations.ts` copies `client.csv` and `login.csv` from the country
 config template of the version being upgraded to, adding whatever rows a
 country config is missing. **Do not write a codemod for a new translation key,
 and do not add it to a list anywhere here.** Adding it to

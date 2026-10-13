@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { main as addTranslations } from './add-translations'
+import { main as addTranslations } from './persistent/add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
-import { main as updateToolkitDependency } from './update-toolkit-dependency'
+import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
 
 /**
  * Run the upgrade process for the country config in the current working
