@@ -9,13 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
-import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 import {
   defaultResource,
   resourceFromAttributes
 } from '@opentelemetry/resources'
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { readFileSync } from 'fs'
 import os from 'os'
@@ -79,15 +76,16 @@ function getResource(packageJsonPath: string) {
   )
 }
 
+/*
+ * No exporters are passed on purpose: with none configured, NodeSDK builds the
+ * trace and metric exporters from the standard OTEL_TRACES_EXPORTER,
+ * OTEL_METRICS_EXPORTER, OTEL_EXPORTER_OTLP_PROTOCOL and
+ * OTEL_EXPORTER_OTLP_ENDPOINT environment variables. That makes the protocol
+ * (grpc, http/protobuf, http/json) a deployment setting instead of code.
+ */
 function initSdk(packageJsonPath: string) {
   const sdk = new NodeSDK({
     resource: getResource(packageJsonPath),
-    traceExporter: new OTLPTraceExporter(),
-    metricReaders: [
-      new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporter()
-      })
-    ],
     instrumentations: [
       getNodeAutoInstrumentations({
         '@opentelemetry/instrumentation-hapi': {

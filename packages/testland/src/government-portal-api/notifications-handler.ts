@@ -227,10 +227,7 @@ export async function notificationsHandler(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        'x-correlation-id':
-          (request.headers['x-correlation-id'] as string) ||
-          `notifications-${Date.now()}`
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(modifiedPayload)
     })

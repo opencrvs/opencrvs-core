@@ -74,6 +74,18 @@ Users will see two kinds of revoked record: ones revoked before the move show as
 
 [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Tracing: move your country config from Elastic APM to OpenTelemetry
+
+The country config template reported traces through `elastic-apm-node`, configured with `APN_*` variables. The chart never set those, so a country config deployed from it sent nothing to Kibana APM, and its requests broke off the gateway → events → countryconfig trace. The template now uses OpenTelemetry like the core services, configured by the `OTEL_*` variables the chart already sets.
+
+Update your country config repository:
+
+1. Replace `src/monitoring.ts` with the one in `packages/countryconfig-template/src/monitoring.ts`.
+2. In `package.json`, remove `elastic-apm-node` and add `@opentelemetry/auto-instrumentations-node`, `@opentelemetry/resources` and `@opentelemetry/sdk-node` (same versions as the template), then reinstall.
+3. Delete `APN_SERVICE_URL`, `APN_SERVICE_NAME`, `APN_NODE_NAME` and `APN_ENVIRONMENT` from your deployment configuration. Nothing reads them any more.
+
+[#13878](https://github.com/opencrvs/opencrvs-core/issues/13878)
+
 ### Breaking changes
 
 #### `POST /auth/token` no longer accepts parameters in the query string
@@ -132,6 +144,7 @@ A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matchi
 
 ### Bug fixes
 
+- Traces from testland and the country config template reach Kibana APM, and `OTEL_EXPORTER_OTLP_PROTOCOL` (`grpc`, `http/protobuf` or `http/json`) now selects the exporter in every service. Testland used to send OTLP/HTTP to the collector's gRPC port, and the protocol setting was ignored. Log lines from the events service carry `trace_id` and `span_id`, filebeat indexes them as `trace.id` and `span.id` so Kibana can link logs to traces, and the events request log ID is the trace ID instead of the unused `x-correlation-id` header [#13878](https://github.com/opencrvs/opencrvs-core/issues/13878)
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 
 ## 2.1.0

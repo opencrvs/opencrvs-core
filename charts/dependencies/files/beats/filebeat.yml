@@ -39,6 +39,18 @@ processors:
       overwrite_keys: true
       add_error_key: true
 
+  # Link logs to traces: pino's OpenTelemetry instrumentation writes trace_id and
+  # span_id, while the ECS fields Kibana APM looks up for its Logs tab are
+  # trace.id and span.id
+  - rename:
+      fields:
+        - from: trace_id
+          to: trace.id
+        - from: span_id
+          to: span.id
+      ignore_missing: true
+      fail_on_error: false
+
   # Map Numeric log levels to names
   - script:
       lang: javascript
