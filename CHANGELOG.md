@@ -12,6 +12,57 @@ Before the deploy, instruct every user, working offline in particular, to connec
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
+#### Revocation: moving from a custom action to the core `REVOKED` status (optional)
+
+2.2 adds core `REVOKE_REGISTRATION` and `REINSTATE_REGISTRATION` actions and a `REVOKED` status (see [New features](#revoked-status-with-revoke-and-reinstate-registration-actions)). A country that revokes with a custom action and flag, like the template's `REVOKE_REGISTRATION` / `REINSTATE_REVOKE_REGISTRATION` custom actions and `revoked` flag, can keep doing so. Nothing changes until you move. The steps below use the template's names; if your custom actions or flag are named differently, use your own names wherever they appear.
+
+**Do not delete the custom revoke action or the `revoked` flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
+
+1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `supportingCopy` and `form`. Leave out the custom revoke's `flags`: removing e.g. `pending-first-certificate-issuance` only took the record out of workqueues, which the `REVOKED` status now does, and reinstating then puts it back where it was. Hide the core revoke on records revoked the old way:
+
+   ```ts
+   {
+     type: ActionType.REVOKE_REGISTRATION,
+     label: { ... },
+     form: [ ... ],
+     conditionals: [
+       { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
+     ]
+   },
+   {
+     type: ActionType.REINSTATE_REGISTRATION,
+     label: { ... },
+     form: [ ... ]
+   }
+   ```
+
+   Add `ActionType.REINSTATE_REGISTRATION` to `actionOrder`. If your custom revoke is named `'REVOKE_REGISTRATION'`, its `actionOrder` entry already places the core revoke; otherwise add `ActionType.REVOKE_REGISTRATION` too. Keep the existing `not(flag('revoked'))` conditionals on print, correction and other actions: core only blocks those on `REVOKED` records.
+
+2. **Roles.** Every role that can perform the custom revoke should get `record.revoke-registration` instead: remove the custom revoke from its `record.custom-action` scope, so it can no longer be performed, and add `record.revoke-registration`. Keep the custom reinstate scope, so records revoked the old way can still be reinstated, and add `record.reinstate-registration` next to it. Carry over `event` and `placeOfEvent`:
+
+   ```diff
+   -{ type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION'] } },
+   +{ type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REINSTATE_REVOKE_REGISTRATION'] } },
+   +{ type: 'record.revoke-registration', options: { event: ['birth'] } },
+   +{ type: 'record.reinstate-registration', options: { event: ['birth'] } },
+   ```
+
+3. **Workqueues.** Next to every `flags: { noneOf: ['revoked'] }`, exclude the new status as well. Keep the flag filter: records revoked the old way are still `REGISTERED`, so only the flag keeps them out.
+
+   ```diff
+    query: {
+      ...registeredInMyAdminArea,
+   +  status: { type: 'noneOf', terms: ['REVOKED'] },
+      flags: { anyOf: ['pending-first-certificate-issuance'], noneOf: ['revoked'] }
+    }
+   ```
+
+4. **Dashboards.** Only if your dashboards report revocations or reinstatements: they are now recorded two ways, so count both. For revokes, `action_type = 'CUSTOM'` with your custom revoke's `custom_action_type` (the template's is `'REVOKE_REGISTRATION'`) and `action_type = 'REVOKE_REGISTRATION'`; for reinstatements, your custom reinstate's `custom_action_type` (the template's is `'REINSTATE_REVOKE_REGISTRATION'`) and `action_type = 'REINSTATE_REGISTRATION'`.
+
+Users will see two kinds of revoked record: ones revoked before the move show as Registered with the Revoked flag, and new ones show the `Revoked` status.
+
+[#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
+
 ### Breaking changes
 
 #### `POST /auth/token` no longer accepts parameters in the query string
@@ -44,6 +95,25 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 `defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, so events defined with it need no other change. It logs a deprecation warning, though: a future release will remove the top-level `declaration`. It throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
+#### `NOTIFY` action supports `notificationForm` and `review` configuration
+
+`NOTIFY` used to read its form configuration from the `DECLARE` action. It now supports its own notification form and review:
+
+- **`actions[NOTIFY].notificationForm`** is the notify form. Every field in it must also exist in the `DECLARE` declaration form with the same type, and its values pre-fill the declaration.
+- **`actions[NOTIFY].review`** holds the notify review page fields. Notify-only data, such as a notifier's signature, is configured as `NOTIFY` `review` or `form` fields and stored in the `NOTIFY` action annotation. Only `review` fields will be enforced as required. Values of `review` fields that `DECLARE`'s review also has carry over to the declaration.
+
+`defineConfig` still accepts events without a notification form, so these events behave as before. It generates a missing `NOTIFY` action and `review` from the `DECLARE` action with every field optional, and logs a warning when `notificationForm` is missing. If missing, the `DECLARE` form with every field optional is used in its place (`getNotificationForm`). A future release will remove this fallback. An event configuration built without `defineConfig` must give `review` on its `NOTIFY` action.
+
+### New features
+
+#### `REVOKED` status with revoke and reinstate registration actions
+
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+
+#### Exclude statuses in workqueue and search queries
+
+A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
 ### Improvements
 

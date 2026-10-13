@@ -310,6 +310,8 @@ export function buildAction(
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:

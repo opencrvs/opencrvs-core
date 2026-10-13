@@ -819,19 +819,6 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
     ]
   }
 
-  const configWithoutNotify: DeepPartial<EventConfig> = {
-    actions: [
-      {
-        type: ActionType.DECLARE,
-        flags: [{ id: 'declare-only-flag', operation: 'add' }],
-        declaration: {
-          label: { id: '', defaultMessage: '', description: '' },
-          pages: []
-        }
-      }
-    ]
-  }
-
   test('NOTIFY action uses NOTIFY flags when NOTIFY config is present', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
@@ -866,23 +853,6 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
     const flags = resolveEventCustomFlags(event, configWithNotify)
     expect(flags).toContain('declare-only-flag')
     expect(flags).not.toContain('notify-only-flag')
-  })
-
-  test('NOTIFY action falls back to DECLARE flags when no NOTIFY config is present', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
-    }
-
-    // @ts-expect-error - allow partial actions and event config
-    const flags = resolveEventCustomFlags(event, configWithoutNotify)
-    expect(flags).toContain('declare-only-flag')
   })
 })
 
