@@ -14211,6 +14211,31 @@ components:
         type:
           type: string
           const: NOTIFY
+        notificationForm:
+          description: Notification form configuration. Its fields must be a subset of the
+            declaration form fields, with matching types. The values submitted
+            on the notification form pre-fill the declaration. If not defined,
+            the declare action's declaration is used (with all fields optional).
+          $ref: "#/components/schemas/DeclarationFormConfig"
+        review:
+          type: object
+          properties:
+            title:
+              description: Title of the review page
+              $ref: "#/components/schemas/TranslationConfig"
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+              description: Fields displayed on the review page for annotations.
+          required:
+            - title
+            - fields
+          additionalProperties: false
+          description: Review page configuration for the notify action. Values of its
+            fields are stored as the NOTIFY action annotation. If not defined,
+            defineConfig generates it from the declare action's review (with all
+            fields optional).
         form:
           description: Fields rendered on the action confirmation dialog. Submitted values
             are stored in the action annotation and shown in the audit history.
@@ -14221,10 +14246,63 @@ components:
         - label
         - flags
         - type
+        - review
       additionalProperties: false
-      description: Configuration for the notify action. When present, NOTIFY uses this
-        config independently from DECLARE. When absent, NOTIFY falls back to the
+      description: Configuration for the notify action, including the notification
+        form and its review page. When undefined, it is generated using the
         DeclareActionConfig.
+    DeclarationFormConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the form
+          $ref: "#/components/schemas/TranslationConfig"
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the page
+              title:
+                description: Header title of the page
+                $ref: "#/components/schemas/TranslationConfig"
+              requireCompletionToContinue:
+                default: false
+                description: If true, all required fields must be filled before continuing to
+                  the next page
+                type: boolean
+              showClearButton:
+                description: If true, a "Clear" button is shown at the top of the page allowing
+                  the user to reset all fields on the page to their default
+                  state
+                type: boolean
+              fields:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FieldConfig"
+                description: Fields to be rendered on the page
+              conditional:
+                description: Page will be shown if condition is met. If conditional is not
+                  defined, the page will be always shown.
+                $ref: "#/components/schemas/Conditional"
+              type:
+                default: FORM
+                type: string
+                const: FORM
+            required:
+              - id
+              - title
+              - requireCompletionToContinue
+              - fields
+              - type
+            additionalProperties: false
+      required:
+        - label
+        - pages
+      additionalProperties: false
+      description: Configuration of the declaration form.
     DeclareActionConfig:
       type: object
       properties:
@@ -14302,9 +14380,8 @@ components:
         - declaration
         - review
       additionalProperties: false
-      description: Configuration for the declare action. Includes review-page fields.
-        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
-        provided.
+      description: Configuration for the declare action. Includes the declaration form
+        and review-page fields.
     DeduplicationConfig:
       type: object
       properties:
@@ -14449,58 +14526,6 @@ components:
             - type
           additionalProperties: false
       type: object
-    DeclarationFormConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the form
-          $ref: "#/components/schemas/TranslationConfig"
-        pages:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Unique identifier for the page
-              title:
-                description: Header title of the page
-                $ref: "#/components/schemas/TranslationConfig"
-              requireCompletionToContinue:
-                default: false
-                description: If true, all required fields must be filled before continuing to
-                  the next page
-                type: boolean
-              showClearButton:
-                description: If true, a "Clear" button is shown at the top of the page allowing
-                  the user to reset all fields on the page to their default
-                  state
-                type: boolean
-              fields:
-                type: array
-                items:
-                  $ref: "#/components/schemas/FieldConfig"
-                description: Fields to be rendered on the page
-              conditional:
-                description: Page will be shown if condition is met. If conditional is not
-                  defined, the page will be always shown.
-                $ref: "#/components/schemas/Conditional"
-              type:
-                default: FORM
-                type: string
-                const: FORM
-            required:
-              - id
-              - title
-              - requireCompletionToContinue
-              - fields
-              - type
-            additionalProperties: false
-      required:
-        - label
-        - pages
-      additionalProperties: false
-      description: Configuration of the declaration form.
     DuplicateDetectedActionConfig:
       type: object
       properties:
