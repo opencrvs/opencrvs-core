@@ -26,6 +26,8 @@ type DeclarationReviewConfigInput = z.input<typeof DeclarationReviewConfig>
  * Makes a field (and the fields of a field group) optional, and removes its validations.
  * The notification form derived from the declaration accepts what NOTIFY accepts today:
  * structural checks only.
+ *
+ * NOTE: I'm not 100% sure if we need this logic really, lets remove it if we don't need it.
  */
 function toOptionalField<F extends FieldConfig | FieldConfigInput>(
   field: F
