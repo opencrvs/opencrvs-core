@@ -67,6 +67,42 @@ spec:
 {{- end }}
 {{- end }}
 
+{{- /*
+Filebeat and Metricbeat read pod metadata from the Kubernetes API server
+(autodiscover and add_kubernetes_metadata), which the namespace-wide
+default-deny egress blocks. 443 is the in-cluster Service port, 6443 is the
+usual API server endpoint port that CNIs match after DNAT. Metricbeat also
+scrapes the kubelet on its node IP (10250) for node, pod and container metrics.
+*/}}
+{{- if or (eq $service_name "filebeat") (eq $service_name "metricbeat") }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-allow-kube-api-egress" $service_name | trunc 63 | trimSuffix "-" }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ $appLabel | quote }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        {{- range $private_cidrs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443
+        {{- if eq $service_name "metricbeat" }}
+        - protocol: TCP
+          port: 10250
+        {{- end }}
+{{- end }}
+
 {{- range $rule := $rules }}
 {{- if not $rule.name }}
 {{- fail (printf "network_policy rule for service %s must define name" $service_name) }}

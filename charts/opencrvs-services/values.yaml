@@ -289,8 +289,6 @@ env:
   NODE_ENV: production
   MINIO_BUCKET: ocrvs
   # LOG_LEVEL: debug
-  # Application performance monitoring service URL.
-  # APN_SERVICE_URL: http://dependencies_apm-server:8200
 
   # Sentry DSN (Data Source Name) configuration for error tracking.
   # Note: The SENTRY_DSN should be defined at the global level of environment variables.
