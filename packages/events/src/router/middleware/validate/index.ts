@@ -30,6 +30,8 @@ import {
   deepMerge,
   errorMessages,
   findRecordActionPages,
+  getActionAnnotationFields,
+  getActionConfig,
   getActionFormFields,
   getActionReviewFields,
   getCurrentEventState,
@@ -289,22 +291,40 @@ export function validateNotifyAction({
   eventConfig,
   annotation = {},
   declaration = {},
-  context
+  context,
+  actionType = ActionType.NOTIFY
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
   context: ValidatorContext
+  actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
 }) {
   const declarationConfig = getDeclaration(eventConfig)
   const formFields = declarationConfig.pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
 
-  const reviewFields = [
-    ...getActionReviewFields(eventConfig, ActionType.DECLARE),
-    ...getActionFormFields(eventConfig, ActionType.NOTIFY)
-  ]
+  const notifyConfig = getActionConfig({
+    eventConfiguration: eventConfig,
+    actionType: ActionType.NOTIFY
+  })
+
+  if (!notifyConfig) {
+    throw new Error('Notify action config not found!')
+  }
+
+  const notifyAnnotationFields = getActionAnnotationFields(notifyConfig)
+
+  // NOTIFY annotation comes from its own review and dialog fields.
+  // EDIT keeps the DECLARE review fields, plus the NOTIFY dialog fields for "notify with edits".
+  const reviewFields =
+    actionType === ActionType.NOTIFY
+      ? notifyAnnotationFields
+      : [
+          ...getActionReviewFields(eventConfig, ActionType.DECLARE),
+          ...getActionFormFields(eventConfig, ActionType.NOTIFY)
+        ]
 
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
@@ -410,7 +430,8 @@ function validateAction({
         eventConfig,
         annotation: input.annotation,
         declaration: input.declaration,
-        context
+        context,
+        actionType: input.type
       })
     )
 

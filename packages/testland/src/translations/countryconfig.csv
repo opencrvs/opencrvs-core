@@ -237,6 +237,8 @@ event.birth.action.issue-vc.audit-history-label,Audit history label for issued v
 event.birth.action.issue-vc.label,Label for issue verifiable credential action,Issue a verifiable credential,Délivrer une attestation vérifiable
 event.birth.action.issued.audit-history-label,The label to show in audit history for the issued action,Issued,Émis
 event.birth.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
+event.birth.action.notify.form.label,This is what the birth notification form is referred as,Birth notification form,Formulaire de notification de naissance
+event.birth.action.notify.form.review.notifier.signature.label,Label for the notifier signature field in the notify review section,Signature of notifier,Signature du notificateur
 event.birth.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.birth.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.birth.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
