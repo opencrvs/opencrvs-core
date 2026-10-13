@@ -682,6 +682,114 @@ export const RedirectAfterPrint: Story = {
   }
 }
 
+const slowUnassignEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE, user },
+    { type: ActionType.ASSIGN, user },
+    { type: ActionType.DECLARE, user },
+    { type: ActionType.REGISTER, user }
+  ]
+})
+let printRequestCount = 0
+
+export const PrintIsSubmittedOnceWhileUnassignIsPending: Story = {
+  beforeEach: () => {
+    printRequestCount = 0
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    test: {
+      // Since we cannot test the generated PDF, we can ignore the failed font request
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.actions.assignment.unassign.mutation(async () => {
+            await delay(20000)
+            return EventDocumentOnlyLastAction.parse({
+              ...slowUnassignEvent,
+              actions: [
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.UNASSIGN
+                })
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.printCertificate.request.mutation(() => {
+            printRequestCount++
+            return slowUnassignEvent
+          })
+        ]
+      }
+    },
+    offline: {
+      events: [slowUnassignEvent],
+      drafts: [
+        generator.event.draft({
+          eventId: slowUnassignEvent.id,
+          actionType: ActionType.PRINT_CERTIFICATE,
+          annotation: {
+            [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
+            'collector.requesterId': 'INFORMANT',
+            'collector.identity.verify': true,
+            templateId: 'tennis-club-membership-certified-certificate'
+          }
+        })
+      ]
+    },
+    reactRouter: {
+      router: {
+        initialPath: '/',
+        element: <Outlet />,
+        children: [routesConfig]
+      },
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+        { eventId: slowUnassignEvent.id },
+        { templateId: 'tennis-club-membership-certificate' }
+      )
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Print once', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Yes, print certificate' })
+      )
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Print' })
+      )
+      await waitFor(
+        async () => {
+          await expect(printRequestCount).toBe(1)
+        },
+        { timeout: 7000 } // Generating the PDF takes a long time.
+      )
+    })
+
+    await step('Print again while unassign is still pending', async () => {
+      const printButton = await canvas.findByRole('button', {
+        name: 'Yes, print certificate'
+      })
+      await waitFor(async () => {
+        await expect(printButton).toBeEnabled()
+      })
+      await userEvent.click(printButton)
+
+      const confirmButton = canvas.queryByRole('button', { name: 'Print' })
+      if (confirmButton) {
+        await userEvent.click(confirmButton)
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await expect(printRequestCount).toBe(1)
+    })
+  }
+}
+
 // Late HTTP response from a left page must not overwrite the current page's values
 const HTTP_FIELD_URL = '/api/slow-http-field'
 const HTTP_FIELD_DELAY_MS = 1500
