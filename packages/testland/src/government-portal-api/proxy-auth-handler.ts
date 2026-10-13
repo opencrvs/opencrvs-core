@@ -111,7 +111,7 @@ const corsHeaders = [
   },
   {
     key: 'Access-Control-Allow-Headers',
-    value: 'Authorization, Content-Type, Accept, x-correlation-id'
+    value: 'Authorization, Content-Type, Accept'
   }
 ] as const
 

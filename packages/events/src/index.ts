@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { logger } from '@opencrvs/commons'
+// Must stay first: the pino instrumentation only patches loggers created after the SDK starts.
 import '@opencrvs/commons/monitoring'
+import { logger } from '@opencrvs/commons'
 import { env } from './environment'
 import { server } from './server'
 import { getServiceToken } from './service/auth'
