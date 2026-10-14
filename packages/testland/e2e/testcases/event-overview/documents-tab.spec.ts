@@ -8,29 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { format, subDays } from 'date-fns'
-import { faker } from '@faker-js/faker'
 import {
   getToken,
   login,
   switchEventTab,
   triggerDeclarationAction,
-  uploadImage,
-  uploadImageToSection
+  uploadImage
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
-import {
-  ensureAssignedToUser,
-  expectInUrl,
-  selectAction,
-  type,
-  waitForCorrectionAction
-} from '@e2e/support/utils'
+import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import {
   createDeclaration,
@@ -62,38 +54,6 @@ async function declareWithProofOfBirth(): Promise<Declaration> {
     ActionType.DECLARE
   )
   return res.declaration
-}
-
-/**
- * Declares a birth via the API with two proof-of-mother's-ID documents
- * (National ID and Birth Certificate), both under the same FILE_WITH_OPTIONS field.
- */
-async function declareWithProofOfMother(): Promise<Declaration> {
-  const token = await getToken(CREDENTIALS.REGISTRAR)
-  const nationalId = await uploadFile(getSignatureFile(), token)
-  const birthCertificate = await uploadFile(getSignatureFile(), token)
-  const declarationRequest = await getDeclaration({
-    token,
-    partialDeclaration: {
-      'documents.proofOfMother': [
-        { ...nationalId, option: 'NATIONAL_ID' },
-        { ...birthCertificate, option: 'BIRTH_CERTIFICATE' }
-      ]
-    }
-  })
-  const res = await createDeclaration(
-    token,
-    declarationRequest,
-    ActionType.DECLARE
-  )
-  return res.declaration
-}
-
-/** The row of the Documents tab listing the given document. */
-function documentRow(page: Page, documentName: string) {
-  return page
-    .locator('#listTable-documents [id^="row_"]')
-    .filter({ hasText: documentName })
 }
 
 test('Documents tab lists both the original and the replacement of an edited document', async ({
@@ -181,210 +141,6 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
     await expect(
       page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
     ).toHaveCount(1)
-  })
-})
-
-test('Documents tab lists a document replaced during "Register with edits"', async ({
-  page
-}) => {
-  const declaration = await declareWithProofOfBirth()
-
-  await test.step('Navigate to the record and assign', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-  })
-
-  await test.step('Edit the declaration, replace the proof of birth and register', async () => {
-    await selectAction(page, 'Edit')
-    await page
-      .getByTestId('accordion-Accordion_documents')
-      .getByRole('button', { name: 'Change all' })
-      .click()
-
-    await uploadImage(
-      page,
-      page.locator('button[name="documents____proofOfBirth"]'),
-      './e2e/assets/image.png'
-    )
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await triggerDeclarationAction(page, 'Register with edits')
-  })
-
-  await test.step('Documents tab shows the original and the replacement', async () => {
-    await page.getByText('Recent').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-
-    await switchEventTab(page, 'Documents')
-
-    // One row from the declaration, one from the edit that replaced it.
-    await expect(
-      page.locator('#listTable-documents').getByText(PROOF_OF_BIRTH_LABEL)
-    ).toHaveCount(2)
-  })
-})
-
-test('Documents tab lists only the file added to a multi-file document during an edit', async ({
-  page
-}) => {
-  const declaration = await declareWithProofOfMother()
-
-  await test.step('Navigate to the record and assign', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-  })
-
-  await test.step("Edit the declaration and add a passport to the proof of mother's ID", async () => {
-    await selectAction(page, 'Edit')
-    await page
-      .getByTestId('accordion-Accordion_documents')
-      .getByRole('button', { name: 'Change all' })
-      .click()
-
-    await uploadImageToSection({
-      page,
-      sectionLocator: page.locator('#documents____proofOfMother-form-input'),
-      sectionTitle: 'Passport',
-      buttonLocator: page.locator('button[name="documents____proofOfMother"]')
-    })
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await triggerDeclarationAction(page, 'Declare with edits')
-  })
-
-  await test.step('Documents tab lists each file once, under the action that added it', async () => {
-    await page.getByText('Recent').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-
-    await switchEventTab(page, 'Documents')
-
-    // The edit resends the whole field, but only the passport is new.
-    await expect(
-      page.locator('#listTable-documents').getByText("Proof of mother's ID")
-    ).toHaveCount(3)
-    await expect(
-      documentRow(page, "Proof of mother's ID (National ID)")
-    ).toHaveCount(1)
-    await expect(
-      documentRow(page, "Proof of mother's ID (Birth Certificate)")
-    ).toHaveCount(1)
-    await expect(
-      documentRow(page, "Proof of mother's ID (Passport)")
-    ).toHaveCount(1)
-  })
-})
-
-test('Documents tab tells correction request documents apart from direct correction documents', async ({
-  page
-}) => {
-  const token = await getToken(CREDENTIALS.REGISTRAR)
-  const { declaration, trackingId } = await createDeclaration(
-    token,
-    undefined,
-    ActionType.REGISTER
-  )
-
-  async function openRecord() {
-    await type(page, '#searchText', trackingId!)
-    await page.locator('#searchIconButton').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-  }
-
-  async function fillCorrectionDetails(supportingDocument: string) {
-    await page.locator('#requester____type').click()
-    await page.getByText('Legal Guardian', { exact: true }).click()
-    await page.locator('#reason____option').click()
-    await page
-      .getByText('Myself or an agent made a mistake (Clerical error)', {
-        exact: true
-      })
-      .click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-
-    await page.getByRole('button', { name: 'Verified' }).click()
-
-    await page.getByText('Select', { exact: true }).click()
-    await page.getByText(supportingDocument, { exact: true }).click()
-    await uploadImage(
-      page,
-      page.locator('button[name="documents____supportingDocs"]')
-    )
-    await page.getByRole('button', { name: 'Continue' }).click()
-
-    await page.locator('#fees____amount').fill('10')
-    await page.getByRole('button', { name: 'Continue' }).click()
-
-    await page.getByTestId('change-button-child.name').click()
-    await page.getByTestId('text__firstname').fill(faker.person.firstName())
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-  }
-
-  await test.step('Registration Officer requests a correction with an affidavit', async () => {
-    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-    await openRecord()
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-    await selectAction(page, 'Correct')
-
-    await fillCorrectionDetails('Affidavit')
-
-    const correctionRequest = page.waitForResponse(
-      (res) =>
-        res.url().includes('event.actions.correction.request') && res.ok()
-    )
-    await page
-      .getByRole('button', { name: 'Submit correction request' })
-      .click()
-    await page.getByRole('button', { name: 'Confirm' }).click()
-    await correctionRequest
-  })
-
-  await test.step('Registrar rejects the correction request', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await openRecord()
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-    await selectAction(page, 'Review correction request')
-
-    await page.getByRole('button', { name: 'Reject', exact: true }).click()
-    await page.locator('#reject-correction-reason').fill('No legal proof')
-    await waitForCorrectionAction(page, 'reject', async () => {
-      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-    })
-  })
-
-  await test.step('Registrar corrects the record directly with a court document', async () => {
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-    await selectAction(page, 'Correct')
-
-    await fillCorrectionDetails('Court Document')
-
-    await page.getByRole('button', { name: 'Correct' }).click()
-    await waitForCorrectionAction(page, 'approve', async () => {
-      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-    })
-    await expectInUrl(page, `/events/`)
-  })
-
-  await test.step('Documents tab labels each document with the correction action that added it', async () => {
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-
-    await switchEventTab(page, 'Documents')
-
-    await expect(
-      documentRow(page, 'Supporting documents (Affidavit)')
-    ).toContainText('Request correction')
-    await expect(
-      documentRow(page, 'Supporting documents (Court Document)')
-    ).toContainText('Correct')
-    await expect(
-      documentRow(page, 'Supporting documents (Court Document)')
-    ).not.toContainText('Request correction')
   })
 })
 

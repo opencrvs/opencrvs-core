@@ -14,6 +14,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import superjson from 'superjson'
+import { expect, within } from 'storybook/test'
 import {
   ActionDocument,
   ActionType,
@@ -130,6 +131,21 @@ const eventConfig = JSON.parse(
     })
   )
 ) as EventConfig
+
+// Countries label the correction action "Correct", since one action serves both a
+// correction request and a direct correction. The Documents tab must still tell them apart.
+eventConfig.actions = eventConfig.actions.map((action) =>
+  action.type === ActionType.REQUEST_CORRECTION
+    ? {
+        ...action,
+        label: {
+          defaultMessage: 'Correct',
+          description: 'Label for the correction action',
+          id: 'event.tennis-club-membership.action.correction.story.label'
+        }
+      }
+    : action
+)
 
 const actionDefaults = {
   createdAt: generateRandomDatetime(
@@ -327,6 +343,105 @@ const eventWithManyDocuments: EventDocument = {
   ]
 }
 
+// Applies `defaults` last, since the generator replaces e.g. a correction's `requestId`.
+function storyAction<T extends ActionType>(
+  type: T,
+  defaults: Partial<Extract<ActionDocument, { type: T }>> = {}
+): ActionDocument {
+  const overrides = { ...actionDefaults, declaration: {}, ...defaults }
+  return {
+    ...generateActionDocument({
+      configuration: eventConfig,
+      action: type,
+      defaults: overrides
+    }),
+    ...overrides
+  } as ActionDocument
+}
+
+function storyFile(path: string): FileFieldValue {
+  return {
+    path: path as DocumentPath,
+    originalFilename: path,
+    type: 'image/png'
+  }
+}
+
+const applicant = {
+  'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' },
+  'applicant.dob': '1999-11-11'
+}
+
+// Passport and license declared, then edited to add a renewed passport. The edit resends
+// the whole FILE_WITH_OPTIONS field on both EDIT and the DECLARE that follows it.
+const eventWithEditedIdentityDocuments: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: getUUID(),
+  actions: [
+    storyAction(ActionType.CREATE),
+    assigned(),
+    storyAction(ActionType.DECLARE, {
+      createdAt: '2024-03-01T09:00:00.000Z',
+      declaration: { ...applicant, [IDENTITY_DOCS_FIELD_ID]: identityDocuments }
+    }),
+    ...[ActionType.EDIT, ActionType.DECLARE].map((type) =>
+      storyAction(type, {
+        createdAt: '2024-03-10T09:00:00.000Z',
+        declaration: {
+          [IDENTITY_DOCS_FIELD_ID]: [
+            ...identityDocuments,
+            { ...storyFile('passport-renewed.png'), option: 'passport' }
+          ]
+        }
+      })
+    ),
+    assigned()
+  ]
+}
+
+const correctionRequest = storyAction(ActionType.REQUEST_CORRECTION, {
+  createdAt: '2024-03-10T09:00:00.000Z',
+  declaration: { [SUPPORTING_DOC_FIELD_ID]: storyFile('requested.png') }
+})
+
+const directCorrection = storyAction(ActionType.REQUEST_CORRECTION, {
+  createdAt: '2024-03-20T09:00:00.000Z',
+  declaration: { [SUPPORTING_DOC_FIELD_ID]: storyFile('direct.png') }
+})
+
+// A rejected correction request, then a direct correction (a request its requester approved immediately).
+const eventWithCorrections: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: getUUID(),
+  actions: [
+    storyAction(ActionType.CREATE),
+    assigned(),
+    storyAction(ActionType.DECLARE, {
+      createdAt: '2024-03-01T09:00:00.000Z',
+      declaration: applicant
+    }),
+    storyAction(ActionType.REGISTER, { createdAt: '2024-03-02T09:00:00.000Z' }),
+    correctionRequest,
+    storyAction(ActionType.REJECT_CORRECTION, {
+      createdAt: '2024-03-11T09:00:00.000Z',
+      requestId: correctionRequest.id
+    }),
+    directCorrection,
+    storyAction(ActionType.APPROVE_CORRECTION, {
+      createdAt: '2024-03-20T09:00:00.000Z',
+      requestId: directCorrection.id,
+      content: { immediateCorrection: true }
+    }),
+    assigned()
+  ]
+}
+
+/** The Documents tab rows listing the given document, in table order. */
+async function findDocumentRows(canvasElement: HTMLElement, name: string) {
+  const links = await within(canvasElement).findAllByText(name)
+  return links.map((link) => link.closest('[id^="row_"]'))
+}
+
 function handlersFor(event: EventDocument) {
   return {
     events: [
@@ -361,7 +476,9 @@ const meta: Meta<typeof EventOverviewIndex> = {
       events: [
         eventWithDocuments,
         eventWithoutDocuments,
-        eventWithManyDocuments
+        eventWithManyDocuments,
+        eventWithEditedIdentityDocuments,
+        eventWithCorrections
       ]
     }
   },
@@ -423,5 +540,57 @@ export const PaginatedDocuments: Story = {
       })
     },
     msw: { handlers: handlersFor(eventWithManyDocuments) }
+  }
+}
+
+/** An edit resends the whole FILE_WITH_OPTIONS field; each file is listed once, under its first upload. */
+export const ListsEachFileOfAnEditedDocumentOnce: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
+        eventId: eventWithEditedIdentityDocuments.id
+      })
+    },
+    msw: { handlers: handlersFor(eventWithEditedIdentityDocuments) },
+    chromatic: { disableSnapshot: true }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Documents (3)')
+    await expect(
+      await findDocumentRows(canvasElement, `${IDENTITY_DOCS_LABEL} (Passport)`)
+    ).toHaveLength(2)
+    await expect(
+      await findDocumentRows(canvasElement, `${IDENTITY_DOCS_LABEL} (License)`)
+    ).toHaveLength(1)
+  }
+}
+
+/** Documents of a (here rejected) correction request read "Request correction"; a direct correction keeps its label. */
+export const LabelsCorrectionRequestDocuments: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.buildPath({
+        eventId: eventWithCorrections.id
+      })
+    },
+    msw: { handlers: handlersFor(eventWithCorrections) },
+    chromatic: { disableSnapshot: true }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Documents (2)')
+    // Newest first: the direct correction, then the rejected correction request.
+    const [directRow, requestRow] = await findDocumentRows(
+      canvasElement,
+      SUPPORTING_DOC_LABEL
+    )
+    await expect(requestRow).toHaveTextContent('Request correction')
+    await expect(directRow).toHaveTextContent('Correct')
+    await expect(directRow).not.toHaveTextContent('Request correction')
   }
 }
