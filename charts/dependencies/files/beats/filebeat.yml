@@ -31,6 +31,8 @@ processors:
       netinfo.enabled: true
 
   - decode_json_fields:
+      when:
+        has_fields: ['kubernetes.pod.name']
       fields: ['message']
       process_array: false
       max_depth: 1
