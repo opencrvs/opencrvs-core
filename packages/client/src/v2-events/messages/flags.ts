@@ -59,7 +59,7 @@ export function useFlagLabelsString(
 ): string {
   const intl = useIntl()
   return flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
+    .filter((flag) => !ActionFlag.validate(flag))
     .filter((flag) => flag !== InherentFlags.INCOMPLETE)
     .map((flag) => {
       if (flag in flagMessages) {

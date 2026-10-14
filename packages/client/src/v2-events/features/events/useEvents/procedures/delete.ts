@@ -80,8 +80,11 @@ export function usePendingDeleteEventIds(): string[] {
   })
 
   return pendingVariables.flatMap((variables) => {
-    const parsed = DeleteVariables.safeParse(variables)
-    return parsed.success ? [parsed.data.eventId] : []
+    if (DeleteVariables.validate(variables)) {
+      return [variables.eventId]
+    }
+
+    return []
   })
 }
 

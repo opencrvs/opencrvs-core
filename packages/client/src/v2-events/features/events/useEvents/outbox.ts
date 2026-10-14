@@ -31,6 +31,12 @@ const MutationVariables = z.object({
   declaration: EventState.optional()
 })
 
+type MutationVariables = z.infer<typeof MutationVariables>
+
+function isMutationVariables(value: unknown): value is MutationVariables {
+  return MutationVariables.validate(value)
+}
+
 function assignmentMutation(mutationKey: MutationKey) {
   return [
     hashKey(trpcOptionsProxy.event.actions.assignment.assign.mutationKey()),
@@ -62,15 +68,13 @@ export function useOutbox() {
           return null
         }
 
-        const maybeVariables = mutation.state.variables
+        const variables = mutation.state.variables
 
-        const parsedVariables = MutationVariables.safeParse(maybeVariables)
-
-        if (!parsedVariables.success) {
+        if (!isMutationVariables(variables)) {
           return null
         }
 
-        const { eventId, declaration } = parsedVariables.data
+        const { eventId, declaration } = variables
         const event = queryClient.getQueryData(
           trpc.event.get.queryKey({ eventId })
         )
