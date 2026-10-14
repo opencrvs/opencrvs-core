@@ -35,6 +35,7 @@ import {
   getAdministrativeAreaHierarchy,
   resolveVersion,
   ZodDate,
+  isUUID,
   getActionConfig,
   isActionConfigType
 } from '@opencrvs/commons/client'
@@ -127,8 +128,8 @@ export function resolveLocationValue<T extends VersionedEntity>(
   if (pinned) {
     return pinned
   }
-
-  const id = UUID.safeParse(toLocationId(value)).data
+  const locationId = toLocationId(value)
+  const id = locationId && isUUID(locationId) ? locationId : undefined
   const entity = id && entities.get(id)
 
   return entity
@@ -242,6 +243,7 @@ export function recordAnchorDate(eventState: {
  * from), falling back to the record's creation date when that field is
  * empty or not yet configured.
  */
+
 export function liveAnchorDate({
   dateOfEvent,
   form,
@@ -256,10 +258,8 @@ export function liveAnchorDate({
       ? form[dateOfEvent.$$field]
       : undefined
 
-  const parsedDate = ZodDate.safeParse(fieldValue)
-
   return recordAnchorDate({
-    dateOfEvent: parsedDate.success ? parsedDate.data : undefined,
+    dateOfEvent: ZodDate.validate(fieldValue) ? fieldValue : undefined,
     createdAt
   })
 }
