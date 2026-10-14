@@ -141,6 +141,10 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Opt advanced search fields out of form default values
+
+Advanced search fields open with the declaration form's `defaultValue`, so a name defaulting to the logged-in user's name shows up pre-filled and counts towards the search. Set `useFormDefaultValue: false` on a field to open it empty instead, e.g. `field('applicant.name', { useFormDefaultValue: false }).fuzzy()`. Fields without it keep their defaults, e.g. an address defaulting to the user's area. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
