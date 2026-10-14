@@ -90,7 +90,7 @@ function shouldReuseHistoricalAnnotation(
  *
  * @param actionType Action type of the declaration action
  * @param event Event document
- * @param configuration Event configuration
+ * @param eventConfiguration Event configuration
  *
  * If the action is not allowed for the event, redirect the user to overview page.
  * Or throws an error if the user does not have permission to perform the action.
@@ -98,10 +98,9 @@ function shouldReuseHistoricalAnnotation(
 function useActionGuard(
   actionType: AvailableActionTypes,
   event: EventDocument,
-  configuration: EventConfig
+  eventConfiguration: EventConfig
 ) {
-  const eventState = getCurrentEventState(event, configuration)
-
+  const eventState = getCurrentEventState(event, eventConfiguration)
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()
@@ -171,11 +170,9 @@ function DeclarationActionComponent({
   const { setLocalDraft, getLocalDraftOrDefault, useRemoteDraftByEventId } =
     useDrafts()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
-  useActionGuard(actionType, event, configuration)
+  useActionGuard(actionType, event, eventConfiguration)
 
   const remoteDraft = useRemoteDraftByEventId(event.id)
 
@@ -243,9 +240,9 @@ function DeclarationActionComponent({
     : localDraftWithAdjustedTimestamp
 
   const eventStateWithDraftApplied = applyDraftToEventIndex(
-    getCurrentEventState(event, configuration),
+    getCurrentEventState(event, eventConfiguration),
     mergedDraft,
-    configuration
+    eventConfiguration
   )
 
   const actionAnnotation = useMemo(() => {
@@ -270,8 +267,12 @@ function DeclarationActionComponent({
       return {}
     }
 
-    return getAnnotationForActionType({ event, actionType: previousActionType })
-  }, [event, actionType])
+    return getAnnotationForActionType({
+      event,
+      eventConfiguration,
+      actionType: previousActionType
+    })
+  }, [event, eventConfiguration, actionType])
 
   useEffect(() => {
     // Use the form values from the zustand state, so that filled form state is not lost
