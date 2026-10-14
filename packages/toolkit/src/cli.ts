@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable no-console */
-import { runUpgrade } from './migrations/v2.2'
+import fs from 'fs'
+import path from 'path'
+import { runUpgrade } from './migrations'
+import {
+  checkUpgradePath,
+  findCountryConfigToolkitVersion
+} from './migrations/persistent/check-upgrade-path'
 import {
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,
@@ -63,8 +69,15 @@ Exits with a non-zero status if any check fails.
 const UPGRADE_USAGE = `
 Usage: opencrvs upgrade [options]
 
-Upgrade the country config in the current working directory to the next
-major version of OpenCRVS.
+Upgrade the country config in the current working directory to this toolkit's
+version of OpenCRVS. Upgrade one minor version at a time: toolkit 2.2 upgrades
+a country config on 2.1.
+
+The upgrade tells which version the country config is on by its
+@opencrvs/toolkit dependency, and updates that dependency itself once done.
+Run it without changing the dependency first, e.g.
+
+  npx @opencrvs/toolkit@2.2 upgrade
 
 Options:
   -h, --help       Show this message.
@@ -149,6 +162,17 @@ async function runEnvironmentCommand(
   }
 }
 
+/**
+ * Returns the toolkit's own version, e.g. `2.2.0`. Both `src/cli.ts` and the
+ * bundled `dist/cli.js` sit one level below the toolkit's `package.json`.
+ */
+function readToolkitVersion(): string {
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8')
+  )
+  return packageJson.version
+}
+
 async function handleUpgrade() {
   const upgradeArgs = args.slice(1)
 
@@ -164,9 +188,24 @@ async function handleUpgrade() {
     process.exit(1)
   }
 
+  const toolkitVersion = readToolkitVersion()
+  const upgradePath = checkUpgradePath(
+    findCountryConfigToolkitVersion(process.cwd()),
+    toolkitVersion
+  )
+
+  if (upgradePath.status === 'unknown') {
+    console.warn(`⚠️  ${upgradePath.message}\n`)
+  }
+
+  if (upgradePath.status === 'blocked') {
+    console.error(upgradePath.message)
+    process.exit(1)
+  }
+
   console.log('Initiating upgrade...')
   try {
-    await runUpgrade()
+    await runUpgrade(toolkitVersion)
     console.log('Upgrade completed successfully!')
   } catch (error) {
     console.error('Upgrade failed:', error)
