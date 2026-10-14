@@ -214,7 +214,7 @@ export const infrastructureQuestions = [
     valueLabel: 'KUBE_API_ALLOWED_CIDRS',
     initial: process.env.KUBE_API_ALLOWED_CIDRS || '',
     scope: 'ENVIRONMENT' as const
-  },
+  }
 ]
 
 export const staticSSLCertQuestions = [

@@ -144,6 +144,8 @@ A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matchi
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
+- `environment:init` now checks the Docker Hub username, token and repository against Docker Hub before storing them, instead of leaving a bad value to fail at image-pull time during deployment. A rejected username/token or a missing repository (it may be empty) is reported and the questions are asked again; if Docker Hub cannot be reached you choose whether to continue unvalidated. Existing GitHub secrets cannot be read back, so validation only runs when all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412)
+- `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
 
 ### Bug fixes
 

@@ -81,6 +81,7 @@ import {
 
 import { askQuestionWithEditor } from './editor-questions'
 import { selectWithCustom, getIndexFromChoices } from './questions-helper'
+import { validateDockerHubCredentials } from './dockerhub'
 import { manageUsers } from './manage-users'
 import { getEnvironmentInventoryPath } from './paths'
 
@@ -280,6 +281,30 @@ async function promptAndStoreAnswer(
   return { ...Object.fromEntries(existingValuesForQuestions), ...result }
 }
 
+async function promptAndValidateDockerhub(
+  existingValues: Array<Secret | Variable>
+) {
+  const answers = await promptAndStoreAnswer(dockerhubQuestions, existingValues)
+  const result = await validateDockerHubCredentials(
+    answers.dockerhubOrganisation,
+    answers.dockerhubRepository,
+    answers.dockerhubUsername,
+    answers.dockerhubToken
+  )
+  if (result.status === 'valid' || result.status === 'skipped') {
+    return
+  }
+
+  error(`\n${result.status}: ${result.reason || 'Generic error'}\n`)
+  const continueNotValidated = await confirm({
+    message: 'Docker Hub credentials are not validated. Continue anyway?',
+    default: false
+  })
+  if (!continueNotValidated) {
+    process.exit(1)
+  }
+}
+
 ALL_QUESTIONS.push(
   ...githubTokenQuestion,
   ...githubOtherQuestions,
@@ -441,7 +466,7 @@ export async function runSetupEnvironment() {
     await promptAndStoreAnswer(githubOtherQuestions, existingValues)
   }
 
-log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
+  log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
 
   const existingTwoFaEnabled = findExistingValue(
     'TWO_FA_ENABLED',
@@ -465,7 +490,7 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
   }
 
   log('\n', kleur.bold().underline('Docker Hub'))
-  await promptAndStoreAnswer(dockerhubQuestions, existingValues)
+  await promptAndValidateDockerhub(existingValues)
 
   log('\n', kleur.bold().underline('Kubernetes & Runtime'))
 
@@ -681,7 +706,25 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
   }
 
   log('\n', kleur.bold().underline('Monitoring'))
-  await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
+  const existingMonitoringEnabled = findExistingValue(
+    'MONITORING_ENABLED',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const monitoringDefault =
+    process.env.MONITORING_ENABLED || existingMonitoringEnabled?.value
+  const monitoring_enabled = await confirm({
+    message:
+      'Enable monitoring (Kibana, APM, Filebeat, Metricbeat, Elastalert, OpenTelemetry Collector and tracing)? Disable it if this environment does not need its own monitoring stack.',
+    default: monitoringDefault ? monitoringDefault === 'true' : true
+  })
+
+  if (monitoring_enabled) {
+    await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
+  } else {
+    log(kleur.bold().green('✔'), kleur.bold().yellow('Monitoring is disabled'))
+  }
   const sentryDSNExists = findExistingValue(
     'SENTRY_DSN',
     'SECRET',
@@ -780,6 +823,15 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
     didExist: existingTwoFaEnabled,
     // Always stored, so the next run defaults to the current answer
     value: two_fa_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  // Read by the deployment workflows (vars.MONITORING_ENABLED) to decide
+  // whether the OpenTelemetry Collector is installed
+  derivedUpdates.push({
+    name: 'MONITORING_ENABLED',
+    type: 'VARIABLE' as const,
+    didExist: existingMonitoringEnabled,
+    value: monitoring_enabled ? 'true' : 'false',
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)
@@ -1388,6 +1440,7 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
     env: environment,
     environment_type: environment_type,
     two_fa_enabled,
+    monitoring_enabled,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',
