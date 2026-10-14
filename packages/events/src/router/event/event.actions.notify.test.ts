@@ -15,6 +15,7 @@ import { omit } from 'lodash'
 import {
   ActionStatus,
   ActionType,
+  ActionUpdate,
   generateUuid,
   getAcceptedActions,
   getUUID,
@@ -41,6 +42,25 @@ import { getLocations } from '@events/storage/postgres/administrative-hierarchy/
 import { EventNotFoundError } from '@events/service/events/events'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+
+function useNotificationForm(
+  notificationForm: ReturnType<typeof getDeclaration>
+) {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+      HttpResponse.json([
+        {
+          ...tennisClubMembershipEvent,
+          actions: tennisClubMembershipEvent.actions.map((action) =>
+            action.type === ActionType.NOTIFY
+              ? { ...action, notificationForm }
+              : action
+          )
+        }
+      ])
+    )
+  )
+}
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -229,20 +249,7 @@ describe('event.actions.notify', () => {
       }))
     }
 
-    mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
-        HttpResponse.json([
-          {
-            ...tennisClubMembershipEvent,
-            actions: tennisClubMembershipEvent.actions.map((action) =>
-              action.type === ActionType.NOTIFY
-                ? { ...action, notificationForm }
-                : action
-            )
-          }
-        ])
-      )
-    )
+    useNotificationForm(notificationForm)
 
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
@@ -266,6 +273,75 @@ describe('event.actions.notify', () => {
         value: '2024-02-01'
       }
     ])
+  })
+
+  describe('with a notification form that has a required field', () => {
+    // 'applicant.name' is required; declare-only required fields like 'applicant.dob' are left out
+    const declarationForm = getDeclaration(tennisClubMembershipEvent)
+    const notificationForm = {
+      ...declarationForm,
+      pages: declarationForm.pages
+        .filter((page) => page.id === 'applicant')
+        .map((page) => ({
+          ...page,
+          fields: page.fields.filter((field) =>
+            ['applicant.name', 'applicant.email'].includes(field.id)
+          )
+        }))
+    }
+
+    async function notify(declaration: ActionUpdate) {
+      useNotificationForm(notificationForm)
+
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
+
+      return client.event.actions.notify.request({
+        type: ActionType.NOTIFY,
+        eventId: event.id,
+        transactionId: getUUID(),
+        declaration
+      })
+    }
+
+    test('rejects a notification missing a required field', async () => {
+      const error = await notify({
+        'applicant.email': 'applicant@example.com'
+      }).catch((e: unknown) => e)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      expect((error as TRPCError).code).toBe('BAD_REQUEST')
+      expect(JSON.parse((error as TRPCError).message)).toContainEqual({
+        message: errorMessages.requiredField.defaultMessage,
+        id: 'applicant.name'
+      })
+    })
+
+    test('accepts a notification with only the notification form required fields', async () => {
+      const fetchedEvent = await notify({
+        'applicant.name': { firstname: 'John', surname: 'Doe' }
+      })
+
+      expect(fetchedEvent.actions).toContainEqual(
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted
+        })
+      )
+    })
+
+    test('rejects a required name with only the first name', async () => {
+      const error = await notify({
+        'applicant.name': { firstname: 'John' }
+      }).catch((e: unknown) => e)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      expect((error as TRPCError).code).toBe('BAD_REQUEST')
+      expect(JSON.parse((error as TRPCError).message)).toContainEqual(
+        expect.objectContaining({ id: 'applicant.name' })
+      )
+    })
   })
 
   test(`${ActionType.NOTIFY} action accepts partial declaration when NOTIFY has no notification form`, async () => {
