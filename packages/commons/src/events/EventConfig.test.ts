@@ -12,6 +12,9 @@
 import { EventConfig } from './EventConfig'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { ActionType } from './ActionType'
+import { FieldType } from './FieldType'
+import { FieldConfig } from './FieldConfig'
+import { getDeclarationFields } from './utils'
 
 describe('EventConfig', () => {
   it('should successfully validate a valid event config', () => {
@@ -115,6 +118,151 @@ describe('EventConfig', () => {
           message: `Event must have exactly one DECLARE action. Found 2 for event ${tennisClubMembershipEvent.id}`
         })
       )
+    })
+  })
+
+  describe('validateNotificationForm()', () => {
+    const notifyActionIndex = tennisClubMembershipEvent.actions.findIndex(
+      (action) => action.type === ActionType.NOTIFY
+    )
+
+    const getDeclarationField = (id: string) => {
+      const field = getDeclarationFields(tennisClubMembershipEvent).find(
+        (f) => f.id === id
+      )
+      if (!field) {
+        throw new Error(`Field ${id} not found in tennis club declaration`)
+      }
+      return field
+    }
+
+    function withNotificationForm(fields: FieldConfig[]) {
+      return {
+        ...tennisClubMembershipEvent,
+        actions: tennisClubMembershipEvent.actions.map((action) =>
+          action.type === ActionType.NOTIFY
+            ? {
+                ...action,
+                notificationForm: {
+                  label: {
+                    id: 'event.tennis-club-membership.notify.form.label',
+                    defaultMessage: 'Tennis club membership notification',
+                    description: 'Label of the notification form'
+                  },
+                  pages: [
+                    {
+                      id: 'applicant',
+                      title: {
+                        id: 'event.tennis-club-membership.notify.form.page.applicant.title',
+                        defaultMessage: 'Applicant',
+                        description: 'Title of the applicant page'
+                      },
+                      fields
+                    }
+                  ]
+                }
+              }
+            : action
+        )
+      }
+    }
+
+    const fieldPath = (fieldIndex: number) => [
+      'actions',
+      notifyActionIndex,
+      'notificationForm',
+      'pages',
+      0,
+      'fields',
+      fieldIndex
+    ]
+
+    it('should pass validation when NOTIFY has no notification form', () => {
+      const res = EventConfig.safeParse(tennisClubMembershipEvent)
+
+      expect(res.success).toBe(true)
+    })
+
+    it('should pass validation when the notification form fields are a subset of the declaration form fields', () => {
+      const res = EventConfig.safeParse(
+        withNotificationForm([
+          getDeclarationField('applicant.name'),
+          getDeclarationField('applicant.dob')
+        ])
+      )
+
+      expect(res.success).toBe(true)
+    })
+
+    it('should fail validation when a notification form field is not in the declaration form', () => {
+      const res = EventConfig.safeParse(
+        withNotificationForm([
+          getDeclarationField('applicant.name'),
+          {
+            id: 'applicant.favouriteColour',
+            type: FieldType.TEXT,
+            label: {
+              id: 'event.tennis-club-membership.notify.field.favouriteColour.label',
+              defaultMessage: 'Favourite colour',
+              description: 'Label of a field that is not in the declaration'
+            }
+          }
+        ])
+      )
+
+      expect(res.success).toBe(false)
+      expect(res.error?.issues).toEqual([
+        expect.objectContaining({
+          path: fieldPath(1),
+          message: `Notification form field 'applicant.favouriteColour' does not exist in the declaration form of event '${tennisClubMembershipEvent.id}'. Notification form fields must also be defined in the DECLARE action's declaration.`
+        })
+      ])
+    })
+
+    it('should fail validation when a notification form field has a different type than the declaration form field', () => {
+      const res = EventConfig.safeParse(
+        withNotificationForm([
+          {
+            ...getDeclarationField('applicant.email'),
+            type: FieldType.TEXT
+          } as FieldConfig
+        ])
+      )
+
+      expect(res.success).toBe(false)
+      expect(res.error?.issues).toEqual([
+        expect.objectContaining({
+          path: fieldPath(0),
+          message: `Notification form field 'applicant.email' is of type TEXT, but the declaration form field with the same id in event '${tennisClubMembershipEvent.id}' is of type EMAIL.`
+        })
+      ])
+    })
+
+    it('should report every invalid notification form field', () => {
+      const res = EventConfig.safeParse(
+        withNotificationForm([
+          getDeclarationField('applicant.name'),
+          {
+            ...getDeclarationField('applicant.email'),
+            type: FieldType.TEXT
+          } as FieldConfig,
+          {
+            id: 'applicant.favouriteColour',
+            type: FieldType.TEXT,
+            label: {
+              id: 'event.tennis-club-membership.notify.field.favouriteColour.label',
+              defaultMessage: 'Favourite colour',
+              description: 'Label of a field that is not in the declaration'
+            }
+          }
+        ])
+      )
+
+      expect(res.success).toBe(false)
+      expect(res.error?.issues.map((issue) => issue.path)).toEqual([
+        fieldPath(1),
+        fieldPath(2)
+      ])
     })
   })
 })

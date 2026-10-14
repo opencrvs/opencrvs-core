@@ -85,6 +85,12 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
+    notificationForm: DeclarationFormConfig.optional().describe(
+      "Notification form configuration. Its fields must be a subset of the declaration form fields, with matching types. The values submitted on the notification form pre-fill the declaration. If not defined, the declare action's declaration is used (with all fields optional)."
+    ),
+    review: DeclarationReviewConfig.describe(
+      "Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation. If not defined, defineConfig generates it from the declare action's review (with all fields optional)."
+    ),
     form: actionConfirmationForm
   }).shape
 )
@@ -195,6 +201,20 @@ const UnarchiveConfig = ActionConfigBase.extend(
   }).shape
 )
 
+const RevokeRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REVOKE_REGISTRATION),
+    form: actionConfirmationForm
+  }).shape
+)
+
+const ReinstateRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REINSTATE_REGISTRATION),
+    form: actionConfirmationForm
+  }).shape
+)
+
 const EditActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.EDIT),
@@ -299,12 +319,12 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+        'Configuration for the notify action, including the notification form and its review page. When undefined, it is generated using the DeclareActionConfig.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+        'Configuration for the declare action. Includes the declaration form and review-page fields.'
     }),
     DuplicateDetectedConfig.meta({
       id: 'DuplicateDetectedActionConfig',
@@ -357,6 +377,15 @@ export const ActionConfig = z
     UnarchiveConfig.meta({
       id: 'UnarchiveActionConfig',
       description: 'Configuration for unarchiving a record.'
+    }),
+    RevokeRegistrationConfig.meta({
+      id: 'RevokeRegistrationActionConfig',
+      description: 'Configuration for revoking a registered record.'
+    }),
+    ReinstateRegistrationConfig.meta({
+      id: 'ReinstateRegistrationActionConfig',
+      description:
+        'Configuration for reinstating a revoked record back to registered.'
     }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',

@@ -8,6 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import fs from 'fs'
+import path from 'path'
 import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType } from '@opencrvs/toolkit/events'
@@ -34,6 +36,10 @@ import {
   openBirthDeclaration,
   showPageWith
 } from '@e2e/support/birth/helpers'
+
+const OPENCRVS_VERSION: string = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../../package.json'), 'utf8')
+).version
 
 const createDraft = async (page: Page) => {
   await page.goto(CLIENT_URL)
@@ -94,7 +100,9 @@ const expectVersionCard = async (
     page.getByText(`${role} • ${office}`, { exact: true })
   ).toBeVisible()
   await expect(page.getByText('Online', { exact: true })).toBeVisible()
-  await expect(page.getByText('OpenCRVS v2.2.0', { exact: true })).toBeVisible()
+  await expect(
+    page.getByText(`OpenCRVS v${OPENCRVS_VERSION}`, { exact: true })
+  ).toBeVisible()
 }
 
 type RegistrarWithDrafts = {

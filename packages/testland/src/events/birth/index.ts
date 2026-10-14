@@ -35,6 +35,10 @@ import { advancedSearchBirth } from './advancedSearch'
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth } from './forms/pages/child'
 import { CORRECTION_FORM } from './forms/correctionForm'
+import {
+  BIRTH_NOTIFICATION_FORM,
+  BIRTH_NOTIFICATION_REVIEW
+} from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
@@ -348,12 +352,14 @@ export const birthEvent = defineConfig({
     ActionType.PRINT_CERTIFICATE,
     'ISSUE_CERTIFIED_COPY',
     ActionType.REQUEST_CORRECTION,
-    'REVOKE_REGISTRATION',
     'REINSTATE_REVOKE_REGISTRATION',
+    ActionType.REINSTATE_REGISTRATION,
     'ISSUE_VERIFIABLE_CREDENTIAL',
     ActionType.UNASSIGN,
     'SEAL',
-    'UNSEAL'
+    'UNSEAL',
+    // Also orders the custom revoke, which no role can perform any more
+    'REVOKE_REGISTRATION'
   ],
   actions: [
     {
@@ -987,6 +993,72 @@ export const birthEvent = defineConfig({
         }
       ],
       flags: [{ id: 'revoked', operation: 'remove' }],
+      form: [
+        {
+          id: 'reason',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description:
+              'This is the label for the reason field for revoke registration action',
+            id: 'event.birth.custom.action.revoke-registration.field.reason.label'
+          }
+        }
+      ]
+    },
+    {
+      type: ActionType.REVOKE_REGISTRATION,
+      label: {
+        defaultMessage: 'Revoke registration',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.action.revoke-registration.label'
+      },
+      icon: 'Briefcase',
+      supportingCopy: {
+        defaultMessage:
+          'Revoking this registration will invalidate the record and prevent its use for official purposes. This action should only be taken under lawful authority.',
+        description:
+          'This is the confirmation text for the revoke registration action',
+        id: 'event.birth.action.revoke-registration.supportingCopy'
+      },
+      flags: [
+        { id: 'pending-first-certificate-issuance', operation: 'remove' },
+        { id: 'escalated-to-registrar-general', operation: 'remove' },
+        { id: 'escalated-to-provincial-registrar', operation: 'remove' },
+        {
+          id: 'certified-copy-printed-in-advance-of-issuance',
+          operation: 'remove'
+        }
+      ],
+      // Records revoked with the custom action are still REGISTERED
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
+      ],
+      form: [
+        {
+          id: 'reason',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description:
+              'This is the label for the reason field for revoke registration action',
+            id: 'event.birth.custom.action.revoke-registration.field.reason.label'
+          }
+        }
+      ]
+    },
+    {
+      type: ActionType.REINSTATE_REGISTRATION,
+      label: {
+        defaultMessage: 'Reinstate registration',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.action.reinstate-registration.label'
+      },
+      icon: 'ArchiveTray',
       form: [
         {
           id: 'reason',
