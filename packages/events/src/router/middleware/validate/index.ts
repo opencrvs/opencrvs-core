@@ -36,6 +36,7 @@ import {
   getActionReviewFields,
   getCurrentEventState,
   getDeclaration,
+  getNotificationFields,
   getVisibleVerificationPageIds,
   isFieldVisible,
   isPageVisible,
@@ -300,10 +301,12 @@ export function validateNotifyAction({
   context: ValidatorContext
   actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
 }) {
-  const declarationConfig = getDeclaration(eventConfig)
-  const formFields = declarationConfig.pages.flatMap(({ fields }) =>
-    fields.flatMap((field) => field)
-  )
+  const formFields =
+    actionType === ActionType.NOTIFY
+      ? getNotificationFields(eventConfig)
+      : getDeclaration(eventConfig).pages.flatMap(({ fields }) =>
+          fields.flatMap((field) => field)
+        )
 
   const notifyConfig = getActionConfig({
     eventConfiguration: eventConfig,
@@ -358,7 +361,10 @@ export function validateNotifyAction({
 
       if (!field) {
         return {
-          message: errorMessages.unexpectedField.defaultMessage,
+          message:
+            actionType === ActionType.NOTIFY
+              ? errorMessages.notInNotifyForm.defaultMessage
+              : errorMessages.unexpectedField.defaultMessage,
           id: key,
           value
         }

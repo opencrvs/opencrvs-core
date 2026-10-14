@@ -11,6 +11,7 @@
 /* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
+import { omit } from 'lodash'
 import {
   ActionStatus,
   ActionType,
@@ -22,7 +23,9 @@ import {
   AddressType,
   encodeScope,
   getCurrentEventState,
-  EventStatus
+  EventStatus,
+  errorMessages,
+  getDeclaration
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -214,6 +217,91 @@ describe('event.actions.notify', () => {
     await expect(
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
+  })
+
+  test(`${ActionType.NOTIFY} action fails if payload includes declaration field that is not in the notification form`, async () => {
+    const declarationForm = getDeclaration(tennisClubMembershipEvent)
+    const notificationForm = {
+      ...declarationForm,
+      pages: declarationForm.pages.map((page) => ({
+        ...page,
+        fields: page.fields.filter((field) => field.id !== 'applicant.dob')
+      }))
+    }
+
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+        HttpResponse.json([
+          {
+            ...tennisClubMembershipEvent,
+            actions: tennisClubMembershipEvent.actions.map((action) =>
+              action.type === ActionType.NOTIFY
+                ? { ...action, notificationForm }
+                : action
+            )
+          }
+        ])
+      )
+    )
+
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    const error = await client.event.actions.notify
+      .request({
+        type: ActionType.NOTIFY,
+        eventId: event.id,
+        transactionId: getUUID(),
+        declaration: { 'applicant.dob': '2024-02-01' }
+      })
+      .catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(TRPCError)
+    expect((error as TRPCError).code).toBe('BAD_REQUEST')
+    expect(JSON.parse((error as TRPCError).message)).toEqual([
+      {
+        message: errorMessages.notInNotifyForm.defaultMessage,
+        id: 'applicant.dob',
+        value: '2024-02-01'
+      }
+    ])
+  })
+
+  test(`${ActionType.NOTIFY} action accepts partial declaration when NOTIFY has no notification form`, async () => {
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+        HttpResponse.json([
+          {
+            ...tennisClubMembershipEvent,
+            actions: tennisClubMembershipEvent.actions.map((action) =>
+              action.type === ActionType.NOTIFY
+                ? omit(action, 'notificationForm')
+                : action
+            )
+          }
+        ])
+      )
+    )
+
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    // 'applicant.name' is required in the DECLARE form and is omitted here
+    const fetchedEvent = await client.event.actions.notify.request({
+      type: ActionType.NOTIFY,
+      eventId: event.id,
+      transactionId: getUUID(),
+      declaration: { 'applicant.email': 'applicant@example.com' }
+    })
+
+    expect(fetchedEvent.actions).toContainEqual(
+      expect.objectContaining({
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Accepted
+      })
+    )
   })
 
   test(`${ActionType.NOTIFY} action does not fail even if invalid value is sent`, async () => {
