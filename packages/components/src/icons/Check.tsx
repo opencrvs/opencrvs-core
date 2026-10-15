@@ -10,6 +10,13 @@
  */
 import * as React from 'react'
 
+/**
+ * @knipignore
+ *
+ * Drawn by VerificationWizard, which imports the legacy icon set from
+ * `@opencrvs/components/lib/icons`. Knip runs without that build output, so it
+ * cannot follow the import.
+ */
 export const Check = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={24} height={24} fill="none" {...props}>
     <path
