@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import {
   ActionType,
   ConditionalType,
@@ -17,11 +18,13 @@ import {
   FieldType,
   flag,
   generateEventDocument,
+  getDeclaration,
   TestUserRole,
   TokenUserType,
   user
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { getEventValidatorContext } from '@opencrvs/commons/events'
 import { getFieldErrors, validateNotifyAction } from './index'
 
 export const testContext = {
@@ -462,5 +465,213 @@ describe('core action dialog form validation', () => {
     })
 
     expect(errors).toHaveLength(1)
+  })
+})
+
+describe('NOTIFY review field validation', () => {
+  const reviewField = {
+    id: 'notifier.comment',
+    type: FieldType.TEXT,
+    required: true,
+    label: {
+      id: 'notifier.comment.label',
+      defaultMessage: 'Comment of the notifier',
+      description: 'Notify-only review field'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('applicant.email').isEqualTo('notifier@example.com')
+      }
+    ]
+  }
+
+  const declarationForm = getDeclaration(tennisClubMembershipEvent)
+  const notificationForm = {
+    ...declarationForm,
+    pages: declarationForm.pages
+      .filter((page) => page.id === 'applicant')
+      .map((page) => ({
+        ...page,
+        fields: page.fields.filter((f) =>
+          ['applicant.name', 'applicant.email'].includes(f.id)
+        )
+      }))
+  }
+
+  function configWithNotify({
+    withNotificationForm
+  }: {
+    withNotificationForm: boolean
+  }) {
+    return {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.NOTIFY
+          ? {
+              ...action,
+              ...(withNotificationForm && { notificationForm }),
+              review: { ...action.review, fields: [reviewField] }
+            }
+          : action
+      )
+    }
+  }
+
+  const declaration = {
+    'applicant.name': { firstname: 'John', surname: 'Doe' },
+    'applicant.email': 'notifier@example.com'
+  }
+
+  describe('with a notification form', () => {
+    it('rejects a missing required dialog field', () => {
+      const dialogField = {
+        id: 'notify.dialog.comments',
+        type: FieldType.TEXT,
+        required: true,
+        label: {
+          id: 'notify.dialog.comments.label',
+          defaultMessage: 'Comments',
+          description: 'Dialog comments field'
+        }
+      }
+
+      const eventConfig = configWithNotify({ withNotificationForm: true })
+
+      const errors = validateNotifyAction({
+        eventConfig: {
+          ...eventConfig,
+          actions: eventConfig.actions.map((action) =>
+            action.type === ActionType.NOTIFY
+              ? { ...action, form: [dialogField] }
+              : action
+          )
+        },
+        annotation: {},
+        declaration: {
+          ...declaration,
+          'applicant.email': 'someone.else@example.com'
+        },
+        context: testContext
+      })
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: errorMessages.requiredField.defaultMessage,
+          id: 'notify.dialog.comments'
+        })
+      ])
+    })
+
+    it('rejects a missing required review field shown by a declaration value', () => {
+      const errors = validateNotifyAction({
+        eventConfig: configWithNotify({ withNotificationForm: true }),
+        annotation: {},
+        declaration,
+        context: testContext
+      })
+
+      expect(errors).toContainEqual(
+        expect.objectContaining({
+          message: errorMessages.requiredField.defaultMessage,
+          id: 'notifier.comment'
+        })
+      )
+    })
+
+    it('does not require a review field hidden by a declaration value', () => {
+      const errors = validateNotifyAction({
+        eventConfig: configWithNotify({ withNotificationForm: true }),
+        annotation: {},
+        declaration: {
+          ...declaration,
+          'applicant.email': 'someone.else@example.com'
+        },
+        context: testContext
+      })
+
+      expect(errors).toEqual([])
+    })
+  })
+
+  describe('without a notification form', () => {
+    it('does not require a missing review field', () => {
+      const errors = validateNotifyAction({
+        eventConfig: configWithNotify({ withNotificationForm: false }),
+        annotation: {},
+        declaration,
+        context: testContext
+      })
+
+      expect(errors).toEqual([])
+    })
+
+    it('validates a review field value shown by a declaration value', () => {
+      const errors = validateNotifyAction({
+        eventConfig: configWithNotify({ withNotificationForm: false }),
+        annotation: { 'notifier.comment': 123 },
+        declaration,
+        context: testContext
+      })
+
+      expect(errors).toContainEqual(
+        expect.objectContaining({ id: 'notifier.comment' })
+      )
+    })
+  })
+
+  it('requires a review field shown by a saved declaration value when notifying with edits', () => {
+    const eventConfig = configWithNotify({ withNotificationForm: true })
+    const document = generateEventDocument({
+      configuration: eventConfig,
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.NOTIFY,
+          declarationOverrides: { 'applicant.email': 'notifier@example.com' }
+        },
+        { type: ActionType.EDIT, declarationOverrides: {} }
+      ]
+    })
+
+    const errors = validateNotifyAction({
+      eventConfig,
+      annotation: {},
+      declaration: { 'applicant.name': declaration['applicant.name'] },
+      context: {
+        ...testContext,
+        event: getEventValidatorContext(document, eventConfig)
+      }
+    })
+
+    expect(errors).toContainEqual(
+      expect.objectContaining({
+        message: errorMessages.requiredField.defaultMessage,
+        id: 'notifier.comment'
+      })
+    )
+  })
+
+  it('validates an EDIT dialog field value shown by a declaration value', () => {
+    const eventConfig = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.NOTIFY
+          ? { ...action, form: [reviewField] }
+          : action
+      )
+    }
+
+    const errors = validateNotifyAction({
+      eventConfig,
+      annotation: { 'notifier.comment': 123 },
+      declaration,
+      context: testContext,
+      actionType: ActionType.EDIT
+    })
+
+    expect(errors).toContainEqual(
+      expect.objectContaining({ id: 'notifier.comment' })
+    )
   })
 })

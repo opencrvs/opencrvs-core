@@ -359,6 +359,15 @@ export function validateNotifyAction({
           ...getActionFormFields(eventConfig, ActionType.NOTIFY)
         ]
 
+  const mergedDeclaration: EventState = deepMerge(
+    context.event?.state.declaration ?? {},
+    declaration
+  )
+  const completeDeclaration = deepDropNulls(mergedDeclaration)
+
+  // Review field conditionals commonly depend on declaration values
+  const annotationContext = { ...context, baseFormState: completeDeclaration }
+
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
       const field = reviewFields.find((f) => f.id === key)
@@ -374,7 +383,7 @@ export function validateNotifyAction({
       const fieldErrors = runStructuralValidations({
         field,
         values: annotation,
-        context
+        context: annotationContext
       })
 
       return fieldErrors.map((error) => ({
@@ -424,16 +433,38 @@ export function validateNotifyAction({
     return [...annotationErrors, ...declarationErrors]
   }
 
-  const { invalidKeys, fieldErrors } = getDeclarationFormErrors({
-    form: notificationForm,
-    completeDeclaration: deepDropNulls(
-      deepMerge(context.event?.state.declaration ?? {}, declaration)
-    ),
-    declarationUpdate: declaration,
-    context
-  })
+  const { cleanedDeclaration, invalidKeys, fieldErrors } =
+    getDeclarationFormErrors({
+      form: notificationForm,
+      completeDeclaration,
+      declarationUpdate: declaration,
+      context
+    })
 
-  return [...annotationErrors, ...invalidKeys, ...fieldErrors]
+  if (invalidKeys.length > 0) {
+    return [...annotationErrors, ...invalidKeys]
+  }
+
+  const reviewContext = { ...context, baseFormState: cleanedDeclaration }
+
+  // Annotation keys that are not NOTIFY review or dialog fields
+  const unexpectedAnnotationErrors = annotationErrors.filter(
+    ({ id }) => !notifyAnnotationFields.some((field) => field.id === id)
+  )
+
+  // Required, type and custom validation errors of the NOTIFY review and dialog fields.
+  // Unlike DECLARE, dialog fields are not relaxed: the NOTIFY dialog is always shown before submitting.
+  const reviewErrors = getFieldErrors(
+    notifyAnnotationFields,
+    omitHiddenFields(
+      notifyAnnotationFields,
+      deepDropNulls(annotation),
+      reviewContext
+    ),
+    reviewContext
+  )
+
+  return [...unexpectedAnnotationErrors, ...fieldErrors, ...reviewErrors]
 }
 
 /*

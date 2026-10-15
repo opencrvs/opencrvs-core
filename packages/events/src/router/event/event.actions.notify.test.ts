@@ -352,8 +352,7 @@ describe('event.actions.notify', () => {
       )
     })
 
-    test('accepts NOTIFY when a required review field is missing from annotation', async () => {
-      // Annotation is checked only for the keys that are submitted
+    test('rejects NOTIFY when a required review field is missing from annotation', async () => {
       useNotificationForm(notificationForm, [
         {
           id: 'notifier.comment',
@@ -371,22 +370,24 @@ describe('event.actions.notify', () => {
       const client = createTestClient(user)
       const event = await client.event.create(generator.event.create())
 
-      const fetchedEvent = await client.event.actions.notify.request({
-        type: ActionType.NOTIFY,
-        eventId: event.id,
-        transactionId: getUUID(),
-        declaration: {
-          'applicant.name': { firstname: 'John', surname: 'Doe' }
-        },
-        annotation: {}
-      })
-
-      expect(fetchedEvent.actions).toContainEqual(
-        expect.objectContaining({
+      const error = await client.event.actions.notify
+        .request({
           type: ActionType.NOTIFY,
-          status: ActionStatus.Accepted
+          eventId: event.id,
+          transactionId: getUUID(),
+          declaration: {
+            'applicant.name': { firstname: 'John', surname: 'Doe' }
+          },
+          annotation: {}
         })
-      )
+        .catch((e: unknown) => e)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      expect((error as TRPCError).code).toBe('BAD_REQUEST')
+      expect(JSON.parse((error as TRPCError).message)).toContainEqual({
+        message: errorMessages.requiredField.defaultMessage,
+        id: 'notifier.comment'
+      })
     })
   })
 
