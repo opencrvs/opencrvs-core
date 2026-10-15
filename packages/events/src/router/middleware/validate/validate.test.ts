@@ -15,6 +15,7 @@ import {
   errorMessages,
   eventQueryDataGenerator,
   field,
+  FieldConfig,
   FieldType,
   flag,
   generateEventDocument,
@@ -468,6 +469,54 @@ describe('core action dialog form validation', () => {
   })
 })
 
+const tennisClubDeclarationForm = getDeclaration(tennisClubMembershipEvent)
+const applicantPage = tennisClubDeclarationForm.pages.find(
+  (page) => page.id === 'applicant'
+)
+
+function getApplicantField(id: string): FieldConfig {
+  const applicantField = applicantPage?.fields.find((f) => f.id === id)
+
+  if (!applicantField) {
+    throw new Error(`Field ${id} not found in the applicant page`)
+  }
+
+  return applicantField
+}
+
+/** Tennis club config whose NOTIFY action uses the given notification form fields (none when omitted) and review fields. */
+function configWithNotify({
+  notificationFields,
+  reviewFields
+}: {
+  notificationFields?: FieldConfig[]
+  reviewFields?: FieldConfig[]
+}) {
+  if (!applicantPage) {
+    throw new Error('Applicant page not found')
+  }
+
+  return {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.NOTIFY
+        ? {
+            ...action,
+            ...(notificationFields && {
+              notificationForm: {
+                ...tennisClubDeclarationForm,
+                pages: [{ ...applicantPage, fields: notificationFields }]
+              }
+            }),
+            ...(reviewFields && {
+              review: { ...action.review, fields: reviewFields }
+            })
+          }
+        : action
+    )
+  }
+}
+
 describe('NOTIFY review field validation', () => {
   const reviewField = {
     id: 'notifier.comment',
@@ -484,38 +533,6 @@ describe('NOTIFY review field validation', () => {
         conditional: field('applicant.email').isEqualTo('notifier@example.com')
       }
     ]
-  }
-
-  const declarationForm = getDeclaration(tennisClubMembershipEvent)
-  const notificationForm = {
-    ...declarationForm,
-    pages: declarationForm.pages
-      .filter((page) => page.id === 'applicant')
-      .map((page) => ({
-        ...page,
-        fields: page.fields.filter((f) =>
-          ['applicant.name', 'applicant.email'].includes(f.id)
-        )
-      }))
-  }
-
-  function configWithNotify({
-    withNotificationForm
-  }: {
-    withNotificationForm: boolean
-  }) {
-    return {
-      ...tennisClubMembershipEvent,
-      actions: tennisClubMembershipEvent.actions.map((action) =>
-        action.type === ActionType.NOTIFY
-          ? {
-              ...action,
-              ...(withNotificationForm && { notificationForm }),
-              review: { ...action.review, fields: [reviewField] }
-            }
-          : action
-      )
-    }
   }
 
   const declaration = {
@@ -536,7 +553,13 @@ describe('NOTIFY review field validation', () => {
         }
       }
 
-      const eventConfig = configWithNotify({ withNotificationForm: true })
+      const eventConfig = configWithNotify({
+        notificationFields: [
+          getApplicantField('applicant.name'),
+          getApplicantField('applicant.email')
+        ],
+        reviewFields: [reviewField]
+      })
 
       const errors = validateNotifyAction({
         eventConfig: {
@@ -565,7 +588,13 @@ describe('NOTIFY review field validation', () => {
 
     it('rejects a missing required review field shown by a declaration value', () => {
       const errors = validateNotifyAction({
-        eventConfig: configWithNotify({ withNotificationForm: true }),
+        eventConfig: configWithNotify({
+          notificationFields: [
+            getApplicantField('applicant.name'),
+            getApplicantField('applicant.email')
+          ],
+          reviewFields: [reviewField]
+        }),
         annotation: {},
         declaration,
         context: testContext
@@ -581,7 +610,13 @@ describe('NOTIFY review field validation', () => {
 
     it('does not require a review field hidden by a declaration value', () => {
       const errors = validateNotifyAction({
-        eventConfig: configWithNotify({ withNotificationForm: true }),
+        eventConfig: configWithNotify({
+          notificationFields: [
+            getApplicantField('applicant.name'),
+            getApplicantField('applicant.email')
+          ],
+          reviewFields: [reviewField]
+        }),
         annotation: {},
         declaration: {
           ...declaration,
@@ -595,9 +630,30 @@ describe('NOTIFY review field validation', () => {
   })
 
   describe('without a notification form', () => {
+    it('accepts a partial name', () => {
+      const errors = validateNotifyAction({
+        eventConfig: configWithNotify({}),
+        declaration: { 'applicant.name': { firstname: 'John' } },
+        context: testContext
+      })
+
+      expect(errors).toEqual([])
+    })
+
+    it('accepts a value for a field hidden by a conditional', () => {
+      // applicant.age is only shown when applicant.dobUnknown is true
+      const errors = validateNotifyAction({
+        eventConfig: configWithNotify({}),
+        declaration: { 'applicant.age': 25 },
+        context: testContext
+      })
+
+      expect(errors).toEqual([])
+    })
+
     it('does not require a missing review field', () => {
       const errors = validateNotifyAction({
-        eventConfig: configWithNotify({ withNotificationForm: false }),
+        eventConfig: configWithNotify({ reviewFields: [reviewField] }),
         annotation: {},
         declaration,
         context: testContext
@@ -608,7 +664,7 @@ describe('NOTIFY review field validation', () => {
 
     it('validates a review field value shown by a declaration value', () => {
       const errors = validateNotifyAction({
-        eventConfig: configWithNotify({ withNotificationForm: false }),
+        eventConfig: configWithNotify({ reviewFields: [reviewField] }),
         annotation: { 'notifier.comment': 123 },
         declaration,
         context: testContext
@@ -621,7 +677,13 @@ describe('NOTIFY review field validation', () => {
   })
 
   it('requires a review field shown by a saved declaration value when notifying with edits', () => {
-    const eventConfig = configWithNotify({ withNotificationForm: true })
+    const eventConfig = configWithNotify({
+      notificationFields: [
+        getApplicantField('applicant.name'),
+        getApplicantField('applicant.email')
+      ],
+      reviewFields: [reviewField]
+    })
     const document = generateEventDocument({
       configuration: eventConfig,
       actions: [
@@ -673,5 +735,193 @@ describe('NOTIFY review field validation', () => {
     expect(errors).toContainEqual(
       expect.objectContaining({ id: 'notifier.comment' })
     )
+  })
+})
+
+describe('NOTIFY notification form validation', () => {
+  const name = { firstname: 'John', surname: 'Doe' }
+
+  it('lists every missing required field', () => {
+    const errors = validateNotifyAction({
+      eventConfig: configWithNotify({
+        notificationFields: [
+          getApplicantField('applicant.name'),
+          { ...getApplicantField('applicant.email'), required: true }
+        ]
+      }),
+      declaration: {},
+      context: testContext
+    })
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: errorMessages.requiredField.defaultMessage,
+          id: 'applicant.name'
+        }),
+        expect.objectContaining({
+          message: errorMessages.requiredField.defaultMessage,
+          id: 'applicant.email'
+        })
+      ])
+    )
+  })
+
+  it('returns required and custom validation errors from different fields together', () => {
+    const errors = validateNotifyAction({
+      eventConfig: configWithNotify({
+        notificationFields: [
+          getApplicantField('applicant.name'),
+          {
+            ...getApplicantField('applicant.email'),
+            validation: [
+              {
+                message: {
+                  id: 'applicant.email.validation.message',
+                  defaultMessage: 'Failed validation!',
+                  description: 'Custom validation message'
+                },
+                validator:
+                  field('applicant.email').isEqualTo('valid@example.com')
+              }
+            ]
+          }
+        ]
+      }),
+      declaration: { 'applicant.email': 'x@example.com' },
+      context: testContext
+    })
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: errorMessages.requiredField.defaultMessage,
+          id: 'applicant.name'
+        }),
+        expect.objectContaining({
+          message: 'Failed validation!',
+          id: 'applicant.email'
+        })
+      ])
+    )
+  })
+
+  it('rejects a value that fails a custom validation', () => {
+    const errors = validateNotifyAction({
+      eventConfig: configWithNotify({
+        notificationFields: [
+          getApplicantField('applicant.name'),
+          {
+            ...getApplicantField('applicant.email'),
+            validation: [
+              {
+                message: {
+                  id: 'applicant.email.validation.message',
+                  defaultMessage: 'Failed validation!',
+                  description: 'Custom validation message'
+                },
+                validator:
+                  field('applicant.email').isEqualTo('valid@example.com')
+              }
+            ]
+          }
+        ]
+      }),
+      declaration: {
+        'applicant.name': name,
+        'applicant.email': 'x@example.com'
+      },
+      context: testContext
+    })
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: 'Failed validation!',
+        id: 'applicant.email'
+      })
+    ])
+  })
+
+  describe('required field with a conditional', () => {
+    const eventConfig = configWithNotify({
+      notificationFields: [
+        getApplicantField('applicant.name'),
+        getApplicantField('applicant.email'),
+        {
+          ...getApplicantField('applicant.dob'),
+          required: true,
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional:
+                field('applicant.email').isEqualTo('show@example.com')
+            }
+          ]
+        }
+      ]
+    })
+
+    it('requires it when shown', () => {
+      const errors = validateNotifyAction({
+        eventConfig,
+        declaration: {
+          'applicant.name': name,
+          'applicant.email': 'show@example.com'
+        },
+        context: testContext
+      })
+
+      expect(errors).toContainEqual(
+        expect.objectContaining({
+          message: errorMessages.requiredField.defaultMessage,
+          id: 'applicant.dob'
+        })
+      )
+    })
+
+    it('does not require it when hidden', () => {
+      const errors = validateNotifyAction({
+        eventConfig,
+        declaration: {
+          'applicant.name': name,
+          'applicant.email': 'hide@example.com'
+        },
+        context: testContext
+      })
+
+      expect(errors).toEqual([])
+    })
+  })
+
+  it('accepts a required field saved by an earlier action when notifying with edits', () => {
+    const eventConfig = configWithNotify({
+      notificationFields: [
+        getApplicantField('applicant.name'),
+        getApplicantField('applicant.email')
+      ]
+    })
+
+    const document = generateEventDocument({
+      configuration: eventConfig,
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.NOTIFY,
+          declarationOverrides: { 'applicant.name': name }
+        },
+        { type: ActionType.EDIT, declarationOverrides: {} }
+      ]
+    })
+
+    const errors = validateNotifyAction({
+      eventConfig,
+      declaration: { 'applicant.email': 'notifier@example.com' },
+      context: {
+        ...testContext,
+        event: getEventValidatorContext(document, eventConfig)
+      }
+    })
+
+    expect(errors).toEqual([])
   })
 })
