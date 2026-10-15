@@ -26,7 +26,9 @@ import {
   getCurrentEventState,
   EventStatus,
   errorMessages,
-  getDeclaration
+  getDeclaration,
+  FieldConfig,
+  FieldType
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -44,7 +46,8 @@ import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
 function useNotificationForm(
-  notificationForm: ReturnType<typeof getDeclaration>
+  notificationForm: ReturnType<typeof getDeclaration>,
+  reviewFields?: FieldConfig[]
 ) {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
@@ -53,7 +56,13 @@ function useNotificationForm(
           ...tennisClubMembershipEvent,
           actions: tennisClubMembershipEvent.actions.map((action) =>
             action.type === ActionType.NOTIFY
-              ? { ...action, notificationForm }
+              ? {
+                  ...action,
+                  notificationForm,
+                  ...(reviewFields && {
+                    review: { ...action.review, fields: reviewFields }
+                  })
+                }
               : action
           )
         }
@@ -340,6 +349,43 @@ describe('event.actions.notify', () => {
       expect((error as TRPCError).code).toBe('BAD_REQUEST')
       expect(JSON.parse((error as TRPCError).message)).toContainEqual(
         expect.objectContaining({ id: 'applicant.name' })
+      )
+    })
+
+    test('accepts NOTIFY when a required review field is missing from annotation', async () => {
+      // Annotation is checked only for the keys that are submitted
+      useNotificationForm(notificationForm, [
+        {
+          id: 'notifier.comment',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            id: 'event.tennis-club-membership.action.notify.review.notifier.comment.label',
+            defaultMessage: 'Comment of the notifier',
+            description: 'Label of a required notify-only review field'
+          }
+        }
+      ])
+
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
+
+      const fetchedEvent = await client.event.actions.notify.request({
+        type: ActionType.NOTIFY,
+        eventId: event.id,
+        transactionId: getUUID(),
+        declaration: {
+          'applicant.name': { firstname: 'John', surname: 'Doe' }
+        },
+        annotation: {}
+      })
+
+      expect(fetchedEvent.actions).toContainEqual(
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted
+        })
       )
     })
   })
