@@ -18,7 +18,8 @@ import {
   EventIndex,
   applyDraftToEventIndex,
   deepDropNulls,
-  dropSecuredDeclarationFields
+  dropSecuredDeclarationFields,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { EventIcon } from '@client/v2-events/components/EventIcon'
@@ -94,6 +95,16 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     flags: eventIndex.flags
   }
 
+  const declareAction = getAcceptedActions(event).find(
+    ({ type }) => type === ActionType.DECLARE
+  )
+  const formVersion = declareAction
+    ? {
+        declared: true as const,
+        effectiveFrom: declareAction.effectiveFrom ?? undefined
+      }
+    : { declared: false as const }
+
   return (
     <Content
       icon={() => (
@@ -112,6 +123,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
         eventConfiguration={eventConfiguration}
         eventDocument={event}
         eventIndex={eventIndex}
+        formVersion={formVersion}
       />
     </Content>
   )

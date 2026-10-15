@@ -14,7 +14,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
-import { userEvent, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 import addDays from 'date-fns/addDays'
 import {
   ActionType,
@@ -207,6 +207,87 @@ export const Overview: Story = {
         ]
       }
     }
+  }
+}
+
+const eventDeclaredWithFormVersion = {
+  ...defaultEvent,
+  actions: defaultEvent.actions.map((action) =>
+    action.type === ActionType.DECLARE
+      ? { ...action, effectiveFrom: '2025-01-01' }
+      : action
+  )
+}
+
+export const WithFormVersion: Story = {
+  parameters: {
+    offline: {
+      events: [eventDeclaredWithFormVersion]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: eventDeclaredWithFormVersion.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  eventDeclaredWithFormVersion,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const formVersion = await canvas.findByTestId('formVersion')
+    await expect(formVersion).toHaveTextContent('Effective from 2025-01-01')
+  }
+}
+
+export const ProtectedOverviewHidesFormVersion: Story = {
+  parameters: {
+    offline: {
+      events: []
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: eventDeclaredWithFormVersion.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  eventDeclaredWithFormVersion,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await canvas.findByTestId('registrationNumber')
+    await expect(canvas.queryByTestId('formVersion')).toBeNull()
   }
 }
 

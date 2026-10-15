@@ -206,6 +206,25 @@ export const Declared: Story = {
   }
 }
 
+export const DeclaredWithFormVersion: Story = {
+  args: {
+    ...argbase,
+    title: 'Sent for review',
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.DECLARE,
+      effectiveFrom: '2025-01-01'
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(
+      canvas.findByText('Effective from 2025-01-01')
+    ).resolves.toBeInTheDocument()
+  }
+}
+
 const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
