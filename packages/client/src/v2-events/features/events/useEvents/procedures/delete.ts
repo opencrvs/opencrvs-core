@@ -14,7 +14,6 @@ import * as z from 'zod'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
-  refetchAllSearchQueries,
   refetchDraftsList,
   refetchSearchQuery,
   setDraftData
@@ -31,7 +30,8 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
   },
   retryDelay: 10000,
   onSuccess: async ({ id }) => {
-    void refetchAllSearchQueries()
+    // Only CREATED events are deletable and those are never indexed, so no
+    // search can change.
     deleteDraft(id)
     /*
      * The drafts list may have a fetch in flight that started before the event was
