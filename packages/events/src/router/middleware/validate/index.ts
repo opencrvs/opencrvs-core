@@ -38,6 +38,7 @@ import {
   getActionReviewFields,
   getCurrentEventState,
   getDeclaration,
+  getDeclarationFields,
   getNotificationFields,
   getVisibleVerificationPageIds,
   isFieldVisible,
@@ -335,9 +336,7 @@ export function validateNotifyAction({
   const formFields =
     actionType === ActionType.NOTIFY
       ? getNotificationFields(eventConfig)
-      : getDeclaration(eventConfig).pages.flatMap(({ fields }) =>
-          fields.flatMap((field) => field)
-        )
+      : getDeclarationFields(eventConfig)
 
   const notifyConfig = getActionConfig({
     eventConfiguration: eventConfig,
