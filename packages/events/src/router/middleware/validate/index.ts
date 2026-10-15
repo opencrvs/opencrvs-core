@@ -21,9 +21,11 @@ import {
   ActionUpdate,
   AnnotationActionType,
   DeclarationActions,
+  DeclarationFormConfig,
   DeclarationUpdateActionType,
   DeclarationUpdateActions,
   EventConfig,
+  EventState,
   FieldConfig,
   annotationActions,
   deepDropNulls,
@@ -36,6 +38,8 @@ import {
   getActionReviewFields,
   getCurrentEventState,
   getDeclaration,
+  getDeclarationFields,
+  getNotificationFields,
   getVisibleVerificationPageIds,
   isFieldVisible,
   isPageVisible,
@@ -121,6 +125,56 @@ export function getFieldErrors(
   return [...hiddenFieldErrors, ...visibleFieldErrors]
 }
 
+function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
+  form,
+  completeDeclaration,
+  declarationUpdate,
+  context
+}: {
+  form: DeclarationFormConfig
+  completeDeclaration: T
+  declarationUpdate: ActionUpdate
+  context: ValidatorContext
+}) {
+  // 3. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
+  const cleanedDeclaration = omitHiddenPaginatedFields(
+    form,
+    completeDeclaration,
+    context
+  )
+
+  // 4. When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
+  // that may have become hidden due to changes in the current update.
+  const declarationUpdateOnlyComplete = Object.fromEntries(
+    Object.entries(completeDeclaration).filter(
+      ([key]) => key in declarationUpdate
+    )
+  )
+  const invalidKeys = getInvalidUpdateKeys({
+    update: declarationUpdateOnlyComplete,
+    cleaned: cleanedDeclaration
+  })
+
+  if (invalidKeys.length > 0) {
+    return { cleanedDeclaration, invalidKeys, fieldErrors: [] }
+  }
+
+  // 5. Validate declaration update against conditional rules, taking into account conditional pages.
+  const allVisiblePageFields = form.pages
+    .filter((page) => isPageVisible(page, cleanedDeclaration, context))
+    .flatMap((page) => page.fields)
+
+  const fieldErrors = getFieldErrors(
+    allVisiblePageFields,
+    cleanedDeclaration,
+    context
+  )
+
+  return { cleanedDeclaration, invalidKeys, fieldErrors }
+}
+
 function validateDeclarationUpdateAction({
   eventConfig,
   actionType,
@@ -166,41 +220,20 @@ function validateDeclarationUpdateAction({
       : mergedDeclaration
   )
 
-  // 3. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
-  // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
-  const cleanedDeclaration = omitHiddenPaginatedFields(
-    declarationConfig,
+  const {
+    cleanedDeclaration,
+    invalidKeys,
+    fieldErrors: declarationErrors
+  } = getDeclarationFormErrors({
+    form: declarationConfig,
     completeDeclaration,
+    declarationUpdate,
     context
-  )
-
-  // 4. When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
-  // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
-  // that may have become hidden due to changes in the current update.
-  const declarationUpdateOnlyComplete = Object.fromEntries(
-    Object.entries(completeDeclaration).filter(
-      ([key]) => key in declarationUpdate
-    )
-  )
-  const invalidKeys = getInvalidUpdateKeys({
-    update: declarationUpdateOnlyComplete,
-    cleaned: cleanedDeclaration
   })
 
   if (invalidKeys.length > 0) {
     return invalidKeys
   }
-
-  // 5. Validate declaration update against conditional rules, taking into account conditional pages.
-  const allVisiblePageFields = declarationConfig.pages
-    .filter((page) => isPageVisible(page, cleanedDeclaration, context))
-    .flatMap((page) => page.fields)
-
-  const declarationErrors = getFieldErrors(
-    allVisiblePageFields,
-    cleanedDeclaration,
-    context
-  )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
@@ -300,10 +333,10 @@ export function validateNotifyAction({
   context: ValidatorContext
   actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
 }) {
-  const declarationConfig = getDeclaration(eventConfig)
-  const formFields = declarationConfig.pages.flatMap(({ fields }) =>
-    fields.flatMap((field) => field)
-  )
+  const formFields =
+    actionType === ActionType.NOTIFY
+      ? getNotificationFields(eventConfig)
+      : getDeclarationFields(eventConfig)
 
   const notifyConfig = getActionConfig({
     eventConfiguration: eventConfig,
@@ -326,6 +359,15 @@ export function validateNotifyAction({
           ...getActionFormFields(eventConfig, ActionType.NOTIFY)
         ]
 
+  const mergedDeclaration: EventState = deepMerge(
+    context.event?.state.declaration ?? {},
+    declaration
+  )
+  const completeDeclaration = deepDropNulls(mergedDeclaration)
+
+  // Review field conditionals commonly depend on declaration values
+  const annotationContext = { ...context, baseFormState: completeDeclaration }
+
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
       const field = reviewFields.find((f) => f.id === key)
@@ -341,7 +383,7 @@ export function validateNotifyAction({
       const fieldErrors = runStructuralValidations({
         field,
         values: annotation,
-        context
+        context: annotationContext
       })
 
       return fieldErrors.map((error) => ({
@@ -358,7 +400,10 @@ export function validateNotifyAction({
 
       if (!field) {
         return {
-          message: errorMessages.unexpectedField.defaultMessage,
+          message:
+            actionType === ActionType.NOTIFY
+              ? errorMessages.notInNotifyForm.defaultMessage
+              : errorMessages.unexpectedField.defaultMessage,
           id: key,
           value
         }
@@ -379,7 +424,47 @@ export function validateNotifyAction({
     }
   )
 
-  return [...annotationErrors, ...declarationErrors]
+  const notificationForm =
+    actionType === ActionType.NOTIFY && notifyConfig.type === ActionType.NOTIFY
+      ? notifyConfig.notificationForm
+      : undefined
+
+  if (!notificationForm || declarationErrors.length > 0) {
+    return [...annotationErrors, ...declarationErrors]
+  }
+
+  const { cleanedDeclaration, invalidKeys, fieldErrors } =
+    getDeclarationFormErrors({
+      form: notificationForm,
+      completeDeclaration,
+      declarationUpdate: declaration,
+      context
+    })
+
+  if (invalidKeys.length > 0) {
+    return [...annotationErrors, ...invalidKeys]
+  }
+
+  const reviewContext = { ...context, baseFormState: cleanedDeclaration }
+
+  // Annotation keys that are not NOTIFY review or dialog fields
+  const unexpectedAnnotationErrors = annotationErrors.filter(
+    ({ id }) => !notifyAnnotationFields.some((field) => field.id === id)
+  )
+
+  // Required, type and custom validation errors of the NOTIFY review and dialog fields.
+  // Unlike DECLARE, dialog fields are not relaxed: the NOTIFY dialog is always shown before submitting.
+  const reviewErrors = getFieldErrors(
+    notifyAnnotationFields,
+    omitHiddenFields(
+      notifyAnnotationFields,
+      deepDropNulls(annotation),
+      reviewContext
+    ),
+    reviewContext
+  )
+
+  return [...unexpectedAnnotationErrors, ...fieldErrors, ...reviewErrors]
 }
 
 /*

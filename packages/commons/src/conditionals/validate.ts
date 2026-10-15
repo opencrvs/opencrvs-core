@@ -693,6 +693,13 @@ export const errorMessages = {
     description: 'Error message when field is not expected',
     id: 'error.unexpectedField'
   },
+  notInNotifyForm: {
+    defaultMessage:
+      'Field is not part of the notify form. Notify-only data belongs in annotation',
+    description:
+      'Error message when a notify declaration contains a field outside the notify form',
+    id: 'error.notInNotifyForm'
+  },
   correctionNotAllowed: {
     defaultMessage: 'Correction not allowed for field',
     description: 'Error message when correction is not allowed for field',
