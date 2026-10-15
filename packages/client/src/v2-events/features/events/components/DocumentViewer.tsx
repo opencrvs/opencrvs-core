@@ -158,6 +158,7 @@ export function DocumentViewer({
   return (
     <ResponsiveDocumentViewer
       comparisonView={!!comparisonView}
+      data-testid="document-viewer"
       showInMobile={!!showInMobile}
     >
       <DocumentViewerComponent id="document_section" options={fileOptions}>
