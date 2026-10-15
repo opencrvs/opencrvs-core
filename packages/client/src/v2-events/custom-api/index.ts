@@ -132,7 +132,7 @@ export async function editAndRegister({
   }
 
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-    declaration: {},
+    declaration,
     annotation,
     eventId,
     transactionId,

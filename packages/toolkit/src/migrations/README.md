@@ -1,19 +1,28 @@
 # Country config migrations (codemods)
 
 Codemods run by `opencrvs upgrade` against a country config repo to upgrade it
-to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.0/`.
+from the previous minor version to the OpenCRVS version this toolkit is released
+with. For example, toolkit 2.2.0 upgrades a 2.1 country config to 2.2.
 
-Run from inside a country config checkout:
+Only the steps for that upgrade live here: when work on the next version starts,
+remove the previous version's steps. `persistent/` holds what every upgrade runs
+and is kept from version to version: `add-translations` (see below),
+`update-toolkit-dependency` and `check-upgrade-path`.
+
+Run from inside a country config checkout, with the toolkit of the version to
+upgrade to, before changing the country config's `@opencrvs/toolkit`
+dependency: the upgrade checks which version it upgrades from by that
+dependency, and updates it itself once done.
 
 ```bash
-opencrvs upgrade
+npx @opencrvs/toolkit@2.2 upgrade
 ```
 
 Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/version-upgrades#step-2-update-code-and-test-locally
 
 ## Translations are already handled
 
-`add-translations.ts` copies `client.csv` and `login.csv` from the country
+`persistent/add-translations.ts` copies `client.csv` and `login.csv` from the country
 config template of the version being upgraded to, adding whatever rows a
 country config is missing. **Do not write a codemod for a new translation key,
 and do not add it to a list anywhere here.** Adding it to
@@ -21,19 +30,19 @@ and do not add it to a list anywhere here.** Adding it to
 `check-missing-translation` workflow makes you do anyway — and every country
 config picks it up on upgrade.
 
-It lives outside the version folders because every upgrade runs it. When you
-start a new version's folder, call it from that folder's `runUpgrade` with the
-version it upgrades to, e.g. `await addTranslations('2.2')`.
+Unlike the other steps it is kept from version to version, because every
+upgrade runs it. `runUpgrade` calls it with the major.minor of the toolkit's own
+version, so it needs no change from release to release.
 
 `countryconfig.csv` is left alone. It holds copy the country config declares
 itself, which an upgrade has no business rewriting.
 
 ## Adding a step
 
-1. **Create** `v2.2/<your-step-name>.ts` — export `async function main()` that
+1. **Create** `<your-step-name>.ts` — export `async function main()` that
    mutates files under `process.cwd()`.
 
-2. **Wire up** in `v2.2/index.ts`:
+2. **Wire up** in `index.ts`:
 
    ```ts
    import { main as yourStepName } from './your-step-name'
