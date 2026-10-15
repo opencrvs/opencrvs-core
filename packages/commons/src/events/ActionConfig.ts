@@ -29,6 +29,12 @@ export const DeclarationReviewConfig = z
   )
 
 export const ActionConfigBase = z.object({
+  effectiveFrom: z.iso
+    .date()
+    .optional()
+    .describe(
+      'Date (YYYY-MM-DD) from which this version of the action is effective. An action may be given as several versions, each with a different date. A version without one is effective from the beginning of time.'
+    ),
   label: TranslationConfig.describe('Human readable description of the action'),
   flags: z
     .array(ActionFlagConfig)

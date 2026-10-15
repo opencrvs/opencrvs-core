@@ -27,7 +27,8 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
-  validateExactlyOneDeclareAction,
+  validateHasDeclareAction,
+  validateActionVersions,
   validateNotificationForm
 } from './eventConfigValidation'
 
@@ -190,8 +191,9 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigSchemaInput> =
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
   _EventConfigBase
     .superRefine((event, ctx) => {
+      validateActionVersions(event, ctx)
       // This validation is made to early return, since following validations depend on the declare action being present and correctly configured.
-      if (!validateExactlyOneDeclareAction(event, ctx)) {
+      if (!validateHasDeclareAction(event, ctx)) {
         return
       }
       validateNotificationForm(event, ctx)
