@@ -134,8 +134,7 @@ const fetchToken = async (
   const authenticateResponse = await fetch(`${apiBaseUrl}/auth/token`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'x-correlation-id': `${clientId}-${Date.now()}`
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
     body: new URLSearchParams({
       client_id: clientId,
