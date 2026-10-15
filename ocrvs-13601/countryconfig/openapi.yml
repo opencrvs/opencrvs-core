@@ -13467,7 +13467,6 @@ components:
                   - type: string
                   - type: string
                     enum:
-                      - incomplete
                       - rejected
                       - correction-requested
                       - potential-duplicate
@@ -13482,7 +13481,6 @@ components:
                   - type: string
                   - type: string
                     enum:
-                      - incomplete
                       - rejected
                       - correction-requested
                       - potential-duplicate
@@ -13497,7 +13495,6 @@ components:
                   - type: string
                   - type: string
                     enum:
-                      - incomplete
                       - rejected
                       - correction-requested
                       - potential-duplicate
@@ -14194,7 +14191,6 @@ components:
                 - type: string
                 - type: string
                   enum:
-                    - incomplete
                     - rejected
                     - correction-requested
                     - potential-duplicate
