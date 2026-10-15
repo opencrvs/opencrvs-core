@@ -171,4 +171,11 @@ export const derivedVariables = [
     type: 'disabled',
     scope: 'ENVIRONMENT'
   },
+  {
+    name: 'MONITORING_ENABLED',
+    valueLabel: 'MONITORING_ENABLED',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  }
 ] as const

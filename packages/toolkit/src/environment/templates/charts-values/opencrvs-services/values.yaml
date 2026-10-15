@@ -31,7 +31,7 @@ env:
   OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
 
 otel:
-  enabled: true
+  enabled: {{monitoring_enabled}}
   deployment_environment: {{env}}
   exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
 
@@ -55,7 +55,6 @@ platform:
   imagePullSecrets:
     # Default value for credentials created while yarn environment:init
     - name: dockerhub-credentials
-
 
 auth:
   env:

@@ -150,7 +150,10 @@ export function generateInventory(env: string, values: Record<string, any>) {
     'inventory',
     'inventory.template.yml'
   )
-  const outputPath = path.resolve(process.cwd(), getEnvironmentInventoryPath(env))
+  const outputPath = path.resolve(
+    process.cwd(),
+    getEnvironmentInventoryPath(env)
+  )
 
   const templateFile = fs.readFileSync(templatePath, 'utf-8')
   const template = Handlebars.compile(templateFile)
