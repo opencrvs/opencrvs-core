@@ -382,6 +382,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     const localEventDocument = findLocalEventDocument(eventId)
 
     return {
+      // Stamped now, not when the mutation runs: it may run later, from the offline outbox.
+      performedAt: new Date().toISOString(),
       ...restParams,
       eventId,
       declaration: getCleanedDeclarationDiff({

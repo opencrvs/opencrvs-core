@@ -47,7 +47,6 @@ import {
 } from '@events/storage/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { env } from '@events/environment'
-import { getClient } from '@events/storage/postgres/events'
 
 const PAST = '2010-01-01'
 const DISTANT_PAST = '2000-01-01'
@@ -116,11 +115,15 @@ function getFixtureAction(type: ActionType) {
   )
 }
 
-/** The fixture, with the action of `type` replaced by the given versions. */
-function withVersions(type: ActionType, versions: ActionConfig[]): EventConfig {
+/** `config` (default: the fixture), with the action of `type` replaced by the given versions. */
+function withVersions(
+  type: ActionType,
+  versions: ActionConfig[],
+  config: EventConfig = tennisClubMembershipEvent
+): EventConfig {
   return {
-    ...tennisClubMembershipEvent,
-    actions: tennisClubMembershipEvent.actions.flatMap((action) =>
+    ...config,
+    actions: config.actions.flatMap((action) =>
       action.type === type ? versions : [action]
     )
   }
@@ -245,12 +248,10 @@ describe('event actions use the configuration version effective at their anchor 
     useEventConfig(tennisClubMembershipEvent)
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-    await getClient()
-      .updateTable('events')
-      .set({ createdAt: `${DISTANT_PAST}T00:00:00.000Z` })
-      .where('id', '=', event.id)
-      .execute()
+    const event = await client.event.create({
+      ...generator.event.create(),
+      performedAt: `${DISTANT_PAST}T00:00:00.000Z`
+    })
 
     // Today the dated version is in effect, but it was not when the record was created.
     useEventConfig(
@@ -751,5 +752,80 @@ describe('event actions use the configuration version effective at their anchor 
     expect(
       getAction(performed, ActionType.CUSTOM, ActionStatus.Accepted)
     ).toMatchObject({ customActionType: CUSTOM_ACTION_TYPE })
+  })
+})
+
+describe('an action performed earlier on the client, e.g. offline', () => {
+  const CREATED_OFFLINE = '2005-06-01T10:00:00.000Z'
+  const DECLARED_OFFLINE = '2005-06-01T10:30:00.000Z'
+  const REGISTERED_OFFLINE = '2005-06-02T09:00:00.000Z'
+
+  test('uses the versions in effect when the user performed it, and is stamped with them', async () => {
+    const declare = getFixtureAction(ActionType.DECLARE)
+    const register = getFixtureAction(ActionType.REGISTER)
+    useEventConfig(
+      withVersions(
+        ActionType.REGISTER,
+        [register, { ...register, effectiveFrom: PAST }],
+        withVersions(ActionType.DECLARE, [
+          declare,
+          { ...declare, effectiveFrom: PAST }
+        ])
+      )
+    )
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create({
+      ...generator.event.create(),
+      performedAt: CREATED_OFFLINE
+    })
+    await client.event.actions.declare.request({
+      ...generator.event.actions.declare(event.id),
+      performedAt: DECLARED_OFFLINE,
+      keepAssignment: true
+    })
+    const registered = await client.event.actions.register.request({
+      ...generator.event.actions.register(event.id),
+      performedAt: REGISTERED_OFFLINE
+    })
+
+    const declared = getAction(
+      registered,
+      ActionType.DECLARE,
+      ActionStatus.Accepted
+    )
+    expect(declared).not.toHaveProperty('effectiveFrom')
+    expect(declared).toMatchObject({ performedAt: DECLARED_OFFLINE })
+    expect(
+      getAction(registered, ActionType.REGISTER, ActionStatus.Accepted)
+    ).not.toHaveProperty('effectiveFrom')
+  })
+
+  test('cannot be performed in the future', async () => {
+    useEventConfig(tennisClubMembershipEvent)
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const declared = await createEvent(client, generator, [ActionType.DECLARE])
+
+    await expect(
+      client.event.actions.register.request({
+        ...generator.event.actions.register(declared.id),
+        performedAt: `${FUTURE}T00:00:00.000Z`
+      })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  test('cannot be performed before the latest action of the record', async () => {
+    useEventConfig(tennisClubMembershipEvent)
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const declared = await createEvent(client, generator, [ActionType.DECLARE])
+
+    await expect(
+      client.event.actions.register.request({
+        ...generator.event.actions.register(declared.id),
+        performedAt: REGISTERED_OFFLINE
+      })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 })

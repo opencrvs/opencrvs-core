@@ -88,6 +88,12 @@ export const ActionBase = z.object({
     .nullish()
     .describe(
       '`effectiveFrom` of the action configuration version this action was performed with. Absent for the version without one (effective from the beginning of time) and for actions recorded before versioning.'
+    ),
+  performedAt: z.iso
+    .datetime()
+    .nullish()
+    .describe(
+      'When the client performed the action, as sent by the client. Absent when it was not sent: `createdAt` applies.'
     )
 })
 

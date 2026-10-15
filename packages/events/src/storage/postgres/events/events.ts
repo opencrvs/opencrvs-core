@@ -80,14 +80,19 @@ export async function getEventsByIdsInTrx(
       ({
         ...event,
         type: event.eventType,
-        actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
-          return {
-            ...rest,
-            type: actionType,
-            // turns db format +00 to Z format
-            createdAt: DateTime.fromISO(createdAt).toISO()
+        actions: event.actions.map(
+          ({ actionType, createdAt, performedAt, ...rest }) => {
+            return {
+              ...rest,
+              type: actionType,
+              // turns db format +00 to Z format
+              createdAt: DateTime.fromISO(createdAt).toISO(),
+              ...(performedAt && {
+                performedAt: DateTime.fromISO(performedAt).toISO()
+              })
+            }
           }
-        })
+        )
       }) as EventDocument
   )
 }
@@ -291,7 +296,8 @@ async function getOrCreateEventInTrx(
       createdByRole: input.createdByRole,
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation
+      createdAtLocation: input.createdAtLocation,
+      performedAt: input.performedAt
     },
     trx
   )
@@ -332,7 +338,8 @@ async function getOrCreateEventAndAssignInTrx(
       createdByRole: input.createdByRole,
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation
+      createdAtLocation: input.createdAtLocation,
+      performedAt: input.performedAt
     },
     trx
   )
@@ -348,6 +355,7 @@ async function getOrCreateEventAndAssignInTrx(
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
+      performedAt: input.performedAt,
       assignedTo: input.createdBy
     },
     trx

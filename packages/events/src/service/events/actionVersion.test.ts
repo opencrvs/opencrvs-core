@@ -27,7 +27,8 @@ import {
   getEventConfigForAction,
   getEventConfigForConfirmation,
   resolveEffectiveFromForAction,
-  throwConflictIfActionNotInEffect
+  throwConflictIfActionNotInEffect,
+  throwIfPerformedAtOutOfBounds
 } from './actionVersion'
 
 const now = new Date('2020-06-01T10:00:00.000Z')
@@ -91,6 +92,28 @@ describe('action version resolution', () => {
   it('anchors every other action at now (UTC date)', () => {
     expect(getActionAnchorDate(registerInput, baseEvent, now)).toBe(
       '2020-06-01'
+    )
+  })
+
+  it('anchors at the time the client performed the action, when it sends one', () => {
+    const offlineCreated = {
+      ...baseEvent,
+      actions: baseEvent.actions.map((action) =>
+        action.type === ActionType.CREATE
+          ? { ...action, performedAt: '2009-12-31T23:00:00.000Z' }
+          : action
+      )
+    }
+    const performedRegister = {
+      ...registerInput,
+      performedAt: '2014-12-31T23:00:00.000Z'
+    }
+
+    expect(getActionAnchorDate(declareInput, offlineCreated, now)).toBe(
+      '2009-12-31'
+    )
+    expect(getActionAnchorDate(performedRegister, baseEvent, now)).toBe(
+      '2014-12-31'
     )
   })
 
@@ -368,5 +391,92 @@ describe('getEventConfigForConfirmation() view identity', () => {
         now
       )
     ).toBe(getEventConfigForAction(config, registerInput, event, now))
+  })
+})
+
+describe('throwIfPerformedAtOutOfBounds()', () => {
+  const transactionId = getUUID()
+
+  function actionAt(
+    type: ActionType,
+    createdAt: string,
+    defaults: { transactionId?: string; performedAt?: string } = {}
+  ) {
+    return {
+      ...generateActionDocument({ configuration: config, action: type }),
+      createdAt,
+      ...defaults
+    }
+  }
+
+  const event = {
+    ...baseEvent,
+    actions: [
+      actionAt(ActionType.CREATE, '2020-05-01T00:00:00.000Z'),
+      actionAt(ActionType.DECLARE, '2020-05-31T00:00:00.000Z', {
+        performedAt: '2020-05-10T00:00:00.000Z'
+      }),
+      // Another user reading the record does not change it.
+      actionAt(ActionType.READ, '2020-05-20T00:00:00.000Z')
+    ]
+  }
+
+  it('accepts an action without performedAt', () => {
+    expect(() =>
+      throwIfPerformedAtOutOfBounds({ transactionId }, event, now)
+    ).not.toThrow()
+  })
+
+  it('accepts a time after the latest action that changed the record, read at its performedAt', () => {
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        { transactionId, performedAt: '2020-05-15T00:00:00.000Z' },
+        event,
+        now
+      )
+    ).not.toThrow()
+  })
+
+  it('rejects a time before the latest action from another transaction', () => {
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        { transactionId, performedAt: '2020-05-05T00:00:00.000Z' },
+        event,
+        now
+      )
+    ).toThrow(
+      'performedAt 2020-05-05T00:00:00.000Z is before the latest action of the record, performed at 2020-05-10T00:00:00.000Z'
+    )
+  })
+
+  it('ignores actions of the same transaction', () => {
+    const declare = event.actions[1]
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        {
+          transactionId: declare.transactionId,
+          performedAt: '2020-05-05T00:00:00.000Z'
+        },
+        event,
+        now
+      )
+    ).not.toThrow()
+  })
+
+  it('tolerates clock drift, but rejects a time further in the future', () => {
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        { transactionId, performedAt: '2020-06-01T10:04:00.000Z' },
+        event,
+        now
+      )
+    ).not.toThrow()
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        { transactionId, performedAt: '2020-06-01T10:06:00.000Z' },
+        undefined,
+        now
+      )
+    ).toThrow('performedAt 2020-06-01T10:06:00.000Z is in the future')
   })
 })

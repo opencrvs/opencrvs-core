@@ -156,6 +156,7 @@ export const detectDuplicate: MiddlewareFunction<
         eventId: input.eventId,
         declaration: input.declaration,
         annotation: input.annotation,
+        performedAt: input.performedAt,
         content: {
           duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
             id,

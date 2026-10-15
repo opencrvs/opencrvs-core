@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
@@ -57,7 +58,8 @@ import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import {
   getActionVersioning,
   requiresVersionResolution,
-  throwConflictIfActionNotInEffect
+  throwConflictIfActionNotInEffect,
+  throwIfPerformedAtOutOfBounds
 } from '@events/service/events/actionVersion'
 
 export class EventNotFoundError extends TRPCError {
@@ -230,6 +232,8 @@ export async function createEvent({
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
     : eventsRepo.getOrCreateEventAndAssign
 
+  throwIfPerformedAtOutOfBounds(eventInput, undefined, new Date())
+
   const eventLocation = isSystem ? createdAtLocation : user.primaryOfficeId
   const event = await getOrCreateEvent({
     eventType: eventInput.type,
@@ -240,7 +244,8 @@ export async function createEvent({
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: eventLocation
+    createdAtLocation: eventLocation,
+    performedAt: eventInput.performedAt
   })
 
   return event
@@ -290,7 +295,8 @@ export function buildAction(
         ? input.createdAtLocation
         : user.primaryOfficeId,
     originalActionId: input.originalActionId,
-    effectiveFrom
+    effectiveFrom,
+    performedAt: input.performedAt
   }
   switch (input.type) {
     case ActionType.REGISTER: {
@@ -381,6 +387,7 @@ export async function addAction(
   const event = requiresVersionResolution(input)
     ? await getEventById(eventId)
     : undefined
+  throwIfPerformedAtOutOfBounds(input, event, now)
   const { declarationFields, effectiveFrom } = getActionVersioning(
     configuration,
     input,

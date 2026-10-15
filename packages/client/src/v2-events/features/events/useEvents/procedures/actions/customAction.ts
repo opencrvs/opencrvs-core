@@ -176,6 +176,8 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
       }
 
       return mutation.mutate({
+        // Stamped now, not when the mutation runs: it may run later, from the offline outbox.
+        performedAt: new Date().toISOString(),
         ...params,
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({

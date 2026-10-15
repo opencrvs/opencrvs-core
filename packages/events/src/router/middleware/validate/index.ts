@@ -57,6 +57,8 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import {
   getEventConfigForAction,
   getEventConfigForConfirmation,
+  getRecordCreatedAt,
+  throwIfPerformedAtOutOfBounds,
   isAnchoredAtEventCreation,
   throwConflictIfActionNotInEffect
 } from '@events/service/events/actionVersion'
@@ -523,6 +525,9 @@ export const validateRequestAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
+  const now = new Date()
+  throwIfPerformedAtOutOfBounds(input, event, now)
+
   const fetchedEventConfig = await getEventConfigurationById({
     eventType: event.type,
     token: ctx.token
@@ -531,7 +536,7 @@ export const validateRequestAction: MiddlewareFunction<
     fetchedEventConfig,
     input,
     event,
-    new Date()
+    now
   )
 
   throwConflictIfActionNotInEffect({
@@ -541,7 +546,7 @@ export const validateRequestAction: MiddlewareFunction<
     customActionType:
       input.type === ActionType.CUSTOM ? input.customActionType : undefined,
     recordCreatedOn: isAnchoredAtEventCreation(input.type)
-      ? toPlainDate(event.createdAt)
+      ? toPlainDate(getRecordCreatedAt(event))
       : undefined
   })
 

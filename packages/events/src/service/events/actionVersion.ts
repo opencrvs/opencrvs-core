@@ -38,8 +38,81 @@ export function isAnchoredAtEventCreation(type: ActionType) {
   return ANCHORED_AT_EVENT_CREATION.includes(type)
 }
 
+/** Clock drift tolerated on a client's `performedAt`. */
+const CLOCK_SKEW_MS = 5 * 60 * 1000
+
 /**
- * The date (YYYY-MM-DD) whose configuration an action uses.
+ * Actions another user may add while the record is assigned to someone working
+ * offline. They do not change the record, so they do not bound `performedAt`.
+ */
+const NON_MODIFYING_ACTIONS: ActionType[] = [
+  ActionType.READ,
+  ActionType.ASSIGN,
+  ActionType.UNASSIGN
+]
+
+/** When an action was performed: the client's `performedAt`, else when it was stored. */
+function getPerformedAt(action: {
+  performedAt?: string | null
+  createdAt: string
+}) {
+  return action.performedAt ?? action.createdAt
+}
+
+/** When the record was created: (+) pressed on the client, else when the server stored it. */
+export function getRecordCreatedAt(event: EventDocument) {
+  return (
+    event.actions.find(({ type }) => type === ActionType.CREATE)?.performedAt ??
+    event.createdAt
+  )
+}
+
+/**
+ * Throws tRPC HTTP 400 when a client's `performedAt` is in the future (beyond clock
+ * drift) or, with the record given, before its latest action from another transaction.
+ * A record being created has no earlier action, so only the future is checked.
+ * Actions sent together share a transaction (e.g. declare and register), so they
+ * do not bound each other.
+ */
+export function throwIfPerformedAtOutOfBounds(
+  input: { performedAt?: string; transactionId: string },
+  event: EventDocument | undefined,
+  now: Date
+) {
+  if (!input.performedAt) {
+    return
+  }
+
+  const performedAt = new Date(input.performedAt).getTime()
+
+  if (performedAt > now.getTime() + CLOCK_SKEW_MS) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `performedAt ${input.performedAt} is in the future`
+    })
+  }
+
+  const latest = Math.max(
+    ...(event?.actions ?? [])
+      .filter(
+        (action) =>
+          action.transactionId !== input.transactionId &&
+          !NON_MODIFYING_ACTIONS.includes(action.type)
+      )
+      .map((action) => new Date(getPerformedAt(action)).getTime())
+  )
+
+  if (performedAt < latest) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `performedAt ${input.performedAt} is before the latest action of the record, performed at ${new Date(latest).toISOString()}`
+    })
+  }
+}
+
+/**
+ * The date (YYYY-MM-DD) whose configuration an action uses: the record's creation
+ * for DECLARE and NOTIFY, else when the client performed the action, else `now`.
  * @TODO: compares UTC dates. Legislation takes effect at local midnight, so this may
  * need the country's time zone (open question in #13602).
  */
@@ -49,7 +122,9 @@ export function getActionAnchorDate(
   now: Date
 ) {
   return toPlainDate(
-    isAnchoredAtEventCreation(input.type) ? event.createdAt : now.toISOString()
+    isAnchoredAtEventCreation(input.type)
+      ? getRecordCreatedAt(event)
+      : (input.performedAt ?? now.toISOString())
   )
 }
 
@@ -123,7 +198,7 @@ function getRecordDeclarationVersions(
     .reverse()
   const atCreation = getEventConfigEffectiveAt(
     config,
-    toPlainDate(event.createdAt)
+    toPlainDate(getRecordCreatedAt(event))
   )
 
   return ANCHORED_AT_EVENT_CREATION.flatMap((type) => {
@@ -161,11 +236,13 @@ export function getEventConfigForAction(
 
 /**
  * Whether storing the action needs the record: to stamp a version (confirmations and
- * configured actions) or to check the files of the declaration it carries.
+ * configured actions), to check the files of the declaration it carries, or to bound
+ * the time the client says it performed the action.
  */
 export function requiresVersionResolution(input: ActionInputWithType) {
   return (
     Boolean(input.originalActionId) ||
+    Boolean(input.performedAt) ||
     isActionConfigType(input.type) ||
     Object.keys(input.declaration).length > 0
   )
