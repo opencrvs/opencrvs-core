@@ -12,6 +12,7 @@ import { main as addTranslations } from './persistent/add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
+import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -26,6 +27,7 @@ export async function runUpgrade(toolkitVersion: string) {
   await moveDeclarationToDeclareAction()
   await readDeclarationThroughHelper()
   await addTranslations(`${major}.${minor}`)
+  await replaceIncompleteFlag()
   // Last, so a failed upgrade leaves the version it upgrades from in place
   await updateToolkitDependency(toolkitVersion)
 }
