@@ -58,6 +58,7 @@ import {
   processAction
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigForConfirmation } from '@events/service/events/actionVersion'
 import { TrpcUserContext } from '@events/context'
 import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -367,7 +368,13 @@ export async function defaultRequestHandler(
     parsedBody = { ...maybeParsed.data, ...maybeCustom.data }
 
     validateActionPayloadStructure({
-      eventConfig: configuration,
+      eventConfig: getEventConfigForConfirmation(
+        configuration,
+        input,
+        eventWithRequestedAction,
+        requestedAction.id,
+        new Date()
+      ),
       input: {
         type: input.type,
         annotation: parsedBody.annotation,

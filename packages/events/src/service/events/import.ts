@@ -32,7 +32,8 @@ function mapEventActions(actions: EventDocument['actions']) {
     originalActionId: action.originalActionId ?? null,
     createdByRole: action.createdByRole ?? null,
     createdBySignature: action.createdBySignature ?? null,
-    customActionType: (action as any).customActionType ?? null
+    customActionType: (action as any).customActionType ?? null,
+    effectiveFrom: action.effectiveFrom ?? null
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
 }

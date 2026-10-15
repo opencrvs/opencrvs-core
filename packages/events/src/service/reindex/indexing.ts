@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, getDeclarationFields } from '@opencrvs/commons/events'
+import { EventConfig, getAllDeclarationFields } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
   getEventAliasName,
@@ -23,7 +23,7 @@ export async function prepareTemporaryIndex(
   timestamp: number
 ) {
   const tempIndexName = getTemporaryIndexName(eventConfiguration.id, timestamp)
-  const formFields = getDeclarationFields(eventConfiguration)
+  const formFields = getAllDeclarationFields(eventConfiguration)
 
   logger.info(`Preparing temporary reindex index ${tempIndexName}`)
 

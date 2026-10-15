@@ -19,6 +19,7 @@ import {
 import * as middleware from '@events/router/middleware'
 import { userOnlyProcedure } from '@events/router/trpc'
 import { processAction } from '@events/service/events/events'
+import { getEventConfigForAction } from '@events/service/events/actionVersion'
 import {
   defaultRequestHandler,
   getDefaultActionProcedures
@@ -88,7 +89,14 @@ export function declareActionProcedures() {
           }
         })
 
-        const dedupConfig = config.actions.find(
+        // The DECLARE version this record is declared with.
+        const actionConfig = getEventConfigForAction(
+          config,
+          input,
+          event,
+          new Date()
+        )
+        const dedupConfig = actionConfig.actions.find(
           (action) => action.type === input.type
         )?.deduplication
 
@@ -96,7 +104,11 @@ export function declareActionProcedures() {
           return declaredEvent
         }
 
-        const declaredEventState = getCurrentEventState(declaredEvent, config)
+        const declaredEventState = getCurrentEventState(
+          declaredEvent,
+          actionConfig
+        )
+        // The full config: hits may have been declared with any DECLARE version.
         const duplicates = await searchForDuplicates(
           declaredEventState,
           dedupConfig,

@@ -24,7 +24,7 @@ import {
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields,
+  getAllDeclarationFields,
   WorkqueueCountInput,
   getEventConfigById,
   SearchQuery,
@@ -403,7 +403,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
 
   if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    await createIndex(indexName, getAllDeclarationFields(eventConfiguration))
   } else {
     logger.info(`Index ${indexName} already exists as a concrete index.`)
     await ensureAlias(indexName)

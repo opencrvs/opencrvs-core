@@ -24,6 +24,7 @@ import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { getEventConfigForAction } from '@events/service/events/actionVersion'
 import { processAction } from '@events/service/events/events'
 
 function requiresDedupCheck(
@@ -68,7 +69,14 @@ export const detectDuplicate: MiddlewareFunction<
     )
   }
 
-  const dedupConfig = config.actions.find(
+  // The version of the action effective at its anchor date.
+  const actionConfig = getEventConfigForAction(
+    config,
+    input,
+    storedEvent,
+    new Date()
+  )
+  const dedupConfig = actionConfig.actions.find(
     (action): action is DeclarationActionConfig => action.type === input.type
   )?.deduplication
 
@@ -90,7 +98,7 @@ export const detectDuplicate: MiddlewareFunction<
     createdBySignature: user.signature
   }
 
-  const existingEventState = getCurrentEventState(storedEvent, config)
+  const existingEventState = getCurrentEventState(storedEvent, actionConfig)
 
   const futureEventState = getCurrentEventState(
     {
@@ -106,7 +114,7 @@ export const detectDuplicate: MiddlewareFunction<
         }
       ]
     },
-    config
+    actionConfig
   )
 
   const isMarkedAsNotDuplicate = storedEvent.actions.reduce((acc, action) => {
@@ -135,6 +143,7 @@ export const detectDuplicate: MiddlewareFunction<
   const duplicates = await searchForDuplicates(
     futureEventState,
     dedupConfig,
+    // The full config: hits may have been declared with any DECLARE version.
     config
   )
 

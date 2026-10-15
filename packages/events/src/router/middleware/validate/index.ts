@@ -49,10 +49,17 @@ import {
   EventInput,
   UUID,
   getDeclarationFieldById,
-  StrictValidatorContext
+  StrictValidatorContext,
+  toPlainDate
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
+import {
+  getEventConfigForAction,
+  getEventConfigForConfirmation,
+  isAnchoredAtEventCreation,
+  throwConflictIfActionNotInEffect
+} from '@events/service/events/actionVersion'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -516,9 +523,26 @@ export const validateRequestAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
-  const eventConfig = await getEventConfigurationById({
+  const fetchedEventConfig = await getEventConfigurationById({
     eventType: event.type,
     token: ctx.token
+  })
+  const eventConfig = getEventConfigForAction(
+    fetchedEventConfig,
+    input,
+    event,
+    new Date()
+  )
+
+  throwConflictIfActionNotInEffect({
+    fetchedEventConfiguration: fetchedEventConfig,
+    eventConfiguration: eventConfig,
+    actionType: input.type,
+    customActionType:
+      input.type === ActionType.CUSTOM ? input.customActionType : undefined,
+    recordCreatedOn: isAnchoredAtEventCreation(input.type)
+      ? toPlainDate(event.createdAt)
+      : undefined
   })
 
   const eventState = getCurrentEventState(event, eventConfig)
@@ -551,14 +575,25 @@ export const validateAcceptAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
-  const eventConfig = await getEventConfigurationById({
+  const fetchedEventConfig = await getEventConfigurationById({
     eventType: event.type,
     token: ctx.token
   })
+  // `requireConfirmableAction` has already checked `actionId` names the Requested action.
+  const originalActionId =
+    'actionId' in input && typeof input.actionId === 'string'
+      ? input.actionId
+      : undefined
 
   validateActionPayloadStructure({
     input,
-    eventConfig
+    eventConfig: getEventConfigForConfirmation(
+      fetchedEventConfig,
+      input,
+      event,
+      originalActionId,
+      new Date()
+    )
   })
 
   return next()

@@ -21,9 +21,8 @@ import {
   EventState,
   FieldType,
   FieldValue,
-  getDeclarationFieldById,
   FieldConfig,
-  getDeclarationFields,
+  getAllDeclarationFields,
   isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
@@ -31,6 +30,7 @@ import {
   UUID
 } from '@opencrvs/commons/events'
 import {
+  getOrThrow,
   JurisdictionFilter,
   RecordScopeV2,
   UserFilter,
@@ -58,10 +58,18 @@ function getDeclarationFieldConfigs(
   }
 
   const fieldConfigs = Object.fromEntries(
-    getDeclarationFields(eventConfig).map((f) => [f.id, f])
+    getAllDeclarationFields(eventConfig).map((f) => [f.id, f])
   )
   declarationFieldConfigsByEventConfig.set(eventConfig, fieldConfigs)
   return fieldConfigs
+}
+
+/** A declaration field of any DECLARE version, so records of every version index. */
+function getDeclarationFieldConfig(eventConfig: EventConfig, fieldId: string) {
+  return getOrThrow(
+    getDeclarationFieldConfigs(eventConfig)[fieldId],
+    `Field with id ${fieldId} not found in event config`
+  )
 }
 
 export type EncodedEventIndex = EventIndex
@@ -91,7 +99,10 @@ function addIndexFieldsToValue(
   value: FieldValue,
   declaration: EventState
 ) {
-  const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
+  const field = {
+    config: getDeclarationFieldConfig(eventConfig, fieldId),
+    value
+  }
 
   if (isNameFieldType(field)) {
     return {
@@ -162,7 +173,10 @@ function stripIndexFieldsFromValue(
   fieldId: string,
   value: FieldValue
 ) {
-  const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
+  const field = {
+    config: getDeclarationFieldConfig(eventConfig, fieldId),
+    value
+  }
 
   if (isIndexedNameFieldValue(field.value)) {
     return _.omit(field.value, [NAME_QUERY_KEY])
