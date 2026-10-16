@@ -21,7 +21,7 @@ import {
   getCurrentEventState,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForAction } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -43,7 +43,10 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
+  const { eventConfiguration: config } = useEventConfigurationForAction(
+    event,
+    ActionType.EDIT
+  )
   const formConfig = getDeclaration(config)
   const currentEventState = getCurrentEventState(event, config)
   const previousFormValues = currentEventState.declaration

@@ -14,12 +14,12 @@ import {
   EventDocument,
   DeclareActionInput,
   ACTION_SCOPE_MAP,
-  getCurrentEventState
+  getCurrentEventState,
+  getEventConfigForAction
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { userOnlyProcedure } from '@events/router/trpc'
 import { processAction } from '@events/service/events/events'
-import { getEventConfigForAction } from '@events/service/events/actionVersion'
 import {
   defaultRequestHandler,
   getDefaultActionProcedures

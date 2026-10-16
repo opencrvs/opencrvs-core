@@ -8,15 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { EventConfig } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventConfig,
+  EventDocument,
+  getEventConfigEffectiveAt,
+  getEventConfigForAction,
+  toPlainDate
+} from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 
 /**
- * Fetches configured events and finds a matching event
- * @returns a list of event configurations
+ * Fetches configured events, with every version of each action as served by country
+ * config. Resolve a version before reading an action's configuration: see
+ * `useEventConfigurations` and `useEventConfigurationForAction`.
  */
-export function useEventConfigurations() {
+export function useEventConfigurationVersions() {
   const trpc = useTRPC()
   const config = useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
@@ -26,21 +35,68 @@ export function useEventConfigurations() {
   return config
 }
 
+/** `config` with the version of each action in effect today. */
+export function getEventConfigEffectiveToday(config: EventConfig) {
+  return getEventConfigEffectiveAt(
+    config,
+    toPlainDate(new Date().toISOString())
+  )
+}
+
+/**
+ * Fetches configured events, each with the version of its actions in effect today:
+ * which actions can be performed always follows today's configuration.
+ * @returns a list of event configurations
+ */
+export function useEventConfigurations() {
+  const configs = useEventConfigurationVersions()
+  const today = toPlainDate(new Date().toISOString())
+  return useMemo(
+    () => configs.map((config) => getEventConfigEffectiveAt(config, today)),
+    [configs, today]
+  )
+}
+
+function findEventConfiguration(configs: EventConfig[], eventType: string) {
+  const eventConfiguration = configs.find((event) => event.id === eventType)
+  if (!eventConfiguration) {
+    throw new Error('Event configuration not found')
+  }
+  return eventConfiguration
+}
+
 /**
  * Fetches configured events and finds a matching event
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
- * @returns event configuration
+ * @returns event configuration, with the version of each action in effect today
  */
 export function useEventConfiguration(eventIdentifier: string): {
   eventConfiguration: EventConfig
 } {
-  const config = useEventConfigurations()
-  const eventConfiguration = config.find(
-    (event) => event.id === eventIdentifier
-  )
-  if (!eventConfiguration) {
-    throw new Error('Event configuration not found')
+  return {
+    eventConfiguration: findEventConfiguration(
+      useEventConfigurations(),
+      eventIdentifier
+    )
   }
+}
 
-  return { eventConfiguration }
+/**
+ * The configuration an action on `event` is performed with, as the server resolves it:
+ * DECLARE and NOTIFY use the versions in effect when the record was created, other
+ * actions the version in effect today, reading the declaration with the DECLARE /
+ * NOTIFY versions the record was made with.
+ */
+export function useEventConfigurationForAction(
+  event: EventDocument,
+  actionType: ActionType
+): { eventConfiguration: EventConfig } {
+  return {
+    eventConfiguration: getEventConfigForAction(
+      findEventConfiguration(useEventConfigurationVersions(), event.type),
+      { type: actionType },
+      event,
+      new Date()
+    )
+  }
 }

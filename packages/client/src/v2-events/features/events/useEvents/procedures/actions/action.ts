@@ -25,9 +25,13 @@ import {
   deepMerge,
   getCurrentEventState,
   getEventValidatorContext,
-  getActionConfig
+  getActionConfig,
+  getEventConfigForAction
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  getEventConfigEffectiveToday,
+  useEventConfigurationVersions
+} from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
   findLocalEventDocument,
@@ -283,7 +287,7 @@ interface Options extends Params {
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
-  const eventConfigurations = useEventConfigurations()
+  const eventConfigurations = useEventConfigurationVersions()
 
   const validatorContext = useValidatorContext()
 
@@ -326,11 +330,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
        */
       findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
-    const eventConfiguration = eventConfigurations.find(
+    const eventConfigurationVersions = eventConfigurations.find(
       (e) => e.id === localEvent?.type
     )
 
-    if (!eventConfiguration) {
+    if (!eventConfigurationVersions) {
       throw new Error(
         `Event configuration not found for event: ${localEvent?.type}`
       )
@@ -344,15 +348,29 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       )
     }
 
+    // Stamped now, not when the mutation runs: it may run later, from the offline outbox.
+    const performedAt = new Date().toISOString()
+
+    const localFullEvent =
+      fullEvent ??
+      (findLocalEventDocument(eventId) as EventDocument | undefined)
+
+    // The versions the server performs the action with. Without the full record
+    // (e.g. assigning from the overview) no declaration is read: today's versions.
+    const eventConfiguration = localFullEvent
+      ? getEventConfigForAction(
+          eventConfigurationVersions,
+          { type: actionType, performedAt },
+          localFullEvent,
+          new Date(performedAt)
+        )
+      : getEventConfigEffectiveToday(eventConfigurationVersions)
+
     const actionConfig = getActionConfig({
       eventConfiguration,
       actionType,
       customActionType: params.customActionType
     })
-
-    const localFullEvent =
-      fullEvent ??
-      (findLocalEventDocument(eventId) as EventDocument | undefined)
 
     const originalDeclaration = localFullEvent
       ? getCurrentEventState(localFullEvent, eventConfiguration).declaration
@@ -382,8 +400,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     const localEventDocument = findLocalEventDocument(eventId)
 
     return {
-      // Stamped now, not when the mutation runs: it may run later, from the offline outbox.
-      performedAt: new Date().toISOString(),
+      performedAt,
       ...restParams,
       eventId,
       declaration: getCleanedDeclarationDiff({

@@ -16,6 +16,7 @@ import * as z from 'zod/v4'
 import {
   eventAttachmentPath,
   getEventConfigEffectiveAt,
+  getEventConfigForRecord,
   logger,
   toPlainDate,
   TokenUserType,
@@ -57,7 +58,6 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import {
   getActionVersioning,
-  getEventConfigForRecord,
   requiresVersionResolution,
   throwConflictIfActionNotInEffect,
   throwIfPerformedAtOutOfBounds

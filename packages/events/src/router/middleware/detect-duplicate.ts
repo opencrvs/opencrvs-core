@@ -18,13 +18,13 @@ import {
   DeclarationActionConfig,
   EventDocument,
   getCurrentEventState,
+  getEventConfigForAction,
   RegisterActionInput
 } from '@opencrvs/commons/events'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
-import { getEventConfigForAction } from '@events/service/events/actionVersion'
 import { processAction } from '@events/service/events/events'
 
 function requiresDedupCheck(

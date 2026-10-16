@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   eventAttachmentPath,
   getDeclarationPages
 } from '@opencrvs/commons/client'
@@ -26,7 +27,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForAction } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { EditPageBanner } from './EditPageBanner'
 
@@ -41,8 +42,9 @@ export function Pages() {
   const event = events.getEvent.useGetEventFromCache(eventId)
 
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
+  const { eventConfiguration: configuration } = useEventConfigurationForAction(
+    event,
+    ActionType.EDIT
   )
   const declarationPages = getDeclarationPages(configuration)
 

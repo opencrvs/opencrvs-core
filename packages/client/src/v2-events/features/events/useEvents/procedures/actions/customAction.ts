@@ -14,10 +14,14 @@ import {
   EventDocument,
   EventState,
   getCurrentEventState,
+  getEventConfigForRecord,
   getEventValidatorContext
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  getEventConfigEffectiveToday,
+  useEventConfigurationVersions
+} from '@client/v2-events/features/events/useEventConfiguration'
 import {
   deleteLocalEvent,
   findLocalEventDocument
@@ -128,7 +132,7 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
 export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
-  const eventConfigurations = useEventConfigurations()
+  const eventConfigurations = useEventConfigurationVersions()
 
   const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
@@ -141,13 +145,23 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
     mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
       const localEvent = findLocalEventDocument(params.eventId)
 
-      const eventConfiguration = eventConfigurations.find(
+      const eventConfigurationVersions = eventConfigurations.find(
         (event) => event.id === localEvent?.type
       )
 
-      if (!eventConfiguration) {
+      if (!eventConfigurationVersions) {
         throw new Error('Event configuration not found')
       }
+
+      // Today's actions, reading the declaration with the DECLARE / NOTIFY versions
+      // the record was made with, as the server does.
+      const eventConfiguration = localEvent
+        ? getEventConfigForRecord(
+            eventConfigurationVersions,
+            localEvent,
+            new Date()
+          )
+        : getEventConfigEffectiveToday(eventConfigurationVersions)
 
       // Edit and direct-correction actions need the registered declaration as
       // the original so cleared fields in the diff are emitted as `null`. Use

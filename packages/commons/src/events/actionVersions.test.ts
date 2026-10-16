@@ -14,6 +14,8 @@ import { ActionType } from './ActionType'
 import {
   getAllDeclarationFields,
   getEventConfigEffectiveAt,
+  getEventConfigForAction,
+  getEventConfigForRecord,
   resolveActionVersion
 } from './actionVersions'
 import { DeclareActionConfig } from './ActionConfig'
@@ -21,6 +23,7 @@ import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import { FieldType } from './FieldType'
 import { getActionConfig, getDeclaration, getDeclarationFields } from './utils'
+import { generateEventDocument } from './test.utils'
 
 function v(effectiveFrom?: string) {
   return { effectiveFrom }
@@ -129,6 +132,85 @@ function getFixtureDeclare(): DeclareActionConfig {
   }
   return declare
 }
+
+describe('getEventConfigForRecord()', () => {
+  const declare = getActionConfig({
+    eventConfiguration: tennisClubMembershipEvent,
+    actionType: ActionType.DECLARE
+  })
+  const register = getActionConfig({
+    eventConfiguration: tennisClubMembershipEvent,
+    actionType: ActionType.REGISTER
+  })
+  if (
+    declare?.type !== ActionType.DECLARE ||
+    register?.type !== ActionType.REGISTER
+  ) {
+    throw new Error('Expected DECLARE and REGISTER actions')
+  }
+  const laterDeclare = {
+    ...declare,
+    effectiveFrom: '2010-01-01',
+    declaration: {
+      ...declare.declaration,
+      label: { ...declare.declaration.label, defaultMessage: 'Later form' }
+    }
+  }
+  const laterRegister = { ...register, effectiveFrom: '2010-01-01' }
+  const config = {
+    ...tennisClubMembershipEvent,
+    actions: [...tennisClubMembershipEvent.actions, laterDeclare, laterRegister]
+  }
+  const generated = generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+  })
+  // Created and declared before the later versions took effect.
+  const event = {
+    ...generated,
+    actions: generated.actions.map((action) =>
+      action.type === ActionType.CREATE
+        ? { ...action, performedAt: '2005-01-01T00:00:00.000Z' }
+        : action
+    )
+  }
+  const now = new Date('2020-01-01T00:00:00.000Z')
+
+  it("uses today's version of each action, with the record's DECLARE version", () => {
+    const view = getEventConfigForRecord(config, event, now)
+
+    expect(getDeclaration(view)).toBe(declare.declaration)
+    expect(
+      getActionConfig({
+        eventConfiguration: view,
+        actionType: ActionType.REGISTER
+      })
+    ).toBe(laterRegister)
+  })
+
+  it('gives an action on the record the DECLARE version the server resolves', () => {
+    expect(
+      getDeclaration(
+        getEventConfigForAction(
+          config,
+          { type: ActionType.DECLARE },
+          event,
+          now
+        )
+      )
+    ).toBe(declare.declaration)
+    expect(
+      getDeclaration(
+        getEventConfigForAction(
+          config,
+          { type: ActionType.REGISTER },
+          event,
+          now
+        )
+      )
+    ).toBe(declare.declaration)
+  })
+})
 
 describe('getAllDeclarationFields()', () => {
   const declare = getFixtureDeclare()

@@ -19,12 +19,12 @@ import {
   getUUID,
   ActionInput,
   ActionStatus,
-  generateActionDocument
+  generateActionDocument,
+  getActionAnchorDate,
+  getEventConfigForAction
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
-  getActionAnchorDate,
-  getEventConfigForAction,
   getEventConfigForConfirmation,
   resolveEffectiveFromForAction,
   throwConflictIfActionNotInEffect,
