@@ -14,6 +14,7 @@ import {
   ActionConfig,
   ActionStatus,
   ActionType,
+  ConditionalType,
   createPrng,
   encodeScope,
   EventConfig,
@@ -22,6 +23,7 @@ import {
   eventQueryDataGenerator,
   FieldConfig,
   FieldType,
+  flag,
   generateActionDuplicateDeclarationInput,
   getOrThrow,
   getUUID,
@@ -654,6 +656,73 @@ describe('event actions use the configuration version effective at their anchor 
     )
     const registered = await client.event.actions.register.request(
       generator.event.actions.register(declared.id)
+    )
+
+    expect(
+      getAction(registered, ActionType.REGISTER, ActionStatus.Accepted)
+    ).toBeDefined()
+  })
+
+  test("which actions can be performed follows today's configuration, with the flags of the DECLARE version the record was declared with", async () => {
+    const DECLARED_WITH_V1 = 'declared-with-v1'
+    const declare = getFixtureAction(ActionType.DECLARE)
+    const register = getFixtureAction(ActionType.REGISTER)
+    if (
+      declare.type !== ActionType.DECLARE ||
+      register.type !== ActionType.REGISTER
+    ) {
+      throw new Error('Expected DECLARE and REGISTER actions')
+    }
+    const config = withVersions(
+      ActionType.REGISTER,
+      [
+        {
+          ...register,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: flag(DECLARED_WITH_V1)
+            }
+          ]
+        }
+      ],
+      withVersions(ActionType.DECLARE, [
+        {
+          ...declare,
+          flags: [{ id: DECLARED_WITH_V1, operation: 'add' }]
+        },
+        { ...declare, effectiveFrom: PAST }
+      ])
+    )
+    useEventConfig({
+      ...config,
+      flags: [
+        ...config.flags,
+        {
+          id: DECLARED_WITH_V1,
+          requiresAction: false,
+          label: {
+            id: 'event.tennis-club-membership.flag.declared-with-v1.label',
+            defaultMessage: 'Declared with v1',
+            description: 'Flag added by the oldest DECLARE version'
+          }
+        }
+      ]
+    })
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    // Created before the dated DECLARE version took effect, so declared with the undated one.
+    const event = await client.event.create({
+      ...generator.event.create(),
+      performedAt: `${DISTANT_PAST}T00:00:00.000Z`
+    })
+    await client.event.actions.declare.request({
+      ...generator.event.actions.declare(event.id),
+      keepAssignment: true
+    })
+
+    const registered = await client.event.actions.register.request(
+      generator.event.actions.register(event.id)
     )
 
     expect(

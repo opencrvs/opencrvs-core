@@ -140,21 +140,18 @@ export function getActionAnchorDate(
   )
 }
 
-const swappedViews = new WeakMap<EventConfig, Map<string, EventConfig>>()
+const swappedConfigs = new WeakMap<EventConfig, Map<string, EventConfig>>()
 
-/**
- * `view` with each action of `versions` replaced by (or, when absent, extended with)
- * the given version. Returns `view` itself when it already holds every version, and
- * the same object for the same view and versions, so caches keyed on the config
- * (e.g. the derived notification form) keep working.
- */
+/** Uses the given action versions in place of the ones in `effectiveConfig`. */
 function withVersions(
-  view: EventConfig,
+  effectiveConfig: EventConfig,
   versions: ActionConfig[]
 ): EventConfig {
-  const replaced = versions.filter((version) => !view.actions.includes(version))
+  const replaced = versions.filter(
+    (version) => !effectiveConfig.actions.includes(version)
+  )
   if (replaced.length === 0) {
-    return view
+    return effectiveConfig
   }
 
   const cacheKey = replaced
@@ -162,24 +159,24 @@ function withVersions(
       (version) => `${getActionVersionKey(version)}@${version.effectiveFrom}`
     )
     .join('|')
-  const cached = swappedViews.get(view)?.get(cacheKey)
+  const cached = swappedConfigs.get(effectiveConfig)?.get(cacheKey)
   if (cached) {
     return cached
   }
 
   const keys = new Set(replaced.map(getActionVersionKey))
   const swapped = {
-    ...view,
+    ...effectiveConfig,
     actions: [
-      ...view.actions.filter(
+      ...effectiveConfig.actions.filter(
         (action) => !keys.has(getActionVersionKey(action))
       ),
       ...replaced
     ]
   }
-  swappedViews.set(
-    view,
-    (swappedViews.get(view) ?? new Map()).set(cacheKey, swapped)
+  swappedConfigs.set(
+    effectiveConfig,
+    (swappedConfigs.get(effectiveConfig) ?? new Map()).set(cacheKey, swapped)
   )
   return swapped
 }
@@ -223,6 +220,23 @@ function getRecordDeclarationVersions(
       atCreation.actions.find((action) => action.type === type)
     return version ? [version] : []
   })
+}
+
+/**
+ * The configuration in effect today, reading the record's declaration with the
+ * DECLARE / NOTIFY versions it was made with. Which actions can be performed on a
+ * record follows today's configuration, but the flags and state its declaration
+ * produced follow the versions that captured it.
+ */
+export function getEventConfigForRecord(
+  config: EventConfig,
+  event: EventDocument,
+  now: Date
+) {
+  return withVersions(
+    getEventConfigEffectiveAt(config, toPlainDate(now.toISOString())),
+    getRecordDeclarationVersions(config, event)
+  )
 }
 
 /**

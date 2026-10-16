@@ -57,6 +57,7 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import {
   getActionVersioning,
+  getEventConfigForRecord,
   requiresVersionResolution,
   throwConflictIfActionNotInEffect,
   throwIfPerformedAtOutOfBounds
@@ -124,13 +125,17 @@ export async function throwConflictIfActionNotAllowed(
     eventType: event.type,
     token
   })
+  const now = new Date()
   // Whether an action can be performed is decided by the configuration in effect today.
   const eventConfiguration = getEventConfigEffectiveAt(
     fetchedEventConfiguration,
-    toPlainDate(new Date().toISOString())
+    toPlainDate(now.toISOString())
   )
 
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const eventIndex = getCurrentEventState(
+    event,
+    getEventConfigForRecord(fetchedEventConfiguration, event, now)
+  )
 
   const allowedActions: DisplayableAction[] =
     getAvailableActionsForEvent(eventIndex)
