@@ -20,7 +20,7 @@ const CONFIG_KEYS = [
   'SECRET_KEY'
 ].flatMap((name) => [`S3_${name}`, `MINIO_${name}`])
 
-const OTHER_KEYS = ['S3_PROVIDER', 'S3_USE_SSL', 'S3_BUCKET', 'MINIO_BUCKET']
+const OTHER_KEYS = ['S3_USE_SSL', 'S3_BUCKET', 'MINIO_BUCKET']
 
 /**
  * The constants are read when the module loads, so each case loads it afresh
@@ -49,7 +49,6 @@ describe('s3 constants', () => {
   it('defaults to a local MinIO', () => {
     const constants = loadConstants()
 
-    expect(constants.S3_PROVIDER).toBe('minio')
     expect(constants.S3_HOST).toBe('localhost')
     expect(constants.S3_PORT).toBe(3535)
     expect(constants.S3_USE_SSL).toBe(false)
@@ -131,27 +130,5 @@ describe('s3 constants', () => {
   it('connects over TLS only when asked to', () => {
     expect(loadConstants({ S3_USE_SSL: 'true' }).S3_USE_SSL).toBe(true)
     expect(loadConstants({ S3_USE_SSL: 'false' }).S3_USE_SSL).toBe(false)
-  })
-
-  it('defaults the region to the one the provider expects', () => {
-    expect(loadConstants({ S3_PROVIDER: 'gcs' }).S3_BUCKET_REGION).toBe('auto')
-    expect(loadConstants({ S3_PROVIDER: 'aws' }).S3_BUCKET_REGION).toBe(
-      'us-east-1'
-    )
-  })
-
-  it('lets an explicit region override the provider default', () => {
-    const constants = loadConstants({
-      S3_PROVIDER: 'aws',
-      S3_BUCKET_REGION: 'af-south-1'
-    })
-
-    expect(constants.S3_BUCKET_REGION).toBe('af-south-1')
-  })
-
-  it('fails at load for a provider that is not supported', () => {
-    expect(() => loadConstants({ S3_PROVIDER: 'ceph' })).toThrow(
-      'Unsupported S3_PROVIDER "ceph"'
-    )
   })
 })

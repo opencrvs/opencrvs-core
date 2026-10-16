@@ -25,8 +25,6 @@ import {
   S3_BUCKET,
   S3_HOST,
   S3_PORT,
-  S3_PROVIDER,
-  S3_PROVIDER_PROFILE,
   S3_PUBLIC_URL,
   S3_USE_SSL
 } from '@documents/s3/constants'
@@ -34,13 +32,12 @@ import { createS3Client } from '@documents/s3/sdk-client'
 import { signFileUrl } from '@documents/s3/sign'
 
 /**
- * What a store must do to be a supported provider. Each test is one point of
+ * What a store must do to be a supported one. Each test is one point of
  * the capability contract in docs/adr/0004-documents-speaks-plain-s3.md, and
  * runs the same functions that the documents service runs.
  *
  * Run it against a store with `pnpm test:s3-conformance`, which reads the same
- * `S3_*` variables as the service. The README has the settings for each store.
- * It writes only under a prefix of its own and removes it afterwards.
+ * `S3_*` variables as the service. It writes only under a prefix of its own and removes it afterwards.
  */
 
 /** More than one page of `ListObjectsV2` and more than one `DeleteObjects`. */
@@ -55,10 +52,6 @@ const key = (name: string) => `${PREFIX}${name}`
 const admin = createS3Client(
   `${S3_USE_SSL ? 'https' : 'http'}://${S3_HOST}:${S3_PORT}`
 )
-
-/** The check only means something where the bucket policy is what governs access. */
-const itWhereAccessIsAPolicy =
-  S3_PROVIDER_PROFILE.privateBucketStrategy === 'delete-policy' ? it : it.skip
 
 const sha256 = (data: Buffer) => createHash('sha256').update(data).digest('hex')
 
@@ -84,7 +77,11 @@ function streamOf(data: Buffer, chunkSize = 1024 * 1024) {
 }
 
 /** Runs the work in small batches, so that a large store is not flooded. */
-async function inBatches<T>(items: T[], size: number, work: (item: T) => Promise<unknown>) {
+async function inBatches<T>(
+  items: T[],
+  size: number,
+  work: (item: T) => Promise<unknown>
+) {
   for (let start = 0; start < items.length; start += size) {
     await Promise.all(items.slice(start, start + size).map(work))
   }
@@ -94,7 +91,7 @@ beforeAll(async () => {
   // A run's report must say which store it ran against
   // eslint-disable-next-line no-console
   console.log(
-    `S3 conformance: provider=${S3_PROVIDER} endpoint=${S3_HOST}:${S3_PORT} public=${S3_PUBLIC_URL} bucket=${S3_BUCKET} prefix=${PREFIX}`
+    `S3 conformance: endpoint=${S3_HOST}:${S3_PORT} public=${S3_PUBLIC_URL} bucket=${S3_BUCKET} prefix=${PREFIX}`
   )
   await ensureDefaultBucket()
   await ensureDefaultBucketIsPrivate()
@@ -115,42 +112,39 @@ describe('bucket', () => {
     await ensureDefaultBucketIsPrivate()
   })
 
-  itWhereAccessIsAPolicy(
-    'is made private again when it was left readable by anyone',
-    async () => {
-      await putObject(key('was-public.txt'), Buffer.from('x'))
-      const signed = new URL(await signFileUrl(key('was-public.txt')))
-      const unsigned = `${signed.origin}${signed.pathname}`
+  it('is made private again when it was left readable by anyone', async () => {
+    await putObject(key('was-public.txt'), Buffer.from('x'))
+    const signed = new URL(await signFileUrl(key('was-public.txt')))
+    const unsigned = `${signed.origin}${signed.pathname}`
 
-      await admin.send(
-        new PutBucketPolicyCommand({
-          Bucket: S3_BUCKET,
-          Policy: JSON.stringify({
-            Version: '2012-10-17',
-            Statement: [
-              {
-                Effect: 'Allow',
-                Principal: { AWS: ['*'] },
-                Action: ['s3:GetObject'],
-                Resource: [`arn:aws:s3:::${S3_BUCKET}/*`]
-              }
-            ]
-          })
+    await admin.send(
+      new PutBucketPolicyCommand({
+        Bucket: S3_BUCKET,
+        Policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Effect: 'Allow',
+              Principal: { AWS: ['*'] },
+              Action: ['s3:GetObject'],
+              Resource: [`arn:aws:s3:::${S3_BUCKET}/*`]
+            }
+          ]
         })
-      )
+      })
+    )
 
-      try {
-        // The control: the store did serve the object to anyone
-        expect((await fetch(unsigned)).status).toBe(200)
+    try {
+      // The control: the store did serve the object to anyone
+      expect((await fetch(unsigned)).status).toBe(200)
 
-        await ensureDefaultBucketIsPrivate()
+      await ensureDefaultBucketIsPrivate()
 
-        expect([401, 403]).toContain((await fetch(unsigned)).status)
-      } finally {
-        await ensureDefaultBucketIsPrivate()
-      }
+      expect([401, 403]).toContain((await fetch(unsigned)).status)
+    } finally {
+      await ensureDefaultBucketIsPrivate()
     }
-  )
+  })
 })
 
 describe('objects', () => {

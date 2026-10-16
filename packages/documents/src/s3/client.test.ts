@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { S3_BUCKET, S3_BUCKET_REGION } from '@documents/s3/constants'
-import type { S3ProviderProfile } from '@documents/s3/providers'
 
 const send = jest.fn()
 const Upload = jest.fn()
@@ -17,11 +16,11 @@ const uploadDone = jest.fn()
 
 /*
  * test/setupJest.ts replaces the client module with a mock in all other test
- * files. Get the real one, because these tests must use it. It is loaded in an
- * isolated registry so that a test can swap the provider profile, which is read
- * when the module loads.
+ * files. Get the real one, because these tests must use it. It builds its SDK
+ * client when it loads, so it is loaded in an isolated registry with that client
+ * replaced.
  */
-function loadClient(profile: Partial<S3ProviderProfile> = {}) {
+function loadClient() {
   let client!: typeof import('@documents/s3/client')
 
   jest.isolateModules(() => {
@@ -38,14 +37,6 @@ function loadClient(profile: Partial<S3ProviderProfile> = {}) {
       }
     }))
     jest.doMock('@aws-sdk/lib-storage', () => ({ Upload }))
-    jest.doMock('@documents/s3/constants', () => {
-      const actual = jest.requireActual('@documents/s3/constants')
-
-      return {
-        ...actual,
-        S3_PROVIDER_PROFILE: { ...actual.S3_PROVIDER_PROFILE, ...profile }
-      }
-    })
 
     client = jest.requireActual('@documents/s3/client')
   })
@@ -85,15 +76,6 @@ describe('ensureDefaultBucket', () => {
       Bucket: S3_BUCKET,
       CreateBucketConfiguration: { LocationConstraint: S3_BUCKET_REGION }
     })
-  })
-
-  it('sends no location constraint to a store that does not take one', async () => {
-    send.mockRejectedValueOnce(storeError('NotFound', 404))
-    send.mockResolvedValueOnce({})
-
-    await loadClient({ sendLocationConstraint: false }).ensureDefaultBucket()
-
-    expect(sentCommand(1).input).toEqual({ Bucket: S3_BUCKET })
   })
 
   it('leaves an existing bucket alone', async () => {
@@ -154,14 +136,6 @@ describe('ensureDefaultBucketIsPrivate', () => {
     await expect(loadClient().ensureDefaultBucketIsPrivate()).rejects.toThrow(
       'AccessDenied'
     )
-  })
-
-  it('leaves the bucket to the store when the store governs access itself', async () => {
-    await loadClient({
-      privateBucketStrategy: 'skip'
-    }).ensureDefaultBucketIsPrivate()
-
-    expect(send).not.toHaveBeenCalled()
   })
 })
 
@@ -304,19 +278,6 @@ describe('removeObjects', () => {
     await expect(loadClient().removeObjects(keys(2))).rejects.toThrow(
       'events/e1/0.png (AccessDenied)'
     )
-  })
-
-  it('deletes one key at a time for a store without the batch call', async () => {
-    send.mockResolvedValue({})
-
-    await loadClient({ batchDelete: 'per-key' }).removeObjects(keys(3))
-
-    expect(send).toHaveBeenCalledTimes(3)
-    expectCommand(0, 'DeleteObjectCommand')
-    expect(sentCommand(2).input).toEqual({
-      Bucket: S3_BUCKET,
-      Key: 'events/e1/2.png'
-    })
   })
 })
 

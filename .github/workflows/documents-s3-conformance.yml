@@ -25,12 +25,12 @@ permissions:
 
 jobs:
   conformance:
-    name: ${{ matrix.provider }}
+    name: ${{ matrix.store }}
     runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
-        provider: [minio, seaweedfs, rustfs]
+        store: [minio, seaweedfs, rustfs]
     steps:
       - uses: actions/checkout@v7
 
@@ -43,15 +43,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Start ${{ matrix.provider }}
+      - name: Start ${{ matrix.store }}
         run: |
-          docker compose -f packages/documents/test/s3-conformance/docker-compose.yml up -d ${{ matrix.provider }}
+          docker compose -f packages/documents/test/s3-conformance/docker-compose.yml up -d ${{ matrix.store }}
           timeout 60 sh -c 'until curl -s -o /dev/null localhost:3535; do sleep 1; done'
           # A store answers before it takes requests
           sleep 5
 
       # The compose file starts each store on localhost:3535 with the service's
-      # default minioadmin credentials, so only the provider needs naming
+      # default minioadmin credentials, so no S3_* setting is needed
       - run: pnpm --filter @opencrvs/documents test:s3-conformance
-        env:
-          S3_PROVIDER: ${{ matrix.provider }}

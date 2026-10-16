@@ -10,10 +10,10 @@
 # The stores that the conformance suite is verified against, started the way the
 # suite was run. Each one answers on localhost:3535 with the minioadmin
 # credentials, which are the defaults of the documents service, so no S3_*
-# setting is needed besides S3_PROVIDER. Start one at a time:
+# setting is needed. Start one at a time:
 #
 #   docker compose -f packages/documents/test/s3-conformance/docker-compose.yml up -d seaweedfs
-#   S3_PROVIDER=seaweedfs pnpm --filter @opencrvs/documents test:s3-conformance
+#   pnpm --filter @opencrvs/documents test:s3-conformance
 #   docker compose -f packages/documents/test/s3-conformance/docker-compose.yml down -v
 #
 # The images are pinned to the versions that the suite last passed on, see
@@ -35,6 +35,8 @@ services:
       - ./seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
     ports:
       - '3535:8333'
+      # Uncomment this port to enable the SeaweedFS S3 file browser, which is not needed for the conformance suite
+      # - '3536:8888'
 
   rustfs:
     image: rustfs/rustfs:1.0.1
@@ -43,6 +45,9 @@ services:
       RUSTFS_ACCESS_KEY: minioadmin
       RUSTFS_SECRET_KEY: minioadmin
       RUSTFS_ADDRESS: ':9000'
+      # The console is not needed for the conformance suite, and it is not yet compatible with the S3 API.
       RUSTFS_CONSOLE_ENABLE: 'false'
     ports:
       - '3535:9000'
+      # Uncomment this port to enable the RustFS console, which is not needed for the conformance suite
+      # - '3536:9001'

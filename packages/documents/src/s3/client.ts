@@ -24,7 +24,6 @@ import {
   S3_BUCKET_REGION,
   S3_HOST,
   S3_PORT,
-  S3_PROVIDER_PROFILE,
   S3_USE_SSL
 } from '@documents/s3/constants'
 import { createS3Client } from '@documents/s3/sdk-client'
@@ -68,15 +67,12 @@ export async function ensureDefaultBucket() {
     }
   }
 
-  const sendLocationConstraint =
-    S3_PROVIDER_PROFILE.sendLocationConstraint &&
-    S3_BUCKET_REGION !== 'us-east-1'
-
   try {
     await s3Client.send(
       new CreateBucketCommand({
         Bucket: S3_BUCKET,
-        ...(sendLocationConstraint && {
+        // S3 rejects a location constraint for us-east-1
+        ...(S3_BUCKET_REGION !== 'us-east-1' && {
           CreateBucketConfiguration: {
             LocationConstraint: S3_BUCKET_REGION as BucketLocationConstraint
           }
@@ -104,16 +100,9 @@ export async function ensureDefaultBucket() {
  * persons. A check at each start keeps the rule in one place. It also repairs
  * the installations that have no private policy.
  *
- * Stores that govern access outside a bucket policy skip this, see
- * {@link S3ProviderProfile.privateBucketStrategy}.
- *
  * @see https://github.com/opencrvs/opencrvs-core/issues/13436
  */
 export async function ensureDefaultBucketIsPrivate() {
-  if (S3_PROVIDER_PROFILE.privateBucketStrategy === 'skip') {
-    return
-  }
-
   try {
     await s3Client.send(new DeleteBucketPolicyCommand({ Bucket: S3_BUCKET }))
   } catch (error) {
@@ -188,13 +177,6 @@ export async function removeObject(key: string) {
  * sweep is not mistaken for a successful one.
  */
 export async function removeObjects(keys: string[]) {
-  if (S3_PROVIDER_PROFILE.batchDelete === 'per-key') {
-    for (const key of keys) {
-      await removeObject(key)
-    }
-    return
-  }
-
   for (let start = 0; start < keys.length; start += MAX_KEYS_PER_DELETE) {
     const { Errors } = await s3Client.send(
       new DeleteObjectsCommand({
