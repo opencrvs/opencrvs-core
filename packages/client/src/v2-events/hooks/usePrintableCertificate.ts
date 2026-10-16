@@ -24,7 +24,7 @@ import {
   getAcceptedActions,
   getCurrentEventState,
   getDeclarationFields,
-  isMinioUrl,
+  isS3Url,
   LanguageConfig,
   PrintCertificateAction,
   UserOrSystemSummary,
@@ -55,7 +55,7 @@ async function replaceMinioUrlWithBase64(
   for (const fieldId of fileFieldIds) {
     const field = declarationClone[fieldId]
 
-    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
+    if (hasStringFilename(field) && isS3Url(field.filename)) {
       // TypeScript now knows `field` has a `filename` property of type string
       field.filename = await fetchImageAsBase64(field.filename)
     }
