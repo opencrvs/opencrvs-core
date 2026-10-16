@@ -1,41 +1,61 @@
-# The documents service speaks plain S3 and supports the stores that pass a conformance suite
+# The documents service uses only the S3 API
 
-The documents service stores files through the S3 API and nothing else, and has no code that is specific to a store. Which store answers is a deployment choice. A store is supported when it passes the conformance suite in `packages/documents/test/s3-conformance` and is listed, with the version it passed on, in `packages/documents/README.md`. We chose this when [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348) asked for MinIO to be replaced and gave no replacement: the code could be made independent of the store at once, while the choice of a bundled store needs its own decision.
+The documents service stores files through the S3 API. The service has no code that is specific to one store. The operator chooses the store. A store is supported when it passes the conformance suite. The conformance suite is a set of tests in `packages/documents/test/s3-conformance`. The README of the package lists each supported store and the version that passed.
+
+We made this decision for issue [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348). The issue asks us to replace MinIO, but it does not name a new store. The service can become independent of the store now. The choice of a store for the Helm chart needs a separate decision.
 
 ## What a store must do
 
-The documents service needs these from a store. The conformance suite has one test for each, and it runs the same functions that the service runs.
+The service needs these functions from a store. The conformance suite tests each function in this list, except cross-origin reads. The tests use the same code as the service.
 
-- `HeadBucket`, `CreateBucket` with a region, and `DeleteBucketPolicy`, or an equivalent that leaves the bucket private.
-- `PutObject` of a stream of unknown length, up to 50 MB, as a multipart upload where needed.
-- User metadata (`created-by`) and `Content-Type` that come back as they were stored.
-- `HeadObject` that answers 404 for a key that does not exist.
-- `ListObjectsV2` with pagination, and `DeleteObjects` of up to 1000 keys per request.
-- Path-style SigV4 presigned `GET` URLs, signed for the public host. Browsers fetch these, so the store must allow cross-origin reads from the client's origin.
-- No anonymous reads. An unsigned `GET` for an existing key is refused.
+- `HeadBucket` and `CreateBucket` with a region.
+- `DeleteBucketPolicy`, or an equivalent function that keeps the bucket private.
+- `PutObject` for a stream of unknown length, up to 50 MB. For a large file, the store must accept a multipart upload.
+- User metadata, such as the `created-by` field, and `Content-Type`. The store returns both as they were stored.
+- `HeadObject`, with the answer 404 for a key that does not exist.
+- `ListObjectsV2` with pagination.
+- `DeleteObjects` for up to 1000 keys in one request.
+- Path-style SigV4 presigned `GET` URLs, signed for the public host.
+- A refusal of an unsigned `GET` request for an existing key.
+- Cross-origin reads from the origin of the client. Browsers fetch the presigned URLs. The suite does not test this function.
 
-## Considered options
+## Options that we rejected
 
-**Any S3-compatible store.** Stores implement different parts of S3. A deployment on a store that lacks one of the calls above would work until the first sweep, or the first large upload, and then fail in the field. A list that says which stores were run through the suite is a promise we can keep.
+**Any S3-compatible store.** Stores do not all implement the complete S3 API. A service can work with a store that lacks one function. Then the service fails at the first sweep or at the first large upload. A list of tested stores is a promise that we can keep.
 
-**Keep the MinIO client.** It works against any S3 store and is Apache-2.0, as is the AWS SDK that replaces it. We changed because `sign.ts` imported a private path inside the MinIO package, `minio/dist/main/signing.js`, and because every handler spoke a vendor's API. The AWS SDK is only a protocol client here: the endpoint and credentials come from `S3_*`, so it makes no deployment depend on AWS.
+**The MinIO client.** The MinIO client works with each S3 store. Its license is Apache-2.0, the same license as the AWS SDK that replaces it. We changed for two reasons.
 
-**A provider setting that selects a profile per store.** We built `S3_PROVIDER` with a profile of what could differ: the default region, whether to send a location constraint, whether to remove the bucket policy, and whether to batch deletes. We removed it again. The suite passes on MinIO, SeaweedFS and RustFS with each other's profile and region, so the profiles held nothing that mattered, and the code that selected them and warned about unverified ones guarded differences that nobody had found. A store that needs a difference gets a setting when it does.
+First, `sign.ts` imported a private path in the MinIO package: `minio/dist/main/signing.js`. Second, each handler used the API of one vendor.
+
+In the service, the AWS SDK is only a protocol client. The endpoint and the credentials come from the `S3_*` settings. No installation depends on AWS.
+
+**A provider setting that selects a profile for each store.** We built the setting `S3_PROVIDER` with a profile for each store. A profile set the default region and three actions of the service. The actions were: send a location constraint, clear the bucket policy, and delete objects in a batch. We removed the setting.
+
+The suite passes on MinIO, SeaweedFS and RustFS with the profile and the region of each of the other two stores. The code that selected the profiles guarded against differences that nobody found. If a store needs a difference, we add a setting at that time.
 
 ## Consequences
 
-**`MINIO_*` stays as a fallback.** Every existing deployment sets `MINIO_HOST`, `MINIO_URL` and the rest, so each `S3_*` setting falls back to its `MINIO_*` name. `S3_PUBLIC_URL` replaces `MINIO_URL`. An upgraded deployment behaves as before. `isMinioUrl` and `MINIO_REGEX` in `@opencrvs/commons` stay as deprecated aliases of `isS3Url` and `S3_URL_REGEX`, because country configs may import them.
+**The `MINIO_*` settings stay as a fallback.** Each installation sets `MINIO_HOST`, `MINIO_URL` and other `MINIO_*` variables. When an `S3_*` variable is not set, the service uses the `MINIO_*` variable with the same name. `S3_PUBLIC_URL` replaces `MINIO_URL`. An upgraded installation works as before.
 
-**The bucket name stays `MINIO_BUCKET`.** The events migration that strips the bucket from stored paths, the Helm chart and CI all read it, and a second name could let them disagree with this service. It is renamed together with the chart.
+**The old URL helpers stay as aliases.** Country configurations can import `isMinioUrl` and `MINIO_REGEX` from `@opencrvs/commons`. These names stay as deprecated aliases of `isS3Url` and `S3_URL_REGEX`.
 
-**The list is a statement and not a check.** The service does not know which store it talks to and does not refuse one that is not listed, which may work. Support means that the store is in the README table, with the date and the version that the suite passed on.
+**The bucket name stays `MINIO_BUCKET`.** The events migration reads this name. The migration removes the bucket from stored paths. The Helm chart and the CI also read the name. A second name can cause a different value in the service. We will rename the variable together with the chart.
 
-**One supported store must be open source and self-hostable.** AWS S3 and Google Cloud Storage are closed services, and neither has been tried. For the Digital Public Goods Standard's platform independence indicator a closed component needs an open alternative, and MinIO, SeaweedFS and RustFS are those alternatives. If the open stores ever fall out of the table, it must not be left with only cloud services.
+**The list is a statement, not a check.** The service does not know which store it uses. The service does not refuse a store that is not in the table. Such a store can work. A store is supported when the README table shows the store, the date and the version that passed.
 
-**The handlers know nothing of the SDK.** They call `putObject`, `statObjectIfExists`, `removeObjects`, `listObjectKeys` and `signFileUrl`. Switching the SDK, or adding a difference for one store, touches `packages/documents/src/s3/` only.
+**One supported store must be open source and self-hosted.** AWS S3 and Google Cloud Storage are closed services, and we did not test them. The Digital Public Goods Standard has an indicator for platform independence. For this indicator, each closed component must have an open alternative. MinIO, SeaweedFS and RustFS are open alternatives. The table must always show at least one open store.
 
-**Presigning is asynchronous.** `signFileUrl` was synchronous and now returns a promise, so the two presign handlers are `async`. A key is signed for the public host and not the internal one, because the signature covers the host.
+**The handlers do not use the SDK.** The handlers call `putObject`, `statObjectIfExists`, `removeObjects`, `listObjectKeys` and `signFileUrl`. A change of the SDK affects only `packages/documents/src/s3/`. A difference for one store also affects only this directory.
 
-**A failed batch delete now fails.** `removeObjects` throws when the store reports a key it could not delete. The earlier call returned without looking, which let a sweep that deleted nothing look like one that succeeded, the failure that [ADR 0003](./0003-a-records-prefix-owns-its-attachments.md) already corrected for single deletes.
+**The function `signFileUrl` is asynchronous.** The function was synchronous. Now the function returns a promise, and the two presign handlers are `async`. The signature covers the host. The service signs a key for the public host, not for the internal host.
 
-**Not decided here.** Which store ships in the Helm chart and Docker Compose files, and the move of the chart's `MINIO_*` variables to `S3_*`, are a separate decision. So are lifecycle rules for abandoned uploads and object versioning. The Helm charts, Compose files, backup and restore scripts, and the cleanup job still deploy MinIO.
+**A failed batch delete now causes an error.** `removeObjects` throws an error when the store reports that it cannot delete a key. The earlier code did not look at the result. A sweep that deleted nothing then looked successful. [ADR 0003](./0003-a-records-prefix-owns-its-attachments.md) corrected the same problem for single deletes.
+
+**We did not decide these points here.** Some points need separate decisions:
+
+- The store for the Helm chart and the Compose files.
+- The change of the chart variables from `MINIO_*` to `S3_*`.
+- Lifecycle rules for abandoned uploads.
+- Object versioning.
+
+The Helm charts, the Compose files, the backup and restore scripts, and the cleanup job still use MinIO.
