@@ -9,7 +9,7 @@
 name: Publish images from any branch or tag
 run-name: Publish images from ${{ inputs.branch_tag_name || github.ref_name }}
 env:
-  CONTAINER_REGISTRY: ghcr.io/opencrvs
+  CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY || 'ghcr.io/opencrvs' }}
 on:
   push:
     branches:
@@ -58,9 +58,6 @@ on:
         type: boolean
         default: false
         required: false
-
-env:
-  TARGET_REPO: ${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}
 
 jobs:
   base:
@@ -232,7 +229,7 @@ jobs:
             build-args: |
               VERSION=${{ needs.base.outputs.version }}
               BRANCH=${{ needs.base.outputs.branch }}
-              BASE_IMAGE=${{ env.TARGET_REPO }}/ocrvs-base
+              BASE_IMAGE=${{ env.CONTAINER_REGISTRY }}/ocrvs-base
             provenance: false
             push: true
             context: .
