@@ -19,11 +19,12 @@ import {
 import getPlugins from '@documents/config/plugins'
 import { getRoutes } from '@documents/config/routes'
 import { readFileSync } from 'fs'
-import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
+import { S3_HOST, S3_PORT, S3_PROVIDER } from '@documents/s3/constants'
+import { VERIFIED_S3_PROVIDERS } from '@documents/s3/providers'
 import {
-  ensureDefaultMinioBucket,
-  ensureDefaultMinioBucketIsPrivate
-} from '@documents/minio/client'
+  ensureDefaultBucket,
+  ensureDefaultBucketIsPrivate
+} from '@documents/s3/client'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -58,15 +59,24 @@ export async function createServer() {
 
   async function start() {
     try {
-      await ensureDefaultMinioBucket()
-      await ensureDefaultMinioBucketIsPrivate()
-      server.log('info', `Minio started on ${MINIO_HOST}:${MINIO_PORT}`)
+      if (!VERIFIED_S3_PROVIDERS.includes(S3_PROVIDER)) {
+        server.log(
+          'warn',
+          `Object storage provider ${S3_PROVIDER} is supported but has not yet passed the conformance suite (packages/documents/README.md). Run it against your store before relying on it.`
+        )
+      }
+      await ensureDefaultBucket()
+      await ensureDefaultBucketIsPrivate()
+      server.log(
+        'info',
+        `Object storage (${S3_PROVIDER}) ready on ${S3_HOST}:${S3_PORT}`
+      )
       await server.start()
       server.log('info', `Documents server started on ${HOST}:${PORT}`)
     } catch (error) {
       server.log(
         'error',
-        `Error preparing Minio bucket! ${(error as Error).stack}`
+        `Error preparing object storage bucket! ${(error as Error).stack}`
       )
       throw error
     }

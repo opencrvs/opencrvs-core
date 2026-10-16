@@ -12,10 +12,10 @@ import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
 
 jest.setMock('node-fetch', { default: fetch })
-jest.mock('@documents/minio/client', () => ({
+jest.mock('@documents/s3/client', () => ({
   __esModule: true,
-  ensureDefaultMinioBucket: jest.fn(),
-  ensureDefaultMinioBucketIsPrivate: jest.fn()
+  ensureDefaultBucket: jest.fn(),
+  ensureDefaultBucketIsPrivate: jest.fn()
 }))
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
