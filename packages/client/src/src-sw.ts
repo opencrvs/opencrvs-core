@@ -18,7 +18,7 @@ import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 import { WorkboxPlugin } from 'workbox-core/types'
-import { MINIO_REGEX } from '@opencrvs/commons/client'
+import { S3_URL_REGEX } from '@opencrvs/commons/client'
 
 // "App shell" = the SPA's index.html, served for any unmatched route. True
 // if a document's URL got poisoned with that HTML instead of the real file.
@@ -98,8 +98,8 @@ const documentsOnly: WorkboxPlugin = {
   }
 }
 
-// This caches the minio urls
-registerRoute(MINIO_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
+// This caches the document urls served by the object store
+registerRoute(S3_URL_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist

@@ -19,6 +19,11 @@
     "noUnusedLocals": true,
     "types": ["jest"]
   },
-  "include": ["src/**/*.ts", "typings", "test/setupJest.ts"],
+  "include": [
+    "src/**/*.ts",
+    "typings",
+    "test/setupJest.ts",
+    "test/s3-conformance/**/*.ts"
+  ],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

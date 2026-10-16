@@ -141,6 +141,19 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Documents service speaks plain S3
+
+The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys, so **nothing needs to change when you upgrade**: every `S3_*` setting falls back to the `MINIO_*` variable that your deployment already sets.
+
+The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement, so a store is supported only once it passes a conformance suite (`pnpm --filter @opencrvs/documents test:s3-conformance`). MinIO, SeaweedFS and RustFS have passed it; AWS S3 and Google Cloud Storage have not been tried. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store passed on and how to run the suite against yours.
+
+Two things to know if you build on this:
+
+- `MINIO_*` variables are deprecated in favour of `S3_*` (`MINIO_URL` becomes `S3_PUBLIC_URL`). `MINIO_BUCKET` keeps its name, because the events migration and the Helm chart read it too.
+- `isMinioUrl` and `MINIO_REGEX` in `@opencrvs/commons` are deprecated aliases of `isS3Url` and `S3_URL_REGEX`. They still work.
+
+A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. The Helm charts, Docker Compose files and backup scripts are unchanged. Choosing the replacement store is tracked separately. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)

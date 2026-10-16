@@ -12,8 +12,14 @@
 import * as z from 'zod/v4'
 import { UUID } from './uuid'
 
-export const MINIO_REGEX =
+export const S3_URL_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|jpeg|jfif|png|pdf|svg)(\?.*)?$/i
+
+/**
+ * @alias
+ * @deprecated The store is not necessarily MinIO. Use {@link S3_URL_REGEX}.
+ */
+export const MINIO_REGEX = S3_URL_REGEX
 
 export function isBase64FileString(str: string) {
   if (str === '' || str.trim() === '') {
@@ -23,8 +29,14 @@ export function isBase64FileString(str: string) {
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
 
-export const isMinioUrl = (url: string): url is FullDocumentUrl =>
-  MINIO_REGEX.test(url)
+export const isS3Url = (url: string): url is FullDocumentUrl =>
+  S3_URL_REGEX.test(url)
+
+/**
+ * @alias
+ * @deprecated The store is not necessarily MinIO. Use {@link isS3Url}.
+ */
+export const isMinioUrl = isS3Url
 
 export const FullDocumentUrl = z
   .string()
