@@ -61,6 +61,18 @@ export default interface EventActionsTable {
   >
 
   customActionType: ColumnType<string | null, string | null, string | null>
+
+  effectiveFrom: ColumnType<
+    string | null,
+    string | null | undefined,
+    string | null
+  >
+
+  performedAt: ColumnType<
+    string | null,
+    string | null | undefined,
+    string | null
+  >
 }
 
 export type EventActions = Selectable<EventActionsTable>

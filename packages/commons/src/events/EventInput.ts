@@ -11,6 +11,7 @@
 import * as z from 'zod/v4'
 import { v4 as uuidv4 } from 'uuid'
 import { UUID } from '../uuid'
+import { PerformedAt } from './ActionInput'
 
 export const EventInput = z
   .object({
@@ -18,7 +19,8 @@ export const EventInput = z
     type: z.string(),
     createdAtLocation: UUID.nullish().describe(
       'Location where the event occurred. Required for system users.'
-    )
+    ),
+    performedAt: PerformedAt
   })
   .meta({ default: { transactionId: uuidv4(), type: 'birth' } })
 

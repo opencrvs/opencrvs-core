@@ -14,6 +14,7 @@ import { ActionConfig } from './ActionConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import { findAllFields, getDeclarationFields } from './utils'
+import { getActionVersionKey } from './actionVersions'
 import { FieldType } from './FieldType'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
@@ -195,17 +196,6 @@ export function validateHasDeclareAction<
   }
 
   return true
-}
-
-/**
- * Identifies an action across its versions. Custom actions are keyed apart from core
- * actions, so a custom action whose `customActionType` matches a core action type
- * (e.g. 'DECLARE') is not taken for a version of it.
- */
-function getActionVersionKey(action: ActionConfig) {
-  return action.type === ActionType.CUSTOM
-    ? `${ActionType.CUSTOM}.${action.customActionType}`
-    : action.type
 }
 
 function describeAction(action: ActionConfig) {

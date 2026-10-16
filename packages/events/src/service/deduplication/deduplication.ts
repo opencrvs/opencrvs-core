@@ -18,7 +18,7 @@ import {
   ClauseOutput,
   FieldValue,
   EventConfig,
-  getDeclarationFieldById,
+  getAllDeclarationFields,
   PlainDate,
   FieldType,
   extractPotentialDuplicatesFromActions,
@@ -28,6 +28,7 @@ import {
   getAcceptedScopesFromToken,
   getCurrentEventState,
   getEventConfigById,
+  getOrThrow,
   logger,
   userCanAccessEventWithScopes
 } from '@opencrvs/commons'
@@ -113,7 +114,10 @@ export function generateElasticsearchQuery(
   }
 
   function resolveFieldPath(fieldId: string): string {
-    const fieldConfig = getDeclarationFieldById(eventConfig, fieldId)
+    const fieldConfig = getOrThrow(
+      getAllDeclarationFields(eventConfig).find(({ id }) => id === fieldId),
+      `Field with id ${fieldId} not found in event config`
+    )
     const encodedFieldId = encodeFieldId(fieldId)
     if (fieldConfig.type == FieldType.NAME) {
       return nameQueryKey(encodedFieldId)

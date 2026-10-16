@@ -13,7 +13,7 @@ import {
   ContainsFlags,
   EventConfig,
   FieldType,
-  getAllUniqueFields,
+  getAllDeclarationFields,
   FieldConfig,
   QueryExpression,
   QueryType,
@@ -70,7 +70,7 @@ function generateQuery(
 ): estypes.QueryDslQueryContainer {
   const allEventFields = eventConfigs.reduce<FieldConfig[]>(
     (acc, eventConfig) => {
-      const fields = getAllUniqueFields(eventConfig)
+      const fields = getAllDeclarationFields(eventConfig)
       return acc.concat(fields)
     },
     []

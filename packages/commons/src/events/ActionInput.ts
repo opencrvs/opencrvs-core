@@ -20,6 +20,13 @@ import {
 
 import { UUID, getUUID } from '../uuid'
 
+export const PerformedAt = z.iso
+  .datetime()
+  .optional()
+  .describe(
+    'When the client performed the action, e.g. while offline. The configuration version the action uses is resolved from it. Must not be in the future, nor before the latest action of the record from another transaction. Defaults to the time the server receives the action.'
+  )
+
 export const BaseActionInput = z.object({
   eventId: UUID,
   transactionId: z.string(),
@@ -39,7 +46,8 @@ export const BaseActionInput = z.object({
   // @TODO: createdAtLocation should be limited to actions that system users can perform. For normal users, it should not be part of the base action.
   createdAtLocation: UUID.nullish().describe(
     'A valid office location ID. This is required for system users performing actions. The provided location must be a leaf-location, i.e. it must not have any children locations.'
-  )
+  ),
+  performedAt: PerformedAt
 })
 
 const CreateActionInput = BaseActionInput.extend(

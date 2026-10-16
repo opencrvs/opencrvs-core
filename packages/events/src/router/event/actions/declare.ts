@@ -14,7 +14,8 @@ import {
   EventDocument,
   DeclareActionInput,
   ACTION_SCOPE_MAP,
-  getCurrentEventState
+  getCurrentEventState,
+  getEventConfigForAction
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { userOnlyProcedure } from '@events/router/trpc'
@@ -88,7 +89,14 @@ export function declareActionProcedures() {
           }
         })
 
-        const dedupConfig = config.actions.find(
+        // The DECLARE version this record is declared with.
+        const actionConfig = getEventConfigForAction(
+          config,
+          input,
+          event,
+          new Date()
+        )
+        const dedupConfig = actionConfig.actions.find(
           (action) => action.type === input.type
         )?.deduplication
 
@@ -96,7 +104,11 @@ export function declareActionProcedures() {
           return declaredEvent
         }
 
-        const declaredEventState = getCurrentEventState(declaredEvent, config)
+        const declaredEventState = getCurrentEventState(
+          declaredEvent,
+          actionConfig
+        )
+        // The full config: hits may have been declared with any DECLARE version.
         const duplicates = await searchForDuplicates(
           declaredEventState,
           dedupConfig,
@@ -112,6 +124,7 @@ export function declareActionProcedures() {
               eventId: input.eventId,
               declaration: {},
               annotation: {},
+              performedAt: input.performedAt,
               content: {
                 duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
                   id,

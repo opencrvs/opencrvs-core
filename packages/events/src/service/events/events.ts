@@ -8,13 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
 import {
   eventAttachmentPath,
+  getEventConfigEffectiveAt,
+  getEventConfigForRecord,
   logger,
+  toPlainDate,
   TokenUserType,
   TokenWithBearer,
   UUID
@@ -36,7 +40,6 @@ import {
   getActionConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  getDeclarationFields,
   getStatusFromActions,
   isActionVisible,
   isActionEnabled,
@@ -53,6 +56,12 @@ import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getValidatorContext } from '@events/router/middleware/validate/utils'
+import {
+  getActionVersioning,
+  requiresVersionResolution,
+  throwConflictIfActionNotInEffect,
+  throwIfPerformedAtOutOfBounds
+} from '@events/service/events/actionVersion'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -112,12 +121,21 @@ export async function throwConflictIfActionNotAllowed(
   existingEvent?: EventDocument
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
-  const eventConfiguration = await getEventConfigurationById({
+  const fetchedEventConfiguration = await getEventConfigurationById({
     eventType: event.type,
     token
   })
+  const now = new Date()
+  // Whether an action can be performed is decided by the configuration in effect today.
+  const eventConfiguration = getEventConfigEffectiveAt(
+    fetchedEventConfiguration,
+    toPlainDate(now.toISOString())
+  )
 
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const eventIndex = getCurrentEventState(
+    event,
+    getEventConfigForRecord(fetchedEventConfiguration, event, now)
+  )
 
   const allowedActions: DisplayableAction[] =
     getAvailableActionsForEvent(eventIndex)
@@ -132,6 +150,13 @@ export async function throwConflictIfActionNotAllowed(
   const actionConfig = getActionConfig({
     actionType,
     eventConfiguration,
+    customActionType
+  })
+
+  throwConflictIfActionNotInEffect({
+    fetchedEventConfiguration,
+    eventConfiguration,
+    actionType,
     customActionType
   })
 
@@ -212,6 +237,16 @@ export async function createEvent({
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
     : eventsRepo.getOrCreateEventAndAssign
 
+  throwIfPerformedAtOutOfBounds(
+    {
+      type: ActionType.CREATE,
+      performedAt: eventInput.performedAt,
+      transactionId
+    },
+    undefined,
+    new Date()
+  )
+
   const eventLocation = isSystem ? createdAtLocation : user.primaryOfficeId
   const event = await getOrCreateEvent({
     eventType: eventInput.type,
@@ -222,7 +257,8 @@ export async function createEvent({
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: eventLocation
+    createdAtLocation: eventLocation,
+    performedAt: eventInput.performedAt
   })
 
   return event
@@ -251,7 +287,8 @@ function extractFileValues(
 export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
-  user: TrpcUserContext
+  user: TrpcUserContext,
+  effectiveFrom?: string
 ) {
   const commonAttributes = {
     eventId: input.eventId,
@@ -270,7 +307,9 @@ export function buildAction(
       user.type === TokenUserType.enum.system
         ? input.createdAtLocation
         : user.primaryOfficeId,
-    originalActionId: input.originalActionId
+    originalActionId: input.originalActionId,
+    effectiveFrom,
+    performedAt: input.performedAt
   }
   switch (input.type) {
     case ActionType.REGISTER: {
@@ -356,11 +395,22 @@ export async function addAction(
     configuration: EventConfig
   }
 ): Promise<EventDocument> {
+  const now = new Date()
+  // READ, ASSIGN etc. resolve no version and carry no files: skip loading the record.
+  const event = requiresVersionResolution(input)
+    ? await getEventById(eventId)
+    : undefined
+  throwIfPerformedAtOutOfBounds(input, event, now)
+  const { declarationFields, effectiveFrom } = getActionVersioning(
+    configuration,
+    input,
+    event,
+    now
+  )
   // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(
     input.declaration,
-    fieldConfigs
+    declarationFields
   )
 
   for (const file of fileValuesInCurrentAction) {
@@ -372,7 +422,7 @@ export async function addAction(
     }
   }
 
-  await eventsRepo.createAction(buildAction(input, status, user))
+  await eventsRepo.createAction(buildAction(input, status, user, effectiveFrom))
 
   // We want to unassign only if:
   // - ActionStatus is not requested
@@ -532,6 +582,9 @@ export async function addAsyncRejectAction(
     originalActionId,
     requestId,
     content,
+    effectiveFrom:
+      event.actions.find(({ id }) => id === originalActionId)?.effectiveFrom ??
+      undefined,
     createdBy: user.id,
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,

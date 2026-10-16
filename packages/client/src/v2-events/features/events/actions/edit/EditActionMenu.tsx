@@ -50,7 +50,7 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
 import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForAction } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
@@ -194,7 +194,10 @@ function EditActionModal({
 }
 
 function useEditActions(event: EventDocument) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForAction(
+    event,
+    ActionType.EDIT
+  )
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const navigate = useNavigate()
   const { isActionAllowed } = useUserAllowedActions(eventIndex)

@@ -18,6 +18,7 @@ import {
   DeclarationActionConfig,
   EventDocument,
   getCurrentEventState,
+  getEventConfigForAction,
   RegisterActionInput
 } from '@opencrvs/commons/events'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
@@ -68,7 +69,14 @@ export const detectDuplicate: MiddlewareFunction<
     )
   }
 
-  const dedupConfig = config.actions.find(
+  // The version of the action effective at its anchor date.
+  const actionConfig = getEventConfigForAction(
+    config,
+    input,
+    storedEvent,
+    new Date()
+  )
+  const dedupConfig = actionConfig.actions.find(
     (action): action is DeclarationActionConfig => action.type === input.type
   )?.deduplication
 
@@ -90,7 +98,7 @@ export const detectDuplicate: MiddlewareFunction<
     createdBySignature: user.signature
   }
 
-  const existingEventState = getCurrentEventState(storedEvent, config)
+  const existingEventState = getCurrentEventState(storedEvent, actionConfig)
 
   const futureEventState = getCurrentEventState(
     {
@@ -106,7 +114,7 @@ export const detectDuplicate: MiddlewareFunction<
         }
       ]
     },
-    config
+    actionConfig
   )
 
   const isMarkedAsNotDuplicate = storedEvent.actions.reduce((acc, action) => {
@@ -135,6 +143,7 @@ export const detectDuplicate: MiddlewareFunction<
   const duplicates = await searchForDuplicates(
     futureEventState,
     dedupConfig,
+    // The full config: hits may have been declared with any DECLARE version.
     config
   )
 
@@ -147,6 +156,7 @@ export const detectDuplicate: MiddlewareFunction<
         eventId: input.eventId,
         declaration: input.declaration,
         annotation: input.annotation,
+        performedAt: input.performedAt,
         content: {
           duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
             id,

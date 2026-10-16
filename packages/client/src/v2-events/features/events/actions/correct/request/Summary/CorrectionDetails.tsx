@@ -36,7 +36,7 @@ import {
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForAction } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
@@ -221,7 +221,10 @@ export function CorrectionDetails({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForAction(
+    event,
+    ActionType.REQUEST_CORRECTION
+  )
 
   const navigate = useNavigate()
   const { getUserDetails } = useUserDetails()

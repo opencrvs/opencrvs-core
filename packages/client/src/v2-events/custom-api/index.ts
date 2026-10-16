@@ -40,6 +40,8 @@ export interface CustomMutationParams {
    * another action's dialog metadata.
    */
   targetActionAnnotation?: ActionUpdate
+  /** When the user performed the action, sent with every action of the sequence. */
+  performedAt?: string
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
@@ -78,6 +80,7 @@ export async function registerOnDeclare({
   eventConfiguration,
   declaration,
   transactionId,
+  performedAt,
   annotation,
   targetActionAnnotation
 }: CustomMutationParams) {
@@ -86,6 +89,7 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
+    performedAt,
     keepAssignmentIfAccepted: true
   })
 
@@ -100,7 +104,8 @@ export async function registerOnDeclare({
     declaration: {},
     annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
-    transactionId
+    transactionId,
+    performedAt
   })
 }
 
@@ -108,6 +113,7 @@ export async function editAndRegister({
   eventId,
   declaration,
   transactionId,
+  performedAt,
   annotation,
   targetActionAnnotation,
   eventConfiguration
@@ -117,6 +123,7 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
+    performedAt,
     keepAssignmentIfAccepted: true
   })
 
@@ -129,6 +136,7 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
+    performedAt,
     keepAssignmentIfAccepted: true
   })
 
@@ -143,7 +151,8 @@ export async function editAndRegister({
     declaration: {},
     annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
-    transactionId
+    transactionId,
+    performedAt
   })
 }
 
@@ -151,6 +160,7 @@ export async function editAndDeclare({
   eventId,
   declaration,
   transactionId,
+  performedAt,
   annotation,
   targetActionAnnotation
 }: CustomMutationParams) {
@@ -159,6 +169,7 @@ export async function editAndDeclare({
     annotation,
     eventId,
     transactionId,
+    performedAt,
     keepAssignmentIfAccepted: true
   })
 
@@ -170,7 +181,8 @@ export async function editAndDeclare({
     declaration,
     annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
-    transactionId
+    transactionId,
+    performedAt
   })
 }
 
@@ -178,6 +190,7 @@ export async function editAndNotify({
   eventId,
   declaration,
   transactionId,
+  performedAt,
   annotation,
   targetActionAnnotation
 }: CustomMutationParams) {
@@ -186,6 +199,7 @@ export async function editAndNotify({
     annotation,
     eventId,
     transactionId,
+    performedAt,
     keepAssignmentIfAccepted: true
   })
 
@@ -197,7 +211,8 @@ export async function editAndNotify({
     declaration,
     annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
-    transactionId
+    transactionId,
+    performedAt
   })
 }
 
@@ -207,12 +222,14 @@ export async function editAndNotify({
 export async function archiveOnDuplicate({
   eventId,
   transactionId,
+  performedAt,
   declaration,
   content
 }: ArchiveOnDuplicateParams) {
   await trpcClient.event.actions.duplicate.markAsDuplicate.mutate({
     eventId,
     transactionId,
+    performedAt,
     declaration,
     keepAssignmentIfAccepted: true,
     ...(content.duplicateOf
@@ -222,6 +239,7 @@ export async function archiveOnDuplicate({
   return trpcClient.event.actions.archive.request.mutate({
     eventId,
     transactionId,
+    performedAt,
     declaration,
     content: { reason: content.reason }
   })
@@ -242,6 +260,7 @@ export async function makeCorrectionOnRequest({
   declaration,
   annotation: declarationMixedUpAnnotation,
   transactionId,
+  performedAt,
   event,
   eventConfiguration,
   context
@@ -272,6 +291,7 @@ export async function makeCorrectionOnRequest({
       eventId,
       declaration,
       transactionId,
+      performedAt,
       annotation,
       keepAssignmentIfAccepted: true
     })
@@ -294,6 +314,7 @@ export async function makeCorrectionOnRequest({
   return trpcClient.event.actions.correction.approve.request.mutate({
     type: ActionType.APPROVE_CORRECTION,
     transactionId: getUUID(),
+    performedAt,
     eventId,
     requestId,
     content: { immediateCorrection: true },

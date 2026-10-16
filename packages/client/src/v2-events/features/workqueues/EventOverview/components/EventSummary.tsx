@@ -78,6 +78,30 @@ const messages = {
       description: 'Message when no flags are present'
     }
   },
+  formVersion: {
+    label: {
+      id: 'event.summary.formVersion.label',
+      defaultMessage: 'Form version',
+      description:
+        'Label for the version of the declaration form the record was declared with'
+    },
+    emptyValueMessage: {
+      id: 'event.summary.formVersion.empty',
+      defaultMessage: 'Not declared',
+      description: 'Shown when the record has no declare action yet'
+    },
+    initial: {
+      id: 'event.summary.formVersion.initial',
+      defaultMessage: 'Initial version',
+      description:
+        'Shown when the declaration used the form version without an effective date'
+    },
+    value: {
+      id: 'event.summary.formVersion.value',
+      defaultMessage: 'Effective from {effectiveFrom}',
+      description: 'Value for the form version field'
+    }
+  },
   event: {
     label: {
       id: 'event.summary.event.label',
@@ -128,13 +152,16 @@ export function EventSummary({
   eventConfiguration,
   eventIndex,
   hideSecuredFields = false,
-  eventDocument
+  eventDocument,
+  formVersion
 }: {
   event: Record<string, FieldValue>
   eventConfiguration: EventConfig
   eventIndex: EventIndex
   hideSecuredFields?: boolean
   eventDocument?: EventDocument
+  /** Omit to hide the form version row, e.g. when only the event index is available. */
+  formVersion?: { declared: false } | { declared: true; effectiveFrom?: string }
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
   const validatorContext = useValidatorContext(eventDocument)
@@ -208,6 +235,15 @@ export function EventSummary({
     }
   })
 
+  let formVersionValue: string | undefined
+  if (formVersion?.declared) {
+    formVersionValue = formVersion.effectiveFrom
+      ? intl.formatMessage(messages.formVersion.value, {
+          effectiveFrom: formVersion.effectiveFrom
+        })
+      : intl.formatMessage(messages.formVersion.initial)
+  }
+
   return (
     <>
       {visibleBanners.map((banner, index) => (
@@ -270,6 +306,17 @@ export function EventSummary({
           )}
           value={intl.formatMessage(messages.registrationNumber.value, event)}
         />
+        {formVersion && (
+          <List.Item
+            key="formVersion"
+            data-testid="formVersion"
+            label={intl.formatMessage(messages.formVersion.label)}
+            placeholder={intl.formatMessage(
+              messages.formVersion.emptyValueMessage
+            )}
+            value={formVersionValue}
+          />
+        )}
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
           .map((field) => (

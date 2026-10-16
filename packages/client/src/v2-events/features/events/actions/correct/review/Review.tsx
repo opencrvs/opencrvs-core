@@ -23,7 +23,7 @@ import {
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForAction } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -39,8 +39,9 @@ export function Review() {
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
+  const { eventConfiguration: configuration } = useEventConfigurationForAction(
+    event,
+    ActionType.APPROVE_CORRECTION
   )
   const eventIndex = getCurrentEventState(event, configuration)
 

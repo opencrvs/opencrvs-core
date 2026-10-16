@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   eventAttachmentPath,
   getDeclarationPages
 } from '@opencrvs/commons/client'
@@ -29,7 +30,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { isTemporaryId } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForAction } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 export function Pages() {
@@ -45,8 +46,9 @@ export function Pages() {
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
+  const { eventConfiguration: configuration } = useEventConfigurationForAction(
+    event,
+    ActionType.DECLARE
   )
   const declarationPages = getDeclarationPages(configuration)
 

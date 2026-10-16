@@ -103,7 +103,9 @@ function EventSelector() {
     createEvent.mutate({
       type: eventType,
       transactionId,
-      createdAtLocation: user?.primaryOfficeId
+      createdAtLocation: user?.primaryOfficeId,
+      // Stamped now, not when the mutation runs: it may run later, from the offline outbox.
+      performedAt: new Date().toISOString()
     })
 
     clearForm()
