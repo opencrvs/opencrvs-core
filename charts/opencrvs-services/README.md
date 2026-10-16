@@ -160,6 +160,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>minio-opencrvs-users</td>
             <td>Secret name to store MinIO credentials, more information about credentials secret is at <a href="#authentication-configuration">Authentication configuration</a></td>
         </tr>
+        <tr>
+            <td>documents.env.S3_PROVIDER</td>
+            <td><code>minio</code></td>
+            <td>The object store that the documents service talks to: <code>minio</code>, <code>seaweedfs</code>, <code>rustfs</code>, <code>aws</code> or <code>gcs</code>. This chart still renders the <code>MINIO_*</code> settings above, which the documents service reads when the matching <code>S3_*</code> setting is not set. Set <code>S3_*</code> under <code>documents.env</code> to override them. Which stores are verified, and the full list of settings, is in <a href="../../packages/documents/README.md">packages/documents/README.md</a>.</td>
+        </tr>
        <tr>
             <th>postgres.{}</th>
             <th></th>
