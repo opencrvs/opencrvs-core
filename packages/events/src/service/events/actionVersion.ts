@@ -68,18 +68,21 @@ export function getRecordCreatedAt(event: EventDocument) {
 }
 
 /**
- * Throws tRPC HTTP 400 when a client's `performedAt` is in the future (beyond clock
- * drift) or, with the record given, before its latest action from another transaction.
+ * Throws tRPC HTTP 400 when a client's `performedAt` is in the future or, with the
+ * record given, before its latest action from another transaction, either beyond
+ * clock drift: clients' clocks differ, from the server's and from each other's.
  * A record being created has no earlier action, so only the future is checked.
  * Actions sent together share a transaction (e.g. declare and register), so they
- * do not bound each other.
+ * do not bound each other, and a confirmation of a Requested action counts at the
+ * time of the action it confirms. READ, ASSIGN and UNASSIGN do not change the record, so
+ * they are not bounded either.
  */
 export function throwIfPerformedAtOutOfBounds(
-  input: { performedAt?: string; transactionId: string },
+  input: { type: ActionType; performedAt?: string; transactionId: string },
   event: EventDocument | undefined,
   now: Date
 ) {
-  if (!input.performedAt) {
+  if (!input.performedAt || NON_MODIFYING_ACTIONS.includes(input.type)) {
     return
   }
 
@@ -92,17 +95,26 @@ export function throwIfPerformedAtOutOfBounds(
     })
   }
 
+  const actions = event?.actions ?? []
   const latest = Math.max(
-    ...(event?.actions ?? [])
+    ...actions
       .filter(
         (action) =>
           action.transactionId !== input.transactionId &&
           !NON_MODIFYING_ACTIONS.includes(action.type)
       )
-      .map((action) => new Date(getPerformedAt(action)).getTime())
+      // A confirmation is stored when the country config answers, not when the user
+      // acted: it is bounded by the action it confirms.
+      .map((action) =>
+        new Date(
+          getPerformedAt(
+            actions.find(({ id }) => id === action.originalActionId) ?? action
+          )
+        ).getTime()
+      )
   )
 
-  if (performedAt < latest) {
+  if (performedAt < latest - CLOCK_SKEW_MS) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: `performedAt ${input.performedAt} is before the latest action of the record, performed at ${new Date(latest).toISOString()}`

@@ -232,7 +232,15 @@ export async function createEvent({
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
     : eventsRepo.getOrCreateEventAndAssign
 
-  throwIfPerformedAtOutOfBounds(eventInput, undefined, new Date())
+  throwIfPerformedAtOutOfBounds(
+    {
+      type: ActionType.CREATE,
+      performedAt: eventInput.performedAt,
+      transactionId
+    },
+    undefined,
+    new Date()
+  )
 
   const eventLocation = isSystem ? createdAtLocation : user.primaryOfficeId
   const event = await getOrCreateEvent({

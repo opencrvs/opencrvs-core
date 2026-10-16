@@ -124,6 +124,7 @@ export function declareActionProcedures() {
               eventId: input.eventId,
               declaration: {},
               annotation: {},
+              performedAt: input.performedAt,
               content: {
                 duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
                   id,

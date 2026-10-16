@@ -423,14 +423,22 @@ describe('throwIfPerformedAtOutOfBounds()', () => {
 
   it('accepts an action without performedAt', () => {
     expect(() =>
-      throwIfPerformedAtOutOfBounds({ transactionId }, event, now)
+      throwIfPerformedAtOutOfBounds(
+        { type: ActionType.REGISTER, transactionId },
+        event,
+        now
+      )
     ).not.toThrow()
   })
 
   it('accepts a time after the latest action that changed the record, read at its performedAt', () => {
     expect(() =>
       throwIfPerformedAtOutOfBounds(
-        { transactionId, performedAt: '2020-05-15T00:00:00.000Z' },
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-05-15T00:00:00.000Z'
+        },
         event,
         now
       )
@@ -440,7 +448,11 @@ describe('throwIfPerformedAtOutOfBounds()', () => {
   it('rejects a time before the latest action from another transaction', () => {
     expect(() =>
       throwIfPerformedAtOutOfBounds(
-        { transactionId, performedAt: '2020-05-05T00:00:00.000Z' },
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-05-05T00:00:00.000Z'
+        },
         event,
         now
       )
@@ -449,11 +461,83 @@ describe('throwIfPerformedAtOutOfBounds()', () => {
     )
   })
 
+  it('tolerates clock drift between clients, but rejects a time further before the latest action', () => {
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-05-09T23:56:00.000Z'
+        },
+        event,
+        now
+      )
+    ).not.toThrow()
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-05-09T23:54:00.000Z'
+        },
+        event,
+        now
+      )
+    ).toThrow('is before the latest action of the record')
+  })
+
+  it.each([ActionType.READ, ActionType.ASSIGN, ActionType.UNASSIGN])(
+    'does not bound %s, which does not change the record',
+    (type) => {
+      expect(() =>
+        throwIfPerformedAtOutOfBounds(
+          { type, transactionId, performedAt: '2020-05-05T00:00:00.000Z' },
+          event,
+          now
+        )
+      ).not.toThrow()
+    }
+  )
+
+  it('bounds by a confirmation at the time of the action it confirms', () => {
+    const requested = actionAt(
+      ActionType.REGISTER,
+      '2020-05-12T00:00:00.000Z',
+      {
+        performedAt: '2020-05-11T00:00:00.000Z'
+      }
+    )
+    const withConfirmation = {
+      ...event,
+      actions: [
+        ...event.actions,
+        { ...requested, status: ActionStatus.Requested },
+        {
+          ...actionAt(ActionType.REGISTER, '2020-05-25T00:00:00.000Z'),
+          originalActionId: requested.id
+        }
+      ]
+    }
+
+    expect(() =>
+      throwIfPerformedAtOutOfBounds(
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-05-15T00:00:00.000Z'
+        },
+        withConfirmation,
+        now
+      )
+    ).not.toThrow()
+  })
+
   it('ignores actions of the same transaction', () => {
     const declare = event.actions[1]
     expect(() =>
       throwIfPerformedAtOutOfBounds(
         {
+          type: ActionType.REGISTER,
           transactionId: declare.transactionId,
           performedAt: '2020-05-05T00:00:00.000Z'
         },
@@ -466,14 +550,22 @@ describe('throwIfPerformedAtOutOfBounds()', () => {
   it('tolerates clock drift, but rejects a time further in the future', () => {
     expect(() =>
       throwIfPerformedAtOutOfBounds(
-        { transactionId, performedAt: '2020-06-01T10:04:00.000Z' },
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-06-01T10:04:00.000Z'
+        },
         event,
         now
       )
     ).not.toThrow()
     expect(() =>
       throwIfPerformedAtOutOfBounds(
-        { transactionId, performedAt: '2020-06-01T10:06:00.000Z' },
+        {
+          type: ActionType.REGISTER,
+          transactionId,
+          performedAt: '2020-06-01T10:06:00.000Z'
+        },
         undefined,
         now
       )
