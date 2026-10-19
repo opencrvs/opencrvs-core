@@ -83,7 +83,9 @@ export function ActionTypeSpecificContent({
     ActionType.DECLARE,
     ActionType.REGISTER,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.REVOKE_REGISTRATION,
+    ActionType.REINSTATE_REGISTRATION
   ]
 
   if (coreDialogFormActions.includes(type)) {
