@@ -127,7 +127,7 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ secrets.GHCR_PUBLISH_USER }}
           password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
       - name: Build and push base image
         uses: Wandalen/wretry.action@v3.8.0
