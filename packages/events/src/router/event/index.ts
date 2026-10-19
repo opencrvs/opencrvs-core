@@ -147,6 +147,7 @@ export const eventRouter = router({
         }
       })
       .input(z.void())
+      .use(middleware.reuseEventConfigResponse)
       .output(z.array(EventConfig))
       .query(async (options) =>
         getInMemoryEventConfigurations(options.ctx.token)
