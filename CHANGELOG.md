@@ -103,9 +103,24 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 **Country configs must read the form through `getDeclaration`.** `opencrvs upgrade` does it for you: the `read-declaration-through-helper` codemod rewrites every `declaration` read on an `EventConfig` under `src/` and imports `getDeclaration`, then lists every read it could not rewrite — an optional chain, a destructured `declaration`, an assignment — for you to change by hand.
 
-`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, so events defined with it need no other change. It logs a deprecation warning, though: a future release will remove the top-level `declaration`. It throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
+`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, but logs a deprecation warning: a future release will remove the top-level `declaration`. `opencrvs upgrade` moves it for you: the `move-declaration-to-declare-action` codemod moves the top-level `declaration` of every `defineConfig` call under `src/` onto its `DECLARE` action, then lists every config it could not rewrite — `actions` built outside the call, a `DECLARE` action that is not written inline — for you to change by hand. `defineConfig` throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
+#### The `incomplete` flag is removed
+
+`InherentFlags.INCOMPLETE` mirrored the `NOTIFIED` status, so it has been removed [#13985](https://github.com/opencrvs/opencrvs-core/issues/13985). References to `InherentFlags.INCOMPLETE` no longer compile. References written as the string `'incomplete'` (for example in encoded scope strings such as `record.read[flags=incomplete]`) still parse, but match nothing. Switch to the `NOTIFIED` status instead (`status` in workqueues and scope options, `event.status` in conditionals).
+
+`opencrvs upgrade` does it for workqueue queries: the `replace-incomplete-flag` codemod rewrites them as below, then lists every other `InherentFlags.INCOMPLETE` reference for you to change by hand:
+
+```diff
+ query: {
+-  flags: { anyOf: [InherentFlags.INCOMPLETE], noneOf: [InherentFlags.REJECTED] },
++  flags: { noneOf: [InherentFlags.REJECTED] },
++  status: { type: 'exact', term: EventStatus.enum.NOTIFIED },
+```
+
+Unlike the flag, an archived notification no longer matches, since its status is `ARCHIVED`. Remove the `flags.builtin.incomplete.label` translation, and reindex after upgrading. The `NOTIFIED` status now reads "Notified" in workqueues and search too, not "In progress".
 
 #### `NOTIFY` action supports `notificationForm` and `review` configuration
 
