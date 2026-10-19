@@ -29,9 +29,10 @@ spec:
       labels:
         app: mosip-mock
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mosip_mock) | nindent 6 }}
       containers:
         - name: mosip-mock
-          image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_mock) }}
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.mosip_mock) }}
           imagePullPolicy: {{ .Values.mosip_mock.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: MOSIP_WEBSUB_CALLBACK_URL

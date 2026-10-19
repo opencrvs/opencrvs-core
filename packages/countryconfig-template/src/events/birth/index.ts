@@ -738,7 +738,7 @@ export const birthEvent = defineConfig({
       icon: 'Briefcase',
       supportingCopy: {
         defaultMessage:
-          'Revoking this registration will invalidate the record and prevent its use for official purposes. This action should only be taken under lawful authority.',
+          'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
         id: 'event.birth.action.revoke-registration.supportingCopy'

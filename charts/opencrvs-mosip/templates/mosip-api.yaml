@@ -74,6 +74,7 @@ spec:
       labels:
         app: mosip-api
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mosip_api) | nindent 6 }}
       initContainers:
         # Change ownership to the node user the mosip-api image runs as
         - name: volume-permission-fix
@@ -88,7 +89,7 @@ spec:
               mountPath: /data/sqlite
       containers:
         - name: mosip-api
-          image: {{ include "mosip.image" (dict "root" $ "service" .Values.mosip_api) }}
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.mosip_api) }}
           imagePullPolicy: {{ .Values.mosip_api.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: CLIENT_APP_URL
