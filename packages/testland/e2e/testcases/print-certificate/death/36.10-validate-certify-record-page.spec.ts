@@ -48,6 +48,18 @@ test('10.0 Validate "Review" page', async ({ page }) => {
     await page.getByRole('button', { name: 'Verified' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
+    await expect(page.locator('#content-name')).toContainText(
+      'Print certificate'
+    )
+    await expect(
+      page.getByText(
+        'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.'
+      )
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'No, make correction' })
+    ).toBeVisible()
+
     await page.getByRole('button', { name: 'Yes, print certificate' }).click()
     await expect(page.locator('#confirm-print-modal')).toBeVisible()
     await expect(page.locator('#confirm-print-modal')).toContainText(

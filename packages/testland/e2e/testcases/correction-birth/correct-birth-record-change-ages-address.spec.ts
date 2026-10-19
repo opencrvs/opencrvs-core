@@ -266,8 +266,6 @@ test('Correct record - Change ages', async ({ page }) => {
     await expect(page.getByText("Child's details")).not.toBeVisible()
     await expect(page.getByText("Mother's details")).toBeVisible()
 
-    await page.pause()
-
     await expect(
       page.getByText(
         'Age of mother (at the time of event)' +

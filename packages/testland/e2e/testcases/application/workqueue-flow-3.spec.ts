@@ -173,7 +173,9 @@ test('3. Workqueue flow - 3', async ({ page }) => {
     await test.step('3.2.4 Unassign', async () => {
       await selectAction(page, 'Unassign')
       await page.getByRole('button', { name: 'Unassign', exact: true }).click()
-      await expect(page.getByText('Not assigned')).toBeVisible()
+      await expect(page.getByTestId('assignedTo-value')).toHaveText(
+        'Not assigned'
+      )
       if (await page.getByTestId('exit-event').isVisible()) {
         await page.getByTestId('exit-event').click()
       }
@@ -380,6 +382,9 @@ test('3. Workqueue flow - 3', async ({ page }) => {
     await test.step('3.5.2 Go to edit', async () => {
       await page.getByText('Pending updates').click()
       await openRecordByTitle(page, childName)
+
+      await expect(page.getByTestId('status-value')).toContainText('Declared')
+
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await selectAction(page, 'Edit')

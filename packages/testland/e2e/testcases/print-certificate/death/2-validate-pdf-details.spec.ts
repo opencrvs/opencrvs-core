@@ -80,7 +80,7 @@ test.describe("Validate 'Death Certificate Certified Copy' PDF details", () => {
     await test.step('Validate spouse name', async () => {
       await expectInPdf(
         page,
-        `${declaration['deceased.name'].firstname} ${declaration['deceased.name'].surname}`
+        `${declaration['spouse.name'].firstname} ${declaration['spouse.name'].surname}`
       )
       await expectInPdf(page, 'Spouse')
     })

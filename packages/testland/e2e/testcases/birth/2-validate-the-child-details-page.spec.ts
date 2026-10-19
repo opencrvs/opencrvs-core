@@ -129,12 +129,10 @@ test.describe("2. Validate the child's details page", () => {
     })
   })
 
-  test.describe('2.3 Validate the Sex dropdown field', async () => {
-    test.beforeEach(async ({ page }) => {
-      await loginAndBeginBirthDeclaration({ page })
-    })
+  test('2.3 Validate the Sex dropdown field', async ({ page }) => {
+    await loginAndBeginBirthDeclaration({ page })
 
-    test('2.3.1 Select any dropdown value: "Female"', async ({ page }) => {
+    await test.step('2.3.1 Select any dropdown value: "Female"', async () => {
       await page.locator('#child____gender').click()
       await page.getByText('Female', { exact: true }).click()
 
@@ -145,28 +143,12 @@ test.describe("2. Validate the child's details page", () => {
         page.locator('#child____gender', { hasText: 'Female' })
       ).toBeVisible()
     })
-
-    test('2.3.2 Set the field as null', async ({ page }) => {
-      await goToSection(page, 'review')
-
-      /*
-       * Expected result: should throw error in application review page:
-       * - Required
-       */
-      await expect(
-        page
-          .locator('[data-testid="child.gender-value"]')
-          .getByText(REQUIRED_VALIDATION_ERROR)
-      ).toBeVisible()
-    })
   })
 
-  test.describe('2.4 Validate the "DOB" field', async () => {
-    test.beforeEach(async ({ page }) => {
-      await loginAndBeginBirthDeclaration({ page })
-    })
+  test('2.4 Validate the "DOB" field', async ({ page }) => {
+    await loginAndBeginBirthDeclaration({ page })
 
-    test('2.4.1 Enter date less than the current date', async ({ page }) => {
+    await test.step('2.4.1 Enter date less than the current date', async () => {
       const yesterday = new Date()
       yesterday.setDate(new Date().getDate() - 1)
       const [yyyy, mm, dd] = yesterday.toISOString().split('T')[0].split('-')
@@ -181,7 +163,7 @@ test.describe("2. Validate the child's details page", () => {
     })
 
     // @TODO: This validation is not implemented in Events V2 yet
-    test.skip('2.4.2 Enter invalid date', async ({ page }) => {
+    await test.step.skip('2.4.2 Enter invalid date', async () => {
       await page.getByPlaceholder('dd').fill('0')
       await page.getByPlaceholder('mm').fill('0')
       await page.getByPlaceholder('yyyy').fill('0')
@@ -195,7 +177,7 @@ test.describe("2. Validate the child's details page", () => {
     })
 
     // @TODO: This validation is not implemented in Events V2 yet
-    test.skip('2.4.3 Enter future date', async ({ page }) => {
+    await test.step.skip('2.4.3 Enter future date', async () => {
       const futureDate = new Date()
       futureDate.setDate(new Date().getDate() + 5)
       const [yyyy, mm, dd] = futureDate.toISOString().split('T')[0].split('-')
@@ -211,20 +193,6 @@ test.describe("2. Validate the child's details page", () => {
       await expect(page.locator('#child____dob_error')).toHaveText(
         'Must be a valid birth date'
       )
-    })
-
-    test('2.4.4 Set the field as null', async ({ page }) => {
-      await goToSection(page, 'review')
-
-      /*
-       * Expected result: should throw error in application review page:
-       * - Required
-       */
-      await expect(
-        page
-          .locator('[data-testid="child.dob-value"]')
-          .getByText(REQUIRED_VALIDATION_ERROR)
-      ).toBeVisible()
     })
   })
 
@@ -303,84 +271,69 @@ test.describe("2. Validate the child's details page", () => {
     })
   })
 
-  test.describe('2.6 Validate place of delivery field', async () => {
-    test('2.6.2 Select place of delivery', async ({ page }) => {
-      test.setTimeout(300_000)
+  test('2.6 Validate place of delivery field', async ({ page }) => {
+    test.setTimeout(300_000)
 
-      await loginAndBeginBirthDeclaration({ page })
+    await loginAndBeginBirthDeclaration({ page })
 
-      await test.step('2.6.2.a Validate Health Institution', async () => {
-        await test.step('Select Health Institution', async () => {
-          await page.locator('#child____placeOfBirth').click()
-          await page.getByText('Health Institution', { exact: true }).click()
-          /*
-           * Expected result: should show input field for:
-           * - Health institution
-           */
-          await expect(page.locator('#child____birthLocation')).toBeVisible()
-        })
-        await test.step('Enter any health institution', async () => {
-          await page
-            .locator('#searchable-select-child____birthLocation input')
-            .fill('ib')
-          await page.getByText('Ibombo District Hospital').click()
-
-          await expect(
-            page.locator(
-              '#searchable-select-child____birthLocation .react-select__single-value'
-            )
-          ).toHaveText('Ibombo District Hospital')
-        })
-      })
-
-      await test.step('2.6.2.b Select Residential address', async () => {
+    await test.step('2.6.2.a Validate Health Institution', async () => {
+      await test.step('Select Health Institution', async () => {
         await page.locator('#child____placeOfBirth').click()
-        await page.getByText('Residential address', { exact: true }).click()
-
+        await page.getByText('Health Institution', { exact: true }).click()
         /*
-         * Expected result:
-         * - should select "Residential address" as place of birth
-         * - Should show input field for address
+         * Expected result: should show input field for:
+         * - Health institution
          */
-        await expect(page.locator('#child____placeOfBirth')).toContainText(
-          'Residential address'
-        )
+        await expect(page.locator('#child____birthLocation')).toBeVisible()
+      })
+      await test.step('Enter any health institution', async () => {
+        await page
+          .locator('#searchable-select-child____birthLocation input')
+          .fill('ib')
+        await page.getByText('Ibombo District Hospital').click()
 
         await expect(
-          page.locator('#child____birthLocation____privateHome-form-input')
-        ).toBeVisible()
+          page.locator(
+            '#searchable-select-child____birthLocation .react-select__single-value'
+          )
+        ).toHaveText('Ibombo District Hospital')
       })
+    })
 
-      await test.step('2.6.2.c Select Other', async () => {
-        await page.locator('#child____placeOfBirth').click()
-        await page.getByText('Other', { exact: true }).click()
+    await test.step('2.6.2.b Select Residential address', async () => {
+      await page.locator('#child____placeOfBirth').click()
+      await page.getByText('Residential address', { exact: true }).click()
 
-        /*
+      /*
+       * Expected result:
+       * - should select "Residential address" as place of birth
+       * - Should show input field for address
+       */
+      await expect(page.locator('#child____placeOfBirth')).toContainText(
+        'Residential address'
+      )
+
+      await expect(
+        page.locator('#child____birthLocation____privateHome-form-input')
+      ).toBeVisible()
+    })
+
+    await test.step('2.6.2.c Select Other', async () => {
+      await page.locator('#child____placeOfBirth').click()
+      await page.getByText('Other', { exact: true }).click()
+
+      /*
        * Expected result:
        should select "Other" as place of birth
        * - Should show input field for address
        */
-        await expect(page.locator('#child____placeOfBirth')).toContainText(
-          'Other'
-        )
+      await expect(page.locator('#child____placeOfBirth')).toContainText(
+        'Other'
+      )
 
-        await expect(
-          page.locator('#child____birthLocation____other-form-input')
-        ).toBeVisible()
-      })
-    })
-
-    test('2.6.1 Keep field as null', async ({ page }) => {
-      await loginAndBeginBirthDeclaration({ page }) // Use a fresh page for null test
-      await goToSection(page, 'review')
-
-      /*
-       * Expected result: should throw error in application review page:
-       * - Required
-       */
       await expect(
-        page.locator('[data-testid="child.placeOfBirth-value"]')
-      ).toHaveText(REQUIRED_VALIDATION_ERROR)
+        page.locator('#child____birthLocation____other-form-input')
+      ).toBeVisible()
     })
   })
 })

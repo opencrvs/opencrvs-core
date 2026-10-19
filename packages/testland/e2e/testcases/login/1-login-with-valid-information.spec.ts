@@ -10,6 +10,7 @@
  */
 import { test, expect } from '@playwright/test'
 import {
+  CLIENT_URL,
   CREDENTIALS,
   LOGIN_URL,
   TEST_USER_PASSWORD
@@ -48,5 +49,9 @@ test.describe('1. Login with valid information', () => {
 
     await page.fill('#code', '000000')
     await page.click('#login-mobile-submit')
+
+    // Expected result: User should be logged in to the client and asked to create a PIN
+    await page.waitForURL((url) => url.origin === CLIENT_URL)
+    await expect(page.locator('#pin-input')).toBeVisible()
   })
 })

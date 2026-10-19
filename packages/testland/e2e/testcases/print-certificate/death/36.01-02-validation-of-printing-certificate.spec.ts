@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { getToken, joinValuesWith, login } from '@e2e/support/helpers'
+import { getToken, login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
@@ -19,6 +19,11 @@ import { navigateToCertificatePrintAction } from '@e2e/support/print-certificate
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 import { expectInUrl } from '@e2e/support/utils'
 import { faker } from '@faker-js/faker'
+import { format } from 'date-fns'
+
+// The identity page shows display labels, not the stored values
+const ID_TYPE_LABELS: Record<string, string> = { NATIONAL_ID: 'National ID' }
+const NATIONALITY_LABELS: Record<string, string> = { FAR: 'Farajaland' }
 
 test('Certified copies', async ({ page }) => {
   test.setTimeout(240_000)
@@ -76,24 +81,32 @@ test('Certified copies', async ({ page }) => {
       await page.getByRole('button', { name: 'Continue' }).click()
       await expectInUrl(page, '/pages/collector.identity.verify')
 
-      await page.getByText('Verify their identity').isVisible()
+      await expect(page.getByText('Verify their identity')).toBeVisible()
 
-      await page.getByText('Type of ID').isVisible()
-      await page.getByText(declaration?.['spouse.idType']).isVisible()
-      await page.getByText(declaration?.['spouse.nid']).isVisible()
+      await expect(page.getByText('Type of ID')).toBeVisible()
+      await expect(
+        page.getByText(ID_TYPE_LABELS[declaration['spouse.idType']])
+      ).toBeVisible()
+      await expect(page.getByText(declaration['spouse.nid'])).toBeVisible()
 
-      await page.getByText("Spouse's name").isVisible()
-      await page
-        .getByText(
-          joinValuesWith([...Object.values(declaration['spouse.name'])])
+      await expect(page.getByText("Spouse's name")).toBeVisible()
+      await expect(
+        page.getByText(
+          `${declaration['spouse.name'].firstname} ${declaration['spouse.name'].surname}`
         )
-        .isVisible()
+      ).toBeVisible()
 
-      await page.getByText('Date of birth').isVisible()
-      await page.getByText(declaration['spouse.dob']).isVisible()
+      await expect(page.getByText('Date of birth')).toBeVisible()
+      await expect(
+        page.getByText(
+          format(new Date(declaration['spouse.dob']), 'd MMMM yyyy')
+        )
+      ).toBeVisible()
 
-      await page.getByText('Nationality').isVisible()
-      await page.getByText(declaration['spouse.nationality']).isVisible()
+      await expect(page.getByText('Nationality')).toBeVisible()
+      await expect(
+        page.getByText(NATIONALITY_LABELS[declaration['spouse.nationality']])
+      ).toBeVisible()
     })
   })
 })
@@ -144,23 +157,31 @@ test('Certified copies renders spouse age correctly', async ({ page }) => {
       await page.getByRole('button', { name: 'Continue' }).click()
       await expectInUrl(page, '/pages/collector.identity.verify')
 
-      await page.getByText('Verify their identity').isVisible()
+      await expect(page.getByText('Verify their identity')).toBeVisible()
 
-      await page.getByText('Type of ID').isVisible()
-      await page.getByText(declaration['spouse.idType']).isVisible()
-      await page.getByText(declaration['spouse.nid']).isVisible()
-      await page.getByText("Spouse's name").isVisible()
-      await page
-        .getByText(
-          joinValuesWith([...Object.values(declaration['spouse.name'])])
+      await expect(page.getByText('Type of ID')).toBeVisible()
+      await expect(
+        page.getByText(ID_TYPE_LABELS[declaration['spouse.idType']])
+      ).toBeVisible()
+      await expect(page.getByText(declaration['spouse.nid'])).toBeVisible()
+      await expect(page.getByText("Spouse's name")).toBeVisible()
+      await expect(
+        page.getByText(
+          `${declaration['spouse.name'].firstname} ${declaration['spouse.name'].surname}`
         )
-        .isVisible()
+      ).toBeVisible()
 
-      await page.getByText('Age of spouse (at the time of event)').isVisible()
-      await page.getByText(joinValuesWith([spouseAge, 'years'])).isVisible()
+      await expect(
+        page.getByText('Age of spouse (at the time of event)')
+      ).toBeVisible()
+      await expect(
+        page.getByText(String(spouseAge), { exact: true })
+      ).toBeVisible()
 
-      await page.getByText('Nationality').isVisible()
-      await page.getByText(declaration['spouse.nationality']).isVisible()
+      await expect(page.getByText('Nationality')).toBeVisible()
+      await expect(
+        page.getByText(NATIONALITY_LABELS[declaration['spouse.nationality']])
+      ).toBeVisible()
     })
   })
 })
@@ -228,29 +249,35 @@ test('Certified copies renders non-spouse informant age correctly', async ({
       await page.getByRole('button', { name: 'Continue' }).click()
       await expectInUrl(page, '/pages/collector.identity.verify')
 
-      await page.getByText('Verify their identity').isVisible()
+      await expect(page.getByText('Verify their identity')).toBeVisible()
 
-      await page.getByText('Type of ID').isVisible()
-      await page.getByText(declarationOverrides['informant.idType']).isVisible()
-      await page.getByText(declarationOverrides['informant.nid']).isVisible()
-      await page.getByText("Son's name").isVisible()
-      await page
-        .getByText(
-          joinValuesWith([
-            ...Object.values(declarationOverrides['informant.name'])
-          ])
+      await expect(page.getByText('Type of ID')).toBeVisible()
+      await expect(
+        page.getByText(ID_TYPE_LABELS[declarationOverrides['informant.idType']])
+      ).toBeVisible()
+      await expect(
+        page.getByText(declarationOverrides['informant.nid'])
+      ).toBeVisible()
+      await expect(page.getByText("Informant's name")).toBeVisible()
+      await expect(
+        page.getByText(
+          `${declarationOverrides['informant.name'].firstname} ${declarationOverrides['informant.name'].surname}`
         )
-        .isVisible()
+      ).toBeVisible()
 
-      await page
-        .getByText('Age of informant (at the time of event)')
-        .isVisible()
-      await page.getByText(joinValuesWith([informantAge, 'years'])).isVisible()
+      await expect(
+        page.getByText('Age of informant (at the time of event)')
+      ).toBeVisible()
+      await expect(
+        page.getByText(String(informantAge), { exact: true })
+      ).toBeVisible()
 
-      await page.getByText('Nationality').isVisible()
-      await page
-        .getByText(declarationOverrides['informant.nationality'])
-        .isVisible()
+      await expect(page.getByText('Nationality')).toBeVisible()
+      await expect(
+        page.getByText(
+          NATIONALITY_LABELS[declarationOverrides['informant.nationality']]
+        )
+      ).toBeVisible()
     })
   })
 })

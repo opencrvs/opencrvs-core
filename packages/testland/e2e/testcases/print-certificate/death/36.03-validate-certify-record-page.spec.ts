@@ -83,6 +83,10 @@ test('3.0 Validate "Certify record" page', async ({ page }) => {
 
   await test.step('3.3 should navigate to collect payment page on "Verified" button click', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
+    await expectInUrl(
+      page,
+      `/print-certificate/${eventId}/pages/collector.collect.payment`
+    )
 
     await expect(page.locator('#content-name')).toContainText('Collect Payment')
 

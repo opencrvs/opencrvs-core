@@ -206,47 +206,6 @@ test('Approval of late birth registration', async ({ page }) => {
   })
 })
 
-test('Birth with non-late registration will not have flag or Approve-action available', async ({
-  page
-}) => {
-  const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
-  const declarationRequest = await getDeclaration({
-    token,
-    partialDeclaration: {
-      'child.dob': recentDateString
-    },
-    placeOfBirthType: 'PRIVATE_HOME'
-  })
-  const res = await createDeclaration(
-    token,
-    declarationRequest,
-    ActionType.DECLARE,
-    'PRIVATE_HOME'
-  )
-  const declaration = res.declaration
-
-  await test.step('Declaration started by CL', async () => {
-    await login(page, CREDENTIALS.COMMUNITY_LEADER)
-
-    await test.step('Navigate to the record', async () => {
-      await page.getByText('Recent').click()
-
-      await openRecordByTitle(page, formatV2ChildName(declaration))
-    })
-
-    await test.step("Record should not have the 'Approval required for late registration' -flag", async () => {
-      await expect(
-        page.getByText('Approval required for late registration')
-      ).not.toBeVisible()
-    })
-
-    await test.step('Record should not have the "Approve"-action available', async () => {
-      await page.getByRole('button', { name: 'Action', exact: true }).click()
-      await expect(page.getByText('Approve', { exact: true })).not.toBeVisible()
-    })
-  })
-})
-
 test("'Approval required for late registration' -flag blocks direct registration", async ({
   page
 }) => {

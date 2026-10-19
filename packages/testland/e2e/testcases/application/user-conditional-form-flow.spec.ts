@@ -114,7 +114,7 @@ test('1. User conditional form flow', async ({ page }) => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await page.getByText('Notifications').click()
-      openRecordByTitle(page, formatName(declaration.applicant.name))
+      await openRecordByTitle(page, formatName(declaration.applicant.name))
 
       await page.getByRole('button', { name: 'Record', exact: true }).click()
 

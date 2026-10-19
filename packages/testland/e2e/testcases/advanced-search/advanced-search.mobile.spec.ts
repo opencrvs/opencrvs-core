@@ -81,18 +81,25 @@ test('Advanced Search - Mobile', async ({ page }) => {
     await page.locator('#child____placeOfBirth').click()
     await page.getByText('Residential address', { exact: true }).click()
 
-    page
-      .locator('[id="child____birthLocation____privateHome.country"]')
-      .getByText('Farajaland')
-    page
-      .locator('[id="child____birthLocation____privateHome.province"]')
-      .getByText('Central')
-    page
-      .locator('[id="child____birthLocation____privateHome.district"]')
-      .getByText('Ibombo')
-    page
-      .locator('[id="child____birthLocation____privateHome.village"]')
-      .getByText('Klow')
+    await expect(
+      page
+        .locator('[id="child____birthLocation____privateHome.country"]')
+        .getByText('Farajaland')
+    ).toBeVisible()
+    await expect(
+      page
+        .locator(
+          '[id="searchable-select-child____birthLocation____privateHome.province"]'
+        )
+        .getByText('Central')
+    ).toBeVisible()
+    await expect(
+      page
+        .locator(
+          '[id="searchable-select-child____birthLocation____privateHome.district"]'
+        )
+        .getByText('Ibombo')
+    ).toBeVisible()
 
     await page
       .locator('[id="child____birthLocation____privateHome.town"]')
@@ -106,17 +113,16 @@ test('Advanced Search - Mobile', async ({ page }) => {
     await page.click('#search')
     await expect(page).toHaveURL(/.*\/search-result/)
 
-    const searchParams = new URLSearchParams(page.url())
+    const searchParams = new URL(page.url()).searchParams
     const address = searchParams.get('child.birthLocation.privateHome')
-    if (address !== null) {
-      const addressObject = JSON.parse(address)
-      await expect(addressObject.country).toBe('FAR')
-      await expect(addressObject.town).toBe('Dhaka')
-      await expect(addressObject.addressType).toBe('DOMESTIC')
-      await expect(addressObject.province).toBeTruthy()
-      await expect(addressObject.district).toBeTruthy()
-      await expect(addressObject.village).toBeTruthy()
-    }
+    expect(address).not.toBeNull()
+    const addressObject = JSON.parse(address!)
+    await expect(addressObject.country).toBe('FAR')
+    await expect(addressObject.town).toBe('Dhaka')
+    await expect(addressObject.addressType).toBe('DOMESTIC')
+    await expect(addressObject.province).toBeTruthy()
+    await expect(addressObject.district).toBeTruthy()
+    await expect(addressObject.village).toBeTruthy()
 
     await expect(page.getByText('Search results')).toBeVisible()
   })

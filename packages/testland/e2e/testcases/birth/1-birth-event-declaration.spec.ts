@@ -564,13 +564,16 @@ test.describe('1. Birth event declaration', () => {
     })
 
     test('1.11.2 Click Cancel', async ({ page }) => {
+      await expect(
+        page.getByRole('heading', { name: 'Delete draft?' })
+      ).toBeVisible()
       await page.getByRole('button', { name: 'Cancel' }).click()
 
       /*
        * Expected result: should close the modal
        */
       await expect(
-        page.getByRole('heading', { name: 'Exit without saving changes?' })
+        page.getByRole('heading', { name: 'Delete draft?' })
       ).toBeHidden()
     })
 

@@ -298,10 +298,10 @@ test('3. Death declaration case - 3', async ({ page }) => {
       await page.locator('#country').click()
       await page
         .locator('#country input')
-        .fill(declaration.informant.address.country.slice(0, 3))
+        .fill(declaration.spouse.address.country.slice(0, 3))
       await page
         .locator('#country .react-select__option', {
-          hasText: declaration.informant.address.country
+          hasText: declaration.spouse.address.country
         })
         .click()
 

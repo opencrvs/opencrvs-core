@@ -12,6 +12,9 @@ import { test, type Page, expect } from '@playwright/test'
 import { login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 
+/** Matches a navigation item, with or without its record count, e.g. "Drafts 1" */
+const navItemName = (name: string) => new RegExp(`^${name}( \\d+)?$`)
+
 test.describe('Side menu navigation', () => {
   let page: Page
 
@@ -43,7 +46,9 @@ test.describe('Side menu navigation', () => {
 
     // All workqueues are present on home page.
     for (const item of expectedWorkqueues) {
-      page.getByRole('button', { name: item })
+      await expect(
+        page.getByRole('button', { name: navItemName(item) })
+      ).toBeVisible()
     }
 
     const expectedItemsWithFrame = ['Organisation', 'Team']
@@ -59,18 +64,24 @@ test.describe('Side menu navigation', () => {
 
       // All workqueues are present on each page.
       for (const item of expectedWorkqueues) {
-        await page.getByRole('button', { name: item })
+        await expect(
+          page.getByRole('button', { name: navItemName(item) })
+        ).toBeVisible()
       }
 
       // All workqueues are present on each page.
       for (const item of expectedItemsWithoutFrame) {
-        await page.getByRole('button', { name: item })
+        await expect(
+          page.getByRole('button', { name: navItemName(item) })
+        ).toBeVisible()
       }
     }
 
     for (const item of expectedItemsWithoutFrame) {
       await page.getByRole('button', { name: item }).click()
-      await expect(page.locator('Farajaland CRS')).toBeHidden()
+      await expect(
+        page.getByText('Farajaland CRS', { exact: true })
+      ).toBeHidden()
 
       // Only one button available (X)
       await page.locator('#page-title').getByRole('button').click()
@@ -96,7 +107,9 @@ test.describe('Side menu navigation', () => {
 
     // All workqueues are present on home page.
     for (const item of expectedWorkqueues) {
-      page.getByRole('button', { name: item })
+      await expect(
+        page.getByRole('button', { name: navItemName(item) })
+      ).toBeVisible()
     }
 
     const expectedItemsWithFrame = ['Organisation', 'Team']
@@ -112,17 +125,23 @@ test.describe('Side menu navigation', () => {
 
       // All workqueues are present on each page. V1 have different workqueues, so we should notice.
       for (const item of expectedWorkqueues) {
-        page.getByText(item)
+        await expect(
+          page.getByRole('button', { name: navItemName(item) })
+        ).toBeVisible()
       }
       // All workqueues are present on each page. V1 have different workqueues, so we should notice.
       for (const item of expectedItemsWithoutFrame) {
-        page.getByText(item)
+        await expect(
+          page.getByRole('button', { name: navItemName(item) })
+        ).toBeVisible()
       }
     }
 
     for (const item of expectedItemsWithoutFrame) {
       await page.getByText(item).click()
-      await expect(page.locator('Farajaland CRS')).toBeHidden()
+      await expect(
+        page.getByText('Farajaland CRS', { exact: true })
+      ).toBeHidden()
 
       // Only one button available (X)
       await page.locator('#page-title').getByRole('button').click()
@@ -178,12 +197,16 @@ test.describe('Side menu navigation', () => {
       }
 
       for (const items of nationalSystemAdminNestedNavItemsWithFrame) {
-        page.getByRole('button', { name: items[0] })
+        await expect(
+          page.getByRole('button', { name: navItemName(items[0]) })
+        ).toBeVisible()
         await expect(page.locator(items[1])).toBeHidden()
       }
 
       for (const item of nationalSystemAdminNavItemsWithoutFrame) {
-        page.getByRole('button', { name: item })
+        await expect(
+          page.getByRole('button', { name: navItemName(item) })
+        ).toBeVisible()
       }
     }
 
@@ -197,7 +220,9 @@ test.describe('Side menu navigation', () => {
 
     for (const item of nationalSystemAdminNavItemsWithoutFrame) {
       await page.getByRole('button', { name: item }).click()
-      await expect(page.locator('Farajaland CRS')).toBeHidden()
+      await expect(
+        page.getByText('Farajaland CRS', { exact: true })
+      ).toBeHidden()
 
       // Only one button available (X)
       await page.locator('#page-title').getByRole('button').click()

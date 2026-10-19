@@ -164,11 +164,8 @@ test('Archival of declaration pending validation', async ({ page }) => {
   })
 
   await test.step('Archived declaration can be found via search', async () => {
-    await page.locator('#searchText').fill(formatV2ChildName(declaration))
-    await page.locator('#searchIconButton').click()
-    await expect(
-      page.getByRole('button', { name: formatV2ChildName(declaration) })
-    ).not.toBeVisible()
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
+    await expect(page.getByTestId('status-value')).toHaveText('Archived')
   })
 })
 

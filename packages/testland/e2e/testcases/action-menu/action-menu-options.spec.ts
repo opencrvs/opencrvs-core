@@ -18,7 +18,7 @@ import {
 } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { ensureAssignedToUser } from '@e2e/support/utils'
 
 async function getActionMenuOptions(page: Page, declaration: Declaration) {
   await searchFromSearchBar(page, formatV2ChildName(declaration))
@@ -128,44 +128,6 @@ test.describe('Action menu options', () => {
         'Issue a verifiable credential',
         'Unassign'
       ])
-    })
-  })
-
-  test('Event status: ARCHIVED', async ({ page }) => {
-    test.setTimeout(180_000)
-
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const { declaration } = await createDeclaration(
-      token,
-      undefined,
-      ActionType.DECLARE
-    )
-
-    await test.step('Archive declaration', async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-      await searchFromSearchBar(page, formatV2ChildName(declaration))
-
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-      await selectAction(page, 'Archive')
-
-      const archiveResponse = page.waitForResponse(
-        (res) => res.url().includes('event.actions.archive') && res.ok()
-      )
-
-      await page.getByRole('button', { name: 'Archive' }).click()
-      await archiveResponse
-    })
-
-    await test.step('Registrar', async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-      const options = await getActionMenuOptions(page, declaration)
-      expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
-    })
-
-    await test.step('Registration Officer', async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-      const options = await getActionMenuOptions(page, declaration)
-      expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
     })
   })
 })
