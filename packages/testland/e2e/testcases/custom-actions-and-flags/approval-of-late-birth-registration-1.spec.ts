@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -27,7 +27,6 @@ import { format, subDays } from 'date-fns'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import {
   createDeclaration,
-  Declaration,
   getDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
@@ -40,37 +39,28 @@ const lateRegDate = subDays(recentDate, 500)
 const lateRegDateString = format(lateRegDate, 'yyyy-MM-dd')
 
 /* Use API to declare when form filling does not have any relevant tests. For registrar there is a use case. For CL not. */
-test.describe.serial('Approval of late birth registration', () => {
-  let page: Page
-  let declaration: Declaration
+test('Approval of late birth registration', async ({ page }) => {
+  test.setTimeout(240_000)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-
-    const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
-    const declarationRequest = await getDeclaration({
-      token,
-      partialDeclaration: {
-        'child.dob': lateRegDateString,
-        'child.reason': 'Late registration'
-      },
-      placeOfBirthType: 'PRIVATE_HOME'
-    })
-    const res = await createDeclaration(
-      token,
-      declarationRequest,
-      ActionType.DECLARE,
-      'PRIVATE_HOME'
-    )
-    declaration = res.declaration
+  const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
+  const declarationRequest = await getDeclaration({
+    token,
+    partialDeclaration: {
+      'child.dob': lateRegDateString,
+      'child.reason': 'Late registration'
+    },
+    placeOfBirthType: 'PRIVATE_HOME'
   })
+  const res = await createDeclaration(
+    token,
+    declarationRequest,
+    ActionType.DECLARE,
+    'PRIVATE_HOME'
+  )
+  const declaration = res.declaration
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test.describe('Declaration Review by RO', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Declaration Review by RO', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
       await page.getByText('Pending validation').click()
 
@@ -78,19 +68,19 @@ test.describe.serial('Approval of late birth registration', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
     })
 
-    test("Event should have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Event should have the 'Approval required for late registration' -flag", async () => {
       await expect(
         page.getByText('Approval required for late registration')
       ).toBeVisible()
     })
 
-    test('RO should not have the option to Approve', async () => {
+    await test.step('RO should not have the option to Approve', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
       await expect(page.getByText('Approve', { exact: true })).not.toBeVisible()
       await page.getByRole('button', { name: 'Action', exact: true }).click()
     })
 
-    test('Validate', async () => {
+    await test.step('Validate', async () => {
       const validateResponse = page.waitForResponse(
         (response) =>
           response.url().includes('event.actions.custom') && response.ok()
@@ -103,42 +93,42 @@ test.describe.serial('Approval of late birth registration', () => {
     })
   })
 
-  test.describe('Declaration Review by Registrar', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Declaration Review by Registrar', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
       await page.getByText('Pending approval').click()
 
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test('LR should not have the option to Approve', async () => {
+    await test.step('LR should not have the option to Approve', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
       await expect(page.getByText('Approve', { exact: true })).not.toBeVisible()
     })
   })
 
-  test.describe('Declaration Review by PR(Provincial Registrar)', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Declaration Review by PR(Provincial Registrar)', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.PROVINCIAL_REGISTRAR)
       await page.getByText('Pending approval').first().click()
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test('Approve action should be disabled before assignment', async () => {
+    await test.step('Approve action should be disabled before assignment', async () => {
       await validateActionMenuButton(page, 'Approve', false)
     })
 
-    test('Assign', async () => {
+    await test.step('Assign', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.PROVINCIAL_REGISTRAR)
     })
 
-    test("Event should have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Event should have the 'Approval required for late registration' -flag", async () => {
       await expect(
         page.getByText('Approval required for late registration')
       ).toBeVisible()
     })
 
-    test('Fill comments field and add file before confirming Approve declaration', async () => {
+    await test.step('Fill comments field and add file before confirming Approve declaration', async () => {
       await selectAction(page, 'Approve')
       await expect(
         page.getByText(
@@ -167,7 +157,7 @@ test.describe.serial('Approval of late birth registration', () => {
       await approveResponse
     })
 
-    test("Validate that the 'Approval required for late registration' -flag is removed after approval", async () => {
+    await test.step("Validate that the 'Approval required for late registration' -flag is removed after approval", async () => {
       await searchFromSearchBar(page, formatV2ChildName(declaration))
 
       await expect(
@@ -176,22 +166,22 @@ test.describe.serial('Approval of late birth registration', () => {
     })
   })
 
-  test.describe('Audit review by Registrar', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Audit review by Registrar', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.REGISTRAR, true)
       await searchFromSearchBar(page, formatV2ChildName(declaration))
     })
 
-    test('Assign', async () => {
+    await test.step('Assign', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     })
 
-    test('LR should not have the option to Approve', async () => {
+    await test.step('LR should not have the option to Approve', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
       await expect(page.getByText('Approve', { exact: true })).not.toBeVisible()
     })
 
-    test('Validate that action and form field value appearing in audit trail', async () => {
+    await test.step('Validate that action and form field value appearing in audit trail', async () => {
       await switchEventTab(page, 'Audit')
       await page.getByRole('button', { name: 'Approved', exact: true }).click()
       await expect(
@@ -200,7 +190,7 @@ test.describe.serial('Approval of late birth registration', () => {
       await page.getByTestId('close-dialog').click()
     })
 
-    test('Documents tab shows the document uploaded by the Approve action', async () => {
+    await test.step('Documents tab shows the document uploaded by the Approve action', async () => {
       await switchEventTab(page, 'Documents')
 
       const documentRows = page.locator('#listTable-documents [id^="row_"]')
@@ -216,80 +206,60 @@ test.describe.serial('Approval of late birth registration', () => {
   })
 })
 
-test.describe('Birth with non-late registration will not have flag or Approve-action available', () => {
-  let page: Page
-  let declaration: Declaration
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-
-    const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
-    const declarationRequest = await getDeclaration({
-      token,
-      partialDeclaration: {
-        'child.dob': recentDateString
-      },
-      placeOfBirthType: 'PRIVATE_HOME'
-    })
-    const res = await createDeclaration(
-      token,
-      declarationRequest,
-      ActionType.DECLARE,
-      'PRIVATE_HOME'
-    )
-    declaration = res.declaration
+test('Birth with non-late registration will not have flag or Approve-action available', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
+  const declarationRequest = await getDeclaration({
+    token,
+    partialDeclaration: {
+      'child.dob': recentDateString
+    },
+    placeOfBirthType: 'PRIVATE_HOME'
   })
+  const res = await createDeclaration(
+    token,
+    declarationRequest,
+    ActionType.DECLARE,
+    'PRIVATE_HOME'
+  )
+  const declaration = res.declaration
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('Declaration started by CL', async () => {
+    await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
-  test.describe.serial('Declaration started by CL', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.COMMUNITY_LEADER)
-    })
-
-    test('Navigate to the record', async () => {
+    await test.step('Navigate to the record', async () => {
       await page.getByText('Recent').click()
 
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test("Record should not have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Record should not have the 'Approval required for late registration' -flag", async () => {
       await expect(
         page.getByText('Approval required for late registration')
       ).not.toBeVisible()
     })
 
-    test('Record should not have the "Approve"-action available', async () => {
+    await test.step('Record should not have the "Approve"-action available', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
       await expect(page.getByText('Approve', { exact: true })).not.toBeVisible()
     })
   })
 })
 
-test.describe
-  .serial("'Approval required for late registration' -flag blocks direct registration", () => {
-  let page: Page
+test("'Approval required for late registration' -flag blocks direct registration", async ({
+  page
+}) => {
+  test.setTimeout(240_000)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
+  await test.step('Declaration started by Registrar', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test.describe('Declaration started by Registrar', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('Fill child details with birth date from over a year ago', async () => {
+    await test.step('Fill child details with birth date from over a year ago', async () => {
       await page.locator('#firstname').fill(faker.person.firstName())
       await page.locator('#surname').fill(faker.person.lastName())
       await page.locator('#child____gender').click()
@@ -312,7 +282,7 @@ test.describe
       await continueForm(page)
     })
 
-    test('Fill informant details', async () => {
+    await test.step('Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page.getByText('Mother', { exact: true }).click()
 
@@ -321,7 +291,7 @@ test.describe
       await continueForm(page)
     })
 
-    test("Fill mother's details", async () => {
+    await test.step("Fill mother's details", async () => {
       await page.locator('#firstname').fill(faker.person.firstName('female'))
       await page.locator('#surname').fill(faker.person.lastName('female'))
 
@@ -345,7 +315,7 @@ test.describe
       await continueForm(page)
     })
 
-    test("Fill father's details", async () => {
+    await test.step("Fill father's details", async () => {
       await page.locator('#firstname').fill(faker.person.firstName('male'))
       await page.locator('#surname').fill(faker.person.lastName('male'))
 
@@ -364,11 +334,11 @@ test.describe
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('Go to review', async () => {
+    await test.step('Go to review', async () => {
       await goToSection(page, 'review')
     })
 
-    test('Fill up informant comment & signature', async () => {
+    await test.step('Fill up informant comment & signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -378,12 +348,12 @@ test.describe
         .click()
     })
 
-    test('Direct registration should be unavailable', async () => {
+    await test.step('Direct registration should be unavailable', async () => {
       await validateActionMenuButton(page, 'Declare')
       await validateActionMenuButton(page, 'Register', false)
     })
 
-    test('Change child dob to recent date', async () => {
+    await test.step('Change child dob to recent date', async () => {
       await page.getByTestId('change-button-child.dob').click()
       await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -395,7 +365,7 @@ test.describe
       await page.getByRole('button', { name: 'Go to review' }).click()
     })
 
-    test('Direct registration should be available', async () => {
+    await test.step('Direct registration should be available', async () => {
       await validateActionMenuButton(page, 'Register')
     })
   })

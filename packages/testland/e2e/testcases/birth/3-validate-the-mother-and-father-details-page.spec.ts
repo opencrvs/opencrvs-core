@@ -39,7 +39,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
     ).toBeVisible()
   })
 
-  test.describe.serial('3.1 Validate "First Name(s)" text field', async () => {
+  test.describe('3.1 Validate "First Name(s)" text field', async () => {
     test.describe('3.1.1 Enter Non-English characters', async () => {
       test('Using name: Richard the 3rd', async ({ page }) => {
         await type(page, '#firstname', 'Richard the 3rd')
@@ -118,7 +118,7 @@ test.describe('3. Validate the mothers and fathers details pages', () => {
     })
   })
 
-  test.describe.serial('3.2 Validate the "National ID" field', async () => {
+  test.describe('3.2 Validate the "National ID" field', async () => {
     test.beforeEach(async ({ page }) => {
       await page
         .locator('#mother____idType')

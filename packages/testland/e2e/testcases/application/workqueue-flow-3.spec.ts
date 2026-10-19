@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { faker } from '@faker-js/faker'
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -31,30 +31,20 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 // HO Notifies => RO Rejects => RO Re-declares and validates => Registrar rejects
 // => RO Re-declares again => Registrar registers
 
-test.describe.serial('3. Workqueue flow - 3', () => {
-  let page: Page
+test('3. Workqueue flow - 3', async ({ page }) => {
+  test.setTimeout(480_000)
 
   const declaration = generateBirthInputs()
   const childName = formatName(declaration.child.name)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
+  await test.step('3.1 Notify by HO', async () => {
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test.describe('3.1 Notify by HO', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('3.1.1 Fill child details', async () => {
+    await test.step('3.1.1 Fill child details', async () => {
       await page.locator('#firstname').fill(declaration.child.name.firstNames)
       await page.locator('#surname').fill(declaration.child.name.familyName)
       await page.locator('#child____gender').click()
@@ -76,11 +66,11 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await page.getByText(declaration.birthLocation.facility).click()
     })
 
-    test('3.1.2 Go to review', async () => {
+    await test.step('3.1.2 Go to review', async () => {
       await goToSection(page, 'review')
     })
 
-    test('3.1.3 Fill up informant comment & signature', async () => {
+    await test.step('3.1.3 Fill up informant comment & signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -92,11 +82,11 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
     })
 
-    test('3.1.4 Notify', async () => {
+    await test.step('3.1.4 Notify', async () => {
       await triggerDeclarationAction(page, 'Notify')
     })
 
-    test('3.1.5 Verify workqueue', async () => {
+    await test.step('3.1.5 Verify workqueue', async () => {
       await assertRecordInWorkqueue({
         page,
         name: childName,
@@ -109,8 +99,8 @@ test.describe.serial('3. Workqueue flow - 3', () => {
     })
   })
 
-  test.describe('3.2 Reject by RO', async () => {
-    test('3.2.1 Verify workqueue', async () => {
+  await test.step('3.2 Reject by RO', async () => {
+    await test.step('3.2.1 Verify workqueue', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await assertRecordInWorkqueue({
@@ -131,7 +121,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       })
     })
 
-    test('3.2.2 Reject', async () => {
+    await test.step('3.2.2 Reject', async () => {
       await page.getByText('Notifications').click()
 
       await openRecordByTitle(page, childName)
@@ -166,7 +156,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       })
     })
 
-    test('3.2.3 Ensure rejection is no longer available', async () => {
+    await test.step('3.2.3 Ensure rejection is no longer available', async () => {
       await page.getByRole('button', { name: 'Recent' }).click()
       await openRecordByTitle(page, childName)
 
@@ -180,7 +170,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await page.getByRole('button', { name: 'Action' }).click()
     })
 
-    test('3.2.4 Unassign', async () => {
+    await test.step('3.2.4 Unassign', async () => {
       await selectAction(page, 'Unassign')
       await page.getByRole('button', { name: 'Unassign', exact: true }).click()
       await expect(page.getByText('Not assigned')).toBeVisible()
@@ -190,8 +180,8 @@ test.describe.serial('3. Workqueue flow - 3', () => {
     })
   })
 
-  test.describe('3.3 Re-declare and validate by RO', async () => {
-    test('3.3.1 Go to edit', async () => {
+  await test.step('3.3 Re-declare and validate by RO', async () => {
+    await test.step('3.3.1 Go to edit', async () => {
       await openRecordByTitle(page, childName)
 
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
@@ -199,7 +189,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await selectAction(page, 'Edit')
     })
 
-    test('3.3.2 Fill informant details', async () => {
+    await test.step('3.3.2 Fill informant details', async () => {
       await page
         .getByTestId('accordion-Accordion_informant')
         .getByRole('button', { name: 'Change all' })
@@ -217,7 +207,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await continueForm(page)
     })
 
-    test("3.3.3 Fill mother's details", async () => {
+    await test.step("3.3.3 Fill mother's details", async () => {
       await page.locator('#firstname').fill(declaration.mother.name.firstNames)
       await page.locator('#surname').fill(declaration.mother.name.familyName)
 
@@ -261,7 +251,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await continueForm(page)
     })
 
-    test("3.3.4 Fill father's details", async () => {
+    await test.step("3.3.4 Fill father's details", async () => {
       await page.locator('#firstname').fill(declaration.father.name.firstNames)
       await page.locator('#surname').fill(declaration.father.name.familyName)
 
@@ -285,11 +275,11 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await continueForm(page, 'Go to review')
     })
 
-    test('3.3.5 Declare with edits', async () => {
+    await test.step('3.3.5 Declare with edits', async () => {
       await triggerDeclarationAction(page, 'Declare with edits')
     })
 
-    test('3.3.6 Verify workqueue', async () => {
+    await test.step('3.3.6 Verify workqueue', async () => {
       await assertRecordInWorkqueue({
         page,
         name: childName,
@@ -302,8 +292,8 @@ test.describe.serial('3. Workqueue flow - 3', () => {
     })
   })
 
-  test.describe('3.4 Reject by Registrar', async () => {
-    test('3.4.1 Login with Registrar', async () => {
+  await test.step('3.4 Reject by Registrar', async () => {
+    await test.step('3.4.1 Login with Registrar', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
 
       await assertRecordInWorkqueue({
@@ -326,7 +316,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
         ]
       })
     })
-    test('3.4.2 Reject', async () => {
+    await test.step('3.4.2 Reject', async () => {
       await page.getByText('Pending registration').click()
 
       await openRecordByTitle(page, childName)
@@ -365,8 +355,8 @@ test.describe.serial('3. Workqueue flow - 3', () => {
     })
   })
 
-  test.describe('3.5 Re-declare with edits by RO', async () => {
-    test('3.5.1 Login with RO', async () => {
+  await test.step('3.5 Re-declare with edits by RO', async () => {
+    await test.step('3.5.1 Login with RO', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER, true)
 
       await assertRecordInWorkqueue({
@@ -387,7 +377,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       })
     })
 
-    test('3.5.2 Go to edit', async () => {
+    await test.step('3.5.2 Go to edit', async () => {
       await page.getByText('Pending updates').click()
       await openRecordByTitle(page, childName)
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
@@ -395,7 +385,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
       await selectAction(page, 'Edit')
     })
 
-    test('3.5.3 Change informant email', async () => {
+    await test.step('3.5.3 Change informant email', async () => {
       await page
         .getByTestId('accordion-Accordion_informant')
         .getByRole('button', { name: 'Change all' })
@@ -408,7 +398,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
         .click()
     })
 
-    test('3.5.4 Re-declare with edits', async () => {
+    await test.step('3.5.4 Re-declare with edits', async () => {
       await triggerDeclarationAction(page, 'Declare with edits')
 
       await assertRecordInWorkqueue({
@@ -430,8 +420,8 @@ test.describe.serial('3. Workqueue flow - 3', () => {
     })
   })
 
-  test.describe('3.6 Register by Registrar', async () => {
-    test('3.6.1 Login with Registrar', async () => {
+  await test.step('3.6 Register by Registrar', async () => {
+    await test.step('3.6.1 Login with Registrar', async () => {
       await login(page, CREDENTIALS.REGISTRAR, true)
 
       await assertRecordInWorkqueue({
@@ -454,7 +444,7 @@ test.describe.serial('3. Workqueue flow - 3', () => {
         ]
       })
     })
-    test('3.6.2 Register', async () => {
+    await test.step('3.6.2 Register', async () => {
       await page.getByText('Pending registration').click()
 
       await openRecordByTitle(page, childName)

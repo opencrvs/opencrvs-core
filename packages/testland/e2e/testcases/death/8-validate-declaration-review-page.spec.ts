@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   getRandomDate,
   drawSignature,
@@ -31,8 +31,8 @@ import {
 } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('8. Validate declaration review page', () => {
-  let page: Page
+test('8. Validate declaration review page', async ({ page }) => {
+  test.setTimeout(240_000)
 
   const declaration = {
     deceased: {
@@ -93,23 +93,16 @@ test.describe.serial('8. Validate declaration review page', () => {
       comment: 'He was a good man'
     }
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+  await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
 
-    await page.click('#header-new-event')
-    await page.getByLabel('Death').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
+  await page.click('#header-new-event')
+  await page.getByLabel('Death').click()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test.describe('8.1 Hospital Official actions', async () => {
-    test.describe('8.1.0 Fill up death registration form', async () => {
-      test('8.1.0.1 Fill deceased details', async () => {
+  await test.step('8.1 Hospital Official actions', async () => {
+    await test.step('8.1.0 Fill up death registration form', async () => {
+      await test.step('8.1.0.1 Fill deceased details', async () => {
         await page
           .locator('#firstname')
           .fill(declaration.deceased.name.firstname)
@@ -133,7 +126,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         await continueForm(page)
       })
 
-      test('8.1.0.2 Fill event details', async () => {
+      await test.step('8.1.0.2 Fill event details', async () => {
         await page.getByPlaceholder('dd').fill(declaration.eventDetails.date.dd)
         await page.getByPlaceholder('mm').fill(declaration.eventDetails.date.mm)
         await page
@@ -152,7 +145,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         await continueForm(page)
       })
 
-      test('8.1.0.3 Fill informant details', async () => {
+      await test.step('8.1.0.3 Fill informant details', async () => {
         await page.locator('#informant____relation').click()
         await page
           .getByText(declaration.informant.relation, {
@@ -169,7 +162,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         await continueForm(page)
       })
 
-      test('8.1.0.4 Fill spouse details', async () => {
+      await test.step('8.1.0.4 Fill spouse details', async () => {
         await page.locator('#firstname').fill(declaration.spouse.name.firstname)
         await page.locator('#surname').fill(declaration.spouse.name.surname)
 
@@ -186,8 +179,8 @@ test.describe.serial('8. Validate declaration review page', () => {
       })
     })
 
-    test.describe('8.1.1 Navigate to declaration preview page', async () => {
-      test('8.1.1.1 Verify information added on previous pages', async () => {
+    await test.step('8.1.1 Navigate to declaration preview page', async () => {
+      await test.step('8.1.1.1 Verify information added on previous pages', async () => {
         await goToSection(page, 'review')
 
         /*
@@ -374,8 +367,8 @@ test.describe.serial('8. Validate declaration review page', () => {
       })
     })
 
-    test.describe('8.1.2 Click any "Change" link', async () => {
-      test("8.1.2.1 Change deceased's name", async () => {
+    await test.step('8.1.2 Click any "Change" link', async () => {
+      await test.step("8.1.2.1 Change deceased's name", async () => {
         await page.getByTestId('change-button-deceased.name').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -397,7 +390,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.1.2.2 Change deceased's gender", async () => {
+      await test.step("8.1.2.2 Change deceased's gender", async () => {
         await page.getByTestId('change-button-deceased.gender').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -417,7 +410,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.1.2.3 Change deceased's birthday", async () => {
+      await test.step("8.1.2.3 Change deceased's birthday", async () => {
         await page.getByTestId('change-button-deceased.dob').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -436,7 +429,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.1.2.4 Change deceased's ID type", async () => {
+      await test.step("8.1.2.4 Change deceased's ID type", async () => {
         await page.getByTestId('change-button-deceased.idType').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -456,7 +449,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           declaration.deceased.idType
         )
       })
-      test("8.1.2.5 Change deceased's ID", async () => {
+      await test.step("8.1.2.5 Change deceased's ID", async () => {
         await page.getByTestId('change-button-deceased.passport').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -475,7 +468,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test('8.1.2.7 Change informant type', async () => {
+      await test.step('8.1.2.7 Change informant type', async () => {
         await page.getByTestId('change-button-informant.relation').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -497,7 +490,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         ).toContainText(declaration.informant.relation)
       })
 
-      test('8.1.2.8 Change registration email', async () => {
+      await test.step('8.1.2.8 Change registration email', async () => {
         await page.getByTestId('change-button-informant.email').click()
         await page.getByRole('button', { name: 'Continue' }).click()
         declaration.informant.email = faker.internet.email()
@@ -513,7 +506,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.1.2.9 Change spouse's name", async () => {
+      await test.step("8.1.2.9 Change spouse's name", async () => {
         await page.getByTestId('change-button-spouse.name').click()
         await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.name.firstname = faker.person.firstName('female')
@@ -530,7 +523,7 @@ test.describe.serial('8. Validate declaration review page', () => {
             declaration.spouse.name.surname
         )
       })
-      test("8.1.2.10 Change spouse's birthday", async () => {
+      await test.step("8.1.2.10 Change spouse's birthday", async () => {
         await page.getByTestId('change-button-spouse.dob').click()
         await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.dob = getRandomDate(19, 200)
@@ -546,7 +539,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           formatDateObjectTo_dMMMMyyyy(declaration.spouse.dob)
         )
       })
-      test("8.1.2.11 Change spouse's nationality", async () => {
+      await test.step("8.1.2.11 Change spouse's nationality", async () => {
         await page.getByTestId('change-button-spouse.nationality').click()
         await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.nationality = 'Holy See'
@@ -564,7 +557,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           page.getByTestId('spouse.nationality-value')
         ).toContainText(declaration.spouse.nationality)
       })
-      test("8.1.2.12 Change spouse's ID type", async () => {
+      await test.step("8.1.2.12 Change spouse's ID type", async () => {
         await page.getByTestId('change-button-spouse.idType').click()
         await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.idType = 'Passport'
@@ -582,7 +575,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           declaration.spouse.idType
         )
       })
-      test("8.1.2.13 Change spouse's ID", async () => {
+      await test.step("8.1.2.13 Change spouse's ID", async () => {
         await page.getByTestId('change-button-spouse.passport').click()
         await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.passport = faker.string.numeric(10)
@@ -599,8 +592,8 @@ test.describe.serial('8. Validate declaration review page', () => {
       })
     })
 
-    test.describe('8.1.3 Validate supporting document', async () => {
-      test('8.1.3.0 Go to upload supporting document page', async () => {
+    await test.step('8.1.3 Validate supporting document', async () => {
+      await test.step('8.1.3.0 Go to upload supporting document page', async () => {
         await page
           .locator('#Accordion_documents-accordion')
           .getByRole('button', { name: 'Change all', exact: true })
@@ -609,7 +602,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         await page.getByRole('button', { name: 'Continue' }).click()
       })
 
-      test('8.1.3.1 Upload proof for deceased', async () => {
+      await test.step('8.1.3.1 Upload proof for deceased', async () => {
         const imageUploadSectionTitles = [
           'National ID',
           'Passport',
@@ -629,7 +622,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         }
       })
 
-      test('8.1.3.2 Upload proof for informant', async () => {
+      await test.step('8.1.3.2 Upload proof for informant', async () => {
         const imageUploadSectionTitles = [
           'National ID',
           'Passport',
@@ -649,7 +642,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         }
       })
 
-      test('8.1.3.3 Upload proof of death', async () => {
+      await test.step('8.1.3.3 Upload proof of death', async () => {
         const imageUploadSectionTitles = [
           'Attested letter of death',
           'Police certificate of death',
@@ -671,18 +664,18 @@ test.describe.serial('8. Validate declaration review page', () => {
         }
       })
 
-      test('8.1.3.4 Go back to preview', async () => {
+      await test.step('8.1.3.4 Go back to preview', async () => {
         await page.getByRole('button', { name: 'Go to review' }).click()
       })
     })
-    test('8.1.4 Validate additional comments box', async () => {
+    await test.step('8.1.4 Validate additional comments box', async () => {
       await page.locator('#review____comment').fill(annotation.review.comment)
     })
-    test.describe('8.1.5 Validate the declaration send button', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.1.5 Validate the declaration send button', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
 
-    test('8.1.6 Fill up informant signature', async () => {
+    await test.step('8.1.6 Fill up informant signature', async () => {
       await page.locator('#review____comment').fill(annotation.review.comment)
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -692,11 +685,11 @@ test.describe.serial('8. Validate declaration review page', () => {
         .click()
     })
 
-    test('8.1.7 Notify', async () => {
+    await test.step('8.1.7 Notify', async () => {
       await triggerDeclarationAction(page, 'Notify')
     })
 
-    test('8.1.8 Validate that declaration is available on "Recent"', async () => {
+    await test.step('8.1.8 Validate that declaration is available on "Recent"', async () => {
       await expect(page.getByText('Farajaland CRS')).toBeVisible()
 
       /*
@@ -719,8 +712,8 @@ test.describe.serial('8. Validate declaration review page', () => {
     })
   })
 
-  test.describe('8.1b Attestation by Health Administrator', async () => {
-    test('Health Administrator attests the notification', async () => {
+  await test.step('8.1b Attestation by Health Administrator', async () => {
+    await test.step('Health Administrator attests the notification', async () => {
       await login(page, CREDENTIALS.HEALTH_ADMINISTRATOR)
 
       await page.getByText('Pending attestation').click()
@@ -745,8 +738,8 @@ test.describe.serial('8. Validate declaration review page', () => {
     })
   })
 
-  test.describe('8.2 Registration Officer actions', async () => {
-    test('8.2.1 Navigate to the declaration preview page', async () => {
+  await test.step('8.2 Registration Officer actions', async () => {
+    await test.step('8.2.1 Navigate to the declaration preview page', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await page.getByText('Notifications').click()
@@ -759,7 +752,7 @@ test.describe.serial('8. Validate declaration review page', () => {
       )
     })
 
-    test('8.2.1.1 Verify information added on previous pages', async () => {
+    await test.step('8.2.1.1 Verify information added on previous pages', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
       await selectAction(page, 'Edit')
       /*
@@ -928,8 +921,8 @@ test.describe.serial('8. Validate declaration review page', () => {
       )
     })
 
-    test.describe('8.2.2 Click any "Change" link', async () => {
-      test("8.2.2.1 Change deceased's name", async () => {
+    await test.step('8.2.2 Click any "Change" link', async () => {
+      await test.step("8.2.2.1 Change deceased's name", async () => {
         await page.getByTestId('change-button-deceased.name').click()
 
         declaration.deceased.name.firstname = faker.person.firstName('male')
@@ -950,7 +943,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.2.2.2 Change deceased's gender", async () => {
+      await test.step("8.2.2.2 Change deceased's gender", async () => {
         await page.getByTestId('change-button-deceased.gender').click()
 
         declaration.deceased.gender = 'Male'
@@ -969,7 +962,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.2.2.3 Change deceased's birthday", async () => {
+      await test.step("8.2.2.3 Change deceased's birthday", async () => {
         await page.getByTestId('change-button-deceased.dob').click()
 
         declaration.deceased.dob = getRandomDate(5, 200)
@@ -987,7 +980,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.2.2.4 Change deceased's ID type", async () => {
+      await test.step("8.2.2.4 Change deceased's ID type", async () => {
         await page.getByTestId('change-button-deceased.idType').click()
 
         declaration.deceased.idType = 'Birth Registration Number'
@@ -1006,7 +999,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           declaration.deceased.idType
         )
       })
-      test("8.2.2.5 Change deceased's ID", async () => {
+      await test.step("8.2.2.5 Change deceased's ID", async () => {
         await page.getByTestId('change-button-deceased.brn').click()
 
         declaration.deceased.brn = faker.string.numeric(10)
@@ -1022,7 +1015,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.2.2.6 Change deceased's address", async () => {
+      await test.step("8.2.2.6 Change deceased's address", async () => {
         await page.getByTestId('change-button-deceased.address').click()
 
         declaration.deceased.address.province = 'Central'
@@ -1053,7 +1046,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test('8.2.2.7 Change informant type', async () => {
+      await test.step('8.2.2.7 Change informant type', async () => {
         await page.getByTestId('change-button-informant.relation').click()
 
         declaration.informant.relation = 'Spouse'
@@ -1074,7 +1067,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         ).toContainText(declaration.informant.relation)
       })
 
-      test('8.2.2.8 Change registration email', async () => {
+      await test.step('8.2.2.8 Change registration email', async () => {
         await page.getByTestId('change-button-informant.email').click()
         declaration.informant.email = faker.internet.email()
         await page
@@ -1089,7 +1082,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.2.2.9 Change spouse's name", async () => {
+      await test.step("8.2.2.9 Change spouse's name", async () => {
         await page.getByTestId('change-button-spouse.name').click()
         declaration.spouse.name.firstname = faker.person.firstName('female')
         declaration.spouse.name.surname = faker.person.lastName('female')
@@ -1105,7 +1098,7 @@ test.describe.serial('8. Validate declaration review page', () => {
             declaration.spouse.name.surname
         )
       })
-      test("8.2.2.10 Change spouse's birthday", async () => {
+      await test.step("8.2.2.10 Change spouse's birthday", async () => {
         await page.getByTestId('change-button-spouse.dob').click()
         declaration.spouse.dob = getRandomDate(19, 200)
         await page.getByPlaceholder('dd').fill(declaration.spouse.dob.dd)
@@ -1120,7 +1113,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           formatDateObjectTo_dMMMMyyyy(declaration.spouse.dob)
         )
       })
-      test("8.2.2.11 Change spouse's nationality", async () => {
+      await test.step("8.2.2.11 Change spouse's nationality", async () => {
         await page.getByTestId('change-button-spouse.nationality').click()
         declaration.spouse.nationality = 'Japan'
         await page.locator('#spouse____nationality').click()
@@ -1137,7 +1130,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           page.getByTestId('spouse.nationality-value')
         ).toContainText(declaration.spouse.nationality)
       })
-      test("8.2.2.12 Change spouse's ID type", async () => {
+      await test.step("8.2.2.12 Change spouse's ID type", async () => {
         await page.getByTestId('change-button-spouse.idType').click()
         declaration.spouse.idType = 'Birth Registration Number'
         await page.locator('#spouse____idType').click()
@@ -1154,7 +1147,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           declaration.spouse.idType
         )
       })
-      test("8.2.2.13 Change spouse's ID", async () => {
+      await test.step("8.2.2.13 Change spouse's ID", async () => {
         await page.getByTestId('change-button-spouse.brn').click()
         declaration.spouse.brn = faker.string.numeric(10)
         await page.locator('#spouse____brn').fill(declaration.spouse.brn)
@@ -1167,21 +1160,21 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
     })
-    test.describe('8.2.3 Validate supporting document', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.2.3 Validate supporting document', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
-    test.describe('8.2.4 Validate additional comments box', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.2.4 Validate additional comments box', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
-    test.describe('8.2.5 Validate the declaration send button', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.2.5 Validate the declaration send button', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
 
-    test('8.2.6 Declare and validate', async () => {
+    await test.step('8.2.6 Declare and validate', async () => {
       await triggerDeclarationAction(page, 'Declare with edits')
     })
 
-    test('8.2.7 Confirm the declaration to send for approval', async () => {
+    await test.step('8.2.7 Confirm the declaration to send for approval', async () => {
       await page.getByText('Recent').click()
       /*
        * @TODO: When workflows are implemented on V2, this should navigate to correct workflow first.
@@ -1197,8 +1190,8 @@ test.describe.serial('8. Validate declaration review page', () => {
     })
   })
 
-  test.describe('8.3 Registrar actions', async () => {
-    test('8.3.1 Navigate to the declaration "Record" tab', async () => {
+  await test.step('8.3 Registrar actions', async () => {
+    await test.step('8.3.1 Navigate to the declaration "Record" tab', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
 
       await page.getByText('Pending registration').click()
@@ -1213,7 +1206,7 @@ test.describe.serial('8. Validate declaration review page', () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await switchEventTab(page, 'Record')
     })
-    test('8.3.1.1 Verify information added on previous pages', async () => {
+    await test.step('8.3.1.1 Verify information added on previous pages', async () => {
       /*
        * Expected result: should include
        * - Deceased's First Name
@@ -1357,12 +1350,12 @@ test.describe.serial('8. Validate declaration review page', () => {
       await expectRowValue(page, 'spouse.addressSameAs', 'Yes')
     })
 
-    test.describe('8.3.2 Click any "Change" link', async () => {
-      test('8.3.2.0 Navigate to Edit-action', async () => {
+    await test.step('8.3.2 Click any "Change" link', async () => {
+      await test.step('8.3.2.0 Navigate to Edit-action', async () => {
         await selectAction(page, 'Edit')
       })
 
-      test("8.3.2.1 Change deceased's name", async () => {
+      await test.step("8.3.2.1 Change deceased's name", async () => {
         await page.getByTestId('change-button-deceased.name').click()
 
         declaration.deceased.name.firstname = faker.person.firstName('male')
@@ -1383,7 +1376,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.3.2.2 Change deceased's gender", async () => {
+      await test.step("8.3.2.2 Change deceased's gender", async () => {
         await page.getByTestId('change-button-deceased.gender').click()
 
         declaration.deceased.gender = 'Female'
@@ -1402,7 +1395,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.3.2.3 Change deceased's birthday", async () => {
+      await test.step("8.3.2.3 Change deceased's birthday", async () => {
         await page.getByTestId('change-button-deceased.dob').click()
 
         declaration.deceased.dob = getRandomDate(1, 200)
@@ -1420,7 +1413,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.3.2.4 Change deceased's ID type", async () => {
+      await test.step("8.3.2.4 Change deceased's ID type", async () => {
         await page.getByTestId('change-button-deceased.idType').click()
 
         declaration.deceased.idType = 'Passport'
@@ -1439,7 +1432,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           declaration.deceased.idType
         )
       })
-      test("8.3.2.5 Change deceased's ID", async () => {
+      await test.step("8.3.2.5 Change deceased's ID", async () => {
         await page.getByTestId('change-button-deceased.passport').click()
 
         declaration.deceased.nid = faker.string.numeric(10)
@@ -1457,7 +1450,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.3.2.6 Change deceased's address", async () => {
+      await test.step("8.3.2.6 Change deceased's address", async () => {
         await page.getByTestId('change-button-deceased.address').click()
 
         declaration.deceased.address.village = 'Pemba'
@@ -1478,7 +1471,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test('8.3.2.7 Change informant type', async () => {
+      await test.step('8.3.2.7 Change informant type', async () => {
         await page.getByTestId('change-button-informant.relation').click()
 
         declaration.informant = {
@@ -1532,7 +1525,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         ).toContainText(declaration.informant.relation)
       })
 
-      test('8.3.2.8 Change registration email', async () => {
+      await test.step('8.3.2.8 Change registration email', async () => {
         await page.getByTestId('change-button-informant.email').click()
         declaration.informant.email = faker.internet.email()
         await page
@@ -1547,7 +1540,7 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
 
-      test("8.3.2.9 Change spouse's name", async () => {
+      await test.step("8.3.2.9 Change spouse's name", async () => {
         await page.getByTestId('change-button-spouse.name').click()
         declaration.spouse.name.firstname = faker.person.firstName('female')
         declaration.spouse.name.surname = faker.person.lastName('female')
@@ -1563,7 +1556,7 @@ test.describe.serial('8. Validate declaration review page', () => {
             declaration.spouse.name.surname
         )
       })
-      test("8.3.2.10 Change spouse's birthday", async () => {
+      await test.step("8.3.2.10 Change spouse's birthday", async () => {
         await page.getByTestId('change-button-spouse.dob').click()
         declaration.spouse.dob = getRandomDate(19, 200)
         await page.getByPlaceholder('dd').fill(declaration.spouse.dob.dd)
@@ -1578,7 +1571,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           formatDateObjectTo_dMMMMyyyy(declaration.spouse.dob)
         )
       })
-      test("8.3.2.11 Change spouse's nationality", async () => {
+      await test.step("8.3.2.11 Change spouse's nationality", async () => {
         await page.getByTestId('change-button-spouse.nationality').click()
         declaration.spouse.nationality = 'Holy See'
         await page.locator('#spouse____nationality').click()
@@ -1595,7 +1588,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           page.getByTestId('spouse.nationality-value')
         ).toContainText(declaration.spouse.nationality)
       })
-      test("8.3.2.12 Change spouse's ID type", async () => {
+      await test.step("8.3.2.12 Change spouse's ID type", async () => {
         await page.getByTestId('change-button-spouse.idType').click()
         declaration.spouse.idType = 'Passport'
         await page.locator('#spouse____idType').click()
@@ -1612,7 +1605,7 @@ test.describe.serial('8. Validate declaration review page', () => {
           declaration.spouse.idType
         )
       })
-      test("8.3.2.13 Change spouse's ID", async () => {
+      await test.step("8.3.2.13 Change spouse's ID", async () => {
         await page.getByTestId('change-button-spouse.passport').click()
         declaration.spouse.passport = faker.string.numeric(10)
         await page
@@ -1627,21 +1620,21 @@ test.describe.serial('8. Validate declaration review page', () => {
         )
       })
     })
-    test.describe('8.3.3 Validate supporting document', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.3.3 Validate supporting document', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
-    test.describe('8.3.4 Validate additional comments box', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.3.4 Validate additional comments box', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
-    test.describe('8.3.5 Validate the register button', async () => {
-      test.skip('Skipped for now', async () => {})
+    await test.step('8.3.5 Validate the register button', async () => {
+      await test.step.skip('Skipped for now', async () => {})
     })
 
-    test('8.3.6 Register with edits', async () => {
+    await test.step('8.3.6 Register with edits', async () => {
       await triggerDeclarationAction(page, 'Register with edits')
     })
 
-    test('8.3.7 Confirm the declaration to "Pending certification"-workqueue', async () => {
+    await test.step('8.3.7 Confirm the declaration to "Pending certification"-workqueue', async () => {
       await page.getByText('Pending certification').click()
 
       await expect(

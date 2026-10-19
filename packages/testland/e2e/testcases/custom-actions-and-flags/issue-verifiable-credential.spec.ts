@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
 import {
@@ -27,12 +27,8 @@ import {
   selectRequesterType
 } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('Issue verifiable credential', () => {
-  let page: Page
-  let motherInformantDeclaration: Declaration
-  let motherInformantChildName: string
-  let nonParentInformantDeclaration: Declaration
-  let nonParentInformantChildName: string
+test('Issue verifiable credential', async ({ page }) => {
+  test.setTimeout(180_000)
 
   async function openIssueVerifiableCredentialAction() {
     await page.getByRole('button', { name: 'Action', exact: true }).click()
@@ -41,42 +37,33 @@ test.describe.serial('Issue verifiable credential', () => {
       .getByText('Issue a verifiable credential', { exact: true })
       .click()
   }
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const motherInformantRes = await createDeclaration(token)
+  const motherInformantDeclaration = motherInformantRes.declaration
+  const motherInformantChildName = formatV2ChildName(motherInformantDeclaration)
 
-    const motherInformantRes = await createDeclaration(token)
-    motherInformantDeclaration = motherInformantRes.declaration
-    motherInformantChildName = formatV2ChildName(motherInformantDeclaration)
-
-    const nonParentInformantDec = await getDeclaration({
-      token,
-      informantRelation: 'BROTHER'
-    })
-
-    const nonParentInformantRes = await createDeclaration(
-      token,
-      nonParentInformantDec
-    )
-    nonParentInformantDeclaration = nonParentInformantRes.declaration
-    nonParentInformantChildName = formatV2ChildName(
-      nonParentInformantDeclaration
-    )
-
-    page = await browser.newPage()
+  const nonParentInformantDec = await getDeclaration({
+    token,
+    informantRelation: 'BROTHER'
   })
 
-  test.afterAll(async () => {
-    await page?.close()
-  })
+  const nonParentInformantRes = await createDeclaration(
+    token,
+    nonParentInformantDec
+  )
+  const nonParentInformantDeclaration = nonParentInformantRes.declaration
+  const nonParentInformantChildName = formatV2ChildName(
+    nonParentInformantDeclaration
+  )
 
-  test('Log in and navigate to mother informant record', async () => {
+  await test.step('Log in and navigate to mother informant record', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     await searchFromSearchBar(page, motherInformantChildName)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
-  test('Requester dropdown spec: mother informant only shows mother (and father if available)', async () => {
+  await test.step('Requester dropdown spec: mother informant only shows mother (and father if available)', async () => {
     await openIssueVerifiableCredentialAction()
 
     await page.locator('#requester____type').click()
@@ -115,7 +102,7 @@ test.describe.serial('Issue verifiable credential', () => {
     await verifiableCredentialResponse
   })
 
-  test('Requester dropdown spec: non-parent informant shows available parent(s) plus informant relation', async () => {
+  await test.step('Requester dropdown spec: non-parent informant shows available parent(s) plus informant relation', async () => {
     await navigateToWorkqueue(page, 'Pending certification')
     await searchFromSearchBar(page, nonParentInformantChildName)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
@@ -153,7 +140,7 @@ test.describe.serial('Issue verifiable credential', () => {
     await verifiableCredentialResponse
   })
 
-  test('Show verifiable credential QR code in Birth Certificate', async () => {
+  await test.step('Show verifiable credential QR code in Birth Certificate', async () => {
     await navigateToWorkqueue(page, 'Pending certification')
     await searchFromSearchBar(page, motherInformantChildName)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)

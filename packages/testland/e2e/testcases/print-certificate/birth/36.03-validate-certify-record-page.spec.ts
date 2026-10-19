@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
 import {
@@ -29,35 +29,24 @@ import {
 } from '@e2e/support/utils'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
-test.describe.serial('3.0 Validate "Certify record" page', () => {
-  let eventId: string
-  let declaration: Declaration
-  let page: Page
-  let trackingId: string | undefined
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    eventId = res.eventId
-    declaration = res.declaration
-    trackingId = res.trackingId
-    page = await browser.newPage()
-  })
+test('3.0 Validate "Certify record" page', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const eventId = res.eventId
+  const declaration = res.declaration
+  const trackingId = res.trackingId
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('3.0.1 Log in', async () => {
+  await test.step('3.0.1 Log in', async () => {
     await login(page)
   })
 
-  test('3.0.2 Navigate to certificate print action', async () => {
+  await test.step('3.0.2 Navigate to certificate print action', async () => {
     await searchFromSearchBar(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Print')
   })
 
-  test('3.1 should navigate to Verify their identity page', async () => {
+  await test.step('3.1 should navigate to Verify their identity page', async () => {
     await expectInUrl(page, `/print-certificate/${eventId}/pages/collector`)
 
     await selectCertificationType(page, 'Birth Certificate')
@@ -70,7 +59,7 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     )
   })
 
-  test('3.2 should see informant Id, names, nationality and dob', async () => {
+  await test.step('3.2 should see informant Id, names, nationality and dob', async () => {
     await expectInUrl(
       page,
       `/print-certificate/${eventId}/pages/collector.identity.verify`
@@ -97,7 +86,7 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     await expect(page.getByRole('button', { name: 'Verified' })).toBeVisible()
   })
 
-  test('3.3 should navigate to collect payment page on "Verified" button click', async () => {
+  await test.step('3.3 should navigate to collect payment page on "Verified" button click', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
 
     await expect(page.locator('#content-name')).toContainText('Collect Payment')
@@ -113,7 +102,7 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     await page.getByRole('button', { name: 'Back' }).click()
   })
 
-  test('3.4 should open warning modal on "Identity does not match" button click', async () => {
+  await test.step('3.4 should open warning modal on "Identity does not match" button click', async () => {
     await page.getByRole('button', { name: 'Identity does not match' }).click()
     await expect(page.getByRole('dialog')).toContainText(
       'Print without proof of ID?'
@@ -123,7 +112,7 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     )
   })
 
-  test('3.5 click warning modal cancel button should close the modal', async () => {
+  await test.step('3.5 click warning modal cancel button should close the modal', async () => {
     await page.getByRole('button', { name: 'Cancel' }).click()
     await expect(page.getByRole('dialog')).toBeHidden()
     await expectInUrl(
@@ -132,7 +121,7 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     )
   })
 
-  test('3.6 click warning modal confirm button should take to payment page', async () => {
+  await test.step('3.6 click warning modal confirm button should take to payment page', async () => {
     await page.getByRole('button', { name: 'Identity does not match' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
     await expect(page.locator('#content-name')).toContainText('Collect Payment')
@@ -146,11 +135,11 @@ test.describe.serial('3.0 Validate "Certify record" page', () => {
     )
   })
 
-  test('3.7 Print', async () => {
+  await test.step('3.7 Print', async () => {
     await printAndExpectPopup(page)
   })
 
-  test('3.8 Validate Certified -modal', async () => {
+  await test.step('3.8 Validate Certified -modal', async () => {
     if (!trackingId) {
       throw new Error('Tracking ID is undefined')
     }

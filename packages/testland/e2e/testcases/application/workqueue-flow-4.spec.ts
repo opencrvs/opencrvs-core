@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { faker } from '@faker-js/faker'
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -28,30 +28,22 @@ import {
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 // HO Declares => RO Validates => Registrar Registers
-test.describe.serial('4. Workqueue flow - 4', () => {
-  let page: Page
+test('4. Workqueue flow - 4', async ({ page }) => {
+  test.setTimeout(360_000)
+
   const declaration = generateBirthInputs({
     includeOptionalFields: false,
     placeOfBirth: 'Other'
   })
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('4.1 Declare by CL', async () => {
+    await login(page, CREDENTIALS.COMMUNITY_LEADER)
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.describe('4.1 Declare by CL', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.COMMUNITY_LEADER)
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('4.1.1 Fill child details', async () => {
+    await test.step('4.1.1 Fill child details', async () => {
       await page.locator('#firstname').fill(declaration.child.name.firstNames)
       await page.locator('#surname').fill(declaration.child.name.familyName)
       await page.locator('#child____gender').click()
@@ -71,7 +63,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       await continueForm(page)
     })
 
-    test('4.1.2 Fill informant details', async () => {
+    await test.step('4.1.2 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informantType, {
@@ -84,7 +76,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       await continueForm(page)
     })
 
-    test("4.1.3 Fill mother's details", async () => {
+    await test.step("4.1.3 Fill mother's details", async () => {
       await page.locator('#firstname').fill(declaration.mother.name.firstNames)
       await page.locator('#surname').fill(declaration.mother.name.familyName)
 
@@ -128,7 +120,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       await continueForm(page)
     })
 
-    test("4.1.4 Fill father's details", async () => {
+    await test.step("4.1.4 Fill father's details", async () => {
       await page.locator('#firstname').fill(declaration.father.name.firstNames)
       await page.locator('#surname').fill(declaration.father.name.familyName)
 
@@ -151,11 +143,11 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       await page.locator('#father____addressSameAs_YES').click()
     })
 
-    test('4.1.5 Go to review', async () => {
+    await test.step('4.1.5 Go to review', async () => {
       await goToSection(page, 'review')
     })
 
-    test('4.1.6 Fill up informant comment & signature', async () => {
+    await test.step('4.1.6 Fill up informant comment & signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -167,11 +159,11 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
     })
 
-    test('4.1.7 Declare', async () => {
+    await test.step('4.1.7 Declare', async () => {
       await triggerDeclarationAction(page, 'Declare')
     })
 
-    test('4.1.8 Verify workqueue', async () => {
+    await test.step('4.1.8 Verify workqueue', async () => {
       await assertRecordInWorkqueue({
         page,
         name: formatName(declaration.child.name),
@@ -183,7 +175,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test('4.2 Workqueue for Registrar', async () => {
+  await test.step('4.2 Workqueue for Registrar', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
 
     await assertRecordInWorkqueue({
@@ -207,8 +199,8 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test.describe('4.3 Validate by RO', async () => {
-    test('4.3.1 Verify workqueue', async () => {
+  await test.step('4.3 Validate by RO', async () => {
+    await test.step('4.3.1 Verify workqueue', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await assertRecordInWorkqueue({
@@ -229,7 +221,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       })
     })
 
-    test('4.3.2 Validate', async () => {
+    await test.step('4.3.2 Validate', async () => {
       await page.getByText('Pending validation').click()
 
       await openRecordByTitle(page, formatName(declaration.child.name))
@@ -257,7 +249,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test('4.4 CL can not see the validated record', async () => {
+  await test.step('4.4 CL can not see the validated record', async () => {
     await login(page, CREDENTIALS.COMMUNITY_LEADER, true)
 
     await assertRecordInWorkqueue({
@@ -270,8 +262,8 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test.describe('4.5 Register by Registrar', async () => {
-    test('4.5.1 Validate workqueue', async () => {
+  await test.step('4.5 Register by Registrar', async () => {
+    await test.step('4.5.1 Validate workqueue', async () => {
       await login(page, CREDENTIALS.REGISTRAR, true)
 
       await assertRecordInWorkqueue({
@@ -295,7 +287,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
       })
     })
 
-    test('4.5.2 Register', async () => {
+    await test.step('4.5.2 Register', async () => {
       await page.getByText('Pending registration').click()
 
       await openRecordByTitle(page, formatName(declaration.child.name))
@@ -325,7 +317,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test('4.6 CL can not see the registered record', async () => {
+  await test.step('4.6 CL can not see the registered record', async () => {
     await login(page, CREDENTIALS.COMMUNITY_LEADER, true)
 
     await assertRecordInWorkqueue({
@@ -338,7 +330,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test('4.7 Workqueue for RO', async () => {
+  await test.step('4.7 Workqueue for RO', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER, true)
 
     await assertRecordInWorkqueue({

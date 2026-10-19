@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import {
   login,
@@ -35,34 +35,22 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 import { faker } from '@faker-js/faker'
 
-test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
-  let page: Page
-  let declaration: Declaration
-  let eventId: string
+test('4(b) Validate "Pending updates"-workqueue for RO', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
+  const res = await createDeclaration(token, undefined, ActionType.DECLARE)
+  const declaration = res.declaration
+  const eventId = res.eventId
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
-    const res = await createDeclaration(token, undefined, ActionType.DECLARE)
-    declaration = res.declaration
-    eventId = res.eventId
-
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('4.0.1 Login', async () => {
+  await test.step('4.0.1 Login', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
   })
 
-  test('4.0.2 Navigate to record audit', async () => {
+  await test.step('4.0.2 Navigate to record audit', async () => {
     await page.getByText('Pending registration').click()
     await openRecordByTitle(page, formatV2ChildName(declaration))
   })
 
-  test('4.0.3 Reject a declaration', async () => {
+  await test.step('4.0.3 Reject a declaration', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Reject')
 
@@ -77,7 +65,7 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
     await rejectResponse
   })
 
-  test('4.1 Go to "Pending updates"-workqueue', async () => {
+  await test.step('4.1 Go to "Pending updates"-workqueue', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
     await page.getByText('Pending updates').click()
@@ -89,7 +77,7 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
     )
   })
 
-  test('4.2 validate the list', async () => {
+  await test.step('4.2 validate the list', async () => {
     const header = page.getByTestId('workqueue-table-header')
     const columns = await header.locator(':scope > div').allInnerTexts()
     expect(columns).toStrictEqual([
@@ -111,7 +99,7 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
     )
   })
 
-  test('4.3 Click a name', async () => {
+  await test.step('4.3 Click a name', async () => {
     await openRecordByTitle(page, formatV2ChildName(declaration))
 
     // User should navigate to record audit page
@@ -121,12 +109,12 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
     )
   })
 
-  test('4.4 Click Edit -action', async () => {
+  await test.step('4.4 Click Edit -action', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
     await selectAction(page, 'Edit')
   })
 
-  test('4.5 Complete declare with edits action', async () => {
+  await test.step('4.5 Complete declare with edits action', async () => {
     await page.getByTestId('change-button-child.weightAtBirth').click()
     await page.getByTestId('number__child____weightAtBirth').fill('2.6')
     await page.getByRole('button', { name: 'Go to review' }).click()
@@ -141,7 +129,7 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
     ).not.toBeVisible()
   })
 
-  test('4.6 Assert record has correct flags', async () => {
+  await test.step('4.6 Assert record has correct flags', async () => {
     await navigateToWorkqueue(page, 'Recent')
     await openRecordByTitle(page, formatV2ChildName(declaration))
     await expect(page.getByTestId('flags-value')).toHaveText('Validated')

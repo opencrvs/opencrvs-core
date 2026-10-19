@@ -34,11 +34,12 @@ import {
   waitForCorrectionAction
 } from '@e2e/support/utils'
 
-test.describe.serial(' Correct record - 3', () => {
+test(' Correct record - 3', async ({ page }) => {
+  test.setTimeout(300_000)
+
   let declaration: DeclarationV2
   let trackingId: string
   let eventId: string
-  let page: Page
 
   const updatedMotherDetails = {
     firstNames: faker.person.firstName('female'),
@@ -92,15 +93,7 @@ test.describe.serial(' Correct record - 3', () => {
     col3 && (await expect(_page.getByText(col3, { exact: true })).toBeVisible())
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('3.0 Shortcut declaration', async () => {
+  await test.step('3.0 Shortcut declaration', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
 
     const res = await createDeclarationV2(
@@ -157,8 +150,8 @@ test.describe.serial(' Correct record - 3', () => {
     expect(declaration).toBeDefined()
   })
 
-  test.describe('3.1 Print > Event overview', async () => {
-    test('3.1.1 Print', async () => {
+  await test.step('3.1 Print > Event overview', async () => {
+    await test.step('3.1.1 Print', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await auditRecord({
@@ -192,13 +185,13 @@ test.describe.serial(' Correct record - 3', () => {
       await expectInUrl(page, `/events/${eventId}`)
     })
 
-    test('3.1.2 Record audit', async () => {
+    await test.step('3.1.2 Record audit', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
       await selectAction(page, 'Correct')
     })
   })
 
-  test('3.2 Correction requester: child', async () => {
+  await test.step('3.2 Correction requester: child', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Informant (Mother)', { exact: true }).click()
 
@@ -212,7 +205,7 @@ test.describe.serial(' Correct record - 3', () => {
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
   })
 
-  test('3.3 Verify identity', async () => {
+  await test.step('3.3 Verify identity', async () => {
     /*
      * Expected result: should Confirm
      * First Name
@@ -271,9 +264,9 @@ test.describe.serial(' Correct record - 3', () => {
     await expectInUrl(page, 'review')
   })
 
-  test.describe('3.4 Make correction', async () => {
-    test.describe('3.4.1 Make correction on mother details', async () => {
-      test('3.4.1 Change name', async () => {
+  await test.step('3.4 Make correction', async () => {
+    await test.step('3.4.1 Make correction on mother details', async () => {
+      await test.step('3.4.1 Change name', async () => {
         await page.getByTestId('change-button-mother.name').click()
 
         /*
@@ -317,7 +310,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       })
 
-      test('3.4.2 Change age', async () => {
+      await test.step('3.4.2 Change age', async () => {
         await page.getByTestId('change-button-mother.dob').click()
 
         /*
@@ -356,7 +349,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toHaveText('-')
       })
 
-      test('3.4.3 Change nationality', async () => {
+      await test.step('3.4.3 Change nationality', async () => {
         await page.getByTestId('change-button-mother.nationality').click()
 
         /*
@@ -395,7 +388,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       })
 
-      test('3.4.4 Change id type', async () => {
+      await test.step('3.4.4 Change id type', async () => {
         await page.getByTestId('change-button-mother.idType').click()
 
         /*
@@ -432,7 +425,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       })
 
-      test('3.4.5 Change passport', async () => {
+      await test.step('3.4.5 Change passport', async () => {
         await expect(
           await page.getByTestId('mother.passport-value').getByText('Required')
         ).toBeVisible()
@@ -474,7 +467,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       })
 
-      test('3.4.6 Change usual place of residence', async () => {
+      await test.step('3.4.6 Change usual place of residence', async () => {
         await page.getByTestId('change-button-mother.address').click()
 
         /*
@@ -589,7 +582,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       }) // <-- Add this closing brace for test('3.4.6 Change usual place of residence')
 
-      test('3.4.7 Change marital status', async () => {
+      await test.step('3.4.7 Change marital status', async () => {
         await page.getByTestId('change-button-mother.maritalStatus').click()
 
         /*
@@ -630,7 +623,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       })
 
-      test('3.4.8 Change level of education', async () => {
+      await test.step('3.4.8 Change level of education', async () => {
         await page
           .getByTestId('change-button-mother.educationalAttainment')
           .click()
@@ -671,7 +664,7 @@ test.describe.serial(' Correct record - 3', () => {
         ).toBeVisible()
       })
     })
-    test('3.4.2 Change place of delivery', async () => {
+    await test.step('3.4.2 Change place of delivery', async () => {
       await page.getByTestId('change-button-child.placeOfBirth').click()
 
       /*
@@ -758,7 +751,7 @@ test.describe.serial(' Correct record - 3', () => {
     })
   })
 
-  test('3.7 Correction summary', async () => {
+  await test.step('3.7 Correction summary', async () => {
     /*
      * Expected result: should
      * - navigate to correction summary
@@ -933,16 +926,10 @@ test.describe.serial(' Correct record - 3', () => {
     ).toBeVisible()
   })
 
-  test.describe.serial('3.8 Correction Approval', async () => {
-    test.beforeAll(async ({ browser }) => {
-      await page.close()
+  await test.step('3.8 Correction Approval', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
 
-      page = await browser.newPage()
-
-      await login(page, CREDENTIALS.REGISTRAR)
-    })
-
-    test('3.8.1 Record audit by Registrar', async () => {
+    await test.step('3.8.1 Record audit by Registrar', async () => {
       await auditRecord({
         page,
         name: `${formatV2ChildName(declaration)}`,
@@ -962,7 +949,7 @@ test.describe.serial(' Correct record - 3', () => {
       await selectAction(page, 'Review correction request')
       await visible(page, 'Correction request')
     })
-    test('3.8.2 Correction request summary screen', async () => {
+    await test.step('3.8.2 Correction request summary screen', async () => {
       // Header assertions
       await visible(page, 'Requester', 'Informant (Mother)')
       await visible(
@@ -1103,7 +1090,7 @@ test.describe.serial(' Correct record - 3', () => {
       // 📝 Add more assertions here if the page changes after approval (modal, redirect, etc.)
     })
 
-    test('3.8.3 Approve correction', async () => {
+    await test.step('3.8.3 Approve correction', async () => {
       await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
       await waitForCorrectionAction(page, 'approve', async () => {
@@ -1113,11 +1100,11 @@ test.describe.serial(' Correct record - 3', () => {
       await expectInUrl(page, `events/${eventId}`)
     })
 
-    test('3.8.4 Assign record', async () => {
+    await test.step('3.8.4 Assign record', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     })
 
-    test('3.8.5 Validate history in record audit', async () => {
+    await test.step('3.8.5 Validate history in record audit', async () => {
       await page.getByRole('button', { name: 'Audit' }).click()
 
       /*

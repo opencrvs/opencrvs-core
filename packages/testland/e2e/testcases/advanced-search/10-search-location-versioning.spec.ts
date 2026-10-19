@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { login } from '@e2e/support/helpers'
 import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
@@ -27,30 +27,14 @@ function formatDeceasedName(declaration: {
   return `${firstname} ${surname}`
 }
 
-test.describe.serial('Advanced search - inactive registration office', () => {
-  let page: Page
-  let officeName: string
-  let birth: Awaited<
-    ReturnType<typeof registerDeclarationsThenDeactivateOffice>
-  >['birth']
-  let death: Awaited<
-    ReturnType<typeof registerDeclarationsThenDeactivateOffice>
-  >['death']
+test('Advanced search - inactive registration office', async ({ page }) => {
+  test.setTimeout(180_000)
+  const result = await registerDeclarationsThenDeactivateOffice(page)
+  const officeName = result.officeName
+  const birth = result.birth
+  const death = result.death
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-
-    const result = await registerDeclarationsThenDeactivateOffice(page)
-    officeName = result.officeName
-    birth = result.birth
-    death = result.death
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('0 - Log in as a nationally-scoped user and load advanced search', async () => {
+  await test.step('0 - Log in as a nationally-scoped user and load advanced search', async () => {
     // Registrar General's `record.search` scope has no jurisdiction
     // restriction — needed since this office is created fresh, not tied to
     // any specific pre-seeded jurisdiction.
@@ -59,7 +43,7 @@ test.describe.serial('Advanced search - inactive registration office', () => {
     await expect(page).toHaveURL(/.*\/advanced-search/)
   })
 
-  test('1 - Inactive office appears in Place of Registration filter and finds the birth record', async () => {
+  await test.step('1 - Inactive office appears in Place of Registration filter and finds the birth record', async () => {
     await page.getByText('Birth').click()
     await page.getByText('Registration details').click()
 
@@ -88,7 +72,7 @@ test.describe.serial('Advanced search - inactive registration office', () => {
     })
   })
 
-  test('2 - Inactive office appears in Place of Registration filter and finds the death record', async () => {
+  await test.step('2 - Inactive office appears in Place of Registration filter and finds the death record', async () => {
     await page.goto(CLIENT_URL)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
@@ -121,36 +105,18 @@ test.describe.serial('Advanced search - inactive registration office', () => {
   })
 })
 
-test.describe.serial('Advanced search - inactive health facilities', () => {
-  let page: Page
+test('Advanced search - inactive health facilities', async ({ page }) => {
+  test.setTimeout(180_000)
+  const birthFacility = await createBirthRegisteredWithInactiveFacility()
+  const deathFacility = await createDeathRegisteredWithInactiveFacility()
 
-  let birthFacility: Awaited<
-    ReturnType<typeof createBirthRegisteredWithInactiveFacility>
-  >
-  let deathFacility: Awaited<
-    ReturnType<typeof createDeathRegisteredWithInactiveFacility>
-  >
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-
-    birthFacility = await createBirthRegisteredWithInactiveFacility()
-    deathFacility = await createDeathRegisteredWithInactiveFacility()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('0 - Log in and load advanced search', async () => {
+  await test.step('0 - Log in and load advanced search', async () => {
     await login(page, CREDENTIALS.REGISTRAR_GENERAL)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
   })
 
-  test('1 - Inactive health facility appears in Place of Delivery filter and finds the birth record', async () => {
-    test.setTimeout(10000)
-
+  await test.step('1 - Inactive health facility appears in Place of Delivery filter and finds the birth record', async () => {
     await page.getByText('Birth').click()
     await page.getByText('Event details').click()
 
@@ -186,7 +152,7 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
     })
   })
 
-  test('2 - Inactive health facility appears in Place of Delivery filter and finds the death record', async () => {
+  await test.step('2 - Inactive health facility appears in Place of Delivery filter and finds the death record', async () => {
     await page.goto(CLIENT_URL)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
@@ -224,33 +190,25 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
   })
 })
 
-test.describe
-  .serial('Advanced search - inactive admin area excluded from address filter', () => {
-  let page: Page
-  let areaName: string
+test('Advanced search - inactive admin area excluded from address filter', async ({
+  page
+}) => {
+  test.setTimeout(180_000)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
+  // Record itself isn't asserted on here — the filter should hide the
+  // inactive admin area as a search option regardless, but exercising the
+  // full notify flow confirms nothing breaks when a real record actually
+  // holds an inactive location in this field.
+  const result = await createBirthNotifiedInactiveAddress()
+  const areaName = result.areaName
 
-    // Record itself isn't asserted on here — the filter should hide the
-    // inactive admin area as a search option regardless, but exercising the
-    // full notify flow confirms nothing breaks when a real record actually
-    // holds an inactive location in this field.
-    const result = await createBirthNotifiedInactiveAddress()
-    areaName = result.areaName
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('0 - Log in and load advanced search', async () => {
+  await test.step('0 - Log in and load advanced search', async () => {
     await login(page, CREDENTIALS.REGISTRAR_GENERAL)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
   })
 
-  test('1 - Inactive admin area is hidden from the Other address filter', async () => {
+  await test.step('1 - Inactive admin area is hidden from the Other address filter', async () => {
     await page.getByText('Birth').click()
     await page.getByText('Event details').click()
 
