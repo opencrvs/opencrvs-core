@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { faker } from '@faker-js/faker'
+import { notifyChildDetailsViaApi } from '@e2e/support/test-data/api-actions'
 import { test, expect } from '@playwright/test'
 import {
   continueForm,
-  drawSignature,
   formatName,
-  goToSection,
+  getToken,
   login,
   triggerDeclarationAction
 } from '@e2e/support/helpers'
@@ -36,52 +36,11 @@ test('5. Workqueue flow - 5', async ({ page }) => {
   const childName = formatName(declaration.child.name)
 
   await test.step('5.1 Notify by HO', async () => {
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-
-    await test.step('5.1.1 Fill child details', async () => {
-      await page.locator('#firstname').fill(declaration.child.name.firstNames)
-      await page.locator('#surname').fill(declaration.child.name.familyName)
-      await page.locator('#child____gender').click()
-      await page.getByText(declaration.child.gender, { exact: true }).click()
-
-      await page.getByPlaceholder('dd').fill(declaration.child.birthDate.dd)
-      await page.getByPlaceholder('mm').fill(declaration.child.birthDate.mm)
-      await page.getByPlaceholder('yyyy').fill(declaration.child.birthDate.yyyy)
-
-      await page.locator('#child____placeOfBirth').click()
-      await page
-        .getByText(declaration.placeOfBirth, {
-          exact: true
-        })
-        .click()
-      await page
-        .locator('#child____birthLocation')
-        .fill(declaration.birthLocation.facility.slice(0, 3))
-      await page.getByText(declaration.birthLocation.facility).click()
-    })
-
-    await test.step('5.1.2 Go to review', async () => {
-      await goToSection(page, 'review')
-    })
-
-    await test.step('5.1.3 Fill up informant comment & signature', async () => {
-      await page.locator('#review____comment').fill(faker.lorem.sentence())
-      await page.getByRole('button', { name: 'Sign', exact: true }).click()
-      await drawSignature(page, 'review____signature_canvas_element', false)
-      await page
-        .locator('#review____signature_modal')
-        .getByRole('button', { name: 'Apply' })
-        .click()
-
-      await expect(page.getByRole('dialog')).not.toBeVisible()
-    })
-
-    await test.step('5.1.4 Notify', async () => {
-      await triggerDeclarationAction(page, 'Notify')
+    await test.step('5.1.1 Notify child details via API', async () => {
+      await notifyChildDetailsViaApi(
+        await getToken(CREDENTIALS.HOSPITAL_OFFICIAL),
+        declaration
+      )
     })
   })
 

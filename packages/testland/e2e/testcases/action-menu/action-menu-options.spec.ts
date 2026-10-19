@@ -18,7 +18,8 @@ import {
 } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { archiveViaApi } from '@e2e/support/test-data/api-actions'
 
 async function getActionMenuOptions(page: Page, declaration: Declaration) {
   await searchFromSearchBar(page, formatV2ChildName(declaration))
@@ -143,34 +144,19 @@ test.describe('Action menu options', () => {
   })
 
   test('Event status: ARCHIVED', async ({ page }) => {
-    test.setTimeout(180_000)
-
     const token = await getToken(CREDENTIALS.REGISTRAR)
-    const { declaration } = await createDeclaration(
+    const { declaration, eventId } = await createDeclaration(
       token,
       undefined,
       ActionType.DECLARE
     )
 
-    await test.step('Archive declaration', async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-      await searchFromSearchBar(page, formatV2ChildName(declaration))
-
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-      await selectAction(page, 'Archive')
-
-      const archiveResponse = page.waitForResponse(
-        (res) => res.url().includes('event.actions.archive') && res.ok()
-      )
-
-      await page.getByRole('button', { name: 'Archive' }).click()
-      await archiveResponse
+    await test.step('Archive declaration via API', async () => {
+      await archiveViaApi(token, eventId)
     })
 
-    // Still logged in as the registrar who archived the declaration.
-    // Reload so the action menu isn't built from the pre-archive cache.
     await test.step('Registrar', async () => {
-      await page.reload()
+      await login(page, CREDENTIALS.REGISTRAR)
       await expectActionMenuOptions(page, declaration, [
         'Assign',
         'Escalate',

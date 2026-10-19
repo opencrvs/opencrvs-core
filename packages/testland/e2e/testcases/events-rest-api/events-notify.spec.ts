@@ -17,6 +17,7 @@ import {
   drawSignature,
   fetchUserLocationHierarchy,
   formatName,
+  getToken,
   login,
   triggerDeclarationAction,
   switchEventTab,
@@ -171,10 +172,8 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     )
   })
 
-  test('HTTP 200 with payload containing declaration with half filled names', async ({
-    page
-  }) => {
-    const token = await login(page)
+  test('HTTP 200 with payload containing declaration with half filled names', async () => {
+    const token = await getToken(CREDENTIALS.REGISTRAR)
     const { sub } = decode<{ sub: string }>(token)
     const location = await fetchUserLocationHierarchy(sub, {
       headers: {

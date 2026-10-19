@@ -20,8 +20,11 @@ import {
   expectRowValue,
   expectRowValueWithChangeButton,
   switchEventTab,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  getEventIdFromUrl,
+  getToken
 } from '@e2e/support/helpers'
+import { customActionViaApi } from '@e2e/support/test-data/api-actions'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -33,6 +36,7 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('8. Validate declaration review page', async ({ page }) => {
   test.setTimeout(240_000)
+  let eventId = ''
 
   const declaration = {
     deceased: {
@@ -686,6 +690,7 @@ test('8. Validate declaration review page', async ({ page }) => {
     })
 
     await test.step('8.1.7 Notify', async () => {
+      eventId = getEventIdFromUrl(page)
       await triggerDeclarationAction(page, 'Notify')
     })
 
@@ -713,28 +718,14 @@ test('8. Validate declaration review page', async ({ page }) => {
   })
 
   await test.step('8.1b Attestation by Health Administrator', async () => {
-    await test.step('Health Administrator attests the notification', async () => {
-      await login(page, CREDENTIALS.HEALTH_ADMINISTRATOR)
-
-      await page.getByText('Pending attestation').click()
-      await openRecordByTitle(
-        page,
-        declaration.deceased.name.firstname +
-          ' ' +
-          declaration.deceased.name.surname
-      )
-
-      await ensureAssignedToUser(page, CREDENTIALS.HEALTH_ADMINISTRATOR)
-      await selectAction(page, 'Attest')
-      await page.locator('#comments').fill('Attested for review')
-
-      const attestResponse = page.waitForResponse(
-        (response) =>
-          response.url().includes('event.actions.custom') &&
-          response.status() === 200
-      )
-      await page.getByRole('button', { name: 'Confirm' }).click()
-      await attestResponse
+    await test.step('Health Administrator attests the notification (via API)', async () => {
+      const token = await getToken(CREDENTIALS.HEALTH_ADMINISTRATOR)
+      await customActionViaApi({
+        token,
+        eventId,
+        customActionType: 'ATTEST',
+        annotation: { comments: 'Attested for review' }
+      })
     })
   })
 

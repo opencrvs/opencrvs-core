@@ -29,7 +29,7 @@ function formatDeceasedName(declaration: {
 
 test('Advanced search - inactive registration office', async ({ page }) => {
   test.setTimeout(180_000)
-  const result = await registerDeclarationsThenDeactivateOffice(page)
+  const result = await registerDeclarationsThenDeactivateOffice()
   const officeName = result.officeName
   const birth = result.birth
   const death = result.death

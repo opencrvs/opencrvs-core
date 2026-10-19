@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import {
-  auditRecord,
-  getToken,
-  goBackToReview,
-  login
-} from '@e2e/support/helpers'
+import { auditRecord, getToken, login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration as createDeclarationV2,
@@ -31,6 +26,7 @@ import {
   waitForCorrectionAction
 } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { requestCorrectionViaApi } from '@e2e/support/test-data/api-actions'
 
 test('Request correction, escalate, then approve as Local Registrar', async ({
   page
@@ -108,81 +104,25 @@ test('Request correction, escalate, then approve as Local Registrar', async ({
     declaration = res.declaration
   })
 
+  await test.step('Request correction as Registration Agent via API', async () => {
+    await requestCorrectionViaApi({
+      token: await getToken(CREDENTIALS.REGISTRATION_OFFICER),
+      eventId,
+      declaration: { 'child.name': updatedChildDetails },
+      annotation: {
+        'requester.type': 'LEGAL_GUARDIAN',
+        'reason.option': 'MATERIAL_ERROR',
+        'requester.identity.verify': true,
+        'fees.amount': correctionFee
+      }
+    })
+  })
+
   await test.step('Login as Registration Agent', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
   })
 
-  await test.step('Navigate to record correction', async () => {
-    await auditRecord({
-      page,
-      name: formatV2ChildName(declaration),
-      trackingId
-    })
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-    await selectAction(page, 'Correct')
-  })
-
-  await test.step('Add correction requester and reason', async () => {
-    await page.locator('#requester____type').click()
-    await page.getByText('Legal Guardian', { exact: true }).click()
-    await page.locator('#reason____option').click()
-    await page
-      .getByText('Informant provided incorrect information (Material error)', {
-        exact: true
-      })
-      .click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
-
-  await test.step('Verify identity', async () => {
-    await page.getByRole('button', { name: 'Verified' }).click()
-  })
-
-  await test.step('Skip uploading documents', async () => {
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
-
-  await test.step('Add correction fee', async () => {
-    await page.locator('#fees____amount').fill(correctionFee.toString())
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
-
-  await test.step('Change child name', async () => {
-    await page.getByTestId('change-button-child.name').click()
-
-    await page
-      .getByTestId('text__firstname')
-      .fill(updatedChildDetails.firstname)
-    await page.getByTestId('text__surname').fill(updatedChildDetails.surname)
-
-    await goBackToReview(page)
-    await page.getByRole('button', { name: 'Continue' }).click()
-  })
-
-  await test.step('Submit correction request', async () => {
-    const correctionResponse = page.waitForResponse(
-      (res) =>
-        res.url().includes('event.actions.correction.request') && res.ok()
-    )
-    await page
-      .getByRole('button', { name: 'Submit correction request' })
-      .click()
-    await page.getByRole('button', { name: 'Confirm' }).click()
-
-    await correctionResponse
-    await expectInUrl(page, `events/${eventId}`)
-
-    await expect(
-      page.locator('#content-name', {
-        hasText: formatV2ChildName(declaration)
-      })
-    ).toBeVisible()
-
-    await page.getByTestId('exit-event').click()
-  })
-
-  await test.step('Navigate back to the record', async () => {
+  await test.step('Navigate to the record', async () => {
     await auditRecord({
       page,
       name: formatV2ChildName(declaration),

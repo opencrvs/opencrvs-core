@@ -10,23 +10,24 @@
  */
 import { test, expect } from '@playwright/test'
 import {
-  continueForm,
-  drawSignature,
   fillRegisterDialogRequiredFields,
   formatName,
   getRandomDate,
-  goToSection,
+  getToken,
   login,
-  logout,
   switchEventTab,
-  validateActionMenuButton,
-  triggerDeclarationAction
+  validateActionMenuButton
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import {
+  createDeclaration,
+  getDeclaration
+} from '@e2e/support/test-data/birth-declaration'
+import { ActionType, AddressType } from '@opencrvs/toolkit/events'
 
 test('Add mother details on review', async ({ page }) => {
   test.setTimeout(240_000)
@@ -36,204 +37,70 @@ test('Add mother details on review', async ({ page }) => {
       name: {
         firstNames: faker.person.firstName() + '-Peter',
         familyName: faker.person.lastName()
-      },
-      gender: 'Unknown',
-      birthDate: getRandomDate(0, 200)
-    },
-    attendantAtBirth: 'Other paramedical personnel',
-    birthType: 'Quadruplet',
-    placeOfBirth: 'Other',
-    birthLocation: {
-      country: 'Farajaland',
-      province: 'Central',
-      district: 'Ibombo',
-      town: faker.location.city(),
-      residentialArea: faker.location.county(),
-      street: faker.location.street(),
-      number: faker.location.buildingNumber(),
-      postcodeOrZip: faker.location.zipCode()
+      }
     },
     mother: {
       name: {
         firstNames: faker.person.firstName('female'),
         familyName: faker.person.lastName('female')
       },
-      age: 25,
-      nationality: 'Farajaland',
-      identifier: {
-        type: 'None'
-      },
-      address: {
-        country: 'Guam',
-        state: faker.location.state(),
-        district: faker.location.county(),
-        town: faker.location.city(),
-        addressLine1: faker.location.county(),
-        addressLine2: faker.location.street(),
-        addressLine3: faker.location.buildingNumber(),
-        postcodeOrZip: faker.location.zipCode()
-      },
-      maritalStatus: 'Divorced',
-      levelOfEducation: 'Tertiary'
+      age: 25
     },
     father: {
       name: {
         firstNames: faker.person.firstName('male'),
         familyName: faker.person.lastName('male')
       },
-      birthDate: getRandomDate(22, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        type: 'None'
-      },
-      maritalStatus: 'Divorced',
-      levelOfEducation: 'Tertiary',
-      address: {
-        sameAsMother: false,
-        country: 'Grenada',
-        state: faker.location.state(),
-        district: faker.location.county(),
-        town: faker.location.city(),
-        addressLine1: faker.location.county(),
-        addressLine2: faker.location.street(),
-        addressLine3: faker.location.buildingNumber(),
-        postcodeOrZip: faker.location.zipCode()
-      }
+      birthDate: getRandomDate(22, 200)
     }
   }
 
-  await test.step('Declaration started by RO', async () => {
-    await test.step('Login as RO', async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
-    })
+  await test.step('Declaration by RO (via API): grandmother as informant, mother details not available', async () => {
+    const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
+    const base = await getDeclaration({ token, informantRelation: 'BROTHER' })
+    const village = base['mother.address'].administrativeArea
+    const {
+      'mother.name': _motherName,
+      'mother.dob': _motherDob,
+      'mother.nationality': _motherNationality,
+      'mother.idType': _motherIdType,
+      'mother.nid': _motherNid,
+      'mother.address': _motherAddress,
+      'father.reason': _fatherReason,
+      ...rest
+    } = base
 
-    await test.step('Initiate birth declaration', async () => {
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    await test.step('Fill child details', async () => {
-      await page.locator('#firstname').fill(declaration.child.name.firstNames)
-      await page.locator('#surname').fill(declaration.child.name.familyName)
-      await page.locator('#child____gender').click()
-      await page.getByText(declaration.child.gender, { exact: true }).click()
-
-      await page.getByPlaceholder('dd').fill(declaration.child.birthDate.dd)
-      await page.getByPlaceholder('mm').fill(declaration.child.birthDate.mm)
-      await page.getByPlaceholder('yyyy').fill(declaration.child.birthDate.yyyy)
-
-      await page.locator('#child____placeOfBirth').click()
-      await page
-        .getByText(declaration.placeOfBirth, {
-          exact: true
-        })
-        .click()
-
-      // Province and district are disabled because the user jurisdiction is limited to user's administrative area
-      await expect(
-        page.locator('#child____birthLocation____other-form-input #province')
-      ).toBeDisabled()
-
-      await expect(
-        page.locator('#child____birthLocation____other-form-input #district')
-      ).toBeDisabled()
-
-      await page.locator('#town').fill(declaration.birthLocation.town)
-      await page
-        .locator('#residentialArea')
-        .fill(declaration.birthLocation.residentialArea)
-      await page.locator('#street').fill(declaration.birthLocation.street)
-      await page.locator('#number').fill(declaration.birthLocation.number)
-      await page
-        .locator('#zipCode')
-        .fill(declaration.birthLocation.postcodeOrZip)
-
-      await page.locator('#child____attendantAtBirth').click()
-      await page
-        .getByText(declaration.attendantAtBirth, {
-          exact: true
-        })
-        .click()
-      await page.locator('#child____birthType').click()
-      await page
-        .getByText(declaration.birthType, {
-          exact: true
-        })
-        .click()
-
-      await continueForm(page)
-    })
-
-    await test.step('Select Grandmother as informant', async () => {
-      await page.locator('#informant____relation').click()
-      await page.getByText('Grandmother', { exact: true }).click()
-      await page.getByText('Exact date of birth unknown').click()
-      await page
-        .locator('#informant____age')
-        .fill(faker.number.int({ min: 18, max: 100 }).toString())
-
-      await page.locator('#firstname').fill(faker.person.firstName())
-      await page.locator('#surname').fill(faker.person.lastName())
-
-      await page.locator('#informant____idType').click()
-      await page.getByText('None', { exact: true }).click()
-      await page.locator('#informant____email').fill(faker.internet.email())
-      await continueForm(page)
-    })
-
-    await test.step('Mark mothers details as not available', async () => {
-      await page.getByLabel("Mother's details are not available").check()
-      await page.locator('#mother____reason').fill(faker.lorem.sentence())
-
-      await continueForm(page)
-    })
-
-    await test.step('Fill fathers details', async () => {
-      await page.locator('#firstname').fill(declaration.father.name.firstNames)
-      await page.locator('#surname').fill(declaration.father.name.familyName)
-
-      await page.getByPlaceholder('dd').fill(declaration.father.birthDate.dd)
-      await page.getByPlaceholder('mm').fill(declaration.father.birthDate.mm)
-      await page
-        .getByPlaceholder('yyyy')
-        .fill(declaration.father.birthDate.yyyy)
-
-      await page.locator('#father____idType').click()
-      await page
-        .getByText(declaration.father.identifier.type, { exact: true })
-        .click()
-    })
-
-    await test.step('Go to review', async () => {
-      await goToSection(page, 'review')
-    })
-
-    await test.step('Fill up signature and comment', async () => {
-      await page.locator('#review____comment').fill(faker.lorem.sentence())
-      await page.getByRole('button', { name: 'Sign', exact: true }).click()
-      await drawSignature(page, 'review____signature_canvas_element', false)
-      await page
-        .locator('#review____signature_modal')
-        .getByRole('button', { name: 'Apply' })
-        .click()
-
-      await expect(page.getByRole('dialog')).not.toBeVisible()
-    })
-
-    await test.step('Declare', async () => {
-      await triggerDeclarationAction(page, 'Declare')
-
-      await page.getByText('Recent').click()
-
-      await openRecordByTitle(page, formatName(declaration.child.name))
-    })
+    await createDeclaration(
+      token,
+      {
+        ...rest,
+        'child.name': {
+          firstname: declaration.child.name.firstNames,
+          surname: declaration.child.name.familyName
+        },
+        'informant.relation': 'GRANDMOTHER',
+        'mother.detailsNotAvailable': true,
+        'mother.reason': faker.lorem.sentence(),
+        'father.detailsNotAvailable': false,
+        'father.name': {
+          firstname: declaration.father.name.firstNames,
+          surname: declaration.father.name.familyName
+        },
+        'father.dob': `${declaration.father.birthDate.yyyy}-${declaration.father.birthDate.mm}-${declaration.father.birthDate.dd}`,
+        'father.nationality': 'FAR',
+        'father.idType': 'NONE',
+        'father.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: village
+        }
+      },
+      ActionType.DECLARE
+    )
   })
 
   await test.step('Declaration Review by Registrar', async () => {
     await test.step('Navigate to the declaration Edit-action', async () => {
-      await logout(page)
       await login(page, CREDENTIALS.REGISTRAR_VILLAGE)
 
       await page.getByText('Pending registration').click()

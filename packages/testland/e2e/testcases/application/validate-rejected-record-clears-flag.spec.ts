@@ -15,20 +15,16 @@ import { CREDENTIALS } from '@e2e/support/constants'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
-import {
-  ensureAssignedToUser,
-  navigateToWorkqueue,
-  selectAction
-} from '@e2e/support/utils'
+import { ensureAssignedToUser, navigateToWorkqueue } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
-import { faker } from '@faker-js/faker'
+import { rejectViaApi } from '@e2e/support/test-data/api-actions'
 
 test('Validating a rejected declaration clears the Rejected flag', async ({
   browser
 }) => {
   test.setTimeout(180_000) // two logins plus reject/validate round-trips can exceed the default 90s under CI load
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
-  const { declaration } = await createDeclaration(
+  const { declaration, eventId } = await createDeclaration(
     token,
     undefined,
     ActionType.DECLARE
@@ -36,22 +32,8 @@ test('Validating a rejected declaration clears the Rejected flag', async ({
   const childName = formatV2ChildName(declaration)
   const page = await browser.newPage()
 
-  await test.step('Registrar rejects the declaration (Send For Update)', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, childName)
-
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR, { timeout: 15_000 })
-    await selectAction(page, 'Reject')
-    await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
-    const rejectResponse = page.waitForResponse(
-      (res) => res.url().includes('event.actions.reject') && res.ok()
-    )
-
-    await page.getByRole('button', { name: 'Send For Update' }).click()
-
-    await rejectResponse
+  await test.step('Registrar rejects the declaration (Send For Update) via API', async () => {
+    await rejectViaApi(await getToken(CREDENTIALS.REGISTRAR), eventId)
   })
 
   await test.step('Registration Officer finds it in "Pending updates"', async () => {

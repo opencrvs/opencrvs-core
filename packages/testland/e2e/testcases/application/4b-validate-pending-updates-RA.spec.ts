@@ -25,7 +25,7 @@ import {
   getRowByTitle,
   openRecordByTitle
 } from '@e2e/support/print-certificate/birth/helpers'
-import { faker } from '@faker-js/faker'
+import { rejectViaApi } from '@e2e/support/test-data/api-actions'
 
 test('4(b) Validate "Pending updates"-workqueue for RO', async ({ page }) => {
   test.setTimeout(180_000)
@@ -34,28 +34,8 @@ test('4(b) Validate "Pending updates"-workqueue for RO', async ({ page }) => {
   const declaration = res.declaration
   const eventId = res.eventId
 
-  await test.step('4.0.1 Login', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-  })
-
-  await test.step('4.0.2 Navigate to record audit', async () => {
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-  })
-
-  await test.step('4.0.3 Reject a declaration', async () => {
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-    await selectAction(page, 'Reject')
-
-    await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
-
-    const rejectResponse = page.waitForResponse(
-      (res) => res.url().includes('event.actions.reject') && res.ok()
-    )
-
-    await page.getByRole('button', { name: 'Send For Update' }).click()
-
-    await rejectResponse
+  await test.step('4.0 Reject the declaration via API as Registrar', async () => {
+    await rejectViaApi(await getToken(CREDENTIALS.REGISTRAR), eventId)
   })
 
   await test.step('4.1 Go to "Pending updates"-workqueue', async () => {

@@ -19,8 +19,11 @@ import {
   formatDateObjectTo_dMMMMyyyy,
   expectRowValueWithChangeButton,
   expectRowValue,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  getEventIdFromUrl,
+  getToken
 } from '@e2e/support/helpers'
+import { customActionViaApi } from '@e2e/support/test-data/api-actions'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { fillDate, generateBirthInputs } from '@e2e/support/birth/helpers'
@@ -29,6 +32,7 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('8. Validate declaration review page', async ({ page }) => {
   test.setTimeout(240_000)
+  let eventId = ''
 
   const declaration = generateBirthInputs({
     includeOptionalFields: true,
@@ -809,32 +813,19 @@ test('8. Validate declaration review page', async ({ page }) => {
     })
 
     await test.step('8.1.7 Declare', async () => {
+      eventId = getEventIdFromUrl(page)
       await triggerDeclarationAction(page, 'Declare')
     })
   })
 
   await test.step('8.2 Registration Officer actions', async () => {
-    await test.step('8.2.1 Navigate to the declaration preview page', async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-      await page.getByText('Pending validation').click()
-
-      await openRecordByTitle(page, formatName(declaration.child.name))
-    })
-    await test.step('8.2.2 Validate', async () => {
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-      await triggerDeclarationAction(page, 'Validate')
-    })
-
-    await test.step('8.2.3 Confirm the declaration is in Recent-workqueue', async () => {
-      await page.getByText('Recent').click()
-
-      await expect(
-        page.getByRole('button', {
-          name: formatName(declaration.child.name)
-        })
-      ).toBeVisible()
+    await test.step('8.2.2 Validate (via API)', async () => {
+      const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
+      await customActionViaApi({
+        token,
+        eventId,
+        customActionType: 'VALIDATE_DECLARATION'
+      })
     })
   })
 

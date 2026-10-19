@@ -33,6 +33,7 @@ import {
   selectAction,
   waitForCorrectionAction
 } from '@e2e/support/utils'
+import { printCertificateViaApi } from '@e2e/support/print-certificate/birth/helpers'
 
 test(' Correct record - 3', async ({ page }) => {
   test.setTimeout(300_000)
@@ -151,7 +152,15 @@ test(' Correct record - 3', async ({ page }) => {
   })
 
   await test.step('3.1 Print > Event overview', async () => {
-    await test.step('3.1.1 Print', async () => {
+    await test.step('3.1.1 Print certificate via API', async () => {
+      await printCertificateViaApi({
+        token: await getToken(CREDENTIALS.REGISTRATION_OFFICER),
+        eventId,
+        templateId: 'v2.birth-certificate'
+      })
+    })
+
+    await test.step('3.1.2 Record audit', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await auditRecord({
@@ -160,32 +169,6 @@ test(' Correct record - 3', async ({ page }) => {
         trackingId
       })
 
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-      await page.getByRole('button', { name: 'Action' }).click()
-      await page.locator('#action-dropdownMenu').getByText('Print').click()
-
-      await page
-        .locator('#certificateTemplateId')
-        .getByText('Birth Certificate')
-      await page.locator('#collector____requesterId').click()
-      await page
-        .locator('#collector____requesterId')
-        .getByText('Print and issue to Informant (Mother)', { exact: true })
-        .click()
-
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Verified' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Yes, print certificate' }).click()
-      await page.getByRole('button', { name: 'Print', exact: true }).click()
-
-      // Wait for PDF the load and the page to be redirected to the overview page
-      await page.waitForURL(`**/events/${eventId}`)
-      await expectInUrl(page, `/events/${eventId}`)
-    })
-
-    await test.step('3.1.2 Record audit', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
       await selectAction(page, 'Correct')
     })

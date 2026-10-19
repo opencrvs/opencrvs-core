@@ -15,13 +15,13 @@ import {
   getToken,
   getAuthTokens,
   login,
-  loginWithNewUser,
   NEW_USER_PASSWORD,
   waitForAuthenticatedLanding
 } from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
 import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
+import { activateUserViaApi } from '@e2e/support/test-data/api-actions'
 
 test('Phone number changed from settings is stored as entered', async ({
   browser
@@ -60,8 +60,8 @@ test('Phone number changed from settings is stored as entered', async ({
     await client.user.create.mutate(user)
   })
 
-  await test.step('Complete account setup for the new user', async () => {
-    await loginWithNewUser(page, username)
+  await test.step('Complete account setup for the new user (via API)', async () => {
+    await activateUserViaApi(username)
   })
 
   await test.step('Log in to the client as the new user', async () => {
