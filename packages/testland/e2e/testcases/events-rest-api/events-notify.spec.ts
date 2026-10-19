@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { addDays, format, subDays } from 'date-fns'
 import { faker } from '@faker-js/faker'
@@ -572,30 +572,24 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     expect(body1).toEqual(body2)
   })
 
-  test.describe
-    .serial('Registrar can register and print an event notified via integration', async () => {
+  test('Registrar can register and print an event notified via integration', async ({
+    page
+  }) => {
+    test.setTimeout(180_000)
+
     const childName = {
       firstname: faker.person.firstName(),
       surname: faker.person.lastName()
     }
 
     let token: string
-    let page: Page
     let eventId: string
 
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Login', async () => {
+    await test.step('Login', async () => {
       token = await login(page)
     })
 
-    test('Notify an event via integration', async () => {
+    await test.step('Notify an event via integration', async () => {
       const createEventResponse = await fetchClientAPI(
         '/api/events/events',
         'POST',
@@ -643,7 +637,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       expect(response.status).toBe(200)
     })
 
-    test("Navigate to event via 'Notifications' -workqueue", async () => {
+    await test.step("Navigate to event via 'Notifications' -workqueue", async () => {
       await page.getByRole('button', { name: 'Notifications' }).click()
       await openRecordByTitle(
         page,
@@ -651,7 +645,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       )
     })
 
-    test('Edit event', async () => {
+    await test.step('Edit event', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Edit')
 
@@ -666,7 +660,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await validateActionMenuButton(page, 'Register with edits', false)
     })
 
-    test('Fill missing child dob field', async () => {
+    await test.step('Fill missing child dob field', async () => {
       await page.getByTestId('change-button-child.dob').click()
 
       const yesterday = new Date()
@@ -683,7 +677,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       surname: `Laurila-${childName.surname}`
     }
 
-    test('Change child surname', async () => {
+    await test.step('Change child surname', async () => {
       await page.getByTestId('text__surname').fill(newChildName.surname)
       await page.getByRole('button', { name: 'Go to review' }).click()
 
@@ -692,7 +686,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       )
     })
 
-    test('Fill comment & signature', async () => {
+    await test.step('Fill comment & signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -702,11 +696,11 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         .click()
     })
 
-    test('Register event', async () => {
+    await test.step('Register event', async () => {
       await triggerDeclarationAction(page, 'Register with edits')
     })
 
-    test("Navigate to event via 'Pending certification' -workqueue", async () => {
+    await test.step("Navigate to event via 'Pending certification' -workqueue", async () => {
       await page.getByRole('button', { name: 'Pending certification' }).click()
       await openRecordByTitle(
         page,
@@ -714,7 +708,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       )
     })
 
-    test('Print certificate', async () => {
+    await test.step('Print certificate', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Print')
       await selectRequesterType(page, 'Print and issue to Informant (Mother)')
@@ -740,32 +734,26 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     })
   })
 
-  test.describe
-    .serial('Registrar can reject an event notified via integration', async () => {
+  test('Registrar can reject an event notified via integration', async ({
+    page
+  }) => {
+    test.setTimeout(180_000)
+
     const childName = {
       firstname: faker.person.firstName(),
       surname: faker.person.lastName()
     }
 
     let token: string
-    let page: Page
     let eventId: string
 
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Login', async () => {
+    await test.step('Login', async () => {
       token = await login(page)
     })
 
     let trackingId: string
 
-    test('Notify event an event via integration', async () => {
+    await test.step('Notify event an event via integration', async () => {
       const createEventResponse = await fetchClientAPI(
         '/api/events/events',
         'POST',
@@ -815,7 +803,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       trackingId = (await res.json()).trackingId
     })
 
-    test("Navigate to event via 'Notifications' -workqueue", async () => {
+    await test.step("Navigate to event via 'Notifications' -workqueue", async () => {
       await page.getByRole('button', { name: 'Notifications' }).click()
       await openRecordByTitle(
         page,
@@ -823,7 +811,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       )
     })
 
-    test('Reject event', async () => {
+    await test.step('Reject event', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Reject')
       await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
@@ -836,7 +824,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       await rejectResponse
     })
 
-    test('Navigate to event via search', async () => {
+    await test.step('Navigate to event via search', async () => {
       await page.getByRole('button', { name: 'Search' }).click()
       await page.getByPlaceholder('Search').fill(trackingId)
       await page.getByRole('button', { name: 'Search' }).click()
@@ -847,7 +835,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       )
     })
 
-    test('Audit event', async () => {
+    await test.step('Audit event', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
       await switchEventTab(page, 'Audit')

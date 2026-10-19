@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 import {
   continueForm,
@@ -22,10 +22,9 @@ import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import { fillDate, generateBirthInputs } from '@e2e/support/birth/helpers'
 
-test.describe
-  .serial('30: Validate user can send multiple complete and incomplete records offline', () => {
-  let page: Page
-
+test('30: Validate user can send multiple complete and incomplete records offline', async ({
+  page
+}) => {
   const declaration = generateBirthInputs({ includeOptionalFields: true })
 
   const partialDeclaration1 = {
@@ -46,15 +45,7 @@ test.describe
     }
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('30.0 Login', async () => {
+  await test.step('30.0 Login', async () => {
     await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
     // this is needed to get eventConfig before going offline
@@ -68,15 +59,13 @@ test.describe
   })
 
   // @TODO: Skipped due role scope changes. Delete if not needed.
-  test.describe.skip('30.1 Send a complete declaration', async () => {
-    test.beforeAll(async () => {
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
+  await test.step.skip('30.1 Send a complete declaration', async () => {
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-    test('30.1.1 Fill child details', async () => {
+    await test.step('30.1.1 Fill child details', async () => {
       await page.locator('#firstname').fill(declaration.child.name.firstNames)
       await page.locator('#surname').fill(declaration.child.name.familyName)
       await page.locator('#child____gender').click()
@@ -118,7 +107,7 @@ test.describe
       await continueForm(page)
     })
 
-    test('30.1.2 Fill informant details', async () => {
+    await test.step('30.1.2 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informantType, {
@@ -131,7 +120,7 @@ test.describe
       await continueForm(page)
     })
 
-    test("30.1.3 Fill mother's details", async () => {
+    await test.step("30.1.3 Fill mother's details", async () => {
       await page.locator('#firstname').fill(declaration.mother.name.firstNames)
       await page.locator('#surname').fill(declaration.mother.name.familyName)
 
@@ -195,7 +184,7 @@ test.describe
       await continueForm(page)
     })
 
-    test("30.1.4 Fill father's details", async () => {
+    await test.step("30.1.4 Fill father's details", async () => {
       await page.locator('#firstname').fill(declaration.father.name.firstNames)
       await page.locator('#surname').fill(declaration.father.name.familyName)
 
@@ -230,11 +219,11 @@ test.describe
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('30.1.5 Go to review', async () => {
+    await test.step('30.1.5 Go to review', async () => {
       await goToSection(page, 'review')
     })
 
-    test('30.1.7 Fill up informant comment & signature', async () => {
+    await test.step('30.1.7 Fill up informant comment & signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -246,7 +235,7 @@ test.describe
       await expect(page.getByRole('dialog')).not.toBeVisible()
     })
 
-    test('30.1.8 Declare', async () => {
+    await test.step('30.1.8 Declare', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
 
       await page.getByText('Declare', { exact: true }).click()
@@ -255,15 +244,13 @@ test.describe
     })
   })
 
-  test.describe('30.2 Send an incomplete declaration', async () => {
-    test.beforeAll(async () => {
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
+  await test.step('30.2 Send an incomplete declaration', async () => {
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-    test('30.2.1 Fill child details', async () => {
+    await test.step('30.2.1 Fill child details', async () => {
       await page
         .locator('#firstname')
         .fill(partialDeclaration1.child.name.firstNames)
@@ -272,22 +259,20 @@ test.describe
         .fill(partialDeclaration1.child.name.familyName)
       await goToSection(page, 'review')
     })
-    test('30.2.2 Notify', async () => {
+    await test.step('30.2.2 Notify', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
       await page.getByText('Notify', { exact: true }).click()
       await page.getByRole('button', { name: 'Notify', exact: true }).click()
     })
   })
 
-  test.describe('30.3 Send an incomplete declaration', async () => {
-    test.beforeAll(async () => {
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
+  await test.step('30.3 Send an incomplete declaration', async () => {
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-    test('30.3.1 Fill child details', async () => {
+    await test.step('30.3.1 Fill child details', async () => {
       await page
         .locator('#firstname')
         .fill(partialDeclaration2.child.name.firstNames)
@@ -296,14 +281,14 @@ test.describe
         .fill(partialDeclaration2.child.name.familyName)
       await goToSection(page, 'review')
     })
-    test('30.3.2 Notify', async () => {
+    await test.step('30.3.2 Notify', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
       await page.getByText('Notify', { exact: true }).click()
       await page.getByRole('button', { name: 'Notify', exact: true }).click()
     })
   })
 
-  test('30.4 Validate outbox', async () => {
+  await test.step('30.4 Validate outbox', async () => {
     const rows = [
       // { row: '#row_2', name: formatName(declaration.child.name) },
       { row: '#row_1', name: formatName(partialDeclaration1.child.name) },
