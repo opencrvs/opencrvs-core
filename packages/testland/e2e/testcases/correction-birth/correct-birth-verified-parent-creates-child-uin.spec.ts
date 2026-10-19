@@ -144,6 +144,8 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
   })
 
   await test.step('Record audit shows the corrected record and the child UIN', async () => {
+    // MOSIP approves the correction asynchronously; reload so the page drops the stale "approve requested" flag that keeps Assign disabled.
+    await page.reload()
     await page.getByRole('button', { name: 'Assign record' }).click()
     await page.getByRole('button', { name: 'Assign', exact: true }).click()
 

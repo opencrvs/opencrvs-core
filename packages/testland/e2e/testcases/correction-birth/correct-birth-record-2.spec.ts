@@ -94,10 +94,14 @@ test.describe.serial('Correct record - 2', () => {
   })
 
   test('2.2 Select requester and reason', async () => {
-    // Ensure form is responsive.  There is a slight chance that the click does not register.
-    await page.waitForTimeout(500)
-    await page.locator('#requester____type').click()
-    await page.getByText('Father', { exact: true }).click()
+    // The first click can land before the form is responsive, so retry until Father is actually selected.
+    await expect(async () => {
+      await page.locator('#requester____type').click()
+      await page.getByText('Father', { exact: true }).click()
+      await expect(
+        page.locator('#requester____type .react-select__single-value')
+      ).toHaveText('Father', { timeout: 1000 })
+    }).toPass()
 
     await page.locator('#reason____option').click()
     await page
