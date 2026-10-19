@@ -47,6 +47,7 @@ import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
 import { getCurrentEventState } from '../events/state'
+import { isPlainDate } from '../events/PlainDate'
 
 const ajv = new Ajv({
   $data: true,
@@ -329,12 +330,7 @@ export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
 }
 
 function isAgeValue(value: unknown): value is AgeValue {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'age' in value &&
-    typeof value.age === 'number'
-  )
+  return AgeValue.validate(value)
 }
 
 function mergeWithBaseFormState(
@@ -374,24 +370,20 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
 
   if ('$form' in data) {
     const entries = Object.entries(data.$form).map(([key, value]) => {
-      // This was previously checked with AgeValue.safeParse(), but due to performance issues we need to check "manually".
       if (!isAgeValue(value)) {
         return [key, value]
       }
 
       const age = value.age
-      const maybeAsOfDate = PlainDate.safeParse(data.$form[value.asOfDateRef])
+
+      const asOf: unknown = data.$form[value.asOfDateRef]
+      const asOfDate = isPlainDate(asOf) ? asOf : PlainDate.parse(data.$now)
 
       return [
         key,
         {
           age,
-          dob: ageToDate(
-            age,
-            maybeAsOfDate.success
-              ? maybeAsOfDate.data
-              : PlainDate.parse(data.$now)
-          )
+          dob: ageToDate(age, asOfDate)
         }
       ]
     })
