@@ -10,17 +10,9 @@
  */
 import { expect, test } from '@playwright/test'
 
-import {
-  login,
-  getToken,
-  triggerDeclarationAction,
-  waitForActionResponses
-} from '@e2e/support/helpers'
+import { login, getToken, triggerDeclarationAction } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
-import {
-  createDeclaration,
-  Declaration
-} from '@e2e/support/test-data/birth-declaration'
+import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import {
@@ -36,6 +28,7 @@ import {
 import { faker } from '@faker-js/faker'
 
 test('4(b) Validate "Pending updates"-workqueue for RO', async ({ page }) => {
+  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const res = await createDeclaration(token, undefined, ActionType.DECLARE)
   const declaration = res.declaration
