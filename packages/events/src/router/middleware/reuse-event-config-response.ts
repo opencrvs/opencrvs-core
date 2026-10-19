@@ -22,7 +22,7 @@ import { reuseSerializedResponse } from '@events/router/serialization'
 
 let cached: {
   configurations: EventConfig[]
-  result: MiddlewareResult<TrpcContext>
+  result: Promise<MiddlewareResult<TrpcContext>>
 } | null = null
 
 /**
@@ -45,17 +45,24 @@ export const reuseEventConfigResponse: MiddlewareFunction<
   const configurations = await getInMemoryEventConfigurations(ctx.token)
 
   if (cached?.configurations === configurations) {
-    return cached.result
+    // Waits for the cached or still-rebuilding response instead of building another.
+    const result = await cached.result
+    if (result.ok) {
+      return result
+    }
   }
 
-  // Runs the rest of the chain: output validation, then the query.
-  const result = await next()
+  // Runs the rest of the chain (output validation, then the query); the response is still building or already built.
+  const response = next().then((result) => {
+    // Keep the serialized form for later calls with the same configurations.
+    if (result.ok && typeof result.data === 'object' && result.data !== null) {
+      reuseSerializedResponse(result.data)
+    }
+    return result
+  })
 
-  // Keep the validated response and its serialized form for later calls with the same configurations.
-  if (result.ok && typeof result.data === 'object' && result.data !== null) {
-    reuseSerializedResponse(result.data)
-    cached = { configurations, result }
-  }
+  // Stored before awaiting, so calls arriving during the rebuild wait for it instead of rebuilding too.
+  cached = { configurations, result: response }
 
-  return result
+  return response
 }
