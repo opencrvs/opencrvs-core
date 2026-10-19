@@ -39,8 +39,8 @@ importers:
         specifier: ^7.0.0
         version: 7.1.2
       '@opencrvs/toolkit':
-        specifier: 2.1.0
-        version: 2.1.0(@types/node@18.19.130)(typescript@7.0.2)
+        specifier: 2.2.0-rc.90ed9cd
+        version: 2.2.0-rc.90ed9cd(@types/node@18.19.130)(typescript@7.0.2)
       '@types/chalk':
         specifier: ^2.2.0
         version: 2.2.4
@@ -1007,8 +1007,8 @@ packages:
   '@octokit/types@9.3.2':
     resolution: {integrity: sha512-D4iHGTdAnEEVsB8fl95m1hiz7D5YiRdQ9b/OEb3BYRVwbLsGHcRVPz+u+BgRLNk0Q0/4iZCBqDN96j2XNxfXrA==}
 
-  '@opencrvs/toolkit@2.1.0':
-    resolution: {integrity: sha512-MuKlE0b/6NxBqgtEFtOQs5OiE1XZ/+u27vT2SxPBx3L4ez9Jnzwk5zTReGlyM3sjOUBv2YI8bp955gI1Tpe7Cw==}
+  '@opencrvs/toolkit@2.2.0-rc.90ed9cd':
+    resolution: {integrity: sha512-EEyzKQdDTQKtTo1Np46CacZq8HZL3q9qmdnWV36qpekRz4w8djWWQ6BYANxyM2v+4iyhgxb/BY/3IW2HJKZGFA==}
     hasBin: true
 
   '@opentelemetry/api@1.9.1':
@@ -5044,7 +5044,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 18.1.1
 
-  '@opencrvs/toolkit@2.1.0(@types/node@18.19.130)(typescript@7.0.2)':
+  '@opencrvs/toolkit@2.2.0-rc.90ed9cd(@types/node@18.19.130)(typescript@7.0.2)':
     dependencies:
       '@inquirer/prompts': 8.5.2(@types/node@18.19.130)
       '@octokit/core': 4.2.1

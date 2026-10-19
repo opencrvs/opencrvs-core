@@ -227,6 +227,12 @@ export function getEventIndexWithoutLocationHierarchy(
     )
   }
 
+  if (event.legalStatuses.REVOKED) {
+    event.legalStatuses.REVOKED.createdAtLocation = takeLast(
+      event.legalStatuses.REVOKED.createdAtLocation
+    )
+  }
+
   const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
 
   // Process declaration fields
@@ -323,6 +329,13 @@ export async function getEventIndexWithAdministrativeHierarchy(
     tempEvent.legalStatuses.REGISTERED.createdAtLocation =
       await buildAdministrativeHierarchyById(
         event.legalStatuses.REGISTERED.createdAtLocation
+      )
+  }
+
+  if (event.legalStatuses.REVOKED?.createdAtLocation) {
+    tempEvent.legalStatuses.REVOKED.createdAtLocation =
+      await buildAdministrativeHierarchyById(
+        event.legalStatuses.REVOKED.createdAtLocation
       )
   }
 

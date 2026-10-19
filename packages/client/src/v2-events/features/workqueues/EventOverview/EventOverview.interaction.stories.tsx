@@ -25,7 +25,8 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
-  tennisClubMembershipEventWithArchiveAndUnarchive
+  tennisClubMembershipEventWithArchiveAndUnarchive,
+  tennisClubMembershipEventWithRevokeAndReinstate
 } from '../../events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
 
@@ -190,6 +191,51 @@ export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
 
         await expect(await canvas.findByText('Archived')).toBeInTheDocument()
         await expect(await canvas.findByText('Unarchived')).toBeInTheDocument()
+      }
+    )
+  }
+}
+
+export const RevokeAndReinstateShowInAuditHistory: Story = {
+  parameters: {
+    offline: {
+      events: [tennisClubMembershipEventWithRevokeAndReinstate]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventWithRevokeAndReinstate.id
+      })
+    },
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.list.query(() => {
+            return [generator.user.localRegistrar().summary]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return generator.user.localRegistrar().v2
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Revoke and reinstate actions show correct labels in Audit history',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Audit' })
+        )
+
+        await expect(
+          await canvas.findByText('Registration revoked')
+        ).toBeInTheDocument()
+        await expect(
+          await canvas.findByText('Registration reinstated')
+        ).toBeInTheDocument()
       }
     )
   }

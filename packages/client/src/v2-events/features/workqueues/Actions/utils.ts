@@ -62,6 +62,16 @@ export const actionLabels = {
     description: 'Label for archive record button in dropdown menu',
     id: 'event.birth.action.archive.label'
   },
+  [ActionType.REVOKE_REGISTRATION]: {
+    defaultMessage: 'Revoke registration',
+    description: 'Label for revoke registration button in dropdown menu',
+    id: 'event.action.revokeRegistration.label'
+  },
+  [ActionType.REINSTATE_REGISTRATION]: {
+    defaultMessage: 'Reinstate registration',
+    description: 'Label for reinstate registration button in dropdown menu',
+    id: 'event.action.reinstateRegistration.label'
+  },
   [ActionType.UNARCHIVE]: {
     defaultMessage: 'Unarchive',
     description: 'Label for unarchive record button in dropdown menu',
@@ -108,6 +118,8 @@ export const actionIcons: Record<
   [ActionType.UNASSIGN]: 'ArrowCircleDown',
   [ActionType.ARCHIVE]: 'Archive',
   [ActionType.UNARCHIVE]: 'ArchiveTray',
+  [ActionType.REVOKE_REGISTRATION]: 'XCircle',
+  [ActionType.REINSTATE_REGISTRATION]: 'ArrowCounterClockwise',
   [ActionType.MARK_AS_DUPLICATE]: 'Files',
   [ActionType.DELETE]: 'Trash',
   [ActionType.DECLARE]: 'PaperPlaneTilt',

@@ -50,6 +50,8 @@ export const RecordScopeTypeV2 = z.enum([
   'record.print-certified-copies',
   'record.request-correction',
   'record.correct',
+  'record.revoke-registration',
+  'record.reinstate-registration',
   'record.unassign-others',
   'record.custom-action',
   'record.action.accept',
@@ -224,6 +226,8 @@ export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.read',
   'record.request-correction',
   'record.correct',
+  'record.revoke-registration',
+  'record.reinstate-registration',
   'record.unassign-others',
   'record.review-duplicates'
 ])
