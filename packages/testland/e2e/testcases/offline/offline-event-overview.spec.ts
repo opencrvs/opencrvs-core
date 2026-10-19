@@ -22,7 +22,7 @@ import { formatV2ChildName } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Can view non-downloaded event online', async ({ page }) => {
-  test.setTimeout(240_000)
+  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const res = await createDeclaration(token, undefined, ActionType.DECLARE)
   const declaration = res.declaration
@@ -52,7 +52,7 @@ test('Can view non-downloaded event online', async ({ page }) => {
 })
 
 test('Can partially view non-downloaded event offline', async ({ page }) => {
-  test.setTimeout(240_000)
+  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const res = await createDeclaration(token, undefined, ActionType.DECLARE)
   const declaration = res.declaration
@@ -87,7 +87,7 @@ test('Can partially view non-downloaded event offline', async ({ page }) => {
 })
 
 test('Can view downloaded event offline', async ({ page }) => {
-  test.setTimeout(240_000)
+  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const res = await createDeclaration(token, undefined, ActionType.DECLARE)
   const declaration = res.declaration

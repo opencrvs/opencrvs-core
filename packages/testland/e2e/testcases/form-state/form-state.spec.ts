@@ -47,8 +47,6 @@ test.describe('Form state', () => {
   test('Declaration form state or annotation is not persisted to a new event', async ({
     page
   }) => {
-    test.setTimeout(360_000)
-
     let childName = ''
 
     await test.step('Login', async () => {
@@ -96,7 +94,7 @@ test.describe('Form state', () => {
   test('Declaration form state or annotation is not persisted to another events action', async ({
     page
   }) => {
-    test.setTimeout(360_000)
+    test.setTimeout(180_000)
 
     let actionableEventChildName = ''
 
@@ -157,7 +155,7 @@ test.describe('Form state', () => {
   test('Action annotation state is not persisted to another action instance', async ({
     page
   }) => {
-    test.setTimeout(360_000)
+    test.setTimeout(300_000)
 
     let declaration: Declaration
 
@@ -247,7 +245,7 @@ test.describe('Form state', () => {
   })
 
   test('Declaration form is populated after refresh', async ({ page }) => {
-    test.setTimeout(360_000)
+    test.setTimeout(180_000)
 
     await test.step('Login', async () => {
       await login(page)

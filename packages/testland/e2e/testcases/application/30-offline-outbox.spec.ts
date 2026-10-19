@@ -53,7 +53,14 @@ test('30: Validate user can send multiple complete and incomplete records offlin
     await page.getByLabel('Birth').click()
     await goToSection(page, 'review')
     await page.getByTestId('exit-button').click()
+
+    // Going offline before the discarded draft is deleted would queue the
+    // deletion in the outbox, next to the declarations this test expects there
+    const deleteResponse = page.waitForResponse(
+      (res) => res.url().includes('event.delete') && res.ok()
+    )
     await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+    await deleteResponse
 
     await page.context().setOffline(true)
   })

@@ -37,8 +37,6 @@ test.describe("2. Validate the child's details page", () => {
   trackAndDeleteCreatedEvents()
 
   test('2.1 Validate "First Name(s)" text field', async ({ page }) => {
-    test.setTimeout(300_000)
-
     await loginAndBeginBirthDeclaration({ page })
 
     await test.step('2.1.1 Enter Non-English characters', async () => {
@@ -229,7 +227,7 @@ test.describe("2. Validate the child's details page", () => {
   })
 
   test('2.5 Validate delayed registration', async ({ page }) => {
-    test.setTimeout(300_000)
+    test.setTimeout(180_000)
 
     await loginAndBeginBirthDeclaration({ page })
 
@@ -305,8 +303,6 @@ test.describe("2. Validate the child's details page", () => {
 
   test.describe('2.6 Validate place of delivery field', async () => {
     test('2.6.2 Select place of delivery', async ({ page }) => {
-      test.setTimeout(300_000)
-
       await loginAndBeginBirthDeclaration({ page })
 
       await test.step('2.6.2.a Validate Health Institution', async () => {

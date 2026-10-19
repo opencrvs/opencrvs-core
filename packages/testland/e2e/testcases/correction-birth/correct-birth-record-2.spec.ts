@@ -42,7 +42,7 @@ import {
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 test('Correct record - 2', async ({ page }) => {
-  test.setTimeout(240_000)
+  test.setTimeout(180_000)
 
   const fatherDetails = {
     'father.detailsNotAvailable': false,

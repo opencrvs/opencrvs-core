@@ -30,6 +30,17 @@ async function getActionMenuOptions(page: Page, declaration: Declaration) {
   return textContents
 }
 
+/** Retries until the menu settles, as it may still re-render after an action. */
+async function expectActionMenuOptions(
+  page: Page,
+  declaration: Declaration,
+  expected: string[]
+) {
+  await searchFromSearchBar(page, formatV2ChildName(declaration))
+  await page.getByRole('button', { name: 'Action', exact: true }).click()
+  await expect(page.locator('#action-Dropdown-Content li')).toHaveText(expected)
+}
+
 test.describe('Action menu options', () => {
   test.describe('Event status: DECLARED', () => {
     let declaration: Declaration
@@ -156,16 +167,24 @@ test.describe('Action menu options', () => {
       await archiveResponse
     })
 
+    // Still logged in as the registrar who archived the declaration.
+    // Reload so the action menu isn't built from the pre-archive cache.
     await test.step('Registrar', async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-      const options = await getActionMenuOptions(page, declaration)
-      expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
+      await page.reload()
+      await expectActionMenuOptions(page, declaration, [
+        'Assign',
+        'Escalate',
+        'Unarchive'
+      ])
     })
 
     await test.step('Registration Officer', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-      const options = await getActionMenuOptions(page, declaration)
-      expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
+      await expectActionMenuOptions(page, declaration, [
+        'Assign',
+        'Escalate',
+        'Unarchive'
+      ])
     })
   })
 })

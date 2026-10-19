@@ -250,8 +250,6 @@ test('Birth with non-late registration will not have flag or Approve-action avai
 test("'Approval required for late registration' -flag blocks direct registration", async ({
   page
 }) => {
-  test.setTimeout(240_000)
-
   await test.step('Declaration started by Registrar', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     await page.click('#header-new-event')

@@ -363,8 +363,6 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('User is not auto-reassigned but is locked out from login when their office is inactivated', async ({
     browser
   }) => {
-    test.setTimeout(180_000)
-
     const officeName = `E2E No-Reassign Office ${uuidv4()}`
     const office = await createOffice(
       systemAdminToken,
