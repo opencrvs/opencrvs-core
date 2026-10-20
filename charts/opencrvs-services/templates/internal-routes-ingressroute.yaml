@@ -19,10 +19,11 @@ spec:
   - match: '{{ include "render-opencrvs-host-matchers" . }} && PathRegexp(`^/(.*(/|%2[fF]))?{{ $internal }}(/|%2[fF]|$)|{{ $double_encoded }}`)'
     kind: Rule
     priority: 1000
+    # Placeholder only: Traefik requires a service on every route. Traffic never reaches it,
+    # block-internal-routes answers 403 first. Do not remove: without a service the route is dropped.
     services:
-    - name: auth
-      namespace: {{ .Release.Namespace }}
-      port: {{ .Values.auth.port }}
+    - name: noop@internal
+      kind: TraefikService
     middlewares:
       - name: block-internal-routes
   {{- if .Values.ingress.tls_resolver }}
