@@ -891,16 +891,16 @@ export async function runSetupEnvironment() {
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MINIO_ROOT_USER',
+      name: 'S3_ADMIN_ACCESS_KEY',
       type: 'SECRET' as const,
       didExist: findExistingValue(
-        'MINIO_ROOT_USER',
+        'S3_ADMIN_ACCESS_KEY',
         'SECRET',
         'ENVIRONMENT',
         existingValues
       ),
       value: findExistingOrDefine(
-        'MINIO_ROOT_USER',
+        'S3_ADMIN_ACCESS_KEY',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()
@@ -908,16 +908,16 @@ export async function runSetupEnvironment() {
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MINIO_ROOT_PASSWORD',
+      name: 'S3_ADMIN_SECRET_KEY',
       type: 'SECRET' as const,
       didExist: findExistingValue(
-        'MINIO_ROOT_PASSWORD',
+        'S3_ADMIN_SECRET_KEY',
         'SECRET',
         'ENVIRONMENT',
         existingValues
       ),
       value: findExistingOrDefine(
-        'MINIO_ROOT_PASSWORD',
+        'S3_ADMIN_SECRET_KEY',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()

@@ -13,7 +13,7 @@ def copy_secrets(dependencies_namespace, opencrvs_namespace):
     secrets_to_copy = [
         "elasticsearch-admin-user",
         "redis-opencrvs-users",
-        "minio-opencrvs-users",
+        "s3-opencrvs-users",
         "mongodb-admin-user",
         "postgres-admin-user",
     ]
