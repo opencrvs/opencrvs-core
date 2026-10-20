@@ -15,7 +15,7 @@
 # - hostname: valid DNS name for opencrvs
 # - countryconfig.image.name: Countryconfig image repository
 # - countryconfig.image.tag: Countryconfig image tag
-environment_type: {{environment_type}}
+environment_type: { { environment_type } }
 
 network_policy:
   ingress_mode: deny
@@ -27,19 +27,19 @@ hpa:
   enabled: false
 
 env:
-  MINIO_BUCKET: ocrvs
-  OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
+  S3_BUCKET: ocrvs
+  OPENCRVS_ENVIRONMENT: { { opencrvs_environment } }
 
 otel:
   enabled: true
-  deployment_environment: {{env}}
-  exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
+  deployment_environment: { { env } }
+  exporter_otlp_endpoint: 'opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317'
 
 elasticsearch:
   auth_mode: auto
   host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
 
-minio:
+s3:
   auth_mode: use_secret
   host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
 
@@ -56,14 +56,13 @@ platform:
     # Default value for credentials created while yarn environment:init
     - name: dockerhub-credentials
 
-
 auth:
   env:
-    TWO_FA_ENABLED: {{two_fa_enabled}}
+    TWO_FA_ENABLED: { { two_fa_enabled } }
 
 events:
   env:
-    TWO_FA_ENABLED: {{two_fa_enabled}}
+    TWO_FA_ENABLED: { { two_fa_enabled } }
 
 countryconfig:
   secrets:
@@ -81,4 +80,4 @@ dashboards:
   enabled: true
 
 on_restore_cronjob:
-  enabled: {{restore_enabled}}
+  enabled: { { restore_enabled } }

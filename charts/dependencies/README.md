@@ -259,10 +259,10 @@ Example of Kubernetes secret:
 
 ```
 $ kubectl get secret -oyaml -n opencrvs-dev minio-opencrvs-users | yq .data
-MINIO_ACCESS_KEY: RE...wMw==
-MINIO_ROOT_PASSWORD: dG...FU=
-MINIO_ROOT_USER: RE...wMw==
-MINIO_SECRET_KEY: dG...FU=
+S3_ACCESS_KEY: RE...wMw==
+S3_ADMIN_SECRET_KEY: dG...FU=
+S3_ADMIN_ACCESS_KEY: RE...wMw==
+S3_SECRET_KEY: dG...FU=
 ```
 
 Reference secret values within `values.yaml`:
@@ -271,8 +271,8 @@ Reference secret values within `values.yaml`:
 documents:
   secrets:
     minio-secret:
-      - MINIO_ACCESS_KEY
-      - MINIO_SECRET_KEY
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
 ```
 
 ### Backup and Restore Section Reference

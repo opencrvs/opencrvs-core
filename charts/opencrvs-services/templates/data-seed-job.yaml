@@ -34,17 +34,17 @@ spec:
                 secretKeyRef:
                   key: SUPER_USER_PASSWORD
                   name: opencrvs-superuser
-          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
-            - name: MINIO_ROOT_USER
+          {{- if or (eq .Values.s3.auth_mode "auto") (eq .Values.s3.auth_mode "use_secret") }}
+            - name: S3_ADMIN_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  key: MINIO_ROOT_USER
-                  name: {{ .Values.minio.users_secret }}
-            - name: MINIO_ROOT_PASSWORD
+                  key: S3_ADMIN_ACCESS_KEY
+                  name: {{ .Values.s3.users_secret }}
+            - name: S3_ADMIN_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  key: MINIO_ROOT_PASSWORD
-                  name: {{ .Values.minio.users_secret }}
+                  key: S3_ADMIN_SECRET_KEY
+                  name: {{ .Values.s3.users_secret }}
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_seed" "Values" .Values) }}
       restartPolicy: "Never"

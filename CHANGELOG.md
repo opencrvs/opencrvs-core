@@ -131,6 +131,58 @@ Unlike the flag, an archived notification no longer matches, since its status is
 
 `defineConfig` still accepts events without a notification form, so these events behave as before. It generates a missing `NOTIFY` action and `review` from the `DECLARE` action with every field optional, and logs a warning when `notificationForm` is missing. If missing, the `DECLARE` form with every field optional is used in its place (`getNotificationForm`). A future release will remove this fallback. An event configuration built without `defineConfig` must give `review` on its `NOTIFY` action.
 
+#### Object store settings renamed from `MINIO_*` to `S3_*`
+
+The documents service no longer reads `MINIO_*` environment variables, and the `opencrvs-services` Helm chart has no `minio` block in its values any more. Both speak of a generic S3 object store. MinIO is still the store that the dependencies chart deploys, and the defaults still point at it.
+
+| Before                | After              |
+| --------------------- | ------------------ |
+| `MINIO_HOST`          | `S3_HOST`          |
+| `MINIO_PORT`          | `S3_PORT`          |
+| `MINIO_URL`           | `S3_PUBLIC_URL`    |
+| `MINIO_PROTOCOL`      | `S3_PROTOCOL`      |
+| `MINIO_BUCKET`        | `S3_BUCKET`        |
+| `MINIO_BUCKET_REGION` | `S3_BUCKET_REGION` |
+| `MINIO_ACCESS_KEY`    | `S3_ACCESS_KEY`    |
+| `MINIO_SECRET_KEY`    | `S3_SECRET_KEY`    |
+
+If you deploy with the Helm chart:
+
+- Rename the `minio:` block of your values (`host`, `port`, `external_url`, `external_protocol`, `auth_mode`, `users_secret`) to `s3:`. A `minio:` block that is left behind is ignored without a warning, and the defaults apply.
+- Rename `env.MINIO_BUCKET` to `env.S3_BUCKET`. **A `MINIO_BUCKET` that is left behind is ignored as well, and the documents service uses the bucket `ocrvs`.** If your bucket has another name, the files that were uploaded before the upgrade appear to be missing until you set `S3_BUCKET`. The events migration that strips the bucket from stored paths reads `S3_BUCKET` too.
+- The keys of the credentials secret (`minio-opencrvs-users`) are renamed. The name of the secret does not change.
+
+  | Before                | After                 | Role                                      |
+  | --------------------- | --------------------- | ----------------------------------------- |
+  | `MINIO_ACCESS_KEY`    | `S3_ACCESS_KEY`       | regular bucket user, read by documents    |
+  | `MINIO_SECRET_KEY`    | `S3_SECRET_KEY`       | regular bucket user, read by documents    |
+  | `MINIO_ROOT_USER`     | `S3_ADMIN_ACCESS_KEY` | administrator, read by MinIO and the jobs |
+  | `MINIO_ROOT_PASSWORD` | `S3_ADMIN_SECRET_KEY` | administrator, read by MinIO and the jobs |
+
+  The dependencies chart keeps a secret that exists (`helm.sh/resource-policy: keep`), so an upgrade does not add the new keys. **Add them before you upgrade the dependencies chart, in the dependencies namespace and in the OpenCRVS namespace, or the MinIO pod cannot start.** The old keys can stay. A deployment with `minio.use_default_credentials: true` has no such secret and needs nothing.
+
+  ```bash
+  for NAMESPACE in <dependencies namespace> <OpenCRVS namespace>; do
+    kubectl -n "$NAMESPACE" patch secret minio-opencrvs-users --type merge -p "$(
+      kubectl -n "$NAMESPACE" get secret minio-opencrvs-users -o json | jq '{data: {
+        S3_ACCESS_KEY: .data.MINIO_ACCESS_KEY,
+        S3_SECRET_KEY: .data.MINIO_SECRET_KEY,
+        S3_ADMIN_ACCESS_KEY: .data.MINIO_ROOT_USER,
+        S3_ADMIN_SECRET_KEY: .data.MINIO_ROOT_PASSWORD
+      }}')"
+  done
+  ```
+
+  A secret that you create yourself needs the same four keys. The MinIO server still reads `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` as its own environment variables, and the chart fills them from `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`.
+
+- The data-seed and data-cleanup jobs get the administrator credentials as `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`, where they were `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD`. A data seeder that reads the old names must change.
+- `opencrvs environment init` creates the administrator credentials as the environment secrets `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`, where it created `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD`, and `deploy.sh` in the country config template requires the new names. The command looks up existing secrets by name. Run on an existing environment, it creates new values for the new names and leaves the old secrets as they are. To keep your credentials, give it the current values: `S3_ADMIN_ACCESS_KEY=<MINIO_ROOT_USER> S3_ADMIN_SECRET_KEY=<MINIO_ROOT_PASSWORD> opencrvs environment init`. A Docker Compose file that reads `MINIO_ROOT_USER` or `MINIO_ROOT_PASSWORD` must take its value from the new names.
+- `opencrvs-validate.sh` reads `S3_HOST`, `S3_PORT` and `S3_PUBLIC_URL` where it read `MINIO_HOST`, `MINIO_PORT` and `MINIO_URL`.
+
+If you run the documents service in another way, for example with Docker Compose, rename the variables in your own configuration.
+
+In `@opencrvs/commons`, `isMinioUrl` and `MINIO_REGEX` are removed. Use `isS3Url` and `S3_URL_REGEX`, which are the same function and the same expression. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
 ### New features
 
 #### `REVOKED` status with revoke and reinstate registration actions
@@ -140,6 +192,14 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 #### Exclude statuses in workqueue and search queries
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
+
+#### Documents service speaks plain S3
+
+The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys. **The settings were renamed, so check [Object store settings renamed from `MINIO_*` to `S3_*`](#object-store-settings-renamed-from-minio_-to-s3_) before you upgrade.**
+
+The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement, so a store is supported only once it passes a conformance suite (`pnpm --filter @opencrvs/documents test:s3-conformance`). MinIO, SeaweedFS and RustFS have passed it; AWS S3 and Google Cloud Storage have not been tried. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store passed on and how to run the suite against yours.
+
+A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. The dependencies chart, Docker Compose files and backup scripts are unchanged. Choosing the replacement store is tracked separately. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Improvements
 

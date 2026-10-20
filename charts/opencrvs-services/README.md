@@ -21,7 +21,7 @@ helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik \
 
 **2. Install the OpenCRVS Dependencies Chart (Database & Storage Components)**
 
-OpenCRVS requires supporting services (Postgres, MinIO, Elasticsearch, Redis):
+OpenCRVS requires supporting services (Postgres, an S3 object store, Elasticsearch, Redis):
 
 ```
 helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart \
@@ -121,32 +121,32 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret to store Elasticsearch URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: auto</code> and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
         </tr>
        <tr>
-            <th>minio.{}</th>
+            <th>s3.{}</th>
             <th></th>
             <th></th>
         </tr>
         <tr>
-            <td>minio.host</td>
+            <td>s3.host</td>
             <td>minio-0.minio.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>MinIO hostname configuration.</td>
+            <td>Hostname of the S3 object store. The default is the MinIO that the dependencies chart deploys.</td>
         </tr>
         <tr>
-            <td>minio.port</td>
+            <td>s3.port</td>
             <td>3535</td>
-            <td>MinIO port configuration.</td>
+            <td>Port of the S3 object store.</td>
         </tr>
         <tr>
-            <td>minio.external_url</td>
-            <td><code>minio.`opencrvs hostname>`</code></td>
-            <td>external `host/ip`[:port] available for client browser to issue signed document URL. </td>
+            <td>s3.external_url</td>
+            <td><code>minio.&ltopencrvs hostname&gt</code></td>
+            <td>external `host/ip`[:port] available for client browser to issue signed document URL. The default is where the dependencies chart exposes its S3 datastore (MinIO), and it follows <code>subdomain_separator</code>.</td>
         </tr>
         <tr>
-            <td>minio.external_protocol</td>
+            <td>s3.external_protocol</td>
             <td>https</td>
             <td>external protocol (http or https) available for client browser. Default: helm chart http_scheme helper value</td>
         </tr>
         <tr>
-            <td>minio.auth_mode</td>
+            <td>s3.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
                 <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
@@ -156,11 +156,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             </td>
         </tr>
         <tr>
-            <td>minio.users_secret</td>
-            <td>minio-opencrvs-users</td>
-            <td>Secret name to store MinIO credentials, more information about credentials secret is at <a href="#authentication-configuration">Authentication configuration</a></td>
+            <td>s3.users_secret</td>
+            <td>s3-opencrvs-users</td>
+            <td>Secret name to store the S3 object store credentials, more information about credentials secret is at <a href="#authentication-configuration">Authentication configuration</a></td>
         </tr>
-       <tr>
+        <tr>
             <th>postgres.{}</th>
             <th></th>
             <th></th>
@@ -656,7 +656,7 @@ not fixed IPs a private-range rule could cover), so it carries its own
 
 For a fully locked-down deployment, set `egress_mode: deny` and list every
 namespace OpenCRVS pods actually need in `allowed_namespaces` — otherwise auth,
-gateway, events, etc. lose access to Postgres, Elasticsearch, MinIO and Redis
+gateway, events, etc. lose access to Postgres, Elasticsearch, the S3 object store and Redis
 the moment the private-range baseline goes away too.
 
 The dependencies chart and this chart are typically deployed to separate namespaces
@@ -722,16 +722,16 @@ ingress:
 
 The public dashboards on the Metabase host are left untouched, since the Performance page embeds them for every user: `/public/`, `/app/` (static assets), `/api/public/`, `/api/geojson/` (custom region maps) and `/api/session/properties` follow `application_allowlist` instead, and everything else on the host is the admin console.
 
-Set the same key in the dependencies chart's `values.yaml` to also restrict the MinIO console and Kibana (the MinIO S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
+Set the same key in the dependencies chart's `values.yaml` to also restrict the MinIO console and Kibana (the S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
 
 # Authentication configuration
 
 ## General information
 
-OpenCRVS has more then 10 microservices that require authentication to multiple datastores (Elasticsearch, Redis and MinIO. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
+OpenCRVS has more then 10 microservices that require authentication to multiple datastores (Elasticsearch, Redis and the S3 object store. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
 
-- No authentication enabled (`disabled`), password-less access to datastores. MinIO will use default credentials (minioadmin/minioadmin). All other services will work without authentication.
-- Auto (`auto`) mode allows OpenCRVS chart to create users for Elasticsearch at installation time, but you need to provide admin credentials for that service. Mode is not supported by MinIO and Redis.
+- No authentication enabled (`disabled`), password-less access to datastores. The S3 object store will use default credentials (minioadmin/minioadmin). All other services will work without authentication.
+- Auto (`auto`) mode allows OpenCRVS chart to create users for Elasticsearch at installation time, but you need to provide admin credentials for that service. Mode is not supported by the S3 object store and Redis.
 - In case when users are created by datastore administrator (`use_secret`) and DevOps gets those credentials, kubernetes secrets needs to be created manually as well. Check how to create secret in the section below.
 - DevOps may decide to manage secrets by own way and map to environment variables manually (`managed`). Check [Mapping secrets](#mapping-secrets) section for details. **NOTE**: This way is not recommended since we can't avoid human error and mapping secrets manually requires deep knowledge of OpenCRVS internals.
 
@@ -741,7 +741,7 @@ Table contains list of required secrets for each `auth_mode` grouped by datastor
 | ------------- | ---------------------- | ------------------------ | --------------------- | --------------------------- |
 | Postgres      | admin_user_secret_name | postgres-admin-user      | urls_secret           | postgres-urls               |
 | Elasticsearch | admin_user_secret_name | elasticsearch-admin-user | urls_secret           | elasticsearch-opencrvs-urls |
-| MinIO         | not supported          |                          | users_secret          | minio-opencrvs-users        |
+| S3            | not supported          |                          | users_secret          | s3-opencrvs-users           |
 | Redis         | not supported          |                          | users_secret          | redis-opencrvs-users        |
 
 ## Secrets specification
@@ -844,21 +844,21 @@ search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 ```
 
-### Minio Secret (minio.users_secret)
+### S3 Secret (s3.users_secret)
 
-**Default secret name:** minio-opencrvs-users
+**Default secret name:** s3-opencrvs-users
 
 **auth_mode:** use_secret
 
 **Keys:**
 
-- MINIO_ROOT_PASSWORD
-- MINIO_ROOT_USER
-- MINIO_ACCESS_KEY
-- MINIO_SECRET_KEY
+- S3_ADMIN_SECRET_KEY
+- S3_ADMIN_ACCESS_KEY
+- S3_ACCESS_KEY
+- S3_SECRET_KEY
 
-**Description:** MinIO credentials for OpenCRVS services. OpenCRVS requires credentials for administrator and for regular bucket user.
-Users must be created by MinIO server administrator. OpenCRVS will pickup correct credentials by key values and assign to appropriate microservice containers.
+**Description:** S3 object store credentials for OpenCRVS services. The default secret is created by the dependencies chart, which deploys S3 object store, hence the key names. OpenCRVS requires credentials for administrator and for regular bucket user.
+Users must be created by the administrator of the object store. OpenCRVS will pickup correct credentials by key values and assign to appropriate microservice containers.
 
 ### Redis Secret (redis.users_secret)
 

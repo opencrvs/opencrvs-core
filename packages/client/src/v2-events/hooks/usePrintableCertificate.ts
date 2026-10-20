@@ -24,7 +24,7 @@ import {
   getAcceptedActions,
   getCurrentEventState,
   getDeclarationFields,
-  isMinioUrl,
+  isS3Url,
   LanguageConfig,
   PrintCertificateAction,
   UserOrSystemSummary,
@@ -41,7 +41,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { hasStringFilename } from '../utils'
 
-async function replaceMinioUrlWithBase64(
+async function replaceS3UrlWithBase64(
   declaration: EventState,
   config: EventConfig
 ) {
@@ -55,7 +55,7 @@ async function replaceMinioUrlWithBase64(
   for (const fieldId of fileFieldIds) {
     const field = declarationClone[fieldId]
 
-    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
+    if (hasStringFilename(field) && isS3Url(field.filename)) {
       // TypeScript now knows `field` has a `filename` property of type string
       field.filename = await fetchImageAsBase64(field.filename)
     }
@@ -138,7 +138,7 @@ export const usePrintableCertificate = ({
   const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
-    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+    const declarationWithResolvedImages = await replaceS3UrlWithBase64(
       updatedDeclaration,
       config
     )
