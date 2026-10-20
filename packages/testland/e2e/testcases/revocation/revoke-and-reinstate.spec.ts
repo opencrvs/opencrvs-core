@@ -26,7 +26,10 @@ import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
-import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import {
+  assertRecordInWorkqueue,
+  formatV2ChildName
+} from '@e2e/support/birth/helpers'
 
 const REVOKE_SUPPORTING_COPY =
   'The registration is withdrawn and any certificate issued from it stops being valid.'
@@ -37,13 +40,35 @@ const REINSTATE_REASON = 'Reinstating record for testing purposes.'
 
 test('Revoke and reinstate record', async ({ browser }) => {
   const page = await browser.newPage()
+  // Checks the workqueues of the record's office while the Registrar General stays logged in on `page`
+  const officerPage = await browser.newPage()
   let declaration: Declaration
   let childName: string
+
+  const expectInWorkqueues = async (
+    pendingCertification: boolean,
+    revoked: boolean
+  ) => {
+    await officerPage.getByRole('button', { name: 'Assigned to you' }).click()
+    await assertRecordInWorkqueue({
+      page: officerPage,
+      name: childName,
+      workqueues: [
+        { title: 'Pending certification', exists: pendingCertification },
+        { title: 'Revoked', exists: revoked }
+      ]
+    })
+  }
 
   await test.step('Setup declaration', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
     declaration = (await createDeclaration(token)).declaration
     childName = formatV2ChildName(declaration)
+  })
+
+  await test.step('Registered record is pending certification', async () => {
+    await login(officerPage, CREDENTIALS.REGISTRATION_OFFICER)
+    await expectInWorkqueues(true, false)
   })
 
   await test.step('Login as Registrar General', async () => {
@@ -101,6 +126,10 @@ test('Revoke and reinstate record', async ({ browser }) => {
     await page.getByRole('button', { name: childName }).click()
   })
 
+  await test.step('Revoked record is no longer pending certification', async () => {
+    await expectInWorkqueues(false, true)
+  })
+
   await test.step('Reinstate record', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_GENERAL)
     await selectAction(page, 'Reinstate registration')
@@ -125,6 +154,10 @@ test('Revoke and reinstate record', async ({ browser }) => {
   await test.step('Assert the record has the "Registered" status again', async () => {
     await searchFromSearchBar(page, childName)
     await expect(page.locator('#summary').getByText('Registered')).toBeVisible()
+  })
+
+  await test.step('Reinstated record is pending certification again, since revoke kept its flags', async () => {
+    await expectInWorkqueues(true, false)
   })
 
   await test.step('Audit history shows the reasons of the revoke and reinstate actions', async () => {
