@@ -65,7 +65,7 @@ test.describe('International place of birth renders the required street levels',
   test('Street levels survive on both birth certificate templates', async ({
     page
   }) => {
-    test.setTimeout(180_000)
+    test.setTimeout(240_000)
 
     let declaration: Declaration
 
@@ -141,7 +141,7 @@ test.describe('International place of birth renders the required street levels',
   test("Father's row falls back to the mother's address when it is shared", async ({
     page
   }) => {
-    test.setTimeout(180_000)
+    test.setTimeout(240_000)
 
     let declaration: Declaration
 

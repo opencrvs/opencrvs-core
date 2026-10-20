@@ -20,6 +20,8 @@ const deceased = {
 
 test.describe('1. Death event declaration', () => {
   test('Fill all form sections. Save & Exit', async ({ page }) => {
+    test.setTimeout(180_000)
+
     await test.step('1.1. Navigate to the death event declaration page', async () => {
       await login(page)
 

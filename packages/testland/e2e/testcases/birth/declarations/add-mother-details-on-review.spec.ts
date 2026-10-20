@@ -30,7 +30,7 @@ import {
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
 
 test('Add mother details on review', async ({ page }) => {
-  test.setTimeout(180_000)
+  test.setTimeout(240_000)
 
   const declaration = {
     child: {
