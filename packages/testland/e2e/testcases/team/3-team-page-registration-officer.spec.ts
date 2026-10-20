@@ -13,19 +13,9 @@ import { login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { verifyTeamMembers } from '@e2e/support/birth/helpers'
 
-test.describe.serial('3. Team Page -1', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test.describe('3.1 Basic UI check', async () => {
-    test('3.1.0 Verify UI', async () => {
+test('3. Team Page -1', async ({ page }) => {
+  await test.step('3.1 Basic UI check', async () => {
+    await test.step('3.1.0 Verify UI', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
       await page.getByRole('button', { name: 'Team' }).click()
       await expect(page.locator('#content-name')).toHaveText(
@@ -43,7 +33,7 @@ test.describe.serial('3. Team Page -1', () => {
       { name: 'Kennedy Mweene', role: 'Registrar' }
     ]
 
-    test('3.1.1 Verify Team Members, Roles and their statuses', async () => {
+    await test.step('3.1.1 Verify Team Members, Roles and their statuses', async () => {
       await verifyTeamMembers(page, team)
     })
   })

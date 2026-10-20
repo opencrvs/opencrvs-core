@@ -21,6 +21,7 @@ import { CREDENTIALS } from '@e2e/support/constants'
 import {
   navigateToCertificatePrintAction,
   openRecordByTitle,
+  printCertificateViaApi,
   selectRequesterType,
   selectCertificationType
 } from '@e2e/support/print-certificate/birth/helpers'
@@ -159,26 +160,19 @@ test.describe('International place of birth renders the required street levels',
       const res = await createDeclaration(token, dec)
 
       declaration = res.declaration
+
+      await test.step('Print the standard certificate, which unlocks the certified copy (via API)', async () => {
+        await printCertificateViaApi({
+          token,
+          eventId: res.eventId,
+          templateId: 'v2.birth-certificate',
+          requesterId: 'INFORMANT'
+        })
+      })
     })
 
     await test.step('Log in as the registrar', async () => {
       await login(page)
-    })
-
-    await test.step('Print the standard certificate, which unlocks the certified copy', async () => {
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration,
-        CREDENTIALS.REGISTRAR
-      )
-      await selectCertificationType(page, 'Birth Certificate')
-      await selectRequesterType(page, 'Print and issue to Informant (Mother)')
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Verified' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Yes, print certificate' }).click()
-      await page.getByRole('button', { name: 'Print', exact: true }).click()
     })
 
     await test.step("'Birth Certificate Certified Copy' repeats the mother's address", async () => {

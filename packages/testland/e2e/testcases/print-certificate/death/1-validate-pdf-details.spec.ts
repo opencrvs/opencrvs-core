@@ -29,8 +29,6 @@ test.describe("Validate 'Death Certificate' PDF details", () => {
   test('Standard certificate renders deceased name, place of death and registrar', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered death record (via API)', async () => {

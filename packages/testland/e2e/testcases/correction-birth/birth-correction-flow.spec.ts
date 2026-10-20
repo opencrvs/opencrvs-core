@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, login, logout } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -30,34 +30,26 @@ import {
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import { ASSETS_DIR } from '@e2e/support/paths'
 
-test.describe.serial('Birth correction flow', () => {
-  let declaration: Declaration
-  let eventId: string
-  let page: Page
+test('Birth correction flow', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(
+    token,
+    undefined,
+    undefined,
+    'HEALTH_FACILITY'
+  )
+  const declaration = res.declaration
+  const eventId = res.eventId
+  await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(
-      token,
-      undefined,
-      undefined,
-      'HEALTH_FACILITY'
-    )
-    declaration = res.declaration
-    eventId = res.eventId
-
-    page = await browser.newPage()
-    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-  })
-
-  test('Navigate to the correction form', async () => {
+  await test.step('Navigate to the correction form', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await openRecordByTitle(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
     await selectAction(page, 'Correct')
   })
 
-  test('Try to continue without filling in required fields', async () => {
+  await test.step('Try to continue without filling in required fields', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
     await expect(page.locator('#requester____type_error')).toHaveText(
       REQUIRED_VALIDATION_ERROR
@@ -67,7 +59,7 @@ test.describe.serial('Birth correction flow', () => {
     )
   })
 
-  test('Fill in the correction details form', async () => {
+  await test.step('Fill in the correction details form', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Informant (Mother)', { exact: true }).click()
 
@@ -82,7 +74,7 @@ test.describe.serial('Birth correction flow', () => {
     await page.getByRole('button', { name: 'Verified' }).click()
   })
 
-  test('Fill in the supporting documents form', async () => {
+  await test.step('Fill in the supporting documents form', async () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
     const path = require('path')
     const attachmentPath = path.join(ASSETS_DIR, 'image.png')
@@ -102,7 +94,7 @@ test.describe.serial('Birth correction flow', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Fill in the fees form', async () => {
+  await test.step('Fill in the fees form', async () => {
     await page
       .locator('#fees____amount')
       .fill(faker.number.int({ min: 1, max: 1000 }).toString())
@@ -110,12 +102,12 @@ test.describe.serial('Birth correction flow', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Review page should be displayed and continue button should be disabled', async () => {
+  await test.step('Review page should be displayed and continue button should be disabled', async () => {
     await expectInUrl(page, `/events/request-correction/${eventId}/review`)
     await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  test('Go through the declaration correction form without changing any details', async () => {
+  await test.step('Go through the declaration correction form without changing any details', async () => {
     await page
       .getByRole('button', { name: 'Change all', exact: true })
       .first()
@@ -143,12 +135,12 @@ test.describe.serial('Birth correction flow', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('When back on review page, continue button should still be disabled', async () => {
+  await test.step('When back on review page, continue button should still be disabled', async () => {
     await expectInUrl(page, `/events/request-correction/${eventId}/review`)
     await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  test('After changing a value, continue button should be enabled', async () => {
+  await test.step('After changing a value, continue button should be enabled', async () => {
     await page.getByTestId('change-button-informant.email').click()
 
     await page
@@ -159,7 +151,7 @@ test.describe.serial('Birth correction flow', () => {
     await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
-  test('After changing the value back to the original, continue button should be disabled', async () => {
+  await test.step('After changing the value back to the original, continue button should be disabled', async () => {
     await page.getByTestId('change-button-informant.email').click()
 
     await page
@@ -170,7 +162,7 @@ test.describe.serial('Birth correction flow', () => {
     await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  test('After changing another value to an invalid value, continue button should still be disabled', async () => {
+  await test.step('After changing another value to an invalid value, continue button should still be disabled', async () => {
     await page.getByTestId('change-button-child.dob').click()
     // Future date
     await page.getByTestId('child____dob-yyyy').fill('2045')
@@ -182,7 +174,7 @@ test.describe.serial('Birth correction flow', () => {
   const newFirstName = faker.person.firstName()
   const reasonForDelayedRegistration = faker.lorem.sentence(4)
 
-  test('After changing the value to a valid value, continue button should be enabled', async () => {
+  await test.step('After changing the value to a valid value, continue button should be enabled', async () => {
     await page.getByTestId('change-button-child.dob').click()
     await page.getByTestId('child____dob-yyyy').fill('2024')
     await page.getByTestId('child____dob-mm').fill('06')
@@ -196,7 +188,7 @@ test.describe.serial('Birth correction flow', () => {
     await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
-  test('Continue to the summary page', async () => {
+  await test.step('Continue to the summary page', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
     await expectInUrl(page, `/events/request-correction/${eventId}/summary`)
     await expect(
@@ -207,19 +199,19 @@ test.describe.serial('Birth correction flow', () => {
     ).toBeEnabled()
   })
 
-  test('Press Fees change link and change the fee amount', async () => {
+  await test.step('Press Fees change link and change the fee amount', async () => {
     await page.getByTestId('change-fees.amount').click()
     await page
       .locator('#fees____amount')
       .fill(faker.number.int({ min: 1, max: 1000 }).toString())
   })
 
-  test('Return to summary page', async () => {
+  await test.step('Return to summary page', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Preview a file on summary page', async () => {
+  await test.step('Preview a file on summary page', async () => {
     await expect(
       page.getByRole('button', { name: 'Court Document' })
     ).toBeVisible()
@@ -233,7 +225,7 @@ test.describe.serial('Birth correction flow', () => {
     await page.locator('#preview_close').click()
   })
 
-  test('Submit correction request', async () => {
+  await test.step('Submit correction request', async () => {
     await page
       .getByRole('button', { name: 'Submit correction request' })
       .click()
@@ -251,7 +243,7 @@ test.describe.serial('Birth correction flow', () => {
     await expectInUrl(page, `/workqueue/pending-certification`)
   })
 
-  test("Event appears in 'Recent' workqueue", async () => {
+  await test.step("Event appears in 'Recent' workqueue", async () => {
     await page.getByText('Recent').click()
 
     await expect(
@@ -259,19 +251,19 @@ test.describe.serial('Birth correction flow', () => {
     ).toBeVisible()
   })
 
-  test.describe('Approve correction request', () => {
-    test('Login as Registrar', async () => {
+  await test.step('Approve correction request', async () => {
+    await test.step('Login as Registrar', async () => {
       await logout(page)
       await login(page, CREDENTIALS.REGISTRAR)
     })
 
-    test("Find the event in the 'Pending corrections' workflow", async () => {
+    await test.step("Find the event in the 'Pending corrections' workflow", async () => {
       await page.getByRole('button', { name: 'Pending corrections' }).click()
 
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test('Correction request action appears in audit history', async () => {
+    await test.step('Correction request action appears in audit history', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await page.getByRole('button', { name: 'Audit' }).click()
       await expect(
@@ -279,7 +271,7 @@ test.describe.serial('Birth correction flow', () => {
       ).toBeVisible()
     })
 
-    test('Correction request audit history modal opens when action is clicked', async () => {
+    await test.step('Correction request audit history modal opens when action is clicked', async () => {
       await page
         .getByRole('button', { name: 'Correction requested', exact: true })
         .click()
@@ -301,7 +293,7 @@ test.describe.serial('Birth correction flow', () => {
       await page.locator('#close-dialog').click()
     })
 
-    test('Navigate to correction review', async () => {
+    await test.step('Navigate to correction review', async () => {
       await selectAction(page, 'Review correction request')
 
       await expect(page.getByText('RequesterInformant (Mother)')).toBeVisible()
@@ -316,7 +308,7 @@ test.describe.serial('Birth correction flow', () => {
       ).toBeVisible()
     })
 
-    test('Approve correction request', async () => {
+    await test.step('Approve correction request', async () => {
       await page.getByRole('button', { name: 'Approve', exact: true }).click()
       await waitForCorrectionAction(page, 'approve', async () => {
         await page.getByRole('button', { name: 'Confirm', exact: true }).click()
@@ -333,7 +325,7 @@ test.describe.serial('Birth correction flow', () => {
       await openRecordByTitle(page, childName)
     })
 
-    test('Correction approved action appears in audit history', async () => {
+    await test.step('Correction approved action appears in audit history', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await page.getByRole('button', { name: 'Audit' }).click()
 
@@ -342,7 +334,7 @@ test.describe.serial('Birth correction flow', () => {
       ).toBeVisible()
     })
 
-    test('Enter the direct correction form to ensure form is reset', async () => {
+    await test.step('Enter the direct correction form to ensure form is reset', async () => {
       await selectAction(page, 'Correct')
 
       await expect(page.locator('#requester____type')).toHaveText('Select')

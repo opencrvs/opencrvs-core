@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -31,8 +31,7 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 const JFIF_JPEG_BASE64 =
   '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AfwD/2Q=='
 
-test.describe.serial('3. Birth declaration case - 3', () => {
-  let page: Page
+test('3. Birth declaration case - 3', async ({ page }) => {
   const declaration = {
     child: {
       name: {
@@ -131,24 +130,15 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       }
     }
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('3.1 Declaration started by RO', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.describe('3.1 Declaration started by RO', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('3.1.1 Fill child details', async () => {
+    await test.step('3.1.1 Fill child details', async () => {
       await page.locator('#firstname').fill(declaration.child.name.firstNames)
       await page.locator('#surname').fill(declaration.child.name.familyName)
       await page.locator('#child____gender').click()
@@ -205,7 +195,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       await continueForm(page)
     })
 
-    test('3.1.2 Fill informant details', async () => {
+    await test.step('3.1.2 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informantType, {
@@ -277,7 +267,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       await continueForm(page)
     })
 
-    test("3.1.3 Fill mother's details", async () => {
+    await test.step("3.1.3 Fill mother's details", async () => {
       await page.locator('#firstname').fill(declaration.mother.name.firstNames)
       await page.locator('#surname').fill(declaration.mother.name.familyName)
 
@@ -334,7 +324,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       await continueForm(page)
     })
 
-    test("3.1.4 Fill father's details", async () => {
+    await test.step("3.1.4 Fill father's details", async () => {
       await page.locator('#firstname').fill(declaration.father.name.firstNames)
       await page.locator('#surname').fill(declaration.father.name.familyName)
 
@@ -390,12 +380,12 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test.describe('3.1.5 Add supporting documents', async () => {
-      test('3.1.5.0 Go to supporting documents page', async () => {
+    await test.step('3.1.5 Add supporting documents', async () => {
+      await test.step('3.1.5.0 Go to supporting documents page', async () => {
         await goToSection(page, 'documents')
       })
 
-      test('3.1.5.1 Upload proof of birth as a .jfif image', async () => {
+      await test.step('3.1.5.1 Upload proof of birth as a .jfif image', async () => {
         const fileChooserPromise = page.waitForEvent('filechooser')
         await page.locator('button[name="documents____proofOfBirth"]').click()
         const fileChooser = await fileChooserPromise
@@ -410,7 +400,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         ).toBeVisible()
       })
 
-      test("3.1.5.2 Upload proof of mother's id", async () => {
+      await test.step("3.1.5.2 Upload proof of mother's id", async () => {
         const imageUploadSectionTitles = [
           'National ID',
           'Passport',
@@ -430,7 +420,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         }
       })
 
-      test("3.1.5.3 Upload proof of father's id", async () => {
+      await test.step("3.1.5.3 Upload proof of father's id", async () => {
         const imageUploadSectionTitles = [
           'National ID',
           'Passport',
@@ -450,7 +440,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         }
       })
 
-      test("3.1.5.4 Upload proof of informant's id", async () => {
+      await test.step("3.1.5.4 Upload proof of informant's id", async () => {
         const imageUploadSectionTitles = [
           'National ID',
           'Passport',
@@ -470,7 +460,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         }
       })
 
-      test('3.1.5.5 Upload other', async () => {
+      await test.step('3.1.5.5 Upload other', async () => {
         const imageUploadSectionTitles = [
           'Proof of legal guardianship',
           'Proof of assigned responsibility'
@@ -489,11 +479,11 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       })
     })
 
-    test('3.1.6 Go to Review', async () => {
+    await test.step('3.1.6 Go to Review', async () => {
       await goToSection(page, 'review')
     })
 
-    test('3.1.7 Verify information on review page', async () => {
+    await test.step('3.1.7 Verify information on review page', async () => {
       /*
        * Expected result: should include
        * - Child's First Name
@@ -736,7 +726,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       )
     })
 
-    test('3.1.8 Fill up informant comment & signature', async () => {
+    await test.step('3.1.8 Fill up informant comment & signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -748,7 +738,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
     })
 
-    test('3.1.9 Declare', async () => {
+    await test.step('3.1.9 Declare', async () => {
       await triggerDeclarationAction(page, 'Declare')
 
       await page.getByText('Recent').click()
@@ -761,13 +751,11 @@ test.describe.serial('3. Birth declaration case - 3', () => {
     })
   })
 
-  test.describe('3.2 Declaration Review by Registrar', async () => {
-    test.beforeAll(async () => {
-      await logout(page)
-      await login(page, CREDENTIALS.REGISTRAR)
-    })
+  await test.step('3.2 Declaration Review by Registrar', async () => {
+    await logout(page)
+    await login(page, CREDENTIALS.REGISTRAR)
 
-    test('3.2.1 Navigate to the declaration "Record" -tab', async () => {
+    await test.step('3.2.1 Navigate to the declaration "Record" -tab', async () => {
       await page.getByText('Pending registration').click()
 
       await openRecordByTitle(page, formatName(declaration.child.name))
@@ -780,7 +768,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       )
     })
 
-    test('3.2.1a The .jfif proof of birth is served as an image and previews correctly', async () => {
+    await test.step('3.2.1a The .jfif proof of birth is served as an image and previews correctly', async () => {
       // The document viewer defaults to the first uploaded file: the proof of birth we uploaded as a `.jfif`.
       await expect(page.locator('#select_document')).toContainText(
         'Proof of birth'
@@ -800,7 +788,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
         .toBeGreaterThan(0)
     })
 
-    test('3.2.2 Verify information on "Record" -tab', async () => {
+    await test.step('3.2.2 Verify information on "Record" -tab', async () => {
       /*
        * Expected result: should include
        * - Child's First Name
@@ -1044,7 +1032,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       )
     })
 
-    test('3.2.3 Documents tab lists the documents uploaded during declaration', async () => {
+    await test.step('3.2.3 Documents tab lists the documents uploaded during declaration', async () => {
       await switchEventTab(page, 'Documents')
 
       const documentRows = page.locator('#listTable-documents [id^="row_"]')
@@ -1054,7 +1042,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       ).toBeVisible()
     })
 
-    test('3.2.4 Documents tab allows previewing of document', async () => {
+    await test.step('3.2.4 Documents tab allows previewing of document', async () => {
       await page
         .locator('#listTable-documents')
         .getByText('Proof of birth')
@@ -1070,7 +1058,7 @@ test.describe.serial('3. Birth declaration case - 3', () => {
       )
     })
 
-    test('3.2.5 Closing preview takes us back to documents tab', async () => {
+    await test.step('3.2.5 Closing preview takes us back to documents tab', async () => {
       await page.getByTestId('preview_close').click()
       await expect(page.getByText('Documents (15)')).toBeVisible()
     })

@@ -26,7 +26,7 @@ TL;DR:
 
 - Use the `{ page }` fixture instead of a shared `let page` + `beforeAll`/`afterAll`.
 - `test.step` names each phase in the report while keeping the whole scenario one atomic test, so a failure doesn't leave later steps as misleading "skipped" in a serial chain.
-- Many older specs still use `test.describe.serial`; follow this pattern for new tests and when touching old ones.
+- Use `test.describe` only to group independent tests, never `test.describe.serial`.
 
 \* When user is redirected after action back to event overview (happens only if you come to the event through search), it takes few seconds for the UI to sync up completely. In these scenarios you might need to explicitly wait for the search cache to update.
 
