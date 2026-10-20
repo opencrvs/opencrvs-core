@@ -15,7 +15,7 @@ import { useTRPC } from '@client/v2-events/trpc'
 /**
  * Event configuration only changes when countryconfig is deployed, so refetching it with staleTime 0 causes lots of unnecessary calls.
  */
-const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 30 * 1000
+const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
 
 /**
  * Fetches configured events and finds a matching event

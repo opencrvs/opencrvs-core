@@ -90,11 +90,7 @@ test.describe.serial('Correct record - 2', () => {
     await page.getByRole('button', { name: 'Verified', exact: true }).click()
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
-    const eventConfigResponse = page.waitForResponse((res) =>
-      res.url().includes('event.config.get')
-    )
     await page.getByRole('button', { name: 'No, make correction' }).click()
-    await eventConfigResponse
   })
 
   test('2.2 Select requester and reason', async () => {
