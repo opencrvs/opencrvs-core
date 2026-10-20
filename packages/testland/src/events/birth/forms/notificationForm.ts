@@ -9,9 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineDeclarationForm, FieldType } from '@opencrvs/toolkit/events'
-import { securePageWhileSealed } from '@countryconfig/events/utils'
-import { child } from './pages/child'
+import {
+  defineDeclarationForm,
+  FieldType,
+  field,
+  defineFormPage,
+  FieldConfigInput,
+  PageTypes
+} from '@opencrvs/toolkit/events'
+import {
+  BIRTH_LATE_REGISTRATION_TARGET_DAYS,
+  securePageWhileSealed
+} from '@countryconfig/events/utils'
+import {
+  child,
+  typeOfBirthOptions,
+  attendantAtBirthOptions
+} from './pages/child'
 import { BIRTH_DECLARATION_REVIEW } from './declaration'
 
 /**
@@ -21,12 +35,93 @@ import { BIRTH_DECLARATION_REVIEW } from './declaration'
 const NOTIFICATION_CHILD_FIELD_IDS = [
   'child.name',
   'child.gender',
-  'child.dob',
   'child.placeOfBirth',
   'child.birthLocation',
   'child.birthLocation.privateHome',
-  'child.birthLocation.other'
+  'child.birthLocation.other',
+  'child.weightAtBirth',
+  'child.birthLocationId'
 ]
+
+// Fields directly picked from the declaration form.
+const pickedFields = child.fields.filter(({ id }) =>
+  NOTIFICATION_CHILD_FIELD_IDS.includes(id)
+)
+
+// Fields which are different on the notification form.
+const differentFields: FieldConfigInput[] = [
+  // For notification, dont allow late registration.
+  {
+    id: 'child.dob',
+    analytics: true,
+    type: FieldType.DATE,
+    required: true,
+    secured: true,
+    validation: [
+      {
+        message: {
+          defaultMessage: 'Must be a valid Birthdate',
+          description: 'This is the error message for invalid date',
+          id: 'event.birth.action.declare.form.section.child.field.dob.error'
+        },
+        validator: field('child.dob').isBefore().now()
+      },
+      {
+        message: {
+          defaultMessage: 'Late registration is not allowed',
+          description: 'This is the error message for late registration',
+          id: 'event.birth.action.notify.form.section.child.field.dob.error'
+        },
+        validator: field('child.dob')
+          .isAfter()
+          .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
+          .inPast()
+      }
+    ],
+    label: {
+      defaultMessage: 'Date of birth',
+      description: 'This is the label for the field',
+      id: 'event.birth.action.declare.form.section.child.field.dob.label'
+    }
+  },
+  // This field is required on the notification form, but optional on the declaration form.
+  {
+    id: 'child.birthType',
+    analytics: true,
+    type: FieldType.SELECT,
+    required: true,
+    label: {
+      defaultMessage: 'Type of birth',
+      description: 'This is the label for the field',
+      id: 'event.birth.action.declare.form.section.child.field.birthType.label'
+    },
+    options: typeOfBirthOptions
+  },
+  // This field is required on the notification form, but optional on the declaration form.
+  {
+    id: 'child.attendantAtBirth',
+    type: FieldType.SELECT,
+    analytics: true,
+    required: true,
+    label: {
+      defaultMessage: 'Attendant at birth',
+      description: 'This is the label for the field',
+      id: 'event.birth.action.declare.form.section.child.field.attendantAtBirth.label'
+    },
+    options: attendantAtBirthOptions
+  }
+]
+
+const childPage = defineFormPage({
+  id: 'child',
+  type: PageTypes.enum.FORM,
+  title: {
+    defaultMessage: "Child's details",
+    description: 'Form section title for Child',
+    id: 'form.birth.child.title'
+  },
+  fields: [...pickedFields, ...differentFields]
+})
 
 export const BIRTH_NOTIFICATION_FORM = defineDeclarationForm({
   label: {
@@ -34,14 +129,7 @@ export const BIRTH_NOTIFICATION_FORM = defineDeclarationForm({
     id: 'event.birth.action.notify.form.label',
     description: 'This is what the birth notification form is referred as'
   },
-  pages: [
-    securePageWhileSealed({
-      ...child,
-      fields: child.fields.filter(({ id }) =>
-        NOTIFICATION_CHILD_FIELD_IDS.includes(id)
-      )
-    })
-  ]
+  pages: [securePageWhileSealed(childPage)]
 })
 
 /**
@@ -49,6 +137,7 @@ export const BIRTH_NOTIFICATION_FORM = defineDeclarationForm({
  * review page during notify carry over to the declaration.
  * `notifier.signature` is notify-only data, stored only in the NOTIFY action annotation.
  */
+// TODO CIHAN:
 export const BIRTH_NOTIFICATION_REVIEW = {
   title: BIRTH_DECLARATION_REVIEW.title,
   fields: [

@@ -380,6 +380,8 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
       },
+      notificationForm: BIRTH_NOTIFICATION_FORM,
+      review: BIRTH_NOTIFICATION_REVIEW,
       form: [
         {
           id: 'comments',
