@@ -99,7 +99,6 @@ test('Certified copies', async ({ page }) => {
 })
 
 test('Certified copies renders spouse age correctly', async ({ page }) => {
-  test.setTimeout(180_000)
   const spouseAge = 25
   const token = await getToken(CREDENTIALS.REGISTRAR)
   const res = await createDeclaration(token, () => ({
@@ -168,7 +167,6 @@ test('Certified copies renders spouse age correctly', async ({ page }) => {
 test('Certified copies renders non-spouse informant age correctly', async ({
   page
 }) => {
-  test.setTimeout(180_000)
   const informantAge = faker.number.int({ min: 18, max: 90 })
 
   const declarationOverrides = {

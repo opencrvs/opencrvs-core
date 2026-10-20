@@ -28,8 +28,6 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import { requestCorrectionViaApi } from '@e2e/support/test-data/api-actions'
 
 test('Request and accept correction (offline)', async ({ page }) => {
-  test.setTimeout(180_000)
-
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId: string

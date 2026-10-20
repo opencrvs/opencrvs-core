@@ -22,7 +22,6 @@ import { rejectViaApi } from '@e2e/support/test-data/api-actions'
 test('Validating a rejected declaration clears the Rejected flag', async ({
   browser
 }) => {
-  test.setTimeout(180_000) // two logins plus reject/validate round-trips can exceed the default 90s under CI load
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const { declaration, eventId } = await createDeclaration(
     token,

@@ -227,8 +227,6 @@ test.describe("2. Validate the child's details page", () => {
   })
 
   test('2.5 Validate delayed registration', async ({ page }) => {
-    test.setTimeout(180_000)
-
     await loginAndBeginBirthDeclaration({ page })
 
     async function fillDelayedDate() {

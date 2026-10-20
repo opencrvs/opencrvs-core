@@ -27,7 +27,6 @@ test('Phone number changed from settings is stored as entered', async ({
   browser
 }) => {
   // Covers two full logins plus the account setup flow
-  test.setTimeout(180_000)
 
   const page = await browser.newPage()
 

@@ -245,8 +245,6 @@ test.describe('Form state', () => {
   })
 
   test('Declaration form is populated after refresh', async ({ page }) => {
-    test.setTimeout(180_000)
-
     await test.step('Login', async () => {
       await login(page)
     })

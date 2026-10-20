@@ -28,7 +28,6 @@ import {
 import { rejectViaApi } from '@e2e/support/test-data/api-actions'
 
 test('4(b) Validate "Pending updates"-workqueue for RO', async ({ page }) => {
-  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const res = await createDeclaration(token, undefined, ActionType.DECLARE)
   const declaration = res.declaration

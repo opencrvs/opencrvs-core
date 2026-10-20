@@ -283,8 +283,6 @@ test('Scope changes after office change - user loses access when the office chan
 })
 
 test('Scope changes after office and role changes', async ({ browser }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
 
   const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
@@ -388,8 +386,6 @@ test('Scope changes after office and role changes', async ({ browser }) => {
 })
 
 test('Drafts are removed when only the role changes', async ({ browser }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
   const { username, fullName, childName, trackingId, draftCountBeforeChange } =
     await setupRegistrarWithDrafts(page, 3)

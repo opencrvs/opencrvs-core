@@ -37,8 +37,6 @@ import { ActionType } from '@opencrvs/toolkit/events'
 import { rejectViaApi } from '@e2e/support/test-data/api-actions'
 
 test('4(a) Validate "Pending updates"-workqueue for HO', async ({ page }) => {
-  test.setTimeout(180_000)
-
   let formattedChildName: string
   const token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
   // @TODO: Create throwaway role for user that can notify and declare

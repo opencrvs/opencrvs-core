@@ -29,7 +29,6 @@ import {
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 
 test('10. Death declaration case - 10', async ({ page }) => {
-  test.setTimeout(180_000)
   let eventId = ''
 
   const declaration = {

@@ -116,7 +116,6 @@ test('Basic Archival flow', async ({ page }) => {
 })
 
 test('Archival of declaration pending validation', async ({ page }) => {
-  test.setTimeout(180_000)
   let declaration: Declaration
   let eventId: string
 

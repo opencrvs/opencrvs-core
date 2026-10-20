@@ -27,8 +27,6 @@ test.describe('1. Birth event declaration', () => {
   trackAndDeleteCreatedEvents()
 
   test('Fill all form sections. Save & Exit', async ({ page }) => {
-    test.setTimeout(180_000)
-
     await test.step('1.1. Navigate to the birth event declaration page', async () => {
       await login(page)
 
