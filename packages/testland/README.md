@@ -53,7 +53,7 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` starts the dependencies (databases, Elasticsearch, MinIO etc.) with Docker Compose and all Core services, including Testland on port 3040. It asks for confirmation first, then stops all running Docker containers on your machine.
+`pnpm dev` starts the dependencies (databases, Elasticsearch, S3 etc.) with Docker Compose and all Core services, including Testland on port 3040. It asks for confirmation first, then stops all running Docker containers on your machine.
 
 You can also start them separately:
 

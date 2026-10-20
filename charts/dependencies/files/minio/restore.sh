@@ -50,7 +50,7 @@ validate_restore_contents() {
 # Restore using MinIO mirror (bucket by bucket)
 restore_mirror() {
   MINIO_ALIAS=local-restore
-  mcli alias set "$MINIO_ALIAS" http://minio:3535 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
+  mcli alias set "$MINIO_ALIAS" http://minio:3535 "$S3_ADMIN_ACCESS_KEY" "$S3_ADMIN_SECRET_KEY"
 
   # Restore each bucket
   for bucket_dir in "$WORK_PATH"/*; do

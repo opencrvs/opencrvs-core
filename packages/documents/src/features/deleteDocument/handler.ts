@@ -9,8 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import {
+  listObjectKeys,
+  removeObject,
+  removeObjects,
+  statObjectIfExists
+} from '@documents/s3/client'
+import { S3_BUCKET } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import { badRequest, forbidden } from '@hapi/boom'
 import {
@@ -35,21 +40,15 @@ export async function deleteDocument(
 
   const documentPath = DocumentPath.parse(request.params.filePath)
 
-  try {
-    await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if ((error as { code?: string }).code === 'NotFound') {
-      return h
-        .response(
-          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
-        )
-        .code(404)
-    }
-
-    throw error
+  if (!(await statObjectIfExists(documentPath))) {
+    return h
+      .response(
+        `request failed: document ${documentPath} does not exist in bucket ${S3_BUCKET}`
+      )
+      .code(404)
   }
 
-  await minioClient.removeObject(MINIO_BUCKET, documentPath)
+  await removeObject(documentPath)
 
   return h.response().code(204)
 }
@@ -79,20 +78,10 @@ export async function deletePrefix(
     )
   }
 
-  const names: string[] = []
-
-  for await (const object of minioClient.listObjectsV2(
-    MINIO_BUCKET,
-    prefix,
-    true
-  )) {
-    if (object.name) {
-      names.push(object.name)
-    }
-  }
+  const names = await listObjectKeys(prefix)
 
   if (names.length > 0) {
-    await minioClient.removeObjects(MINIO_BUCKET, names)
+    await removeObjects(names)
   }
 
   return h.response({ deleted: names.length }).code(200)

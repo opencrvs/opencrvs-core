@@ -18,7 +18,7 @@ import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 import { WorkboxPlugin } from 'workbox-core/types'
-import { MINIO_REGEX } from '@opencrvs/commons/client'
+import { S3_URL_REGEX } from '@opencrvs/commons/client'
 
 // "App shell" = the SPA's index.html, served for any unmatched route. True
 // if a document's URL got poisoned with that HTML instead of the real file.
@@ -32,20 +32,6 @@ declare let self: ServiceWorkerGlobalScope
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()
-})
-
-self.addEventListener('message', async (event) => {
-  if (!event.data) {
-    return
-  }
-
-  if (
-    typeof event.data === 'object' &&
-    event.data.hasOwnProperty('minioUrls')
-  ) {
-    await removeCache(event.data.minioUrls)
-    return
-  }
 })
 
 precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
@@ -98,8 +84,8 @@ const documentsOnly: WorkboxPlugin = {
   }
 }
 
-// This caches the minio urls
-registerRoute(MINIO_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
+// This caches the document urls served by the object store
+registerRoute(S3_URL_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
@@ -113,18 +99,3 @@ registerRoute(
 
 self.skipWaiting()
 clientsClaim()
-
-const removeCache = async (minioUrls: string) => {
-  const runTimeCacheKey = (await caches.keys()).find((e) =>
-    e.includes('workbox-runtime')
-  )
-  if (!runTimeCacheKey) {
-    return
-  }
-  const runtimecache = await caches.open(runTimeCacheKey)
-  for (const minioUrl of minioUrls) {
-    const cacheDeletionSuccess = await runtimecache.delete(minioUrl)
-    // eslint-disable-next-line no-console
-    console.log(`Deleted cache for ${minioUrl} : ${cacheDeletionSuccess}`)
-  }
-}
