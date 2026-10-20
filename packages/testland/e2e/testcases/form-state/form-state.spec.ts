@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   continueForm,
   login,
@@ -44,24 +44,16 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe('Form state', () => {
-  test.describe
-    .serial('Declaration form state or annotation is not persisted to a new event', async () => {
+  test('Declaration form state or annotation is not persisted to a new event', async ({
+    page
+  }) => {
     let childName = ''
-    let page: Page
 
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Login', async () => {
+    await test.step('Login', async () => {
       await login(page)
     })
 
-    test('Create a draft', async () => {
+    await test.step('Create a draft', async () => {
       await openBirthDeclaration(page)
       childName = await fillChildDetails(page)
 
@@ -78,7 +70,7 @@ test.describe('Form state', () => {
       await triggerDeclarationAction(page, 'Save & Exit')
     })
 
-    test('Form states and annotations are not persisted', async () => {
+    await test.step('Form states and annotations are not persisted', async () => {
       //@todo: The user should be navigated to "my-drafts" tab by default
       await page.getByText('Drafts').click()
 
@@ -99,24 +91,16 @@ test.describe('Form state', () => {
     })
   })
 
-  test.describe
-    .serial('Declaration form state or annotation is not persisted to another events action', async () => {
-    let page: Page
+  test('Declaration form state or annotation is not persisted to another events action', async ({
+    page
+  }) => {
     let actionableEventChildName = ''
 
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Login', async () => {
+    await test.step('Login', async () => {
       await login(page)
     })
 
-    test('Create a draft', async () => {
+    await test.step('Create a draft', async () => {
       await openBirthDeclaration(page)
       actionableEventChildName = await fillChildDetails(page)
 
@@ -146,7 +130,7 @@ test.describe('Form state', () => {
       await triggerDeclarationAction(page, 'Save & Exit')
     })
 
-    test('Form states and annotations are not persisted', async () => {
+    await test.step('Form states and annotations are not persisted', async () => {
       await page.getByRole('button', { name: 'Drafts' }).click()
 
       await openRecordByTitle(page, actionableEventChildName)
@@ -166,29 +150,23 @@ test.describe('Form state', () => {
     })
   })
 
-  test.describe
-    .serial('Action annotation state is not persisted to another action instance', async () => {
+  test('Action annotation state is not persisted to another action instance', async ({
+    page
+  }) => {
+    test.setTimeout(300_000)
+
     let declaration: Declaration
-    let page: Page
 
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Create a declaration', async () => {
+    await test.step('Create a declaration', async () => {
       const token = await getToken(CREDENTIALS.REGISTRAR)
       declaration = (await createDeclaration(token)).declaration
     })
 
-    test('Login', async () => {
+    await test.step('Login', async () => {
       await login(page)
     })
 
-    test('Open correction through Print action', async () => {
+    await test.step('Open correction through Print action', async () => {
       expect(declaration).toBeDefined()
       await searchFromSearchBar(page, formatV2ChildName(declaration))
 
@@ -207,7 +185,7 @@ test.describe('Form state', () => {
       await eventConfigResponse
     })
 
-    test('Select informant', async () => {
+    await test.step('Select informant', async () => {
       await page.locator('#requester____type').click()
       await page.getByText('Informant (Mother)', { exact: true }).click()
 
@@ -224,7 +202,7 @@ test.describe('Form state', () => {
       await page.getByRole('button', { name: 'Continue', exact: true }).click()
     })
 
-    test('Form changes in correction are persisted after reload', async () => {
+    await test.step('Form changes in correction are persisted after reload', async () => {
       const updatedMotherName = faker.person.firstName('female')
 
       await page.getByRole('button', { name: 'Verified' }).click()
@@ -240,7 +218,7 @@ test.describe('Form state', () => {
       await expect(page.locator('#firstname')).toHaveValue(updatedMotherName)
     })
 
-    test('Form states and annotations are not persisted', async () => {
+    await test.step('Form states and annotations are not persisted', async () => {
       expect(declaration).toBeDefined()
       await page.goto(CLIENT_URL)
 
@@ -269,36 +247,25 @@ test.describe('Form state', () => {
     })
   })
 
-  test.describe
-    .serial('Declaration form is populated after refresh', async () => {
-    let page: Page
-
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Login', async () => {
+  test('Declaration form is populated after refresh', async ({ page }) => {
+    await test.step('Login', async () => {
       await login(page)
     })
-    test('Move to birth form', async () => {
+    await test.step('Move to birth form', async () => {
       await page.click('#header-new-event')
       await page.getByLabel('Birth').click()
       await page.getByRole('button', { name: 'Continue' }).click()
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('Input child fields', async () => {
+    await test.step('Input child fields', async () => {
       const firstname = 'foo'
       const surname = 'bar'
       await type(page, '#firstname', firstname)
       await type(page, '#surname', surname)
     })
 
-    test('refresh the page and verify fields are populated', async () => {
+    await test.step('refresh the page and verify fields are populated', async () => {
       await waitForLocalDraftToContain(page, 'bar')
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue('foo')
