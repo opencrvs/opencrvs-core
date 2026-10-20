@@ -26,7 +26,6 @@ import {
   typeOfBirthOptions,
   attendantAtBirthOptions
 } from './pages/child'
-import { BIRTH_DECLARATION_REVIEW } from './declaration'
 
 /**
  * Child fields captured on a birth notification. The fields are taken from the
@@ -132,19 +131,24 @@ export const BIRTH_NOTIFICATION_FORM = defineDeclarationForm({
   pages: [securePageWhileSealed(childPage)]
 })
 
-/**
- * The declaration review fields are kept (optional) so that values entered on the
- * review page during notify carry over to the declaration.
- * `notifier.signature` is notify-only data, stored only in the NOTIFY action annotation.
- */
-// TODO CIHAN:
 export const BIRTH_NOTIFICATION_REVIEW = {
-  title: BIRTH_DECLARATION_REVIEW.title,
+  title: {
+    defaultMessage:
+      '{child.name.firstname, select, __EMPTY__ {Birth notification} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notificaton for {child.name.firstname} {child.name.surname}}}}}',
+    id: 'event.birth.action.notify.form.review.title',
+    description: 'Title of the form to show in review page'
+  },
   fields: [
-    ...BIRTH_DECLARATION_REVIEW.fields.map((field) => ({
-      ...field,
-      required: false
-    })),
+    {
+      id: 'review.comment',
+      type: FieldType.TEXTAREA,
+      label: {
+        defaultMessage: 'Comment',
+        id: 'event.birth.action.declare.form.review.comment.label',
+        description: 'Label for the comment field in the review section'
+      },
+      required: true
+    },
     {
       type: FieldType.SIGNATURE,
       id: 'notifier.signature',
