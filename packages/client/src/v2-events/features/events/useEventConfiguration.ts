@@ -13,14 +13,21 @@ import { EventConfig } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 
 /**
+ * Event configuration only changes when countryconfig is deployed, so refetching it with staleTime 0 causes lots of unnecessary calls.
+ */
+const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 30 * 1000
+
+/**
  * Fetches configured events and finds a matching event
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
   const trpc = useTRPC()
+
   const config = useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
-    queryKey: trpc.event.config.get.queryKey()
+    queryKey: trpc.event.config.get.queryKey(),
+    staleTime: import.meta.env.PROD ? EVENT_CONFIGURATION_STALE_TIME_MS : 0
   }).data
 
   return config
