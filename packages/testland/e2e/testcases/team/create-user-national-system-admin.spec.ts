@@ -8,15 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import path from 'path'
 import { continueForm, login, loginWithNewUser } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ASSETS_DIR } from '@e2e/support/paths'
 
-test.describe.serial('1. Create user -1', () => {
-  let page: Page
+test('1. Create user -1', async ({ page, browser }) => {
   const userinfo = {
     firstName: faker.person.firstName('male'),
     surname: faker.person.lastName('male'),
@@ -25,32 +24,22 @@ test.describe.serial('1. Create user -1', () => {
   }
   const signaturePath = path.join(ASSETS_DIR, 'sign1.png')
   const username = `${userinfo.firstName[0]}.${userinfo.surname}`.toLowerCase()
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
+  await test.step('1.1 User creation started by national system admin', async () => {
+    await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+    await page.getByRole('button', { name: 'Team' }).click()
+    await expect(
+      page.locator('#location-range-picker-action').getByText('HQ Office')
+    ).toBeVisible()
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+    await page.getByRole('button', { name: /HQ Office/ }).click()
+    await page.getByTestId('locationSearchInput').fill('Klow')
 
-  test.describe('1.1 User creation started by national system admin', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
-      await page.getByRole('button', { name: 'Team' }).click()
-      await expect(
-        page.locator('#location-range-picker-action').getByText('HQ Office')
-      ).toBeVisible()
+    await page.getByText(/Klow Village Hospital/).click()
 
-      await page.getByRole('button', { name: /HQ Office/ }).click()
-      await page.getByTestId('locationSearchInput').fill('Klow')
+    await page.click('#add-user')
+    await expect(page.getByText('User details')).toBeVisible()
 
-      await page.getByText(/Klow Village Hospital/).click()
-
-      await page.click('#add-user')
-      await expect(page.getByText('User details')).toBeVisible()
-    })
-
-    test('1.1.1 Fill user details', async () => {
+    await test.step('1.1.1 Fill user details', async () => {
       await page.locator('#surname').fill(userinfo.surname)
       await page.locator('#firstname').fill(userinfo.firstName)
       await page.locator('#email').fill(userinfo.email)
@@ -60,12 +49,12 @@ test.describe.serial('1. Create user -1', () => {
     })
 
     // @TODO: requires file upload support in events service.
-    test('1.1.2 Upload Signature', async () => {
+    await test.step('1.1.2 Upload Signature', async () => {
       await page.setInputFiles('input[type="file"]', signaturePath)
       await continueForm(page)
     })
 
-    test('1.1.2 Create user', async () => {
+    await test.step('1.1.2 Create user', async () => {
       await page.getByRole('button', { name: 'Create user' }).click()
 
       await expect(page.locator('#header')).toContainText(
@@ -80,9 +69,11 @@ test.describe.serial('1. Create user -1', () => {
     })
   })
 
-  test.describe('2.1 Login with newly created user credentials', () => {
-    test('2.1.1 Enter your username and password', async ({ page }) => {
-      await loginWithNewUser(page, username)
+  await test.step('2.1 Login with newly created user credentials', async () => {
+    await test.step('2.1.1 Enter your username and password', async () => {
+      // A fresh page, so the new user logs in without the admin's session
+      const newUserPage = await browser.newPage()
+      await loginWithNewUser(newUserPage, username)
     })
   })
 })

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { login, getToken } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -24,29 +24,17 @@ import {
 } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('6 Validate "Pending certification"-workqueue', () => {
-  let page: Page
-  let declaration: Declaration
-  let eventId: string
+test('6 Validate "Pending certification"-workqueue', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
+  const eventId = res.eventId
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    eventId = res.eventId
-
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('6.0 Login', async () => {
+  await test.step('6.0 Login', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
   })
 
-  test('6.1 Go to "Pending certification"-workqueue', async () => {
+  await test.step('6.1 Go to "Pending certification"-workqueue', async () => {
     await page.getByText('Pending certification').click()
     await expect(
       page.getByRole('button', { name: formatV2ChildName(declaration) })
@@ -56,7 +44,7 @@ test.describe.serial('6 Validate "Pending certification"-workqueue', () => {
     )
   })
 
-  test('6.2 validate the list', async () => {
+  await test.step('6.2 validate the list', async () => {
     const button = page.getByRole('button', {
       name: formatV2ChildName(declaration)
     })
@@ -81,7 +69,7 @@ test.describe.serial('6 Validate "Pending certification"-workqueue', () => {
     )
   })
 
-  test('6.4 Click a name', async () => {
+  await test.step('6.4 Click a name', async () => {
     await openRecordByTitle(page, formatV2ChildName(declaration))
 
     await expectInUrl(
@@ -90,7 +78,7 @@ test.describe.serial('6 Validate "Pending certification"-workqueue', () => {
     )
   })
 
-  test('6.5 Click Print action', async () => {
+  await test.step('6.5 Click Print action', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Print')
     await expect(page.locator('#content-name')).toHaveText('Certify record')

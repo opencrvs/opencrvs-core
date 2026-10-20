@@ -767,8 +767,8 @@ export const randomPastDate = (daysBack = 14) => {
  * The Organisation page paginates its location list client-side (10 items
  * per page) once a level has more than 10 children — e.g. locations created
  * directly via the API can push a previously first-page entry onto a later
- * page. Since tests in the same `test.describe.serial` block share one page
- * instance, a prior test may have already paged forward past where the
+ * page. Since the steps of a test share one page
+ * instance, a prior step may have already paged forward past where the
  * target actually is — so this first resets to page 1 (clicking 'Previous
  * page' until disabled), then clicks 'Next page' until `locator` becomes
  * visible or that button is disabled (no more pages), then asserts on it.

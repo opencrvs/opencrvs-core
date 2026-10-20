@@ -32,47 +32,38 @@ const todayDate = `${new Date().getDate() < 10 ? '0' : ''}${new Date().getDate()
 const thisMonth = `${new Date().getMonth() < 9 ? '0' : ''}${(new Date().getMonth() + 1).toString()}`
 const thisYear = new Date().getFullYear().toString()
 
-test.describe
-  .serial('Advanced Search - Birth Event Declaration - Registration details', () => {
-  let page: Page
+test('Advanced Search - Birth Event Declaration - Registration details', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const toDate = format(new Date(), 'yyyy-MM-dd')
+  // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+  const fromDate = format(
+    subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+    'yyyy-MM-dd'
+  )
 
-    const toDate = format(new Date(), 'yyyy-MM-dd')
-    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
-    const fromDate = format(
-      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
-      'yyyy-MM-dd'
-    )
-
-    await createDeclaration(token, {
-      'mother.dob': '1995-09-12',
-      'child.dob': faker.date
-        // DOB must be at least 18 years after mother.dob to pass validation
-        // Upper bound ensures the record appears on the first page of search results
-        .between({ from: fromDate, to: toDate })
-        .toISOString()
-        .split('T')[0],
-      'child.gender': 'female'
-    })
+  await createDeclaration(token, {
+    'mother.dob': '1995-09-12',
+    'child.dob': faker.date
+      // DOB must be at least 18 years after mother.dob to pass validation
+      // Upper bound ensures the record appears on the first page of search results
+      .between({ from: fromDate, to: toDate })
+      .toISOString()
+      .split('T')[0],
+    'child.gender': 'female'
   })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('1.1 - Validate log in and load search page', async () => {
+  await test.step('1.1 - Validate log in and load search page', async () => {
     await login(page)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
     await page.getByText('Birth').click()
   })
 
-  test.describe
-    .serial('1.5 - Validate search by registration details search fields', () => {
-    test('1.5.1 - Validate Place of registration filters, Date of registration Status of Record and Time Period', async () => {
+  await test.step('1.5 - Validate search by registration details search fields', async () => {
+    await test.step('1.5.1 - Validate Place of registration filters, Date of registration Status of Record and Time Period', async () => {
       await page.getByText('Registration details').click()
 
       await page
@@ -113,7 +104,7 @@ test.describe
       await expect(page.getByText('Last 7 days')).toHaveCount(2)
     })
 
-    test('1.5.2 - Validate search and show results', async () => {
+    await test.step('1.5.2 - Validate search and show results', async () => {
       await page.click('#search')
       await expect(page).toHaveURL(/.*\/search-result/)
 
@@ -146,7 +137,7 @@ test.describe
       ).toBeVisible()
     })
 
-    test('1.5.3 - Validate clicking on the search edit button', async () => {
+    await test.step('1.5.3 - Validate clicking on the search edit button', async () => {
       await page.getByRole('button', { name: 'Edit', exact: true }).click()
       await expect(page).toHaveURL(/.*\/advanced-search/)
 
