@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -21,26 +21,16 @@ import {
   selectRequesterType
 } from '@e2e/support/print-certificate/death/helpers'
 
-test.describe.serial('9.0 Validate "Certify record" page', () => {
-  let page: Page
-  let declaration: Declaration
+test('9.0 Validate "Certify record" page', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('9.0.1 Log in', async () => {
+  await test.step('9.0.1 Log in', async () => {
     await login(page)
   })
 
-  test('9.0.1 Navigate to certificate print action', async () => {
+  await test.step('9.0.1 Navigate to certificate print action', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await navigateToCertificatePrintAction(
       page,
@@ -49,7 +39,7 @@ test.describe.serial('9.0 Validate "Certify record" page', () => {
     )
   })
 
-  test('9.1 Review page validations', async () => {
+  await test.step('9.1 Review page validations', async () => {
     await selectCertificationType(page, 'Death Certificate Certified Copy')
     await selectRequesterType(page, 'Print and issue to Informant (Spouse)')
 

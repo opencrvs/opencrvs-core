@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   goToSection,
   login,
@@ -28,16 +28,12 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
  * Develop is already in broken state. We'll revisit this when we have ungloc the pipeline and can dedicate time on which change caused the error.
  */
 test.describe('Save and delete drafts', () => {
-  test.describe.serial('Save draft', () => {
+  test('Save draft', async ({ page }) => {
     let childName = ''
-    let page: Page
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-      await openBirthDeclaration(page)
-    })
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await openBirthDeclaration(page)
 
-    test('Save draft via Save & Exit', async () => {
+    await test.step('Save draft via Save & Exit', async () => {
       childName = await fillChildDetails(page)
       await page.getByRole('button', { name: 'Save & Exit' }).click()
       await expect(
@@ -58,7 +54,7 @@ test.describe('Save and delete drafts', () => {
       await expect(page.locator('#content-name')).toHaveText(childName)
     })
 
-    test('Saved draft is not visible to other users', async () => {
+    await test.step('Saved draft is not visible to other users', async () => {
       await logout(page)
       await login(page, CREDENTIALS.REGISTRAR)
 
@@ -69,12 +65,12 @@ test.describe('Save and delete drafts', () => {
       ).not.toBeVisible()
     })
 
-    test('Login as Registration Officer', async () => {
+    await test.step('Login as Registration Officer', async () => {
       await logout(page)
       await login(page, CREDENTIALS.REGISTRATION_OFFICER, true)
     })
 
-    test('Delete saved draft', async () => {
+    await test.step('Delete saved draft', async () => {
       await page.getByRole('button', { name: 'Drafts' }).click()
       await openRecordByTitle(page, childName)
 
@@ -87,14 +83,10 @@ test.describe('Save and delete drafts', () => {
     })
   })
 
-  test.describe.serial('Exit without saving', () => {
-    let page: Page
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-      await openBirthDeclaration(page)
-    })
-    test('Exit without saving', async () => {
+  test('Exit without saving', async ({ page }) => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await openBirthDeclaration(page)
+    await test.step('Exit without saving', async () => {
       const childName = await fillChildDetails(page)
       await goToSection(page, 'review')
       await page.getByTestId('exit-button').click()

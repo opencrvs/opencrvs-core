@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import {
   login,
@@ -34,57 +34,30 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 import { faker } from '@faker-js/faker'
 import { ActionType } from '@opencrvs/toolkit/events'
+import { rejectViaApi } from '@e2e/support/test-data/api-actions'
 
-test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
-  let page: Page
-  let declaration: Declaration
-  let eventId: string
+test('4(a) Validate "Pending updates"-workqueue for HO', async ({ page }) => {
   let formattedChildName: string
+  const token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
+  // @TODO: Create throwaway role for user that can notify and declare
+  const res = await createDeclaration(
+    token,
+    undefined,
+    ActionType.NOTIFY,
+    'HEALTH_FACILITY'
+  )
+  const declaration = res.declaration
+  const eventId = res.eventId
+  formattedChildName = formatV2ChildName(declaration)
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
-    // @TODO: Create throwaway role for user that can notify and declare
-    const res = await createDeclaration(
-      token,
-      undefined,
-      ActionType.NOTIFY,
-      'HEALTH_FACILITY'
+  await test.step('4.0 Reject the notification via API as RO', async () => {
+    await rejectViaApi(
+      await getToken(CREDENTIALS.REGISTRATION_OFFICER),
+      eventId
     )
-    declaration = res.declaration
-    eventId = res.eventId
-    formattedChildName = formatV2ChildName(declaration)
-    page = await browser.newPage()
   })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('4.0.1 Login', async () => {
-    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-  })
-
-  test('4.0.2 Navigate to record audit', async () => {
-    await page.getByText('Notifications').click()
-
-    await openRecordByTitle(page, formattedChildName)
-  })
-
-  test('4.0.3 Reject a declaration', async () => {
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-    await selectAction(page, 'Reject')
-
-    await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
-
-    const rejectResponse = page.waitForResponse(
-      (res) => res.url().includes('event.actions.reject.request') && res.ok()
-    )
-
-    await page.getByRole('button', { name: 'Send For Update' }).click()
-    await rejectResponse
-  })
-
-  test('4.1 Go to "Pending updates"-workqueue', async () => {
+  await test.step('4.1 Go to "Pending updates"-workqueue', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
 
     await page.getByText('Pending updates').click()
@@ -96,7 +69,7 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
     )
   })
 
-  test('4.2 validate the list', async () => {
+  await test.step('4.2 validate the list', async () => {
     const header = page.getByTestId('workqueue-table-header')
     const columns = await header.locator(':scope > div').allInnerTexts()
     expect(columns).toStrictEqual([
@@ -118,7 +91,7 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
     )
   })
 
-  test('4.4 Click a name', async () => {
+  await test.step('4.4 Click a name', async () => {
     await openRecordByTitle(page, formattedChildName)
 
     // User should navigate to record audit page
@@ -128,7 +101,7 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
     )
   })
 
-  test('4.5 Acting directly from workqueue should redirect to the same workqueue', async () => {
+  await test.step('4.5 Acting directly from workqueue should redirect to the same workqueue', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.HOSPITAL_OFFICIAL)
     await page.goBack()
 
@@ -155,7 +128,7 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
     await expect(page.locator('#content-name')).toHaveText('Pending updates')
   })
 
-  test('4.6 Assert record does not have "Edit in progress" flag', async () => {
+  await test.step('4.6 Assert record does not have "Edit in progress" flag', async () => {
     await navigateToWorkqueue(page, 'Recent')
     await openRecordByTitle(page, formattedChildName)
     await expect(page.getByText('Edit in progress')).not.toBeVisible()
