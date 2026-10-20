@@ -11,7 +11,7 @@
 
 /* eslint-disable max-lines -- location schemas, anchored version resolution and scope-access logic are cohesive; splitting them would create an import cycle (ClientLocation derives from Location) or fan the access helpers' 30+ importers across modules. */
 
-import { UUID } from '../uuid'
+import { maybeUuid, UUID } from '../uuid'
 import * as z from 'zod/v4'
 import { PlainDate } from './PlainDate'
 import { EventIndex } from './EventIndex'
@@ -662,11 +662,10 @@ export function getAdministrativeAreaHierarchy<
   // Collect location objects from leaf to root
   const collectedLocations: A[] = []
 
-  const parsedAdministrativeAreaId =
-    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
+  const maybeAdministrativeAreaId = maybeUuid(administrativeAreaId)
 
-  let current = parsedAdministrativeAreaId
-    ? administrativeAreas.get(parsedAdministrativeAreaId)
+  let current = maybeAdministrativeAreaId
+    ? administrativeAreas.get(maybeAdministrativeAreaId)
     : null
 
   while (current) {

@@ -116,7 +116,7 @@
     "tsx": "^4.15.7",
     "typescript": "7.0.2",
     "uuid": "^11.1.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
