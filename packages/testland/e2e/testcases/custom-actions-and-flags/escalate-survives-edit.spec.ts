@@ -31,6 +31,7 @@ import {
   formatV2ChildName
 } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { customActionViaApi } from '@e2e/support/test-data/api-actions'
 
 const ESCALATION_FLAG = 'Escalated to Provincial Registrar'
 
@@ -43,7 +44,6 @@ const ESCALATION_FLAG = 'Escalated to Provincial Registrar'
 test('An escalated declaration keeps its escalation flag when edited by the RO', async ({
   browser
 }) => {
-  test.setTimeout(180_000)
   const page = await browser.newPage()
 
   let declaration: Declaration
@@ -55,51 +55,29 @@ test('An escalated declaration keeps its escalation flag when edited by the RO',
 
     declaration = res.declaration
     childName = formatV2ChildName(declaration)
+
+    await test.step('Registrar escalates the record to the provincial registrar (via API)', async () => {
+      await customActionViaApi({
+        token,
+        eventId: res.eventId,
+        customActionType: 'ESCALATE',
+        annotation: {
+          'escalate-to': 'PROVINCIAL_REGISTRAR',
+          reason: 'Escalating this declaration for provincial guidance.'
+        }
+      })
+    })
   })
 
-  await test.step('Registrar escalates the record to the provincial registrar', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
+  await test.step('RO sees the escalation flag on the record', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
-    await navigateToWorkqueue(page, 'Pending registration')
-    await openRecordByTitle(page, childName)
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR, { timeout: 15_000 })
-
-    await selectAction(page, 'Escalate')
-
-    const confirmButton = page.getByRole('button', { name: 'Confirm' })
-    await expect(confirmButton).toBeDisabled()
-
-    await page.locator('#escalate-to').click()
-    await page
-      .getByText('My state provincial registrar', { exact: true })
-      .first()
-      .click()
-
-    await page
-      .locator('#reason')
-      .fill('Escalating this declaration for provincial guidance.')
-
-    const escalateResponse = page.waitForResponse(
-      (response) =>
-        response.url().includes('event.actions.custom') && response.ok()
-    )
-
-    await expect(confirmButton).toBeEnabled()
-    await confirmButton.click()
-
-    await escalateResponse
-  })
-
-  await test.step('The escalation flag is shown on the record', async () => {
     await searchFromSearchBar(page, childName)
 
     await expect(page.getByTestId('flags-value')).toContainText(ESCALATION_FLAG)
   })
 
   await test.step('RO edits the record and declares with edits', async () => {
-    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-    await searchFromSearchBar(page, childName)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER, {
       timeout: 15_000
     })

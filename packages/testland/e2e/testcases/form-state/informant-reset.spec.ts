@@ -8,24 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Page, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { goToSection, login } from '@e2e/support/helpers'
 import { openBirthDeclaration } from '@e2e/support/birth/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 
 test.describe('Informant details resets when relation is changed', () => {
-  test.describe.serial('Birth', async () => {
-    let page: Page
-
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Fill in informant details', async () => {
+  test('Birth', async ({ page }) => {
+    await test.step('Fill in informant details', async () => {
       await login(page, CREDENTIALS.REGISTRAR_VILLAGE)
       await openBirthDeclaration(page)
 
@@ -69,7 +59,7 @@ test.describe('Informant details resets when relation is changed', () => {
       await page.locator('#informant____email').fill('bart@gmail.com')
     })
 
-    test('Change informant', async () => {
+    await test.step('Change informant', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText('Sister', {
@@ -104,18 +94,8 @@ test.describe('Informant details resets when relation is changed', () => {
     })
   })
 
-  test.describe.serial('Death', async () => {
-    let page: Page
-
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('Fill in informant details', async () => {
+  test('Death', async ({ page }) => {
+    await test.step('Fill in informant details', async () => {
       await login(page)
       await page.click('#header-new-event')
       await page.getByLabel('Death').click()
@@ -162,7 +142,7 @@ test.describe('Informant details resets when relation is changed', () => {
       await page.locator('#informant____email').fill('bart@gmail.com')
     })
 
-    test('Change informant', async () => {
+    await test.step('Change informant', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText('Daughter', {

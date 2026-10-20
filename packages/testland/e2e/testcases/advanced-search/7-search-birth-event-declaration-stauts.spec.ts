@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   joinValuesWith,
   login,
@@ -17,23 +17,13 @@ import {
 import { faker } from '@faker-js/faker'
 import { expectInUrl, type } from '@e2e/support/utils'
 
-test.describe
-  .serial("Advanced Search - Birth Event Declaration - Informant's details", () => {
-  let page: Page
-  let firstname: string
-  let surname: string
+test("Advanced Search - Birth Event Declaration - Informant's details", async ({
+  page
+}) => {
+  const firstname = faker.person.firstName()
+  const surname = faker.person.firstName()
 
-  test.beforeAll(async ({ browser }) => {
-    firstname = faker.person.firstName()
-    surname = faker.person.firstName()
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('7.1 Create a draft birth declaration by filling in child details', async () => {
+  await test.step('7.1 Create a draft birth declaration by filling in child details', async () => {
     await login(page)
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
@@ -63,13 +53,13 @@ test.describe
     ).toBeVisible()
   })
 
-  test('7.2 - Navigate to the advanced search page and select Birth event type', async () => {
+  await test.step('7.2 - Navigate to the advanced search page and select Birth event type', async () => {
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
     await page.getByText('Birth').click()
   })
 
-  test('7.3 - Search for birth declaration using child name and status filter', async () => {
+  await test.step('7.3 - Search for birth declaration using child name and status filter', async () => {
     await page.getByText('Registration details').click()
 
     await page.locator('#event____status').click()
@@ -85,7 +75,7 @@ test.describe
     await expect(page).toHaveURL(/.*\/search-result/)
   })
 
-  test('7.4 - Confirm that draft records do not appear in search results', async () => {
+  await test.step('7.4 - Confirm that draft records do not appear in search results', async () => {
     await expect(page.getByText('Search results')).toBeVisible()
     const searchResult = await page.locator('#content-name').textContent()
     const searchResultCountNumberInBracketsRegex = /\((\d+)\)$/

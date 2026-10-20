@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { login, triggerDeclarationAction } from '@e2e/support/helpers'
 import path from 'path'
 import { faker } from '@faker-js/faker'
@@ -23,20 +23,11 @@ const child = {
   }
 }
 
-test.describe.serial('1. Birth event declaration', () => {
+test.describe('1. Birth event declaration', () => {
   trackAndDeleteCreatedEvents()
 
-  test.describe.serial('Fill all form sections. Save & Exit', () => {
-    let page: Page
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('1.1. Navigate to the birth event declaration page', async () => {
+  test('Fill all form sections. Save & Exit', async ({ page }) => {
+    await test.step('1.1. Navigate to the birth event declaration page', async () => {
       await login(page)
 
       await page.click('#header-new-event')
@@ -46,8 +37,8 @@ test.describe.serial('1. Birth event declaration', () => {
       ).toBeVisible()
     })
 
-    test.describe('1.2. Validate event selection page', async () => {
-      test('1.2.1 Validate the contents of the event type page', async () => {
+    await test.step('1.2. Validate event selection page', async () => {
+      await test.step('1.2.1 Validate the contents of the event type page', async () => {
         /*
          * Expected result: should show
          * - Radio buttons of the events
@@ -64,7 +55,7 @@ test.describe.serial('1. Birth event declaration', () => {
         await expect(page.getByRole('button', { name: 'Exit' })).toBeVisible()
       })
 
-      test('1.2.2 Click the "Continue" button without selecting any event', async () => {
+      await test.step('1.2.2 Click the "Continue" button without selecting any event', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
         /*
          * Expected result: should throw an error as below:
@@ -75,7 +66,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.2.3 Select the "Birth" event and click "Continue" button', async () => {
+      await test.step('1.2.3 Select the "Birth" event and click "Continue" button', async () => {
         await page.getByLabel('Birth').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -85,8 +76,8 @@ test.describe.serial('1. Birth event declaration', () => {
       })
     })
 
-    test.describe('1.3 Validate "Introduction" page', async () => {
-      test('1.3.1 Validate the contents of introduction page', async () => {
+    await test.step('1.3 Validate "Introduction" page', async () => {
+      await test.step('1.3.1 Validate the contents of introduction page', async () => {
         /*
          * Expected result: should show
          * - verbiage of birth event introduction
@@ -120,7 +111,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.3.2 Verify the verbiage of introduction page of birth event', async () => {
+      await test.step('1.3.2 Verify the verbiage of introduction page of birth event', async () => {
         /*
          * Expected result: should show
          * - I am going to help you make a declaration of birth.
@@ -150,7 +141,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.3.3 Click the "continue" button', async () => {
+      await test.step('1.3.3 Click the "continue" button', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
         /*
          * Expected result: should navigate to the "Child details" page
@@ -159,8 +150,8 @@ test.describe.serial('1. Birth event declaration', () => {
       })
     })
 
-    test.describe('1.4 Validate "Child Details" page', async () => {
-      test('1.4.1 Validate the contents of Child details page', async () => {
+    await test.step('1.4 Validate "Child Details" page', async () => {
+      await test.step('1.4.1 Validate the contents of Child details page', async () => {
         /*
          * Expected result: should see
          * - Child details block
@@ -188,14 +179,14 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.4.2 Validate Child details block', async () => {
+      await test.step('1.4.2 Validate Child details block', async () => {
         await page.locator('#firstname').fill(child.name.firstNames)
         await page.locator('#firstname').blur()
         await page.locator('#surname').fill(child.name.surname)
         await page.locator('#surname').blur()
       })
 
-      test('1.4.3 Click "continue"', async () => {
+      await test.step('1.4.3 Click "continue"', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
 
         /*
@@ -205,8 +196,8 @@ test.describe.serial('1. Birth event declaration', () => {
       })
     })
 
-    test.describe('1.5 Validate "Informant details" page', async () => {
-      test('1.5.1 Validate the contents of informant details page', async () => {
+    await test.step('1.5 Validate "Informant details" page', async () => {
+      await test.step('1.5.1 Validate the contents of informant details page', async () => {
         /*
          * Expected result: should see
          * - Relationship to child dropdown
@@ -238,7 +229,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.5.3 Select any option in relationship to child and click the "continue" button', async () => {
+      await test.step('1.5.3 Select any option in relationship to child and click the "continue" button', async () => {
         await page.getByText('Select').click()
         await page.getByText('Mother', { exact: true }).click()
         await page.getByRole('button', { name: 'Continue' }).click()
@@ -252,8 +243,8 @@ test.describe.serial('1. Birth event declaration', () => {
       })
     })
 
-    test.describe('1.6 Validate "Mother Details" page', async () => {
-      test("1.6.1 validate the contents of mother's details page", async () => {
+    await test.step('1.6 Validate "Mother Details" page', async () => {
+      await test.step("1.6.1 validate the contents of mother's details page", async () => {
         /*
          * Expected result: should see
          * - Mother's details block
@@ -284,9 +275,12 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test.skip("1.6.2 Validate Mother's details block", async () => {})
+      await test.step.skip(
+        "1.6.2 Validate Mother's details block",
+        async () => {}
+      )
 
-      test('1.6.3 click continue', async () => {
+      await test.step('1.6.3 click continue', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
 
         /*
@@ -298,8 +292,8 @@ test.describe.serial('1. Birth event declaration', () => {
       })
     })
 
-    test.describe('1.7 Validate "Father Details" page', async () => {
-      test("1.7.1 validate the contents of Father's details page", async () => {
+    await test.step('1.7 Validate "Father Details" page', async () => {
+      await test.step("1.7.1 validate the contents of Father's details page", async () => {
         /*
          * Expected result: should see
          * - Father's details block
@@ -330,9 +324,12 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test.skip("1.7.2 Validate Father's details block", async () => {})
+      await test.step.skip(
+        "1.7.2 Validate Father's details block",
+        async () => {}
+      )
 
-      test('1.7.3 click continue', async () => {
+      await test.step('1.7.3 click continue', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
 
         /*
@@ -344,8 +341,8 @@ test.describe.serial('1. Birth event declaration', () => {
       })
     })
 
-    test.describe('1.8 Validate "Supporting Document" page', async () => {
-      test('1.8.1 validate the contents of Supporting Document page', async () => {
+    await test.step('1.8 Validate "Supporting Document" page', async () => {
+      await test.step('1.8.1 validate the contents of Supporting Document page', async () => {
         /*
          * Expected result: should see
          * - Supporting Document block
@@ -376,7 +373,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.8.2 Validate Supporting Document block', async () => {
+      await test.step('1.8.2 Validate Supporting Document block', async () => {
         await page
           .locator('#documents____proofOfMother-form-input div')
           .filter({ hasText: /^Select$/ })
@@ -395,14 +392,14 @@ test.describe.serial('1. Birth event declaration', () => {
         await expect(page.getByLabel('Delete attachment')).toBeVisible()
       })
 
-      test('1.8.3 click continue', async () => {
+      await test.step('1.8.3 click continue', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
         await expectInUrl(page, `/review`)
       })
     })
 
-    test.describe('1.9 Validate "Save & Exit" Button', () => {
-      test('1.9.1 Click the "Save & Exit" button from review page', async () => {
+    await test.step('1.9 Validate "Save & Exit" Button', async () => {
+      await test.step('1.9.1 Click the "Save & Exit" button from review page', async () => {
         await page.getByRole('button', { name: 'Action' }).click()
         await page.getByText('Save & Exit', { exact: true }).click()
 
@@ -430,7 +427,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.9.2 Click Cancel', async () => {
+      await test.step('1.9.2 Click Cancel', async () => {
         await page.getByRole('button', { name: 'Cancel' }).click()
 
         /*
@@ -441,7 +438,7 @@ test.describe.serial('1. Birth event declaration', () => {
         ).toBeHidden()
       })
 
-      test('1.9.3 Click Confirm', async () => {
+      await test.step('1.9.3 Click Confirm', async () => {
         await triggerDeclarationAction(page, 'Save & Exit')
 
         /*
@@ -457,7 +454,7 @@ test.describe.serial('1. Birth event declaration', () => {
         await expect(page.getByText(child.name.firstNames)).toBeVisible()
       })
 
-      test('1.9.4 Reopen draft and navigate to review page', async () => {
+      await test.step('1.9.4 Reopen draft and navigate to review page', async () => {
         await page
           .getByRole('button', {
             name: child.name.firstNames + ' ' + child.name.surname

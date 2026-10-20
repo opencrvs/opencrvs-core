@@ -8,15 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
   expectRowValueWithChangeButton,
   goToSection,
   login,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  getEventIdFromUrl,
+  getToken
 } from '@e2e/support/helpers'
+import { customActionViaApi } from '@e2e/support/test-data/api-actions'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -27,8 +30,8 @@ import {
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('8. Death declaration case - 8', () => {
-  let page: Page
+test('8. Death declaration case - 8', async ({ page }) => {
+  let eventId = ''
 
   const declaration = {
     deceased: {
@@ -52,31 +55,22 @@ test.describe.serial('8. Death declaration case - 8', () => {
       comment: "He was a great person, we'll miss him"
     }
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('8.1 Declaration started by HO', async () => {
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
 
-  test.describe('8.1 Declaration started by HO', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await page.click('#header-new-event')
+    await page.getByLabel('Death').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-      await page.click('#header-new-event')
-      await page.getByLabel('Death').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('8.1.1 Fill deceased details', async () => {
+    await test.step('8.1.1 Fill deceased details', async () => {
       await page.locator('#firstname').fill(declaration.deceased.name.firstname)
       await page.locator('#surname').fill(declaration.deceased.name.surname)
       await continueForm(page)
     })
 
-    test('8.1.2 Fill event details', async () => {
+    await test.step('8.1.2 Fill event details', async () => {
       // A place of death is needed, since hospital official may only declare a record in their own location
       await page.getByTestId('select__eventDetails____placeOfDeath').click()
       await page.getByText('Health Institution', { exact: true }).click()
@@ -87,7 +81,7 @@ test.describe.serial('8. Death declaration case - 8', () => {
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('8.1.3 Fill informant details', async () => {
+    await test.step('8.1.3 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informant.relation, {
@@ -99,11 +93,11 @@ test.describe.serial('8. Death declaration case - 8', () => {
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('8.1.4 Go to preview', async () => {
+    await test.step('8.1.4 Go to preview', async () => {
       await goToSection(page, 'review')
     })
 
-    test('8.1.5 Verify information on preview page', async () => {
+    await test.step('8.1.5 Verify information on preview page', async () => {
       /*
        * Expected result: should include
        * - Deceased's First Name
@@ -261,7 +255,7 @@ test.describe.serial('8. Death declaration case - 8', () => {
       await expectRowValueWithChangeButton(page, 'spouse.addressSameAs', 'Yes')
     })
 
-    test('8.1.6 Fill up informant signature', async () => {
+    await test.step('8.1.6 Fill up informant signature', async () => {
       await page.locator('#review____comment').fill(annotation.review.comment)
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -271,7 +265,8 @@ test.describe.serial('8. Death declaration case - 8', () => {
         .click()
     })
 
-    test('8.1.7 Notify', async () => {
+    await test.step('8.1.7 Notify', async () => {
+      eventId = getEventIdFromUrl(page)
       await triggerDeclarationAction(page, 'Notify')
 
       await expect(page.getByText('Farajaland CRS')).toBeVisible()
@@ -294,34 +289,20 @@ test.describe.serial('8. Death declaration case - 8', () => {
     })
   })
 
-  test.describe('8.1b Attestation by Health Administrator', async () => {
-    test('Health Administrator attests the notification', async () => {
-      await login(page, CREDENTIALS.HEALTH_ADMINISTRATOR)
-
-      await page.getByText('Pending attestation').click()
-      await openRecordByTitle(
-        page,
-        declaration.deceased.name.firstname +
-          ' ' +
-          declaration.deceased.name.surname
-      )
-
-      await ensureAssignedToUser(page, CREDENTIALS.HEALTH_ADMINISTRATOR)
-      await selectAction(page, 'Attest')
-      await page.locator('#comments').fill('Attested for review')
-
-      const attestResponse = page.waitForResponse(
-        (response) =>
-          response.url().includes('event.actions.custom') &&
-          response.status() === 200
-      )
-      await page.getByRole('button', { name: 'Confirm' }).click()
-      await attestResponse
+  await test.step('8.1b Attestation by Health Administrator', async () => {
+    await test.step('Health Administrator attests the notification (via API)', async () => {
+      const token = await getToken(CREDENTIALS.HEALTH_ADMINISTRATOR)
+      await customActionViaApi({
+        token,
+        eventId,
+        customActionType: 'ATTEST',
+        annotation: { comments: 'Attested for review' }
+      })
     })
   })
 
-  test.describe('8.2 Declaration Review by RO', async () => {
-    test('8.2.1 Navigate to the declaration Edit-action', async () => {
+  await test.step('8.2 Declaration Review by RO', async () => {
+    await test.step('8.2.1 Navigate to the declaration Edit-action', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
       await page.getByText('Notifications').click()
@@ -337,7 +318,7 @@ test.describe.serial('8. Death declaration case - 8', () => {
       await selectAction(page, 'Edit')
     })
 
-    test('8.2.2 Verify information on review page', async () => {
+    await test.step('8.2.2 Verify information on review page', async () => {
       /*
        * Expected result: should include
        * - Deceased's First Name
