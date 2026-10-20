@@ -42,7 +42,6 @@ const lateRegDateString = format(lateRegDate, 'yyyy-MM-dd')
 test('Approval of late birth registration -flag can be removed during edit and redeclare', async ({
   page
 }) => {
-  test.setTimeout(240_000)
   const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
   const declarationRequest = await getDeclaration({
     token,
@@ -118,7 +117,7 @@ test('Approval of late birth registration -flag can be removed during edit and r
 test('Approval of late birth registration -flag can be added during edit and redeclare', async ({
   page
 }) => {
-  test.setTimeout(240_000)
+  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
   const declarationRequest = await getDeclaration({
     token,

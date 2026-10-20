@@ -21,7 +21,6 @@ import { expectInUrl } from '@e2e/support/utils'
 import { faker } from '@faker-js/faker'
 
 test('Certified copies', async ({ page }) => {
-  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRAR)
   const res = await createDeclaration(token)
   const declaration = res.declaration
