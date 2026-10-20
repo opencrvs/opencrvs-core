@@ -16,6 +16,8 @@ import { faker } from '@faker-js/faker'
 import { getIdByName, getAdministrativeAreas } from '@e2e/support/birth/helpers'
 import { expectInUrl } from '@e2e/support/utils'
 import { setMobileViewport } from '@e2e/support/mobile-helpers'
+import { format, subDays } from 'date-fns'
+import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 
 test.describe.serial('Advanced Search - Mobile', () => {
   let page: Page
@@ -36,11 +38,17 @@ test.describe.serial('Advanced Search - Mobile', () => {
       throw new Error('Province, district or village not found')
     }
 
+    const toDate = format(new Date(), 'yyyy-MM-dd')
+    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+    const fromDate = format(
+      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+      'yyyy-MM-dd'
+    )
     await createDeclaration(
       token,
       {
         'child.dob': faker.date
-          .between({ from: '2025-09-10', to: '2025-11-28' })
+          .between({ from: fromDate, to: toDate })
           .toISOString()
           .split('T')[0],
         'child.placeOfBirth': 'PRIVATE_HOME',
