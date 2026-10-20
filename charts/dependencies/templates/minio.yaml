@@ -144,12 +144,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: minio-opencrvs-users
-                  key: MINIO_ROOT_USER
+                  key: S3_ADMIN_ACCESS_KEY
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: minio-opencrvs-users
-                  key: MINIO_ROOT_PASSWORD
+                  key: S3_ADMIN_SECRET_KEY
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "minio" "Values" .Values) }}
           ports:

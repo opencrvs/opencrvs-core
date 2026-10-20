@@ -9,6 +9,7 @@
     "start:prod": "TS_NODE_BASEURL=./build/dist node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
+    "test:s3-conformance": "jest -c jest.s3-conformance.config.js --runInBand",
     "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "test:compilation": "tsc --noEmit",
@@ -16,6 +17,9 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/lib-storage": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^21.0.0",
     "@opencrvs/commons": "workspace:*",
@@ -29,7 +33,6 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.0.0",
-    "minio": "^7.0.33",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "tsconfig-paths": "^4.2.0",

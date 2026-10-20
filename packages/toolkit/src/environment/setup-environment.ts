@@ -441,7 +441,7 @@ export async function runSetupEnvironment() {
     await promptAndStoreAnswer(githubOtherQuestions, existingValues)
   }
 
-log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
+  log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
 
   const existingTwoFaEnabled = findExistingValue(
     'TWO_FA_ENABLED',
@@ -839,16 +839,16 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MINIO_ROOT_USER',
+      name: 'S3_ADMIN_ACCESS_KEY',
       type: 'SECRET' as const,
       didExist: findExistingValue(
-        'MINIO_ROOT_USER',
+        'S3_ADMIN_ACCESS_KEY',
         'SECRET',
         'ENVIRONMENT',
         existingValues
       ),
       value: findExistingOrDefine(
-        'MINIO_ROOT_USER',
+        'S3_ADMIN_ACCESS_KEY',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()
@@ -856,16 +856,16 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MINIO_ROOT_PASSWORD',
+      name: 'S3_ADMIN_SECRET_KEY',
       type: 'SECRET' as const,
       didExist: findExistingValue(
-        'MINIO_ROOT_PASSWORD',
+        'S3_ADMIN_SECRET_KEY',
         'SECRET',
         'ENVIRONMENT',
         existingValues
       ),
       value: findExistingOrDefine(
-        'MINIO_ROOT_PASSWORD',
+        'S3_ADMIN_SECRET_KEY',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()

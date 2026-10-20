@@ -14,7 +14,7 @@
 ensure_alpine_utils || exit 1
 MINIO_ALIAS=local-cleanup
 
-mcli alias set "$MINIO_ALIAS" http://minio:3535 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
+mcli alias set "$MINIO_ALIAS" http://minio:3535 "$S3_ADMIN_ACCESS_KEY" "$S3_ADMIN_SECRET_KEY"
 
 # Figure out buckets to back up
 if [ -z "$BUCKETS" ]; then

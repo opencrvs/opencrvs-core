@@ -29,12 +29,12 @@
       value: {{ $root.Values.elasticsearch.host | quote }}
     - name: ELASTICSEARCH_PORT
       value: {{ $root.Values.elasticsearch.port | default 9200 | quote }}
-    - name: MINIO_HOST
-      value: {{ $root.Values.minio.host | quote }}
-    - name: MINIO_PORT
-      value: {{ $root.Values.minio.port | default 9000 | quote }}
-    - name: MINIO_URL
-      value: {{ $root.Values.minio.external_url  | default (printf "minio.%s" $root.Values.hostname) }}
+    - name: S3_HOST
+      value: {{ $root.Values.s3.host | quote }}
+    - name: S3_PORT
+      value: {{ $root.Values.s3.port | default 9000 | quote }}
+    - name: S3_PUBLIC_URL
+      value: {{ include "s3-external-url" $root }}
     - name: REDIS_HOST
       value: {{ $root.Values.redis.host | quote }}
     - name: REDIS_PORT

@@ -1,0 +1,55 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Runs the documents service's object store conformance suite against each
+# verified self-hosted store, see packages/documents/README.md.
+
+name: Documents S3 conformance
+
+on:
+  pull_request:
+    paths:
+      - 'packages/documents/src/s3/**'
+      - 'packages/documents/test/s3-conformance/**'
+      - 'packages/documents/package.json'
+      - '.github/workflows/documents-s3-conformance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: ${{ matrix.store }}
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        store: [minio, seaweedfs, rustfs]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Start ${{ matrix.store }}
+        run: |
+          docker compose -f packages/documents/test/s3-conformance/docker-compose.yml up -d ${{ matrix.store }}
+          timeout 60 sh -c 'until curl -s -o /dev/null localhost:3535; do sleep 1; done'
+          # A store answers before it takes requests
+          sleep 5
+
+      # The compose file starts each store on localhost:3535 with the service's
+      # default minioadmin credentials, so no S3_* setting is needed
+      - run: pnpm --filter @opencrvs/documents test:s3-conformance

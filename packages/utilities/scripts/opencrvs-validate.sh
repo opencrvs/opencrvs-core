@@ -23,9 +23,9 @@ POSTGRES_HOST="${POSTGRES_HOST:-}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 ELASTICSEARCH_HOST="${ELASTICSEARCH_HOST:-${ELASTICSEARCH_URI:-}}"
 ELASTICSEARCH_PORT="${ELASTICSEARCH_PORT:-9200}"
-MINIO_HOST="${MINIO_HOST:-}"
-MINIO_PORT="${MINIO_PORT:-9000}"
-MINIO_URL="${MINIO_URL:-}"
+S3_HOST="${S3_HOST:-}"
+S3_PORT="${S3_PORT:-9000}"
+S3_PUBLIC_URL="${S3_PUBLIC_URL:-}"
 REDIS_HOST="${REDIS_HOST:-}"
 REDIS_PORT="${REDIS_PORT:-6379}"
 
@@ -78,7 +78,7 @@ Environment variables:
   Datastores:
     POSTGRES_HOST [POSTGRES_PORT=5432]
     ELASTICSEARCH_HOST or ELASTICSEARCH_URI [ELASTICSEARCH_PORT=9200]
-    MINIO_HOST [MINIO_PORT=9000]
+    S3_HOST [S3_PORT=9000]
     REDIS_HOST [REDIS_PORT=6379]
 
   SMTP / 2FA:
@@ -669,21 +669,21 @@ check_send_email() {
 normalise_configuration() {
   local postgres_endpoint="$POSTGRES_HOST"
   local elasticsearch_endpoint="$ELASTICSEARCH_HOST"
-  local minio_endpoint="$MINIO_HOST"
+  local s3_endpoint="$S3_HOST"
   local redis_endpoint="$REDIS_HOST"
 
   POSTGRES_HOST="$(normalise_host "$postgres_endpoint")"
   POSTGRES_PORT="$(normalise_port "$postgres_endpoint" "$POSTGRES_PORT")"
   ELASTICSEARCH_HOST="$(normalise_host "$elasticsearch_endpoint")"
   ELASTICSEARCH_PORT="$(normalise_port "$elasticsearch_endpoint" "$ELASTICSEARCH_PORT")"
-  MINIO_HOST="$(normalise_host "$minio_endpoint")"
-  MINIO_PORT="$(normalise_port "$minio_endpoint" "$MINIO_PORT")"
+  S3_HOST="$(normalise_host "$s3_endpoint")"
+  S3_PORT="$(normalise_port "$s3_endpoint" "$S3_PORT")"
   REDIS_HOST="$(normalise_host "$redis_endpoint")"
   REDIS_PORT="$(normalise_port "$redis_endpoint" "$REDIS_PORT")"
 }
 
 configure_public_domains() {
-  local minio_url="${MINIO_URL:-minio.$DOMAIN}"
+  local s3_public_url="${S3_PUBLIC_URL:-minio.$DOMAIN}"
 
   PUBLIC_DOMAINS=(
     "gateway.$DOMAIN"
@@ -691,7 +691,7 @@ configure_public_domains() {
     "register.$DOMAIN"
     "countryconfig.$DOMAIN"
     "metabase.$DOMAIN"
-    "$minio_url"
+    "$s3_public_url"
   )
 
   if [ "$MONITORING_ENABLED" == "true" ]; then
@@ -703,7 +703,7 @@ run_predeploy() {
   section "Preflight datastore availability"
   check_tcp_service "Postgres" "$POSTGRES_HOST" "$POSTGRES_PORT"
   check_tcp_service "Elasticsearch" "$ELASTICSEARCH_HOST" "$ELASTICSEARCH_PORT"
-  check_tcp_service "MinIO" "$MINIO_HOST" "$MINIO_PORT"
+  check_tcp_service "S3" "$S3_HOST" "$S3_PORT"
   check_tcp_service "Redis" "$REDIS_HOST" "$REDIS_PORT"
 
   section "Preflight SMTP configuration"

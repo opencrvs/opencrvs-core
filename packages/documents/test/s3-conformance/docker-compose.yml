@@ -1,0 +1,53 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# The stores that the conformance suite is verified against, started the way the
+# suite was run. Each one answers on localhost:3535 with the minioadmin
+# credentials, which are the defaults of the documents service, so no S3_*
+# setting is needed. Start one at a time:
+#
+#   docker compose -f packages/documents/test/s3-conformance/docker-compose.yml up -d seaweedfs
+#   pnpm --filter @opencrvs/documents test:s3-conformance
+#   docker compose -f packages/documents/test/s3-conformance/docker-compose.yml down -v
+#
+# The images are pinned to the versions that the suite last passed on, see
+# packages/documents/README.md.
+name: ocrvs-s3-conformance
+
+services:
+  minio:
+    image: ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z
+    command: server --address ":3535" /data
+    ports:
+      - '3535:3535'
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48
+    # Without identities SeaweedFS serves every request without a signature
+    command: server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data
+    volumes:
+      - ./seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
+    ports:
+      - '3535:8333'
+      # Uncomment this port to enable the SeaweedFS S3 file browser, which is not needed for the conformance suite
+      # - '3536:8888'
+
+  rustfs:
+    image: rustfs/rustfs:1.0.1
+    command: /data
+    environment:
+      RUSTFS_ACCESS_KEY: minioadmin
+      RUSTFS_SECRET_KEY: minioadmin
+      RUSTFS_ADDRESS: ':9000'
+      # The console is not needed for the conformance suite, and it is not yet compatible with the S3 API.
+      RUSTFS_CONSOLE_ENABLE: 'false'
+    ports:
+      - '3535:9000'
+      # Uncomment this port to enable the RustFS console, which is not needed for the conformance suite
+      # - '3536:9001'
