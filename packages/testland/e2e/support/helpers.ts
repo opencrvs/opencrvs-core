@@ -556,7 +556,10 @@ export async function waitForActionResponses(
   let mainDone = false
   const main = Promise.all(
     urls.map((url) =>
-      page.waitForResponse((res) => res.url().includes(url) && res.ok())
+      // add arbitrary timeout to prevent indefinite hanging in failure situations
+      page.waitForResponse((res) => res.url().includes(url) && res.ok(), {
+        timeout: 30_000
+      })
     )
   ).then(() => {
     mainDone = true
@@ -572,7 +575,9 @@ export async function waitForActionResponses(
           res.ok() &&
           res.request().method() === 'POST' &&
           (res.request().postData()?.includes(eventId) ?? false) &&
-          mainDone
+          mainDone,
+        // add arbitrary timeout to prevent indefinite hanging in failure situations
+        { timeout: 30_000 }
       )
     )
   }
