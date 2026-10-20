@@ -27,8 +27,6 @@ import { ensureAssignedToUser, expectInUrl } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('4. Death declaration case - 4', async ({ page }) => {
-  test.setTimeout(180_000)
-
   const declaration = {
     deceased: {
       name: {

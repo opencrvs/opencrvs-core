@@ -574,8 +574,6 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
   test('Registrar can register and print an event notified via integration', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     const childName = {
       firstname: faker.person.firstName(),
       surname: faker.person.lastName()
@@ -736,8 +734,6 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
   test('Registrar can reject an event notified via integration', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     const childName = {
       firstname: faker.person.firstName(),
       surname: faker.person.lastName()

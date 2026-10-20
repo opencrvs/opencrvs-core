@@ -23,8 +23,6 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 
 test('1: Validate my draft tab', async ({ page }) => {
-  test.setTimeout(180_000)
-
   const name = {
     firstNames: faker.person.firstName('male'),
     familyName: faker.person.lastName('male')

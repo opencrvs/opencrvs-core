@@ -41,8 +41,6 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe('10. Correct record', () => {
   test('10.1 Record correction by someone else', async ({ page }) => {
-    test.setTimeout(180_000)
-
     const updatedChildDetails = {
       firstNames: faker.person.firstName('male'),
       familyName: faker.person.firstName('male'),

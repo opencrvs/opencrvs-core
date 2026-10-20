@@ -33,8 +33,6 @@ import {
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test("Correct record - Change father's ID number", async ({ page }) => {
-  test.setTimeout(180_000)
-
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId = ''

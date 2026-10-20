@@ -30,7 +30,6 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import { ASSETS_DIR } from '@e2e/support/paths'
 
 test('Birth correction flow - Mobile', async ({ page }) => {
-  test.setTimeout(180_000)
   const token = await getToken(CREDENTIALS.REGISTRAR)
   const res = await createDeclaration(
     token,

@@ -197,8 +197,6 @@ const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
 test('Scope changes after office change - user loses access when the office changes', async ({
   browser
 }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
   const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
     await setupRegistrarWithDrafts(page, 3)

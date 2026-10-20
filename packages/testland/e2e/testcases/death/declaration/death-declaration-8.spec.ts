@@ -31,7 +31,6 @@ import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('8. Death declaration case - 8', async ({ page }) => {
-  test.setTimeout(180_000)
   let eventId = ''
 
   const declaration = {

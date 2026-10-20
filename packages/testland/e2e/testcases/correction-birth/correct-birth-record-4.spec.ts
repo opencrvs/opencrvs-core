@@ -38,8 +38,6 @@ import {
 } from '@e2e/support/utils'
 
 test('Correct record - 4', async ({ page }) => {
-  test.setTimeout(180_000)
-
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId: string

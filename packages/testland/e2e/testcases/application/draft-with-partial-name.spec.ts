@@ -15,8 +15,6 @@ import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 
 test('Validate draft with partial name', async ({ page }) => {
-  test.setTimeout(180_000)
-
   const name1 = {
     firstNames: faker.person.firstName('male')
   }

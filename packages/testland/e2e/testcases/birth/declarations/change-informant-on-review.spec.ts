@@ -30,8 +30,6 @@ import {
 import { ActionType } from '@opencrvs/toolkit/events'
 
 test('Change informant on review', async ({ page }) => {
-  test.setTimeout(180_000)
-
   const declaration = {
     child: {
       name: {

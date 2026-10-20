@@ -28,8 +28,6 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 
 test('Issue verifiable credential', async ({ page }) => {
-  test.setTimeout(180_000)
-
   async function openIssueVerifiableCredentialAction() {
     await page.getByRole('button', { name: 'Action', exact: true }).click()
     await page

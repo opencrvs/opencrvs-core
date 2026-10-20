@@ -94,8 +94,6 @@ test.describe('Form state', () => {
   test('Declaration form state or annotation is not persisted to another events action', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     let actionableEventChildName = ''
 
     await test.step('Login', async () => {

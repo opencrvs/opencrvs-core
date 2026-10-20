@@ -105,7 +105,6 @@ test('Advanced search - inactive registration office', async ({ page }) => {
 })
 
 test('Advanced search - inactive health facilities', async ({ page }) => {
-  test.setTimeout(180_000)
   const birthFacility = await createBirthRegisteredWithInactiveFacility()
   const deathFacility = await createDeathRegisteredWithInactiveFacility()
 
@@ -192,8 +191,6 @@ test('Advanced search - inactive health facilities', async ({ page }) => {
 test('Advanced search - inactive admin area excluded from address filter', async ({
   page
 }) => {
-  test.setTimeout(180_000)
-
   // Record itself isn't asserted on here — the filter should hide the
   // inactive admin area as a search option regardless, but exercising the
   // full notify flow confirms nothing breaks when a real record actually
