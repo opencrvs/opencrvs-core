@@ -154,6 +154,10 @@ export function getNotificationFields(
   )
 }
 
+export function getNotificationPages(configuration: EventConfig) {
+  return getNotificationForm(configuration).pages
+}
+
 export function isActionConfigType(
   type: ActionType
 ): type is ActionConfigTypes {
