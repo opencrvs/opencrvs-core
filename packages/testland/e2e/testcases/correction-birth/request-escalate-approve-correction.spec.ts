@@ -31,9 +31,8 @@ import { requestCorrectionViaApi } from '@e2e/support/test-data/api-actions'
 test('Request correction, escalate, then approve as Local Registrar', async ({
   page
 }) => {
-  test.setTimeout(240_000)
-
   // Explicit longer timeout. test.step pattern seems to behave differently with respect to timeouts and kill the test before all steps have completed.
+  test.setTimeout(240_000)
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId: string

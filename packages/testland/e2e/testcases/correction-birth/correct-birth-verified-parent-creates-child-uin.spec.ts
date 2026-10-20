@@ -40,7 +40,8 @@ async function getEventById(eventId: string, token: string) {
 test('Correcting a birth with a verified parent ID creates the child UIN (#13734)', async ({
   page
 }) => {
-  // Even the one line awaits expect this to take 120 seconds.
+  // Two waits for MOSIP can take up to 60s each, on top of the UI flow
+  test.setTimeout(240_000)
   let token: string
   let declaration: Declaration
   let eventId: string

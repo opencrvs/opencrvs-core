@@ -205,6 +205,40 @@ export async function requestCorrectionViaApi({
   return res
 }
 
+/** Mirrors the username normalisation in events/src/service/users/utils.ts */
+function normalizeUsername(str: string) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9.\-]/g, '')
+    .replace(/^[.\-]+|[.\-]+$/g, '')
+    .toLowerCase()
+}
+
+/**
+ * The username the server generates for a user created with `name` (see
+ * `generateUsername` in events/src/service/users/utils.ts): initials and
+ * surname without diacritics or special characters, padded to 5 and cut to
+ * 30 characters. Assumes no other user already has that username.
+ */
+export function getExpectedUsername(name: {
+  firstname: string
+  surname: string
+}) {
+  const initials = normalizeUsername(
+    name.firstname
+      .split(' ')
+      .map((n) => n.charAt(0))
+      .join('')
+  )
+  const surname = normalizeUsername(name.surname)
+  const raw = `${initials}${initials ? '.' : ''}${surname}`
+  return raw
+    .padEnd(5, '0')
+    .slice(0, 30)
+    .replace(/[.\-]+$/, '')
+}
+
 /**
  * API equivalent of `loginWithNewUser`: completes the first-login account
  * setup (password + security questions) of a freshly created user, so tests

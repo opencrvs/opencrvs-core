@@ -21,7 +21,10 @@ import {
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
 import { getIdByName, getLocations } from '@e2e/support/birth/helpers'
-import { activateUserViaApi } from '@e2e/support/test-data/api-actions'
+import {
+  activateUserViaApi,
+  getExpectedUsername
+} from '@e2e/support/test-data/api-actions'
 
 test('Phone number changed from settings is stored as entered', async ({
   browser
@@ -35,7 +38,7 @@ test('Phone number changed from settings is stored as entered', async ({
     surname: faker.person.lastName()
   }
   const fullName = `${name.firstname} ${name.surname}`
-  const username = `${name.firstname[0]}.${name.surname}`.toLowerCase()
+  const username = getExpectedUsername(name)
   const newPhoneNumber = `07${faker.string.numeric(8)}`
 
   await test.step('Create a new user through API', async () => {

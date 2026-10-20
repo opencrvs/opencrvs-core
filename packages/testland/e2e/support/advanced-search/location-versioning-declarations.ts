@@ -29,7 +29,10 @@ import {
   getDeclaration as getBirthDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { createDeclaration as createDeathDeclaration } from '@e2e/support/test-data/death-declaration'
-import { activateUserViaApi } from '@e2e/support/test-data/api-actions'
+import {
+  activateUserViaApi,
+  getExpectedUsername
+} from '@e2e/support/test-data/api-actions'
 
 function getUserIdFromToken(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
@@ -87,9 +90,7 @@ export async function registerDeclarationsThenDeactivateOffice() {
     firstname: faker.person.firstName(),
     surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   }
-  const username = `${name.firstname[0]}.${name.surname}`
-    .toLowerCase()
-    .replace(/[^a-z0-9.]/g, '')
+  const username = getExpectedUsername(name)
 
   await client.user.create.mutate({
     name,

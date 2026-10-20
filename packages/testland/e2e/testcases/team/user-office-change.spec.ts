@@ -35,7 +35,8 @@ import {
 } from '@e2e/support/birth/helpers'
 import {
   activateUserViaApi,
-  createBirthDraftViaApi
+  createBirthDraftViaApi,
+  getExpectedUsername
 } from '@e2e/support/test-data/api-actions'
 
 const OPENCRVS_VERSION: string = JSON.parse(
@@ -112,19 +113,12 @@ const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
 
     const name = {
       firstname: faker.person.firstName(),
-      // Append random chars to ensure username is unique. Letters only and
-      // capped so the derived username below matches the server-generated one
-      // (which keeps hyphens and truncates to 30 characters).
-      surname: `${faker.person
-        .lastName()
-        .replace(/[^A-Za-z]/g, '')
-        .slice(0, 15)}${faker.string.alphanumeric(6)}`
+      // Append random chars to ensure username is unique
+      surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
     }
 
     const fullName = `${name.firstname} ${name.surname}`
-    const username = `${name.firstname[0]}.${name.surname}`
-      .toLowerCase()
-      .replace(/[^a-z0-9.]/g, '')
+    const username = getExpectedUsername(name)
 
     const offices = await getLocations('CRVS_OFFICE', adminToken)
     const ibomboDistrictOfficeId = getIdByName(
