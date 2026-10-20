@@ -109,6 +109,8 @@ function EventSelector() {
     clearForm()
     clearAnnotation()
 
+    // TODO CIHAN: check if user can only notify or not
+
     navigate(
       ROUTES.V2.EVENTS.DECLARE.buildPath({
         eventId: transactionId
