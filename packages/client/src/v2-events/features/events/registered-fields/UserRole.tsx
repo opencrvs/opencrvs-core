@@ -15,6 +15,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getAcceptedScopesByType,
   getAvailableRolesForUserUpdatePayload,
+  maybeUuid,
   UserContext,
   UserRoleField,
   UserScopeV2,
@@ -87,15 +88,13 @@ function UserRoleInputWithLocation({
 // navigation completes)
 function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
   const userForm = useUserFormState((s) => s.userForm)
-  const subjectLocation = UUID.safeParse(userForm?.primaryOfficeId)
+  const subjectLocation = maybeUuid(userForm?.primaryOfficeId)
 
-  if (!subjectLocation.success) {
+  if (!subjectLocation) {
     return <Select.Input {...props} options={[]} />
   }
 
-  return (
-    <UserRoleInputWithLocation {...props} locationId={subjectLocation.data} />
-  )
+  return <UserRoleInputWithLocation {...props} locationId={subjectLocation} />
 }
 
 function UserRoleOutput({ value }: { value: string | undefined }) {

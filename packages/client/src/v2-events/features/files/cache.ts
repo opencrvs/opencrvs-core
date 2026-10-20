@@ -15,8 +15,8 @@ import {
   DocumentPath,
   Draft,
   EventDocument,
-  FileFieldValue,
-  FileFieldWithOptionValue,
+  isFileFieldValue,
+  isFileFieldWithOptionValue,
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { precacheFiles, removeCached } from '@client/v2-events/cache'
@@ -37,17 +37,15 @@ export function getFilepathsFromActionDocument(
       .filter((value): value is DocumentPath => !!value)
 
     const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
-      (value) => {
+      (value): DocumentPath[] => {
         // Handle single file field & signatures
-        const fileParsed = FileFieldValue.safeParse(value)
-        if (fileParsed.success) {
-          return [fileParsed.data.path]
+        if (isFileFieldValue(value)) {
+          return [value.path]
         }
 
         // Handle multiple file field (file with options)
-        const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-        if (fileOptionParsed.success) {
-          return fileOptionParsed.data.map((val) => val.path)
+        if (isFileFieldWithOptionValue(value)) {
+          return value.map((val) => val.path)
         }
 
         return []

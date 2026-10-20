@@ -179,7 +179,12 @@ test.describe('Form state', () => {
       await continueForm(page)
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
+
+      const eventConfigResponse = page.waitForResponse((res) =>
+        res.url().includes('event.config.get')
+      )
       await page.getByRole('button', { name: 'No, make correction' }).click()
+      await eventConfigResponse
     })
 
     await test.step('Select informant', async () => {

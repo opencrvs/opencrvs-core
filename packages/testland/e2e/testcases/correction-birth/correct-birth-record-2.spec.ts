@@ -84,12 +84,14 @@ test('Correct record - 2', async ({ page }) => {
     await page.getByRole('button', { name: 'Verified', exact: true }).click()
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
+    const eventConfigResponse = page.waitForResponse((res) =>
+      res.url().includes('event.config.get')
+    )
     await page.getByRole('button', { name: 'No, make correction' }).click()
+    await eventConfigResponse
   })
 
   await test.step('2.2 Select requester and reason', async () => {
-    // Ensure form is responsive.  There is a slight chance that the click does not register.
-    await page.waitForTimeout(500)
     await page.locator('#requester____type').click()
     await page.getByText('Father', { exact: true }).click()
 
@@ -106,8 +108,6 @@ test('Correct record - 2', async ({ page }) => {
   const fee = faker.number.int({ min: 1, max: 1000 }).toString()
 
   await test.step('2.3 Fill correction form', async () => {
-    // Ensure form is responsive.
-    await page.waitForTimeout(500)
     await expect(page.getByText('Type of ID')).toBeVisible()
     await expect(page.getByText('National ID')).toBeVisible()
 
