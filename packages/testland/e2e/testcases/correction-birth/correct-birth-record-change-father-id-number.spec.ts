@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   auditRecord,
   getToken,
@@ -32,24 +32,15 @@ import {
 } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial("Correct record - Change father's ID number", () => {
+test("Correct record - Change father's ID number", async ({ page }) => {
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId = ''
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
 
   const oldIdNumber = faker.string.numeric(10)
   const newIdNumber = faker.string.numeric(10)
 
-  test('Shortcut declaration', async () => {
+  await test.step('Shortcut declaration', async () => {
     let token = await getToken(CREDENTIALS.REGISTRAR)
     const res = await createDeclarationV2(
       token,
@@ -106,11 +97,11 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     declaration = res.declaration
   })
 
-  test('Login as RO', async () => {
+  await test.step('Login as RO', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
   })
 
-  test('Ready to correct record > record audit', async () => {
+  await test.step('Ready to correct record > record audit', async () => {
     await auditRecord({
       page,
       name: formatV2ChildName(declaration),
@@ -121,7 +112,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await selectAction(page, 'Correct')
   })
 
-  test('Correction requester: legal guardian', async () => {
+  await test.step('Correction requester: legal guardian', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Legal Guardian', { exact: true }).click()
     await page.locator('#reason____option').click()
@@ -133,11 +124,11 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Verify identity', async () => {
+  await test.step('Verify identity', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
   })
 
-  test('Upload supporting documents', async () => {
+  await test.step('Upload supporting documents', async () => {
     await expectInUrl(page, 'correction')
     await expectInUrl(page, 'onboarding/documents')
 
@@ -157,7 +148,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Correction fee', async () => {
+  await test.step('Correction fee', async () => {
     await page
       .locator('#fees____amount')
       .fill(faker.number.int({ min: 1, max: 1000 }).toString())
@@ -168,7 +159,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await expectInUrl(page, 'review')
   })
 
-  test('Change father id number', async () => {
+  await test.step('Change father id number', async () => {
     await page.getByTestId('change-button-father.nid').click()
 
     await page.getByTestId('text__father____nid').fill(newIdNumber)
@@ -186,7 +177,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     ).toBeVisible()
   })
 
-  test('Correction summary', async () => {
+  await test.step('Correction summary', async () => {
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
     await expectInUrl(page, 'correction')
@@ -200,7 +191,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     ).toBeVisible()
   })
 
-  test('Submit correction request', async () => {
+  await test.step('Submit correction request', async () => {
     await page
       .getByRole('button', { name: 'Submit correction request' })
       .click()
@@ -215,21 +206,21 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     await correctionResponse
   })
 
-  test('Logout', async () => {
+  await test.step('Logout', async () => {
     await logout(page)
   })
 
-  test('Login as Registrar', async () => {
+  await test.step('Login as Registrar', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
   })
 
-  test('Find the event in the "Pending corrections" workqueue', async () => {
+  await test.step('Find the event in the "Pending corrections" workqueue', async () => {
     await page.getByRole('button', { name: 'Pending corrections' }).click()
 
     await openRecordByTitle(page, formatV2ChildName(declaration))
   })
 
-  test('Approve correction request', async () => {
+  await test.step('Approve correction request', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Review correction request')
     await page.getByRole('button', { name: 'Approve', exact: true }).click()
@@ -239,7 +230,7 @@ test.describe.serial("Correct record - Change father's ID number", () => {
     })
   })
 
-  test('View record', async () => {
+  await test.step('View record', async () => {
     await auditRecord({
       page,
       name: formatV2ChildName(declaration),

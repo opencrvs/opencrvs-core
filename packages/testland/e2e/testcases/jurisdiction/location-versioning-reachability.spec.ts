@@ -18,7 +18,6 @@ import {
   getAuthTokens,
   createPIN,
   login,
-  loginWithNewUser,
   ensureLoginPageReady,
   NEW_USER_PASSWORD
 } from '@e2e/support/helpers'
@@ -39,6 +38,7 @@ import {
   assertRecordInWorkqueue
 } from '@e2e/support/birth/helpers'
 import { fetchClientAPI } from '@e2e/support/events-rest-api/helpers'
+import { activateUserViaApi } from '@e2e/support/test-data/api-actions'
 
 /**
  * Verifies jurisdiction/routing predicates as locations are renamed,
@@ -128,7 +128,7 @@ async function provisionUserInOffice(
   return { username, fullname }
 }
 
-// Password is NEW_USER_PASSWORD post-loginWithNewUser, not `login()`'s default.
+// Password is NEW_USER_PASSWORD post-activateUserViaApi, not `login()`'s default.
 async function loginAsProvisionedUser(page: Page, username: string) {
   const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
   expect(refreshToken).toBeDefined()
@@ -175,8 +175,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       'REGISTRATION_AGENT'
     )
 
-    const userPage = await newPage(browser)
-    await loginWithNewUser(userPage, username)
+    await activateUserViaApi(username)
     const userToken = await getToken(username, NEW_USER_PASSWORD)
 
     const { declaration, eventId } = await createDeclaration(
@@ -208,7 +207,6 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('Inactivating an office keeps its Notified/Declared records reachable and processable to the same administrative area', async ({
     browser
   }) => {
-    test.setTimeout(180_000) // full office+user provisioning cycle plus first-login ceremony
     const officeName = `E2E Inactivate Office ${uuidv4()}`
     const office = await createOffice(
       systemAdminToken,
@@ -222,8 +220,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       'REGISTRATION_AGENT'
     )
 
-    const userPage = await newPage(browser)
-    await loginWithNewUser(userPage, username)
+    await activateUserViaApi(username)
     const userToken = await getToken(username, NEW_USER_PASSWORD)
 
     const { declaration, eventId } = await createDeclaration(
@@ -273,7 +270,6 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('Transfer (inactivate-old + create-new) keeps old records under the old entity and routes new records to the new entity', async ({
     browser
   }) => {
-    test.setTimeout(180_000)
     const oldOfficeName = `E2E Transfer Old Office ${uuidv4()}`
     const oldOffice = await createOffice(
       systemAdminToken,
@@ -287,8 +283,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       'REGISTRATION_AGENT'
     )
 
-    const oldUserPage = await newPage(browser)
-    await loginWithNewUser(oldUserPage, oldUser.username)
+    await activateUserViaApi(oldUser.username)
     const oldUserToken = await getToken(oldUser.username, NEW_USER_PASSWORD)
 
     const { declaration: oldDeclaration, eventId: oldEventId } =
@@ -363,8 +358,6 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('User is not auto-reassigned but is locked out from login when their office is inactivated', async ({
     browser
   }) => {
-    test.setTimeout(180_000)
-
     const officeName = `E2E No-Reassign Office ${uuidv4()}`
     const office = await createOffice(
       systemAdminToken,
@@ -426,8 +419,6 @@ test.describe('Jurisdiction & routing under location versioning', () => {
   test('Inactivating an office keeps its Notified records reachable to the same administrative area', async ({
     browser
   }) => {
-    test.setTimeout(180_000) // office+user provisioning plus first-login ceremony
-
     const officeName = `E2E Notify Office ${uuidv4()}`
     const office = await createOffice(
       systemAdminToken,
@@ -443,8 +434,7 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       'COMMUNITY_LEADER'
     )
 
-    const firstLoginPage = await newPage(browser)
-    await loginWithNewUser(firstLoginPage, username)
+    await activateUserViaApi(username)
     const userToken = await getToken(username, NEW_USER_PASSWORD)
 
     const { declaration, eventId } = await createDeclaration(
