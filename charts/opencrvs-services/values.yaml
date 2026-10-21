@@ -48,10 +48,14 @@ elasticsearch:
 # S3 object store configuration, including the hostname and port.
 # The defaults point at the S3 datastore that the dependencies chart deploys.
 s3:
+  # With `seaweedfs.enabled: true` in the dependencies chart, the host is
+  # seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local
+  # and external_url below must be seaweedfs.<opencrvs domain>
   host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
   port: '3535'
   # external_url: external <host/ip>[:port] available for client browser to issue signed document URL.
-  #                   Default: minio<subdomain_separator><opencrvs domain>, where the dependencies chart exposes its S3 service.
+  #                   Default: minio<subdomain_separator><opencrvs domain>, where the dependencies chart exposes MinIO.
+  #                   SeaweedFS is exposed on seaweedfs<subdomain_separator><opencrvs domain>.
   # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
   # auth_mode:
   # - disabled: No authentication enabled, password-less access to databases
