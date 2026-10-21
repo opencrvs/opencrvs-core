@@ -8,7 +8,7 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
   - Postgres
   - Elasticsearch
   - Redis
-  - MinIO
+  - MinIO, or SeaweedFS as an alternative
 - Observability (Monitoring and Logging):
   - Kibana
   - Logstash
@@ -27,30 +27,30 @@ Any particular service within this helm chart can be disabled by setting `<servi
 
 ## Global configuration options
 
-| Parameter                           | Type   | Default                            | Description                                                                                                                                                                                                                                                                          |
-| ----------------------------------- | ------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| hostname                            | string | farajaland.dev                     | All chart services will be available under specified domain. Exposed services are MinIO and Kibana, if Monitoring is enabled                                                                                                                                                         |
-| ingress.ssl_enabled                 | bool   | false                              | Enable or disable https endpoint, by default all http traffic is routed to https                                                                                                                                                                                                     |
-| ingress.tls_resolver                | string | ` `                                | If traefik was deployed with custom resolver, please define resolver name here. Resolver will be attached to Traefik CRD IngressRoute, otherwise default Traefik SSL Certificate will be used.                                                                                       |
-| ingress.tls_secret_name             | string | ` `                                | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                                                                                                                |
-| ingress.admin_console_allowlist     | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the MinIO console and Kibana, enforced via a Traefik `ipAllowList` middleware. Leave empty to leave these admin consoles publicly reachable. Does not restrict the MinIO S3 API route - use `application_allowlist` below to restrict that. |
-| ingress.application_allowlist       | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the MinIO S3 API route, enforced via a Traefik `ipAllowList` middleware. `admin_console_allowlist` is always merged in. Leave empty to leave the MinIO API publicly reachable.                                                              |
-| network_policy.enabled              | bool   | `true`                             | Render Kubernetes NetworkPolicy resources for dependency workloads. Requires a CNI provider that enforces NetworkPolicy.                                                                                                                                                             |
-| network_policy.ingress_mode         | string | `deny`                             | Baseline policy for ingress to dependency pods: `deny` (default, requires another NetworkPolicy to allow it), `private` (allow only RFC1918 private ranges), or `full` (unrestricted).                                                                                               |
-| network_policy.egress_mode          | string | `deny`                             | Baseline policy for egress from dependency pods. Same modes as `ingress_mode`, applied to egress. DNS (53) is always allowed except in `full` mode.                                                                                                                                  |
-| network_policy.allow_same_namespace | bool   | `true`                             | Allow dependency pods in the same namespace to communicate with each other.                                                                                                                                                                                                          |
-| network_policy.allowed_namespaces   | list   | `[]`                               | Namespaces allowed to reach dependency pods (e.g. the opencrvs-services namespace). When set, dependency pods accept ingress on any port from every pod in each listed namespace, so the OpenCRVS application keeps working once ingress is denied by default.                       |
-| timezone                            | string | ` `                                | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                                                                                                          |
-| storage_type                        | string | `pvc`                              | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                                                                                                         |
-| platform.imagePullSecrets           | list   | `[]`                               | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                                                                                                          |
-| node_selector                       | dict   | `{}`                               | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                                                                                                             |
-| monitoring.enabled                  | bool   | `false`                            | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                                                                                                          |
-| priority_class.enabled              | bool   | `false`                            | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                                                                                                           |
-| backup.enabled                      | bool   | `true`                             | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                                                                                                                 |
-| restore.enabled                     | bool   | `true`                             | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                                                                                                                 |
-| service_type                        | string | `ClusterIP`                        | Kubernetes Service type for datastore Services (Postgres, Elasticsearch, Kibana, Redis, MinIO), e.g. `ClusterIP` or `NodePort`. Applies to all of them; there is no per-service override.                                                                                            |
-| utilities.image.repository          | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                                                                                                                                           |
-| utilities.image.tag                 | string | `v2.1.0`                           | Shared utilities image tag used by helper jobs and init containers.                                                                                                                                                                                                                  |
+| Parameter                           | Type   | Default                            | Description                                                                                                                                                                                                                                                                                 |
+| ----------------------------------- | ------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| hostname                            | string | farajaland.dev                     | All chart services will be available under specified domain. Exposed services are MinIO and Kibana, if Monitoring is enabled                                                                                                                                                                |
+| ingress.ssl_enabled                 | bool   | false                              | Enable or disable https endpoint, by default all http traffic is routed to https                                                                                                                                                                                                            |
+| ingress.tls_resolver                | string | ` `                                | If traefik was deployed with custom resolver, please define resolver name here. Resolver will be attached to Traefik CRD IngressRoute, otherwise default Traefik SSL Certificate will be used.                                                                                              |
+| ingress.tls_secret_name             | string | ` `                                | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                                                                                                                       |
+| ingress.admin_console_allowlist     | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the MinIO or SeaweedFS console and Kibana, enforced via a Traefik `ipAllowList` middleware. Leave empty to leave these admin consoles publicly reachable. Does not restrict the S3 API route - use `application_allowlist` below to restrict that. |
+| ingress.application_allowlist       | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the S3 API route of MinIO or SeaweedFS, enforced via a Traefik `ipAllowList` middleware. `admin_console_allowlist` is always merged in. Leave empty to leave the S3 API publicly reachable.                                                        |
+| network_policy.enabled              | bool   | `true`                             | Render Kubernetes NetworkPolicy resources for dependency workloads. Requires a CNI provider that enforces NetworkPolicy.                                                                                                                                                                    |
+| network_policy.ingress_mode         | string | `deny`                             | Baseline policy for ingress to dependency pods: `deny` (default, requires another NetworkPolicy to allow it), `private` (allow only RFC1918 private ranges), or `full` (unrestricted).                                                                                                      |
+| network_policy.egress_mode          | string | `deny`                             | Baseline policy for egress from dependency pods. Same modes as `ingress_mode`, applied to egress. DNS (53) is always allowed except in `full` mode.                                                                                                                                         |
+| network_policy.allow_same_namespace | bool   | `true`                             | Allow dependency pods in the same namespace to communicate with each other.                                                                                                                                                                                                                 |
+| network_policy.allowed_namespaces   | list   | `[]`                               | Namespaces allowed to reach dependency pods (e.g. the opencrvs-services namespace). When set, dependency pods accept ingress on any port from every pod in each listed namespace, so the OpenCRVS application keeps working once ingress is denied by default.                              |
+| timezone                            | string | ` `                                | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                                                                                                                 |
+| storage_type                        | string | `pvc`                              | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                                                                                                                |
+| platform.imagePullSecrets           | list   | `[]`                               | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                                                                                                                 |
+| node_selector                       | dict   | `{}`                               | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                                                                                                                    |
+| monitoring.enabled                  | bool   | `false`                            | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                                                                                                                 |
+| priority_class.enabled              | bool   | `false`                            | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                                                                                                                  |
+| backup.enabled                      | bool   | `true`                             | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                                                                                                                        |
+| restore.enabled                     | bool   | `true`                             | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                                                                                                                        |
+| service_type                        | string | `ClusterIP`                        | Kubernetes Service type for datastore Services (Postgres, Elasticsearch, Kibana, Redis, MinIO), e.g. `ClusterIP` or `NodePort`. Applies to all of them; there is no per-service override.                                                                                                   |
+| utilities.image.repository          | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                                                                                                                                                  |
+| utilities.image.tag                 | string | `v2.1.0`                           | Shared utilities image tag used by helper jobs and init containers.                                                                                                                                                                                                                         |
 
 ## Network Policies
 
@@ -132,6 +132,7 @@ Applies once `network_policy.enabled: true`. Every dependency pod always accepts
 | Elasticsearch                                          | 9200                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | Redis                                                  | 6379                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | MinIO                                                  | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
+| SeaweedFS                                              | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | —                                                                                                          |
 | Kibana                                                 | 5601                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | Filebeat, Metricbeat, Logstash, APM Server, Elastalert | —                          | —                                                         | —                                                                                                          |
 | postgres-restore-runner (differential restore)         | —                          | —                                                         | 80, 443 (package installs); restore host:22 when restore enabled                                           |
@@ -243,12 +244,12 @@ MinIO strongly discourages use of the default credentials regardless of deployme
 Check official documentation for more details:
 https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html
 
-Values are stored as a Kubernetes secret `minio-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
+Values are stored as a Kubernetes secret `s3-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
 
 ```
 DEPENDENCIES_NAMESPACE=<dependencies namespace>
 OPENCRVS_NAMESPACE=<OpenCRVS namespace>
-kubectl get secret minio-opencrvs-users -n $DEPENDENCIES_NAMESPACE -o yaml \
+kubectl get secret s3-opencrvs-users -n $DEPENDENCIES_NAMESPACE -o yaml \
   | sed "s#namespace: $DEPENDENCIES_NAMESPACE#namespace: $OPENCRVS_NAMESPACE#" \
   | kubectl apply -n $OPENCRVS_NAMESPACE -f -
 ```
@@ -258,7 +259,7 @@ Don't forget to replace placeholders with appropriate namespaces.
 Example of Kubernetes secret:
 
 ```
-$ kubectl get secret -oyaml -n opencrvs-dev minio-opencrvs-users | yq .data
+$ kubectl get secret -oyaml -n opencrvs-dev s3-opencrvs-users | yq .data
 S3_ACCESS_KEY: RE...wMw==
 S3_ADMIN_SECRET_KEY: dG...FU=
 S3_ADMIN_ACCESS_KEY: RE...wMw==
@@ -279,6 +280,67 @@ documents:
 
 For detailed configuration, review the values.yaml file and refer to the Backup and Restore sections of this README.
 Adjust schedules, server credentials, and directories as needed for your deployment.
+
+## SeaweedFS
+
+[SeaweedFS](https://github.com/seaweedfs/seaweedfs) is an open-source, S3 compatible object store, and an alternative to MinIO. The documents service passes its [S3 conformance suite](../../packages/documents/README.md), and so does MinIO. Enable one of the two, not both: they are exposed on the same hostnames (`minio.<hostname>` and `minio-console.<hostname>`), so switching needs no DNS or certificate change. The chart fails to render when both are enabled.
+
+> NOTE: SeaweedFS is disabled by default. Backup, restore and migration of the data of MinIO are not part of this chart yet, so choose it for a new environment or one that holds no documents you need to keep.
+
+Enable it, and point the OpenCRVS services chart at it:
+
+```yaml
+# dependencies chart
+minio:
+  enabled: false
+seaweedfs:
+  enabled: true
+```
+
+```yaml
+# OpenCRVS services chart
+s3:
+  host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local
+```
+
+The S3 API listens on port `3535`, as MinIO's, so `s3.port` stays as it is. The data-cleanup job of the services chart works with it unchanged.
+
+### Configuration options
+
+| Key                     | Type   | Default value         | Description                                                                                                                                                               |
+| ----------------------- | ------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| enabled                 | bool   | false                 | Enable or disable the seaweedfs service                                                                                                                                   |
+| image.repository        | string | `chrislusf/seaweedfs` | SeaweedFS Docker image repository.                                                                                                                                        |
+| image.tag               | string | `4.48`                | SeaweedFS Docker image tag. The conformance suite of the documents service lists the versions that passed.                                                                |
+| port                    | int    | `3535`                | Port of the S3 API.                                                                                                                                                       |
+| use_default_credentials | bool   | true                  | Default credentials are access key `minioadmin` and secret key `minioadmin`. Set to `false` to generate strong ones, see [SeaweedFS Credentials](#seaweedfs-credentials). |
+| console.enabled         | bool   | true                  | Expose the admin console on port `3536` and on `minio-console.<hostname>`, see [SeaweedFS console](#seaweedfs-console).                                                   |
+| volume_size_limit_mb    | int    | `1024`                | Size at which SeaweedFS starts another volume file. Smaller files give space back sooner after deletions. SeaweedFS allows as many volumes as fit on the disk.            |
+| storage_type            | string | `global storage_type` | Optional SeaweedFS-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used.    |
+| pvc.storage_class       | string | `n/a`                 | StorageClass name used for dynamic volume provisioning                                                                                                                    |
+| pvc.storage_size        | string | 10Gi                  | Persistent volume claim size for the SeaweedFS data volume                                                                                                                |
+| pvc.access_mode         | string | ReadWriteOnce         | Kubernetes PVC access mode                                                                                                                                                |
+| host_data_path          | string | `/data/seaweedfs`     | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                                   |
+| node_selector           | dict   | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                                                  |
+| env                     | dict   | `{}`                  | Flat dictionary (key/value) of environment variables passed to the SeaweedFS container                                                                                    |
+| node_port               | int    | `n/a`                 | Fixed NodePort to expose port `3535` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                      |
+| node_port_console       | int    | `n/a`                 | Fixed NodePort to expose port `3536` (console) on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                            |
+
+### SeaweedFS Credentials
+
+SeaweedFS has a single identity, built from `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. The documents service signs with `S3_ACCESS_KEY` and `S3_SECRET_KEY`, so these four must hold two equal pairs, as they do in the secret that the chart generates. With a secret of your own, a documents service that has other keys is refused by the store.
+
+Unlike MinIO, SeaweedFS serves every request without a signature when it has no identity, so the chart always gives it one: the default credentials, or the generated ones. Setting `use_default_credentials` to `false` generates strong credentials into the Kubernetes secret `s3-opencrvs-users` in the dependencies namespace, the same secret that `minio.use_default_credentials: false` generates, and with the same keys. [MinIO Credentials](#minio-credentials) shows how to copy it into the OpenCRVS namespace.
+
+An upgrade of a deployment that has the secret `minio-opencrvs-users` copies its credentials into `s3-opencrvs-users`, so they are not rotated.
+
+### SeaweedFS console
+
+The console is SeaweedFS's admin web interface, a separate `weed admin` container in the same pod. It shows the volumes and the cluster, and browses the files. It asks users to log in with `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`, which are `minioadmin` and `minioadmin` unless generated credentials are on. It is the one console that SeaweedFS has with a login, and the pod does not start it without a password. Restrict who can reach it with `ingress.admin_console_allowlist`, and set `console.enabled` to `false` to not expose it at all.
+
+SeaweedFS has two more web interfaces, the master's and the filer's. The filer serves every object without checking an S3 credential, so the pod binds the master, the volume server and the filer to its loopback interface, and only the S3 API (`3535`) and the console (`3536`) listen on the pod's address. The S3 gateway also keeps an internal gRPC port (`13535`) on the pod's address. The `NetworkPolicy` of the chart opens only `3535` and `3536`, so on a cluster that does not enforce `NetworkPolicy`, or with `network_policy.enabled: false`, pods of the cluster can reach port `13535`.
+
+To open the master or filer interfaces, run `kubectl port-forward` against the pod, which reaches the loopback interface.
 
 ## Redis
 

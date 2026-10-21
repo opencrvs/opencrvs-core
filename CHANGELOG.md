@@ -150,7 +150,7 @@ If you deploy with the Helm chart:
 
 - Rename the `minio:` block of your values (`host`, `port`, `external_url`, `external_protocol`, `auth_mode`, `users_secret`) to `s3:`. A `minio:` block that is left behind is ignored without a warning, and the defaults apply.
 - Rename `env.MINIO_BUCKET` to `env.S3_BUCKET`. **A `MINIO_BUCKET` that is left behind is ignored as well, and the documents service uses the bucket `ocrvs`.** If your bucket has another name, the files that were uploaded before the upgrade appear to be missing until you set `S3_BUCKET`. The events migration that strips the bucket from stored paths reads `S3_BUCKET` too.
-- The keys of the credentials secret (`minio-opencrvs-users`) are renamed. The name of the secret does not change.
+- The credentials secret is renamed from `minio-opencrvs-users` to `s3-opencrvs-users`, since either object store that the dependencies chart can deploy uses it, and its keys are renamed too.
 
   | Before                | After                 | Role                                      |
   | --------------------- | --------------------- | ----------------------------------------- |
@@ -159,19 +159,17 @@ If you deploy with the Helm chart:
   | `MINIO_ROOT_USER`     | `S3_ADMIN_ACCESS_KEY` | administrator, read by MinIO and the jobs |
   | `MINIO_ROOT_PASSWORD` | `S3_ADMIN_SECRET_KEY` | administrator, read by MinIO and the jobs |
 
-  The dependencies chart keeps a secret that exists (`helm.sh/resource-policy: keep`), so an upgrade does not add the new keys. **Add them before you upgrade the dependencies chart, in the dependencies namespace and in the OpenCRVS namespace, or the MinIO pod cannot start.** The old keys can stay. A deployment with `minio.use_default_credentials: true` has no such secret and needs nothing.
+  The dependencies chart creates `s3-opencrvs-users` when you upgrade it, with the credentials of `minio-opencrvs-users`, whichever of the new key names or the old ones that secret has. Nothing is rotated, and the MinIO pod can start. The old secret stays where it is. A deployment with `minio.use_default_credentials: true` has no such secret and needs nothing.
+
+  The OpenCRVS services chart reads the secret from its own namespace, so copy it there **before you upgrade the OpenCRVS services chart**:
 
   ```bash
-  for NAMESPACE in <dependencies namespace> <OpenCRVS namespace>; do
-    kubectl -n "$NAMESPACE" patch secret minio-opencrvs-users --type merge -p "$(
-      kubectl -n "$NAMESPACE" get secret minio-opencrvs-users -o json | jq '{data: {
-        S3_ACCESS_KEY: .data.MINIO_ACCESS_KEY,
-        S3_SECRET_KEY: .data.MINIO_SECRET_KEY,
-        S3_ADMIN_ACCESS_KEY: .data.MINIO_ROOT_USER,
-        S3_ADMIN_SECRET_KEY: .data.MINIO_ROOT_PASSWORD
-      }}')"
-  done
+  kubectl get secret s3-opencrvs-users -n <dependencies namespace> -o yaml \
+    | sed "s#namespace: <dependencies namespace>#namespace: <OpenCRVS namespace>#" \
+    | kubectl apply -n <OpenCRVS namespace> -f -
   ```
+
+  To keep using the old secret in the OpenCRVS namespace, set `s3.users_secret: minio-opencrvs-users` and add the four new keys to it, each with the value of the key that it replaces in the table above.
 
   A secret that you create yourself needs the same four keys. The MinIO server still reads `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` as its own environment variables, and the chart fills them from `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`.
 
@@ -199,11 +197,20 @@ The documents service now reaches its object store through the AWS SDK for JavaS
 
 The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement, so a store is supported only once it passes a conformance suite (`pnpm --filter @opencrvs/documents test:s3-conformance`). MinIO, SeaweedFS and RustFS have passed it; AWS S3 and Google Cloud Storage have not been tried. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store passed on and how to run the suite against yours.
 
-A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. The dependencies chart, Docker Compose files and backup scripts are unchanged. Choosing the replacement store is tracked separately. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. The Docker Compose files and the backup scripts are unchanged, and the dependencies chart still deploys MinIO unless you enable SeaweedFS (see below). Choosing the replacement store is tracked separately. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
+#### SeaweedFS as an alternative to MinIO in the dependencies chart
+
+The dependencies chart can deploy [SeaweedFS](https://github.com/seaweedfs/seaweedfs), an open-source S3 object store that passes the same conformance suite as MinIO. It is disabled by default and replaces MinIO, it does not run beside it: set `minio.enabled: false` and `seaweedfs.enabled: true` in the dependencies chart, and `s3.host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local` in the OpenCRVS services chart. It is served on the same port and hostnames as MinIO, so nothing else changes.
+
+It comes with an admin console that asks for a login, `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. Only the S3 API and the console listen beyond the pod. See the [SeaweedFS section of the dependencies chart](charts/dependencies/README.md#seaweedfs) for the options and for what it shares with MinIO.
+
+Backup, restore and migration of the data of MinIO are not part of this yet, so use it for a new environment or one that holds no documents you need to keep. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
+- The `data-cleanup` job stops with an error before it deletes a file when the object store refuses its credentials or cannot be reached, where it used to end as successful with the files left in place [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Bug fixes
 
