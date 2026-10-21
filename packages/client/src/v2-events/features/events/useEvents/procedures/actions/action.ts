@@ -25,7 +25,8 @@ import {
   deepMerge,
   getCurrentEventState,
   getEventValidatorContext,
-  getActionConfig
+  getActionConfig,
+  getNotificationForm
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -386,6 +387,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       eventId,
       declaration: getCleanedDeclarationDiff({
         eventConfiguration,
+        // NOTIFY is validated against the notification form, whose field visibility can differ from the declaration form
+        form:
+          actionType === ActionType.NOTIFY
+            ? getNotificationForm(eventConfiguration)
+            : undefined,
         originalDeclaration,
         declarationDiff: params.declaration,
         validatorContext: {

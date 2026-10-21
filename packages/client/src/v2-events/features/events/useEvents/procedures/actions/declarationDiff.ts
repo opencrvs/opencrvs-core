@@ -12,6 +12,7 @@ import { isEmpty } from 'lodash'
 import {
   ActionUpdate,
   deepMerge,
+  DeclarationFormConfig,
   EventConfig,
   EventState,
   FieldConfig,
@@ -159,11 +160,14 @@ export function getChangedDeclarationDiff(
 // By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
 export function getCleanedDeclarationDiff({
   eventConfiguration,
+  form = getDeclaration(eventConfiguration),
   originalDeclaration,
   declarationDiff,
   validatorContext
 }: {
   eventConfiguration: EventConfig
+  /** Form whose field visibility decides which fields are kept. Defaults to the declaration form. */
+  form?: DeclarationFormConfig
   originalDeclaration?: EventState
   declarationDiff?: EventState
   validatorContext: ValidatorContext
@@ -175,7 +179,7 @@ export function getCleanedDeclarationDiff({
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
+      form,
       declarationDiff,
       validatorContext,
       true
@@ -191,12 +195,7 @@ export function getCleanedDeclarationDiff({
   // Because hidden fields with values in current event state causes confusion and bug in search endpoint
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclarationWithHiddenFieldsWithNullValues =
-    omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
-      merged,
-      validatorContext,
-      true
-    )
+    omitHiddenPaginatedFields(form, merged, validatorContext, true)
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
