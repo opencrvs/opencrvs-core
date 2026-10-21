@@ -37,7 +37,7 @@ AWS S3 and Google Cloud Storage have not been tried. At least one open source, s
 ### What the suite does not cover
 
 - **CORS.** Browsers fetch presigned URLs, so the store must allow cross-origin reads from the client's origin. This is a setting of each store and is not checked.
-- **Load, durability and backups.** The suite checks behaviour, not capacity or recovery. The backup, restore and data-cleanup jobs in `charts` are written for MinIO.
+- **Load, durability and backups.** The suite checks behaviour, not capacity or recovery. The backup and restore jobs of MinIO in `charts` copy its files. Those of SeaweedFS use the S3 API, and so does the data-cleanup job, which works with both.
 - **Other versions.** A pass is for the version in the table. A newer one may behave differently, so run the suite again when you upgrade the store.
 
 ### Adding or removing a store

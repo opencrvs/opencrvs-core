@@ -536,6 +536,70 @@ seaweedfs:
   # node_port: 30535         # exposes port 3535
   # node_port_console: 30536 # exposes port 3536
 
+  # Backup of the objects, over the S3 API with rclone, to the backup server of the global
+  # `backup` section. Backups are encrypted with the key of `backup_encryption_secret`,
+  # file names included, so the backup server cannot read them.
+  # The user metadata of the objects (created-by) cannot be kept in files on the backup server,
+  # so each backup holds it in a manifest, and a restore applies it again.
+  # See "SeaweedFS backup and restore" in README.md.
+  backup:
+    # Enable or disable backup of SeaweedFS.
+    enabled: false
+
+    # Backup type:
+    # "dump"         - a full backup, on the `dump` schedule;
+    # "differential" - a full backup on the `full` schedule, and on the `differential` schedule
+    #                  the objects that are new or changed since the latest full backup.
+    type: dump
+
+    # Schedules (cron expressions), as for Postgres.
+    schedule:
+      dump: '0 1 * * *' # used only when type=dump
+      full: '0 1 * * 0' # Sunday 01:00, used when type=differential
+      differential: '0 1 * * 1-6' # Mon-Sat 01:00, used when type=differential
+
+    # Full backups to keep, with the differentials that are based on them. Older ones are deleted
+    # at the end of a successful full backup. 0 keeps every backup, so the backup server fills
+    # up until someone deletes the old ones.
+    keep_fulls: 0
+
+    # Settings that win over those of the global `backup` section:
+    # server_secret: backup-server-ssh-credentials
+    # encryption_secret: backup-encryption-secret
+    # host: backup server hostname or IP
+    # server_dir: /home/backup/demo
+
+    # Lines of a known_hosts file for the backup server, as `ssh-keyscan -t ed25519 <host>` prints
+    # them, for example `10.0.0.5 ssh-ed25519 AAAA...`. The host key is checked against them, and
+    # a server with another key, or one that is not listed, is refused. Without it, the host key
+    # is not checked. The host must be written as `backup.host` is, and a port other than 22 as
+    # `[10.0.0.5]:2222`.
+    # known_hosts: ''
+
+  restore:
+    # Enable or disable restore of SeaweedFS.
+    # A restore deletes every bucket of SeaweedFS, and fills it with the newest complete backup.
+    enabled: false
+
+    # Restore the newest complete backup on or before this date, for example 2026-10-21.
+    # Empty means the newest complete backup.
+    date: ''
+
+    # Settings that win over those of the global `restore` section, see `backup` above:
+    # server_secret: backup-server-ssh-credentials
+    # encryption_secret: restore-encryption-secret
+    # host: backup server hostname or IP
+    # server_dir: /home/backup/demo
+    # schedule: "0 3 * * *"
+    # known_hosts: ''
+
+# The image of the jobs that copy objects between the object stores and the backup server:
+# the backup and restore of SeaweedFS. It is a plain rclone, with a shell.
+rclone:
+  image:
+    repository: rclone/rclone
+    tag: 1.75.2
+
 redis:
   # Enable Redis deployment.
   # Redis is built on top of bitnami/redis docker image:

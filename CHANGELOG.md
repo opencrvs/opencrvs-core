@@ -214,7 +214,9 @@ The OpenCRVS services chart uses one object store at a time, MinIO by default. T
 
 SeaweedFS uses the credentials of MinIO, so the same keys work in both: `minio.use_default_credentials` decides, and the secret is `s3-opencrvs-users`. The console asks for a login, `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. Only the S3 API and the console listen beyond the pod. See the [SeaweedFS section of the dependencies chart](charts/dependencies/README.md#seaweedfs) for the options and for what it shares with MinIO.
 
-Backup, restore and migration of the data of MinIO are not part of this yet, so use it for a new environment or one that holds no documents you need to keep. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+SeaweedFS has its own backup and restore jobs, set up with `seaweedfs.backup` and `seaweedfs.restore` as the other datastores are, and by `opencrvs environment init`, which writes the backup type of the environment for it as well. They work over the S3 API with rclone, and write to the backup server over SFTP, which needs no rsync. `type: differential` makes a full backup weekly, and a differential daily with only what changed since it. Everything on the backup server is encrypted, file names included, with the backup encryption key, and the job refuses to write when it is given another key than the backups were made with. `seaweedfs.backup.known_hosts` makes the jobs check the host key of the backup server, which is not checked otherwise. The metadata of the objects (`created-by`, content type) is kept in a manifest in each backup, and restored from it. See [SeaweedFS backup and restore](charts/dependencies/README.md#seaweedfs-backup-and-restore).
+
+A restore deletes every bucket of SeaweedFS, and fills it with the newest complete backup, or with the newest on or before `seaweedfs.restore.date`. Use it on an environment that may be overwritten. Migration of the data of MinIO is not part of this yet, so use SeaweedFS for a new environment or one that holds no documents you need to keep. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Improvements
 

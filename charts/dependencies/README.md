@@ -120,7 +120,7 @@ Each rule must define `name`; the chart uses it to generate deterministic `Netwo
 
 For backup and restore jobs, external backup server access must be allowed explicitly. Standard Kubernetes `NetworkPolicy` supports IP blocks, pod selectors, namespace selectors, and ports; it does not support DNS/FQDN destinations.
 
-To handle this, the chart computes an `ipBlock` egress rule (`<host>/32`, TCP port 22) for Postgres and MinIO directly from the resolved backup/restore host (`backup.host`, `restore.host`, `postgres.backup.host`, `postgres.restore.host`, `minio.backup.host`, `minio.restore.host`), rendered only when the corresponding `backup.enabled`/`restore.enabled` flag is true. **This requires the host value to be a literal IP address** — if you configure a DNS hostname instead, the generated `ipBlock.cidr` will be invalid and the policy will not match traffic to that host.
+To handle this, the chart computes an `ipBlock` egress rule (`<host>/32`, TCP port 22) for Postgres, MinIO and the backup and restore jobs of SeaweedFS directly from the resolved backup/restore host (`backup.host`, `restore.host`, `postgres.backup.host`, `postgres.restore.host`, `minio.backup.host`, `minio.restore.host`, `seaweedfs.backup.host`, `seaweedfs.restore.host`), rendered only when the corresponding `backup.enabled`/`restore.enabled` flag is true. **This requires the host value to be a literal IP address** — if you configure a DNS hostname instead, the generated `ipBlock.cidr` will be invalid and the policy will not match traffic to that host.
 
 ### Service connections
 
@@ -132,7 +132,7 @@ Applies once `network_policy.enabled: true`. Every dependency pod always accepts
 | Elasticsearch                                          | 9200                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | Redis                                                  | 6379                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | MinIO                                                  | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
-| SeaweedFS                                              | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | —                                                                                                          |
+| SeaweedFS                                              | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | backup/restore host:22 when backup/restore enabled (the pods of the jobs only)                             |
 | Kibana                                                 | 5601                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | Filebeat, Metricbeat, Logstash, APM Server, Elastalert | —                          | —                                                         | —                                                                                                          |
 | postgres-restore-runner (differential restore)         | —                          | —                                                         | 80, 443 (package installs); restore host:22 when restore enabled                                           |
@@ -285,7 +285,7 @@ Adjust schedules, server credentials, and directories as needed for your deploym
 
 [SeaweedFS](https://github.com/seaweedfs/seaweedfs) is an open-source, S3 compatible object store, and an alternative to MinIO. The documents service passes its [S3 conformance suite](../../packages/documents/README.md), and so does MinIO. It can run beside MinIO: it has a service, a volume and hostnames of its own, `seaweedfs.<hostname>` for the S3 API and `seaweedfs-console.<hostname>` for the console, while MinIO stays on `minio.<hostname>` and `minio-console.<hostname>`. The two SeaweedFS hostnames need DNS records, unless a wildcard record covers them.
 
-> NOTE: SeaweedFS is disabled by default. Backup, restore and migration of the data of MinIO are not part of this chart yet, so choose it for a new environment or one that holds no documents you need to keep.
+> NOTE: SeaweedFS is disabled by default. It has its own [backup and restore](#seaweedfs-backup-and-restore). Migration of the data of MinIO is not part of this chart yet, so choose SeaweedFS for a new environment or one that holds no documents you need to keep.
 
 Enable it, with or without MinIO:
 
@@ -343,6 +343,55 @@ The console is SeaweedFS's admin web interface, a separate `weed admin` containe
 SeaweedFS has two more web interfaces, the master's and the filer's. The filer serves every object without checking an S3 credential, so the pod binds the master, the volume server and the filer to its loopback interface, and only the S3 API (`3535`) and the console (`3536`) listen on the pod's address. The S3 gateway also keeps an internal gRPC port (`13535`) on the pod's address. The `NetworkPolicy` of the chart opens only `3535` and `3536`, so on a cluster that does not enforce `NetworkPolicy`, or with `network_policy.enabled: false`, pods of the cluster can reach port `13535`.
 
 To open the master or filer interfaces, run `kubectl port-forward` against the pod, which reaches the loopback interface.
+
+### SeaweedFS backup and restore
+
+SeaweedFS is backed up over the S3 API, with [rclone](https://rclone.org), and not by copying its data directory, which holds volume files and a metadata database that change while it runs. The jobs run in the cluster, read every bucket, and write to the backup server of the global [backup](#backup-configuration) and [restore](#restore-configuration) sections over SSH, as SFTP. The backup server needs no rsync, and the jobs need no access to the Kubernetes API.
+
+Everything on the backup server is encrypted: the contents, and the names of the files and directories, with the key `backup_encryption_key` of the backup encryption secret. A backup is a dated directory under `<backup_server_dir>/seaweedfs`:
+
+| Directory                    | Holds                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `full/<date>/data/<bucket>/` | Every object of the bucket.                                                                                                                                  |
+| `diff/<date>/data/<bucket>/` | Only the objects that are new or changed since the full backup it is based on.                                                                               |
+| `<backup>/manifest.tsv`      | Every live key at the time of the backup, with its metadata (`created-by`, content type). Files on a backup server cannot hold the metadata of an S3 object. |
+| `<backup>/COMPLETE`          | Written last. A backup without it was interrupted, and is never used as the base of a differential or for a restore.                                         |
+
+`seaweedfs.backup.type` chooses the jobs, as for Postgres:
+
+| Type           | Jobs                                                                                               | What they do                                                                                                                                                                                                |
+| -------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dump`         | `seaweedfs-backup`, on `schedule.dump`                                                             | A full backup each time.                                                                                                                                                                                    |
+| `differential` | `seaweedfs-backup-full` on `schedule.full`, and `seaweedfs-backup-diff` on `schedule.differential` | A full backup weekly, and daily what changed since the latest complete full backup, so a differential grows until the next full backup. A differential when there is no complete full backup is a full one. |
+
+A backup of the same date replaces the earlier one. `seaweedfs.backup.keep_fulls` keeps that many full backups with the differentials that are based on them, and deletes the older ones at the end of a full backup. The default, `0`, keeps all of them, so the backup server fills up until someone deletes the old ones.
+
+**Restoring.** The job `seaweedfs-restore` **deletes every bucket of SeaweedFS** and fills it again with the newest complete backup, or with the newest on or before `seaweedfs.restore.date`. A differential is restored together with its full backup. Objects that were deleted before the backup stay deleted, and `created-by` and the content type are restored from the manifest. Use it on an environment that may be overwritten, for example staging, which restores the backups of production by setting `restore.host`, `restore.backup_server_dir` to the `backup_server_dir` of production, and the key of production in the `restore-encryption-secret`.
+
+It stops, before it writes or deletes anything, when:
+
+- the encryption key does not decrypt what is on the backup server. A backup under another key would otherwise be written beside the others, be reported as complete, and never be restorable together with them.
+- the backup server refuses the SSH key, or its host key does not match `known_hosts`.
+- there is no complete backup, or a differential's full backup is missing or incomplete.
+
+**The host key** of the backup server is not checked, as for the other backup jobs, until `seaweedfs.backup.known_hosts` (and `seaweedfs.restore.known_hosts`) holds its public key, as `ssh-keyscan -t ed25519 <host>` prints it. A server with another key is then refused, which is also what happens when the key of the server was changed.
+
+| Key                                                                                                          | Default                   | Description                                                                                              |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `seaweedfs.backup.enabled`                                                                                   | `false`                   | Back up SeaweedFS. The global `backup.enabled` turns it on as well, when `seaweedfs.enabled` is `true`.  |
+| `seaweedfs.backup.type`                                                                                      | `dump`                    | `dump` or `differential`.                                                                                |
+| `seaweedfs.backup.schedule.dump`                                                                             | `0 1 * * *`               | Used when the type is `dump`. Without it, `backup.schedule`.                                             |
+| `seaweedfs.backup.schedule.full`                                                                             | `0 1 * * 0`               | Used when the type is `differential`: Sunday.                                                            |
+| `seaweedfs.backup.schedule.differential`                                                                     | `0 1 * * 1-6`             | Used when the type is `differential`: Monday to Saturday.                                                |
+| `seaweedfs.backup.keep_fulls`                                                                                | `0`                       | Full backups to keep, `0` for all.                                                                       |
+| `seaweedfs.backup.known_hosts`                                                                               | not set                   | The public key of the backup server, to check its host key.                                              |
+| `seaweedfs.backup.host`, `.server_dir`, `.server_secret`, `.encryption_secret`                               | the global `backup`       | Settings of SeaweedFS that win over the global ones.                                                     |
+| `seaweedfs.restore.enabled`                                                                                  | `false`                   | Restore SeaweedFS. The global `restore.enabled` turns it on as well, when `seaweedfs.enabled` is `true`. |
+| `seaweedfs.restore.date`                                                                                     | not set                   | The newest complete backup on or before this date, for example `2026-10-21`.                             |
+| `seaweedfs.restore.known_hosts`, `.host`, `.server_dir`, `.server_secret`, `.encryption_secret`, `.schedule` | the global `restore`      | As for the backup.                                                                                       |
+| `rclone.image.repository` and `.tag`                                                                         | `rclone/rclone`, `1.75.2` | The image of the jobs. Mirror it for an [air-gap installation](#air-gap-installation).                   |
+
+The backup server must allow SFTP, which is on by default in OpenSSH. A job fails with a clear error if the object store or the backup server does not answer within `WAIT_TIMEOUT_SECONDS` (default 600), and the CronJobs do not start a second run while one is still running.
 
 ## Redis
 
@@ -421,6 +470,10 @@ Start from the default Postgres image and add:
 - `openssh-client`
 - `rsync`
 - `pgbackrest`
+
+### SeaweedFS backup and restore image
+
+The backup and restore jobs of SeaweedFS (`rclone.image.*`) run a plain rclone, and need no packages at runtime. Mirror the image into your registry and point the chart to it.
 
 ### MinIO image
 
@@ -676,6 +729,7 @@ Supported datastores:
 - Elasticsearch
 - PostgreSQL
 - MinIO
+- SeaweedFS, see [SeaweedFS backup and restore](#seaweedfs-backup-and-restore)
 
 Each datastore has its own backup job, configured as a Kubernetes `CronJob`.
 Backup settings are defined in the `backup` section of the chart values.

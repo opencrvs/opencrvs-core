@@ -1,0 +1,47 @@
+{{- if and .Values.seaweedfs.enabled (eq (include "seaweedfs.restore_enabled" .) "true") }}
+{{- $run_as_cronjob := or .Values.restore.cronjob .Values.seaweedfs.restore.cronjob }}
+---
+apiVersion: batch/v1
+{{ if $run_as_cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: seaweedfs-restore
+  labels:
+    app: seaweedfs-restore
+    job-type: restore
+spec:
+  {{ if $run_as_cronjob }}
+  schedule: {{ default .Values.restore.schedule .Values.seaweedfs.restore.schedule | quote }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  # A restore that is still running is not started a second time
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: seaweedfs-restore
+            job-type: restore
+        spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.rclone) | nindent 10 }}
+          restartPolicy: OnFailure
+          containers:
+            - name: restore
+              image: {{ include "opencrvs.imageReference" .Values.rclone }}
+              command: ["/bin/sh", "/scripts/restore.sh"]
+              env:
+                {{- include "seaweedfs.rclone_env" (dict "root" . "type" "restore") | nindent 16 }}
+                - name: RESTORE_DATE
+                  value: {{ .Values.seaweedfs.restore.date | quote }}
+              {{- include "render-env-vars" (dict "service_name" "restore" "Values" .Values) | nindent 4 }}
+              volumeMounts:
+                {{- include "seaweedfs.rclone_job_volume_mounts" (dict "root" . "type" "restore") | nindent 16 }}
+          volumes:
+            {{- include "seaweedfs.rclone_job_volumes" (dict "root" . "type" "restore") | nindent 12 }}
+{{- end }}

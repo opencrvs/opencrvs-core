@@ -1,0 +1,70 @@
+{{- /*
+One backup job, a CronJob or a Job.
+  name:     name of the job
+  mode:     full, or differential: only what changed since the latest full backup
+  schedule: cron expression
+  keep:     whether to delete the full backups beyond seaweedfs.backup.keep_fulls
+*/}}
+{{- define "seaweedfs.backup_job" -}}
+{{- $root := .root }}
+{{- $run_as_cronjob := or $root.Values.backup.cronjob $root.Values.seaweedfs.backup.cronjob }}
+---
+apiVersion: batch/v1
+{{ if $run_as_cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: {{ .name }}
+  labels:
+    app: seaweedfs-backup
+    job-type: backup
+spec:
+  {{ if $run_as_cronjob }}
+  schedule: {{ .schedule | quote }}
+  {{- if $root.Values.timezone }}
+  timeZone: {{ $root.Values.timezone }}
+  {{- end }}
+  # A backup that is still running is not started a second time
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: seaweedfs-backup
+            job-type: backup
+        spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" $root "service" $root.Values.rclone) | nindent 10 }}
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: {{ include "opencrvs.imageReference" $root.Values.rclone }}
+              command: ["/bin/sh", "/scripts/backup.sh"]
+              env:
+                {{- include "seaweedfs.rclone_env" (dict "root" $root "type" "backup") | nindent 16 }}
+                - name: BACKUP_MODE
+                  value: {{ .mode }}
+              {{- if .keep }}
+                - name: KEEP_FULLS
+                  value: {{ $root.Values.seaweedfs.backup.keep_fulls | quote }}
+              {{- end }}
+              {{- include "render-env-vars" (dict "service_name" "backup" "Values" $root.Values) | nindent 4 }}
+              volumeMounts:
+                {{- include "seaweedfs.rclone_job_volume_mounts" (dict "root" $root "type" "backup") | nindent 16 }}
+          volumes:
+            {{- include "seaweedfs.rclone_job_volumes" (dict "root" $root "type" "backup") | nindent 12 }}
+{{- end }}
+
+{{- if and .Values.seaweedfs.enabled (eq (include "seaweedfs.backup_enabled" .) "true") }}
+{{- $schedule := .Values.seaweedfs.backup.schedule }}
+{{- if eq .Values.seaweedfs.backup.type "dump" }}
+{{- /* A full backup every time: `dump` has the schedule of the other datastores */}}
+{{ include "seaweedfs.backup_job" (dict "root" . "name" "seaweedfs-backup" "mode" "full" "keep" true "schedule" (default .Values.backup.schedule $schedule.dump)) }}
+{{- else if eq .Values.seaweedfs.backup.type "differential" }}
+{{ include "seaweedfs.backup_job" (dict "root" . "name" "seaweedfs-backup-full" "mode" "full" "keep" true "schedule" $schedule.full) }}
+{{ include "seaweedfs.backup_job" (dict "root" . "name" "seaweedfs-backup-diff" "mode" "differential" "keep" false "schedule" $schedule.differential) }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,13 @@
+{{- if and .Values.seaweedfs.enabled (or (eq (include "seaweedfs.backup_enabled" .) "true") (eq (include "seaweedfs.restore_enabled" .) "true")) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: seaweedfs
+  name: seaweedfs-scripts
+data:
+{{- range $path, $file := .Files.Glob "files/seaweedfs/*" }}
+  {{ base $path }}: |
+{{ toString $file | indent 4 }}
+{{- end }}
+{{- end }}

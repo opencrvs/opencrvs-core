@@ -1,0 +1,19 @@
+{{- $backup := and (eq (include "seaweedfs.backup_enabled" .) "true") .Values.seaweedfs.backup.known_hosts }}
+{{- $restore := and (eq (include "seaweedfs.restore_enabled" .) "true") .Values.seaweedfs.restore.known_hosts }}
+{{- if and .Values.seaweedfs.enabled (or $backup $restore) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: seaweedfs
+  name: seaweedfs-known-hosts
+data:
+  {{- if $backup }}
+  backup: |
+{{ .Values.seaweedfs.backup.known_hosts | indent 4 }}
+  {{- end }}
+  {{- if $restore }}
+  restore: |
+{{ .Values.seaweedfs.restore.known_hosts | indent 4 }}
+  {{- end }}
+{{- end }}

@@ -116,16 +116,20 @@ spec:
 Backup and restore server egress rules.
 
 Standard Kubernetes NetworkPolicy egress peers only support ipBlock,
-podSelector and namespaceSelector - not DNS/FQDN destinations. Postgres and
-MinIO connect to the backup/restore server over SSH (port 22), so the rules
-below assume *.host values are literal IP addresses and build a /32 ipBlock
-from them.
+podSelector and namespaceSelector - not DNS/FQDN destinations. Postgres,
+MinIO and the backup and restore jobs of SeaweedFS connect to the backup/restore
+server over SSH (port 22), so the rules below assume *.host values are literal IP
+addresses and build a /32 ipBlock from them.
 */}}
 {{- $any_backup_restore_enabled := false }}
-{{- range $app := list "postgres" "minio" }}
+{{- range $app := list "postgres" "minio" "seaweedfs" }}
 {{- range $type := list "backup" "restore" }}
-{{- if eq (include (printf "%s.%s_enabled" $app $type) $) "true" }}
+{{- /* SeaweedFS is off by default, so its jobs are not allowed to reach the backup server unless it is deployed */}}
+{{- if and (or (ne $app "seaweedfs") $.Values.seaweedfs.enabled) (eq (include (printf "%s.%s_enabled" $app $type) $) "true") }}
+{{- /* The jobs of SeaweedFS do not run in the pods of backup-runner */}}
+{{- if ne $app "seaweedfs" }}
 {{- $any_backup_restore_enabled = true }}
+{{- end }}
 {{- $host := default (index $.Values $type "host") (index $.Values $app $type "host") }}
 {{- if $host }}
 ---
@@ -139,7 +143,12 @@ spec:
       - key: app
         operator: In
         values:
+          {{- if eq $app "seaweedfs" }}
+          {{- /* The jobs of SeaweedFS talk to the backup server, and not its own pod */}}
+          - seaweedfs-{{ $type }}
+          {{- else }}
           - {{ $app }}
+          {{- end }}
           {{- /* Differential postgres restore runs pgBackRest in a separate runner pod */}}
           {{- if and (eq $app "postgres") (eq $type "restore") (eq $.Values.postgres.restore.type "differential") }}
           - postgres-restore-runner

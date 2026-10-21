@@ -36,6 +36,15 @@ minio:
     type: {{backup_type}}
   {{/if}}
 
+{{#if backup_enabled}}
+# SeaweedFS is backed up the way the other datastores are, when it is deployed. The block is
+# only written with a backup, as `seaweedfs:` with nothing under it would delete the settings
+# of the chart. Restoring needs nothing here: it takes the newest backup of whatever type.
+seaweedfs:
+  backup:
+    type: {{backup_type}}
+
+{{/if}}
 elasticsearch:
   use_default_credentials: false
 

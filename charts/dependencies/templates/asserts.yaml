@@ -7,3 +7,22 @@
 {{- if eq .Values.restore.backup_server_dir .Values.backup.backup_server_dir }}
 {{- fail "Invalid configuration: backup and restore 'backup_server_dir' is the same, please check values.yaml and (or) GitHub environment. Values should differ to avoid backup corruption." }}
 {{- end }}
+{{- if and .Values.seaweedfs.enabled (eq (include "seaweedfs.backup_enabled" .) "true") }}
+{{- if not (has .Values.seaweedfs.backup.type (list "dump" "differential")) }}
+{{- fail (printf "Invalid configuration: seaweedfs.backup.type must be dump or differential, not '%v'." .Values.seaweedfs.backup.type) }}
+{{- end }}
+{{- if not (default .Values.backup.host .Values.seaweedfs.backup.host) }}
+{{- fail "Invalid configuration: backup of SeaweedFS is enabled, but there is no backup server. Set backup.host, or seaweedfs.backup.host." }}
+{{- end }}
+{{- if not (regexMatch "^[0-9]+$" (toString .Values.seaweedfs.backup.keep_fulls)) }}
+{{- fail (printf "Invalid configuration: seaweedfs.backup.keep_fulls must be a number, not '%v'." .Values.seaweedfs.backup.keep_fulls) }}
+{{- end }}
+{{- end }}
+{{- if and .Values.seaweedfs.enabled (eq (include "seaweedfs.restore_enabled" .) "true") }}
+{{- if not (default .Values.restore.host .Values.seaweedfs.restore.host) }}
+{{- fail "Invalid configuration: restore of SeaweedFS is enabled, but there is no backup server. Set restore.host, or seaweedfs.restore.host." }}
+{{- end }}
+{{- if and .Values.seaweedfs.restore.date (not (regexMatch "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" (toString .Values.seaweedfs.restore.date))) }}
+{{- fail (printf "Invalid configuration: seaweedfs.restore.date must look like 2026-10-21, not '%v'." .Values.seaweedfs.restore.date) }}
+{{- end }}
+{{- end }}
