@@ -1,9 +1,6 @@
 {{- if and .Values.monitoring.enabled .Values.elasticsearch.use_default_credentials }}
 {{- fail "Invalid configuration: Cannot enable both monitoring with default Elasticsearch credentials." }}
 {{- end }}
-{{- if and .Values.minio.enabled .Values.seaweedfs.enabled }}
-{{- fail "Invalid configuration: minio.enabled and seaweedfs.enabled are both true. Both are exposed on the same hostnames, enable one of them." }}
-{{- end }}
 {{- if not .Values.hostname }}
 {{- fail "Invalid configuration: hostname value is not defined, please check values.yaml and (or) GitHub environment DOMAIN variable" }}
 {{- end }}
