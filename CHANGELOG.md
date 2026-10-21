@@ -201,9 +201,11 @@ A batch delete that the store partly refuses now fails instead of passing silent
 
 #### SeaweedFS as an alternative to MinIO in the dependencies chart
 
-The dependencies chart can deploy [SeaweedFS](https://github.com/seaweedfs/seaweedfs), an open-source S3 object store that passes the same conformance suite as MinIO. It is disabled by default and replaces MinIO, it does not run beside it: set `minio.enabled: false` and `seaweedfs.enabled: true` in the dependencies chart, and `s3.host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local` in the OpenCRVS services chart. It is served on the same port and hostnames as MinIO, so nothing else changes.
+The dependencies chart can deploy [SeaweedFS](https://github.com/seaweedfs/seaweedfs), an open-source S3 object store that passes the same conformance suite as MinIO. It is disabled by default (`seaweedfs.enabled: true` turns it on) and can run beside MinIO, which stays on `minio.<hostname>`: SeaweedFS has a service, a volume and hostnames of its own, `seaweedfs.<hostname>` for the S3 API and `seaweedfs-console.<hostname>` for the console. Add DNS records for them unless a wildcard record covers them.
 
-It comes with an admin console that asks for a login, `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. Only the S3 API and the console listen beyond the pod. See the [SeaweedFS section of the dependencies chart](charts/dependencies/README.md#seaweedfs) for the options and for what it shares with MinIO.
+The OpenCRVS services chart uses one object store at a time, MinIO by default. To use SeaweedFS, set both `s3.host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local` and `s3.external_url: seaweedfs.<hostname>`. With only the first, document URLs are signed for `minio.<hostname>` and do not work.
+
+The console asks for a login, `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. Only the S3 API and the console listen beyond the pod. See the [SeaweedFS section of the dependencies chart](charts/dependencies/README.md#seaweedfs) for the options and for what it shares with MinIO.
 
 Backup, restore and migration of the data of MinIO are not part of this yet, so use it for a new environment or one that holds no documents you need to keep. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 

@@ -19,9 +19,8 @@ spec:
 {{- end }}
 ---
 {{- /*
-The public hostnames are those of MinIO, so that switching the store needs no
-DNS or certificate change, and the services chart derives S3_PUBLIC_URL from the
-same name.
+SeaweedFS has hostnames of its own, so that it can run beside MinIO. The
+services chart signs document URLs for the hostname that s3.external_url names.
 */}}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -36,7 +35,7 @@ spec:
     - web
   {{- end }}
   routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "minio" "Values" .Values) }}`)'
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "seaweedfs" "Values" .Values) }}`)'
     kind: Rule
     services:
     - name: seaweedfs
@@ -47,7 +46,7 @@ spec:
       - name: application-ip-allowlist
     {{- end }}
   {{- if .Values.seaweedfs.console.enabled }}
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "minio-console" "Values" .Values) }}`)'
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "seaweedfs-console" "Values" .Values) }}`)'
     kind: Rule
     services:
     - name: seaweedfs
