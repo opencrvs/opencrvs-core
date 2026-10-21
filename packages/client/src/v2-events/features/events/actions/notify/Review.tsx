@@ -31,7 +31,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { NotifyActionMenu } from './NotifyActionMenu'
@@ -47,29 +46,27 @@ export function Review() {
   const validatorContext = useValidatorContext(event)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
   const formConfig = getNotificationForm(config)
+  const form = useEventFormData((state) => state.getFormValues())
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const anchor = recordAnchorDate(getCurrentEventState(event, config))
+  const annotation = getAnnotation()
 
   const actionConfiguration = config.actions.find(
     (a) => a.type === ActionType.NOTIFY
   )
+
   if (!actionConfiguration) {
     throw new Error('Action configuration not found')
   }
 
   const reviewConfig = actionConfiguration.review
-  const anchor = recordAnchorDate(getCurrentEventState(event, config))
-  const form = useEventFormData((state) => state.getFormValues())
 
-  const { setAnnotation, getAnnotation } = useActionAnnotation()
-  const annotation = getAnnotation()
-
-  async function handleEdit({
+  function handleEdit({
     pageId,
-    fieldId,
-    confirmation
+    fieldId
   }: {
     pageId: string
     fieldId?: string
-    confirmation?: boolean
   }) {
     navigate(
       ROUTES.V2.EVENTS.NOTIFY.PAGES.buildPath(

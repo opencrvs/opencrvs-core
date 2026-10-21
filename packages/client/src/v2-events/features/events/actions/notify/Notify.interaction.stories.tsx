@@ -24,7 +24,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
-import { ReviewIndex } from './Review'
+import { Review } from './index'
 
 const generator = testDataGenerator()
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -74,8 +74,8 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(
 const mockUser = generator.user.fieldAgent().summary
 const mockUserFull = generator.user.fieldAgent().v2
 
-const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare/Notify config',
+const meta: Meta<typeof Review> = {
+  title: 'Notify/Notify config',
   parameters: {
     offline: {
       events: [createdEventDocument],
@@ -88,7 +88,7 @@ const meta: Meta<typeof ReviewIndex> = {
 }
 
 export default meta
-type Story = StoryObj<typeof ReviewIndex>
+type Story = StoryObj<typeof Review>
 
 const msw = {
   handlers: {
@@ -131,7 +131,7 @@ export const NotifyConfigSupportingCopyIsShownInDialog: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.NOTIFY.REVIEW.buildPath({
         eventId: createdEventDocument.id
       })
     },
@@ -168,10 +168,18 @@ export const NotifyConfigSupportingCopyIsShownInDialog: Story = {
     await step('Notify mutation was called, not declare', async () => {
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
+          'event.create': false,
           'event.actions.notify.request': true,
-          'event.actions.declare.request': false
+          'event.actions.declare.request': false,
+          'event.actions.register.request': false
         })
       })
+    })
+
+    await step('User is taken back to the workqueue', async () => {
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
     })
   }
 }
