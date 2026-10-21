@@ -114,5 +114,3 @@ export function Review() {
     </FormLayout>
   )
 }
-
-export const ReviewIndex = withSuspense(Review)
