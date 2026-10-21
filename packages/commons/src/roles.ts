@@ -9,12 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { EncodedScope } from './scopes'
+import { EncodedScope, getNotifyAndDeclareRoleError } from './scopes'
 
-export const Role = z.object({
-  id: z.string(),
-  scopes: z.array(EncodedScope)
-})
+export const Role = z
+  .object({
+    id: z.string(),
+    scopes: z.array(EncodedScope)
+  })
+  .superRefine((role, ctx) => {
+    const error = getNotifyAndDeclareRoleError(role)
+
+    if (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: error,
+        path: ['scopes']
+      })
+    }
+  })
 
 export type Role = z.infer<typeof Role>
 
