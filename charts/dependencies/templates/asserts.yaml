@@ -7,3 +7,14 @@
 {{- if eq .Values.restore.backup_server_dir .Values.backup.backup_server_dir }}
 {{- fail "Invalid configuration: backup and restore 'backup_server_dir' is the same, please check values.yaml and (or) GitHub environment. Values should differ to avoid backup corruption." }}
 {{- end }}
+{{- if .Values.minio_to_seaweedfs.enabled }}
+{{- if not (and .Values.minio.enabled .Values.seaweedfs.enabled) }}
+{{- fail "Invalid configuration: minio_to_seaweedfs.enabled copies MinIO into SeaweedFS, so minio.enabled and seaweedfs.enabled must both be true." }}
+{{- end }}
+{{- if not (has .Values.minio_to_seaweedfs.mode (list "copy" "sync")) }}
+{{- fail (printf "Invalid configuration: minio_to_seaweedfs.mode must be copy or sync, not '%v'." .Values.minio_to_seaweedfs.mode) }}
+{{- end }}
+{{- if not (has .Values.minio_to_seaweedfs.verify (list "hash" "size" "download" "none")) }}
+{{- fail (printf "Invalid configuration: minio_to_seaweedfs.verify must be hash, size, download or none, not '%v'." .Values.minio_to_seaweedfs.verify) }}
+{{- end }}
+{{- end }}

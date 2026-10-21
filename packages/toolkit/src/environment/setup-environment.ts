@@ -83,6 +83,16 @@ import { askQuestionWithEditor } from './editor-questions'
 import { selectWithCustom, getIndexFromChoices } from './questions-helper'
 import { manageUsers } from './manage-users'
 import { getEnvironmentInventoryPath } from './paths'
+import {
+  MIGRATION_VARIABLE,
+  S3_STORAGE_VARIABLE,
+  S3Storage,
+  isLegacyEnvironment,
+  needsObjectStorageAnswers,
+  objectStorageNextSteps,
+  parseStoredObjectStorage,
+  resolveObjectStorage
+} from './object-storage'
 
 function questionToPrompt<T extends string>({
   valueType,
@@ -680,6 +690,70 @@ export async function runSetupEnvironment() {
     log(kleur.bold().green('✔'), kleur.bold().yellow('Restore is disabled'))
   }
 
+  log('\n', kleur.bold().underline('Object storage'))
+  const existingS3Storage = findExistingValue(
+    S3_STORAGE_VARIABLE,
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const existingMigration = findExistingValue(
+    MIGRATION_VARIABLE,
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const storedObjectStorage = parseStoredObjectStorage(
+    existingS3Storage?.value,
+    existingMigration?.value
+  )
+  const legacyEnvironment = isLegacyEnvironment(
+    existingEnvironmentVariables.length > 0 ||
+      existingEnvironmentSecrets.length > 0,
+    storedObjectStorage
+  )
+  let migrationAnswer: boolean | undefined
+  let storageAnswer: S3Storage | undefined
+  if (needsObjectStorageAnswers(legacyEnvironment, storedObjectStorage)) {
+    if (legacyEnvironment) {
+      log(
+        'This environment keeps its documents in MinIO. OpenCRVS can use SeaweedFS instead, and SeaweedFS is deployed next to MinIO to move the documents over.'
+      )
+    }
+    const migrationDefault =
+      process.env[MIGRATION_VARIABLE] || existingMigration?.value
+    migrationAnswer = await confirm({
+      message:
+        'Copy the documents from MinIO to SeaweedFS on every deployment? The copy can run any number of times and deletes nothing. It needs free disk space on the data node as large as the data of MinIO.',
+      default: migrationDefault ? migrationDefault === 'true' : false
+    })
+    storageAnswer = await select<S3Storage>({
+      message: 'Which object store should the OpenCRVS services use?',
+      default:
+        process.env[S3_STORAGE_VARIABLE] ||
+        storedObjectStorage.storage ||
+        'minio',
+      choices: [
+        { name: 'MinIO (the store of this environment today)', value: 'minio' },
+        {
+          name: 'SeaweedFS (choose this after the documents have been copied)',
+          value: 'seaweedfs'
+        }
+      ]
+    })
+  }
+  const objectStorage = resolveObjectStorage({
+    legacy: legacyEnvironment,
+    stored: storedObjectStorage,
+    answers: { migrate: migrationAnswer, storage: storageAnswer }
+  })
+  for (const line of objectStorageNextSteps(objectStorage, {
+    legacy: legacyEnvironment,
+    stored: storedObjectStorage
+  })) {
+    log(kleur.bold().green('✔'), kleur.bold().yellow(line))
+  }
+
   log('\n', kleur.bold().underline('Monitoring'))
   await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
   const sentryDSNExists = findExistingValue(
@@ -782,6 +856,23 @@ export async function runSetupEnvironment() {
     value: two_fa_enabled ? 'true' : 'false',
     scope: 'ENVIRONMENT' as const
   })
+  derivedUpdates.push(
+    {
+      name: S3_STORAGE_VARIABLE,
+      type: 'VARIABLE' as const,
+      didExist: existingS3Storage,
+      // Always stored: an environment without it is taken for one that predates SeaweedFS
+      value: objectStorage.storage,
+      scope: 'ENVIRONMENT' as const
+    },
+    {
+      name: MIGRATION_VARIABLE,
+      type: 'VARIABLE' as const,
+      didExist: existingMigration,
+      value: objectStorage.migrationEnabled ? 'true' : 'false',
+      scope: 'ENVIRONMENT' as const
+    }
+  )
   derivedUpdates.push(...ssl_answers)
   if (configureBackup) {
     derivedUpdates.push({
@@ -1395,7 +1486,11 @@ export async function runSetupEnvironment() {
     restore_host: restoreHost || '',
     backup_enabled: configureBackup ? true : false,
     backup_type: backupType,
-    backup_host: backupHost || ''
+    backup_host: backupHost || '',
+    minio_enabled: objectStorage.minioEnabled,
+    seaweedfs_enabled: objectStorage.seaweedfsEnabled,
+    minio_to_seaweedfs_enabled: objectStorage.migrationEnabled,
+    services_use_seaweedfs: objectStorage.servicesUseSeaweedfs
   })
 
   log('\n', kleur.bold().underline('Updating workflow files'))

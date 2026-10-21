@@ -536,6 +536,85 @@ seaweedfs:
   # node_port: 30535         # exposes port 3535
   # node_port_console: 30536 # exposes port 3536
 
+# Copies the objects of MinIO into SeaweedFS, to move an environment from one object
+# store to the other. It is a post-deploy hook: while `enabled` is true, it runs on every
+# helm install and upgrade, and it can run any number of times. Helm waits for it, so
+# give helm a --timeout that is long enough for the copy. See "Migrating from MinIO to
+# SeaweedFS" in README.md.
+minio_to_seaweedfs:
+  enabled: false
+  image:
+    repository: rclone/rclone
+    tag: 1.75.2
+
+  # copy: copies what SeaweedFS does not have, and leaves newer objects of SeaweedFS and
+  #       everything else alone. Safe before and after the services switch to SeaweedFS.
+  # sync: also deletes the objects of SeaweedFS that MinIO does not have, for example the
+  #       documents that were deleted in MinIO. Once the services write to SeaweedFS, that
+  #       deletes their new documents, so use it only while they still use MinIO.
+  mode: copy
+
+  # How a bucket is checked after it has been copied:
+  # hash:     compares sizes and hashes. Objects that were uploaded in parts have no
+  #           comparable hash, so they are compared by size only.
+  # size:     compares sizes only.
+  # download: downloads both sides and compares the content. The most thorough, and it
+  #           reads every object twice more.
+  # none:     no check. Use it after the services switch to SeaweedFS, where objects are
+  #           written and deleted, so a difference is not a failure of the copy.
+  verify: hash
+
+  # Buckets to copy. Empty means every bucket of MinIO.
+  buckets: []
+
+  # Copy only the objects that are younger than this, for example 48h. Empty means all.
+  # For a run after the services switch to SeaweedFS: a document that was deleted from
+  # SeaweedFS since is copied back from MinIO, and this limits that to the last hours.
+  max_age: ''
+
+  # How long to wait for each store to answer before the job fails
+  wait_timeout_seconds: 600
+  # The job as a whole, and how often a failed pod is replaced
+  active_deadline_seconds: 21600
+  backoff_limit: 2
+
+  # Environment variables of rclone, see https://rclone.org/docs/. These suit a small
+  # node, raise them if the node can take more.
+  env:
+    RCLONE_LOG_LEVEL: NOTICE
+    RCLONE_TRANSFERS: '4'
+    RCLONE_CHECKERS: '8'
+    RCLONE_S3_UPLOAD_CONCURRENCY: '4'
+    RCLONE_S3_CHUNK_SIZE: 16M
+    RCLONE_BUFFER_SIZE: 16M
+    RCLONE_RETRIES: '3'
+    RCLONE_LOW_LEVEL_RETRIES: '10'
+
+  resources:
+    memoryRequest: '128Mi'
+    cpuRequest: '100m'
+    memoryLimit: '1Gi'
+    cpuLimit: '2'
+
+  network_policy:
+    rules:
+      # The job talks to the two object stores only. DNS is allowed for every pod.
+      - name: allow-egress-to-object-stores
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+              - podSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - minio
+                        - seaweedfs
+            ports:
+              - protocol: TCP
+                port: 3535
+
 redis:
   # Enable Redis deployment.
   # Redis is built on top of bitnami/redis docker image:

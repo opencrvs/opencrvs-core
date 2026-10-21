@@ -21,7 +21,7 @@ helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik \
 
 **2. Install the OpenCRVS Dependencies Chart (Database & Storage Components)**
 
-OpenCRVS requires supporting services (Postgres, an S3 object store, Elasticsearch, Redis):
+OpenCRVS requires supporting services (Postgres, an S3 object store, Elasticsearch, Redis). The chart deploys MinIO as the object store, or SeaweedFS with `seaweedfs.enabled: true`. OpenCRVS talks to its object store through the S3 API only, so it works with S3 object stores in general: the documents service has been verified against MinIO, SeaweedFS and RustFS, and a store such as AWS S3 can be used the same way, though it has not been verified yet. To use one, disable both stores in this chart and point the `s3` values of the OpenCRVS chart below at it. See the [documents service](../../packages/documents/README.md#supported-object-stores) for the verified stores, the settings, and how to run the conformance suite against yours.
 
 ```
 helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart \
@@ -128,7 +128,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>s3.host</td>
             <td>minio-0.minio.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>Hostname of the S3 object store. The default is the MinIO that the dependencies chart deploys. With <code>seaweedfs.enabled: true</code> in the dependencies chart, set <code>seaweedfs-0.seaweedfs.&lt;dependencies namespace&gt;.svc.cluster.local</code>, and set <code>s3.external_url</code> to <code>seaweedfs.&lt;opencrvs hostname&gt;</code> as well. SeaweedFS listens on the same port, so <code>s3.port</code> stays.</td>
+            <td>Hostname of the S3 object store. The default is the MinIO that the dependencies chart deploys. With <code>seaweedfs.enabled: true</code> in the dependencies chart, set <code>seaweedfs-0.seaweedfs.&lt;dependencies namespace&gt;.svc.cluster.local</code>, and set <code>s3.external_subdomain</code> to <code>seaweedfs</code> as well. SeaweedFS listens on the same port, so <code>s3.port</code> stays.</td>
         </tr>
         <tr>
             <td>s3.port</td>
@@ -136,9 +136,14 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Port of the S3 object store.</td>
         </tr>
         <tr>
+            <td>s3.external_subdomain</td>
+            <td>minio</td>
+            <td>Subdomain of the <code>hostname</code> where the dependencies chart exposes the S3 object store, used for the signed document URL unless <code>s3.external_url</code> is set. <code>minio</code> for MinIO, <code>seaweedfs</code> for SeaweedFS. Set it together with <code>s3.host</code>, or document URLs are signed for the wrong store and do not work. It follows <code>subdomain_separator</code>.</td>
+        </tr>
+        <tr>
             <td>s3.external_url</td>
-            <td><code>minio.&ltopencrvs hostname&gt</code></td>
-            <td>external `host/ip`[:port] available for client browser to issue signed document URL. The default is where the dependencies chart exposes MinIO, and it follows <code>subdomain_separator</code>. SeaweedFS is exposed on <code>seaweedfs.&lt;opencrvs hostname&gt;</code>, so set this value when <code>s3.host</code> points at SeaweedFS, or document URLs are signed for MinIO's hostname and do not work.</td>
+            <td><code>&lt;s3.external_subdomain&gt;.&lt;opencrvs hostname&gt;</code></td>
+            <td>external `host/ip`[:port] available for client browser to issue signed document URL. Overrides <code>s3.external_subdomain</code>, for an object store that is not exposed by the dependencies chart.</td>
         </tr>
         <tr>
             <td>s3.external_protocol</td>

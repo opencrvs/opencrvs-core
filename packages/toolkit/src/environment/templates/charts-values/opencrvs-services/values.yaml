@@ -15,7 +15,7 @@
 # - hostname: valid DNS name for opencrvs
 # - countryconfig.image.name: Countryconfig image repository
 # - countryconfig.image.tag: Countryconfig image tag
-environment_type: { { environment_type } }
+environment_type: {{environment_type}}
 
 network_policy:
   ingress_mode: deny
@@ -28,12 +28,12 @@ hpa:
 
 env:
   S3_BUCKET: ocrvs
-  OPENCRVS_ENVIRONMENT: { { opencrvs_environment } }
+  OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
 
 otel:
   enabled: true
-  deployment_environment: { { env } }
-  exporter_otlp_endpoint: 'opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317'
+  deployment_environment: {{env}}
+  exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
 
 elasticsearch:
   auth_mode: auto
@@ -41,7 +41,12 @@ elasticsearch:
 
 s3:
   auth_mode: use_secret
+  {{#if services_use_seaweedfs}}
+  host: seaweedfs-0.seaweedfs.opencrvs-deps-{{env}}.svc.cluster.local
+  external_subdomain: seaweedfs
+  {{else}}
   host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
+  {{/if}}
 
 redis:
   auth_mode: use_secret
@@ -58,11 +63,11 @@ platform:
 
 auth:
   env:
-    TWO_FA_ENABLED: { { two_fa_enabled } }
+    TWO_FA_ENABLED: {{two_fa_enabled}}
 
 events:
   env:
-    TWO_FA_ENABLED: { { two_fa_enabled } }
+    TWO_FA_ENABLED: {{two_fa_enabled}}
 
 countryconfig:
   secrets:
@@ -80,4 +85,4 @@ dashboards:
   enabled: true
 
 on_restore_cronjob:
-  enabled: { { restore_enabled } }
+  enabled: {{restore_enabled}}

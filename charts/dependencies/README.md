@@ -8,7 +8,7 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
   - Postgres
   - Elasticsearch
   - Redis
-  - MinIO, or SeaweedFS as an alternative
+  - An S3 object store: MinIO, or SeaweedFS as an alternative
 - Observability (Monitoring and Logging):
   - Kibana
   - Logstash
@@ -16,6 +16,8 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
   - Metricbeat
   - Elastic APM server
   - Elastalert2
+
+OpenCRVS talks to its object store through the S3 API only, so it works with S3 object stores in general: the documents service has been verified against MinIO, SeaweedFS and RustFS, and a store such as AWS S3 can be used the same way, though it has not been verified yet. This chart deploys MinIO or SeaweedFS. To use another store, disable both (`minio.enabled: false`, `seaweedfs.enabled: false`) and point the `s3` values of the OpenCRVS services chart at it. The documents service README lists the [verified stores](../../packages/documents/README.md#supported-object-stores) and the settings, and how to run the conformance suite against yours.
 
 Datastore services are deployed as StatefulSets with data persistence enabled. By default security is turned off and default password or no-password access is used datastore access. Please check appropriate section for each service for more details.
 
@@ -285,7 +287,7 @@ Adjust schedules, server credentials, and directories as needed for your deploym
 
 [SeaweedFS](https://github.com/seaweedfs/seaweedfs) is an open-source, S3 compatible object store, and an alternative to MinIO. The documents service passes its [S3 conformance suite](../../packages/documents/README.md), and so does MinIO. It can run beside MinIO: it has a service, a volume and hostnames of its own, `seaweedfs.<hostname>` for the S3 API and `seaweedfs-console.<hostname>` for the console, while MinIO stays on `minio.<hostname>` and `minio-console.<hostname>`. The two SeaweedFS hostnames need DNS records, unless a wildcard record covers them.
 
-> NOTE: SeaweedFS is disabled by default. Backup, restore and migration of the data of MinIO are not part of this chart yet, so choose it for a new environment or one that holds no documents you need to keep.
+> NOTE: SeaweedFS is disabled by default. To move an environment that keeps its documents in MinIO, see [Migrating from MinIO to SeaweedFS](#migrating-from-minio-to-seaweedfs). This chart has no backup and restore jobs for SeaweedFS yet.
 
 Enable it, with or without MinIO:
 
@@ -343,6 +345,139 @@ The console is SeaweedFS's admin web interface, a separate `weed admin` containe
 SeaweedFS has two more web interfaces, the master's and the filer's. The filer serves every object without checking an S3 credential, so the pod binds the master, the volume server and the filer to its loopback interface, and only the S3 API (`3535`) and the console (`3536`) listen on the pod's address. The S3 gateway also keeps an internal gRPC port (`13535`) on the pod's address. The `NetworkPolicy` of the chart opens only `3535` and `3536`, so on a cluster that does not enforce `NetworkPolicy`, or with `network_policy.enabled: false`, pods of the cluster can reach port `13535`.
 
 To open the master or filer interfaces, run `kubectl port-forward` against the pod, which reaches the loopback interface.
+
+## Migrating from MinIO to SeaweedFS
+
+An environment that keeps its documents in MinIO can move them to SeaweedFS without stopping OpenCRVS. The move has three phases, and nothing is deleted until you decide to:
+
+1. **Copy.** MinIO and SeaweedFS run side by side, the OpenCRVS services keep using MinIO, and a job copies the documents from MinIO to SeaweedFS after each deployment.
+2. **Switch.** The services use SeaweedFS. MinIO and the job stay, for a last copy of what was written to MinIO right before the switch.
+3. **Finish.** MinIO is removed from the deployment. Its data stays on the disk until you delete it.
+
+An environment that was set up with `opencrvs environment init` goes through the phases by answering the questions of that command, see [Migrating with `opencrvs environment init`](#migrating-with-opencrvs-environment-init). With Helm alone, use the values below.
+
+### The migration job
+
+`minio_to_seaweedfs.enabled: true` adds the job `minio-to-seaweedfs`, a [post-deploy hook](https://helm.sh/docs/topics/charts_hooks/): it runs after every `helm install` and `helm upgrade` of this chart for as long as the value is `true`, and each run replaces the previous job. It runs [rclone](https://rclone.org) in the cluster, between the two services, with the credentials that both stores share.
+
+- **It can run any number of times.** A run copies what SeaweedFS does not have yet, and what changed in MinIO. It leaves objects that are newer in SeaweedFS alone, and deletes nothing, so it is safe before and after the services switch. Documents that were deleted from MinIO during the migration are not deleted from SeaweedFS, unless you choose `mode: sync`, see the options below.
+- **It keeps the metadata.** The documents service remembers who created a file in its metadata (`created-by`) and refuses an upload over a file that another user created. The job copies the metadata and the content type with each file.
+- **It copies every bucket of MinIO**, creating each in SeaweedFS first, or only the buckets in `buckets`.
+- **It checks each bucket** after copying it, see `verify` below. Files that were uploaded in parts, which are the larger ones, have no hash to compare, so they are compared by size.
+- **It waits** until both stores answer, and fails at once if one of them refuses the credentials.
+
+### Before you start
+
+- **Disk space.** SeaweedFS needs free space on its disk as large as the data of MinIO. With `storage_type: host_path`, check it on the data node: `du -sh /data/minio` and `df -h /data`.
+- **DNS.** SeaweedFS is on `seaweedfs.<hostname>` and `seaweedfs-console.<hostname>`, which need DNS records, or a wildcard record, before the services switch to it.
+- **Helm waits for the job.** Give `helm upgrade` a `--timeout` that is long enough for the copy. A failed job fails the upgrade, and with `--atomic` it rolls the release back. Rolling back does not touch MinIO, and you can run the copy again.
+- **Backups.** This chart has no backup and restore jobs for SeaweedFS yet. The jobs of MinIO run while MinIO is deployed and stop when it is removed, so keep MinIO until the data of SeaweedFS is protected some other way.
+
+### 1. Copy
+
+```yaml
+# dependencies chart
+seaweedfs:
+  enabled: true
+minio_to_seaweedfs:
+  enabled: true
+```
+
+Follow the job, which ends with `Migration finished`:
+
+```bash
+kubectl logs job/minio-to-seaweedfs --follow --namespace <dependencies namespace>
+```
+
+The services keep using MinIO, and new documents keep arriving there. Run the job again to copy them, by running `helm upgrade` of this chart again with the same values, or without an upgrade:
+
+```bash
+kubectl delete job minio-to-seaweedfs --namespace <dependencies namespace> --ignore-not-found
+helm template opencrvs-deps <chart> --namespace <dependencies namespace> -f <your values> \
+  --show-only templates/minio-to-seaweedfs-job.yaml | kubectl apply --namespace <dependencies namespace> -f -
+```
+
+### 2. Switch
+
+Once the copy has finished, point the services chart at SeaweedFS, and upgrade it:
+
+```yaml
+# OpenCRVS services chart
+s3:
+  host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local
+  external_subdomain: seaweedfs
+```
+
+From now on SeaweedFS holds documents that MinIO does not, and documents that were deleted from it, so a check of the copy would report differences that are not failures. Turn it off in this chart, and run the job once more to copy what was written to MinIO right before the switch:
+
+```yaml
+# dependencies chart
+minio_to_seaweedfs:
+  enabled: true
+  verify: none
+  # Optionally copy only the documents of the last days. A document that was deleted
+  # from SeaweedFS since the switch is copied back from MinIO otherwise, as MinIO
+  # still has it.
+  # max_age: 72h
+```
+
+Then check OpenCRVS: open records that were created before the switch, with their attachments and signatures, and create a new one.
+
+### 3. Finish
+
+When everything works, turn the job off and remove MinIO:
+
+```yaml
+# dependencies chart
+minio:
+  enabled: false
+minio_to_seaweedfs:
+  enabled: false
+```
+
+**Wait before you delete the data of MinIO.** The upgrade removes MinIO from the cluster, and does not delete its data. Keep it until you have run on SeaweedFS for a while and confirmed that everything works, for example a week or two, and only then delete it:
+
+- With `storage_type: host_path`, the data is in `/data/minio` on the data node. Delete it there.
+- With `storage_type: pvc`, the data is in the volume claim `minio`, which this chart keeps when MinIO is removed. Delete it with `kubectl delete pvc minio --namespace <dependencies namespace>`.
+
+### Rolling back
+
+Before the switch, nothing needs rolling back: the services use MinIO, so turn the job off. After the switch, point the services at MinIO again (`s3.host` and `s3.external_subdomain: minio`). The job copies in one direction only, so documents that were uploaded since the switch are only in SeaweedFS.
+
+### Options
+
+| Key                                              | Default                   | Description                                                                                                                                                                                                                                         |
+| ------------------------------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `minio_to_seaweedfs.enabled`                     | `false`                   | Run the job after each deployment. `minio.enabled` and `seaweedfs.enabled` must be `true`, or the chart fails to render.                                                                                                                            |
+| `minio_to_seaweedfs.mode`                        | `copy`                    | `copy` never deletes. `sync` also deletes the objects of SeaweedFS that MinIO does not have, for example the documents that were deleted from MinIO. Use `sync` only while the services still use MinIO: afterwards it deletes their new documents. |
+| `minio_to_seaweedfs.verify`                      | `hash`                    | How a bucket is checked after it was copied: `hash`, `size`, `download` (downloads both sides and compares the content, the most thorough) or `none`. Use `none` after the switch.                                                                  |
+| `minio_to_seaweedfs.buckets`                     | `[]`                      | The buckets to copy. Empty means every bucket of MinIO.                                                                                                                                                                                             |
+| `minio_to_seaweedfs.max_age`                     | `''`                      | Copy only the objects that are younger than this, for example `72h`. Empty means all.                                                                                                                                                               |
+| `minio_to_seaweedfs.wait_timeout_seconds`        | `600`                     | How long to wait for each store to answer.                                                                                                                                                                                                          |
+| `minio_to_seaweedfs.active_deadline_seconds`     | `21600`                   | How long the job may run in total. Raise it for a lot of data.                                                                                                                                                                                      |
+| `minio_to_seaweedfs.backoff_limit`               | `2`                       | How often a failed pod is replaced.                                                                                                                                                                                                                 |
+| `minio_to_seaweedfs.env`                         | see `values.yaml`         | [rclone settings](https://rclone.org/docs/), as environment variables: the number of transfers, chunk sizes and retries. The defaults suit a small node.                                                                                            |
+| `minio_to_seaweedfs.resources`                   | see `values.yaml`         | Requests and limits of the job.                                                                                                                                                                                                                     |
+| `minio_to_seaweedfs.image.repository` and `.tag` | `rclone/rclone`, `1.75.2` | The image that runs the job. Mirror it for an [air-gap installation](#air-gap-installation).                                                                                                                                                        |
+
+### Migrating with `opencrvs environment init`
+
+For an environment that was set up with `opencrvs environment init`, the command writes the values above for you. It stores two variables in the GitHub environment, and reads them back on each run, so run it again, and deploy, to move on to the next phase:
+
+| Variable                               | Meaning                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| `S3_STORAGE`                           | The store that the OpenCRVS services use: `minio` or `seaweedfs`.         |
+| `MINIO_TO_SEAWEEDFS_MIGRATION_ENABLED` | `true` while the job copies the documents of MinIO after each deployment. |
+
+| Phase                        | Answers                     | MinIO | SeaweedFS | Job |
+| ---------------------------- | --------------------------- | ----- | --------- | --- |
+| New environment              | none are asked              | off   | on        | off |
+| Existing, migration declined | copy: no, store: MinIO      | on    | on        | off |
+| 1. Copy                      | copy: yes, store: MinIO     | on    | on        | on  |
+| 2. Switch                    | copy: yes, store: SeaweedFS | on    | on        | on  |
+| 3. Finish                    | copy: no, store: SeaweedFS  | off   | on        | off |
+
+An environment that existed before SeaweedFS is asked the two questions on its first run, and on each later run until it has finished. A new environment has SeaweedFS only and is never asked. In phase 2 the command sets `verify: none` for you. The advice above applies to every phase: wait, and delete `/data/minio` only once you have confirmed that everything works.
 
 ## Redis
 
@@ -421,6 +556,10 @@ Start from the default Postgres image and add:
 - `openssh-client`
 - `rsync`
 - `pgbackrest`
+
+### SeaweedFS and migration images
+
+SeaweedFS (`seaweedfs.image.*`) needs no packages at runtime, and neither does the migration job (`minio_to_seaweedfs.image.*`, which runs `rclone`). Mirror both images into your registry and point the chart to them.
 
 ### MinIO image
 

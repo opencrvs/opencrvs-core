@@ -1,0 +1,11 @@
+{{- if .Values.minio_to_seaweedfs.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: minio-to-seaweedfs
+  name: minio-to-seaweedfs-scripts
+data:
+  migrate.sh: |
+{{ .Files.Get "files/minio-to-seaweedfs/migrate.sh" | indent 4 }}
+{{- end }}
