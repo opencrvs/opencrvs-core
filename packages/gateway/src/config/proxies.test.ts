@@ -136,7 +136,7 @@ describe('auth proxy', () => {
         method: '*',
         path,
         handler: (request) => {
-          upstreamHits.push(request.path)
+          upstreamHits.push(request.path + request.url.search)
           return { token: 'minted' }
         }
       })
@@ -177,6 +177,19 @@ describe('auth proxy', () => {
 
     expect(res.statusCode).toBe(200)
     expect(upstreamHits).toEqual([url.slice('/auth'.length)])
+  })
+
+  // 2.1.x still accepts deprecated OAuth parameters in the query string
+  it('forwards the query string on POST /auth/token', async () => {
+    const res = await gateway.inject({
+      method: 'POST',
+      url: '/auth/token?grant_type=client_credentials&client_id=id'
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(upstreamHits).toEqual([
+      '/token?grant_type=client_credentials&client_id=id'
+    ])
   })
 
   // Internal auth routes mint tokens without credentials and must only be
