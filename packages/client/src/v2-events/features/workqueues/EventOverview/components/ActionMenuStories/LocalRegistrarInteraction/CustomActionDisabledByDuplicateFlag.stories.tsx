@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, screen, within } from 'storybook/test'
-import superjson from 'superjson'
+
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
@@ -148,8 +148,7 @@ const mockDuplicateEvent: EventDocument = {
 let currentDoc: EventDocument = eventUnassigned
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 /*

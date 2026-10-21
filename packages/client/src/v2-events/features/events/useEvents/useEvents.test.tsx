@@ -16,7 +16,6 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
 import { Provider } from 'react-redux'
-import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
 import {
   ActionStatus,
@@ -106,8 +105,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 const server = setupServer(
   http.post<never, EventInput, EventDocument>(

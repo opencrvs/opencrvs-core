@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { TestUserRole, User, UUID } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { routesConfig } from '@client/v2-events/routes'
@@ -20,8 +20,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TeamPage } from './Team'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const generator = testDataGenerator()

@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within, expect, fireEvent, waitFor } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { TRPCError } from '@trpc/server'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -22,8 +22,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const meta: Meta<typeof SettingsPage> = {

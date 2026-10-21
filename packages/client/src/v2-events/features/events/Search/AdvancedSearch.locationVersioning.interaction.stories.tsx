@@ -13,7 +13,7 @@ import React from 'react'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within, expect, waitFor } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   AdministrativeArea,
   ChildOnboardingEvent,
@@ -55,8 +55,7 @@ export default meta
 type Story = StoryObj<typeof AdvancedSearch>
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID

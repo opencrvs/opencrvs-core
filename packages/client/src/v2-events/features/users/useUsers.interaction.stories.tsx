@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { within, waitFor, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   ActionType,
   generateEventDocument,
@@ -86,8 +86,7 @@ const eventWithFiveUsers = generateEventDocument({
 })
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const spies = { userList: 0 }

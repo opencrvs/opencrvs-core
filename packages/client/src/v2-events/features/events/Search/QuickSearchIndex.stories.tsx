@@ -11,7 +11,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   eventQueryDataGenerator,
   tennisClubMembershipEvent
@@ -37,8 +37,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 export default meta

@@ -14,7 +14,7 @@ import { within, expect } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   ActionType,
   and,
@@ -43,8 +43,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const meta: Meta<typeof FormFieldGenerator> = {

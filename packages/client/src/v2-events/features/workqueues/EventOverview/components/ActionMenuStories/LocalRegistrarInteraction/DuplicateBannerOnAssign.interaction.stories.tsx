@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, screen, userEvent, within } from 'storybook/test'
-import superjson from 'superjson'
+
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
@@ -103,8 +103,7 @@ let currentDoc: EventDocument = eventUnassigned
 let getDuplicatesCallCount = 0
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 /*

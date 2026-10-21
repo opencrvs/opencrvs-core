@@ -11,15 +11,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { TRPCError } from '@trpc/server'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ChangeEmailView } from './ChangeEmailView'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const meta: Meta<typeof ChangeEmailView> = {

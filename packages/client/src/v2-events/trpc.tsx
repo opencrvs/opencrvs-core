@@ -28,7 +28,7 @@ import {
 } from '@trpc/tanstack-react-query'
 import { partition, throttle } from 'lodash'
 import React from 'react'
-import superjson from 'superjson'
+
 import { getUUID } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { CACHE_VERSION } from '@client/utils/constants'
@@ -49,7 +49,6 @@ function getTrpcClient() {
         }),
         httpLink({
           url: '/api/events',
-          transformer: superjson,
           async headers() {
             await ensureFreshAccessToken()
             return {
@@ -67,7 +66,6 @@ function getTrpcClient() {
       }),
       httpBatchLink({
         url: '/api/events',
-        transformer: superjson,
         methodOverride: 'POST',
         async headers() {
           await ensureFreshAccessToken()

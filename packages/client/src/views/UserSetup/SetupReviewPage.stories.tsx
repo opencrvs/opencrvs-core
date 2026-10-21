@@ -12,14 +12,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { AppRouter } from '@client/v2-events/trpc'
 import { V2_DEFAULT_MOCK_LOCATIONS } from '@opencrvs/commons/client'
 import { UserSetupReview } from './SetupReviewPage'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const meta: Meta<typeof UserSetupReview> = {

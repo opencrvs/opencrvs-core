@@ -10,7 +10,7 @@
  */
 import { Meta, StoryObj } from '@storybook/react-vite'
 import { waitFor, within, expect } from 'storybook/test'
-import superjson from 'superjson'
+
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
@@ -133,8 +133,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 export const unassignLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> =

@@ -12,7 +12,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect, waitFor } from 'storybook/test'
-import superjson from 'superjson'
+
 import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from 'storybook/test'
@@ -33,7 +33,10 @@ import {
   type FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { storybookEventId, TestImage } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  TestImage
+} from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import { SignatureField } from './SignatureField'
@@ -111,8 +114,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const createdEvent = generateEventDocument({

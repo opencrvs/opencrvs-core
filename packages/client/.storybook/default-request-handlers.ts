@@ -11,7 +11,6 @@
 
 import { http, graphql, HttpResponse } from 'msw'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
@@ -53,8 +52,7 @@ export const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 export const handlers = {

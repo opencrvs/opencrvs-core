@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { expect, within } from 'storybook/test'
 import {
   TestUserRole,
@@ -29,8 +29,7 @@ import {
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const ISAMBA_DISTRICT_ID = '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID

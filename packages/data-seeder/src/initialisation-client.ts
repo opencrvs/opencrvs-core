@@ -10,7 +10,7 @@
  */
 
 /** Lives here rather than in `./index`, as otherwise importing it would re-run seeding */
-import superjson from 'superjson'
+
 import { createTRPCClient, httpLink } from '@trpc/client'
 import { env } from './environment'
 import type { InitialisationRouter } from '@opencrvs/events/src/router'
@@ -20,7 +20,7 @@ export const createInitialisationClient = (token: string) => {
     links: [
       httpLink({
         url: new URL('events/initialisation/', env.GATEWAY_HOST).href,
-        transformer: superjson,
+
         async headers() {
           return { authorization: `Bearer ${token}` }
         }

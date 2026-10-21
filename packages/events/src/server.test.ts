@@ -12,7 +12,7 @@
 import { readFileSync } from 'fs'
 import { generateKeyPairSync } from 'crypto'
 import { join } from 'path'
-import superjson from 'superjson'
+
 import {
   createTRPCClient,
   httpBatchLink,
@@ -92,7 +92,6 @@ beforeAll(() => {
       links: [
         httpBatchLink({
           url,
-          transformer: superjson,
           headers({ opList }) {
             const ctxHeaders = opList[0].context.headers
             if (ctxHeaders && typeof ctxHeaders === 'object') {
@@ -107,7 +106,6 @@ beforeAll(() => {
       links: [
         httpLink({
           url: `${url}/internal`,
-          transformer: superjson,
           headers({ op }) {
             const ctxHeaders = op.context.headers
             if (ctxHeaders && typeof ctxHeaders === 'object') {

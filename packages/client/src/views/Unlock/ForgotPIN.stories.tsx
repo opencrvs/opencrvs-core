@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import React, { useState } from 'react'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -20,8 +20,7 @@ import { CreatePin } from '@client/views/PIN/CreatePin'
 import { ForgotPIN } from './ForgotPIN'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const generator = testDataGenerator()

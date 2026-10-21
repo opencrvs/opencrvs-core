@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { userEvent, within, expect, waitFor } from 'storybook/test'
 import {
   ActionType,
@@ -28,8 +28,7 @@ import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 /*

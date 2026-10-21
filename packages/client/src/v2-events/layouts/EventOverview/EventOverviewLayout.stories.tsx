@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
-import superjson from 'superjson'
+
 import {
   getCurrentEventState,
   tennisClubMembershipEvent,
@@ -45,8 +45,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const defaultMswHandlers = {

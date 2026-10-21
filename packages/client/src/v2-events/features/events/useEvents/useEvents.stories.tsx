@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import superjson from 'superjson'
+
 import React, { useEffect } from 'react'
 import { within } from 'storybook/test'
 import { waitFor, expect } from 'storybook/test'
@@ -92,8 +92,7 @@ const trpcMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const spies = {

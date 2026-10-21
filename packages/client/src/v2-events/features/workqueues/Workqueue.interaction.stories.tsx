@@ -12,7 +12,7 @@
 /* eslint-disable max-lines */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import superjson from 'superjson'
+
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect, waitFor } from 'storybook/test'
 import { onlineManager } from '@tanstack/react-query'
@@ -71,8 +71,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const queryData = Array.from(

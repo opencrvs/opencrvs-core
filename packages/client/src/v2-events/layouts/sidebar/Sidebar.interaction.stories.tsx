@@ -12,7 +12,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   generateWorkqueues,
   TestUserRole,
@@ -23,8 +23,7 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const MOBILE_WIDTH = 375

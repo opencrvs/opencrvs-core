@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import React from 'react'
-import superjson from 'superjson'
+
 import { expect, within } from 'storybook/test'
 import {
   ActionDocument,
@@ -45,8 +45,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const refData = testDataGenerator()

@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { within, expect, waitFor, userEvent } from 'storybook/test'
 import { TestUserRole, UUID } from '@opencrvs/commons/client'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -24,8 +24,7 @@ import { withValidatorContext } from '../../../../../../.storybook/decorators'
 import { useUserFormState } from './useUserFormState'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const generator = testDataGenerator()

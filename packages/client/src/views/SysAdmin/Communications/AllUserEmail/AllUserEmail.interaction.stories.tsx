@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import React from 'react'
 import { TestUserRole } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -19,8 +19,7 @@ import { NotificationComponent } from '@client/components/Notification'
 import AllUserEmail from './AllUserEmail'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const meta: Meta<typeof AllUserEmail> = {

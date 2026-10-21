@@ -20,7 +20,7 @@ import {
   HTTPHeaders,
   httpLink
 } from '@trpc/client'
-import superjson from 'superjson'
+
 import {
   NotificationEvent,
   generateVerificationCode,
@@ -93,7 +93,6 @@ export const internalClient = createTRPCClient<InternalRouter>({
   links: [
     httpLink({
       url: new URL('/internal', env.EVENTS_URL).href,
-      transformer: superjson,
       async headers() {
         const token = await createInternalServiceToken()
         return { authorization: `Bearer ${token}` }
@@ -106,7 +105,6 @@ const eventsClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: env.EVENTS_URL,
-      transformer: superjson,
       headers({ opList }) {
         const headers = opList[0].context?.headers
         return (headers as HTTPHeaders) ?? {}

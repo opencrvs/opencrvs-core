@@ -14,7 +14,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 
 import { within, userEvent, expect, waitFor, fireEvent } from 'storybook/test'
 import { Outlet } from 'react-router-dom'
@@ -58,8 +57,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 export const NoTemplateAvailable: Story = {

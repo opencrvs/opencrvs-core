@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   TestUserRole,
   UUID,
@@ -27,8 +27,7 @@ import { buildInactiveLocation } from '@client/tests/v2-events/location.utils'
 import { useUserFormState } from './useUserFormState'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const mockRoles = [{ id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] }]

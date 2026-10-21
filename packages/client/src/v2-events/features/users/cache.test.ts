@@ -14,7 +14,7 @@ import React, { PropsWithChildren } from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { setupServer } from 'msw/node'
 import { Provider } from 'react-redux'
-import superjson from 'superjson'
+
 import { vi } from 'vitest'
 import {
   ActionStatus,
@@ -81,8 +81,7 @@ const EVENT_DOCUMENT: EventDocument = {
 // ── MSW / tRPC server ─────────────────────────────────────────────────────────
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 /** Tracks every HTTP call made to the user.list endpoint. */

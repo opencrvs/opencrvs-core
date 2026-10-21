@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import { expect, waitFor } from 'storybook/test'
 import {
   getCurrentEventState,
@@ -54,8 +54,7 @@ export default meta
 type Story = StoryObj<typeof EventOverviewIndex>
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const localRegistrar = testDataGenerator().user

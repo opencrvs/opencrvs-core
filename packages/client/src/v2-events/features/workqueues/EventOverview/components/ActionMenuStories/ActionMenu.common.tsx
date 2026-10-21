@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { userEvent, expect, waitFor, screen } from 'storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   ActionStatus,
   ActionType,
@@ -280,8 +280,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 export const enum AssertType {

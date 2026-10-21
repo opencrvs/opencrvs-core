@@ -19,7 +19,7 @@ import {
   waitFor
 } from 'storybook/test'
 import React from 'react'
-import superjson from 'superjson'
+
 import { noop } from 'lodash'
 import {
   AddressFieldValue,
@@ -105,8 +105,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 export const ReviewWithoutChanges: Story = {

@@ -13,13 +13,10 @@ import { env } from '@gateway/environment'
 
 import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 
-import superjson from 'superjson'
-
 export const api = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: env.EVENTS_URL,
-      transformer: superjson,
       headers({ opList }) {
         const headers = opList[0].context?.headers
         return headers as HTTPHeaders

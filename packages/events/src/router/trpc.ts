@@ -10,7 +10,6 @@
  */
 
 import { initTRPC, TRPCError } from '@trpc/server'
-import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { DefaultErrorShape } from '@trpc/server/unstable-core-do-not-import'
 import { logger, TokenUserType } from '@opencrvs/commons'
@@ -48,12 +47,10 @@ export const t = initTRPC
   .context<Partial<TrpcContext>>()
   .meta<OpenApiMeta>()
   .create({
-    transformer: superjson,
     errorFormatter
   })
 
 export const tService = initTRPC.context<ServiceTrpcContext>().create({
-  transformer: superjson,
   errorFormatter
 })
 
@@ -104,6 +101,7 @@ const authedProcedure = t.procedure.use(async (opts) => {
       message: 'Authorization token is missing'
     })
   }
+
   if (!user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
@@ -151,7 +149,6 @@ export const userOnlyProcedure = authedProcedure.use(async (opts) => {
   })
 })
 
-
 /**
  * Procedures that are only available to system (API key) users
  * and will throw an error if a human user tries to access them
@@ -163,7 +160,7 @@ export const systemOnlyProcedure = authedProcedure.use(async (opts) => {
     logger.error(
       `Non-system user tried to access system-only procedure. User id: '${user.id}'`
     )
-    throw new TRPCError({ code: "FORBIDDEN" })
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
   return opts.next({

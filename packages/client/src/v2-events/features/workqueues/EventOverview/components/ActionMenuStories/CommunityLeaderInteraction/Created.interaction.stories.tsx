@@ -12,7 +12,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, expect, waitFor, screen } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
+
 import {
   ActionType,
   generateEventDocument,
@@ -31,8 +31,7 @@ import { ActionMenu } from '../../ActionMenu'
 const generator = testDataGenerator()
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 /*
