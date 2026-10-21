@@ -56,7 +56,7 @@ function addIndexFieldsToValue(
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
-  if (isNameFieldType(field)) {
+  if (isNameFieldType(field) && field.value) {
     return {
       ...field.value,
       [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
