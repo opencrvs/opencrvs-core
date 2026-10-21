@@ -71,24 +71,16 @@ export function Review() {
     fieldId?: string
     confirmation?: boolean
   }) {
-    const confirmedEdit =
-      confirmation ||
-      (await openModal<boolean | null>((close) => (
-        <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
-      )))
-
-    if (confirmedEdit) {
-      navigate(
-        ROUTES.V2.EVENTS.NOTIFY.PAGES.buildPath(
-          { pageId, eventId },
-          {
-            from: 'review',
-            backTo
-          },
-          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
-        )
+    navigate(
+      ROUTES.V2.EVENTS.NOTIFY.PAGES.buildPath(
+        { pageId, eventId },
+        {
+          from: 'review',
+          backTo
+        },
+        fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
       )
-    }
+    )
 
     return
   }

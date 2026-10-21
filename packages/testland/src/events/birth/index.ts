@@ -381,7 +381,16 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.notify.label'
       },
       notificationForm: BIRTH_NOTIFICATION_FORM,
-      review: BIRTH_NOTIFICATION_REVIEW,
+      review: {
+        title: {
+          defaultMessage:
+            '{child.name.firstname, select, __EMPTY__ {Birth notification} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notificaton for {child.name.firstname} {child.name.surname}}}}}',
+          id: 'event.birth.action.notify.form.review.title',
+          description: 'Title of the form to show in review page'
+        },
+        // We dont want review fields on notification
+        fields: []
+      },
       form: [
         {
           id: 'comments',
