@@ -175,8 +175,14 @@ test.describe('Form state', () => {
 
       await selectRequesterType(page, 'Print and issue to Informant (Mother)')
       await continueForm(page)
+      // HTTP call will override annotation on next step if we do not wait for this.
+      const credentialResponse = page.waitForResponse(
+        (res) => res.url().includes('verifiable-credentials/paper-credential'),
+        { timeout: 30_000 }
+      )
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
+      await credentialResponse
 
       await page.getByRole('button', { name: 'No, make correction' }).click()
     })
