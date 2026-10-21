@@ -10,11 +10,26 @@
  */
 import * as Hapi from '@hapi/hapi'
 
+/** Every parameter the token endpoint reads, across both grants. */
+const OAUTH_TOKEN_PARAMS = [
+  'grant_type',
+  'client_id',
+  'client_secret',
+  'subject_token',
+  'subject_token_type',
+  'requested_token_type',
+  'event_id',
+  'action_id'
+]
+
 /**
- * Retrieves a parameter from the request payload.
+ * Retrieves a parameter from either the request payload or query string.
+ * Prioritizes payload over query for POST requests with form data.
  *
- * The query string is deliberately not read: RFC 6749 §2.3.1 requires the
- * parameters in the body, and a secret in a URL ends up in access logs.
+ * @deprecated the query string fallback is going away
  */
 export const getParam = (req: Hapi.Request, key: string) =>
-  (req.payload as any)?.[key]
+  (req.payload as any)?.[key] || req.query[key]
+
+export const deprecatedQueryParams = (req: Hapi.Request) =>
+  OAUTH_TOKEN_PARAMS.filter((key) => key in req.query)
