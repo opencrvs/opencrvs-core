@@ -54,7 +54,7 @@ test.describe('Document storage', () => {
           Authorization: `Bearer ${token}`,
           'content-type': 'application/json'
         },
-        body: JSON.stringify({ json: { filePath: objectPath } })
+        body: JSON.stringify({ filePath: objectPath })
       }
     )
 
