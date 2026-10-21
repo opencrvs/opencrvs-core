@@ -16,12 +16,12 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^6.0.0",
     "node-pg-migrate": "^8.0.3",
     "pg": "^8.16.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/pg": "^8.15.1",
     "@typescript-eslint/eslint-plugin": "8.63.0",
     "@typescript-eslint/parser": "8.63.0",
