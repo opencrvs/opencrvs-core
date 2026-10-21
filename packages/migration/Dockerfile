@@ -1,5 +1,6 @@
 ARG  BRANCH=develop
-FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
+ARG  BASE_IMAGE=ghcr.io/opencrvs/ocrvs-base
+FROM ${BASE_IMAGE}:${BRANCH}
 
 USER root
 # Install envsubst and clean up apt cache
