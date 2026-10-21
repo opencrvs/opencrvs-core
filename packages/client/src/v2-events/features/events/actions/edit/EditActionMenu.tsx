@@ -35,13 +35,10 @@ import {
   AttachmentPath,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Icon, Dialog, Stack, Button } from '@opencrvs/components'
+import { Dialog, Stack, Button } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { messages as actionMessages } from '@client/i18n/messages/views/action'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -55,6 +52,7 @@ import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
+import { ActionMenuDropdown } from '../ActionMenuDropdown'
 import {
   aggregateAnnotations,
   getReviewFormFields,
@@ -412,35 +410,7 @@ function useEditActions(event: EventDocument) {
 
 /** Menu component available on the Edit-action review page. */
 export function EditActionMenu({ event }: { event: EventDocument }) {
-  const intl = useIntl()
   const { actions, modals } = useEditActions(event)
 
-  return (
-    <>
-      <DropdownMenu id="action">
-        <DropdownMenu.Trigger asChild>
-          <Button
-            data-testid="action-dropdownMenu"
-            size="medium"
-            type="primary"
-          >
-            {intl.formatMessage(actionMessages.action)} <CaretDown />
-          </Button>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content>
-          {actions.map(({ onClick, icon, label, disabled }, index) => (
-            <DropdownMenu.Item
-              key={index}
-              disabled={disabled}
-              onClick={onClick}
-            >
-              <Icon color="currentColor" name={icon} size="small" />
-              {intl.formatMessage(label)}
-            </DropdownMenu.Item>
-          ))}
-        </DropdownMenu.Content>
-      </DropdownMenu>
-      {modals}
-    </>
-  )
+  return <ActionMenuDropdown actions={actions} modals={modals} />
 }
