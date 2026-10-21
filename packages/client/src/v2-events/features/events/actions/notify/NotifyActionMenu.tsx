@@ -58,7 +58,7 @@ import { useEventConfiguration } from '../../useEventConfiguration'
  *   - Save and exit
  *   - Delete
  */
-function useDeclarationActions(event: EventDocument) {
+function useNotificationActions(event: EventDocument) {
   const intl = useIntl()
   const eventType = event.type
   const drafts = useDrafts()
@@ -214,7 +214,7 @@ function useDeclarationActions(event: EventDocument) {
  * */
 export function NotifyActionMenu({ event }: { event: EventDocument }) {
   const intl = useIntl()
-  const { modals, actions } = useDeclarationActions(event)
+  const { modals, actions } = useNotificationActions(event)
 
   return (
     <>
