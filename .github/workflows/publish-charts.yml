@@ -14,7 +14,6 @@ on:
     tags:
       - "v*.*.*"
     branches:
-      - "master"
       - "develop"
       - "release/*"
     paths:

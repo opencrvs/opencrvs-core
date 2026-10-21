@@ -36,7 +36,7 @@ jobs:
     outputs:
       skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Validate branch name
         id: validate
@@ -79,7 +79,7 @@ jobs:
       slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Get input data (when manually triggered)
         env:
@@ -200,7 +200,7 @@ jobs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check trigger-build status and exit on non-success
         run: |
           if [ ${{ needs.trigger-build.outputs.build_status }} == 'success' ]; then
