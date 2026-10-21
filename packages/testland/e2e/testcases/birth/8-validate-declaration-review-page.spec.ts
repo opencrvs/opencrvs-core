@@ -19,20 +19,16 @@ import {
   formatDateObjectTo_dMMMMyyyy,
   expectRowValueWithChangeButton,
   expectRowValue,
-  triggerDeclarationAction,
-  getEventIdFromUrl,
-  getToken
+  triggerDeclarationAction
 } from '@e2e/support/helpers'
-import { customActionViaApi } from '@e2e/support/test-data/api-actions'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { fillDate, generateBirthInputs } from '@e2e/support/birth/helpers'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { selectAction } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('8. Validate declaration review page', async ({ page }) => {
   test.setTimeout(240_000)
-  let eventId = ''
 
   const declaration = generateBirthInputs({
     includeOptionalFields: true,
@@ -40,13 +36,13 @@ test('8. Validate declaration review page', async ({ page }) => {
   })
 
   const comment = faker.lorem.sentence()
-  await login(page, CREDENTIALS.COMMUNITY_LEADER)
+  await login(page, CREDENTIALS.REGISTRATION_OFFICER)
   await page.click('#header-new-event')
   await page.getByLabel('Birth').click()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Continue' }).click()
 
-  await test.step('8.1 Community leader actions', async () => {
+  await test.step('8.1 Registration officer actions', async () => {
     await test.step('8.1.0 Fill up birth registration form', async () => {
       await test.step('8.1.0.1 Fill child details', async () => {
         await page.locator('#firstname').fill(declaration.child.name.firstNames)
@@ -65,6 +61,11 @@ test('8. Validate declaration review page', async ({ page }) => {
           .getByText(declaration.placeOfBirth, {
             exact: true
           })
+          .click()
+
+        await page.locator('#village').click()
+        await page
+          .getByText(declaration.birthLocation.village, { exact: true })
           .click()
 
         await page.locator('#child____attendantAtBirth').click()
@@ -813,19 +814,7 @@ test('8. Validate declaration review page', async ({ page }) => {
     })
 
     await test.step('8.1.7 Declare', async () => {
-      eventId = getEventIdFromUrl(page)
       await triggerDeclarationAction(page, 'Declare')
-    })
-  })
-
-  await test.step('8.2 Registration Officer actions', async () => {
-    await test.step('8.2.2 Validate (via API)', async () => {
-      const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
-      await customActionViaApi({
-        token,
-        eventId,
-        customActionType: 'VALIDATE_DECLARATION'
-      })
     })
   })
 

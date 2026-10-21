@@ -40,11 +40,10 @@ test('10. Birth declaration case - 10', async ({ page }) => {
     }
   }
 
-  await test.step('10.1 Declaration started by HO', async () => {
+  await test.step('10.1 Declaration notification by HO', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
     await test.step('10.1.1 Fill child details', async () => {
