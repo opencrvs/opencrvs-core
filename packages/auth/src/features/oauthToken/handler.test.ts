@@ -10,6 +10,7 @@
  */
 import { AuthServer, createServer } from '@auth/server'
 import * as authService from '@auth/features/authenticate/service'
+import { logger } from '@opencrvs/commons'
 
 const CREDENTIALS =
   'client_id=123&client_secret=456&grant_type=client_credentials'
@@ -23,15 +24,13 @@ const formEncodedRequest = (payload: string) => ({
 
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
-  let authenticateSystem: jest.SpyInstance
 
   beforeEach(async () => {
     server = await createServer()
     jest
       .spyOn(authService, 'createToken')
       .mockReturnValue(Promise.resolve('789'))
-    authenticateSystem = jest.spyOn(authService, 'authenticateSystem')
-    authenticateSystem.mockReturnValue(
+    jest.spyOn(authService, 'authenticateSystem').mockReturnValue(
       Promise.resolve({
         systemId: '1',
         status: 'active',
@@ -71,26 +70,66 @@ describe('authenticate handler receives a request', () => {
     })
   })
 
-  describe('parameters are passed in the query string', () => {
-    it('does not authenticate the client', async () => {
+  describe('parameters are passed in the deprecated query string', () => {
+    const nodeEnv = process.env.NODE_ENV
+
+    afterEach(() => {
+      process.env.NODE_ENV = nodeEnv
+      jest.restoreAllMocks()
+    })
+
+    it('rejects the request outside production', async () => {
+      process.env.NODE_ENV = 'development'
       const res = await server.server.inject({
         method: 'POST',
         url: `/token?${CREDENTIALS}`
       })
 
       expect(res.statusCode).toBe(400)
-      expect(JSON.parse(res.payload).error).toBe('unsupported_grant_type')
-      expect(JSON.parse(res.payload).access_token).toBeUndefined()
+      expect(JSON.parse(res.payload).error).toBe('invalid_request')
+      expect(JSON.parse(res.payload).error_description).toContain(
+        'client_secret'
+      )
     })
 
-    it('reads the payload, ignoring what the query string carries', async () => {
+    it('issues a token in production, logging the parameters', async () => {
+      process.env.NODE_ENV = 'production'
+      const logError = jest.spyOn(logger, 'error').mockImplementation()
+
       const res = await server.server.inject({
-        ...formEncodedRequest(CREDENTIALS),
-        url: '/token?client_secret=wrong'
+        method: 'POST',
+        url: `/token?${CREDENTIALS}`
       })
 
       expect(JSON.parse(res.payload).access_token).toBe('789')
-      expect(authenticateSystem).toHaveBeenCalledWith('123', '456')
+      expect(logError).toHaveBeenCalledWith(
+        expect.stringContaining('grant_type, client_id, client_secret')
+      )
+    })
+
+    it('reports parameters the payload also carries', async () => {
+      process.env.NODE_ENV = 'production'
+      const logError = jest.spyOn(logger, 'error').mockImplementation()
+
+      const res = await server.server.inject({
+        ...formEncodedRequest(CREDENTIALS),
+        url: '/token?client_secret=456'
+      })
+
+      expect(JSON.parse(res.payload).access_token).toBe('789')
+      expect(logError).toHaveBeenCalledWith(
+        expect.stringContaining('client_secret')
+      )
+    })
+
+    it('ignores non-OAuth query parameters', async () => {
+      process.env.NODE_ENV = 'development'
+      const res = await server.server.inject({
+        ...formEncodedRequest(CREDENTIALS),
+        url: '/token?utm_source=docs'
+      })
+
+      expect(JSON.parse(res.payload).access_token).toBe('789')
     })
   })
 })
