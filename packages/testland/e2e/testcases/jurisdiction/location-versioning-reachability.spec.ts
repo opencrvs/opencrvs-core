@@ -426,12 +426,12 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       officeName
     )
 
-    // Community Leader lacks record.declare, so it has no bucket to review
+    // Hospital Official (the only notifier role) lacks record.declare, so it has no bucket to review
     // its own notification in — the reachability check comes from a registrar.
     const { username } = await provisionUserInOffice(
       systemAdminToken,
       office.id,
-      'COMMUNITY_LEADER'
+      'HOSPITAL_CLERK'
     )
 
     await activateUserViaApi(username)

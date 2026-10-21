@@ -388,6 +388,30 @@ export const drawSignature = async (
 }
 
 /**
+ * Fills the review page's comment and informant signature, unless they are already filled in.
+ */
+export async function signReview(
+  page: Page,
+  comment: string = faker.lorem.sentence()
+) {
+  const commentInput = page.locator('#review____comment')
+  if (!(await commentInput.inputValue())) {
+    await commentInput.fill(comment)
+  }
+
+  const signButton = page.getByRole('button', { name: 'Sign', exact: true })
+  if (await signButton.isVisible()) {
+    await signButton.click()
+    await drawSignature(page, 'review____signature_canvas_element', false)
+    await page
+      .locator('#review____signature_modal')
+      .getByRole('button', { name: 'Apply' })
+      .click()
+    await expect(page.getByRole('dialog')).not.toBeVisible()
+  }
+}
+
+/**
   Opens the record audit view of a record with given trackingId or name
  */
 export const auditRecord = async ({
@@ -450,6 +474,15 @@ export async function expectRowValueWithChangeButton(
     assertionText
   )
 
+  await expect(page.getByTestId(`change-button-${fieldName}`)).toBeVisible()
+}
+
+/** Assert that a review row has no value (and no validation error) but can be changed */
+export async function expectEmptyRowWithChangeButton(
+  page: Page,
+  fieldName: string
+) {
+  await expect(page.getByTestId(`${fieldName}-value`)).toHaveText('')
   await expect(page.getByTestId(`change-button-${fieldName}`)).toBeVisible()
 }
 

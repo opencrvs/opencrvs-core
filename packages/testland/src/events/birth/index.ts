@@ -35,10 +35,7 @@ import { advancedSearchBirth } from './advancedSearch'
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth } from './forms/pages/child'
 import { CORRECTION_FORM } from './forms/correctionForm'
-import {
-  BIRTH_NOTIFICATION_FORM,
-  BIRTH_NOTIFICATION_REVIEW
-} from './forms/notificationForm'
+import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
