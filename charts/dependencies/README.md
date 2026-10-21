@@ -243,12 +243,12 @@ MinIO strongly discourages use of the default credentials regardless of deployme
 Check official documentation for more details:
 https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html
 
-Values are stored as a Kubernetes secret `minio-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
+Values are stored as a Kubernetes secret `s3-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
 
 ```
 DEPENDENCIES_NAMESPACE=<dependencies namespace>
 OPENCRVS_NAMESPACE=<OpenCRVS namespace>
-kubectl get secret minio-opencrvs-users -n $DEPENDENCIES_NAMESPACE -o yaml \
+kubectl get secret s3-opencrvs-users -n $DEPENDENCIES_NAMESPACE -o yaml \
   | sed "s#namespace: $DEPENDENCIES_NAMESPACE#namespace: $OPENCRVS_NAMESPACE#" \
   | kubectl apply -n $OPENCRVS_NAMESPACE -f -
 ```
@@ -258,7 +258,7 @@ Don't forget to replace placeholders with appropriate namespaces.
 Example of Kubernetes secret:
 
 ```
-$ kubectl get secret -oyaml -n opencrvs-dev minio-opencrvs-users | yq .data
+$ kubectl get secret -oyaml -n opencrvs-dev s3-opencrvs-users | yq .data
 S3_ACCESS_KEY: RE...wMw==
 S3_ADMIN_SECRET_KEY: dG...FU=
 S3_ADMIN_ACCESS_KEY: RE...wMw==

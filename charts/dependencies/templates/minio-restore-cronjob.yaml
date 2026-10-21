@@ -38,12 +38,12 @@ spec:
                 - name: S3_ADMIN_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: minio-opencrvs-users
+                      name: s3-opencrvs-users
                       key: S3_ADMIN_ACCESS_KEY
                 - name: S3_ADMIN_SECRET_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: minio-opencrvs-users
+                      name: s3-opencrvs-users
                       key: S3_ADMIN_SECRET_KEY
               {{- end }}
                 - name: ENCRYPT_PASS
