@@ -9,7 +9,7 @@ storage_type: host_path
 # by a service-specific image configuration.
 platform:
   # Default tag for all OpenCRVS/MOSIP images.
-  tag: v2.0.0
+  tag: v2.1.1
 
   # Default repository for all OpenCRVS/MOSIP images,
   # for example: ghcr.io/opencrvs or myorg
