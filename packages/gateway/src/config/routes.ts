@@ -134,9 +134,17 @@ export const getRoutes = () => {
     catchAllProxy.location,
     catchAllProxy.locationId,
 
-    catchAllProxy.authInternal,
-    catchAllProxy.auth,
+    // Only these auth endpoints are reachable through the gateway; any other
+    // /auth/* path is a 404. A new public auth endpoint needs its own route here.
     authProxy.token,
+    authProxy.resendAuthenticationCode,
+    authProxy.verifyCode,
+    authProxy.verifyNumber,
+    authProxy.verifySecurityAnswer,
+    authProxy.changePassword,
+    authProxy.sendUserName,
+    authProxy.refreshToken,
+    authProxy.invalidateToken,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser,
