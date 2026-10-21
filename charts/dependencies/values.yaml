@@ -467,6 +467,72 @@ minio:
     # Cron schedule for restore job.
     # schedule: "0 3 * * *"
 
+# SeaweedFS is an open-source S3 object store and an alternative to MinIO.
+# Enable one of `minio` and `seaweedfs`, not both: they are exposed on the same
+# hostnames (minio.<hostname> and minio-console.<hostname>), so that switching
+# the store needs no DNS or certificate change.
+# Point the OpenCRVS services chart at it with
+#   s3.host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local
+seaweedfs:
+  # Enable or disable SeaweedFS deployment.
+  enabled: false
+  image:
+    repository: chrislusf/seaweedfs
+    tag: '4.48'
+  # Port of the S3 API, the same as MinIO's, so that `s3.port` of the OpenCRVS
+  # services chart is not changed by switching.
+  port: 3535
+  network_policy:
+    ingress_mode: private
+    rules:
+      # network_policy.ingress_mode only scopes to the service's single `port`
+      # value (the S3 API). Ingress for the console (port 3536) is opened
+      # explicitly below. Every other port of SeaweedFS stays closed.
+      - name: allow-console-ingress
+        policyTypes:
+          - Ingress
+        ingress:
+          - ports:
+              - protocol: TCP
+                port: 3536
+
+  # Use default credentials (access key: minioadmin, secret key: minioadmin).
+  # Highly discouraged for production environments. Without them the credentials
+  # are generated into the `s3-opencrvs-users` secret, like MinIO's.
+  # SeaweedFS has a single identity, built from S3_ADMIN_ACCESS_KEY and
+  # S3_ADMIN_SECRET_KEY of that secret, so S3_ACCESS_KEY and S3_SECRET_KEY, which
+  # the documents service uses, must hold the same values. The generated secret does.
+  use_default_credentials: true
+
+  console:
+    # The admin console, on port 3536 and on minio-console.<hostname>.
+    # Users log in with S3_ADMIN_ACCESS_KEY and S3_ADMIN_SECRET_KEY. The console
+    # always asks for them, even with the default credentials.
+    enabled: true
+
+  # Size at which SeaweedFS stops writing to a volume file and starts another.
+  # Smaller volumes give space back sooner after deletions. SeaweedFS allows as
+  # many volumes as fit on the disk.
+  volume_size_limit_mb: 1024
+
+  # storage_type: host_path
+  # PVC Configuration
+  pvc:
+    # storage_class: "default"
+    access_mode: 'ReadWriteOnce'
+    storage_size: '10Gi'
+
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/seaweedfs
+
+  # Node selector for SeaweedFS pods, usually used to keep data persistent on specified nodes.
+  node_selector: {}
+
+  # Fixed NodePorts, only used when `service_type` is `NodePort`.
+  # node_port: 30535         # exposes port 3535
+  # node_port_console: 30536 # exposes port 3536
+
 redis:
   # Enable Redis deployment.
   # Redis is built on top of bitnami/redis docker image:
