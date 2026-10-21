@@ -381,7 +381,7 @@ export const birthEvent = defineConfig({
       review: {
         title: {
           defaultMessage:
-            '{child.name.firstname, select, __EMPTY__ {Birth notification} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notificaton for {child.name.firstname} {child.name.surname}}}}}',
+            '{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}',
           id: 'event.birth.action.notify.form.review.title',
           description: 'Title of the form to show in review page'
         },
