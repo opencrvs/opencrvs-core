@@ -27,7 +27,7 @@ import { ActionMenuDropdown } from '../ActionMenuDropdown'
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
- *   - Declare (non-incomplete records)
+ *   - Declare
  *   - Register (aka. 'direct registration', which means declare+validate+register actions)
  *   - Save and exit
  *   - Delete declaration
