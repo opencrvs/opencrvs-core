@@ -157,11 +157,22 @@ export async function getAuthTokens(
   }
 }
 
+const tokenCache = new Map<string, { token: string; expiresAt: number }>()
+
+/**
+ * Returns token from cache if already present.
+ */
 export async function getToken(
   username: string,
   password: string = TEST_USER_PASSWORD
 ) {
-  return (await getAuthTokens(username, password)).token
+  const cached = tokenCache.get(username)
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.token
+  }
+  const token = (await getAuthTokens(username, password)).token
+  tokenCache.set(username, { token, expiresAt: Date.now() + 8 * 60_000 })
+  return token
 }
 
 export async function getClientToken(client_id: string, client_secret: string) {
@@ -556,7 +567,10 @@ export async function waitForActionResponses(
   let mainDone = false
   const main = Promise.all(
     urls.map((url) =>
-      page.waitForResponse((res) => res.url().includes(url) && res.ok())
+      // add arbitrary timeout to prevent indefinite hanging in failure situations
+      page.waitForResponse((res) => res.url().includes(url) && res.ok(), {
+        timeout: 30_000
+      })
     )
   ).then(() => {
     mainDone = true
@@ -572,7 +586,9 @@ export async function waitForActionResponses(
           res.ok() &&
           res.request().method() === 'POST' &&
           (res.request().postData()?.includes(eventId) ?? false) &&
-          mainDone
+          mainDone,
+        // add arbitrary timeout to prevent indefinite hanging in failure situations
+        { timeout: 30_000 }
       )
     )
   }
