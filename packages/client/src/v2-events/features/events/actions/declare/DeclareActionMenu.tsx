@@ -21,7 +21,6 @@ import {
   getActionReview,
   getAvailableActionsForEvent,
   getActionConfig,
-  isValidIcon,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
@@ -54,7 +53,6 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
- *   - Notify (incomplete records)
  *   - Declare (non-incomplete records)
  *   - Validate (aka. 'direct validation', which means declare+validate actions)
  *   - Register (aka. 'direct registration', which means declare+validate+register actions)
@@ -87,11 +85,6 @@ function useDeclarationActions(event: EventDocument) {
     actionType: ActionType.DECLARE
   })
 
-  const notifyActionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.NOTIFY
-  })
-
   const dialogCopy =
     actionConfig && 'dialogCopy' in actionConfig
       ? actionConfig.dialogCopy
@@ -100,22 +93,6 @@ function useDeclarationActions(event: EventDocument) {
   const eventId = event.id
 
   const actions = {
-    [ActionType.NOTIFY]: {
-      supportingCopy: notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
-      fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
-      title: {
-        id: 'review.declare.incomplete.confirmModal.title',
-        defaultMessage: 'Notify the {event}?',
-        description: 'The title for review action modal when declaring'
-      },
-      onConfirm: (values: AcceptActionModalResult['values']) =>
-        events.actions.notify.mutate({
-          eventId,
-          declaration,
-          annotation: { ...annotation, ...values },
-          transactionId: uuid()
-        })
-    },
     [ActionType.DECLARE]: {
       supportingCopy: dialogCopy?.declare,
       fields: getActionFormFields(eventConfiguration, ActionType.DECLARE),
@@ -162,8 +139,6 @@ function useDeclarationActions(event: EventDocument) {
    * hasValidationErrors is true if:
    * - the form has any field validation errors or
    * - the form is incomplete
-   *
-   * If hasValidationErrors is true, the user is still able to Notify an event (if they have the required scope)
    */
   const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
@@ -229,16 +204,6 @@ function useDeclarationActions(event: EventDocument) {
         onClick: async () => handleDeclaration(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
         disabled: hasValidationErrors
-      },
-      {
-        icon: isValidIcon(notifyActionConfig?.icon)
-          ? notifyActionConfig.icon
-          : actionIcons[ActionType.DECLARE],
-        label: actionLabels[ActionType.NOTIFY],
-        onClick: async () => handleDeclaration(ActionType.NOTIFY),
-        hidden:
-          !availableActions.includes(ActionType.NOTIFY) ||
-          !isActionAllowed(ActionType.NOTIFY)
       },
       {
         icon: 'FloppyDisk' as const,

@@ -152,6 +152,7 @@ export const BIRTH_NOTIFICATION_REVIEW = {
     {
       type: FieldType.SIGNATURE,
       id: 'notifier.signature',
+      required: true,
       label: {
         defaultMessage: 'Signature of notifier',
         id: 'event.birth.action.notify.form.review.notifier.signature.label',

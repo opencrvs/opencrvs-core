@@ -18,7 +18,7 @@ import {
 import {
   ActionType,
   getCurrentEventState,
-  getDeclaration,
+  getNotificationForm,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { recordAnchorDate } from '@client/v2-events/utils'
@@ -34,6 +34,7 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { NotifyActionMenu } from './NotifyActionMenu'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.NOTIFY.REVIEW)
@@ -45,7 +46,8 @@ export function Review() {
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(config)
+  const formConfig = getNotificationForm(config)
+
   const actionConfiguration = config.actions.find(
     (a) => a.type === ActionType.NOTIFY
   )
@@ -93,7 +95,7 @@ export function Review() {
 
   return (
     <FormLayout
-      // actionComponent={/*TODO CIHAN*/}
+      actionComponent={<NotifyActionMenu event={event} />}
       route={ROUTES.V2.EVENTS.NOTIFY}
     >
       <ReviewComponent.Body
