@@ -79,14 +79,18 @@ test('Correct record - 2', async ({ page }) => {
     await selectCertificationType(page, 'Birth Certificate')
     await selectRequesterType(page, 'Print and issue to Informant (Mother)')
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
+    // HTTP call will override annotation on next step if we do not wait for this.
+    const credentialResponse = page.waitForResponse(
+      (res) => res.url().includes('verifiable-credentials/paper-credential'),
+      { timeout: 30_000 }
+    )
+
     await page.getByRole('button', { name: 'Verified', exact: true }).click()
+
+    await credentialResponse
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
-    const eventConfigResponse = page.waitForResponse((res) =>
-      res.url().includes('event.config.get')
-    )
     await page.getByRole('button', { name: 'No, make correction' }).click()
-    await eventConfigResponse
   })
 
   await test.step('2.2 Select requester and reason', async () => {
