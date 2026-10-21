@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.1 Release Candidate
+
+### Bug fixes
+
+- Postgres with differential backup or restore enabled no longer fails to start once its pinned pgBackRest version is superseded. The container installs pgBackRest on every start, and the PostgreSQL apt repository keeps only the latest releases, so after 2.59.0 was dropped from it the `postgres-0` pod and the restore runner could not start. They now also install from the PostgreSQL archive repository, which keeps every release, so the version in `postgres.pgbackrest_version` stays installable and keeps matching the backup server. [#14038](https://github.com/opencrvs/opencrvs-core/issues/14038)
+
+  **Deployment notes:**
+
+  - If outbound traffic from the cluster is limited to an allowlist, add `apt-archive.postgresql.org` (HTTPS).
+
+- A differential Postgres restore can now reach the backup server: the restore runner pod has the SSH key with the permissions pgBackRest needs, and is allowed through the network policies. `environment:init` now also sets the variables a differential restore needs. [#13992](https://github.com/opencrvs/opencrvs-core/pull/13992)
+
 ## 2.1.0
 
 ### Upgrade guidance
