@@ -245,9 +245,9 @@ test('Certified copies renders non-spouse informant age correctly', async ({
       await page.getByText(joinValuesWith([informantAge, 'years'])).isVisible()
 
       await page.getByText('Nationality').isVisible()
-      await page
-        .getByText(declarationOverrides['informant.nationality'])
-        .isVisible()
+
+      // Previously matched by country code 'FAR' and it failed randomly when name was Farrel or similar.
+      await page.getByText('Farajaland', { exact: true }).isVisible()
     })
   })
 })
