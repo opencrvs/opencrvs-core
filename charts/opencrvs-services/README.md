@@ -128,7 +128,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>s3.host</td>
             <td>minio-0.minio.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>Hostname of the S3 object store. The default is the MinIO that the dependencies chart deploys.</td>
+            <td>Hostname of the S3 object store. The default is the MinIO that the dependencies chart deploys. With <code>seaweedfs.enabled: true</code> in the dependencies chart, set <code>seaweedfs-0.seaweedfs.&lt;dependencies namespace&gt;.svc.cluster.local</code>. Nothing else in this chart changes, as SeaweedFS listens on the same port.</td>
         </tr>
         <tr>
             <td>s3.port</td>
@@ -138,7 +138,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>s3.external_url</td>
             <td><code>minio.&ltopencrvs hostname&gt</code></td>
-            <td>external `host/ip`[:port] available for client browser to issue signed document URL. The default is where the dependencies chart exposes its S3 datastore (MinIO), and it follows <code>subdomain_separator</code>.</td>
+            <td>external `host/ip`[:port] available for client browser to issue signed document URL. The default is where the dependencies chart exposes its S3 datastore, MinIO or SeaweedFS, and it follows <code>subdomain_separator</code>.</td>
         </tr>
         <tr>
             <td>s3.external_protocol</td>
@@ -1006,6 +1006,8 @@ Use kubectl to check logs:
 ```
 kubectl logs job/data-cleanup -f --all-containers=true
 ```
+
+The job empties Postgres, Elasticsearch and the S3 bucket, `env.S3_BUCKET` of the values (default `ocrvs`), then creates the bucket again. It works with every S3 object store that the dependencies chart can deploy, MinIO and SeaweedFS, as the S3 container only needs the `mc` client of `s3.image`. It logs in to the store as the administrator: with `s3.auth_mode: use_secret` as `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY` of `s3.users_secret`, and without a secret as the default credentials (minioadmin/minioadmin). If the store refuses them, or cannot be reached, the `cleanup-s3` container stops with an error before it deletes a file, and the job is retried.
 
 # Contributors guide
 

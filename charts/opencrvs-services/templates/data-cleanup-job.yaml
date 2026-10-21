@@ -71,10 +71,17 @@ spec:
             - |
               S3_BUCKET=${S3_BUCKET:-ocrvs}
               echo "Running S3 cleanup script..."
-              mc alias set store http://$S3_HOST:$S3_PORT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
+              # Without a credentials secret (auth_mode: disabled) the store runs with
+              # the default credentials, which the documents service falls back to as well.
+              # Every command below fails on credentials the store refuses, and the job would
+              # still end as successful with the files left in place. Stop before that.
+              # Without the alias, mc reads "store/<bucket>" as a path on its own disk.
+              mc alias set store http://$S3_HOST:$S3_PORT ${S3_ADMIN_ACCESS_KEY:-minioadmin} ${S3_ADMIN_SECRET_KEY:-minioadmin} \
+                && mc ls store > /dev/null \
+                || { echo "Cannot list the buckets of http://$S3_HOST:$S3_PORT with these credentials, S3 cleanup aborted"; exit 1; }
               mc rm --recursive --force store/$S3_BUCKET
               mc rb store/$S3_BUCKET
-              [ "${make_bucket:-true}" == 'true' ] && mc mb store/$S3_BUCKET
+              [ "${make_bucket:-true}" == 'true' ] && { mc mb store/$S3_BUCKET || exit 1; }
               echo "Cleanup complete!"
           env:
             - name: S3_HOST
