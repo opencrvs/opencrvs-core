@@ -155,7 +155,7 @@ function useDeclarationActions(event: EventDocument) {
     await deleteDeclaration(eventId, backTo)
   }, [eventId, deleteDeclaration, backTo])
 
-  async function handleDeclaration(actionType: keyof typeof actions) {
+  async function handleAction(actionType: keyof typeof actions) {
     const action = actions[actionType]
 
     const modalResult = await openModal<AcceptActionModalResult | null>(
@@ -194,14 +194,14 @@ function useDeclarationActions(event: EventDocument) {
       {
         icon: actionIcons[ActionType.REGISTER],
         label: actionLabels[ActionType.REGISTER],
-        onClick: async () => handleDeclaration(ActionType.REGISTER),
+        onClick: async () => handleAction(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
         disabled: hasValidationErrors || !canDirectlyRegister
       },
       {
         icon: actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.DECLARE],
-        onClick: async () => handleDeclaration(ActionType.DECLARE),
+        onClick: async () => handleAction(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
         disabled: hasValidationErrors
       },
