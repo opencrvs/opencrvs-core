@@ -1,6 +1,10 @@
 # Changelog
 
-## 2.1.1 Release Candidate
+## 2.1.1
+
+### Security
+
+- Fixes a critical security vulnerability. Details will be published in a security advisory.
 
 ### Bug fixes
 
