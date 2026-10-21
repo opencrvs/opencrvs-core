@@ -158,7 +158,8 @@ export type Declaration = Awaited<ReturnType<typeof getDeclaration>>
 /**
  * Declaration with only the fields of the birth notification form (see
  * `src/events/birth/forms/notificationForm.ts`), all required ones filled in.
- * NOTIFY rejects any field outside that form, including `child.birthLocationId`.
+ * NOTIFY rejects any field outside that form. The optional `child.birthLocationId` is left
+ * out, so the record's place of event stays the notifier's office.
  * Hospital officials, the only notifiers, can only choose a health facility as the place of birth.
  */
 export async function getNotificationDeclaration({
