@@ -188,6 +188,27 @@ If you run the documents service in another way, for example with Docker Compose
 
 In `@opencrvs/commons`, `isMinioUrl` and `MINIO_REGEX` are removed. Use `isS3Url` and `S3_URL_REGEX`, which are the same function and the same expression. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
+#### Moving the object store from MinIO to SeaweedFS (optional)
+
+MinIO stays the object store of the dependencies chart, and nothing has to change. An environment that keeps its documents in MinIO can move them to SeaweedFS without stopping OpenCRVS, in three phases:
+
+1. **Copy.** MinIO and SeaweedFS run side by side, the OpenCRVS services keep using MinIO, and a job copies the documents from MinIO to SeaweedFS after each deployment. It can run any number of times, and deletes nothing.
+2. **Switch.** The services use SeaweedFS. MinIO and the job stay, for a last copy of what was written to MinIO right before the switch.
+3. **Finish.** MinIO is removed from the deployment.
+
+For an environment that was set up with `opencrvs environment init`, run the command and deploy once for each phase. On its first run it asks whether to copy the documents, and which store the services should use, and it asks again until the environment has finished. It stores the answers as the GitHub environment variables `MINIO_TO_SEAWEEDFS_MIGRATION_ENABLED` and `S3_STORAGE`. Without the command, set the values of the dependencies and services charts by hand, see [Migrating from MinIO to SeaweedFS](charts/dependencies/README.md#migrating-from-minio-to-seaweedfs).
+
+Before you start:
+
+- SeaweedFS needs free disk space on the data node as large as the data of MinIO.
+- SeaweedFS is exposed on `seaweedfs.<domain>` and `seaweedfs-console.<domain>`, which need DNS records, or a wildcard record. Create them before the switch.
+- Helm waits for the copy, so give the deployment a timeout that is long enough for it.
+- This release has no backup and restore jobs for SeaweedFS. The jobs of MinIO stop when it is removed, so keep MinIO until the data is protected some other way.
+
+**After the migration, disable MinIO and remove its data once you have confirmed that everything works.** The finish phase removes MinIO from the cluster, and leaves its data in `/data/minio` on the data node (or in the volume claim `minio`, which the chart now keeps when MinIO is removed or the chart is uninstalled). Wait until you have run on SeaweedFS for a while, for example a week or two, then delete `/data/minio`, or the claim with `kubectl delete pvc minio`.
+
+An environment that is set up with this version has SeaweedFS only, and no MinIO, so it needs the DNS records of SeaweedFS instead of `minio.<domain>`. The services chart has a new value, `s3.external_subdomain` (default `minio`), for the hostname where the object store is exposed.
+
 ### New features
 
 #### `REVOKED` status with revoke and reinstate registration actions
@@ -210,11 +231,13 @@ A batch delete that the store partly refuses now fails instead of passing silent
 
 The dependencies chart can deploy [SeaweedFS](https://github.com/seaweedfs/seaweedfs), an open-source S3 object store that passes the same conformance suite as MinIO. It is disabled by default (`seaweedfs.enabled: true` turns it on) and can run beside MinIO, which stays on `minio.<hostname>`: SeaweedFS has a service, a volume and hostnames of its own, `seaweedfs.<hostname>` for the S3 API and `seaweedfs-console.<hostname>` for the console. Add DNS records for them unless a wildcard record covers them.
 
-The OpenCRVS services chart uses one object store at a time, MinIO by default. To use SeaweedFS, set both `s3.host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local` and `s3.external_url: seaweedfs.<hostname>`. With only the first, document URLs are signed for `minio.<hostname>` and do not work.
+The OpenCRVS services chart uses one object store at a time, MinIO by default. To use SeaweedFS, set both `s3.host: seaweedfs-0.seaweedfs.<dependencies namespace>.svc.cluster.local` and `s3.external_subdomain: seaweedfs`. With only the first, document URLs are signed for `minio.<hostname>` and do not work.
 
 SeaweedFS uses the credentials of MinIO, so the same keys work in both: `minio.use_default_credentials` decides, and the secret is `s3-opencrvs-users`. The console asks for a login, `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. Only the S3 API and the console listen beyond the pod. See the [SeaweedFS section of the dependencies chart](charts/dependencies/README.md#seaweedfs) for the options and for what it shares with MinIO.
 
-Backup, restore and migration of the data of MinIO are not part of this yet, so use it for a new environment or one that holds no documents you need to keep. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+To move an environment from MinIO to SeaweedFS, the dependencies chart has a post-deploy job, `minio_to_seaweedfs.enabled`, that copies the documents with their metadata and can run any number of times without deleting anything. `opencrvs environment init` asks for the phase, stores it in the GitHub environment variables `S3_STORAGE` and `MINIO_TO_SEAWEEDFS_MIGRATION_ENABLED`, and sets up SeaweedFS only for a new environment. See [Moving the object store from MinIO to SeaweedFS](#moving-the-object-store-from-minio-to-seaweedfs-optional).
+
+This release has no backup and restore jobs for SeaweedFS. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Improvements
 

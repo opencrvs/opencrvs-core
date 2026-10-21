@@ -7,6 +7,10 @@ metadata:
   labels:
     app: minio
   name: minio
+  annotations:
+    # Disabling MinIO after its documents were moved to SeaweedFS must not delete them
+    # with it. Delete the claim yourself when the data is no longer needed.
+    "helm.sh/resource-policy": keep
 spec:
   {{- if .Values.minio.pvc.storage_class }}
   storageClassName: {{ .Values.minio.pvc.storage_class | quote }}

@@ -152,7 +152,7 @@ spec:
             - -s3.port.iceberg=0
             - -s3.port.lance=0
           env:
-            {{- include "seaweedfs.admin_credentials_env" . | nindent 12 }}
+            {{- include "s3.admin_credentials_env" . | nindent 12 }}
             # The identity of the store, created from these variables at startup
             - name: AWS_ACCESS_KEY_ID
               value: $(S3_ADMIN_ACCESS_KEY)
@@ -182,7 +182,7 @@ spec:
             - -adminUser=$(S3_ADMIN_ACCESS_KEY)
             - -adminPassword=$(S3_ADMIN_SECRET_KEY)
           env:
-            {{- include "seaweedfs.admin_credentials_env" . | nindent 12 }}
+            {{- include "s3.admin_credentials_env" . | nindent 12 }}
           ports:
             - containerPort: 3536
               protocol: TCP

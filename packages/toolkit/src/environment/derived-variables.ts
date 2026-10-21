@@ -158,6 +158,20 @@ export const derivedVariables = [
     scope: 'ENVIRONMENT'
   },
   {
+    name: 'S3_STORAGE',
+    valueLabel: 'S3_STORAGE',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'MINIO_TO_SEAWEEDFS_MIGRATION_ENABLED',
+    valueLabel: 'MINIO_TO_SEAWEEDFS_MIGRATION_ENABLED',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
     name: 'NOTIFICATION_TRANSPORT',
     valueLabel: 'NOTIFICATION_TRANSPORT',
     valueType: 'VARIABLE',

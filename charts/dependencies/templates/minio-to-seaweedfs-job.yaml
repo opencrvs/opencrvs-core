@@ -1,0 +1,91 @@
+{{- if .Values.minio_to_seaweedfs.enabled }}
+{{- $minio_endpoint := printf "http://minio-0.minio.%s.svc.cluster.local:%v" .Release.Namespace .Values.minio.port }}
+{{- $seaweedfs_endpoint := printf "http://seaweedfs-0.seaweedfs.%s.svc.cluster.local:%v" .Release.Namespace .Values.seaweedfs.port }}
+{{- /*
+A post-deploy hook, so that it runs on every helm install and upgrade while
+minio_to_seaweedfs.enabled is true, and each run replaces the previous job.
+Helm waits for it to finish, so give helm a --timeout that is long enough for
+the copy. The job copies what the previous runs did not, and deletes nothing
+unless minio_to_seaweedfs.mode is sync.
+*/}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-to-seaweedfs
+  labels:
+    app: minio-to-seaweedfs
+    job-type: migration
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: {{ .Values.minio_to_seaweedfs.backoff_limit }}
+  activeDeadlineSeconds: {{ .Values.minio_to_seaweedfs.active_deadline_seconds }}
+  template:
+    metadata:
+      labels:
+        app: minio-to-seaweedfs
+        job-type: migration
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio_to_seaweedfs) | nindent 6 }}
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: {{ include "opencrvs.imageReference" .Values.minio_to_seaweedfs }}
+          command: ["/bin/sh", "/scripts/migrate.sh"]
+          env:
+            {{- include "s3.admin_credentials_env" . | nindent 12 }}
+            # The stores have the same credentials. rclone reads its remotes from
+            # these variables, so no credentials are written to a file.
+            - name: RCLONE_CONFIG_MINIO_TYPE
+              value: s3
+            - name: RCLONE_CONFIG_MINIO_PROVIDER
+              value: Minio
+            - name: RCLONE_CONFIG_MINIO_ENV_AUTH
+              value: "false"
+            - name: RCLONE_CONFIG_MINIO_ENDPOINT
+              value: {{ $minio_endpoint }}
+            - name: RCLONE_CONFIG_MINIO_FORCE_PATH_STYLE
+              value: "true"
+            - name: RCLONE_CONFIG_MINIO_ACCESS_KEY_ID
+              value: $(S3_ADMIN_ACCESS_KEY)
+            - name: RCLONE_CONFIG_MINIO_SECRET_ACCESS_KEY
+              value: $(S3_ADMIN_SECRET_KEY)
+            - name: RCLONE_CONFIG_SEAWEEDFS_TYPE
+              value: s3
+            - name: RCLONE_CONFIG_SEAWEEDFS_PROVIDER
+              value: SeaweedFS
+            - name: RCLONE_CONFIG_SEAWEEDFS_ENV_AUTH
+              value: "false"
+            - name: RCLONE_CONFIG_SEAWEEDFS_ENDPOINT
+              value: {{ $seaweedfs_endpoint }}
+            - name: RCLONE_CONFIG_SEAWEEDFS_FORCE_PATH_STYLE
+              value: "true"
+            - name: RCLONE_CONFIG_SEAWEEDFS_ACCESS_KEY_ID
+              value: $(S3_ADMIN_ACCESS_KEY)
+            - name: RCLONE_CONFIG_SEAWEEDFS_SECRET_ACCESS_KEY
+              value: $(S3_ADMIN_SECRET_KEY)
+            - name: MIGRATION_MODE
+              value: {{ .Values.minio_to_seaweedfs.mode | quote }}
+            - name: MIGRATION_VERIFY
+              value: {{ .Values.minio_to_seaweedfs.verify | quote }}
+            - name: MIGRATION_BUCKETS
+              value: {{ join " " .Values.minio_to_seaweedfs.buckets | quote }}
+            - name: MIGRATION_MAX_AGE
+              value: {{ .Values.minio_to_seaweedfs.max_age | quote }}
+            - name: WAIT_TIMEOUT_SECONDS
+              value: {{ .Values.minio_to_seaweedfs.wait_timeout_seconds | quote }}
+          {{- include "render-env-vars" (dict "service_name" "minio-to-seaweedfs" "Values" .Values) }}
+          {{ include "resources-helper" (dict "service_name" "minio-to-seaweedfs" "Values" .Values) | indent 10 | trim }}
+          volumeMounts:
+            - mountPath: /scripts
+              name: scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: minio-to-seaweedfs-scripts
+            defaultMode: 0755
+
+{{ include "network-policy-rules" (dict "service_name" "minio-to-seaweedfs" "Values" .Values) }}
+{{- end }}

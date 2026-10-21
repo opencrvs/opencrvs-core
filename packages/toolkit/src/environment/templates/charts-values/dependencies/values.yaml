@@ -25,7 +25,12 @@ storage_type: host_path
 node_selector:
   role: data1
 
+# MinIO and SeaweedFS are object stores with the same credentials, in the secret
+# s3-opencrvs-users. A new environment has SeaweedFS only. An environment that was set
+# up with MinIO keeps it for as long as the services use it, and while minio_to_seaweedfs
+# copies from it, see `opencrvs environment init`.
 minio:
+  enabled: {{minio_enabled}}
   use_default_credentials: false
   {{#if restore_enabled}}
   restore:
@@ -35,6 +40,20 @@ minio:
   backup:
     type: {{backup_type}}
   {{/if}}
+
+seaweedfs:
+  enabled: {{seaweedfs_enabled}}
+
+{{#if minio_to_seaweedfs_enabled}}
+# Copies the documents from MinIO to SeaweedFS after each deployment
+minio_to_seaweedfs:
+  enabled: true
+  {{#if services_use_seaweedfs}}
+  # The services write to SeaweedFS now, so objects are written and deleted there, and
+  # a check of the copy would report that as a difference
+  verify: none
+  {{/if}}
+{{/if}}
 
 elasticsearch:
   use_default_credentials: false
