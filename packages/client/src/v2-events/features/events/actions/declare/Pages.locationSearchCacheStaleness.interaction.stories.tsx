@@ -22,7 +22,8 @@ import {
   UUID,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
@@ -136,7 +137,9 @@ const storyParams = {
   msw: {
     handlers: {
       events: [
-        tRPCMsw.event.config.get.query(() => [anchoredChildOnboardingEvent])
+        tRPCMsw.event.config.get.query(() => [
+          toVersionedEventConfig(anchoredChildOnboardingEvent)
+        ])
       ],
       event: [
         tRPCMsw.event.get.query(() => freshDraftEvent),

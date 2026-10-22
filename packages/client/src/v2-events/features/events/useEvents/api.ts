@@ -17,6 +17,8 @@ import {
 import {
   Draft,
   EventConfig,
+  resolveEventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventDocumentOnlyLastAction,
   EventIndex,
@@ -57,14 +59,17 @@ async function invalidateWorkqueues() {
   })
 }
 
-export function findLocalEventConfig(eventType: string) {
-  return getQueryData(trpcOptionsProxy.event.config.get)?.find(
-    ({ id }: EventConfig) => id === eventType
-  ) as EventConfig | undefined
+export function findLocalEventConfig(
+  eventType: string
+): EventConfig | undefined {
+  const config = getQueryData(trpcOptionsProxy.event.config.get)?.find(
+    ({ id }: VersionedEventConfig) => id === eventType
+  ) as VersionedEventConfig | undefined
+  return config && resolveEventConfig(config)
 }
 
-export function addLocalEventConfig(config: EventConfig) {
-  const currentConfigs = queryClient.getQueryData<EventConfig[]>(
+export function addLocalEventConfig(config: VersionedEventConfig) {
+  const currentConfigs = queryClient.getQueryData<VersionedEventConfig[]>(
     trpcOptionsProxy.event.config.get.queryKey()
   )
 

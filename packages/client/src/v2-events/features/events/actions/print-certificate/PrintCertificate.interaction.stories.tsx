@@ -28,7 +28,8 @@ import {
   tennisClubMembershipEvent,
   never,
   generateActionDocument,
-  EventDocumentOnlyLastAction
+  EventDocumentOnlyLastAction,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -119,7 +120,7 @@ export const NoTemplateAvailable: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
@@ -162,7 +163,7 @@ export const ContinuingAndGoingBack: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument

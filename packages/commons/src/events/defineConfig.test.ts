@@ -8,8 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig } from './defineConfig'
-import { EventConfig, EventConfigInput } from './EventConfig'
+import { DEFAULT_EVENT_CONFIG_VERSION_ID, defineConfig } from './defineConfig'
+import {
+  EventConfig,
+  EventConfigInput,
+  resolveEventConfig,
+  VersionedEventConfig
+} from './EventConfig'
 import { ActionType } from './ActionType'
 import { FieldType } from './FieldType'
 import { FieldConfig, FieldConfigInput } from './FieldConfig'
@@ -38,6 +43,11 @@ const actionsWithoutDeclaration: EventConfigInput['actions'] =
     return rest
   })
 
+/** The configuration of the only version of an event defined without `versions`. */
+function defineResolvedConfig(config: EventConfigInput) {
+  return resolveEventConfig(defineConfig(config))
+}
+
 describe('defineConfig()', () => {
   let warn: jest.SpyInstance
 
@@ -50,7 +60,7 @@ describe('defineConfig()', () => {
   })
 
   it('should keep a declaration given on the DECLARE action', () => {
-    const config = defineConfig(tennisClubMembershipEvent)
+    const config = defineResolvedConfig(tennisClubMembershipEvent)
 
     expect(getDeclaration(config)).toEqual(declaration)
     expect(warn).not.toHaveBeenCalledWith(
@@ -59,7 +69,7 @@ describe('defineConfig()', () => {
   })
 
   it('should move a top-level declaration onto the DECLARE action', () => {
-    const config = defineConfig({
+    const config = defineResolvedConfig({
       ...tennisClubMembershipEvent,
       actions: actionsWithoutDeclaration,
       declaration
@@ -223,7 +233,7 @@ describe('defineConfig()', () => {
     }
 
     it('should use a configured notification form as is, without warning', () => {
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithNotify({
           ...notifyActionWithoutForm,
@@ -238,7 +248,7 @@ describe('defineConfig()', () => {
     })
 
     it('should generate the review from the DECLARE review, without warning, when only the notification form is configured', () => {
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithNotify({
           ...notifyActionWithoutForm,
@@ -281,7 +291,7 @@ describe('defineConfig()', () => {
         }
       }
 
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify.map((action) =>
           action.type === ActionType.DECLARE
@@ -306,7 +316,7 @@ describe('defineConfig()', () => {
     })
 
     it('should not put a notification form in the config when none is configured', () => {
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify
       })
@@ -315,7 +325,7 @@ describe('defineConfig()', () => {
     })
 
     it('should derive the notification form from the declaration, and generate the review from the DECLARE review, with every field optional', () => {
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify
       })
@@ -361,7 +371,7 @@ describe('defineConfig()', () => {
         fields: [{ ...requiredField, id: 'applicant.group.nickname' }]
       } satisfies FieldConfig
 
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithoutNotify.map((action) =>
           action.type === ActionType.DECLARE
@@ -407,7 +417,7 @@ describe('defineConfig()', () => {
     })
 
     it('should keep the NOTIFY settings of a NOTIFY action without a notification form', () => {
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithNotify(notifyActionWithoutForm)
       })
@@ -422,7 +432,7 @@ describe('defineConfig()', () => {
     })
 
     it('should keep a configured NOTIFY review when only the notification form is missing', () => {
-      const config = defineConfig({
+      const config = defineResolvedConfig({
         ...tennisClubMembershipEvent,
         actions: actionsWithNotify({
           ...notifyActionWithoutForm,
@@ -450,8 +460,137 @@ describe('defineConfig()', () => {
         actions: actionsWithoutNotify
       })
 
-      expect(EventConfig.parse(config)).toEqual(config)
+      expect(VersionedEventConfig.parse(config)).toEqual(config)
       expect(defineConfig(config)).toEqual(config)
+    })
+  })
+
+  describe('versions', () => {
+    const {
+      id: eventId,
+      label,
+      advancedSearch,
+      ...versionFields
+    } = tennisClubMembershipEvent
+
+    const v1 = { ...versionFields, id: 'v1' }
+    const v2 = { ...versionFields, id: 'v2', effectiveFrom: '2027-03-01' }
+
+    it('should accept two versions with distinct ids and dates', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1, v2]
+      })
+
+      expect(config.versions.map(({ id }) => id)).toEqual(['v1', 'v2'])
+      expect(config.versions[1].effectiveFrom).toBe('2027-03-01')
+      expect(config).toMatchObject({ id: eventId, label, advancedSearch })
+    })
+
+    it('should take an event without versions as one version with id `default` and no `effectiveFrom`', () => {
+      const config = defineConfig(tennisClubMembershipEvent)
+
+      expect(config.versions).toHaveLength(1)
+      expect(config.versions[0].id).toBe(DEFAULT_EVENT_CONFIG_VERSION_ID)
+      expect(config.versions[0]).not.toHaveProperty('effectiveFrom')
+      expect(config).not.toHaveProperty('actions')
+    })
+
+    it('should reject two versions with the same id, naming the event and the id', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'v1' }]
+        })
+      ).toThrow(
+        `Event '${eventId}' has more than one version with id 'v1'. Each version must have a different id.`
+      )
+    })
+
+    it('should reject two versions with the same `effectiveFrom`, naming the event and the date', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2027-03-01' }, v2]
+        })
+      ).toThrow(
+        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2027-03-01'. Each version must have a different \`effectiveFrom\`.`
+      )
+    })
+
+    it('should reject two versions without `effectiveFrom`', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, effectiveFrom: undefined }]
+        })
+      ).toThrow(
+        `Event '${eventId}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`
+      )
+    })
+
+    it('should move a top-level declaration of each version onto its DECLARE action', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [
+          v1,
+          { ...v2, actions: actionsWithoutDeclaration, declaration }
+        ]
+      })
+
+      expect(
+        getDeclaration(
+          resolveEventConfig({ ...config, versions: [config.versions[1]] })
+        )
+      ).toEqual(declaration)
+      expect(config.versions[1]).not.toHaveProperty('declaration')
+    })
+
+    it('should report an invalid version under its index', () => {
+      const result = VersionedEventConfig.safeParse({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [
+          v1,
+          {
+            ...v2,
+            actions: v2.actions.filter(
+              (action) => action.type !== ActionType.DECLARE
+            )
+          }
+        ]
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.error?.issues).toContainEqual(
+        expect.objectContaining({ path: ['versions', 1, 'actions'] })
+      )
+    })
+
+    it('should use the first version until versions are resolved from the record', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [
+          v1,
+          { ...v2, title: { ...v2.title, defaultMessage: 'Version 2' } }
+        ]
+      })
+
+      expect(resolveEventConfig(config).title).toEqual(v1.title)
+      expect(resolveEventConfig(config)).toBe(resolveEventConfig(config))
     })
   })
 })

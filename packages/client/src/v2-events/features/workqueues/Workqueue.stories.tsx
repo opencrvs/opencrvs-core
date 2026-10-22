@@ -20,9 +20,13 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { libraryMembershipEvent } from '@opencrvs/commons/client'
+import {
+  libraryMembershipEvent,
+  versionedLibraryMembershipEvent
+} from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -116,7 +120,10 @@ export const WorkqueueWithMultipleEventType: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent, libraryMembershipEvent]
+            return [
+              versionedTennisClubMembershipEvent,
+              versionedLibraryMembershipEvent
+            ]
           })
         ],
         workqueues: [
@@ -170,7 +177,7 @@ export const WorkqueueWithPagination: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.search.query((input) => {
             return { results: queryData, total: queryData.length }
@@ -211,7 +218,7 @@ export const ReadyToPrintWorkqueue: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.search.query((input) => {
             const results = queryData.filter(

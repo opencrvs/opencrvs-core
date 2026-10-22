@@ -25,7 +25,7 @@ import {
   DeleteActionInput,
   Draft,
   DraftInput,
-  EventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventIndex,
   EventInput,
@@ -47,7 +47,8 @@ import {
 } from '@events/router/trpc'
 import {
   getEventConfigurationById,
-  getInMemoryEventConfigurations
+  getInMemoryEventConfigurations,
+  getInMemoryVersionedEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
@@ -147,9 +148,9 @@ export const eventRouter = router({
         }
       })
       .input(z.void())
-      .output(z.array(EventConfig))
+      .output(z.array(VersionedEventConfig))
       .query(async (options) =>
-        getInMemoryEventConfigurations(options.ctx.token)
+        getInMemoryVersionedEventConfigurations(options.ctx.token)
       )
   }),
   create: userAndSystemProcedure

@@ -11,8 +11,8 @@
 import {
   decodeScope,
   EncodedScope,
-  EventConfig,
-  joinUrl
+  joinUrl,
+  VersionedEventConfig
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { z } from 'zod'
@@ -193,7 +193,7 @@ export async function readRoles(token: string): Promise<RoleRead> {
     )
   }
 
-  const eventsConfig = (await eventsResponse.json()) as EventConfig[]
+  const eventsConfig = (await eventsResponse.json()) as VersionedEventConfig[]
 
   return parseRoles(
     await rolesResponse.json(),

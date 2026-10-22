@@ -25,7 +25,8 @@ import {
   tennisClubMembershipEvent,
   TestUserRole,
   TokenUserType,
-  UserOrSystemSummary
+  UserOrSystemSummary,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import {
   AppRouter,
@@ -302,7 +303,9 @@ function auditParameters(event: EventDocument) {
     msw: {
       handlers: {
         events: [
-          tRPCMsw.event.config.get.query(() => [config]),
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(config)
+          ]),
           tRPCMsw.event.get.query(() => event),
           tRPCMsw.event.search.query(() => ({
             results: [getCurrentEventState(event, config)],

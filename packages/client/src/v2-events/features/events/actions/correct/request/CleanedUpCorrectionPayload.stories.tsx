@@ -29,7 +29,8 @@ import {
   generateTranslationConfig,
   FieldUpdateValue,
   withDeclaration,
-  getDeclaration
+  getDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -208,7 +209,7 @@ const draft = generator.event.draft({
 export const CleanedUpCorrectionPayload: Story = {
   beforeEach: () => {
     useEventFormData.setState({ formValues: {} })
-    addLocalEventConfig(overriddenEventConfig)
+    addLocalEventConfig(toVersionedEventConfig(overriddenEventConfig))
     setEventData(overriddenEvent.id, overriddenEvent)
   },
   loaders: [
@@ -263,7 +264,11 @@ export const CleanedUpCorrectionPayload: Story = {
     },
     msw: {
       handlers: {
-        events: [tRPCMsw.event.config.get.query(() => [overriddenEventConfig])],
+        events: [
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(overriddenEventConfig)
+          ])
+        ],
         event: [tRPCMsw.event.get.query(() => overriddenEvent)],
         actions: [
           tRPCMsw.event.actions.correction.request.request.mutation(

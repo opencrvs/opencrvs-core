@@ -17,7 +17,8 @@ import {
   ActionType,
   generateActionDocument,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -55,7 +56,7 @@ export const CollectorForm: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
