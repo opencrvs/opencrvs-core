@@ -136,7 +136,7 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   declarationUpdate: ActionUpdate
   context: ValidatorContext
 }) {
-  // 3. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     form,
@@ -144,7 +144,7 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
     context
   )
 
-  // 4. When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
   // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
   // that may have become hidden due to changes in the current update.
   const declarationUpdateOnlyComplete = Object.fromEntries(
@@ -161,7 +161,7 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
     return { cleanedDeclaration, invalidKeys, fieldErrors: [] }
   }
 
-  // 5. Validate declaration update against conditional rules, taking into account conditional pages.
+  // Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = form.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
@@ -194,13 +194,13 @@ function validateDeclarationUpdateAction({
    */
 
   const declarationConfig = getDeclaration(eventConfig)
-  // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
+  // Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = context.event.state.declaration
 
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
-  // 2. Check for any invalid key that doesn't exist in declaration config
+  // Check for any invalid key that doesn't exist in declaration config
   // getDeclarationFieldById will throw if any field is not in the declaration config
   Object.keys(mergedDeclaration).forEach((key) => {
     getDeclarationFieldById(eventConfig, key)
@@ -235,7 +235,7 @@ function validateDeclarationUpdateAction({
     return invalidKeys
   }
 
-  // 6. Validate against action review fields and dialog form fields, if applicable.
+  // Validate against action review fields and dialog form fields, if applicable.
   // Dialog form fields are validated with `required` relaxed: combined flows
   // (e.g. declare+register) only collect the final action's dialog fields, so
   // intermediate actions legitimately arrive without their own.
