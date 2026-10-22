@@ -32,19 +32,37 @@ export const ROUTES = {
             ':eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: { backTo: string() }
+              searchParams: {
+                backTo: string()
+              }
             },
             {
-              RECORD: route('record', { searchParams: { backTo: string() } }),
-              DOCUMENTS: route('documents', {
-                searchParams: { backTo: string() }
+              RECORD: route('record', {
+                searchParams: {
+                  backTo: string()
+                }
               }),
-              AUDIT: route('audit', { searchParams: { backTo: string() } })
+              DOCUMENTS: route('documents', {
+                searchParams: {
+                  backTo: string()
+                }
+              }),
+              AUDIT: route('audit', {
+                searchParams: {
+                  backTo: string()
+                }
+              })
             }
           ),
-          CREATE: route('create', { searchParams: { backTo: string() } }),
+          CREATE: route('create', {
+            searchParams: {
+              backTo: string()
+            }
+          }),
           DELETE: route('delete/:eventId', {
-            searchParams: { backTo: string() }
+            searchParams: {
+              backTo: string()
+            }
           }),
           NOTIFY: route(
             'notify/:eventId',
@@ -68,10 +86,15 @@ export const ROUTES = {
               searchParams: { backTo: string() }
             },
             {
-              REVIEW: route('review', { searchParams: { backTo: string() } }),
+              REVIEW: route('review', {
+                searchParams: { backTo: string() }
+              }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
-                searchParams: { from: string(), backTo: string() },
+                searchParams: {
+                  from: string(),
+                  backTo: string()
+                },
                 hash: hashValues()
               })
             }
@@ -83,10 +106,15 @@ export const ROUTES = {
               searchParams: { backTo: string() }
             },
             {
-              REVIEW: route('review', { searchParams: { backTo: string() } }),
+              REVIEW: route('review', {
+                searchParams: { backTo: string() }
+              }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
-                searchParams: { from: string(), backTo: string() },
+                searchParams: {
+                  from: string(),
+                  backTo: string()
+                },
                 hash: hashValues()
               })
             }
@@ -95,22 +123,32 @@ export const ROUTES = {
             'print-certificate/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: { backTo: string() }
+              searchParams: {
+                backTo: string()
+              }
             },
             {
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
-                searchParams: { from: string(), backTo: string() },
+                searchParams: {
+                  from: string(),
+                  backTo: string()
+                },
                 hash: hashValues()
               }),
               REVIEW: route('review', {
-                searchParams: { templateId: string(), backTo: string() }
+                searchParams: {
+                  templateId: string(),
+                  backTo: string()
+                }
               })
             }
           ),
           REVIEW_POTENTIAL_DUPLICATE: route('review-duplicate/:eventId', {
             params: { eventId: uuid().defined() },
-            searchParams: { backTo: string() }
+            searchParams: {
+              backTo: string()
+            }
           }),
           REQUEST_CORRECTION: correctionRequestRoutes,
           REVIEW_CORRECTION: correctionReviewRoutes
@@ -143,18 +181,32 @@ export const ROUTES = {
             {},
             {
               CREATE: route('create', {
-                searchParams: { officeId: uuid().defined(), from: string() }
+                searchParams: {
+                  officeId: uuid().defined(),
+                  from: string()
+                }
               }),
               VIEW: route(':userId/view', {
-                params: { userId: uuid().defined() }
+                params: {
+                  userId: uuid().defined()
+                }
               }),
               REVIEW: route(':userId/review', {
-                params: { userId: uuid().defined() },
-                searchParams: { from: string() }
+                params: {
+                  userId: uuid().defined()
+                },
+                searchParams: {
+                  from: string()
+                }
               }),
               EDIT: route(':userId/edit/:pageId', {
-                params: { userId: uuid().defined(), pageId: string() },
-                searchParams: { from: string() }
+                params: {
+                  userId: uuid().defined(),
+                  pageId: string()
+                },
+                searchParams: {
+                  from: string()
+                }
               })
             }
           )

@@ -13,8 +13,7 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
-  getDeclaration,
-  getNotificationForm,
+  getActionForm,
   EventDocument,
   FieldConfig,
   getCurrentEventState,
@@ -90,10 +89,7 @@ export function useReviewPageActions(
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const eventId = event.id
-  const formConfig =
-    actionType === ActionType.NOTIFY
-      ? getNotificationForm(eventConfiguration)
-      : getDeclaration(eventConfiguration)
+  const formConfig = getActionForm(eventConfiguration, actionType)
 
   const reviewConfig = getActionReview(eventConfiguration, actionType)
   if (!reviewConfig) {

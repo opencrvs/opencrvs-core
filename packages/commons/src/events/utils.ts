@@ -154,8 +154,17 @@ export function getNotificationFields(
   )
 }
 
-export function getNotificationPages(configuration: EventConfig) {
-  return getNotificationForm(configuration).pages
+/**
+ * Form a user fills in to submit the given action:
+ * the notification form for NOTIFY, the declaration form for DECLARE.
+ */
+export function getActionForm(
+  configuration: EventConfig,
+  actionType: typeof ActionType.NOTIFY | typeof ActionType.DECLARE
+) {
+  return actionType === ActionType.NOTIFY
+    ? getNotificationForm(configuration)
+    : getDeclaration(configuration)
 }
 
 export function isActionConfigType(

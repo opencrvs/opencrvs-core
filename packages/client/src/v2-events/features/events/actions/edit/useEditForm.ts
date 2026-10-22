@@ -13,9 +13,8 @@ import {
   ActionType,
   canUserNotifyEvent,
   EventDocument,
-  getActionReview,
-  getDeclaration,
-  getNotificationForm
+  getActionForm,
+  getActionReview
 } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../../useEventConfiguration'
@@ -30,14 +29,9 @@ export function useEditForm(event: EventDocument) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const isNotifier = canUserNotifyEvent(scopes, event.type)
 
-  const formConfig = isNotifier
-    ? getNotificationForm(eventConfiguration)
-    : getDeclaration(eventConfiguration)
-
-  const reviewConfig = getActionReview(
-    eventConfiguration,
-    isNotifier ? ActionType.NOTIFY : ActionType.DECLARE
-  )
+  const actionType = isNotifier ? ActionType.NOTIFY : ActionType.DECLARE
+  const formConfig = getActionForm(eventConfiguration, actionType)
+  const reviewConfig = getActionReview(eventConfiguration, actionType)
 
   if (!reviewConfig) {
     throw new Error('Review config not found')
