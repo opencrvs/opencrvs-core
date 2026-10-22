@@ -12,72 +12,12 @@ import * as _ from 'lodash'
 import {
   FieldConfig,
   EventState,
-  isFieldVisible,
   ValidatorContext,
   deepMerge,
-  omitHiddenFields,
-  getDeclarationFields,
   EventConfig,
-  ActionDocument,
-  FieldUpdateValue,
-  deepDropNulls
+  ActionDocument
 } from '@opencrvs/commons/client'
-
-/**
- * Function we use for checking whether a field value has changed.
- * For objects we need to ignore undefined values since the form might create them.
- * @returns whether the two field values are equal when ignoring undefined values
- */
-export function isEqualFieldValue<T extends FieldUpdateValue>(a: T, b: T) {
-  if (typeof a === 'object' && typeof b === 'object') {
-    return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
-  }
-
-  return _.isEqual(a, b)
-}
-
-export function hasFieldChanged(
-  f: FieldConfig,
-  form: EventState,
-  previousFormValues: EventState,
-  context: ValidatorContext
-) {
-  const isVisible = isFieldVisible(f, form, context)
-
-  const prevValue = previousFormValues[f.id]
-  const currValue = form[f.id]
-
-  // Ensure that if previous value is 'undefined' and current value is 'null'
-  // it doesn't get detected as a value change
-  const bothNil = _.isNil(prevValue) && _.isNil(currValue)
-  const valueHasChanged =
-    !isEqualFieldValue(deepDropNulls(prevValue), deepDropNulls(currValue)) &&
-    !bothNil
-
-  return isVisible && valueHasChanged
-}
-
-export function hasDeclarationFieldChanged(
-  f: FieldConfig,
-  form: EventState,
-  previousFormValues: EventState,
-  eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext,
-  /** Fields of the form being edited, which decide what is hidden. Defaults to the declaration form. */
-  formFields: FieldConfig[] = getDeclarationFields(eventConfiguration)
-) {
-  const formWithoutHiddenFields = omitHiddenFields(
-    formFields,
-    form,
-    validatorContext
-  )
-  return hasFieldChanged(
-    f,
-    formWithoutHiddenFields,
-    previousFormValues,
-    validatorContext
-  )
-}
+import { hasFieldChanged } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 export function aggregateAnnotations(actions: ActionDocument[]) {
   return actions.reduce((ann, sortedAction) => {

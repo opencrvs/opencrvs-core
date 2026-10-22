@@ -44,18 +44,17 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Act
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
-import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getChangedDeclarationDiff,
+  hasDeclarationFieldChanged,
+  hasFieldChanged
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { ActionMenuDropdown } from '../ActionMenuDropdown'
-import {
-  aggregateAnnotations,
-  getReviewFormFields,
-  hasDeclarationFieldChanged,
-  hasFieldChanged
-} from '../correct/utils'
+import { aggregateAnnotations, getReviewFormFields } from '../annotationUtils'
 import { useEditForm } from './useEditForm'
 
 export const commentLabel = {
