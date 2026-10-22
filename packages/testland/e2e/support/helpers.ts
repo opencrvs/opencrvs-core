@@ -561,7 +561,7 @@ const actionTitleToApiCallMap = {
   Declare: ['event.actions.declare'],
   Register: ['event.actions.register'],
   Validate: ['event.actions.custom'],
-  'Delete declaration': ['event.delete'],
+  'Delete draft': ['event.delete'],
   'Save & Exit': ['event.draft.create'],
   'Declare with edits': ['event.actions.edit', 'event.actions.declare'],
   'Notify with edits': ['event.actions.edit', 'event.actions.notify'],
@@ -666,7 +666,7 @@ export async function triggerDeclarationAction(
     | 'Declare'
     | 'Register'
     | 'Validate'
-    | 'Delete declaration'
+    | 'Delete draft'
     | 'Save & Exit'
     | 'Declare with edits'
     | 'Notify with edits'

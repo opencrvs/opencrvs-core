@@ -29,7 +29,7 @@ import { ActionMenuDropdown } from '../ActionMenuDropdown'
  * Notify actions contain actions available on the review page of the notify flow. This can include:
  *   - Notify
  *   - Save and exit
- *   - Delete declaration
+ *   - Delete draft
  */
 function useNotificationActions(event: EventDocument) {
   const events = useEvents()

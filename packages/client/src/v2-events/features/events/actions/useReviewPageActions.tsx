@@ -62,7 +62,7 @@ const modalActionNames = {
  *   - form validation state
  *   - opening the accept modal for an action and closing the action view once confirmed
  *   - Save and exit
- *   - Delete declaration
+ *   - Delete draft
  */
 export function useReviewPageActions(
   event: EventDocument,
@@ -159,7 +159,7 @@ export function useReviewPageActions(
   if (availableActions.includes(ActionType.DELETE)) {
     commonActions.push({
       icon: 'Trash',
-      label: formHeaderMessages.deleteDeclaration,
+      label: formHeaderMessages.deleteDraft,
       onClick: async () => onDelete()
     })
   }

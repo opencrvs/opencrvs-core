@@ -127,9 +127,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
 
           await expect(canvas.getByText('Delete draft?')).toBeInTheDocument()
           await expect(
-            canvas.getByText(
-              "Are you certain you want to delete this draft declaration form? Please note, this action can't be undone."
-            )
+            canvas.getByText('Are you sure you want to delete this draft?')
           ).toBeInTheDocument()
 
           const cancelDelete = await waitFor(() =>

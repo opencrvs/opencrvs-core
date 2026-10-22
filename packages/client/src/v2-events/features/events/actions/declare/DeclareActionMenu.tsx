@@ -30,7 +30,7 @@ import { ActionMenuDropdown } from '../ActionMenuDropdown'
  *   - Declare
  *   - Register (aka. 'direct registration', which means declare+validate+register actions)
  *   - Save and exit
- *   - Delete declaration
+ *   - Delete draft
  */
 function useDeclarationActions(event: EventDocument) {
   const events = useEvents()
