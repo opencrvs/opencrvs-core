@@ -62,11 +62,12 @@ export function hasDeclarationFieldChanged(
   form: EventState,
   previousFormValues: EventState,
   eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  /** Fields of the form being edited, which decide what is hidden. Defaults to the declaration form. */
+  formFields: FieldConfig[] = getDeclarationFields(eventConfiguration)
 ) {
-  const fields = getDeclarationFields(eventConfiguration)
   const formWithoutHiddenFields = omitHiddenFields(
-    fields,
+    formFields,
     form,
     validatorContext
   )

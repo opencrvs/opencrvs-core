@@ -17,8 +17,6 @@ import {
   ActionType,
   EventDocument,
   getUUID,
-  getDeclaration,
-  getActionReview,
   getCurrentEventState,
   EventStatus,
   getActionConfig,
@@ -47,7 +45,6 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
 import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
-import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
@@ -59,6 +56,7 @@ import {
   hasDeclarationFieldChanged,
   hasFieldChanged
 } from '../correct/utils'
+import { useEditForm } from './useEditForm'
 
 export const commentLabel = {
   id: 'event.edit.comment.label',
@@ -192,7 +190,7 @@ function EditActionModal({
 }
 
 function useEditActions(event: EventDocument) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration, formConfig, reviewConfig } = useEditForm(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const navigate = useNavigate()
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
@@ -202,10 +200,8 @@ function useEditActions(event: EventDocument) {
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
   const events = useEvents()
-  const formConfig = getDeclaration(eventConfiguration)
   const declaration = useEventFormData((state) => state.getFormValues())
   const validatorContext = useValidatorContext(event)
-  const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const declarationDiff = getChangedDeclarationDiff(
@@ -221,7 +217,8 @@ function useEditActions(event: EventDocument) {
       declaration,
       eventIndex.declaration,
       eventConfiguration,
-      validatorContext
+      validatorContext,
+      formFields
     )
   )
 
@@ -236,10 +233,6 @@ function useEditActions(event: EventDocument) {
 
   const anyValuesHaveChanged =
     changedFields.length > 0 || changedAnnotationFields.length > 0
-
-  if (!reviewConfig) {
-    throw new Error('Review config not found')
-  }
 
   const actionConfig = getActionConfig({
     eventConfiguration,
@@ -389,7 +382,9 @@ function useEditActions(event: EventDocument) {
           }
         },
         disabled:
-          !anyValuesHaveChanged || !isTargetActionEnabled(ActionType.NOTIFY),
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !isTargetActionEnabled(ActionType.NOTIFY),
         hidden:
           !isActionAllowed(ActionType.NOTIFY) ||
           eventIndex.status !== EventStatus.enum.NOTIFIED

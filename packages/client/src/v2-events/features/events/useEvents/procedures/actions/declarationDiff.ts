@@ -120,11 +120,8 @@ export function getChangedDeclarationDiff(
   eventConfiguration: EventConfig,
   validatorContext: ValidatorContext
 ): EventState {
-  const visibleForm = omitHiddenFields(
-    getDeclarationFields(eventConfiguration),
-    form,
-    validatorContext
-  )
+  // Visibility is decided by the form being edited, e.g. the notification form for a notifier
+  const visibleForm = omitHiddenFields(fields, form, validatorContext)
 
   function shouldClearNowHiddenField(field: FieldConfig) {
     const wasVisibleAndFilled =
@@ -143,7 +140,8 @@ export function getChangedDeclarationDiff(
             form,
             previousFormValues,
             eventConfiguration,
-            validatorContext
+            validatorContext,
+            fields
           ) || shouldClearNowHiddenField(field)
       )
       .map((field) => {
