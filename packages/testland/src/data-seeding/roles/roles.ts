@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
-import { defineRoles, defineScopes, EncodedScope } from '@opencrvs/toolkit/scopes'
+import { defineScopes, EncodedScope, defineRoles } from '@opencrvs/toolkit/scopes'
 
 type Role = {
   id: string

@@ -23,7 +23,7 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 /**
  * Form and review the Edit action is done against. A user who can notify the event type
  * edits the notification form, since their edit ends in a NOTIFY. Others edit the declaration form.
- * A role can not both notify and declare an event type, see `defineRoles`.
+ * A role is not expected to both notify and declare an event type.
  */
 export function useEditForm(event: EventDocument) {
   const scopes = useSelector(getScope) ?? []

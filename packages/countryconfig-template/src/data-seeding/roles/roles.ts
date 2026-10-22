@@ -10,7 +10,7 @@
  */
 
 import { MessageDescriptor } from 'react-intl'
-import { defineRoles, defineScopes, EncodedScope } from '@opencrvs/toolkit/scopes'
+import { defineScopes, EncodedScope, defineRoles } from '@opencrvs/toolkit/scopes'
 
 type Role = {
   id: string

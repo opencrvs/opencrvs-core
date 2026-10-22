@@ -670,74 +670,6 @@ export function canUserNotifyEvent(
   return hasScopeForEventType(userScopes, eventType, 'record.notify')
 }
 
-/** Event types a scope type applies to: 'all', or a list of event ids (empty when there is no such scope). */
-function getEventTypesOfScopeType(
-  scopes: EncodedScope[],
-  scopeType: ScopeType
-): 'all' | string[] {
-  const matching = getAcceptedScopesByType({
-    acceptedScopes: [scopeType],
-    scopes
-  })
-
-  const eventTypes = new Set<string>()
-
-  for (const scope of matching) {
-    if (
-      !('options' in scope) ||
-      !scope.options ||
-      !('event' in scope.options)
-    ) {
-      return 'all'
-    }
-
-    scope.options.event?.forEach((eventType) => eventTypes.add(eventType))
-  }
-
-  return [...eventTypes]
-}
-
-/**
- * A user can either notify or declare an event of a given type, never both:
- * users who can notify go to the notify flow instead of the declare flow.
- *
- * @returns event types the scopes allow to both notify and declare, 'all' when that is every event type, or an empty array when there are none.
- */
-export function getEventTypesWithNotifyAndDeclare(
-  scopes: EncodedScope[]
-): 'all' | string[] {
-  const notify = getEventTypesOfScopeType(scopes, 'record.notify')
-  const declare = getEventTypesOfScopeType(scopes, 'record.declare')
-
-  if (notify === 'all') {
-    return declare
-  }
-
-  if (declare === 'all') {
-    return notify
-  }
-
-  return notify.filter((eventType) => declare.includes(eventType))
-}
-
-/**
- * @returns an error message when the role can both notify and declare the same event type, undefined otherwise.
- */
-export function getNotifyAndDeclareRoleError(role: Role): string | undefined {
-  const eventTypes = getEventTypesWithNotifyAndDeclare(role.scopes)
-
-  if (eventTypes.length === 0) {
-    return undefined
-  }
-
-  const ofEventTypes =
-    eventTypes === 'all'
-      ? 'every event type'
-      : `event type(s) ${eventTypes.map((t) => `"${t}"`).join(', ')}`
-
-  return `Role "${role.id}" has both record.notify and record.declare scopes for ${ofEventTypes}. A role can either notify or declare an event type, not both.`
-}
-
 /**
  * Helper for defining scopes for user roles. Should be used in country config.
  *
@@ -753,15 +685,6 @@ export function defineScopes(scopes: Scope[]) {
  *
  * @param roles Array of roles in object format.
  */
-export function defineRoles<T extends Role>(roles: T[]): T[] {
-  const errors = roles.flatMap((role) => {
-    const error = getNotifyAndDeclareRoleError(role)
-    return error ? [error] : []
-  })
-
-  if (errors.length > 0) {
-    throw new Error(`Invalid user roles:\n${errors.join('\n')}`)
-  }
-
+export function defineRoles(roles: Role[]) {
   return roles
 }
