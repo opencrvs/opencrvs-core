@@ -1425,6 +1425,27 @@ export function withDeclaration(
   }
 }
 
+export function withNotificationForm(
+  configuration: EventConfig,
+  notificationForm?: DeclarationFormConfig,
+  reviewFields?: FieldConfig[]
+): EventConfig {
+  return {
+    ...configuration,
+    actions: configuration.actions.map((action) =>
+      action.type === ActionType.NOTIFY
+        ? {
+            ...action,
+            ...(notificationForm && { notificationForm }),
+            ...(reviewFields && {
+              review: { ...action.review, fields: reviewFields }
+            })
+          }
+        : action
+    )
+  }
+}
+
 /**
  * Get the leaf administrative area IDs from a list of administrative areas.
  *

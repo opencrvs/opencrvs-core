@@ -22,7 +22,8 @@ import {
   getDeclaration,
   TestUserRole,
   TokenUserType,
-  user
+  user,
+  withNotificationForm
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getEventValidatorContext } from '@opencrvs/commons/events'
@@ -496,25 +497,14 @@ function configWithNotify({
     throw new Error('Applicant page not found')
   }
 
-  return {
-    ...tennisClubMembershipEvent,
-    actions: tennisClubMembershipEvent.actions.map((action) =>
-      action.type === ActionType.NOTIFY
-        ? {
-            ...action,
-            ...(notificationFields && {
-              notificationForm: {
-                ...tennisClubDeclarationForm,
-                pages: [{ ...applicantPage, fields: notificationFields }]
-              }
-            }),
-            ...(reviewFields && {
-              review: { ...action.review, fields: reviewFields }
-            })
-          }
-        : action
-    )
-  }
+  return withNotificationForm(
+    tennisClubMembershipEvent,
+    notificationFields && {
+      ...tennisClubDeclarationForm,
+      pages: [{ ...applicantPage, fields: notificationFields }]
+    },
+    reviewFields
+  )
 }
 
 describe('NOTIFY review field validation', () => {
