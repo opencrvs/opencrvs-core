@@ -40,7 +40,6 @@ export function Review() {
   const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.NOTIFY.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
-  const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
@@ -99,7 +98,6 @@ export function Review() {
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       />
-      {modal}
     </FormLayout>
   )
 }
