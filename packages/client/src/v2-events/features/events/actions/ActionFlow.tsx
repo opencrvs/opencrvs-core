@@ -189,7 +189,7 @@ export function ActionFlowReview({
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  async function handleEdit({
+  function handleEdit({
     pageId,
     fieldId
   }: {

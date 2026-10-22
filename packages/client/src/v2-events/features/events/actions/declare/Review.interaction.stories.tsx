@@ -409,13 +409,6 @@ export const ReviewForIncompleteNameInteraction: Story = {
         { timeout: 5000 }
       )
       await userEvent.click(changeButton)
-      const modal = within(await canvas.findByRole('dialog'))
-
-      const confirmEditButton = await modal.findByRole('button', {
-        name: 'Continue'
-      })
-
-      await userEvent.click(confirmEditButton)
 
       const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
@@ -482,9 +475,6 @@ export const ChangeFieldInReview: Story = {
       )
 
       await userEvent.click(surnameChangeButton)
-
-      const continueButton = await canvas.findByText('Continue')
-      await userEvent.click(continueButton)
     })
 
     await step('Change input field value', async () => {
