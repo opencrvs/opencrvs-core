@@ -10,7 +10,6 @@
  */
 import * as z from 'zod/v4'
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { ActionConfig } from './ActionConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import { findAllFields, getDeclarationFields } from './utils'
@@ -180,15 +179,19 @@ export function validateActionOrder(
 /**
  * Runs on both the `defineConfig` input and the parsed `EventConfig`.
  *
- * @returns whether the event has a DECLARE action.
+ * @returns whether the event has exactly one DECLARE action.
  */
-export function validateHasDeclareAction<
+export function validateExactlyOneDeclareAction<
   T extends { id: string; actions: Array<{ type: string }> }
 >(event: T, ctx: z.RefinementCtx<T>): boolean {
-  if (!event.actions.some((action) => action.type === ActionType.DECLARE)) {
+  const declareActionCount = event.actions.filter(
+    (action) => action.type === ActionType.DECLARE
+  ).length
+
+  if (declareActionCount !== 1) {
     ctx.addIssue({
       code: 'custom',
-      message: `Event must have a ${ActionType.DECLARE} action. Found none for event ${event.id}`,
+      message: `Event must have exactly one ${ActionType.DECLARE} action. Found ${declareActionCount} for event ${event.id}`,
       path: ['actions']
     })
     return false
@@ -198,106 +201,37 @@ export function validateHasDeclareAction<
 }
 
 /**
- * Identifies an action across its versions. Custom actions are keyed apart from core
- * actions, so a custom action whose `customActionType` matches a core action type
- * (e.g. 'DECLARE') is not taken for a version of it.
- */
-function getActionVersionKey(action: ActionConfig) {
-  return action.type === ActionType.CUSTOM
-    ? `${ActionType.CUSTOM}.${action.customActionType}`
-    : action.type
-}
-
-function describeAction(action: ActionConfig) {
-  return action.type === ActionType.CUSTOM
-    ? `Custom action '${action.customActionType}'`
-    : `Action '${action.type}'`
-}
-
-/**
- * Versions of an action are told apart by `effectiveFrom`, so no two versions
- * may share one, and at most one may omit it (effective from the beginning of time).
- */
-export function validateActionVersions(
-  event: EventConfig,
-  ctx: z.RefinementCtx<EventConfig>
-) {
-  const seenEffectiveFroms = new Map<string, Set<string | undefined>>()
-
-  event.actions.forEach((action, index) => {
-    const key = getActionVersionKey(action)
-    const effectiveFroms =
-      seenEffectiveFroms.get(key) ?? new Set<string | undefined>()
-    seenEffectiveFroms.set(key, effectiveFroms)
-
-    if (!effectiveFroms.has(action.effectiveFrom)) {
-      effectiveFroms.add(action.effectiveFrom)
-      return
-    }
-
-    ctx.addIssue({
-      code: 'custom',
-      message: action.effectiveFrom
-        ? `${describeAction(action)} of event '${event.id}' has more than one version with \`effectiveFrom\` '${action.effectiveFrom}'. Each version must have a different \`effectiveFrom\`.`
-        : `${describeAction(action)} of event '${event.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`,
-      path: ['actions', index, 'effectiveFrom']
-    })
-  })
-}
-
-/**
- * `declaration` must be given exactly once for every version of the DECLARE action:
- * at the top level (kept for backwards compatibility, and then shared by every version)
- * or on every version itself. Mixing the two is rejected.
+ * `declaration` must be given exactly once: at the top level (kept for backwards
+ * compatibility) or on the DECLARE action.
  */
 export function validateDeclarationGivenExactlyOnce(
   config: EventConfigInput,
   ctx: z.RefinementCtx<EventConfigInput>
 ) {
-  const declareVersions = config.actions.flatMap((action, index) =>
-    action.type === ActionType.DECLARE ? [{ action, index }] : []
+  const declareActionIndex = config.actions.findIndex(
+    (action) => action.type === ActionType.DECLARE
   )
-  const withDeclaration = declareVersions.filter(
-    ({ action }) => !!action.declaration
-  )
-  const withoutDeclaration = declareVersions.filter(
-    ({ action }) => !action.declaration
-  )
+  const declareAction = config.actions[declareActionIndex]
+  const onDeclareAction =
+    declareAction.type === ActionType.DECLARE && !!declareAction.declaration
   const onTopLevel = !!config.declaration
-  const isVersioned = declareVersions.length > 1
+  const declareActionPath = `actions[${declareActionIndex}].declaration`
 
-  const describe = (versions: typeof declareVersions) =>
-    versions
-      .map(({ action, index }) =>
-        !isVersioned
-          ? `\`actions[${index}].declaration\``
-          : `\`actions[${index}].declaration\` (${action.effectiveFrom ? `\`effectiveFrom\` '${action.effectiveFrom}'` : 'no `effectiveFrom`'})`
-      )
-      .join(', ')
-
-  if (onTopLevel && withDeclaration.length > 0) {
+  if (onTopLevel && onDeclareAction) {
     ctx.addIssue({
       code: 'custom',
-      message: !isVersioned
-        ? `Event '${config.id}' defines \`declaration\` both at the top level and on the ${ActionType.DECLARE} action (${describe(withDeclaration)}). Define it in only one of these places.`
-        : `Event '${config.id}' defines \`declaration\` both at the top level and on versions of the ${ActionType.DECLARE} action (${describe(withDeclaration)}). Define it either only at the top level, to share it across every version, or on every version and not at the top level.`,
+      message: `Event '${config.id}' defines \`declaration\` both at the top level and on the ${ActionType.DECLARE} action (\`${declareActionPath}\`). Define it in only one of these places.`,
       path: ['declaration']
     })
-    return
   }
 
-  if (onTopLevel || withoutDeclaration.length === 0) {
-    return
+  if (!onTopLevel && !onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' does not define \`declaration\`. Define it either at the top level or on the ${ActionType.DECLARE} action (\`${declareActionPath}\`).`,
+      path: ['declaration']
+    })
   }
-
-  ctx.addIssue({
-    code: 'custom',
-    message:
-      withDeclaration.length > 0
-        ? `Event '${config.id}' defines \`declaration\` on some versions of the ${ActionType.DECLARE} action but not on ${describe(withoutDeclaration)}. Define it on every version, or remove it from every version and define it once at the top level.`
-        : `Event '${config.id}' does not define \`declaration\`. Define it either at the top level or on ${isVersioned ? 'every version of ' : ''}the ${ActionType.DECLARE} action (${describe(withoutDeclaration)}).`,
-    path: ['declaration']
-  })
 }
 
 /**

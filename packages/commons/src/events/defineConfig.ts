@@ -15,12 +15,12 @@ import { ActionType } from './ActionType'
 import { generateNotifyReview } from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
-  validateHasDeclareAction
+  validateExactlyOneDeclareAction
 } from './eventConfigValidation'
 
 /**
  * Moves a top-level `declaration` onto the DECLARE action, where `EventConfig` expects it.
- * Expects the input to have a DECLARE action, and `declaration` in only one place for each of its versions.
+ * Expects the input to have exactly one DECLARE action, and `declaration` in only one place.
  */
 function moveDeclarationToDeclareAction({
   declaration,
@@ -128,7 +128,7 @@ function generateNotificationFormFallback(
 const EventConfigDefinition = z
   .custom<EventConfigInput>()
   .superRefine((config, ctx) => {
-    if (validateHasDeclareAction(config, ctx)) {
+    if (validateExactlyOneDeclareAction(config, ctx)) {
       validateDeclarationGivenExactlyOnce(config, ctx)
     }
   })
