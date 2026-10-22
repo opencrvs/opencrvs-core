@@ -144,6 +144,7 @@ A role should hold either `record.notify` or `record.declare` for an event type,
 Update the client translations:
 
 - Rename `user.profile.audit.description.inProgress` to `user.profile.audit.description.notified` ("Notified").
+- Rename `review.declare.incomplete.confirmModal.title` to `review.notify.confirmModal.title` ("Notify event?").
 - Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
 - `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
 

@@ -76,9 +76,9 @@ function useNotificationActions(event: EventDocument) {
           notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
         fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
         title: {
-          id: 'review.declare.incomplete.confirmModal.title',
+          id: 'review.notify.confirmModal.title',
           defaultMessage: 'Notify the {event}?',
-          description: 'The title for review action modal when declaring'
+          description: 'The title for review action modal when notifying'
         },
         onConfirm: (values) =>
           events.actions.notify.mutate({

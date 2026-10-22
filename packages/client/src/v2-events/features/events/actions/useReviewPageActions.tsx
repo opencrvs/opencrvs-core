@@ -139,7 +139,8 @@ export function useReviewPageActions(
     )
 
     if (modalResult) {
-      action.onConfirm(modalResult.values)
+      // Don't await the action.onConfirm call to avoid blocking the UI.
+      void action.onConfirm(modalResult.values)
       return closeActionView(backTo)
     }
   }
