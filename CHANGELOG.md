@@ -107,6 +107,36 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
+#### Event configurations are versioned with `effectiveFrom`
+
+An event configuration can now have several versions, each effective from a date. `defineConfig` takes them under `versions`, and fields shared by every version (`id`, `label`, `advancedSearch`) stay at the top level:
+
+```ts
+defineConfig({
+  id: 'birth',
+  label: { ... },
+  versions: [
+    { id: 'v1', actions: [ ... ] },
+    { id: 'v2', effectiveFrom: '2027-01-01', actions: [ ... ] }
+  ]
+})
+```
+
+A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event. For now, the first version applies to every record.
+
+`defineConfig` still accepts a flat configuration and wraps it in a single version, so existing event configurations need no change. It now returns a `VersionedEventConfig` instead of an `EventConfig`, though, so code that reads a version's fields off its result stops compiling:
+
+| Before                                | After                                                     |
+| ------------------------------------- | --------------------------------------------------------- |
+| `birthEvent.actions`                  | `resolveEventConfig(birthEvent).actions`                  |
+| `getCurrentEventState(e, birthEvent)` | `getCurrentEventState(e, resolveEventConfig(birthEvent))` |
+
+Core 2.2 reads event configurations only in the versioned shape, so a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading. Upgrade core and the country config together.
+
+`opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601)
+
 #### The `incomplete` flag is removed
 
 `InherentFlags.INCOMPLETE` mirrored the `NOTIFIED` status, so it has been removed [#13985](https://github.com/opencrvs/opencrvs-core/issues/13985). References to `InherentFlags.INCOMPLETE` no longer compile. References written as the string `'incomplete'` (for example in encoded scope strings such as `record.read[flags=incomplete]`) still parse, but match nothing. Switch to the `NOTIFIED` status instead (`status` in workqueues and scope options, `event.status` in conditionals).
