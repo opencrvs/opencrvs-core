@@ -54,7 +54,7 @@ export function useFlagLabelsString(
 ): string {
   const intl = useIntl()
   return flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
+    .filter((flag) => !ActionFlag.validate(flag))
     .map((flag) => {
       if (flag in flagMessages) {
         return intl.formatMessage(flagMessages[flag as InherentFlags])

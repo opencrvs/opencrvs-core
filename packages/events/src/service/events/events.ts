@@ -40,8 +40,10 @@ import {
   getStatusFromActions,
   isActionVisible,
   isActionEnabled,
-  isWriteAction
+  isWriteAction,
+  isFileFieldValue
 } from '@opencrvs/commons/events'
+
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 import {
@@ -90,11 +92,12 @@ function getValidFileValue(
 ) {
   const isFileType =
     fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
-  const validFieldValue = FileFieldValue.safeParse(fieldValue)
-  if (!isFileType || !validFieldValue.success) {
+
+  if (!isFileType || !isFileFieldValue(fieldValue)) {
     return undefined
   }
-  return validFieldValue.data
+
+  return fieldValue
 }
 
 /**

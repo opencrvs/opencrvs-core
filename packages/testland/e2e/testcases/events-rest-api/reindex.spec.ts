@@ -21,7 +21,7 @@ import { getToken } from '@e2e/support/helpers'
 const EVENTS_URL = `${GATEWAY_HOST}/events/events`
 
 /** How often (ms) to poll the status endpoint */
-const POLL_INTERVAL_MS = 3_000
+const POLL_INTERVAL_MS = 1_000
 /** Maximum time (ms) to wait for reindex to complete (3 minutes) */
 const MAX_WAIT_MS = 3 * 60 * 1000
 
@@ -108,12 +108,8 @@ test.describe('Events reindex API', () => {
 
     // Poll until the reindex completes or fails
     const deadline = Date.now() + MAX_WAIT_MS
-    let firstPoll = true
-
     while (Date.now() < deadline) {
-      // Short initial wait, then regular interval
-      await sleep(firstPoll ? 3_000 : POLL_INTERVAL_MS)
-      firstPoll = false
+      await sleep(POLL_INTERVAL_MS)
 
       const run = await fetchLatestRunSince(token, triggerTime)
 

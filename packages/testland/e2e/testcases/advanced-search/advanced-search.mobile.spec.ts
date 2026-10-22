@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, login } from '@e2e/support/helpers'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -19,61 +19,53 @@ import { setMobileViewport } from '@e2e/support/mobile-helpers'
 import { format, subDays } from 'date-fns'
 import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 
-test.describe.serial('Advanced Search - Mobile', () => {
-  let page: Page
+test('Advanced Search - Mobile', async ({ page }) => {
   let province = ''
   let district = ''
   let village = ''
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    await setMobileViewport(page)
-    const token = await getToken(CREDENTIALS.REGISTRAR_VILLAGE)
+  await setMobileViewport(page)
+  const token = await getToken(CREDENTIALS.REGISTRAR_VILLAGE)
 
-    const administrativeAreas = await getAdministrativeAreas(token)
-    province = getIdByName(administrativeAreas, 'Central')!
-    district = getIdByName(administrativeAreas, 'Ibombo')!
-    village = getIdByName(administrativeAreas, 'Klow')!
+  const administrativeAreas = await getAdministrativeAreas(token)
+  province = getIdByName(administrativeAreas, 'Central')!
+  district = getIdByName(administrativeAreas, 'Ibombo')!
+  village = getIdByName(administrativeAreas, 'Klow')!
 
-    if (!province || !district || !village) {
-      throw new Error('Province, district or village not found')
-    }
+  if (!province || !district || !village) {
+    throw new Error('Province, district or village not found')
+  }
 
-    const toDate = format(new Date(), 'yyyy-MM-dd')
-    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
-    const fromDate = format(
-      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
-      'yyyy-MM-dd'
-    )
-    await createDeclaration(
-      token,
-      {
-        'child.dob': faker.date
-          .between({ from: fromDate, to: toDate })
-          .toISOString()
-          .split('T')[0],
-        'child.placeOfBirth': 'PRIVATE_HOME',
-        'child.birthLocation.privateHome': {
-          country: 'FAR',
-          addressType: 'DOMESTIC',
-          administrativeArea: village,
-          streetLevelDetails: { town: 'Dhaka' }
-        },
-        'child.gender': 'female'
+  const toDate = format(new Date(), 'yyyy-MM-dd')
+  // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+  const fromDate = format(
+    subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+    'yyyy-MM-dd'
+  )
+  await createDeclaration(
+    token,
+    {
+      'child.dob': faker.date
+        .between({ from: fromDate, to: toDate })
+        .toISOString()
+        .split('T')[0],
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC',
+        administrativeArea: village,
+        streetLevelDetails: { town: 'Dhaka' }
       },
-      'REGISTER',
-      'PRIVATE_HOME'
-    )
-  })
+      'child.gender': 'female'
+    },
+    'REGISTER',
+    'PRIVATE_HOME'
+  )
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Login', async () => {
+  await test.step('Login', async () => {
     await login(page, CREDENTIALS.REGISTRAR_VILLAGE)
   })
 
-  test('Navigate to advanced search', async () => {
+  await test.step('Navigate to advanced search', async () => {
     await page
       .getByRole('button', { name: 'Go to search', exact: true })
       .click()
@@ -82,7 +74,7 @@ test.describe.serial('Advanced Search - Mobile', () => {
     await expectInUrl(page, '/advanced-search')
   })
 
-  test('Fill search fields', async () => {
+  await test.step('Fill search fields', async () => {
     await page.getByText('Birth').click()
     await page.getByText('Event details').click()
 
@@ -110,7 +102,7 @@ test.describe.serial('Advanced Search - Mobile', () => {
       .blur()
   })
 
-  test('Search', async () => {
+  await test.step('Search', async () => {
     await page.click('#search')
     await expect(page).toHaveURL(/.*\/search-result/)
 

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionStatus, ActionType } from '@opencrvs/toolkit/events'
@@ -27,19 +27,10 @@ import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
  * drafts workqueue has synced it — without the user first opening the record's
  * event overview while online.
  */
-test.describe.serial('Draft created on another device syncs in full', () => {
-  let page: Page
+test('Draft created on another device syncs in full', async ({ page }) => {
   let childName: string
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Device A logs in and goes offline', async () => {
+  await test.step('Device A logs in and goes offline', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     await expect(page.getByText('Farajaland CRS')).toBeVisible({
       timeout: 30000
@@ -48,7 +39,7 @@ test.describe.serial('Draft created on another device syncs in full', () => {
     await mockNetworkConditions(page, 'offline')
   })
 
-  test('Device B creates a draft', async () => {
+  await test.step('Device B creates a draft', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
     const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
 
@@ -69,7 +60,7 @@ test.describe.serial('Draft created on another device syncs in full', () => {
     })
   })
 
-  test('Device A comes back online and the draft syncs', async () => {
+  await test.step('Device A comes back online and the draft syncs', async () => {
     await restoreNetworkConditions(page)
 
     await page.getByRole('button', { name: 'Drafts' }).click()
@@ -85,7 +76,7 @@ test.describe.serial('Draft created on another device syncs in full', () => {
     ).toBeVisible({ timeout: 30000 })
   })
 
-  test('Device A opens the synced draft offline', async () => {
+  await test.step('Device A opens the synced draft offline', async () => {
     await mockNetworkConditions(page, 'offline')
     await openRecordByTitle(page, childName)
 
@@ -93,7 +84,7 @@ test.describe.serial('Draft created on another device syncs in full', () => {
     await expect(page.locator('#suspense-offline-message')).toBeHidden()
   })
 
-  test('The draft shows in full without having been opened online', async () => {
+  await test.step('The draft shows in full without having been opened online', async () => {
     await expect(page.getByTestId('informant.contact-value')).toHaveText(
       'mothers@email.com'
     )

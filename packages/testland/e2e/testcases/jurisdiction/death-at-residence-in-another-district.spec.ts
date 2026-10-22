@@ -46,9 +46,7 @@ async function selectAdministrativeArea(page: Page, id: string, name: string) {
  * whose `record.create` placeOfEvent is unrestricted — an administrative area
  * bound registrar cannot pick a usual residence at all.
  */
-test.describe.serial('Death at a usual residence in another district', () => {
-  let page: Page
-
+test('Death at a usual residence in another district', async ({ page }) => {
   const declaration = {
     deceased: {
       name: {
@@ -91,15 +89,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
     ' ' +
     declaration.deceased.name.surname
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Registrar General starts a death declaration', async () => {
+  await test.step('Registrar General starts a death declaration', async () => {
     await login(page, CREDENTIALS.REGISTRAR_GENERAL)
 
     await page.click('#header-new-event')
@@ -108,7 +98,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Fill deceased details, with a usual residence in Isamba', async () => {
+  await test.step('Fill deceased details, with a usual residence in Isamba', async () => {
     await page.locator('#firstname').fill(declaration.deceased.name.firstname)
     await page.locator('#surname').fill(declaration.deceased.name.surname)
 
@@ -146,7 +136,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
     await continueForm(page)
   })
 
-  test('Record the death as having happened at that residence', async () => {
+  await test.step('Record the death as having happened at that residence', async () => {
     await page.getByPlaceholder('dd').fill(declaration.eventDetails.date.dd)
     await page.getByPlaceholder('mm').fill(declaration.eventDetails.date.mm)
     await page.getByPlaceholder('yyyy').fill(declaration.eventDetails.date.yyyy)
@@ -159,7 +149,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
     await continueForm(page)
   })
 
-  test('Fill informant details', async () => {
+  await test.step('Fill informant details', async () => {
     await page.locator('#informant____relation').click()
     await page
       .getByText(declaration.informant.relation, { exact: true })
@@ -173,7 +163,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
     await continueForm(page)
   })
 
-  test('Fill spouse details', async () => {
+  await test.step('Fill spouse details', async () => {
     await page.locator('#firstname').fill(declaration.spouse.name.firstname)
     await page.locator('#surname').fill(declaration.spouse.name.surname)
 
@@ -187,7 +177,7 @@ test.describe.serial('Death at a usual residence in another district', () => {
     await continueForm(page)
   })
 
-  test('Sign the declaration', async () => {
+  await test.step('Sign the declaration', async () => {
     await goToSection(page, 'review')
 
     await page.locator('#review____comment').fill(declaration.review.comment)
@@ -199,11 +189,11 @@ test.describe.serial('Death at a usual residence in another district', () => {
       .click()
   })
 
-  test('Declare', async () => {
+  await test.step('Declare', async () => {
     await triggerDeclarationAction(page, 'Declare')
   })
 
-  test('The Isamba registrar finds the declaration', async () => {
+  await test.step('The Isamba registrar finds the declaration', async () => {
     await login(page, CREDENTIALS.REGISTRAR_ISAMBA)
 
     await searchFromSearchBar(page, deceasedName)
