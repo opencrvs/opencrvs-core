@@ -10,17 +10,17 @@
  */
 
 import { initTRPC, TRPCError } from '@trpc/server'
-import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { env } from '@events/environment'
+import { transformer } from './serialization'
 
 export const t = initTRPC
   .context<TrpcContext>()
   .meta<OpenApiMeta>()
   .create({
-    transformer: superjson,
+    transformer,
     errorFormatter: ({ shape, error }) => {
       // If received unhandled error, don't leak the error message or stack trace in the response.
       // This is a security measure: the message or stack trace could contain internal technical details etc. sensitive information.
