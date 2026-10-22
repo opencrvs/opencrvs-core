@@ -14,8 +14,7 @@ import {
   EventDocument,
   EventState,
   getCurrentEventState,
-  getEventValidatorContext,
-  getNotificationForm
+  getEventValidatorContext
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -23,7 +22,10 @@ import {
   deleteLocalEvent,
   findLocalEventDocument
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   deleteLocalEventAndToastOnDuplicate,
@@ -181,11 +183,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({
           eventConfiguration,
-          // "Notify with edits" ends in a NOTIFY, which is validated against the notification form
-          form:
-            mutationName === 'editAndNotify'
-              ? getNotificationForm(eventConfiguration)
-              : undefined,
+          form: getSubmissionForm(eventConfiguration, mutationName),
           originalDeclaration,
           declarationDiff: params.declaration,
           validatorContext: {

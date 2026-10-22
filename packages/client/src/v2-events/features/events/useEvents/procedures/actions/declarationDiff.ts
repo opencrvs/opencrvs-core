@@ -18,8 +18,10 @@ import {
   EventState,
   FieldConfig,
   FieldUpdateValue,
+  ActionType,
   getDeclaration,
   getDeclarationFields,
+  getNotificationForm,
   isFieldVisible,
   omitHiddenFields,
   omitHiddenPaginatedFields,
@@ -80,6 +82,25 @@ export function hasDeclarationFieldChanged(
     previousFormValues,
     validatorContext
   )
+}
+
+/** Submissions that end in a NOTIFY: the NOTIFY action itself, and "Notify with edits". */
+const NOTIFY_SUBMISSIONS = new Set<string>([ActionType.NOTIFY, 'editAndNotify'])
+
+/**
+ * Form a submitted declaration is cleaned against, see `getCleanedDeclarationDiff`.
+ * A NOTIFY is validated against the notification form, whose field visibility can differ
+ * from the declaration form. Other submissions use the declaration form (`undefined`).
+ *
+ * @param submission action type, or custom mutation name, of the submission
+ */
+export function getSubmissionForm(
+  eventConfiguration: EventConfig,
+  submission: string
+) {
+  return NOTIFY_SUBMISSIONS.has(submission)
+    ? getNotificationForm(eventConfiguration)
+    : undefined
 }
 
 /**

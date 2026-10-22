@@ -25,8 +25,7 @@ import {
   deepMerge,
   getCurrentEventState,
   getEventValidatorContext,
-  getActionConfig,
-  getNotificationForm
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -37,7 +36,10 @@ import {
   deleteLocalEvent,
   onMarkNotDuplicate
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
@@ -387,11 +389,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       eventId,
       declaration: getCleanedDeclarationDiff({
         eventConfiguration,
-        // NOTIFY is validated against the notification form, whose field visibility can differ from the declaration form
-        form:
-          actionType === ActionType.NOTIFY
-            ? getNotificationForm(eventConfiguration)
-            : undefined,
+        form: getSubmissionForm(eventConfiguration, actionType),
         originalDeclaration,
         declarationDiff: params.declaration,
         validatorContext: {

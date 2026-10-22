@@ -53,8 +53,7 @@ const eventConfigWithNotifyConfig = {
           defaultMessage:
             'This will notify the health worker responsible for this record.',
           description: 'Supporting copy shown in the notify confirmation dialog'
-        },
-        flags: [{ id: 'health-worker-notified', operation: 'add' as const }]
+        }
       }
     }
     return action
