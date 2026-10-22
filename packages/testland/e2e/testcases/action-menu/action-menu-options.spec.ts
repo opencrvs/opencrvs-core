@@ -18,7 +18,8 @@ import {
 } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { archiveViaApi } from '@e2e/support/test-data/api-actions'
 
 async function getActionMenuOptions(page: Page, declaration: Declaration) {
   await searchFromSearchBar(page, formatV2ChildName(declaration))
@@ -30,17 +31,18 @@ async function getActionMenuOptions(page: Page, declaration: Declaration) {
   return textContents
 }
 
+/** Retries until the menu settles, as it may still re-render after an action. */
+async function expectActionMenuOptions(
+  page: Page,
+  declaration: Declaration,
+  expected: string[]
+) {
+  await searchFromSearchBar(page, formatV2ChildName(declaration))
+  await page.getByRole('button', { name: 'Action', exact: true }).click()
+  await expect(page.locator('#action-Dropdown-Content li')).toHaveText(expected)
+}
+
 test.describe('Action menu options', () => {
-  let page: Page
-
-  test.beforeEach(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterEach(async () => {
-    await page.close()
-  })
-
   test.describe('Event status: DECLARED', () => {
     let declaration: Declaration
 
@@ -50,7 +52,7 @@ test.describe('Action menu options', () => {
       declaration = res.declaration
     })
 
-    test('Registration Officer', async () => {
+    test('Registration Officer', async ({ page }) => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
       const options = await getActionMenuOptions(page, declaration)
       expect(options).toStrictEqual([
@@ -63,7 +65,7 @@ test.describe('Action menu options', () => {
       ])
     })
 
-    test('Registrar', async () => {
+    test('Registrar', async ({ page }) => {
       await login(page, CREDENTIALS.REGISTRAR)
       const options = await getActionMenuOptions(page, declaration)
       expect(options).toStrictEqual([
@@ -86,7 +88,7 @@ test.describe('Action menu options', () => {
       declaration = res.declaration
     })
 
-    test('Registrar', async () => {
+    test('Registrar', async ({ page }) => {
       await login(page, CREDENTIALS.REGISTRAR)
       const options = await getActionMenuOptions(page, declaration)
       expect(options).toStrictEqual([
@@ -109,7 +111,7 @@ test.describe('Action menu options', () => {
       declaration = res.declaration
     })
 
-    test('Registrar', async () => {
+    test('Registrar', async ({ page }) => {
       await login(page, CREDENTIALS.REGISTRAR)
       const options = await getActionMenuOptions(page, declaration)
       expect(options).toStrictEqual([
@@ -121,7 +123,7 @@ test.describe('Action menu options', () => {
       ])
     })
 
-    test('Registrar (assigned)', async () => {
+    test('Registrar (assigned)', async ({ page }) => {
       await login(page, CREDENTIALS.REGISTRAR)
       await searchFromSearchBar(page, formatV2ChildName(declaration))
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
@@ -141,40 +143,34 @@ test.describe('Action menu options', () => {
     })
   })
 
-  test.describe.serial('Event status: ARCHIVED', async () => {
-    let declaration: Declaration
+  test('Event status: ARCHIVED', async ({ page }) => {
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+    const { declaration, eventId } = await createDeclaration(
+      token,
+      undefined,
+      ActionType.DECLARE
+    )
 
-    test.beforeAll(async () => {
-      const token = await getToken(CREDENTIALS.REGISTRAR)
-      const res = await createDeclaration(token, undefined, ActionType.DECLARE)
-      declaration = res.declaration
+    await test.step('Archive declaration via API', async () => {
+      await archiveViaApi(token, eventId)
     })
 
-    test('Archive declaration', async () => {
+    await test.step('Registrar', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
-      await searchFromSearchBar(page, formatV2ChildName(declaration))
-
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-      await selectAction(page, 'Archive')
-
-      const archiveResponse = page.waitForResponse(
-        (res) => res.url().includes('event.actions.archive') && res.ok()
-      )
-
-      await page.getByRole('button', { name: 'Archive' }).click()
-      await archiveResponse
+      await expectActionMenuOptions(page, declaration, [
+        'Assign',
+        'Escalate',
+        'Unarchive'
+      ])
     })
 
-    test('Registrar', async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-      const options = await getActionMenuOptions(page, declaration)
-      expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
-    })
-
-    test('Registration Officer', async () => {
+    await test.step('Registration Officer', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-      const options = await getActionMenuOptions(page, declaration)
-      expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
+      await expectActionMenuOptions(page, declaration, [
+        'Assign',
+        'Escalate',
+        'Unarchive'
+      ])
     })
   })
 })

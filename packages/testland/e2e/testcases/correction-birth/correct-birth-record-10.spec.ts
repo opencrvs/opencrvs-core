@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   formatDateTo_dMMMMyyyy,
   formatName,
@@ -40,50 +40,35 @@ import { getMixedPath } from '@opencrvs/toolkit/events'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test.describe('10. Correct record', () => {
-  let declaration: Declaration
-  let eventId: string
-  let trackingId: string | undefined
-  let token: string
+  test('10.1 Record correction by someone else', async ({ page }) => {
+    const updatedChildDetails = {
+      firstNames: faker.person.firstName('male'),
+      familyName: faker.person.firstName('male'),
+      gender: 'Male',
+      birthDate: format(
+        subDays(new Date(), Math.ceil(15 * Math.random()) + 5),
+        'yyyy-MM-dd'
+      ),
+      birthLocation: 'Ibombo District Hospital',
+      attendantAtBirth: 'Nurse',
+      typeOfBirth: 'Twin',
+      weightAtBirth: '3.1'
+    }
 
-  const updatedChildDetails = {
-    firstNames: faker.person.firstName('male'),
-    familyName: faker.person.firstName('male'),
-    gender: 'Male',
-    birthDate: format(
-      subDays(new Date(), Math.ceil(15 * Math.random()) + 5),
-      'yyyy-MM-dd'
-    ),
-    birthLocation: 'Ibombo District Hospital',
-    attendantAtBirth: 'Nurse',
-    typeOfBirth: 'Twin',
-    weightAtBirth: '3.1'
-  }
-
-  test.beforeAll(async () => {
-    token = await getToken(CREDENTIALS.REGISTRAR)
+    const token = await getToken(CREDENTIALS.REGISTRAR)
     const res = await createDeclaration(
       token,
       undefined,
       undefined,
       'HEALTH_FACILITY'
     )
-    declaration = res.declaration
-    eventId = res.eventId
-    trackingId = res.trackingId
-  })
+    const declaration: Declaration = res.declaration
+    const eventId: string = res.eventId
+    const trackingId: string | undefined = res.trackingId
 
-  test.describe.serial('10.1 Record correction by someone else', async () => {
-    let page: Page
     let childBirthLocationName: string | undefined
 
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
     const nationalId = faker.string.numeric(10)
 
@@ -95,7 +80,7 @@ test.describe('10. Correct record', () => {
     const relationship = 'Niece'
     const reason = faker.lorem.sentence(8)
 
-    test('10.0.0 Navigate to record correction', async () => {
+    await test.step('10.0.0 Navigate to record correction', async () => {
       await page.getByRole('button', { name: 'Pending certification' }).click()
 
       await openRecordByTitle(page, formatV2ChildName(declaration))
@@ -103,7 +88,7 @@ test.describe('10. Correct record', () => {
       await selectAction(page, 'Correct')
     })
 
-    test('10.1.0 Correction details', async () => {
+    await test.step('10.1.0 Correction details', async () => {
       await expect(page.locator('#requester____type_error')).not.toBeVisible()
       await expect(page.locator('#reason____option_error')).not.toBeVisible()
 
@@ -148,7 +133,7 @@ test.describe('10. Correct record', () => {
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('10.1.1 Verify identity', async () => {
+    await test.step('10.1.1 Verify identity', async () => {
       await page.getByRole('button', { name: 'Verified' }).click()
 
       /*
@@ -160,7 +145,7 @@ test.describe('10. Correct record', () => {
       )
     })
 
-    test('10.1.2 Upload supporting documents', async () => {
+    await test.step('10.1.2 Upload supporting documents', async () => {
       const imageUploadSectionTitles = ['Affidavit', 'Court Document', 'Other']
 
       for (const sectionTitle of imageUploadSectionTitles) {
@@ -174,7 +159,7 @@ test.describe('10. Correct record', () => {
 
     const fee = faker.number.int({ min: 1, max: 1000 })
 
-    test('10.1.3 Fees', async () => {
+    await test.step('10.1.3 Fees', async () => {
       await expectInUrl(
         page,
         `/events/request-correction/${eventId}/onboarding/fees`
@@ -191,8 +176,8 @@ test.describe('10. Correct record', () => {
       await expectInUrl(page, `/events/request-correction/${eventId}/review`)
     })
 
-    test.describe('10.1.4 Correction made on child details', async () => {
-      test('10.1.4.1 Change name', async () => {
+    await test.step('10.1.4 Correction made on child details', async () => {
+      await test.step('10.1.4.1 Change name', async () => {
         await page.getByTestId('change-button-child.name').click()
 
         /*
@@ -238,7 +223,7 @@ test.describe('10. Correct record', () => {
         ).toBeVisible()
       })
 
-      test('10.1.4.2 Change gender', async () => {
+      await test.step('10.1.4.2 Change gender', async () => {
         await page.getByTestId('change-button-child.gender').click()
 
         /*
@@ -280,7 +265,7 @@ test.describe('10. Correct record', () => {
         ).toBeVisible()
       })
 
-      test('10.1.4.3 Change date of birth', async () => {
+      await test.step('10.1.4.3 Change date of birth', async () => {
         await page.getByTestId('change-button-child.dob').click()
 
         /*
@@ -321,7 +306,7 @@ test.describe('10. Correct record', () => {
         ).toBeVisible()
       })
 
-      test('10.1.4.4 Change place of delivery', async () => {
+      await test.step('10.1.4.4 Change place of delivery', async () => {
         await page.getByTestId('change-button-child.placeOfBirth').click()
 
         /*
@@ -370,7 +355,7 @@ test.describe('10. Correct record', () => {
         ).toBeVisible()
       })
 
-      test('10.1.4.5 Change attendant at birth', async () => {
+      await test.step('10.1.4.5 Change attendant at birth', async () => {
         await page.getByTestId('change-button-child.attendantAtBirth').click()
 
         /*
@@ -409,7 +394,7 @@ test.describe('10. Correct record', () => {
         ).toBeVisible()
       })
 
-      test('10.1.4.6 Change type of birth', async () => {
+      await test.step('10.1.4.6 Change type of birth', async () => {
         await page.getByTestId('change-button-child.birthType').click()
 
         /*
@@ -449,8 +434,8 @@ test.describe('10. Correct record', () => {
       })
     })
 
-    test.describe('10.1.5 Correction summary', async () => {
-      test('10.1.5.1 Go back to review', async () => {
+    await test.step('10.1.5 Correction summary', async () => {
+      await test.step('10.1.5.1 Go back to review', async () => {
         await page
           .getByRole('button', { name: 'Continue', exact: true })
           .click()
@@ -470,7 +455,7 @@ test.describe('10. Correct record', () => {
         await expectInUrl(page, `/events/request-correction/${eventId}/review`)
       })
 
-      test('10.1.5.2 Change weight at birth', async () => {
+      await test.step('10.1.5.2 Change weight at birth', async () => {
         await page.getByTestId('change-button-child.weightAtBirth').click()
 
         /*
@@ -510,7 +495,7 @@ test.describe('10. Correct record', () => {
         ).toBeVisible()
       })
 
-      test('10.1.5.3 Validate information in correction summary page', async () => {
+      await test.step('10.1.5.3 Validate information in correction summary page', async () => {
         await page
           .getByRole('button', { name: 'Continue', exact: true })
           .click()
@@ -602,14 +587,10 @@ test.describe('10. Correct record', () => {
       })
     })
 
-    test.describe('10.1.6 Correction Approval', async () => {
-      test.beforeAll(async ({ browser }) => {
-        await page.close()
-        page = await browser.newPage()
-        await login(page, CREDENTIALS.REGISTRAR)
-      })
+    await test.step('10.1.6 Correction Approval', async () => {
+      await login(page, CREDENTIALS.REGISTRAR)
 
-      test('10.1.6.1 Record audit by Registrar', async () => {
+      await test.step('10.1.6.1 Record audit by Registrar', async () => {
         if (!trackingId) {
           throw new Error('Tracking ID is required')
         }
@@ -619,7 +600,7 @@ test.describe('10. Correct record', () => {
         await openRecordByTitle(page, formatV2ChildName(declaration))
       })
 
-      test('10.1.6.2 Correction review', async () => {
+      await test.step('10.1.6.2 Correction review', async () => {
         await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
         await selectAction(page, 'Review correction request')
 
@@ -648,7 +629,7 @@ test.describe('10. Correct record', () => {
         await expect(page.getByText('Fee total' + '$' + fee)).toBeVisible()
       })
 
-      test('10.1.6.3 Approve correction', async () => {
+      await test.step('10.1.6.3 Approve correction', async () => {
         await page.getByRole('button', { name: 'Approve', exact: true }).click()
 
         await waitForCorrectionAction(page, 'approve', async () => {
@@ -659,14 +640,17 @@ test.describe('10. Correct record', () => {
 
         await expectInUrl(page, `/events/${eventId}`)
       })
-      test.describe('10.1.6.4 Validate history in record audit', async () => {
-        test('10.1.6.4.0 Ensure record is assigned', async () => {
+      await test.step('10.1.6.4 Validate history in record audit', async () => {
+        await test.step('10.1.6.4.0 Ensure record is assigned', async () => {
           await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
         })
-        test('10.1.6.4.1 Validate correction requested modal', async () => {
+        await test.step('10.1.6.4.1 Validate correction requested modal', async () => {
           await page.getByRole('button', { name: 'Audit' }).click()
           await page
-            .getByRole('button', { name: 'Correction requested', exact: true })
+            .getByRole('button', {
+              name: 'Correction requested',
+              exact: true
+            })
             .click()
 
           await expect(
@@ -710,7 +694,7 @@ test.describe('10. Correct record', () => {
           await page.locator('#close-dialog').click()
         })
 
-        test('10.1.6.4.2 Validate correction approved modal', async () => {
+        await test.step('10.1.6.4.2 Validate correction approved modal', async () => {
           await page
             .getByRole('button', { name: 'Correction approved', exact: true })
             .click()

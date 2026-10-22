@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   auditRecord,
   getToken,
@@ -37,26 +37,19 @@ import {
 import { AddressType } from '@opencrvs/toolkit/events'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('Correct record - Change ages', () => {
+test('Correct record - Change ages', async ({ page }) => {
+  test.setTimeout(240_000)
+
   let declaration: Declaration
   let trackingId = ''
   let eventId = ''
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
 
   const motherAgeBefore = '28'
   const motherAgeAfter = '29'
   const informantAgeBefore = '16'
   const informantAgeAfter = '22'
 
-  test('Shortcut declaration', async () => {
+  await test.step('Shortcut declaration', async () => {
     let token = await getToken(CREDENTIALS.REGISTRAR)
 
     const administrativeAreas = await getAdministrativeAreas(token)
@@ -133,11 +126,11 @@ test.describe.serial('Correct record - Change ages', () => {
     declaration = res.declaration
   })
 
-  test('Login as Registration Officer', async () => {
+  await test.step('Login as Registration Officer', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
   })
 
-  test('Ready to correct record > record audit', async () => {
+  await test.step('Ready to correct record > record audit', async () => {
     await auditRecord({
       page,
       name: formatV2ChildName(declaration),
@@ -148,7 +141,7 @@ test.describe.serial('Correct record - Change ages', () => {
     await selectAction(page, 'Correct')
   })
 
-  test('Correction requester: legal guardian', async () => {
+  await test.step('Correction requester: legal guardian', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Legal Guardian', { exact: true }).click()
     await page.locator('#reason____option').click()
@@ -160,11 +153,11 @@ test.describe.serial('Correct record - Change ages', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Verify identity', async () => {
+  await test.step('Verify identity', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
   })
 
-  test('Upload supporting documents', async () => {
+  await test.step('Upload supporting documents', async () => {
     await expectInUrl(page, 'correction')
     await expectInUrl(page, 'onboarding/documents')
 
@@ -184,7 +177,7 @@ test.describe.serial('Correct record - Change ages', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Correction fee', async () => {
+  await test.step('Correction fee', async () => {
     await page
       .locator('#fees____amount')
       .fill(faker.number.int({ min: 1, max: 1000 }).toString())
@@ -195,7 +188,7 @@ test.describe.serial('Correct record - Change ages', () => {
     await expectInUrl(page, 'review')
   })
 
-  test('Change informant age', async () => {
+  await test.step('Change informant age', async () => {
     await page.getByTestId('change-button-informant.age').click()
 
     await page.getByTestId('age__informant____age').fill(informantAgeAfter)
@@ -213,7 +206,7 @@ test.describe.serial('Correct record - Change ages', () => {
     ).toBeVisible()
   })
 
-  test('Change mother address to international', async () => {
+  await test.step('Change mother address to international', async () => {
     await page.getByTestId('change-button-mother.address').click()
     await page.getByTestId('location__country').click()
     await page.getByText('Ethiopia').click()
@@ -245,7 +238,7 @@ test.describe.serial('Correct record - Change ages', () => {
     )
   })
 
-  test('Change mother age', async () => {
+  await test.step('Change mother age', async () => {
     await page.getByTestId('change-button-mother.age').click()
 
     await page.getByTestId('age__mother____age').fill(motherAgeAfter)
@@ -263,7 +256,7 @@ test.describe.serial('Correct record - Change ages', () => {
     ).toBeVisible()
   })
 
-  test('Correction summary', async () => {
+  await test.step('Correction summary', async () => {
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
     await expectInUrl(page, 'correction')
@@ -299,7 +292,7 @@ test.describe.serial('Correct record - Change ages', () => {
     ).toBeVisible()
   })
 
-  test('Submit correction request', async () => {
+  await test.step('Submit correction request', async () => {
     await page
       .getByRole('button', { name: 'Submit correction request' })
       .click()
@@ -314,21 +307,21 @@ test.describe.serial('Correct record - Change ages', () => {
     await correctionResponse
   })
 
-  test('Logout', async () => {
+  await test.step('Logout', async () => {
     await logout(page)
   })
 
-  test('Login as Registrar', async () => {
+  await test.step('Login as Registrar', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
   })
 
-  test('Find the event in the "Pending corrections" workqueue', async () => {
+  await test.step('Find the event in the "Pending corrections" workqueue', async () => {
     await page.getByRole('button', { name: 'Pending corrections' }).click()
 
     await openRecordByTitle(page, formatV2ChildName(declaration))
   })
 
-  test('Approve correction request', async () => {
+  await test.step('Approve correction request', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     await selectAction(page, 'Review correction request')
     await page.getByRole('button', { name: 'Approve', exact: true }).click()
@@ -338,7 +331,7 @@ test.describe.serial('Correct record - Change ages', () => {
     })
   })
 
-  test('View record', async () => {
+  await test.step('View record', async () => {
     await auditRecord({
       page,
       name: formatV2ChildName(declaration),

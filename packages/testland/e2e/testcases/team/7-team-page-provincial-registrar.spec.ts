@@ -16,19 +16,9 @@ import {
   verifyTeamMembers
 } from '@e2e/support/birth/helpers'
 
-test.describe.serial('7. Team Page -1', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test.describe('7.1 Basic UI check', async () => {
-    test('7.1.0 Verify UI', async () => {
+test('7. Team Page -1', async ({ page }) => {
+  await test.step('7.1 Basic UI check', async () => {
+    await test.step('7.1.0 Verify UI', async () => {
       await login(page, CREDENTIALS.PROVINCIAL_REGISTRAR)
       await page.getByRole('button', { name: 'Team' }).click()
       await expect(page.locator('#content-name')).toHaveText(
@@ -47,11 +37,11 @@ test.describe.serial('7. Team Page -1', () => {
       { name: 'Mitchel Owen', role: 'Provincial Registrar' }
     ]
 
-    test('7.1.1 Verify Team Members, Roles and their statuses', async () => {
+    await test.step('7.1.1 Verify Team Members, Roles and their statuses', async () => {
       await verifyTeamMembers(page, team)
     })
 
-    test('7.1.2 Verify team page member list', async () => {
+    await test.step('7.1.2 Verify team page member list', async () => {
       const members = ['Emmanuel Mayuka', 'Mitchel Owen']
 
       await verifyMembersClickable(page, members, 'Central Province Office')

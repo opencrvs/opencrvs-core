@@ -202,18 +202,17 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  const declarationActionParse = DeclarationActions.safeParse(actionType)
-
   // 6. Validate against action review fields and dialog form fields, if applicable.
   // Dialog form fields are validated with `required` relaxed: combined flows
   // (e.g. declare+register) only collect the final action's dialog fields, so
   // intermediate actions legitimately arrive without their own.
-  const reviewFields = declarationActionParse.success
+  const reviewFields = DeclarationActions.validate(actionType)
     ? [
-        ...getActionReviewFields(eventConfig, declarationActionParse.data),
-        ...getActionFormFields(eventConfig, declarationActionParse.data).map(
-          (formField) => ({ ...formField, required: false })
-        )
+        ...getActionReviewFields(eventConfig, actionType),
+        ...getActionFormFields(eventConfig, actionType).map((formField) => ({
+          ...formField,
+          required: false
+        }))
       ]
     : []
 
@@ -474,15 +473,13 @@ function validateAction({
     return
   }
 
-  const declarationUpdateAction = DeclarationUpdateActions.safeParse(input.type)
-
-  if (declarationUpdateAction.success) {
+  if (DeclarationUpdateActions.validate(input.type)) {
     throwWhenNotEmpty(
       validateDeclarationUpdateAction({
         eventConfig,
         declarationUpdate: input.declaration,
         annotation: input.annotation,
-        actionType: declarationUpdateAction.data,
+        actionType: input.type,
         context
       })
     )
@@ -490,14 +487,12 @@ function validateAction({
     return
   }
 
-  const annotationActionParse = annotationActions.safeParse(input.type)
-
-  if (annotationActionParse.success) {
+  if (annotationActions.validate(input.type)) {
     throwWhenNotEmpty(
       validateActionAnnotation({
         eventConfig,
         annotation: input.annotation,
-        actionType: annotationActionParse.data,
+        actionType: input.type,
         context
       })
     )

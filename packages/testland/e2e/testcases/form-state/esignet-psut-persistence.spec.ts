@@ -99,8 +99,6 @@ test.describe('E-Signet PSUT persistence', () => {
   })
 
   test('Declare birth with father E-Signet and confirm `sub` in backend payload', async () => {
-    test.setTimeout(180_000)
-
     await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
     const eventId = await openBirthDeclarationAndCaptureEventId(page)
