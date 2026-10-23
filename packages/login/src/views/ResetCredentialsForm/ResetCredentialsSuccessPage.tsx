@@ -10,12 +10,8 @@
  */
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import { storage } from '@login/storage'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Frame, AppBar, Button, Stack, Text } from '@opencrvs/components'
+import { CountryLogo } from '@opencrvs/components/icons'
 import {
   Container,
   LogoContainer

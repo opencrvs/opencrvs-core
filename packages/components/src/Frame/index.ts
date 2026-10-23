@@ -9,3 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './Frame'
+export { MAIN_CONTENT_ANCHOR_ID } from './components/SkipToContent'

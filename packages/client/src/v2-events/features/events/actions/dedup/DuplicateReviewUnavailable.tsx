@@ -11,7 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '@opencrvs/components'
 
 const messages = {
   title: {

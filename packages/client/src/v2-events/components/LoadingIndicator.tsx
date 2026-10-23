@@ -15,8 +15,8 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import styled from 'styled-components'
-import { ConnectionError } from '@opencrvs/components/lib/icons'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { ConnectionError } from '@opencrvs/components/icons'
+import { Spinner } from '@opencrvs/components'
 import { errorMessages } from '@client/v2-events/messages'
 import { useOnlineStatus } from '@client/utils'
 

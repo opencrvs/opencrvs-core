@@ -16,11 +16,7 @@ import {
   WrappedComponentProps as IntlShapeProps,
   IntlShape
 } from 'react-intl'
-import {
-  IToggleMenuItem,
-  ToggleMenu
-} from '@opencrvs/components/lib/ToggleMenu'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { IToggleMenuItem, ToggleMenu, Icon } from '@opencrvs/components'
 import { Avatar } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
 import { getLanguage } from '@client/i18n/selectors'

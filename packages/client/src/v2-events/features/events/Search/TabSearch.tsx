@@ -13,9 +13,7 @@ import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import { Accordion } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Accordion, Icon, Button } from '@opencrvs/components'
 import {
   EventConfig,
   FieldConfig,

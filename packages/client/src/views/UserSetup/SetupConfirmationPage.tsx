@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/icons'
 import { Button, Content, ContentSize } from '@opencrvs/components'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import {

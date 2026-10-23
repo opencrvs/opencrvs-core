@@ -17,13 +17,15 @@ import {
   FileFieldValue,
   FileFieldValueWithOption
 } from '@opencrvs/commons/client'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { DividerVertical } from '@opencrvs/components/lib/Divider'
-import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
-import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Stack } from '@opencrvs/components/lib/Stack'
+import {
+  AppBar,
+  Button,
+  DividerVertical,
+  PanControls,
+  PanViewer,
+  Icon,
+  Stack
+} from '@opencrvs/components'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { toFileUrl, precacheFile } from '@client/v2-events/cache'
 import { PreviewErrorBox } from './PreviewErrorBox'

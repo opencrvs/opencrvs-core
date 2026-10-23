@@ -13,11 +13,13 @@ import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIntl } from 'react-intl'
 import { stringify } from 'qs'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
-import { NavigationSubItem } from '@opencrvs/components'
+import {
+  Icon,
+  NavigationGroup,
+  NavigationItem,
+  NavigationSubItem
+} from '@opencrvs/components'
+import { Expandable } from '@opencrvs/components/icons'
 import {
   TAB_GROUPS,
   WORKQUEUE_TABS

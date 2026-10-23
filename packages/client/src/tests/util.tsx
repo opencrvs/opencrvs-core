@@ -15,7 +15,7 @@ import { EventType } from '@client/utils/gateway-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import { TestUserRole, UUID } from '@opencrvs/commons/client'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { getTheme } from '@opencrvs/components'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import {
   configure,
