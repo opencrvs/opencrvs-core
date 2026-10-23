@@ -73,8 +73,6 @@ spec:
               echo "Running S3 cleanup script..."
               mc alias set store $S3_ENDPOINT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
               mc rm --recursive --force store/$S3_BUCKET
-              mc rb store/$S3_BUCKET
-              [ "${make_bucket:-true}" == 'true' ] && mc mb store/$S3_BUCKET
               echo "Cleanup complete!"
           env:
             - name: S3_ENDPOINT
