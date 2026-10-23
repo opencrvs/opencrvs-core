@@ -12,7 +12,7 @@ import { createServer } from '@documents/server'
 
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { S3_BUCKET } from '../../s3/constants'
+import { env } from '../../s3/constants'
 
 const putObjectMock = jest.fn()
 const statObjectIfExistsMock = jest.fn()
@@ -35,7 +35,7 @@ describe('fileExistsHandler', () => {
 
   beforeEach(async () => {
     putObjectMock.mockClear()
-    statObjectIfExistsMock.mockReset().mockResolvedValue({ metaData: {} })
+    statObjectIfExistsMock.mockReset().mockResolvedValue({ metadata: {} })
     server = await createServer()
   })
 
@@ -45,7 +45,7 @@ describe('fileExistsHandler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: `/files/${S3_BUCKET}/${path}/${transactionId}.txt`,
+      url: `/files/${env.S3_BUCKET}/${path}/${transactionId}.txt`,
       headers: {
         authorization: `Bearer ${token}`
       }
@@ -63,7 +63,7 @@ describe('fileExistsHandler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: `/files/${S3_BUCKET}/${path}/${transactionId}.txt`,
+      url: `/files/${env.S3_BUCKET}/${path}/${transactionId}.txt`,
       headers: {
         authorization: `Bearer ${token}`
       }
@@ -82,7 +82,7 @@ describe('fileExistsHandler', () => {
     const res = await server.server.inject({
       method: 'GET',
       // double slash is handled
-      url: `/files//${S3_BUCKET}/${path}/${transactionId}.txt`,
+      url: `/files//${env.S3_BUCKET}/${path}/${transactionId}.txt`,
       headers: {
         authorization: `Bearer ${token}`
       }
@@ -276,7 +276,7 @@ describe('fileUploadHandler', () => {
 
   it('refuses to replace a file uploaded by someone else', async () => {
     statObjectIfExistsMock.mockResolvedValue({
-      metaData: { 'created-by': 'another-user' }
+      metadata: { 'created-by': 'another-user' }
     })
 
     const res = await uploadTo('transaction-3')
@@ -287,7 +287,7 @@ describe('fileUploadHandler', () => {
 
   it('lets the original uploader replace their own file', async () => {
     statObjectIfExistsMock.mockResolvedValue({
-      metaData: { 'created-by': '123123' }
+      metadata: { 'created-by': '123123' }
     })
 
     const res = await uploadTo('transaction-4')
@@ -320,8 +320,8 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
     expect(res.payload).toEqual(`${transactionId}.jfif`)
 
-    const metaData = putObjectMock.mock.calls[0][2]
-    expect(metaData['content-type']).toBe('image/jpeg')
+    const { contentType } = putObjectMock.mock.calls[0][2]
+    expect(contentType).toBe('image/jpeg')
   })
 })
 

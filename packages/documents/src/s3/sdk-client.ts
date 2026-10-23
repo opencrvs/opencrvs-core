@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { S3Client } from '@aws-sdk/client-s3'
-import {
-  S3_ACCESS_KEY,
-  S3_BUCKET_REGION,
-  S3_SECRET_KEY
-} from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 
 /**
  * One place for the SDK options that every supported store needs, so the client
@@ -27,10 +23,10 @@ import {
 export function createS3Client(endpoint: string) {
   return new S3Client({
     endpoint,
-    region: S3_BUCKET_REGION,
+    region: env.S3_BUCKET_REGION,
     credentials: {
-      accessKeyId: S3_ACCESS_KEY,
-      secretAccessKey: S3_SECRET_KEY
+      accessKeyId: env.S3_ACCESS_KEY,
+      secretAccessKey: env.S3_SECRET_KEY
     },
     forcePathStyle: true,
     requestChecksumCalculation: 'WHEN_REQUIRED',

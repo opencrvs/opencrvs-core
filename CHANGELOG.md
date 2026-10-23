@@ -142,8 +142,8 @@ Unlike the flag, an archived notification no longer matches, since its status is
 - The documents service reads two URLs, with the protocol, where it read a host, a port and a protocol. Following variable names were changed, make sure your helm chart values were updated:
   | Before | After |
   | --------------------- | ------------------ |
-  | `MINIO_HOST`, `MINIO_PORT` | `S3_ENDPOINT`, for example `http://minio:3535` |
-  | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://minio.example.org`. Without it the service uses `S3_ENDPOINT` |
+  | `MINIO_HOST`, `MINIO_PORT` | `S3_ENDPOINT`, for example `http://minio:3535`. Required in production |
+  | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://minio.example.org`. Required in production, also when it is the same as `S3_ENDPOINT` |
   | `MINIO_BUCKET` | `S3_BUCKET` |
   | `MINIO_BUCKET_REGION` | `S3_BUCKET_REGION` |
   | `MINIO_ACCESS_KEY` | `S3_ACCESS_KEY` |

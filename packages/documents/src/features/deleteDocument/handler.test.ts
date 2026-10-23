@@ -52,14 +52,14 @@ describe('deleteDocument', () => {
   let server: any
 
   beforeEach(async () => {
-    statObjectIfExistsMock.mockReset().mockResolvedValue({ metaData: {} })
+    statObjectIfExistsMock.mockReset().mockResolvedValue({ metadata: {} })
     removeObjectMock.mockReset()
     server = await createServer()
   })
 
   it('deletes a document uploaded by someone else', async () => {
     statObjectIfExistsMock.mockResolvedValue({
-      metaData: { 'created-by': 'someone-else' }
+      metadata: { 'created-by': 'someone-else' }
     })
 
     const res = await server.server.inject({

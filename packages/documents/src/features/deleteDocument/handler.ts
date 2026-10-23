@@ -15,7 +15,7 @@ import {
   removeObjects,
   statObjectIfExists
 } from '@documents/s3/client'
-import { S3_BUCKET } from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import { badRequest, forbidden } from '@hapi/boom'
 import {
@@ -43,7 +43,7 @@ export async function deleteDocument(
   if (!(await statObjectIfExists(documentPath))) {
     return h
       .response(
-        `request failed: document ${documentPath} does not exist in bucket ${S3_BUCKET}`
+        `request failed: document ${documentPath} does not exist in bucket ${env.S3_BUCKET}`
       )
       .code(404)
   }

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { putObject, statObjectIfExists } from '@documents/s3/client'
-import { S3_BUCKET } from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import {
   DocumentPath,
@@ -87,18 +87,16 @@ export async function fileUploadHandler(
    */
   const existing = await statObjectIfExists(filePath)
 
-  if (existing && existing.metaData['created-by'] !== userId) {
+  if (existing && existing.metadata['created-by'] !== userId) {
     throw forbidden(
       `request failed: user with id ${userId} does not have permission to replace this document`
     )
   }
 
-  // Persist the content type the client reported for the file
-  const contentType = file.hapi.headers['content-type']
-
   await putObject(filePath, file, {
-    'created-by': userId,
-    ...(contentType && { 'content-type': contentType })
+    // Persist the content type the client reported for the file
+    contentType: file.hapi.headers['content-type'],
+    metadata: { 'created-by': userId }
   })
 
   return filePath
@@ -113,8 +111,8 @@ export async function fileExistsHandler(
     filePath = filePath.slice(1)
   }
 
-  if (filePath.startsWith(S3_BUCKET)) {
-    filePath = filePath.slice(S3_BUCKET.length + 1)
+  if (filePath.startsWith(env.S3_BUCKET)) {
+    filePath = filePath.slice(env.S3_BUCKET.length + 1)
   }
 
   const documentPath = DocumentPath.parse(filePath)
@@ -124,7 +122,7 @@ export async function fileExistsHandler(
   if (!stat) {
     return h
       .response(
-        `request failed: document ${documentPath} does not exist in bucket ${S3_BUCKET}`
+        `request failed: document ${documentPath} does not exist in bucket ${env.S3_BUCKET}`
       )
       .code(404)
   }
@@ -152,12 +150,13 @@ export async function documentUploadHandler(
     const generateFileName = `${ref}.${fileType.ext}`
 
     await putObject(generateFileName, base64Decoded, {
-      ...payload.metaData,
-      'content-type': fileType.mime,
-      'created-by': userId
+      contentType: fileType.mime,
+      metadata: { ...payload.metaData, 'created-by': userId }
     })
 
-    return h.response({ refUrl: `/${S3_BUCKET}/${generateFileName}` }).code(200)
+    return h
+      .response({ refUrl: `/${env.S3_BUCKET}/${generateFileName}` })
+      .code(200)
   } catch (error) {
     return Promise.reject(
       new Error(`request failed: ${(error as Error).message}`)

@@ -11,7 +11,7 @@
 import { createServer } from '@documents/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { S3_BUCKET } from '../../s3/constants'
+import { env } from '../../s3/constants'
 
 const signFileUrlMock = jest.fn().mockResolvedValue('https://signed-url')
 
@@ -43,7 +43,7 @@ describe('createPreSignedUrl', () => {
   it('strips the bucket prefix from a FullDocumentPath', async () => {
     const res = await server.server.inject({
       method: 'GET',
-      url: `/presigned-url/${S3_BUCKET}/eventId/imageId.png`,
+      url: `/presigned-url/${env.S3_BUCKET}/eventId/imageId.png`,
       headers: { authorization: `Bearer ${token}` }
     })
 
@@ -137,5 +137,23 @@ describe('listFiles', () => {
     expect(res.statusCode).toBe(200)
     expect(JSON.parse(res.payload)).toEqual(['events/eventId/a.png'])
     expect(listObjectKeysMock).toHaveBeenCalledWith('events/eventId/')
+  })
+
+  it.each([
+    '/list-files',
+    '/list-files/',
+    '/list-files/events/',
+    '/list-files/events/eventId/a.png',
+    '/list-files/events/eventId',
+    '/list-files/other/eventId/'
+  ])('refuses %s, which is not a record or user prefix', async (url) => {
+    const res = await server.server.inject({
+      method: 'GET',
+      url,
+      headers: { authorization: `Bearer ${token}` }
+    })
+
+    expect(res.statusCode).toBe(400)
+    expect(listObjectKeysMock).not.toHaveBeenCalled()
   })
 })
