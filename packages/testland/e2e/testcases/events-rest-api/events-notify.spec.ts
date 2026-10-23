@@ -168,7 +168,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     expect(response.status).toBe(400)
     const body = await response.json()
     expect(body.message).toBe(
-      '[{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"}]'
+      '[{"message":"Field is not part of the notify form. Notify-only data belongs in annotation","id":"foo.bar","value":"this should cause an error"}]'
     )
   })
 
