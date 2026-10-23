@@ -87,6 +87,12 @@ test('3.0 Validate "Certify record" page', async ({ page }) => {
   })
 
   await test.step('3.3 should navigate to collect payment page on "Verified" button click', async () => {
+    // HTTP call will override annotation on next step if we do not wait for this.
+    const credentialResponse = page.waitForResponse(
+      (res) => res.url().includes('verifiable-credentials/paper-credential'),
+      { timeout: 30_000 }
+    )
+
     await page.getByRole('button', { name: 'Verified' }).click()
 
     await expect(page.locator('#content-name')).toContainText('Collect Payment')
@@ -99,6 +105,7 @@ test('3.0 Validate "Certify record" page', async ({ page }) => {
     await expect(page.locator('#maincontent')).toContainText('$5.00')
 
     await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible()
+    await credentialResponse
     await page.getByRole('button', { name: 'Back' }).click()
   })
 
