@@ -61,6 +61,12 @@ type NotifyActionConfigInput = Extract<
   { type: typeof ActionType.NOTIFY }
 >
 
+/** A version as `VersionedEventConfig` expects it, once `defineConfig` has prepared it. */
+type PreparedVersion = z.input<typeof VersionedEventConfig>['versions'][number]
+
+/** An action with `declaration` on DECLARE and `review` on NOTIFY, as `EventConfig` expects. */
+type PreparedActionConfig = PreparedVersion['actions'][number]
+
 /**
  * Fallback for events without a configured notification form or NOTIFY review.
  *
@@ -71,10 +77,15 @@ type NotifyActionConfigInput = Extract<
  *
  * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
  * Expects the `declaration` to already be on the DECLARE action.
+ *
+ * @returns the configuration with `declaration` on the DECLARE action and `review` on every
+ * NOTIFY action.
  */
 function generateNotificationFormFallback(
   config: Omit<EventConfigInput, 'declaration'>
-) {
+): Omit<EventConfigInput, 'declaration' | 'actions'> & {
+  actions: PreparedActionConfig[]
+} {
   const declareAction = config.actions.find(
     (action): action is DeclareActionConfigInput =>
       action.type === ActionType.DECLARE
@@ -92,42 +103,45 @@ function generateNotificationFormFallback(
     )
   }
 
-  if (notifyAction?.review) {
-    return config
-  }
+  const declaration = declareAction?.declaration
 
-  if (!declareAction?.declaration) {
+  if (!declaration) {
     throw new Error(
       `Event '${config.id}' has no ${ActionType.DECLARE} form. Configure \`actions[${ActionType.DECLARE}].declaration\`.`
     )
   }
 
-  const review = generateNotifyReview(declareAction.review)
-
-  if (notifyAction) {
-    return {
-      ...config,
-      actions: config.actions.map((action) =>
-        action === notifyAction ? { ...notifyAction, review } : action
-      )
-    }
-  }
-
-  const notifyFromDeclare: NotifyActionConfigInput = {
+  const notifyFromDeclare = (): PreparedActionConfig => ({
     type: ActionType.NOTIFY,
     label: declareAction.label,
     icon: declareAction.icon,
     conditionals: declareAction.conditionals,
     flags: declareAction.flags,
     supportingCopy: declareAction.dialogCopy?.notify,
-    review
-  }
+    review: generateNotifyReview(declareAction.review)
+  })
 
   return {
     ...config,
-    actions: config.actions.flatMap((action) =>
-      action === declareAction ? [notifyFromDeclare, action] : [action]
-    )
+    actions: config.actions.flatMap((action): PreparedActionConfig[] => {
+      if (action.type === ActionType.DECLARE) {
+        const declareWithForm = { ...action, declaration }
+        return notifyAction
+          ? [declareWithForm]
+          : [notifyFromDeclare(), declareWithForm]
+      }
+
+      if (action.type === ActionType.NOTIFY) {
+        return [
+          {
+            ...action,
+            review: action.review ?? generateNotifyReview(declareAction.review)
+          }
+        ]
+      }
+
+      return [action]
+    })
   }
 }
 
@@ -170,7 +184,7 @@ function getVersionInput(
 
 /**
  * Moves `declaration` onto the DECLARE action and generates the NOTIFY fallback, for each
- * version. The NOTIFY fallback always sets `review`, which the input type cannot tell.
+ * version.
  */
 function prepareVersions(
   config: VersionedEventConfigInput
@@ -195,7 +209,7 @@ function prepareVersions(
         ...(version.effectiveFrom !== undefined && {
           effectiveFrom: version.effectiveFrom
         })
-      } as z.input<typeof VersionedEventConfig>['versions'][number]
+      } satisfies PreparedVersion
     })
   }
 }
