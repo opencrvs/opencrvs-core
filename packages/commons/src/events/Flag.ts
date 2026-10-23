@@ -15,7 +15,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 
 export const InherentFlags = {
-  INCOMPLETE: 'incomplete',
   REJECTED: 'rejected',
   CORRECTION_REQUESTED: 'correction-requested',
   POTENTIAL_DUPLICATE: 'potential-duplicate',

@@ -39,8 +39,8 @@ import {
   readCsvFile,
   toCsvLine,
   writeCsvFile
-} from '../csv'
-import { candidateRefs, fetchTemplate } from '../translations/template'
+} from '../../csv'
+import { candidateRefs, fetchTemplate } from '../../translations/template'
 
 const APPLICATIONS = ['client', 'login']
 

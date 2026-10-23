@@ -367,5 +367,19 @@ export const Workqueues = defineWorkqueues([
       }
     },
     action: { type: ActionType.READ }
+  },
+  {
+    slug: 'revoked',
+    icon: 'FileX',
+    name: {
+      id: 'workqueues.revoked.title',
+      defaultMessage: 'Revoked',
+      description: 'Title of revoked workqueue'
+    },
+    query: {
+      ...registeredInMyAdminArea,
+      status: { type: 'exact', term: EventStatus.enum.REVOKED }
+    },
+    action: { type: ActionType.READ }
   }
 ])
