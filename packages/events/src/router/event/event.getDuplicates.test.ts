@@ -29,6 +29,7 @@ import {
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 import AppSchema from '../../storage/postgres/events/schema/app/AppSchema'
+import { deleteEventById } from '../../storage/postgres/events/events'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -286,4 +287,63 @@ test('Returns multiple duplicates when found', async () => {
   await expect(
     client.event.getDuplicates({ eventId: event1.id })
   ).resolves.toHaveLength(0)
+})
+
+test('Skips duplicates that no longer exist instead of failing', async () => {
+  const tennisClubMembershipWithDedupCheckConfig =
+    tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+    })
+  )
+
+  const { user, generator, eventsDb } = await setupTestCase(
+    1881,
+    tennisClubMembershipWithDedupCheckConfig
+  )
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+  ])
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    createPrng(73)
+  )
+
+  const event1 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration })
+  )
+
+  const event2 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration })
+  )
+
+  const event3 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, { declaration })
+  )
+
+  // Simulate a duplicate that is referenced by DUPLICATE_DETECTED but missing from the database
+  await deleteEventById(event1.id)
+
+  const event2ActionsBeforeGet = await getEventActions(eventsDb, event2.id)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event3.id, { assignedTo: user.id })
+  )
+
+  const duplicates = await client.event.getDuplicates({ eventId: event3.id })
+
+  expect(duplicates.map(({ id }) => id)).toEqual([event2.id])
+
+  const event2ActionsAfterGet = await getEventActions(eventsDb, event2.id)
+  expect(event2ActionsAfterGet).toHaveLength(event2ActionsBeforeGet.length + 1)
+  expect(last(event2ActionsAfterGet)?.actionType).toEqual(ActionType.READ)
 })

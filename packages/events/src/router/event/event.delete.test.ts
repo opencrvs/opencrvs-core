@@ -17,6 +17,7 @@ import {
   FullDocumentPath,
   getUUID
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import {
@@ -24,6 +25,11 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
+import { indexEvent } from '@events/service/indexing/indexing'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -72,6 +78,23 @@ test('stored events can be deleted', async () => {
   await expect(client.event.get(event.id)).rejects.toThrow(
     `Event not found with ID: ${event.id}`
   )
+})
+
+test('deleting an event removes it from the search index', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const esClient = getOrCreateClient()
+
+  const event = await client.event.create(generator.event.create())
+
+  // Created events are not indexed by default, but can end up in the index (e.g. after an async rejection)
+  await indexEvent(event, tennisClubMembershipEvent)
+
+  await client.event.delete({ eventId: event.id })
+
+  await expect(
+    esClient.exists({ index: getEventIndexName(event.type), id: event.id })
+  ).resolves.toBe(false)
 })
 
 test('declared event can not be deleted', async () => {

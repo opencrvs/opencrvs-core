@@ -6,6 +6,10 @@
 
 - Internal auth service endpoints that issue tokens without credentials could be reached from the internet through the gateway and on the auth subdomain (`auth.<domain>`). The gateway now forwards only the public auth endpoints, and the Helm charts block `/internal/` paths on every host. [GHSA-3fpv-fj7v-pmj6](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-3fpv-fj7v-pmj6)
 
+### Bug fixes
+
+- Opening the potential duplicates of a record no longer fails when one of the flagged duplicates has since been deleted. Previously the request failed with an `event_actions_event_id_fkey` foreign key violation; the duplicates that still exist are now returned. Deleting an undeclared record now also removes it from search, and a record whose submission was rejected before it was declared is no longer added to search, so neither can be flagged as a duplicate of other records. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
+
 ## 1.9.20
 
 ### Bug fixes
