@@ -27,7 +27,8 @@ import {
   deepMerge,
   FileFieldValue,
   FileFieldValueWithOption,
-  FileFieldWithOptionValue
+  isFileFieldValue,
+  isFileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
   getCreatedEvent,
@@ -49,13 +50,11 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     const replaceTemporaryIdInObject = (obj: object) => {
       return Object.fromEntries(
         Object.entries(obj).map(([key, value]) => {
-          const maybeFile = FileFieldValue.safeParse(value)
-          if (maybeFile.success) {
-            return [key, replaceTemporaryIdInDocumentPath(maybeFile.data)]
+          if (isFileFieldValue(value)) {
+            return [key, replaceTemporaryIdInDocumentPath(value)]
           }
-          const maybeFileWithOptions = FileFieldWithOptionValue.safeParse(value)
-          if (maybeFileWithOptions.success) {
-            const filesWithActualUrls = maybeFileWithOptions.data.map((file) =>
+          if (isFileFieldWithOptionValue(value)) {
+            const filesWithActualUrls = value.map((file) =>
               replaceTemporaryIdInDocumentPath(file)
             )
             return [key, filesWithActualUrls]

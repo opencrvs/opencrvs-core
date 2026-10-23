@@ -106,5 +106,13 @@ exports[`getAvailableActionsForEvent() should return the correct actions for "RE
   "PRINT_CERTIFICATE",
   "REQUEST_CORRECTION",
   "CUSTOM",
+  "REVOKE_REGISTRATION",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "REVOKED" status with no flags 1`] = `
+[
+  "READ",
+  "REINSTATE_REGISTRATION",
 ]
 `;

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   auditRecord,
   getToken,
@@ -29,22 +29,17 @@ import {
   selectAction
 } from '@e2e/support/utils'
 
-test.describe.serial('Direct correction offline', () => {
+test('Direct correction offline', async ({ page }) => {
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId: string
-  let page: Page
 
   const updatedChildDetails = {
     firstname: faker.person.firstName(),
     surname: faker.person.lastName()
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test('Shortcut declaration', async () => {
+  await test.step('Shortcut declaration', async () => {
     let token = await getToken(CREDENTIALS.REGISTRAR)
 
     const res = await createDeclarationV2(
@@ -102,7 +97,7 @@ test.describe.serial('Direct correction offline', () => {
     declaration = res.declaration
   })
 
-  test('Navigate to record correction', async () => {
+  await test.step('Navigate to record correction', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
 
     await auditRecord({
@@ -115,7 +110,7 @@ test.describe.serial('Direct correction offline', () => {
     await selectAction(page, 'Correct')
   })
 
-  test('Add correction requester', async () => {
+  await test.step('Add correction requester', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Legal Guardian', { exact: true }).click()
     await page.locator('#reason____option').click()
@@ -127,15 +122,15 @@ test.describe.serial('Direct correction offline', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Verify identity', async () => {
+  await test.step('Verify identity', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
   })
 
-  test('Skip uploading documents', async () => {
+  await test.step('Skip uploading documents', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Add correction fee', async () => {
+  await test.step('Add correction fee', async () => {
     await page
       .locator('#fees____amount')
       .fill(faker.number.int({ min: 1, max: 1000 }).toString())
@@ -143,7 +138,7 @@ test.describe.serial('Direct correction offline', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Change child name', async () => {
+  await test.step('Change child name', async () => {
     await page.getByTestId('change-button-child.name').click()
 
     await page
@@ -156,7 +151,7 @@ test.describe.serial('Direct correction offline', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Make correction while offline', async () => {
+  await test.step('Make correction while offline', async () => {
     // Go offline
     await page.context().setOffline(true)
 
@@ -178,7 +173,7 @@ test.describe.serial('Direct correction offline', () => {
     await expect(page.getByText('Offline')).toBeVisible()
   })
 
-  test('Go back online', async () => {
+  await test.step('Go back online', async () => {
     const correctionResponse = page.waitForResponse(
       (res) =>
         res.url().includes('event.actions.correction.approve') && res.ok()

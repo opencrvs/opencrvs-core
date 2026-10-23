@@ -29,8 +29,6 @@ test.describe("Validate 'Death Certificate Certified Copy' PDF details", () => {
   test('Certified copy renders deceased, spouse, place of death and office name', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered death record (via API)', async () => {

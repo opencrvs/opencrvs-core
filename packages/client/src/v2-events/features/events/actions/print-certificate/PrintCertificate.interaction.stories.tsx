@@ -18,7 +18,7 @@ import superjson from 'superjson'
 
 import { within, userEvent, expect, waitFor, fireEvent } from 'storybook/test'
 import { Outlet } from 'react-router-dom'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import {
   ActionType,
   EventConfig,
@@ -28,7 +28,10 @@ import {
   tennisClubMembershipEvent,
   never,
   generateActionDocument,
-  EventDocumentOnlyLastAction
+  EventDocumentOnlyLastAction,
+  FieldType,
+  PageTypes,
+  generateTranslationConfig
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -675,6 +678,229 @@ export const RedirectAfterPrint: Story = {
       await expect(canvas.getByTestId('assignedTo-value')).toHaveTextContent(
         'Not assigned'
       )
+    })
+  }
+}
+
+const slowUnassignEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE, user },
+    { type: ActionType.ASSIGN, user },
+    { type: ActionType.DECLARE, user },
+    { type: ActionType.REGISTER, user }
+  ]
+})
+let printRequestCount = 0
+
+export const PrintIsSubmittedOnceWhileUnassignIsPending: Story = {
+  beforeEach: () => {
+    printRequestCount = 0
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    test: {
+      // Since we cannot test the generated PDF, we can ignore the failed font request
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.actions.assignment.unassign.mutation(async () => {
+            await delay(20000)
+            return EventDocumentOnlyLastAction.parse({
+              ...slowUnassignEvent,
+              actions: [
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.UNASSIGN
+                })
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.printCertificate.request.mutation(() => {
+            printRequestCount++
+            return slowUnassignEvent
+          })
+        ]
+      }
+    },
+    offline: {
+      events: [slowUnassignEvent],
+      drafts: [
+        generator.event.draft({
+          eventId: slowUnassignEvent.id,
+          actionType: ActionType.PRINT_CERTIFICATE,
+          annotation: {
+            [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
+            'collector.requesterId': 'INFORMANT',
+            'collector.identity.verify': true,
+            templateId: 'tennis-club-membership-certified-certificate'
+          }
+        })
+      ]
+    },
+    reactRouter: {
+      router: {
+        initialPath: '/',
+        element: <Outlet />,
+        children: [routesConfig]
+      },
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+        { eventId: slowUnassignEvent.id },
+        { templateId: 'tennis-club-membership-certificate' }
+      )
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Print once', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Yes, print certificate' })
+      )
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Print' })
+      )
+      await waitFor(
+        async () => {
+          await expect(printRequestCount).toBe(1)
+        },
+        { timeout: 7000 } // Generating the PDF takes a long time.
+      )
+    })
+
+    await step('Print again while unassign is still pending', async () => {
+      const printButton = await canvas.findByRole('button', {
+        name: 'Yes, print certificate'
+      })
+      await waitFor(async () => {
+        await expect(printButton).toBeEnabled()
+      })
+      await userEvent.click(printButton)
+
+      const confirmButton = canvas.queryByRole('button', { name: 'Print' })
+      if (confirmButton) {
+        await userEvent.click(confirmButton)
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await expect(printRequestCount).toBe(1)
+    })
+  }
+}
+
+// Late HTTP response from a left page must not overwrite the current page's values
+const HTTP_FIELD_URL = '/api/slow-http-field'
+const HTTP_FIELD_DELAY_MS = 1500
+
+const eventWithSlowHttpPage = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type === ActionType.PRINT_CERTIFICATE
+      ? {
+          ...action,
+          printForm: {
+            ...action.printForm,
+            pages: [
+              {
+                id: 'collector',
+                type: PageTypes.enum.FORM,
+                title: generateTranslationConfig('Certify record'),
+                fields: [
+                  {
+                    id: 'collector.name',
+                    type: FieldType.TEXT,
+                    label: generateTranslationConfig('Collector name')
+                  }
+                ]
+              },
+              {
+                id: 'collector.payment',
+                type: PageTypes.enum.FORM,
+                title: generateTranslationConfig('Collect payment'),
+                fields: [
+                  {
+                    id: 'collector.payment.http',
+                    type: FieldType.HTTP,
+                    label: generateTranslationConfig('Slow request'),
+                    configuration: {
+                      url: HTTP_FIELD_URL,
+                      method: 'POST',
+                      timeout: 5000
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      : action
+  )
+} as EventConfig
+
+export const LateHttpResponseDoesNotClearPreviousPage: Story = {
+  beforeEach: () => {
+    useActionAnnotation.getState().clear()
+    useEventFormData.getState().clear()
+    localDraftStore.getState().setDraft(null)
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    offline: {
+      configs: [eventWithSlowHttpPage]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
+        eventId: tennisClubMembershipEventDocument.id,
+        pageId: 'collector'
+      })
+    },
+    msw: {
+      handlers: {
+        http: [
+          http.post(HTTP_FIELD_URL, async () => {
+            await delay(HTTP_FIELD_DELAY_MS)
+            return HttpResponse.json({ ok: true })
+          })
+        ],
+        events: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Fill the first page and continue', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__collector____name'),
+        'Nomen'
+      )
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Continue' })
+      )
+      await canvas.findByText('Collect payment')
+    })
+
+    await step('Go back before the HTTP response arrives', async () => {
+      await userEvent.click(await canvas.findByRole('button', { name: 'Back' }))
+      await expect(
+        await canvas.findByTestId('text__collector____name')
+      ).toHaveValue('Nomen')
+    })
+
+    await step('Value is still shown after the response arrives', async () => {
+      await new Promise((resolve) =>
+        setTimeout(resolve, HTTP_FIELD_DELAY_MS + 1000)
+      )
+      await expect(
+        await canvas.findByTestId('text__collector____name')
+      ).toHaveValue('Nomen')
     })
   }
 }

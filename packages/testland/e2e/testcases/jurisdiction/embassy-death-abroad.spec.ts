@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import {
   continueForm,
@@ -30,9 +30,7 @@ import { CREDENTIALS } from '@e2e/support/constants'
  *
  * @see https://github.com/opencrvs/opencrvs-core/issues/13651
  */
-test.describe.serial('Death abroad declared by an embassy official', () => {
-  let page: Page
-
+test('Death abroad declared by an embassy official', async ({ page }) => {
   const declaration = {
     deceased: {
       name: {
@@ -82,15 +80,7 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
     ' ' +
     declaration.deceased.name.surname
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Embassy official starts a death declaration', async () => {
+  await test.step('Embassy official starts a death declaration', async () => {
     await login(page, CREDENTIALS.EMBASSY_OFFICIAL)
 
     await page.click('#header-new-event')
@@ -99,7 +89,7 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Fill deceased details, with a usual residence in Farajaland', async () => {
+  await test.step('Fill deceased details, with a usual residence in Farajaland', async () => {
     await page.locator('#firstname').fill(declaration.deceased.name.firstname)
     await page.locator('#surname').fill(declaration.deceased.name.surname)
 
@@ -134,7 +124,7 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
     await continueForm(page)
   })
 
-  test('Record the death as having happened in a foreign country', async () => {
+  await test.step('Record the death as having happened in a foreign country', async () => {
     await page.getByPlaceholder('dd').fill(declaration.eventDetails.date.dd)
     await page.getByPlaceholder('mm').fill(declaration.eventDetails.date.mm)
     await page.getByPlaceholder('yyyy').fill(declaration.eventDetails.date.yyyy)
@@ -164,7 +154,7 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
     await continueForm(page)
   })
 
-  test('Fill informant details', async () => {
+  await test.step('Fill informant details', async () => {
     await page.locator('#informant____relation').click()
     await page
       .getByText(declaration.informant.relation, { exact: true })
@@ -178,7 +168,7 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
     await continueForm(page)
   })
 
-  test('Fill spouse details', async () => {
+  await test.step('Fill spouse details', async () => {
     await page.locator('#firstname').fill(declaration.spouse.name.firstname)
     await page.locator('#surname').fill(declaration.spouse.name.surname)
 
@@ -192,7 +182,7 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
     await continueForm(page)
   })
 
-  test('Sign the declaration', async () => {
+  await test.step('Sign the declaration', async () => {
     await goToSection(page, 'review')
 
     await page.locator('#review____comment').fill(declaration.review.comment)
@@ -204,19 +194,19 @@ test.describe.serial('Death abroad declared by an embassy official', () => {
       .click()
   })
 
-  test('Declare', async () => {
+  await test.step('Declare', async () => {
     await triggerDeclarationAction(page, 'Declare')
 
     await expect(page.getByText('Farajaland CRS')).toBeVisible()
   })
 
-  test('The declaration is in the embassy official`s own workqueue', async () => {
+  await test.step('The declaration is in the embassy official`s own workqueue', async () => {
     await page.getByText('Recent').click()
 
     await expect(page.getByRole('button', { name: deceasedName })).toBeVisible()
   })
 
-  test('The embassy official can find the declaration by searching for it', async () => {
+  await test.step('The embassy official can find the declaration by searching for it', async () => {
     await searchFromSearchBar(page, deceasedName)
   })
 })

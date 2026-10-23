@@ -27,23 +27,14 @@ async function authenticateInformantWithESignet(page: Page) {
   await page.waitForURL((url) => url.origin === new URL(CLIENT_URL).origin)
 }
 
-test.describe
-  .serial('E-Signet LINK_BUTTON inserts and locks informant data', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Login', async () => {
+test('E-Signet LINK_BUTTON inserts and locks informant data', async ({
+  page
+}) => {
+  await test.step('Login', async () => {
     await login(page)
   })
 
-  test('Name and DOB are inserted+disabled, National ID is unavailable', async () => {
+  await test.step('Name and DOB are inserted+disabled, National ID is unavailable', async () => {
     await openBirthDeclaration(page)
     await goToSection(page, 'informant')
 
@@ -72,5 +63,5 @@ test.describe
     await expect(page.locator('#informant____nid')).toBeHidden()
   })
 
-  test.skip('Handle surnames with spaces', async () => {})
+  await test.step.skip('Handle surnames with spaces', async () => {})
 })

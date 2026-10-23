@@ -40,7 +40,9 @@ import {
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   UnarchiveActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  RevokeRegistrationActionInput,
+  ReinstateRegistrationActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
@@ -380,13 +382,11 @@ export function generateActionDeclarationInput(
     locations: SetLocationPayload[]
   }
 ): ActionUpdate {
-  const parsed = DeclarationUpdateActions.safeParse(action)
-
   if (isEmpty(overrides) && typeof overrides === 'object') {
     return {}
   }
 
-  if (parsed.success) {
+  if (DeclarationUpdateActions.validate(action)) {
     const fields = getDeclarationFields(configuration)
 
     const declarationConfig = getDeclaration(configuration)
@@ -705,6 +705,48 @@ export function eventPayloadGenerator(
         eventId,
         ...input
       }),
+      revokeRegistration: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            RevokeRegistrationActionInput,
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.REVOKE_REGISTRATION,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
+        ...input
+      }),
+      reinstateRegistration: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            ReinstateRegistrationActionInput,
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.REINSTATE_REGISTRATION,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
+        ...input
+      }),
       reject: (
         eventId: string,
         input: Partial<
@@ -1005,6 +1047,8 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {
@@ -1355,6 +1399,9 @@ export const generateEventConfig = ({
 }
 
 /**
+ * The notification form is dropped, since it may refer to fields of the replaced declaration.
+ * `getNotificationForm` then derives it from the new declaration.
+ *
  * @returns a copy of the configuration with the DECLARE action's declaration replaced.
  */
 export function withDeclaration(
@@ -1363,9 +1410,18 @@ export function withDeclaration(
 ): EventConfig {
   return {
     ...configuration,
-    actions: configuration.actions.map((action) =>
-      action.type === ActionType.DECLARE ? { ...action, declaration } : action
-    )
+    actions: configuration.actions.map((action) => {
+      if (action.type === ActionType.DECLARE) {
+        return { ...action, declaration }
+      }
+
+      if (action.type === ActionType.NOTIFY) {
+        const { notificationForm: _notificationForm, ...notifyAction } = action
+        return notifyAction
+      }
+
+      return action
+    })
   }
 }
 

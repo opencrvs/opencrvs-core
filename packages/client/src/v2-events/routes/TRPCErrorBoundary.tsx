@@ -81,10 +81,6 @@ const NoticeButton = styled(Button)`
   padding: 12px 16px;
 `
 
-const development = ['127.0.0.1', 'localhost'].includes(
-  window.location.hostname
-)
-
 const StructuredError = z.object({
   message: z.string(),
   redirection: z.object({
@@ -139,9 +135,9 @@ function decodeStructuredError(
 ): z.infer<typeof StructuredError> | string {
   try {
     const parsed = JSON.parse(message)
-    const result = StructuredError.safeParse(parsed)
-    if (result.success) {
-      return result.data
+
+    if (StructuredError.validate(parsed)) {
+      return parsed
     }
     return message
   } catch {

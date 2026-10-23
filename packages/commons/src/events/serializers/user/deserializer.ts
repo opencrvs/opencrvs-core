@@ -160,6 +160,13 @@ function deserializeQueryExpression(
       )
     : undefined
 
+  const revokedLocation = expression['legalStatuses.REVOKED.createdAtLocation']
+    ? userDeserializer(
+        expression['legalStatuses.REVOKED.createdAtLocation'].location,
+        user
+      )
+    : undefined
+
   return {
     ...expression,
 
@@ -210,6 +217,15 @@ function deserializeQueryExpression(
         ? {
             ...expression['legalStatuses.REGISTERED.createdAtLocation'],
             location: registeredLocation
+          }
+        : undefined,
+
+    ['legalStatuses.REVOKED.createdAtLocation']:
+      expression['legalStatuses.REVOKED.createdAtLocation'] &&
+      isDefined(revokedLocation)
+        ? {
+            ...expression['legalStatuses.REVOKED.createdAtLocation'],
+            location: revokedLocation
           }
         : undefined
   }

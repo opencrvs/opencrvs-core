@@ -34,6 +34,7 @@ import {
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { validateViaApi } from '@e2e/support/test-data/api-actions'
 
 test('Basic Archival flow', async ({ page }) => {
   let declaration: Declaration
@@ -115,29 +116,21 @@ test('Basic Archival flow', async ({ page }) => {
 })
 
 test('Archival of declaration pending validation', async ({ page }) => {
-  test.setTimeout(180_000)
   let declaration: Declaration
+  let eventId: string
 
   await test.step('Initialise a declared birth record via API', async () => {
     const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
     const res = await createDeclaration(token, undefined, ActionType.DECLARE)
     declaration = res.declaration
+    eventId = res.eventId
   })
 
-  await test.step('Login as RO', async () => {
-    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-  })
-
-  await test.step('Navigate to the event overview page', async () => {
-    await page.getByText('Pending validation').click()
-
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-  })
-
-  await test.step('Validate the declaration', async () => {
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-    await triggerDeclarationAction(page, 'Validate')
+  await test.step('Validate the declaration via API as RO', async () => {
+    await validateViaApi(
+      await getToken(CREDENTIALS.REGISTRATION_OFFICER),
+      eventId
+    )
   })
 
   await test.step('Confirm the declaration is in "Pending registration" -workqueue', async () => {

@@ -227,6 +227,42 @@ export const tennisClubMembershipEventWithArchiveAndUnarchive: EventDocument = {
   ]
 }
 
+const revokeRegistrationAction: ActionDocument = {
+  id: '5b3d4e5f-6a7b-4c2d-8e1f-2a3b4c5d6e7f' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.REVOKE_REGISTRATION,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-26T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k29'
+}
+
+const reinstateRegistrationAction: ActionDocument = {
+  id: '6c4e5f6a-7b8c-4d3e-9f2a-3b4c5d6e7f8a' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.REINSTATE_REGISTRATION,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-27T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k30'
+}
+
+export const tennisClubMembershipEventWithRevokeAndReinstate: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: 'b4c5d6e7-00bf-4631-89dc-89ca506c5d9e' as UUID,
+  actions: [
+    ...tennisClubMembershipEventDocument.actions,
+    revokeRegistrationAction,
+    reinstateRegistrationAction
+  ]
+}
+
 export const TestImage = {
   Box: `
         <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

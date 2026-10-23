@@ -25,8 +25,6 @@ test.describe("Validate 'Birth Certificate' PDF details", () => {
   test('Standard certificate renders place of birth and office name', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered birth record at a health facility (via API)', async () => {

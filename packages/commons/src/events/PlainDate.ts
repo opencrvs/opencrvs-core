@@ -25,6 +25,9 @@ export const PlainDate = z
   .describe('Date in the format YYYY-MM-DD')
 export type PlainDate = z.infer<typeof PlainDate>
 
+export const isPlainDate = (date: unknown): date is PlainDate =>
+  PlainDate.validate(date)
+
 /**
  * Extracts the plain calendar date from an ISO 8601 datetime (or passes an
  * already-plain YYYY-MM-DD through) as a {@link PlainDate}. This is the single
