@@ -9,63 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { WorkqueueCountInput } from '@opencrvs/commons/client'
-import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
-import { invalidateWorkqueueSearchQueries } from '../api'
-import { setQueryDefaults } from './utils'
-
-setQueryDefaults(trpcOptionsProxy.workqueue.count, {
-  queryFn: async (...params) => {
-    const { queryKey } = params[0]
-    const [, { input }] = queryKey
-
-    const { queryFn } = trpcOptionsProxy.workqueue.count.queryOptions(input)
-    if (!queryFn) {
-      throw new Error('queryFn is not defined for workqueue.count')
-    }
-
-    const previousCounts =
-      queryClient.getQueryData<Record<string, number>>(queryKey)
-
-    const response = await queryFn(params[0])
-
-    if (previousCounts) {
-      const changedSlugs = Object.keys(response).filter(
-        (slug) => previousCounts[slug] !== response[slug]
-      )
-      await Promise.all(changedSlugs.map(invalidateWorkqueueSearchQueries))
-    }
-
-    return response
-  }
-})
+import { useTRPC } from '@client/v2-events/trpc'
 
 export function useGetEventCountsByWorkqueue() {
   const trpc = useTRPC()
   return {
-    useQuery: (query: WorkqueueCountInput) => {
-      const { queryFn: _queryFn, ...options } =
-        trpc.workqueue.count.queryOptions(query)
-      return useQuery({
-        ...options,
-        queryKey: trpc.workqueue.count.queryKey(query),
+    useSuspenseQuery: (queries: WorkqueueCountInput) =>
+      useSuspenseQuery({
+        ...trpc.workqueue.count.queryOptions(queries),
         refetchOnMount: 'always',
-        staleTime: 0,
-        refetchInterval: 20000
-      })
-    },
-    useSuspenseQuery: (queries: WorkqueueCountInput) => {
-      const { queryFn: _queryFn, ...options } =
-        trpc.workqueue.count.queryOptions(queries)
-      return useSuspenseQuery({
-        ...options,
-        queryKey: trpc.workqueue.count.queryKey(queries),
-        refetchOnMount: 'always',
-        staleTime: 0,
-        refetchInterval: 20000
+        staleTime: 0
       }).data
-    }
   }
 }
