@@ -110,6 +110,8 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        // Fresh form per page: late async field callbacks can't write into another page
+        key={currentPageId}
         hideBackToReview
         attachmentPath={eventAttachmentPath(eventId)}
         eventConfig={configuration}

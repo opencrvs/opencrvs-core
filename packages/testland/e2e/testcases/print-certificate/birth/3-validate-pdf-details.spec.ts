@@ -30,8 +30,6 @@ test.describe('Residential place of birth renders every administrative level', (
   test('Village level survives on both birth certificate templates', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered birth record with a residential place of birth (via API)', async () => {

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, login } from '@e2e/support/helpers'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -18,40 +18,31 @@ import { getMonthFormatted } from '@e2e/support/advanced-search/helper'
 import { assertTexts, expectInUrl, type } from '@e2e/support/utils'
 import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 
-test.describe
-  .serial("Advanced Search - Birth Event Declaration - Child's details", () => {
-  let page: Page
+test("Advanced Search - Birth Event Declaration - Child's details", async ({
+  page
+}) => {
   let [yyyy, mm, dd] = ['', '', '']
   let fullNameOfChild = ''
-  let record: Awaited<ReturnType<typeof createDeclaration>>
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const toDate = format(new Date(), 'yyyy-MM-dd')
+  // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+  const fromDate = format(
+    subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+    'yyyy-MM-dd'
+  )
 
-    const toDate = format(new Date(), 'yyyy-MM-dd')
-    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
-    const fromDate = format(
-      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
-      'yyyy-MM-dd'
-    )
-
-    record = await createDeclaration(token, {
-      'child.dob': faker.date
-        .between({ from: fromDate, to: toDate })
-        .toISOString()
-        .split('T')[0],
-      'child.gender': 'female'
-    })
-    ;[yyyy, mm, dd] = record.declaration['child.dob'].split('-')
-    fullNameOfChild = `${record.declaration['child.name'].firstname} ${record.declaration['child.name'].surname}`
+  const record = await createDeclaration(token, {
+    'child.dob': faker.date
+      .between({ from: fromDate, to: toDate })
+      .toISOString()
+      .split('T')[0],
+    'child.gender': 'female'
   })
+  ;[yyyy, mm, dd] = record.declaration['child.dob'].split('-')
+  fullNameOfChild = `${record.declaration['child.name'].firstname} ${record.declaration['child.name'].surname}`
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('2.1 - Validate log in and load search page', async () => {
+  await test.step('2.1 - Validate log in and load search page', async () => {
     await login(page)
     await page.click('#searchType')
     await expectInUrl(page, 'advanced-search')
@@ -59,8 +50,8 @@ test.describe
     await page.getByText('Birth').click()
   })
 
-  test.describe.serial("2.5 - Validate search by Child's details", () => {
-    test('2.5.1 - Validate filling DOB and gender filters', async () => {
+  await test.step("2.5 - Validate search by Child's details", async () => {
+    await test.step('2.5.1 - Validate filling DOB and gender filters', async () => {
       await page.getByText('Child details').click()
 
       await type(page, '#firstname', record.declaration['child.name'].firstname)
@@ -74,7 +65,7 @@ test.describe
       await type(page, '[data-testid="child____dob-yyyy"]', yyyy)
     })
 
-    test('2.5.2 - Validate search and show results', async () => {
+    await test.step('2.5.2 - Validate search and show results', async () => {
       await page.click('#search')
       await expect(page).toHaveURL(/.*\/search-result/)
       expect(page.url()).toContain(`child.dob=${yyyy}-${mm}-${dd}`)
@@ -109,7 +100,7 @@ test.describe
       ).toBeVisible()
     })
 
-    test('2.5.3 - Validate clicking on the search edit button', async () => {
+    await test.step('2.5.3 - Validate clicking on the search edit button', async () => {
       await page.getByRole('button', { name: 'Edit', exact: true }).click()
       await expect(page).toHaveURL(/.*\/advanced-search/)
       expect(page.url()).toContain(`child.dob=${yyyy}-${mm}-${dd}`)
@@ -141,7 +132,7 @@ test.describe
       )
     })
 
-    test('2.5.4 - Validate child.dob range input', async () => {
+    await test.step('2.5.4 - Validate child.dob range input', async () => {
       const childDOBRangeButton = page.locator(
         '#child____dob-date_range_button'
       )

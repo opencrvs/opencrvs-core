@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import {
   continueForm,
@@ -20,9 +20,7 @@ import {
   triggerDeclarationAction
 } from '@e2e/support/helpers'
 
-test.describe.serial('Death event summary', () => {
-  let page: Page
-
+test('Death event summary', async ({ page }) => {
   const declaration = {
     deceased: {
       name: {
@@ -59,26 +57,18 @@ test.describe.serial('Death event summary', () => {
     }
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Log in', async () => {
+  await test.step('Log in', async () => {
     await login(page)
   })
 
-  test('Start death event declaration', async () => {
+  await test.step('Start death event declaration', async () => {
     await page.click('#header-new-event')
     await page.getByLabel('Death').click()
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Input deceased address', async () => {
+  await test.step('Input deceased address', async () => {
     await page.locator('#firstname').fill(declaration.deceased.name.firstname)
     await page.locator('#surname').fill(declaration.deceased.name.surname)
 
@@ -110,7 +100,7 @@ test.describe.serial('Death event summary', () => {
     await continueForm(page)
   })
 
-  test('Input place of death address', async () => {
+  await test.step('Input place of death address', async () => {
     await page.locator('#eventDetails____placeOfDeath').click()
     await page
       .getByText(declaration.eventDetails.placeOfDeath, { exact: true })
@@ -138,7 +128,7 @@ test.describe.serial('Death event summary', () => {
     await goToSection(page, 'review')
   })
 
-  test('Verify input in review section', async () => {
+  await test.step('Verify input in review section', async () => {
     await expectRowValueWithChangeButton(
       page,
       'deceased.address',
@@ -152,7 +142,7 @@ test.describe.serial('Death event summary', () => {
     )
   })
 
-  test('Save draft and find it in workqueue', async () => {
+  await test.step('Save draft and find it in workqueue', async () => {
     await triggerDeclarationAction(page, 'Save & Exit')
 
     await page.getByRole('button', { name: 'Drafts' }).click()
@@ -164,7 +154,7 @@ test.describe.serial('Death event summary', () => {
       .click()
   })
 
-  test('Uses "other" location in summary', async () => {
+  await test.step('Uses "other" location in summary', async () => {
     await expect(
       page.getByTestId('eventDetails.deathLocationOther')
     ).toContainText(

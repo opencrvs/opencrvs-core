@@ -4,9 +4,22 @@ ingress:
 
 storage_type: host_path
 
+# Default image configuration for the OpenCRVS/MOSIP platform.
+# These values apply to all OpenCRVS/MOSIP services unless overridden
+# by a service-specific image configuration.
 platform:
-  tag: 'v2.1.0'
-  imagePullPolicy: Always
+  # Default tag for all OpenCRVS/MOSIP images.
+  tag: v2.0.0
+
+  # Default repository for all OpenCRVS/MOSIP images,
+  # for example: ghcr.io/opencrvs or myorg
+  repository: ghcr.io/opencrvs
+
+  # Secrets used to pull images from private registries, if needed.
+  # Example:
+  # imagePullSecrets:
+  #   - name: registry-secret
+  imagePullSecrets: []
 
 # Deployment rollout strategy, applied to all three MOSIP mock/test services
 # below unless overridden per-service under <service>.strategy (e.g.
@@ -21,7 +34,7 @@ strategy:
 mosip_mock:
   enabled: true
   image:
-    repository: ghcr.io/opencrvs/mosip-mock
+    name: mosip-mock
   env:
     FOO: bar
     SENDER_EMAIL_ADDRESS: 'test@opencrvs.org'
@@ -37,7 +50,7 @@ mosip_mock:
 esignet_mock:
   enabled: true
   image:
-    repository: ghcr.io/opencrvs/esignet-mock
+    name: esignet-mock
   env:
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
 
@@ -45,7 +58,7 @@ mosip_api:
   enabled: true
   host_data_path: /data/sqlite
   image:
-    repository: ghcr.io/opencrvs/mosip-api
+    name: mosip-api
   env:
     LOCALE: en
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
   formatDateTo_dMMMMyyyy,
   formatName,
@@ -41,12 +41,7 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
-test.describe.serial('Correct record - 2', () => {
-  let declaration: Declaration
-  let trackingId: string | undefined
-  let eventId: string
-  let page: Page
-
+test('Correct record - 2', async ({ page }) => {
   const fatherDetails = {
     'father.detailsNotAvailable': false,
     'father.name': {
@@ -60,23 +55,20 @@ test.describe.serial('Correct record - 2', () => {
     'father.addressSameAs': 'YES'
   }
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-    // Create declaration with father details available
-    const res = await createDeclaration(
-      token,
-      fatherDetails,
-      undefined,
-      'HEALTH_FACILITY'
-    )
-    declaration = res.declaration
-    trackingId = res.trackingId
-    eventId = res.eventId
-    page = await browser.newPage()
-  })
+  // Create declaration with father details available
+  const res = await createDeclaration(
+    token,
+    fatherDetails,
+    undefined,
+    'HEALTH_FACILITY'
+  )
+  const declaration: Declaration = res.declaration
+  const trackingId: string | undefined = res.trackingId
+  const eventId: string = res.eventId
 
-  test('2.1 Certificate preview', async () => {
+  await test.step('2.1 Certificate preview', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
     await searchFromSearchBar(page, formatV2ChildName(declaration))
@@ -87,15 +79,22 @@ test.describe.serial('Correct record - 2', () => {
     await selectCertificationType(page, 'Birth Certificate')
     await selectRequesterType(page, 'Print and issue to Informant (Mother)')
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
+    // HTTP call will override annotation on next step if we do not wait for this.
+    // Workaround: a late HTTP field response overwrites the annotation with a stale copy. Safe to remove if that no longer happens.
+    const credentialResponse = page.waitForResponse(
+      (res) => res.url().includes('verifiable-credentials/paper-credential'),
+      { timeout: 30_000 }
+    )
+
     await page.getByRole('button', { name: 'Verified', exact: true }).click()
+
+    await credentialResponse
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
 
     await page.getByRole('button', { name: 'No, make correction' }).click()
   })
 
-  test('2.2 Select requester and reason', async () => {
-    // Ensure form is responsive.  There is a slight chance that the click does not register.
-    await page.waitForTimeout(500)
+  await test.step('2.2 Select requester and reason', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Father', { exact: true }).click()
 
@@ -111,9 +110,7 @@ test.describe.serial('Correct record - 2', () => {
 
   const fee = faker.number.int({ min: 1, max: 1000 }).toString()
 
-  test('2.3 Fill correction form', async () => {
-    // Ensure form is responsive.
-    await page.waitForTimeout(500)
+  await test.step('2.3 Fill correction form', async () => {
     await expect(page.getByText('Type of ID')).toBeVisible()
     await expect(page.getByText('National ID')).toBeVisible()
 
@@ -168,8 +165,8 @@ test.describe.serial('Correct record - 2', () => {
     email: faker.internet.email()
   }
 
-  test.describe('2.4 Make correction', async () => {
-    test('2.4.1 Change informant details', async () => {
+  await test.step('2.4 Make correction', async () => {
+    await test.step('2.4.1 Change informant details', async () => {
       await page.getByTestId('change-button-informant.relation').click()
 
       await expectInUrl(
@@ -216,7 +213,7 @@ test.describe.serial('Correct record - 2', () => {
       )
     })
 
-    test('2.4.2 Change place of delivery', async () => {
+    await test.step('2.4.2 Change place of delivery', async () => {
       await page.getByTestId('change-button-child.placeOfBirth').click()
 
       await expectInUrl(
@@ -254,7 +251,7 @@ test.describe.serial('Correct record - 2', () => {
     })
   })
 
-  test('2.7 Correction summary', async () => {
+  await test.step('2.7 Correction summary', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
 
     await expect(page.getByText('Requester' + 'Father')).toBeVisible()
@@ -289,14 +286,10 @@ test.describe.serial('Correct record - 2', () => {
     await expectInUrl(page, `/events/${eventId}`)
   })
 
-  test.describe('2.8 Correction Review', async () => {
-    test.beforeAll(async ({ browser }) => {
-      await page.close()
-      page = await browser.newPage()
-      await login(page, CREDENTIALS.REGISTRAR)
-    })
+  await test.step('2.8 Correction Review', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
 
-    test('2.8.1 Record audit by Registrar', async () => {
+    await test.step('2.8.1 Record audit by Registrar', async () => {
       if (!trackingId) {
         throw new Error('Tracking ID is required')
       }
@@ -307,7 +300,7 @@ test.describe.serial('Correct record - 2', () => {
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test('2.8.2 Correction review page', async () => {
+    await test.step('2.8.2 Correction review page', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       await selectAction(page, 'Review correction request')
       await expect(page.getByText('Requester' + 'Father')).toBeVisible()
@@ -368,7 +361,7 @@ test.describe.serial('Correct record - 2', () => {
       ).toBeVisible()
     })
 
-    test('2.8.3 Reject correction', async () => {
+    await test.step('2.8.3 Reject correction', async () => {
       await page.getByRole('button', { name: 'Reject', exact: true }).click()
       await expect(
         page.getByRole('button', { name: 'Confirm', exact: true })
@@ -383,16 +376,16 @@ test.describe.serial('Correct record - 2', () => {
       await expectInUrl(page, `/events/${eventId}`)
     })
 
-    test.describe('2.8.4 Validate history in record audit', async () => {
-      test('2.8.4.1 Assign', async () => {
+    await test.step('2.8.4 Validate history in record audit', async () => {
+      await test.step('2.8.4.1 Assign', async () => {
         await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
       })
 
-      test('2.8.4.2 Navigate to record audit', async () => {
+      await test.step('2.8.4.2 Navigate to record audit', async () => {
         await page.getByRole('button', { name: 'Audit' }).click()
       })
 
-      test('2.8.4.3 Validate correction requested modal', async () => {
+      await test.step('2.8.4.3 Validate correction requested modal', async () => {
         await page
           .getByRole('button', { name: 'Correction requested', exact: true })
           .click()
@@ -427,7 +420,7 @@ test.describe.serial('Correct record - 2', () => {
         await page.locator('#close-dialog').click()
       })
 
-      test('2.8.4.4 Validate correction rejected modal', async () => {
+      await test.step('2.8.4.4 Validate correction rejected modal', async () => {
         await page
           .getByRole('button', { name: 'Correction rejected', exact: true })
           .click()
@@ -437,7 +430,7 @@ test.describe.serial('Correct record - 2', () => {
         await page.locator('#close-dialog').click()
       })
 
-      test('2.8.4.5 Documents tab shows the correction supporting document', async () => {
+      await test.step('2.8.4.5 Documents tab shows the correction supporting document', async () => {
         await page
           .getByRole('button', { name: 'Documents', exact: true })
           .click()

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   formatDateTo_dMMMMyyyy,
   goToSection,
@@ -39,57 +39,49 @@ const lateRegDate = subDays(recentDate, 500)
 const lateRegDateString = format(lateRegDate, 'yyyy-MM-dd')
 
 /* Use API to declare when form filling does not have any relevant tests. For registrar there is a use case. For CL not. */
-test.describe
-  .serial('Approval of late birth registration -flag can be removed during edit and redeclare', () => {
-  let page: Page
-  let declaration: Declaration
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-
-    const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
-    const declarationRequest = await getDeclaration({
-      token,
-      partialDeclaration: {
-        'child.dob': lateRegDateString,
-        'child.reason': 'Late registration'
-      },
-      placeOfBirthType: 'PRIVATE_HOME'
-    })
-    const res = await createDeclaration(
-      token,
-      declarationRequest,
-      ActionType.DECLARE,
-      'PRIVATE_HOME'
-    )
-    declaration = res.declaration
+test('Approval of late birth registration -flag can be removed during edit and redeclare', async ({
+  page
+}) => {
+  test.setTimeout(240_000)
+  const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
+  const declarationRequest = await getDeclaration({
+    token,
+    partialDeclaration: {
+      'child.dob': lateRegDateString,
+      'child.reason': 'Late registration'
+    },
+    placeOfBirthType: 'PRIVATE_HOME'
   })
-  test.afterAll(async () => {
-    await page.close()
-  })
+  const res = await createDeclaration(
+    token,
+    declarationRequest,
+    ActionType.DECLARE,
+    'PRIVATE_HOME'
+  )
+  const declaration = res.declaration
 
-  test.describe('Declaration Review by RO', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Declaration Review by RO', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
       await page.getByText('Pending validation').click()
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test('Assign', async () => {
+    await test.step('Assign', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
     })
 
-    test("Event should have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Event should have the 'Approval required for late registration' -flag", async () => {
       await expect(
         page.getByText('Approval required for late registration')
       ).toBeVisible()
     })
 
-    test('Select Edit-action', async () => {
+    await test.step('Select Edit-action', async () => {
       await selectAction(page, 'Edit')
     })
 
-    test('Change child dob to recent date', async () => {
+    await test.step('Change child dob to recent date', async () => {
       await page.getByTestId('change-button-child.dob').click()
       const [recentYear, recentMonth, recentDay] = recentDateString.split('-')
 
@@ -98,20 +90,20 @@ test.describe
       await page.getByPlaceholder('yyyy').fill(recentYear)
     })
 
-    test('Go back to review', async () => {
+    await test.step('Go back to review', async () => {
       await page.getByRole('button', { name: 'Go to review' }).click()
     })
 
-    test('Declare with edits', async () => {
+    await test.step('Declare with edits', async () => {
       await triggerDeclarationAction(page, 'Declare with edits')
     })
 
-    test('Go to record', async () => {
+    await test.step('Go to record', async () => {
       await page.getByText('Recent').click()
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test("Event should not have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Event should not have the 'Approval required for late registration' -flag", async () => {
       await expect(page.getByTestId('flags-value')).toHaveText('Validated')
       await expect(
         page.getByText('Approval required for late registration')
@@ -123,58 +115,49 @@ test.describe
   })
 })
 
-test.describe
-  .serial('Approval of late birth registration -flag can be added during edit and redeclare', () => {
-  let page: Page
-  let declaration: Declaration
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-
-    const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
-    const declarationRequest = await getDeclaration({
-      token,
-      partialDeclaration: {
-        'child.dob': recentDateString
-      },
-      placeOfBirthType: 'PRIVATE_HOME'
-    })
-    const res = await createDeclaration(
-      token,
-      declarationRequest,
-      ActionType.DECLARE,
-      'PRIVATE_HOME'
-    )
-
-    declaration = res.declaration
+test('Approval of late birth registration -flag can be added during edit and redeclare', async ({
+  page
+}) => {
+  test.setTimeout(240_000)
+  const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
+  const declarationRequest = await getDeclaration({
+    token,
+    partialDeclaration: {
+      'child.dob': recentDateString
+    },
+    placeOfBirthType: 'PRIVATE_HOME'
   })
+  const res = await createDeclaration(
+    token,
+    declarationRequest,
+    ActionType.DECLARE,
+    'PRIVATE_HOME'
+  )
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  const declaration = res.declaration
 
-  test.describe('Declaration Review by Registrar', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Declaration Review by Registrar', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
       await page.getByText('Pending registration').click()
       await openRecordByTitle(page, formatV2ChildName(declaration))
     })
 
-    test('Assign', async () => {
+    await test.step('Assign', async () => {
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     })
 
-    test("Event should not have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Event should not have the 'Approval required for late registration' -flag", async () => {
       await expect(
         page.getByText('Approval required for late registration')
       ).not.toBeVisible()
     })
 
-    test('Select Edit-action', async () => {
+    await test.step('Select Edit-action', async () => {
       await selectAction(page, 'Edit')
     })
 
-    test('Change child dob to over a year ago date', async () => {
+    await test.step('Change child dob to over a year ago date', async () => {
       await page.getByTestId('change-button-child.dob').click()
 
       const [lateRegYear, lateRegMonth, lateRegDay] =
@@ -185,7 +168,7 @@ test.describe
       await page.locator('#child____reason').fill('Late registration reason')
     })
 
-    test('Upload a document during edit', async () => {
+    await test.step('Upload a document during edit', async () => {
       await goToSection(page, 'documents')
       await uploadImage(
         page,
@@ -193,26 +176,26 @@ test.describe
       )
     })
 
-    test('Go back to review', async () => {
+    await test.step('Go back to review', async () => {
       await page.getByRole('button', { name: 'Go to review' }).click()
     })
 
-    test('Register with edits should be unavailable', async () => {
+    await test.step('Register with edits should be unavailable', async () => {
       await validateActionMenuButton(page, 'Register with edits', false)
     })
 
-    test('Declare with edits', async () => {
+    await test.step('Declare with edits', async () => {
       await triggerDeclarationAction(page, 'Declare with edits')
     })
 
-    test('Go to record', async () => {
+    await test.step('Go to record', async () => {
       await page.getByText('Recent').click()
 
       await openRecordByTitle(page, formatV2ChildName(declaration))
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
     })
 
-    test("Event should have the 'Approval required for late registration' -flag", async () => {
+    await test.step("Event should have the 'Approval required for late registration' -flag", async () => {
       await expect(
         page.getByText('Approval required for late registration')
       ).toBeVisible()
@@ -222,7 +205,7 @@ test.describe
       )
     })
 
-    test('Assert audit trail', async () => {
+    await test.step('Assert audit trail', async () => {
       await switchEventTab(page, 'Audit')
 
       await page.getByRole('button', { name: 'Edited', exact: true }).click()
@@ -243,7 +226,7 @@ test.describe
       await page.getByTestId('close-dialog').click()
     })
 
-    test('Documents tab shows the document added during edit', async () => {
+    await test.step('Documents tab shows the document added during edit', async () => {
       await switchEventTab(page, 'Documents')
       await expect(
         page.locator('#listTable-documents').getByText('Proof of birth')
