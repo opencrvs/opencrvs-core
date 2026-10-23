@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  BucketAlreadyOwnedByYou,
   BucketLocationConstraint,
   CreateBucketCommand,
   DeleteBucketPolicyCommand,
@@ -16,14 +17,12 @@ import {
   DeleteObjectsCommand,
   HeadBucketCommand,
   HeadObjectCommand,
+  NoSuchKey,
+  NotFound,
   paginateListObjectsV2
 } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import {
-  S3_BUCKET,
-  S3_BUCKET_REGION,
-  S3_ENDPOINT
-} from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 import { createS3Client } from '@documents/s3/sdk-client'
 import { Readable } from 'stream'
 
@@ -33,29 +32,27 @@ import { Readable } from 'stream'
  * it. What each store must support is listed in
  * docs/adr/0004-documents-speaks-plain-s3.md.
  */
-const s3Client = createS3Client(S3_ENDPOINT)
+const s3Client = createS3Client(env.S3_ENDPOINT)
 
 /** The most keys a single `DeleteObjects` request may carry. */
 const MAX_KEYS_PER_DELETE = 1000
 
-function errorName(error: unknown) {
-  return (error as { name?: string }).name
-}
+/** How many of the keys that could not be deleted an error names. */
+const MAX_FAILED_KEYS_REPORTED = 10
 
+/** Stores other than AWS S3 may answer a bare 404, which the SDK names `UnknownError`. */
 function isNotFound(error: unknown) {
   const status = (error as { $metadata?: { httpStatusCode?: number } })
     .$metadata?.httpStatusCode
 
   return (
-    errorName(error) === 'NotFound' ||
-    errorName(error) === 'NoSuchKey' ||
-    status === 404
+    error instanceof NotFound || error instanceof NoSuchKey || status === 404
   )
 }
 
 export async function ensureDefaultBucket() {
   try {
-    await s3Client.send(new HeadBucketCommand({ Bucket: S3_BUCKET }))
+    await s3Client.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }))
     return
   } catch (error) {
     if (!isNotFound(error)) {
@@ -66,18 +63,18 @@ export async function ensureDefaultBucket() {
   try {
     await s3Client.send(
       new CreateBucketCommand({
-        Bucket: S3_BUCKET,
+        Bucket: env.S3_BUCKET,
         // S3 rejects a location constraint for us-east-1
-        ...(S3_BUCKET_REGION !== 'us-east-1' && {
+        ...(env.S3_BUCKET_REGION !== 'us-east-1' && {
           CreateBucketConfiguration: {
-            LocationConstraint: S3_BUCKET_REGION as BucketLocationConstraint
+            LocationConstraint: env.S3_BUCKET_REGION as BucketLocationConstraint
           }
         })
       })
     )
   } catch (error) {
     // Another replica of this service created it between our check and now
-    if (errorName(error) !== 'BucketAlreadyOwnedByYou') {
+    if (!(error instanceof BucketAlreadyOwnedByYou)) {
       throw error
     }
   }
@@ -100,10 +97,13 @@ export async function ensureDefaultBucket() {
  */
 export async function ensureDefaultBucketIsPrivate() {
   try {
-    await s3Client.send(new DeleteBucketPolicyCommand({ Bucket: S3_BUCKET }))
+    await s3Client.send(
+      new DeleteBucketPolicyCommand({ Bucket: env.S3_BUCKET })
+    )
   } catch (error) {
-    // Nothing to remove, which is the state that we want
-    if (errorName(error) !== 'NoSuchBucketPolicy') {
+    // Nothing to remove, which is the state that we want. The SDK has no class
+    // for this error, so it is known by its name.
+    if ((error as { name?: string }).name !== 'NoSuchBucketPolicy') {
       throw error
     }
   }
@@ -115,10 +115,10 @@ export async function ensureDefaultBucketIsPrivate() {
 export async function statObjectIfExists(key: string) {
   try {
     const head = await s3Client.send(
-      new HeadObjectCommand({ Bucket: S3_BUCKET, Key: key })
+      new HeadObjectCommand({ Bucket: env.S3_BUCKET, Key: key })
     )
 
-    return { metaData: head.Metadata ?? {} }
+    return { metadata: head.Metadata ?? {} }
   } catch (error) {
     if (isNotFound(error)) {
       return null
@@ -129,25 +129,17 @@ export async function statObjectIfExists(key: string) {
 }
 
 /**
- * @param metaData `content-type` becomes the object's content type. Every other
- * entry is stored as user metadata, which the store lowercases.
+ * @param options.metadata stored as user metadata. The SDK lowercases the names,
+ * and of two that differ only in case, the later one wins.
  */
 export async function putObject(
   key: string,
   body: Readable | Buffer,
-  metaData: Record<string, string> = {}
+  {
+    contentType,
+    metadata = {}
+  }: { contentType?: string; metadata?: Record<string, string> } = {}
 ) {
-  let contentType: string | undefined
-  const userMetadata: Record<string, string> = {}
-
-  for (const [name, value] of Object.entries(metaData)) {
-    if (name.toLowerCase() === 'content-type') {
-      contentType = value
-    } else {
-      userMetadata[name.toLowerCase()] = value
-    }
-  }
-
   /*
    * An upload is a stream of unknown length, and a plain `PutObject` needs the
    * length up front. `Upload` streams it, as a multipart upload when it is large.
@@ -155,28 +147,35 @@ export async function putObject(
   await new Upload({
     client: s3Client,
     params: {
-      Bucket: S3_BUCKET,
+      Bucket: env.S3_BUCKET,
       Key: key,
       Body: body,
       ContentType: contentType,
-      Metadata: userMetadata
+      Metadata: metadata
     }
   }).done()
 }
 
 export async function removeObject(key: string) {
-  await s3Client.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }))
+  await s3Client.send(
+    new DeleteObjectCommand({ Bucket: env.S3_BUCKET, Key: key })
+  )
 }
 
 /**
- * @throws when the store reports any key it could not delete, so that a failed
- * sweep is not mistaken for a successful one.
+ * Sends every batch even when an earlier one fails. The store cannot delete
+ * keys as a single transaction, so a failure leaves the rest deleted.
+ *
+ * @throws once all batches are sent, when the store reports any key it could
+ * not delete, so that a failed sweep is not mistaken for a successful one.
  */
 export async function removeObjects(keys: string[]) {
+  const failed: string[] = []
+
   for (let start = 0; start < keys.length; start += MAX_KEYS_PER_DELETE) {
-    const { Errors } = await s3Client.send(
+    const { Errors = [] } = await s3Client.send(
       new DeleteObjectsCommand({
-        Bucket: S3_BUCKET,
+        Bucket: env.S3_BUCKET,
         Delete: {
           Objects: keys
             .slice(start, start + MAX_KEYS_PER_DELETE)
@@ -186,25 +185,27 @@ export async function removeObjects(keys: string[]) {
       })
     )
 
-    if (Errors?.length) {
-      throw new Error(
-        `Failed to delete ${Errors.length} object(s): ${Errors.map(
-          ({ Key, Code }) => `${Key} (${Code})`
-        ).join(', ')}`
-      )
-    }
+    failed.push(...Errors.map(({ Key, Code }) => `${Key} (${Code})`))
+  }
+
+  if (failed.length > 0) {
+    throw new Error(
+      `Failed to delete ${failed.length} object(s), the first of them: ${failed
+        .slice(0, MAX_FAILED_KEYS_REPORTED)
+        .join(', ')}`
+    )
   }
 }
 
 /**
  * @returns the key of every object under the prefix, at any depth.
  */
-export async function listObjectKeys(prefix = '') {
+export async function listObjectKeys(prefix: string) {
   const keys: string[] = []
 
   for await (const page of paginateListObjectsV2(
     { client: s3Client },
-    { Bucket: S3_BUCKET, Prefix: prefix }
+    { Bucket: env.S3_BUCKET, Prefix: prefix }
   )) {
     for (const object of page.Contents ?? []) {
       if (object.Key) {

@@ -10,9 +10,11 @@
  */
 
 import { listObjectKeys } from '@documents/s3/client'
-import { S3_BUCKET } from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 import { signFileUrl } from '@documents/s3/sign'
 import * as Hapi from '@hapi/hapi'
+import { badRequest } from '@hapi/boom'
+import { isAttachmentPath } from '@opencrvs/commons'
 import { z } from 'zod'
 
 export async function createPreSignedUrl(
@@ -27,8 +29,8 @@ export async function createPreSignedUrl(
     filePath = filePath.slice(1)
   }
 
-  if (filePath.startsWith(S3_BUCKET)) {
-    filePath = filePath.slice(S3_BUCKET.length + 1)
+  if (filePath.startsWith(env.S3_BUCKET)) {
+    filePath = filePath.slice(env.S3_BUCKET.length + 1)
   }
 
   try {
@@ -64,5 +66,14 @@ export async function listFiles(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  return h.response(await listObjectKeys(request.params.prefix))
+  const { prefix } = request.params
+
+  // Anything looser than a record's or a user's prefix would list the bucket
+  if (!isAttachmentPath(prefix)) {
+    throw badRequest(
+      `request failed: ${prefix} is not a record or user prefix, refusing to list`
+    )
+  }
+
+  return h.response(await listObjectKeys(prefix))
 }

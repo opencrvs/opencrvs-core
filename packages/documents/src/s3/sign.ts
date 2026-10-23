@@ -10,11 +10,7 @@
  */
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import {
-  S3_BUCKET,
-  S3_PRESIGNED_URL_EXPIRY_IN_SECOND,
-  S3_PUBLIC_ENDPOINT
-} from '@documents/s3/constants'
+import { env, S3_PRESIGNED_URL_EXPIRY_IN_SECOND } from '@documents/s3/constants'
 import { createS3Client } from '@documents/s3/sdk-client'
 
 /*
@@ -22,7 +18,7 @@ import { createS3Client } from '@documents/s3/sdk-client'
  * for, so this client points at the public address that browsers use and not at
  * the internal address that the documents service connects to.
  */
-const presignClient = createS3Client(S3_PUBLIC_ENDPOINT)
+const presignClient = createS3Client(env.S3_PUBLIC_ENDPOINT)
 
 /**
  * @param key the object's key within the bucket, never starting with `/`
@@ -30,7 +26,7 @@ const presignClient = createS3Client(S3_PUBLIC_ENDPOINT)
 export function signFileUrl(key: string): Promise<string> {
   return getSignedUrl(
     presignClient,
-    new GetObjectCommand({ Bucket: S3_BUCKET, Key: key }),
+    new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: key }),
     { expiresIn: S3_PRESIGNED_URL_EXPIRY_IN_SECOND }
   )
 }

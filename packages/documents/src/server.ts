@@ -19,7 +19,7 @@ import {
 import getPlugins from '@documents/config/plugins'
 import { getRoutes } from '@documents/config/routes'
 import { readFileSync } from 'fs'
-import { S3_ENDPOINT } from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 import {
   ensureDefaultBucket,
   ensureDefaultBucketIsPrivate
@@ -60,7 +60,7 @@ export async function createServer() {
     try {
       await ensureDefaultBucket()
       await ensureDefaultBucketIsPrivate()
-      server.log('info', `Object storage ready on ${S3_ENDPOINT}`)
+      server.log('info', `Object storage ready on ${env.S3_ENDPOINT}`)
       await server.start()
       server.log('info', `Documents server started on ${HOST}:${PORT}`)
     } catch (error) {

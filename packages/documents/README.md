@@ -6,14 +6,14 @@ Stores and serves the files that belong to records: attachments, signatures and 
 
 The service is configured with `S3_*` environment variables. An empty value counts as unset. The service checks them with `envalid` when it starts, and does not start if one does not fit: an endpoint that does not start with `http://` or `https://`.
 
-| Setting              | Default                    | Meaning                                                                                                                         |
-| -------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `S3_ENDPOINT`        | `http://localhost:3535`    | URL, with the protocol, where the documents service reaches the store.                                                          |
-| `S3_PUBLIC_ENDPOINT` | the value of `S3_ENDPOINT` | URL, with the protocol, that browsers use. Presigned URLs are signed for it. Set it when the store has another address outside. |
-| `S3_BUCKET`          | `ocrvs`                    | The bucket. The events migration reads it too, to strip it from stored paths, so give both the same value.                      |
-| `S3_BUCKET_REGION`   | `local`                    | Region of the bucket.                                                                                                           |
-| `S3_ACCESS_KEY`      | `minioadmin`               |                                                                                                                                 |
-| `S3_SECRET_KEY`      | `minioadmin`               |                                                                                                                                 |
+| Setting              | Default                                                           | Meaning                                                                                                                        |
+| -------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `S3_ENDPOINT`        | `http://localhost:3535`, required when `NODE_ENV` is `production` | URL, with the protocol, where the documents service reaches the store.                                                         |
+| `S3_PUBLIC_ENDPOINT` | `http://localhost:3535`, required when `NODE_ENV` is `production` | URL, with the protocol, that browsers use. Presigned URLs are signed for it. Set it even when it is the same as `S3_ENDPOINT`. |
+| `S3_BUCKET`          | `ocrvs`                                                           | The bucket. The events migration reads it too, to strip it from stored paths, so give both the same value.                     |
+| `S3_BUCKET_REGION`   | `local`                                                           | Region of the bucket.                                                                                                          |
+| `S3_ACCESS_KEY`      | `minioadmin`                                                      |                                                                                                                                |
+| `S3_SECRET_KEY`      | `minioadmin`                                                      |                                                                                                                                |
 
 The defaults match the store that `docker-compose.dev-deps.yml` starts for development. The Helm chart sets these settings from its `s3` values.
 

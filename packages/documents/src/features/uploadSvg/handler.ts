@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { putObject } from '@documents/s3/client'
-import { S3_BUCKET } from '@documents/s3/constants'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import isSvg from 'is-svg'
@@ -40,11 +40,13 @@ export async function svgUploadHandler(
   const generateFileName = `${ref}.svg`
   try {
     await putObject(generateFileName, bufferData, {
-      'content-type': 'image/svg+xml',
-      'created-by': userId
+      contentType: 'image/svg+xml',
+      metadata: { 'created-by': userId }
     })
 
-    return h.response({ refUrl: `/${S3_BUCKET}/${generateFileName}` }).code(200)
+    return h
+      .response({ refUrl: `/${env.S3_BUCKET}/${generateFileName}` })
+      .code(200)
   } catch (error) {
     return h.response(error as Error).code(400)
   }
