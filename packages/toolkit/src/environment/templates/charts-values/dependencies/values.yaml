@@ -54,7 +54,7 @@ redis:
   auth_mode: acl
 
 monitoring:
-  enabled: true
+  enabled: {{monitoring_enabled}}
 
 elastalert:
   env:
