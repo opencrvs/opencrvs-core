@@ -18,6 +18,7 @@ import {
   RecordForm,
   generateEventDocument,
   getCurrentEventState,
+  getRecordVersions,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { useRecordVersions } from './useRecordVersions'
@@ -83,6 +84,84 @@ describe('useRecordVersions', () => {
     expect(result.current.selected?.form).toBe(RecordForm.REGISTRATION)
     expect(result.current.selected?.isLatestOfForm).toBe(true)
     expect(result.current.isLatest).toBe(true)
+  })
+
+  /*
+   * Regression: the fallback used to resolve `selected` but not the index it
+   * came from, so with no `version` in the url — the default when the Record
+   * tab opens — there was never a previous version to compare against.
+   */
+  it('resolves the previous version when no version param is given', () => {
+    // Ends on an edited declaration, so the newest version has one before it
+    // of the same form — the case the comparison is actually offered for.
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.EDIT },
+        { type: ActionType.DECLARE }
+      ]
+    })
+    const { result } = renderVersions(event)
+
+    expect(result.current.previous).toBeDefined()
+    expect(result.current.previous?.actionId).toBe(
+      result.current.versions.at(-2)?.actionId
+    )
+    expect(result.current.previousState).toBeDefined()
+  })
+
+  it('does not compare a first registration against the declaration', () => {
+    const event = editedThenRegistered()
+    const { result } = renderVersions(event)
+
+    // REGISTER never alters declaration data, so there is nothing to show.
+    expect(result.current.selected?.form).toBe(RecordForm.REGISTRATION)
+    expect(result.current.previous).toBeUndefined()
+  })
+
+  it('does not compare a first declaration against the notification', () => {
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.NOTIFY },
+        { type: ActionType.DECLARE }
+      ]
+    })
+    const declaration = getRecordVersions(event).find(
+      ({ form }) => form === RecordForm.DECLARATION
+    )
+    const { result } = renderVersions(
+      event,
+      `?version=${declaration?.actionId}`
+    )
+
+    // The record being completed, not edited — there is no earlier declaration.
+    expect(result.current.previous).toBeUndefined()
+  })
+
+  it('compares a declaration against the declaration before it', () => {
+    const event = editedThenRegistered()
+    const declarations = getRecordVersions(event).filter(
+      ({ form }) => form === RecordForm.DECLARATION
+    )
+    const { result } = renderVersions(
+      event,
+      `?version=${declarations[1].actionId}`
+    )
+
+    expect(result.current.previous?.actionId).toBe(declarations[0].actionId)
+  })
+
+  it('has no previous version on the first one', () => {
+    const event = editedThenRegistered()
+    const first = getRecordVersions(event)[0]
+    const { result } = renderVersions(event, `?version=${first.actionId}`)
+
+    expect(result.current.previous).toBeUndefined()
+    expect(result.current.previousState).toBeUndefined()
   })
 
   it('honours a version search param', () => {

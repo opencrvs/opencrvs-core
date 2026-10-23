@@ -130,6 +130,22 @@ export const tertiary = css`
   }
 `
 
+/*
+ * A button that holds an on/off state, rather than firing once. It keeps the
+ * background the variant already uses for `:active`, so being switched on
+ * reads as still held down instead of introducing another state colour.
+ *
+ * Intended for the unfilled variants — tertiary, secondary and icon. On a
+ * filled variant it would flatten the fill.
+ */
+export const pressed = css`
+  background: ${({ theme }) => theme.colors.grey200};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey300};
+  }
+`
+
 export const positive = css`
   background: ${({ theme }) => theme.colors.positive};
   color: ${({ theme }) => theme.colors.white};
