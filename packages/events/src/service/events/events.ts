@@ -41,7 +41,10 @@ import {
   deleteFile,
   fileExists
 } from '@events/service/files'
-import { indexEvent } from '@events/service/indexing/indexing'
+import {
+  deleteIndexedEvent,
+  indexEvent
+} from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 
@@ -147,6 +150,7 @@ export async function deleteEvent(
   await deleteEventAttachments(token, event)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
+  await deleteIndexedEvent(event)
 
   return { id }
 }
@@ -477,7 +481,7 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent, configuration)
+  await ensureEventIndexed(updatedEvent, configuration)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
