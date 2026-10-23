@@ -163,7 +163,9 @@ A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matchi
 
 The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys. **The settings were renamed, so check [Object store settings renamed from `MINIO_*` to `S3_*`](#object-store-settings-renamed-from-minio_-to-s3_) before you upgrade.**
 
-The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement. MinIO, SeaweedFS and RustFS were tried by hand; AWS S3 and Google Cloud Storage have not been tried, and nothing in CI runs against a store other than MinIO. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store was tried on and what to check when you use another.
+The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store was tried on and what to check when you use another.
+
+The client's Content-Security-Policy allows the origin of the S3 public endpoint in `connect-src`, so browsers can read documents from a store on another domain, such as `storage.googleapis.com`. The services chart sets it as `S3_PUBLIC_ORIGIN` on the client. A deployment without the chart can set that variable on the client container. When it is not set, nothing is added.
 
 A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
