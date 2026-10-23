@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { loginWithNewUser, continueForm, login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 
-test.describe.serial('1. Create and update user -1', () => {
-  let page: Page
+test('1. Create and update user -1', async ({ page, browser }) => {
   const userinfo = {
     firstName: faker.person.firstName('male'),
     surname: faker.person.lastName('male'),
@@ -39,36 +38,26 @@ test.describe.serial('1. Create and update user -1', () => {
     `${updatedUserInfo.firstName[0]}.${updatedUserInfo.surname}`.toLowerCase()
   const updatedFullname = `${updatedUserInfo.firstName} ${updatedUserInfo.surname}`
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
+  await test.step('1.1 User creation started by local system admin', async () => {
+    await login(page, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
+    await page.getByRole('button', { name: 'Team' }).click()
+    await expect(page.locator('#content-name')).toHaveText(
+      'Central Province Office'
+    )
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+    await page
+      .getByRole('button', {
+        name: /Central Province Office, Central/
+      })
+      .click()
+    await page.getByTestId('locationSearchInput').fill('Zimbi')
 
-  test.describe('1.1 User creation started by local system admin', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
-      await page.getByRole('button', { name: 'Team' }).click()
-      await expect(page.locator('#content-name')).toHaveText(
-        'Central Province Office'
-      )
+    await page.getByText(/Zimbi Village Office, Zimbi, Isamba/).click()
 
-      await page
-        .getByRole('button', {
-          name: /Central Province Office, Central/
-        })
-        .click()
-      await page.getByTestId('locationSearchInput').fill('Zimbi')
+    await page.click('#add-user')
+    await expect(page.getByText('User details')).toBeVisible()
 
-      await page.getByText(/Zimbi Village Office, Zimbi, Isamba/).click()
-
-      await page.click('#add-user')
-      await expect(page.getByText('User details')).toBeVisible()
-    })
-
-    test('1.1.1 Fill user details', async () => {
+    await test.step('1.1.1 Fill user details', async () => {
       await page.locator('#surname').fill(userinfo.surname)
       await page.locator('#firstname').fill(userinfo.firstName)
       await page.locator('#phoneNumber').fill(userinfo.phone)
@@ -80,7 +69,7 @@ test.describe.serial('1. Create and update user -1', () => {
       await continueForm(page)
     })
 
-    test('1.1.2 Create user', async () => {
+    await test.step('1.1.2 Create user', async () => {
       await page.getByRole('button', { name: 'Create user' }).click()
 
       await expect(page.getByText('New user created')).toBeVisible()
@@ -102,7 +91,7 @@ test.describe.serial('1. Create and update user -1', () => {
       ).toBeVisible()
     })
 
-    test('1.1.3 Verify user details', async () => {
+    await test.step('1.1.3 Verify user details', async () => {
       await page.getByRole('button', { name: fullname }).click()
       await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
       await page.getByText('Edit details').click()
@@ -122,7 +111,7 @@ test.describe.serial('1. Create and update user -1', () => {
       await expect(page.getByTestId('device-value')).toHaveText(userinfo.device)
     })
 
-    test('1.1.4 Update user details', async () => {
+    await test.step('1.1.4 Update user details', async () => {
       await page.getByTestId('change-button-name').click()
 
       await page.locator('#surname').fill(updatedUserInfo.surname)
@@ -151,7 +140,7 @@ test.describe.serial('1. Create and update user -1', () => {
       await expect(page.getByText('Farajaland CRS')).toBeVisible()
     })
 
-    test('1.1.5 Verify user details', async () => {
+    await test.step('1.1.5 Verify user details', async () => {
       await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
       await page.getByText('Edit details').click()
 
@@ -177,9 +166,11 @@ test.describe.serial('1. Create and update user -1', () => {
     })
   })
 
-  test.describe('2.1 Login with newly created user credentials', () => {
-    test('2.1.1 Enter your username and password', async ({ page }) => {
-      await loginWithNewUser(page, updatedUsername)
+  await test.step('2.1 Login with newly created user credentials', async () => {
+    await test.step('2.1.1 Enter your username and password', async () => {
+      // A fresh page, so the new user logs in without the admin's session
+      const newUserPage = await browser.newPage()
+      await loginWithNewUser(newUserPage, updatedUsername)
     })
   })
 })

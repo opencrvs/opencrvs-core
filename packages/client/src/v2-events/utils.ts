@@ -10,7 +10,6 @@
  */
 import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { IntlShape } from 'react-intl'
 import {
   ActionDocument,
   EventConfig,
@@ -35,8 +34,7 @@ import {
   getAdministrativeAreaHierarchy,
   resolveVersion,
   ZodDate,
-  getActionConfig,
-  isActionConfigType
+  isUUID
 } from '@opencrvs/commons/client'
 import {
   findSelectedVersion,
@@ -127,8 +125,8 @@ export function resolveLocationValue<T extends VersionedEntity>(
   if (pinned) {
     return pinned
   }
-
-  const id = UUID.safeParse(toLocationId(value)).data
+  const locationId = toLocationId(value)
+  const id = locationId && isUUID(locationId) ? locationId : undefined
   const entity = id && entities.get(id)
 
   return entity
@@ -154,30 +152,6 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   )
 
   return uniq(userIds)
-}
-
-/**
- * The human-readable name of an action, taken from its configured 'label' (e.g. "Declare").
- */
-export function getRecordActionLabel(
-  action: ActionDocument,
-  eventConfiguration: EventConfig,
-  intl: IntlShape
-): string {
-  if (isActionConfigType(action.type)) {
-    const actionConfig = getActionConfig({
-      eventConfiguration,
-      actionType: action.type,
-      customActionType:
-        'customActionType' in action ? action.customActionType : undefined
-    })
-
-    if (actionConfig?.label) {
-      return intl.formatMessage(actionConfig.label)
-    }
-  }
-
-  return action.type
 }
 
 function eventMetadataObjectFromEntries(entries: [string, unknown][]) {
@@ -242,6 +216,7 @@ export function recordAnchorDate(eventState: {
  * from), falling back to the record's creation date when that field is
  * empty or not yet configured.
  */
+
 export function liveAnchorDate({
   dateOfEvent,
   form,
@@ -256,10 +231,8 @@ export function liveAnchorDate({
       ? form[dateOfEvent.$$field]
       : undefined
 
-  const parsedDate = ZodDate.safeParse(fieldValue)
-
   return recordAnchorDate({
-    dateOfEvent: parsedDate.success ? parsedDate.data : undefined,
+    dateOfEvent: ZodDate.validate(fieldValue) ? fieldValue : undefined,
     createdAt
   })
 }

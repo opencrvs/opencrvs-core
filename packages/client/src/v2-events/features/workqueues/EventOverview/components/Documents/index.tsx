@@ -10,7 +10,7 @@
  */
 import React, { useMemo, useState } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { defineMessages, useIntl } from 'react-intl'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   ActionDocument,
@@ -22,6 +22,8 @@ import {
   FileFieldValueWithOption,
   findAllFields,
   getAcceptedActions,
+  getActionConfig,
+  isActionConfigType,
   isFileFieldType,
   isFileFieldWithOptionType,
   TranslationConfig
@@ -40,10 +42,10 @@ import { ActionType } from '@opencrvs/commons/client'
 import { messages as eventOverviewMessages } from '@client/v2-events/layouts/EventOverview'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { getRecordActionLabel } from '@client/v2-events/utils'
 import { DocumentPreview } from '@client/v2-events/components/forms/inputs/FileInput/DocumentPreview'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useOnlineStatus } from '@client/utils'
+import { findImmediateApproveCorrection } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionByCell, WhenCell } from '../EventHistory'
 
 const PAGE_SIZE = 10
@@ -92,6 +94,10 @@ const messages = defineMessages({
     id: 'events.documents.offline.description',
     defaultMessage:
       "This record's documents have not been downloaded yet, so they cannot be opened offline. Please reconnect to the internet to view them."
+  },
+  requestCorrection: {
+    id: 'events.documents.requestCorrection',
+    defaultMessage: 'Request correction'
   }
 })
 
@@ -169,7 +175,7 @@ function getUploadedDocuments(
  * Collects every document uploaded to a record as a flat, chronological history of upload events.
  */
 function collectDocuments(
-  event: EventDocument,
+  acceptedActions: ActionDocument[],
   config: EventConfig
 ): DocumentEntry[] {
   // findAllFields covers both declaration and annotation field configs, so file uploads living in either resolve to a config here.
@@ -177,15 +183,60 @@ function collectDocuments(
     findAllFields(config).map((field) => [field.id, field])
   )
 
-  // We want to hide documents for reject correction and edit actions.
-  // - Why hide reject correction? We dont want to display documents for a rejected correction, only a correction request or an accepted correction.
-  // - Why hide edit? Edit also applies declare/register action, which displays the documents, so we dont want a duplicate row.
-  return getAcceptedActions(event)
+  // List each file only once, under the action that first uploaded it.
+  const listedPaths = new Set<string>()
+
+  // We skip the reject correction and edit actions themselves.
+  // - Why skip reject correction? Its documents live on the correction request, which stays listed even when rejected.
+  // - Why skip edit? Edit also applies declare/register action, which displays the documents, so we dont want a duplicate row.
+  return acceptedActions
     .filter(
       ({ type }) =>
         type !== ActionType.REJECT_CORRECTION && type !== ActionType.EDIT
     )
     .flatMap((action) => getUploadedDocuments(action, fieldById))
+    .filter(({ file }) => {
+      if (listedPaths.has(file.path)) {
+        return false
+      }
+      listedPaths.add(file.path)
+      return true
+    })
+}
+
+/**
+ * The human-readable name of the action that added a document, taken from its configured 'label' (e.g. "Declare").
+ *
+ * A direct correction is stored as a correction request that its requester approves immediately, so both share the same action.
+ * Only the direct correction keeps the configured label; `acceptedActions` are the record's actions used to tell the two apart.
+ */
+function getRecordActionLabel(
+  action: ActionDocument,
+  acceptedActions: ActionDocument[],
+  eventConfiguration: EventConfig,
+  intl: IntlShape
+): string {
+  if (
+    action.type === ActionType.REQUEST_CORRECTION &&
+    !findImmediateApproveCorrection(acceptedActions, action)
+  ) {
+    return intl.formatMessage(messages.requestCorrection)
+  }
+
+  if (isActionConfigType(action.type)) {
+    const actionConfig = getActionConfig({
+      eventConfiguration,
+      actionType: action.type,
+      customActionType:
+        'customActionType' in action ? action.customActionType : undefined
+    })
+
+    if (actionConfig?.label) {
+      return intl.formatMessage(actionConfig.label)
+    }
+  }
+
+  return action.type
 }
 
 /**
@@ -223,10 +274,13 @@ function DocumentsContent({ event }: { event: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
   const { eventConfiguration } = useEventConfiguration(event.type)
 
-  const entries = useMemo(
-    () => collectDocuments(event, eventConfiguration),
-    [event, eventConfiguration]
-  )
+  const { acceptedActions, entries } = useMemo(() => {
+    const actions = getAcceptedActions(event)
+    return {
+      acceptedActions: actions,
+      entries: collectDocuments(actions, eventConfiguration)
+    }
+  }, [event, eventConfiguration])
 
   const columns = [
     // Padding column
@@ -282,6 +336,7 @@ function DocumentsContent({ event }: { event: EventDocument }) {
       document: <DocumentNameCell file={entry.file} name={documentName} />,
       recordAction: getRecordActionLabel(
         entry.action,
+        acceptedActions,
         eventConfiguration,
         intl
       ),

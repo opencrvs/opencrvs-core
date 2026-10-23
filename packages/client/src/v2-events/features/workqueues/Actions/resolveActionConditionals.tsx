@@ -33,6 +33,7 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
   EventStatus.enum.REGISTERED,
+  EventStatus.enum.REVOKED,
   EventStatus.enum.ARCHIVED
 ]
 
@@ -89,6 +90,8 @@ function resolveInternalActionConditions({
       }
     case ActionType.ARCHIVE:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
     case ActionType.DELETE:
     case ActionType.EDIT:
     case ActionType.REJECT:

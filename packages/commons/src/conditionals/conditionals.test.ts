@@ -1050,7 +1050,7 @@ describe('"flag" conditionals', () => {
       $online: true
     } satisfies EventStateConditionalParameters
 
-    expect(validate(flag(InherentFlags.INCOMPLETE), params)).toBe(false)
+    expect(validate(flag(InherentFlags.REJECTED), params)).toBe(false)
     expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
       true
     )

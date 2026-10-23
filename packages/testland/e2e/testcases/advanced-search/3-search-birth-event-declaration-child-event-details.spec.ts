@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, login } from '@e2e/support/helpers'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -18,57 +18,49 @@ import { assertTexts, selectLocationOption, type } from '@e2e/support/utils'
 import { format, subDays } from 'date-fns'
 import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 
-test.describe
-  .serial("Advanced Search - Birth Event Declaration - Child's details", () => {
-  let page: Page
+test("Advanced Search - Birth Event Declaration - Child's details", async ({
+  page
+}) => {
   let [yyyy, mm, dd] = ['', '', '']
   let fullNameOfChild = ''
   let facilityId = ''
-  let record: Awaited<ReturnType<typeof createDeclaration>>
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-    const toDate = format(new Date(), 'yyyy-MM-dd')
-    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
-    const fromDate = format(
-      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
-      'yyyy-MM-dd'
-    )
+  const toDate = format(new Date(), 'yyyy-MM-dd')
+  // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+  const fromDate = format(
+    subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+    'yyyy-MM-dd'
+  )
 
-    record = await createDeclaration(
-      token,
-      {
-        'child.dob': faker.date
-          .between({ from: fromDate, to: toDate })
-          .toISOString()
-          .split('T')[0],
-        'child.gender': 'female'
-      },
-      'REGISTER',
-      'HEALTH_FACILITY'
-    )
-    ;[yyyy, mm, dd] = record.declaration['child.dob'].split('-')
-    fullNameOfChild =
-      record.declaration['child.name'].firstname +
-      ' ' +
-      record.declaration['child.name'].surname
-    facilityId = record.declaration['child.birthLocation'] ?? ''
-  })
+  const record = await createDeclaration(
+    token,
+    {
+      'child.dob': faker.date
+        .between({ from: fromDate, to: toDate })
+        .toISOString()
+        .split('T')[0],
+      'child.gender': 'female'
+    },
+    'REGISTER',
+    'HEALTH_FACILITY'
+  )
+  ;[yyyy, mm, dd] = record.declaration['child.dob'].split('-')
+  fullNameOfChild =
+    record.declaration['child.name'].firstname +
+    ' ' +
+    record.declaration['child.name'].surname
+  facilityId = record.declaration['child.birthLocation'] ?? ''
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('3.1 - Validate log in and load search page', async () => {
+  await test.step('3.1 - Validate log in and load search page', async () => {
     await login(page)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
     await page.getByText('Birth').click()
   })
 
-  test.describe.serial("3 - Validate search by Child's DOB & Gender", () => {
-    test('3.1.1 - Validate filling DOB and gender filters', async () => {
+  await test.step("3 - Validate search by Child's DOB & Gender", async () => {
+    await test.step('3.1.1 - Validate filling DOB and gender filters', async () => {
       await page.getByText('Child details').click()
 
       await type(
@@ -100,7 +92,7 @@ test.describe
       await selectLocationOption(page, 'Klow Village Hospital')
     })
 
-    test('3.1.2 - Validate search and show results', async () => {
+    await test.step('3.1.2 - Validate search and show results', async () => {
       await page.click('#search')
       await expect(page).toHaveURL(/.*\/search-result/)
       expect(page.url()).toContain(`child.dob=${yyyy}-${mm}-${dd}`)
@@ -127,7 +119,7 @@ test.describe
       ).toBeVisible()
     })
 
-    test('3.1.3 - Validate clicking on the search edit button', async () => {
+    await test.step('3.1.3 - Validate clicking on the search edit button', async () => {
       await page.getByRole('button', { name: 'Edit', exact: true }).click()
       await expect(page).toHaveURL(/.*\/advanced-search/)
       expect(page.url()).toContain(`child.birthLocation=${facilityId}`)
@@ -150,73 +142,65 @@ test.describe
   })
 })
 
-test.describe
-  .serial("Advanced Search - Birth Event Declaration - Child's Residential Address", () => {
-  let page: Page
+test("Advanced Search - Birth Event Declaration - Child's Residential Address", async ({
+  page
+}) => {
   let fullNameOfChild = ''
   let province = ''
   let district = ''
   let village = ''
-  let record: Awaited<ReturnType<typeof createDeclaration>>
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-    const administrativeAreas = await getAdministrativeAreas(token)
-    province = getIdByName(administrativeAreas, 'Central')!
-    district = getIdByName(administrativeAreas, 'Ibombo')!
-    village = getIdByName(administrativeAreas, 'Klow')!
+  const administrativeAreas = await getAdministrativeAreas(token)
+  province = getIdByName(administrativeAreas, 'Central')!
+  district = getIdByName(administrativeAreas, 'Ibombo')!
+  village = getIdByName(administrativeAreas, 'Klow')!
 
-    if (!province || !district || !village) {
-      throw new Error('Province, district or village not found')
-    }
+  if (!province || !district || !village) {
+    throw new Error('Province, district or village not found')
+  }
 
-    const toDate = format(new Date(), 'yyyy-MM-dd')
-    // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
-    const fromDate = format(
-      subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
-      'yyyy-MM-dd'
-    )
+  const toDate = format(new Date(), 'yyyy-MM-dd')
+  // Previously tested failed and had to retry consistently since with late registration "child.reason" becomes required.
+  const fromDate = format(
+    subDays(new Date(), BIRTH_LATE_REGISTRATION_TARGET_DAYS - 10),
+    'yyyy-MM-dd'
+  )
 
-    record = await createDeclaration(
-      token,
-      {
-        'child.dob': faker.date
-          .between({ from: fromDate, to: toDate })
-          .toISOString()
-          .split('T')[0],
-        'child.placeOfBirth': 'PRIVATE_HOME',
-        'child.birthLocation.privateHome': {
-          country: 'FAR',
-          addressType: 'DOMESTIC',
-          administrativeArea: village,
-          streetLevelDetails: { town: 'Dhaka' }
-        },
-        'child.gender': 'female'
+  const record = await createDeclaration(
+    token,
+    {
+      'child.dob': faker.date
+        .between({ from: fromDate, to: toDate })
+        .toISOString()
+        .split('T')[0],
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC',
+        administrativeArea: village,
+        streetLevelDetails: { town: 'Dhaka' }
       },
-      'REGISTER',
-      'PRIVATE_HOME'
-    )
+      'child.gender': 'female'
+    },
+    'REGISTER',
+    'PRIVATE_HOME'
+  )
 
-    fullNameOfChild =
-      record.declaration['child.name'].firstname +
-      ' ' +
-      record.declaration['child.name'].surname
-  })
+  fullNameOfChild =
+    record.declaration['child.name'].firstname +
+    ' ' +
+    record.declaration['child.name'].surname
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('3.2 - Validate log in and load search page', async () => {
+  await test.step('3.2 - Validate log in and load search page', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
     await page.getByText('Birth').click()
   })
 
-  test.describe.serial("3 - Validate search by Child's Place of Birth", () => {
-    test('3.2.1 - Validate filling Place of Birth', async () => {
+  await test.step("3 - Validate search by Child's Place of Birth", async () => {
+    await test.step('3.2.1 - Validate filling Place of Birth', async () => {
       await page.getByText('Event details').click()
 
       await page.locator('#child____placeOfBirth').click()
@@ -251,7 +235,7 @@ test.describe
         .blur()
     })
 
-    test('3.2.2 - Validate search and show results', async () => {
+    await test.step('3.2.2 - Validate search and show results', async () => {
       await page.click('#search')
       await expect(page).toHaveURL(/.*\/search-result/)
 
@@ -287,7 +271,7 @@ test.describe
       ).toBeVisible()
     })
 
-    test('3.2.3 - Validate clicking on the search edit button', async () => {
+    await test.step('3.2.3 - Validate clicking on the search edit button', async () => {
       await page.getByRole('button', { name: 'Edit', exact: true }).click()
       await expect(page).toHaveURL(/.*\/advanced-search/)
       const searchParams = new URLSearchParams(page.url())

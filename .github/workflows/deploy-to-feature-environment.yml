@@ -29,6 +29,10 @@ concurrency:
   group: ${{ inputs.pr_number || github.ref }}
   cancel-in-progress: true
 
+env:
+  E2E_REPO_NAME: ${{ vars.E2E_REPO_NAME || 'e2e' }}
+  E2E_REPO_OWNER: ${{ vars.E2E_REPO_OWNER || 'opencrvs' }}
+
 jobs:
   # Validate branch name and read the e2e-related labels off the PR
   check_skip_e2e_label:
@@ -76,7 +80,7 @@ jobs:
       pr_number: ${{ steps.set_branch_and_pr_number.outputs.PR_NUMBER }}
       keep_e2e: ${{ steps.set_branch_and_pr_number.outputs.keep_e2e }}
       author: ${{ steps.get_author.outputs.AUTHOR }}
-      slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
+      stack: ${{ steps.slugify_bname.outputs.stack }}
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
     steps:
       - uses: actions/checkout@v7
@@ -139,7 +143,7 @@ jobs:
         id: get_e2e_branch
         # ls-remote should provide list of branches. When none are found, it should be empty string.
         run: |
-          e2e_repo_url="https://github.com/opencrvs/e2e.git"
+          e2e_repo_url="https://github.com/${E2E_REPO_OWNER}/${E2E_REPO_NAME}.git"
           if [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
             e2e_branch=${{ github.head_ref }}
           elif [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
@@ -192,13 +196,18 @@ jobs:
       skip_security_check: true
     secrets: inherit
 
-  trigger-e2e:
+  # Deploys and seeds the environment in opencrvs/e2e. E2E tests run in this
+  # repository (run-e2e-tests) once the deploy finishes.
+  trigger-e2e-deploy:
     runs-on: ubuntu-26.04
     needs: [check_skip_e2e_label, generate_stack_name_and_branch, trigger-build]
     if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
+    env:
+      stack: ${{ needs.generate_stack_name_and_branch.outputs.stack }}
+      domain: ${{ needs.generate_stack_name_and_branch.outputs.stack }}.${{ vars.E2E_DOMAIN }}
     outputs:
-      run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
-      deployment_link: ${{ steps.print-links.outputs.deployment_link }}
+      run_id: ${{ steps.dispatch_e2e_deploy.outputs.run_id }}
+      head_sha: ${{ steps.pr_info.outputs.HEAD_SHA }}
     steps:
       - uses: actions/checkout@v7
       - name: Check trigger-build status and exit on non-success
@@ -216,22 +225,23 @@ jobs:
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Get PR Information
+        id: pr_info
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER=${{ needs.generate_stack_name_and_branch.outputs.pr_number }}
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
-          HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headRefOid' | cut -c1-7)
+
+          HEAD_SHA=$(echo "$PR_DATA" | jq -r '.headRefOid')
+          echo "HEAD_SHA=${HEAD_SHA}" >> $GITHUB_OUTPUT
+
+          HEAD_COMMIT_HASH=$(echo "$HEAD_SHA" | cut -c1-7)
           echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
 
-      # testland ships in core now: the single core sha tags both the core and
-      # testland (countryconfig) images, so the cross-repo farajaland
-      # branch-matching resolution is gone. core-image-tag covers both.
       - name: Parse the stack name
         id: generate_stack
         run: |
-          stack=${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
-          echo "stack=${stack}" >> $GITHUB_OUTPUT
+          echo "core_branch=${{ github.event.repository.private && github.base_ref || env.BRANCH_NAME }}" >> $GITHUB_OUTPUT
       - name: Output Variables
         run: |
           echo """
@@ -239,22 +249,22 @@ jobs:
           PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}
           Keep e2e: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}
           E2E Branch: ${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}
-          Stack: ${{ steps.generate_stack.outputs.stack }}
+          Core Branch (Helm charts): ${{ steps.generate_stack.outputs.core_branch }}
+          Stack: ${{ env.stack }}
           """
 
-      - name: Trigger E2E Workflow
-        id: dispatch_e2e
+      - name: Trigger E2E Deploy
+        id: dispatch_e2e_deploy
         uses: actions/github-script@v9
         with:
-          # TODO: Replace with fine-grained e2e token
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const e2eBranch = '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}';
 
             const result = await github.rest.actions.createWorkflowDispatch({
-              owner: 'opencrvs',
-              repo: 'e2e',
-              workflow_id: 'deploy-and-e2e.yml',
+              owner: process.env.E2E_REPO_OWNER,
+              repo: process.env.E2E_REPO_NAME,
+              workflow_id: 'deploy-e2e-environment.yml',
               ref: e2eBranch,
 
               // Important: ask API to return run details
@@ -266,15 +276,11 @@ jobs:
 
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
-                // e2e checks out Helm charts from the public opencrvs-core repo, where
-                // a private repository's branches don't exist. There, use the branch
-                // the PR targets instead.
-                'core-branch': '${{ github.event.repository.private && github.base_ref || env.BRANCH_NAME }}',
-                stack: '${{ steps.generate_stack.outputs.stack }}',
+                'core-branch': '${{ steps.generate_stack.outputs.core_branch }}',
+                stack: '${{ env.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 branch: e2eBranch,
                 'actor': '${{ github.actor }}',
-                reset: 'true',
                 registry: '${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}',
               },
             });
@@ -293,81 +299,57 @@ jobs:
             console.log(`Triggered runId: ${runId}`);
             console.log(`Run URL: ${result.data.html_url}`);
 
-      - name: Print link to E2E workflow run
+      - name: Print link to E2E deploy workflow run
         id: print-links
         run: |
-          E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
-          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.e2e-k8s.opencrvs.dev"
+          E2E_RUN_LINK="https://github.com/${E2E_REPO_OWNER}/${E2E_REPO_NAME}/actions/runs/${{ steps.dispatch_e2e_deploy.outputs.run_id }}"
 
           echo """
           # E2E Environment summary
-          Action workflow (pipeline): $E2E_RUN_LINK
-          All Deployments: https://github.com/opencrvs/e2e/deployments/${{ steps.generate_stack.outputs.stack }}
+          Deploy workflow (pipeline): $E2E_RUN_LINK
+          All Deployments: https://github.com/${E2E_REPO_OWNER}/${E2E_REPO_NAME}/deployments/${{ env.stack }}
 
-          Web link: $DEPLOYMENT_LINK
+          Web link: https://${{ env.domain }}
 
           **NOTE**: Web link is available only while deployment, if you would like to
           keep environment accessible for debug purposes, please add '🔒 Keep e2e' to PR
           https://github.com/${{ github.repository }}/pull/${{ needs.generate_stack_name_and_branch.outputs.pr_number }}
           """ >> $GITHUB_STEP_SUMMARY
 
-          echo "deployment_link=$DEPLOYMENT_LINK" >> $GITHUB_OUTPUT
-
-  listen-e2e:
-    needs: [trigger-e2e, generate_stack_name_and_branch]
+  listen-e2e-deploy:
+    needs: [trigger-e2e-deploy, generate_stack_name_and_branch]
     runs-on: ubuntu-26.04
+    env:
+      domain: ${{ needs.generate_stack_name_and_branch.outputs.stack }}.${{ vars.E2E_DOMAIN }}
     steps:
-      - name: Wait for Environment Deployment (Deploy Job)
+      - name: Wait for E2E Deploy Workflow Completion
         uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
-            const owner = 'opencrvs';
-            const repo = 'e2e';
-            const runId = ${{ needs.trigger-e2e.outputs.run_id }};
-            let deployJobCompleted = false;
+            const owner = process.env.E2E_REPO_OWNER;
+            const repo = process.env.E2E_REPO_NAME;
+            const runId = ${{ needs.trigger-e2e-deploy.outputs.run_id }};
+            let run;
 
-            // Check if deploy job has completed
-            while (!deployJobCompleted) {
-              const workflowRun = await github.rest.actions.getWorkflowRun({
-                owner,
-                repo,
-                run_id: runId
-              });
-              const jobs = await github.rest.actions.listJobsForWorkflowRun({
-                owner,
-                repo,
-                run_id: runId
-              });
-
-              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
-              const cancelled = jobs.data.jobs.find(job => job.conclusion === 'cancelled');
-
-              if (cancelled) {
-                throw new Error('E2E workflow was cancelled');
-              }
-
-              if (deployJob && deployJob.status === 'completed') {
-                deployJobCompleted = true;
-
-                if (deployJob.conclusion !== 'success') {
-                  throw new Error('Deploy job failed');
-                }
-
-                console.log('Deploy job completed successfully');
-              }
-
-              if(workflowRun.data.status === 'completed') {
-                deployJobCompleted = true;
-
-                if (workflowRun.data.conclusion !== 'success') {
-                  throw new Error('E2E workflow failed');
-                }
-              }
-
-              if (!deployJobCompleted) {
+            // Besides queued / in_progress, a run can also be waiting, pending or requested.
+            while (run?.status !== 'completed') {
+              if (run) {
                 await new Promise(resolve => setTimeout(resolve, 10000));
               }
+
+              run = (await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              })).data;
+
+              console.log(`Current status: ${run.status}`);
+            }
+
+            console.log(`E2E deploy workflow finished with conclusion: ${run.conclusion}`);
+            if (run.conclusion !== 'success') {
+              throw new Error(`E2E deploy workflow did not succeed (${run.conclusion}): ${run.html_url}`);
             }
       - name: Update github comment on PR
         uses: actions/github-script@v9
@@ -375,7 +357,7 @@ jobs:
           github-token: ${{ secrets.CORE_ISSUES_PR_TOKEN }}
           script: |
             const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
-            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
+            const deployMessage = `Your environment is deployed to https://${{ env.domain }}`;
             // Check if the comment already exists
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -397,39 +379,65 @@ jobs:
               console.log('PR comment already exists, skipping...');
             }
 
-      - name: Wait for E2E Workflow Completion
+  run-e2e-tests:
+    needs:
+      [generate_stack_name_and_branch, trigger-e2e-deploy, listen-e2e-deploy]
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      domain: ${{ needs.generate_stack_name_and_branch.outputs.stack }}.${{ vars.E2E_DOMAIN }}
+      # The commit the deployed images were built from
+      ref: ${{ needs.trigger-e2e-deploy.outputs.head_sha }}
+
+  # Required check for e2e: a reusable-workflow caller can't report under its
+  # own name. Upstream jobs are in `needs` because a failed deploy skips
+  # run-e2e-tests, and a skip alone would pass.
+  e2e-tests:
+    name: e2e-tests
+    needs:
+      - check_skip_e2e_label
+      - generate_stack_name_and_branch
+      - trigger-build
+      - trigger-e2e-deploy
+      - listen-e2e-deploy
+      - run-e2e-tests
+    # `always()`, or a skipped dependency would skip this job too and take
+    # the gate down with it
+    if: always()
+    runs-on: ubuntu-26.04
+    permissions: {}
+    steps:
+      - name: Fail unless every dependency succeeded or was skipped
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more e2e jobs failed or were cancelled."
+          exit 1
+
+  # Tear the environment down in opencrvs/e2e once the tests pass, unless the
+  # PR asks to keep it ('🔒 Keep e2e').
+  cleanup-e2e:
+    needs: [generate_stack_name_and_branch, run-e2e-tests]
+    if: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e != 'true' }}
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Trigger E2E Cleanup
         uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
-            const owner = 'opencrvs';
-            const repo = 'e2e';
-            const runId = ${{ needs.trigger-e2e.outputs.run_id }};
-            let status = 'in_progress';
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: process.env.E2E_REPO_OWNER,
+              repo: process.env.E2E_REPO_NAME,
+              workflow_id: 'cleanup-namespace-by-name.yml',
+              ref: '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}',
 
-            while (status === 'in_progress' || status === 'queued') {
-              const run = await github.rest.actions.getWorkflowRun({
-                owner,
-                repo,
-                run_id: runId
-              });
+              return_run_details: true,
 
-              status = run.data.status;
-              console.log(`Current status: ${status}`);
+              headers: {
+                'X-GitHub-Api-Version': '2026-03-10',
+              },
+              inputs: {
+                namespace: 'opencrvs-${{ needs.generate_stack_name_and_branch.outputs.stack }}',
+              },
+            });
 
-              if (status === 'in_progress' || status === 'queued') {
-                await new Promise(resolve => setTimeout(resolve, 10000));
-              }
-            }
-
-            if (status === 'completed') {
-              const conclusion = await github.rest.actions.getWorkflowRun({
-                owner,
-                repo,
-                run_id: runId
-              });
-              console.log(`Workflow finished with conclusion: ${conclusion.data.conclusion}`);
-              if (conclusion.data.conclusion !== 'success') {
-                throw new Error('E2E workflow failed');
-              }
-            }
+            console.log(`Cleanup run URL: ${result.data.html_url}`);

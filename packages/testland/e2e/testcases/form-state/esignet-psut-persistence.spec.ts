@@ -17,13 +17,14 @@ import { ActionType } from '@opencrvs/toolkit/events'
 import {
   continueForm,
   drawSignature,
+  getRandomDate,
   getToken,
   goToSection,
   login,
   triggerDeclarationAction
 } from '@e2e/support/helpers'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
-import { openBirthDeclaration } from '@e2e/support/birth/helpers'
+import { fillDate, openBirthDeclaration } from '@e2e/support/birth/helpers'
 
 const MOCK_NID = '1234567898'
 const EXPECTED_SUB = `12345678901234567890123456${MOCK_NID}`
@@ -68,9 +69,7 @@ async function fillChildDetails(page: Page) {
   await page.locator('#child____gender').click()
   await page.getByText('Female', { exact: true }).click()
 
-  await page.getByPlaceholder('dd').fill('10')
-  await page.getByPlaceholder('mm').fill('10')
-  await page.getByPlaceholder('yyyy').fill('2025')
+  await fillDate(page, getRandomDate(0, 200))
 
   await page.locator('#child____placeOfBirth').click()
   await page
@@ -100,8 +99,6 @@ test.describe('E-Signet PSUT persistence', () => {
   })
 
   test('Declare birth with father E-Signet and confirm `sub` in backend payload', async () => {
-    test.setTimeout(180_000)
-
     await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
     const eventId = await openBirthDeclarationAndCaptureEventId(page)

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -26,9 +26,7 @@ import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, expectInUrl } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('5. Death declaration case - 5', () => {
-  let page: Page
-
+test('5. Death declaration case - 5', async ({ page }) => {
   const declaration = {
     deceased: {
       name: {
@@ -100,24 +98,15 @@ test.describe.serial('5. Death declaration case - 5', () => {
       comment: "He was a great person, we'll miss him"
     }
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('5.1 Declaration started by RO', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
 
-  test.describe('5.1 Declaration started by RO', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-      await page.click('#header-new-event')
-      await page.getByLabel('Death').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-    test('5.1.1 Fill deceased details', async () => {
+    await page.click('#header-new-event')
+    await page.getByLabel('Death').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await test.step('5.1.1 Fill deceased details', async () => {
       await page.locator('#firstname').fill(declaration.deceased.name.firstname)
       await page.locator('#surname').fill(declaration.deceased.name.surname)
       await page.locator('#deceased____gender').click()
@@ -162,7 +151,7 @@ test.describe.serial('5. Death declaration case - 5', () => {
       await continueForm(page)
     })
 
-    test('5.1.2 Fill event details', async () => {
+    await test.step('5.1.2 Fill event details', async () => {
       await page.getByPlaceholder('dd').fill(declaration.eventDetails.date.dd)
       await page.getByPlaceholder('mm').fill(declaration.eventDetails.date.mm)
       await page
@@ -204,7 +193,7 @@ test.describe.serial('5. Death declaration case - 5', () => {
       await continueForm(page)
     })
 
-    test('5.1.3 Fill informant details', async () => {
+    await test.step('5.1.3 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informant.relation, {
@@ -267,7 +256,7 @@ test.describe.serial('5. Death declaration case - 5', () => {
       await continueForm(page)
     })
 
-    test('5.1.4 Fill spouse details', async () => {
+    await test.step('5.1.4 Fill spouse details', async () => {
       await page.getByLabel("Spouse's details are not available").check()
 
       await page.locator('#spouse____reason').fill(declaration.spouse.reason)
@@ -275,11 +264,11 @@ test.describe.serial('5. Death declaration case - 5', () => {
       await continueForm(page)
     })
 
-    test('5.1.5 Go to preview', async () => {
+    await test.step('5.1.5 Go to preview', async () => {
       await goToSection(page, 'review')
     })
 
-    test('5.1.6 Verify information on preview page', async () => {
+    await test.step('5.1.6 Verify information on preview page', async () => {
       /*
        * Expected result: should include
        * - Deceased's First Name
@@ -524,7 +513,7 @@ test.describe.serial('5. Death declaration case - 5', () => {
       )
     })
 
-    test('5.1.7 Fill up informant signature', async () => {
+    await test.step('5.1.7 Fill up informant signature', async () => {
       await page.locator('#review____comment').fill(annotation.review.comment)
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -534,7 +523,7 @@ test.describe.serial('5. Death declaration case - 5', () => {
         .click()
     })
 
-    test('5.1.8 Declare and validate', async () => {
+    await test.step('5.1.8 Declare and validate', async () => {
       await triggerDeclarationAction(page, 'Declare')
 
       await expect(page.getByText('Farajaland CRS')).toBeVisible()
@@ -559,8 +548,8 @@ test.describe.serial('5. Death declaration case - 5', () => {
       ).toBeVisible()
     })
   })
-  test.describe('5.2 Declaration Review by Registrar', async () => {
-    test('5.2.1 Navigate to the declaration "Record" -tab', async () => {
+  await test.step('5.2 Declaration Review by Registrar', async () => {
+    await test.step('5.2.1 Navigate to the declaration "Record" -tab', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
 
       await page.getByText('Pending registration').click()
@@ -576,7 +565,7 @@ test.describe.serial('5. Death declaration case - 5', () => {
       await switchEventTab(page, 'Record')
     })
 
-    test('5.2.2 Verify information on "Record" tab', async () => {
+    await test.step('5.2.2 Verify information on "Record" tab', async () => {
       /*
        * Expected result: should include
        * - Deceased's First Name

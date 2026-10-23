@@ -49,7 +49,7 @@ const FileSchema = z
     )
   }, 'Not a readable stream or missing hapi field')
   .refine(
-    (val) => HapiSchema.safeParse(val.hapi).success,
+    (val) => HapiSchema.validate(val.hapi),
     'hapi does not match the required structure'
   )
 
