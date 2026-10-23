@@ -99,13 +99,7 @@ const BaseField = z.object({
     ),
   allowedLocations: JurisdictionReference.optional().describe(
     `Override the allowedLocations for a location field in advanced search. Use this when the declaration form's allowedLocations references a scope (e.g. record.create) that search-only users don't have — specify record.search scope instead.`
-  ),
-  useFormDefaultValue: z
-    .boolean()
-    .optional()
-    .describe(
-      `Set to false to open the field empty in advanced search instead of pre-filled with the declaration form's defaultValue.`
-    )
+  )
 })
 
 export const SearchQueryParams = z
@@ -122,7 +116,13 @@ export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
-  fieldType: z.literal('field')
+  fieldType: z.literal('field'),
+  defaultValue: z
+    .union([z.boolean(), z.string(), z.number()])
+    .optional()
+    .describe(
+      `Value the field opens with in advanced search. Omitted or true uses the declaration form's defaultValue, false opens the field empty, and any other value opens it with that value. Only text, number and date fields take a value; every other field type, and date fields searched as a range, only accept true or false.`
+    )
 })
 
 /**
