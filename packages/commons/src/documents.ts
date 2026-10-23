@@ -12,7 +12,7 @@
 import * as z from 'zod/v4'
 import { UUID } from './uuid'
 
-export const MINIO_REGEX =
+export const S3_URL_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|jpeg|jfif|png|pdf|svg)(\?.*)?$/i
 
 export function isBase64FileString(str: string) {
@@ -23,14 +23,14 @@ export function isBase64FileString(str: string) {
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
 
-export const isMinioUrl = (url: string): url is FullDocumentUrl =>
-  MINIO_REGEX.test(url)
+export const isS3Url = (url: string): url is FullDocumentUrl =>
+  S3_URL_REGEX.test(url)
 
 export const FullDocumentUrl = z
   .string()
   .brand('FullDocumentUrl')
   .describe(
-    'A full url with protocol, host, bucket name, starting from the root of the S3 server, https://minio.opencrvs.com/bucket-name/document-id.jpg'
+    'A full url with protocol, host, bucket name, starting from the root of the S3 server, https://s3.opencrvs.com/bucket-name/document-id.jpg'
   )
 
 export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>

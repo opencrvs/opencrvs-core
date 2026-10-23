@@ -27,7 +27,7 @@ hpa:
   enabled: false
 
 env:
-  MINIO_BUCKET: ocrvs
+  S3_BUCKET: ocrvs
   OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
 
 otel:
@@ -39,8 +39,7 @@ elasticsearch:
   auth_mode: auto
   host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
 
-minio:
-  auth_mode: use_secret
+s3:
   host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
 
 redis:

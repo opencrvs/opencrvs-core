@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
-jest.mock('../../minio/client', () => {
+jest.mock('../../s3/client', () => {
   return {
     __esModule: true,
-    minioClient: { putObject: () => {} }
+    putObject: async () => {}
   }
 })
 

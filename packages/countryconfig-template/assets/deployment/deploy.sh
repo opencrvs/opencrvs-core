@@ -149,13 +149,13 @@ validate_environment_variables() {
       print_usage_and_exit
   fi
 
-  if [ -z "$MINIO_ROOT_USER" ] ; then
-      echo 'Error: Missing environment variable MINIO_ROOT_USER.'
+  if [ -z "$S3_ADMIN_ACCESS_KEY" ] ; then
+      echo 'Error: Missing environment variable S3_ADMIN_ACCESS_KEY.'
       print_usage_and_exit
   fi
 
-  if [ -z "$MINIO_ROOT_PASSWORD" ] ; then
-      echo 'Error: Missing environment variable MINIO_ROOT_PASSWORD.'
+  if [ -z "$S3_ADMIN_SECRET_KEY" ] ; then
+      echo 'Error: Missing environment variable S3_ADMIN_SECRET_KEY.'
       print_usage_and_exit
   fi
 
