@@ -217,7 +217,7 @@ importers:
         version: 5.2.5(eslint-config-prettier@10.1.1(eslint@9.23.0))(eslint@9.23.0)(prettier@3.5.3)
       jest:
         specifier: 29.7.0
-        version: 29.7.0(@types/node@26.2.0)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@26.2.0)(typescript@7.0.2))
+        version: 29.7.0(@types/node@22.20.1)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@22.20.1)(typescript@7.0.2))
       jest-fetch-mock:
         specifier: ^2.1.2
         version: 2.1.2(encoding@0.1.13)
@@ -782,7 +782,7 @@ importers:
         version: 2.30.0
       jest:
         specifier: 29.7.0
-        version: 29.7.0(@types/node@22.20.1)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@22.20.1)(typescript@7.0.2))
+        version: 29.7.0(@types/node@26.2.0)(babel-plugin-macros@3.1.0)(node-notifier@8.0.2)(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@26.2.0)(typescript@7.0.2))
       jwt-decode:
         specifier: ^3.0.0
         version: 3.1.2
@@ -1231,9 +1231,9 @@ importers:
       '@trpc/server':
         specifier: 11.8.0
         version: 11.8.0(typescript@7.0.2)
-      '@types/bcryptjs':
-        specifier: ^2.4.2
-        version: 2.4.6
+      '@types/bcrypt':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@types/lodash':
         specifier: 4.17.0
         version: 4.17.0
@@ -1252,9 +1252,9 @@ importers:
       app-module-path:
         specifier: ^2.2.0
         version: 2.2.0
-      bcryptjs:
-        specifier: ^2.4.3
-        version: 2.4.3
+      bcrypt:
+        specifier: ^6.0.0
+        version: 6.0.0
       envalid:
         specifier: ^8.0.0
         version: 8.0.0
@@ -1867,9 +1867,9 @@ importers:
 
   packages/migration:
     dependencies:
-      bcryptjs:
-        specifier: ^2.4.3
-        version: 2.4.3
+      bcrypt:
+        specifier: ^6.0.0
+        version: 6.0.0
       node-pg-migrate:
         specifier: ^8.0.3
         version: 8.0.4(@types/pg@8.20.0)(pg@8.22.0)
@@ -1877,9 +1877,9 @@ importers:
         specifier: ^8.16.0
         version: 8.22.0
     devDependencies:
-      '@types/bcryptjs':
-        specifier: ^2.4.2
-        version: 2.4.6
+      '@types/bcrypt':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@types/pg':
         specifier: ^8.15.1
         version: 8.20.0
@@ -6564,6 +6564,9 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
+  '@types/bcrypt@6.0.0':
+    resolution: {integrity: sha512-/oJGukuH3D2+D+3H4JWLaAsJ/ji86dhRidzZ/Od7H/i8g+aCmvkeCc6Ni/f9uxGLSQVCRZkX2/lqEFG2BvWtlQ==}
+
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
 
@@ -8240,6 +8243,10 @@ packages:
 
   bcrypt-pbkdf@1.0.2:
     resolution: {integrity: sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==}
+
+  bcrypt@6.0.0:
+    resolution: {integrity: sha512-cU8v/EGSrnH+HnxV2z0J7/blxH8gq7Xh2JFT6Aroax7UohdmiJJlxApMxtKfuI7z68NvvVcmR78k2LbT6efhRg==}
+    engines: {node: '>= 18'}
 
   bcryptjs@2.4.3:
     resolution: {integrity: sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==}
@@ -12983,6 +12990,10 @@ packages:
     resolution: {integrity: sha512-W5ZNO5KRPB5TkYmGVD9F6YqhsglXJzE6etpbmT+f6EQElhiX/UTG551cnsRGvLG3fyZEg9HwaDmNmj5nwJ4z9g==}
     engines: {node: '>=10'}
 
+  node-addon-api@8.9.2:
+    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
+    engines: {node: ^18 || ^20 || >= 21}
+
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -13017,6 +13028,10 @@ packages:
   node-forge@1.4.0:
     resolution: {integrity: sha512-LarFH0+6VfriEhqMMcLX2F7SwSXeWwnEAJEsYm5QKWchiVYVvJyV9v7UDvUv+w5HO23ZpQTXDv/GxdDdMyOuoQ==}
     engines: {node: '>= 6.13.0'}
+
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
 
   node-gyp@10.3.1:
     resolution: {integrity: sha512-Pp3nFHBThHzVtNY7U6JfPjvT/DTE8+o/4xKsLQtBoU+j2HLsGlhcfzflAoUreaJbNmYnX+LlLi0qjV8kpyO6xQ==}
@@ -21876,6 +21891,10 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.7
 
+  '@types/bcrypt@6.0.0':
+    dependencies:
+      '@types/node': 22.20.1
+
   '@types/bcryptjs@2.4.6': {}
 
   '@types/better-sqlite3@7.6.13':
@@ -23830,6 +23849,11 @@ snapshots:
   bcrypt-pbkdf@1.0.2:
     dependencies:
       tweetnacl: 0.14.5
+
+  bcrypt@6.0.0:
+    dependencies:
+      node-addon-api: 8.9.2
+      node-gyp-build: 4.8.4
 
   bcryptjs@2.4.3: {}
 
@@ -30187,6 +30211,8 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
+  node-addon-api@8.9.2: {}
+
   node-domexception@1.0.0: {}
 
   node-exports-info@1.6.2:
@@ -30215,6 +30241,8 @@ snapshots:
       formdata-polyfill: 4.0.10
 
   node-forge@1.4.0: {}
+
+  node-gyp-build@4.8.4: {}
 
   node-gyp@10.3.1:
     dependencies:
