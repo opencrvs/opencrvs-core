@@ -167,6 +167,8 @@ The change prepares for replacing MinIO. Stores differ in which parts of S3 they
 
 The client's Content-Security-Policy allows the origin of the S3 public endpoint in `connect-src`, so browsers can read documents from a store on another domain, such as `storage.googleapis.com`. The services chart sets it as `S3_PUBLIC_ORIGIN` on the client. A deployment without the chart can set that variable on the client container. When it is not set, nothing is added.
 
+The data cleanup job now empties the bucket and keeps it, where it removed the bucket and made it again. The bucket keeps its settings, such as CORS and access rules.
+
 A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Improvements
