@@ -13,21 +13,13 @@ import { AUTH_URL } from '@gateway/constants'
 import { rateLimitedRoute } from '@gateway/rate-limit'
 import { ServerRoute } from '@hapi/hapi'
 
-export const catchAllProxy = {
-  authInternal: {
-    method: '*',
-    path: '/auth/internal/{suffix}',
-    handler: (_, h) => h.response().code(404),
-    options: {
-      auth: false
-    }
-  },
-  auth: {
+export const authProxy = {
+  token: {
     method: 'POST',
-    path: '/auth/{suffix}',
+    path: '/auth/token',
     handler: (_, h) =>
       h.proxy({
-        uri: AUTH_URL + '/{suffix}'
+        uri: AUTH_URL + '/token'
       }),
     options: {
       auth: false,
@@ -36,16 +28,28 @@ export const catchAllProxy = {
         parse: false
       }
     }
-  }
-} satisfies Record<string, ServerRoute>
-
-export const authProxy = {
-  token: {
+  },
+  refreshToken: {
     method: 'POST',
-    path: '/auth/token',
+    path: '/auth/refreshToken',
     handler: (_, h) =>
       h.proxy({
-        uri: AUTH_URL + '/token'
+        uri: AUTH_URL + '/refreshToken'
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  invalidateToken: {
+    method: 'POST',
+    path: '/auth/invalidateToken',
+    handler: (_, h) =>
+      h.proxy({
+        uri: AUTH_URL + '/invalidateToken'
       }),
     options: {
       auth: false,

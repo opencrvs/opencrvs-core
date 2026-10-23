@@ -175,12 +175,12 @@ const paperCredentialRoute = {
 
 /** FieldType.HTTP uses this URL to fetch the credential offer from the form */
 export const CREDENTIAL_OFFER_HANDLER_URL = new URL(
-  `api/countryconfig/${credentialOfferRoute.path}`,
+  `api/countryconfig${credentialOfferRoute.path}`,
   CLIENT_APP_URL
 ).toString()
 
 export const PAPER_CREDENTIAL_HANDLER_URL = new URL(
-  `api/countryconfig/${paperCredentialRoute.path}`,
+  `api/countryconfig${paperCredentialRoute.path}`,
   CLIENT_APP_URL
 ).toString()
 
