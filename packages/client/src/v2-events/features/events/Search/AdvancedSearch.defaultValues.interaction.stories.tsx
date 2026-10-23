@@ -66,7 +66,7 @@ function eventWithNameDefault(searchField: AdvancedSearchField): EventConfig {
 }
 
 const eventWithDefaultSkipped = eventWithNameDefault(
-  field('applicant.name', { useFormDefaultValue: false }).fuzzy()
+  field('applicant.name', { defaultValue: false }).fuzzy()
 )
 
 const eventWithDefaultKept = eventWithNameDefault(
@@ -74,7 +74,11 @@ const eventWithDefaultKept = eventWithNameDefault(
 )
 
 const eventWithDefaultEnabled = eventWithNameDefault(
-  field('applicant.name', { useFormDefaultValue: true }).fuzzy()
+  field('applicant.name', { defaultValue: true }).fuzzy()
+)
+
+const eventWithSearchDefault = eventWithNameDefault(
+  field('applicant.email', { defaultValue: 'applicant@example.com' }).exact()
 )
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -189,4 +193,38 @@ export const PrefillsDefaultValuesWhenEnabled: Story = {
     }
   },
   play: PrefillsDefaultValuesWhenNotOptedOut.play
+}
+
+export const PrefillsSearchDefaultValue: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+    },
+    chromatic: { disableSnapshot: true },
+    offline: { configs: [eventWithSearchDefault] },
+    msw: {
+      handlers: {
+        events: [tRPCMsw.event.config.get.query(() => [eventWithSearchDefault])]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open applicant section', async () => {
+      const accordion = await canvas.findByTestId(
+        'accordion-event.tennis-club-membership.search.applicants'
+      )
+      await userEvent.click(
+        within(accordion).getByRole('button', { name: 'Show' })
+      )
+    })
+
+    await step('Email input shows the search default', async () => {
+      await expect(
+        await canvas.findByTestId('text__applicant____email')
+      ).toHaveValue('applicant@example.com')
+    })
+  }
 }

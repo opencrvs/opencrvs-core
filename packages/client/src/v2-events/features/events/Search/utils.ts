@@ -531,20 +531,39 @@ function buildSearchQueryFields(
 }
 
 /**
- * @returns the field configuration with overrides applied from the search field
+ * @returns the field with the default value its search field asks for: the
+ * form's (omitted or true), none (false), or the given value
  */
-function applySearchFieldOverridesToFieldConfig(
+function withSearchDefaultValue(
   field: FieldConfig,
   searchField: AdvancedSearchField
 ): FieldConfig {
+  if (
+    searchField.fieldType !== 'field' ||
+    searchField.defaultValue === undefined ||
+    searchField.defaultValue === true
+  ) {
+    return field
+  }
+  if (searchField.defaultValue === false) {
+    return { ...field, defaultValue: undefined } as FieldConfig
+  }
+  // Event config validation only lets a value through for field types that take it
+  return { ...field, defaultValue: searchField.defaultValue } as FieldConfig
+}
+
+/**
+ * @returns the field configuration with overrides applied from the search field
+ */
+function applySearchFieldOverridesToFieldConfig(
+  formField: FieldConfig,
+  searchField: AdvancedSearchField
+): FieldConfig {
+  const field = withSearchDefaultValue(formField, searchField)
   const commonConfig = {
     conditionals: searchField.conditionals ?? field.conditionals,
     validation: searchField.validations ?? field.validation,
-    required: false as const,
-    // Form defaults apply unless the search field explicitly opts out
-    ...(searchField.useFormDefaultValue === false && {
-      defaultValue: undefined
-    })
+    required: false as const
   }
   if (field.type === FieldType.DATE && searchField.config.type === 'range') {
     return {
