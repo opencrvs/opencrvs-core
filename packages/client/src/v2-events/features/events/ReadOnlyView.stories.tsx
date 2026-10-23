@@ -79,9 +79,13 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       await canvas.findByTestId('applicant.name-value')
     ).toHaveTextContent('Riku This value is from a draft')
 
-    await canvas.findByText(
-      'Member declaration for Riku This value is from a draft'
-    )
+    /*
+     * The tab is headed by its own name, the way Summary, Documents and Audit
+     * are, rather than by the review card's "Member declaration for ..."
+     * banner. That the draft value reaches the tab is asserted above, on the
+     * field itself.
+     */
+    await canvas.findByText('Record', { selector: '#content-name' })
   },
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,

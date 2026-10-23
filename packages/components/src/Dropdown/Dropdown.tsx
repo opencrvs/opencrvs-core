@@ -45,7 +45,7 @@ const StyledContent = styled.ul.withConfig({
     ['popover'].includes(prop) || defaultValidatorFn(prop)
   // Forward popover prop directly
 })<StyledContentProp>`
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.light};
