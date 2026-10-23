@@ -80,6 +80,7 @@ test('Correct record - 2', async ({ page }) => {
     await selectRequesterType(page, 'Print and issue to Informant (Mother)')
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
     // HTTP call will override annotation on next step if we do not wait for this.
+    // Workaround: a late HTTP field response overwrites the annotation with a stale copy. Safe to remove if that no longer happens.
     const credentialResponse = page.waitForResponse(
       (res) => res.url().includes('verifiable-credentials/paper-credential'),
       { timeout: 30_000 }
