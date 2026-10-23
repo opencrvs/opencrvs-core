@@ -15542,15 +15542,22 @@ components:
                     required:
                       - $jurisdiction
                     additionalProperties: false
-                  useFormDefaultValue:
-                    description: Set to false to open the field empty in advanced search instead of
-                      pre-filled with the declaration form's defaultValue.
-                    type: boolean
                   fieldId:
                     type: string
                   fieldType:
                     type: string
                     const: field
+                  defaultValue:
+                    description: Value the field opens with in advanced search. Omitted or true uses
+                      the declaration form's defaultValue, false opens the field
+                      empty, and any other value opens it with that value. Only
+                      text, number and date fields take a value; every other
+                      field type, and date fields searched as a range, only
+                      accept true or false.
+                    anyOf:
+                      - type: boolean
+                      - type: string
+                      - type: number
                 required:
                   - config
                   - fieldId
@@ -15865,10 +15872,6 @@ components:
                     required:
                       - $jurisdiction
                     additionalProperties: false
-                  useFormDefaultValue:
-                    description: Set to false to open the field empty in advanced search instead of
-                      pre-filled with the declaration form's defaultValue.
-                    type: boolean
                   fieldId:
                     type: string
                     enum:
