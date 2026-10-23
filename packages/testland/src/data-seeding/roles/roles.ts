@@ -278,7 +278,6 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.notify', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } }
     ])
   },
@@ -318,7 +317,6 @@ export const roles: Role[] = [
       { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { status: ['NOTIFIED'] } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
-      { type: 'record.declare', options: { placeOfEvent: 'location' } },
       { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])

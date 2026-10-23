@@ -22,7 +22,10 @@ import {
   deleteLocalEvent,
   findLocalEventDocument
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   deleteLocalEventAndToastOnDuplicate,
@@ -180,6 +183,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({
           eventConfiguration,
+          form: getSubmissionForm(eventConfiguration, mutationName),
           originalDeclaration,
           declarationDiff: params.declaration,
           validatorContext: {

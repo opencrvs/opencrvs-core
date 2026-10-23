@@ -26,7 +26,8 @@ import {
 } from '@e2e/support/birth/helpers'
 import {
   createDeclaration as createBirthDeclaration,
-  getDeclaration as getBirthDeclaration
+  getDeclaration as getBirthDeclaration,
+  getNotificationDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { createDeclaration as createDeathDeclaration } from '@e2e/support/test-data/death-declaration'
 import {
@@ -242,13 +243,12 @@ export async function createBirthNotifiedInactiveAddress() {
   const offices = await getLocations('CRVS_OFFICE', token)
   const officeId = getIdByName(offices, 'Ibombo District Office')
 
-  const declaration = await getBirthDeclaration({
+  // NOTIFY only accepts the fields of the birth notification form
+  const declaration = await getNotificationDeclaration({
     token,
     partialDeclaration: {
-      'mother.nid': null,
-      'mother.dob': null,
       'child.placeOfBirth': 'OTHER',
-      'child.birthLocation.privateHome': null,
+      'child.birthLocation': undefined,
       'child.birthLocation.other': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,

@@ -164,21 +164,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
-  changeModalContinue: {
-    id: 'changeModal.continue',
-    defaultMessage: 'Continue',
-    description: 'The label for continue button of change modal'
-  },
-  changeModalTitle: {
-    id: 'changeModal.title',
-    defaultMessage: 'Edit declaration?',
-    description: 'The title for change modal'
-  },
-  changeModalDescription: {
-    id: 'changeModal.description',
-    defaultMessage: 'A record will be created of any changes you make',
-    description: 'The description for change modal'
-  },
   govtName: {
     id: 'review.header.title.govtName',
     defaultMessage: 'Government',
@@ -465,15 +450,7 @@ function ReviewComponent({
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
-  onEdit: ({
-    pageId,
-    fieldId,
-    confirmation
-  }: {
-    pageId: string
-    fieldId?: string
-    confirmation?: boolean
-  }) => void
+  onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
@@ -625,59 +602,6 @@ function ReviewComponent({
         </RightColumn>
       )}
     </Row>
-  )
-}
-
-function EditModal({
-  copy,
-  close
-}: {
-  copy?: {
-    continue?: MessageDescriptor
-    title?: MessageDescriptor
-    description?: MessageDescriptor
-  }
-  close: (result: boolean | null) => void
-}) {
-  const intl = useIntl()
-  return (
-    <Dialog
-      isOpen
-      actions={[
-        <Button
-          key="cancel_edit"
-          id="cancel_edit"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(buttonMessages.cancel)}
-        </Button>,
-        <Button
-          key="confirm_edit"
-          id="confirm_edit"
-          type="primary"
-          onClick={() => {
-            close(true)
-          }}
-        >
-          {intl.formatMessage(
-            copy?.continue || reviewMessages.changeModalContinue
-          )}
-        </Button>
-      ]}
-      title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
-      onClose={() => close(null)}
-    >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(
-            copy?.description || reviewMessages.changeModalDescription
-          )}
-        </Text>
-      </Stack>
-    </Dialog>
   )
 }
 
@@ -899,7 +823,6 @@ function RejectActionModal({
 
 export const Review = {
   Body: withSuspense(ReviewComponent),
-  EditModal,
   ActionModal: {
     Accept: AcceptActionModal,
     Reject: RejectActionModal

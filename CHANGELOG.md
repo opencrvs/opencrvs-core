@@ -131,6 +131,23 @@ Unlike the flag, an archived notification no longer matches, since its status is
 
 `defineConfig` still accepts events without a notification form, so these events behave as before. It generates a missing `NOTIFY` action and `review` from the `DECLARE` action with every field optional, and logs a warning when `notificationForm` is missing. If missing, the `DECLARE` form with every field optional is used in its place (`getNotificationForm`). A future release will remove this fallback. An event configuration built without `defineConfig` must give `review` on its `NOTIFY` action.
 
+#### Notifiers get their own notify flow
+
+A user whose role holds `record.notify` for an event type now fills in the notification form in a separate notify flow, instead of the declaration form [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975):
+
+- **New records** open the notify flow. Notify is enabled once the notification form's required fields are complete.
+- **Editing a notified record** uses the notification form too, and "Notify with edits" requires its required fields.
+- **The declare flow** only offers Declare and Register, and requires `record.declare`.
+
+A role should hold either `record.notify` or `record.declare` for an event type, not both. A role holding both now gets only the notify flow for that event type. Remove one of the two scopes.
+
+Update the client translations:
+
+- Rename `user.profile.audit.description.inProgress` to `user.profile.audit.description.notified` ("Notified").
+- Rename `review.declare.incomplete.confirmModal.title` to `review.notify.confirmModal.title` ("Notify event?").
+- Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
+- `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
+
 ### New features
 
 #### `REVOKED` status with revoke and reinstate registration actions
@@ -143,6 +160,7 @@ A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matchi
 
 ### Improvements
 
+- Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
 - `environment:init` now checks the Docker Hub username, token and repository against Docker Hub before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or Docker Hub cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
