@@ -11,12 +11,6 @@
 import { cleanEnv, makeValidator, str } from 'envalid'
 import { PRODUCTION } from '@documents/constants'
 
-// An empty variable counts as unset, which is what a templated Helm chart or
-// Compose file leaves behind
-const set = Object.fromEntries(
-  Object.entries(process.env).filter(([, value]) => value !== '')
-)
-
 /**
  * The AWS SDK needs the protocol on both endpoints. `url()` is not enough: it
  * reads `minio:3535` as a URL with the protocol `minio:` and accepts it.
@@ -41,7 +35,7 @@ const endpoint = makeValidator((input: string) => {
 /**
  * Define URLs without trailing slashes, include the protocol.
  */
-export const env = cleanEnv(set, {
+export const env = cleanEnv(process.env, {
   /** Where the documents service connects to the object store */
   S3_ENDPOINT: endpoint({ devDefault: 'http://localhost:3535' }),
   /**

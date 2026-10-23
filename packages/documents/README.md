@@ -4,7 +4,7 @@ Stores and serves the files that belong to records: attachments, signatures and 
 
 ## Configuration
 
-The service is configured with `S3_*` environment variables. An empty value counts as unset. The service checks them with `envalid` when it starts, and does not start if one does not fit: an endpoint that does not start with `http://` or `https://`.
+The service is configured with `S3_*` environment variables. It checks and does not start if one does not fit: an endpoint that does not start with `http://` or `https://`.
 
 | Setting              | Default                                                           | Meaning                                                                                                                        |
 | -------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
