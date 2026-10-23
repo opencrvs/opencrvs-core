@@ -350,6 +350,20 @@ export async function createIndex(
                   keyof RegistrationCreationMetadata,
                   estypes.MappingProperty
                 >
+              },
+              [EventStatus.enum.REVOKED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
               }
             }
           },
@@ -614,11 +628,11 @@ export async function getEventCount({
 
   return responses.reduce((acc: Record<string, number>, response, index) => {
     const slug = queries[index].slug
-    const validatedResponse = MsearchResponseSchema.safeParse(response)
+
     return {
       ...acc,
-      [slug]: validatedResponse.success
-        ? validatedResponse.data.hits.total.value
+      [slug]: MsearchResponseSchema.validate(response)
+        ? response.hits.total.value
         : 0
     }
   }, {})

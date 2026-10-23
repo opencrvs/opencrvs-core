@@ -188,6 +188,18 @@ const UnarchiveAction = ActionBase.extend(
   }).shape
 )
 
+const RevokeRegistrationAction = ActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.REVOKE_REGISTRATION)
+  }).shape
+)
+
+const ReinstateRegistrationAction = ActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.REINSTATE_REGISTRATION)
+  }).shape
+)
+
 const CreatedAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.CREATE)
@@ -279,6 +291,8 @@ export const ActionDocument = z
     MarkAsDuplicateAction.meta({ id: 'MarkAsDuplicateAction' }),
     ArchiveAction.meta({ id: 'ArchiveAction' }),
     UnarchiveAction.meta({ id: 'UnarchiveAction' }),
+    RevokeRegistrationAction.meta({ id: 'RevokeRegistrationAction' }),
+    ReinstateRegistrationAction.meta({ id: 'ReinstateRegistrationAction' }),
     NotifiedAction.meta({ id: 'NotifiedAction' }),
     RegisterAction.meta({ id: 'RegisterAction' }),
     DeclareAction.meta({ id: 'DeclareAction' }),
@@ -297,6 +311,8 @@ export const ActionDocument = z
   })
 
 export type ActionDocument = z.infer<typeof ActionDocument>
+export const isActionDocument = (a: unknown): a is ActionDocument =>
+  ActionDocument.validate(a)
 
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,

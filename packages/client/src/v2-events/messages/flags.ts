@@ -34,11 +34,6 @@ const flagMessages = {
     defaultMessage: 'Rejected',
     description: 'Flag label for rejected'
   },
-  [InherentFlags.INCOMPLETE]: {
-    id: 'flags.builtin.incomplete.label',
-    defaultMessage: 'Incomplete',
-    description: 'Flag label for incomplete'
-  },
   [InherentFlags.EDIT_IN_PROGRESS]: {
     id: 'flags.builtin.edit-in-progress.label',
     defaultMessage: 'Edit in progress',
@@ -59,8 +54,7 @@ export function useFlagLabelsString(
 ): string {
   const intl = useIntl()
   return flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
-    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
+    .filter((flag) => !ActionFlag.validate(flag))
     .map((flag) => {
       if (flag in flagMessages) {
         return intl.formatMessage(flagMessages[flag as InherentFlags])

@@ -16,9 +16,6 @@ import { faker } from '@faker-js/faker'
 test('Email and phone changed from settings are reflected in user details', async ({
   browser
 }) => {
-  // Two full logins (f.katongo + j.campbell) plus contact change flows
-  test.setTimeout(240_000)
-
   const page = await browser.newPage()
   const newEmail = faker.internet.email().toLowerCase()
   const newPhoneNumber = `07${faker.string.numeric(8)}`

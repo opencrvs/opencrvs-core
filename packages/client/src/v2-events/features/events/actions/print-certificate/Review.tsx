@@ -161,6 +161,8 @@ export function Review() {
   const isOnline = useOnlineStatus()
   const isOnlineRef = useRef(isOnline)
   isOnlineRef.current = isOnline
+  // Blocks a second print while the page is still waiting to navigate away
+  const printingRef = useRef(false)
   const [modal, openModal] = useModal()
 
   const {
@@ -267,6 +269,10 @@ export function Review() {
     )
 
   const handlePrint = async () => {
+    if (printingRef.current) {
+      return
+    }
+
     const confirmed = await openModal<boolean>((close) => (
       <Dialog
         isOpen
@@ -303,6 +309,8 @@ export function Review() {
      * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. @see preparePdfCertificate for more details.
      */
     if (confirmed) {
+      printingRef.current = true
+      let printed = false
       try {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
@@ -316,6 +324,7 @@ export function Review() {
           transactionId: uuid(),
           type: ActionType.PRINT_CERTIFICATE
         })
+        printed = true
 
         printCertificate()
 
@@ -345,6 +354,9 @@ export function Review() {
           })
         }
       } catch (error) {
+        if (!printed) {
+          printingRef.current = false
+        }
         // TODO: add notification alert
         // eslint-disable-next-line no-console
         console.error(error)

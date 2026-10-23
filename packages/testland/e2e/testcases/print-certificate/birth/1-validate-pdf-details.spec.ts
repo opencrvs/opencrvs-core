@@ -13,11 +13,10 @@ import {
   Declaration,
   createDeclaration
 } from '@e2e/support/test-data/birth-declaration'
-import { login, getToken } from '@e2e/support/helpers'
+import { login, getToken, searchFromSearchBar } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
-  navigateToCertificatePrintAction,
-  openRecordByTitle,
+  printCertificateViaApi,
   selectRequesterType,
   selectCertificationType
 } from '@e2e/support/print-certificate/birth/helpers'
@@ -28,8 +27,6 @@ test.describe("Validate 'Birth Certificate Certified Copy' PDF details", () => {
   test('Certified copy renders place of birth, office name and print count', async ({
     page
   }) => {
-    test.setTimeout(180_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered birth record at a health facility (via API)', async () => {
@@ -42,35 +39,23 @@ test.describe("Validate 'Birth Certificate Certified Copy' PDF details", () => {
       )
 
       declaration = res.declaration
+
+      await test.step('Print the birth certificate once (via API)', async () => {
+        await printCertificateViaApi({
+          token,
+          eventId: res.eventId,
+          templateId: 'v2.birth-certificate',
+          requesterId: 'INFORMANT'
+        })
+      })
     })
 
     await test.step('Log in as the registrar', async () => {
       await login(page)
     })
 
-    await test.step('Print the birth certificate once', async () => {
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration,
-        CREDENTIALS.REGISTRAR
-      )
-      await selectCertificationType(page, 'Birth Certificate')
-      await selectRequesterType(page, 'Print and issue to Informant (Mother)')
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Verified' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Yes, print certificate' }).click()
-      await page.getByRole('button', { name: 'Print', exact: true }).click()
-    })
-
     await test.step('Open the certified copy preview', async () => {
-      await page
-        .getByRole('textbox', { name: 'Search for a record' })
-        .fill(formatV2ChildName(declaration))
-
-      await page.getByRole('button', { name: 'Search' }).click()
-      await openRecordByTitle(page, formatV2ChildName(declaration))
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
       await selectAction(page, 'Print')

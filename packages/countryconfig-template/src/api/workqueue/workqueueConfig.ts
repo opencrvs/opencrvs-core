@@ -15,7 +15,6 @@ import {
   EventStatus,
   InherentFlags,
   defineWorkqueues,
-  event,
   user
 } from '@opencrvs/toolkit/events'
 
@@ -81,9 +80,9 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       flags: {
-        anyOf: [InherentFlags.INCOMPLETE],
         noneOf: [InherentFlags.REJECTED]
       },
+      status: { type: 'exact', term: EventStatus.enum.NOTIFIED },
       updatedAtLocation: { type: 'within', location: user('primaryOfficeId') }
     },
     action: { type: ActionType.READ },
@@ -210,6 +209,7 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
       flags: {
         anyOf: [
           'escalated-to-registrar-general',
@@ -227,7 +227,10 @@ export const Workqueues = defineWorkqueues([
       defaultMessage: 'Pending feedback',
       description: 'Title of pending feedback workqueue'
     },
-    query: { flags: { anyOf: ['escalated-to-registrar-general'] } },
+    query: {
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
+      flags: { anyOf: ['escalated-to-registrar-general'] }
+    },
     action: { type: ActionType.READ }
   },
   {
@@ -238,7 +241,10 @@ export const Workqueues = defineWorkqueues([
       defaultMessage: 'Pending feedback',
       description: 'Title of pending feedback workqueue'
     },
-    query: { flags: { anyOf: ['escalated-to-provincial-registrar'] } },
+    query: {
+      status: { type: 'noneOf', terms: [EventStatus.enum.REVOKED] },
+      flags: { anyOf: ['escalated-to-provincial-registrar'] }
+    },
     action: { type: ActionType.READ }
   },
   {
@@ -269,9 +275,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      status: { type: 'exact', term: EventStatus.enum.REGISTERED },
       flags: {
         anyOf: ['pending-first-certificate-issuance'],
-        noneOf: ['revoked', InherentFlags.CORRECTION_REQUESTED]
+        noneOf: [InherentFlags.CORRECTION_REQUESTED]
       }
     },
     action: { type: ActionType.PRINT_CERTIFICATE },
@@ -291,9 +298,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      status: { type: 'exact', term: EventStatus.enum.REGISTERED },
       flags: {
         anyOf: ['certified-copy-printed-in-advance-of-issuance'],
-        noneOf: ['revoked', InherentFlags.CORRECTION_REQUESTED]
+        noneOf: [InherentFlags.CORRECTION_REQUESTED]
       }
     },
     action: { type: ActionType.READ },
@@ -313,9 +321,9 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...registeredInMyAdminArea,
+      status: { type: 'exact', term: EventStatus.enum.REGISTERED },
       flags: {
-        anyOf: [InherentFlags.CORRECTION_REQUESTED],
-        noneOf: ['revoked']
+        anyOf: [InherentFlags.CORRECTION_REQUESTED]
       }
     },
     action: { type: ActionType.READ }

@@ -57,6 +57,10 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
   'event.actions.archive.request': messages.archivedAuditAction,
   'event.actions.reinstate.request': messages.reInstatedInProgressAuditAction,
   'event.actions.print_certificate.request': messages.certifiedAuditAction,
+  'event.actions.revoke_registration.request':
+    messages.registrationRevokedAuditAction,
+  'event.actions.reinstate_registration.request':
+    messages.registrationReinstatedAuditAction,
   'event.actions.correction.request.request':
     messages.requestedCorrectionAuditAction,
   'event.actions.correction.approve.request':

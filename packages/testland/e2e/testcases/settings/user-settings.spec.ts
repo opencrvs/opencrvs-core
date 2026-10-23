@@ -8,37 +8,30 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import path from 'path'
 import { ASSETS_DIR } from '@e2e/support/paths'
 
-test.describe.serial('1. Settings Page', () => {
-  let page: Page
+test('1. Settings Page', async ({ page }) => {
+  await login(page, CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    await login(page, CREDENTIALS.REGISTRAR)
-  })
+  // 1.1.1 Navigate to settings page
+  async function openSettings() {
+    await page.getByRole('button', { name: 'Profile' }).click()
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+    await page
+      .locator('#ProfileMenu-Dropdown-Content')
+      .waitFor({ state: 'visible' })
 
-  test.describe('1.1 Registrar Settings page', async () => {
-    // 1.1.1 Navigate to settings page
-    test.beforeEach(async () => {
-      await page.getByRole('button', { name: 'Profile' }).click()
+    await page.locator('li').filter({ hasText: 'Settings' }).click()
+  }
 
-      await page
-        .locator('#ProfileMenu-Dropdown-Content')
-        .waitFor({ state: 'visible' })
+  await test.step('1.1 Registrar Settings page', async () => {
+    await test.step('1.1.2 Validate content', async () => {
+      await openSettings()
 
-      await page.locator('li').filter({ hasText: 'Settings' }).click()
-    })
-
-    test('1.1.2 Validate content', async () => {
       // User details displayed
       await expect(page.getByTestId('name-value')).toContainText(
         'Kennedy Mweene'
@@ -72,7 +65,9 @@ test.describe.serial('1. Settings Page', () => {
       ).toBeVisible()
     })
 
-    test('1.1.3 Change avatar', async () => {
+    await test.step('1.1.3 Change avatar', async () => {
+      await openSettings()
+
       await page.getByTestId('change-avatar').first().click()
 
       const attachmentPath = path.join(ASSETS_DIR, 'image.png')

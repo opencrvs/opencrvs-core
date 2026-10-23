@@ -40,7 +40,7 @@ async function getEventById(eventId: string, token: string) {
 test('Correcting a birth with a verified parent ID creates the child UIN (#13734)', async ({
   page
 }) => {
-  // Even the one line awaits expect this to take 120 seconds.
+  // Two waits for MOSIP can take up to 60s each, on top of the UI flow
   test.setTimeout(240_000)
   let token: string
   let declaration: Declaration
@@ -144,6 +144,11 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
   })
 
   await test.step('Record audit shows the corrected record and the child UIN', async () => {
+    // MOSIP takes time to send the response, so simulate real-life by going back and forth to the event.
+    await page.getByTestId('exit-event').click()
+    await page.getByRole('button', { name: 'Pending certification' }).click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+
     await page.getByRole('button', { name: 'Assign record' }).click()
     await page.getByRole('button', { name: 'Assign', exact: true }).click()
 
