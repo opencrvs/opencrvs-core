@@ -10,7 +10,9 @@
  */
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Link, Stack, Text } from '../'
+import { Link } from '../Link'
+import { Stack } from '../Stack'
+import { Text } from '../Text'
 import { Icon } from '../Icon'
 
 const Container = styled.div`

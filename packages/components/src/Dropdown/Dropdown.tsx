@@ -10,8 +10,7 @@
  */
 
 import React, { ReactNode, useEffect } from 'react'
-import { disabled } from '../Button/Button.styles'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { DropdownProvider, useDropdown } from './DropdownContext'
 
 const StyledWrapper = styled.nav`
@@ -77,6 +76,12 @@ const Separator = styled.div<{ weight: number }>`
   border-bottom: ${({ weight }) => `${weight}px solid `}
     ${({ theme }) => theme.colors.grey300};
   margin: 4px 0;
+`
+
+const disabled = css`
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
 `
 
 const MenuItem = styled.li<{ disabled?: boolean }>`

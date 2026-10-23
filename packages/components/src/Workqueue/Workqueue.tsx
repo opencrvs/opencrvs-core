@@ -14,7 +14,7 @@ import { grid, ITheme } from '../tokens'
 import { IColumn, IActionObject, IAction } from './types'
 import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
-import { SortIcon } from '../icons/SortIcon'
+import { SortIcon } from '../icons'
 import { ListItemAction } from './components/ListItemAction'
 import { useWindowSize } from '../hooks'
 

@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 import { Button } from '../Button'
-import { InputError } from '../InputField/InputError'
+import { InputError } from '../InputField'
 
 const SEARCH_DEBOUNCE_DURATION = 300
 

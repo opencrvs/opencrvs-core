@@ -10,8 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ExpansionButton } from '../../buttons/ExpansionButton'
-import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
+import { ExpansionButton, ArrowExpansionButton } from '../../buttons'
 import { Button } from '../../Button'
 import { ColumnContentAlignment, IAction, IActionComponent } from '..'
 const Container = styled.div`
