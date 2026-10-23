@@ -7,6 +7,10 @@ package-lock.json
 # production
 build
 
+# playwright
+playwright-report
+test-results
+
 
 # NOTE: Only for OpenCRVS Core Team:
 # Sparce checkout from OpenCRVS core

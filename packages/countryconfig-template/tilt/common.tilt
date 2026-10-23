@@ -143,3 +143,17 @@ for workload in opensrvs_services:
   k8s_resource(workload, labels=[tilt_label], resource_deps=dependencies + opensrvs_predeploy_jobs)
 for job in opensrvs_postdeploy_jobs:
   k8s_resource(job, labels=[job_label], resource_deps=opensrvs_services)
+
+
+if os.path.exists('playwright.config.ts'):
+  domain = 'opencrvs.localhost'
+  local_resource(
+      'e2e-tests',
+      cmd='npx playwright install chromium && npx playwright test',
+      # The local environment is served over plain HTTP
+      env={'DOMAIN': domain, 'SCHEME': 'http'},
+      trigger_mode=TRIGGER_MODE_MANUAL,
+      auto_init=False,
+      allow_parallel=True,
+      labels=['6.Tests']
+  )
