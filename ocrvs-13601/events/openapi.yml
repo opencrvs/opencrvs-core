@@ -264,6 +264,10 @@ paths:
                   type: string
                 declaration:
                   default: {}
+                  description: Values for fields of the notification form, keyed by field id.
+                    Fields outside the notification form are rejected. Only
+                    these values become part of the record declaration, so any
+                    id that needs to be searchable must be a declaration field.
                   type: object
                   propertyNames:
                     type: string
@@ -271,9 +275,10 @@ paths:
                     description: Value that matches exactly one of the possible schema types
                       (TextValue, DateValue, DateRangeFieldValue). The best
                       matching schema is chosen by priority.
-                  description: Record of field-level changes made by an action. Supports partial
-                    updates and nullable values.
                 annotation:
+                  description: Values for notify-only fields (NOTIFY review and form fields),
+                    keyed by field id. These are stored on the NOTIFY action,
+                    not in the record declaration.
                   type: object
                   propertyNames:
                     type: string
@@ -281,8 +286,6 @@ paths:
                     description: Value that matches exactly one of the possible schema types
                       (TextValue, DateValue, DateRangeFieldValue). The best
                       matching schema is chosen by priority.
-                  description: Record of field-level changes made by an action. Supports partial
-                    updates and nullable values.
                 originalActionId:
                   type: string
                   format: uuid
@@ -349,6 +352,10 @@ paths:
                   type: string
                 declaration:
                   default: {}
+                  description: Values for fields of the notification form, keyed by field id.
+                    Fields outside the notification form are rejected. Only
+                    these values become part of the record declaration, so any
+                    id that needs to be searchable must be a declaration field.
                   type: object
                   propertyNames:
                     type: string
@@ -356,9 +363,10 @@ paths:
                     description: Value that matches exactly one of the possible schema types
                       (TextValue, DateValue, DateRangeFieldValue). The best
                       matching schema is chosen by priority.
-                  description: Record of field-level changes made by an action. Supports partial
-                    updates and nullable values.
                 annotation:
+                  description: Values for notify-only fields (NOTIFY review and form fields),
+                    keyed by field id. These are stored on the NOTIFY action,
+                    not in the record declaration.
                   type: object
                   propertyNames:
                     type: string
@@ -366,8 +374,6 @@ paths:
                     description: Value that matches exactly one of the possible schema types
                       (TextValue, DateValue, DateRangeFieldValue). The best
                       matching schema is chosen by priority.
-                  description: Record of field-level changes made by an action. Supports partial
-                    updates and nullable values.
                 originalActionId:
                   type: string
                   format: uuid
