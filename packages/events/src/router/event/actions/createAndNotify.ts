@@ -25,7 +25,10 @@ import {
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
-import { getInMemoryVersionedEventConfigurations } from '@events/service/config/config'
+import {
+  getCountryTimeZone,
+  getInMemoryVersionedEventConfigurations
+} from '@events/service/config/config'
 import { createEvent } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -172,7 +175,8 @@ export function createAndNotifyProcedure() {
           user,
           transactionId: createTransactionId,
           createdAtLocation,
-          config: versionedConfig
+          config: versionedConfig,
+          timeZone: await getCountryTimeZone(token)
         })
         const eventConfig = getEventConfigForRecord(versionedConfig, event)
 
