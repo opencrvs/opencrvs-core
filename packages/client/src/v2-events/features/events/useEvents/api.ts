@@ -17,7 +17,7 @@ import {
 import {
   Draft,
   EventConfig,
-  resolveEventConfig,
+  getEventConfigForRecord,
   VersionedEventConfig,
   EventDocument,
   EventDocumentOnlyLastAction,
@@ -59,13 +59,17 @@ async function invalidateWorkqueues() {
   })
 }
 
+/**
+ * @returns the cached configuration of the version `record` was created under, or
+ * undefined when its event's configuration is not cached.
+ */
 export function findLocalEventConfig(
-  eventType: string
+  record: Pick<EventDocument, 'type' | 'configVersionId'>
 ): EventConfig | undefined {
   const config = getQueryData(trpcOptionsProxy.event.config.get)?.find(
-    ({ id }: VersionedEventConfig) => id === eventType
+    ({ id }: VersionedEventConfig) => id === record.type
   ) as VersionedEventConfig | undefined
-  return config && resolveEventConfig(config)
+  return config && getEventConfigForRecord(config, record)
 }
 
 export function addLocalEventConfig(config: VersionedEventConfig) {
@@ -130,7 +134,7 @@ function setLocalEventIndexById(id: string, eventIndex: EventIndex) {
  * Does nothing when the event's configuration is not cached.
  */
 export function seedLocalEventIndex(id: string, event: EventDocument) {
-  const config = findLocalEventConfig(event.type)
+  const config = findLocalEventConfig(event)
 
   if (config) {
     setLocalEventIndexById(id, getCurrentEventState(event, config))
@@ -138,7 +142,7 @@ export function seedLocalEventIndex(id: string, event: EventDocument) {
 }
 
 export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
-  const config = findLocalEventConfig(updatedEvent.type)
+  const config = findLocalEventConfig(updatedEvent)
 
   if (!config) {
     throw new Error(

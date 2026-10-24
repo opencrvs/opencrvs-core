@@ -23,6 +23,7 @@ import {
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
+import { summaryMessages } from '../../EventSummary'
 import { ActionTypeSpecificContent } from './components'
 import { SystemUpdatedFields } from './components/SystemUpdatedFields'
 
@@ -46,6 +47,12 @@ const messages = defineMessages({
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
+  },
+  configVersion: {
+    defaultMessage: 'Configuration version',
+    description:
+      'Label for the id of the event configuration version the record was created under',
+    id: 'event.history.modal.configVersion'
   },
   awaitingConfirmationBanner: {
     defaultMessage:
@@ -191,6 +198,27 @@ export function EventHistoryDialog({
             }
           ]}
           content={[{ duplicateOf }]}
+          noResultText=" "
+        />
+      )}
+      {action.type === ActionType.CREATE && (
+        <Table
+          columns={[
+            {
+              key: 'configVersion',
+              label: intl.formatMessage(messages.configVersion),
+              width: 100
+            }
+          ]}
+          content={[
+            {
+              configVersion:
+                fullEvent.configVersionId ??
+                intl.formatMessage(
+                  summaryMessages.configVersion.emptyValueMessage
+                )
+            }
+          ]}
           noResultText=" "
         />
       )}

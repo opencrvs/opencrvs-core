@@ -34,9 +34,12 @@ import {
 import {
   dropSecuredDeclarationFields,
   EventIndexWithAdministrativeHierarchy,
+  getEventConfigForRecord,
+  getOrThrow,
   logger,
   RecordScopeV2,
-  TokenWithBearer
+  TokenWithBearer,
+  VersionedEventConfig
 } from '@opencrvs/commons'
 import {
   getEventAliasName,
@@ -289,6 +292,7 @@ export async function createIndex(
         properties: {
           id: { type: 'keyword' },
           type: { type: 'keyword' },
+          configVersionId: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
           createdByUserType: { type: 'keyword' },
@@ -421,7 +425,7 @@ export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],
-  configs: EventConfig[],
+  configs: VersionedEventConfig[],
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
@@ -429,7 +433,14 @@ export async function indexEventsInBulk(
   const hiearchyResolutionStarted = new Date()
 
   const indexableEvents = batch.map((doc) => {
-    const config = getEventConfigById(configs, doc.type)
+    // Each record is indexed with the version it was created under.
+    const config = getEventConfigForRecord(
+      getOrThrow(
+        configs.find(({ id }) => id === doc.type),
+        `No configuration found for event type: ${doc.type}`
+      ),
+      doc
+    )
     return { doc, config, eventIndex: eventToEventIndex(doc, config) }
   })
 

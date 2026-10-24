@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { PlainDate, plainDateToLocalDate } from './PlainDate'
+import {
+  PlainDate,
+  plainDateToLocalDate,
+  toPlainDateInTimeZone
+} from './PlainDate'
 
 describe('plainDateToLocalDate', () => {
   describe.each([
@@ -71,5 +75,19 @@ describe('plainDateToLocalDate', () => {
       expect(result.getDate()).toBe(1)
       expect(result.getHours()).toBe(0)
     })
+  })
+})
+
+describe('toPlainDateInTimeZone', () => {
+  const lateEveningUtc = new Date('2029-12-31T20:00:00.000Z')
+
+  it('returns the calendar date in the time zone', () => {
+    expect(toPlainDateInTimeZone(lateEveningUtc, 'UTC')).toBe('2029-12-31')
+    expect(toPlainDateInTimeZone(lateEveningUtc, 'Asia/Dhaka')).toBe(
+      '2030-01-01'
+    )
+    expect(toPlainDateInTimeZone(lateEveningUtc, 'America/Los_Angeles')).toBe(
+      '2029-12-31'
+    )
   })
 })

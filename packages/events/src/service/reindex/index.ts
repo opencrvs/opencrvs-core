@@ -10,7 +10,7 @@
  */
 import fetch from 'node-fetch'
 import { getUUID, logger, TokenWithBearer, UUID } from '@opencrvs/commons'
-import { EventConfig, EventDocument } from '@opencrvs/commons/events'
+import { EventDocument, VersionedEventConfig } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 
 import {
@@ -19,7 +19,10 @@ import {
 } from '@events/storage/postgres/events/events'
 import { getClient } from '@events/storage/postgres/events'
 import { getTemporaryIndexName } from '@events/storage/elasticsearch'
-import { getInMemoryEventConfigurations } from '../config/config'
+import {
+  getInMemoryEventConfigurations,
+  getInMemoryVersionedEventConfigurations
+} from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupOrphanedIndices,
@@ -117,7 +120,7 @@ async function fetchReadableEvents(
 async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
-  configurations: EventConfig[],
+  configurations: VersionedEventConfig[],
   onBatchProcessed?: (count: number) => Promise<void>,
   onEventsSkipped?: (skipped: SkippedEvent[]) => void
 ) {
@@ -222,6 +225,9 @@ export async function runReindex(token: TokenWithBearer) {
 
   await createReindexingStatusEntry(runId, startTimestamp)
 
+  const versionedConfigurations =
+    await getInMemoryVersionedEventConfigurations(token)
+  // Indices are prepared from the version in effect today.
   const configurations = await getInMemoryEventConfigurations(token)
 
   // Best-effort: leftover orphans are retried on the next run.
@@ -266,7 +272,7 @@ export async function runReindex(token: TokenWithBearer) {
     await reindexSearch(
       timestamp,
       token,
-      configurations,
+      versionedConfigurations,
       async (batchSize) => {
         const currentSecond = Math.floor(Date.now() / 1000) - startSecond
         const processedThisSecond = processedCounts[currentSecond] || 0
