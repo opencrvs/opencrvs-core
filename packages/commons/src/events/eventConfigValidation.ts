@@ -14,9 +14,26 @@ import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import { findAllFields, getDeclarationFields } from './utils'
 import { FieldType } from './FieldType'
+import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
+
+/** Field types that accept a text, number or date defaultValue in advanced search */
+const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
+  FieldType.TEXT,
+  FieldType.TEXTAREA,
+  FieldType.EMAIL,
+  FieldType.PHONE,
+  FieldType.ID,
+  FieldType.SELECT,
+  FieldType.RADIO_GROUP,
+  FieldType.COUNTRY,
+  FieldType.LOCATION,
+  FieldType.ADMINISTRATIVE_AREA,
+  FieldType.NUMBER,
+  FieldType.DATE
+]
 
 export function validateAdvancedSearchConfig(
   event: EventConfig,
@@ -64,6 +81,79 @@ export function validateAdvancedSearchConfig(
       path: ['advancedSearch']
     })
   }
+
+  // Rejects search field default values that can't be filled into the field
+  event.advancedSearch.forEach((section, sectionIndex) => {
+    section.fields.forEach((searchField, fieldIndex) => {
+      if (
+        searchField.fieldType !== 'field' ||
+        searchField.defaultValue === undefined
+      ) {
+        return
+      }
+
+      const path = [
+        'advancedSearch',
+        sectionIndex,
+        'fields',
+        fieldIndex,
+        'defaultValue'
+      ]
+
+      if (
+        searchField.config.searchFields &&
+        searchField.config.searchFields.length > 0
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} searches across several form fields, so it does not support a defaultValue.`,
+          path
+        })
+        return
+      }
+
+      if (typeof searchField.defaultValue === 'boolean') {
+        return
+      }
+
+      const formField = allFields.find(({ id }) => id === searchField.fieldId)
+
+      // An unknown field id is already reported above
+      if (!formField) {
+        return
+      }
+
+      if (
+        !SEARCH_DEFAULT_VALUE_FIELD_TYPES.some(
+          (type) => type === formField.type
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} is a ${formField.type} field, which does not support a defaultValue value, only true or false. Field types that support a defaultValue value: ${SEARCH_DEFAULT_VALUE_FIELD_TYPES.join(', ')}.`,
+          path
+        })
+      } else if (
+        formField.type === FieldType.DATE &&
+        searchField.config.type === 'range'
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} is searched as a date range, so its defaultValue can only be true or false.`,
+          path
+        })
+      } else if (
+        !mapFieldTypeToZod(formField).safeParse(searchField.defaultValue)
+          .success
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} has defaultValue "${searchField.defaultValue}", which is not a valid ${formField.type} value.`,
+          path
+        })
+      }
+    })
+  })
 }
 
 export function validateDateOfEvent(

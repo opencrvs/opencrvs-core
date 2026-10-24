@@ -141,6 +141,16 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Default values for advanced search fields
+
+Advanced search fields open with the declaration form's `defaultValue`, so a name defaulting to the logged-in user's name shows up pre-filled and counts towards the search. Set `defaultValue` on a search field to change that:
+
+- omitted or `true` keeps the form's default, e.g. an address defaulting to the user's area
+- `false` opens the field empty, e.g. `field('applicant.name', { defaultValue: false }).fuzzy()`
+- a text, number or date value opens the field with that value, e.g. `field('applicant.email', { defaultValue: 'applicant@example.com' }).exact()`
+
+Only TEXT, TEXTAREA, EMAIL, PHONE, ID, SELECT, RADIO_GROUP, COUNTRY, LOCATION, ADMINISTRATIVE_AREA, NUMBER and DATE fields take a value. Other field types, such as NAME and ADDRESS, and dates searched as a range accept only `true` or `false`. Fields using `config.searchFields` don't support `defaultValue`. An event configuration that breaks these rules fails validation. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
+
 ### Improvements
 
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
