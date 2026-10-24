@@ -37,6 +37,12 @@ export const EventDocument = z
       .string()
       .describe(
         'System-generated tracking identifier used to look up the event.'
+      ),
+    configVersionId: z
+      .string()
+      .optional()
+      .describe(
+        'Id of the event configuration version the record was created under. Every action on the record uses that version. Absent for records created before versioning, which use the earliest version.'
       )
   })
   .meta({ id: 'EventDocument' })

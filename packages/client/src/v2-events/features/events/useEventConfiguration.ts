@@ -10,7 +10,13 @@
  */
 import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { EventConfig, resolveEventConfig } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  getEventConfigForRecord,
+  getOrThrow,
+  resolveEventConfig,
+  VersionedEventConfig
+} from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 
 /**
@@ -19,17 +25,35 @@ import { useTRPC } from '@client/v2-events/trpc'
 const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
 
 /**
- * Fetches configured events
- * @returns a list of event configurations, each at the version that applies (see `resolveEventConfig`)
+ * Fetches configured events with every version of their configuration.
  */
-export function useEventConfigurations() {
+export function useVersionedEventConfigurations(): VersionedEventConfig[] {
   const trpc = useTRPC()
 
-  const versionedConfigs = useSuspenseQuery({
+  return useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
     queryKey: trpc.event.config.get.queryKey(),
     staleTime: import.meta.env.PROD ? EVENT_CONFIGURATION_STALE_TIME_MS : 0
   }).data
+}
+
+/**
+ * Fetches configured events and finds a matching event, with every version of its configuration
+ * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
+ */
+export function useVersionedEventConfiguration(eventIdentifier: string) {
+  return getOrThrow(
+    useVersionedEventConfigurations().find(({ id }) => id === eventIdentifier),
+    `Configuration not found for event: ${eventIdentifier}`
+  )
+}
+
+/**
+ * Fetches configured events
+ * @returns a list of event configurations, each at the version that applies (see `resolveEventConfig`)
+ */
+export function useEventConfigurations() {
+  const versionedConfigs = useVersionedEventConfigurations()
 
   return useMemo(
     () => versionedConfigs.map(resolveEventConfig),
@@ -54,4 +78,20 @@ export function useEventConfiguration(eventIdentifier: string): {
   }
 
   return { eventConfiguration }
+}
+
+/**
+ * @returns the configuration of the version `record` was created under. Every action on
+ * a record uses that version.
+ */
+export function useEventConfigurationForRecord(record: {
+  type: string
+  configVersionId?: string
+}): { eventConfiguration: EventConfig } {
+  return {
+    eventConfiguration: getEventConfigForRecord(
+      useVersionedEventConfiguration(record.type),
+      record
+    )
+  }
 }

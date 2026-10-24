@@ -22,12 +22,18 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { canUserCreateEvent } from '@opencrvs/commons/client'
+import {
+  canUserCreateEvent,
+  resolveEffectiveVersion
+} from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { useEventConfigurations } from './useEventConfiguration'
+import {
+  useEventConfigurations,
+  useVersionedEventConfigurations
+} from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
@@ -76,6 +82,7 @@ function EventSelector() {
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
+  const versionedEventConfigurations = useVersionedEventConfigurations()
   const events = useEvents()
   const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
@@ -100,10 +107,17 @@ function EventSelector() {
       throw new Error(`Configuration for event '${eventType}' not found`)
     }
 
+    const versionedConfig = versionedEventConfigurations.find(
+      ({ id }) => id === eventType
+    )
+
     createEvent.mutate({
       type: eventType,
       transactionId,
-      createdAtLocation: user?.primaryOfficeId
+      createdAtLocation: user?.primaryOfficeId,
+      configVersionId:
+        versionedConfig &&
+        resolveEffectiveVersion(versionedConfig, new Date())?.id
     })
 
     clearForm()

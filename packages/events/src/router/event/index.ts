@@ -46,7 +46,8 @@ import {
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
-  getEventConfigurationById,
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById,
   getInMemoryEventConfigurations,
   getInMemoryVersionedEventConfigurations
 } from '@events/service/config/config'
@@ -170,9 +171,9 @@ export const eventRouter = router({
 
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
-      const config = await getEventConfigurationById({
-        token: ctx.token,
-        eventType: input.type
+      const config = await getVersionedEventConfigurationById({
+        eventType: input.type,
+        token: ctx.token
       })
 
       const result = await createEvent({
@@ -214,10 +215,10 @@ export const eventRouter = router({
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
     .query(async ({ ctx }) => {
-      const { eventId, eventType } = ctx
-      const configuration = await getEventConfigurationById({
-        token: ctx.token,
-        eventType
+      const { eventId, eventType, configVersionId } = ctx
+      const configuration = await getEventConfigurationForRecord({
+        event: { type: eventType, configVersionId },
+        token: ctx.token
       })
 
       const updatedEvent = await processAction(
@@ -468,9 +469,9 @@ export const eventRouter = router({
 
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
-          const configuration = await getEventConfigurationById({
-            token,
-            eventType: event.type
+          const configuration = await getEventConfigurationForRecord({
+            event: event,
+            token
           })
           const result = await markAsDuplicate(
             event,
@@ -504,9 +505,9 @@ export const eventRouter = router({
 
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
-          const configuration = await getEventConfigurationById({
-            token,
-            eventType: event.type
+          const configuration = await getEventConfigurationForRecord({
+            event: event,
+            token
           })
           const result = await markNotDuplicate(
             event,

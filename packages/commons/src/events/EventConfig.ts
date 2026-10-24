@@ -21,6 +21,8 @@ import { Conditional } from './Conditional'
 import type { JSONSchema } from '../conditionals/conditionals'
 import { AvailableIcons } from '../icons'
 import { ActionType } from './ActionType'
+import { toPlainDate } from './PlainDate'
+import { getOrThrow } from '../utils'
 import {
   validateActionOrder,
   validateActionFlags,
@@ -294,7 +296,7 @@ const resolvedConfigs = new WeakMap<EventConfigVersion, EventConfig>()
  * version of the event. The same version gives the same object, so caches keyed on
  * the configuration keep working.
  */
-export function getEventConfigOfVersion(
+function toEventConfig(
   config: VersionedEventConfig,
   version: EventConfigVersion
 ): EventConfig {
@@ -315,11 +317,74 @@ export function getEventConfigOfVersion(
 }
 
 /**
- * @returns the configuration of the version of the event that applies.
- * @TODO: always the first version until the version is resolved from the record (#13602).
+ * @returns the configuration of the version with id `versionId`.
+ * @throws when the version is not configured.
+ */
+export function getEventConfigOfVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfig {
+  return toEventConfig(
+    config,
+    getOrThrow(
+      config.versions.find(({ id }) => id === versionId),
+      `Event '${config.id}' has no version '${versionId}'`
+    )
+  )
+}
+
+/** Orders versions by `effectiveFrom`, a version without one first. */
+function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
+  return (a.effectiveFrom ?? '').localeCompare(b.effectiveFrom ?? '')
+}
+
+/** @returns the version effective from the beginning of time, or else the earliest. */
+function getEarliestVersion(config: VersionedEventConfig) {
+  return [...config.versions].sort(byEffectiveFrom)[0]
+}
+
+/**
+ * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
+ * after it, where a version without one is effective from the beginning of time.
+ * Undefined when every version takes effect later.
+ * @TODO: compares UTC dates. Legislation takes effect at local midnight, so this may
+ * need the country's time zone (open question in #13602).
+ */
+export function resolveEffectiveVersion(
+  config: VersionedEventConfig,
+  now: Date
+): EventConfigVersion | undefined {
+  const today = toPlainDate(now.toISOString())
+  return config.versions
+    .filter(({ effectiveFrom }) => !effectiveFrom || effectiveFrom <= today)
+    .sort(byEffectiveFrom)
+    .at(-1)
+}
+
+/**
+ * @returns the configuration of the version a record is stamped with. A record created
+ * before versioning has no stamp and uses the earliest version.
+ * @throws when the record's version is no longer configured.
+ */
+export function getEventConfigForRecord(
+  config: VersionedEventConfig,
+  record: { configVersionId?: string }
+): EventConfig {
+  return getEventConfigOfVersion(
+    config,
+    record.configVersionId ?? getEarliestVersion(config).id
+  )
+}
+
+/**
+ * @returns the configuration of the version in effect today (the earliest, when every
+ * version takes effect later). For a record, use `getEventConfigForRecord` instead.
  */
 export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
-  return getEventConfigOfVersion(config, config.versions[0])
+  return toEventConfig(
+    config,
+    resolveEffectiveVersion(config, new Date()) ?? getEarliestVersion(config)
+  )
 }
 
 /**
@@ -415,9 +480,7 @@ export const VersionedEventConfig: z.ZodType<
     validateVersionList(config, ctx)
     validateEachVersion(
       ctx,
-      config.versions.map((version) =>
-        getEventConfigOfVersion(config, version)
-      ),
+      config.versions.map((version) => toEventConfig(config, version)),
       validateEventConfig
     )
   })
