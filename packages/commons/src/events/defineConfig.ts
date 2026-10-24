@@ -10,7 +10,13 @@
  */
 
 import * as z from 'zod/v4'
-import { EventConfig, EventConfigInput } from './EventConfig'
+import {
+  EventConfigInput,
+  EventConfigVersionInput,
+  validateEachVersion,
+  VersionedEventConfig,
+  VersionedEventConfigInput
+} from './EventConfig'
 import { ActionType } from './ActionType'
 import { generateNotifyReview } from './notificationFormFallback'
 import {
@@ -55,6 +61,12 @@ type NotifyActionConfigInput = Extract<
   { type: typeof ActionType.NOTIFY }
 >
 
+/** A version as `VersionedEventConfig` expects it, once `defineConfig` has prepared it. */
+type PreparedVersion = z.input<typeof VersionedEventConfig>['versions'][number]
+
+/** An action with `declaration` on DECLARE and `review` on NOTIFY, as `EventConfig` expects. */
+type PreparedActionConfig = PreparedVersion['actions'][number]
+
 /**
  * Fallback for events without a configured notification form or NOTIFY review.
  *
@@ -65,10 +77,15 @@ type NotifyActionConfigInput = Extract<
  *
  * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
  * Expects the `declaration` to already be on the DECLARE action.
+ *
+ * @returns the configuration with `declaration` on the DECLARE action and `review` on every
+ * NOTIFY action.
  */
 function generateNotificationFormFallback(
   config: Omit<EventConfigInput, 'declaration'>
-) {
+): Omit<EventConfigInput, 'declaration' | 'actions'> & {
+  actions: PreparedActionConfig[]
+} {
   const declareAction = config.actions.find(
     (action): action is DeclareActionConfigInput =>
       action.type === ActionType.DECLARE
@@ -86,55 +103,139 @@ function generateNotificationFormFallback(
     )
   }
 
-  if (notifyAction?.review) {
-    return config
-  }
+  const declaration = declareAction?.declaration
 
-  if (!declareAction?.declaration) {
+  if (!declaration) {
     throw new Error(
       `Event '${config.id}' has no ${ActionType.DECLARE} form. Configure \`actions[${ActionType.DECLARE}].declaration\`.`
     )
   }
 
-  const review = generateNotifyReview(declareAction.review)
-
-  if (notifyAction) {
-    return {
-      ...config,
-      actions: config.actions.map((action) =>
-        action === notifyAction ? { ...notifyAction, review } : action
-      )
-    }
-  }
-
-  const notifyFromDeclare: NotifyActionConfigInput = {
+  const notifyFromDeclare = (): PreparedActionConfig => ({
     type: ActionType.NOTIFY,
     label: declareAction.label,
     icon: declareAction.icon,
     conditionals: declareAction.conditionals,
     flags: declareAction.flags,
     supportingCopy: declareAction.dialogCopy?.notify,
-    review
-  }
+    review: generateNotifyReview(declareAction.review)
+  })
 
   return {
     ...config,
-    actions: config.actions.flatMap((action) =>
-      action === declareAction ? [notifyFromDeclare, action] : [action]
-    )
+    actions: config.actions.flatMap((action): PreparedActionConfig[] => {
+      if (action.type === ActionType.DECLARE) {
+        const declareWithForm = { ...action, declaration }
+        return notifyAction
+          ? [declareWithForm]
+          : [notifyFromDeclare(), declareWithForm]
+      }
+
+      if (action.type === ActionType.NOTIFY) {
+        return [
+          {
+            ...action,
+            review: action.review ?? generateNotifyReview(declareAction.review)
+          }
+        ]
+      }
+
+      return [action]
+    })
+  }
+}
+
+/** Id of the version of an event configured without `versions`. */
+export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+
+/** An event configured without `versions` is a single version, effective from the beginning of time. */
+function toVersionedInput(
+  config: EventConfigInput | VersionedEventConfigInput
+): VersionedEventConfigInput {
+  if ('versions' in config) {
+    return config
+  }
+
+  const { id, label, advancedSearch, ...version } = config
+  return {
+    id,
+    label,
+    advancedSearch,
+    versions: [{ ...version, id: DEFAULT_EVENT_CONFIG_VERSION_ID }]
+  }
+}
+
+/** The input of one version, together with the fields shared by every version. */
+function getVersionInput(
+  config: VersionedEventConfigInput,
+  {
+    id: _id,
+    effectiveFrom: _effectiveFrom,
+    ...version
+  }: EventConfigVersionInput
+): EventConfigInput {
+  return {
+    ...version,
+    id: config.id,
+    label: config.label,
+    advancedSearch: config.advancedSearch
+  }
+}
+
+/**
+ * Moves `declaration` onto the DECLARE action and generates the NOTIFY fallback, for each
+ * version.
+ */
+function prepareVersions(
+  config: VersionedEventConfigInput
+): z.input<typeof VersionedEventConfig> {
+  return {
+    id: config.id,
+    label: config.label,
+    advancedSearch: config.advancedSearch,
+    versions: config.versions.map((version) => {
+      const {
+        id: _id,
+        label: _label,
+        advancedSearch: _advancedSearch,
+        ...prepared
+      } = generateNotificationFormFallback(
+        moveDeclarationToDeclareAction(getVersionInput(config, version))
+      )
+
+      return {
+        ...prepared,
+        id: version.id,
+        ...(version.effectiveFrom !== undefined && {
+          effectiveFrom: version.effectiveFrom
+        })
+      } satisfies PreparedVersion
+    })
   }
 }
 
 const EventConfigDefinition = z
-  .custom<EventConfigInput>()
-  .superRefine((config, ctx) => {
-    if (validateExactlyOneDeclareAction(config, ctx)) {
-      validateDeclarationGivenExactlyOnce(config, ctx)
-    }
-  })
-  .transform(moveDeclarationToDeclareAction)
-  .transform(generateNotificationFormFallback)
-  .pipe(EventConfig)
+  .custom<EventConfigInput | VersionedEventConfigInput>()
+  .transform(toVersionedInput)
+  .superRefine((config, ctx) =>
+    validateEachVersion(
+      ctx,
+      config.versions.map((version) => getVersionInput(config, version)),
+      (event, versionCtx) => {
+        if (validateExactlyOneDeclareAction(event, versionCtx)) {
+          validateDeclarationGivenExactlyOnce(event, versionCtx)
+        }
+      }
+    )
+  )
+  .transform(prepareVersions)
+  .pipe(VersionedEventConfig)
 
-export const defineConfig = (config: EventConfigInput) =>
-  EventConfigDefinition.parse(config)
+/**
+ * Validates an event configuration. Accepts an event with `versions`, or, as before
+ * versioning, an event without them, which is taken as a single version with id
+ * `default`, effective from the beginning of time.
+ */
+export const defineConfig = (
+  config: EventConfigInput | VersionedEventConfigInput
+) => EventConfigDefinition.parse(config)

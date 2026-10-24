@@ -178,21 +178,30 @@ function toEventTriggerConfig(value: unknown): EventTriggerConfig | null {
   if (typeof record.id !== 'string') {
     return null
   }
-  const actions = Array.isArray(record.actions)
-    ? Array.from(
-        new Set(
-          record.actions
-            .map((action) => {
-              if (typeof action !== 'object' || action === null) {
-                return null
-              }
-              const type = (action as Record<string, unknown>).type
-              return typeof type === 'string' ? type : null
-            })
-            .filter((type): type is string => type !== null)
+  // Triggers are checked for the actions of every version of the event.
+  const versions: unknown[] = Array.isArray(record.versions)
+    ? record.versions
+    : [record]
+  const actions = Array.from(
+    new Set(
+      versions
+        .flatMap((version) =>
+          typeof version === 'object' &&
+          version !== null &&
+          Array.isArray((version as Record<string, unknown>).actions)
+            ? ((version as Record<string, unknown>).actions as unknown[])
+            : []
         )
-      )
-    : []
+        .map((action) => {
+          if (typeof action !== 'object' || action === null) {
+            return null
+          }
+          const type = (action as Record<string, unknown>).type
+          return typeof type === 'string' ? type : null
+        })
+        .filter((type): type is string => type !== null)
+    )
+  )
   return { id: record.id, actions }
 }
 

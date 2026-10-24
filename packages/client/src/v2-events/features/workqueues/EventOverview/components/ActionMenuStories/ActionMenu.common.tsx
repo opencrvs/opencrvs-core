@@ -28,7 +28,8 @@ import {
   generateUuid,
   createPrng,
   AssignmentStatus,
-  TestUserRole
+  TestUserRole,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -397,7 +398,7 @@ export function createStoriesFromScenarios(
            * Ensure record is "downloaded offline" in the user's browser
            */
           if (recordDownloaded) {
-            addLocalEventConfig(tennisClubMembershipEvent)
+            addLocalEventConfig(versionedTennisClubMembershipEvent)
             setEventData(event.id, event)
           }
         },
@@ -473,7 +474,7 @@ export function createdByOtherUserScenario({
       </React.Suspense>
     ),
     beforeEach: () => {
-      addLocalEventConfig(tennisClubMembershipEvent)
+      addLocalEventConfig(versionedTennisClubMembershipEvent)
       setEventData(event.id, event)
     },
     play: async () => {

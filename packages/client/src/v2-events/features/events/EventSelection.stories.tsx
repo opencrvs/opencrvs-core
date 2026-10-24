@@ -10,7 +10,10 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  toVersionedEventConfig,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { EventSelection } from './EventSelection'
@@ -57,8 +60,8 @@ const randomConfig = {
 
 export const EventSelectionWithCreateScopeForAllEventTypes: Story = {
   beforeEach: () => {
-    addLocalEventConfig(birthConfig)
-    addLocalEventConfig(randomConfig)
+    addLocalEventConfig(toVersionedEventConfig(birthConfig))
+    addLocalEventConfig(toVersionedEventConfig(randomConfig))
   },
   loaders: [
     async () => {

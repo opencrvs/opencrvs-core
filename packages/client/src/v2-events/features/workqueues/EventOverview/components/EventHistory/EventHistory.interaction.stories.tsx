@@ -31,7 +31,8 @@ import {
   TestUserRole,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -218,7 +219,7 @@ export const ShowsEventDependentFieldInUpdateDetails: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [eventConfig]
+            return [toVersionedEventConfig(eventConfig)]
           }),
           tRPCMsw.event.get.query(() => {
             return registeredEvent

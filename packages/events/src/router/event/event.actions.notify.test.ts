@@ -28,7 +28,8 @@ import {
   errorMessages,
   getDeclaration,
   FieldConfig,
-  FieldType
+  FieldType,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -52,7 +53,7 @@ function useNotificationForm(
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
       HttpResponse.json([
-        {
+        toVersionedEventConfig({
           ...tennisClubMembershipEvent,
           actions: tennisClubMembershipEvent.actions.map((action) =>
             action.type === ActionType.NOTIFY
@@ -65,7 +66,7 @@ function useNotificationForm(
                 }
               : action
           )
-        }
+        })
       ])
     )
   )
@@ -395,14 +396,14 @@ describe('event.actions.notify', () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
         HttpResponse.json([
-          {
+          toVersionedEventConfig({
             ...tennisClubMembershipEvent,
             actions: tennisClubMembershipEvent.actions.map((action) =>
               action.type === ActionType.NOTIFY
                 ? omit(action, 'notificationForm')
                 : action
             )
-          }
+          })
         ])
       )
     )

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -23,7 +24,7 @@ import {
 /**
  * @knipignore
  */
-export const footballClubMembershipEvent = defineConfig({
+export const versionedFootballClubMembershipEvent = defineConfig({
   id: 'FOOTBALL_CLUB_MEMBERSHIP',
   label: {
     defaultMessage: 'Football club membership application',
@@ -361,3 +362,8 @@ export const footballClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+/** The configuration of the first version of `versionedFootballClubMembershipEvent`. */
+export const footballClubMembershipEvent = resolveEventConfig(
+  versionedFootballClubMembershipEvent
+)

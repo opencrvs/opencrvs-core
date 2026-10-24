@@ -19,7 +19,8 @@ import {
   getAcceptedActions,
   getActionConfig,
   getCurrentEventState,
-  getUUID
+  getUUID,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -107,7 +108,7 @@ describe('event.actions.notify with a notification form', () => {
   function useEventConfig(config: EventConfig) {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
-        HttpResponse.json([config])
+        HttpResponse.json([toVersionedEventConfig(config)])
       )
     )
   }

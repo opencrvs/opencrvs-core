@@ -46,7 +46,12 @@ import {
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
-import { EventConfig, EventConfigInput } from './EventConfig'
+import {
+  EventConfig,
+  EventConfigInput,
+  resolveEventConfig,
+  VersionedEventConfig
+} from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
@@ -87,7 +92,7 @@ import {
 } from '../authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
-import { defineConfig } from './defineConfig'
+import { DEFAULT_EVENT_CONFIG_VERSION_ID, defineConfig } from './defineConfig'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
@@ -1357,45 +1362,47 @@ export const generateEventConfig = ({
   /** Extra actions appended to the default READ + DECLARE pair, e.g. a REQUEST_CORRECTION action with its own correctionForm. */
   actions?: EventConfigInput['actions']
 }): EventConfig => {
-  return defineConfig({
-    id,
-    label: generateTranslationConfig(id),
-    title: generateTranslationConfig(`${id} Event`),
-    summary: {
-      fields: []
-    },
-    placeOfEvent: placeOfEventId ? { $$field: placeOfEventId } : undefined,
-    dateOfEvent: dateOfEventId ? { $$field: dateOfEventId } : undefined,
-    declaration: {
-      label: generateTranslationConfig(`${id} Declaration`),
-      pages: [
+  return resolveEventConfig(
+    defineConfig({
+      id,
+      label: generateTranslationConfig(id),
+      title: generateTranslationConfig(`${id} Event`),
+      summary: {
+        fields: []
+      },
+      placeOfEvent: placeOfEventId ? { $$field: placeOfEventId } : undefined,
+      dateOfEvent: dateOfEventId ? { $$field: dateOfEventId } : undefined,
+      declaration: {
+        label: generateTranslationConfig(`${id} Declaration`),
+        pages: [
+          {
+            id: 'page1',
+            title: generateTranslationConfig('Page 1'),
+            fields
+          }
+        ]
+      },
+      actions: [
         {
-          id: 'page1',
-          title: generateTranslationConfig('Page 1'),
-          fields
-        }
+          type: ActionType.READ,
+          label: generateTranslationConfig('Read'),
+          review: {
+            title: generateTranslationConfig('Review Read Action'),
+            fields: []
+          }
+        },
+        {
+          type: ActionType.DECLARE,
+          label: generateTranslationConfig('Declare'),
+          review: {
+            title: generateTranslationConfig('Review Declare Action'),
+            fields: []
+          }
+        },
+        ...actions
       ]
-    },
-    actions: [
-      {
-        type: ActionType.READ,
-        label: generateTranslationConfig('Read'),
-        review: {
-          title: generateTranslationConfig('Review Read Action'),
-          fields: []
-        }
-      },
-      {
-        type: ActionType.DECLARE,
-        label: generateTranslationConfig('Declare'),
-        review: {
-          title: generateTranslationConfig('Review Declare Action'),
-          fields: []
-        }
-      },
-      ...actions
-    ]
-  })
+    })
+  )
 }
 
 /**
@@ -1501,5 +1508,23 @@ export function generateTestValidatorContext(
     user,
     leafAdminStructureLocationIds,
     event: getEventValidatorContext(event, eventConfig)
+  }
+}
+
+/**
+ * Serves `config` as country config does: as the only version of its event.
+ * For mocking `/config/events` and `event.config.get` with a configuration built in a test.
+ */
+export function toVersionedEventConfig({
+  id,
+  label,
+  advancedSearch,
+  ...version
+}: EventConfig): VersionedEventConfig {
+  return {
+    id,
+    label,
+    advancedSearch,
+    versions: [{ ...version, id: DEFAULT_EVENT_CONFIG_VERSION_ID }]
   }
 }
