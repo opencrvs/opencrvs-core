@@ -46,6 +46,7 @@ import {
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
+  getCountryTimeZone,
   getEventConfigurationForRecord,
   getVersionedEventConfigurationById,
   getInMemoryEventConfigurations,
@@ -181,7 +182,8 @@ export const eventRouter = router({
         eventInput: input,
         user: ctx.user,
         createdAtLocation: input.createdAtLocation,
-        config
+        config,
+        timeZone: await getCountryTimeZone(ctx.token)
       })
 
       await writeAuditLog({

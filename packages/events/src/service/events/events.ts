@@ -204,19 +204,23 @@ export async function createEvent({
   user,
   transactionId,
   createdAtLocation,
-  config
+  config,
+  timeZone
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
   createdAtLocation?: UUID | null | undefined
   config: VersionedEventConfig
+  /** The country's time zone, in which configuration versions take effect. */
+  timeZone: string
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
   const version = resolveVersionForNewRecord(
     config,
     eventInput.configVersionId,
-    new Date()
+    new Date(),
+    timeZone
   )
 
   const getOrCreateEvent = isSystem

@@ -44,7 +44,7 @@ export function updateEventOptimistically<T extends ActionInput>(
       return
     }
 
-    const eventConfig = findLocalEventConfig(localEvent.type)
+    const eventConfig = findLocalEventConfig(localEvent)
     if (!eventConfig) {
       return
     }

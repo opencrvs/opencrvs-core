@@ -40,6 +40,24 @@ export function toPlainDate(dateTime: string): PlainDate {
 }
 
 /**
+ * The calendar date of `date` in the IANA `timeZone` (e.g. 'Asia/Dhaka'), as a
+ * {@link PlainDate}. Unlike {@link toPlainDate}, which reads the UTC date.
+ */
+export function toPlainDateInTimeZone(date: Date, timeZone: string): PlainDate {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+      .formatToParts(date)
+      .map(({ type, value }) => [type, value])
+  )
+  return `${parts.year}-${parts.month}-${parts.day}` as PlainDate
+}
+
+/**
  * Converts a {@link PlainDate} (YYYY-MM-DD) to a local `Date` at midnight.
  *
  * The `Date(year, month, day)` constructor uses the local timezone, unlike

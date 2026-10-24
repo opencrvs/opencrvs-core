@@ -35,26 +35,51 @@ const config: VersionedEventConfig = {
 describe('resolveEffectiveVersion()', () => {
   it('returns the version with the latest effectiveFrom not after the date', () => {
     expect(
-      resolveEffectiveVersion(config, new Date('2025-06-01T10:00:00.000Z'))?.id
+      resolveEffectiveVersion(
+        config,
+        new Date('2025-06-01T10:00:00.000Z'),
+        'UTC'
+      )?.id
     ).toBe('v2')
   })
 
   it('includes a version taking effect on the date itself', () => {
     expect(
-      resolveEffectiveVersion(config, new Date('2030-01-01T00:00:00.000Z'))?.id
+      resolveEffectiveVersion(
+        config,
+        new Date('2030-01-01T00:00:00.000Z'),
+        'UTC'
+      )?.id
     ).toBe('v3')
   })
 
   it('treats a version without effectiveFrom as effective from the beginning of time', () => {
     expect(
-      resolveEffectiveVersion(config, new Date('1990-01-01T00:00:00.000Z'))?.id
+      resolveEffectiveVersion(
+        config,
+        new Date('1990-01-01T00:00:00.000Z'),
+        'UTC'
+      )?.id
     ).toBe('v1')
+  })
+
+  it("switches version at midnight in the country's time zone, not UTC", () => {
+    // 2029-12-31T20:00Z is already 2030-01-01 in Dhaka (UTC+6).
+    const lateEvening = new Date('2029-12-31T20:00:00.000Z')
+    expect(resolveEffectiveVersion(config, lateEvening, 'UTC')?.id).toBe('v2')
+    expect(resolveEffectiveVersion(config, lateEvening, 'Asia/Dhaka')?.id).toBe(
+      'v3'
+    )
   })
 
   it('returns undefined when every version takes effect later', () => {
     const datedOnly = { ...config, versions: config.versions.slice(0, 1) }
     expect(
-      resolveEffectiveVersion(datedOnly, new Date('2019-01-01T00:00:00.000Z'))
+      resolveEffectiveVersion(
+        datedOnly,
+        new Date('2019-01-01T00:00:00.000Z'),
+        'UTC'
+      )
     ).toBeUndefined()
   })
 })

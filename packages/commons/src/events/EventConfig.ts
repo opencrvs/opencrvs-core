@@ -21,7 +21,7 @@ import { Conditional } from './Conditional'
 import type { JSONSchema } from '../conditionals/conditionals'
 import { AvailableIcons } from '../icons'
 import { ActionType } from './ActionType'
-import { toPlainDate } from './PlainDate'
+import { toPlainDateInTimeZone } from './PlainDate'
 import { getOrThrow } from '../utils'
 import {
   validateActionOrder,
@@ -345,16 +345,16 @@ function getEarliestVersion(config: VersionedEventConfig) {
 
 /**
  * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
- * after it, where a version without one is effective from the beginning of time.
- * Undefined when every version takes effect later.
- * @TODO: compares UTC dates. Legislation takes effect at local midnight, so this may
- * need the country's time zone (open question in #13602).
+ * after the date of `now` in `timeZone`, the country's time zone, since versions take
+ * effect at its midnight. A version without `effectiveFrom` is effective from the
+ * beginning of time. Undefined when every version takes effect later.
  */
 export function resolveEffectiveVersion(
   config: VersionedEventConfig,
-  now: Date
+  now: Date,
+  timeZone: string
 ): EventConfigVersion | undefined {
-  const today = toPlainDate(now.toISOString())
+  const today = toPlainDateInTimeZone(now, timeZone)
   return config.versions
     .filter(({ effectiveFrom }) => !effectiveFrom || effectiveFrom <= today)
     .sort(byEffectiveFrom)
@@ -377,14 +377,27 @@ export function getEventConfigForRecord(
 }
 
 /**
- * @returns the configuration of the version in effect today (the earliest, when every
- * version takes effect later). For a record, use `getEventConfigForRecord` instead.
+ * @returns the configuration of the version in effect today in `timeZone`, the
+ * country's time zone (the earliest, when every version takes effect later). For a
+ * record, use `getEventConfigForRecord` instead.
  */
-export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
+export function resolveEventConfigInTimeZone(
+  config: VersionedEventConfig,
+  timeZone: string
+): EventConfig {
   return toEventConfig(
     config,
-    resolveEffectiveVersion(config, new Date()) ?? getEarliestVersion(config)
+    resolveEffectiveVersion(config, new Date(), timeZone) ??
+      getEarliestVersion(config)
   )
+}
+
+/**
+ * @returns the configuration of the version in effect today in UTC. For country config
+ * code with no time zone at hand; core code uses `resolveEventConfigInTimeZone`.
+ */
+export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
+  return resolveEventConfigInTimeZone(config, 'UTC')
 }
 
 /**

@@ -10,19 +10,26 @@
  */
 import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
 import {
   EventConfig,
   getEventConfigForRecord,
   getOrThrow,
-  resolveEventConfig,
+  resolveEventConfigInTimeZone,
   VersionedEventConfig
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { getOfflineData } from '@client/offline/selectors'
 
 /**
  * Event configuration only changes when countryconfig is deployed, so refetching it with staleTime 0 causes lots of unnecessary calls.
  */
 const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
+
+/** @returns the country's time zone (IANA), in which configuration versions take effect. */
+export function useCountryTimeZone() {
+  return useSelector(getOfflineData).config.SYSTEM_IANA_TIMEZONE
+}
 
 /**
  * Fetches configured events with every version of their configuration.
@@ -50,14 +57,18 @@ export function useVersionedEventConfiguration(eventIdentifier: string) {
 
 /**
  * Fetches configured events
- * @returns a list of event configurations, each at the version that applies (see `resolveEventConfig`)
+ * @returns a list of event configurations, each at the version in effect today in the country's time zone
  */
 export function useEventConfigurations() {
   const versionedConfigs = useVersionedEventConfigurations()
+  const timeZone = useCountryTimeZone()
 
   return useMemo(
-    () => versionedConfigs.map(resolveEventConfig),
-    [versionedConfigs]
+    () =>
+      versionedConfigs.map((config) =>
+        resolveEventConfigInTimeZone(config, timeZone)
+      ),
+    [versionedConfigs, timeZone]
   )
 }
 

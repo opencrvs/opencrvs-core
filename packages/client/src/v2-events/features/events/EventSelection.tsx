@@ -31,6 +31,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
+  useCountryTimeZone,
   useEventConfigurations,
   useVersionedEventConfigurations
 } from './useEventConfiguration'
@@ -83,6 +84,7 @@ function EventSelector() {
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
   const versionedEventConfigurations = useVersionedEventConfigurations()
+  const timeZone = useCountryTimeZone()
   const events = useEvents()
   const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
@@ -117,7 +119,7 @@ function EventSelector() {
       createdAtLocation: user?.primaryOfficeId,
       configVersionId:
         versionedConfig &&
-        resolveEffectiveVersion(versionedConfig, new Date())?.id
+        resolveEffectiveVersion(versionedConfig, new Date(), timeZone)?.id
     })
 
     clearForm()

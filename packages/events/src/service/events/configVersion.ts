@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import {
   resolveEffectiveVersion,
-  toPlainDate,
+  toPlainDateInTimeZone,
   VersionedEventConfig
 } from '@opencrvs/commons'
 
@@ -23,6 +23,7 @@ const CLOCK_SKEW_MS = 5 * 60 * 1000
  * The version a new record is created under:
  *  - the one the client chose (it may have created the record offline, before a newer version took effect),
  *  - else the one in effect now.
+ * Versions take effect at midnight in `timeZone`, the country's time zone.
  * @throws {TRPCError}
  *  - HTTP 400 when the client's version is not configured
  *  - HTTP 400 when the client's version takes effect in the future (beyond clock drift)
@@ -31,14 +32,15 @@ const CLOCK_SKEW_MS = 5 * 60 * 1000
 export function resolveVersionForNewRecord(
   config: VersionedEventConfig,
   configVersionId: string | undefined,
-  now: Date
+  now: Date,
+  timeZone: string
 ) {
   if (!configVersionId) {
-    const version = resolveEffectiveVersion(config, now)
+    const version = resolveEffectiveVersion(config, now, timeZone)
     if (!version) {
       throw new TRPCError({
         code: 'CONFLICT',
-        message: `Event '${config.id}' has no version in effect on ${toPlainDate(now.toISOString())}`
+        message: `Event '${config.id}' has no version in effect on ${toPlainDateInTimeZone(now, timeZone)}`
       })
     }
     return version
@@ -52,8 +54,9 @@ export function resolveVersionForNewRecord(
     })
   }
 
-  const latestClientDate = toPlainDate(
-    new Date(now.getTime() + CLOCK_SKEW_MS).toISOString()
+  const latestClientDate = toPlainDateInTimeZone(
+    new Date(now.getTime() + CLOCK_SKEW_MS),
+    timeZone
   )
   if (version.effectiveFrom && version.effectiveFrom > latestClientDate) {
     throw new TRPCError({
