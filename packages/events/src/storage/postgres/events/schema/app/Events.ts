@@ -20,6 +20,12 @@ export default interface EventsTable {
   createdAt: ColumnType<string, string | undefined, string>
 
   updatedAt: ColumnType<string, string | undefined, string>
+
+  configVersionId: ColumnType<
+    string | null,
+    string | null | undefined,
+    string | null
+  >
 }
 
 export type Events = Selectable<EventsTable>

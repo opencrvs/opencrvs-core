@@ -71,6 +71,7 @@ exports[`Should add an ASSIGN action when last action is not ASSIGN 1`] = `
       "type": "READ",
     },
   ],
+  "configVersionId": "default",
   "createdAt": "[sanitized]",
   "id": "[sanitized]",
   "trackingId": "[sanitized]",

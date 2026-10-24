@@ -27,6 +27,7 @@ import {
   AsyncRejectActionDocument,
   DisplayableAction,
   EventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventInput,
   EventStatus,
@@ -45,7 +46,8 @@ import {
 } from '@opencrvs/commons/events'
 
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
+import { resolveVersionForNewRecord } from '@events/service/events/configVersion'
 import {
   sweepUnreferencedFiles,
   deleteFilesByPrefix,
@@ -115,8 +117,8 @@ export async function throwConflictIfActionNotAllowed(
   existingEvent?: EventDocument
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
-  const eventConfiguration = await getEventConfigurationById({
-    eventType: event.type,
+  const eventConfiguration = await getEventConfigurationForRecord({
+    event: event,
     token
   })
 
@@ -201,15 +203,21 @@ export async function createEvent({
   eventInput,
   user,
   transactionId,
-  createdAtLocation
+  createdAtLocation,
+  config
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
   createdAtLocation?: UUID | null | undefined
-  config: EventConfig
+  config: VersionedEventConfig
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
+  const version = resolveVersionForNewRecord(
+    config,
+    eventInput.configVersionId,
+    new Date()
+  )
 
   const getOrCreateEvent = isSystem
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
@@ -225,7 +233,8 @@ export async function createEvent({
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: eventLocation
+    createdAtLocation: eventLocation,
+    configVersionId: version.id
   })
 
   return event

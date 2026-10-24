@@ -13,6 +13,8 @@ import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
   ApplicationConfig,
+  EventDocument,
+  getEventConfigForRecord,
   getOrThrow,
   logger,
   resolveEventConfig,
@@ -142,6 +144,37 @@ export async function getEventConfigurationById({
       token
     }),
     `No configuration found for event type: ${eventType}`
+  )
+}
+
+export async function getVersionedEventConfigurationById({
+  eventType,
+  token
+}: {
+  eventType: string
+  token: TokenWithBearer
+}) {
+  const configurations = await getInMemoryVersionedEventConfigurations(token)
+  return getOrThrow(
+    configurations.find((config) => config.id === eventType),
+    `No configuration found for event type: ${eventType}`
+  )
+}
+
+/**
+ * @returns the configuration of the version `event` is stamped with: every action on
+ * a record uses the version it was created under.
+ */
+export async function getEventConfigurationForRecord({
+  event,
+  token
+}: {
+  event: Pick<EventDocument, 'type' | 'configVersionId'>
+  token: TokenWithBearer
+}) {
+  return getEventConfigForRecord(
+    await getVersionedEventConfigurationById({ eventType: event.type, token }),
+    event
   )
 }
 

@@ -33,7 +33,6 @@ import {
   RecordScopeTypeV2,
   RecordScopeV2,
   canUserCreateEvent,
-  getEventConfigById,
   userCanAccessEventWithScopes,
   getAcceptedScopesFromToken,
   ScopeType,
@@ -53,7 +52,10 @@ import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
-import { getInMemoryEventConfigurations } from '../../../service/config/config'
+import {
+  getEventConfigurationForRecord,
+  getInMemoryEventConfigurations
+} from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 
 /**
@@ -261,11 +263,13 @@ function canAccessEventWithInputScopes(
     TrpcContext,
     OpenApiMeta,
     TrpcContext,
-    TrpcContext & { eventId: UUID; eventType: string },
+    TrpcContext & {
+      eventId: UUID
+      eventType: string
+      configVersionId: string | undefined
+    },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
-    const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
     // Since determining access requires knowing the event type, we need to parse the input before we can check access.
     // default .input(...) throws 400, which is something that we want to return only if the user should have access.
     const rawInput = await getRawInput()
@@ -289,7 +293,10 @@ function canAccessEventWithInputScopes(
     const input = rawInput
 
     const event = await getEventById(input.eventId)
-    const eventConfig = getEventConfigById(eventConfigs, event.type)
+    const eventConfig = await getEventConfigurationForRecord({
+      event,
+      token: ctx.token
+    })
 
     const eventIndex = getCurrentEventState(event, eventConfig)
     const eventIndexWithLocationHierarchy =
@@ -311,7 +318,8 @@ function canAccessEventWithInputScopes(
         ...ctx,
         acceptedScopes,
         eventId: input.eventId,
-        eventType: event.type
+        eventType: event.type,
+        configVersionId: event.configVersionId
       }
     })
   }

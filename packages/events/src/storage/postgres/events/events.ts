@@ -32,7 +32,7 @@ import Schema from './schema/Database'
 const STREAM_BATCH_SIZE = 1000
 
 function toEventDocument(
-  { eventType, ...event }: Events,
+  { eventType, configVersionId, ...event }: Events,
   actions: EventActions[]
 ) {
   const notNullActions = actions.map(({ actionType, ...action }) =>
@@ -45,6 +45,7 @@ function toEventDocument(
   return EventDocument.parse({
     ...event,
     type: eventType,
+    ...(configVersionId && { configVersionId }),
     actions: notNullActions
   })
 }
@@ -76,10 +77,11 @@ export async function getEventsByIdsInTrx(
     .execute()) as (Events & { actions: EventActions[] })[]
 
   return events.map(
-    (event) =>
+    ({ configVersionId, ...event }) =>
       ({
         ...event,
         type: event.eventType,
+        ...(configVersionId && { configVersionId }),
         actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
           return {
             ...rest,
@@ -269,7 +271,8 @@ async function getOrCreateEventInTrx(
       transactionId: input.transactionId,
       trackingId: input.trackingId,
       createdAt: input.createdAt,
-      updatedAt: input.updatedAt
+      updatedAt: input.updatedAt,
+      configVersionId: input.configVersionId
     })
     .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .execute()
@@ -310,7 +313,8 @@ async function getOrCreateEventAndAssignInTrx(
       transactionId: input.transactionId,
       trackingId: input.trackingId,
       createdAt: input.createdAt,
-      updatedAt: input.updatedAt
+      updatedAt: input.updatedAt,
+      configVersionId: input.configVersionId
     })
     .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .execute()

@@ -102,6 +102,20 @@ const messages = {
       description: 'Tracking id value'
     }
   },
+  configVersion: {
+    label: {
+      id: 'event.summary.configVersion.label',
+      defaultMessage: 'Configuration version',
+      description:
+        'Label for the id of the event configuration version the record was created under'
+    },
+    emptyValueMessage: {
+      id: 'event.summary.configVersion.empty',
+      defaultMessage: 'Created before versioning',
+      description:
+        'Shown when the record was created before event configurations had versions'
+    }
+  },
   registrationNumber: {
     label: {
       id: 'event.summary.registrationNumber.label',
@@ -269,6 +283,15 @@ export function EventSummary({
             messages.registrationNumber.emptyValueMessage
           )}
           value={intl.formatMessage(messages.registrationNumber.value, event)}
+        />
+        <List.Item
+          key="configVersion"
+          data-testid="configVersion"
+          label={intl.formatMessage(messages.configVersion.label)}
+          placeholder={intl.formatMessage(
+            messages.configVersion.emptyValueMessage
+          )}
+          value={eventIndex.configVersionId}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
