@@ -152,6 +152,8 @@ Update the client translations:
 
 **NOTE:** If your environment is managed by `environment:init` skip this section, otherwise update your helm chart values manually.
 
+`environment:init` keeps the credentials of the object store you already run. While the previous `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` secrets exist, it does not generate `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. The secrets migration workflow of your infrastructure repository copies them to the new names the next time the environment is deployed.
+
 - Rename the `minio:` block of your values to `s3:`. A `minio:` block that is left behind is ignored without a warning, and the defaults apply.
 
 - In the `s3` block, `external_url` and `external_protocol` are replaced by `public_endpoint`, a URL with the protocol, and the new `protocol` (default `http`) is the protocol that the services use to reach the store. Without `public_endpoint` the chart still signs document URLs for `minio.<hostname>`. If you set `external_url`, move it to `public_endpoint`, with the protocol.
@@ -188,11 +190,20 @@ The data cleanup job now empties the bucket and keeps it, where it removed the b
 
 A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
+#### Container registry other than Docker Hub
+
+The toolkit and the country configuration template work with any container registry that implements the OCI Registry v2 API, for example GHCR. The `DOCKERHUB_ACCOUNT`, `DOCKERHUB_REPO`, `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets are renamed to `REGISTRY_ORGANISATION`, `REGISTRY_REPOSITORY`, `REGISTRY_USERNAME` and `REGISTRY_TOKEN`. The new repository variable `REGISTRY_HOST` (default `docker.io`) sets the registry, and the pull secret `dockerhub-credentials` is now `registry-credentials`. `environment:init` asks for these and checks them with the Registry v2 API. `check-before-build.sh` now takes `REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]`. [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
+
+**Nothing has to change for a deployment to keep working.** The previous names are still read, and `dockerhub-credentials` is still created. To move to the new names:
+
+1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
+2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
+
 ### Improvements
 
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
-- `environment:init` now checks the Docker Hub username, token and repository against Docker Hub before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or Docker Hub cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412)
+- `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
 
 ### Bug fixes

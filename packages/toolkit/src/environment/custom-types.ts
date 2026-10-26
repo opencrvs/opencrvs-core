@@ -17,6 +17,8 @@ export type Question<T extends string> = PromptObject<T> & {
   valueType?: 'SECRET' | 'VARIABLE'
   scope: 'ENVIRONMENT' | 'REPOSITORY'
   valueLabel?: string
+  // The previous name of a SECRET or VARIABLE, see https://github.com/opencrvs/infrastructure/pull/411
+  legacyValueLabel?: string
 }
 
 export type QuestionDescriptor<T extends string> = Omit<Question<T>, 'type'> & {
