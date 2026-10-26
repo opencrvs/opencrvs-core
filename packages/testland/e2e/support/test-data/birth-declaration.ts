@@ -155,6 +155,55 @@ export async function getDeclaration({
 
 export type Declaration = Awaited<ReturnType<typeof getDeclaration>>
 
+/**
+ * Declaration with only the fields of the birth notification form (see
+ * `src/events/birth/forms/notificationForm.ts`), all required ones filled in.
+ * NOTIFY rejects any field outside that form. The optional `child.birthLocationId` is left
+ * out, so the record's place of event stays the notifier's office.
+ * Hospital officials, the only notifiers, can only choose a health facility as the place of birth.
+ */
+export async function getNotificationDeclaration({
+  token,
+  facility,
+  partialDeclaration = {}
+}: {
+  token: string
+  facility?: string
+  partialDeclaration?: Record<string, any>
+}) {
+  const { 'child.birthLocationId': _, ...placeOfBirth } = await getPlaceOfBirth(
+    'HEALTH_FACILITY',
+    token,
+    facility
+  )
+
+  return {
+    'child.name': {
+      firstname: faker.person.firstName(),
+      surname: faker.person.lastName()
+    },
+    'child.gender': 'female',
+    // Late registrations can not be notified
+    'child.dob': randomPastDate(14),
+    'child.birthType': 'SINGLE',
+    'child.attendantAtBirth': 'PHYSICIAN',
+    ...placeOfBirth,
+    'mother.name': {
+      firstname: faker.person.firstName(),
+      surname: faker.person.lastName()
+    },
+    'mother.dob': dateToIsoDateString(
+      // Must be at least 18 years before child.dob
+      faker.date.between({ from: '1995-09-12', to: '2000-11-28' })
+    ),
+    'informant.email': 'mothers@email.com',
+    ...partialDeclaration
+  }
+}
+
+/** Annotation of the NOTIFY action: the birth notify review has no fields, only the dialog's comment. */
+export const NOTIFY_ANNOTATION = { comments: 'My comment' }
+
 export interface CreateDeclarationResponse {
   eventId: string
   declaration: Declaration
@@ -177,15 +226,9 @@ export async function createDeclaration(
 ): Promise<CreateDeclarationResponse> {
   const declaration =
     dec ??
-    (await getDeclaration({
-      placeOfBirthType,
-      token,
-      partialDeclaration:
-        action === ActionType.NOTIFY
-          ? // Drop arbitrary fields not needed for notify action
-            { 'mother.nid': null, 'mother.dob': null }
-          : undefined
-    }))
+    (action === ActionType.NOTIFY
+      ? await getNotificationDeclaration({ token })
+      : await getDeclaration({ placeOfBirthType, token }))
 
   const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
 
@@ -197,19 +240,12 @@ export async function createDeclaration(
 
   const eventId = createResponse.id as string
 
-  const filename = await uploadFile(getSignatureFile(), token)
-
-  const annotation = {
-    'review.comment': 'My comment',
-    'review.signature': filename
-  }
-
   if (action === ActionType.NOTIFY) {
     const notifyRes = await client.event.actions.notify.request.mutate({
       eventId: eventId,
       transactionId: uuidv4(),
       declaration,
-      annotation,
+      annotation: NOTIFY_ANNOTATION,
       createdAtLocation
     })
 
@@ -225,6 +261,13 @@ export async function createDeclaration(
       eventId,
       declaration: declareAction?.declaration as Declaration
     }
+  }
+
+  const filename = await uploadFile(getSignatureFile(), token)
+
+  const annotation = {
+    'review.comment': 'My comment',
+    'review.signature': filename
   }
 
   const declareRes = await client.event.actions.declare.request.mutate({
@@ -305,73 +348,5 @@ export async function createDeclaration(
     declaration: registerActionRequested?.declaration as Declaration,
     trackingId,
     registrationNumber
-  }
-}
-
-/**
- * Notifies and then declares the same event as the same user, so that
- * `legalStatuses.NOTIFIED.createdBy` is set to the caller. Roles scoped by
- * `notifiedBy`/`notifiedIn` (e.g. Hospital Official) need this to retain
- * `record.read`/`record.edit` access to a record they later declare.
- */
-export async function notifyAndDeclare(
-  token: string,
-  placeOfBirthType?: 'PRIVATE_HOME' | 'HEALTH_FACILITY'
-): Promise<CreateDeclarationResponse> {
-  const declaration = await getDeclaration({ placeOfBirthType, token })
-
-  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
-
-  const createResponse = await client.event.create.mutate({
-    type: 'birth',
-    transactionId: uuidv4()
-  })
-
-  const eventId = createResponse.id as string
-
-  const filename = await uploadFile(getSignatureFile(), token)
-
-  const annotation = {
-    'review.comment': 'My comment',
-    'review.signature': filename
-  }
-
-  await client.event.actions.notify.request.mutate({
-    eventId,
-    transactionId: uuidv4(),
-    declaration,
-    annotation,
-    keepAssignment: true
-  })
-
-  // A NOTIFIED event only allows DECLARE once an EDIT action is the latest
-  // accepted action (sets the EDIT_IN_PROGRESS flag, which unlocks DECLARE).
-  await client.event.actions.edit.request.mutate({
-    eventId,
-    transactionId: uuidv4(),
-    declaration,
-    annotation,
-    keepAssignmentIfAccepted: true
-  })
-
-  const declareRes = await client.event.actions.declare.request.mutate({
-    eventId,
-    transactionId: uuidv4(),
-    declaration,
-    annotation
-  })
-
-  const declareAction = declareRes.actions.find(
-    (action) => action.type === ActionType.DECLARE
-  )
-
-  if (!declareAction || !('declaration' in declareAction)) {
-    throw new Error('Declaration info not found in action')
-  }
-
-  return {
-    eventId,
-    declaration: declareAction.declaration as Declaration,
-    trackingId: declareRes.trackingId
   }
 }

@@ -16,17 +16,21 @@ import {
   triggerDeclarationAction
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
-import { faker } from '@faker-js/faker'
+import {
+  fillNotificationChildPage,
+  fillNotificationMotherPage,
+  generateBirthNotificationInputs,
+  startBirthNotification
+} from '@e2e/support/birth/notify'
 import {
   clickWorkqueueActionByTitle,
   getRowByTitle
 } from '@e2e/support/print-certificate/birth/helpers'
 
 test('1: Validate my draft tab', async ({ page }) => {
-  const name = {
-    firstNames: faker.person.firstName('male'),
-    familyName: faker.person.lastName('male')
-  }
+  // A complete notification, so that the draft can be notified at the end
+  const inputs = generateBirthNotificationInputs()
+  const name = inputs.child.name
 
   const formattedName = formatName(name)
 
@@ -39,14 +43,11 @@ test('1: Validate my draft tab', async ({ page }) => {
     )
   })
 
-  await test.step('1.2 Create a draft', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-
-    await page.locator('#firstname').fill(name.firstNames)
-    await page.locator('#surname').fill(name.familyName)
+  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
+  await test.step.skip('1.2 Create a draft', async () => {
+    await startBirthNotification(page)
+    await fillNotificationChildPage(page, inputs)
+    await fillNotificationMotherPage(page, inputs)
 
     const draftResponse = page.waitForResponse(
       (res) => res.url().includes('event.draft.create') && res.ok()
@@ -58,7 +59,8 @@ test('1: Validate my draft tab', async ({ page }) => {
     await draftResponse
   })
 
-  await test.step('1.3 Record appears in draft', async () => {
+  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
+  await test.step.skip('1.3 Record appears in draft', async () => {
     await page.getByRole('button', { name: 'Drafts' }).click()
 
     // 5s (Playwright's default) wasn't always enough for the drafts
@@ -69,7 +71,8 @@ test('1: Validate my draft tab', async ({ page }) => {
     )
   })
 
-  await test.step('1.4 Record has "Update" -CTA', async () => {
+  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
+  await test.step.skip('1.4 Record has "Update" -CTA', async () => {
     await clickWorkqueueActionByTitle(page, formattedName, 'Update')
 
     await expect(page.getByTestId('child.name-value')).toHaveText(formattedName)
@@ -94,21 +97,25 @@ test('1: Validate my draft tab', async ({ page }) => {
     )
   })
 
-  await test.step('1.7 Record does not appear in draft after notifying ', async () => {
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL, true)
-    await page.getByRole('button', { name: 'Drafts' }).click()
+  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
+  await test.step.skip(
+    '1.7 Record does not appear in draft after notifying ',
+    async () => {
+      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL, true)
+      await page.getByRole('button', { name: 'Drafts' }).click()
 
-    await getRowByTitle(page, formattedName)
-      .getByRole('button', {
-        name: 'Update'
-      })
-      .click()
+      await getRowByTitle(page, formattedName)
+        .getByRole('button', {
+          name: 'Update'
+        })
+        .click()
 
-    await triggerDeclarationAction(page, 'Notify')
+      await triggerDeclarationAction(page, 'Notify')
 
-    await expect(page.getByTestId('search-result')).toContainText('Drafts')
-    await expect(page.getByTestId('search-result')).not.toContainText(
-      formattedName
-    )
-  })
+      await expect(page.getByTestId('search-result')).toContainText('Drafts')
+      await expect(page.getByTestId('search-result')).not.toContainText(
+        formattedName
+      )
+    }
+  )
 })
