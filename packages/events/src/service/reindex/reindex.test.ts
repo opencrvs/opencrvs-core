@@ -584,7 +584,7 @@ describe('cleanupOrphanedIndices', () => {
     const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now() - TWO_DAYS_MS}`
     await esClient.indices.create({ index: orphanIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
 
     expect(await esClient.indices.exists({ index: orphanIndex })).toBe(false)
   })
@@ -596,7 +596,7 @@ describe('cleanupOrphanedIndices', () => {
     const inProgressIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now()}`
     await esClient.indices.create({ index: inProgressIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
 
     expect(await esClient.indices.exists({ index: inProgressIndex })).toBe(true)
   })
@@ -611,7 +611,7 @@ describe('cleanupOrphanedIndices', () => {
       aliases: { [getEventAliasName()]: {} }
     })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
 
     expect(await esClient.indices.exists({ index: liveIndex })).toBe(true)
   })
@@ -624,7 +624,7 @@ describe('cleanupOrphanedIndices', () => {
     const liveIndexName = getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)
     await esClient.indices.create({ index: liveIndexName })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
 
     expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
   })
@@ -642,7 +642,7 @@ describe('cleanupOrphanedIndices', () => {
     const liveIndexName = getEventIndexNameMock(configuration.id)
     await esClient.indices.create({ index: liveIndexName })
 
-    await cleanupOrphanedIndices([configuration])
+    await cleanupOrphanedIndices([configuration.id])
 
     expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
   })
@@ -654,7 +654,7 @@ describe('cleanupOrphanedIndices', () => {
     const foreignIndex = `${getEventIndexNameMock('not-configured')}_${Date.now() - TWO_DAYS_MS}`
     await esClient.indices.create({ index: foreignIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
 
     expect(await esClient.indices.exists({ index: foreignIndex })).toBe(true)
   })
@@ -677,7 +677,7 @@ describe('cleanupOrphanedIndices', () => {
     // A failed delete must not throw out of cleanupOrphanedIndices -- it's a
     // best-effort step that shouldn't be able to block the reindex it precedes.
     await expect(
-      cleanupOrphanedIndices([tennisClubMembershipEvent])
+      cleanupOrphanedIndices([tennisClubMembershipEvent.id])
     ).resolves.not.toThrow()
 
     expect(deleteSpy).toHaveBeenCalledWith({ index: orphanIndex })

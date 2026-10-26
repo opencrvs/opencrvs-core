@@ -24,7 +24,7 @@ import {
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields,
+  getDeclarationFieldsOfAllVersions,
   WorkqueueCountInput,
   getEventConfigById,
   SearchQuery,
@@ -389,7 +389,9 @@ export async function createIndex(
   }
 }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
+export async function ensureIndexExists(
+  eventConfiguration: VersionedEventConfig
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
 
@@ -407,7 +409,10 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
 
   if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    await createIndex(
+      indexName,
+      getDeclarationFieldsOfAllVersions(eventConfiguration)
+    )
   } else {
     logger.info(`Index ${indexName} already exists as a concrete index.`)
     await ensureAlias(indexName)

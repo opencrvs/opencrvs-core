@@ -19,10 +19,7 @@ import {
 } from '@events/storage/postgres/events/events'
 import { getClient } from '@events/storage/postgres/events'
 import { getTemporaryIndexName } from '@events/storage/elasticsearch'
-import {
-  getInMemoryEventConfigurations,
-  getInMemoryVersionedEventConfigurations
-} from '../config/config'
+import { getInMemoryVersionedEventConfigurations } from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupOrphanedIndices,
@@ -227,19 +224,17 @@ export async function runReindex(token: TokenWithBearer) {
 
   const versionedConfigurations =
     await getInMemoryVersionedEventConfigurations(token)
-  // Indices are prepared from the version in effect today.
-  const configurations = await getInMemoryEventConfigurations(token)
 
   // Best-effort: leftover orphans are retried on the next run.
-  await cleanupOrphanedIndices(configurations).catch((err) =>
-    logger.error('Failed to clean up orphaned indices', err)
-  )
+  await cleanupOrphanedIndices(
+    versionedConfigurations.map(({ id }) => id)
+  ).catch((err) => logger.error('Failed to clean up orphaned indices', err))
 
   /*
    * Create temporary indices for all event types
    */
   const temporaryIndices = await Promise.all(
-    configurations.map(async (configuration) => {
+    versionedConfigurations.map(async (configuration) => {
       const indexNameWithTimestamp = await prepareTemporaryIndex(
         configuration,
         timestamp
@@ -322,7 +317,7 @@ export async function runReindex(token: TokenWithBearer) {
   }
 
   await Promise.all(
-    configurations.map(async (config) =>
+    versionedConfigurations.map(async (config) =>
       finaliseReindexIndex(
         config.id,
         getTemporaryIndexName(config.id, timestamp)
