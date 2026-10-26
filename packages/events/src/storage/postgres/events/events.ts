@@ -398,6 +398,10 @@ export async function getEventsAuditTrailed(
       })
     }
 
+    if (existingIds.length === 0) {
+      return []
+    }
+
     const readActions = existingIds.map((eventId) =>
       buildAction(
         {

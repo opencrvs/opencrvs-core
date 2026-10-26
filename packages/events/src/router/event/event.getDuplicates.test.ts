@@ -347,3 +347,50 @@ test('Skips duplicates that no longer exist instead of failing', async () => {
   expect(event2ActionsAfterGet).toHaveLength(event2ActionsBeforeGet.length + 1)
   expect(last(event2ActionsAfterGet)?.actionType).toEqual(ActionType.READ)
 })
+
+test('Returns no duplicates when every flagged duplicate no longer exists', async () => {
+  const tennisClubMembershipWithDedupCheckConfig =
+    tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+    })
+  )
+
+  const { user, generator } = await setupTestCase(
+    1882,
+    tennisClubMembershipWithDedupCheckConfig
+  )
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+  ])
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    createPrng(74)
+  )
+
+  const event1 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration })
+  )
+
+  const event2 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration })
+  )
+
+  await deleteEventById(event1.id)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event2.id, { assignedTo: user.id })
+  )
+
+  await expect(
+    client.event.getDuplicates({ eventId: event2.id })
+  ).resolves.toEqual([])
+})
