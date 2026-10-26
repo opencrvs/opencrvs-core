@@ -164,6 +164,7 @@ async function findEventConfigurationById({
   return configurations.find((config) => config.id === eventType)
 }
 
+/** @knipignore */
 export async function getEventConfigurationById({
   eventType,
   token

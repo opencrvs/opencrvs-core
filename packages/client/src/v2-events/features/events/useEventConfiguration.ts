@@ -48,7 +48,7 @@ export function useVersionedEventConfigurations(): VersionedEventConfig[] {
  * Fetches configured events and finds a matching event, with every version of its configuration
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
  */
-export function useVersionedEventConfiguration(eventIdentifier: string) {
+function useVersionedEventConfiguration(eventIdentifier: string) {
   return getOrThrow(
     useVersionedEventConfigurations().find(({ id }) => id === eventIdentifier),
     `Configuration not found for event: ${eventIdentifier}`
