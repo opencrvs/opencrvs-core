@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.9.21 Release Candidate
+## 1.9.21
+
+### Security
+
+- Internal auth service endpoints that issue tokens without credentials could be reached from the internet through the gateway and on the auth subdomain (`auth.<domain>`). The gateway now forwards only the public auth endpoints, and the Helm charts block `/internal/` paths on every host. [GHSA-3fpv-fj7v-pmj6](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-3fpv-fj7v-pmj6)
 
 ### Bug fixes
 
