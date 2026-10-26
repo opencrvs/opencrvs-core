@@ -2,6 +2,10 @@
 
 ## 1.9.22 Release Candidate
 
+### Improvements
+
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
+
 ## 1.9.21
 
 ### Security
