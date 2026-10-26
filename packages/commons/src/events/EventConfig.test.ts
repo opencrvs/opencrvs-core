@@ -257,13 +257,13 @@ describe('EventConfig', () => {
     )
 
     const getDeclarationField = (id: string) => {
-      const field = getDeclarationFields(tennisClubMembershipEvent).find(
-        (f) => f.id === id
-      )
-      if (!field) {
+      const declarationField = getDeclarationFields(
+        tennisClubMembershipEvent
+      ).find((f) => f.id === id)
+      if (!declarationField) {
         throw new Error(`Field ${id} not found in tennis club declaration`)
       }
-      return field
+      return declarationField
     }
 
     function withNotificationForm(fields: FieldConfig[]) {
