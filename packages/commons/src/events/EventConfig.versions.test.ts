@@ -16,6 +16,10 @@ import {
   VersionedEventConfig
 } from './EventConfig'
 import { toVersionedEventConfig } from './test.utils'
+import { ActionType } from './ActionType'
+import { FieldConfig } from './FieldConfig'
+import { FieldType } from './FieldType'
+import { getDeclarationFieldsOfAllVersions } from './utils'
 
 const { versions, ...eventLevel } = toVersionedEventConfig(
   tennisClubMembershipEvent
@@ -115,6 +119,100 @@ describe('getEventConfigForRecord()', () => {
     const record = { configVersionId: 'v2' }
     expect(getEventConfigForRecord(config, record)).toBe(
       getEventConfigForRecord(config, record)
+    )
+  })
+})
+
+describe('getDeclarationFieldsOfAllVersions()', () => {
+  function withField(
+    version: (typeof versions)[number],
+    field: FieldConfig
+  ): (typeof versions)[number] {
+    return {
+      ...version,
+      actions: version.actions.map((action) => {
+        if (action.type !== ActionType.DECLARE) {
+          return action
+        }
+        const [firstPage, ...otherPages] = action.declaration.pages
+        return {
+          ...action,
+          declaration: {
+            ...action.declaration,
+            pages: [
+              { ...firstPage, fields: [...firstPage.fields, field] },
+              ...otherPages
+            ]
+          }
+        }
+      })
+    }
+  }
+
+  const label = {
+    id: 'event.versions.test.field.label',
+    defaultMessage: 'Field',
+    description: 'Field of the versions tests'
+  }
+
+  it('returns the fields of every version, one per id', () => {
+    const fields = getDeclarationFieldsOfAllVersions({
+      ...eventLevel,
+      versions: [
+        withField(
+          { ...base, id: 'v1' },
+          {
+            id: 'applicant.removed',
+            type: FieldType.TEXT,
+            label
+          }
+        ),
+        withField(
+          { ...base, id: 'v2', effectiveFrom: '2020-01-01' },
+          {
+            id: 'applicant.added',
+            type: FieldType.TEXT,
+            label
+          }
+        )
+      ]
+    })
+    const ids = fields.map(({ id }) => id)
+
+    expect(ids).toEqual(
+      expect.arrayContaining(['applicant.removed', 'applicant.added'])
+    )
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  // https://github.com/opencrvs/opencrvs-core/issues/13973
+  // The ticket avobe will restrict multiple field type for same id
+  it("keeps the newest version's field when versions define an id differently", () => {
+    const fields = getDeclarationFieldsOfAllVersions({
+      ...eventLevel,
+      // Listed newest first: the newest wins by effectiveFrom, not by position.
+      versions: [
+        withField(
+          { ...base, id: 'v2', effectiveFrom: '2020-01-01' },
+          {
+            id: 'applicant.changed',
+            type: FieldType.NUMBER,
+            label
+          }
+        ),
+        withField(
+          { ...base, id: 'v1' },
+          {
+            id: 'applicant.changed',
+            type: FieldType.TEXT,
+            label
+          }
+        )
+      ]
+    })
+
+    expect(fields.find(({ id }) => id === 'applicant.changed')?.type).toBe(
+      FieldType.NUMBER
     )
   })
 })

@@ -334,7 +334,7 @@ export function getEventConfigOfVersion(
 }
 
 /** Orders versions by `effectiveFrom`, a version without one first. */
-function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
+export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
   return (a.effectiveFrom ?? '').localeCompare(b.effectiveFrom ?? '')
 }
 
