@@ -97,6 +97,7 @@ export {
   UserCircle,
   UserPlus,
   Users,
+  Warning,
   WarningCircle,
   Webcam,
   X,
