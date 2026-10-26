@@ -64,35 +64,29 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
-        - name: cleanup-minio
-          image: "ghcr.io/opencrvs/minio-mc:release.2025-05-21t01-59-54z"
+        - name: cleanup-s3
+          image: {{ include "opencrvs.imageReference" .Values.s3 }}
           command: ["/bin/bash", "-c"]
           args:
             - |
-              MINIO_BUCKET=${MINIO_BUCKET:-ocrvs}
-              echo "Running minio cleanup script..."
-              mc alias set myminio http://$MINIO_HOST:$MINIO_PORT ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin}
-              mc rm --recursive --force myminio/$MINIO_BUCKET
-              mc rb myminio/$MINIO_BUCKET
-              [ "${make_bucket:-true}" == 'true' ] && mc mb myminio/$MINIO_BUCKET
+              S3_BUCKET=${S3_BUCKET:-ocrvs}
+              echo "Running S3 cleanup script..."
+              mc alias set store $S3_ENDPOINT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
+              mc rm --recursive --force store/$S3_BUCKET
               echo "Cleanup complete!"
           env:
-            - name: MINIO_HOST
-              value: {{ .Values.minio.host }}
-            - name: MINIO_PORT
-              value: {{ .Values.minio.port | quote }}
-          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
-            - name: MINIO_ROOT_USER
+            - name: S3_ENDPOINT
+              value: {{ include "s3-endpoint" . | quote }}
+            - name: S3_ADMIN_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  key: MINIO_ROOT_USER
-                  name: {{ .Values.minio.users_secret }}
-            - name: MINIO_ROOT_PASSWORD
+                  key: S3_ADMIN_ACCESS_KEY
+                  name: {{ .Values.s3.users_secret }}
+            - name: S3_ADMIN_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  key: MINIO_ROOT_PASSWORD
-                  name: {{ .Values.minio.users_secret }}
-          {{- end }}
+                  key: S3_ADMIN_SECRET_KEY
+                  name: {{ .Values.s3.users_secret }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-elasticsearch
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}

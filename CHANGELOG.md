@@ -148,6 +148,24 @@ Update the client translations:
 - Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
 - `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
 
+#### Object store settings renamed from `MINIO_*` to `S3_*`
+
+**NOTE:** If your environment is managed by `environment:init` skip this section, otherwise update your helm chart values manually.
+
+- Rename the `minio:` block of your values to `s3:`. A `minio:` block that is left behind is ignored without a warning, and the defaults apply.
+
+- In the `s3` block, `external_url` and `external_protocol` are replaced by `public_endpoint`, a URL with the protocol, and the new `protocol` (default `http`) is the protocol that the services use to reach the store. Without `public_endpoint` the chart still signs document URLs for `minio.<hostname>`. If you set `external_url`, move it to `public_endpoint`, with the protocol.
+
+- The documents service reads two URLs, with the protocol, where it read a host, a port and a protocol. Following variable names were changed, make sure your helm chart values were updated:
+  | Before | After |
+  | --------------------- | ------------------ |
+  | `MINIO_HOST`, `MINIO_PORT` | `S3_ENDPOINT`, for example `http://minio:3535`. Required in production |
+  | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://minio.example.org`. Required in production, also when it is the same as `S3_ENDPOINT` |
+  | `MINIO_BUCKET` | `S3_BUCKET` |
+  | `MINIO_BUCKET_REGION` | `S3_BUCKET_REGION` |
+  | `MINIO_ACCESS_KEY` | `S3_ACCESS_KEY` |
+  | `MINIO_SECRET_KEY` | `S3_SECRET_KEY` |
+
 ### New features
 
 #### `REVOKED` status with revoke and reinstate registration actions
@@ -157,6 +175,18 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 #### Exclude statuses in workqueue and search queries
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
+
+#### Documents service speaks plain S3
+
+The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys. **The settings were renamed, so check [Object store settings renamed from `MINIO_*` to `S3_*`](#object-store-settings-renamed-from-minio_-to-s3_) before you upgrade.**
+
+The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store was tried on and what to check when you use another.
+
+The client's Content-Security-Policy allows the origin of the S3 public endpoint in `connect-src`, so browsers can read documents from a store on another domain, such as `storage.googleapis.com`. The services chart sets it as `S3_PUBLIC_ORIGIN` on the client. A deployment without the chart can set that variable on the client container. When it is not set, nothing is added.
+
+The data cleanup job now empties the bucket and keeps it, where it removed the bucket and made it again. The bucket keeps its settings, such as CORS and access rules.
+
+A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
 ### Improvements
 

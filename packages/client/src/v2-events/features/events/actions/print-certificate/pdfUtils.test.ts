@@ -61,7 +61,7 @@ const adminLevels = [
 describe('isFetchableHref', () => {
   test.each([
     ['https://example.com/logo.png', true],
-    ['http://minio.example.com/passport.jpg', true],
+    ['http://s3.example.com/passport.jpg', true],
     ['/users/abc123/signature.png', true],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [toFileUrl('users/abc123/signature.png' as any), true],

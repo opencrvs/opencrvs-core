@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import { putObject, statObjectIfExists } from '@documents/s3/client'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import {
   DocumentPath,
@@ -60,21 +60,6 @@ const Payload = z.object({
 })
 
 /**
- * @returns the object's metadata, or null when it does not exist.
- */
-async function statObjectIfExists(documentPath: DocumentPath) {
-  try {
-    return await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if ((error as { code?: string }).code === 'NotFound') {
-      return null
-    }
-
-    throw error
-  }
-}
-
-/**
  * V2 version of the file upload handler.
  */
 export async function fileUploadHandler(
@@ -102,18 +87,16 @@ export async function fileUploadHandler(
    */
   const existing = await statObjectIfExists(filePath)
 
-  if (existing && existing.metaData['created-by'] !== userId) {
+  if (existing && existing.metadata['created-by'] !== userId) {
     throw forbidden(
       `request failed: user with id ${userId} does not have permission to replace this document`
     )
   }
 
-  // Persist the content type the client reported for the file
-  const contentType = file.hapi.headers['content-type']
-
-  await minioClient.putObject(MINIO_BUCKET, filePath, file, {
-    'created-by': userId,
-    ...(contentType && { 'content-type': contentType })
+  await putObject(filePath, file, {
+    // Persist the content type the client reported for the file
+    contentType: file.hapi.headers['content-type'],
+    metadata: { 'created-by': userId }
   })
 
   return filePath
@@ -128,8 +111,8 @@ export async function fileExistsHandler(
     filePath = filePath.slice(1)
   }
 
-  if (filePath.startsWith(MINIO_BUCKET)) {
-    filePath = filePath.slice(MINIO_BUCKET.length + 1)
+  if (filePath.startsWith(env.S3_BUCKET)) {
+    filePath = filePath.slice(env.S3_BUCKET.length + 1)
   }
 
   const documentPath = DocumentPath.parse(filePath)
@@ -139,7 +122,7 @@ export async function fileExistsHandler(
   if (!stat) {
     return h
       .response(
-        `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
+        `request failed: document ${documentPath} does not exist in bucket ${env.S3_BUCKET}`
       )
       .code(404)
   }
@@ -166,14 +149,13 @@ export async function documentUploadHandler(
     const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
     const generateFileName = `${ref}.${fileType.ext}`
 
-    await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
-      ...payload.metaData,
-      'content-type': fileType.mime,
-      'created-by': userId
+    await putObject(generateFileName, base64Decoded, {
+      contentType: fileType.mime,
+      metadata: { ...payload.metaData, 'created-by': userId }
     })
 
     return h
-      .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
+      .response({ refUrl: `/${env.S3_BUCKET}/${generateFileName}` })
       .code(200)
   } catch (error) {
     return Promise.reject(
