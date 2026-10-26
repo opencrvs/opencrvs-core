@@ -27,9 +27,9 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 export function useEditForm(event: EventDocument) {
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const isNotifier = canUserNotifyEvent(scopes, event.type)
-
-  const actionType = isNotifier ? ActionType.NOTIFY : ActionType.DECLARE
+  const actionType = canUserNotifyEvent(scopes, event.type)
+    ? ActionType.NOTIFY
+    : ActionType.DECLARE
   const formConfig = getActionForm(eventConfiguration, actionType)
   const reviewConfig = getActionReview(eventConfiguration, actionType)
 
@@ -37,5 +37,5 @@ export function useEditForm(event: EventDocument) {
     throw new Error('Review config not found')
   }
 
-  return { eventConfiguration, formConfig, reviewConfig, isNotifier }
+  return { eventConfiguration, formConfig, reviewConfig }
 }

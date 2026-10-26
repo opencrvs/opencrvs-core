@@ -27,6 +27,7 @@ import {
   omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
+import type { CustomMutationKeys } from './customAction'
 
 /**
  * Function we use for checking whether a field value has changed.
@@ -85,7 +86,10 @@ export function hasDeclarationFieldChanged(
 }
 
 /** Submissions that end in a NOTIFY: the NOTIFY action itself, and "Notify with edits". */
-const NOTIFY_SUBMISSIONS = new Set<string>([ActionType.NOTIFY, 'editAndNotify'])
+const NOTIFY_SUBMISSIONS = new Set<ActionType | CustomMutationKeys>([
+  ActionType.NOTIFY,
+  'editAndNotify'
+])
 
 /**
  * Form a submitted declaration is cleaned against, see `getCleanedDeclarationDiff`.
@@ -96,7 +100,7 @@ const NOTIFY_SUBMISSIONS = new Set<string>([ActionType.NOTIFY, 'editAndNotify'])
  */
 export function getSubmissionForm(
   eventConfiguration: EventConfig,
-  submission: string
+  submission: ActionType | CustomMutationKeys
 ) {
   return NOTIFY_SUBMISSIONS.has(submission)
     ? getNotificationForm(eventConfiguration)

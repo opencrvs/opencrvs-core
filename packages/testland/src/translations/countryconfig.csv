@@ -357,8 +357,8 @@ event.death.action.correction.form.section.requester.label,This is the label for
 event.death.action.correction.form.section.requester.name.label,This is the label for the field,Name,Nom
 event.death.action.correction.form.section.requester.nid.label,This is the label for the field,ID Number,Numéro d'identité
 event.death.action.correction.form.section.requester.passport.label,This is the label for the field,ID Number,Numéro d'identité
-event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to child,Relation avec l'enfant
-event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Grandmother,ex. Grand-mère
+event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to deceased,Relation avec le défunt
+event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Mother,ex. Mère
 event.death.action.correction.form.section.supporting-documents.title,This is the title of the section,Upload supporting documents,Télécharger les documents justificatifs
 event.death.action.correction.form.section.verifyIdentity.data.label,Title for the data section,,
 event.death.action.correction.form.verify,This is the label for the verification button,Verified,Vérifié

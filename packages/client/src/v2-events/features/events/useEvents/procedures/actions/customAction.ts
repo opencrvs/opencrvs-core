@@ -37,7 +37,7 @@ import { waitUntilEventIsCreated } from '@client/v2-events/features/events/useEv
 import { queryClient } from '@client/v2-events/trpc'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
-type CustomMutationKeys = keyof typeof customApi
+export type CustomMutationKeys = keyof typeof customApi
 
 const customMutationKeys = {
   registerOnDeclare: [['registerOnDeclare']],

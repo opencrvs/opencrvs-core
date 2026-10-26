@@ -25,8 +25,10 @@ import { getCleanedDeclarationDiff, getSubmissionForm } from './declarationDiff'
 const eventConfiguration = tennisClubMembershipEvent
 const validatorContext: ValidatorContext = {}
 
+type Submission = Parameters<typeof getSubmissionForm>[1]
+
 describe('getSubmissionForm', () => {
-  it.each([ActionType.NOTIFY, 'editAndNotify'])(
+  it.each<Submission>([ActionType.NOTIFY, 'editAndNotify'])(
     'returns the notification form for %s',
     (submission) => {
       expect(getSubmissionForm(eventConfiguration, submission)).toEqual(
@@ -35,7 +37,7 @@ describe('getSubmissionForm', () => {
     }
   )
 
-  it.each([
+  it.each<Submission>([
     ActionType.DECLARE,
     ActionType.REGISTER,
     ActionType.EDIT,
@@ -75,7 +77,7 @@ describe('getSubmissionForm', () => {
       )
     } as EventConfig
 
-    const clean = (submission: string) =>
+    const clean = (submission: Submission) =>
       getCleanedDeclarationDiff({
         eventConfiguration: config,
         form: getSubmissionForm(config, submission),

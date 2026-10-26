@@ -55,7 +55,6 @@ const pickedFields = child.fields.filter(({ id }) =>
 
 // Fields which are different on the notification form.
 const differentFields: FieldConfigInput[] = [
-  // For notification, dont allow late registration.
   {
     id: 'child.name',
     type: FieldType.NAME,
@@ -75,6 +74,7 @@ const differentFields: FieldConfigInput[] = [
     },
     validation: [invalidNameValidator('child.name')]
   },
+  // For notification, dont allow late registration.
   {
     id: 'child.dob',
     analytics: true,
