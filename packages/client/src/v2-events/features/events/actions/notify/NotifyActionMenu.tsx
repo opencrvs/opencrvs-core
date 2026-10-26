@@ -22,8 +22,8 @@ import {
   actionIcons,
   actionLabels
 } from '@client/v2-events/features/workqueues/Actions/utils'
-import { useReviewPageActions } from '../useReviewPageActions'
-import { ActionMenuDropdown } from '../ActionMenuDropdown'
+import { ActionMenuItem } from '../ActionMenuDropdown'
+import { ReviewPageActionMenu, ReviewPageState } from '../ReviewPageActionMenu'
 
 /**
  * Notify actions contain actions available on the review page of the notify flow. This can include:
@@ -31,20 +31,19 @@ import { ActionMenuDropdown } from '../ActionMenuDropdown'
  *   - Save and exit
  *   - Delete draft
  */
-function useNotificationActions(event: EventDocument) {
-  const events = useEvents()
-  const {
+function getNotificationActions(
+  event: EventDocument,
+  events: ReturnType<typeof useEvents>,
+  {
     eventConfiguration,
     declaration,
     annotation,
     hasValidationErrors,
     isActionAllowed,
     availableActions,
-    confirmAction,
-    commonActions,
-    modals
-  } = useReviewPageActions(event, ActionType.NOTIFY)
-
+    confirmAction
+  }: ReviewPageState
+): ActionMenuItem[] {
   const declareActionConfig = getActionConfig({
     eventConfiguration,
     actionType: ActionType.DECLARE
@@ -91,10 +90,7 @@ function useNotificationActions(event: EventDocument) {
     disabled: hasValidationErrors
   }
 
-  return {
-    modals,
-    actions: canNotify ? [notifyAction, ...commonActions] : commonActions
-  }
+  return canNotify ? [notifyAction] : []
 }
 
 /**
@@ -102,7 +98,13 @@ function useNotificationActions(event: EventDocument) {
  * We have tried to contain all logic to which actions are available in the notify in this component.
  * */
 export function NotifyActionMenu({ event }: { event: EventDocument }) {
-  const { modals, actions } = useNotificationActions(event)
+  const events = useEvents()
 
-  return <ActionMenuDropdown actions={actions} modals={modals} />
+  return (
+    <ReviewPageActionMenu
+      actionType={ActionType.NOTIFY}
+      event={event}
+      getActions={(state) => getNotificationActions(event, events, state)}
+    />
+  )
 }

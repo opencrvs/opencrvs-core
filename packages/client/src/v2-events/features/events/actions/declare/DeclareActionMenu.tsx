@@ -22,8 +22,8 @@ import {
   actionLabels
 } from '@client/v2-events/features/workqueues/Actions/utils'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
-import { useReviewPageActions } from '../useReviewPageActions'
-import { ActionMenuDropdown } from '../ActionMenuDropdown'
+import { ActionMenuItem } from '../ActionMenuDropdown'
+import { ReviewPageActionMenu, ReviewPageState } from '../ReviewPageActionMenu'
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
@@ -32,20 +32,19 @@ import { ActionMenuDropdown } from '../ActionMenuDropdown'
  *   - Save and exit
  *   - Delete draft
  */
-function useDeclarationActions(event: EventDocument) {
-  const events = useEvents()
-  const canDirectlyRegister = useCanDirectlyRegister(event)
-  const {
+function getDeclarationActions(
+  event: EventDocument,
+  events: ReturnType<typeof useEvents>,
+  canDirectlyRegister: boolean,
+  {
     eventConfiguration,
     declaration,
     annotation,
     hasValidationErrors,
     isActionAllowed,
-    confirmAction,
-    commonActions,
-    modals
-  } = useReviewPageActions(event, ActionType.DECLARE)
-
+    confirmAction
+  }: ReviewPageState
+): ActionMenuItem[] {
   const actionConfig = getActionConfig({
     eventConfiguration,
     actionType: ActionType.DECLARE
@@ -110,9 +109,9 @@ function useDeclarationActions(event: EventDocument) {
       hidden: !isActionAllowed(ActionType.DECLARE),
       disabled: hasValidationErrors
     }
-  ].filter((a) => !a.hidden)
+  ]
 
-  return { modals, actions: [...actions, ...commonActions] }
+  return actions.filter((a) => !a.hidden)
 }
 
 /**
@@ -120,7 +119,16 @@ function useDeclarationActions(event: EventDocument) {
  * We have tried to contain all logic to which actions are available in the declaration in this component.
  * */
 export function DeclareActionMenu({ event }: { event: EventDocument }) {
-  const { modals, actions } = useDeclarationActions(event)
+  const events = useEvents()
+  const canDirectlyRegister = useCanDirectlyRegister(event)
 
-  return <ActionMenuDropdown actions={actions} modals={modals} />
+  return (
+    <ReviewPageActionMenu
+      actionType={ActionType.DECLARE}
+      event={event}
+      getActions={(state) =>
+        getDeclarationActions(event, events, canDirectlyRegister, state)
+      }
+    />
+  )
 }

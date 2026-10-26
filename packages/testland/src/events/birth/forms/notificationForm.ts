@@ -228,8 +228,7 @@ const mothersPage = defineFormPage({
             field('informant.phoneNo').isFalsy()
           )
         }
-      ],
-      parent: field('informant.relation')
+      ]
     },
     {
       id: 'informant.email',
@@ -243,8 +242,7 @@ const mothersPage = defineFormPage({
       },
       configuration: {
         maxLength: 255
-      },
-      parent: field('informant.relation')
+      }
     }
   ]
 })

@@ -37,7 +37,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useActionAnnotation } from '../useActionAnnotation'
 import { useEventFormData } from '../useEventFormData'
 import { useEventConfiguration } from '../useEventConfiguration'
-import { ActionMenuItem } from './ActionMenuDropdown'
+import { ActionMenuDropdown, ActionMenuItem } from './ActionMenuDropdown'
 
 type ReviewPageActionType = typeof ActionType.DECLARE | typeof ActionType.NOTIFY
 
@@ -64,7 +64,7 @@ const modalActionNames = {
  *   - Save and exit
  *   - Delete draft
  */
-export function useReviewPageActions(
+function useReviewPageActions(
   event: EventDocument,
   actionType: ReviewPageActionType
 ) {
@@ -176,4 +176,37 @@ export function useReviewPageActions(
     commonActions,
     modals: [modal, saveAndExitModal, deleteDeclarationModal]
   }
+}
+
+/** Review page state an action menu builds its own actions from. */
+export type ReviewPageState = Omit<
+  ReturnType<typeof useReviewPageActions>,
+  'commonActions' | 'modals'
+>
+
+/**
+ * "Action" dropdown of the declare and notify review pages. Renders the actions the caller
+ * builds from the review page state, followed by Save and exit and Delete draft, and the
+ * modals they open.
+ */
+export function ReviewPageActionMenu({
+  event,
+  actionType,
+  getActions
+}: {
+  event: EventDocument
+  actionType: ReviewPageActionType
+  getActions: (state: ReviewPageState) => ActionMenuItem[]
+}) {
+  const { commonActions, modals, ...state } = useReviewPageActions(
+    event,
+    actionType
+  )
+
+  return (
+    <ActionMenuDropdown
+      actions={[...getActions(state), ...commonActions]}
+      modals={modals}
+    />
+  )
 }

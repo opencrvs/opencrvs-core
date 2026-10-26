@@ -183,16 +183,12 @@ const mothersPage = defineFormPage({
         },
         {
           message: {
-            defaultMessage:
-              "Birth date must be 18 years before child's birth date",
+            defaultMessage: "Birth date must be before child's birth date",
             description:
               "This is the error message for a birth date after child's birth date",
             id: 'event.birth.action.declare.form.section.person.dob.afterChild'
           },
-          validator: field('mother.dob')
-            .isBefore()
-            .days(6570)
-            .fromDate(field('child.dob'))
+          validator: field('mother.dob').isBefore().date(field('child.dob'))
         }
       ],
       label: {
@@ -225,8 +221,7 @@ const mothersPage = defineFormPage({
             field('informant.phoneNo').isFalsy()
           )
         }
-      ],
-      parent: field('informant.relation')
+      ]
     },
     {
       id: 'informant.email',
@@ -240,8 +235,7 @@ const mothersPage = defineFormPage({
       },
       configuration: {
         maxLength: 255
-      },
-      parent: field('informant.relation')
+      }
     }
   ]
 })
