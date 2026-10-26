@@ -42,7 +42,7 @@ import { ActionMenuDropdown, ActionMenuItem } from './ActionMenuDropdown'
 type ReviewPageActionType = typeof ActionType.DECLARE | typeof ActionType.NOTIFY
 
 /** An action which is confirmed through the accept modal before it is submitted. */
-export interface ConfirmableAction {
+interface ConfirmableAction {
   /** Label of the modal's confirm button */
   confirmLabel: MessageDescriptor
   title: MessageDescriptor
