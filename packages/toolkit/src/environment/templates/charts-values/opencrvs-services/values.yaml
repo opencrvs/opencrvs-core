@@ -53,7 +53,7 @@ postgres:
 platform:
   imagePullSecrets:
     # Default value for credentials created while yarn environment:init
-    - name: dockerhub-credentials
+    - name: registry-credentials
 
 auth:
   env:
