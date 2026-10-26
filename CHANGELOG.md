@@ -8,7 +8,7 @@
 
 ### Bug fixes
 
-- Opening the potential duplicates of a record no longer fails when one of the flagged duplicates has since been deleted. Previously the request failed with an `event_actions_event_id_fkey` foreign key violation; the duplicates that still exist are now returned. Deleting an undeclared record now also removes it from search, and a record whose submission was rejected before it was declared is no longer added to search, so neither can be flagged as a duplicate of other records. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
+- Opening the potential duplicates of a record no longer fails when one of the flagged duplicates has since been deleted. Previously the request failed with an `event_actions_event_id_fkey` foreign key violation; the duplicates that still exist are now returned. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
 
 ## 1.9.20
 
