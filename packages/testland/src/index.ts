@@ -101,7 +101,6 @@ import {
 import { getClient } from './analytics/postgres'
 import { createClient } from '@opencrvs/toolkit/api'
 import { getBearerToken } from '@countryconfig/utils'
-import { getGovernmentPortalApiRoutes } from './government-portal-api/routes'
 import { getLocationsQaRoutes } from './qa-tools/locations.routes'
 import { getAdministrativeAreasQaRoutes } from './qa-tools/administrative-areas.routes'
 import { Event } from './events/utils/types'
@@ -498,7 +497,6 @@ export async function createServer() {
     }
   })
 
-  server.route(getGovernmentPortalApiRoutes())
   server.route(getLocationsQaRoutes())
   server.route(getAdministrativeAreasQaRoutes())
 
