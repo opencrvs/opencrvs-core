@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/mosip-api",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "license": "MPL-2.0",
   "engines": {
     "node": "22.x.x"
