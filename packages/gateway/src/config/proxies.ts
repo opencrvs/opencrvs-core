@@ -98,29 +98,6 @@ const getLocationsHandler = async (req: Request, h: ResponseToolkit) => {
 }
 
 export const catchAllProxy = {
-  authInternal: {
-    method: '*',
-    path: '/auth/internal/{suffix}',
-    handler: (_, h) => h.response().code(404),
-    options: {
-      auth: false
-    }
-  },
-  auth: {
-    method: 'POST',
-    path: '/auth/{suffix}',
-    handler: (_, h) =>
-      h.proxy({
-        uri: AUTH_URL + '/{suffix}'
-      }),
-    options: {
-      auth: false,
-      payload: {
-        output: 'data',
-        parse: false
-      }
-    }
-  },
   /** @deprecated old naming strategy from Hearth.
    * These are included for backwards compability but `locationS` should be preferred */
   location: {
@@ -265,6 +242,24 @@ export const catchAllProxy = {
   }
 } satisfies Record<string, ServerRoute>
 
+function proxyToAuth(endpoint: string): ServerRoute {
+  return {
+    method: 'POST',
+    path: `/auth/${endpoint}`,
+    handler: (_, h) =>
+      h.proxy({
+        uri: `${AUTH_URL}/${endpoint}`
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  }
+}
+
 export const authProxy = {
   token: {
     method: 'POST',
@@ -280,7 +275,15 @@ export const authProxy = {
         parse: false
       }
     }
-  }
+  },
+  resendAuthenticationCode: proxyToAuth('resendAuthenticationCode'),
+  verifyCode: proxyToAuth('verifyCode'),
+  verifyNumber: proxyToAuth('verifyNumber'),
+  verifySecurityAnswer: proxyToAuth('verifySecurityAnswer'),
+  changePassword: proxyToAuth('changePassword'),
+  sendUserName: proxyToAuth('sendUserName'),
+  refreshToken: proxyToAuth('refreshToken'),
+  invalidateToken: proxyToAuth('invalidateToken')
 } satisfies Record<string, ServerRoute>
 
 export const rateLimitedAuthProxy = {
