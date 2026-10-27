@@ -131,6 +131,8 @@ Unlike the flag, an archived notification no longer matches, since its status is
 
 `NOTIFY` is optional: an event without a `NOTIFY` action cannot be notified. A `NOTIFY` action must configure both `notificationForm` and `review`, and nothing is generated from the `DECLARE` action. The notification form is validated like any form, so a plain copy of the declaration form would reject incomplete records. To keep `NOTIFY` accepting them, use `toNotificationForm(<declaration form>)` and `toNotificationReview(<DECLARE review>)`, which copy the `DECLARE` form and review with every field optional and without validations. A role holding `record.notify` for an event type needs a `NOTIFY` action on that event.
 
+`opencrvs upgrade` does it for you: the `add-notify-config` codemod adds `notificationForm: toNotificationForm(...)` and `review: toNotificationReview(...)`, copied from the `DECLARE` action, to every `NOTIFY` action under `src/` that lacks them, then lists every event without a `NOTIFY` action and every config it could not rewrite — a `DECLARE` form or review written inline, a `NOTIFY` action not written inline — for you to change by hand.
+
 #### Notifiers get their own notify flow
 
 A user whose role holds `record.notify` for an event type now fills in the notification form in a separate notify flow, instead of the declaration form [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975):
