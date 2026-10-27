@@ -10,6 +10,7 @@
  */
 import { tennisClubMembershipEvent } from '../fixtures'
 import {
+  findEventConfigForRecord,
   getEventConfigForRecord,
   getEventConfigOfVersion,
   resolveEffectiveVersion,
@@ -120,6 +121,26 @@ describe('getEventConfigForRecord()', () => {
     expect(getEventConfigForRecord(config, record)).toBe(
       getEventConfigForRecord(config, record)
     )
+  })
+})
+
+describe('findEventConfigForRecord()', () => {
+  it('finds the version the record is stamped with', () => {
+    expect(findEventConfigForRecord(config, { configVersionId: 'v1' })).toBe(
+      getEventConfigOfVersion(config, 'v1')
+    )
+  })
+
+  it('finds the earliest version for a record created before versioning', () => {
+    expect(findEventConfigForRecord(config, {})).toBe(
+      getEventConfigOfVersion(config, 'v1')
+    )
+  })
+
+  it('is undefined when the version is not configured', () => {
+    expect(
+      findEventConfigForRecord(config, { configVersionId: 'v9' })
+    ).toBeUndefined()
   })
 })
 
