@@ -14,6 +14,7 @@ import { array } from 'zod'
 import {
   ApplicationConfig,
   EventDocument,
+  getEventConfigById,
   getEventConfigForRecord,
   getOrThrow,
   logger,
@@ -188,10 +189,9 @@ export async function getVersionedEventConfigurationById({
   eventType: string
   token: TokenWithBearer
 }) {
-  const configurations = await getInMemoryVersionedEventConfigurations(token)
-  return getOrThrow(
-    configurations.find((config) => config.id === eventType),
-    `No configuration found for event type: ${eventType}`
+  return getEventConfigById(
+    await getInMemoryVersionedEventConfigurations(token),
+    eventType
   )
 }
 
