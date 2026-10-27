@@ -36,7 +36,10 @@ import {
   deleteLocalEvent,
   onMarkNotDuplicate
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
@@ -386,6 +389,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       eventId,
       declaration: getCleanedDeclarationDiff({
         eventConfiguration,
+        form: getSubmissionForm(eventConfiguration, actionType),
         originalDeclaration,
         declarationDiff: params.declaration,
         validatorContext: {

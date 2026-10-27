@@ -30,7 +30,7 @@ def setup_opencrvs(
 
     Args:
         core_images_tag: OpenCRVS core images tag to use for deployment
-        countryconfig_image_name: Countryconfig image repository (e.g. your DockerHub repository or Farajaland demo repository)
+        countryconfig_image_name: Countryconfig image repository (e.g. your container registry repository or Farajaland demo repository)
         countryconfig_image_tag: Countryconfig image tag to use for deployment
         dependencies_namespace: Kubernetes namespace for dependencies (e.g. MongoDB, MinIO, Elasticsearch)
         opencrvs_namespace: Kubernetes namespace for OpenCRVS services

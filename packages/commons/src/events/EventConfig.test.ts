@@ -233,7 +233,7 @@ describe('EventConfig', () => {
       expect(res.error?.issues).toEqual([
         expect.objectContaining({
           path: fieldPath(0),
-          message: `Notification form field 'applicant.email' is of type TEXT, but the declaration form field with the same id in event '${tennisClubMembershipEvent.id}' is of type EMAIL.`
+          message: `Notification form field 'applicant.email' on page 'applicant' is of type TEXT, but the declaration form field with the same id in event '${tennisClubMembershipEvent.id}' (DECLARE declaration, page 'applicant') is of type EMAIL.`
         })
       ])
     })

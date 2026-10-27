@@ -17,7 +17,8 @@ import {
   formatName,
   getToken,
   login,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  signReview
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
@@ -239,6 +240,7 @@ test('3. Workqueue flow - 3', async ({ page }) => {
     })
 
     await test.step('3.3.5 Declare with edits', async () => {
+      await signReview(page)
       await triggerDeclarationAction(page, 'Declare with edits')
     })
 
@@ -362,6 +364,7 @@ test('3. Workqueue flow - 3', async ({ page }) => {
     })
 
     await test.step('3.5.4 Re-declare with edits', async () => {
+      await signReview(page)
       await triggerDeclarationAction(page, 'Declare with edits')
 
       await assertRecordInWorkqueue({

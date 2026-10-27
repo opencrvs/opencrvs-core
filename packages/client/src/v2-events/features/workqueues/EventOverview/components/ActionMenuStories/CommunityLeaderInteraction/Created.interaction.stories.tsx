@@ -70,8 +70,11 @@ export default {
 
 /**
  * Regression: Community leaders have record.notify (not record.declare).
- * Before the fix, the Declare (Update) button was disabled and Delete was hidden
- * for CREATED drafts owned by the community leader.
+ * Before the fix, Delete was hidden for CREATED drafts owned by the community leader.
+ *
+ * Users who can notify have their own notify flow, so Declare (Update) is not offered.
+ * Continuing a notification from the action menu comes with NOTIFY drafts:
+ * https://github.com/opencrvs/opencrvs-core/issues/14036
  *
  * NOTE: This story requires the communityLeader token in test-data-generators.ts
  * to be regenerated after the scopes were corrected from record.declare to
@@ -119,18 +122,14 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
     await expect(actionButton).toBeVisible()
     await userEvent.click(actionButton)
 
-    // Declare (Update) must be enabled — community leader can open the declare form
-    // even though they only hold record.notify, not record.declare.
-    // tennisClubMembershipEvent configures DECLARE's label as "Send an application".
-    const declareItem = await screen.findByText('Send an application')
-    await waitFor(async () => {
-      await expect(declareItem.hasAttribute('disabled')).toBe(false)
-    })
-
     // Delete must be visible and enabled — record.notify satisfies the delete scope.
     const deleteItem = await screen.findByText('Delete')
     await waitFor(async () => {
       await expect(deleteItem.hasAttribute('disabled')).toBe(false)
     })
+
+    // Declare (Update) is not offered: the community leader only holds record.notify.
+    // tennisClubMembershipEvent configures DECLARE's label as "Send an application".
+    await expect(screen.queryByText('Send an application')).toBeNull()
   }
 }

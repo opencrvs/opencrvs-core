@@ -23,7 +23,10 @@ import {
   TEST_USER_PASSWORD
 } from '@e2e/support/constants'
 import { formatName, NEW_USER_PASSWORD } from '@e2e/support/helpers'
-import { getPlaceOfBirth } from './birth-declaration'
+import {
+  getNotificationDeclaration,
+  NOTIFY_ANNOTATION
+} from './birth-declaration'
 import { getSignatureFile, uploadFile } from './utils'
 
 /*
@@ -76,28 +79,24 @@ export async function notifyChildDetailsViaApi(
   })
 
   const { dd, mm, yyyy } = inputs.child.birthDate
-  const declaration = {
-    'child.name': {
-      firstname: inputs.child.name.firstNames,
-      surname: inputs.child.name.familyName
-    },
-    'child.gender': inputs.child.gender.toLowerCase(),
-    'child.dob': `${yyyy}-${mm}-${dd}`,
-    ...(await getPlaceOfBirth(
-      'HEALTH_FACILITY',
-      token,
-      inputs.birthLocation.facility
-    ))
-  }
+  const declaration = await getNotificationDeclaration({
+    token,
+    facility: inputs.birthLocation.facility,
+    partialDeclaration: {
+      'child.name': {
+        firstname: inputs.child.name.firstNames,
+        surname: inputs.child.name.familyName
+      },
+      'child.gender': inputs.child.gender.toLowerCase(),
+      'child.dob': `${yyyy}-${mm}-${dd}`
+    }
+  })
 
   await client.event.actions.notify.request.mutate({
     eventId,
     transactionId: uuidv4(),
     declaration,
-    annotation: {
-      'review.comment': faker.lorem.sentence(),
-      'review.signature': await uploadFile(getSignatureFile(), token)
-    }
+    annotation: NOTIFY_ANNOTATION
   })
 
   return { eventId: eventId as string }

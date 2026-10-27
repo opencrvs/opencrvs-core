@@ -64,6 +64,12 @@ export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 export const NotifyActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
+    declaration: BaseActionInput.shape.declaration.describe(
+      'Values for fields of the notification form, keyed by field id. Fields outside the notification form are rejected. Only these values become part of the record declaration, so any id that needs to be searchable must be a declaration field.'
+    ),
+    annotation: BaseActionInput.shape.annotation.describe(
+      'Values for notify-only fields (NOTIFY review and form fields), keyed by field id. These are stored on the NOTIFY action, not in the record declaration.'
+    ),
     // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
     createdAtLocation: UUID.nullish().describe(
       'A valid office location ID. This is required for system users performing actions. The provided location must be a leaf-location, i.e. it must not have any children locations.'

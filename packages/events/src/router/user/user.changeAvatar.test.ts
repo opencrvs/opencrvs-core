@@ -42,7 +42,7 @@ describe('user.changeAvatar', () => {
     ).rejects.toMatchObject({ code: 'UNAUTHORIZED' })
   })
 
-  test('persists provided MinIO path as profileImagePath', async () => {
+  test('persists provided S3 path as profileImagePath', async () => {
     const { user, eventsDb } = await setupTestCase()
     const client = createTestClient(user)
     const path = `/users/${user.id}/avatar-${getUUID()}.png`

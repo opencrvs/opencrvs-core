@@ -67,5 +67,6 @@ export const CREDENTIALS = {
   LOCAL_SYSTEM_ADMIN: 'e.mayuka',
   PERFORMANCE_MANAGER: 'm.musonda',
   PROVINCIAL_REGISTRAR: 'm.owen',
-  EMBASSY_OFFICIAL: 't.mwila'
+  EMBASSY_OFFICIAL: 't.mwila',
+  FIELD_AGENT: 'a.nala'
 } as const

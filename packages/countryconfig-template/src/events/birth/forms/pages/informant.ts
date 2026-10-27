@@ -49,7 +49,7 @@ export const InformantType = {
 } as const
 export type InformantTypeKey = keyof typeof InformantType
 
-const PHONE_NUMBER_REGEX = '^0(7|9)[0-9]{8}$'
+export const PHONE_NUMBER_REGEX = '^0(7|9)[0-9]{8}$'
 const informantMessageDescriptors = {
   MOTHER: {
     defaultMessage: 'Mother',
