@@ -33,7 +33,7 @@ import {
 import {
   byEffectiveFrom,
   EventConfig,
-  getEventConfigOfVersion,
+  toEventConfig,
   VersionedEventConfig
 } from './EventConfig'
 import { FieldConfig, FieldReference } from './FieldConfig'
@@ -117,7 +117,7 @@ export function getDeclarationFieldsOfAllVersions(
   const oldestFirst = [...config.versions].sort(byEffectiveFrom)
   const fieldsById = new Map(
     oldestFirst.flatMap((version) =>
-      getDeclarationFields(getEventConfigOfVersion(config, version.id)).map(
+      getDeclarationFields(toEventConfig(config, version)).map(
         (field) => [field.id, field] as const
       )
     )

@@ -296,7 +296,7 @@ const resolvedConfigs = new WeakMap<EventConfigVersion, EventConfig>()
  * version of the event. The same version gives the same object, so caches keyed on
  * the configuration keep working.
  */
-function toEventConfig(
+export function toEventConfig(
   config: VersionedEventConfig,
   version: EventConfigVersion
 ): EventConfig {
