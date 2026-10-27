@@ -160,9 +160,10 @@ function ReviewDuplicate() {
     Record<string, { eventState: EventIndex; event: EventDocument }>
   >((acc, { id, trackingId }) => {
     const localEvent = findLocalEventDocument(id)
-    // getDuplicates skips duplicates that no longer exist, so they are never cached
     if (!localEvent) {
-      return acc
+      throw new Error(
+        `Event with id ${id} and trackingId ${trackingId} not found in cache.`
+      )
     }
     acc[trackingId] = {
       eventState: getCurrentEventState(localEvent, configuration),
@@ -178,7 +179,7 @@ function ReviewDuplicate() {
       color: 'red',
       icon: <Icon color="red" name="WarningCircle" size="medium" />
     },
-    ...Object.keys(potentialDuplicates).map((trackingId) => ({
+    ...eventState.potentialDuplicates.map(({ trackingId }) => ({
       id: trackingId,
       title: trackingId
     }))

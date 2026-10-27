@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { difference } from 'lodash'
 import { Kysely, sql } from 'kysely'
 import { DateTime } from 'luxon'
 import {
@@ -374,48 +373,29 @@ async function createActionsInTrx(
 /**
  *
  * @param eventIds array of event IDs to fetch
- * @returns Get events while adding READ action for each of them. Ids without a matching event are skipped.
+ * @returns Get events while adding READ action for each of them.
  */
 export async function getEventsAuditTrailed(
   user: TrpcUserContext,
   eventIds: UUID[]
 ) {
+  const readActions = eventIds.map((eventId) =>
+    buildAction(
+      {
+        type: ActionType.READ,
+        declaration: {},
+        eventId,
+        transactionId: getUUID()
+      },
+      ActionStatus.Accepted,
+      user
+    )
+  )
+
   const db = getClient()
   return db.transaction().execute(async (trx) => {
-    const existingIds = (
-      await trx
-        .selectFrom('events')
-        .select('id')
-        .where('id', 'in', eventIds)
-        .execute()
-    ).map(({ id }) => id)
-
-    const missingIds = difference(eventIds, existingIds)
-    if (missingIds.length > 0) {
-      logger.warn({
-        message: 'Skipping READ audit trail for events that do not exist',
-        eventIds: missingIds
-      })
-    }
-
-    if (existingIds.length === 0) {
-      return []
-    }
-
-    const readActions = existingIds.map((eventId) =>
-      buildAction(
-        {
-          type: ActionType.READ,
-          declaration: {},
-          eventId,
-          transactionId: getUUID()
-        },
-        ActionStatus.Accepted,
-        user
-      )
-    )
     await createActionsInTrx(readActions, trx)
 
-    return getEventsByIdsInTrx(trx, existingIds)
+    return getEventsByIdsInTrx(trx, eventIds)
   })
 }

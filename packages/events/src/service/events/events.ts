@@ -41,10 +41,7 @@ import {
   deleteFile,
   fileExists
 } from '@events/service/files'
-import {
-  deleteIndexedEvent,
-  indexEvent
-} from '@events/service/indexing/indexing'
+import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 
@@ -150,7 +147,6 @@ export async function deleteEvent(
   await deleteEventAttachments(token, event)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
-  await deleteIndexedEvent(event)
 
   return { id }
 }
@@ -377,8 +373,8 @@ export async function addAction(
 }
 
 /**
- * Created events are kept out of the index on the live path. Reindexing and bulk import
- * index every event regardless, so created events can still be found in the index.
+ * Created events are never indexed, and only created events can be deleted. Together these
+ * guarantee that every event deduplication can flag still exists.
  */
 function isEventIndexable(event: EventDocument) {
   return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED

@@ -414,20 +414,6 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   })
 }
 
-export async function deleteIndexedEvent(event: EventDocument) {
-  const esClient = getOrCreateClient()
-
-  return esClient.delete(
-    {
-      index: getEventIndexName(event.type),
-      id: event.id,
-      refresh: 'wait_for'
-    },
-    // Events in CREATED status are usually not indexed.
-    { ignore: [404] }
-  )
-}
-
 export async function getIndexedEvents(
   userId: string,
   eventConfigs: EventConfig[]
