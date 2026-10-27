@@ -362,6 +362,19 @@ export function resolveEffectiveVersion(
 }
 
 /**
+ * @returns the configuration of the version a record is stamped with, like
+ * `getEventConfigForRecord`, or undefined when that version is not configured.
+ */
+export function findEventConfigForRecord(
+  config: VersionedEventConfig,
+  record: { configVersionId?: string }
+): EventConfig | undefined {
+  const versionId = record.configVersionId ?? getEarliestVersion(config).id
+  const version = config.versions.find(({ id }) => id === versionId)
+  return version && toEventConfig(config, version)
+}
+
+/**
  * @returns the configuration of the version a record is stamped with. A record created
  * before versioning has no stamp and uses the earliest version.
  * @throws when the record's version is no longer configured.
@@ -370,9 +383,9 @@ export function getEventConfigForRecord(
   config: VersionedEventConfig,
   record: { configVersionId?: string }
 ): EventConfig {
-  return getEventConfigOfVersion(
-    config,
-    record.configVersionId ?? getEarliestVersion(config).id
+  return getOrThrow(
+    findEventConfigForRecord(config, record),
+    `Event '${config.id}' has no version '${record.configVersionId}'`
   )
 }
 

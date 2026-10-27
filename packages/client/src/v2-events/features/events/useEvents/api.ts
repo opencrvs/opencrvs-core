@@ -17,7 +17,7 @@ import {
 import {
   Draft,
   EventConfig,
-  getEventConfigForRecord,
+  findEventConfigForRecord,
   VersionedEventConfig,
   EventDocument,
   EventDocumentOnlyLastAction,
@@ -61,7 +61,7 @@ async function invalidateWorkqueues() {
 
 /**
  * @returns the cached configuration of the version `record` was created under, or
- * undefined when its event's configuration is not cached.
+ * undefined when its event's configuration or that version is not cached.
  */
 export function findLocalEventConfig(
   record: Pick<EventDocument, 'type' | 'configVersionId'>
@@ -69,7 +69,7 @@ export function findLocalEventConfig(
   const config = getQueryData(trpcOptionsProxy.event.config.get)?.find(
     ({ id }: VersionedEventConfig) => id === record.type
   ) as VersionedEventConfig | undefined
-  return config && getEventConfigForRecord(config, record)
+  return config && findEventConfigForRecord(config, record)
 }
 
 export function addLocalEventConfig(config: VersionedEventConfig) {
