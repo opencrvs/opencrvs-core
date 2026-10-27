@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.2 Release Candidate
+## 2.1.2
 
 ### Improvements
 
