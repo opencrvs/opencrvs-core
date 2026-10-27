@@ -12,6 +12,7 @@ import { expect, test } from '@playwright/test'
 
 import {
   formatName,
+  getToken,
   login,
   triggerDeclarationAction
 } from '@e2e/support/helpers'
@@ -24,10 +25,12 @@ import {
 } from '@e2e/support/birth/notify'
 import {
   clickWorkqueueActionByTitle,
-  getRowByTitle
+  getRowByTitle,
+  openRecordByTitle
 } from '@e2e/support/print-certificate/birth/helpers'
+import { createCompleteBirthDraftViaApi } from '@e2e/support/test-data/api-actions'
 
-test('1: Validate my draft tab', async ({ page }) => {
+test('Validate my draft tab', async ({ page }) => {
   // A complete notification, so that the draft can be notified at the end
   const inputs = generateBirthNotificationInputs()
   const name = inputs.child.name
@@ -110,5 +113,49 @@ test('1: Validate my draft tab', async ({ page }) => {
     await expect(page.getByTestId('search-result')).not.toContainText(
       formattedName
     )
+  })
+})
+
+test('Declaring a draft removes it from my drafts', async ({ page }) => {
+  let formattedName = ''
+
+  await test.step('2.1 Create a complete declare draft (via API)', async () => {
+    formattedName = await createCompleteBirthDraftViaApi(
+      await getToken(CREDENTIALS.REGISTRATION_OFFICER)
+    )
+  })
+
+  await test.step('2.2 Record appears in draft', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).toContainText(
+      formattedName,
+      { timeout: 15000 }
+    )
+  })
+
+  await test.step('2.3 Reopen the draft with the "Update" -CTA and declare', async () => {
+    await clickWorkqueueActionByTitle(page, formattedName, 'Update')
+
+    await expect(page.getByTestId('child.name-value')).toHaveText(formattedName)
+
+    await triggerDeclarationAction(page, 'Declare')
+  })
+
+  await test.step('2.4 Record does not appear in draft after declaring', async () => {
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).toContainText('Drafts')
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formattedName
+    )
+  })
+
+  await test.step('2.5 Record is declared', async () => {
+    await page.getByText('Recent').click()
+    await openRecordByTitle(page, formattedName)
+
+    await expect(page.getByTestId('status-value')).toHaveText('Declared')
   })
 })
