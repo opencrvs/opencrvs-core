@@ -486,6 +486,30 @@ test('runReindex skips events that cannot be read and reports them in its status
   expect(history[0].progress.errors[0]).toContain(unreadable.id)
 })
 
+test('runReindex skips events whose version is not configured and reports them in its status', async () => {
+  mswServer.use(postHandler)
+
+  await getClient()
+    .updateTable('events')
+    .set({ configVersionId: 'v9' })
+    .where('trackingId', '=', event.trackingId)
+    .execute()
+
+  await runReindex(reindexToken)
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history[0].status).toBe('completed')
+  expect(history[0].progress.skipped).toBe(1)
+  expect(history[0].progress.errors).toHaveLength(1)
+  expect(history[0].progress.errors[0]).toContain(
+    `Event '${TENNIS_CLUB_MEMBERSHIP}' has no version 'v9'`
+  )
+})
+
 test('runReindex fails when no event in a chunk can be read', async () => {
   mswServer.use(postHandler)
 
