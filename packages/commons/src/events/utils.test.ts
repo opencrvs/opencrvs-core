@@ -58,6 +58,7 @@ import {
   withDeclaration
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
+import { toNotificationForm } from './toNotificationForm'
 
 const commonAction = {
   status: 'Requested' as const,
@@ -1247,7 +1248,7 @@ describe('getDeclaration() and withDeclaration()', () => {
     )
   })
 
-  it('should replace the declaration on the DECLARE action, and generate the notification form from it', () => {
+  it('should replace the declaration on the DECLARE action, and the notification form with it', () => {
     const firstPageOnly = {
       ...getDeclaration(tennisClubMembershipEvent),
       pages: getDeclaration(tennisClubMembershipEvent).pages.slice(0, 1)
@@ -1255,16 +1256,11 @@ describe('getDeclaration() and withDeclaration()', () => {
     const config = withDeclaration(tennisClubMembershipEvent, firstPageOnly)
     const isOtherAction = (action: ActionConfig) =>
       action.type !== ActionType.DECLARE && action.type !== ActionType.NOTIFY
-    const notificationFields = getNotificationFields(config)
 
     expect(getDeclaration(config)).toBe(firstPageOnly)
-    expect(notificationFields.map(({ id }) => id)).toEqual(
-      firstPageOnly.pages[0].fields.map(({ id }) => id)
+    expect(getNotificationForm(config)).toEqual(
+      toNotificationForm(firstPageOnly)
     )
-    expect(notificationFields.length).toBeLessThan(
-      getNotificationFields(tennisClubMembershipEvent).length
-    )
-    expect(notificationFields.every(({ required }) => !required)).toBe(true)
     expect(config.actions.filter(isOtherAction)).toEqual(
       tennisClubMembershipEvent.actions.filter(isOtherAction)
     )
@@ -1298,27 +1294,7 @@ describe('getNotificationForm() / getNotificationFields()', () => {
     expect(getNotificationFields(config)).toEqual(firstPage.fields.slice(0, 2))
   })
 
-  it('derives the notification form from the declaration, with every field optional, when none is configured', () => {
-    const notificationFields = getNotificationFields(tennisClubMembershipEvent)
-
-    expect(notificationFields.map(({ id }) => id)).toEqual(
-      getDeclarationFields(tennisClubMembershipEvent).map(({ id }) => id)
-    )
-    expect(notificationFields.every(({ required }) => !required)).toBe(true)
-    expect(
-      getDeclarationFields(tennisClubMembershipEvent).some(
-        ({ required }) => required
-      )
-    ).toBe(true)
-  })
-
-  it('derives the notification form once per configuration', () => {
-    expect(getNotificationForm(tennisClubMembershipEvent)).toBe(
-      getNotificationForm(tennisClubMembershipEvent)
-    )
-  })
-
-  it('derives the notification form from the declaration when the event has no NOTIFY action', () => {
+  it('throws when asked for the notification form of an event that does not use NOTIFY', () => {
     const config = {
       ...tennisClubMembershipEvent,
       actions: tennisClubMembershipEvent.actions.filter(
@@ -1326,8 +1302,8 @@ describe('getNotificationForm() / getNotificationFields()', () => {
       )
     }
 
-    expect(getNotificationFields(config).map(({ id }) => id)).toEqual(
-      getDeclarationFields(config).map(({ id }) => id)
+    expect(() => getNotificationForm(config)).toThrow(
+      `Event '${tennisClubMembershipEvent.id}' has no NOTIFY action.`
     )
   })
 })
@@ -1353,13 +1329,16 @@ describe('findAllFields()', () => {
     }
   })
 
-  it('does not repeat the declaration fields when no notification form is configured', () => {
-    const allFields = findAllFields(tennisClubMembershipEvent)
-
-    for (const notificationField of getNotificationFields(
-      tennisClubMembershipEvent
-    )) {
-      expect(allFields).not.toContain(notificationField)
+  it('returns the fields of an event without a NOTIFY action', () => {
+    const config = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.filter(
+        (action) => action.type !== ActionType.NOTIFY
+      )
     }
+
+    expect(findAllFields(config)).toEqual(
+      expect.arrayContaining(getDeclarationFields(config))
+    )
   })
 })
