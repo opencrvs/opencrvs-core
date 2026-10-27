@@ -13,6 +13,7 @@ import {
   continueForm,
   drawSignature,
   expectRowValueWithChangeButton,
+  expectEmptyRowWithChangeButton,
   goToSection,
   login,
   triggerDeclarationAction
@@ -108,26 +109,18 @@ test('9. Death declaration case - 9', async ({ page }) => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Deceased's Gender
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'deceased.gender',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'deceased.gender')
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Deceased's date of birth
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'deceased.dob',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'deceased.dob')
 
       /*
        * Expected result: should include
@@ -140,15 +133,11 @@ test('9. Death declaration case - 9', async ({ page }) => {
         'Farajaland'
       )
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Deceased's Type of Id
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'deceased.idType',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'deceased.idType')
 
       /*
        * Expected result: should include
@@ -164,15 +153,11 @@ test('9. Death declaration case - 9', async ({ page }) => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Date of death
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'eventDetails.date',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'eventDetails.date')
 
       /*
        * Expected result: should include
@@ -186,39 +171,27 @@ test('9. Death declaration case - 9', async ({ page }) => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Informant's Email
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'informant.email',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'informant.email')
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Spouse's First Name
        * - Spouse's Family Name
        * - Change button
        */
 
-      await expectRowValueWithChangeButton(
-        page,
-        'spouse.name',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'spouse.name')
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Spouse's date of birth
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'spouse.dob',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'spouse.dob')
 
       /*
        * Expected result: should include
@@ -232,18 +205,14 @@ test('9. Death declaration case - 9', async ({ page }) => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Spouse's Type of Id
        * - Change button
        */
-      await expectRowValueWithChangeButton(
-        page,
-        'spouse.idType',
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expectEmptyRowWithChangeButton(page, 'spouse.idType')
 
       /*
-       * Expected result: should require
+       * Expected result: optional on the notification form, should be empty
        * - Spouse's address
        * - Change button
        */

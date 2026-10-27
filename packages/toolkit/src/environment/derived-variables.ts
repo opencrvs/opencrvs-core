@@ -67,15 +67,17 @@ export const derivedVariables = [
     scope: 'ENVIRONMENT'
   },
   {
-    name: 'MINIO_ROOT_USER',
-    valueLabel: 'MINIO_ROOT_USER',
+    name: 'S3_ADMIN_ACCESS_KEY',
+    valueLabel: 'S3_ADMIN_ACCESS_KEY',
+    legacyValueLabel: 'MINIO_ROOT_USER',
     valueType: 'SECRET',
     type: 'disabled',
     scope: 'ENVIRONMENT'
   },
   {
-    name: 'MINIO_ROOT_PASSWORD',
-    valueLabel: 'MINIO_ROOT_PASSWORD',
+    name: 'S3_ADMIN_SECRET_KEY',
+    valueLabel: 'S3_ADMIN_SECRET_KEY',
+    legacyValueLabel: 'MINIO_ROOT_PASSWORD',
     valueType: 'SECRET',
     type: 'disabled',
     scope: 'ENVIRONMENT'
@@ -171,4 +173,11 @@ export const derivedVariables = [
     type: 'disabled',
     scope: 'ENVIRONMENT'
   },
+  {
+    name: 'MONITORING_ENABLED',
+    valueLabel: 'MONITORING_ENABLED',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  }
 ] as const

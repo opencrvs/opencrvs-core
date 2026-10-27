@@ -45,7 +45,7 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
   'event.create': messages.createdAuditAction,
   'event.get': messages.downloadAuditAction,
   'event.search': messages.searchAuditAction,
-  'event.actions.notify.request': messages.inProgressAuditAction,
+  'event.actions.notify.request': messages.notifiedAuditAction,
   'event.actions.declare.request': messages.declaredAuditAction,
   'event.actions.register.request': messages.registeredAuditAction,
   'event.actions.reject.request': messages.rejectedAuditAction,

@@ -10,7 +10,6 @@
  */
 import { test, expect } from '@playwright/test'
 import {
-  formatName,
   goToSection,
   login,
   switchEventTab,
@@ -22,37 +21,43 @@ import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { fillDate } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
+/**
+ * Death is used since all of its fields are optional on notification: the birth
+ * notification form requires e.g. the child's name and date of birth.
+ */
 test('Cleared field values are removed after editing and re-notifying a declaration', async ({
   page
 }) => {
-  const childName = {
-    firstNames: faker.person.firstName(),
-    familyName: faker.person.lastName()
+  const deceasedName = {
+    firstname: faker.person.firstName('male'),
+    surname: faker.person.lastName('male')
   }
-  const formattedChildName = formatName(childName)
-  const childDob = { dd: '12', mm: '03', yyyy: '2015' }
-  const childWeight = '3.5'
+  const formattedDeceasedName = `${deceasedName.firstname} ${deceasedName.surname}`
+  const deceasedDob = { dd: '12', mm: '03', yyyy: '1950' }
+  const numberOfDependants = '3'
   let dobValueBefore = ''
   let nameValueBefore = ''
   let recordUrl = ''
 
-  await test.step('Login as Community Leader', async () => {
-    await login(page, CREDENTIALS.COMMUNITY_LEADER)
+  await test.step('Login as Hospital official', async () => {
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
   })
 
-  await test.step('Initiate birth declaration', async () => {
+  await test.step('Initiate death notification', async () => {
     await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
+    await page.getByLabel('Death').click()
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  await test.step("Fill child's name, date of birth and weight at birth", async () => {
-    await page.locator('#firstname').fill(childName.firstNames)
-    await page.locator('#surname').fill(childName.familyName)
-    await fillDate(page, childDob)
+  await test.step("Fill deceased's name, date of birth and number of dependants", async () => {
+    await page.locator('#firstname').fill(deceasedName.firstname)
+    await page.locator('#surname').fill(deceasedName.surname)
+    await fillDate(page, deceasedDob)
     // A non-mandatory field that we will later clear during edit.
-    await page.locator('#child____weightAtBirth').fill(childWeight)
+    await page
+      .locator('#deceased____numberOfDependants')
+      .fill(numberOfDependants)
   })
 
   await test.step('Continue to review and Notify', async () => {
@@ -62,48 +67,48 @@ test('Cleared field values are removed after editing and re-notifying a declarat
 
   await test.step('Open the notified record and capture the values shown', async () => {
     await page.getByText('Recent').click()
-    await openRecordByTitle(page, formattedChildName)
+    await openRecordByTitle(page, formattedDeceasedName)
     await expect(page.getByTestId('status-value')).toHaveText('Notified')
     // Capture the record URL so it can be reopened after the name (used as the workqueue row title) has been cleared.
     recordUrl = page.url()
 
-    await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
+    await ensureAssignedToUser(page, CREDENTIALS.HOSPITAL_OFFICIAL)
     await switchEventTab(page, 'Record')
 
-    const dob = page.getByTestId('child.dob-value')
-    await expect(dob).toContainText(childDob.yyyy)
+    const dob = page.getByTestId('deceased.dob-value')
+    await expect(dob).toContainText(deceasedDob.yyyy)
     dobValueBefore = (await dob.innerText()).trim()
 
-    const name = page.getByTestId('child.name-value')
-    await expect(name).toContainText(childName.familyName)
+    const name = page.getByTestId('deceased.name-value')
+    await expect(name).toContainText(deceasedName.surname)
     nameValueBefore = (await name.innerText()).trim()
   })
 
-  await test.step('Edit the notification and clear the date of birth, the name and the weight', async () => {
+  await test.step('Edit the notification and clear the date of birth, the name and the number of dependants', async () => {
     await selectAction(page, 'Edit')
 
-    await page.getByTestId('change-button-child.dob').click()
+    await page.getByTestId('change-button-deceased.dob').click()
 
     // Clear the date of birth ...
     await fillDate(page, { dd: '', mm: '', yyyy: '' })
 
-    // ... clear the child's name, a complex (multi-part) field, on the same
+    // ... clear the deceased's name, a complex (multi-part) field, on the same
     // page ...
     await page.locator('#firstname').fill('')
     await page.locator('#surname').fill('')
 
-    // ... and clear the weight at birth, a non-mandatory field on the same
+    // ... and clear the number of dependants, a non-mandatory field on the same
     // page.
-    await page.locator('#child____weightAtBirth').fill('')
+    await page.locator('#deceased____numberOfDependants').fill('')
 
     await page.getByRole('button', { name: 'Go to review' }).click()
   })
 
-  await test.step('Review page during edit shows the cleared weight as deleted', async () => {
-    const weightRow = page.getByTestId('child.weightAtBirth-value')
+  await test.step('Review page during edit shows the cleared number of dependants as deleted', async () => {
+    const dependantsRow = page.getByTestId('deceased.numberOfDependants-value')
 
     // The previous value is shown as deleted
-    await expect(weightRow.locator('del')).toContainText(childWeight)
+    await expect(dependantsRow.locator('del')).toContainText(numberOfDependants)
   })
 
   await test.step('Notify again with the cleared field', async () => {
@@ -122,19 +127,19 @@ test('Cleared field values are removed after editing and re-notifying a declarat
     await searchResponse
 
     await expect(page.getByLabel('Assign record')).toBeVisible()
-    await ensureAssignedToUser(page, CREDENTIALS.COMMUNITY_LEADER)
+    await ensureAssignedToUser(page, CREDENTIALS.HOSPITAL_OFFICIAL)
     await switchEventTab(page, 'Record')
 
     // The cleared values must not persist: neither the date of birth nor the
     // name row may still display the value entered before the edit.
-    await expect(page.getByTestId('child.dob-value')).not.toHaveText(
+    await expect(page.getByTestId('deceased.dob-value')).not.toHaveText(
       dobValueBefore
     )
-    await expect(page.getByTestId('child.name-value')).not.toHaveText(
+    await expect(page.getByTestId('deceased.name-value')).not.toHaveText(
       nameValueBefore
     )
     await expect(
-      page.getByTestId('child.weightAtBirth-value')
-    ).not.toContainText(childWeight)
+      page.getByTestId('deceased.numberOfDependants-value')
+    ).not.toContainText(numberOfDependants)
   })
 })

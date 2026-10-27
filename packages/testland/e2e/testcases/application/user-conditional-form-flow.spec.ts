@@ -55,7 +55,6 @@ test('1. User conditional form flow', async ({ page }) => {
 
     await test.step('1.1.1 Fill applicant details', async () => {
       await page.getByTestId('change-button-applicant.name').click()
-      await page.getByTestId('confirm_edit').click()
 
       await page
         .locator('#firstname')

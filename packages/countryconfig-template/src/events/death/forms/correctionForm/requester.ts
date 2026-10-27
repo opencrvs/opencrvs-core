@@ -213,11 +213,11 @@ export const correctionFormRequesters: FieldConfig[] = [
     required: true,
     label: {
       id: 'event.death.action.correction.form.section.requester.relationship.label',
-      defaultMessage: 'Relationship to child',
+      defaultMessage: 'Relationship to deceased',
       description: 'This is the label for the field'
     },
     placeholder: {
-      defaultMessage: 'eg. Grandmother',
+      defaultMessage: 'eg. Mother',
       description: 'This is the placeholder for the field',
       id: 'event.death.action.correction.form.section.requester.relationship.placeholder'
     },

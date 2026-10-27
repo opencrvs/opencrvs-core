@@ -16,12 +16,9 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
-  ActionType,
-  getDeclaration,
   getCurrentEventState,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -34,6 +31,7 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { EditActionMenu } from './EditActionMenu'
 import { EditPageBanner } from './EditPageBanner'
+import { useEditForm } from './useEditForm'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
@@ -43,19 +41,13 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(config)
+  const {
+    eventConfiguration: config,
+    formConfig,
+    reviewConfig
+  } = useEditForm(event)
   const currentEventState = getCurrentEventState(event, config)
   const previousFormValues = currentEventState.declaration
-  const actionConfiguration = config.actions.find(
-    (a) => a.type === ActionType.DECLARE
-  )
-
-  if (!actionConfiguration) {
-    throw new Error('Action configuration not found')
-  }
-
-  const reviewConfig = actionConfiguration.review
   const form = useEventFormData((state) => state.getFormValues())
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
