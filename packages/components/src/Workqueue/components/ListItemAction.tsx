@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton, ArrowExpansionButton } from '../../buttons'
 import { Button } from '../../Button'
-import { ColumnContentAlignment, IAction, IActionComponent } from '..'
+import { ColumnContentAlignment, IAction, IActionComponent } from '../types'
 const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
   display: flex;
