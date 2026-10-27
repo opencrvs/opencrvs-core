@@ -10,8 +10,8 @@
  */
 import {
   PrecacheEntry,
-  createHandlerBoundToURL,
-  precacheAndRoute,
+  PrecacheController,
+  PrecacheRoute,
   cleanupOutdatedCaches
 } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
@@ -19,6 +19,7 @@ import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 import { WorkboxPlugin } from 'workbox-core/types'
 import { S3_URL_REGEX } from '@opencrvs/commons/client'
+import { installPrecache } from './precache'
 
 // "App shell" = the SPA's index.html, served for any unmatched route. True
 // if a document's URL got poisoned with that HTML instead of the real file.
@@ -34,7 +35,13 @@ self.addEventListener('install', (event) => {
   self.skipWaiting()
 })
 
-precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
+const precacheController = new PrecacheController()
+precacheController.addToCacheList(self.__WB_MANIFEST as PrecacheEntry[])
+self.addEventListener('install', (event) =>
+  event.waitUntil(installPrecache(precacheController, event))
+)
+self.addEventListener('activate', (event) => precacheController.activate(event))
+registerRoute(new PrecacheRoute(precacheController))
 
 cleanupOutdatedCaches()
 
@@ -91,10 +98,13 @@ registerRoute(S3_URL_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('/index.html'), {
-    ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
-    denylist: [/^\/__.*$/, /^\/login/]
-  })
+  new NavigationRoute(
+    precacheController.createHandlerBoundToURL('/index.html'),
+    {
+      ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
+      denylist: [/^\/__.*$/, /^\/login/]
+    }
+  )
 )
 
 self.skipWaiting()
