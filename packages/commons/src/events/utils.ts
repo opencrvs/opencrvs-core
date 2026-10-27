@@ -776,11 +776,14 @@ export function getMixedPath<T = unknown>(
   return isNil(result) ? defaultValue : result
 }
 
-export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
-  const eventConfig = eventConfigs.find(
-    (eventConfiguration) => eventConfiguration.id === id
+export function getEventConfigById<T extends { id: string }>(
+  eventConfigs: T[],
+  id: string
+): T {
+  return getOrThrow(
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id),
+    `No configuration found for event type: ${id}`
   )
-  return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }
 
 export function timePeriodToDateRange(value: SelectDateRangeValue) {

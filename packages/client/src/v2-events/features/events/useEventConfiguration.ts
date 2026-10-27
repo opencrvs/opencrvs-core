@@ -13,8 +13,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import {
   EventConfig,
+  getEventConfigById,
   getEventConfigForRecord,
-  getOrThrow,
   resolveEventConfigInTimeZone,
   VersionedEventConfig
 } from '@opencrvs/commons/client'
@@ -49,10 +49,7 @@ export function useVersionedEventConfigurations(): VersionedEventConfig[] {
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
  */
 function useVersionedEventConfiguration(eventIdentifier: string) {
-  return getOrThrow(
-    useVersionedEventConfigurations().find(({ id }) => id === eventIdentifier),
-    `Configuration not found for event: ${eventIdentifier}`
-  )
+  return getEventConfigById(useVersionedEventConfigurations(), eventIdentifier)
 }
 
 /**

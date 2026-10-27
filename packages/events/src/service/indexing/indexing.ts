@@ -26,6 +26,7 @@ import {
   getCurrentEventState,
   getDeclarationFieldsOfAllVersions,
   WorkqueueCountInput,
+  getEventConfigById,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
@@ -34,7 +35,6 @@ import {
   dropSecuredDeclarationFields,
   EventIndexWithAdministrativeHierarchy,
   getEventConfigForRecord,
-  getOrThrow,
   logger,
   RecordScopeV2,
   TokenWithBearer,
@@ -436,10 +436,7 @@ export function getConfigForRecord(
   record: Pick<EventIndex, 'type' | 'configVersionId'>
 ) {
   return getEventConfigForRecord(
-    getOrThrow(
-      configs.find(({ id }) => id === record.type),
-      `No configuration found for event type: ${record.type}`
-    ),
+    getEventConfigById(configs, record.type),
     record
   )
 }
