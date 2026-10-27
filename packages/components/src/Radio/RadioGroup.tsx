@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { RadioButton } from './RadioButton'
 import { NoticeWrapper } from '../DateField'
-import { InputLabel } from '../InputField/InputLabel'
+import { InputLabel } from '../InputField'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
