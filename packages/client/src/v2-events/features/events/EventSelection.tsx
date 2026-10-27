@@ -24,6 +24,7 @@ import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import {
   canUserCreateEvent,
+  canUserNotifyEvent,
   resolveEffectiveVersion
 } from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
@@ -100,7 +101,7 @@ function EventSelector() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
-    const transactionId = createTemporaryId()
+
     const eventConfig = allowedEventConfigurations.find(
       ({ id }) => id === eventType
     )
@@ -109,13 +110,14 @@ function EventSelector() {
       throw new Error(`Configuration for event '${eventType}' not found`)
     }
 
+    const eventId = createTemporaryId()
     const versionedConfig = versionedEventConfigurations.find(
       ({ id }) => id === eventType
     )
 
     createEvent.mutate({
       type: eventType,
-      transactionId,
+      transactionId: eventId,
       createdAtLocation: user?.primaryOfficeId,
       configVersionId:
         versionedConfig &&
@@ -125,11 +127,14 @@ function EventSelector() {
     clearForm()
     clearAnnotation()
 
-    navigate(
-      ROUTES.V2.EVENTS.DECLARE.buildPath({
-        eventId: transactionId
-      })
-    )
+    // If the user is allowed to notify, it means that they will go to the notify flow instead of the declare flow.
+    // We no longer support user roles which can both notify and declare records.
+    const path = canUserNotifyEvent(scopes, eventType)
+      ? ROUTES.V2.EVENTS.NOTIFY
+      : ROUTES.V2.EVENTS.DECLARE
+
+    navigate(path.buildPath({ eventId }))
+    return
   }
 
   return (

@@ -41,7 +41,6 @@ test('4. Validate the informants details pages', async ({ page }) => {
 
     await test.step('4.1.3 Change phone number to empty', async () => {
       await page.getByTestId('change-button-informant.phoneNo').click()
-      await page.getByText('Continue').click()
       await page.locator('#informant____phoneNo').fill('')
       await page.getByRole('heading', { name: 'Birth', exact: true }).click()
 

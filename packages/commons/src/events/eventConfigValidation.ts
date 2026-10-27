@@ -12,7 +12,11 @@ import * as z from 'zod/v4'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
-import { findAllFields, getDeclarationFields } from './utils'
+import {
+  findAllFields,
+  getDeclarationFields,
+  getDeclarationPages
+} from './utils'
 import { FieldType } from './FieldType'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
@@ -246,7 +250,9 @@ export function validateNotificationForm(
   event: EventConfig,
   ctx: z.RefinementCtx<EventConfig>
 ) {
-  const declarationFields = getDeclarationFields(event)
+  const declarationFields = getDeclarationPages(event).flatMap((page) =>
+    page.fields.map((field) => ({ field, pageId: page.id }))
+  )
 
   event.actions.forEach((action, actionIndex) => {
     if (action.type !== ActionType.NOTIFY || !action.notificationForm) {
@@ -266,7 +272,7 @@ export function validateNotificationForm(
         ]
 
         const matchingFields = declarationFields.filter(
-          ({ id }) => id === field.id
+          (declarationField) => declarationField.field.id === field.id
         )
 
         if (matchingFields.length === 0) {
@@ -278,10 +284,15 @@ export function validateNotificationForm(
           return
         }
 
-        if (!matchingFields.some(({ type }) => type === field.type)) {
+        if (
+          !matchingFields.some(
+            (declarationField) => declarationField.field.type === field.type
+          )
+        ) {
+          const [declarationField] = matchingFields
           ctx.addIssue({
             code: 'custom',
-            message: `Notification form field '${field.id}' is of type ${field.type}, but the declaration form field with the same id in event '${event.id}' is of type ${matchingFields[0].type}.`,
+            message: `Notification form field '${field.id}' on page '${page.id}' is of type ${field.type}, but the declaration form field with the same id in event '${event.id}' (${ActionType.DECLARE} declaration, page '${declarationField.pageId}') is of type ${declarationField.field.type}.`,
             path
           })
         }

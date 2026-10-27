@@ -59,7 +59,7 @@ buttons.copy,Copy button text,Copy,Copier
 buttons.correctRecord,Rectord correction button text,Correct record,Correct record
 buttons.create,Label for submit button of client integration creation form,Create,Créer
 buttons.delete,Delete button,Delete,Supprimer
-buttons.deleteDeclaration,Delete declaration button text,Delete declaration,Supprimer la déclaration
+buttons.deleteDraft,The label for the delete draft button,Delete draft,Supprimer le brouillon
 buttons.edit,Edit button text,Edit,Modifier
 buttons.editRecord,Correct record button text on review certificate,"No, make correction","Non, faites la correction"
 buttons.editRegistration,Edit registration button text,Edit registration,Modifier l'enregistrement
@@ -118,9 +118,6 @@ certificate.parent.details.label.firstName,Parent first names,First name(s),Pré
 certificate.parent.details.label.nationality,Parent Nationality,Nationality,Nationalité
 certificate.parent.details.label.number,Parent number,Number,Numéro
 changeEmail.validation.msg,Phone number validation message,Must be a valid email address,Doit être une adresse e-mail valide
-changeModal.continue,The label for continue button of change modal,Continue,Continuer
-changeModal.description,The description for change modal,A record will be created of any changes you make,Un enregistrement sera créé pour toute modification que vous apporterez
-changeModal.title,The title for change modal,Edit declaration?,Modifier la déclaration ?
 changePhone.validation.msg,Phone number validation message,Must be a valid 10 digit number that starts with 0,Doit être un numéro valide à {num} chiffres qui commence par {start}.
 clearForm.desc.clearFormConfirm,Description for clear form confirmation modal,All fields on this page will be cleared. Are you sure you want to continue?,Tous les champs de cette page seront effacés. Voulez-vous vraiment continuer ?
 clearForm.title.clearFormConfirm,Title for clear form confirmation modal,Clear form?,Effacer le formulaire ?
@@ -651,7 +648,7 @@ events.documents.offline.title,Title shown on the Documents tab when the user is
 events.documents.recordAction,Column header for the record action that added a document,Record action,Action sur l'enregistrement
 events.documents.requestCorrection,Record action shown on the documents tab for a document added through a correction request,Request correction,Demande de correction
 events.history.awaitingConfirmationBanner,Banner shown in the action detail dialog when the action is still awaiting external validation,"This action has been initiated, but is still awaiting validation from an external system.","Cette action a été initiée, mais est toujours en attente de validation par un système externe."
-events.history.status,Events status history,"{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Declaration started} NOTIFY {Notified} EDIT {Edited} VALIDATE {Sent for approval} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} REVOKE_REGISTRATION {Registration revoked} REINSTATE_REGISTRATION {Registration reinstated} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} MARK_AS_NOT_DUPLICATE {Marked not a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}","{status, select, Rejected {{action, select, REGISTER {Enregistrement échoué} other {Rejeté}}} other {{action, select, CREATE {Déclaration commencée} NOTIFY {Envoyé incomplet} EDIT {Modifié} VALIDATE {Envoyé pour approbation} DRAFT {Brouillon} DECLARE {Envoyé pour révision} REGISTER {Enregistré} PRINT_CERTIFICATE {Certifié} REJECT {Rejeté} ARCHIVE {Archivé} UNARCHIVE {Désarchivé} REVOKE_REGISTRATION {Enregistrement révoqué} REINSTATE_REGISTRATION {Enregistrement réintégré} DUPLICATE_DETECTED {Marqué comme doublon} MARK_AS_DUPLICATE {Marqué comme doublon} MARK_AS_NOT_DUPLICATE {Marqué comme non en doublon} CORRECTED {Enregistrement corrigé} REQUEST_CORRECTION {Correction demandée} APPROVE_CORRECTION {Correction approuvée} REJECT_CORRECTION {Correction refusée} READ {Consulté} ASSIGN {Attribué} UNASSIGN {Désattribué} other {Inconnu}}}}"
+events.history.status,Events status history,"{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Declaration started} NOTIFY {Notified} EDIT {Edited} VALIDATE {Sent for approval} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} REVOKE_REGISTRATION {Registration revoked} REINSTATE_REGISTRATION {Registration reinstated} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} MARK_AS_NOT_DUPLICATE {Marked not a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}","{status, select, Rejected {{action, select, REGISTER {Enregistrement échoué} other {Rejeté}}} other {{action, select, CREATE {Déclaration commencée} NOTIFY {Notifié} EDIT {Modifié} VALIDATE {Envoyé pour approbation} DRAFT {Brouillon} DECLARE {Envoyé pour révision} REGISTER {Enregistré} PRINT_CERTIFICATE {Certifié} REJECT {Rejeté} ARCHIVE {Archivé} UNARCHIVE {Désarchivé} REVOKE_REGISTRATION {Enregistrement révoqué} REINSTATE_REGISTRATION {Enregistrement réintégré} DUPLICATE_DETECTED {Marqué comme doublon} MARK_AS_DUPLICATE {Marqué comme doublon} MARK_AS_NOT_DUPLICATE {Marqué comme non en doublon} CORRECTED {Enregistrement corrigé} REQUEST_CORRECTION {Correction demandée} APPROVE_CORRECTION {Correction approuvée} REJECT_CORRECTION {Correction refusée} READ {Consulté} ASSIGN {Attribué} UNASSIGN {Désattribué} other {Inconnu}}}}"
 events.history.status.accepted,Status badge shown on an action that has been confirmed,Accepted,Accepté
 events.history.status.awaitingConfirmation,Placeholder label in the audit dropdown for an action that has not been accepted or rejected yet,Awaiting confirmation,En attente de confirmation
 events.history.status.rejected,Status badge shown on an action that was rejected,Rejected,Rejeté
@@ -970,7 +967,7 @@ register.eventInfo.marriage.listItem0,,I am here to complete the marriage regist
 register.eventInfo.marriage.listItem1,,"Once I complete the declaration, it will be sent to the registration office for review.","Une fois que j'aurai complété la déclaration, elle sera envoyée au bureau d'enregistrement pour examen."
 register.eventInfo.marriage.listItem2,,Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.,Attendez un SMS vous indiquant quand vous rendre au bureau pour retirer le certificat - Prenez votre pièce d'identité avec vous
 register.form.modal.desc.saveDeclarationConfirm,Description for save declaration confirmation modal,All inputted data will be kept secure for future editing. Are you ready to save any changes to this declaration form?,Toutes les données saisies seront conservées en toute sécurité pour de futures modifications. Êtes-vous prêt à enregistrer les modifications apportées à ce formulaire de déclaration?
-register.form.modal.description.deleteDeclarationConfirm,Description for delete declaration confirmation modal,Are you sure you want to delete this declaration?,Êtes-vous sûr de vouloir supprimer cette déclaration ?
+register.form.modal.description.deleteDeclarationConfirm,Description for delete draft confirmation modal,Are you sure you want to delete this draft?,Êtes-vous sûr de vouloir supprimer ce brouillon ?
 register.form.modal.title.deleteDeclarationConfirm,Title for delete declaration confirmation modal,Delete draft?,Supprimer le brouillon?
 register.form.modal.title.saveDeclarationConfirm,Title for save declaration confirmation modal,Save & exit?,Enregistrer et quitter?
 register.form.required,Required field error message,This field is required,Ce champ est obligatoire
@@ -993,12 +990,12 @@ reloadmodal.button.update,Label of update button,Update,Mise à jour
 reloadmodal.title,Title when update is available,Update available,Mise à jour disponible
 review.annotations.title,Title for the annotations accordion section in review,Annotations,Annotations
 review.declare.confirmModal.title,The title for review action modal when declaring,Declare event?,Déclarer l'événement?
-review.declare.incomplete.confirmModal.title,The title for review action modal when declaring,Notify event?,Notifier l'événement?
 review.documents.zeroDocumentsTextForAnySection,Zero documents text,No supporting documents,Aucune pièce justificative
 review.error.unauthorized,The error message shown when a query fails,We are unable to display this page to you,Nous ne sommes pas en mesure de vous afficher cette page
 review.form.title,Review form label for update action,Review form,Formulaire de révision
 review.header.title.govtName,Header title that shows bgd govt name,Republic of Farajaland,République du Farajaland
 review.inputs.supportingDocuments,Section heading title for supporting documents,Supporting documents,Documents justificatifs
+review.notify.confirmModal.title,The title for review action modal when notifying,Notify event?,Notifier l'événement?
 review.register.confirmModal.title,The title for review action modal when registering,Register the {event}?,Enregistrer cet {event}?
 review.signature.clear,Label for button that clear signature input,Clear,Supprimer
 review.signature.delete,Label for button that deletes signature,Delete,Supprimer
@@ -1104,7 +1101,7 @@ user.profile.audit.column.date,Title for audit date column,Date,Date
 user.profile.audit.column.trackingId,Title for audit tracking id column,Record,Dossier
 user.profile.audit.description.certified,Description for certified declaration,Certified,Certifié
 user.profile.audit.description.declared,Description for complete declaration,Declaration started,Déclaration initiée
-user.profile.audit.description.inProgress,Description for incomplete declaration,Sent incomplete,Envoyé incomplet
+user.profile.audit.description.notified,Description for notified record,Notified,Notifié
 user.profile.audit.description.registered,Description for registered declaration,Registered,Enregistré
 user.profile.audit.description.rejected,Description for rejected declaration,Rejected,Rejeté
 user.profile.audit.description.updated,Description for updated declaration,Updated,Mise à jour de

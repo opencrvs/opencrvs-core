@@ -103,7 +103,7 @@ describe('AvatarChangeModal', () => {
     getCroppedImage = vi.fn()
   })
 
-  it('uploads cropped image then calls changeAvatar mutation with MinIO path string', async () => {
+  it('uploads cropped image then calls changeAvatar mutation with S3 path string', async () => {
     const cropped = { type: 'image/png', data: 'data:image/png;base64,yyy' }
     getCroppedImage.mockResolvedValue(cropped)
     uploadFileAsync.mockResolvedValue({ url: '/users/user-123/avatar.png' })

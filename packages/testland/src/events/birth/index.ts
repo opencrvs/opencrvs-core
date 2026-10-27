@@ -35,10 +35,7 @@ import { advancedSearchBirth } from './advancedSearch'
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth } from './forms/pages/child'
 import { CORRECTION_FORM } from './forms/correctionForm'
-import {
-  BIRTH_NOTIFICATION_FORM,
-  BIRTH_NOTIFICATION_REVIEW
-} from './forms/notificationForm'
+import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
@@ -379,6 +376,17 @@ export const birthEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
+      },
+      notificationForm: BIRTH_NOTIFICATION_FORM,
+      review: {
+        title: {
+          defaultMessage:
+            '{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}',
+          id: 'event.birth.action.notify.form.review.title',
+          description: 'Title of the form to show in review page'
+        },
+        // We dont want review fields on notification
+        fields: []
       },
       form: [
         {

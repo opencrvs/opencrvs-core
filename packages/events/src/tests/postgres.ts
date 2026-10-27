@@ -23,7 +23,7 @@ const MIGRATIONS_DIR = path.resolve(
 // run-migrations.sh fills these in with envsubst before running the SQL files
 const SQL_PLACEHOLDER_VALUES: Record<string, string> = {
   EVENTS_DB_USER: 'events_app',
-  MINIO_BUCKET: 'ocrvs'
+  S3_BUCKET: 'ocrvs'
 }
 
 // Matches a ${NAME} placeholder and captures NAME
