@@ -146,7 +146,6 @@ export function canSaveDraft(event: EventDocument) {
 }
 
 setMutationDefaults(trpcOptionsProxy.event.draft.create, {
-  // A refused draft (409) stays refused, retrying won't save it
   retry: retryUnlessConflict,
   mutationFn: createEventActionMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
