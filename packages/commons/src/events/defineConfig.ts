@@ -18,6 +18,7 @@ import {
   VersionedEventConfigInput
 } from './EventConfig'
 import { ActionType } from './ActionType'
+import { toPlainDateInTimeZone } from './PlainDate'
 import { generateNotifyReview } from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
@@ -214,10 +215,33 @@ function prepareVersions(
   }
 }
 
+/**
+ * An event must have a version in effect today, so that it can be declared once it
+ * is configured. Without the country's time zone at hand, today is taken in UTC.
+ */
+function validateVersionInEffectToday(
+  config: VersionedEventConfigInput,
+  ctx: z.RefinementCtx<VersionedEventConfigInput>
+) {
+  const today = toPlainDateInTimeZone(new Date(), 'UTC')
+  const isAnyVersionInEffect = config.versions.some(
+    ({ effectiveFrom }) => !effectiveFrom || effectiveFrom <= today
+  )
+
+  if (!isAnyVersionInEffect) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' has no version in effect today (${today}, UTC). At least one version must omit \`effectiveFrom\` or take effect on or before today.`,
+      path: ['versions']
+    })
+  }
+}
+
 const EventConfigDefinition = z
   .custom<EventConfigInput | VersionedEventConfigInput>()
   .transform(toVersionedInput)
-  .superRefine((config, ctx) =>
+  .superRefine((config, ctx) => {
+    validateVersionInEffectToday(config, ctx)
     validateEachVersion(
       ctx,
       config.versions.map((version) => getVersionInput(config, version)),
@@ -227,7 +251,7 @@ const EventConfigDefinition = z
         }
       }
     )
-  )
+  })
   .transform(prepareVersions)
   .pipe(VersionedEventConfig)
 
