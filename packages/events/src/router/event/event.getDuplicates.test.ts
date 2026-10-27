@@ -330,7 +330,8 @@ test('Skips duplicates that no longer exist instead of failing', async () => {
     generator.event.actions.declare(event3.id, { declaration })
   )
 
-  // Simulate a duplicate that is referenced by DUPLICATE_DETECTED but missing from the database
+  // Declared events cannot be deleted through the API. Remove the row directly to reproduce the
+  // production state from #13906, where a flagged duplicate id has no row in events (cause unknown).
   await deleteEventById(event1.id)
 
   const event2ActionsBeforeGet = await getEventActions(eventsDb, event2.id)
@@ -384,6 +385,7 @@ test('Returns no duplicates when every flagged duplicate no longer exists', asyn
     generator.event.actions.declare(event2.id, { declaration })
   )
 
+  // See 'Skips duplicates that no longer exist instead of failing' for why the row is removed directly
   await deleteEventById(event1.id)
 
   await client.event.actions.assignment.assign(

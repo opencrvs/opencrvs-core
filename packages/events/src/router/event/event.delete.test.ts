@@ -87,7 +87,7 @@ test('deleting an event removes it from the search index', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  // Created events are not indexed by default, but can end up in the index (e.g. after an async rejection)
+  // Created events are not indexed by default, but reindexing and bulk import index every event
   await indexEvent(event, tennisClubMembershipEvent)
 
   await client.event.delete({ eventId: event.id })

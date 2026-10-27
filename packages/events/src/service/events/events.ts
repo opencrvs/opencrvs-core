@@ -376,6 +376,10 @@ export async function addAction(
   return updatedEvent
 }
 
+/**
+ * Created events are kept out of the index on the live path. Reindexing and bulk import
+ * index every event regardless, so created events can still be found in the index.
+ */
 function isEventIndexable(event: EventDocument) {
   return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
 }
