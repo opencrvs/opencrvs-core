@@ -217,7 +217,7 @@ export function applyTextEdits(sourceFile: SourceFile, edits: TextEdit[]) {
 }
 
 /** Finds the value import of the toolkit's events module, if the file has one. */
-export function findToolkitImport(sourceFile: SourceFile) {
+function findToolkitImport(sourceFile: SourceFile) {
   // A type-only import cannot carry a function, and a namespace import cannot
   // be given named imports, so neither is extended
   return sourceFile.getImportDeclaration(
