@@ -427,7 +427,11 @@ type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 export type BulkResponse = estypes.BulkResponse
 
-function getConfigForRecord(
+/**
+ * @returns the configuration of the version `record` was created under.
+ * @throws when its event type or version is not configured.
+ */
+export function getConfigForRecord(
   configs: VersionedEventConfig[],
   record: Pick<EventIndex, 'type' | 'configVersionId'>
 ) {

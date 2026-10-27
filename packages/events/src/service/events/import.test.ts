@@ -22,6 +22,7 @@ import {
   setupTestCase,
   TEST_SYSTEM_ID
 } from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 describe('bulkImport', () => {
   test('prevents forbidden access if missing required scope', async () => {
@@ -105,5 +106,40 @@ describe('bulkImport', () => {
     expect([events[0].id, events[1].id].sort()).toEqual(
       [event1.id, event2.id].sort()
     )
+  })
+  test('rejects the whole import when a record names a version that is not configured', async () => {
+    const { user } = await setupTestCase()
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.import' })
+    ])
+    const actions = [
+      { type: ActionType.CREATE, user },
+      { type: ActionType.DECLARE, user }
+    ]
+    const configured = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions,
+      rng: createPrng(873)
+    })
+    const unconfigured = {
+      ...generateEventDocument({
+        configuration: tennisClubMembershipEvent,
+        actions,
+        rng: createPrng(874)
+      }),
+      configVersionId: 'v9'
+    }
+
+    await expect(
+      client.event.bulkImport([configured, unconfigured])
+    ).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+      message: `Event '${tennisClubMembershipEvent.id}' has no version 'v9'`
+    })
+
+    // Not even the records before it are written.
+    await expect(
+      getClient().selectFrom('events').select('id').execute()
+    ).resolves.toHaveLength(0)
   })
 })
