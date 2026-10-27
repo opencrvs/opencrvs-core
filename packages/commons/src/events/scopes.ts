@@ -49,6 +49,12 @@ export const ACTION_SCOPE_MAP = {
     'record.correct'
   ],
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: ['record.correct'],
+  // The scopes of the actions a draft is saved for, DECLARE and NOTIFY
+  [ClientSpecificAction.CONTINUE_DRAFT]: [
+    'record.declare',
+    'record.register',
+    'record.notify'
+  ],
   [ActionType.REJECT_CORRECTION]: ['record.correct'],
   [ActionType.APPROVE_CORRECTION]: ['record.correct'],
   [ActionType.REVOKE_REGISTRATION]: ['record.revoke-registration'],

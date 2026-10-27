@@ -24,10 +24,9 @@ import {
   getOrThrow,
   isActionEnabled,
   isActionVisible,
-  ValidatorContext,
-  WorkqueueActionType
+  ValidatorContext
 } from '@opencrvs/commons/client'
-import { ActionMenuActionType } from './utils'
+import { ActionMenuActionType, WorkqueueCtaType } from './utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -64,15 +63,16 @@ function resolveInternalActionConditions({
   isDownloaded,
   assignmentStatus,
   isAssigning,
-  isDraftOpen,
   areDuplicatesAvailable
 }: {
   assignmentStatus: AssignmentStatus
-  actionType: WorkqueueActionType | ActionMenuActionType
+  actionType: Exclude<
+    WorkqueueCtaType | ActionMenuActionType,
+    typeof ClientSpecificAction.CONTINUE_DRAFT
+  >
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
-  isDraftOpen: boolean
   areDuplicatesAvailable: boolean
 }): {
   enabled: boolean
@@ -109,10 +109,7 @@ function resolveInternalActionConditions({
         visible: true
       }
     case ActionType.DECLARE:
-      return {
-        enabled: isDownloadedAndAssignedToUser || isDraftOpen,
-        visible: true
-      }
+      return { enabled: isDownloadedAndAssignedToUser, visible: true }
     case ActionType.READ:
       return { enabled: true, visible: true }
     default:
@@ -122,67 +119,39 @@ function resolveInternalActionConditions({
   }
 }
 
-/**
- * Given event and action type, determines if the action should be enabled and visible for the user.
- */
-export function resolveActionConditionals({
-  event,
-  actionType,
-  performedActionType = actionType,
-  isDraftOpen,
-  validatorContext,
-  isActionAllowedForUser,
-  eventConfiguration,
-  isOnline,
-  isDownloaded,
-  isAssigning,
-  areDuplicatesAvailable = true
-}: {
+interface ActionConditionalsContext {
   event: EventIndex
-  actionType: WorkqueueActionType | ActionMenuActionType
-  /**
-   * Action the CTA performs, when it differs from the CTA's own type. Availability, the user's
-   * scopes and the action's configured conditionals are checked against it. E.g. the DECLARE
-   * ("Update") CTA continues an open NOTIFY draft in the notify flow.
-   */
-  performedActionType?: DisplayableAction
-  /** The user has a declare or notify draft open for the event */
-  isDraftOpen: boolean
   validatorContext: ValidatorContext
   isActionAllowedForUser: (action: DisplayableAction) => boolean
   eventConfiguration: EventConfig
-  isOnline: boolean
-  isDownloaded: boolean
-  isAssigning: boolean
-  areDuplicatesAvailable?: boolean
-}): {
-  enabled: boolean
-  visible: boolean
-} {
-  const user = getOrThrow(
-    validatorContext.user,
-    'Cannot determine action conditionals without user information'
-  )
+}
 
-  const availableEventActions = getAvailableActionsForEvent(event)
-  const availableAssignActions = getAvailableAssignmentActions(event, user.sub)
+/**
+ * Checks that the action is available for the event, the user can perform it,
+ * and the action's configured conditionals allow it.
+ */
+function resolveBaseActionConditionals({
+  event,
+  actionType,
+  userId,
+  validatorContext,
+  isActionAllowedForUser,
+  eventConfiguration
+}: ActionConditionalsContext & {
+  actionType: DisplayableAction
+  userId: string
+}) {
   // 1. Gather all available actions for the event, including assignment actions
   const allAvailableActions = [
-    ...availableEventActions,
-    ...availableAssignActions
+    ...getAvailableActionsForEvent(event),
+    ...getAvailableAssignmentActions(event, userId)
   ]
 
-  const assignmentStatus = getAssignmentStatus(event, user.sub)
-
   // 2. Check if the action is available for the event at all.
-  const actionIsAvailableForEvent =
-    allAvailableActions.includes(performedActionType)
+  const actionIsAvailableForEvent = allAvailableActions.includes(actionType)
   // 3. Check if the user can perform it.
-  const actionIsAllowedForUser = isActionAllowedForUser(performedActionType)
-  const actionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: performedActionType
-  })
+  const actionIsAllowedForUser = isActionAllowedForUser(actionType)
+  const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
   // 4. Check if the action is enabled/visible based on the configuration conditionals.
   const isVisible = actionConfig
@@ -192,25 +161,90 @@ export function resolveActionConditionals({
     ? isActionEnabled(actionConfig, event, validatorContext)
     : true
 
-  // 5. Combine all the above to determine if the action should be enabled and visible as the base result.
-  const baseEnabled =
-    actionIsAvailableForEvent && actionIsAllowedForUser && isEnabled
-  const baseVisible =
-    actionIsAvailableForEvent && actionIsAllowedForUser && isVisible
+  return {
+    enabled: actionIsAvailableForEvent && actionIsAllowedForUser && isEnabled,
+    visible: actionIsAvailableForEvent && actionIsAllowedForUser && isVisible
+  }
+}
+
+/**
+ * Given event and action type, determines if the action should be enabled and visible for the user.
+ */
+export function resolveActionConditionals({
+  actionType,
+  isOnline,
+  isDownloaded,
+  isAssigning,
+  areDuplicatesAvailable = true,
+  ...context
+}: ActionConditionalsContext & {
+  actionType: Exclude<
+    WorkqueueCtaType | ActionMenuActionType,
+    typeof ClientSpecificAction.CONTINUE_DRAFT
+  >
+  isOnline: boolean
+  isDownloaded: boolean
+  isAssigning: boolean
+  areDuplicatesAvailable?: boolean
+}): {
+  enabled: boolean
+  visible: boolean
+} {
+  const user = getOrThrow(
+    context.validatorContext.user,
+    'Cannot determine action conditionals without user information'
+  )
+
+  // 1-5. The base result.
+  const base = resolveBaseActionConditionals({
+    ...context,
+    actionType,
+    userId: user.sub
+  })
 
   // 6. Run hardcoded internal business rules.
   const internalConditions = resolveInternalActionConditions({
     actionType,
     isOnline,
-    assignmentStatus,
+    assignmentStatus: getAssignmentStatus(context.event, user.sub),
     isDownloaded,
     isAssigning,
-    isDraftOpen,
     areDuplicatesAvailable
   })
 
   return {
-    enabled: baseEnabled && internalConditions.enabled,
-    visible: baseVisible && internalConditions.visible
+    enabled: base.enabled && internalConditions.enabled,
+    visible: base.visible && internalConditions.visible
   }
+}
+
+/**
+ * Determines if the user can continue their draft of the event. The draft's own action
+ * must still be available to them. A draft opens without assignment or a connection, so
+ * the internal rules of its action don't apply.
+ */
+export function resolveContinueDraftConditionals({
+  draftActionType,
+  ...context
+}: ActionConditionalsContext & {
+  /** Undefined when the user has no draft of the event */
+  draftActionType: DisplayableAction | undefined
+}): {
+  enabled: boolean
+  visible: boolean
+} {
+  if (!draftActionType) {
+    return { enabled: false, visible: false }
+  }
+
+  const user = getOrThrow(
+    context.validatorContext.user,
+    'Cannot determine action conditionals without user information'
+  )
+
+  return resolveBaseActionConditionals({
+    ...context,
+    actionType: draftActionType,
+    userId: user.sub
+  })
 }

@@ -19,6 +19,7 @@ import {
   DisplayableAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components'
+import { buttonMessages } from '@client/i18n/messages'
 
 export const actionLabels = {
   [ActionType.READ]: {
@@ -107,11 +108,12 @@ export const actionLabels = {
     defaultMessage: 'Review correction request',
     description: 'Label for review correction button in dropdown menu',
     id: 'event.action.review-correction.label'
-  }
+  },
+  [ClientSpecificAction.CONTINUE_DRAFT]: buttonMessages.update
 } as const
 
 export const actionIcons: Record<
-  ActionMenuActionType | WorkqueueActionType,
+  ActionMenuActionType | WorkqueueCtaType,
   IconProps['name']
 > = {
   [ActionType.ASSIGN]: 'PushPin',
@@ -129,6 +131,7 @@ export const actionIcons: Record<
   [ActionType.PRINT_CERTIFICATE]: 'Printer',
   [ActionType.REQUEST_CORRECTION]: 'PencilCircle',
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: 'FileSearch',
+  [ClientSpecificAction.CONTINUE_DRAFT]: 'FileDotted',
   [ActionType.READ]: 'Eye'
 }
 
@@ -143,10 +146,19 @@ export interface ActionCtaConfig<T extends DisplayableAction> {
   type: T
 }
 
+/**
+ * Workqueue CTAs: the configurable workqueue actions, and the core drafts workqueue's CTA,
+ * which isn't configurable.
+ */
+export type WorkqueueCtaType =
+  | WorkqueueActionType
+  | typeof ClientSpecificAction.CONTINUE_DRAFT
+
 export const ActionMenuActionType = z
   .enum([
     ...WorkqueueActionType.options,
     ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+    ClientSpecificAction.CONTINUE_DRAFT,
     ActionType.ASSIGN,
     ActionType.UNASSIGN
   ])

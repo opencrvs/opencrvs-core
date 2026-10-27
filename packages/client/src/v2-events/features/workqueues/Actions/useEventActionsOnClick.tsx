@@ -36,6 +36,9 @@ import { useQuickActionModal } from '@client/v2-events/features/events/actions/q
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useAuthentication } from '@client/utils/userUtils'
 
+/** Actions whose drafts are saved to the server, see `DraftInput` */
+export type DraftActionType = typeof ActionType.DECLARE | typeof ActionType.NOTIFY
+
 /**
  * Given an event,
  * @returns onClick handlers for workqueue item actions, and any modals that should be rendered alongside.
@@ -63,13 +66,27 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   const eventId = event.id
 
+  /** Opens the user's draft of the event in the flow of the draft's action */
+  const continueDraft = useCallback(
+    async (draftActionType: DraftActionType, backTo?: string) => {
+      clearEphemeralFormState()
+
+      const route =
+        draftActionType === ActionType.NOTIFY
+          ? ROUTES.V2.EVENTS.NOTIFY.REVIEW
+          : ROUTES.V2.EVENTS.DECLARE.REVIEW
+
+      return navigate(route.buildPath({ eventId }, { backTo }))
+    },
+    [eventId, clearEphemeralFormState, navigate]
+  )
+
   const onClick = useCallback(
     async (
-      actionType:
-        | WorkqueueActionType
-        | ClientSpecificAction
-        // Continuing a notify draft, see useEventActionConfigurationResolver
-        | typeof ActionType.NOTIFY,
+      actionType: Exclude<
+        WorkqueueActionType | ClientSpecificAction,
+        typeof ClientSpecificAction.CONTINUE_DRAFT
+      >,
       backTo?: string
     ) => {
       switch (actionType) {
@@ -79,11 +96,6 @@ export function useEventActionsOnClick(event: EventIndex) {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }, { backTo })
-          )
-        case ActionType.NOTIFY:
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.NOTIFY.REVIEW.buildPath({ eventId }, { backTo })
           )
         case ActionType.EDIT:
           clearEphemeralFormState()
@@ -170,6 +182,7 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   return {
     onClick,
+    continueDraft,
     modals: [deleteModal, rejectionModal, quickActionModal]
   }
 }

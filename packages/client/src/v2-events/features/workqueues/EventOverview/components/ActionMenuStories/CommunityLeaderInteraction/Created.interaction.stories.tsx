@@ -140,8 +140,8 @@ const notifyDraft = generateEventDraftDocument({
 })
 
 /**
- * A community leader with a notify draft open gets Update, which continues the draft
- * in the notify flow. The DECLARE CTA is checked against NOTIFY, which they hold.
+ * A community leader with a notify draft open gets Update (CONTINUE_DRAFT), which
+ * continues the draft in the notify flow. It's checked against NOTIFY, which they hold.
  */
 export const AssignedToSelfWithNotifyDraft: StoryObj<typeof ActionMenu> = {
   ...AssignedToSelf,
@@ -159,5 +159,8 @@ export const AssignedToSelfWithNotifyDraft: StoryObj<typeof ActionMenu> = {
     await waitFor(async () => {
       await expect(updateItem.hasAttribute('disabled')).toBe(false)
     })
+
+    // Declare is not offered alongside it
+    await expect(screen.queryByText('Send an application')).toBeNull()
   }
 }

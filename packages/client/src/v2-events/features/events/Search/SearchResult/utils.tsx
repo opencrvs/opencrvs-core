@@ -23,9 +23,9 @@ import {
   deepDropNulls,
   applyDraftToEventIndex,
   getEventConfigById,
-  Draft,
-  WorkqueueActionType
+  Draft
 } from '@opencrvs/commons/client'
+import { WorkqueueCtaType } from '@client/v2-events/features/workqueues/Actions/utils'
 
 import { formattedDuration } from '../../../../../utils/date-formatting'
 import { DownloadButton } from '../../../../components/DownloadButton'
@@ -351,7 +351,7 @@ function buildAvailableActionComponents({
 }: {
   event: EventIndex
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
-  action?: { type: WorkqueueActionType }
+  action?: { type: WorkqueueCtaType }
   isWideScreen: boolean
 }) {
   const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
@@ -456,7 +456,7 @@ export function processEventsToRows({
   }[]
   eventConfigs: EventConfig[]
   outbox: OutboxEventIndex[]
-  action?: { type: WorkqueueActionType }
+  action?: { type: WorkqueueCtaType }
   isWideScreen: boolean
   isOnline: boolean
   intl: IntlShape
