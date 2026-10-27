@@ -261,7 +261,7 @@ export function useDrafts() {
     setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
     getLocalDraftOrDefault,
     /**
-     * Only the declare view saves a draft to the server. The store it reads
+     * Only the declare and notify views save a draft to the server. The store it reads
      * from is shared with the edit, print and correction views, whose drafts
      * stay local, so the type has to be narrowed before submitting.
      */
@@ -270,9 +270,12 @@ export function useDrafts() {
         throw new Error('No draft to submit')
       }
 
-      if (localDraft.action.type !== ActionType.DECLARE) {
+      if (
+        localDraft.action.type !== ActionType.DECLARE &&
+        localDraft.action.type !== ActionType.NOTIFY
+      ) {
         throw new Error(
-          `Only ${ActionType.DECLARE} drafts can be saved to the server, this one is ${localDraft.action.type}`
+          `Only ${ActionType.DECLARE} and ${ActionType.NOTIFY} drafts can be saved to the server, this one is ${localDraft.action.type}`
         )
       }
 

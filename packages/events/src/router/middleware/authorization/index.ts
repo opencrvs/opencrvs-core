@@ -249,7 +249,15 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
  * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
  *
  */
-export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+/**
+ * @param scopes scopes that grant access, or a function picking them from the raw input when they
+ * depend on it, e.g. on the action type of a draft. Return `undefined` for input that names no scopes.
+ */
+export const canAccessEventWithScopes = (
+  scopes:
+    | RecordScopeTypeV2[]
+    | ((rawInput: unknown) => RecordScopeTypeV2[] | undefined)
+) => {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -259,15 +267,22 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   > = async ({ next, ctx, getRawInput }) => {
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
-    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
+
+    const requiredScopes =
+      typeof scopes === 'function' ? scopes(rawInput) : scopes
+
+    if (!requiredScopes) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, requiredScopes)
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
-
-    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
-    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
-    const rawInput = await getRawInput()
 
     if (!isEventIdParam(rawInput)) {
       throw new TRPCError({ code: 'BAD_REQUEST' })

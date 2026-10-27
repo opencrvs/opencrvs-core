@@ -64,7 +64,7 @@ function resolveInternalActionConditions({
   isDownloaded,
   assignmentStatus,
   isAssigning,
-  isDeclareDraftOpen,
+  isDraftOpen,
   areDuplicatesAvailable
 }: {
   assignmentStatus: AssignmentStatus
@@ -72,7 +72,7 @@ function resolveInternalActionConditions({
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
-  isDeclareDraftOpen: boolean
+  isDraftOpen: boolean
   areDuplicatesAvailable: boolean
 }): {
   enabled: boolean
@@ -110,7 +110,7 @@ function resolveInternalActionConditions({
       }
     case ActionType.DECLARE:
       return {
-        enabled: isDownloadedAndAssignedToUser || isDeclareDraftOpen,
+        enabled: isDownloadedAndAssignedToUser || isDraftOpen,
         visible: true
       }
     case ActionType.READ:
@@ -128,7 +128,8 @@ function resolveInternalActionConditions({
 export function resolveActionConditionals({
   event,
   actionType,
-  isDeclareDraftOpen,
+  performedActionType = actionType,
+  isDraftOpen,
   validatorContext,
   isActionAllowedForUser,
   eventConfiguration,
@@ -139,7 +140,14 @@ export function resolveActionConditionals({
 }: {
   event: EventIndex
   actionType: WorkqueueActionType | ActionMenuActionType
-  isDeclareDraftOpen: boolean
+  /**
+   * Action the CTA performs, when it differs from the CTA's own type. Availability, the user's
+   * scopes and the action's configured conditionals are checked against it. E.g. the DECLARE
+   * ("Update") CTA continues an open NOTIFY draft in the notify flow.
+   */
+  performedActionType?: DisplayableAction
+  /** The user has a declare or notify draft open for the event */
+  isDraftOpen: boolean
   validatorContext: ValidatorContext
   isActionAllowedForUser: (action: DisplayableAction) => boolean
   eventConfiguration: EventConfig
@@ -167,10 +175,14 @@ export function resolveActionConditionals({
   const assignmentStatus = getAssignmentStatus(event, user.sub)
 
   // 2. Check if the action is available for the event at all.
-  const actionIsAvailableForEvent = allAvailableActions.includes(actionType)
+  const actionIsAvailableForEvent =
+    allAvailableActions.includes(performedActionType)
   // 3. Check if the user can perform it.
-  const actionIsAllowedForUser = isActionAllowedForUser(actionType)
-  const actionConfig = getActionConfig({ eventConfiguration, actionType })
+  const actionIsAllowedForUser = isActionAllowedForUser(performedActionType)
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: performedActionType
+  })
 
   // 4. Check if the action is enabled/visible based on the configuration conditionals.
   const isVisible = actionConfig
@@ -193,7 +205,7 @@ export function resolveActionConditionals({
     assignmentStatus,
     isDownloaded,
     isAssigning,
-    isDeclareDraftOpen,
+    isDraftOpen,
     areDuplicatesAvailable
   })
 

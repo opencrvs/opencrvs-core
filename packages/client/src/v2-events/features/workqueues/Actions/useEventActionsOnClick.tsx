@@ -65,7 +65,11 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   const onClick = useCallback(
     async (
-      actionType: WorkqueueActionType | ClientSpecificAction,
+      actionType:
+        | WorkqueueActionType
+        | ClientSpecificAction
+        // Continuing a notify draft, see useEventActionConfigurationResolver
+        | typeof ActionType.NOTIFY,
       backTo?: string
     ) => {
       switch (actionType) {
@@ -75,6 +79,11 @@ export function useEventActionsOnClick(event: EventIndex) {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }, { backTo })
+          )
+        case ActionType.NOTIFY:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.NOTIFY.REVIEW.buildPath({ eventId }, { backTo })
           )
         case ActionType.EDIT:
           clearEphemeralFormState()

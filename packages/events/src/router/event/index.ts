@@ -51,7 +51,12 @@ import {
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
-import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
+import {
+  createDraft,
+  getDraftScopes,
+  getDraftsByUserId,
+  throwConflictIfDraftNotAllowed
+} from '@events/service/events/drafts'
 import {
   processAction,
   createEvent,
@@ -286,6 +291,8 @@ export const eventRouter = router({
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: userOnlyProcedure
       .input(DraftInput)
+      // A draft is saved by a user who can perform its action
+      .use(middleware.canAccessEventWithScopes(getDraftScopes))
       .use(middleware.requireAssignment)
       .output(Draft)
       .mutation(async ({ input, ctx }) => {
@@ -301,6 +308,8 @@ export const eventRouter = router({
           undefined,
           ctx.event
         )
+
+        throwConflictIfDraftNotAllowed(ctx.event)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,

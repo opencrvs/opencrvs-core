@@ -16,6 +16,7 @@ import superjson from 'superjson'
 import {
   ActionType,
   generateEventDocument,
+  generateEventDraftDocument,
   getCurrentEventState,
   tennisClubMembershipEvent,
   TestUserRole
@@ -72,9 +73,8 @@ export default {
  * Regression: Community leaders have record.notify (not record.declare).
  * Before the fix, Delete was hidden for CREATED drafts owned by the community leader.
  *
- * Users who can notify have their own notify flow, so Declare (Update) is not offered.
- * Continuing a notification from the action menu comes with NOTIFY drafts:
- * https://github.com/opencrvs/opencrvs-core/issues/14036
+ * Users who can notify have their own notify flow, so Declare is not offered.
+ * With a notify draft open, Update continues it, see AssignedToSelfWithNotifyDraft.
  *
  * NOTE: This story requires the communityLeader token in test-data-generators.ts
  * to be regenerated after the scopes were corrected from record.declare to
@@ -131,5 +131,33 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
     // Declare (Update) is not offered: the community leader only holds record.notify.
     // tennisClubMembershipEvent configures DECLARE's label as "Send an application".
     await expect(screen.queryByText('Send an application')).toBeNull()
+  }
+}
+
+const notifyDraft = generateEventDraftDocument({
+  eventId: createdEventDocument.id,
+  actionType: ActionType.NOTIFY
+})
+
+/**
+ * A community leader with a notify draft open gets Update, which continues the draft
+ * in the notify flow. The DECLARE CTA is checked against NOTIFY, which they hold.
+ */
+export const AssignedToSelfWithNotifyDraft: StoryObj<typeof ActionMenu> = {
+  ...AssignedToSelf,
+  parameters: {
+    ...AssignedToSelf.parameters,
+    offline: {
+      drafts: [notifyDraft]
+    }
+  },
+  play: async () => {
+    const actionButton = await screen.findByRole('button', { name: 'Action' })
+    await userEvent.click(actionButton)
+
+    const updateItem = await screen.findByText('Update')
+    await waitFor(async () => {
+      await expect(updateItem.hasAttribute('disabled')).toBe(false)
+    })
   }
 }

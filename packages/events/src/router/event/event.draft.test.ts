@@ -15,6 +15,7 @@ import {
   ActionType,
   DraftInput,
   DocumentPath,
+  decodeScope,
   generateUuid
 } from '@opencrvs/commons'
 import { mswServer } from '@events/tests/msw'
@@ -22,14 +23,26 @@ import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
+  TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 import { env } from '@events/environment'
 import { updateUser } from '@events/service/users/api'
 
+function withoutScopes(...types: string[]) {
+  return TEST_USER_DEFAULT_SCOPES.filter(
+    (scope) => !types.includes(decodeScope(scope)?.type ?? '')
+  )
+}
+
+/** A user holds either record.notify or record.declare for an event type, never both. */
+const DECLARER_SCOPES = withoutScopes('record.notify', 'record.register')
+const NOTIFIER_SCOPES = withoutScopes('record.declare', 'record.register')
+const REGISTRAR_SCOPES = withoutScopes('record.notify', 'record.declare')
+
 test('Throws error when creating a draft against non-existent id', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const uuid = 'd09ca1db-98b6-4edc-891f-eebb33fea7a6'
 
@@ -46,8 +59,8 @@ test('Throws error when creating a draft against non-existent id', async () => {
 test('Throws error when creating a draft for event without assignment', async () => {
   const { users, generator } = await setupTestCase()
   const [defaultUser, anotherUser] = users
-  const defaultClient = createTestClient(defaultUser)
-  const anotherClient = createTestClient(anotherUser)
+  const defaultClient = createTestClient(defaultUser, DECLARER_SCOPES)
+  const anotherClient = createTestClient(anotherUser, DECLARER_SCOPES)
 
   const eventCreatedByOther = await anotherClient.event.create(
     generator.event.create()
@@ -64,14 +77,12 @@ test('Throws error when creating a draft for event without assignment', async ()
 })
 
 /*
- * Only the declare view saves drafts, and a declare draft is possible exactly
- * where the record can still be deleted or is on its way to an action that
- * sweeps it. NOTIFY is available on a created event, so refusing it here is the
- * action rule alone, not the availability check behind it.
+ * Only the declare and notify views save drafts, and those drafts are possible exactly
+ * where the record can still be deleted or is on its way to an action that sweeps it.
  */
-test('Refuses a draft for any action other than declare', async () => {
+test('Refuses a draft for any action other than declare or notify', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 
@@ -79,16 +90,16 @@ test('Refuses a draft for any action other than declare', async () => {
     client.event.draft.create({
       eventId: event.id,
       // @ts-expect-error - the input type refuses this, the test proves the server does too
-      type: ActionType.NOTIFY,
+      type: ActionType.REGISTER,
       status: 'Accepted',
       transactionId: 'trnx-id'
     })
-  ).rejects.toThrow('Invalid input')
+  ).rejects.toThrow('invalid_value')
 })
 
 test('Allows creating draft for event without actions', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 
@@ -104,9 +115,183 @@ test('Allows creating draft for event without actions', async () => {
   ).toMatchSnapshot()
 })
 
+describe('Scopes', () => {
+  test.each([
+    ['record.declare', DECLARER_SCOPES],
+    ['record.register', REGISTRAR_SCOPES]
+  ])('Allows a declare draft for a user with %s', async (_, scopes) => {
+    const { user, generator } = await setupTestCase()
+    const event = await createTestClient(user, DECLARER_SCOPES).event.create(
+      generator.event.create()
+    )
+
+    const draft = await createTestClient(user, scopes).event.draft.create({
+      eventId: event.id,
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    })
+
+    expect(draft.action.type).toBe(ActionType.DECLARE)
+  })
+
+  test.each([
+    ['record.notify', NOTIFIER_SCOPES],
+    [
+      'neither',
+      withoutScopes('record.notify', 'record.declare', 'record.register')
+    ]
+  ])('Refuses a declare draft for a user with %s', async (_, scopes) => {
+    const { user, generator } = await setupTestCase()
+    const event = await createTestClient(user, DECLARER_SCOPES).event.create(
+      generator.event.create()
+    )
+
+    await expect(
+      createTestClient(user, scopes).event.draft.create({
+        eventId: event.id,
+        type: ActionType.DECLARE,
+        status: ActionStatus.Accepted,
+        transactionId: generateUuid()
+      })
+    ).rejects.toThrow('FORBIDDEN')
+  })
+})
+
+describe('Notify drafts', () => {
+  test('Allows a notify draft for a user with record.notify', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, NOTIFIER_SCOPES)
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.draft.create({
+      eventId: event.id,
+      type: ActionType.NOTIFY,
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    })
+
+    const drafts = await client.event.draft.list()
+    expect(drafts).toHaveLength(1)
+    expect(drafts[0].action.type).toBe(ActionType.NOTIFY)
+  })
+
+  test('Refuses a notify draft for a user without record.notify', async () => {
+    const { user, generator } = await setupTestCase()
+    const event = await createTestClient(user, NOTIFIER_SCOPES).event.create(
+      generator.event.create()
+    )
+
+    await expect(
+      createTestClient(user, DECLARER_SCOPES).event.draft.create({
+        eventId: event.id,
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Accepted,
+        transactionId: generateUuid()
+      })
+    ).rejects.toThrow('FORBIDDEN')
+  })
+
+  test('Refuses a notify draft once the event has been notified', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, NOTIFIER_SCOPES)
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.draft.create({
+        eventId: event.id,
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Accepted,
+        transactionId: generateUuid()
+      })
+    ).rejects.toThrow(
+      "Action 'NOTIFY' cannot be performed on an event in 'NOTIFIED' state"
+    )
+  })
+
+  test('Refuses a notify draft on a rejected record', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, NOTIFIER_SCOPES)
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id, { keepAssignment: true })
+    )
+    await client.event.actions.reject.request(
+      generator.event.actions.reject(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.draft.create({
+        eventId: event.id,
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Accepted,
+        transactionId: generateUuid()
+      })
+    ).rejects.toThrow(
+      'Drafts can only be saved on a record that has not been notified or declared yet. The record is NOTIFIED.'
+    )
+  })
+
+  test('Notifying the event deletes the notify draft', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, NOTIFIER_SCOPES)
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.draft.create({
+      eventId: event.id,
+      type: ActionType.NOTIFY,
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    })
+
+    await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
+
+    expect(await client.event.draft.list()).toHaveLength(0)
+  })
+
+  /*
+   * A user has one draft per event. A user holds either record.notify or record.declare,
+   * so this happens when their role changes between saving the two drafts.
+   */
+  test('A draft of another action replaces the previous draft', async () => {
+    const { user, generator } = await setupTestCase()
+    const notifierClient = createTestClient(user, NOTIFIER_SCOPES)
+    const declarerClient = createTestClient(user, DECLARER_SCOPES)
+    const event = await notifierClient.event.create(generator.event.create())
+
+    await notifierClient.event.draft.create({
+      eventId: event.id,
+      type: ActionType.NOTIFY,
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    })
+
+    const transactionId = generateUuid()
+    const declareDraft = await declarerClient.event.draft.create({
+      eventId: event.id,
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted,
+      transactionId
+    })
+
+    const drafts = await declarerClient.event.draft.list()
+    expect(drafts).toHaveLength(1)
+    expect(drafts[0].action.type).toBe(ActionType.DECLARE)
+    expect(drafts[0].transactionId).toBe(transactionId)
+    expect(declareDraft.transactionId).toBe(transactionId)
+  })
+})
+
 test('Creating another draft replaces the previous one', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 
@@ -142,7 +327,7 @@ test('Creating another draft replaces the previous one', async () => {
 
 test('Refuses a declare draft once the event has been declared', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 
@@ -162,14 +347,9 @@ test('Refuses a declare draft once the event has been declared', async () => {
   )
 })
 
-/*
- * An edit that did not reach its declare or register leaves the record here.
- * Save and exit in the declare view has to keep working, or the user cannot
- * get out of that state without losing what they typed.
- */
-test('Allows a draft on a declared event that is part way through an edit', async () => {
+test('Refuses a draft on a declared event that is part way through an edit', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 
@@ -181,19 +361,21 @@ test('Allows a draft on a declared event that is part way through an edit', asyn
     keepAssignmentIfAccepted: true
   })
 
-  const draft = await client.event.draft.create({
-    eventId: event.id,
-    type: ActionType.DECLARE,
-    status: 'Accepted',
-    transactionId: 'trnx-id'
-  })
-
-  expect(draft.eventId).toBe(event.id)
+  await expect(
+    client.event.draft.create({
+      eventId: event.id,
+      type: ActionType.DECLARE,
+      status: 'Accepted',
+      transactionId: 'trnx-id'
+    })
+  ).rejects.toThrow(
+    'Drafts can only be saved on a record that has not been notified or declared yet. The record is DECLARED.'
+  )
 })
 
 test('Creating a draft is idempotent', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 
@@ -241,7 +423,7 @@ describe('Delete document references in drafts as side-effect', () => {
 
   test('Delete previous draft attachments', async () => {
     const { user, generator, rng } = await setupTestCase(987)
-    const client = createTestClient(user)
+    const client = createTestClient(user, DECLARER_SCOPES)
     const event = await client.event.create(generator.event.create())
 
     const getDraft = (n: number): DraftInput => {
@@ -280,7 +462,7 @@ describe('Delete document references in drafts as side-effect', () => {
 
 test('clears all drafts when user primary office changes', async () => {
   const { user, generator, locations } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
   await client.event.draft.create({
@@ -302,7 +484,7 @@ test('clears all drafts when user primary office changes', async () => {
 
 test('deletes the events orphaned by a primary office change', async () => {
   const { user, generator, locations } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
   await client.event.draft.create({
@@ -316,9 +498,7 @@ test('deletes the events orphaned by a primary office change', async () => {
 
   mswServer.use(
     http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, ({ request }) => {
-      sweptPrefixes.push(
-        new URL(request.url).pathname.replace('/prefix/', '')
-      )
+      sweptPrefixes.push(new URL(request.url).pathname.replace('/prefix/', ''))
       return HttpResponse.json({ deleted: 0 })
     })
   )
@@ -340,7 +520,7 @@ test('deletes the events orphaned by a primary office change', async () => {
 
 test('the sweep looks for files under the record prefix', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, DECLARER_SCOPES)
 
   const event = await client.event.create(generator.event.create())
 

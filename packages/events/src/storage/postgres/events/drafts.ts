@@ -52,7 +52,10 @@ export async function createDraft(draft: NewEventActionDrafts) {
     .insertInto('eventActionDrafts')
     .values(draft)
     .onConflict((oc) =>
+      // A user has one draft per event: saving a draft of another action replaces it
       oc.columns(['eventId', 'createdBy']).doUpdateSet({
+        actionType: sql`EXCLUDED.action_type`,
+        transactionId: sql`EXCLUDED.transaction_id`,
         declaration: sql`EXCLUDED.declaration`,
         annotation: sql`EXCLUDED.annotation`,
         createdAt: sql`NOW()`

@@ -72,15 +72,25 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
     <T extends WorkqueueActionType | ClientSpecificAction>(
       actionType: T
     ): ActionCtaConfig<T> => {
-      const isDeclareDraftOpen = drafts.some(
+      const openDraft = drafts.find(
         (draft) =>
-          draft.action.type === ActionType.DECLARE && draft.eventId === event.id
+          draft.eventId === event.id &&
+          (draft.action.type === ActionType.DECLARE ||
+            draft.action.type === ActionType.NOTIFY)
       )
+
+      // The DECLARE ("Update") CTA continues an open notify draft in the notify flow
+      const performedActionType =
+        actionType === ActionType.DECLARE &&
+        openDraft?.action.type === ActionType.NOTIFY
+          ? ActionType.NOTIFY
+          : actionType
 
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        isDeclareDraftOpen,
+        performedActionType,
+        isDraftOpen: !!openDraft,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,
@@ -91,18 +101,19 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
-      const replaceLabelForDeclareDraft =
-        isDeclareDraftOpen && actionType === ActionType.DECLARE
+      const replaceLabelForDraft =
+        !!openDraft && actionType === ActionType.DECLARE
 
       return {
-        label: replaceLabelForDeclareDraft
+        label: replaceLabelForDraft
           ? buttonMessages.update
           : (actionConfig?.label ?? actionLabels[actionType]),
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
           ? actionConfig.icon
           : actionIcons[actionType],
-        onClick: async (backTo?: string) => onClick(actionType, backTo),
+        onClick: async (backTo?: string) =>
+          onClick(performedActionType, backTo),
         disabled: !enabled,
         hidden: !visible
       }
@@ -156,7 +167,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        isDeclareDraftOpen: false,
+        isDraftOpen: false,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,
