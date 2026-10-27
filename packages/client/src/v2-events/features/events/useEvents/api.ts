@@ -233,7 +233,7 @@ export function setEventData(id: string, data: EventDocument) {
   updateDraftsWithEvent(id, data)
 }
 
-export async function refetchSearchQuery(eventId: string) {
+export async function refetchSearchQueryById(eventId: string) {
   await queryClient.refetchQueries({
     queryKey: byIdSearchKey(eventId)
   })
@@ -258,7 +258,7 @@ async function invalidateWorkqueueSearchQueries() {
 /** Standard refresh path for a workqueue-affecting write. */
 async function refreshAffectedSearchQueries(...eventIds: string[]) {
   await Promise.all([
-    ...eventIds.map(refetchSearchQuery),
+    ...eventIds.map(refetchSearchQueryById),
     invalidateWorkqueueSearchQueries()
   ])
 }

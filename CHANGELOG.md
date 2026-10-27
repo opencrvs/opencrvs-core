@@ -143,6 +143,7 @@ A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matchi
 
 ### Improvements
 
+- Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
 
 ### Bug fixes

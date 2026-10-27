@@ -34,6 +34,7 @@ export async function refetchGroup({ name }: RefetchGroup) {
     [...queryKeys].map(async (queryKey) =>
       queryClient.refetchQueries(
         { queryKey, type: 'active' },
+        // Join a fetch already in flight (e.g. a write's refetch), don't cancel it.
         { cancelRefetch: false }
       )
     )

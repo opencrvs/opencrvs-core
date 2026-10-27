@@ -15,7 +15,7 @@ import {
   clearPendingDraftCreationRequests,
   deleteDraft,
   refetchDraftsList,
-  refetchSearchQuery,
+  refetchSearchQueryById,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import { trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -56,7 +56,7 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
    * Also check utils.event.create.onSuccess for the same logic but for when even is created.
    */
   mutationFn: async (variables) => {
-    await refetchSearchQuery(variables.eventId)
+    await refetchSearchQueryById(variables.eventId)
 
     const originalMutationFn =
       trpcOptionsProxy.event.delete.mutationOptions().mutationFn
