@@ -47,46 +47,70 @@ function validateCIDRs(input: string): true | string {
   return true
 }
 
-export const dockerhubQuestions = [
+// A host with an optional port, without protocol or path (e.g. docker.io, ghcr.io, registry.example.org:5000)
+function validateRegistryHost(input: string): true | string {
+  return /^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?$/i.test(input)
+    ? true
+    : 'Please enter a registry host without protocol or path (e.g. docker.io, ghcr.io)'
+}
+
+// The DOCKER_* and DOCKERHUB_* secrets are the previous names of the REGISTRY_* secrets
+export const registryQuestions = [
   {
-    name: 'dockerhubOrganisation',
-    type: 'text' as const,
-    message: 'What is the name of your Docker Hub organisation?',
-    valueType: 'SECRET' as const,
-    valueLabel: 'DOCKERHUB_ACCOUNT',
-    validate: notEmpty,
-    initial: process.env.DOCKER_ORGANISATION,
-    scope: 'REPOSITORY' as const
-  },
-  {
-    name: 'dockerhubRepository',
-    type: 'text' as const,
-    message: 'What is the name of your private Docker Hub repository?',
-    valueType: 'SECRET' as const,
-    valueLabel: 'DOCKERHUB_REPO',
-    validate: notEmpty,
-    initial: process.env.DOCKER_REPO,
-    scope: 'REPOSITORY' as const
-  },
-  {
-    name: 'dockerhubUsername',
+    name: 'registryHost',
     type: 'text' as const,
     message:
-      'What is the Docker Hub username the the target server should be using?',
-    valueType: 'SECRET' as const,
-    valueLabel: 'DOCKER_USERNAME',
-    validate: notEmpty,
-    initial: process.env.DOCKER_USERNAME,
+      'What is the host of your container registry? (e.g. docker.io, ghcr.io)',
+    valueType: 'VARIABLE' as const,
+    valueLabel: 'REGISTRY_HOST',
+    validate: validateRegistryHost,
+    initial: process.env.REGISTRY_HOST || 'docker.io',
     scope: 'REPOSITORY' as const
   },
   {
-    name: 'dockerhubToken',
+    name: 'registryOrganisation',
     type: 'text' as const,
-    message: 'What is the token of this Docker Hub account?',
+    message:
+      'What is the name of your organisation (or user) in the container registry?',
     valueType: 'SECRET' as const,
-    valueLabel: 'DOCKER_TOKEN',
+    valueLabel: 'REGISTRY_ORGANISATION',
+    legacyValueLabel: 'DOCKERHUB_ACCOUNT',
     validate: notEmpty,
-    initial: process.env.DOCKER_TOKEN,
+    initial: process.env.REGISTRY_ORGANISATION,
+    scope: 'REPOSITORY' as const
+  },
+  {
+    name: 'registryRepository',
+    type: 'text' as const,
+    message: 'What is the name of your private container repository?',
+    valueType: 'SECRET' as const,
+    valueLabel: 'REGISTRY_REPOSITORY',
+    legacyValueLabel: 'DOCKERHUB_REPO',
+    validate: notEmpty,
+    initial: process.env.REGISTRY_REPOSITORY,
+    scope: 'REPOSITORY' as const
+  },
+  {
+    name: 'registryUsername',
+    type: 'text' as const,
+    message:
+      'What is the container registry username the target server should be using?',
+    valueType: 'SECRET' as const,
+    valueLabel: 'REGISTRY_USERNAME',
+    legacyValueLabel: 'DOCKER_USERNAME',
+    validate: notEmpty,
+    initial: process.env.REGISTRY_USERNAME,
+    scope: 'REPOSITORY' as const
+  },
+  {
+    name: 'registryToken',
+    type: 'text' as const,
+    message: 'What is the token of this container registry account?',
+    valueType: 'SECRET' as const,
+    valueLabel: 'REGISTRY_TOKEN',
+    legacyValueLabel: 'DOCKER_TOKEN',
+    validate: notEmpty,
+    initial: process.env.REGISTRY_TOKEN,
     scope: 'REPOSITORY' as const
   }
 ]
