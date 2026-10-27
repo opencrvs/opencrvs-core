@@ -6,6 +6,10 @@
 
 - Internal auth service endpoints that issue tokens without credentials could be reached from the internet through the gateway and on the auth subdomain (`auth.<domain>`). The gateway now forwards only the public auth endpoints, and the Helm charts block `/internal/` paths on every host. [GHSA-3fpv-fj7v-pmj6](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-3fpv-fj7v-pmj6)
 
+### Bug fixes
+
+- Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
+
 ## 1.9.20
 
 ### Bug fixes
