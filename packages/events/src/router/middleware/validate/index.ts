@@ -319,6 +319,131 @@ function validateCustomAction({
   return getFieldErrors(customActionFields, annotation, context)
 }
 
+function getNotifyAnnotationErrors({
+  annotation,
+  reviewFields,
+  annotationContext
+}: {
+  annotation: ActionUpdate
+  reviewFields: FieldConfig[]
+  annotationContext: ValidatorContext
+}) {
+  return Object.entries(annotation).flatMap(([key, value]) => {
+    const field = reviewFields.find((f) => f.id === key)
+
+    if (!field) {
+      return {
+        message: errorMessages.unexpectedField.defaultMessage,
+        id: key,
+        value
+      }
+    }
+
+    const fieldErrors = runStructuralValidations({
+      field,
+      values: annotation,
+      context: annotationContext
+    })
+
+    return fieldErrors.map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value: annotation[field.id]
+    }))
+  })
+}
+
+function getNotifyDeclarationErrors({
+  declaration,
+  formFields,
+  context,
+  actionType
+}: {
+  declaration: ActionUpdate
+  formFields: FieldConfig[]
+  context: ValidatorContext
+  actionType: typeof ActionType.NOTIFY | typeof ActionType.EDIT
+}) {
+  return Object.entries(declaration).flatMap(([key, value]) => {
+    const field = formFields.find((f) => f.id === key)
+
+    if (!field) {
+      return {
+        message:
+          actionType === ActionType.NOTIFY
+            ? errorMessages.notInNotifyForm.defaultMessage
+            : errorMessages.unexpectedField.defaultMessage,
+        id: key,
+        value
+      }
+    }
+
+    const fieldErrors = runStructuralValidations({
+      field: { ...field, required: false },
+      values: declaration,
+      context,
+      actionType: ActionType.NOTIFY
+    })
+
+    return fieldErrors.map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value: declaration[field.id]
+    }))
+  })
+}
+
+function getNotificationFormErrors({
+  notificationForm,
+  completeDeclaration,
+  declaration,
+  annotation,
+  annotationErrors,
+  notifyAnnotationFields,
+  context
+}: {
+  notificationForm: DeclarationFormConfig
+  completeDeclaration: EventState
+  declaration: ActionUpdate
+  annotation: ActionUpdate
+  annotationErrors: ReturnType<typeof getNotifyAnnotationErrors>
+  notifyAnnotationFields: FieldConfig[]
+  context: ValidatorContext
+}) {
+  const { cleanedDeclaration, invalidKeys, fieldErrors } =
+    getDeclarationFormErrors({
+      form: notificationForm,
+      completeDeclaration,
+      declarationUpdate: declaration,
+      context
+    })
+
+  if (invalidKeys.length > 0) {
+    return [...annotationErrors, ...invalidKeys]
+  }
+
+  const reviewContext = { ...context, baseFormState: cleanedDeclaration }
+
+  // Annotation keys that are not NOTIFY review or dialog fields
+  const unexpectedAnnotationErrors = annotationErrors.filter(
+    ({ id }) => !notifyAnnotationFields.some((field) => field.id === id)
+  )
+
+  // Required, type and custom validation errors of the NOTIFY review and dialog fields.
+  // Unlike DECLARE, dialog fields are not relaxed: the NOTIFY dialog is always shown before submitting.
+  const reviewErrors = getFieldErrors(
+    notifyAnnotationFields,
+    omitHiddenFields(
+      notifyAnnotationFields,
+      deepDropNulls(annotation),
+      reviewContext
+    ),
+    reviewContext
+  )
+
+  return [...unexpectedAnnotationErrors, ...fieldErrors, ...reviewErrors]
+}
+
 export function validateNotifyAction({
   eventConfig,
   annotation = {},
@@ -367,61 +492,18 @@ export function validateNotifyAction({
   // Review field conditionals commonly depend on declaration values
   const annotationContext = { ...context, baseFormState: completeDeclaration }
 
-  const annotationErrors = Object.entries(annotation).flatMap(
-    ([key, value]) => {
-      const field = reviewFields.find((f) => f.id === key)
+  const annotationErrors = getNotifyAnnotationErrors({
+    annotation,
+    reviewFields,
+    annotationContext
+  })
 
-      if (!field) {
-        return {
-          message: errorMessages.unexpectedField.defaultMessage,
-          id: key,
-          value
-        }
-      }
-
-      const fieldErrors = runStructuralValidations({
-        field,
-        values: annotation,
-        context: annotationContext
-      })
-
-      return fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: annotation[field.id]
-      }))
-    }
-  )
-
-  const declarationErrors = Object.entries(declaration).flatMap(
-    ([key, value]) => {
-      const field = formFields.find((f) => f.id === key)
-
-      if (!field) {
-        return {
-          message:
-            actionType === ActionType.NOTIFY
-              ? errorMessages.notInNotifyForm.defaultMessage
-              : errorMessages.unexpectedField.defaultMessage,
-          id: key,
-          value
-        }
-      }
-
-      const fieldErrors = runStructuralValidations({
-        field: { ...field, required: false },
-        values: declaration,
-        context,
-        actionType: ActionType.NOTIFY
-      })
-
-      return fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: declaration[field.id]
-      }))
-    }
-  )
+  const declarationErrors = getNotifyDeclarationErrors({
+    declaration,
+    formFields,
+    context,
+    actionType
+  })
 
   const notificationForm =
     actionType === ActionType.NOTIFY && notifyConfig.type === ActionType.NOTIFY
@@ -432,38 +514,15 @@ export function validateNotifyAction({
     return [...annotationErrors, ...declarationErrors]
   }
 
-  const { cleanedDeclaration, invalidKeys, fieldErrors } =
-    getDeclarationFormErrors({
-      form: notificationForm,
-      completeDeclaration,
-      declarationUpdate: declaration,
-      context
-    })
-
-  if (invalidKeys.length > 0) {
-    return [...annotationErrors, ...invalidKeys]
-  }
-
-  const reviewContext = { ...context, baseFormState: cleanedDeclaration }
-
-  // Annotation keys that are not NOTIFY review or dialog fields
-  const unexpectedAnnotationErrors = annotationErrors.filter(
-    ({ id }) => !notifyAnnotationFields.some((field) => field.id === id)
-  )
-
-  // Required, type and custom validation errors of the NOTIFY review and dialog fields.
-  // Unlike DECLARE, dialog fields are not relaxed: the NOTIFY dialog is always shown before submitting.
-  const reviewErrors = getFieldErrors(
+  return getNotificationFormErrors({
+    notificationForm,
+    completeDeclaration,
+    declaration,
+    annotation,
+    annotationErrors,
     notifyAnnotationFields,
-    omitHiddenFields(
-      notifyAnnotationFields,
-      deepDropNulls(annotation),
-      reviewContext
-    ),
-    reviewContext
-  )
-
-  return [...unexpectedAnnotationErrors, ...fieldErrors, ...reviewErrors]
+    context
+  })
 }
 
 /*

@@ -28,7 +28,8 @@ import {
   errorMessages,
   getDeclaration,
   FieldConfig,
-  FieldType
+  FieldType,
+  withNotificationForm
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -45,27 +46,18 @@ import { EventNotFoundError } from '@events/service/events/events'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
-function useNotificationForm(
+function mockNotificationForm(
   notificationForm: ReturnType<typeof getDeclaration>,
   reviewFields?: FieldConfig[]
 ) {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
       HttpResponse.json([
-        {
-          ...tennisClubMembershipEvent,
-          actions: tennisClubMembershipEvent.actions.map((action) =>
-            action.type === ActionType.NOTIFY
-              ? {
-                  ...action,
-                  notificationForm,
-                  ...(reviewFields && {
-                    review: { ...action.review, fields: reviewFields }
-                  })
-                }
-              : action
-          )
-        }
+        withNotificationForm(
+          tennisClubMembershipEvent,
+          notificationForm,
+          reviewFields
+        )
       ])
     )
   )
@@ -258,7 +250,7 @@ describe('event.actions.notify', () => {
       }))
     }
 
-    useNotificationForm(notificationForm)
+    mockNotificationForm(notificationForm)
 
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
@@ -300,7 +292,7 @@ describe('event.actions.notify', () => {
     }
 
     async function notify(declaration: ActionUpdate) {
-      useNotificationForm(notificationForm)
+      mockNotificationForm(notificationForm)
 
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
@@ -353,7 +345,7 @@ describe('event.actions.notify', () => {
     })
 
     test('rejects NOTIFY when a required review field is missing from annotation', async () => {
-      useNotificationForm(notificationForm, [
+      mockNotificationForm(notificationForm, [
         {
           id: 'notifier.comment',
           type: FieldType.TEXT,
