@@ -37,7 +37,9 @@ import { useRejectionModal } from '@client/v2-events/features/events/actions/rej
 import { useAuthentication } from '@client/utils/userUtils'
 
 /** Actions whose drafts are saved to the server, see `DraftInput` */
-export type DraftActionType = typeof ActionType.DECLARE | typeof ActionType.NOTIFY
+export type DraftActionType =
+  | typeof ActionType.DECLARE
+  | typeof ActionType.NOTIFY
 
 /**
  * Given an event,
@@ -68,7 +70,7 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   /** Opens the user's draft of the event in the flow of the draft's action */
   const continueDraft = useCallback(
-    async (draftActionType: DraftActionType, backTo?: string) => {
+    (draftActionType: DraftActionType, backTo?: string) => {
       clearEphemeralFormState()
 
       const route =
