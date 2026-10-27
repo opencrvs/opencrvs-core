@@ -26,7 +26,6 @@ import {
   getCurrentEventState,
   getDeclarationFieldsOfAllVersions,
   WorkqueueCountInput,
-  getEventConfigById,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
@@ -428,6 +427,19 @@ type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 export type BulkResponse = estypes.BulkResponse
 
+function getConfigForRecord(
+  configs: VersionedEventConfig[],
+  record: Pick<EventIndex, 'type' | 'configVersionId'>
+) {
+  return getEventConfigForRecord(
+    getOrThrow(
+      configs.find(({ id }) => id === record.type),
+      `No configuration found for event type: ${record.type}`
+    ),
+    record
+  )
+}
+
 export async function indexEventsInBulk(
   batch: EventDocument[],
   configs: VersionedEventConfig[],
@@ -439,13 +451,7 @@ export async function indexEventsInBulk(
 
   const indexableEvents = batch.map((doc) => {
     // Each record is indexed with the version it was created under.
-    const config = getEventConfigForRecord(
-      getOrThrow(
-        configs.find(({ id }) => id === doc.type),
-        `No configuration found for event type: ${doc.type}`
-      ),
-      doc
-    )
+    const config = getConfigForRecord(configs, doc)
     return { doc, config, eventIndex: eventToEventIndex(doc, config) }
   })
 
@@ -523,12 +529,14 @@ export async function indexEvent(
 export async function findRecordsByQuery({
   search,
   eventConfigs,
+  versionedEventConfigs,
   user,
   acceptedScopes,
   token
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
+  versionedEventConfigs: VersionedEventConfig[]
   user: TrpcUserContext
   acceptedScopes: RecordScopeV2[]
   token: TokenWithBearer
@@ -575,7 +583,8 @@ export async function findRecordsByQuery({
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
     .map((eventIndex: EncodedEventIndex) => {
-      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      // Each hit is decoded and secured with the version its record was created under.
+      const eventConfig = getConfigForRecord(versionedEventConfigs, eventIndex)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
       const eventIndexWithoutLocationHierarchy =
         getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)

@@ -552,11 +552,15 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+      const [eventConfigs, versionedEventConfigs] = await Promise.all([
+        getInMemoryEventConfigurations(ctx.token),
+        getInMemoryVersionedEventConfigurations(ctx.token)
+      ])
 
       const result = await findRecordsByQuery({
         search: input,
         eventConfigs,
+        versionedEventConfigs,
         user: ctx.user,
         acceptedScopes: ctx.acceptedScopes,
         token: ctx.token
