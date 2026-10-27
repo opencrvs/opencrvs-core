@@ -30,7 +30,8 @@ const groupFolders = Object.entries(ENTRY_POINTS)
 
 const problems = []
 
-if (JSON.stringify(pkg.exports) !== JSON.stringify(ENTRY_POINTS)) {
+const canonicalJson = (obj) => JSON.stringify(Object.entries(obj ?? {}).sort())
+if (canonicalJson(pkg.exports) !== canonicalJson(ENTRY_POINTS)) {
   problems.push(
     `package.json "exports" must be exactly ${JSON.stringify(ENTRY_POINTS)}. ` +
       'Export new modules from src/index.ts instead of adding a subpath.'
@@ -57,7 +58,8 @@ for (const entry of readdirSync(join(root, 'src'), { withFileTypes: true })) {
   )
   if (!reExported && !groupFolders.includes(name)) {
     problems.push(
-      `src/${name} is not re-exported from src/index.ts, so no consumer can reach it.`
+      `src/${name} is not re-exported from src/index.ts, so no consumer can reach it. ` +
+        `Add the line: export * from './${name}'`
     )
   }
 }

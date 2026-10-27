@@ -35,7 +35,9 @@ move without breaking consumers, and each module had two equivalent import paths
   never `@opencrvs/components`. Going through the root index creates import cycles.
 - Guarded in `packages/components`. `pnpm lint` runs `check-public-surface.mjs` (exact
   `exports`, `sideEffects`, every folder has an `index.ts` and is reachable from the root or a
-  group, no loose files in `src/`) and the import rules in `eslint.config.js`. Consumers that
+  group, no loose files in `src/`) and the import rules in `eslint.config.js`. Stories
+  (`*.stories.tsx`) are exempt from the import rules on purpose: nothing imports them, so they
+  can't create cycles, and they may import the package by name like a consumer would. Consumers that
   use a subpath fail TypeScript resolution, the vite build, and `import/no-unresolved`.
 - The groups are temporary. When `buttons/` is deleted and the legacy icons are renamed or
   removed, fold them into the root and drop the entries.

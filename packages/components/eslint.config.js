@@ -8,6 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+const { readdirSync } = require('node:fs')
+const { join } = require('node:path')
 const baseConfig = require('../../eslint.config.js')
 
 function importsFromOtherFolders(levelsBelowSrc) {
@@ -31,7 +33,18 @@ function importsFromOtherFolders(levelsBelowSrc) {
   ]
 }
 
-const levels = [1, 2, 3, 4]
+function depthsWithSourceFiles(dir, depth = 0, found = new Set()) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      depthsWithSourceFiles(join(dir, entry.name), depth + 1, found)
+    } else if (depth > 0 && /\.tsx?$/.test(entry.name)) {
+      found.add(depth)
+    }
+  }
+  return found
+}
+
+const levels = [...depthsWithSourceFiles(join(__dirname, 'src'))]
 
 module.exports = [
   { ignores: ['eslint*.js', 'check-public-surface.mjs', 'no-font-styles.js'] },
