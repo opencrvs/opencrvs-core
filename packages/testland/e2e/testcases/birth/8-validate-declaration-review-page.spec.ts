@@ -19,20 +19,16 @@ import {
   formatDateObjectTo_dMMMMyyyy,
   expectRowValueWithChangeButton,
   expectRowValue,
-  triggerDeclarationAction,
-  getEventIdFromUrl,
-  getToken
+  triggerDeclarationAction
 } from '@e2e/support/helpers'
-import { customActionViaApi } from '@e2e/support/test-data/api-actions'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { fillDate, generateBirthInputs } from '@e2e/support/birth/helpers'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { selectAction } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
 test('8. Validate declaration review page', async ({ page }) => {
   test.setTimeout(240_000)
-  let eventId = ''
 
   const declaration = generateBirthInputs({
     includeOptionalFields: true,
@@ -40,13 +36,13 @@ test('8. Validate declaration review page', async ({ page }) => {
   })
 
   const comment = faker.lorem.sentence()
-  await login(page, CREDENTIALS.COMMUNITY_LEADER)
+  await login(page, CREDENTIALS.REGISTRATION_OFFICER)
   await page.click('#header-new-event')
   await page.getByLabel('Birth').click()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Continue' }).click()
 
-  await test.step('8.1 Community leader actions', async () => {
+  await test.step('8.1 Registration officer actions', async () => {
     await test.step('8.1.0 Fill up birth registration form', async () => {
       await test.step('8.1.0.1 Fill child details', async () => {
         await page.locator('#firstname').fill(declaration.child.name.firstNames)
@@ -65,6 +61,11 @@ test('8. Validate declaration review page', async ({ page }) => {
           .getByText(declaration.placeOfBirth, {
             exact: true
           })
+          .click()
+
+        await page.locator('#village').click()
+        await page
+          .getByText(declaration.birthLocation.village, { exact: true })
           .click()
 
         await page.locator('#child____attendantAtBirth').click()
@@ -421,7 +422,6 @@ test('8. Validate declaration review page', async ({ page }) => {
     await test.step('8.1.2 Click any "Change" link', async () => {
       await test.step("8.1.2.1 Change child's name", async () => {
         await page.getByTestId('change-button-child.name').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.child.name = {
           firstNames: faker.person.firstName('male'),
@@ -444,7 +444,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.2 Change child's gender", async () => {
         await page.getByTestId('change-button-child.gender').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.child.gender = 'Female'
 
@@ -462,7 +461,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.3 Change child's birthday", async () => {
         await page.getByTestId('change-button-child.dob').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.child.birthDate = getRandomDate(0, 200)
         await page.getByPlaceholder('dd').fill(declaration.child.birthDate.dd)
@@ -483,7 +481,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step('8.1.2.5 Change attendant at birth', async () => {
         await page.getByTestId('change-button-child.attendantAtBirth').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.attendantAtBirth = 'Midwife'
         await page.locator('#child____attendantAtBirth').click()
         await page
@@ -503,7 +500,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step('8.1.2.6 Change type of birth', async () => {
         await page.getByTestId('change-button-child.birthType').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.birthType = 'Twin'
         await page.locator('#child____birthType').click()
@@ -524,7 +520,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.7 Change child's weight at birth", async () => {
         await page.getByTestId('change-button-child.weightAtBirth').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.weightAtBirth = 2.7
         await page
@@ -542,7 +537,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step('8.1.2.8 Change informant type', async () => {
         await page.getByTestId('change-button-informant.relation').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.informantType = 'Father'
         await page.locator('#informant____relation').click()
@@ -563,7 +557,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step('8.1.2.9 Change registration email', async () => {
         await page.getByTestId('change-button-informant.email').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.informantEmail =
           declaration.father.name.firstNames.toLowerCase() +
@@ -586,7 +579,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.10 Change mother's name", async () => {
         await page.getByTestId('change-button-mother.name').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.mother.name.firstNames = faker.person.firstName('female')
         declaration.mother.name.familyName = faker.person.lastName('female')
@@ -606,7 +598,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.11 Change mother's birthday", async () => {
         await page.getByTestId('change-button-mother.dob').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.mother.birthDate = getRandomDate(19, 200)
         await page.getByPlaceholder('dd').fill(declaration.mother.birthDate.dd)
@@ -627,7 +618,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.12 Change mother's nationality", async () => {
         await page.getByTestId('change-button-mother.nationality').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.mother.nationality = 'Holy See'
         await page.locator('#mother____nationality').click()
@@ -648,7 +638,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.13 & 8.1.2.14 Change mother's ID type and id number", async () => {
         await page.getByTestId('change-button-mother.idType').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.mother.identifier.type = 'Passport'
         await page.locator('#mother____idType').click()
@@ -677,7 +666,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.15 Change mother's address", async () => {
         await page.getByTestId('change-button-mother.address').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.mother.address.district = 'Afue'
         declaration.mother.address.village = 'Imani'
@@ -704,7 +692,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.16 Change father's name", async () => {
         await page.getByTestId('change-button-father.name').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.father.name.firstNames = faker.person.firstName('male')
         declaration.father.name.familyName = faker.person.lastName('male')
@@ -724,7 +711,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.17 Change father's birthday", async () => {
         await page.getByTestId('change-button-father.dob').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.father.birthDate = getRandomDate(21, 200)
         await fillDate(page, declaration.father.birthDate)
@@ -741,7 +727,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.18 Change father's nationality", async () => {
         await page.getByTestId('change-button-father.nationality').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.father.nationality = 'Holy See'
         await page.locator('#father____nationality').click()
@@ -762,7 +747,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.19 Change father's ID type", async () => {
         await page.getByTestId('change-button-father.idType').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.father.identifier.type = 'Passport'
         await page.locator('#father____idType').click()
@@ -813,19 +797,7 @@ test('8. Validate declaration review page', async ({ page }) => {
     })
 
     await test.step('8.1.7 Declare', async () => {
-      eventId = getEventIdFromUrl(page)
       await triggerDeclarationAction(page, 'Declare')
-    })
-  })
-
-  await test.step('8.2 Registration Officer actions', async () => {
-    await test.step('8.2.2 Validate (via API)', async () => {
-      const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER)
-      await customActionViaApi({
-        token,
-        eventId,
-        customActionType: 'VALIDATE_DECLARATION'
-      })
     })
   })
 

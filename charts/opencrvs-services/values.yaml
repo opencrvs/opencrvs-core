@@ -45,22 +45,27 @@ elasticsearch:
   # TEMPORAL SECRET TO STORE ELASTICSEARCH USERS
   users_secret: elasticsearch-opencrvs-users
 
-# MinIO configuration, including the hostname and port.
-minio:
+# S3 object store configuration, including the hostname and port.
+# The defaults point at the S3 datastore that the dependencies chart deploys.
+s3:
   host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
   port: '3535'
-  # external_url: external <host/ip>[:port] available for client browser to issue signed document URL.
-  #                   Default: minio.<opencrvs domain>
-  # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
-  # auth_mode:
-  # - disabled: No authentication enabled, password-less access to databases
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
-  #               will pick up data from users_secret
-  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
-  #            please check README.md
-  auth_mode: disabled
-  users_secret: minio-opencrvs-users
-  # Image used as client to run OpenCRVS configuration scripts
+  # Protocol that the services use to reach the object store: http or https.
+  protocol: http
+  # public_endpoint: URL that browsers use to reach the object store. Presigned document URLs are signed for it.
+  #                  Default: <http or https>://minio<subdomain_separator><hostname>, where the dependencies chart exposes
+  #                  its object store. The protocol is https if `ingress.ssl_enabled` is true.
+  #                  Set it for a store that is exposed elsewhere, for example https://s3.example.org
+  # The services always read the credentials from users_secret. Keys: S3_ACCESS_KEY, S3_SECRET_KEY, S3_ADMIN_ACCESS_KEY, S3_ADMIN_SECRET_KEY
+  # The dependencies chart creates it in its own namespace, copy it here. See README.md
+  users_secret: s3-opencrvs-users
+  # Admin username and password of the object store, used to create users_secret when it does not exist yet,
+  # for example the values that the dependencies chart got as `minio.admin_username` and `minio.admin_password`.
+  # `helm install` and `helm upgrade` fail without them if users_secret does not exist. `helm template` cannot read the
+  # cluster, so it renders the secret only with them. An existing users_secret is left as it is.
+  # admin_username: minioadmin
+  # admin_password: minioadmin
+  # Image used as client to run OpenCRVS configuration scripts. It needs the `mc` command line client.
   image:
     repository: ghcr.io/opencrvs/minio-mc
     tag: 'release.2025-05-21t01-59-54z'
@@ -205,7 +210,7 @@ network_policy:
   # Namespaces OpenCRVS pods are allowed to reach. Only takes effect when
   # egress_mode is not "full". Required for the OpenCRVS application to
   # keep working once egress is denied by default (e.g. auth/gateway
-  # reaching redis/postgres/elasticsearch/minio), since the dependencies
+  # reaching redis/postgres/elasticsearch/s3), since the dependencies
   # chart is typically deployed to a separate namespace. See "Hardening"
   # in README.md.
   allowed_namespaces: []
@@ -287,7 +292,7 @@ resources:
 env:
   OPENCRVS_ENVIRONMENT: production
   NODE_ENV: production
-  MINIO_BUCKET: ocrvs
+  S3_BUCKET: ocrvs
   # LOG_LEVEL: debug
   # Application performance monitoring service URL.
   # APN_SERVICE_URL: http://dependencies_apm-server:8200

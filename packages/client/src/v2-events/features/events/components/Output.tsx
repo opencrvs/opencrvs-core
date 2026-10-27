@@ -89,7 +89,7 @@ import { SignatureField } from '@client/v2-events/components/forms/inputs/Signat
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
-import { isEqualFieldValue } from '../actions/correct/utils'
+import { isEqualFieldValue } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { Data } from '../registered-fields/Data'
 import { Custom } from '../registered-fields/Custom'
 

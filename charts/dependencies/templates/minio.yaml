@@ -139,18 +139,16 @@ spec:
               value: {{ include "render-external-url" (dict "service_name" "minio" "Values" .Values) }}
             - name: MINIO_API_CORS_ALLOW_ORIGIN
               value: '*'
-          {{- if not .Values.minio.use_default_credentials }}
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  name: minio-opencrvs-users
-                  key: MINIO_ROOT_USER
+                  name: s3-opencrvs-users
+                  key: S3_ADMIN_ACCESS_KEY
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: minio-opencrvs-users
-                  key: MINIO_ROOT_PASSWORD
-          {{- end }}
+                  name: s3-opencrvs-users
+                  key: S3_ADMIN_SECRET_KEY
           {{- include "render-env-vars" (dict "service_name" "minio" "Values" .Values) }}
           ports:
             - containerPort: 3535

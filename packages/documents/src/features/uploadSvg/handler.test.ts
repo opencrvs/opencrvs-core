@@ -12,10 +12,10 @@ import { createServer } from '@documents/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
-jest.mock('../../minio/client', () => {
+jest.mock('../../s3/client', () => {
   return {
     __esModule: true,
-    minioClient: { putObject: () => {} }
+    putObject: async () => {}
   }
 })
 

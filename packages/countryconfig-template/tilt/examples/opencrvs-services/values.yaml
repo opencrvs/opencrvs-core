@@ -42,6 +42,13 @@ dashboards:
 # Expose services on Node port
 service_type: NodePort
 
+# Credentials of the S3 object store that the dependencies chart deploys, which are the MinIO defaults.
+# Tilt renders the chart with `helm template`, which cannot see a secret in the cluster, so the chart
+# creates the secret s3-opencrvs-users from them.
+s3:
+  admin_username: minioadmin
+  admin_password: minioadmin
+
 data_seed:
   enabled: false
   env:

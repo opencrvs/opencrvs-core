@@ -213,7 +213,9 @@ This section allows you to configure the deployment and authentication settings 
 | enabled                 | bool   | true                            | Enable or disable minio service                                                                                                                                    |
 | image.repository        | string | `ghcr.io/opencrvs/minio`        | MinIO Docker image repository.                                                                                                                                     |
 | image.tag               | string | `release.2025-06-13t11-33-47z`  | MinIO Docker image tag.                                                                                                                                            |
-| use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                                                 |
+| use_default_credentials | bool   | true                            | Use `minioadmin` / `minioadmin`, unless `admin_username` and `admin_password` are set. If `false` and they are not set, random ones are generated.                 |
+| admin_username          | string | `n/a`                           | MinIO administrator username. Used even if `use_default_credentials` is `true`. Set together with `admin_password`.                                                |
+| admin_password          | string | `n/a`                           | MinIO administrator password. Used even if `use_default_credentials` is `true`. Set together with `admin_username`.                                                |
 | storage_type            | string | `global storage_type`           | Optional MinIO-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
 | pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                             |
 | pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                                              |
@@ -236,19 +238,27 @@ This section allows you to configure the deployment and authentication settings 
 
 ### MinIO Credentials
 
-Setting `use_default_credentials` to `false` will generate strong password for MinIO.
+The chart writes the credentials to the secret `s3-opencrvs-users` when the secret does not exist. The first rule that fits applies:
+
+1. The secret exists: the chart leaves it as it is, and the values below are not read.
+2. The secret `minio-opencrvs-users` of an earlier version exists: the chart creates `s3-opencrvs-users` from it, with the new key names and the same values, and leaves the old secret in place.
+3. `admin_username` and `admin_password` are set: the chart uses them, whatever `use_default_credentials` is.
+4. `use_default_credentials` is `true`: the chart uses `minioadmin` and `minioadmin`.
+5. Otherwise the chart generates a random username and a random password.
+
+Setting only one of `admin_username` and `admin_password` fails the installation with `minio.admin_username and minio.admin_password must be set together`. MinIO and the backup and restore jobs always read the credentials from the secret, so read the generated ones from it.
 
 MinIO defaults to minioadmin and minioadmin as the access key and secret key respectively.
 MinIO strongly discourages use of the default credentials regardless of deployment environment.
 Check official documentation for more details:
 https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html
 
-Values are stored as a Kubernetes secret `minio-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
+Values are stored as a Kubernetes secret `s3-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
 
 ```
 DEPENDENCIES_NAMESPACE=<dependencies namespace>
 OPENCRVS_NAMESPACE=<OpenCRVS namespace>
-kubectl get secret minio-opencrvs-users -n $DEPENDENCIES_NAMESPACE -o yaml \
+kubectl get secret s3-opencrvs-users -n $DEPENDENCIES_NAMESPACE -o yaml \
   | sed "s#namespace: $DEPENDENCIES_NAMESPACE#namespace: $OPENCRVS_NAMESPACE#" \
   | kubectl apply -n $OPENCRVS_NAMESPACE -f -
 ```
@@ -258,11 +268,11 @@ Don't forget to replace placeholders with appropriate namespaces.
 Example of Kubernetes secret:
 
 ```
-$ kubectl get secret -oyaml -n opencrvs-dev minio-opencrvs-users | yq .data
-MINIO_ACCESS_KEY: RE...wMw==
-MINIO_ROOT_PASSWORD: dG...FU=
-MINIO_ROOT_USER: RE...wMw==
-MINIO_SECRET_KEY: dG...FU=
+$ kubectl get secret -oyaml -n opencrvs-dev s3-opencrvs-users | yq .data
+S3_ACCESS_KEY: RE...wMw==
+S3_ADMIN_SECRET_KEY: dG...FU=
+S3_ADMIN_ACCESS_KEY: RE...wMw==
+S3_SECRET_KEY: dG...FU=
 ```
 
 Reference secret values within `values.yaml`:
@@ -271,8 +281,8 @@ Reference secret values within `values.yaml`:
 documents:
   secrets:
     minio-secret:
-      - MINIO_ACCESS_KEY
-      - MINIO_SECRET_KEY
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
 ```
 
 ### Backup and Restore Section Reference
