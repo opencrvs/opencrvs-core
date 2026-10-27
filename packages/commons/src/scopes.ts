@@ -626,18 +626,20 @@ export function hasScope(
 }
 
 /**
- * Checks if the given event type is allowed by the accepted scopes. If no specific event types are defined, it returns true.
+ * Checks if the user has the scope to perform an action on an event of a certain type.
  *
  * @param {Scope[]} userScopes - The scopes of the user.
  * @param {string} eventType - The event type to check for permission.
- * @returns {boolean} Returns true if the event type is allowed by the scope.
+ * @param {ScopeType[]} acceptedScopes - The scopes to check for permission.
+ * @returns {boolean} Returns true if the user has the scope to perform an action on an event of a certain type.
  */
-export function canUserCreateEvent(
+export function hasScopeForEventType(
   userScopes: EncodedScope[],
-  eventType: string
+  eventType: string,
+  acceptedScope: ScopeType
 ) {
   const scopes = getAcceptedScopesByType({
-    acceptedScopes: ['record.create'],
+    acceptedScopes: [acceptedScope],
     scopes: userScopes
   })
 
@@ -652,6 +654,20 @@ export function canUserCreateEvent(
 
     return scope.options?.event?.includes(eventType)
   })
+}
+
+export function canUserCreateEvent(
+  userScopes: EncodedScope[],
+  eventType: string
+) {
+  return hasScopeForEventType(userScopes, eventType, 'record.create')
+}
+
+export function canUserNotifyEvent(
+  userScopes: EncodedScope[],
+  eventType: string
+) {
+  return hasScopeForEventType(userScopes, eventType, 'record.notify')
 }
 
 /**

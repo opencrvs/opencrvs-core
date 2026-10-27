@@ -10,16 +10,16 @@
  */
 import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
-import { addDays, format, subDays } from 'date-fns'
+import { format, subDays } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import decode from 'jwt-decode'
 import {
-  drawSignature,
   fetchUserLocationHierarchy,
   formatName,
   getToken,
   login,
   triggerDeclarationAction,
+  signReview,
   switchEventTab,
   validateActionMenuButton
 } from '@e2e/support/helpers'
@@ -31,10 +31,14 @@ import {
 import {
   getAdministrativeAreas,
   getIdByName,
+  getLocations,
   formatV2ChildName,
   REQUIRED_VALIDATION_ERROR
 } from '@e2e/support/birth/helpers'
-import { getDeclaration } from '@e2e/support/test-data/birth-declaration'
+import {
+  fillDeclarationOnlyFields,
+  generateBirthNotificationInputs
+} from '@e2e/support/birth/notify'
 import {
   openRecordByTitle,
   printAndExpectPopup,
@@ -62,6 +66,32 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     clientName = context.clientName
     healthFacilityId = context.healthFacilityId
   })
+
+  /**
+   * A complete birth notification. NOTIFY is validated against the birth notification form,
+   * so integrations too must send its required fields, and only its fields.
+   */
+  function notificationDeclaration(overrides: Record<string, unknown> = {}) {
+    return {
+      'child.name': {
+        firstname: faker.person.firstName(),
+        surname: faker.person.lastName()
+      },
+      'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd'),
+      'child.gender': 'female',
+      'child.birthType': 'SINGLE',
+      'child.attendantAtBirth': 'PHYSICIAN',
+      'child.placeOfBirth': 'HEALTH_FACILITY',
+      'child.birthLocation': healthFacilityId,
+      'mother.name': {
+        firstname: faker.person.firstName(),
+        surname: faker.person.lastName()
+      },
+      'mother.dob': '1998-05-05',
+      'informant.email': 'mothers@email.com',
+      ...overrides
+    }
+  }
 
   test('HTTP 401 when invalid token is used', async () => {
     const response = await fetchClientAPI(
@@ -156,11 +186,11 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         eventId,
         transactionId: uuidv4(),
         type: 'NOTIFY',
-        declaration: {
+        declaration: notificationDeclaration({
           'foo.bar': 'this should cause an error',
           'child.name': { surname: fakeSurname },
           'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
-        },
+        }),
         annotation: {}
       }
     )
@@ -168,7 +198,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     expect(response.status).toBe(400)
     const body = await response.json()
     expect(body.message).toBe(
-      '[{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"}]'
+      '[{"message":"Field is not part of the notify form. Notify-only data belongs in annotation","id":"foo.bar","value":"this should cause an error"}]'
     )
   })
 
@@ -206,10 +236,12 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         transactionId: uuidv4(),
         type: 'NOTIFY',
         createdAtLocation: location[location.length - 1],
-        declaration: {
-          'child.name': { surname: fakeSurname },
-          'child.dob': format(addDays(new Date(), 10), 'yyyy-MM-dd')
-        },
+        declaration: notificationDeclaration({
+          // The first name is optional on the notification form. The key must still be sent:
+          // a non-required NAME subfield allows an empty string, not a missing key.
+          'child.name': { firstname: '', surname: fakeSurname },
+          'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
+        }),
         annotation: {}
       }
     )
@@ -264,13 +296,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         type: 'NOTIFY',
         createdAtLocation: healthFacilityId,
         eventType: 'birth',
-        declaration: {
+        declaration: notificationDeclaration({
           'child.name': {
             firstname: faker.person.firstName(),
             surname: faker.person.lastName()
           },
           'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
-        },
+        }),
         annotation: {}
       }
     )
@@ -305,13 +337,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         eventId,
         transactionId: uuidv4(),
         type: 'NOTIFY',
-        declaration: {
+        declaration: notificationDeclaration({
           'child.name': {
             firstname: childName.firstNames,
             surname: childName.familyName
           },
           'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
-        },
+        }),
         annotation: {}
       }
     )
@@ -352,13 +384,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         eventId,
         transactionId: uuidv4(),
         type: 'NOTIFY',
-        declaration: {
+        declaration: notificationDeclaration({
           'child.name': {
             firstname: childName.firstNames,
             surname: childName.familyName
           },
           'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
-        },
+        }),
         annotation: {},
         createdAtLocation: 'invalid-location-id'
       }
@@ -401,13 +433,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         eventId,
         transactionId: uuidv4(),
         type: 'NOTIFY',
-        declaration: {
+        declaration: notificationDeclaration({
           'child.name': {
             firstname: childName.firstNames,
             surname: childName.familyName
           },
           'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
-        },
+        }),
         annotation: {},
         createdAtLocation: centralId
       }
@@ -460,16 +492,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         eventId,
         transactionId: uuidv4(),
         type: 'NOTIFY',
-        declaration: {
+        declaration: notificationDeclaration({
           'child.name': {
             firstname: childName.firstNames,
             surname: childName.familyName
           },
-          'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd'),
-          'child.placeOfBirth': 'Health Institution',
-          'child.birthLocation': locationId,
-          'child.birthLocationId': locationId
-        },
+          'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
+        }),
         annotation: {},
         createdAtLocation: locationId
       }
@@ -538,13 +567,13 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
       eventId,
       transactionId: uuidv4(),
       type: 'NOTIFY',
-      declaration: {
+      declaration: notificationDeclaration({
         'child.name': {
           firstname: childName.firstNames,
           surname: childName.familyName
         },
         'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd')
-      },
+      }),
       annotation: {},
       createdAtLocation: healthFacilityId
     }
@@ -610,14 +639,12 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
 
       const locationId = location[location.length - 1]
 
-      const declaration = {
-        ...(await getDeclaration({ token })),
+      // Integrations can only send the notification form fields
+      const facilities = await getLocations('HEALTH_FACILITY', token)
+      const declaration = notificationDeclaration({
         'child.name': childName,
-        'child.dob': undefined,
-        'child.birthLocation': locationId,
-        'child.birthLocationId': locationId,
-        'child.placeOfBirth': 'HEALTH_FACILITY'
-      }
+        'child.birthLocation': getIdByName(facilities, 'Klow Village Hospital')
+      })
       const response = await fetchClientAPI(
         `/api/events/events/${eventId}/notify`,
         'POST',
@@ -650,23 +677,16 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         formatV2ChildName({ 'child.name': childName })
       )
 
-      await expect(page.getByTestId('child.dob-value')).toHaveText(
+      // Declaration-only fields are left for the registrar
+      await expect(page.getByTestId('informant.relation-value')).toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
 
       await validateActionMenuButton(page, 'Register with edits', false)
     })
 
-    await test.step('Fill missing child dob field', async () => {
-      await page.getByTestId('change-button-child.dob').click()
-
-      const yesterday = new Date()
-      yesterday.setDate(new Date().getDate() - 1)
-      const [yyyy, mm, dd] = yesterday.toISOString().split('T')[0].split('-')
-
-      await page.getByPlaceholder('dd').fill(dd)
-      await page.getByPlaceholder('mm').fill(mm)
-      await page.getByPlaceholder('yyyy').fill(yyyy)
+    await test.step('Fill missing declaration fields', async () => {
+      await fillDeclarationOnlyFields(page, generateBirthNotificationInputs())
     })
 
     const newChildName = {
@@ -675,22 +695,17 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
     }
 
     await test.step('Change child surname', async () => {
+      await page.getByTestId('change-button-child.name').click()
       await page.getByTestId('text__surname').fill(newChildName.surname)
       await page.getByRole('button', { name: 'Go to review' }).click()
 
-      await expect(page.getByTestId('child.dob-value')).not.toHaveText(
+      await expect(page.getByTestId('informant.relation-value')).not.toHaveText(
         REQUIRED_VALIDATION_ERROR
       )
     })
 
     await test.step('Fill comment & signature', async () => {
-      await page.locator('#review____comment').fill(faker.lorem.sentence())
-      await page.getByRole('button', { name: 'Sign', exact: true }).click()
-      await drawSignature(page, 'review____signature_canvas_element', false)
-      await page
-        .locator('#review____signature_modal')
-        .getByRole('button', { name: 'Apply' })
-        .click()
+      await signReview(page)
     })
 
     await test.step('Register event', async () => {
@@ -772,14 +787,7 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
 
       const locationId = location[location.length - 1]
 
-      const declaration = {
-        ...(await getDeclaration({ token })),
-        'child.name': childName,
-        'child.dob': undefined,
-        'child.birthLocation': locationId,
-        'child.birthLocationId': locationId,
-        'child.placeOfBirth': 'HEALTH_FACILITY'
-      }
+      const declaration = notificationDeclaration({ 'child.name': childName })
 
       const res = await fetchClientAPI(
         `/api/events/events/${eventId}/notify`,

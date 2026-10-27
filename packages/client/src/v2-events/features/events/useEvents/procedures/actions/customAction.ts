@@ -22,7 +22,10 @@ import {
   deleteLocalEvent,
   findLocalEventDocument
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   deleteLocalEventAndToastOnDuplicate,
@@ -34,7 +37,7 @@ import { waitUntilEventIsCreated } from '@client/v2-events/features/events/useEv
 import { queryClient } from '@client/v2-events/trpc'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
-type CustomMutationKeys = keyof typeof customApi
+export type CustomMutationKeys = keyof typeof customApi
 
 const customMutationKeys = {
   registerOnDeclare: [['registerOnDeclare']],
@@ -180,6 +183,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({
           eventConfiguration,
+          form: getSubmissionForm(eventConfiguration, mutationName),
           originalDeclaration,
           declarationDiff: params.declaration,
           validatorContext: {

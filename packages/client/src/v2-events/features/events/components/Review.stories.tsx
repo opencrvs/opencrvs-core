@@ -123,52 +123,6 @@ export const ReviewWithoutChanges: Story = {
   }
 }
 
-export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('Open modal', async () => {
-      const [changeButton] = await canvas.findAllByRole('button', {
-        name: 'Change'
-      })
-
-      await fireEvent.click(changeButton)
-    })
-
-    await step('Close modal', async () => {
-      const cancelButton = await canvas.findByRole('button', {
-        name: 'Cancel'
-      })
-
-      await fireEvent.click(cancelButton)
-    })
-  },
-  render: function Component(args) {
-    const [modal, openModal] = useModal()
-
-    async function handleEdit() {
-      await openModal<boolean | null>((close) => (
-        <Review.EditModal close={close}></Review.EditModal>
-      ))
-
-      return
-    }
-
-    return (
-      <>
-        <Review.Body
-          {...args}
-          form={mockDeclaration}
-          formConfig={TENNIS_CLUB_DECLARATION_FORM}
-          title="My test action"
-          onEdit={handleEdit}
-        ></Review.Body>
-        {modal}
-      </>
-    )
-  }
-}
-
 export const ReviewWithValidationErrors: Story = {
   parameters: {
     msw: {

@@ -523,5 +523,18 @@ describe('getCleanedDeclarationDiff', () => {
         })
       ).toEqual({})
     })
+
+    it('uses the given form instead of the declaration form', () => {
+      // e.g. NOTIFY: a field hidden in the declaration form can be visible in the notification form
+      expect(
+        getCleanedDeclarationDiff({
+          eventConfiguration: configWithFlaggedField,
+          form: getDeclaration(eventConfiguration),
+          originalDeclaration: {},
+          declarationDiff: { [flaggedFieldId]: 'jane@example.com' },
+          validatorContext: {}
+        })
+      ).toEqual({ [flaggedFieldId]: 'jane@example.com' })
+    })
   })
 })

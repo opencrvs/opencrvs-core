@@ -408,6 +408,11 @@ minio:
   # Highly discouraged for production environments—see official docs:
   # https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html
   use_default_credentials: true
+  # Admin username and password for MinIO. When both are set, they are used even if `use_default_credentials` is `true`.
+  # If `use_default_credentials` is `false` and they are not set, random ones are generated. Set both or none.
+  # They are written to the secret s3-opencrvs-users when it does not exist yet, and an existing secret is left as it is.
+  # admin_username: minioadmin
+  # admin_password: minioadmin
 
   # storage_type: host_path
   # PVC Configuration

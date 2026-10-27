@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0 Release Candidate
+
+### New features
+
+- Birth has its own notification form (`src/events/birth/forms/notificationForm.ts`) on an explicit `NOTIFY` action.
+
 ## 2.1.0 Release Candidate
 
 ### Breaking changes
@@ -96,14 +102,14 @@
   - `POST /tracking-id`
   - `GET /record-notification`
 - The following countryconfig endpoints have been renamed to sit under the `/config/` namespace:
-  | Old path | New path |
-  |---|---|
-  | `GET /workqueue` | `GET /config/workqueues` |
+  | Old path                  | New path                  |
+  | ------------------------- | ------------------------- |
+  | `GET /workqueue`          | `GET /config/workqueues`  |
   | `GET /application-config` | `GET /config/application` |
-  | `GET /locations` | `GET /config/locations` |
-  | `GET /roles` | `GET /config/roles` |
-  | `GET /users` | `GET /config/users` |
-  | `GET /events` | `GET /config/events` |
+  | `GET /locations`          | `GET /config/locations`   |
+  | `GET /roles`              | `GET /config/roles`       |
+  | `GET /users`              | `GET /config/users`       |
+  | `GET /events`             | `GET /config/events`      |
 - Switch to docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2 image to support `mongo_fdw`. This is required for the legacy user migrations to work. It will be switched back to the official postgres image in a future release.
 - A new service `legacy-data-migration` which runs the same migration image but with the `migrate-legacy-data` flag and with the following new environment variables:
   - EVENTS_SUPERUSER_POSTGRES_URL
@@ -556,9 +562,9 @@ INSERT CSV ROWS IN ENGLISH ONLY
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
   `FEATURES: {
-  DEATH_REGISTRATION: true,
-  MARRIAGE_REGISTRATION: false,
-  ...
+DEATH_REGISTRATION: true,
+MARRIAGE_REGISTRATION: false,
+...
 } `
 - **Improve rendering of addresses in review page where addresses match** When entering father's address details, some countries make use of a checkbox which says "Address is the same as the mothers. " which, when selected, makes the mother's address and fathers address the same. The checkbox has a programatic value of "Yes" or "No". As a result on the review page, the value "Yes" was displayed which didn't make grammatical sense as a response. We decided to use a custom label: "Same as mother's", which is what was asked on the form. This requires some code changes in the src/form/addresses/index.ts file to pull in the `hideInPreview` prop which will hide the value "Yes" on the review page and replace with a content managed label. Associated bug [#5086](https://github.com/opencrvs/opencrvs-core/issues/5086)
 

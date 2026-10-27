@@ -353,7 +353,6 @@ test("'Approval required for late registration' -flag blocks direct registration
 
     await test.step('Change child dob to recent date', async () => {
       await page.getByTestId('change-button-child.dob').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
 
       const [recentYear, recentMonth, recentDay] = recentDateString.split('-')
       await page.getByPlaceholder('dd').fill(recentDay)

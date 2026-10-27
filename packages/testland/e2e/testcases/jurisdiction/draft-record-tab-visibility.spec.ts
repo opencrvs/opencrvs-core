@@ -18,6 +18,7 @@ import {
   validateAddress
 } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { startBirthNotification } from '@e2e/support/birth/notify'
 import { selectLocationOption } from '@e2e/support/utils'
 
 async function selectFirstAvailableAdministrativeArea(page: Page, id: string) {
@@ -68,8 +69,32 @@ test.describe('Draft birth declarations show the Record tab to their own creator
     await page.close()
   })
 
-  test('Hospital Official sees the Record tab on their own draft after selecting their health facility', async () => {
+  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
+  test.skip('Hospital Official sees the Record tab on their own draft after selecting their health facility', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    // Hospital officials can only notify, so they get the notify flow
+    await startBirthNotification(page)
+
+    const childName = await fillChildDetails(page)
+    const facilityName = await selectHealthInstitution(page)
+
+    await saveAndExit(page)
+
+    await page.getByRole('button', { name: 'Drafts' }).click()
+    await openRecordByTitle(page, childName)
+
+    await expect(
+      page.getByRole('button', { name: 'Record', exact: true })
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Record', exact: true }).click()
+
+    await expect(page.getByTestId('child.birthLocation-value')).toContainText(
+      facilityName ?? ''
+    )
+  })
+
+  test('Field Agent sees the Record tab on their own draft after selecting a health facility', async () => {
+    await login(page, CREDENTIALS.FIELD_AGENT)
     await openBirthDeclaration(page)
 
     const childName = await fillChildDetails(page)
