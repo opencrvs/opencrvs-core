@@ -1,0 +1,9 @@
+{{- if and .Values.monitoring.enabled (not .Values.create_cluster_roles) }}
+WARNING: The chart does not create the ClusterRoles and ClusterRoleBindings of Filebeat and Metricbeat (create_cluster_roles is false).
+Make sure that the objects "filebeat" and "metricbeat" exist. If they do not exist, the beats cannot read cluster data.
+{{- if .Release.IsUpgrade }}
+If an earlier chart version created these objects, this upgrade can delete them. Check that they exist.
+To keep them in the next upgrade, set create_cluster_roles to true or add the annotation helm.sh/resource-policy=keep to the objects.
+{{- end }}
+See the README, section "Cluster roles".
+{{- end -}}

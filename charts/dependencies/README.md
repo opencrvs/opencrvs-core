@@ -45,6 +45,9 @@ Any particular service within this helm chart can be disabled by setting `<servi
 | platform.imagePullSecrets           | list   | `[]`                               | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                                                                                                          |
 | node_selector                       | dict   | `{}`                               | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                                                                                                             |
 | monitoring.enabled                  | bool   | `false`                            | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                                                                                                          |
+| create_cluster_roles                | bool   | `false`                            | Create the Filebeat and Metricbeat ClusterRoles and ClusterRoleBindings. This value has an effect only if monitoring is enabled. See [Cluster roles](#cluster-roles)                                                                                                                 |
+| filebeat.service_account_name       | string | `filebeat`                         | Name of the ServiceAccount created for the Filebeat DaemonSet, also the subject of its ClusterRoleBinding, see [Cluster roles](#cluster-roles)                                                                                                                                       |
+| metricbeat.service_account_name     | string | `metricbeat`                       | Name of the ServiceAccount created for the Metricbeat DaemonSet, also the subject of its ClusterRoleBinding, see [Cluster roles](#cluster-roles)                                                                                                                                     |
 | priority_class.enabled              | bool   | `false`                            | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                                                                                                           |
 | backup.enabled                      | bool   | `true`                             | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                                                                                                                 |
 | restore.enabled                     | bool   | `true`                             | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                                                                                                                 |
@@ -455,6 +458,54 @@ Following tools are included in monitoring suite:
 ```yaml
 elasticsearch:
   use_default_credentials: false
+```
+
+### Cluster roles
+
+Filebeat and Metricbeat each need a `ClusterRole` and a `ClusterRoleBinding`. The objects have the name of the beat: `filebeat` or `metricbeat`. The beats use them to read pod, node, and event data of the whole cluster.
+
+By default, the chart does not create these objects (`create_cluster_roles: false`). Some deployments create cluster-wide objects outside of Helm. Make sure that the objects exist. Use one of these methods.
+
+**Provisioned cluster**
+
+The `provision` workflow of the [infrastructure repository](https://github.com/opencrvs/infrastructure) creates the objects. It binds them to the ServiceAccounts `filebeat` and `metricbeat` in each environment namespace. You do not need to do anything.
+
+**Helm creates the objects**
+
+Use this method if the user that runs Helm can create cluster-wide objects. Set `create_cluster_roles` to `true`:
+
+```yaml
+create_cluster_roles: true
+```
+
+**You create the objects**
+
+Create the objects one time for each cluster. Use a user that can create cluster-wide objects. Do not set `create_cluster_roles` to `true` for this release. Helm stops with an error if the objects exist and it did not create them.
+
+Make the manifests with `helm template` and apply them:
+
+```bash
+helm template opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart --version <chart version> \
+  --namespace <dependencies namespace> \
+  --set monitoring.enabled=true \
+  --set create_cluster_roles=true \
+  --set elasticsearch.use_default_credentials=false \
+  --show-only templates/filebeat.yaml --show-only templates/metricbeat.yaml \
+  | yq 'select(.kind == "ClusterRole" or .kind == "ClusterRoleBinding")' \
+  | kubectl apply -f -
+```
+
+The `ClusterRoleBinding` uses the ServiceAccounts `filebeat.service_account_name` and `metricbeat.service_account_name`. These ServiceAccounts are in the namespace of the release. If you change the values, use the same values in the `helm template` command. If more than one environment uses the cluster, add one subject for each namespace.
+
+**Upgrade an existing release**
+
+A release from an earlier chart version owns these objects. If `create_cluster_roles` is `false`, Helm tries to delete the objects when you upgrade. If Helm deletes them, the beats cannot read the cluster data. Do one of these steps before you upgrade:
+
+- Set `create_cluster_roles` to `true`.
+- Add the annotation `helm.sh/resource-policy=keep` to the objects. Then Helm does not delete them. Provisioned clusters have this annotation.
+
+```bash
+kubectl annotate clusterrole/filebeat clusterrole/metricbeat clusterrolebinding/filebeat clusterrolebinding/metricbeat helm.sh/resource-policy=keep
 ```
 
 ### Elastalert

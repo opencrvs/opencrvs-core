@@ -16,7 +16,7 @@ spec:
         app: metricbeat
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.metricbeat) | nindent 6 }}
-      serviceAccountName: metricbeat
+      serviceAccountName: {{ .Values.metricbeat.service_account_name }}
       initContainers:
         - name: wait-kibana
           image: {{ include "opencrvs.imageReference" .Values.utilities }}
@@ -137,7 +137,8 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: metricbeat
+  name: {{ .Values.metricbeat.service_account_name }}
+{{- if .Values.create_cluster_roles }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -191,8 +192,9 @@ roleRef:
   name: metricbeat
 subjects:
 - kind: ServiceAccount
-  name: metricbeat
+  name: {{ .Values.metricbeat.service_account_name }}
   namespace: {{ .Release.Namespace }}
+{{- end }}
 
 {{ include "network-policy-rules" (dict "service_name" "metricbeat" "Values" .Values) }}
 {{- end }}
