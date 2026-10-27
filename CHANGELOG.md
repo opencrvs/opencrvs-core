@@ -8,7 +8,7 @@
 
 ### Bug fixes
 
-- A record that the country configuration rejected before it was ever declared is no longer added to search. Deduplication relies on undeclared records never being indexed: if a deployment indexes them, deleting one leaves its id on any record flagged as its duplicate, and reviewing those duplicates fails with an `event_actions_event_id_fkey` foreign key violation. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
+- Fetching the potential duplicates of a record no longer fails with an `event_actions_event_id_fkey` foreign key violation when one of them has been deleted, which can happen on deployments that index undeclared records. The duplicates that still exist are returned. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
 - Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
 
 ## 1.9.20
