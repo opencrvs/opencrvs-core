@@ -1,43 +1,43 @@
 -- Up Migration
 
 UPDATE event_actions
-SET created_by_signature = regexp_replace(created_by_signature, '^/${MINIO_BUCKET}/', '')
-WHERE created_by_signature LIKE '/${MINIO_BUCKET}/%';
+SET created_by_signature = regexp_replace(created_by_signature, '^/${S3_BUCKET}/', '')
+WHERE created_by_signature LIKE '/${S3_BUCKET}/%';
 
 UPDATE event_actions
 SET declaration = regexp_replace(
         declaration::text,
-        '"/${MINIO_BUCKET}/',
+        '"/${S3_BUCKET}/',
         '"',
         'g'
     )::jsonb,
     annotation = regexp_replace(
         annotation::text,
-        '"/${MINIO_BUCKET}/',
+        '"/${S3_BUCKET}/',
         '"',
         'g'
     )::jsonb
-WHERE declaration::text LIKE '%"/${MINIO_BUCKET}/%'
-   OR annotation::text LIKE '%"/${MINIO_BUCKET}/%';
+WHERE declaration::text LIKE '%"/${S3_BUCKET}/%'
+   OR annotation::text LIKE '%"/${S3_BUCKET}/%';
 
 UPDATE event_action_drafts
-SET created_by_signature = regexp_replace(created_by_signature, '^/${MINIO_BUCKET}/', '')
-WHERE created_by_signature LIKE '/${MINIO_BUCKET}/%';
+SET created_by_signature = regexp_replace(created_by_signature, '^/${S3_BUCKET}/', '')
+WHERE created_by_signature LIKE '/${S3_BUCKET}/%';
 
 UPDATE event_action_drafts
 SET declaration = regexp_replace(
         declaration::text,
-        '"/${MINIO_BUCKET}/',
+        '"/${S3_BUCKET}/',
         '"',
         'g'
     )::jsonb,
     annotation = regexp_replace(
         annotation::text,
-        '"/${MINIO_BUCKET}/',
+        '"/${S3_BUCKET}/',
         '"',
         'g'
     )::jsonb
-WHERE declaration::text LIKE '%"/${MINIO_BUCKET}/%'
-   OR annotation::text LIKE '%"/${MINIO_BUCKET}/%';
+WHERE declaration::text LIKE '%"/${S3_BUCKET}/%'
+   OR annotation::text LIKE '%"/${S3_BUCKET}/%';
 
 -- One-way: which paths had the bucket prefix is not recorded, so it cannot be added back.

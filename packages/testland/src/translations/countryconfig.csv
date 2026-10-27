@@ -239,6 +239,8 @@ event.birth.action.issued.audit-history-label,The label to show in audit history
 event.birth.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
 event.birth.action.notify.form.label,This is what the birth notification form is referred as,Birth notification form,Formulaire de notification de naissance
 event.birth.action.notify.form.review.notifier.signature.label,Label for the notifier signature field in the notify review section,Signature of notifier,Signature du notificateur
+event.birth.action.notify.form.review.title,Title of the form to show in review page,"{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}","{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Notification de naissance} other {Notification de naissance pour {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Notification de naissance pour {child.name.firstname}} other {Notification de naissance pour {child.name.firstname} {child.name.surname}}}}}"
+event.birth.action.notify.form.section.child.field.dob.error,This is the error message for late registration,Late registration is not allowed,L'inscription tardive n'est pas autorisée
 event.birth.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.birth.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.birth.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
@@ -355,8 +357,8 @@ event.death.action.correction.form.section.requester.label,This is the label for
 event.death.action.correction.form.section.requester.name.label,This is the label for the field,Name,Nom
 event.death.action.correction.form.section.requester.nid.label,This is the label for the field,ID Number,Numéro d'identité
 event.death.action.correction.form.section.requester.passport.label,This is the label for the field,ID Number,Numéro d'identité
-event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to child,Relation avec l'enfant
-event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Grandmother,ex. Grand-mère
+event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to deceased,Relation avec le défunt
+event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Mother,ex. Mère
 event.death.action.correction.form.section.supporting-documents.title,This is the title of the section,Upload supporting documents,Télécharger les documents justificatifs
 event.death.action.correction.form.section.verifyIdentity.data.label,Title for the data section,,
 event.death.action.correction.form.verify,This is the label for the verification button,Verified,Vérifié

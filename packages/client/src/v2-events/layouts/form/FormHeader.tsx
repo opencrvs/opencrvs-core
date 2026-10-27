@@ -36,10 +36,10 @@ export const messages = defineMessages({
     defaultMessage: 'Exit',
     description: 'The label for the exit button'
   },
-  deleteDeclaration: {
-    id: 'buttons.deleteDeclaration',
-    defaultMessage: 'Delete declaration',
-    description: 'The label for the delete declaration button'
+  deleteDraft: {
+    id: 'buttons.deleteDraft',
+    defaultMessage: 'Delete draft',
+    description: 'The label for the delete draft button'
   },
   back: {
     id: 'buttons.back',
@@ -97,7 +97,7 @@ export function FormHeader({
   const menuItems = isUndeclaredDraft(eventIndex.status)
     ? [
         {
-          label: 'Delete declaration',
+          label: intl.formatMessage(messages.deleteDraft),
           icon: <Icon name="Trash" />,
           handler: onDelete
         }
@@ -199,7 +199,7 @@ export function FormHeader({
                   id={'event-menu'}
                   menuItems={[
                     {
-                      label: 'Delete declaration',
+                      label: intl.formatMessage(messages.deleteDraft),
                       icon: <Icon name="Trash" />,
                       handler: onDelete
                     }

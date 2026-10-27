@@ -8,21 +8,104 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isEmpty } from 'lodash'
+import { isEmpty, isEqual, isNil, isUndefined, omitBy } from 'lodash'
 import {
   ActionUpdate,
+  deepDropNulls,
   deepMerge,
+  DeclarationFormConfig,
   EventConfig,
   EventState,
   FieldConfig,
+  FieldUpdateValue,
+  ActionType,
   getDeclaration,
   getDeclarationFields,
+  getNotificationForm,
   isFieldVisible,
   omitHiddenFields,
   omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { hasDeclarationFieldChanged } from '@client/v2-events/features/events/actions/correct/utils'
+import type { CustomMutationKeys } from './customAction'
+
+/**
+ * Function we use for checking whether a field value has changed.
+ * For objects we need to ignore undefined values since the form might create them.
+ * @returns whether the two field values are equal when ignoring undefined values
+ */
+export function isEqualFieldValue<T extends FieldUpdateValue>(a: T, b: T) {
+  if (typeof a === 'object' && typeof b === 'object') {
+    return isEqual(omitBy(a, isUndefined), omitBy(b, isUndefined))
+  }
+
+  return isEqual(a, b)
+}
+
+export function hasFieldChanged(
+  f: FieldConfig,
+  form: EventState,
+  previousFormValues: EventState,
+  context: ValidatorContext
+) {
+  const isVisible = isFieldVisible(f, form, context)
+
+  const prevValue = previousFormValues[f.id]
+  const currValue = form[f.id]
+
+  // Ensure that if previous value is 'undefined' and current value is 'null'
+  // it doesn't get detected as a value change
+  const bothNil = isNil(prevValue) && isNil(currValue)
+  const valueHasChanged =
+    !isEqualFieldValue(deepDropNulls(prevValue), deepDropNulls(currValue)) &&
+    !bothNil
+
+  return isVisible && valueHasChanged
+}
+
+export function hasDeclarationFieldChanged(
+  f: FieldConfig,
+  form: EventState,
+  previousFormValues: EventState,
+  eventConfiguration: EventConfig,
+  validatorContext: ValidatorContext,
+  /** Fields of the form being edited, which decide what is hidden. Defaults to the declaration form. */
+  formFields: FieldConfig[] = getDeclarationFields(eventConfiguration)
+) {
+  const formWithoutHiddenFields = omitHiddenFields(
+    formFields,
+    form,
+    validatorContext
+  )
+  return hasFieldChanged(
+    f,
+    formWithoutHiddenFields,
+    previousFormValues,
+    validatorContext
+  )
+}
+
+/** Submissions that end in a NOTIFY: the NOTIFY action itself, and "Notify with edits". */
+const NOTIFY_SUBMISSIONS = new Set<ActionType | CustomMutationKeys>([
+  ActionType.NOTIFY,
+  'editAndNotify'
+])
+
+/**
+ * Form a submitted declaration is cleaned against, see `getCleanedDeclarationDiff`.
+ * A NOTIFY is validated against the notification form, whose field visibility can differ
+ * from the declaration form. Other submissions use the declaration form (`undefined`).
+ *
+ * @param submission action type, or custom mutation name, of the submission
+ */
+export function getSubmissionForm(
+  eventConfiguration: EventConfig,
+  submission: ActionType | CustomMutationKeys
+) {
+  return NOTIFY_SUBMISSIONS.has(submission)
+    ? getNotificationForm(eventConfiguration)
+    : undefined
+}
 
 /**
  * Structurally empty: `undefined`/`null`/`''`, or an array/object whose every
@@ -119,11 +202,8 @@ export function getChangedDeclarationDiff(
   eventConfiguration: EventConfig,
   validatorContext: ValidatorContext
 ): EventState {
-  const visibleForm = omitHiddenFields(
-    getDeclarationFields(eventConfiguration),
-    form,
-    validatorContext
-  )
+  // Visibility is decided by the form being edited, e.g. the notification form for a notifier
+  const visibleForm = omitHiddenFields(fields, form, validatorContext)
 
   function shouldClearNowHiddenField(field: FieldConfig) {
     const wasVisibleAndFilled =
@@ -142,7 +222,8 @@ export function getChangedDeclarationDiff(
             form,
             previousFormValues,
             eventConfiguration,
-            validatorContext
+            validatorContext,
+            fields
           ) || shouldClearNowHiddenField(field)
       )
       .map((field) => {
@@ -159,11 +240,14 @@ export function getChangedDeclarationDiff(
 // By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
 export function getCleanedDeclarationDiff({
   eventConfiguration,
+  form = getDeclaration(eventConfiguration),
   originalDeclaration,
   declarationDiff,
   validatorContext
 }: {
   eventConfiguration: EventConfig
+  /** Form whose field visibility decides which fields are kept. Defaults to the declaration form. */
+  form?: DeclarationFormConfig
   originalDeclaration?: EventState
   declarationDiff?: EventState
   validatorContext: ValidatorContext
@@ -175,7 +259,7 @@ export function getCleanedDeclarationDiff({
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
+      form,
       declarationDiff,
       validatorContext,
       true
@@ -191,12 +275,7 @@ export function getCleanedDeclarationDiff({
   // Because hidden fields with values in current event state causes confusion and bug in search endpoint
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclarationWithHiddenFieldsWithNullValues =
-    omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
-      merged,
-      validatorContext,
-      true
-    )
+    omitHiddenPaginatedFields(form, merged, validatorContext, true)
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)

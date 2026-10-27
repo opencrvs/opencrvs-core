@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import { putObject } from '@documents/s3/client'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 
@@ -28,12 +28,10 @@ export async function vsExportUploaderHandler(
     const bufferData = payload as Buffer
     const generateFileName = `${ref}.csv`
 
-    minioClient.putObject(MINIO_BUCKET, generateFileName, bufferData, {
-      'content-type': 'text/csv'
-    })
+    await putObject(generateFileName, bufferData, { contentType: 'text/csv' })
 
     return h
-      .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
+      .response({ refUrl: `/${env.S3_BUCKET}/${generateFileName}` })
       .code(200)
   } catch (error) {
     return h.response(error as Error).code(400)

@@ -19,6 +19,7 @@ accessLog:
   enabled: true
   format: "json"
 
+{{#if monitoring_enabled}}
 tracing:
   serviceName: traefik
   resourceAttributes:
@@ -30,6 +31,7 @@ tracing:
       enabled: true
       endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
       insecure: true
+{{/if}}
 
 
 ingressRoute:

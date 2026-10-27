@@ -13,22 +13,19 @@ import { createServer } from '@documents/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { encodeScope } from '@opencrvs/commons'
-import { MINIO_BUCKET } from '../../minio/constants'
 
-const minioStatMock = jest.fn()
-const minioRemoveObjectMock = jest.fn()
-const minioRemoveObjectsMock = jest.fn()
-let objectsInBucket: Array<{ name: string }> = []
+const statObjectIfExistsMock = jest.fn()
+const removeObjectMock = jest.fn()
+const removeObjectsMock = jest.fn()
+let keysInBucket: string[] = []
 
-jest.mock('../../minio/client', () => {
+jest.mock('../../s3/client', () => {
   return {
     __esModule: true,
-    minioClient: {
-      statObject: (...args: unknown[]) => minioStatMock(...args),
-      removeObject: (...args: unknown[]) => minioRemoveObjectMock(...args),
-      removeObjects: (...args: unknown[]) => minioRemoveObjectsMock(...args),
-      listObjectsV2: () => objectsInBucket
-    }
+    statObjectIfExists: (...args: unknown[]) => statObjectIfExistsMock(...args),
+    removeObject: (...args: unknown[]) => removeObjectMock(...args),
+    removeObjects: (...args: unknown[]) => removeObjectsMock(...args),
+    listObjectKeys: async () => keysInBucket
   }
 })
 
@@ -55,13 +52,15 @@ describe('deleteDocument', () => {
   let server: any
 
   beforeEach(async () => {
-    minioStatMock.mockReset().mockReturnValue({ metaData: {} })
-    minioRemoveObjectMock.mockReset()
+    statObjectIfExistsMock.mockReset().mockResolvedValue({ metadata: {} })
+    removeObjectMock.mockReset()
     server = await createServer()
   })
 
   it('deletes a document uploaded by someone else', async () => {
-    minioStatMock.mockReturnValue({ metaData: { 'created-by': 'someone-else' } })
+    statObjectIfExistsMock.mockResolvedValue({
+      metadata: { 'created-by': 'someone-else' }
+    })
 
     const res = await server.server.inject({
       method: 'DELETE',
@@ -70,10 +69,20 @@ describe('deleteDocument', () => {
     })
 
     expect(res.statusCode).toBe(204)
-    expect(minioRemoveObjectMock).toHaveBeenCalledWith(
-      MINIO_BUCKET,
-      `events/${eventId}/proof.png`
-    )
+    expect(removeObjectMock).toHaveBeenCalledWith(`events/${eventId}/proof.png`)
+  })
+
+  it('answers 404 and removes nothing when the document does not exist', async () => {
+    statObjectIfExistsMock.mockResolvedValue(null)
+
+    const res = await server.server.inject({
+      method: 'DELETE',
+      url: `/files/events/${eventId}/proof.png`,
+      headers: { authorization: `Bearer ${writer}` }
+    })
+
+    expect(res.statusCode).toBe(404)
+    expect(removeObjectMock).not.toHaveBeenCalled()
   })
 
   it('refuses a caller who can only read records', async () => {
@@ -84,7 +93,7 @@ describe('deleteDocument', () => {
     })
 
     expect(res.statusCode).toBe(403)
-    expect(minioRemoveObjectMock).not.toHaveBeenCalled()
+    expect(removeObjectMock).not.toHaveBeenCalled()
   })
 })
 
@@ -92,15 +101,15 @@ describe('deletePrefix', () => {
   let server: any
 
   beforeEach(async () => {
-    minioRemoveObjectsMock.mockReset()
-    objectsInBucket = []
+    removeObjectsMock.mockReset()
+    keysInBucket = []
     server = await createServer()
   })
 
   it('deletes every object under a record prefix', async () => {
-    objectsInBucket = [
-      { name: `events/${eventId}/proof.png` },
-      { name: `events/${eventId}/signature.png` }
+    keysInBucket = [
+      `events/${eventId}/proof.png`,
+      `events/${eventId}/signature.png`
     ]
 
     const res = await server.server.inject({
@@ -110,14 +119,14 @@ describe('deletePrefix', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(minioRemoveObjectsMock).toHaveBeenCalledWith(MINIO_BUCKET, [
+    expect(removeObjectsMock).toHaveBeenCalledWith([
       `events/${eventId}/proof.png`,
       `events/${eventId}/signature.png`
     ])
   })
 
   it('accepts a prefix written without its trailing slash', async () => {
-    objectsInBucket = [{ name: `events/${eventId}/proof.png` }]
+    keysInBucket = [`events/${eventId}/proof.png`]
 
     const res = await server.server.inject({
       method: 'DELETE',
@@ -126,13 +135,13 @@ describe('deletePrefix', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(minioRemoveObjectsMock).toHaveBeenCalledWith(MINIO_BUCKET, [
+    expect(removeObjectsMock).toHaveBeenCalledWith([
       `events/${eventId}/proof.png`
     ])
   })
 
   it('refuses a prefix that is not a single record or user', async () => {
-    objectsInBucket = [{ name: `events/${eventId}/proof.png` }]
+    keysInBucket = [`events/${eventId}/proof.png`]
 
     const res = await server.server.inject({
       method: 'DELETE',
@@ -141,11 +150,11 @@ describe('deletePrefix', () => {
     })
 
     expect(res.statusCode).toBe(400)
-    expect(minioRemoveObjectsMock).not.toHaveBeenCalled()
+    expect(removeObjectsMock).not.toHaveBeenCalled()
   })
 
   it('refuses a caller who can only read records', async () => {
-    objectsInBucket = [{ name: `events/${eventId}/proof.png` }]
+    keysInBucket = [`events/${eventId}/proof.png`]
 
     const res = await server.server.inject({
       method: 'DELETE',
@@ -154,6 +163,6 @@ describe('deletePrefix', () => {
     })
 
     expect(res.statusCode).toBe(403)
-    expect(minioRemoveObjectsMock).not.toHaveBeenCalled()
+    expect(removeObjectsMock).not.toHaveBeenCalled()
   })
 })

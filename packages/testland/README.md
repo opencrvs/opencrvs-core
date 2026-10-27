@@ -28,7 +28,7 @@ OpenCRVS requires a country configuration in order to run. Testland is the count
 
 OpenCRVS is designed to be highly configurable for your country needs. It achieves this by seeding reference data that it needs from this module and exposing APIs for certain business critical operations.
 
-Testland also contains example integrations and tools that are not part of the country configuration template, such as MOSIP, verifiable credentials, a government portal API and QA tools for locations.
+Testland also contains example integrations and tools that are not part of the country configuration template, such as MOSIP, verifiable credentials and QA tools for locations.
 
 # How do I run the module alongside the OpenCRVS core?
 
@@ -53,7 +53,7 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` starts the dependencies (databases, Elasticsearch, MinIO etc.) with Docker Compose and all Core services, including Testland on port 3040. It asks for confirmation first, then stops all running Docker containers on your machine.
+`pnpm dev` starts the dependencies (databases, Elasticsearch, S3 etc.) with Docker Compose and all Core services, including Testland on port 3040. It asks for confirmation first, then stops all running Docker containers on your machine.
 
 You can also start them separately:
 
@@ -87,7 +87,7 @@ The environments (QA, QA hotfix, e2e, migration staging and migration production
   - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities, roles, employees and other reference data.
   - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations. The `/config/roles`, `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
   - [src/analytics](src/analytics) contains the code that loads events and locations into the analytics database. The database itself is set up by [assets/postgres/setup-analytics.sh](assets/postgres/setup-analytics.sh). See [ANALYTICS.md](ANALYTICS.md).
-  - [src/verifiable-credentials](src/verifiable-credentials), [src/government-portal-api](src/government-portal-api) and [src/qa-tools](src/qa-tools) contain the Testland-only integrations and tools.
+  - [src/verifiable-credentials](src/verifiable-credentials) and [src/qa-tools](src/qa-tools) contain the Testland-only integrations and tools.
 - The [e2e](e2e) folder contains the Playwright end-to-end tests.
 - The [postman](postman) folder contains Postman collections demonstrating how to interoperate with OpenCRVS.
 
@@ -139,7 +139,6 @@ These endpoints are examples and are not required by OpenCRVS Core.
 - `POST /trigger/events/birth/actions/APPROVE_CORRECTION`: sends informant notifications and forwards corrected birth registrations to MOSIP
 - `POST /trigger/events/adoption/actions/REGISTER`: seals the original birth record of the adopted child, then generates the registration number and sends the informant notification. The registration is rejected if sealing fails.
 - `/verifiable-credentials/*` and `/_demo-issuer/*`: verifiable credential issuance examples
-- `/api/upload` & `/api/events/*`: government portal API example
 - `GET /locations` & `GET /administrative-areas`: QA tool pages for the location write APIs, with `GET /{locations|administrative-areas}/search`, `POST`, `PUT /{id}` and `DELETE /{id}/versions/{versionId}` routes that proxy search and writes to the gateway
 - `/graphql`: proxies requests to the Core gateway
 - `GET /{param*}`: serves the [public](public) folder, a page for printing all registrations

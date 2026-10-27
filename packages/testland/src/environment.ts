@@ -70,16 +70,6 @@ export const env = cleanEnv(process.env, {
     devDefault: '',
     desc: 'Comma separated list of URLs to forward action events to'
   }),
-  SYSTEM_CLIENT_ID: str({
-    default: undefined,
-    devDefault: undefined,
-    desc: 'Client ID for system-to-system authentication on /api/ proxy endpoints'
-  }),
-  SYSTEM_CLIENT_SECRET: str({
-    default: undefined,
-    devDefault: undefined,
-    desc: 'Client secret for system-to-system authentication on /api/ proxy endpoints'
-  }),
   VERIFIABLE_CREDENTIALS_SDJWT_ISSUE_URL: url({
     default: 'http://countryconfig:3040/_demo-issuer/openid4vc/sdjwt/issue',
     devDefault: 'http://localhost:3040/_demo-issuer/openid4vc/sdjwt/issue',

@@ -34,18 +34,16 @@ spec:
               command: ["/scripts/backup.sh"]
               image: {{ include "opencrvs.imageReference" .Values.utilities }}
               env:
-              {{- if not .Values.minio.use_default_credentials }}
-                - name: MINIO_ROOT_USER
+                - name: S3_ADMIN_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: minio-opencrvs-users
-                      key: MINIO_ROOT_USER
-                - name: MINIO_ROOT_PASSWORD
+                      name: s3-opencrvs-users
+                      key: S3_ADMIN_ACCESS_KEY
+                - name: S3_ADMIN_SECRET_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: minio-opencrvs-users
-                      key: MINIO_ROOT_PASSWORD
-              {{- end }}
+                      name: s3-opencrvs-users
+                      key: S3_ADMIN_SECRET_KEY
                 - name: ENCRYPT_PASS
                   valueFrom:
                     secretKeyRef:

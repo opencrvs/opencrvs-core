@@ -27,11 +27,11 @@ hpa:
   enabled: false
 
 env:
-  MINIO_BUCKET: ocrvs
+  S3_BUCKET: ocrvs
   OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
 
 otel:
-  enabled: true
+  enabled: {{monitoring_enabled}}
   deployment_environment: {{env}}
   exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
 
@@ -39,8 +39,7 @@ elasticsearch:
   auth_mode: auto
   host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
 
-minio:
-  auth_mode: use_secret
+s3:
   host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
 
 redis:
@@ -54,8 +53,7 @@ postgres:
 platform:
   imagePullSecrets:
     # Default value for credentials created while yarn environment:init
-    - name: dockerhub-credentials
-
+    - name: registry-credentials
 
 auth:
   env:
