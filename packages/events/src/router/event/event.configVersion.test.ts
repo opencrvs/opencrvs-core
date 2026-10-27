@@ -35,6 +35,7 @@ const PAST = '2010-01-01'
 const FUTURE = '2999-01-01'
 const EXTRA_FIELD_ID = 'applicant.extra'
 const CUSTOM_ACTION_TYPE = 'VERSIONS_TEST_ACTION'
+const SECURED_FIELD_ID = 'applicant.address'
 
 const { versions, ...eventLevel } = toVersionedEventConfig(
   tennisClubMembershipEvent
@@ -66,6 +67,14 @@ const CUSTOM_ACTION_SCOPES = [
       event: [TENNIS_CLUB_MEMBERSHIP],
       customActionTypes: [CUSTOM_ACTION_TYPE]
     }
+  })
+]
+
+const SEARCH_SCOPES = [
+  ...TEST_USER_DEFAULT_SCOPES,
+  encodeScope({
+    type: 'record.search',
+    options: { event: [TENNIS_CLUB_MEMBERSHIP] }
   })
 ]
 
@@ -117,6 +126,35 @@ function versionRequiringExtraField(
             },
             ...otherPages
           ]
+        }
+      }
+    })
+  }
+}
+
+/** A version that updates secured field with `secured: false`. */
+function versionWithFieldUnsecured(
+  id: string,
+  effectiveFrom?: string
+): EventConfigVersion {
+  return {
+    ...version(id, effectiveFrom),
+    actions: base.actions.map((action) => {
+      if (action.type !== ActionType.DECLARE) {
+        return action
+      }
+      return {
+        ...action,
+        declaration: {
+          ...action.declaration,
+          pages: action.declaration.pages.map((page) => ({
+            ...page,
+            fields: page.fields.map((field) =>
+              field.id === SECURED_FIELD_ID
+                ? { ...field, secured: false }
+                : field
+            )
+          }))
         }
       }
     })
@@ -278,5 +316,57 @@ describe('the event configuration version of a record', () => {
         annotation: {}
       })
     ).resolves.not.toHaveProperty('configVersionId')
+  })
+
+  test("search drops the fields secured in the record's version", async () => {
+    // The record is stamped v1:
+    // versions: [
+    //   { id: 'v1', fields: [..., { id: 'applicant.address', secured: true }] },
+    //   { id: 'v2', fields: [..., { id: 'applicant.address', secured: false }] }
+    // ]
+    useVersions(version('v1'), versionWithFieldUnsecured('v2', FUTURE))
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, SEARCH_SCOPES)
+    const declared = await createEvent(client, generator, [ActionType.DECLARE])
+    const search = async () =>
+      client.event.search({
+        query: { type: 'and', clauses: [{ id: declared.id }] }
+      })
+    expect((await search()).results[0].declaration).not.toHaveProperty([
+      SECURED_FIELD_ID
+    ])
+
+    // v2, which has taken effect since, does not secure the field.
+    useVersions(version('v1'), versionWithFieldUnsecured('v2', PAST))
+
+    expect((await search()).results[0].declaration).not.toHaveProperty([
+      SECURED_FIELD_ID
+    ])
+  })
+
+  test("search keeps the fields not secured in the record's version", async () => {
+    // The record is stamped v2:
+    // versions: [
+    //   { id: 'v1', fields: [..., { id: 'applicant.address', secured: true }] },
+    //   { id: 'v2', fields: [..., { id: 'applicant.address', secured: false }] }
+    // ]
+    useVersions(version('v1'), versionWithFieldUnsecured('v2', PAST))
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, SEARCH_SCOPES)
+    const declared = await createEvent(client, generator, [ActionType.DECLARE])
+    const search = async () =>
+      client.event.search({
+        query: { type: 'and', clauses: [{ id: declared.id }] }
+      })
+    expect((await search()).results[0].declaration).toHaveProperty([
+      SECURED_FIELD_ID
+    ])
+
+    // v2 takes effect later now, so v1, which secures the field, is in effect today.
+    useVersions(version('v1'), versionWithFieldUnsecured('v2', FUTURE))
+
+    expect((await search()).results[0].declaration).toHaveProperty([
+      SECURED_FIELD_ID
+    ])
   })
 })
