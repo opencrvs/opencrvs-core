@@ -460,12 +460,35 @@ describe('core action dialog form validation', () => {
   it('rejects NOTIFY annotation values not present in any configured field', () => {
     const errors = validateNotifyAction({
       eventConfig: eventConfigWithNotifyForm,
-      annotation: { 'unknown.field': 'boom' },
+      annotation: {
+        'notify.dialog.comments': 'reported at facility',
+        'unknown.field': 'boom'
+      },
       declaration: {},
       context: testContext
     })
 
     expect(errors).toHaveLength(1)
+  })
+
+  it('reports an unknown annotation key together with a missing required dialog field', () => {
+    const errors = validateNotifyAction({
+      eventConfig: eventConfigWithNotifyForm,
+      annotation: { 'unknown.field': 'boom' },
+      declaration: {},
+      context: testContext
+    })
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: errorMessages.unexpectedField.defaultMessage,
+        id: 'unknown.field'
+      }),
+      expect.objectContaining({
+        message: errorMessages.requiredField.defaultMessage,
+        id: 'notify.dialog.comments'
+      })
+    ])
   })
 })
 
