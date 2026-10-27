@@ -39,7 +39,7 @@ import {
 } from './utils'
 import {
   resolveActionConditionals,
-  resolveContinueDraftConditionals
+  resolveBaseActionConditionals
 } from './resolveActionConditionals'
 import { useUserAllowedActions } from './useUserAllowedActions'
 
@@ -84,13 +84,17 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       actionType: T
     ): ActionCtaConfig<T> => {
       if (actionType === ClientSpecificAction.CONTINUE_DRAFT) {
-        const { enabled, visible } = resolveContinueDraftConditionals({
-          event,
-          draftActionType,
-          validatorContext,
-          isActionAllowedForUser,
-          eventConfiguration
-        })
+        // The draft's own action must still be available to the user. A draft opens
+        // without assignment or a connection, so the action's internal rules don't apply.
+        const { enabled, visible } = draftActionType
+          ? resolveBaseActionConditionals({
+              event,
+              actionType: draftActionType,
+              validatorContext,
+              isActionAllowedForUser,
+              eventConfiguration
+            })
+          : { enabled: false, visible: false }
 
         return {
           label: actionLabels[actionType],

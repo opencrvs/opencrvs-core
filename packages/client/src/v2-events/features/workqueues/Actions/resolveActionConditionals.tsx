@@ -119,32 +119,32 @@ function resolveInternalActionConditions({
   }
 }
 
-interface ActionConditionalsContext {
-  event: EventIndex
-  validatorContext: ValidatorContext
-  isActionAllowedForUser: (action: DisplayableAction) => boolean
-  eventConfiguration: EventConfig
-}
-
 /**
  * Checks that the action is available for the event, the user can perform it,
  * and the action's configured conditionals allow it.
  */
-function resolveBaseActionConditionals({
+export function resolveBaseActionConditionals({
   event,
   actionType,
-  userId,
   validatorContext,
   isActionAllowedForUser,
   eventConfiguration
-}: ActionConditionalsContext & {
+}: {
+  event: EventIndex
   actionType: DisplayableAction
-  userId: string
+  validatorContext: ValidatorContext
+  isActionAllowedForUser: (action: DisplayableAction) => boolean
+  eventConfiguration: EventConfig
 }) {
+  const user = getOrThrow(
+    validatorContext.user,
+    'Cannot determine action conditionals without user information'
+  )
+
   // 1. Gather all available actions for the event, including assignment actions
   const allAvailableActions = [
     ...getAvailableActionsForEvent(event),
-    ...getAvailableAssignmentActions(event, userId)
+    ...getAvailableAssignmentActions(event, user.sub)
   ]
 
   // 2. Check if the action is available for the event at all.
@@ -171,17 +171,24 @@ function resolveBaseActionConditionals({
  * Given event and action type, determines if the action should be enabled and visible for the user.
  */
 export function resolveActionConditionals({
+  event,
   actionType,
+  validatorContext,
+  isActionAllowedForUser,
+  eventConfiguration,
   isOnline,
   isDownloaded,
   isAssigning,
-  areDuplicatesAvailable = true,
-  ...context
-}: ActionConditionalsContext & {
+  areDuplicatesAvailable = true
+}: {
+  event: EventIndex
   actionType: Exclude<
     WorkqueueCtaType | ActionMenuActionType,
     typeof ClientSpecificAction.CONTINUE_DRAFT
   >
+  validatorContext: ValidatorContext
+  isActionAllowedForUser: (action: DisplayableAction) => boolean
+  eventConfiguration: EventConfig
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
@@ -191,22 +198,24 @@ export function resolveActionConditionals({
   visible: boolean
 } {
   const user = getOrThrow(
-    context.validatorContext.user,
+    validatorContext.user,
     'Cannot determine action conditionals without user information'
   )
 
   // 1-5. The base result.
   const base = resolveBaseActionConditionals({
-    ...context,
+    event,
     actionType,
-    userId: user.sub
+    validatorContext,
+    isActionAllowedForUser,
+    eventConfiguration
   })
 
   // 6. Run hardcoded internal business rules.
   const internalConditions = resolveInternalActionConditions({
     actionType,
     isOnline,
-    assignmentStatus: getAssignmentStatus(context.event, user.sub),
+    assignmentStatus: getAssignmentStatus(event, user.sub),
     isDownloaded,
     isAssigning,
     areDuplicatesAvailable
@@ -216,35 +225,4 @@ export function resolveActionConditionals({
     enabled: base.enabled && internalConditions.enabled,
     visible: base.visible && internalConditions.visible
   }
-}
-
-/**
- * Determines if the user can continue their draft of the event. The draft's own action
- * must still be available to them. A draft opens without assignment or a connection, so
- * the internal rules of its action don't apply.
- */
-export function resolveContinueDraftConditionals({
-  draftActionType,
-  ...context
-}: ActionConditionalsContext & {
-  /** Undefined when the user has no draft of the event */
-  draftActionType: DisplayableAction | undefined
-}): {
-  enabled: boolean
-  visible: boolean
-} {
-  if (!draftActionType) {
-    return { enabled: false, visible: false }
-  }
-
-  const user = getOrThrow(
-    context.validatorContext.user,
-    'Cannot determine action conditionals without user information'
-  )
-
-  return resolveBaseActionConditionals({
-    ...context,
-    actionType: draftActionType,
-    userId: user.sub
-  })
 }

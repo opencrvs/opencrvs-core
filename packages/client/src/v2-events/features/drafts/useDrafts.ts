@@ -16,6 +16,9 @@ import {
   ActionType,
   deepDropNulls,
   Draft,
+  EventDocument,
+  EventStatus,
+  getStatusFromActions,
   UUID
 } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
@@ -28,6 +31,7 @@ import {
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import { usePendingDeleteEventIds } from '@client/v2-events/features/events/useEvents/procedures/delete'
+import { retryUnlessConflict } from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
 import {
   createEventActionMutationFn,
   QueryOptions,
@@ -136,8 +140,14 @@ export const localDraftStore = create<DraftStore>()(
   )
 )
 
+/** Drafts are saved only on a created record. The server refuses them on any other. */
+export function canSaveDraft(event: EventDocument) {
+  return getStatusFromActions(event.actions) === EventStatus.enum.CREATED
+}
+
 setMutationDefaults(trpcOptionsProxy.event.draft.create, {
-  retry: true,
+  // A refused draft (409) stays refused, retrying won't save it
+  retry: retryUnlessConflict,
   mutationFn: createEventActionMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
     const optimisticDraft: Draft = {

@@ -248,8 +248,6 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
 /**
  * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
  *
- */
-/**
  * @param scopes scopes that grant access, or a function picking them from the raw input when they
  * depend on it, e.g. on the action type of a draft. Return `undefined` for input that names no scopes.
  */
