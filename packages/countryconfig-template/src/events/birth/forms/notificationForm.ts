@@ -30,6 +30,7 @@ import {
   MAX_NAME_LENGTH
 } from '../validators'
 import { PHONE_NUMBER_REGEX } from './pages/informant'
+import { mother } from './pages/mother'
 
 /**
  * Child fields captured on a birth notification. The fields are taken from the
@@ -133,6 +134,22 @@ const differentFields: FieldConfigInput[] = [
   }
 ]
 
+/**
+ * Mother's ID fields are picked from the declaration form. `requireMotherDetails`
+ * in their conditionals is always true here, as the notification form has
+ * neither the informant's relation nor the "details not available" checkbox.
+ *
+ * The ID type is optional on a notification, so notifications without the
+ * mother's ID stay valid. Once a type is chosen, its ID number is required.
+ */
+const motherIdFields = mother.fields
+  .filter(({ id }) =>
+    ['mother.idType', 'mother.nid', 'mother.passport', 'mother.brn'].includes(
+      id
+    )
+  )
+  .map((f) => (f.id === 'mother.idType' ? { ...f, required: false } : f))
+
 const childPage = defineFormPage({
   id: 'child',
   type: PageTypes.enum.FORM,
@@ -197,6 +214,7 @@ const mothersPage = defineFormPage({
         id: 'event.birth.action.declare.form.section.person.field.dob.label'
       }
     },
+    ...motherIdFields,
     {
       id: 'informant.phoneNo',
       type: FieldType.PHONE,

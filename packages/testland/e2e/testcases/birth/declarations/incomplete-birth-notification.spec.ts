@@ -132,6 +132,12 @@ test('Incomplete birth notification', async ({ page }) => {
     await expect(page.getByTestId('mother.name-value')).toHaveText(
       formatName(inputs.mother.name)
     )
+    await expect(page.getByTestId('mother.idType-value')).toHaveText(
+      inputs.mother.identifier.type
+    )
+    await expect(page.getByTestId('mother.nid-value')).toHaveText(
+      inputs.mother.identifier.id
+    )
     await expect(page.getByTestId('informant.email-value')).toHaveText(
       inputs.informantEmail
     )

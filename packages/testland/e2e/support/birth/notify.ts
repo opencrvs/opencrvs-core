@@ -81,6 +81,10 @@ export async function fillNotificationMotherPage(
 
   await fillDate(page, inputs.mother.birthDate)
 
+  await page.locator('#mother____idType').click()
+  await page.getByText(inputs.mother.identifier.type, { exact: true }).click()
+  await page.locator('#mother____nid').fill(inputs.mother.identifier.id)
+
   await page.locator('#informant____email').fill(inputs.informantEmail)
 }
 
