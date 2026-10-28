@@ -372,6 +372,10 @@ export async function addAction(
   return updatedEvent
 }
 
+/**
+ * Created events are never indexed, and only created events can be deleted. Together these
+ * guarantee that every event deduplication can flag still exists.
+ */
 function isEventIndexable(event: EventDocument) {
   return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
 }
@@ -477,7 +481,7 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent, configuration)
+  await ensureEventIndexed(updatedEvent, configuration)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
