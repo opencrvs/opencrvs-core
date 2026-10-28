@@ -309,6 +309,8 @@ export const eventRouter = router({
           ctx.event
         )
 
+        // Checked against the event loaded before the upsert, like throwConflictIfActionNotAllowed above.
+        // An action committed in between leaves a stale draft, which the record's next action deletes.
         throwConflictIfDraftNotAllowed(ctx.event)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(

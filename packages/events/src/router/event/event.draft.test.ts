@@ -94,7 +94,7 @@ test('Refuses a draft for any action other than declare or notify', async () => 
       status: 'Accepted',
       transactionId: 'trnx-id'
     })
-  ).rejects.toThrow('invalid_value')
+  ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
 })
 
 test('Allows creating draft for event without actions', async () => {
