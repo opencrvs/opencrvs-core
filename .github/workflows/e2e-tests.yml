@@ -243,6 +243,15 @@ jobs:
           name: ctrf-report-shard-${{ matrix.shard }}-${{ github.run_id }}
           path: packages/testland/ctrf/*.json
           retention-days: 7
+      # Written by e2e/retry-reporter.ts; missing only if Playwright never finished.
+      - name: Upload retries
+        uses: actions/upload-artifact@v7
+        if: '!cancelled()'
+        with:
+          name: retries-shard-${{ matrix.shard }}-attempt-${{ github.run_attempt }}
+          path: packages/testland/retries/retries.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload report artifact
         uses: actions/upload-artifact@v7
         if: '!cancelled()'
@@ -250,3 +259,23 @@ jobs:
           name: playwright-report-shard-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: packages/testland/playwright-report/
           retention-days: 30
+
+  # Shard reports keep only each test's final attempt, so retries are invisible there.
+  retry-report:
+    name: Retry report
+    needs: test
+    if: "!cancelled() && needs.test.result != 'skipped'"
+    continue-on-error: true
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          sparse-checkout: packages/testland/e2e
+      # No setup-node: the script has no dependencies and the runner's Node runs it.
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: retries-shard-*
+          path: retries
+      - name: Summarise retried tests
+        run: node packages/testland/e2e/summarise-retries.mjs retries
