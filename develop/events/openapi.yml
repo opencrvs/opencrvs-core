@@ -15250,6 +15250,17 @@ components:
                   fieldType:
                     type: string
                     const: field
+                  defaultValue:
+                    description: Value the field opens with in advanced search. Omitted or true uses
+                      the declaration form's defaultValue, false opens the field
+                      empty, and any other value opens it with that value. Only
+                      text, number and date fields take a value; every other
+                      field type, and date fields searched as a range, only
+                      accept true or false.
+                    type:
+                      - boolean
+                      - string
+                      - number
                 required:
                   - config
                   - fieldId
