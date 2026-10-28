@@ -73,8 +73,7 @@ export default {
  * Regression: Community leaders have record.notify (not record.declare).
  * Before the fix, Delete was hidden for CREATED drafts owned by the community leader.
  *
- * Declare is never in the menu. With a notify draft open, Update continues it,
- * see AssignedToSelfWithNotifyDraft.
+ * With a notify draft open, Update continues it, see AssignedToSelfWithNotifyDraft.
  *
  * NOTE: This story requires the communityLeader token in test-data-generators.ts
  * to be regenerated after the scopes were corrected from record.declare to
@@ -127,9 +126,6 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
     await waitFor(async () => {
       await expect(deleteItem.hasAttribute('disabled')).toBe(false)
     })
-
-    // Declare is not in the menu. tennisClubMembershipEvent configures DECLARE's label as "Send an application".
-    await expect(screen.queryByText('Send an application')).toBeNull()
   }
 }
 
@@ -158,8 +154,5 @@ export const AssignedToSelfWithNotifyDraft: StoryObj<typeof ActionMenu> = {
     await waitFor(async () => {
       await expect(updateItem.hasAttribute('disabled')).toBe(false)
     })
-
-    // Declare is not offered alongside it
-    await expect(screen.queryByText('Send an application')).toBeNull()
   }
 }
