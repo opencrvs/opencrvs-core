@@ -15,8 +15,7 @@ import {
   field,
   defineFormPage,
   FieldConfigInput,
-  PageTypes,
-  or
+  PageTypes
 } from '@opencrvs/toolkit/events'
 import {
   BIRTH_LATE_REGISTRATION_TARGET_DAYS,
@@ -32,7 +31,6 @@ import {
   invalidNameValidator,
   MAX_NAME_LENGTH
 } from '../validators'
-import { PHONE_NUMBER_REGEX } from './pages/informant'
 import { mother } from './pages/mother'
 import { connectToMOSIPIdReader } from '@countryconfig/events/mosip'
 
@@ -245,47 +243,7 @@ const mothersPage = defineFormPage({
         disableIf: ['pending', 'verified', 'authenticated']
       }
     ),
-    ...motherIdFields,
-    {
-      id: 'informant.phoneNo',
-      type: FieldType.PHONE,
-      required: false,
-      secured: true,
-      label: {
-        defaultMessage: 'Phone number',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.phoneNo.label'
-      },
-      validation: [
-        {
-          message: {
-            defaultMessage:
-              'Must be a valid 10 digit number that starts with 0(7|9)',
-            description:
-              'The error message that appears on phone numbers where the first two characters must be 07 or 09, and length must be 10',
-            id: 'event.birth.action.declare.form.section.informant.field.phoneNo.error'
-          },
-          validator: or(
-            field('informant.phoneNo').matches(PHONE_NUMBER_REGEX),
-            field('informant.phoneNo').isFalsy()
-          )
-        }
-      ]
-    },
-    {
-      id: 'informant.email',
-      type: FieldType.EMAIL,
-      required: true,
-      secured: true,
-      label: {
-        defaultMessage: 'Email',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.email.label'
-      },
-      configuration: {
-        maxLength: 255
-      }
-    }
+    ...motherIdFields
   ]
 })
 

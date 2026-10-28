@@ -75,7 +75,6 @@ test("Hospital official authenticates the mother's National ID on a birth notifi
   })
 
   await test.step('Notify', async () => {
-    await page.locator('#informant____email').fill(inputs.informantEmail)
     await goToSection(page, 'review')
 
     // Child details survive the round trip to E-Signet

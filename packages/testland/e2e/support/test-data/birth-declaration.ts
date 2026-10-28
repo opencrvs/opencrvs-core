@@ -196,7 +196,6 @@ export async function getNotificationDeclaration({
       // Must be at least 18 years before child.dob
       faker.date.between({ from: '1995-09-12', to: '2000-11-28' })
     ),
-    'informant.email': 'mothers@email.com',
     ...partialDeclaration
   }
 }
