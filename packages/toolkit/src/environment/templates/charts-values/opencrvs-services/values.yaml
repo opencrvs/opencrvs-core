@@ -40,7 +40,12 @@ elasticsearch:
   host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
 
 s3:
+  auth_mode: use_secret
+  {{#if rustfs_enabled}}
+  host: rustfs-0.rustfs.opencrvs-deps-{{env}}.svc.cluster.local
+  {{else}}
   host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
+  {{/if}}
 
 redis:
   auth_mode: use_secret

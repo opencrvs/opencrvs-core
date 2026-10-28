@@ -1,0 +1,215 @@
+{{ if .Values.rustfs.enabled }}
+{{- $s3 := .Values.rustfs }}
+{{- $id := .Values.rustfs.run_as_id }}
+{{- $storageType := default .Values.storage_type $s3.storage_type | default "pvc" }}
+{{- if and (eq $storageType "pvc") (not $s3.pvc.use_existing_claim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: rustfs
+  name: {{ $s3.pvc.name }}
+spec:
+  {{- if $s3.pvc.storage_class }}
+  storageClassName: {{ $s3.pvc.storage_class | quote }}
+  {{- end }}
+  accessModes:
+    - {{ $s3.pvc.access_mode }}
+  resources:
+    requests:
+      storage: {{ $s3.pvc.storage_size }}
+{{- end }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rustfs-route
+spec:
+  entryPoints:
+  {{- if .Values.ingress.ssl_enabled }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "rustfs" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: rustfs
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.rustfs.port }}
+    {{- if .Values.ingress.application_allowlist }}
+    middlewares:
+      - name: application-ip-allowlist
+    {{- end }}
+  {{- if .Values.rustfs.console.enabled }}
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "rustfs-console" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: rustfs
+      namespace: {{ .Release.Namespace }}
+      port: 3536
+    {{- if .Values.ingress.admin_console_allowlist }}
+    middlewares:
+      - name: admin-console-ip-allowlist
+    {{- end }}
+  {{- end }}
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rustfs
+  name: rustfs
+spec:
+  {{- $service_type := default .Values.service_type .Values.rustfs.service_type }}
+  type: {{ $service_type }}
+  {{- if eq $service_type "ClusterIP" }}
+  clusterIP: None
+  {{- end }}
+  ports:
+    - name: s3
+      port: {{ .Values.rustfs.port }}
+      targetPort: {{ .Values.rustfs.port }}
+      {{- if .Values.rustfs.node_port }}
+      nodePort: {{ .Values.rustfs.node_port }}
+      {{- end }}
+    {{- if .Values.rustfs.console.enabled }}
+    - name: console
+      port: 3536
+      targetPort: 3536
+      {{- if .Values.rustfs.node_port_console }}
+      nodePort: {{ .Values.rustfs.node_port_console }}
+      {{- end }}
+    {{- end }}
+  selector:
+    app: rustfs
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: rustfs
+  name: rustfs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rustfs
+  serviceName: rustfs
+  template:
+    metadata:
+      labels:
+        app: rustfs
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.rustfs) | nindent 6 }}
+    {{- if .Values.priority_class.enabled }}
+      priorityClassName: {{ .Values.priority_class.name }}
+    {{- end }}
+    {{- $node_selector := default .Values.node_selector $s3.node_selector }}
+    {{- if $node_selector }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+            {{- range $k, $v := $node_selector }}
+              - key: {{ $k }}
+                operator: In
+                values:
+                - {{ $v }}
+            {{- end }}
+    {{- end }}
+      securityContext:
+        runAsUser: {{ $id }}
+        runAsGroup: {{ $id }}
+        fsGroup: {{ $id }}
+        fsGroupChangePolicy: OnRootMismatch
+    {{- if eq $storageType "host_path" }}
+      initContainers:
+        - name: fix-permissions
+          image: {{ include "opencrvs.imageReference" .Values.rustfs }}
+          command:
+            - sh
+            - -c
+            - '[ "$(stat -c %u /data)" = "{{ $id }}" ] || { find /data -mindepth 1 -exec chown {{ $id }}:{{ $id }} {} + && chown {{ $id }}:{{ $id }} /data; }'
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /data
+              name: rustfs
+    {{- end }}
+      containers:
+        - name: rustfs
+          image: {{ include "opencrvs.imageReference" .Values.rustfs }}
+          # No args: the image serves /data, which is its RUSTFS_VOLUMES
+          env:
+            - name: RUSTFS_ADDRESS
+              value: {{ printf ":%v" .Values.rustfs.port | quote }}
+            - name: RUSTFS_CONSOLE_ENABLE
+              value: {{ .Values.rustfs.console.enabled | quote }}
+            {{- if .Values.rustfs.console.enabled }}
+            - name: RUSTFS_CONSOLE_ADDRESS
+              value: ':3536'
+            {{- end }}
+            # The same as MINIO_API_CORS_ALLOW_ORIGIN of MinIO. With *, a browser
+            # does not send credentials, which presigned URLs do not need.
+            - name: RUSTFS_CORS_ALLOWED_ORIGINS
+              value: '*'
+            - name: RUSTFS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-opencrvs-users
+                  key: S3_ADMIN_ACCESS_KEY
+            - name: RUSTFS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-opencrvs-users
+                  key: S3_ADMIN_SECRET_KEY
+          {{- include "render-env-vars" (dict "service_name" "rustfs" "Values" .Values) }}
+          ports:
+            - containerPort: {{ .Values.rustfs.port }}
+              protocol: TCP
+          {{- if .Values.rustfs.console.enabled }}
+            - containerPort: 3536
+              protocol: TCP
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.rustfs.port }}
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /data
+              name: rustfs
+      {{- if and (eq (include "s3.use_rsync" .) "true") (eq (include "s3.store" .) "rustfs") }}
+        {{- include "s3.rsync_container" . | nindent 8 }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: rustfs
+      {{- if eq $storageType "pvc" }}
+          persistentVolumeClaim:
+            claimName: {{ $s3.pvc.name }}
+      {{- else if eq $storageType "host_path" }}
+          hostPath:
+            path: {{ $s3.host_data_path }}
+            type: DirectoryOrCreate
+      {{- end }}
+      {{- if and (eq (include "s3.use_rsync" .) "true") (eq (include "s3.store" .) "rustfs") }}
+        {{- include "s3.rsync_volume" . | nindent 8 }}
+      {{- end }}
+
+{{ include "network-policy-rules" (dict "service_name" "rustfs"  "Values" .Values) }}
+{{- end }}
