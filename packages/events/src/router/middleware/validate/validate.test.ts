@@ -712,6 +712,18 @@ describe('NOTIFY review field validation', () => {
       expect.objectContaining({ id: 'notifier.comment' })
     )
   })
+
+  it('accepts an EDIT annotation value of a NOTIFY review field', () => {
+    const errors = validateNotifyAction({
+      eventConfig: configWithNotify({ reviewFields: [reviewField] }),
+      annotation: { 'notifier.comment': 'Seen at the clinic' },
+      declaration,
+      context: testContext,
+      actionType: ActionType.EDIT
+    })
+
+    expect(errors).toEqual([])
+  })
 })
 
 describe('event without a NOTIFY action', () => {

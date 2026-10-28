@@ -355,13 +355,13 @@ export function validateNotifyAction({
     : []
 
   // NOTIFY annotation comes from its own review and dialog fields.
-  // EDIT keeps the DECLARE review fields, plus the NOTIFY dialog fields for "notify with edits".
+  // EDIT accepts both, since the edit review shows the DECLARE or the NOTIFY review depending on the user.
   const reviewFields =
     actionType === ActionType.NOTIFY
       ? notifyAnnotationFields
       : [
           ...getActionReviewFields(eventConfig, ActionType.DECLARE),
-          ...getActionFormFields(eventConfig, ActionType.NOTIFY)
+          ...notifyAnnotationFields
         ]
 
   const mergedDeclaration: EventState = deepMerge(
