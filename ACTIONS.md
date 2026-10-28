@@ -48,8 +48,6 @@ All custom actions and certain core actions are configurable.
 
 Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
 
-> [!NOTE] > `NOTIFY` is optional: an event without a `NOTIFY` action cannot be notified. A `NOTIFY` action must configure its own `notificationForm` and `review`, and nothing is taken from the `DECLARE` action config. Flag operations on `NOTIFY` do not affect `DECLARE` and vice versa. For a `NOTIFY` that accepts incomplete records, `toNotificationForm` and `toNotificationReview` copy the `DECLARE` form and review with every field optional.
-
 Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 
 ### Flag configurations
