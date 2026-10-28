@@ -84,7 +84,7 @@ export function sortActions(
       return actionOrder.indexOf(ActionType.REQUEST_CORRECTION)
     }
 
-    // Likewise `CONTINUE_DRAFT` replaces `DECLARE` while the user has a draft
+    // `CONTINUE_DRAFT` replaces `DECLARE` while the user has a draft
     if (item.type === ClientSpecificAction.CONTINUE_DRAFT) {
       return actionOrder.indexOf(ActionType.DECLARE)
     }

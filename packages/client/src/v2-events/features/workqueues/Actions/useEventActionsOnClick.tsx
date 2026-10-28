@@ -36,7 +36,7 @@ import { useQuickActionModal } from '@client/v2-events/features/events/actions/q
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useAuthentication } from '@client/utils/userUtils'
 
-/** Actions whose drafts are saved to the server, see `DraftInput` */
+/** Actions whose drafts can be saved to the server */
 export type DraftActionType =
   | typeof ActionType.DECLARE
   | typeof ActionType.NOTIFY
