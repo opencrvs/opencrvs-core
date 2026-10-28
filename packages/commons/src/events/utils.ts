@@ -102,7 +102,7 @@ export function getDeclarationFields(
 /**
  * @returns the notification form of the NOTIFY action, or undefined when the event has no NOTIFY action.
  */
-function getConfiguredNotificationForm(configuration: EventConfig) {
+function findNotificationForm(configuration: EventConfig) {
   const notifyAction = configuration.actions.find(
     (action) => action.type === ActionType.NOTIFY
   )
@@ -119,7 +119,7 @@ function getConfiguredNotificationForm(configuration: EventConfig) {
 export function getNotificationForm(
   configuration: EventConfig
 ): DeclarationFormConfig {
-  const notificationForm = getConfiguredNotificationForm(configuration)
+  const notificationForm = findNotificationForm(configuration)
   if (!notificationForm) {
     throw new Error(
       `Event '${configuration.id}' has no ${ActionType.NOTIFY} action.`
@@ -700,9 +700,8 @@ export function isWriteAction(actionType: ActionType): boolean {
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
-    ...(getConfiguredNotificationForm(config)?.pages.flatMap(
-      ({ fields }) => fields
-    ) ?? []),
+    ...(findNotificationForm(config)?.pages.flatMap(({ fields }) => fields) ??
+      []),
     ...getAllAnnotationFields(config)
   ])
 }
