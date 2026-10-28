@@ -100,7 +100,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
           label: actionLabels[actionType],
           type: actionType,
           icon: actionIcons[actionType],
-          onClick: async (backTo?: string) =>
+          onClick: (backTo?: string) =>
             draftActionType && continueDraft(draftActionType, backTo),
           disabled: !enabled,
           hidden: !visible
