@@ -117,16 +117,18 @@ Backup and restore server egress rules.
 
 Standard Kubernetes NetworkPolicy egress peers only support ipBlock,
 podSelector and namespaceSelector - not DNS/FQDN destinations. Postgres and
-MinIO connect to the backup/restore server over SSH (port 22), so the rules
+the S3 store connect to the backup/restore server over SSH (port 22), so the rules
 below assume *.host values are literal IP addresses and build a /32 ipBlock
 from them.
 */}}
 {{- $any_backup_restore_enabled := false }}
-{{- range $app := list "postgres" "minio" }}
+{{- /* The S3 store is the one that s3.store names */}}
+{{- range $entry := list (dict "app" "postgres" "helper" "postgres" "settings" "postgres") (dict "app" (include "s3.store" $) "helper" "s3" "settings" (include "s3.store" $)) }}
+{{- $app := $entry.app }}
 {{- range $type := list "backup" "restore" }}
-{{- if eq (include (printf "%s.%s_enabled" $app $type) $) "true" }}
+{{- if eq (include (printf "%s.%s_enabled" $entry.helper $type) $) "true" }}
 {{- $any_backup_restore_enabled = true }}
-{{- $host := default (index $.Values $type "host") (index $.Values $app $type "host") }}
+{{- $host := default (index $.Values $type "host") (index $.Values $entry.settings $type "host") }}
 {{- if $host }}
 ---
 apiVersion: networking.k8s.io/v1

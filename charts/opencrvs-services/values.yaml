@@ -60,7 +60,8 @@ s3:
   # The dependencies chart creates it in its own namespace, copy it here. See README.md
   users_secret: s3-opencrvs-users
   # Admin username and password of the object store, used to create users_secret when it does not exist yet,
-  # for example the values that the dependencies chart got as `minio.admin_username` and `minio.admin_password`.
+  # for example the values that the dependencies chart got as `minio.admin_username` and `minio.admin_password`,
+  # or `rustfs.admin_username` and `rustfs.admin_password` when it deploys RustFS and not MinIO.
   # `helm install` and `helm upgrade` fail without them if users_secret does not exist. `helm template` cannot read the
   # cluster, so it renders the secret only with them. An existing users_secret is left as it is.
   # admin_username: minioadmin

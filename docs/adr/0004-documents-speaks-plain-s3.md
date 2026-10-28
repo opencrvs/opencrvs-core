@@ -6,7 +6,7 @@ We made this decision for issue [#13348](https://github.com/opencrvs/opencrvs-co
 
 ## What a store must do
 
-The service calls each function in this list. Nothing in CI runs them against a store other than MinIO.
+The service calls each function in this list. The end-to-end tests run them against RustFS. The unit tests mock the S3 client. Nothing in CI runs them against another store.
 
 - `HeadBucket`, `CreateBucket` with a region, and `DeleteBucketPolicy` or an equivalent that keeps the bucket private.
 - `PutObject` for a stream of unknown length, up to 50 MB. For a large file, the store must accept a multipart upload.

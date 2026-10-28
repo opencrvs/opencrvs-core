@@ -1,20 +1,22 @@
-{{ if and .Values.minio.enabled (eq (include "minio.restore_enabled" .) "true") }}
-{{- if eq .Values.minio.restore.type "dump" }}
+{{- $store := include "s3.store" . }}
+{{- $s3 := index .Values (include "s3.store" .) }}
+{{ if and (index .Values $store).enabled (eq (include "s3.backup_enabled" .) "true") }}
+{{- if eq $s3.backup.type "dump" }}
 ---
 apiVersion: batch/v1
-{{ if .Values.restore.cronjob }}
+{{ if .Values.backup.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
 {{- end }}
 metadata:
-  name: minio-restore
+  name: {{ $store }}-backup
   labels:
-    app: minio
-    job-type: restore
+    app: {{ $store }}
+    job-type: backup
 spec:
-  {{ if .Values.restore.cronjob }}
-  schedule: {{ .Values.minio.restore_schedule | default .Values.restore.schedule }}
+  {{ if .Values.backup.cronjob }}
+  schedule: {{ $s3.backup_schedule | default .Values.backup.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
   {{- end }}
@@ -24,14 +26,14 @@ spec:
       template:
         metadata:
           labels:
-            app: minio
-            job-type: restore
+            app: {{ $store }}
+            job-type: backup
         spec:
-          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" (index .Values $store)) | nindent 10 }}
           restartPolicy: OnFailure
           containers:
-            - name: restore
-              command: ["/scripts/restore.sh"]
+            - name: backup
+              command: ["/scripts/backup.sh"]
               image: {{ include "opencrvs.imageReference" .Values.utilities }}
               env:
                 - name: S3_ADMIN_ACCESS_KEY
@@ -44,56 +46,58 @@ spec:
                     secretKeyRef:
                       name: s3-opencrvs-users
                       key: S3_ADMIN_SECRET_KEY
+                - name: S3_ENDPOINT
+                  value: {{ include "s3.endpoint" . }}
                 - name: ENCRYPT_PASS
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.restore.backup_encryption_secret }}
+                      name: {{ .Values.backup.backup_encryption_secret }}
                       key: backup_encryption_key
                 - name: BACKUP_USER
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.restore.backup_server_secret }}
+                      name: {{ .Values.backup.backup_server_secret }}
                       key: user
                 - name: BACKUP_HOST
-                  value: {{ default .Values.restore.host .Values.minio.restore.host }}
+                  value: {{ default .Values.backup.host $s3.backup.host }}
                 - name: BACKUP_REMOTE_DIR
-                  value: {{ default .Values.restore.backup_server_dir .Values.minio.backup_server_dir }}
-              {{- include "render-env-vars" (dict "service_name" "restore" "Values" .Values) | nindent 4 }}
+                  value: "{{ $s3.backup_server_dir | default .Values.backup.backup_server_dir }}"
+              {{- include "render-env-vars" (dict "service_name" "backup" "Values" .Values) | nindent 4 }}
               volumeMounts:
                 - name: backup-ssh-key
                   mountPath: /ssh
                   readOnly: true
                 - mountPath: /scripts
-                  name: minio-scripts
+                  name: s3-scripts
           volumes:
             - name: backup-ssh-key
               secret:
-                secretName: {{ .Values.restore.backup_server_secret }}
+                secretName: {{ .Values.backup.backup_server_secret }}
                 defaultMode: 0400
                 items:
                   - key: ssh_key
                     path: ssh_key
-            - name: minio-scripts
+            - name: s3-scripts
               configMap:
-                name: minio-scripts
+                name: s3-scripts
                 defaultMode: 0755
 {{- end }}
-{{- if eq .Values.minio.restore.type "differential" }}
+{{- if eq $s3.backup.type "differential" }}
 ---
 apiVersion: batch/v1
-{{ if .Values.restore.cronjob }}
+{{ if .Values.backup.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
 {{- end }}
 metadata:
-  name: minio-restore
+  name: {{ $store }}-backup
   labels:
     app: backup-runner
-    job-type: restore
+    job-type: backup
 spec:
-  {{ if .Values.restore.cronjob }}
-  schedule: {{ default .Values.restore.schedule .Values.minio.restore.schedule }}
+  {{ if .Values.backup.cronjob }}
+  schedule: {{ default .Values.backup.schedule $s3.backup.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
   {{- end }}
@@ -104,9 +108,9 @@ spec:
         metadata:
           labels:
             app: backup-runner
-            job-type: restore
+            job-type: backup
         spec:
-          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" (index .Values $store)) | nindent 10 }}
           serviceAccountName: backup-runner
           containers:
             - name: runner
@@ -115,8 +119,8 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  kubectl exec minio-0 -c rsync -- \
-                    /bin/sh -c "rsync -avz -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' \$BACKUP_USER@\$BACKUP_HOST:\$BACKUP_REMOTE_DIR/minio/ /data"
+                  kubectl exec {{ $store }}-0 -c rsync -- \
+                    /bin/sh -c "rsync -avz --exclude='.minio.sys/config/iam/' --exclude='.rustfs.sys/config/iam/' -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' /data/ \$BACKUP_USER@\$BACKUP_HOST:\$BACKUP_REMOTE_DIR/minio"
           restartPolicy: OnFailure
 {{- end }}
 {{- end }}

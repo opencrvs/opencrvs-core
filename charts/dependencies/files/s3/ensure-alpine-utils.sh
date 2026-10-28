@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# FIXME: Remove this file after https://github.com/opencrvs/opencrvs-core/pull/14293
 ensure_alpine_utils() {
   local missing=""
   local utility

@@ -18,9 +18,11 @@ BACKUP_DATE=$(date +%Y-%m-%d)
 # Local directory inside container where minio data is mounted
 BACKUP_DIR="/data"
 # Temporal directory inside container to store data
-BACKUP_PATH=/tmp/minio-backup
+BACKUP_PATH=/tmp/s3-backup
 mkdir -p $BACKUP_PATH
 # Temporal archive path inside container
+# The archive keeps the name it had when MinIO was the only store, so that the backups
+# of an earlier version are found and a backup of MinIO restores into any store
 ARCHIVE_PATH="/tmp/minio_backup_${BACKUP_DATE}.tar.gz"
 # Remote directory on backup server
 REMOTE_DIR="${BACKUP_REMOTE_DIR:-"/home/$BACKUP_USER"}/$BACKUP_DATE"
@@ -29,7 +31,12 @@ MAX_RETRIES=10
 
 ensure_alpine_utils || exit 1
 
-# Check backup encryption password
+# Check S3 endpoint and backup encryption password
+if [ -z "$S3_ENDPOINT" ]; then
+  echo "[$(date +%F\ %H:%M:%S)] [ERROR] Must provide S3_ENDPOINT environment variable"
+  exit 1
+fi
+
 if [ -z "$ENCRYPT_PASS" ]; then
   echo "[$(date +%F\ %H:%M:%S)] [ERROR] Must provide ENCRYPT_PASS environment variable"
   exit 1
@@ -37,19 +44,19 @@ fi
 
 # Mirror data before backup
 backup_buckets(){
-  MINIO_ALIAS=local
-  mcli alias set $MINIO_ALIAS http://minio:3535 $S3_ADMIN_ACCESS_KEY $S3_ADMIN_SECRET_KEY
+  S3_ALIAS=local
+  mcli alias set $S3_ALIAS $S3_ENDPOINT $S3_ADMIN_ACCESS_KEY $S3_ADMIN_SECRET_KEY
 
   # Figure out buckets to back up
   if [ -z "$BUCKETS" ]; then
     # All buckets
-    BUCKETS=$(mcli ls --json $MINIO_ALIAS | jq -r .key | sed 's:/$::')
+    BUCKETS=$(mcli ls --json $S3_ALIAS | jq -r .key | sed 's:/$::')
   fi
-  echo "Backing up MinIO buckets: $BUCKETS"
+  echo "Backing up S3 buckets: $BUCKETS"
   echo "Destination: $BACKUP_PATH"
   for bucket in $BUCKETS; do
     echo "Backing up bucket: $bucket"
-    mcli mirror --overwrite $MINIO_ALIAS/$bucket "$BACKUP_PATH/$bucket"
+    mcli mirror --overwrite $S3_ALIAS/$bucket "$BACKUP_PATH/$bucket"
   done
 
   echo "Backup completed! Buckets saved at: $BACKUP_PATH"
@@ -57,7 +64,7 @@ backup_buckets(){
 
 echo "[$(date +%F\ %H:%M:%S)] Running backup container"
 
-echo "[$(date +%F\ %H:%M:%S)] Setup connection to container http://minio:3535"
+echo "[$(date +%F\ %H:%M:%S)] Setup connection to $S3_ENDPOINT"
 
 
 backup_buckets

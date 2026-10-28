@@ -13,3 +13,10 @@ ingress:
   ssl_enabled: false
 
 storage_type: host_path
+
+# FIXME: v2.4: Remove MinIO and RustFS from this file
+minio:
+  enabled: false
+
+rustfs:
+  enabled: true
