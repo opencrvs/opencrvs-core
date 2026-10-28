@@ -42,7 +42,6 @@ import { ActionMenuItem } from '../../Actions/utils'
 const DEFAULT_ACTION_ORDER = [
   ActionType.ASSIGN,
   ActionType.REGISTER,
-  ActionType.DECLARE,
   ClientSpecificAction.CONTINUE_DRAFT,
   ActionType.EDIT,
   ActionType.REJECT,
@@ -84,7 +83,7 @@ export function sortActions(
       return actionOrder.indexOf(ActionType.REQUEST_CORRECTION)
     }
 
-    // `CONTINUE_DRAFT` replaces `DECLARE` while the user has a draft
+    // `CONTINUE_DRAFT` stands in for `DECLARE` in the menu, so it takes its configured position
     if (item.type === ClientSpecificAction.CONTINUE_DRAFT) {
       return actionOrder.indexOf(ActionType.DECLARE)
     }

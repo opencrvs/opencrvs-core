@@ -162,7 +162,8 @@ export const ActionMenuActionType = z
     ActionType.ASSIGN,
     ActionType.UNASSIGN
   ])
-  .exclude([ActionType.READ])
+  // New records are only reachable as the user's draft, where CONTINUE_DRAFT stands in for DECLARE
+  .exclude([ActionType.READ, ActionType.DECLARE])
 
 export type ActionMenuActionType = z.infer<typeof ActionMenuActionType>
 export type ActionMenuItem = ActionCtaConfig<
