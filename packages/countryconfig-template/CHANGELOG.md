@@ -5,6 +5,7 @@
 ### New features
 
 - Birth has its own notification form (`src/events/birth/forms/notificationForm.ts`) on an explicit `NOTIFY` action.
+- Death has an explicit `NOTIFY` action, with its declaration form and review made optional through `toNotificationForm` and `toNotificationReview`.
 
 ## 2.1.0 Release Candidate
 

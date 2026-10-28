@@ -48,8 +48,6 @@ All custom actions and certain core actions are configurable.
 
 Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
 
-> [!NOTE] > `NOTIFY` has a special fallback behaviour: if no `NOTIFY` action config is defined, `defineConfig` generates one from the `DECLARE` action config (label, flags, icon, conditionals). When a `NOTIFY` config is present, it is used independently — flag operations on `NOTIFY` do not affect `DECLARE` and vice versa. When `review` is omitted, `defineConfig` generates it from the `DECLARE` review page with every field optional. When `notificationForm` is omitted, the `DECLARE` form with every field optional is used in its place.
-
 Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 
 ### Flag configurations
