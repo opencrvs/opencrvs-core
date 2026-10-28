@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isEmpty, isEqual, isNil, isUndefined, omitBy } from 'lodash'
+import { isEmpty, isEqual, isNil, isUndefined, omitBy, pickBy } from 'lodash'
 import {
   ActionUpdate,
   deepDropNulls,
@@ -242,19 +242,29 @@ export function getCleanedDeclarationDiff({
   eventConfiguration,
   form = getDeclaration(eventConfiguration),
   originalDeclaration,
-  declarationDiff,
+  declarationDiff: submittedDiff,
   validatorContext
 }: {
   eventConfiguration: EventConfig
-  /** Form whose field visibility decides which fields are kept. Defaults to the declaration form. */
+  /** Form whose fields, and their visibility, decide which fields are kept. Defaults to the declaration form. */
   form?: DeclarationFormConfig
   originalDeclaration?: EventState
   declarationDiff?: EventState
   validatorContext: ValidatorContext
 }): ActionUpdate | undefined {
-  if (isEmpty(declarationDiff)) {
-    return declarationDiff
+  if (isEmpty(submittedDiff)) {
+    return submittedDiff
   }
+
+  // The form state can hold values for fields that are not in the submitted form,
+  // e.g. a declaration-only field listening to a field the notification form shares.
+  // The server rejects such fields, so they are dropped.
+  const formFieldIds = new Set(
+    form.pages.flatMap((page) => page.fields.map((field) => field.id))
+  )
+  const declarationDiff = pickBy(submittedDiff, (_, fieldId) =>
+    formFieldIds.has(fieldId)
+  )
 
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
