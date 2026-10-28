@@ -11,8 +11,27 @@ spec:
   {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
     - web
   {{- end }}
+  {{- $client_hosts := printf "(Host(`%s`) || Host(`%s`))" (include "render-external-subdomain" (dict "service_name" "register" "Values" .Values)) .Values.hostname }}
   routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "register" "Values" .Values) }}`) || Host(`{{ .Values.hostname }}`)'
+  {{- /*
+    Vite's content-hashed bundles never change under their name, so the
+    client's nginx marks them cacheable for a year. Without no-store the
+    service worker's precache reuses the copy the page just downloaded.
+    Keep the pattern in step with nginx.conf.
+  */}}
+  - match: '{{ $client_hosts }} && PathRegexp(`^/assets/.*-[\w-]{8}\.js(\.map)?$`)'
+    kind: Rule
+    services:
+    - name: client
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.client.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers-cacheable
+      - name: enable-compression
+      {{- if .Values.ingress.application_allowlist }}
+      - name: application-ip-allowlist
+      {{- end }}
+  - match: '{{ $client_hosts }}'
     kind: Rule
     services:
     - name: client

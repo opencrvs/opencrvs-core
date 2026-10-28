@@ -12,6 +12,21 @@ spec:
     stsIncludeSubdomains: true
     stsPreload: true
 ---
+# sts-and-basic-response-headers without the cache headers, for responses that
+# set their own: no-store there would make browsers download content-hashed
+# assets again on every load.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: sts-and-basic-response-headers-cacheable
+spec:
+  headers:
+    customResponseHeaders:
+      X-Robots-Tag: "none"
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+---
 # Enable compression
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
