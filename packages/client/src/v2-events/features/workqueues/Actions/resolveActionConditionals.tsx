@@ -55,7 +55,9 @@ function getAvailableAssignmentActions(event: EventIndex, userId: string) {
 }
 
 /**
- * Resolves "internal" conditionals for actions. e.g. ensures user is online when needed, or the event is downloaded and assigned to the user for certain actions.
+ * Resolves "internal" conditionals for actions: rules that change with what the user does,
+ * such as being online, or having the event downloaded and assigned to them.
+ * See {@link resolveBaseActionConditionals} for the rules the user can't change.
  */
 function resolveInternalActionConditions({
   actionType,
@@ -120,8 +122,11 @@ function resolveInternalActionConditions({
 }
 
 /**
- * Checks that the action is available for the event, the user can perform it,
- * and the action's configured conditionals allow it.
+ * Resolves "base" conditionals for actions: rules the user can't change by their own actions.
+ * Checks that the action is available in the event's state, the user's scopes allow it,
+ * and the action's configured conditionals pass.
+ *
+ * CONTINUE_DRAFT uses only these, since a draft opens offline and without assignment.
  */
 export function resolveBaseActionConditionals({
   event,

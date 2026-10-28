@@ -290,9 +290,9 @@ export const eventRouter = router({
       .output(z.array(Draft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: userOnlyProcedure
-      .input(DraftInput)
       // A draft is saved by a user who can perform its action
       .use(middleware.canAccessEventWithScopes(getDraftScopes))
+      .input(DraftInput)
       .use(middleware.requireAssignment)
       .output(Draft)
       .mutation(async ({ input, ctx }) => {

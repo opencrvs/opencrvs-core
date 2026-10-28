@@ -120,6 +120,9 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
+      // While the user has a draft of the event, Update (CONTINUE_DRAFT) replaces Declare
+      const isReplacedByDraft =
+        actionType === ActionType.DECLARE && !!draftActionType
 
       return {
         label: actionConfig?.label ?? actionLabels[actionType],
@@ -129,8 +132,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
           : actionIcons[actionType],
         onClick: async (backTo?: string) => onClick(actionType, backTo),
         disabled: !enabled,
-        hidden:
-          !visible || (actionType === ActionType.DECLARE && !!draftActionType)
+        hidden: !visible || isReplacedByDraft
       }
     },
     [
