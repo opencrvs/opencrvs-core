@@ -13,15 +13,15 @@ import { createServer } from '@documents/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { env } from '../../s3/constants'
+import {
+  ensureDefaultBucket,
+  putObject,
+  statObjectIfExists
+} from '../../s3/client'
+import { getObject } from '../../../test/s3'
 
-const putObjectMock = jest.fn()
-const statObjectIfExistsMock = jest.fn()
-jest.mock('../../s3/client', () => {
-  return {
-    __esModule: true,
-    putObject: (...args: unknown[]) => putObjectMock(...args),
-    statObjectIfExists: (...args: unknown[]) => statObjectIfExistsMock(...args)
-  }
+beforeAll(async () => {
+  await ensureDefaultBucket()
 })
 
 describe('fileExistsHandler', () => {
@@ -33,9 +33,12 @@ describe('fileExistsHandler', () => {
     subject: '123123'
   })
 
+  beforeAll(async () => {
+    // Each way of writing the path below must find this object
+    await putObject('event-12345/transaction-12345.txt', Buffer.from(''))
+  })
+
   beforeEach(async () => {
-    putObjectMock.mockClear()
-    statObjectIfExistsMock.mockReset().mockResolvedValue({ metadata: {} })
     server = await createServer()
   })
 
@@ -51,9 +54,6 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -68,9 +68,6 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
@@ -88,9 +85,6 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -106,9 +100,6 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -123,9 +114,6 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
@@ -143,18 +131,13 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
   it('answers 404 when the object does not exist', async () => {
-    statObjectIfExistsMock.mockResolvedValue(null)
-
     const res = await server.server.inject({
       method: 'GET',
-      url: `/files/event-12345/transaction-12345.txt`,
+      url: `/files/event-12345/missing.txt`,
       headers: {
         authorization: `Bearer ${token}`
       }
@@ -174,9 +157,6 @@ describe('fileUploadHandler', () => {
   })
 
   beforeEach(async () => {
-    putObjectMock.mockClear()
-    // By default the key is free, which is the ordinary case for a new upload.
-    statObjectIfExistsMock.mockReset().mockResolvedValue(null)
     server = await createServer()
   })
 
@@ -221,11 +201,12 @@ describe('fileUploadHandler', () => {
     })
 
     expect(res.payload).toEqual(`${path}/${transactionId}.txt`)
-
-    const [filename] = putObjectMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
+    expect(await getObject(`${path}/${transactionId}.txt`)).toEqual({
+      contentType: 'text/plain',
+      metadata: { 'created-by': '123123' },
+      body: 'test upload'
+    })
   })
 
   it('returns file path without bucket prefix', async () => {
@@ -248,11 +229,8 @@ describe('fileUploadHandler', () => {
     })
 
     expect(res.payload).toEqual(`${transactionId}.txt`)
-
-    const [filename] = putObjectMock.mock.calls[0]
-    expect(filename).toBe(`${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
+    expect(await statObjectIfExists(`${transactionId}.txt`)).not.toBeNull()
   })
 
   const uploadTo = (transactionId: string) => {
@@ -275,25 +253,28 @@ describe('fileUploadHandler', () => {
   }
 
   it('refuses to replace a file uploaded by someone else', async () => {
-    statObjectIfExistsMock.mockResolvedValue({
+    await putObject('transaction-3.txt', Buffer.from('original'), {
       metadata: { 'created-by': 'another-user' }
     })
 
     const res = await uploadTo('transaction-3')
 
     expect(res.statusCode).toBe(403)
-    expect(putObjectMock).not.toHaveBeenCalled()
+    expect(await getObject('transaction-3.txt')).toMatchObject({
+      metadata: { 'created-by': 'another-user' },
+      body: 'original'
+    })
   })
 
   it('lets the original uploader replace their own file', async () => {
-    statObjectIfExistsMock.mockResolvedValue({
+    await putObject('transaction-4.txt', Buffer.from('original'), {
       metadata: { 'created-by': '123123' }
     })
 
     const res = await uploadTo('transaction-4')
 
     expect(res.statusCode).toBe(200)
-    expect(putObjectMock).toHaveBeenCalled()
+    expect((await getObject('transaction-4.txt')).body).toBe('test upload')
   })
 
   it('persists the client-reported content type so extensions the object store cannot infer (e.g. .jfif) stay renderable', async () => {
@@ -320,7 +301,7 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
     expect(res.payload).toEqual(`${transactionId}.jfif`)
 
-    const { contentType } = putObjectMock.mock.calls[0][2]
+    const { contentType } = await getObject(`${transactionId}.jfif`)
     expect(contentType).toBe('image/jpeg')
   })
 })
@@ -352,5 +333,11 @@ describe('verify document uploader handler', () => {
     })
 
     expect(res.statusCode).toBe(200)
+    const { refUrl } = JSON.parse(res.payload)
+    const key = refUrl.slice(`/${env.S3_BUCKET}/`.length)
+    expect(await getObject(key)).toMatchObject({
+      contentType: 'image/png',
+      metadata: { 'created-by': '123123' }
+    })
   })
 })

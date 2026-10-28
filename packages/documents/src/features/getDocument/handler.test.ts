@@ -9,35 +9,46 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
+import { ensureDefaultBucket, putObject } from '@documents/s3/client'
+import { randomUUID } from 'crypto'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { env } from '../../s3/constants'
 
-const signFileUrlMock = jest.fn().mockResolvedValue('https://signed-url')
+const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+  algorithm: 'RS256',
+  issuer: 'opencrvs:auth-service',
+  audience: 'opencrvs:documents-user',
+  subject: '123123'
+})
 
-jest.mock('../../s3/sign', () => ({
-  signFileUrl: (...args: unknown[]) => signFileUrlMock(...args)
-}))
+/** The key within the bucket that a presigned URL points to. */
+const signedKey = (url: string) =>
+  decodeURIComponent(new URL(url).pathname).slice(`/${env.S3_BUCKET}/`.length)
 
-const listObjectKeysMock = jest.fn()
+let server: Awaited<ReturnType<typeof createServer>>
 
-jest.mock('../../s3/client', () => ({
-  __esModule: true,
-  listObjectKeys: (...args: unknown[]) => listObjectKeysMock(...args)
-}))
+beforeAll(async () => {
+  await ensureDefaultBucket()
+})
+
+beforeEach(async () => {
+  server = await createServer()
+})
 
 describe('createPreSignedUrl', () => {
-  let server: any
-  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:documents-user',
-    subject: '123123'
-  })
+  it('signs a URL that opens the document', async () => {
+    await putObject('eventId/imageId.png', Buffer.from('content'))
 
-  beforeEach(async () => {
-    signFileUrlMock.mockClear()
-    server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/presigned-url/eventId/imageId.png`,
+      headers: { authorization: `Bearer ${token}` }
+    })
+
+    expect(res.statusCode).toBe(200)
+    const { presignedURL } = JSON.parse(res.payload)
+    expect(await (await fetch(presignedURL)).text()).toBe('content')
   })
 
   it('strips the bucket prefix from a FullDocumentPath', async () => {
@@ -48,7 +59,9 @@ describe('createPreSignedUrl', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(signFileUrlMock).toHaveBeenCalledWith('eventId/imageId.png')
+    expect(signedKey(JSON.parse(res.payload).presignedURL)).toBe(
+      'eventId/imageId.png'
+    )
   })
 
   it('signs a DocumentPath (eventId/imageId) as it is', async () => {
@@ -59,29 +72,14 @@ describe('createPreSignedUrl', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(signFileUrlMock).toHaveBeenCalledWith('eventId/imageId.png')
+    expect(signedKey(JSON.parse(res.payload).presignedURL)).toBe(
+      'eventId/imageId.png'
+    )
   })
 })
 
 describe('createPresignedUrlsInBulk', () => {
-  let server: any
-  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:documents-user',
-    subject: '123123'
-  })
-
-  beforeEach(async () => {
-    signFileUrlMock.mockClear()
-    server = await createServer()
-  })
-
   it('signs every filename and keeps their order', async () => {
-    signFileUrlMock
-      .mockResolvedValueOnce('https://signed-url/first')
-      .mockResolvedValueOnce('https://signed-url/second')
-
     const res = await server.server.inject({
       method: 'POST',
       url: '/presigned-urls',
@@ -90,15 +88,13 @@ describe('createPresignedUrlsInBulk', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(JSON.parse(res.payload)).toEqual([
-      'https://signed-url/first',
-      'https://signed-url/second'
+    expect(JSON.parse(res.payload).map(signedKey)).toEqual([
+      'eventId/first.png',
+      'eventId/second.png'
     ])
-    expect(signFileUrlMock).toHaveBeenCalledWith('eventId/first.png')
-    expect(signFileUrlMock).toHaveBeenCalledWith('eventId/second.png')
   })
 
-  it('signs nothing for a payload without filenames', async () => {
+  it('refuses a payload without filenames', async () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/presigned-urls',
@@ -107,36 +103,23 @@ describe('createPresignedUrlsInBulk', () => {
     })
 
     expect(res.statusCode).toBeGreaterThanOrEqual(400)
-    expect(signFileUrlMock).not.toHaveBeenCalled()
   })
 })
 
 describe('listFiles', () => {
-  let server: any
-  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:documents-user',
-    subject: '123123'
-  })
-
-  beforeEach(async () => {
-    listObjectKeysMock.mockReset()
-    server = await createServer()
-  })
-
-  it('lists the keys under the prefix', async () => {
-    listObjectKeysMock.mockResolvedValue(['events/eventId/a.png'])
+  it('lists the keys under the prefix, and none outside it', async () => {
+    const eventId = randomUUID()
+    await putObject(`events/${eventId}/a.png`, Buffer.from(''))
+    await putObject(`events/${randomUUID()}/b.png`, Buffer.from(''))
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/list-files/events/eventId/',
+      url: `/list-files/events/${eventId}/`,
       headers: { authorization: `Bearer ${token}` }
     })
 
     expect(res.statusCode).toBe(200)
-    expect(JSON.parse(res.payload)).toEqual(['events/eventId/a.png'])
-    expect(listObjectKeysMock).toHaveBeenCalledWith('events/eventId/')
+    expect(JSON.parse(res.payload)).toEqual([`events/${eventId}/a.png`])
   })
 
   it.each([
@@ -154,6 +137,5 @@ describe('listFiles', () => {
     })
 
     expect(res.statusCode).toBe(400)
-    expect(listObjectKeysMock).not.toHaveBeenCalled()
   })
 })

@@ -8,21 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { randomUUID } from 'crypto'
 import {
-  BucketAlreadyOwnedByYou,
   CreateBucketCommand,
+  DeleteBucketCommand,
   DeleteBucketPolicyCommand,
-  DeleteObjectCommand,
   DeleteObjectsCommand,
   HeadBucketCommand,
-  HeadObjectCommand,
   ListObjectsV2Command,
-  NoSuchKey,
-  NotFound,
+  PutBucketPolicyCommand,
   S3Client,
   S3ServiceException
 } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
 import {
   ensureDefaultBucket,
   ensureDefaultBucketIsPrivate,
@@ -33,17 +30,15 @@ import {
   statObjectIfExists
 } from '@documents/s3/client'
 import { env } from '@documents/s3/constants'
+import { Readable } from 'stream'
+import { getObject, s3 } from '../../test/s3'
 
-jest.mock('@aws-sdk/lib-storage', () => ({ Upload: jest.fn() }))
-
-/* Replaces what the client sends over the network */
+/*
+ * These tests run against the RustFS that test/global-setup.ts starts. The
+ * spy passes every request through to it, except where a test makes the store
+ * fail in a way that a real store cannot be made to.
+ */
 const send = jest.spyOn(S3Client.prototype, 'send') as unknown as jest.Mock
-const UploadMock = Upload as unknown as jest.Mock
-const uploadDone = jest.fn()
-
-const $metadata = (httpStatusCode: number) => ({
-  $metadata: { httpStatusCode }
-})
 
 /** The shape the AWS SDK gives to an error that it has no class for. */
 const storeError = (name: string, httpStatusCode: number) =>
@@ -51,40 +46,62 @@ const storeError = (name: string, httpStatusCode: number) =>
     name,
     message: name,
     $fault: httpStatusCode < 500 ? 'client' : 'server',
-    ...$metadata(httpStatusCode)
+    $metadata: { httpStatusCode }
   })
 
-const notFound = () => new NotFound({ message: 'NotFound', ...$metadata(404) })
+const sentCommands = (type: new (...args: never[]) => unknown) =>
+  send.mock.calls.map(([command]) => command).filter((c) => c instanceof type)
 
-const sentCommand = (call: number) => send.mock.calls[call][0]
+/** A prefix no other test writes to, so the tests do not see each other's objects. */
+const newPrefix = () => `events/${randomUUID()}/`
+
+const anonymousGet = (key: string) =>
+  fetch(`${env.S3_ENDPOINT}/${env.S3_BUCKET}/${key}`)
+
+beforeAll(async () => {
+  await ensureDefaultBucket()
+})
 
 beforeEach(() => {
-  send.mockReset()
-  uploadDone.mockReset().mockResolvedValue({})
-  UploadMock.mockReset().mockImplementation(() => ({ done: uploadDone }))
+  send.mockClear()
+})
+
+afterAll(() => {
+  send.mockRestore()
 })
 
 describe('ensureDefaultBucket', () => {
   it('creates the bucket in the configured region when it does not exist', async () => {
-    send.mockRejectedValueOnce(notFound())
-    send.mockResolvedValueOnce({})
+    // Nothing is stored yet, as this is the first test of the file
+    await s3.send(new DeleteBucketCommand({ Bucket: env.S3_BUCKET }))
 
     await ensureDefaultBucket()
 
-    expect(sentCommand(0)).toBeInstanceOf(HeadBucketCommand)
-    expect(sentCommand(1)).toBeInstanceOf(CreateBucketCommand)
-    expect(sentCommand(1).input).toEqual({
-      Bucket: env.S3_BUCKET,
-      CreateBucketConfiguration: { LocationConstraint: env.S3_BUCKET_REGION }
+    await expect(
+      s3.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }))
+    ).resolves.toBeDefined()
+    // RustFS answers us-east-1 for any bucket, so the region is checked on the request
+    expect(sentCommands(CreateBucketCommand)[0]).toMatchObject({
+      input: {
+        Bucket: env.S3_BUCKET,
+        CreateBucketConfiguration: { LocationConstraint: env.S3_BUCKET_REGION }
+      }
     })
   })
 
   it('leaves an existing bucket alone', async () => {
-    send.mockResolvedValueOnce({})
-
     await ensureDefaultBucket()
 
-    expect(send).toHaveBeenCalledTimes(1)
+    expect(sentCommands(HeadBucketCommand)).toHaveLength(1)
+    expect(sentCommands(CreateBucketCommand)).toHaveLength(0)
+  })
+
+  it('accepts a bucket that another replica created first', async () => {
+    // The check runs before the other replica creates the bucket
+    send.mockRejectedValueOnce(storeError('NotFound', 404))
+
+    await expect(ensureDefaultBucket()).resolves.toBeUndefined()
+    expect(sentCommands(CreateBucketCommand)).toHaveLength(1)
   })
 
   it('fails when the store refuses to say whether the bucket exists', async () => {
@@ -95,37 +112,42 @@ describe('ensureDefaultBucket', () => {
   })
 
   it('fails when the bucket could not be created', async () => {
-    send.mockRejectedValueOnce(notFound())
+    send.mockRejectedValueOnce(storeError('NotFound', 404))
     send.mockRejectedValueOnce(new Error('store is unreachable'))
 
     await expect(ensureDefaultBucket()).rejects.toThrow('store is unreachable')
-  })
-
-  it('accepts a bucket that another replica created first', async () => {
-    send.mockRejectedValueOnce(notFound())
-    send.mockRejectedValueOnce(
-      new BucketAlreadyOwnedByYou({
-        message: 'BucketAlreadyOwnedByYou',
-        ...$metadata(409)
-      })
-    )
-
-    await expect(ensureDefaultBucket()).resolves.toBeUndefined()
   })
 })
 
 describe('ensureDefaultBucketIsPrivate', () => {
   it('removes any bucket policy so nothing is served anonymously', async () => {
-    send.mockResolvedValueOnce({})
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+    await s3.send(
+      new PutBucketPolicyCommand({
+        Bucket: env.S3_BUCKET,
+        Policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Effect: 'Allow',
+              Principal: { AWS: ['*'] },
+              Action: ['s3:GetObject'],
+              Resource: [`arn:aws:s3:::${env.S3_BUCKET}/*`]
+            }
+          ]
+        })
+      })
+    )
+    expect((await anonymousGet(key)).status).toBe(200)
 
     await ensureDefaultBucketIsPrivate()
 
-    expect(sentCommand(0)).toBeInstanceOf(DeleteBucketPolicyCommand)
-    expect(sentCommand(0).input).toEqual({ Bucket: env.S3_BUCKET })
+    expect((await anonymousGet(key)).status).toBe(403)
   })
 
   it('accepts a bucket that has no policy to remove', async () => {
-    send.mockRejectedValueOnce(storeError('NoSuchBucketPolicy', 404))
+    await ensureDefaultBucketIsPrivate()
 
     await expect(ensureDefaultBucketIsPrivate()).resolves.toBeUndefined()
   })
@@ -134,36 +156,36 @@ describe('ensureDefaultBucketIsPrivate', () => {
     send.mockRejectedValueOnce(storeError('AccessDenied', 403))
 
     await expect(ensureDefaultBucketIsPrivate()).rejects.toThrow('AccessDenied')
+    expect(sentCommands(DeleteBucketPolicyCommand)).toHaveLength(1)
   })
 })
 
 describe('statObjectIfExists', () => {
   it('returns the user metadata of an existing object', async () => {
-    send.mockResolvedValueOnce({ Metadata: { 'created-by': 'user-1' } })
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'), {
+      metadata: { 'created-by': 'user-1' }
+    })
 
-    const stat = await statObjectIfExists('events/e1/a.png')
-
-    expect(stat).toEqual({ metadata: { 'created-by': 'user-1' } })
-    expect(sentCommand(0)).toBeInstanceOf(HeadObjectCommand)
-    expect(sentCommand(0).input).toEqual({
-      Bucket: env.S3_BUCKET,
-      Key: 'events/e1/a.png'
+    expect(await statObjectIfExists(key)).toEqual({
+      metadata: { 'created-by': 'user-1' }
     })
   })
 
   it('returns empty metadata for an object that has none', async () => {
-    send.mockResolvedValueOnce({})
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
 
-    expect(await statObjectIfExists('a.png')).toEqual({ metadata: {} })
+    expect(await statObjectIfExists(key)).toEqual({ metadata: {} })
   })
 
-  it.each([
-    ['NotFound', notFound()],
-    ['NoSuchKey', new NoSuchKey({ message: 'NoSuchKey', ...$metadata(404) })],
-    // What a store other than AWS S3 may answer
-    ['a bare 404', storeError('UnknownError', 404)]
-  ])('returns null when the store answers %s', async (_, error) => {
-    send.mockRejectedValueOnce(error)
+  it('returns null for a key that does not exist', async () => {
+    expect(await statObjectIfExists(`${newPrefix()}a.png`)).toBeNull()
+  })
+
+  it('returns null when a store answers a bare 404', async () => {
+    // What some stores other than AWS S3 and RustFS answer
+    send.mockRejectedValueOnce(storeError('UnknownError', 404))
 
     expect(await statObjectIfExists('a.png')).toBeNull()
   })
@@ -176,61 +198,49 @@ describe('statObjectIfExists', () => {
 })
 
 describe('putObject', () => {
-  it('streams the body with its content type and user metadata', async () => {
-    const body = Buffer.from('content')
+  it('stores the body with its content type and user metadata', async () => {
+    const key = `${newPrefix()}a.png`
 
-    await putObject('events/e1/a.png', body, {
+    await putObject(key, Buffer.from('content'), {
       contentType: 'image/png',
       metadata: { 'created-by': 'user-1' }
     })
 
-    expect(Upload).toHaveBeenCalledWith({
-      client: expect.any(S3Client),
-      params: {
-        Bucket: env.S3_BUCKET,
-        Key: 'events/e1/a.png',
-        Body: body,
-        ContentType: 'image/png',
-        Metadata: { 'created-by': 'user-1' }
-      }
+    expect(await getObject(key)).toEqual({
+      contentType: 'image/png',
+      metadata: { 'created-by': 'user-1' },
+      body: 'content'
     })
-    expect(uploadDone).toHaveBeenCalledTimes(1)
   })
 
-  it('leaves the content type to the store when none is given', async () => {
-    await putObject('a.png', Buffer.from(''))
+  it('streams a large body of unknown length as a multipart upload', async () => {
+    const key = `${newPrefix()}large.pdf`
+    // Larger than one 5 MB part
+    const part = Buffer.alloc(1024 * 1024, 'a')
+    const body = Readable.from(Array.from({ length: 6 }, () => part))
 
-    const { params } = UploadMock.mock.calls[0][0]
-    expect(params.ContentType).toBeUndefined()
-    expect(params.Metadata).toEqual({})
-  })
+    await putObject(key, body, { contentType: 'application/pdf' })
 
-  it('fails when the upload fails', async () => {
-    uploadDone.mockRejectedValueOnce(new Error('store is unreachable'))
-
-    await expect(putObject('a.png', Buffer.from(''))).rejects.toThrow(
-      'store is unreachable'
-    )
+    const stored = await getObject(key)
+    expect(stored.body).toHaveLength(6 * part.length)
+    expect(stored.contentType).toBe('application/pdf')
   })
 })
 
 describe('removeObject', () => {
   it('deletes the key from the bucket', async () => {
-    send.mockResolvedValueOnce({})
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
 
-    await removeObject('events/e1/a.png')
+    await removeObject(key)
 
-    expect(sentCommand(0)).toBeInstanceOf(DeleteObjectCommand)
-    expect(sentCommand(0).input).toEqual({
-      Bucket: env.S3_BUCKET,
-      Key: 'events/e1/a.png'
-    })
+    expect(await statObjectIfExists(key)).toBeNull()
   })
 })
 
 describe('removeObjects', () => {
-  const keys = (count: number) =>
-    Array.from({ length: count }, (_, index) => `events/e1/${index}.png`)
+  const keys = (prefix: string, count: number) =>
+    Array.from({ length: count }, (_, index) => `${prefix}${index}.png`)
 
   const deleteErrors = (failedKeys: string[]) => ({
     Errors: failedKeys.map((Key) => ({ Key, Code: 'AccessDenied' }))
@@ -243,35 +253,38 @@ describe('removeObjects', () => {
   })
 
   it('deletes at most 1000 keys per request', async () => {
-    send.mockResolvedValue({})
+    const prefix = newPrefix()
+    const toDelete = keys(prefix, 2500)
+    // Deleting a key that does not exist succeeds, so only a few are stored
+    await putObject(toDelete[0], Buffer.from(''))
+    await putObject(toDelete[2499], Buffer.from(''))
+    send.mockClear()
 
-    await removeObjects(keys(2500))
+    await removeObjects(toDelete)
 
-    expect(send).toHaveBeenCalledTimes(3)
-    const sizes = [0, 1, 2].map(
-      (call) => sentCommand(call).input.Delete.Objects.length
+    const sizes = sentCommands(DeleteObjectsCommand).map(
+      (command) =>
+        (command as DeleteObjectsCommand).input.Delete!.Objects!.length
     )
     expect(sizes).toEqual([1000, 1000, 500])
-    expect(sentCommand(0)).toBeInstanceOf(DeleteObjectsCommand)
-    expect(sentCommand(0).input.Delete.Objects[0]).toEqual({
-      Key: 'events/e1/0.png'
-    })
+    expect(await listObjectKeys(prefix)).toEqual([])
   })
 
   it('fails when the store could not delete a key', async () => {
     send.mockResolvedValueOnce(deleteErrors(['events/e1/0.png']))
 
-    await expect(removeObjects(keys(2))).rejects.toThrow(
+    await expect(removeObjects(keys('events/e1/', 2))).rejects.toThrow(
       'Failed to delete 1 object(s), the first of them: events/e1/0.png (AccessDenied)'
     )
   })
 
   it('sends the remaining batches after one fails, then fails with the total', async () => {
-    send.mockResolvedValueOnce(deleteErrors(keys(1000).slice(0, 15)))
+    const toDelete = keys('events/e1/', 2500)
+    send.mockResolvedValueOnce(deleteErrors(toDelete.slice(0, 15)))
     send.mockResolvedValueOnce({})
     send.mockResolvedValueOnce(deleteErrors(['events/e1/2400.png']))
 
-    const error = await removeObjects(keys(2500)).catch((e: Error) => e)
+    const error = await removeObjects(toDelete).catch((e: Error) => e)
 
     expect(send).toHaveBeenCalledTimes(3)
     expect(error).toBeInstanceOf(Error)
@@ -284,7 +297,19 @@ describe('removeObjects', () => {
 })
 
 describe('listObjectKeys', () => {
+  it('lists every key under the prefix, at any depth', async () => {
+    const prefix = newPrefix()
+    await putObject(`${prefix}a.png`, Buffer.from(''))
+    await putObject(`${prefix}nested/b.png`, Buffer.from(''))
+    await putObject(`${newPrefix()}elsewhere.png`, Buffer.from(''))
+
+    const found = await listObjectKeys(prefix)
+
+    expect(found.sort()).toEqual([`${prefix}a.png`, `${prefix}nested/b.png`])
+  })
+
   it('follows the continuation token across pages', async () => {
+    // A real page holds 1000 keys, too many to store for one test
     send.mockResolvedValueOnce({
       Contents: [{ Key: 'events/e1/a.png' }],
       IsTruncated: true,
@@ -295,17 +320,13 @@ describe('listObjectKeys', () => {
     const found = await listObjectKeys('events/e1/')
 
     expect(found).toEqual(['events/e1/a.png', 'events/e1/b.png'])
-    expect(sentCommand(0)).toBeInstanceOf(ListObjectsV2Command)
-    expect(sentCommand(0).input).toMatchObject({
-      Bucket: env.S3_BUCKET,
-      Prefix: 'events/e1/'
-    })
-    expect(sentCommand(1).input.ContinuationToken).toBe('next-page')
+    const [, second] = sentCommands(ListObjectsV2Command)
+    expect((second as ListObjectsV2Command).input.ContinuationToken).toBe(
+      'next-page'
+    )
   })
 
   it('returns nothing for a prefix that holds no object', async () => {
-    send.mockResolvedValueOnce({})
-
-    expect(await listObjectKeys('events/none/')).toEqual([])
+    expect(await listObjectKeys(newPrefix())).toEqual([])
   })
 })
