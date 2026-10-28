@@ -33,10 +33,12 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import {
   getAnnotationComparisonForField,
-  getReviewFormFields,
+  getReviewFormFields
+} from '@client/v2-events/features/events/actions/annotationUtils'
+import {
+  getChangedDeclarationDiff,
   hasFieldChanged
-} from '@client/v2-events/features/events/actions/correct/utils'
-import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 const TableHeader = styled.th`
   text-transform: uppercase;

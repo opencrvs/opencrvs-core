@@ -72,7 +72,7 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-    // upload a file to minio
+    // upload a file to the object store
     {
       method: 'POST',
       path: '/files',

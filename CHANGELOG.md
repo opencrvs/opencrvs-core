@@ -127,9 +127,48 @@ Unlike the flag, an archived notification no longer matches, since its status is
 `NOTIFY` used to read its form configuration from the `DECLARE` action. It now supports its own notification form and review:
 
 - **`actions[NOTIFY].notificationForm`** is the notify form. Every field in it must also exist in the `DECLARE` declaration form with the same type, and its values pre-fill the declaration. A `NOTIFY` is rejected when a required `notificationForm` field is missing or invalid, or when its `declaration` contains a field that is not in the notification form.
-- **`actions[NOTIFY].review`** holds the notify review page fields. Notify-only data, such as a notifier's signature, is configured as `NOTIFY` `review` or `form` fields and stored in the `NOTIFY` action annotation. When `notificationForm` is configured, required `review` and dialog `form` fields are enforced on `NOTIFY`. When the record is later declared, `review` fields that also exist on the `DECLARE` review page are pre-filled with the values captured at notify.
+- **`actions[NOTIFY].review`** holds the notify review page fields. Notify-only data, such as a notifier's signature, is configured as `NOTIFY` `review` or `form` fields and stored in the `NOTIFY` action annotation. Required `review` and dialog `form` fields are enforced on `NOTIFY`. When the record is later declared, `review` fields that also exist on the `DECLARE` review page are pre-filled with the values captured at notify.
 
-`defineConfig` still accepts events without a notification form, so these events behave as before. It generates a missing `NOTIFY` action and `review` from the `DECLARE` action with every field optional, and logs a warning when `notificationForm` is missing. If missing, the `DECLARE` form with every field optional is used in its place (`getNotificationForm`). A future release will remove this fallback. An event configuration built without `defineConfig` must give `review` on its `NOTIFY` action.
+`NOTIFY` is optional: an event without a `NOTIFY` action cannot be notified. A `NOTIFY` action must configure both `notificationForm` and `review`, and nothing is generated from the `DECLARE` action. The notification form is validated like any form, so a plain copy of the declaration form would reject incomplete records. To keep `NOTIFY` accepting them, use `toNotificationForm(<declaration form>)` and `toNotificationReview(<DECLARE review>)`, which copy the `DECLARE` form and review with every field optional and without validations. A role holding `record.notify` for an event type needs a `NOTIFY` action on that event.
+
+`opencrvs upgrade` does it for you: the `add-notify-config` codemod adds `notificationForm: toNotificationForm(...)` and `review: toNotificationReview(...)`, copied from the `DECLARE` action, to every `NOTIFY` action under `src/` that lacks them, then lists every event without a `NOTIFY` action and every config it could not rewrite — a `DECLARE` form or review written inline, a `NOTIFY` action not written inline — for you to change by hand.
+
+#### Notifiers get their own notify flow
+
+A user whose role holds `record.notify` for an event type now fills in the notification form in a separate notify flow, instead of the declaration form [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975):
+
+- **New records** open the notify flow. Notify is enabled once the notification form's required fields are complete.
+- **Editing a notified record** uses the notification form too, and "Notify with edits" requires its required fields.
+- **The declare flow** only offers Declare and Register, and requires `record.declare`.
+
+A role should hold either `record.notify` or `record.declare` for an event type, not both. A role holding both now gets only the notify flow for that event type. Remove one of the two scopes.
+
+Update the client translations:
+
+- Rename `user.profile.audit.description.inProgress` to `user.profile.audit.description.notified` ("Notified").
+- Rename `review.declare.incomplete.confirmModal.title` to `review.notify.confirmModal.title` ("Notify event?").
+- Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
+- `buttons.deleteDeclaration`, `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
+
+#### Object store settings renamed from `MINIO_*` to `S3_*`
+
+**NOTE:** If your environment is managed by `environment:init` skip this section, otherwise update your helm chart values manually.
+
+`environment:init` keeps the credentials of the object store you already run. While the previous `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` secrets exist, it does not generate `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. The secrets migration workflow of your infrastructure repository copies them to the new names the next time the environment is deployed.
+
+- Rename the `minio:` block of your values to `s3:`. A `minio:` block that is left behind is ignored without a warning, and the defaults apply.
+
+- In the `s3` block, `external_url` and `external_protocol` are replaced by `public_endpoint`, a URL with the protocol, and the new `protocol` (default `http`) is the protocol that the services use to reach the store. Without `public_endpoint` the chart still signs document URLs for `minio.<hostname>`. If you set `external_url`, move it to `public_endpoint`, with the protocol.
+
+- The documents service reads two URLs, with the protocol, where it read a host, a port and a protocol. Following variable names were changed, make sure your helm chart values were updated:
+  | Before | After |
+  | --------------------- | ------------------ |
+  | `MINIO_HOST`, `MINIO_PORT` | `S3_ENDPOINT`, for example `http://minio:3535`. Required in production |
+  | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://minio.example.org`. Required in production, also when it is the same as `S3_ENDPOINT` |
+  | `MINIO_BUCKET` | `S3_BUCKET` |
+  | `MINIO_BUCKET_REGION` | `S3_BUCKET_REGION` |
+  | `MINIO_ACCESS_KEY` | `S3_ACCESS_KEY` |
+  | `MINIO_SECRET_KEY` | `S3_SECRET_KEY` |
 
 ### New features
 
@@ -151,10 +190,32 @@ Advanced search fields open with the declaration form's `defaultValue`, so a nam
 
 Only TEXT, TEXTAREA, EMAIL, PHONE, ID, SELECT, RADIO_GROUP, COUNTRY, LOCATION, ADMINISTRATIVE_AREA, NUMBER and DATE fields take a value. Other field types, such as NAME and ADDRESS, and dates searched as a range accept only `true` or `false`. Fields using `config.searchFields` don't support `defaultValue`. An event configuration that breaks these rules fails validation. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
 
+#### Documents service speaks plain S3
+
+The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys. **The settings were renamed, so check [Object store settings renamed from `MINIO_*` to `S3_*`](#object-store-settings-renamed-from-minio_-to-s3_) before you upgrade.**
+
+The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store was tried on and what to check when you use another.
+
+The client's Content-Security-Policy allows the origin of the S3 public endpoint in `connect-src`, so browsers can read documents from a store on another domain, such as `storage.googleapis.com`. The services chart sets it as `S3_PUBLIC_ORIGIN` on the client. A deployment without the chart can set that variable on the client container. When it is not set, nothing is added.
+
+The data cleanup job now empties the bucket and keeps it, where it removed the bucket and made it again. The bucket keeps its settings, such as CORS and access rules.
+
+A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
+#### Container registry other than Docker Hub
+
+The toolkit and the country configuration template work with any container registry that implements the OCI Registry v2 API, for example GHCR. The `DOCKERHUB_ACCOUNT`, `DOCKERHUB_REPO`, `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets are renamed to `REGISTRY_ORGANISATION`, `REGISTRY_REPOSITORY`, `REGISTRY_USERNAME` and `REGISTRY_TOKEN`. The new repository variable `REGISTRY_HOST` (default `docker.io`) sets the registry, and the pull secret `dockerhub-credentials` is now `registry-credentials`. `environment:init` asks for these and checks them with the Registry v2 API. `check-before-build.sh` now takes `REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]`. [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
+
+**Nothing has to change for a deployment to keep working.** The previous names are still read, and `dockerhub-credentials` is still created. To move to the new names:
+
+1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
+2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
+
 ### Improvements
 
+- Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
-- `environment:init` now checks the Docker Hub username, token and repository against Docker Hub before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or Docker Hub cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412)
+- `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
 
 ### Bug fixes

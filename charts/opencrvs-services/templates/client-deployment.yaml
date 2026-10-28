@@ -67,6 +67,13 @@ spec:
             - name: CONTENT_SECURITY_POLICY_WILDCARD
               value: "*.{{ .Values.hostname }}"
           {{- end }}
+          {{- if and
+            (not (hasKey (.Values.client.env | default dict) "S3_PUBLIC_ORIGIN"))
+            (not (hasKey (.Values.env | default dict) "S3_PUBLIC_ORIGIN"))
+          }}
+            - name: S3_PUBLIC_ORIGIN
+              value: {{ include "s3-public-origin" . | quote }}
+          {{- end }}
             - name: COUNTRY_CONFIG_URL_INTERNAL
               value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
             - name: GATEWAY_URL_INTERNAL

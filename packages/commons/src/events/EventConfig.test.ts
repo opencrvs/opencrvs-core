@@ -307,8 +307,38 @@ describe('EventConfig', () => {
       fieldIndex
     ]
 
-    it('should pass validation when NOTIFY has no notification form', () => {
-      const res = EventConfig.safeParse(tennisClubMembershipEvent)
+    // EventConfig parses configs served by countryconfig directly, without defineConfig
+    it.each(['notificationForm', 'review'] as const)(
+      'should fail validation when NOTIFY has no %s',
+      (key) => {
+        const res = EventConfig.safeParse({
+          ...tennisClubMembershipEvent,
+          actions: tennisClubMembershipEvent.actions.map((action) => {
+            if (action.type !== ActionType.NOTIFY) {
+              return action
+            }
+            const { [key]: _omitted, ...rest } = action
+            return rest
+          })
+        })
+
+        expect(res.success).toBe(false)
+        expect(res.error?.issues).toContainEqual(
+          expect.objectContaining({
+            path: ['actions', notifyActionIndex, key]
+          })
+        )
+      }
+    )
+
+    // NOTIFY is optional
+    it('should pass validation when the event has no NOTIFY action', () => {
+      const res = EventConfig.safeParse({
+        ...tennisClubMembershipEvent,
+        actions: tennisClubMembershipEvent.actions.filter(
+          (action) => action.type !== ActionType.NOTIFY
+        )
+      })
 
       expect(res.success).toBe(true)
     })
@@ -363,7 +393,7 @@ describe('EventConfig', () => {
       expect(res.error?.issues).toEqual([
         expect.objectContaining({
           path: fieldPath(0),
-          message: `Notification form field 'applicant.email' is of type TEXT, but the declaration form field with the same id in event '${tennisClubMembershipEvent.id}' is of type EMAIL.`
+          message: `Notification form field 'applicant.email' on page 'applicant' is of type TEXT, but the declaration form field with the same id in event '${tennisClubMembershipEvent.id}' (DECLARE declaration, page 'applicant') is of type EMAIL.`
         })
       ])
     })

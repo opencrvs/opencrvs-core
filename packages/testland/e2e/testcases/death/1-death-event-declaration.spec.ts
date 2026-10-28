@@ -99,7 +99,7 @@ test.describe('1. Death event declaration', () => {
           page
             .locator('#event-menu-dropdownMenu')
             .getByRole('listitem')
-            .filter({ hasText: 'Delete declaration' })
+            .filter({ hasText: 'Delete draft' })
         ).toBeVisible()
       })
 
@@ -167,7 +167,7 @@ test.describe('1. Death event declaration', () => {
           page
             .locator('#event-menu-dropdownMenu')
             .getByRole('listitem')
-            .filter({ hasText: 'Delete declaration' })
+            .filter({ hasText: 'Delete draft' })
         ).toBeVisible()
       })
 
@@ -210,7 +210,7 @@ test.describe('1. Death event declaration', () => {
           page
             .locator('#event-menu-dropdownMenu')
             .getByRole('listitem')
-            .filter({ hasText: 'Delete declaration' })
+            .filter({ hasText: 'Delete draft' })
         ).toBeVisible()
       })
 
@@ -255,7 +255,7 @@ test.describe('1. Death event declaration', () => {
           page
             .locator('#event-menu-dropdownMenu')
             .getByRole('listitem')
-            .filter({ hasText: 'Delete declaration' })
+            .filter({ hasText: 'Delete draft' })
         ).toBeVisible()
       })
 
@@ -314,7 +314,7 @@ test.describe('1. Death event declaration', () => {
           page
             .locator('#event-menu-dropdownMenu')
             .getByRole('listitem')
-            .filter({ hasText: 'Delete declaration' })
+            .filter({ hasText: 'Delete draft' })
         ).toBeVisible()
       })
 
@@ -363,7 +363,7 @@ test.describe('1. Death event declaration', () => {
           page
             .locator('#event-menu-dropdownMenu')
             .getByRole('listitem')
-            .filter({ hasText: 'Delete declaration' })
+            .filter({ hasText: 'Delete draft' })
         ).toBeVisible()
       })
 
@@ -502,7 +502,7 @@ test.describe('1. Death event declaration', () => {
       await page
         .locator('#event-menu-dropdownMenu')
         .getByRole('listitem')
-        .filter({ hasText: 'Delete declaration' })
+        .filter({ hasText: 'Delete draft' })
         .click()
     })
 
@@ -520,7 +520,7 @@ test.describe('1. Death event declaration', () => {
         page.getByRole('heading', { name: 'Delete draft?' })
       ).toBeVisible()
       await expect(
-        page.getByText('Are you sure you want to delete this declaration?')
+        page.getByText('Are you sure you want to delete this draft?')
       ).toBeVisible()
       await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'Confirm' })).toBeVisible()

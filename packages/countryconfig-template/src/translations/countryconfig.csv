@@ -182,6 +182,11 @@ event.birth.action.form.section.signedAffidavit.label,This is the label for uplo
 event.birth.action.issue-certified-copy.label,This is shown as the action name anywhere the user can trigger the action from,Issue certified copy,Délivrer une copie certifiée
 event.birth.action.issue-certified-copy.supportingCopy,This is the confirmation text for the issue certified copy action,Issuing a certified copy confirms that an official document is being released.,Délivrer une copie certifiée confirme qu'un document officiel est remis.
 event.birth.action.issued.audit-history-label,The label to show in audit history for the issued action,Issued,Émis
+event.birth.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
+event.birth.action.notify.form.label,This is what the birth notification form is referred as,Birth notification form,Formulaire de notification de naissance
+event.birth.action.notify.form.review.title,Title of the form to show in review page,"{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}","{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Notification de naissance} other {Notification de naissance pour {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Notification de naissance pour {child.name.firstname}} other {Notification de naissance pour {child.name.firstname} {child.name.surname}}}}}"
+event.birth.action.notify.form.section.child.field.dob.error,This is the error message for late registration,Late registration is not allowed,L'inscription tardive n'est pas autorisée
+event.birth.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.birth.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.birth.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
 event.birth.action.provincial-registrar-feedback.label,This is shown when the provincial registrar feedback can be triggered from the action from,Provincial registrar feedback,Retour du registraire provincial
@@ -259,8 +264,8 @@ event.death.action.correction.form.section.requester.label,This is the label for
 event.death.action.correction.form.section.requester.name.label,This is the label for the field,Name,Nom
 event.death.action.correction.form.section.requester.nid.label,This is the label for the field,ID Number,Numéro d'identité
 event.death.action.correction.form.section.requester.passport.label,This is the label for the field,ID Number,Numéro d'identité
-event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to child,Relation avec l'enfant
-event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Grandmother,ex. Grand-mère
+event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to deceased,Relation avec le défunt
+event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Mother,ex. Mère
 event.death.action.correction.form.section.supporting-documents.title,This is the title of the section,Upload supporting documents,Télécharger les documents justificatifs
 event.death.action.correction.form.section.verifyIdentity.data.label,Title for the data section,,
 event.death.action.correction.form.verify,This is the label for the verification button,Verified,Vérifié
@@ -443,6 +448,7 @@ event.tennis-club-membership.action.form.section.passportDetails.label,Field for
 event.tennis-club-membership.action.form.section.refugeeNumberDetails.label,Field for entering Refugee Number details,Refugee Number Details,Refugee Number Details
 event.tennis-club-membership.action.form.section.relationshipToMember.label,This is the label for the relationship to member field,Relationship to Member,Relationship to Member
 event.tennis-club-membership.action.form.section.signedAffidavit.label,This is the label for uploading a signed affidavit,Signed Affidavit (Optional),Signed Affidavit (Optional)
+event.tennis-club-membership.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.tennis-club-membership.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.tennis-club-membership.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
 event.tennis-club-membership.action.read.label,Title of the review page,Read,Lire

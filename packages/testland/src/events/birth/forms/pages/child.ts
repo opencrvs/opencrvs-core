@@ -208,12 +208,12 @@ const placeOfBirthOptions = [
   }
 ] satisfies SelectOption[]
 
-const typeOfBirthOptions = createSelectOptions(
+export const typeOfBirthOptions = createSelectOptions(
   TypeOfBirth,
   typeOfBirthMessageDescriptors
 )
 
-const attendantAtBirthOptions = createSelectOptions(
+export const attendantAtBirthOptions = createSelectOptions(
   AttendantAtBirth,
   attendantAtBirthMessageDescriptors
 )
