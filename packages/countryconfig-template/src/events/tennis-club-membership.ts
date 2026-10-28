@@ -26,7 +26,9 @@ import {
   defineConditional,
   never,
   now,
-  FieldConfig
+  FieldConfig,
+  toNotificationForm,
+  toNotificationReview
 } from '@opencrvs/toolkit/events'
 
 import { MAX_NAME_LENGTH } from './birth/validators'
@@ -1262,6 +1264,17 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'Title of the review page'
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Notify',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.notify.label'
+      },
+      notificationForm: toNotificationForm(TENNIS_CLUB_DECLARATION_FORM),
+      review: toNotificationReview(TENNIS_CLUB_DECLARATION_REVIEW)
     },
     {
       type: ActionType.DECLARE,
