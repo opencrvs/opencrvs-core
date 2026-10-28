@@ -13,7 +13,7 @@
 import superjson from 'superjson'
 import { createTRPCClient, httpLink } from '@trpc/client'
 import { env } from './environment'
-import type { InitialisationRouter } from '@opencrvs/events/src/router'
+import type { InitialisationRouter } from '@opencrvs/events/router'
 
 export const createInitialisationClient = (token: string) => {
   return createTRPCClient<InitialisationRouter>({

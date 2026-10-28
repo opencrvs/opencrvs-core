@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { AppRouter } from '@gateway/v2-events/events/router'
 import { QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
@@ -29,6 +28,7 @@ import {
 import { partition, throttle } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
+import type { AppRouter } from '@opencrvs/events/router'
 import { getUUID } from '@opencrvs/commons/client'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { CACHE_VERSION } from '@client/utils/constants'
