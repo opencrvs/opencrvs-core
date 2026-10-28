@@ -33,7 +33,6 @@ opencrvs environment swarm-to-k8s
 ### Development using yarn link
 
 ```
-# tsconfig.json references commons. when `tsc --build` is run, both are built.
 > yarn build:all
 # If you miss this part you might face issues with types.
 > cd dist
@@ -63,14 +62,5 @@ Publish via [Publish toolkit to NPM registry](https://github.com/opencrvs/opencr
 
 - All dependencies of the functions and moduless used from `packages/commons` **must** be also defined in the package.json of the toolkit. Otherwise someone installing the package will get errors.
 - Package is published and should be used without knowledge of rest of the monorepo
-- Package exposes `/events, /scopes` directory, with types, from `packages/commons` through the library, others are excluded.
-- If the above directories have subdirectories, the types are not exposed by default. The compiled JavaScript is available though through `esbuild`. See `build.sh` on how to expose subdirectories:
-
-```sh
-# Build common events
-npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
-mkdir -p ./dist/commons/events
-cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
-mkdir -p ./dist/commons/events/state # <-- create the subdirectory
-cp -r ../commons/build/dist/common/events/state/*.d.ts ./dist/commons/events/state # <-- copy the types over
-```
+- Each subpath in `exports` has one entry module under `src/`. `build.sh` bundles its JavaScript with esbuild, and `rolldown.dts.config.mjs` emits its declarations from source, inlining the types it uses from `packages/commons` and `packages/events`. A new subpath needs all three.
+- Every package the declarations import must be a dependency of the toolkit. The declaration build fails otherwise.

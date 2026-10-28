@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid'
 import decode from 'jwt-decode'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
-import { ActionType } from '@opencrvs/toolkit/events'
+import { ActionType, HttpFieldValue } from '@opencrvs/toolkit/events'
 import {
   continueForm,
   drawSignature,
@@ -182,8 +182,11 @@ test.describe('E-Signet PSUT persistence', () => {
             sub:
               declareAction &&
               'declaration' in declareAction &&
-              declareAction.declaration?.['father.verify-nid-http-fetch']?.data
-                ?.sub
+              (
+                declareAction.declaration?.['father.verify-nid-http-fetch'] as
+                  | HttpFieldValue
+                  | undefined
+              )?.data?.sub
           }
         },
         { timeout: 60_000, intervals: [1_000, 2_000, 5_000] }
