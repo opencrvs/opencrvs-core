@@ -13,9 +13,10 @@ import { continueForm, goBackToReview, login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 
 /*
- * applicant.skillLevel is an _EXPERIMENTAL_CUSTOM field. Its component is the
- * ES module src/client-static/custom-fields/skill-level.js, which the client
- * loads at runtime through /api/countryconfig/.
+ * applicant.skillLevel is an _EXPERIMENTAL_CUSTOM field. Its component is
+ * src/custom-fields/skill-level/, which testland bundles into one ES module
+ * and the client loads at runtime through /api/countryconfig/. It uses
+ * react-intl, an npm package that needs the React of the client.
  */
 test('Custom field from country config', async ({ page }) => {
   const problems: string[] = []
@@ -57,7 +58,7 @@ test('Custom field from country config', async ({ page }) => {
     await continueForm(page)
 
     await expect(page.getByTestId('applicant.skillLevel-value')).toHaveText(
-      '★★★★☆ (4/5)'
+      '★★★★☆ (4 stars out of 5)'
     )
   })
 
@@ -72,7 +73,7 @@ test('Custom field from country config', async ({ page }) => {
     await goBackToReview(page)
 
     await expect(page.getByTestId('applicant.skillLevel-value')).toHaveText(
-      '★★☆☆☆ (2/5)'
+      '★★☆☆☆ (2 stars out of 5)'
     )
   })
 

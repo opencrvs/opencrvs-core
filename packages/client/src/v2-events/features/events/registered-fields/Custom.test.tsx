@@ -69,6 +69,20 @@ describe('Custom field', () => {
     ).toBe(1)
   })
 
+  it('shares the React of the client before a bundled module loads', async () => {
+    renderWithTheme(
+      <Custom.Output
+        id="custom"
+        src={fixture('shared-externals.js')}
+        value={1}
+      />
+    )
+
+    expect(
+      await screen.findByText('Text from a context made at load time')
+    ).toBeTruthy()
+  })
+
   it('shows an error when the module has no default export factory', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
 

@@ -20,6 +20,9 @@
         "../commons/src/authentication.ts"
       ],
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
+      "@opencrvs/commons/events/CustomFieldExternals": [
+        "../commons/src/events/CustomFieldExternals.ts"
+      ],
       "@opencrvs/commons/events/deduplication": [
         "../commons/src/events/deduplication.ts"
       ],

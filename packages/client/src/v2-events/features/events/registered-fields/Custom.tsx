@@ -9,8 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import ReactDOM from 'react-dom'
+import * as jsxRuntime from 'react/jsx-runtime'
 import { Pill, Spinner } from '@opencrvs/components'
-import { CustomFieldValue } from '@opencrvs/commons/client'
+import {
+  CUSTOM_FIELD_EXTERNALS_GLOBAL,
+  CustomFieldExternalModule,
+  CustomFieldValue
+} from '@opencrvs/commons/client'
 
 interface InputProps {
   id: string
@@ -43,7 +49,23 @@ interface CustomFieldModuleContext {
 
 const loadedModules = new Map<string, Promise<CustomFieldModule>>()
 
+const externals: Record<CustomFieldExternalModule, unknown> = {
+  react: React,
+  'react/jsx-runtime': jsxRuntime,
+  'react-dom': ReactDOM
+}
+
+/**
+ * Modules bundled with the toolkit plugin read React from this global, also
+ * in their own dependencies and while the module loads. It must exist before
+ * the import.
+ */
+function shareExternals() {
+  Object.assign(globalThis, { [CUSTOM_FIELD_EXTERNALS_GLOBAL]: externals })
+}
+
 async function importModule(src: string): Promise<CustomFieldModule> {
+  shareExternals()
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const imported: { default?: unknown } = await import(/* @vite-ignore */ src)
 

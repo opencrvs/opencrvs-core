@@ -1303,7 +1303,7 @@ const CustomField = BaseField.extend({
   src: z
     .string()
     .describe(
-      'URL of an ES module. Its default export is a function ({ React }) => ({ Input, Output }) that receives the React instance of the client. Use a same-origin path such as /api/countryconfig/static/my-field.js: the client Content-Security-Policy blocks scripts from origins that it does not list.'
+      'URL of an ES module. Its default export is a function ({ React }) => ({ Input, Output }) that receives the React instance of the client. Use a same-origin path such as /api/countryconfig/static/my-field.js: the client Content-Security-Policy blocks scripts from origins that it does not list. To use JSX, many files or npm packages, bundle the module with customFieldBuildOptions from @opencrvs/toolkit/custom-fields.'
     ),
   configuration: z
     .unknown()
