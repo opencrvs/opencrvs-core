@@ -13422,7 +13422,8 @@ components:
             client. Use a same-origin path such as
             /api/countryconfig/static/my-field.js: the client
             Content-Security-Policy blocks scripts from origins that it does not
-            list."
+            list. To use JSX, many files or npm packages, bundle the module with
+            customFieldBuildOptions from @opencrvs/toolkit/custom-fields."
         configuration:
           description: Passed as is to the Input component of the module
       required:
