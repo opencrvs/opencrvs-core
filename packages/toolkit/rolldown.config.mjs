@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// Builds the published package: a CommonJS bundle per public subpath and CLI,
-// and the subpaths' declarations. The private workspace packages
-// (@opencrvs/commons, @opencrvs/events) are inlined from their source; every
-// other package stays an import, so it has to be a dependency a consumer
-// installs with the toolkit.
+// Builds the published package: a CommonJS entry per public subpath and CLI,
+// sharing chunks between them, and the subpaths' declarations. The private
+// workspace packages (@opencrvs/commons, @opencrvs/events) are inlined from
+// their source; every other package stays an import, so it has to be a
+// dependency a consumer installs with the toolkit.
 import path from 'node:path'
 import { defineConfig } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
@@ -58,22 +58,49 @@ const external = (id) => /^[@\w]/.test(id) && !WORKSPACE.test(id)
 // src/api/index.ts -> api/index
 const outName = (file) => path.relative('src', file).replace(/\.ts$/, '')
 
-// Each entry is its own bundle, so entries share no module state.
-const bundle = (input) => ({
-  input,
-  external,
-  platform: 'node',
-  output: {
-    file: `dist/${outName(input)}.js`,
-    format: 'cjs',
-    // Inline dynamic imports too, so the entry stays one file
-    codeSplitting: false,
-    banner: scripts.includes(input) ? '#!/usr/bin/env node' : undefined
+const scriptNames = new Set(scripts.map(outName))
+
+/**
+ * Fails the build when a module that reads files next to itself through
+ * `__dirname` lands outside dist/, where those files are copied.
+ */
+const dirnameAtRoot = {
+  name: 'dirname-at-root',
+  generateBundle(_, bundle) {
+    const modules = ['src/cli.ts', 'src/environment/templates.ts'].map((file) =>
+      path.join(import.meta.dirname, file)
+    )
+    for (const chunk of Object.values(bundle)) {
+      if (chunk.type !== 'chunk' || !chunk.fileName.includes('/')) continue
+      const moduleId = modules.find((id) => chunk.moduleIds.includes(id))
+      if (!moduleId) continue
+      this.error(
+        `${chunk.fileName} contains ${path.relative(import.meta.dirname, moduleId)}, which resolves files from __dirname, so it must be emitted directly in dist/`
+      )
+    }
   }
-})
+}
 
 export default defineConfig([
-  ...[...subpaths, ...scripts].map(bundle),
+  {
+    input: Object.fromEntries(
+      [...subpaths, ...scripts].map((file) => [outName(file), file])
+    ),
+    external,
+    platform: 'node',
+    plugins: [dirnameAtRoot],
+    output: {
+      dir: 'dist',
+      format: 'cjs',
+      entryFileNames: '[name].js',
+      // Directly in dist/, see dirnameAtRoot
+      chunkFileNames: '[name]-[hash].js',
+      banner: (chunk) =>
+        chunk.isEntry && scriptNames.has(chunk.name)
+          ? '#!/usr/bin/env node'
+          : ''
+    }
+  },
   {
     input: subpaths,
     external,
