@@ -24,7 +24,7 @@ import {
   ActionType,
   AssignActionInput,
   DeleteActionInput,
-  Draft,
+  RemoteDraft,
   DraftInput,
   EventConfig,
   EventDocument,
@@ -53,7 +53,6 @@ import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import {
   createDraft,
-  getDraftScopes,
   getDraftsByUserId,
   throwConflictIfDraftNotAllowed
 } from '@events/service/events/drafts'
@@ -287,14 +286,16 @@ export const eventRouter = router({
     }),
   draft: router({
     list: userOnlyProcedure
-      .output(z.array(Draft))
+      .output(z.array(RemoteDraft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: userOnlyProcedure
       // A draft is saved by a user who can perform its action
-      .use(middleware.canAccessEventWithScopes(getDraftScopes))
+      .use(
+        middleware.canAccessEventWithActionScopes(DraftInput.shape.type.options)
+      )
       .input(DraftInput)
       .use(middleware.requireAssignment)
-      .output(Draft)
+      .output(RemoteDraft)
       .mutation(async ({ input, ctx }) => {
         const { eventId, type } = input
 

@@ -26,7 +26,6 @@ import {
   useDuplicatesAvailable
 } from '@client/v2-events/features/events/actions/dedup/useDuplicatesAvailable'
 import {
-  DraftActionType,
   useAssignmentActions,
   useEventActionsOnClick
 } from './useEventActionsOnClick'
@@ -71,13 +70,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
     ) === DuplicatesAvailability.AVAILABLE
 
-  const draftActionType = drafts
-    .filter((draft) => draft.eventId === event.id)
-    .map((draft) => draft.action.type)
-    .find(
-      (type): type is DraftActionType =>
-        type === ActionType.DECLARE || type === ActionType.NOTIFY
-    )
+  const draftActionType = drafts.find((draft) => draft.eventId === event.id)
+    ?.action.type
 
   const resolveAction = useCallback(
     <T extends WorkqueueCtaType | ClientSpecificAction>(

@@ -11,30 +11,19 @@
 
 import { TRPCError } from '@trpc/server'
 import {
-  ACTION_SCOPE_MAP,
-  Draft,
   DraftInput,
   EventDocument,
   EventStatus,
   getStatusFromActions,
+  RemoteDraft,
   UUID
 } from '@opencrvs/commons'
 import { UserContext } from '@opencrvs/commons'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 
 /**
- * Scopes that allow saving a draft: those of the draft's action. `undefined` for input that is not a draft.
- */
-export function getDraftScopes(rawInput: unknown) {
-  const draft = DraftInput.pick({ type: true }).safeParse(rawInput)
-  return draft.success ? ACTION_SCOPE_MAP[draft.data.type] : undefined
-}
-
-/**
- * Drafts are only saved on a new record. A draft can name a file that no action references,
- * and such a file is swept when the record is deleted, which is possible only until it is
- * notified or declared. A rejected record is notified or declared, and is updated with the
- * Edit flow, which saves no drafts.
+ * Drafts are only saved on a new record, before it is notified or declared.
+ * See `DraftInput` for why.
  */
 export function throwConflictIfDraftNotAllowed(event: EventDocument) {
   const status = getStatusFromActions(event.actions)
@@ -58,7 +47,7 @@ export const createDraft = async (
     user: UserContext
     transactionId: string
   }
-): Promise<Draft> => {
+): Promise<RemoteDraft> => {
   const draft = await draftsRepo.createDraft({
     eventId,
     transactionId,

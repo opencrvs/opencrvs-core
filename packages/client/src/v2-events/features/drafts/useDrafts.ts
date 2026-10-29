@@ -19,6 +19,7 @@ import {
   EventDocument,
   EventStatus,
   getStatusFromActions,
+  RemoteDraft,
   UUID
 } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
@@ -149,7 +150,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
   retry: retryUnlessConflict,
   mutationFn: createEventActionMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
-    const optimisticDraft: Draft = {
+    const optimisticDraft: RemoteDraft = {
       id: createTemporaryId(),
       eventId: variables.eventId as UUID,
       transactionId: variables.transactionId as UUID,
@@ -214,7 +215,7 @@ export function useDrafts() {
 
   function useDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-  ): Draft[] {
+  ): RemoteDraft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
     const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
 
@@ -225,8 +226,9 @@ export function useDrafts() {
       queryKey: trpc.event.draft.list.queryKey(),
       select: (currentDraftState) => {
         const locallyStoredDrafts =
-          queryClient.getQueryData<Draft[]>(trpc.event.draft.list.queryKey()) ??
-          []
+          queryClient.getQueryData<RemoteDraft[]>(
+            trpc.event.draft.list.queryKey()
+          ) ?? []
         const serverStoredDrafts = currentDraftState.filter(
           (draft) => !isTemporaryId(draft.id)
         )
@@ -302,7 +304,7 @@ export function useDrafts() {
     useRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft | undefined => {
+    ): RemoteDraft | undefined => {
       const eventDrafts = useDisplayableDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )

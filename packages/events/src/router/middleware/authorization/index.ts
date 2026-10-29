@@ -15,6 +15,7 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
+  ACTION_SCOPE_MAP,
   Action,
   ActionDocument,
   ActionInputWithType,
@@ -245,17 +246,17 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   return next()
 }
 
-/**
- * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
- *
- * @param scopes scopes that grant access, or a function picking them from the raw input when they
- * depend on it, e.g. on the action type of a draft. Return `undefined` for input that names no scopes.
- */
-export const canAccessEventWithScopes = (
-  scopes:
-    | RecordScopeTypeV2[]
-    | ((rawInput: unknown) => RecordScopeTypeV2[] | undefined)
-) => {
+/** Actions that are granted by scopes, rather than always allowed */
+type ScopedActionType = {
+  [A in keyof typeof ACTION_SCOPE_MAP]: (typeof ACTION_SCOPE_MAP)[A] extends null
+    ? never
+    : A
+}[keyof typeof ACTION_SCOPE_MAP]
+
+/** `getRequiredScopes` returns `undefined` for input that names no scopes */
+function canAccessEventWithInputScopes(
+  getRequiredScopes: (rawInput: unknown) => RecordScopeTypeV2[] | undefined
+) {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -269,8 +270,7 @@ export const canAccessEventWithScopes = (
     // default .input(...) throws 400, which is something that we want to return only if the user should have access.
     const rawInput = await getRawInput()
 
-    const requiredScopes =
-      typeof scopes === 'function' ? scopes(rawInput) : scopes
+    const requiredScopes = getRequiredScopes(rawInput)
 
     if (!requiredScopes) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
@@ -318,6 +318,25 @@ export const canAccessEventWithScopes = (
 
   return fn
 }
+
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ */
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) =>
+  canAccessEventWithInputScopes(() => scopes)
+
+/**
+ * Like {@link canAccessEventWithScopes}, for an endpoint that takes one of several actions:
+ * the scopes are those of the input's `type`, see `ACTION_SCOPE_MAP`.
+ * Input whose `type` is not one of `actionTypes` is a bad request.
+ */
+export const canAccessEventWithActionScopes = (
+  actionTypes: readonly ScopedActionType[]
+) =>
+  canAccessEventWithInputScopes((rawInput) => {
+    const input = z.object({ type: z.enum(actionTypes) }).safeParse(rawInput)
+    return input.success ? ACTION_SCOPE_MAP[input.data.type] : undefined
+  })
 
 const ActionConfirmationParams = z.object({
   eventId: UUID,

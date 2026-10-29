@@ -49,5 +49,14 @@ export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
   ])
 })
 
+/*
+ * A draft saved on the server. Unlike a local draft, which also holds the state of
+ * the edit, print and correction views, it can only be a declare or notify draft.
+ */
+export const RemoteDraft = Draft.extend({
+  action: Draft.shape.action.extend({ type: DraftInput.shape.type })
+})
+
 export type Draft = z.infer<typeof Draft>
 export type DraftInput = z.infer<typeof DraftInput>
+export type RemoteDraft = z.infer<typeof RemoteDraft>

@@ -45,7 +45,7 @@ import {
   ReinstateRegistrationActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
-import { Draft } from './Draft'
+import { Draft, DraftInput, RemoteDraft } from './Draft'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
@@ -1201,11 +1201,11 @@ export function generateEventDraftDocument({
   declaration = {}
 }: {
   eventId: UUID
-  actionType: ActionType
+  actionType: DraftInput['type']
   rng?: () => number
   declaration?: ActionUpdate
   annotation?: ActionUpdate
-}): Draft {
+}): RemoteDraft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: actionType,
@@ -1217,6 +1217,7 @@ export function generateEventDraftDocument({
     transactionId: getUUID(),
     action: {
       ...action,
+      type: actionType,
       declaration: {
         ...action.declaration,
         ...declaration

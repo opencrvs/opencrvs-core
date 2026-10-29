@@ -17,6 +17,7 @@ import {
   getUUID,
   ClientSpecificAction,
   getOrThrow,
+  RemoteDraft,
   WorkqueueActionType,
   AssignmentStatus,
   getAssignmentStatus,
@@ -37,9 +38,7 @@ import { useRejectionModal } from '@client/v2-events/features/events/actions/rej
 import { useAuthentication } from '@client/utils/userUtils'
 
 /** Actions whose drafts can be saved to the server */
-export type DraftActionType =
-  | typeof ActionType.DECLARE
-  | typeof ActionType.NOTIFY
+export type DraftActionType = RemoteDraft['action']['type']
 
 /**
  * Given an event,

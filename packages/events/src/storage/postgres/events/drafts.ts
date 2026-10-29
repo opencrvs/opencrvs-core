@@ -13,8 +13,9 @@ import { Kysely, sql } from 'kysely'
 import * as z from 'zod/v4'
 import {
   ActionStatus,
-  ActionType,
   Draft,
+  DraftInput,
+  RemoteDraft,
   TokenUserType,
   UUID
 } from '@opencrvs/commons'
@@ -79,18 +80,19 @@ export async function getDraftsByUserId(createdBy: string) {
   const drafts = await db
     .selectFrom('eventActionDrafts')
     .where('createdBy', '=', createdBy)
+    .where('actionType', 'in', DraftInput.shape.type.options)
     .orderBy('createdAt', 'asc')
     .selectAll()
     .execute()
   const draftDocuments = drafts.map(toDraftDocument)
 
-  return z.array(Draft).parse(draftDocuments satisfies Draft[])
+  return z.array(RemoteDraft).parse(draftDocuments)
 }
 
 export async function findLatestDraftForAction(
   eventId: UUID,
   createdBy: string,
-  actionType: ActionType
+  actionType: DraftInput['type']
 ) {
   const db = getClient()
   const draft = await db
@@ -103,8 +105,7 @@ export async function findLatestDraftForAction(
     .executeTakeFirst()
 
   if (draft) {
-    const draftDocument = toDraftDocument(draft)
-    return Draft.parse(draftDocument satisfies Draft)
+    return RemoteDraft.parse(toDraftDocument(draft))
   }
 
   return undefined
