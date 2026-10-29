@@ -24,6 +24,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { addLocalEventConfig } from './api'
+import { workqueueCountOptions } from './procedures/count'
 import {
   byIdSearchOptions,
   taggedSearchOptions,
@@ -82,7 +83,7 @@ async function mountWorkqueue(rows: EventIndex[]) {
   const queue = new QueryObserver(queryClient, queueOptions)
   const count = new QueryObserver(
     queryClient,
-    trpcOptionsProxy.workqueue.count.queryOptions(countInput)
+    workqueueCountOptions(countInput)
   )
   const unsubscribe = [queue, count].map((observer) =>
     observer.subscribe(() => undefined)
@@ -100,6 +101,10 @@ async function mountWorkqueue(rows: EventIndex[]) {
     rows: () => queue.getCurrentResult().data?.results,
     isOutOfDate: () =>
       queryClient.getQueryState(queueOptions.queryKey)?.isInvalidated,
+    /** A fetch of the queue on screen, as its own poll starts one. */
+    pollQueue: async () => queue.refetch(),
+    /** What the sidebar's poll does. */
+    pollCounts: async () => count.refetch(),
     unmount: () => unsubscribe.forEach((fn) => fn())
   }
 }
@@ -260,6 +265,39 @@ describe('a mounted workqueue follows the server without waiting for the poll', 
 
     expect(workqueue.isOutOfDate()).toBe(false)
     expect(workqueue.fake.searchFetches).toBe(0)
+    workqueue.unmount()
+  })
+})
+
+describe('the sidebar poll keeps the queue on screen in step with its count', () => {
+  it('refreshes the queue when its count changes', async () => {
+    const workqueue = await mountWorkqueue([row])
+
+    workqueue.fake.queue = []
+    await workqueue.pollCounts()
+
+    await vi.waitFor(() => expect(workqueue.rows()).toEqual([]))
+    expect(workqueue.fake.searchFetches).toBe(1)
+    workqueue.unmount()
+  })
+
+  it('leaves the queue alone when its count is unchanged', async () => {
+    const workqueue = await mountWorkqueue([row])
+
+    await workqueue.pollCounts()
+
+    expect(workqueue.fake.searchFetches).toBe(0)
+    workqueue.unmount()
+  })
+
+  it('joins a fetch of the queue already in flight', async () => {
+    const workqueue = await mountWorkqueue([row])
+
+    workqueue.fake.queue = []
+    await Promise.all([workqueue.pollQueue(), workqueue.pollCounts()])
+
+    expect(workqueue.rows()).toEqual([])
+    expect(workqueue.fake.searchFetches).toBe(1)
     workqueue.unmount()
   })
 })

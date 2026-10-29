@@ -66,11 +66,14 @@ export function byIdSearchKey(eventId: string) {
 }
 
 /**
- * Prefix key matching the entries of every workqueue. Shorter than a full
- * tagged key, so it partial-matches every entry beneath it.
+ * Prefix key matching the entries of workqueue `slug`, or of every workqueue
+ * when `slug` is left out. Shorter than a full tagged key, so it partial-matches
+ * every entry beneath it.
  */
-export function workqueueSearchKey() {
-  return [['event', 'search', 'workqueue']] as const
+export function workqueueSearchKey(slug?: string) {
+  return [
+    ['event', 'search', 'workqueue', ...(slug === undefined ? [] : [slug])]
+  ] as const
 }
 
 /**

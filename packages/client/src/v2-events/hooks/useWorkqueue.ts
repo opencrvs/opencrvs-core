@@ -17,22 +17,12 @@ import {
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import {
-  SearchCacheTag,
-  taggedKey,
-  taggedSearchOptions
-} from '@client/v2-events/features/events/useEvents/procedures/search'
+import { taggedSearchOptions } from '@client/v2-events/features/events/useEvents/procedures/search'
+import { WORKQUEUE_POLL_INTERVAL } from '@client/v2-events/features/events/useEvents/procedures/count'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 import { useEvents } from '../features/events/useEvents/useEvents'
-import { queryClient, trpcOptionsProxy } from '../trpc'
+import { queryClient } from '../trpc'
 import { useUsers } from './useUsers'
-import { RefetchGroup, useSharedRefetch } from './useSharedRefetch'
-
-/** The workqueue counts and the workqueue on screen poll together. */
-export const WORKQUEUE_POLL: RefetchGroup = {
-  name: 'workqueue',
-  intervalMs: 20000
-}
 
 function getDeserializedQuery(
   workqueueConfig: WorkqueueConfig | undefined,
@@ -70,24 +60,18 @@ export const useWorkqueue = (workqueueSlug: string) => {
         limit,
         sort: [{ field: 'updatedAt', direction: 'desc' as const }]
       }
-      const tag: SearchCacheTag = ['workqueue', workqueueSlug]
       return {
-        useSuspenseQuery: () => {
-          useSharedRefetch(WORKQUEUE_POLL, taggedKey(searchInput, tag))
-          return searchEvent.useSuspenseQuery(searchInput, tag)
-        }
+        useSuspenseQuery: () =>
+          searchEvent.useSuspenseQuery(
+            searchInput,
+            ['workqueue', workqueueSlug],
+            { refetchInterval: WORKQUEUE_POLL_INTERVAL }
+          )
       }
     },
     getCount: {
-      useSuspenseQuery: () => {
-        useSharedRefetch(
-          WORKQUEUE_POLL,
-          trpcOptionsProxy.workqueue.count.queryKey(deserializedQueries)
-        )
-        return useGetEventCountsByWorkqueue().useSuspenseQuery(
-          deserializedQueries
-        )
-      }
+      useSuspenseQuery: () =>
+        useGetEventCountsByWorkqueue().useSuspenseQuery(deserializedQueries)
     }
   }
 }

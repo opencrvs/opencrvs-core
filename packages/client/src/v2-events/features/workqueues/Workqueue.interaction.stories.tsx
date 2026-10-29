@@ -34,14 +34,17 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
-import { AppRouter, TRPCProvider, queryClient } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  TRPCProvider,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { faker } from '@client/tests/test-data-generators'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
-import { refetchGroup } from '@client/v2-events/hooks/useSharedRefetch'
-import { WORKQUEUE_POLL } from '@client/v2-events/hooks/useWorkqueue'
 import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
@@ -690,8 +693,9 @@ export const WorkqueueGoesOfflineWhileLoading: Story = {
 //   1. MSW count handler returns initialCount (3) on the first call.
 //   2. MSW search handler returns 3 events on the first call.
 //   3. MSW now returns updatedCount (4) and 4 events, and the play function
-//      fires one tick of WORKQUEUE_POLL – what the 20-second poll does.
-//   4. The tick refetches the counts and the workqueue on screen together.
+//      invalidates the counts – what the 20-second count poll does.
+//   4. The count queryFn in count.ts sees the 'recent' count change and
+//      refetches the workqueue on screen.
 //   5. The list shows 4 rows without any user interaction.
 // ---------------------------------------------------------------------------
 
@@ -925,13 +929,15 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
     await step(
       'After count changes workqueue list auto-refreshes to 4 rows',
       async () => {
-        // A tick joins a fetch already in flight, so let the mount's own
-        // refetch land before the server data changes.
+        // A count change joins a queue fetch already in flight, so let the
+        // mount's own refetch land before the server data changes.
         await waitFor(async () => expect(queryClient.isFetching()).toBe(0))
         autoRefreshDataChanged = true
 
-        // One tick of the shared poll, without waiting 20 seconds for it.
-        await refetchGroup(WORKQUEUE_POLL)
+        // What the count poll does, without waiting 20 seconds for it.
+        await queryClient.invalidateQueries({
+          queryKey: trpcOptionsProxy.workqueue.count.queryKey()
+        })
 
         // The list must update automatically – no user interaction required.
         await waitFor(
