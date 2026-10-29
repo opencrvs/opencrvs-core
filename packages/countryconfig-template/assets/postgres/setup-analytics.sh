@@ -22,7 +22,7 @@ set -euo pipefail
 : "${POSTGRES_PASSWORD:?Must set POSTGRES_PASSWORD}"
 : "${KEEP_ALIVE_SECONDS:=0}" # Prevent Swarm from marking this task as failed due to early exit
 
-TARGET_DB=${TARGET_DB-"events"}
+TARGET_DB=${TARGET_DB:-"events"}
 
 export TARGET_DB=${TARGET_DB//-/_}
 
