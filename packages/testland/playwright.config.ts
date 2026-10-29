@@ -47,7 +47,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { open: 'never' }],
-    ['playwright-ctrf-json-reporter', {}]
+    ['playwright-ctrf-json-reporter', {}],
+    ['./e2e/retry-reporter.ts']
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
