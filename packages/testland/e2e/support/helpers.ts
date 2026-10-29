@@ -572,12 +572,6 @@ const actionTitleToApiCallMap = {
   ]
 }
 
-/**
- * The client retries a failed action at least 10s apart (see `retryDelay` in the
- * client's mutationHandlers.ts). A 30s wait only fits two retries, so one slow or
- * failed request on a busy environment would fail the test even though the
- * action still goes through.
- */
 const ACTION_RESPONSE_TIMEOUT = 60_000
 
 /**
