@@ -13,12 +13,13 @@ import { createServer } from '@documents/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { env } from '../../s3/constants'
-import {
-  ensureDefaultBucket,
-  putObject,
-  statObjectIfExists
-} from '../../s3/client'
+import * as client from '../../s3/client'
 import { getObject } from '../../../test/s3'
+
+const { ensureDefaultBucket, putObject, statObjectIfExists } = client
+
+// Passes through to the store, and records which key the handler looked up
+const statObjectIfExistsMock = jest.spyOn(client, 'statObjectIfExists')
 
 beforeAll(async () => {
   await ensureDefaultBucket()
@@ -33,19 +34,20 @@ describe('fileExistsHandler', () => {
     subject: '123123'
   })
 
+  const path = 'event-12345'
+  const transactionId = 'transaction-12345'
+
   beforeAll(async () => {
-    // Each way of writing the path below must find this object
-    await putObject('event-12345/transaction-12345.txt', Buffer.from(''))
+    // So the lookups below answer 200. The spy checks which key they used.
+    await putObject(`${path}/${transactionId}.txt`, Buffer.from(''))
   })
 
   beforeEach(async () => {
+    statObjectIfExistsMock.mockClear()
     server = await createServer()
   })
 
   it('Separates bucket from file paths with multiple directories', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${env.S3_BUCKET}/${path}/${transactionId}.txt`,
@@ -53,14 +55,14 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
+
+    const [filename] = statObjectIfExistsMock.mock.calls[0]
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
 
   it('Separates bucket from file', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${env.S3_BUCKET}/${path}/${transactionId}.txt`,
@@ -69,13 +71,13 @@ describe('fileExistsHandler', () => {
       }
     })
 
+    const [filename] = statObjectIfExistsMock.mock.calls[0]
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
     expect(res.statusCode).toBe(200)
   })
 
   it('handles explicit "/" as start of of file path', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       // double slash is handled
@@ -85,13 +87,13 @@ describe('fileExistsHandler', () => {
       }
     })
 
+    const [filename] = statObjectIfExistsMock.mock.calls[0]
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
     expect(res.statusCode).toBe(200)
   })
 
   it('Handles missing bucket from file paths with multiple directories', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${path}/${transactionId}.txt`,
@@ -99,14 +101,14 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
+
+    const [filename] = statObjectIfExistsMock.mock.calls[0]
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
 
   it('Handles missing bucket from file', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${path}/${transactionId}.txt`,
@@ -115,13 +117,13 @@ describe('fileExistsHandler', () => {
       }
     })
 
+    const [filename] = statObjectIfExistsMock.mock.calls[0]
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
     expect(res.statusCode).toBe(200)
   })
 
   it('handles explicit "/" without bucket as start of of file path', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       // double slash is handled
@@ -130,6 +132,9 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
+
+    const [filename] = statObjectIfExistsMock.mock.calls[0]
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
