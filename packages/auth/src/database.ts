@@ -25,6 +25,7 @@ export async function start() {
   const client = createClient({
     username: env.REDIS_USERNAME,
     password: env.REDIS_PASSWORD,
+    database: env.REDIS_DB,
     socket: {
       host: env.REDIS_HOST
     }

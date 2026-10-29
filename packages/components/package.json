@@ -37,7 +37,7 @@
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint src",
     "lint:public-surface": "node check-public-surface.mjs",
-    "storybook": "storybook dev -p 6060",
+    "storybook": "storybook dev -p ${STORYBOOK_PORT:-6060}",
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=6144 storybook build -o build --disable-telemetry"
   },
   "lint-staged": {

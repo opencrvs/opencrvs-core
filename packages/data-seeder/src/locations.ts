@@ -221,7 +221,7 @@ export function parseLocations(document: unknown): LocationRead {
 }
 
 export async function readLocations(): Promise<LocationRead> {
-  const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/locations', env.COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
 
   if (!res.ok) {
