@@ -10,6 +10,8 @@ RUN apk add --no-cache \
       openssh \
       rsync \
       kubectl \
-      grep
+      grep \
+      coreutils \
+      minio-client
 
 COPY packages/utilities/scripts/ /usr/local/bin/
