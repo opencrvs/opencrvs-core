@@ -24,6 +24,7 @@ import {
 } from '@e2e/support/constants'
 import { formatName, NEW_USER_PASSWORD } from '@e2e/support/helpers'
 import {
+  getDeclaration,
   getNotificationDeclaration,
   NOTIFY_ANNOTATION
 } from './birth-declaration'
@@ -299,6 +300,38 @@ export async function createBirthDraftViaApi(token: string) {
     status: ActionStatus.Requested,
     declaration: { 'child.name': { firstname, surname } },
     annotation: {}
+  })
+
+  return formatName({ firstNames: firstname, familyName: surname })
+}
+
+export async function createCompleteBirthDraftViaApi(token: string) {
+  const client = getClient(token)
+
+  const event = await client.event.create.mutate({
+    type: 'birth',
+    transactionId: uuidv4()
+  })
+
+  const firstname = faker.person.firstName('female')
+  const surname = faker.person.lastName('female')
+
+  const declaration = await getDeclaration({
+    token,
+    partialDeclaration: { 'child.name': { firstname, surname } }
+  })
+  const signature = await uploadFile(getSignatureFile(), token)
+
+  await client.event.draft.create.mutate({
+    eventId: event.id,
+    transactionId: uuidv4(),
+    type: ActionType.DECLARE,
+    status: ActionStatus.Requested,
+    declaration,
+    annotation: {
+      'review.comment': 'My comment',
+      'review.signature': signature
+    }
   })
 
   return formatName({ firstNames: firstname, familyName: surname })

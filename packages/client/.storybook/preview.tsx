@@ -41,7 +41,7 @@ import {
 import {
   ActionType,
   ConditionalType,
-  Draft,
+  RemoteDraft,
   EventDocument,
   InherentFlags,
   not,
@@ -349,7 +349,8 @@ const preview: Preview = {
       })
 
       if (options.parameters?.offline?.drafts) {
-        const offlineDrafts: Array<Draft> = options.parameters.offline.drafts
+        const offlineDrafts: Array<RemoteDraft> =
+          options.parameters.offline.drafts
         setDraftData(() => offlineDrafts)
       }
 

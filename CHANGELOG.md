@@ -157,9 +157,11 @@ Unlike the flag, an archived notification no longer matches, since its status is
 `NOTIFY` used to read its form configuration from the `DECLARE` action. It now supports its own notification form and review:
 
 - **`actions[NOTIFY].notificationForm`** is the notify form. Every field in it must also exist in the `DECLARE` declaration form with the same type, and its values pre-fill the declaration. A `NOTIFY` is rejected when a required `notificationForm` field is missing or invalid, or when its `declaration` contains a field that is not in the notification form.
-- **`actions[NOTIFY].review`** holds the notify review page fields. Notify-only data, such as a notifier's signature, is configured as `NOTIFY` `review` or `form` fields and stored in the `NOTIFY` action annotation. When `notificationForm` is configured, required `review` and dialog `form` fields are enforced on `NOTIFY`. When the record is later declared, `review` fields that also exist on the `DECLARE` review page are pre-filled with the values captured at notify.
+- **`actions[NOTIFY].review`** holds the notify review page fields. Notify-only data, such as a notifier's signature, is configured as `NOTIFY` `review` or `form` fields and stored in the `NOTIFY` action annotation. Required `review` and dialog `form` fields are enforced on `NOTIFY`. When the record is later declared, `review` fields that also exist on the `DECLARE` review page are pre-filled with the values captured at notify.
 
-`defineConfig` still accepts events without a notification form, so these events behave as before. It generates a missing `NOTIFY` action and `review` from the `DECLARE` action with every field optional, and logs a warning when `notificationForm` is missing. If missing, the `DECLARE` form with every field optional is used in its place (`getNotificationForm`). A future release will remove this fallback. An event configuration built without `defineConfig` must give `review` on its `NOTIFY` action.
+`NOTIFY` is optional: an event without a `NOTIFY` action cannot be notified. A `NOTIFY` action must configure both `notificationForm` and `review`, and nothing is generated from the `DECLARE` action. The notification form is validated like any form, so a plain copy of the declaration form would reject incomplete records. To keep `NOTIFY` accepting them, use `toNotificationForm(<declaration form>)` and `toNotificationReview(<DECLARE review>)`, which copy the `DECLARE` form and review with every field optional and without validations. A role holding `record.notify` for an event type needs a `NOTIFY` action on that event.
+
+`opencrvs upgrade` does it for you: the `add-notify-config` codemod adds `notificationForm: toNotificationForm(...)` and `review: toNotificationReview(...)`, copied from the `DECLARE` action, to every `NOTIFY` action under `src/` that lacks them, then lists every event without a `NOTIFY` action and every config it could not rewrite — a `DECLARE` form or review written inline, a `NOTIFY` action not written inline — for you to change by hand.
 
 #### Notifiers get their own notify flow
 
@@ -207,6 +209,16 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 #### Exclude statuses in workqueue and search queries
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
+
+#### Default values for advanced search fields
+
+Advanced search fields open with the declaration form's `defaultValue`, so a name defaulting to the logged-in user's name shows up pre-filled and counts towards the search. Set `defaultValue` on a search field to change that:
+
+- omitted or `true` keeps the form's default, e.g. an address defaulting to the user's area
+- `false` opens the field empty, e.g. `field('applicant.name', { defaultValue: false }).fuzzy()`
+- a text, number or date value opens the field with that value, e.g. `field('applicant.email', { defaultValue: 'applicant@example.com' }).exact()`
+
+Only TEXT, TEXTAREA, EMAIL, PHONE, ID, SELECT, RADIO_GROUP, COUNTRY, LOCATION, ADMINISTRATIVE_AREA, NUMBER and DATE fields take a value. Other field types, such as NAME and ADDRESS, and dates searched as a range accept only `true` or `false`. Fields using `config.searchFields` don't support `defaultValue`. An event configuration that breaks these rules fails validation. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
 
 #### Documents service speaks plain S3
 

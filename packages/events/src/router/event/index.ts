@@ -24,7 +24,7 @@ import {
   ActionType,
   AssignActionInput,
   DeleteActionInput,
-  Draft,
+  RemoteDraft,
   DraftInput,
   VersionedEventConfig,
   EventDocument,
@@ -52,7 +52,11 @@ import {
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
-import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
+import {
+  createDraft,
+  getDraftsByUserId,
+  throwConflictIfDraftNotAllowed
+} from '@events/service/events/drafts'
 import {
   processAction,
   createEvent,
@@ -283,12 +287,16 @@ export const eventRouter = router({
     }),
   draft: router({
     list: userOnlyProcedure
-      .output(z.array(Draft))
+      .output(z.array(RemoteDraft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: userOnlyProcedure
+      // A draft is saved by a user who can perform its action
+      .use(
+        middleware.canAccessEventWithActionScopes(DraftInput.shape.type.options)
+      )
       .input(DraftInput)
       .use(middleware.requireAssignment)
-      .output(Draft)
+      .output(RemoteDraft)
       .mutation(async ({ input, ctx }) => {
         const { eventId, type } = input
 
@@ -302,6 +310,10 @@ export const eventRouter = router({
           undefined,
           ctx.event
         )
+
+        // Checked against the event loaded before the upsert, like throwConflictIfActionNotAllowed above.
+        // An action committed in between leaves a stale draft, which the record's next action deletes.
+        throwConflictIfDraftNotAllowed(ctx.event)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,

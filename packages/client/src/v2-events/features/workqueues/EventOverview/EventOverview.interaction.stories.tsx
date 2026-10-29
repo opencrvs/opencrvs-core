@@ -106,7 +106,7 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',

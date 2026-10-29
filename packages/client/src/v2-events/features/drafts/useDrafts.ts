@@ -16,6 +16,10 @@ import {
   ActionType,
   deepDropNulls,
   Draft,
+  EventDocument,
+  EventStatus,
+  getStatusFromActions,
+  RemoteDraft,
   UUID
 } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
@@ -28,6 +32,7 @@ import {
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import { usePendingDeleteEventIds } from '@client/v2-events/features/events/useEvents/procedures/delete'
+import { retryUnlessConflict } from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
 import {
   createEventActionMutationFn,
   QueryOptions,
@@ -136,11 +141,16 @@ export const localDraftStore = create<DraftStore>()(
   )
 )
 
+/** Drafts are saved only on a created record. The server refuses them on any other. */
+export function canSaveDraft(event: EventDocument) {
+  return getStatusFromActions(event.actions) === EventStatus.enum.CREATED
+}
+
 setMutationDefaults(trpcOptionsProxy.event.draft.create, {
-  retry: true,
+  retry: retryUnlessConflict,
   mutationFn: createEventActionMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
-    const optimisticDraft: Draft = {
+    const optimisticDraft: RemoteDraft = {
       id: createTemporaryId(),
       eventId: variables.eventId as UUID,
       transactionId: variables.transactionId as UUID,
@@ -205,7 +215,7 @@ export function useDrafts() {
 
   function useDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-  ): Draft[] {
+  ): RemoteDraft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
     const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
 
@@ -216,8 +226,9 @@ export function useDrafts() {
       queryKey: trpc.event.draft.list.queryKey(),
       select: (currentDraftState) => {
         const locallyStoredDrafts =
-          queryClient.getQueryData<Draft[]>(trpc.event.draft.list.queryKey()) ??
-          []
+          queryClient.getQueryData<RemoteDraft[]>(
+            trpc.event.draft.list.queryKey()
+          ) ?? []
         const serverStoredDrafts = currentDraftState.filter(
           (draft) => !isTemporaryId(draft.id)
         )
@@ -261,7 +272,7 @@ export function useDrafts() {
     setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
     getLocalDraftOrDefault,
     /**
-     * Only the declare view saves a draft to the server. The store it reads
+     * Only the declare and notify views save a draft to the server. The store it reads
      * from is shared with the edit, print and correction views, whose drafts
      * stay local, so the type has to be narrowed before submitting.
      */
@@ -270,9 +281,12 @@ export function useDrafts() {
         throw new Error('No draft to submit')
       }
 
-      if (localDraft.action.type !== ActionType.DECLARE) {
+      if (
+        localDraft.action.type !== ActionType.DECLARE &&
+        localDraft.action.type !== ActionType.NOTIFY
+      ) {
         throw new Error(
-          `Only ${ActionType.DECLARE} drafts can be saved to the server, this one is ${localDraft.action.type}`
+          `Only ${ActionType.DECLARE} and ${ActionType.NOTIFY} drafts can be saved to the server, this one is ${localDraft.action.type}`
         )
       }
 
@@ -290,7 +304,7 @@ export function useDrafts() {
     useRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft | undefined => {
+    ): RemoteDraft | undefined => {
       const eventDrafts = useDisplayableDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )

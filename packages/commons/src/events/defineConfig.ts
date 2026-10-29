@@ -18,7 +18,6 @@ import {
   VersionedEventConfigInput
 } from './EventConfig'
 import { ActionType } from './ActionType'
-import { generateNotifyReview } from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
@@ -46,102 +45,6 @@ function moveDeclarationToDeclareAction({
         ? { ...action, declaration }
         : action
     )
-  }
-}
-
-type ActionConfigInput = EventConfigInput['actions'][number]
-
-type DeclareActionConfigInput = Extract<
-  ActionConfigInput,
-  { type: typeof ActionType.DECLARE }
->
-
-type NotifyActionConfigInput = Extract<
-  ActionConfigInput,
-  { type: typeof ActionType.NOTIFY }
->
-
-/** A version as `VersionedEventConfig` expects it, once `defineConfig` has prepared it. */
-type PreparedVersion = z.input<typeof VersionedEventConfig>['versions'][number]
-
-/** An action with `declaration` on DECLARE and `review` on NOTIFY, as `EventConfig` expects. */
-type PreparedActionConfig = PreparedVersion['actions'][number]
-
-/**
- * Fallback for events without a configured notification form or NOTIFY review.
- *
- * - Without a NOTIFY action, one is created from the DECLARE action.
- * - Without `review`, it is generated from the DECLARE review with every field optional.
- * - Without `notificationForm`, a warning is logged. The form is not generated here, to keep the
- *   served configuration small: `getNotificationForm` derives it from the declaration when read.
- *
- * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
- * Expects the `declaration` to already be on the DECLARE action.
- *
- * @returns the configuration with `declaration` on the DECLARE action and `review` on every
- * NOTIFY action.
- */
-function generateNotificationFormFallback(
-  config: Omit<EventConfigInput, 'declaration'>
-): Omit<EventConfigInput, 'declaration' | 'actions'> & {
-  actions: PreparedActionConfig[]
-} {
-  const declareAction = config.actions.find(
-    (action): action is DeclareActionConfigInput =>
-      action.type === ActionType.DECLARE
-  )
-
-  const notifyAction = config.actions.find(
-    (action): action is NotifyActionConfigInput =>
-      action.type === ActionType.NOTIFY
-  )
-
-  if (!notifyAction?.notificationForm) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Event '${config.id}' has no ${ActionType.NOTIFY} form. Using the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
-    )
-  }
-
-  const declaration = declareAction?.declaration
-
-  if (!declaration) {
-    throw new Error(
-      `Event '${config.id}' has no ${ActionType.DECLARE} form. Configure \`actions[${ActionType.DECLARE}].declaration\`.`
-    )
-  }
-
-  const notifyFromDeclare = (): PreparedActionConfig => ({
-    type: ActionType.NOTIFY,
-    label: declareAction.label,
-    icon: declareAction.icon,
-    conditionals: declareAction.conditionals,
-    flags: declareAction.flags,
-    supportingCopy: declareAction.dialogCopy?.notify,
-    review: generateNotifyReview(declareAction.review)
-  })
-
-  return {
-    ...config,
-    actions: config.actions.flatMap((action): PreparedActionConfig[] => {
-      if (action.type === ActionType.DECLARE) {
-        const declareWithForm = { ...action, declaration }
-        return notifyAction
-          ? [declareWithForm]
-          : [notifyFromDeclare(), declareWithForm]
-      }
-
-      if (action.type === ActionType.NOTIFY) {
-        return [
-          {
-            ...action,
-            review: action.review ?? generateNotifyReview(declareAction.review)
-          }
-        ]
-      }
-
-      return [action]
-    })
   }
 }
 
@@ -182,10 +85,7 @@ function getVersionInput(
   }
 }
 
-/**
- * Moves `declaration` onto the DECLARE action and generates the NOTIFY fallback, for each
- * version.
- */
+/** Moves `declaration` onto the DECLARE action, for each version. */
 function prepareVersions(
   config: VersionedEventConfigInput
 ): z.input<typeof VersionedEventConfig> {
@@ -199,17 +99,27 @@ function prepareVersions(
         label: _label,
         advancedSearch: _advancedSearch,
         ...prepared
-      } = generateNotificationFormFallback(
-        moveDeclarationToDeclareAction(getVersionInput(config, version))
-      )
+      } = moveDeclarationToDeclareAction(getVersionInput(config, version))
 
       return {
         ...prepared,
+        actions: prepared.actions.map((action) => {
+          if (action.type !== ActionType.DECLARE) {
+            return action
+          }
+          // Unreachable: each version's declaration is checked before this transform
+          if (!action.declaration) {
+            throw new Error(
+              `Event '${config.id}' version '${version.id}' has no ${ActionType.DECLARE} form.`
+            )
+          }
+          return { ...action, declaration: action.declaration }
+        }),
         id: version.id,
         ...(version.effectiveFrom !== undefined && {
           effectiveFrom: version.effectiveFrom
         })
-      } satisfies PreparedVersion
+      } satisfies z.input<typeof VersionedEventConfig>['versions'][number]
     })
   }
 }

@@ -45,7 +45,7 @@ import {
   ReinstateRegistrationActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
-import { Draft } from './Draft'
+import { Draft, DraftInput, RemoteDraft } from './Draft'
 import {
   EventConfig,
   EventConfigInput,
@@ -93,6 +93,7 @@ import {
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { DEFAULT_EVENT_CONFIG_VERSION_ID, defineConfig } from './defineConfig'
+import { toNotificationForm } from './toNotificationForm'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
@@ -1206,11 +1207,11 @@ export function generateEventDraftDocument({
   declaration = {}
 }: {
   eventId: UUID
-  actionType: ActionType
+  actionType: DraftInput['type']
   rng?: () => number
   declaration?: ActionUpdate
   annotation?: ActionUpdate
-}): Draft {
+}): RemoteDraft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: actionType,
@@ -1222,6 +1223,7 @@ export function generateEventDraftDocument({
     transactionId: getUUID(),
     action: {
       ...action,
+      type: actionType,
       declaration: {
         ...action.declaration,
         ...declaration
@@ -1406,10 +1408,9 @@ export const generateEventConfig = ({
 }
 
 /**
- * The notification form is dropped, since it may refer to fields of the replaced declaration.
- * `getNotificationForm` then derives it from the new declaration.
+ * The notification form is replaced too, since it may refer to fields of the replaced declaration.
  *
- * @returns a copy of the configuration with the DECLARE action's declaration replaced.
+ * @returns a copy of the configuration with the DECLARE action's declaration replaced, and the NOTIFY action's notification form made from it.
  */
 export function withDeclaration(
   configuration: EventConfig,
@@ -1423,8 +1424,7 @@ export function withDeclaration(
       }
 
       if (action.type === ActionType.NOTIFY) {
-        const { notificationForm: _notificationForm, ...notifyAction } = action
-        return notifyAction
+        return { ...action, notificationForm: toNotificationForm(declaration) }
       }
 
       return action
