@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.3 Release Candidate
+
+### Bug fixes
+
+- The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
+
 ## 2.1.1 Release Candidate
 
 ### Improvements
