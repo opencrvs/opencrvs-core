@@ -146,8 +146,15 @@ describe('ensureDefaultBucketIsPrivate', () => {
     expect((await anonymousGet(key)).status).toBe(403)
   })
 
-  it('accepts a bucket that has no policy to remove', async () => {
+  it('can run again on a bucket that is already private', async () => {
     await ensureDefaultBucketIsPrivate()
+
+    await expect(ensureDefaultBucketIsPrivate()).resolves.toBeUndefined()
+  })
+
+  it('accepts a store that answers that there is no policy to remove', async () => {
+    // What SeaweedFS answers. RustFS and MinIO answer 204.
+    send.mockRejectedValueOnce(storeError('NoSuchBucketPolicy', 404))
 
     await expect(ensureDefaultBucketIsPrivate()).resolves.toBeUndefined()
   })
