@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS system_clients(
 
 CREATE UNIQUE INDEX IF NOT EXISTS system_clients_legacy_id_idx ON system_clients(legacy_id) WHERE legacy_id IS NOT NULL;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON system_clients TO ${EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON system_clients TO events_app;
 
 -- Down Migration
 DROP TABLE system_clients;

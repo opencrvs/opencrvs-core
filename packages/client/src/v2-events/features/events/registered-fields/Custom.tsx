@@ -72,7 +72,7 @@ async function importModule(src: string): Promise<CustomFieldModule> {
  * Loads each module only once, so that every render gets the same component
  * identities and React does not remount the field.
  */
-function loadModule(src: string) {
+async function loadModule(src: string) {
   const cached = loadedModules.get(src)
   if (cached) {
     return cached

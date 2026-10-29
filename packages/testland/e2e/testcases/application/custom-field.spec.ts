@@ -63,7 +63,6 @@ test('Custom field from country config', async ({ page }) => {
 
   await test.step('Value can be changed from review', async () => {
     await page.getByTestId('change-button-applicant.skillLevel').click()
-    await page.getByTestId('confirm_edit').click()
 
     await expect(page.getByRole('radio', { name: '4 of 5' })).toHaveAttribute(
       'aria-checked',

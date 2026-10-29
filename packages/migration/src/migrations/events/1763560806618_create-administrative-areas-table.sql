@@ -9,7 +9,7 @@ CREATE TABLE administrative_areas (
   valid_until timestamp with time zone
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON administrative_areas TO ${EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON administrative_areas TO events_app;
 
 -- Down Migration
 DROP TABLE IF EXISTS administrative_areas;

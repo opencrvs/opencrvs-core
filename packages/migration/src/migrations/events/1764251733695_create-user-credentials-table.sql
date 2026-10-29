@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS user_credentials(
   updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO ${EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO events_app;
 
 -- Down Migration
 DROP TABLE user_credentials;
