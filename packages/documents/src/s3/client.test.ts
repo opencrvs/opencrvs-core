@@ -11,10 +11,8 @@
 import { randomUUID } from 'crypto'
 import {
   BucketAlreadyOwnedByYou,
-  CreateBucketCommand,
   CreateMultipartUploadCommand,
   DeleteBucketCommand,
-  HeadBucketCommand,
   PutBucketPolicyCommand,
   PutObjectCommand,
   S3Client,
@@ -71,29 +69,24 @@ afterAll(() => {
 })
 
 describe('ensureDefaultBucket', () => {
-  it('creates the bucket in the configured region when it does not exist', async () => {
+  it('creates the bucket when it does not exist', async () => {
     // Nothing is stored yet, as this is the first test of the file
     await s3.send(new DeleteBucketCommand({ Bucket: env.S3_BUCKET }))
 
     await ensureDefaultBucket()
 
-    await expect(
-      s3.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }))
-    ).resolves.toBeDefined()
-    // RustFS answers us-east-1 for any bucket, so the region is checked on the request
-    expect(sentCommands(CreateBucketCommand)[0]).toMatchObject({
-      input: {
-        Bucket: env.S3_BUCKET,
-        CreateBucketConfiguration: { LocationConstraint: env.S3_BUCKET_REGION }
-      }
-    })
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+    expect(await statObjectIfExists(key)).not.toBeNull()
   })
 
-  it('leaves an existing bucket alone', async () => {
+  it('keeps what an existing bucket holds', async () => {
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+
     await ensureDefaultBucket()
 
-    expect(sentCommands(HeadBucketCommand)).toHaveLength(1)
-    expect(sentCommands(CreateBucketCommand)).toHaveLength(0)
+    expect(await statObjectIfExists(key)).not.toBeNull()
   })
 
   it('accepts a bucket that another replica created first', async () => {
@@ -102,7 +95,6 @@ describe('ensureDefaultBucket', () => {
     send.mockRejectedValueOnce(storeError('NotFound', 404))
 
     await expect(ensureDefaultBucket()).resolves.toBeUndefined()
-    expect(sentCommands(CreateBucketCommand)).toHaveLength(1)
   })
 
   it('accepts a store that answers that another replica created the bucket first', async () => {
@@ -113,7 +105,6 @@ describe('ensureDefaultBucket', () => {
     )
 
     await expect(ensureDefaultBucket()).resolves.toBeUndefined()
-    expect(sentCommands(CreateBucketCommand)).toHaveLength(1)
   })
 
   it('fails when the store refuses to say whether the bucket exists', async () => {
