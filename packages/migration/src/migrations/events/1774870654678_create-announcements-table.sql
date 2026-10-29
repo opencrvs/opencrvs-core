@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS announcements (
   CONSTRAINT announcements_status_check CHECK (status IN ('PENDING', 'SENT', 'FAILED'))
 );
 
-GRANT SELECT, INSERT, UPDATE ON announcements TO events_app;
+GRANT SELECT, INSERT, UPDATE ON announcements TO ${EVENTS_DB_USER};
 
 CREATE INDEX ON announcements (status) WHERE status = 'PENDING';
 

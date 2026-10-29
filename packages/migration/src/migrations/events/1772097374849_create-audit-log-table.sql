@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS audit_log (
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
-GRANT SELECT, INSERT ON audit_log TO events_app;
+GRANT SELECT, INSERT ON audit_log TO ${EVENTS_DB_USER};
 
 COMMENT ON TABLE audit_log IS 'Stores an audit trail of operations performed by users and system integrations, including request data and a curated response summary.';
 COMMENT ON COLUMN audit_log.client_id IS 'ID of the integration client or user making the request.';

@@ -14,7 +14,7 @@ CREATE TABLE system_initialisation(
 
 COMMENT ON TABLE system_initialisation IS 'Single-row table tracking application initialisation state. Populated once during initial migration, and never modified except to mark initialisation as completed.';
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON system_initialisation TO events_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON system_initialisation TO ${EVENTS_DB_USER};
 
 -- Down Migration
 DROP TABLE system_initialisation;
