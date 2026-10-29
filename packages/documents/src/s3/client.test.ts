@@ -11,6 +11,7 @@
 import { randomUUID } from 'crypto'
 import {
   CreateBucketCommand,
+  CreateMultipartUploadCommand,
   DeleteBucketCommand,
   DeleteBucketPolicyCommand,
   DeleteObjectsCommand,
@@ -228,6 +229,7 @@ describe('putObject', () => {
 
     await putObject(key, body, { contentType: 'application/pdf' })
 
+    expect(sentCommands(CreateMultipartUploadCommand)).toHaveLength(1)
     const stored = await getObject(key)
     expect(stored.body).toHaveLength(6 * part.length)
     expect(stored.contentType).toBe('application/pdf')
