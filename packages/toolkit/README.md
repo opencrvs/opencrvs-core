@@ -62,5 +62,5 @@ Publish via [Publish toolkit to NPM registry](https://github.com/opencrvs/opencr
 
 - All dependencies of the functions and moduless used from `packages/commons` **must** be also defined in the package.json of the toolkit. Otherwise someone installing the package will get errors.
 - Package is published and should be used without knowledge of rest of the monorepo
-- Each subpath in `exports` has one entry module under `src/`. `build.sh` bundles its JavaScript with esbuild, and `rolldown.dts.config.mjs` emits its declarations from source, inlining the types it uses from `packages/commons` and `packages/events`. A new subpath needs all three.
+- Each subpath in `exports` has one entry module under `src/`, at the same path as its `dist/` file. `rolldown.config.mjs` bundles its JavaScript and emits its declarations from source, inlining what it uses from `packages/commons` and `packages/events`.
 - Every package the declarations import must be a dependency of the toolkit. The declaration build fails otherwise.
