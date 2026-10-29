@@ -107,7 +107,7 @@ const eventDocument = generateEventDocument({
 const eventId = eventDocument.id
 const draft = generateEventDraftDocument({
   eventId,
-  actionType: ActionType.REGISTER
+  actionType: ActionType.DECLARE
 })
 
 /**

@@ -15,7 +15,7 @@ import {
   inferOutput
 } from '@trpc/tanstack-react-query'
 import {
-  Draft,
+  RemoteDraft,
   EventConfig,
   EventDocument,
   EventDocumentOnlyLastAction,
@@ -75,7 +75,9 @@ export function addLocalEventConfig(config: EventConfig) {
   )
 }
 
-export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
+export function setDraftData(
+  updater: (drafts: RemoteDraft[]) => RemoteDraft[]
+) {
   queryClient.setQueryData(
     trpcOptionsProxy.event.draft.list.queryKey(),
     (drafts) => updater(drafts || [])

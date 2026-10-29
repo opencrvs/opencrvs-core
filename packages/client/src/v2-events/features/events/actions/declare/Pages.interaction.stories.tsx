@@ -15,7 +15,7 @@ import superjson from 'superjson'
 import {
   ActionStatus,
   ActionType,
-  Draft,
+  RemoteDraft,
   FieldConfig,
   generateEventDocument,
   generateWorkqueues,
@@ -72,10 +72,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const spy = fn()
 
 function createDraftHandlers() {
-  const draftList = fn<() => Draft[]>(() => [])
+  const draftList = fn<() => RemoteDraft[]>(() => [])
   return [
     tRPCMsw.event.draft.create.mutation((req) => {
-      const response: Draft = {
+      const response: RemoteDraft = {
         id: 'test-draft-id' as UUID,
         eventId: req.eventId as UUID,
         transactionId: req.transactionId,
@@ -84,8 +84,9 @@ function createDraftHandlers() {
           ...req,
           originalActionId: req.originalActionId as UUID,
           declaration: (req.declaration ||
-            {}) as Draft['action']['declaration'],
-          annotation: (req.annotation || {}) as Draft['action']['annotation'],
+            {}) as RemoteDraft['action']['declaration'],
+          annotation: (req.annotation ||
+            {}) as RemoteDraft['action']['annotation'],
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',
