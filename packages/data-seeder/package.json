@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/data-seeder",
-  "version": "1.9.22",
+  "version": "1.9.23",
   "description": "OpenCRVS data-seeder microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "license": "MPL-2.0",
