@@ -29,7 +29,11 @@ METABASE_JAR="./$METABASE_VERSION-metabase.jar"
 export METABASE_DATABASE_SSL=false
 export METABASE_DATABASE_PASSWORD=postgres
 export METABASE_DATABASE_PORT=5432
-export METABASE_DATABASE_NAME=events
+# The analytics source. OpenCRVS gives every local environment its own database
+# and exports the name as TARGET_DB; `events` is the default environment's
+# database and therefore the right fallback for a shell with no environment
+# exported — which is what a freshly forked country config sees.
+export METABASE_DATABASE_NAME=${TARGET_DB:-events}
 export METABASE_DATABASE_HOST=localhost
 export METABASE_DATABASE_USER=postgres
 
@@ -55,15 +59,23 @@ export OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE=${OPENCRVS_ENVIRONMENT_CONFIG
 export MB_DB_FILE=${MB_DB_FILE:-"$(pwd)/data/metabase/metabase.mv.db"}
 export MB_DB_INIT_SQL_FILE=${MB_DB_INIT_SQL_FILE:-"$(pwd)/metabase.init.db.sql"}
 export MB_DB_SAVE_TO_SQL_FILE=${MB_DB_SAVE_TO_SQL_FILE:-"$(pwd)/metabase.init.db.sql"}
-export MB_JETTY_PORT=${MB_JETTY_PORT:-4444}
-export OPENCRVS_METABASE_SITE_URL=${OPENCRVS_METABASE_SITE_URL:-"http://localhost:4444"}
+# METABASE_PORT is the local environment's Metabase port, exported by OpenCRVS
+# alongside every other per-environment port; 4444 is the default
+# environment's, kept for a shell with no environment exported. The site URL is
+# derived from whichever port won, so Metabase does not redirect a non-default
+# environment's browser back to the default one.
+export MB_JETTY_PORT=${MB_JETTY_PORT:-${METABASE_PORT:-4444}}
+export OPENCRVS_METABASE_SITE_URL=${OPENCRVS_METABASE_SITE_URL:-"http://localhost:${MB_JETTY_PORT}"}
 export OPENCRVS_METABASE_DB_HOST=${OPENCRVS_METABASE_DB_HOST:-"localhost"}
 export OPENCRVS_METABASE_DB_USER=${OPENCRVS_METABASE_DB_USER:-""}
 export OPENCRVS_METABASE_DB_PASS=${OPENCRVS_METABASE_DB_PASS:-""}
 export OPENCRVS_METABASE_DB_AUTH_DB=${OPENCRVS_METABASE_DB_AUTH_DB:-""}
 
 export OPENCRVS_METABASE_MAP_NAME=${OPENCRVS_METABASE_MAP_NAME:-"Full country"}
-export OPENCRVS_METABASE_MAP_URL=${OPENCRVS_METABASE_MAP_URL:-"http://localhost:3040/content/map.geojson"}
+# The map is served by this country configuration itself, so it must be fetched
+# from the environment's own countryconfig port rather than the default
+# environment's. 3040 is the default environment's port.
+export OPENCRVS_METABASE_MAP_URL=${OPENCRVS_METABASE_MAP_URL:-"http://localhost:${COUNTRY_CONFIG_PORT:-3040}/content/map.geojson"}
 export OPENCRVS_METABASE_MAP_REGION_KEY=${OPENCRVS_METABASE_MAP_REGION_KEY:-"State"}
 export OPENCRVS_METABASE_MAP_REGION_NAME=${OPENCRVS_METABASE_MAP_REGION_NAME:-"State"}
 export OPENCRVS_METABASE_ADMIN_EMAIL=${OPENCRVS_METABASE_ADMIN_EMAIL:-"user@opencrvs.org"}

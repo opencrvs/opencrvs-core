@@ -18,6 +18,13 @@ POSTGRES_PORT=${POSTGRES_PORT:-5432}
 POSTGRES_USER=${POSTGRES_USER:-postgres}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
 ANALYTICS_POSTGRES_USER=${ANALYTICS_POSTGRES_USER:-events_analytics}
+# The database this country configuration's analytics live in. OpenCRVS gives
+# every local environment its own database and exports the name as TARGET_DB
+# (the same knob `assets/postgres/setup-analytics.sh` reads), so clearing one
+# environment never touches another's data. `events` is the default
+# environment's database and therefore the right fallback for a shell with no
+# environment exported — which is what a freshly forked country config sees.
+TARGET_DB=${TARGET_DB:-events}
 
 print_usage_and_exit() {
   echo 'Usage: ./clear-all-data-dev.sh'
@@ -28,6 +35,7 @@ print_usage_and_exit() {
   echo "POSTGRES_USER=${POSTGRES_USER}"
   echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
   echo "ANALYTICS_POSTGRES_USER=${ANALYTICS_POSTGRES_USER}"
+  echo "TARGET_DB=${TARGET_DB}"
   echo ""
   echo "This script clears all development databases including:"
   echo "- PostgreSQL analytics schema and data"
@@ -44,8 +52,8 @@ if ! PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT
 fi
 
 # Clear PostgreSQL analytics schema
-echo "🗑️  Clearing PostgreSQL analytics schema..."
-PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d events -v ON_ERROR_STOP=1 <<EOSQL || echo "⚠️  Analytics schema may not exist yet"
+echo "🗑️  Clearing PostgreSQL analytics schema in database '${TARGET_DB}'..."
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "$TARGET_DB" -v ON_ERROR_STOP=1 <<EOSQL || echo "⚠️  Analytics schema may not exist yet"
 -- Drop analytics schema and recreate it
 DROP SCHEMA IF EXISTS analytics CASCADE;
 CREATE SCHEMA analytics;
