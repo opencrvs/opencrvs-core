@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+set -euo pipefail
+
+print_usage_and_exit () {
+  echo 'Usage: pnpm e2e:dev [--env <name>] [playwright args...]'
+  echo
+  echo "Runs the Playwright suite against ONE local environment. With"
+  echo "no --env, that is the environment this git worktree owns. Run"
+  echo "'pnpm env:list' to see which environments exist."
+  echo
+  echo "With no playwright args it opens the UI. Any other argument goes to"
+  echo "'playwright test' instead, which then runs headless, e.g."
+  echo "  pnpm e2e:dev 30-offline-outbox --repeat-each 3"
+  echo
+  echo "For a deployed environment use 'pnpm --filter @opencrvs/testland e2e'"
+  echo "with DOMAIN set; that path is unrelated to local environments."
+  exit 1
+}
+
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)
+cd "$DIR"
+
+# Which environment the browser drives. `packages/dev-cli` owns the
+# port arithmetic; `packages/testland/e2e/constants.ts` reads the resulting
+# URLs straight out of the contract this exports. Without it Playwright would
+# fall back to slot 0's literals and quietly create declarations, users and
+# corrections in another environment's database — a passing run against the
+# wrong environment, which is why the documented entry point goes through here.
+# See development-environment/environment.sh.
+# `--env` selects the environment; every other argument is for Playwright.
+ENV_ARGS=()
+PLAYWRIGHT_ARGS=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --env)
+      ENV_ARGS+=("$1" "${2:-}")
+      shift $(($# > 1 ? 2 : 1))
+      continue
+      ;;
+    --env=*) ENV_ARGS+=("$1") ;;
+    --) ;;
+    *) PLAYWRIGHT_ARGS+=("$1") ;;
+  esac
+  shift
+done
+
+source "$DIR/development-environment/environment.sh"
+# The `+` form keeps an empty array safe under `set -u` in bash 3.2 (macOS).
+opencrvs_env_load ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} || print_usage_and_exit
+
+echo
+echo "Running e2e against environment ${OPENCRVS_ENV_NAME} (slot ${OPENCRVS_ENV_SLOT})"
+echo "  client    ${CLIENT_APP_URL}"
+echo "  login     ${LOGIN_URL}"
+echo "  gateway   ${GATEWAY_URL}"
+echo "  auth      ${AUTH_URL}"
+echo "  database  ${TARGET_DB}"
+echo
+
+# `e2e-dev` keeps its name and its NODE_ENV=development, so the filtered
+# command a developer already has in their shell history still works; this
+# wrapper only makes sure the contract is in the environment before it runs.
+if [ ${#PLAYWRIGHT_ARGS[@]} -eq 0 ]; then
+  exec pnpm --filter @opencrvs/testland e2e-dev
+fi
+
+# `e2e-dev` hardcodes --ui, so arguments run Playwright directly with the same
+# environment. Paths are relative to packages/testland.
+export NODE_ENV=development
+export NODE_OPTIONS=--dns-result-order=ipv4first
+exec pnpm --filter @opencrvs/testland exec playwright test "${PLAYWRIGHT_ARGS[@]}"
