@@ -10,6 +10,10 @@
  */
 
 import { defineConfig } from '../events/defineConfig'
+import {
+  toNotificationForm,
+  toNotificationReview
+} from '../events/toNotificationForm'
 import { ActionType, DeclarationActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
@@ -85,6 +89,8 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.notify.label'
       },
+      notificationForm: toNotificationForm(TENNIS_CLUB_DECLARATION_FORM),
+      review: toNotificationReview(TENNIS_CLUB_DECLARATION_REVIEW),
       flags: [
         {
           id: 'health-worker-notified',

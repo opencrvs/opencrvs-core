@@ -10,6 +10,7 @@
  */
 import { main as addTranslations } from './persistent/add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
+import { main as addNotifyConfig } from './add-notify-config'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
 import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
@@ -25,6 +26,8 @@ export async function runUpgrade(toolkitVersion: string) {
   const [major, minor] = toolkitVersion.split('.')
 
   await moveDeclarationToDeclareAction()
+  // After moving `declaration` onto DECLARE, where it copies it from
+  await addNotifyConfig()
   await readDeclarationThroughHelper()
   await addTranslations(`${major}.${minor}`)
   await replaceIncompleteFlag()

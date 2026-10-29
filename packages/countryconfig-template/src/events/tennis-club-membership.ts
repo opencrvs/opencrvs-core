@@ -26,7 +26,9 @@ import {
   defineConditional,
   never,
   now,
-  FieldConfig
+  FieldConfig,
+  toNotificationForm,
+  toNotificationReview
 } from '@opencrvs/toolkit/events'
 
 import { MAX_NAME_LENGTH } from './birth/validators'
@@ -1264,6 +1266,17 @@ export const tennisClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Notify',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.notify.label'
+      },
+      notificationForm: toNotificationForm(TENNIS_CLUB_DECLARATION_FORM),
+      review: toNotificationReview(TENNIS_CLUB_DECLARATION_REVIEW)
+    },
+    {
       type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Declare',
@@ -1533,7 +1546,8 @@ export const tennisClubMembershipEvent = defineConfig({
       fields: [
         field('applicant.name', {
           validations: [],
-          conditionals: []
+          conditionals: [],
+          useFormDefaultValue: false
         }).fuzzy(),
         field('applicant.dob').range()
       ]
@@ -1545,7 +1559,7 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'event.tennis-club-membership.search.recommender'
       },
       fields: [
-        field('recommender.name').fuzzy(),
+        field('recommender.name', { useFormDefaultValue: false }).fuzzy(),
         {
           fieldId: 'recommender.id',
           fieldType: 'field',
