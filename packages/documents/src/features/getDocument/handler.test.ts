@@ -22,9 +22,8 @@ const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
   subject: '123123'
 })
 
-/** The key within the bucket that a presigned URL points to. */
-const signedKey = (url: string) =>
-  decodeURIComponent(new URL(url).pathname).slice(`/${env.S3_BUCKET}/`.length)
+/** Opening the URL proves the presigned URL path is good AND we can use this function to assert the content */
+const open = async (url: string) => (await fetch(url)).text()
 
 let server: Awaited<ReturnType<typeof createServer>>
 
@@ -47,11 +46,12 @@ describe('createPreSignedUrl', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    const { presignedURL } = JSON.parse(res.payload)
-    expect(await (await fetch(presignedURL)).text()).toBe('content')
+    expect(await open(JSON.parse(res.payload).presignedURL)).toBe('content')
   })
 
   it('strips the bucket prefix from a FullDocumentPath', async () => {
+    await putObject('eventId/imageId.png', Buffer.from('content'))
+
     const res = await server.server.inject({
       method: 'GET',
       url: `/presigned-url/${env.S3_BUCKET}/eventId/imageId.png`,
@@ -59,27 +59,15 @@ describe('createPreSignedUrl', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(signedKey(JSON.parse(res.payload).presignedURL)).toBe(
-      'eventId/imageId.png'
-    )
-  })
-
-  it('signs a DocumentPath (eventId/imageId) as it is', async () => {
-    const res = await server.server.inject({
-      method: 'GET',
-      url: `/presigned-url/eventId/imageId.png`,
-      headers: { authorization: `Bearer ${token}` }
-    })
-
-    expect(res.statusCode).toBe(200)
-    expect(signedKey(JSON.parse(res.payload).presignedURL)).toBe(
-      'eventId/imageId.png'
-    )
+    expect(await open(JSON.parse(res.payload).presignedURL)).toBe('content')
   })
 })
 
 describe('createPresignedUrlsInBulk', () => {
   it('signs every filename and keeps their order', async () => {
+    await putObject('eventId/first.png', Buffer.from('first'))
+    await putObject('eventId/second.png', Buffer.from('second'))
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/presigned-urls',
@@ -88,9 +76,9 @@ describe('createPresignedUrlsInBulk', () => {
     })
 
     expect(res.statusCode).toBe(200)
-    expect(JSON.parse(res.payload).map(signedKey)).toEqual([
-      'eventId/first.png',
-      'eventId/second.png'
+    expect(await Promise.all(JSON.parse(res.payload).map(open))).toEqual([
+      'first',
+      'second'
     ])
   })
 
