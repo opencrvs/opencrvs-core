@@ -4,15 +4,15 @@ FROM ${BASE_IMAGE}:${BRANCH}
 
 USER node
 
-# testland depends on the workspace @opencrvs/toolkit, which in turn needs
-# @opencrvs/events build types (commons is already built in ocrvs-base).
+# testland depends on the workspace @opencrvs/toolkit, whose declarations are
+# emitted from the commons and events source (see tsconfig.toolkit-types.json).
 COPY --chown=node:node packages/events/package.json /app/packages/events/package.json
 
 WORKDIR /app/packages/events
 RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/events /app/packages/events
-RUN pnpm build:types
 
+COPY --chown=node:node packages/tsconfig.toolkit-types.json /app/packages/tsconfig.toolkit-types.json
 COPY --chown=node:node packages/toolkit /app/packages/toolkit
 WORKDIR /app/packages/toolkit
 RUN pnpm install --frozen-lockfile

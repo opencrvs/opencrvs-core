@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID } from 'src/uuid'
+import { UUID } from '../uuid'
 import {
   AdministrativeArea,
   Location,

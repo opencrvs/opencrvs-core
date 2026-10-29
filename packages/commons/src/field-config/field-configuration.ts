@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConditional, TranslationConfig } from 'src/events'
-import { SelectOption, ValidationConfig } from 'src/events/FieldConfig'
+import { FieldConditional, TranslationConfig } from '../events'
+import { SelectOption, ValidationConfig } from '../events/FieldConfig'
 import { createSearchConfig } from '../searchConfigs'
 import { JurisdictionReference } from '../users/userReferences'
 

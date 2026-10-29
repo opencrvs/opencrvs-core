@@ -7,7 +7,6 @@
     "opencrvs": "./dist/cli.js"
   },
   "exports": {
-    "./lib": "./dist/lib.js",
     "./api": "./dist/api/index.js",
     "./application-config": "./dist/application-config/index.js",
     "./events": "./dist/events/index.js",
@@ -34,6 +33,7 @@
     "@octokit/core": "4.2.1",
     "@trpc/client": "11.4.3",
     "@trpc/server": "11.8.0",
+    "@types/lodash": "4.17.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "date-fns": "^2.28.0",
@@ -51,6 +51,7 @@
     "qs": "6.15.2",
     "ssh2": "^1.17.0",
     "superjson": "1.9.0-0",
+    "trpc-to-openapi": "^3.2.0",
     "ts-morph": "^27.0.2",
     "uuid": "^9.0.0",
     "zod": "^4.6.5",
@@ -65,11 +66,19 @@
     "@types/prompts": "^2.4.9",
     "@types/ssh2": "^1.15.5",
     "@types/uuid": "^9.0.3",
-    "esbuild": "^0.24.0",
+    "rolldown": "^1.2.15",
+    "rolldown-plugin-dts": "^0.28.8",
     "vitest": "^4.1.10"
   },
-  "moduleNameMapper": {
-    "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",
-    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/scopes.js"
+  "nx": {
+    "targets": {
+      "build": {
+        "inputs": [
+          "production",
+          "^production",
+          "{workspaceRoot}/packages/tsconfig.toolkit-types.json"
+        ]
+      }
+    }
   }
 }

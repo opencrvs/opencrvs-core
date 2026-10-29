@@ -12,11 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
-import {
-  ActionDocument,
-  ActionStatus,
-  ActionType
-} from '@opencrvs/toolkit/events'
+import { Action, ActionStatus, ActionType } from '@opencrvs/toolkit/events'
 import {
   AUTH_URL,
   GATEWAY_HOST,
@@ -195,7 +191,7 @@ export async function requestCorrectionViaApi({
   })
 
   const requestAction = res.actions.find(
-    (action: ActionDocument) => action.type === ActionType.REQUEST_CORRECTION
+    (action: Action) => action.type === ActionType.REQUEST_CORRECTION
   )
   if (!requestAction) {
     throw new Error(`Correction request was not recorded for event ${eventId}`)
