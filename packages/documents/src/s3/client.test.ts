@@ -17,7 +17,6 @@ import {
   DeleteBucketPolicyCommand,
   DeleteObjectsCommand,
   HeadBucketCommand,
-  ListObjectsV2Command,
   PutBucketPolicyCommand,
   PutObjectCommand,
   S3Client,
@@ -347,22 +346,19 @@ describe('listObjectKeys', () => {
     expect(found.sort()).toEqual([`${prefix}a.png`, `${prefix}nested/b.png`])
   })
 
-  it('follows the continuation token across pages', async () => {
-    // A real page holds 1000 keys, too many to store for one test
-    send.mockResolvedValueOnce({
-      Contents: [{ Key: 'events/e1/a.png' }],
-      IsTruncated: true,
-      NextContinuationToken: 'next-page'
-    })
-    send.mockResolvedValueOnce({ Contents: [{ Key: 'events/e1/b.png' }] })
-
-    const found = await listObjectKeys('events/e1/')
-
-    expect(found).toEqual(['events/e1/a.png', 'events/e1/b.png'])
-    const [, second] = sentCommands(ListObjectsV2Command)
-    expect((second as ListObjectsV2Command).input.ContinuationToken).toBe(
-      'next-page'
+  it('lists more keys than fit on one page', async () => {
+    const prefix = newPrefix()
+    // A page holds at most 1000 keys
+    const stored = Array.from({ length: 1001 }, (_, i) => `${prefix}${i}.png`)
+    await Promise.all(
+      stored.map((Key) =>
+        s3.send(new PutObjectCommand({ Bucket: env.S3_BUCKET, Key, Body: '' }))
+      )
     )
+
+    const found = await listObjectKeys(prefix)
+
+    expect(found.sort()).toEqual(stored.sort())
   })
 
   it('returns nothing for a prefix that holds no object', async () => {
