@@ -10,6 +10,7 @@
  */
 import { randomUUID } from 'crypto'
 import {
+  BucketAlreadyOwnedByYou,
   CreateBucketCommand,
   CreateMultipartUploadCommand,
   DeleteBucketCommand,
@@ -99,8 +100,20 @@ describe('ensureDefaultBucket', () => {
   })
 
   it('accepts a bucket that another replica created first', async () => {
-    // The check runs before the other replica creates the bucket
+    // The check runs before the other replica creates the bucket. RustFS
+    // answers 200 to the create.
     send.mockRejectedValueOnce(storeError('NotFound', 404))
+
+    await expect(ensureDefaultBucket()).resolves.toBeUndefined()
+    expect(sentCommands(CreateBucketCommand)).toHaveLength(1)
+  })
+
+  it('accepts a store that answers that another replica created the bucket first', async () => {
+    // What MinIO and SeaweedFS answer
+    send.mockRejectedValueOnce(storeError('NotFound', 404))
+    send.mockRejectedValueOnce(
+      new BucketAlreadyOwnedByYou({ message: 'owned', $metadata: {} })
+    )
 
     await expect(ensureDefaultBucket()).resolves.toBeUndefined()
     expect(sentCommands(CreateBucketCommand)).toHaveLength(1)
