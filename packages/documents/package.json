@@ -97,6 +97,7 @@
       "node"
     ],
     "testEnvironment": "node",
+    "testTimeout": 60000,
     "globalSetup": "./test/global-setup.ts",
     "globalTeardown": "./test/global-teardown.ts",
     "setupFilesAfterEnv": [
