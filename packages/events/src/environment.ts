@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, str, url, bool, num } from 'envalid'
+import { cleanEnv, str, url, bool, num, port } from 'envalid'
 
 /**
  * When defining variables aim to be consistent with existing values.
@@ -20,6 +20,10 @@ export const env = cleanEnv(process.env, {
   CORE_REQUEST_SIGNING_KEY_PATH: str({
     devDefault: '../../.secrets/core-request-signing-key.pem',
     desc: 'Ed25519 private key that core signs its requests to country config with'
+  }),
+  EVENTS_PORT: port({
+    default: 5555,
+    desc: 'Port the events service listens on. Derived per local development environment (slot) so several stacks can run side by side; defaults to the historical fixed port.'
   }),
   EVENTS_POSTGRES_URL: url({
     devDefault: 'postgres://events_app:app_password@localhost:5432/events'

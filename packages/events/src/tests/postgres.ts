@@ -111,7 +111,7 @@ export const createDatabase = async (
   )
 }
 
-/** Same setup as packages/migration/src/migrations/postgres/0001_init.sql */
+/** Same schema setup as packages/migration/src/provision.js */
 export const initializeSchemaAccess = async (client: Client) => {
   await client.query(`CREATE SCHEMA app AUTHORIZATION events_migrator`)
   await client.query(`REVOKE CREATE ON SCHEMA public FROM PUBLIC`)

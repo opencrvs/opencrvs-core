@@ -13,7 +13,8 @@ import { join } from 'node:path'
 import fs from 'node:fs'
 
 export const env = cleanEnv(process.env, {
-  PORT: port({ default: 20240 }),
+  // Named, not the bare `PORT`: see packages/mosip-api/src/constants.ts.
+  MOSIP_MOCK_PORT: port({ default: 20240 }),
   HOST: str({ default: '0.0.0.0', devDefault: 'localhost' }),
   ISSUER_URL: str({
     devDefault: 'http://localhost:20240',

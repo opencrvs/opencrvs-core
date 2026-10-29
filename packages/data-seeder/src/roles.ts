@@ -138,8 +138,8 @@ export function parseRoles(
 }
 
 export async function readRoles(): Promise<RoleRead> {
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_URL, 'config/roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_URL, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetchCountryConfig(rolesUrl),
