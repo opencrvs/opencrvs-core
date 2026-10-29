@@ -89,3 +89,28 @@ _Avoid_: system, connection, third party
 **Audit entry**:
 One immutable record of a single operation by one client: what was called, the request data, a curated summary of the response, and when. The summary is deliberately not the raw response payload.
 _Avoid_: audit log (that is the whole collection), history, trail
+
+### Local environments
+
+**Environment**:
+An isolated run of OpenCRVS on a developer machine — its own set of host node processes plus a logical slice of the shared dependencies. Identified by a `name`.
+_Avoid_: instance; stack, or an environment's stack, as a name for one of these. "Stack" stays correct for a set of services generically ("the dev stack", "start the stack") — it is wrong only when it stands in for one environment.
+
+**Name**:
+The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket, mosip-api SQLite file.
+
+**Slot**:
+A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * stride`) and the Redis logical DB index. Slot 0 is the default environment's alone and matches historical single-environment ports; every other environment, a named one in the primary worktree included, gets 1–5.
+
+**Stride**:
+The port distance between two adjacent slots: `10000` for every service except the MOSIP mocks, whose bases are too high to survive it and which use `100` instead. See `PORT_STRIDES` in `packages/dev-cli/src/types.ts`.
+
+**Primary worktree**:
+The main (non-linked) git checkout. Without `--env` it runs the default environment on slot 0, preserving the original `pnpm dev` behaviour and data; `--env <name>` there gets a slot of its own.
+
+**Registry**:
+The machine-level file (`~/.local/state/opencrvs/envs.json`) mapping each environment `name` to its `slot`.
+
+**Dependency singleton**:
+The single shared set of backing services (Postgres, Elasticsearch, Redis, MinIO) that all local environments share, run under docker compose project `opencrvs-deps`. Contrast with the per-environment node processes.
+_Avoid_: deps stack, dependency stack, backend services. "Singleton" is the load-bearing word — there is exactly one per machine, and calling it a stack invites the reader to assume one per environment.
