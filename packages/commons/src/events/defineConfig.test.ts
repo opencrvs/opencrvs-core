@@ -211,12 +211,12 @@ describe('defineConfig()', () => {
       expect(config).toMatchObject({ id: eventId, label, advancedSearch })
     })
 
-    it('should take an event without versions as one version with id `default` and no `effectiveFrom`', () => {
+    it('should take an event without versions as one version with id `default`, effective from the beginning of time', () => {
       const config = defineConfig(tennisClubMembershipEvent)
 
       expect(config.versions).toHaveLength(1)
       expect(config.versions[0].id).toBe(DEFAULT_EVENT_CONFIG_VERSION_ID)
-      expect(config.versions[0]).not.toHaveProperty('effectiveFrom')
+      expect(config.versions[0].effectiveFrom).toBe('0001-01-01')
       expect(config).not.toHaveProperty('actions')
     })
 

@@ -16,7 +16,7 @@ import { rewriteVersionedEventConfigUses } from './resolve-versioned-event-confi
 const TOOLKIT_EVENTS_TYPES = `
 export type EventConfig = { id: string; label: string; analytics?: boolean; actions: Array<{ type: string }> }
 type EventLevelField = 'id' | 'label'
-export type EventConfigVersion = Omit<EventConfig, EventLevelField> & { id: string; effectiveFrom?: string }
+export type EventConfigVersion = Omit<EventConfig, EventLevelField> & { id: string; effectiveFrom: string }
 export type VersionedEventConfig = Pick<EventConfig, EventLevelField> & { versions: EventConfigVersion[] }
 export declare function resolveEventConfig(config: VersionedEventConfig): EventConfig
 export declare function getCurrentEventState(event: unknown, config: EventConfig): unknown

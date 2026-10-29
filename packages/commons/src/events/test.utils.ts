@@ -47,6 +47,7 @@ import {
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft, DraftInput, RemoteDraft } from './Draft'
 import {
+  DEFAULT_EFFECTIVE_FROM,
   EventConfig,
   EventConfigInput,
   resolveEventConfig,
@@ -1525,6 +1526,12 @@ export function toVersionedEventConfig({
     id,
     label,
     advancedSearch,
-    versions: [{ ...version, id: DEFAULT_EVENT_CONFIG_VERSION_ID }]
+    versions: [
+      {
+        ...version,
+        id: DEFAULT_EVENT_CONFIG_VERSION_ID,
+        effectiveFrom: DEFAULT_EFFECTIVE_FROM
+      }
+    ]
   }
 }

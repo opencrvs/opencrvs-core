@@ -228,10 +228,14 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
 
 type EventLevelField = keyof typeof eventLevelFields
 
+/** `effectiveFrom` of a version configured without one. */
+export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
+
 /** One version of an event: what the event looks like from `effectiveFrom` on. */
 export type EventConfigVersion = Omit<EventConfig, EventLevelField> & {
   id: string
-  effectiveFrom?: string
+  /** Date (YYYY-MM-DD) from which this version is effective. '0001-01-01' when configured without one. */
+  effectiveFrom: string
 }
 
 /**
@@ -253,9 +257,9 @@ const _EventConfigVersion: z.ZodType<
     ),
   effectiveFrom: z.iso
     .date()
-    .optional()
+    .default(DEFAULT_EFFECTIVE_FROM)
     .describe(
-      'Date (YYYY-MM-DD) from which this version is effective. A version without one is effective from the beginning of time.'
+      `Date (YYYY-MM-DD) from which this version is effective. A version without one is effective from the beginning of time ('${DEFAULT_EFFECTIVE_FROM}').`
     ),
   ...versionFields
 })
@@ -304,7 +308,7 @@ function validateVersionList(
   ctx: z.RefinementCtx<VersionedEventConfig>
 ) {
   const ids = new Set<string>()
-  const effectiveFroms = new Set<string | undefined>()
+  const effectiveFroms = new Set<string>()
 
   config.versions.forEach((version, index) => {
     if (ids.has(version.id)) {
@@ -319,9 +323,10 @@ function validateVersionList(
     if (effectiveFroms.has(version.effectiveFrom)) {
       ctx.addIssue({
         code: 'custom',
-        message: version.effectiveFrom
-          ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}'. Each version must have a different \`effectiveFrom\`.`
-          : `Event '${config.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`,
+        message:
+          version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
+            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}'. Each version must have a different \`effectiveFrom\`.`
+            : `Event '${config.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`,
         path: ['versions', index, 'effectiveFrom']
       })
     }
