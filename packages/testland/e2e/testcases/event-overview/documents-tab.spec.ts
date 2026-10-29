@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 import { format, subDays } from 'date-fns'
 import {
   getToken,
@@ -17,13 +17,12 @@ import {
   triggerDeclarationAction,
   uploadImage
 } from '@e2e/support/helpers'
-import { CREDENTIALS } from '@e2e/support/constants'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
-import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 import {
   createDeclaration,
   Declaration,
@@ -39,7 +38,10 @@ const PROOF_OF_BIRTH_LABEL = 'Proof of birth'
  * Declares a birth via the API with a proof-of-birth document attached, so the
  * declaration action already carries one document on the Documents tab.
  */
-async function declareWithProofOfBirth(): Promise<Declaration> {
+async function declareWithProofOfBirth(): Promise<{
+  eventId: string
+  declaration: Declaration
+}> {
   const token = await getToken(CREDENTIALS.REGISTRAR)
   const proofOfBirth = await uploadFile(getSignatureFile(), token)
   const declarationRequest = await getDeclaration({
@@ -53,18 +55,31 @@ async function declareWithProofOfBirth(): Promise<Declaration> {
     declarationRequest,
     ActionType.DECLARE
   )
-  return res.declaration
+  return { eventId: res.eventId, declaration: res.declaration }
+}
+
+async function openEventOverview(
+  page: Page,
+  eventId: string,
+  declaration: Declaration
+) {
+  await page.goto(`${CLIENT_URL}/events/${eventId}`)
+  await expect(
+    page.getByRole('heading', {
+      name: formatV2ChildName(declaration),
+      level: 1
+    })
+  ).toBeVisible({ timeout: 30_000 })
 }
 
 test('Documents tab lists both the original and the replacement of an edited document', async ({
   page
 }) => {
-  const declaration = await declareWithProofOfBirth()
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   await test.step('Navigate to the record and assign', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
@@ -88,8 +103,7 @@ test('Documents tab lists both the original and the replacement of an edited doc
   })
 
   await test.step('Documents tab shows the original and the replacement', async () => {
-    await page.getByText('Recent').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
     await switchEventTab(page, 'Documents')
@@ -104,12 +118,11 @@ test('Documents tab lists both the original and the replacement of an edited doc
 test('Documents tab does not duplicate a document that an edit left unchanged', async ({
   page
 }) => {
-  const declaration = await declareWithProofOfBirth()
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   await test.step('Navigate to the record and assign', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
@@ -132,8 +145,7 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
   })
 
   await test.step('Documents tab shows the unchanged proof of birth only once', async () => {
-    await page.getByText('Recent').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
     await switchEventTab(page, 'Documents')
@@ -145,15 +157,14 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
 })
 
 test('Documents tab shows an offline state while offline', async ({ page }) => {
-  const declaration = await declareWithProofOfBirth()
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   const documentsOfflineMessage =
     "This record's documents have not been downloaded yet, so they cannot be opened offline. Please reconnect to the internet to view them."
 
   await test.step('Navigate to the record and assign', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
@@ -180,12 +191,11 @@ test('Documents tab shows an offline state while offline', async ({ page }) => {
 test('Documents tab shows a loading state while the documents are fetched', async ({
   page
 }) => {
-  const declaration = await declareWithProofOfBirth()
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   await test.step('Login and open the record (without downloading it)', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
   })
 
   await test.step('Opening the Documents tab shows a loading state before the list', async () => {
