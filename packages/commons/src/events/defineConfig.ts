@@ -11,6 +11,7 @@
 
 import * as z from 'zod/v4'
 import {
+  DEFAULT_EVENT_CONFIG_VERSION_ID,
   EventConfig,
   EventConfigInput,
   VersionedEventConfig,
@@ -53,8 +54,29 @@ function moveDeclarationToDeclareAction({
   }
 }
 
-/** Id of the version of an event configured without `versions`. */
-export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+/** Fields an event with `versions` defines at the top level. Every other field belongs on each version. */
+const VERSIONED_EVENT_FIELDS = [
+  'id',
+  'label',
+  'advancedSearch',
+  'versions'
+] satisfies Array<keyof VersionedEventConfigInput>
+
+/** Rejects fields given at the top level of an event with `versions`, which would otherwise be dropped. */
+function validateNoVersionFieldsAtTopLevel(
+  config: VersionedEventConfigInput,
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  Object.keys(config)
+    .filter((key) => !(VERSIONED_EVENT_FIELDS as string[]).includes(key))
+    .forEach((key) => {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Event '${config.id}' defines \`versions\`, so \`${key}\` must be defined on each version, not at the top level.`,
+        path: [key]
+      })
+    })
+}
 
 /** An event configured without `versions` is a single version, effective from the beginning of time. */
 function toVersionedInput(
@@ -79,6 +101,7 @@ const EventConfigDefinition = z
   .superRefine((config, ctx) => {
     // A version gives `declaration` only on the DECLARE action, which its schema checks
     if ('versions' in config) {
+      validateNoVersionFieldsAtTopLevel(config, ctx)
       return
     }
     const eventCtx = { ...ctx, value: config }

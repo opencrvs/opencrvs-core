@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DEFAULT_EVENT_CONFIG_VERSION_ID, defineConfig } from './defineConfig'
+import { defineConfig } from './defineConfig'
 import {
+  DEFAULT_EVENT_CONFIG_VERSION_ID,
   EventConfigInput,
   resolveEventConfig,
   VersionedEventConfig
@@ -294,6 +295,36 @@ describe('defineConfig()', () => {
 
       expect(resolveEventConfig(config).title).toEqual(v1.title)
       expect(resolveEventConfig(config)).toBe(resolveEventConfig(config))
+    })
+
+    it('should resolve a refetched event to its new label when its version is the same object', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1]
+      })
+      const refetched = {
+        ...config,
+        label: { ...label, defaultMessage: 'Renamed' }
+      }
+
+      expect(resolveEventConfig(config).label).toEqual(label)
+      expect(resolveEventConfig(refetched).label).toEqual(refetched.label)
+    })
+
+    it('should reject a version field (e.g. actions) at the top level of an event with versions', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          actions: v1.actions,
+          versions: [v1]
+        })
+      ).toThrow(
+        `Event '${eventId}' defines \`versions\`, so \`actions\` must be defined on each version, not at the top level.`
+      )
     })
   })
 })

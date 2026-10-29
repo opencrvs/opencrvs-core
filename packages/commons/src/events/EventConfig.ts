@@ -228,6 +228,9 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
 
 type EventLevelField = keyof typeof eventLevelFields
 
+/** Id of the version of an event configured without `versions`. */
+export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+
 /** `effectiveFrom` of a version configured without one. */
 export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
 
@@ -264,18 +267,30 @@ const _EventConfigVersion: z.ZodType<
   ...versionFields
 })
 
-const resolvedConfigs = new WeakMap<EventConfigVersion, EventConfig>()
+/**
+ * Keyed on the event as well as the version: after a refetch, a version may be the same
+ * object while a field shared by every version (e.g. `label`) has changed.
+ */
+const resolvedConfigs = new WeakMap<
+  VersionedEventConfig,
+  WeakMap<EventConfigVersion, EventConfig>
+>()
 
 /**
  * @returns the configuration of `version`, together with the fields shared by every
- * version of the event. The same version gives the same object, so caches keyed on
- * the configuration keep working.
+ * version of the event. The same event and version give the same object, so caches
+ * keyed on the configuration keep working.
  */
 export function getEventConfigOfVersion(
   config: VersionedEventConfig,
   version: EventConfigVersion
 ): EventConfig {
-  const cached = resolvedConfigs.get(version)
+  let resolvedVersions = resolvedConfigs.get(config)
+  if (!resolvedVersions) {
+    resolvedVersions = new WeakMap()
+    resolvedConfigs.set(config, resolvedVersions)
+  }
+  const cached = resolvedVersions.get(version)
   if (cached) {
     return cached
   }
@@ -287,7 +302,7 @@ export function getEventConfigOfVersion(
     label: config.label,
     advancedSearch: config.advancedSearch
   }
-  resolvedConfigs.set(version, resolved)
+  resolvedVersions.set(version, resolved)
   return resolved
 }
 
@@ -386,7 +401,7 @@ export const VersionedEventConfig: z.ZodType<
       .array(_EventConfigVersion)
       .min(1)
       .describe(
-        'Versions of the event configuration, each effective from its `effectiveFrom`.'
+        `Versions of the event configuration, each effective from its \`effectiveFrom\`. An event configured without versions has a single version, with id '${DEFAULT_EVENT_CONFIG_VERSION_ID}' and \`effectiveFrom\` '${DEFAULT_EFFECTIVE_FROM}'.`
       )
   })
   .superRefine((config, ctx) => {

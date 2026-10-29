@@ -48,6 +48,7 @@ import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft, DraftInput, RemoteDraft } from './Draft'
 import {
   DEFAULT_EFFECTIVE_FROM,
+  DEFAULT_EVENT_CONFIG_VERSION_ID,
   EventConfig,
   EventConfigInput,
   resolveEventConfig,
@@ -93,7 +94,7 @@ import {
 } from '../authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
-import { DEFAULT_EVENT_CONFIG_VERSION_ID, defineConfig } from './defineConfig'
+import { defineConfig } from './defineConfig'
 import { toNotificationForm } from './toNotificationForm'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
