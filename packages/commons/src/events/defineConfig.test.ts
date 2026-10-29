@@ -259,25 +259,6 @@ describe('defineConfig()', () => {
       )
     })
 
-    it('should move a top-level declaration of each version onto its DECLARE action', () => {
-      const config = defineConfig({
-        id: eventId,
-        label,
-        advancedSearch,
-        versions: [
-          v1,
-          { ...v2, actions: actionsWithoutDeclaration, declaration }
-        ]
-      })
-
-      expect(
-        getDeclaration(
-          resolveEventConfig({ ...config, versions: [config.versions[1]] })
-        )
-      ).toEqual(declaration)
-      expect(config.versions[1]).not.toHaveProperty('declaration')
-    })
-
     it('should report an invalid version under its index', () => {
       const result = VersionedEventConfig.safeParse({
         id: eventId,

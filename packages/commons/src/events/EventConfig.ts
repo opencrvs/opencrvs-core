@@ -100,9 +100,12 @@ export type EventConfigInput = Omit<EventConfigSchemaInput, 'actions'> & {
   >
 }
 
-/** Input accepted by `defineConfig` for one version of an event. */
+/**
+ * Input accepted by `defineConfig` for one version of an event.
+ * `declaration` lives only on the DECLARE action.
+ */
 export type EventConfigVersionInput = Omit<
-  EventConfigInput,
+  EventConfigSchemaInput,
   EventLevelField
 > & {
   /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
@@ -231,14 +234,6 @@ export type EventConfigVersion = Omit<EventConfig, EventLevelField> & {
   effectiveFrom?: string
 }
 
-type EventConfigVersionSchemaInput = Omit<
-  EventConfigSchemaInput,
-  EventLevelField
-> & {
-  id: string
-  effectiveFrom?: string
-}
-
 /**
  * An event with every version of its configuration. This is what country config serves.
  * Read it through `resolveEventConfig`, which gives the configuration of one version.
@@ -247,16 +242,9 @@ export type VersionedEventConfig = Pick<EventConfig, EventLevelField> & {
   versions: EventConfigVersion[]
 }
 
-type VersionedEventConfigSchemaInput = Pick<
-  EventConfigSchemaInput,
-  EventLevelField
-> & {
-  versions: EventConfigVersionSchemaInput[]
-}
-
 const _EventConfigVersion: z.ZodType<
   EventConfigVersion,
-  EventConfigVersionSchemaInput
+  EventConfigVersionInput
 > = z.object({
   id: z
     .string()
@@ -385,7 +373,7 @@ export function validateEachVersion<E>(
 
 export const VersionedEventConfig: z.ZodType<
   VersionedEventConfig,
-  VersionedEventConfigSchemaInput
+  VersionedEventConfigInput
 > = z
   .object({
     ...eventLevelFields,
