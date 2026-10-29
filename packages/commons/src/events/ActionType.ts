@@ -96,7 +96,9 @@ export type ActionTypes = z.infer<typeof ActionTypes>
  * Non-persisted actions that are used in the client to control the UI.
  */
 export const ClientSpecificAction = {
-  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST',
+  /** Opens the user's declare or notify draft of the event in its own flow */
+  CONTINUE_DRAFT: 'CONTINUE_DRAFT'
 } as const
 
 export type ClientSpecificAction =

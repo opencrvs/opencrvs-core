@@ -38,11 +38,10 @@ export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
   /*
    * A draft can name a file that no action references. Such a file stays until
    * the record is deleted or the record's next action sweeps its prefix.
-   * DECLARE is available only where one of those is still coming: a created
-   * record, which can still be deleted, and a record part way through an edit,
-   * which is about to be declared or registered.
+   * Drafts are therefore saved only on a created record, which can still be deleted.
+   * The server refuses them on any other record.
    */
-  type: z.literal(ActionTypes.enum.DECLARE),
+  type: z.enum([ActionTypes.enum.DECLARE, ActionTypes.enum.NOTIFY]),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
@@ -50,5 +49,14 @@ export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
   ])
 })
 
+/*
+ * A draft saved on the server. Unlike a local draft, which also holds the state of
+ * the edit, print and correction views, it can only be a declare or notify draft.
+ */
+export const RemoteDraft = Draft.extend({
+  action: Draft.shape.action.extend({ type: DraftInput.shape.type })
+})
+
 export type Draft = z.infer<typeof Draft>
 export type DraftInput = z.infer<typeof DraftInput>
+export type RemoteDraft = z.infer<typeof RemoteDraft>

@@ -59,7 +59,7 @@ const eventDocument = generateEventDocument({
 
 const modifiedDraft = generateEventDraftDocument({
   eventId: eventDocument.id,
-  actionType: ActionType.REGISTER,
+  actionType: ActionType.DECLARE,
   declaration: {
     'applicant.name': {
       firstname: 'Riku',

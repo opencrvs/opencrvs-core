@@ -296,7 +296,6 @@ type ActionLabel =
   | 'Confirm'
   // tennisClubMembershipEvent configures its own label for these actions,
   // which now takes precedence over the actionLabels hardcoded default.
-  | 'Send an application'
   | 'Print certificate'
   | 'Request correction'
 
