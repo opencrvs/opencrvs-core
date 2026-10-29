@@ -10,10 +10,8 @@
  */
 
 import { Kysely, sql } from 'kysely'
-import * as z from 'zod/v4'
 import {
   ActionStatus,
-  Draft,
   DraftInput,
   RemoteDraft,
   TokenUserType,
@@ -26,8 +24,8 @@ import {
 } from './schema/app/EventActionDrafts'
 import Schema from './schema/Database'
 
-function toDraftDocument(draft: EventActionDrafts): Draft {
-  return Draft.parse({
+function toDraftDocument(draft: EventActionDrafts): RemoteDraft {
+  return RemoteDraft.parse({
     id: draft.id,
     transactionId: draft.transactionId,
     createdAt: draft.createdAt,
@@ -84,9 +82,7 @@ export async function getDraftsByUserId(createdBy: string) {
     .orderBy('createdAt', 'asc')
     .selectAll()
     .execute()
-  const draftDocuments = drafts.map(toDraftDocument)
-
-  return z.array(RemoteDraft).parse(draftDocuments)
+  return drafts.map(toDraftDocument)
 }
 
 export async function findLatestDraftForAction(
@@ -105,7 +101,7 @@ export async function findLatestDraftForAction(
     .executeTakeFirst()
 
   if (draft) {
-    return RemoteDraft.parse(toDraftDocument(draft))
+    return toDraftDocument(draft)
   }
 
   return undefined
