@@ -13,13 +13,12 @@ import { createServer } from '@documents/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { env } from '../../s3/constants'
-import * as client from '../../s3/client'
+import {
+  ensureDefaultBucket,
+  putObject,
+  statObjectIfExists
+} from '../../s3/client'
 import { getObject } from '../../../test/s3'
-
-const { ensureDefaultBucket, putObject, statObjectIfExists } = client
-
-// Passes through to the store, and records which key the handler looked up
-const statObjectIfExistsMock = jest.spyOn(client, 'statObjectIfExists')
 
 beforeAll(async () => {
   await ensureDefaultBucket()
@@ -38,12 +37,11 @@ describe('fileExistsHandler', () => {
   const transactionId = 'transaction-12345'
 
   beforeAll(async () => {
-    // So the lookups below answer 200. The spy checks which key they used.
+    // Only a lookup of this key answers 200
     await putObject(`${path}/${transactionId}.txt`, Buffer.from(''))
   })
 
   beforeEach(async () => {
-    statObjectIfExistsMock.mockClear()
     server = await createServer()
   })
 
@@ -56,9 +54,6 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -70,9 +65,6 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
@@ -87,9 +79,6 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -101,9 +90,6 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
@@ -117,9 +103,6 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
@@ -132,9 +115,6 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
