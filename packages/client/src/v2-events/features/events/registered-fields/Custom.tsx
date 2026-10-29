@@ -37,7 +37,7 @@ interface CustomFieldModule {
  * The module must use this React instance: a second copy of React cannot
  * run hooks inside the client's render tree.
  */
-export interface CustomFieldModuleContext {
+interface CustomFieldModuleContext {
   React: typeof React
 }
 
