@@ -12,7 +12,7 @@
     "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "test:compilation": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "build:clean": "rm -rf build"
   },
   "dependencies": {
