@@ -14,6 +14,10 @@ export const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
   REDIS_USERNAME: str({ default: undefined }),
   REDIS_PASSWORD: str({ default: undefined }),
+  REDIS_DB: num({
+    default: 0,
+    desc: 'Redis logical database index to use. Lets several local development environments share one Redis instance without colliding; defaults to the historical database 0.'
+  }),
   HOST: str({ devDefault: '0.0.0.0' }),
   PORT: port({ default: 7070 }),
   DOMAIN: str({ devDefault: '*' }),

@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@gateway/constants'
+import {
+  REDIS_DB,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_USERNAME
+} from '@gateway/constants'
 import { createClient } from 'redis'
 
 export let redis: ReturnType<typeof createClient<{}, {}, {}, 3>>
@@ -17,10 +22,15 @@ export async function stop() {
   redis.quit()
 }
 
-export async function start(host = REDIS_HOST, port?: number) {
+export async function start(
+  host = REDIS_HOST,
+  port?: number,
+  database = REDIS_DB
+) {
   const client = createClient({
     username: REDIS_USERNAME,
     password: REDIS_PASSWORD,
+    database,
     socket: {
       host,
       port

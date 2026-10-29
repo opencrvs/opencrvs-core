@@ -60,7 +60,7 @@
     "lint": "pnpm lint:css",
     "test:compilation": "tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "storybook": "storybook dev -p 6060",
+    "storybook": "storybook dev -p ${STORYBOOK_PORT:-6060}",
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=6144 storybook build -o build --disable-telemetry",
     "recreate-src-index-ts": "bash recreate-src-index-ts.sh"
   },

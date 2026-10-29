@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "vite --port=3000",
+    "start": "vite --port=${CLIENT_PORT:-3000}",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
@@ -18,7 +18,7 @@
     "test:compilation": "NODE_OPTIONS=\"--max-old-space-size=8192\" tsc --project tsconfig.build.json --noEmit",
     "extract:translations": "bash extract-translations.sh",
     "build:clean": "rm -rf build",
-    "storybook": "STORYBOOK=true storybook dev -p 6006",
+    "storybook": "STORYBOOK=true storybook dev -p ${CLIENT_STORYBOOK_PORT:-6006}",
     "build-storybook": "STORYBOOK=true storybook build",
     "test-storybook": "STORYBOOK=true test-storybook --maxWorkers=2",
     "test-storybook:watch": "STORYBOOK=true test-storybook --watch",

@@ -38,7 +38,7 @@ import {
 async function getToken(): Promise<string> {
   const authUrl = new URL(
     '/auth/authenticate-super-user',
-    env.GATEWAY_HOST
+    env.GATEWAY_URL
   ).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
