@@ -63,6 +63,12 @@ async function openEventOverview(
   eventId: string,
   declaration: Declaration
 ) {
+  // page.goto reloads the app. Any action still in the outbox is restored from
+  // IndexedDB and re-sent after the reload, so let the outbox drain first.
+  // The button is named "Outbox <count>" while it has items.
+  await expect(
+    page.getByRole('button', { name: 'Outbox', exact: true })
+  ).toBeVisible({ timeout: 30_000 })
   await page.goto(`${CLIENT_URL}/events/${eventId}`)
   await expect(
     page.getByRole('heading', {

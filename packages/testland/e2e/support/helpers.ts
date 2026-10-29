@@ -573,6 +573,14 @@ const actionTitleToApiCallMap = {
 }
 
 /**
+ * The client retries a failed action at least 10s apart (see `retryDelay` in the
+ * client's mutationHandlers.ts). A 30s wait only fits two retries, so one slow or
+ * failed request on a busy environment would fail the test even though the
+ * action still goes through.
+ */
+const ACTION_RESPONSE_TIMEOUT = 60_000
+
+/**
  * Attaches response listeners for the given URL fragments, fires the trigger that
  * causes those API calls, then resolves once all of them have returned successfully.
  *
@@ -602,7 +610,7 @@ export async function waitForActionResponses(
     urls.map((url) =>
       // add arbitrary timeout to prevent indefinite hanging in failure situations
       page.waitForResponse((res) => res.url().includes(url) && res.ok(), {
-        timeout: 30_000
+        timeout: ACTION_RESPONSE_TIMEOUT
       })
     )
   ).then(() => {
@@ -621,7 +629,7 @@ export async function waitForActionResponses(
           (res.request().postData()?.includes(eventId) ?? false) &&
           mainDone,
         // add arbitrary timeout to prevent indefinite hanging in failure situations
-        { timeout: 30_000 }
+        { timeout: ACTION_RESPONSE_TIMEOUT }
       )
     )
   }
