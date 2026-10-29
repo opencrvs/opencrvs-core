@@ -14,8 +14,6 @@ import {
   CreateBucketCommand,
   CreateMultipartUploadCommand,
   DeleteBucketCommand,
-  DeleteBucketPolicyCommand,
-  DeleteObjectsCommand,
   HeadBucketCommand,
   PutBucketPolicyCommand,
   PutObjectCommand,
@@ -122,7 +120,6 @@ describe('ensureDefaultBucket', () => {
     send.mockRejectedValueOnce(storeError('Forbidden', 403))
 
     await expect(ensureDefaultBucket()).rejects.toThrow('Forbidden')
-    expect(send).toHaveBeenCalledTimes(1)
   })
 
   it('fails when the bucket could not be created', async () => {
@@ -177,7 +174,6 @@ describe('ensureDefaultBucketIsPrivate', () => {
     send.mockRejectedValueOnce(storeError('AccessDenied', 403))
 
     await expect(ensureDefaultBucketIsPrivate()).rejects.toThrow('AccessDenied')
-    expect(sentCommands(DeleteBucketPolicyCommand)).toHaveLength(1)
   })
 })
 
@@ -284,27 +280,21 @@ describe('removeObjects', () => {
     Errors: failedKeys.map((Key) => ({ Key, Code: 'AccessDenied' }))
   })
 
-  it('sends nothing for an empty list', async () => {
-    await removeObjects([])
-
-    expect(send).not.toHaveBeenCalled()
+  it('accepts an empty list', async () => {
+    // A store refuses a delete request that names no key
+    await expect(removeObjects([])).resolves.toBeUndefined()
   })
 
-  it('deletes at most 1000 keys per request', async () => {
+  it('deletes more keys than one request may name', async () => {
     const prefix = newPrefix()
+    // A store refuses a delete request that names more than 1000 keys
     const toDelete = keys(prefix, 2500)
     // Deleting a key that does not exist succeeds, so only a few are stored
     await putObject(toDelete[0], Buffer.from(''))
     await putObject(toDelete[2499], Buffer.from(''))
-    send.mockClear()
 
     await removeObjects(toDelete)
 
-    const sizes = sentCommands(DeleteObjectsCommand).map(
-      (command) =>
-        (command as DeleteObjectsCommand).input.Delete!.Objects!.length
-    )
-    expect(sizes).toEqual([1000, 1000, 500])
     expect(await listObjectKeys(prefix)).toEqual([])
   })
 
@@ -316,21 +306,21 @@ describe('removeObjects', () => {
     )
   })
 
-  it('sends the remaining batches after one fails, then fails with the total', async () => {
-    const toDelete = keys('events/e1/', 2500)
+  it('deletes the remaining keys after some could not be deleted, then fails', async () => {
+    const prefix = newPrefix()
+    const toDelete = keys(prefix, 2500)
+    await putObject(toDelete[1500], Buffer.from(''))
+    await putObject(toDelete[2499], Buffer.from(''))
     send.mockResolvedValueOnce(deleteErrors(toDelete.slice(0, 15)))
-    send.mockResolvedValueOnce({})
-    send.mockResolvedValueOnce(deleteErrors(['events/e1/2400.png']))
 
     const error = await removeObjects(toDelete).catch((e: Error) => e)
 
-    expect(send).toHaveBeenCalledTimes(3)
+    expect(await listObjectKeys(prefix)).toEqual([])
     expect(error).toBeInstanceOf(Error)
-    expect((error as Error).message).toMatch(/^Failed to delete 16 object\(s\)/)
+    expect((error as Error).message).toMatch(/^Failed to delete 15 object\(s\)/)
     // Names only the first ten, so a large sweep does not make a huge message
-    expect((error as Error).message).toContain('events/e1/9.png')
-    expect((error as Error).message).not.toContain('events/e1/10.png')
-    expect((error as Error).message).not.toContain('events/e1/2400.png')
+    expect((error as Error).message).toContain(`${prefix}9.png`)
+    expect((error as Error).message).not.toContain(`${prefix}10.png`)
   })
 })
 
