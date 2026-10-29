@@ -384,6 +384,7 @@ minio:
   enabled: true
   image:
     # Mirrored copy of the upstream image, which MinIO removed from quay.io.
+    # Ref source code: https://github.com/opencrvs/minio/releases/tag/RELEASE.2025-06-13T11-33-47Z
     repository: ghcr.io/opencrvs/minio
     tag: release.2025-06-13t11-33-47z
   port: 3535
