@@ -1300,11 +1300,18 @@ export type IdReaderField = z.infer<typeof IdReaderField>
 const CustomField = BaseField.extend({
   type: z.literal(FieldType._EXPERIMENTAL_CUSTOM),
   defaultValue: CustomFieldValue.optional(),
-  src: z.string().describe('Module source path for the custom field component'),
-  configuration: z.unknown().optional()
+  src: z
+    .string()
+    .describe(
+      'URL of an ES module. Its default export is a function ({ React }) => ({ Input, Output }) that receives the React instance of the client. Use a same-origin path such as /api/countryconfig/static/my-field.js: the client Content-Security-Policy blocks scripts from origins that it does not list.'
+    ),
+  configuration: z
+    .unknown()
+    .optional()
+    .describe('Passed as is to the Input component of the module')
 }).meta({
   description:
-    'An expiremental custom field that is defined by a module source path',
+    'An experimental custom field that is defined by an ES module, e.g. one served by the country config',
   id: 'CustomField'
 })
 

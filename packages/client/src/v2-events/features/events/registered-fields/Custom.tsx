@@ -27,13 +27,107 @@ interface OutputProps {
   value?: unknown
 }
 
-async function importModule(url: string): Promise<{
-  Input: React.FC<InputProps>
-  Output: React.FC<OutputProps>
-}> {
+interface CustomFieldModule {
+  Input: React.ComponentType<InputProps>
+  Output: React.ComponentType<OutputProps>
+}
+
+/**
+ * What the client hands to the default export of a custom field module.
+ * The module must use this React instance: a second copy of React cannot
+ * run hooks inside the client's render tree.
+ */
+export interface CustomFieldModuleContext {
+  React: typeof React
+}
+
+const loadedModules = new Map<string, Promise<CustomFieldModule>>()
+
+async function importModule(src: string): Promise<CustomFieldModule> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const mod = await import(/* @vite-ignore */ url)
-  return mod
+  const imported: { default?: unknown } = await import(/* @vite-ignore */ src)
+
+  if (typeof imported.default !== 'function') {
+    throw new Error(
+      `Custom field module ${src} must have a default export ({ React }) => ({ Input, Output })`
+    )
+  }
+
+  const context: CustomFieldModuleContext = { React }
+  const created = imported.default(context) as Partial<CustomFieldModule>
+
+  if (
+    typeof created.Input !== 'function' ||
+    typeof created.Output !== 'function'
+  ) {
+    throw new Error(
+      `Custom field module ${src} must return both Input and Output components`
+    )
+  }
+
+  return { Input: created.Input, Output: created.Output }
+}
+
+/**
+ * Loads each module only once, so that every render gets the same component
+ * identities and React does not remount the field.
+ */
+function loadModule(src: string) {
+  const cached = loadedModules.get(src)
+  if (cached) {
+    return cached
+  }
+
+  const loading = importModule(src).catch((error: unknown) => {
+    // Let the next mount try again, e.g. after a network error
+    loadedModules.delete(src)
+    throw error
+  })
+  loadedModules.set(src, loading)
+  return loading
+}
+
+function LoadError() {
+  return (
+    <Pill
+      label={
+        <>
+          {/* eslint-disable-next-line react/jsx-no-literals */}
+          <div>Error loading component</div>
+        </>
+      }
+      pillTheme="dark"
+      size="small"
+      type="inactive"
+    />
+  )
+}
+
+/**
+ * Keeps an error thrown by country config code inside the field,
+ * so that the rest of the form still works.
+ */
+class CustomFieldErrorBoundary extends React.Component<
+  { src: string; children: React.ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: unknown) {
+    // eslint-disable-next-line no-console
+    console.error(`Custom field ${this.props.src} failed to render:`, error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <LoadError />
+    }
+    return this.props.children
+  }
 }
 
 function Loader(
@@ -41,29 +135,40 @@ function Loader(
     | (InputProps & { component: 'Input' })
     | (OutputProps & { component: 'Output' })
 ) {
-  const [loadedModule, setLoadedModule] = React.useState<{
-    Input: React.FC<InputProps>
-    Output: React.FC<OutputProps>
-  } | null>(null)
+  const [loadedModule, setLoadedModule] =
+    React.useState<CustomFieldModule | null>(null)
   const [loading, setLoading] = React.useState(true)
   const { component, ...otherProps } = props
+
   React.useEffect(() => {
-    const loadModules = async () => {
-      try {
-        const importedModule = await importModule(props.src)
-        setLoadedModule(importedModule)
-      } catch (error) {
+    let cancelled = false
+    setLoading(true)
+
+    loadModule(props.src)
+      .then((mod) => {
+        if (!cancelled) {
+          setLoadedModule(mod)
+        }
+      })
+      .catch((error: unknown) => {
         // eslint-disable-next-line no-console
         console.error(
           `Failed to import a custom ${props.component.toLowerCase()} dynamically:`,
           error
         )
-      } finally {
-        setLoading(false)
-      }
-    }
+        if (!cancelled) {
+          setLoadedModule(null)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      })
 
-    void loadModules()
+    return () => {
+      cancelled = true
+    }
   }, [props.component, props.src])
 
   if (loading) {
@@ -71,28 +176,20 @@ function Loader(
   }
 
   if (!loadedModule) {
-    return (
-      <Pill
-        label={
-          <>
-            {/* eslint-disable-next-line react/jsx-no-literals */}
-            <div>Error loading component</div>
-          </>
-        }
-        pillTheme="dark"
-        size="small"
-        type="inactive"
-      />
-    )
+    return <LoadError />
   }
 
   const Component = loadedModule[
     component
   ] as typeof props.component extends 'Input'
-    ? React.FC<InputProps>
-    : React.FC<OutputProps>
+    ? React.ComponentType<InputProps>
+    : React.ComponentType<OutputProps>
 
-  return <Component {...otherProps} />
+  return (
+    <CustomFieldErrorBoundary src={props.src}>
+      <Component {...otherProps} />
+    </CustomFieldErrorBoundary>
+  )
 }
 
 function Input(props: InputProps) {

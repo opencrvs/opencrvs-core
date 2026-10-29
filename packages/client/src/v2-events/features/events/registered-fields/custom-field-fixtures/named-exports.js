@@ -8,10 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// Uses the wrong contract: named exports instead of a default factory
+export function Input() {
+  return null
+}
 
-/*
- * These are exported modules for modules that are dynamically important into the app
- */
-
-import React from 'react'
-export default React
+export function Output() {
+  return null
+}
