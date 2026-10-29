@@ -1,0 +1,447 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { toEnvironmentVariables } from './env-contract'
+import { LocatedEnvironment } from './locator'
+import {
+  LEGACY_DB_NAME,
+  environmentIdentifiers,
+  sanitizeEnvironmentName
+} from './resolver'
+import { EnvironmentDescriptor, RegistryEntry, RegistrySnapshot } from './types'
+
+/** The four things an environment owns outside its own worktree. */
+export type EnvironmentIdentifiers = Pick<
+  EnvironmentDescriptor,
+  'dbName' | 'esPrefix' | 'esReindexingStatusIndex' | 'bucket'
+>
+
+/**
+ * Environments found by asking the datastores what exists, rather than by
+ * reading the registry.
+ *
+ * The registry is the source of truth for *slots*; it is emphatically not a
+ * record of what exists. An entry disappears whenever `env:destroy` releases
+ * one, whenever `~/.local/state/opencrvs/envs.json` is lost or a second user
+ * account is used, and it never existed for a database restored from a
+ * colleague's dump — while the data itself lives on in the shared docker
+ * volumes. Deleting indices on the registry alone therefore sweeps up
+ * environments it has simply never heard of.
+ */
+export interface EnvironmentDiscovery {
+  /** Environment names discovered from a datastore. */
+  names: string[]
+  /**
+   * Set when discovery could not run. Index deletion is skipped entirely in
+   * that case: deleting under an incomplete picture is unrecoverable, and
+   * skipping is not.
+   */
+  failure?: string
+}
+
+/** `events_<name>` databases, the durable record that an environment exists. */
+const DATABASE_PREFIX = `${LEGACY_DB_NAME}_`
+
+/**
+ * Turn `SELECT datname FROM pg_database` output into environment names.
+ *
+ * Postgres is the useful source because a database is the one artefact every
+ * environment has — `pnpm dev` provisions it before anything else — and its
+ * name maps back to the environment name exactly, by construction
+ * (`dbName = events_<name>`). The live index list is deliberately *not* used
+ * for the same purpose: `events_feature_a_v2_birth` is equally consistent with
+ * an environment `feature_a` holding index `v2_birth` and an environment
+ * `feature_a_v2` holding `birth`, and guessing the longer one would stop an
+ * environment from ever clearing its own indices.
+ */
+export function environmentNamesFromDatabases(databases: string[]): string[] {
+  const names = new Set<string>()
+
+  for (const database of databases) {
+    const trimmed = database.trim()
+
+    if (!trimmed.startsWith(DATABASE_PREFIX)) {
+      continue
+    }
+
+    try {
+      names.add(sanitizeEnvironmentName(trimmed.slice(DATABASE_PREFIX.length)))
+    } catch {
+      // Not a name this resolver could ever have produced; not an environment.
+    }
+  }
+
+  return [...names]
+}
+
+export interface PlanDestroyInput {
+  /**
+   * The environment as `EnvironmentLocator.locate` found it, which is where
+   * the default environment is told apart from an ordinary one.
+   */
+  environment: LocatedEnvironment
+  /** The registry as read from disk. Never mutated. */
+  snapshot: RegistrySnapshot
+  /** Required to destroy the default environment's shared data. */
+  force?: boolean
+  /**
+   * Environments that exist outside the registry. Required, not optional, so
+   * that no call site can quietly treat the registry as a complete list of
+   * what exists — that assumption is what makes index deletion dangerous.
+   */
+  discovery: EnvironmentDiscovery
+}
+
+/**
+ * A description of what destroying an environment would delete. Pure data: no
+ * client is opened, nothing is deleted, and nothing here depends on a service
+ * being reachable. The I/O layer executes it; the tests can assert on it.
+ */
+export interface DestroyPlan {
+  /** Sanitized name; keys all per-environment data. */
+  name: string
+  /** Whether the registry knows this name. */
+  registered: boolean
+  /** Recorded slot. Unknown for a name the registry has never seen. */
+  slot?: number
+  isDefaultEnvironment: boolean
+  identifiers: EnvironmentIdentifiers
+  /**
+   * Elasticsearch prefixes belonging to *other* registered environments.
+   * Carried so index selection can tell `events_feature_a` apart from
+   * `events_feature_a_2` — see `selectIndicesToDelete`.
+   */
+  otherEsPrefixes: string[]
+  /** Redis logical DB to flush. Absent when flushing would not be safe. */
+  redisDb?: number
+  /** Why Redis is being left alone, when it is. */
+  redisSkipReason?: string
+  /**
+   * Why no index may be deleted, when it could not be established which
+   * environments own what. Everything else in the plan still stands.
+   */
+  indexSelectionSkipReason?: string
+  /** Whether there is a registry entry to remove afterwards. */
+  releaseRegistryEntry: boolean
+  /** Non-fatal remarks worth printing before acting. */
+  notes: string[]
+  /**
+   * Set when the plan must not be executed at all. The caller prints it and
+   * exits; every operation in the plan is already switched off.
+   */
+  refusal?: string
+}
+
+/**
+ * Work out everything `env:destroy <name>` would remove, without removing it.
+ *
+ * The plan is keyed on the *name*, never on the slot: slots are recycled, so
+ * the environment now sitting at slot 1 may well not be the one being
+ * destroyed. Only Redis — whose logical DB index *is* the slot — needs the
+ * registry at all, which is why an unregistered name can still have its
+ * database, indices and bucket cleaned up.
+ */
+export function planDestroy(input: PlanDestroyInput): DestroyPlan {
+  const { name, entry, isDefaultEnvironment } = input.environment
+  const registered = entry !== undefined
+
+  const { dbName, esPrefix, esReindexingStatusIndex, bucket } =
+    environmentIdentifiers(name, isDefaultEnvironment)
+  const identifiers = { dbName, esPrefix, esReindexingStatusIndex, bucket }
+
+  const notes: string[] = []
+
+  if (!registered) {
+    notes.push(
+      `Environment "${name}" is not in the registry, so there is no entry to ` +
+        'release. Its database, indices and bucket are still derived from the ' +
+        'name and will be removed.'
+    )
+  }
+
+  const refusal =
+    isDefaultEnvironment && input.force !== true
+      ? refusalMessage(name, identifiers)
+      : undefined
+
+  const redis = planRedis({
+    name,
+    entry,
+    isDefaultEnvironment,
+    refused: refusal !== undefined
+  })
+
+  return {
+    name,
+    registered,
+    slot: entry?.slot,
+    isDefaultEnvironment,
+    identifiers,
+    ...indexOwnership(name, input.snapshot, input.discovery),
+    redisDb: redis.db,
+    redisSkipReason: redis.skipReason,
+    releaseRegistryEntry: registered && refusal === undefined,
+    notes,
+    refusal
+  }
+}
+
+/**
+ * The schemas a clear drops. `reference_data` stays: it is loaded once from
+ * the country config, not written by the running stack. `provision` recreates
+ * both empty afterwards.
+ */
+export const CLEARED_SCHEMAS = ['app', 'analytics']
+
+export interface PlanClearInput {
+  /** As `EnvironmentLocator.lookup` found it. */
+  environment: EnvironmentDescriptor
+  /** The registry as read from disk. Never mutated. */
+  snapshot: RegistrySnapshot
+  /** See `PlanDestroyInput.discovery`. */
+  discovery: EnvironmentDiscovery
+}
+
+/**
+ * What clearing an environment empties: its search indices, its bucket's
+ * contents, its mosip-api token store and its `app` / `analytics` schemas.
+ * Unlike a destroy it keeps the database itself, the slot and Redis, so the
+ * environment can be re-provisioned and re-seeded in place.
+ */
+export interface ClearPlan extends IndexOwnership {
+  name: string
+  identifiers: EnvironmentIdentifiers
+  schemas: string[]
+  /** Absolute, as the environment's `SQLITE_DATABASE_PATH`. */
+  mosipDatabasePath: string
+}
+
+export function planClear(input: PlanClearInput): ClearPlan {
+  const { name, dbName, esPrefix, esReindexingStatusIndex, bucket } =
+    input.environment
+
+  return {
+    name,
+    identifiers: { dbName, esPrefix, esReindexingStatusIndex, bucket },
+    schemas: CLEARED_SCHEMAS,
+    mosipDatabasePath: toEnvironmentVariables(input.environment)
+      .SQLITE_DATABASE_PATH,
+    ...indexOwnership(name, input.snapshot, input.discovery)
+  }
+}
+
+/** Which other environments' indices are off limits, and whether that is known. */
+function indexOwnership(
+  name: string,
+  snapshot: RegistrySnapshot,
+  discovery: EnvironmentDiscovery
+): Pick<IndexOwnership, 'otherEsPrefixes' | 'indexSelectionSkipReason'> {
+  return {
+    otherEsPrefixes: otherEsPrefixes(name, snapshot, discovery.names),
+    indexSelectionSkipReason: indexSelectionSkipReason(name, discovery)
+  }
+}
+
+/**
+ * Every other registered environment's index prefix, derived the named way.
+ * An entry that is itself the default environment really owns the unprefixed
+ * `events` indices, but claiming `events_<its name>` on its behalf is
+ * harmless: it can only ever exclude indices from deletion, never add any.
+ */
+export function otherEsPrefixes(
+  name: string,
+  registry: RegistrySnapshot,
+  discoveredNames: string[] = []
+): string[] {
+  const others = new Set(
+    [...Object.keys(registry), ...discoveredNames].filter(
+      (other) => sanitizeEnvironmentNameOrSelf(other) !== name
+    )
+  )
+
+  return [...others].map(
+    (other) =>
+      environmentIdentifiers(other, /* isDefaultEnvironment */ false).esPrefix
+  )
+}
+
+function sanitizeEnvironmentNameOrSelf(name: string): string {
+  try {
+    return sanitizeEnvironmentName(name)
+  } catch {
+    return name
+  }
+}
+
+/**
+ * Refuse to select any index when the set of other environments is unknown.
+ *
+ * Deleting under an incomplete picture is the one irreversible mistake here —
+ * it is exactly how one environment's search data disappears with another's —
+ * while skipping leaves indices behind that a later run removes. So the
+ * asymmetry is deliberate: when in doubt, delete nothing.
+ */
+export function indexSelectionSkipReason(
+  name: string,
+  discovery: EnvironmentDiscovery
+): string | undefined {
+  if (discovery.failure === undefined) {
+    return undefined
+  }
+
+  return (
+    `Could not establish which other environments exist (${discovery.failure}), ` +
+    `so which Elasticsearch indices belong to "${name}" is not knowable and ` +
+    'no index was deleted. Everything else is named exactly and was handled ' +
+    'normally. Re-run once Postgres is reachable.'
+  )
+}
+
+interface RedisPlan {
+  db?: number
+  skipReason?: string
+}
+
+/**
+ * Flushing a Redis DB is irreversible and the DB index is just a number, so
+ * every case where the right number is not certain skips the flush instead of
+ * guessing.
+ */
+function planRedis({
+  name,
+  entry,
+  isDefaultEnvironment,
+  refused
+}: {
+  name: string
+  entry: RegistryEntry | undefined
+  isDefaultEnvironment: boolean
+  refused: boolean
+}): RedisPlan {
+  if (refused) {
+    return {
+      db: undefined,
+      skipReason: `Nothing is flushed: destroying "${name}" was refused.`
+    }
+  }
+
+  if (entry === undefined) {
+    return {
+      db: undefined,
+      skipReason:
+        `The Redis logical DB of an environment is its slot, which is only ` +
+        `recorded in the registry. "${name}" is not in the registry, so no ` +
+        'DB is flushed.'
+    }
+  }
+
+  /*
+   * Only the default environment holds slot 0 now, but a registry written
+   * before that rule can still record a named environment there, sharing DB 0
+   * with the default environment. Flushing it would wipe the ordinary
+   * checkout's queues, so it is skipped.
+   */
+  if (entry.slot === 0 && !isDefaultEnvironment) {
+    return {
+      db: undefined,
+      skipReason:
+        `Redis DB 0 belongs to the default environment, not to "${name}", ` +
+        'even though the registry records it at slot 0. No DB is flushed.'
+    }
+  }
+
+  return { db: entry.slot, skipReason: undefined }
+}
+
+function refusalMessage(
+  name: string,
+  identifiers: EnvironmentIdentifiers
+): string {
+  return (
+    `Refusing to destroy the default environment "${name}" without --force. ` +
+    'It owns the shared data every ordinary checkout uses: the ' +
+    `"${identifiers.dbName}" database, the "${identifiers.esPrefix}" ` +
+    `Elasticsearch indices, the "${identifiers.esReindexingStatusIndex}" ` +
+    `index and the "${identifiers.bucket}" bucket. Re-run with --force if ` +
+    'that is really what you want.'
+  )
+}
+
+/**
+ * What index selection needs to know about an environment: its own prefix and
+ * reindexing-status index, and every other environment's prefix. A
+ * `DestroyPlan` and a `ClearPlan` both satisfy it, which is why the rule below
+ * is written once and shared rather than reimplemented.
+ */
+export interface IndexOwnership {
+  identifiers: Pick<
+    EnvironmentIdentifiers,
+    'esPrefix' | 'esReindexingStatusIndex'
+  >
+  otherEsPrefixes: string[]
+  /** When set, the operation is refused and nothing is selected. */
+  refusal?: string
+  /** When set, ownership is not fully known and nothing may be selected. */
+  indexSelectionSkipReason?: string
+}
+
+/**
+ * Pick, out of the indices Elasticsearch actually reports, the ones belonging
+ * to the environment being destroyed.
+ *
+ * A plain `startsWith` is wrong and dangerous here, because one environment's
+ * prefix can be a prefix of another's: `events` (the default environment) is a
+ * prefix of `events_feature_a`, and `events_feature_a` is a prefix of
+ * `events_feature_a_2`. Naively destroying the default environment would take
+ * every named environment's data with it.
+ *
+ * So an index is awarded to the *longest* prefix that claims it, out of this
+ * environment's and every other registered environment's, and is deleted only
+ * when this environment wins. An index no prefix claims is left alone: this
+ * only ever deletes data it can positively attribute.
+ *
+ * The set of "every other environment" must therefore be complete, which the
+ * registry alone is not: see `EnvironmentDiscovery`. When completeness cannot
+ * be established, `indexSelectionSkipReason` is set and nothing is selected.
+ */
+export function selectIndicesToDelete(
+  indices: string[],
+  plan: IndexOwnership
+): string[] {
+  if (
+    plan.refusal !== undefined ||
+    plan.indexSelectionSkipReason !== undefined
+  ) {
+    return []
+  }
+
+  const own = plan.identifiers.esPrefix
+
+  return indices.filter((index) => {
+    // Carried separately because the default environment's reindexing-status
+    // index (`reindexing_status`) sits outside its own `events` prefix.
+    if (index === plan.identifiers.esReindexingStatusIndex) {
+      return true
+    }
+
+    if (!claims(own, index)) {
+      return false
+    }
+
+    return !plan.otherEsPrefixes.some(
+      (other) => other.length > own.length && claims(other, index)
+    )
+  })
+}
+
+/** Whether `prefix` names the index itself or is a `prefix_`-separated part. */
+function claims(prefix: string, index: string): boolean {
+  return index === prefix || index.startsWith(`${prefix}_`)
+}
