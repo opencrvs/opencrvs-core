@@ -18,6 +18,7 @@ import {
   HeadBucketCommand,
   ListObjectsV2Command,
   PutBucketPolicyCommand,
+  PutObjectCommand,
   S3Client,
   S3ServiceException
 } from '@aws-sdk/client-s3'
@@ -219,6 +220,22 @@ describe('putObject', () => {
       metadata: { 'created-by': 'user-1' },
       body: 'content'
     })
+  })
+
+  it('leaves the content type to the store when none is given', async () => {
+    await putObject(`${newPrefix()}a.png`, Buffer.from('content'))
+
+    const [put] = sentCommands(PutObjectCommand) as PutObjectCommand[]
+    expect(put.input.ContentType).toBeUndefined()
+    expect(put.input.Metadata).toEqual({})
+  })
+
+  it('fails when the upload fails', async () => {
+    send.mockRejectedValueOnce(storeError('InternalError', 500))
+
+    await expect(
+      putObject(`${newPrefix()}a.png`, Buffer.from('content'))
+    ).rejects.toThrow('InternalError')
   })
 
   it('streams a large body of unknown length as a multipart upload', async () => {
