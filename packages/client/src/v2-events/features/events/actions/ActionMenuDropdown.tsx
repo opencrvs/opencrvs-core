@@ -10,9 +10,13 @@
  */
 import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
-import { Button, Icon, IconProps } from '@opencrvs/components'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
+import {
+  Button,
+  DropdownMenu,
+  Icon,
+  IconProps,
+  Icons
+} from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/action'
 
 export interface ActionMenuItem {
@@ -41,7 +45,7 @@ export function ActionMenuDropdown({
             size="medium"
             type="primary"
           >
-            {intl.formatMessage(messages.action)} <CaretDown />
+            {intl.formatMessage(messages.action)} <Icons.CaretDown />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>

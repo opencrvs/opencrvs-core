@@ -20,8 +20,8 @@ import {
   CartesianGrid,
   Cell
 } from 'recharts'
-import { ITheme } from '../theme'
-import { IDataPoint } from '../chart-datapoint-types'
+import { ITheme } from '../tokens'
+import { IBarDataPoint } from '../Bar'
 import { CustomizedXAxisTick } from './components/AxisTick'
 
 const Container = styled.div`
@@ -33,13 +33,13 @@ const Container = styled.div`
 `
 
 interface IVerticalBarProps {
-  data: IDataPoint[]
+  data: IBarDataPoint[]
   xAxisLabel: string
   yAxisLabel: string
 }
 
-const sumUpAllValues = (data: IDataPoint[]) =>
-  data.reduce((sum: number, item: IDataPoint) => sum + item.value, 0)
+const sumUpAllValues = (data: IBarDataPoint[]) =>
+  data.reduce((sum: number, item: IBarDataPoint) => sum + item.value, 0)
 
 export const VerticalBar = withTheme(
   (props: IVerticalBarProps & { theme: ITheme }) => {

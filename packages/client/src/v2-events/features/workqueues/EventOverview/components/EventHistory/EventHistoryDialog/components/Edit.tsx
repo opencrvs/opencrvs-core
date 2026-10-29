@@ -16,7 +16,7 @@ import {
   EventDocument,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Text } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'

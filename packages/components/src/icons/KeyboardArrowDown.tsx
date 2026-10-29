@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 
 export const KeyboardArrowDown = ({
   pathStroke,

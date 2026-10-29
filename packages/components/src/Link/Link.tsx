@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
+import { fonts, IFont, colors, IColor } from '../tokens'
 import styled, { css } from 'styled-components'
 
 export interface LinkProps
@@ -70,7 +69,8 @@ const StyledLink = styled.button<{
 
   &:focus-visible {
     background: ${({ theme }) => theme.colors.yellow};
-    box-shadow: 0 -2px ${({ theme }) => theme.colors.yellow},
+    box-shadow:
+      0 -2px ${({ theme }) => theme.colors.yellow},
       0px 2px ${({ theme }) => theme.colors.yellow},
       0 4px ${({ theme }) => theme.colors.copy};
     color: ${({ theme }) => theme.colors.grey600};

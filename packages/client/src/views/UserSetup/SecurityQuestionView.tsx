@@ -28,7 +28,9 @@ import {
   Select,
   Frame,
   AppBar,
-  Button
+  Button,
+  Content,
+  ContentSize
 } from '@opencrvs/components'
 import { find, at } from 'lodash'
 import {
@@ -36,7 +38,6 @@ import {
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
 export const SECURITY_QUESTION_KEYS = [
   'BIRTH_TOWN',

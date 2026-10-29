@@ -14,24 +14,26 @@ import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { useQuery } from '@tanstack/react-query'
 
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { Table } from '@opencrvs/components/lib/Table'
+import {
+  Pagination,
+  Table,
+  ITheme,
+  ColumnContentAlignment,
+  Dialog,
+  Text,
+  useWindowSize,
+  Link
+} from '@opencrvs/components'
+import { ArrowDownBlue } from '@opencrvs/components/icons'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
 
 import subMonths from 'date-fns/subMonths'
 
-import { Dialog } from '@opencrvs/components/lib/Dialog'
 import format from '@client/utils/date-formatting'
-import { Text } from '@opencrvs/components/lib/Text'
-import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { useTRPC } from '@client/v2-events/trpc'
-import { Link } from '@opencrvs/components'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
 import {

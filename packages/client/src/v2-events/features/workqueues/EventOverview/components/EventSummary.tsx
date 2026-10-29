@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { List } from '@opencrvs/components/lib/List'
+import { List } from '@opencrvs/components'
 import {
   EventConfig,
   getDeclarationFields,
