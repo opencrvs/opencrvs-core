@@ -10,25 +10,20 @@
  */
 import { test, expect, Page } from '@playwright/test'
 import { format, subDays } from 'date-fns'
-import {
-  getToken,
-  login,
-  switchEventTab,
-  triggerDeclarationAction,
-  uploadImage
-} from '@e2e/support/helpers'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
 import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import { ensureAssignedToUser } from '@e2e/support/utils'
 import {
   createDeclaration,
   Declaration,
   getDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { getSignatureFile, uploadFile } from '@e2e/support/test-data/utils'
+import { editAndDeclareViaApi } from '@e2e/support/test-data/api-actions'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
@@ -63,9 +58,6 @@ async function openEventOverview(
   eventId: string,
   declaration: Declaration
 ) {
-  await expect(
-    page.getByRole('button', { name: 'Outbox', exact: true })
-  ).toBeVisible({ timeout: 30_000 })
   await page.goto(`${CLIENT_URL}/events/${eventId}`)
   await expect(
     page.getByRole('heading', {
@@ -80,32 +72,16 @@ test('Documents tab lists both the original and the replacement of an edited doc
 }) => {
   const { eventId, declaration } = await declareWithProofOfBirth()
 
-  await test.step('Navigate to the record and assign', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await openEventOverview(page, eventId, declaration)
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-  })
-
   await test.step('Edit the declaration and replace the proof of birth', async () => {
-    await selectAction(page, 'Edit')
-    await page
-      .getByTestId('accordion-Accordion_documents')
-      .getByRole('button', { name: 'Change all' })
-      .click()
-
-    // Re-uploading a single FILE field replaces its value, so this becomes a
-    // second upload of the same field (a different file than the declaration).
-    await uploadImage(
-      page,
-      page.locator('button[name="documents____proofOfBirth"]'),
-      './e2e/assets/image.png'
-    )
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await triggerDeclarationAction(page, 'Declare with edits')
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+    // A single FILE field holds one value, so uploading another file replaces it.
+    await editAndDeclareViaApi(token, eventId, {
+      'documents.proofOfBirth': await uploadFile(getSignatureFile(), token)
+    })
   })
 
   await test.step('Documents tab shows the original and the replacement', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
     await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
@@ -123,31 +99,16 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
 }) => {
   const { eventId, declaration } = await declareWithProofOfBirth()
 
-  await test.step('Navigate to the record and assign', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await openEventOverview(page, eventId, declaration)
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-  })
-
   await test.step('Edit a non-document field, leaving the proof of birth untouched', async () => {
-    await selectAction(page, 'Edit')
-
-    // Change the date of birth to another recent date — a non-document edit
-    // that keeps the record out of the late-registration approval flow.
-    await page.getByTestId('change-button-child.dob').click()
-    const [year, month, day] = format(
-      subDays(new Date(), 5),
-      'yyyy-MM-dd'
-    ).split('-')
-    await page.getByPlaceholder('dd').fill(day)
-    await page.getByPlaceholder('mm').fill(month)
-    await page.getByPlaceholder('yyyy').fill(year)
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await triggerDeclarationAction(page, 'Declare with edits')
+    // Another recent date of birth keeps the record out of the
+    // late-registration approval flow.
+    await editAndDeclareViaApi(await getToken(CREDENTIALS.REGISTRAR), eventId, {
+      'child.dob': format(subDays(new Date(), 5), 'yyyy-MM-dd')
+    })
   })
 
   await test.step('Documents tab shows the unchanged proof of birth only once', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
     await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
