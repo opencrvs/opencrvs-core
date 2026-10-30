@@ -29,7 +29,8 @@ import {
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
-  getPendingAction,
+  Action,
+  ActionDocument,
   ActionInputWithType,
   EventConfig,
   BaseActionInput
@@ -48,7 +49,8 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
   ensureEventIndexed,
-  processAction
+  processAction,
+  discardFailedActionRequest
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
@@ -195,6 +197,68 @@ type ActionProcedure = {
   }>
 }
 
+function isSameRequest(action: Action, input: ActionInputWithType) {
+  return (
+    action.transactionId === input.transactionId && action.type === input.type
+  )
+}
+
+/**
+ * @returns requested actions that the country config has not yet accepted or rejected
+ */
+function getUnresolvedRequestedActions(actions: Action[]) {
+  return actions.filter(
+    (action): action is ActionDocument =>
+      action.status === ActionStatus.Requested &&
+      !actions.some(
+        (resolution) =>
+          resolution.status !== ActionStatus.Requested &&
+          resolution.originalActionId === action.id
+      )
+  )
+}
+
+/**
+ * Only one action request on an event can wait for the country config at a time.
+ *
+ * Distinct submissions each carry their own transaction id, so without this check a second
+ * submission would store a second requested action next to an unresolved one.
+ */
+function throwConflictIfOtherRequestUnresolved(
+  event: EventDocument,
+  input: ActionInputWithType
+) {
+  const otherRequests = getUnresolvedRequestedActions(event.actions).filter(
+    (action) => !isSameRequest(action, input)
+  )
+
+  if (otherRequests.length === 0) {
+    return
+  }
+
+  logger.warn(
+    {
+      eventId: event.id,
+      actionType: input.type,
+      transactionId: input.transactionId,
+      unresolvedRequests: otherRequests.map(
+        ({ id, type, createdAt, transactionId }) => ({
+          id,
+          type,
+          createdAt,
+          transactionId
+        })
+      )
+    },
+    'Action request refused: another action request on the event is waiting for the country config'
+  )
+
+  throw new TRPCError({
+    code: 'CONFLICT',
+    message: `Action '${input.type}' cannot be requested while another action request on the event is waiting for the country config: ${otherRequests.map(({ id, type }) => `${type} (${id})`).join(', ')}`
+  })
+}
+
 export async function defaultRequestHandler(
   input: ActionInputWithType,
   user: TrpcUserContext,
@@ -205,6 +269,7 @@ export async function defaultRequestHandler(
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
+  throwConflictIfOtherRequestUnresolved(event, input)
 
   const eventWithRequestedAction = await addAction(input, {
     event,
@@ -214,95 +279,122 @@ export async function defaultRequestHandler(
     configuration
   })
 
-  const requestedAction = getPendingAction(eventWithRequestedAction.actions)
-  const eventActionToken = await getActionConfirmationToken(
-    { eventId: input.eventId, actionId: requestedAction.id },
-    token
-  )
-  const { responseStatus, responseBody } = await requestActionConfirmation(
-    input.type,
-    input.transactionId,
-    eventWithRequestedAction,
-    setBearerForToken(eventActionToken)
+  // The insert is idempotent per transaction id and action type, so a replayed
+  // request gets the requested action of its earlier attempt instead of a second one.
+  const requestedAction = eventWithRequestedAction.actions.find(
+    (action): action is ActionDocument =>
+      action.status === ActionStatus.Requested && isSameRequest(action, input)
   )
 
-  // If we get an unexpected failure response, we just return HTTP 500 without saving the
-  if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'Unexpected failure from country config action confirmation API'
-    })
+  if (!requestedAction) {
+    throw new Error(
+      `Requested action not found for transaction ${input.transactionId} (${input.type})`
+    )
   }
 
-  // For Async flow, we just return the event with the requested action and ensure it is indexed
-  if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(eventWithRequestedAction, configuration)
-    return eventWithRequestedAction
+  let isAwaitingConfirmation = false
+
+  try {
+    // A concurrent request may have stored its requested action between the check above and the insert.
+    throwConflictIfOtherRequestUnresolved(eventWithRequestedAction, input)
+
+    const eventActionToken = await getActionConfirmationToken(
+      { eventId: input.eventId, actionId: requestedAction.id },
+      token
+    )
+    const { responseStatus, responseBody } = await requestActionConfirmation(
+      input.type,
+      input.transactionId,
+      eventWithRequestedAction,
+      setBearerForToken(eventActionToken)
+    )
+
+    // If we get an unexpected failure response, we just return HTTP 500 without saving the outcome
+    if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Unexpected failure from country config action confirmation API'
+      })
+    }
+
+    // For Async flow, we just return the event with the requested action and ensure it is indexed
+    if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+      // The country config will accept or reject the requested action later, so it must be kept from here on.
+      isAwaitingConfirmation = true
+      await ensureEventIndexed(eventWithRequestedAction, configuration)
+      return eventWithRequestedAction
+    }
+
+    // For Sync flow, we parse the result and merge it with the action input
+    // before storing the accepted/rejected action
+    const status =
+      responseStatus === ActionConfirmationResponse.Success
+        ? ActionStatus.Accepted
+        : ActionStatus.Rejected
+
+    const schema =
+      responseStatus === ActionConfirmationResponse.Success
+        ? SyncActionConfirmationSchema.merge(
+            actionConfirmationResponseSchema ?? z.object({})
+          )
+        : z.object({})
+
+    const maybeParsed = schema.safeParse(responseBody ?? {})
+
+    if (!maybeParsed.success) {
+      logger.error(maybeParsed.error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
+
+    const parsedBody = maybeParsed.data
+
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        eventType: event.type,
+        actionType: input.type,
+        eventId: event.id
+      },
+      `Action immediately ${status === ActionStatus.Accepted ? 'accepted' : 'rejected'} (status: "${responseStatus}")`
+    )
+
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      declaration,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      annotation,
+      keepAssignment,
+      keepAssignmentIfAccepted,
+      keepAssignmentIfRejected,
+      ...strippedInput
+    } = input
+
+    const effectiveKeepAssignment =
+      status === ActionStatus.Accepted
+        ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
+        : (keepAssignmentIfRejected ?? keepAssignment ?? false)
+
+    return await processAction(
+      {
+        ...strippedInput,
+        keepAssignment: effectiveKeepAssignment,
+        declaration: {},
+        originalActionId: requestedAction.id,
+        ...parsedBody
+      },
+      { event, user, token, status, configuration }
+    )
+  } catch (error) {
+    if (!isAwaitingConfirmation) {
+      await discardFailedActionRequest(input.eventId, requestedAction)
+    }
+    throw error
   }
-
-  // For Sync flow, we parse the result and merge it with the action input
-  // before storing the accepted/rejected action
-  const status =
-    responseStatus === ActionConfirmationResponse.Success
-      ? ActionStatus.Accepted
-      : ActionStatus.Rejected
-
-  const schema =
-    responseStatus === ActionConfirmationResponse.Success
-      ? SyncActionConfirmationSchema.merge(
-          actionConfirmationResponseSchema ?? z.object({})
-        )
-      : z.object({})
-
-  const maybeParsed = schema.safeParse(responseBody ?? {})
-
-  if (!maybeParsed.success) {
-    logger.error(maybeParsed.error)
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message:
-        'Invalid payload received from country config action confirmation API'
-    })
-  }
-
-  const parsedBody = maybeParsed.data
-
-  logger.debug(
-    {
-      transactionId: input.transactionId,
-      eventType: event.type,
-      actionType: input.type,
-      eventId: event.id
-    },
-    `Action immediately ${status === ActionStatus.Accepted ? 'accepted' : 'rejected'} (status: "${responseStatus}")`
-  )
-
-  const {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    declaration,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    annotation,
-    keepAssignment,
-    keepAssignmentIfAccepted,
-    keepAssignmentIfRejected,
-    ...strippedInput
-  } = input
-
-  const effectiveKeepAssignment =
-    status === ActionStatus.Accepted
-      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
-      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
-
-  return processAction(
-    {
-      ...strippedInput,
-      keepAssignment: effectiveKeepAssignment,
-      declaration: {},
-      originalActionId: requestedAction.id,
-      ...parsedBody
-    },
-    { event, user, token, status, configuration }
-  )
 }
 
 /**
