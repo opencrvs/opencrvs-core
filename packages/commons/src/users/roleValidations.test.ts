@@ -12,6 +12,7 @@ import {
   footballClubMembershipEvent,
   tennisClubMembershipEvent
 } from '../fixtures'
+import { Role } from './Role'
 import { validateRole, validateRoles } from './roleValidations'
 import { encodeScope, Scope } from './scopes'
 
@@ -240,6 +241,20 @@ describe('record.notify for an event without a NOTIFY action', () => {
     ).toEqual([
       `record.notify is granted for events without a NOTIFY action: ${FOOTBALL_CLUB}`
     ])
+  })
+})
+
+describe('scopes that do not decode', () => {
+  it('are left out of every rule', () => {
+    expect(
+      validateRole(
+        {
+          id: 'COMMUNITY_LEADER',
+          scopes: ['record.notify-birth', 'record.declare-birth', 'nonsense']
+        } as Role,
+        eventConfigs
+      )
+    ).toEqual([])
   })
 })
 
