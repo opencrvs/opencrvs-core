@@ -13,9 +13,12 @@ import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
   ApplicationConfig,
+  EventDocument,
+  getEventConfigById,
+  getEventConfigForRecord,
   getOrThrow,
   logger,
-  resolveEventConfig,
+  resolveEventConfigInTimeZone,
   Role,
   TokenWithBearer,
   VersionedEventConfig,
@@ -110,12 +113,45 @@ export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
   getEventConfigurations
 )
 
+export async function getApplicationConfig() {
+  const res = await fetch(
+    new URL('/config/application', env.COUNTRY_CONFIG_URL),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch application config: ${res.status}`)
+  }
+
+  return ApplicationConfig.parse(await res.json())
+}
+
 /**
- * @returns the configuration of each event, at the version that applies (see `resolveEventConfig`).
+ * @returns application configuration, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+const getInMemoryApplicationConfig = createTtlConfigCache(
+  'application configuration',
+  async () => getApplicationConfig()
+)
+
+/** @returns the country's time zone (IANA), in which configuration versions take effect. */
+export async function getCountryTimeZone(token: TokenWithBearer) {
+  return (await getInMemoryApplicationConfig(token)).SYSTEM_IANA_TIMEZONE
+}
+
+/**
+ * @returns the configuration of each event, at the version in effect today in the
+ * country's time zone. For a record, use `getEventConfigurationForRecord` instead.
  */
 export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  const configurations = await getInMemoryVersionedEventConfigurations(token)
-  return configurations.map(resolveEventConfig)
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(token),
+    getCountryTimeZone(token)
+  ])
+  return configurations.map((config) =>
+    resolveEventConfigInTimeZone(config, timeZone)
+  )
 }
 
 async function findEventConfigurationById({
@@ -129,6 +165,7 @@ async function findEventConfigurationById({
   return configurations.find((config) => config.id === eventType)
 }
 
+/** @knipignore */
 export async function getEventConfigurationById({
   eventType,
   token
@@ -142,6 +179,36 @@ export async function getEventConfigurationById({
       token
     }),
     `No configuration found for event type: ${eventType}`
+  )
+}
+
+export async function getVersionedEventConfigurationById({
+  eventType,
+  token
+}: {
+  eventType: string
+  token: TokenWithBearer
+}) {
+  return getEventConfigById(
+    await getInMemoryVersionedEventConfigurations(token),
+    eventType
+  )
+}
+
+/**
+ * @returns the configuration of the version `event` is stamped with: every action on
+ * a record uses the version it was created under.
+ */
+export async function getEventConfigurationForRecord({
+  event,
+  token
+}: {
+  event: Pick<EventDocument, 'type' | 'configVersionId'>
+  token: TokenWithBearer
+}) {
+  return getEventConfigForRecord(
+    await getVersionedEventConfigurationById({ eventType: event.type, token }),
+    event
   )
 }
 
@@ -184,17 +251,4 @@ export async function getRoles() {
   }
 
   return array(Role).parse(await res.json())
-}
-
-export async function getApplicationConfig() {
-  const res = await fetch(
-    new URL('/config/application', env.COUNTRY_CONFIG_URL),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch application config: ${res.status}`)
-  }
-
-  return ApplicationConfig.parse(await res.json())
 }

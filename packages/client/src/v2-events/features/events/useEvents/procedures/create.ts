@@ -78,6 +78,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
+      configVersionId: newEvent.configVersionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       actions: [

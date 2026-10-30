@@ -57,7 +57,7 @@ import {
   throwConflictIfActionNotAllowed,
   processAction
 } from '@events/service/events/events'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -457,9 +457,9 @@ export function getDefaultActionProcedures(
         const { eventId } = input
         const event = ctx.event
 
-        const eventConfiguration = await getEventConfigurationById({
-          token,
-          eventType: event.type
+        const eventConfiguration = await getEventConfigurationForRecord({
+          event: event,
+          token
         })
 
         if (existingAction) {
@@ -514,9 +514,9 @@ export function getDefaultActionProcedures(
       .mutation(async ({ ctx, input }) => {
         const { token, user, event, confirmationAction } = ctx
         const { actionId } = input
-        const configuration = await getEventConfigurationById({
-          token,
-          eventType: event.type
+        const configuration = await getEventConfigurationForRecord({
+          event: event,
+          token
         })
 
         if (confirmationAction) {
@@ -586,9 +586,9 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        const configuration = await getEventConfigurationById({
-          token: ctx.token,
-          eventType: event.type
+        const configuration = await getEventConfigurationForRecord({
+          event: event,
+          token: ctx.token
         })
 
         return addAsyncRejectAction(

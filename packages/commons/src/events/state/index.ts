@@ -301,6 +301,7 @@ export function getCurrentEventState(
     updatedAtLocation: requestActionMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
+    ...(event.configVersionId && { configVersionId: event.configVersionId }),
     updatedByUserRole: requestActionMetadata.createdByRole,
     placeOfEvent: resolvePlaceOfEvent(
       { createdAtLocation: creationAction.createdAtLocation },

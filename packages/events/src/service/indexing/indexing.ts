@@ -24,7 +24,7 @@ import {
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields,
+  getDeclarationFieldsOfAllVersions,
   WorkqueueCountInput,
   getEventConfigById,
   SearchQuery,
@@ -34,9 +34,11 @@ import {
 import {
   dropSecuredDeclarationFields,
   EventIndexWithAdministrativeHierarchy,
+  getEventConfigForRecord,
   logger,
   RecordScopeV2,
-  TokenWithBearer
+  TokenWithBearer,
+  VersionedEventConfig
 } from '@opencrvs/commons'
 import {
   getEventAliasName,
@@ -289,6 +291,7 @@ export async function createIndex(
         properties: {
           id: { type: 'keyword' },
           type: { type: 'keyword' },
+          configVersionId: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
           createdByUserType: { type: 'keyword' },
@@ -385,7 +388,9 @@ export async function createIndex(
   }
 }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
+export async function ensureIndexExists(
+  eventConfiguration: VersionedEventConfig
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
 
@@ -403,7 +408,10 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
 
   if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    await createIndex(
+      indexName,
+      getDeclarationFieldsOfAllVersions(eventConfiguration)
+    )
   } else {
     logger.info(`Index ${indexName} already exists as a concrete index.`)
     await ensureAlias(indexName)
@@ -419,9 +427,23 @@ type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 export type BulkResponse = estypes.BulkResponse
 
+/**
+ * @returns the configuration of the version `record` was created under.
+ * @throws when its event type or version is not configured.
+ */
+export function getConfigForRecord(
+  configs: VersionedEventConfig[],
+  record: Pick<EventIndex, 'type' | 'configVersionId'>
+) {
+  return getEventConfigForRecord(
+    getEventConfigById(configs, record.type),
+    record
+  )
+}
+
 export async function indexEventsInBulk(
   batch: EventDocument[],
-  configs: EventConfig[],
+  configs: VersionedEventConfig[],
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
@@ -429,7 +451,8 @@ export async function indexEventsInBulk(
   const hiearchyResolutionStarted = new Date()
 
   const indexableEvents = batch.map((doc) => {
-    const config = getEventConfigById(configs, doc.type)
+    // Each record is indexed with the version it was created under.
+    const config = getConfigForRecord(configs, doc)
     return { doc, config, eventIndex: eventToEventIndex(doc, config) }
   })
 
@@ -507,12 +530,14 @@ export async function indexEvent(
 export async function findRecordsByQuery({
   search,
   eventConfigs,
+  versionedEventConfigs,
   user,
   acceptedScopes,
   token
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
+  versionedEventConfigs: VersionedEventConfig[]
   user: TrpcUserContext
   acceptedScopes: RecordScopeV2[]
   token: TokenWithBearer
@@ -559,7 +584,8 @@ export async function findRecordsByQuery({
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
     .map((eventIndex: EncodedEventIndex) => {
-      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      // Each hit is decoded and secured with the version its record was created under.
+      const eventConfig = getConfigForRecord(versionedEventConfigs, eventIndex)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
       const eventIndexWithoutLocationHierarchy =
         getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)

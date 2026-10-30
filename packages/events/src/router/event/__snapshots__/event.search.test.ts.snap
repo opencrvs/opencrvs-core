@@ -2,6 +2,7 @@
 
 exports[`Returns events based on the updatedAt column 1`] = `
 {
+  "configVersionId": "default",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -48,6 +49,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
 
 exports[`Returns events based on the updatedAt column 2`] = `
 {
+  "configVersionId": "default",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -96,6 +98,7 @@ exports[`Returns relevant events in right order 1`] = `
 [
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -142,6 +145,7 @@ exports[`Returns relevant events in right order 1`] = `
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -577,6 +581,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -621,6 +626,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -670,6 +676,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -714,6 +721,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -758,6 +766,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "default",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -806,6 +815,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 exports[`User with "location" scope can see events from other offices based on their scopes 1`] = `
 {
   "assignedTo": "[sanitized]",
+  "configVersionId": "default",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -852,6 +862,7 @@ exports[`User with "location" scope can see events from other offices based on t
 
 exports[`User with "location" scope only sees events created by system user to their primary office 1`] = `
 {
+  "configVersionId": "default",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -898,6 +909,7 @@ exports[`User with "location" scope only sees events created by system user to t
 exports[`User with "location" scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",
+  "configVersionId": "default",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",

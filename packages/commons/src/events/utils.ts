@@ -30,7 +30,12 @@ import {
   DisplayableAction,
   writeActions
 } from './ActionType'
-import { EventConfig } from './EventConfig'
+import {
+  byEffectiveFrom,
+  EventConfig,
+  toEventConfig,
+  VersionedEventConfig
+} from './EventConfig'
 import { FieldConfig, FieldReference } from './FieldConfig'
 import {
   Action,
@@ -97,6 +102,26 @@ export function getDeclarationFields(
   configuration: EventConfig
 ): FieldConfig[] {
   return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
+}
+
+/**
+ * @returns the declaration fields of every version of the event, one per id: what any
+ * record of the event can hold, whichever version it was created under. Where versions
+ * define an id differently, the newest version's field is kept.
+ * @TODO: reject a field id whose type differs between versions in `defineConfig` (#13973).
+ */
+export function getDeclarationFieldsOfAllVersions(
+  config: VersionedEventConfig
+): FieldConfig[] {
+  const oldestFirst = [...config.versions].sort(byEffectiveFrom)
+  const fieldsById = new Map(
+    oldestFirst.flatMap((version) =>
+      getDeclarationFields(toEventConfig(config, version)).map(
+        (field) => [field.id, field] as const
+      )
+    )
+  )
+  return [...fieldsById.values()]
 }
 
 /**
@@ -745,11 +770,14 @@ export function getMixedPath<T = unknown>(
   return isNil(result) ? defaultValue : result
 }
 
-export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
-  const eventConfig = eventConfigs.find(
-    (eventConfiguration) => eventConfiguration.id === id
+export function getEventConfigById<T extends { id: string }>(
+  eventConfigs: T[],
+  id: string
+): T {
+  return getOrThrow(
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id),
+    `No configuration found for event type: ${id}`
   )
-  return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }
 
 export function timePeriodToDateRange(value: SelectDateRangeValue) {

@@ -240,10 +240,13 @@ describe('defineConfig()', () => {
           id: eventId,
           label,
           advancedSearch,
-          versions: [{ ...v1, effectiveFrom: '2027-03-01' }, v2]
+          versions: [
+            { ...v1, effectiveFrom: '2020-01-01' },
+            { ...v2, effectiveFrom: '2020-01-01' }
+          ]
         })
       ).toThrow(
-        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2027-03-01' ('v1', 'v2'). Each version must have a different \`effectiveFrom\`.`
+        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2020-01-01' ('v1', 'v2'). Each version must have a different \`effectiveFrom\`.`
       )
     })
 
@@ -258,6 +261,50 @@ describe('defineConfig()', () => {
       ).toThrow(
         `Event '${eventId}' has more than one version without \`effectiveFrom\` ('v1', 'v2'). At most one version may omit it.`
       )
+    })
+
+    it('should reject an event with no version in effect today', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2999-01-01' }]
+        })
+      ).toThrow(`Event '${eventId}' has no version in effect today`)
+    })
+
+    it('should accept an event whose earliest version took effect in the past', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2020-01-01' }, v2]
+        })
+      ).not.toThrow()
+    })
+
+    it('should reject an event with no version in effect today', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2999-01-01' }]
+        })
+      ).toThrow(`Event '${eventId}' has no version in effect today`)
+    })
+
+    it('should accept an event whose earliest version took effect in the past', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2020-01-01' }, v2]
+        })
+      ).not.toThrow()
     })
 
     it('should report an invalid version under its index', () => {

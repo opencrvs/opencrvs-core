@@ -10,7 +10,7 @@
  */
 import fetch from 'node-fetch'
 import { getUUID, logger, TokenWithBearer, UUID } from '@opencrvs/commons'
-import { EventConfig, EventDocument } from '@opencrvs/commons/events'
+import { EventDocument, VersionedEventConfig } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 
 import {
@@ -19,8 +19,8 @@ import {
 } from '@events/storage/postgres/events/events'
 import { getClient } from '@events/storage/postgres/events'
 import { getTemporaryIndexName } from '@events/storage/elasticsearch'
-import { getInMemoryEventConfigurations } from '../config/config'
-import { indexEventsInBulk } from '../indexing/indexing'
+import { getInMemoryVersionedEventConfigurations } from '../config/config'
+import { getConfigForRecord, indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupOrphanedIndices,
   cleanupTemporaryIndex,
@@ -117,7 +117,7 @@ async function fetchReadableEvents(
 async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
-  configurations: EventConfig[],
+  configurations: VersionedEventConfig[],
   onBatchProcessed?: (count: number) => Promise<void>,
   onEventsSkipped?: (skipped: SkippedEvent[]) => void
 ) {
@@ -132,10 +132,18 @@ async function reindexSearch(
   let failure: Error | undefined
 
   /*
-   * Records that still cannot be read after retrying are skipped, so one bad
-   * record does not fail the whole reindex. The skip is reported in the run's
-   * progress, so the records can be fixed and reindexed.
+   * Records that still cannot be read after retrying, or whose configuration
+   * cannot be resolved, are skipped, so one bad record does not fail the whole
+   * reindex. The skip is reported in the run's progress, so the records can be
+   * fixed and reindexed.
    */
+  function reportSkipped(message: string, skipped: SkippedEvent[]) {
+    for (const { id, error } of skipped) {
+      logger.error({ message, eventId: id, error })
+    }
+    onEventsSkipped?.(skipped)
+  }
+
   async function fetchEvents(ids: UUID[]): Promise<EventDocument[]> {
     try {
       return await withRetry(async () => getEventsByIdsInTrx(getClient(), ids))
@@ -147,19 +155,36 @@ async function reindexSearch(
         throw err
       }
 
-      for (const { id, error } of skipped) {
-        logger.error({
-          message: 'Skipping event that could not be read',
-          eventId: id,
-          error
-        })
-      }
-      onEventsSkipped?.(skipped)
+      reportSkipped('Skipping event that could not be read', skipped)
       return events
     }
   }
 
-  async function writeBatch(batch: EventDocument[]) {
+  // For example, a record stamped with a version that is no longer configured.
+  function withoutUnindexableEvents(batch: EventDocument[]) {
+    const skipped: SkippedEvent[] = []
+    const indexable = batch.filter((event) => {
+      try {
+        getConfigForRecord(configurations, event)
+        return true
+      } catch (err) {
+        const error = err instanceof Error ? err.message : String(err)
+        skipped.push({ id: event.id, error })
+        return false
+      }
+    })
+    if (skipped.length > 0) {
+      reportSkipped('Skipping event that could not be indexed', skipped)
+    }
+    return indexable
+  }
+
+  async function writeBatch(fetched: EventDocument[]) {
+    const batch = withoutUnindexableEvents(fetched)
+    if (batch.length === 0) {
+      return
+    }
+
     const start = new Date()
     const batchId = batch[0]?.id ?? 'unknown'
     logger.info(`Batch ${batchId}: ${batch.length} events to index`)
@@ -222,18 +247,19 @@ export async function runReindex(token: TokenWithBearer) {
 
   await createReindexingStatusEntry(runId, startTimestamp)
 
-  const configurations = await getInMemoryEventConfigurations(token)
+  const versionedConfigurations =
+    await getInMemoryVersionedEventConfigurations(token)
 
   // Best-effort: leftover orphans are retried on the next run.
-  await cleanupOrphanedIndices(configurations).catch((err) =>
-    logger.error('Failed to clean up orphaned indices', err)
-  )
+  await cleanupOrphanedIndices(
+    versionedConfigurations.map(({ id }) => id)
+  ).catch((err) => logger.error('Failed to clean up orphaned indices', err))
 
   /*
    * Create temporary indices for all event types
    */
   const temporaryIndices = await Promise.all(
-    configurations.map(async (configuration) => {
+    versionedConfigurations.map(async (configuration) => {
       const indexNameWithTimestamp = await prepareTemporaryIndex(
         configuration,
         timestamp
@@ -266,7 +292,7 @@ export async function runReindex(token: TokenWithBearer) {
     await reindexSearch(
       timestamp,
       token,
-      configurations,
+      versionedConfigurations,
       async (batchSize) => {
         const currentSecond = Math.floor(Date.now() / 1000) - startSecond
         const processedThisSecond = processedCounts[currentSecond] || 0
@@ -311,12 +337,12 @@ export async function runReindex(token: TokenWithBearer) {
   await updateReindexingProgress(runId, getProgress())
   if (skippedEvents.length > 0) {
     logger.error(
-      `Reindex skipped ${skippedEvents.length} records that could not be read`
+      `Reindex skipped ${skippedEvents.length} records that could not be read or indexed`
     )
   }
 
   await Promise.all(
-    configurations.map(async (config) =>
+    versionedConfigurations.map(async (config) =>
       finaliseReindexIndex(
         config.id,
         getTemporaryIndexName(config.id, timestamp)
