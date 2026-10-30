@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { defineRoles, defineScopes, Roles } from '@opencrvs/commons'
+import { defineScopes } from '@opencrvs/toolkit/scopes'
+import { defineRoles, Roles } from '@opencrvs/toolkit/roles'
 import { eventConfigs } from '@countryconfig/events'
 
 const roles: Roles = [
