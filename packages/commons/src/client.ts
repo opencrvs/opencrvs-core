@@ -14,7 +14,7 @@ import 'zod/compile' // enables compile-by-default. Perf boost.
 export * from './search'
 export * from './events'
 export * from './scopes'
-export * from './roles'
+export * from './Role'
 export * from './documents'
 export * from './uuid'
 export * from './utils'
