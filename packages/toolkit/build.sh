@@ -63,10 +63,10 @@ npx esbuild src/migrations/index.ts --bundle --platform=node --format=cjs --outd
 chmod +x ./dist/migrations/index.js
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
+  sed -i '' 's|@opencrvs/events/router|../commons/api/router|g' dist/api/index.d.ts
   find dist -type f -exec sed -i '' 's|@opencrvs/commons|../commons|g' {} +
 else
-  sed -i 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
+  sed -i 's|@opencrvs/events/router|../commons/api/router|g' dist/api/index.d.ts
   find dist -type f -exec sed -i 's|@opencrvs/commons|../commons|g' {} +
 fi
 
