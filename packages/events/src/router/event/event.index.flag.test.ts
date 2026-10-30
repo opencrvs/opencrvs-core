@@ -19,7 +19,8 @@ import {
   getCurrentEventState,
   createPrng,
   generateActionDuplicateDeclarationInput,
-  encodeScope
+  encodeScope,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -58,10 +59,7 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
-        return HttpResponse.json(
-          {},
-          { status: 202 }
-        )
+        return HttpResponse.json({}, { status: 202 })
       }
     )
   )
@@ -166,10 +164,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
-        return HttpResponse.json(
-          {},
-          { status: 400 }
-        )
+        return HttpResponse.json({}, { status: 400 })
       }
     )
   )
@@ -398,7 +393,9 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
-          tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+          toVersionedEventConfig(
+            tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+          )
         ])
       })
     )

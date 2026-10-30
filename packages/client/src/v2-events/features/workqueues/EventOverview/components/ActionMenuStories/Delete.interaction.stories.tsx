@@ -19,7 +19,8 @@ import {
   generateTrackingId,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -99,7 +100,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
       /*
        * Ensure record is "downloaded offline" in the user's browser
        */
-      addLocalEventConfig(tennisClubMembershipEvent)
+      addLocalEventConfig(versionedTennisClubMembershipEvent)
       setEventData(createdEventDocument.id, createdEventDocument)
       updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
     },

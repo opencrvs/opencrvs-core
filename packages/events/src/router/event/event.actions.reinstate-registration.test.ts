@@ -17,7 +17,8 @@ import {
   encodeScope,
   never,
   EventStatus,
-  getCurrentEventState
+  getCurrentEventState,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -282,7 +283,7 @@ describe.each([ConditionalType.SHOW, ConditionalType.ENABLE])(
       mswServer.use(
         http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
           HttpResponse.json([
-            {
+            toVersionedEventConfig({
               ...tennisClubMembershipEventWithCustomAction,
               actions: tennisClubMembershipEventWithCustomAction.actions.concat(
                 [
@@ -300,7 +301,7 @@ describe.each([ConditionalType.SHOW, ConditionalType.ENABLE])(
                   }
                 ]
               )
-            }
+            })
           ])
         )
       )

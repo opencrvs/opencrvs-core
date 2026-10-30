@@ -19,7 +19,8 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -113,7 +114,7 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
     </React.Suspense>
   ),
   beforeEach: () => {
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
   },
   play: async () => {

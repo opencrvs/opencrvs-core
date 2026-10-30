@@ -19,7 +19,8 @@ import {
   EventConfig,
   field,
   FieldConfig,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -113,7 +114,9 @@ export const DoesNotPrefillDefaultValues: Story = {
     msw: {
       handlers: {
         events: [
-          tRPCMsw.event.config.get.query(() => [eventWithDefaultSkipped])
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(eventWithDefaultSkipped)
+          ])
         ]
       }
     }
@@ -151,7 +154,11 @@ export const PrefillsDefaultValuesWhenNotOptedOut: Story = {
     offline: { configs: [eventWithDefaultKept] },
     msw: {
       handlers: {
-        events: [tRPCMsw.event.config.get.query(() => [eventWithDefaultKept])]
+        events: [
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(eventWithDefaultKept)
+          ])
+        ]
       }
     }
   },
@@ -187,7 +194,9 @@ export const PrefillsDefaultValuesWhenEnabled: Story = {
     msw: {
       handlers: {
         events: [
-          tRPCMsw.event.config.get.query(() => [eventWithDefaultEnabled])
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(eventWithDefaultEnabled)
+          ])
         ]
       }
     }
@@ -205,7 +214,11 @@ export const PrefillsSearchDefaultValue: Story = {
     offline: { configs: [eventWithSearchDefault] },
     msw: {
       handlers: {
-        events: [tRPCMsw.event.config.get.query(() => [eventWithSearchDefault])]
+        events: [
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(eventWithSearchDefault)
+          ])
+        ]
       }
     }
   },

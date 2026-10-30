@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
 import {
   toNotificationForm,
@@ -28,7 +29,7 @@ import {
 import { Clause, EventConfig } from '../events'
 import { and, field as dedupField } from '../events/deduplication'
 
-export const tennisClubMembershipEvent = defineConfig({
+export const versionedTennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
   declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
@@ -406,6 +407,11 @@ export const tennisClubMembershipEvent = defineConfig({
     }
   ]
 })
+
+/** The configuration of the first version of `versionedTennisClubMembershipEvent`. */
+export const tennisClubMembershipEvent = resolveEventConfig(
+  versionedTennisClubMembershipEvent
+)
 
 /** @knipignore */
 export function tennisClubMembershipEventWithDedupCheck(

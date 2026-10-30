@@ -30,7 +30,8 @@ import {
   getCurrentEventState,
   generateActionDocument,
   getUUID,
-  user
+  user,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -164,7 +165,7 @@ const meta: Meta<typeof ReviewIndex> = {
     // Clear any toast left over from a previous story so this test only asserts
     // on toasts raised by its own play function.
     toast.remove()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
   }
 }
@@ -186,7 +187,7 @@ const duplicateHandlers = {
   ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent]
+      return [versionedTennisClubMembershipEvent]
     }),
     tRPCMsw.event.get.query(() => {
       return eventDocument
@@ -346,7 +347,9 @@ export const SendsEditedDeclarationWithDeclareOnEditAndRegister: Story = {
       handlers: {
         ...duplicateHandlers,
         events: [
-          tRPCMsw.event.config.get.query(() => [tennisClubMembershipEvent]),
+          tRPCMsw.event.config.get.query(() => [
+            versionedTennisClubMembershipEvent
+          ]),
           tRPCMsw.event.get.query(() => eventDocument),
           tRPCMsw.event.actions.edit.request.mutation(() => editAccepted()),
           tRPCMsw.event.actions.declare.request.mutation((payload) => {

@@ -25,7 +25,10 @@ import {
   TokenUserType,
   encodeScope
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestToken,
@@ -84,7 +87,7 @@ const failingPostHandler = http.post(
 // Mock getEventConfigurations to return a single event config
 const singleEventConfigHandler = http.get(
   `${env.COUNTRY_CONFIG_URL}/config/events`,
-  () => HttpResponse.json([tennisClubMembershipEvent])
+  () => HttpResponse.json([versionedTennisClubMembershipEvent])
 )
 
 const reindexToken = createTestToken({
@@ -632,7 +635,10 @@ describe('cleanupOrphanedIndices', () => {
 
     // `<prefix>_marriage_2025` ends in `_<digits>`, so a loose suffix match
     // would mistake it for a temp index.
-    const configuration = { ...tennisClubMembershipEvent, id: 'marriage_2025' }
+    const configuration = {
+      ...tennisClubMembershipEvent,
+      id: 'marriage_2025'
+    }
     const liveIndexName = getEventIndexNameMock(configuration.id)
     await esClient.indices.create({ index: liveIndexName })
 
