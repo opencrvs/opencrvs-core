@@ -170,39 +170,30 @@ interface EventTriggerConfig {
   actions: string[]
 }
 
-function toEventTriggerConfig(value: unknown): EventTriggerConfig | null {
-  if (typeof value !== 'object' || value === null) {
-    return null
-  }
-  const record = value as Record<string, unknown>
-  if (typeof record.id !== 'string') {
-    return null
-  }
-  // Triggers are checked for the actions of every version of the event.
-  const versions: unknown[] = Array.isArray(record.versions)
-    ? record.versions
-    : [record]
-  const actions = Array.from(
-    new Set(
-      versions
-        .flatMap((version) =>
-          typeof version === 'object' &&
-          version !== null &&
-          Array.isArray((version as Record<string, unknown>).actions)
-            ? ((version as Record<string, unknown>).actions as unknown[])
-            : []
-        )
-        .map((action) => {
-          if (typeof action !== 'object' || action === null) {
-            return null
-          }
-          const type = (action as Record<string, unknown>).type
-          return typeof type === 'string' ? type : null
-        })
-        .filter((type): type is string => type !== null)
-    )
+/** One version of an event. Only its action types are needed here. */
+const ServedEventConfigVersion = z.object({
+  actions: z.array(z.object({ type: z.string() }))
+})
+
+/**
+ * One event from `GET /config/events`. It comes in two shapes:
+ * - `{ id, versions: [{ actions }] }` from toolkit 2.2 and later
+ * - `{ id, actions }` from older toolkits, which have no versions
+ */
+const ServedEventConfig = z.union([
+  z.object({ id: z.string(), versions: z.array(ServedEventConfigVersion) }),
+  ServedEventConfigVersion.extend({ id: z.string() })
+])
+
+function toEventTriggerConfig(
+  config: z.infer<typeof ServedEventConfig>
+): EventTriggerConfig {
+  // A trigger may use an action from any version, so collect them all
+  const versions = 'versions' in config ? config.versions : [config]
+  const actions = versions.flatMap((version) =>
+    version.actions.map(({ type }) => type)
   )
-  return { id: record.id, actions }
+  return { id: config.id, actions: Array.from(new Set(actions)) }
 }
 
 /**
@@ -210,7 +201,7 @@ function toEventTriggerConfig(value: unknown): EventTriggerConfig | null {
  * against the real event ids and action types. Returns `null` if the endpoint
  * is unreachable or does not return the expected shape.
  */
-async function fetchEventConfigs(
+export async function fetchEventConfigs(
   baseUrl: string
 ): Promise<EventTriggerConfig[] | null> {
   try {
@@ -220,13 +211,9 @@ async function fetchEventConfigs(
     if (!response.ok) {
       return null
     }
-    const body: unknown = await response.json()
-    if (!Array.isArray(body)) {
-      return null
-    }
-    return body
-      .map(toEventTriggerConfig)
-      .filter((config): config is EventTriggerConfig => config !== null)
+    const parsed = z.array(ServedEventConfig).safeParse(await response.json())
+
+    return parsed.success ? parsed.data.map(toEventTriggerConfig) : null
   } catch {
     return null
   }
