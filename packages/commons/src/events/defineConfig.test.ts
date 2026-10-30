@@ -243,7 +243,7 @@ describe('defineConfig()', () => {
           versions: [{ ...v1, effectiveFrom: '2027-03-01' }, v2]
         })
       ).toThrow(
-        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2027-03-01'. Each version must have a different \`effectiveFrom\`.`
+        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2027-03-01' ('v1', 'v2'). Each version must have a different \`effectiveFrom\`.`
       )
     })
 
@@ -256,7 +256,7 @@ describe('defineConfig()', () => {
           versions: [v1, { ...v2, effectiveFrom: undefined }]
         })
       ).toThrow(
-        `Event '${eventId}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`
+        `Event '${eventId}' has more than one version without \`effectiveFrom\` ('v1', 'v2'). At most one version may omit it.`
       )
     })
 
@@ -282,7 +282,7 @@ describe('defineConfig()', () => {
       )
     })
 
-    it('should use the first version until versions are resolved from the record', () => {
+    it('should resolve to the first version, until #13602 resolves the version from the record', () => {
       const config = defineConfig({
         id: eventId,
         label,
@@ -294,10 +294,20 @@ describe('defineConfig()', () => {
       })
 
       expect(resolveEventConfig(config).title).toEqual(v1.title)
+    })
+
+    it('should return the same object each time for the same version, so caches keyed on it are hit', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1]
+      })
+
       expect(resolveEventConfig(config)).toBe(resolveEventConfig(config))
     })
 
-    it('should resolve a refetched event to its new label when its version is the same object', () => {
+    it('should not return a stale label from the cache after the event is refetched', () => {
       const config = defineConfig({
         id: eventId,
         label,
