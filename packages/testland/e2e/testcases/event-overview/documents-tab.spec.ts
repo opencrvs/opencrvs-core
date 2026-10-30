@@ -8,28 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 import { format, subDays } from 'date-fns'
-import {
-  getToken,
-  login,
-  switchEventTab,
-  triggerDeclarationAction,
-  uploadImage
-} from '@e2e/support/helpers'
-import { CREDENTIALS } from '@e2e/support/constants'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
+import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
-import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { ensureAssignedToUser } from '@e2e/support/utils'
 import {
   createDeclaration,
   Declaration,
   getDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { getSignatureFile, uploadFile } from '@e2e/support/test-data/utils'
+import { editAndDeclareViaApi } from '@e2e/support/test-data/api-actions'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
@@ -39,7 +33,10 @@ const PROOF_OF_BIRTH_LABEL = 'Proof of birth'
  * Declares a birth via the API with a proof-of-birth document attached, so the
  * declaration action already carries one document on the Documents tab.
  */
-async function declareWithProofOfBirth(): Promise<Declaration> {
+async function declareWithProofOfBirth(): Promise<{
+  eventId: string
+  declaration: Declaration
+}> {
   const token = await getToken(CREDENTIALS.REGISTRAR)
   const proofOfBirth = await uploadFile(getSignatureFile(), token)
   const declarationRequest = await getDeclaration({
@@ -53,43 +50,39 @@ async function declareWithProofOfBirth(): Promise<Declaration> {
     declarationRequest,
     ActionType.DECLARE
   )
-  return res.declaration
+  return { eventId: res.eventId, declaration: res.declaration }
+}
+
+async function openEventOverview(
+  page: Page,
+  eventId: string,
+  declaration: Declaration
+) {
+  await page.goto(`${CLIENT_URL}/events/${eventId}`)
+  await expect(
+    page.getByRole('heading', {
+      name: formatV2ChildName(declaration),
+      level: 1
+    })
+  ).toBeVisible({ timeout: 30_000 })
 }
 
 test('Documents tab lists both the original and the replacement of an edited document', async ({
   page
 }) => {
-  const declaration = await declareWithProofOfBirth()
-
-  await test.step('Navigate to the record and assign', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-  })
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   await test.step('Edit the declaration and replace the proof of birth', async () => {
-    await selectAction(page, 'Edit')
-    await page
-      .getByTestId('accordion-Accordion_documents')
-      .getByRole('button', { name: 'Change all' })
-      .click()
-
-    // Re-uploading a single FILE field replaces its value, so this becomes a
-    // second upload of the same field (a different file than the declaration).
-    await uploadImage(
-      page,
-      page.locator('button[name="documents____proofOfBirth"]'),
-      './e2e/assets/image.png'
-    )
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await triggerDeclarationAction(page, 'Declare with edits')
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+    // A single FILE field holds one value, so uploading another file replaces it.
+    await editAndDeclareViaApi(token, eventId, {
+      'documents.proofOfBirth': await uploadFile(getSignatureFile(), token)
+    })
   })
 
   await test.step('Documents tab shows the original and the replacement', async () => {
-    await page.getByText('Recent').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await login(page, CREDENTIALS.REGISTRAR)
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
     await switchEventTab(page, 'Documents')
@@ -104,36 +97,19 @@ test('Documents tab lists both the original and the replacement of an edited doc
 test('Documents tab does not duplicate a document that an edit left unchanged', async ({
   page
 }) => {
-  const declaration = await declareWithProofOfBirth()
-
-  await test.step('Navigate to the record and assign', async () => {
-    await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
-    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-  })
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   await test.step('Edit a non-document field, leaving the proof of birth untouched', async () => {
-    await selectAction(page, 'Edit')
-
-    // Change the date of birth to another recent date — a non-document edit
-    // that keeps the record out of the late-registration approval flow.
-    await page.getByTestId('change-button-child.dob').click()
-    const [year, month, day] = format(
-      subDays(new Date(), 5),
-      'yyyy-MM-dd'
-    ).split('-')
-    await page.getByPlaceholder('dd').fill(day)
-    await page.getByPlaceholder('mm').fill(month)
-    await page.getByPlaceholder('yyyy').fill(year)
-
-    await page.getByRole('button', { name: 'Go to review' }).click()
-    await triggerDeclarationAction(page, 'Declare with edits')
+    // Another recent date of birth keeps the record out of the
+    // late-registration approval flow.
+    await editAndDeclareViaApi(await getToken(CREDENTIALS.REGISTRAR), eventId, {
+      'child.dob': format(subDays(new Date(), 5), 'yyyy-MM-dd')
+    })
   })
 
   await test.step('Documents tab shows the unchanged proof of birth only once', async () => {
-    await page.getByText('Recent').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await login(page, CREDENTIALS.REGISTRAR)
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
     await switchEventTab(page, 'Documents')
@@ -145,15 +121,14 @@ test('Documents tab does not duplicate a document that an edit left unchanged', 
 })
 
 test('Documents tab shows an offline state while offline', async ({ page }) => {
-  const declaration = await declareWithProofOfBirth()
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   const documentsOfflineMessage =
     "This record's documents have not been downloaded yet, so they cannot be opened offline. Please reconnect to the internet to view them."
 
   await test.step('Navigate to the record and assign', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
   })
 
@@ -180,12 +155,11 @@ test('Documents tab shows an offline state while offline', async ({ page }) => {
 test('Documents tab shows a loading state while the documents are fetched', async ({
   page
 }) => {
-  const declaration = await declareWithProofOfBirth()
+  const { eventId, declaration } = await declareWithProofOfBirth()
 
   await test.step('Login and open the record (without downloading it)', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
-    await page.getByText('Pending registration').click()
-    await openRecordByTitle(page, formatV2ChildName(declaration))
+    await openEventOverview(page, eventId, declaration)
   })
 
   await test.step('Opening the Documents tab shows a loading state before the list', async () => {
