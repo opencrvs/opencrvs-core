@@ -22,7 +22,10 @@ import {
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import {
+  canSaveDraft,
+  useDrafts
+} from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as formHeaderMessages } from '@client/v2-events/layouts/form/FormHeader'
@@ -145,8 +148,10 @@ function useReviewPageActions(
     }
   }
 
-  const commonActions: ActionMenuItem[] = [
-    {
+  const commonActions: ActionMenuItem[] = []
+
+  if (canSaveDraft(event)) {
+    commonActions.push({
       icon: 'FloppyDisk',
       label: formHeaderMessages.saveExitButton,
       onClick: async () =>
@@ -154,8 +159,8 @@ function useReviewPageActions(
           drafts.submitLocalDraft()
           return closeActionView(backTo)
         })
-    }
-  ]
+    })
+  }
 
   if (availableActions.includes(ActionType.DELETE)) {
     commonActions.push({

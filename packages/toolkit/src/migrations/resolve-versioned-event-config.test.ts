@@ -10,33 +10,75 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { Project, ts } from 'ts-morph'
-import { rewriteVersionedEventConfigUses } from './resolve-versioned-event-config'
+import {
+  rewriteVersionedEventConfigUses,
+  withToolkitEventsAt
+} from './resolve-versioned-event-config'
 
 /** A stand-in for the published toolkit, resolved like any `node_modules` package. */
 const TOOLKIT_EVENTS_TYPES = `
 export type EventConfig = { id: string; label: string; analytics?: boolean; actions: Array<{ type: string }> }
 type EventLevelField = 'id' | 'label'
-export type EventConfigVersion = Omit<EventConfig, EventLevelField> & { id: string; effectiveFrom?: string }
+export type EventConfigVersion = Omit<EventConfig, EventLevelField> & { id: string; effectiveFrom: string }
 export type VersionedEventConfig = Pick<EventConfig, EventLevelField> & { versions: EventConfigVersion[] }
 export declare function resolveEventConfig(config: VersionedEventConfig): EventConfig
+export declare function defineConfig(config: unknown): VersionedEventConfig
 export declare function getCurrentEventState(event: unknown, config: EventConfig): unknown
 export declare function getAllFields(configs: EventConfig[]): unknown[]
 `
 
+/** The toolkit 2.1 a country config has installed while it upgrades: no `VersionedEventConfig`. */
+const TOOLKIT_2_1_EVENTS_TYPES = `
+export type EventConfig = { id: string; label: string; analytics?: boolean; actions: Array<{ type: string }> }
+export declare function defineConfig(config: unknown): EventConfig
+`
+
+const COMPILER_OPTIONS = {
+  strict: true,
+  // `find` and friends come with ES2015
+  target: ts.ScriptTarget.ES2022,
+  moduleResolution: ts.ModuleResolutionKind.Node10
+}
+
 function rewrite(source: string) {
   const project = new Project({
     useInMemoryFileSystem: true,
-    compilerOptions: {
-      strict: true,
-      // `find` and friends come with ES2015
-      target: ts.ScriptTarget.ES2022,
-      moduleResolution: ts.ModuleResolutionKind.Node10
-    }
+    compilerOptions: COMPILER_OPTIONS
   })
   project.createSourceFile(
     '/node_modules/@opencrvs/toolkit/events/index.d.ts',
     TOOLKIT_EVENTS_TYPES
   )
+  return rewriteFile(project, source)
+}
+
+/**
+ * Rewrites `source` in a country config that has toolkit 2.1 installed, as when the
+ * upgrade runs, with the running toolkit at `/toolkit/dist`.
+ */
+function rewriteWithToolkit21Installed(
+  source: string,
+  { readRunningToolkit }: { readRunningToolkit: boolean }
+) {
+  const runningToolkitEvents = '/toolkit/dist/events'
+  const project = new Project({
+    useInMemoryFileSystem: true,
+    compilerOptions: readRunningToolkit
+      ? withToolkitEventsAt(COMPILER_OPTIONS, runningToolkitEvents)
+      : COMPILER_OPTIONS
+  })
+  project.createSourceFile(
+    '/node_modules/@opencrvs/toolkit/events/index.d.ts',
+    TOOLKIT_2_1_EVENTS_TYPES
+  )
+  project.createSourceFile(
+    `${runningToolkitEvents}/index.d.ts`,
+    TOOLKIT_EVENTS_TYPES
+  )
+  return rewriteFile(project, source)
+}
+
+function rewriteFile(project: Project, source: string) {
   const sourceFile = project.createSourceFile('/src/analytics.ts', source)
 
   const changes = rewriteVersionedEventConfigUses(sourceFile)
@@ -282,5 +324,33 @@ export const actions = (config: VersionedEventConfig) => config.actions
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining('already declares its own `resolveEventConfig`')
     )
+  })
+
+  describe('with toolkit 2.1 installed, as when the upgrade runs', () => {
+    const source = `import { defineConfig } from '@opencrvs/toolkit/events'
+
+const birth = defineConfig({})
+
+export const actions = birth.actions
+`
+
+    it('finds nothing to rewrite through the installed toolkit', () => {
+      const { changes } = rewriteWithToolkit21Installed(source, {
+        readRunningToolkit: false
+      })
+
+      expect(changes).toBe(0)
+    })
+
+    it('rewrites through the types of the toolkit running it', () => {
+      const { changes, text } = rewriteWithToolkit21Installed(source, {
+        readRunningToolkit: true
+      })
+
+      expect(changes).toBe(1)
+      expect(text).toContain(
+        'export const actions = resolveEventConfig(birth).actions'
+      )
+    })
   })
 })

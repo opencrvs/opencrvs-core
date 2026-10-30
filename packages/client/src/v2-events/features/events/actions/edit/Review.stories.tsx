@@ -51,7 +51,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const draft = generateEventDraftDocument({
   eventId,
-  actionType: ActionType.REGISTER
+  actionType: ActionType.DECLARE
 })
 
 const mockUser = generator.user.fieldAgent().summary

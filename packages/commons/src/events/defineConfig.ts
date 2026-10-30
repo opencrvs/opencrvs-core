@@ -11,15 +11,14 @@
 
 import * as z from 'zod/v4'
 import {
+  DEFAULT_EVENT_CONFIG_VERSION_ID,
+  EventConfig,
   EventConfigInput,
-  EventConfigVersionInput,
-  validateEachVersion,
   VersionedEventConfig,
   VersionedEventConfigInput
 } from './EventConfig'
 import { ActionType } from './ActionType'
 import { toPlainDateInTimeZone } from './PlainDate'
-import { generateNotifyReview } from './notificationFormFallback'
 import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
@@ -32,7 +31,7 @@ import {
 function moveDeclarationToDeclareAction({
   declaration,
   ...config
-}: EventConfigInput) {
+}: EventConfigInput): z.input<typeof EventConfig> {
   if (declaration) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -42,122 +41,54 @@ function moveDeclarationToDeclareAction({
 
   return {
     ...config,
-    actions: config.actions.map((action) =>
-      action.type === ActionType.DECLARE && declaration
-        ? { ...action, declaration }
-        : action
-    )
-  }
-}
-
-type ActionConfigInput = EventConfigInput['actions'][number]
-
-type DeclareActionConfigInput = Extract<
-  ActionConfigInput,
-  { type: typeof ActionType.DECLARE }
->
-
-type NotifyActionConfigInput = Extract<
-  ActionConfigInput,
-  { type: typeof ActionType.NOTIFY }
->
-
-/** A version as `VersionedEventConfig` expects it, once `defineConfig` has prepared it. */
-type PreparedVersion = z.input<typeof VersionedEventConfig>['versions'][number]
-
-/** An action with `declaration` on DECLARE and `review` on NOTIFY, as `EventConfig` expects. */
-type PreparedActionConfig = PreparedVersion['actions'][number]
-
-/**
- * Fallback for events without a configured notification form or NOTIFY review.
- *
- * - Without a NOTIFY action, one is created from the DECLARE action.
- * - Without `review`, it is generated from the DECLARE review with every field optional.
- * - Without `notificationForm`, a warning is logged. The form is not generated here, to keep the
- *   served configuration small: `getNotificationForm` derives it from the declaration when read.
- *
- * This keeps NOTIFY behaving as it did when it fell back to the DECLARE configuration at runtime.
- * Expects the `declaration` to already be on the DECLARE action.
- *
- * @returns the configuration with `declaration` on the DECLARE action and `review` on every
- * NOTIFY action.
- */
-function generateNotificationFormFallback(
-  config: Omit<EventConfigInput, 'declaration'>
-): Omit<EventConfigInput, 'declaration' | 'actions'> & {
-  actions: PreparedActionConfig[]
-} {
-  const declareAction = config.actions.find(
-    (action): action is DeclareActionConfigInput =>
-      action.type === ActionType.DECLARE
-  )
-
-  const notifyAction = config.actions.find(
-    (action): action is NotifyActionConfigInput =>
-      action.type === ActionType.NOTIFY
-  )
-
-  if (!notifyAction?.notificationForm) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Event '${config.id}' has no ${ActionType.NOTIFY} form. Using the ${ActionType.DECLARE} form with all fields optional. Configure \`actions[${ActionType.NOTIFY}].notificationForm\`. This fallback will be removed in a future release.`
-    )
-  }
-
-  const declaration = declareAction?.declaration
-
-  if (!declaration) {
-    throw new Error(
-      `Event '${config.id}' has no ${ActionType.DECLARE} form. Configure \`actions[${ActionType.DECLARE}].declaration\`.`
-    )
-  }
-
-  const notifyFromDeclare = (): PreparedActionConfig => ({
-    type: ActionType.NOTIFY,
-    label: declareAction.label,
-    icon: declareAction.icon,
-    conditionals: declareAction.conditionals,
-    flags: declareAction.flags,
-    supportingCopy: declareAction.dialogCopy?.notify,
-    review: generateNotifyReview(declareAction.review)
-  })
-
-  return {
-    ...config,
-    actions: config.actions.flatMap((action): PreparedActionConfig[] => {
-      if (action.type === ActionType.DECLARE) {
-        const declareWithForm = { ...action, declaration }
-        return notifyAction
-          ? [declareWithForm]
-          : [notifyFromDeclare(), declareWithForm]
+    actions: config.actions.map((action) => {
+      if (action.type !== ActionType.DECLARE) {
+        return action
       }
-
-      if (action.type === ActionType.NOTIFY) {
-        return [
-          {
-            ...action,
-            review: action.review ?? generateNotifyReview(declareAction.review)
-          }
-        ]
+      const declarationOfAction = action.declaration ?? declaration
+      // Unreachable: `declaration` is checked to be given exactly once before this transform
+      if (!declarationOfAction) {
+        throw new Error(`Event '${config.id}' does not define \`declaration\`.`)
       }
-
-      return [action]
+      return { ...action, declaration: declarationOfAction }
     })
   }
 }
 
-/** Id of the version of an event configured without `versions`. */
-export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+/** Fields an event with `versions` defines at the top level. Every other field belongs on each version. */
+const VERSIONED_EVENT_FIELDS = [
+  'id',
+  'label',
+  'advancedSearch',
+  'versions'
+] satisfies Array<keyof VersionedEventConfigInput>
+
+/** Rejects fields given at the top level of an event with `versions`, which would otherwise be dropped. */
+function validateNoVersionFieldsAtTopLevel(
+  config: VersionedEventConfigInput,
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  Object.keys(config)
+    .filter((key) => !(VERSIONED_EVENT_FIELDS as string[]).includes(key))
+    .forEach((key) => {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Event '${config.id}' defines \`versions\`, so \`${key}\` must be defined on each version, not at the top level.`,
+        path: [key]
+      })
+    })
+}
 
 /** An event configured without `versions` is a single version, effective from the beginning of time. */
 function toVersionedInput(
   config: EventConfigInput | VersionedEventConfigInput
-): VersionedEventConfigInput {
+): z.input<typeof VersionedEventConfig> {
   if ('versions' in config) {
     return config
   }
 
-  const { id, label, advancedSearch, ...version } = config
+  const { id, label, advancedSearch, ...version } =
+    moveDeclarationToDeclareAction(config)
   return {
     id,
     label,
@@ -166,66 +97,17 @@ function toVersionedInput(
   }
 }
 
-/** The input of one version, together with the fields shared by every version. */
-function getVersionInput(
-  config: VersionedEventConfigInput,
-  {
-    id: _id,
-    effectiveFrom: _effectiveFrom,
-    ...version
-  }: EventConfigVersionInput
-): EventConfigInput {
-  return {
-    ...version,
-    id: config.id,
-    label: config.label,
-    advancedSearch: config.advancedSearch
-  }
-}
-
-/**
- * Moves `declaration` onto the DECLARE action and generates the NOTIFY fallback, for each
- * version.
- */
-function prepareVersions(
-  config: VersionedEventConfigInput
-): z.input<typeof VersionedEventConfig> {
-  return {
-    id: config.id,
-    label: config.label,
-    advancedSearch: config.advancedSearch,
-    versions: config.versions.map((version) => {
-      const {
-        id: _id,
-        label: _label,
-        advancedSearch: _advancedSearch,
-        ...prepared
-      } = generateNotificationFormFallback(
-        moveDeclarationToDeclareAction(getVersionInput(config, version))
-      )
-
-      return {
-        ...prepared,
-        id: version.id,
-        ...(version.effectiveFrom !== undefined && {
-          effectiveFrom: version.effectiveFrom
-        })
-      } satisfies PreparedVersion
-    })
-  }
-}
-
 /**
  * An event must have a version in effect today, so that it can be declared once it
  * is configured. Without the country's time zone at hand, today is taken in UTC.
  */
 function validateVersionInEffectToday(
-  config: VersionedEventConfigInput,
-  ctx: z.RefinementCtx<VersionedEventConfigInput>
+  config: VersionedEventConfig,
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
   const today = toPlainDateInTimeZone(new Date(), 'UTC')
   const isAnyVersionInEffect = config.versions.some(
-    ({ effectiveFrom }) => !effectiveFrom || effectiveFrom <= today
+    ({ effectiveFrom }) => effectiveFrom <= today
   )
 
   if (!isAnyVersionInEffect) {
@@ -239,21 +121,20 @@ function validateVersionInEffectToday(
 
 const EventConfigDefinition = z
   .custom<EventConfigInput | VersionedEventConfigInput>()
-  .transform(toVersionedInput)
   .superRefine((config, ctx) => {
-    validateVersionInEffectToday(config, ctx)
-    validateEachVersion(
-      ctx,
-      config.versions.map((version) => getVersionInput(config, version)),
-      (event, versionCtx) => {
-        if (validateExactlyOneDeclareAction(event, versionCtx)) {
-          validateDeclarationGivenExactlyOnce(event, versionCtx)
-        }
-      }
-    )
+    // A version gives `declaration` only on the DECLARE action, which its schema checks
+    if ('versions' in config) {
+      validateNoVersionFieldsAtTopLevel(config, ctx)
+      return
+    }
+    const eventCtx = { ...ctx, value: config }
+    if (validateExactlyOneDeclareAction(config, eventCtx)) {
+      validateDeclarationGivenExactlyOnce(config, eventCtx)
+    }
   })
-  .transform(prepareVersions)
+  .transform(toVersionedInput)
   .pipe(VersionedEventConfig)
+  .superRefine(validateVersionInEffectToday)
 
 /**
  * Validates an event configuration. Accepts an event with `versions`, or, as before

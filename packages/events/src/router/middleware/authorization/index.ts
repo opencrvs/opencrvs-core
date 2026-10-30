@@ -15,6 +15,7 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
+  ACTION_SCOPE_MAP,
   Action,
   ActionDocument,
   ActionInputWithType,
@@ -247,11 +248,17 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   return next()
 }
 
-/**
- * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
- *
- */
-export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+/** Actions that are granted by scopes, rather than always allowed */
+type ScopedActionType = {
+  [A in keyof typeof ACTION_SCOPE_MAP]: (typeof ACTION_SCOPE_MAP)[A] extends null
+    ? never
+    : A
+}[keyof typeof ACTION_SCOPE_MAP]
+
+/** `getRequiredScopes` returns `undefined` for input that names no scopes */
+function canAccessEventWithInputScopes(
+  getRequiredScopes: (rawInput: unknown) => RecordScopeTypeV2[] | undefined
+) {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -263,15 +270,21 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
-    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
+
+    const requiredScopes = getRequiredScopes(rawInput)
+
+    if (!requiredScopes) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, requiredScopes)
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
-
-    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
-    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
-    const rawInput = await getRawInput()
 
     if (!isEventIdParam(rawInput)) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
@@ -313,6 +326,25 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
   return fn
 }
+
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ */
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) =>
+  canAccessEventWithInputScopes(() => scopes)
+
+/**
+ * Like {@link canAccessEventWithScopes}, for an endpoint that takes one of several actions:
+ * the scopes are those of the input's `type`, see `ACTION_SCOPE_MAP`.
+ * Input whose `type` is not one of `actionTypes` is a bad request.
+ */
+export const canAccessEventWithActionScopes = (
+  actionTypes: readonly ScopedActionType[]
+) =>
+  canAccessEventWithInputScopes((rawInput) => {
+    const input = z.object({ type: z.enum(actionTypes) }).safeParse(rawInput)
+    return input.success ? ACTION_SCOPE_MAP[input.data.type] : undefined
+  })
 
 const ActionConfirmationParams = z.object({
   eventId: UUID,

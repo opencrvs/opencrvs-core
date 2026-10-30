@@ -19,7 +19,9 @@ import {
   status,
   not,
   flag,
-  InherentFlags
+  InherentFlags,
+  toNotificationForm,
+  toNotificationReview
 } from '@opencrvs/toolkit/events'
 import {
   DEATH_DECLARATION_REVIEW,
@@ -193,6 +195,23 @@ export const deathEvent = defineConfig({
         id: 'event.death.action.Read.label'
       },
       review: DEATH_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Declare',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.death.action.declare.label'
+      },
+      notificationForm: toNotificationForm(DEATH_DECLARATION_FORM),
+      review: toNotificationReview(DEATH_DECLARATION_REVIEW),
+      supportingCopy: {
+        id: 'event.death.action.declare.notify.copy',
+        defaultMessage:
+          'You are about to formally notify the relevant Registration Office that a death event has occurred. Please confirm that the information provided is accurate before proceeding.',
+        description: 'Confirmation text for the notify action'
+      }
     },
     {
       type: ActionType.DECLARE,

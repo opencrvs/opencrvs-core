@@ -12,6 +12,7 @@ import { http, HttpResponse } from 'msw'
 import {
   ActionConfig,
   ActionType,
+  DEFAULT_EFFECTIVE_FROM,
   encodeScope,
   EventConfigVersion,
   FieldType,
@@ -87,7 +88,10 @@ function useVersions(...configured: EventConfigVersion[]) {
   )
 }
 
-function version(id: string, effectiveFrom?: string): EventConfigVersion {
+function version(
+  id: string,
+  effectiveFrom = DEFAULT_EFFECTIVE_FROM
+): EventConfigVersion {
   return { ...base, id, effectiveFrom }
 }
 

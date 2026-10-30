@@ -27,6 +27,8 @@
  *
  * What it does:
  *   - Scans all TypeScript files under `src/`
+ *   - Reads `@opencrvs/toolkit/events` from the toolkit running it, not the one the
+ *     country config has installed, which predates `VersionedEventConfig`
  *   - Rewrites `x.field` to `resolveEventConfig(x).field` wherever `x` is the
  *     toolkit's `VersionedEventConfig` and `field` is not one of its own fields
  *     (`id`, `label`, `advancedSearch` and `versions` are left alone)
@@ -47,7 +49,9 @@
  */
 
 import {
+  CompilerOptions,
   Expression,
+  getCompilerOptionsFromTsConfig,
   Node,
   Project,
   PropertyAccessExpression,
@@ -333,6 +337,25 @@ function addResolveEventConfigImport(sourceFile: SourceFile) {
 }
 
 /**
+ * Resolves `@opencrvs/toolkit/events` to `toolkitEventsPath`, keeping the country
+ * config's other `paths`. The country config still has the toolkit it upgrades from
+ * installed, whose types have no `VersionedEventConfig`, so the codemod reads the
+ * types of the toolkit running it instead.
+ */
+export function withToolkitEventsAt(
+  compilerOptions: CompilerOptions,
+  toolkitEventsPath: string
+): CompilerOptions {
+  return {
+    ...compilerOptions,
+    paths: {
+      ...compilerOptions.paths,
+      [TOOLKIT_EVENTS_MODULE]: [toolkitEventsPath]
+    }
+  }
+}
+
+/**
  * Rewrites every use of a `VersionedEventConfig` as a flat `EventConfig` in the
  * file to go through `resolveEventConfig()`.
  *
@@ -397,9 +420,15 @@ async function main() {
     `Scanning for VersionedEventConfig used as an EventConfig in: ${srcDir}\n`
   )
 
+  const tsConfigFilePath = path.resolve(srcDir, '../tsconfig.json')
   const project = new Project({
-    tsConfigFilePath: path.resolve(srcDir, '../tsconfig.json'),
-    skipAddingFilesFromTsConfig: false
+    tsConfigFilePath,
+    skipAddingFilesFromTsConfig: false,
+    // The events module of this toolkit, next to the migrations in `dist`
+    compilerOptions: withToolkitEventsAt(
+      getCompilerOptionsFromTsConfig(tsConfigFilePath).options,
+      path.resolve(__dirname, '../events')
+    )
   })
 
   const sourceFiles = project.getSourceFiles().filter((sf) => {

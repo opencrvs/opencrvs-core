@@ -14,7 +14,6 @@ import {
   ClientSpecificAction,
   EventIndex,
   getActionConfig,
-  WorkqueueActionType,
   isValidIcon
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
@@ -22,7 +21,6 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { buttonMessages } from '@client/i18n/messages'
 import {
   DuplicatesAvailability,
   useDuplicatesAvailable
@@ -35,9 +33,13 @@ import {
   ActionCtaConfig,
   actionIcons,
   actionLabels,
-  ActionMenuItem
+  ActionMenuItem,
+  WorkqueueCtaType
 } from './utils'
-import { resolveActionConditionals } from './resolveActionConditionals'
+import {
+  resolveActionConditionals,
+  resolveBaseActionConditionals
+} from './resolveActionConditionals'
 import { useUserAllowedActions } from './useUserAllowedActions'
 
 /**
@@ -50,7 +52,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { useDisplayableDrafts } = useDrafts()
   const drafts = useDisplayableDrafts()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
-  const { onClick, modals } = useEventActionsOnClick(event)
+  const { onClick, continueDraft, modals } = useEventActionsOnClick(event)
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
 
@@ -68,19 +70,40 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
     ) === DuplicatesAvailability.AVAILABLE
 
+  const draftActionType = drafts.find((draft) => draft.eventId === event.id)
+    ?.action.type
+
   const resolveAction = useCallback(
-    <T extends WorkqueueActionType | ClientSpecificAction>(
+    <T extends WorkqueueCtaType | ClientSpecificAction>(
       actionType: T
     ): ActionCtaConfig<T> => {
-      const isDeclareDraftOpen = drafts.some(
-        (draft) =>
-          draft.action.type === ActionType.DECLARE && draft.eventId === event.id
-      )
+      if (actionType === ClientSpecificAction.CONTINUE_DRAFT) {
+        // The draft's own action must still be available to the user. A draft opens
+        // without assignment or a connection, so the action's internal rules don't apply.
+        const { enabled, visible } = draftActionType
+          ? resolveBaseActionConditionals({
+              event,
+              actionType: draftActionType,
+              validatorContext,
+              isActionAllowedForUser,
+              eventConfiguration
+            })
+          : { enabled: false, visible: false }
+
+        return {
+          label: actionLabels[actionType],
+          type: actionType,
+          icon: actionIcons[actionType],
+          onClick: (backTo?: string) =>
+            draftActionType && continueDraft(draftActionType, backTo),
+          disabled: !enabled,
+          hidden: !visible
+        }
+      }
 
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        isDeclareDraftOpen,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,
@@ -91,13 +114,9 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
-      const replaceLabelForDeclareDraft =
-        isDeclareDraftOpen && actionType === ActionType.DECLARE
 
       return {
-        label: replaceLabelForDeclareDraft
-          ? buttonMessages.update
-          : (actionConfig?.label ?? actionLabels[actionType]),
+        label: actionConfig?.label ?? actionLabels[actionType],
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
           ? actionConfig.icon
@@ -108,7 +127,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       }
     },
     [
-      drafts,
+      draftActionType,
       event,
       validatorContext,
       isActionAllowedForUser,
@@ -117,7 +136,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isDownloaded,
       isAssigning,
       areDuplicatesAvailable,
-      onClick
+      onClick,
+      continueDraft
     ]
   )
 
@@ -156,7 +176,6 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        isDeclareDraftOpen: false,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,

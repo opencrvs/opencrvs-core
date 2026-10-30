@@ -11,7 +11,6 @@
 /* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { omit } from 'lodash'
 import {
   ActionStatus,
   ActionType,
@@ -390,42 +389,6 @@ describe('event.actions.notify', () => {
         id: 'notifier.comment'
       })
     })
-  })
-
-  test(`${ActionType.NOTIFY} action accepts partial declaration when NOTIFY has no notification form`, async () => {
-    mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
-        HttpResponse.json([
-          toVersionedEventConfig({
-            ...tennisClubMembershipEvent,
-            actions: tennisClubMembershipEvent.actions.map((action) =>
-              action.type === ActionType.NOTIFY
-                ? omit(action, 'notificationForm')
-                : action
-            )
-          })
-        ])
-      )
-    )
-
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    // 'applicant.name' is required in the DECLARE form and is omitted here
-    const fetchedEvent = await client.event.actions.notify.request({
-      type: ActionType.NOTIFY,
-      eventId: event.id,
-      transactionId: getUUID(),
-      declaration: { 'applicant.email': 'applicant@example.com' }
-    })
-
-    expect(fetchedEvent.actions).toContainEqual(
-      expect.objectContaining({
-        type: ActionType.NOTIFY,
-        status: ActionStatus.Accepted
-      })
-    )
   })
 
   test(`${ActionType.NOTIFY} action does not fail even if invalid value is sent`, async () => {

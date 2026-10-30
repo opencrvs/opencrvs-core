@@ -62,11 +62,6 @@ type DeclareActionConfigInput = Extract<
   { type: typeof ActionType.DECLARE }
 >
 
-type NotifyActionConfigInput = Extract<
-  ActionConfigInput,
-  { type: typeof ActionType.NOTIFY }
->
-
 /**
  * Input accepted by `EventConfig.parse`. `declaration` lives only on the DECLARE action,
  * and NOTIFY carries its `notificationForm` and `review`.
@@ -95,31 +90,24 @@ type EventConfigSchemaInput = Omit<
  * `declaration` may be given at the top level (kept for backwards compatibility)
  * or on the DECLARE action.
  * `defineConfig` checks at runtime that it is given in exactly one of these places.
- *
- * The NOTIFY action, and its `notificationForm` and `review`, are optional.
- * `defineConfig` generates whatever is missing from the DECLARE action.
  */
 export type EventConfigInput = Omit<EventConfigSchemaInput, 'actions'> & {
   /** @deprecated Define `declaration` on the DECLARE action instead. */
   declaration?: DeclarationFormConfigInput
   actions: Array<
-    | Exclude<
-        ActionConfigInput,
-        DeclareActionConfigInput | NotifyActionConfigInput
-      >
+    | Exclude<ActionConfigInput, DeclareActionConfigInput>
     | (Omit<DeclareActionConfigInput, 'declaration'> & {
         declaration?: DeclarationFormConfigInput
-      })
-    | (Omit<NotifyActionConfigInput, 'notificationForm' | 'review'> & {
-        notificationForm?: NotifyActionConfigInput['notificationForm']
-        review?: NotifyActionConfigInput['review']
       })
   >
 }
 
-/** Input accepted by `defineConfig` for one version of an event. */
+/**
+ * Input accepted by `defineConfig` for one version of an event.
+ * `declaration` lives only on the DECLARE action.
+ */
 export type EventConfigVersionInput = Omit<
-  EventConfigInput,
+  EventConfigSchemaInput,
   EventLevelField
 > & {
   /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
@@ -242,18 +230,17 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
 
 type EventLevelField = keyof typeof eventLevelFields
 
+/** Id of the version of an event configured without `versions`. */
+export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+
+/** `effectiveFrom` of a version configured without one. */
+export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
+
 /** One version of an event: what the event looks like from `effectiveFrom` on. */
 export type EventConfigVersion = Omit<EventConfig, EventLevelField> & {
   id: string
-  effectiveFrom?: string
-}
-
-type EventConfigVersionSchemaInput = Omit<
-  EventConfigSchemaInput,
-  EventLevelField
-> & {
-  id: string
-  effectiveFrom?: string
+  /** Date (YYYY-MM-DD) from which this version is effective. '0001-01-01' when configured without one. */
+  effectiveFrom: string
 }
 
 /**
@@ -264,16 +251,9 @@ export type VersionedEventConfig = Pick<EventConfig, EventLevelField> & {
   versions: EventConfigVersion[]
 }
 
-type VersionedEventConfigSchemaInput = Pick<
-  EventConfigSchemaInput,
-  EventLevelField
-> & {
-  versions: EventConfigVersionSchemaInput[]
-}
-
 const _EventConfigVersion: z.ZodType<
   EventConfigVersion,
-  EventConfigVersionSchemaInput
+  EventConfigVersionInput
 > = z.object({
   id: z
     .string()
@@ -282,25 +262,37 @@ const _EventConfigVersion: z.ZodType<
     ),
   effectiveFrom: z.iso
     .date()
-    .optional()
+    .default(DEFAULT_EFFECTIVE_FROM)
     .describe(
-      'Date (YYYY-MM-DD) from which this version is effective. A version without one is effective from the beginning of time.'
+      `Date (YYYY-MM-DD) from which this version is effective. A version without one is effective from the beginning of time ('${DEFAULT_EFFECTIVE_FROM}').`
     ),
   ...versionFields
 })
 
-const resolvedConfigs = new WeakMap<EventConfigVersion, EventConfig>()
+/**
+ * Keyed on the event as well as the version: after a refetch, a version may be the same
+ * object while a field shared by every version (e.g. `label`) has changed.
+ */
+const resolvedConfigs = new WeakMap<
+  VersionedEventConfig,
+  WeakMap<EventConfigVersion, EventConfig>
+>()
 
 /**
  * @returns the configuration of `version`, together with the fields shared by every
- * version of the event. The same version gives the same object, so caches keyed on
- * the configuration keep working.
+ * version of the event. The same event and version give the same object, so caches
+ * keyed on the configuration keep working.
  */
 export function toEventConfig(
   config: VersionedEventConfig,
   version: EventConfigVersion
 ): EventConfig {
-  const cached = resolvedConfigs.get(version)
+  let resolvedVersions = resolvedConfigs.get(config)
+  if (!resolvedVersions) {
+    resolvedVersions = new WeakMap()
+    resolvedConfigs.set(config, resolvedVersions)
+  }
+  const cached = resolvedVersions.get(version)
   if (cached) {
     return cached
   }
@@ -312,7 +304,7 @@ export function toEventConfig(
     label: config.label,
     advancedSearch: config.advancedSearch
   }
-  resolvedConfigs.set(version, resolved)
+  resolvedVersions.set(version, resolved)
   return resolved
 }
 
@@ -333,12 +325,12 @@ export function getEventConfigOfVersion(
   )
 }
 
-/** Orders versions by `effectiveFrom`, a version without one first. */
+/** Orders versions by `effectiveFrom`, earliest first. */
 export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
-  return (a.effectiveFrom ?? '').localeCompare(b.effectiveFrom ?? '')
+  return a.effectiveFrom.localeCompare(b.effectiveFrom)
 }
 
-/** @returns the version effective from the beginning of time, or else the earliest. */
+/** @returns the version that takes effect earliest. */
 function getEarliestVersion(config: VersionedEventConfig) {
   return [...config.versions].sort(byEffectiveFrom)[0]
 }
@@ -346,8 +338,7 @@ function getEarliestVersion(config: VersionedEventConfig) {
 /**
  * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
  * after the date of `now` in `timeZone`, the country's time zone, since versions take
- * effect at its midnight. A version without `effectiveFrom` is effective from the
- * beginning of time. Undefined when every version takes effect later.
+ * effect at its midnight. Undefined when every version takes effect later.
  */
 export function resolveEffectiveVersion(
   config: VersionedEventConfig,
@@ -356,7 +347,7 @@ export function resolveEffectiveVersion(
 ): EventConfigVersion | undefined {
   const today = toPlainDateInTimeZone(now, timeZone)
   return config.versions
-    .filter(({ effectiveFrom }) => !effectiveFrom || effectiveFrom <= today)
+    .filter(({ effectiveFrom }) => effectiveFrom <= today)
     .sort(byEffectiveFrom)
     .at(-1)
 }
@@ -422,7 +413,7 @@ function validateVersionList(
   ctx: z.RefinementCtx<VersionedEventConfig>
 ) {
   const ids = new Set<string>()
-  const effectiveFroms = new Set<string | undefined>()
+  const effectiveFroms = new Set<string>()
 
   config.versions.forEach((version, index) => {
     if (ids.has(version.id)) {
@@ -437,9 +428,10 @@ function validateVersionList(
     if (effectiveFroms.has(version.effectiveFrom)) {
       ctx.addIssue({
         code: 'custom',
-        message: version.effectiveFrom
-          ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}'. Each version must have a different \`effectiveFrom\`.`
-          : `Event '${config.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`,
+        message:
+          version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
+            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}'. Each version must have a different \`effectiveFrom\`.`
+            : `Event '${config.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`,
         path: ['versions', index, 'effectiveFrom']
       })
     }
@@ -491,7 +483,7 @@ export function validateEachVersion<E>(
 
 export const VersionedEventConfig: z.ZodType<
   VersionedEventConfig,
-  VersionedEventConfigSchemaInput
+  VersionedEventConfigInput
 > = z
   .object({
     ...eventLevelFields,
@@ -499,7 +491,7 @@ export const VersionedEventConfig: z.ZodType<
       .array(_EventConfigVersion)
       .min(1)
       .describe(
-        'Versions of the event configuration, each effective from its `effectiveFrom`.'
+        `Versions of the event configuration, each effective from its \`effectiveFrom\`. An event configured without versions has a single version, with id '${DEFAULT_EVENT_CONFIG_VERSION_ID}' and \`effectiveFrom\` '${DEFAULT_EFFECTIVE_FROM}'.`
       )
   })
   .superRefine((config, ctx) => {
