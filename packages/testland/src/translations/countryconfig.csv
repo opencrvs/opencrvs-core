@@ -535,6 +535,7 @@ event.tennis-club-membership.action.declare.form.section.who.field.idImage.optio
 event.tennis-club-membership.action.declare.form.section.who.field.image.label,This is the label for the field,Applicant's profile picture,Applicant's profile picture
 event.tennis-club-membership.action.declare.form.section.who.field.isRecommendedByFieldAgent.label,This is the label for the field,Field shown when field agent is submitting application.,Champ affiché lorsqu'un agent de terrain soumet la demande.
 event.tennis-club-membership.action.declare.form.section.who.field.name.label,This is the title for the name field,Name of applicant,Nom du demandeur
+event.tennis-club-membership.action.declare.form.section.who.field.skillLevel.label,This is the label for the field,Applicant's tennis skill level,Niveau de tennis du demandeur
 event.tennis-club-membership.action.declare.form.section.who.field.tob.label,This is the label for the time of birth field,Applicant's time of birth,Heure de naissance du demandeur
 event.tennis-club-membership.action.declare.form.section.who.title,This is the title of the section,Who is applying for the membership?,Who is applying for the membership?
 event.tennis-club-membership.action.declare.label,This is shown as the action name anywhere the user can trigger the action from,Send an application,Send an application

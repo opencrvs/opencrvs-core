@@ -16,7 +16,8 @@
     "./client": "./build/dist/esm/client.js",
     "./application-config": "./build/dist/common/application-config.js",
     "./events": "./build/dist/common/events/index.js",
-    "./events/deduplication": "./build/dist/common/events/deduplication.js"
+    "./events/deduplication": "./build/dist/common/events/deduplication.js",
+    "./events/CustomFieldExternals": "./build/dist/common/events/CustomFieldExternals.js"
   },
   "scripts": {
     "start": "pnpm build:watch",
