@@ -15,7 +15,7 @@ spec:
         app: filebeat
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.filebeat) | nindent 6 }}
-      serviceAccountName: filebeat
+      serviceAccountName: {{ .Values.filebeat.service_account_name }}
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: wait-kibana
@@ -83,7 +83,8 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: filebeat
+  name: {{ .Values.filebeat.service_account_name }}
+{{- if .Values.create_cluster_roles }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -112,8 +113,9 @@ roleRef:
   name: filebeat
 subjects:
   - kind: ServiceAccount
-    name: filebeat
+    name: {{ .Values.filebeat.service_account_name }}
     namespace: {{ .Release.Namespace }}
+{{- end }}
 
 {{ include "network-policy-rules" (dict "service_name" "filebeat" "Values" .Values) }}
 {{- end }}

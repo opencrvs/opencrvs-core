@@ -301,6 +301,11 @@ monitoring:
   metrics:
     retention_days: 30
 
+# Create the ClusterRoles and ClusterRoleBindings of Filebeat and Metricbeat.
+# This value has an effect only if monitoring is enabled.
+# If the value is false, make sure that the objects exist before you install the chart. See the README.
+create_cluster_roles: false
+
 apm_server:
   image:
     repository: docker.elastic.co/apm/apm-server
@@ -324,6 +329,8 @@ metricbeat:
   image:
     repository: docker.elastic.co/beats/metricbeat
     tag: 8.19.15
+  # ServiceAccount of the DaemonSet, the one the ClusterRoleBinding is bound to
+  service_account_name: metricbeat
   # Configmap for custom configuration file
   # custom_config_configmap: metricbeat-config
   # Configmap for custom index lifecycle management policy
@@ -333,6 +340,8 @@ filebeat:
   image:
     repository: docker.elastic.co/beats/filebeat
     tag: 8.19.15
+  # ServiceAccount of the DaemonSet, the one the ClusterRoleBinding is bound to
+  service_account_name: filebeat
   # Configmap for custom configuration file
   # custom_config_configmap: filebeat-config
   # Configmap for custom index lifecycle management policy
