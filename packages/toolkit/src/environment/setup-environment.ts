@@ -58,6 +58,8 @@ import {
   githubQuestions,
   githubTokenQuestion,
   githubOtherQuestions,
+  githubApprovalRequiredQuestion,
+  githubApproversQuestion,
   infrastructureQuestions,
   staticSSLCertQuestions,
   countryQuestions,
@@ -570,7 +572,25 @@ export async function runSetupEnvironment() {
           'WARNING! You are setting up a production environment.\n Make sure you have read the deployment guide carefully before proceeding.\n'
         )
     )
-    await promptAndStoreAnswer(githubOtherQuestions, existingValues)
+  }
+
+  log('\n', kleur.bold().underline('Workflow approvals'))
+  // The workflows require approval unless APPROVAL_REQUIRED is 'false'
+  const { approvalRequired } = await promptAndStoreAnswer(
+    [
+      {
+        ...githubApprovalRequiredQuestion,
+        initial: getIndexFromChoices(
+          githubApprovalRequiredQuestion.choices,
+          process.env.APPROVAL_REQUIRED ||
+            (environment_type === 'production' ? 'true' : 'false')
+        )
+      }
+    ],
+    existingValues
+  )
+  if (approvalRequired !== 'false') {
+    await promptAndStoreAnswer([githubApproversQuestion], existingValues)
   }
 
   log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
