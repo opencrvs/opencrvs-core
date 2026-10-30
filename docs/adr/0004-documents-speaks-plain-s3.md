@@ -6,7 +6,7 @@ We made this decision for issue [#13348](https://github.com/opencrvs/opencrvs-co
 
 ## What a store must do
 
-The service calls each function in this list. Nothing in CI runs them against a store other than MinIO.
+The service calls each function in this list. The unit and E2E tests of the service run against RustFS.
 
 - `HeadBucket`, `CreateBucket` with a region, and `DeleteBucketPolicy` or an equivalent that keeps the bucket private.
 - `PutObject` for a stream of unknown length, up to 50 MB. For a large file, the store must accept a multipart upload.
@@ -29,7 +29,7 @@ The service calls each function in this list. Nothing in CI runs them against a 
 
 **The old URL helpers are removed.** `isMinioUrl` and `MINIO_REGEX` in `@opencrvs/commons` are gone, and `isS3Url` and `S3_URL_REGEX` replace them. A country configuration that imports the old names must change them.
 
-**The list is a record, not a check.** The service does not refuse a store that is not in the README table, and that store can work. The table shows what we tried and when. We did not keep an automated suite for it. A newer version of a store, or a change to the service, can break a store without a failing build.
+**The list is a record, not a check.** The service does not refuse a store that is not in the README table, and that store can work. The table shows what we tried and when. We did not keep an automated suite for it, apart from the unit tests that run against RustFS. A newer version of a store, or a change to the service, can break another store without a failing build.
 
 **One listed store must be open source and self-hosted.** AWS S3 and Google Cloud Storage are closed services, and we did not test them. For the platform independence indicator of the Digital Public Goods Standard, each closed component must have an open alternative. MinIO, SeaweedFS and RustFS are open alternatives. The table should always show at least one open store.
 
