@@ -528,6 +528,8 @@ const actionTitleToApiCallMap = {
   ]
 }
 
+const ACTION_RESPONSE_TIMEOUT = 60_000
+
 /**
  * Attaches response listeners for the given URL fragments, fires the trigger that
  * causes those API calls, then resolves once all of them have returned successfully.
@@ -556,7 +558,10 @@ export async function waitForActionResponses(
   let mainDone = false
   const main = Promise.all(
     urls.map((url) =>
-      page.waitForResponse((res) => res.url().includes(url) && res.ok())
+      // add arbitrary timeout to prevent indefinite hanging in failure situations
+      page.waitForResponse((res) => res.url().includes(url) && res.ok(), {
+        timeout: ACTION_RESPONSE_TIMEOUT
+      })
     )
   ).then(() => {
     mainDone = true
@@ -572,7 +577,9 @@ export async function waitForActionResponses(
           res.ok() &&
           res.request().method() === 'POST' &&
           (res.request().postData()?.includes(eventId) ?? false) &&
-          mainDone
+          mainDone,
+        // add arbitrary timeout to prevent indefinite hanging in failure situations
+        { timeout: ACTION_RESPONSE_TIMEOUT }
       )
     )
   }
