@@ -35,6 +35,9 @@ export async function main() {
     const configurations = await getInMemoryEventConfigurations(
       `Bearer ${serviceToken}`
     )
+
+    // TODO CIHAN: add role validation here
+
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)

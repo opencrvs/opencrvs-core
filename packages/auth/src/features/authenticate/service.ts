@@ -33,7 +33,7 @@ import {
   UserName,
   fetchJSON,
   joinUrl,
-  Roles,
+  Role,
   InactiveOfficeError,
   isSelectableAtAnchor,
   Location
@@ -366,7 +366,7 @@ export function verifyRefreshToken(token: string) {
 }
 
 export async function getUserRoleScopeMapping() {
-  const roles = await fetchJSON<Roles>(
+  const roles = await fetchJSON<Role[]>(
     joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
   )
 

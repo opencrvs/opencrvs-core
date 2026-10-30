@@ -13,10 +13,8 @@ import * as z from 'zod/v4'
 import * as qs from 'qs'
 import { UUID } from './uuid'
 import { getScopes } from './authentication'
-import { Role } from './Role'
 import { ContainsFlags } from './events/Flag'
 import { EventStatus } from './events/EventStatus'
-import { EventConfig } from './events/EventConfig'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -679,14 +677,4 @@ export function canUserNotifyEvent(
  */
 export function defineScopes(scopes: Scope[]) {
   return scopes.map((scope) => Scope.parse(scope)).map(encodeScope)
-}
-
-/**
- * Helper for defining user roles. Should be used in country config.
- *
- * @param roles Array of roles in object format.
- * @param eventConfigs Array of event configurations, which are needed to run validations for scopes.
- */
-export function defineRoles(roles: Role[], eventConfigs: EventConfig[]) {
-  return roles
 }

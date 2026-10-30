@@ -10,6 +10,7 @@
  */
 import { z } from 'zod'
 import { EncodedScope } from './scopes'
+import { EventConfig } from './client'
 
 export const Role = z.object({
   id: z.string(),
@@ -18,9 +19,21 @@ export const Role = z.object({
 
 export type Role = z.infer<typeof Role>
 
-export type Roles = Array<{
-  id: string
-  /** @deprecated */
-  labels: Array<{ language: string; label: string }>
-  scopes: EncodedScope[]
-}>
+export function validateRoles(roles: Role[], configurations: EventConfig[]) {
+  const validationErrors: string[] = []
+
+  if (validationErrors.length) {
+    throw new Error(`Invalid roles:\n${validationErrors.join(', ')}`)
+  }
+}
+
+/**
+ * Helper for defining user roles. Should be used in country config.
+ *
+ * @param roles Array of roles in object format.
+ * @param eventConfigs Array of event configurations, which are needed to run validations for scopes.
+ */
+export function defineRoles(roles: Role[], eventConfigs: EventConfig[]) {
+  validateRoles(roles, eventConfigs)
+  return roles.map((role) => Role.parse(role))
+}
