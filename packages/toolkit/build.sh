@@ -25,6 +25,8 @@ mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 mkdir -p ./dist/commons/events/state
 cp -r ../commons/build/dist/common/events/state/*.d.ts ./dist/commons/events/state
+mkdir -p ./dist/commons/users
+cp -r ../commons/build/dist/common/users/*.d.ts ./dist/commons/users
 
 # Build common conditionals
 npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
@@ -34,6 +36,9 @@ cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/commons/conditiona
 # Build common scopes
 npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
 cp -r ../commons/build/dist/common/users/scopes.d.ts ./dist/scopes/index.d.ts
+
+# Build common roles (.d.ts points at dist/commons/users, copied with the events types)
+npx esbuild src/roles/index.ts --bundle --format=cjs --outdir=./dist/roles --allow-overwrite --packages=external
 
 # Build common authentication
 npx esbuild src/authentication/index.ts --bundle --format=cjs --outdir=./dist/authentication --allow-overwrite --packages=external

@@ -25,11 +25,6 @@ import { Read } from './read'
 const RoleRecordSchema = (eventIds: string[]) =>
   z.object({
     id: z.string().min(1),
-    label: z.object({
-      defaultMessage: z.string().min(1),
-      description: z.string(),
-      id: z.string().min(1)
-    }),
     scopes: z.array(
       EncodedScope.superRefine((scope, ctx) => {
         const parsedScope = decodeScope(scope)

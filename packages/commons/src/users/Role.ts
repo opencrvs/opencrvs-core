@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { EncodedScope } from './scopes'
-import { EventConfig } from '../client'
+import { EventConfig } from '../events/EventConfig'
 import { validateRoles } from './roleValidations'
 
 export const Role = z.object({

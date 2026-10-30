@@ -16,6 +16,7 @@
         "../commons/src/conditionals/conditionals.ts"
       ],
       "@opencrvs/commons/scopes": ["../commons/src/users/scopes.ts"],
+      "@opencrvs/commons/users/Role": ["../commons/src/users/Role.ts"],
       "@opencrvs/commons/authentication": [
         "../commons/src/users/authentication.ts"
       ],

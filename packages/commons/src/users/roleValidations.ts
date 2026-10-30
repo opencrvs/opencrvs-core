@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig } from '../client'
+import { EventConfig } from '../events/EventConfig'
 import { Role, Roles } from './Role'
 
 function validateEventIds(role: Role, eventConfigs: EventConfig[]) {

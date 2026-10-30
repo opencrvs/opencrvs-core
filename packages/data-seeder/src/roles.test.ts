@@ -18,11 +18,6 @@ const CONFIGURE = encodeScope({ type: 'config.update-all' })
 function record(overrides: Record<string, unknown> = {}) {
   return {
     id: 'LOCAL_REGISTRAR',
-    label: {
-      defaultMessage: 'Local Registrar',
-      description: 'The role',
-      id: 'role.localRegistrar'
-    },
     scopes: [CONFIGURE],
     ...overrides
   }
@@ -80,6 +75,18 @@ describe('a role that parsed', () => {
       id: 'LOCAL_REGISTRAR',
       scopes: [CONFIGURE]
     })
+  })
+
+  it('is accepted with a label left over from an older country config', () => {
+    const labelled = record({
+      label: {
+        defaultMessage: 'Local Registrar',
+        description: 'The role',
+        id: 'userRole.localRegistrar'
+      }
+    })
+
+    expect(read([labelled]).problems).toEqual([])
   })
 
   it('is rejected for a scope that names an event the country config does not declare', () => {
