@@ -12,7 +12,8 @@ import {
   decodeScope,
   EncodedScope,
   EventConfig,
-  joinUrl
+  joinUrl,
+  validateRole
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { z } from 'zod'
@@ -22,42 +23,19 @@ import { formatUnwrittenFailure } from './seed-failure'
 import { raise } from './utils'
 import { Read } from './read'
 
-const RoleRecordSchema = (eventIds: string[]) =>
-  z.object({
-    id: z.string().min(1),
-    scopes: z.array(
-      EncodedScope.superRefine((scope, ctx) => {
-        const parsedScope = decodeScope(scope)
-
-        if (!parsedScope) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Invalid scope: "${scope}"`
-          })
-          return
-        }
-
-        if (!('options' in parsedScope)) {
-          return
-        }
-
-        const options = parsedScope.options
-
-        if (options && 'event' in options && Array.isArray(options.event)) {
-          const invalidEventIds = options.event.filter(
-            (id) => !eventIds.includes(id)
-          )
-
-          if (invalidEventIds.length > 0) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-            })
-          }
-        }
-      })
-    )
-  })
+const RoleRecordSchema = z.object({
+  id: z.string().min(1),
+  scopes: z.array(
+    EncodedScope.superRefine((scope, ctx) => {
+      if (!decodeScope(scope)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Invalid scope: "${scope}"`
+        })
+      }
+    })
+  )
+})
 
 export interface ParsedRole {
   position: number
@@ -92,17 +70,27 @@ export interface DeclaredRole {
 function readRole(
   record: unknown,
   position: number,
-  schema: ReturnType<typeof RoleRecordSchema>
+  eventConfigs: EventConfig[]
 ): ParsedRole | RoleProblem {
-  const parsed = schema.safeParse(record)
+  const parsed = RoleRecordSchema.safeParse(record)
 
-  return parsed.success
-    ? { position, id: parsed.data.id, scopes: parsed.data.scopes }
-    : {
+  if (!parsed.success) {
+    return {
+      kind: 'roleUnparsed',
+      role: { position, id: readString(record, 'id') },
+      message: describeParseFailure(parsed.error)
+    }
+  }
+
+  const errors = validateRole(parsed.data, eventConfigs)
+
+  return errors.length > 0
+    ? {
         kind: 'roleUnparsed',
-        role: { position, id: readString(record, 'id') },
-        message: describeParseFailure(parsed.error)
+        role: { position, id: parsed.data.id },
+        message: errors.join('; ')
       }
+    : { position, id: parsed.data.id, scopes: parsed.data.scopes }
 }
 
 function duplicateRoleIds(roles: ParsedRole[]): RoleProblem[] {
@@ -127,7 +115,10 @@ function duplicateRoleIds(roles: ParsedRole[]): RoleProblem[] {
   return problems
 }
 
-export function parseRoles(document: unknown, eventIds: string[]): RoleRead {
+export function parseRoles(
+  document: unknown,
+  eventConfigs: EventConfig[]
+): RoleRead {
   const list = ListSchema.safeParse(document)
 
   if (!list.success) {
@@ -140,12 +131,11 @@ export function parseRoles(document: unknown, eventIds: string[]): RoleRead {
     }
   }
 
-  const schema = RoleRecordSchema(eventIds)
   const roles: ParsedRole[] = []
   const problems: RoleProblem[] = []
 
   list.data.forEach((record, index) => {
-    const read = readRole(record, index + 1, schema)
+    const read = readRole(record, index + 1, eventConfigs)
 
     if ('kind' in read) {
       problems.push(read)
@@ -190,10 +180,7 @@ export async function readRoles(token: string): Promise<RoleRead> {
 
   const eventsConfig = (await eventsResponse.json()) as EventConfig[]
 
-  return parseRoles(
-    await rolesResponse.json(),
-    eventsConfig.map((event) => event.id)
-  )
+  return parseRoles(await rolesResponse.json(), eventsConfig)
 }
 
 export function parsedRoles(read: RoleRead): ParsedRole[] {
