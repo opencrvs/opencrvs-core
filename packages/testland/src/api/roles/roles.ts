@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
-import { defineScopes, EncodedScope } from '@opencrvs/toolkit/scopes'
+import { defineRoles, defineScopes, EncodedScope } from '@opencrvs/commons'
+import { eventConfigs } from '@countryconfig/events'
 
 type Role = {
   id: string
@@ -17,7 +18,7 @@ type Role = {
   scopes: EncodedScope[]
 }
 
-export const roles: Role[] = [
+const roles: Role[] = [
   {
     id: 'REGISTRATION_AGENT',
     label: {
@@ -351,3 +352,5 @@ export const roles: Role[] = [
     ])
   }
 ]
+
+export default defineRoles(roles, eventConfigs)

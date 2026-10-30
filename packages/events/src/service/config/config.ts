@@ -22,6 +22,7 @@ import {
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
+
 /**
  * Configuration is served from countryconfig, which can be deployed
  * independently of the events service (e.g. a Kubernetes rollout that updates
