@@ -98,6 +98,7 @@
     ],
     "moduleNameMapper": {
       "@auth/(.*)": "<rootDir>/src/$1",
+      "@opencrvs/commons/authentication": "<rootDir>/../commons/src/users/authentication",
       "@opencrvs/commons/(.*)": "<rootDir>/../commons/src/$1"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",

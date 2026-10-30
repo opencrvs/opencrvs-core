@@ -18,6 +18,7 @@ import {
   logger,
   Role,
   TokenWithBearer,
+  validateRoles,
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -163,7 +164,7 @@ export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
   getWorkqueueConfigurations
 )
 
-export async function getRoles() {
+async function getRoles(token: TokenWithBearer) {
   const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json'
@@ -174,8 +175,15 @@ export async function getRoles() {
     throw new Error('Failed to fetch roles config')
   }
 
-  return array(Role).parse(await res.json())
+  const eventConfigurations = await getInMemoryEventConfigurations(token)
+  const roles = array(Role).parse(await res.json())
+
+  validateRoles(roles, eventConfigurations)
+
+  return roles
 }
+
+export const getInMemoryRoles = createTtlConfigCache('roles', getRoles)
 
 export async function getApplicationConfig() {
   const res = await fetch(

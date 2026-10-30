@@ -161,9 +161,7 @@ export const internalUserRouter = serviceRouter({
         .refine((d) => d.mobile || d.email, 'mobile or email required')
     )
     .output(VerifyUserOutput)
-    .mutation(async ({ input }) => {
-      return verifyUser(input)
-    }),
+    .mutation(async ({ input, ctx }) => verifyUser(input, ctx.token)),
   changePassword: internalProcedure
     .input(
       z.object({

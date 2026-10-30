@@ -42,7 +42,11 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getApplicationConfig, getRoles } from '@events/service/config/config'
+import {
+  getApplicationConfig,
+  getInMemoryRoles,
+  getRoles
+} from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   updatePasswordHash,
@@ -377,7 +381,9 @@ export const userRouter = router({
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   roles: router({
-    list: userOnlyProcedure.query(async () => getRoles())
+    list: userOnlyProcedure.query(async ({ ctx }) =>
+      getInMemoryRoles(ctx.token)
+    )
   }),
   changePassword: userOnlyProcedure
     .input(

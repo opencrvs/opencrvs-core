@@ -16,10 +16,11 @@ export const Role = z.object({
   id: z.string(),
   scopes: z.array(EncodedScope)
 })
-
 export type Role = z.infer<typeof Role>
+export const Roles = z.array(Role)
+export type Roles = z.infer<typeof Roles>
 
-export function validateRoles(roles: Role[], configurations: EventConfig[]) {
+export function validateRoles(roles: Roles, configurations: EventConfig[]) {
   const validationErrors: string[] = []
 
   if (validationErrors.length) {
@@ -33,7 +34,7 @@ export function validateRoles(roles: Role[], configurations: EventConfig[]) {
  * @param roles Array of roles in object format.
  * @param eventConfigs Array of event configurations, which are needed to run validations for scopes.
  */
-export function defineRoles(roles: Role[], eventConfigs: EventConfig[]) {
+export function defineRoles(roles: Roles, eventConfigs: EventConfig[]) {
   validateRoles(roles, eventConfigs)
-  return roles.map((role) => Role.parse(role))
+  return Roles.parse(roles)
 }
