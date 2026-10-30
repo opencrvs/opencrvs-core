@@ -40,6 +40,7 @@ export function validateRoles(roles: Roles, eventConfigs: EventConfig[]) {
     validateRole(role, eventConfigs)
   )
 
+  // eslint-disable-next-line no-console
   console.log(validationErrors2)
 
   if (validationErrors.length) {
