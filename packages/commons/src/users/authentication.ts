@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import decode from 'jwt-decode'
-import { Nominal } from './nominal'
+import { Nominal } from '../nominal'
 import * as z from 'zod/v4'
 import { ScopeType, decodeScope, Scope, EncodedScope } from './scopes'
 export * from './scopes'

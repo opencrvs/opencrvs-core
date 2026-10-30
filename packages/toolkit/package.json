@@ -70,6 +70,6 @@
   },
   "moduleNameMapper": {
     "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",
-    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/scopes.js"
+    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/users/scopes.js"
   }
 }

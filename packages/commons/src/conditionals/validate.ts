@@ -31,7 +31,7 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
+import { EncodedScope, ITokenPayload, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,

@@ -11,7 +11,7 @@
 import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
-import { ITokenPayload as TokenPayload } from '../authentication'
+import { ITokenPayload as TokenPayload } from '../users/authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'

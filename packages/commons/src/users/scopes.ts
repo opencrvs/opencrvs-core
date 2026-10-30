@@ -11,10 +11,10 @@
 
 import * as z from 'zod/v4'
 import * as qs from 'qs'
-import { UUID } from './uuid'
+import { UUID } from '../uuid'
 import { getScopes } from './authentication'
-import { ContainsFlags } from './events/Flag'
-import { EventStatus } from './events/EventStatus'
+import { ContainsFlags } from '../events/Flag'
+import { EventStatus } from '../events/EventStatus'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
