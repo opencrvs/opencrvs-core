@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcrypt'
 
 interface SaltedHash {
   hash: string

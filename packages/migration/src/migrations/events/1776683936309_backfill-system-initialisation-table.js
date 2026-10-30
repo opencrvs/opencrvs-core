@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import bcryptPkg from 'bcryptjs'
+import bcryptPkg from 'bcrypt'
 const { genSaltSync, hashSync } = bcryptPkg
 
 const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
