@@ -37,7 +37,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
@@ -74,7 +74,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea' } },
@@ -224,7 +224,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'location' } },
       { type: 'record.read', options: { placeOfEvent: 'location' } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { placeOfEvent: 'location', notifiedBy: 'user' } },
+      { type: 'record.edit', options: { placeOfEvent: 'location', notifiedBy: 'user', status: ['NOTIFIED'] } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])
   },
@@ -241,7 +241,7 @@ export const roles: Role[] = [
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent'] } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea', status: ['NOTIFIED'] } },
       { type: 'record.notify', options: { placeOfEvent: 'administrativeArea' } }
     ])
   },
@@ -259,7 +259,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'location' } },
       { type: 'record.read', options: { placeOfEvent: 'location' } },
       { type: 'record.declare', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { placeOfEvent: 'location' } },
+      { type: 'record.edit', options: { placeOfEvent: 'location', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE'], placeOfEvent: 'location' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY'], placeOfEvent: 'location' } },
       { type: 'record.print-certified-copies', options: { placeOfEvent: 'location' } },
