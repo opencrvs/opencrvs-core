@@ -67,7 +67,7 @@ const communityLeaderBaseScopesWithoutSearch = [
 
 export const userScopes = {
   /**
-   * scopes are same as countryconfig/src/data-seeding/roles/roles.ts
+   * scopes are same as countryconfig/src/api/roles/roles.ts
    * except for,
    *  - workque scope that has an extra workqueue: all-events
    *  - test admin scope that has extra user create and edit scopes

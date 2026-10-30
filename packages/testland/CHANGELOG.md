@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0 Release Candidate
+
+### Improvements
+
+- Moved `roles.ts` and the `/config/roles` handler from `src/data-seeding/roles/` to `src/api/roles/`. Roles are configuration served from `/config/roles`, not seed data. The endpoint is unchanged. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+
 ## 2.1.0 Release Candidate
 
 ### Breaking changes

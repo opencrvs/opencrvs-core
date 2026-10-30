@@ -560,7 +560,7 @@ describe('2.0 scopes', () => {
 it('transform legacy scope to v2', () => {
   const scopes = {
     /**
-     * scopes are same as countryconfig/src/data-seeding/roles/roles.ts
+     * scopes are same as countryconfig/src/api/roles/roles.ts
      * except for workque scope that has an extra workqueue: all-events
      */
     localRegistrar: [
