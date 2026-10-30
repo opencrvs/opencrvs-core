@@ -27,7 +27,6 @@ import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
-  refetchAllSearchQueries,
   seedLocalEventIndex,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -183,7 +182,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
     return optimisticDraft
   },
   onSuccess: async () => {
-    await refetchAllSearchQueries()
+    // Drafts are never indexed, so no search can change.
     await refetchDraftsList()
   },
   retryDelay: 10000
