@@ -44,8 +44,7 @@ import {
 } from '@events/router/trpc'
 import {
   getApplicationConfig,
-  getInMemoryRoles,
-  getRoles
+  getInMemoryRoles
 } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
