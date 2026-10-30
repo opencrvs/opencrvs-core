@@ -15,16 +15,14 @@
       "@opencrvs/commons/conditionals": [
         "../commons/src/conditionals/conditionals.ts"
       ],
-      "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
+      "@opencrvs/commons/scopes": ["../commons/src/users/scopes.ts"],
+      "@opencrvs/commons/users/Role": ["../commons/src/users/Role.ts"],
       "@opencrvs/commons/authentication": [
-        "../commons/src/authentication.ts"
+        "../commons/src/users/authentication.ts"
       ],
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
       "@opencrvs/commons/events/deduplication": [
         "../commons/src/events/deduplication.ts"
-      ],
-      "@opencrvs/commons/scopes.deprecated.do-not-use": [
-        "../commons/src/scopes.deprecated.do-not-use.ts"
       ],
       "@opencrvs/commons/notification": [
         "../commons/src/notification/index.ts"

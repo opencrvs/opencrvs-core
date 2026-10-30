@@ -8,23 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MessageDescriptor } from 'react-intl'
-import { defineScopes, EncodedScope } from '@opencrvs/toolkit/scopes'
+import { defineScopes } from '@opencrvs/toolkit/scopes'
+import { defineRoles, Roles } from '@opencrvs/toolkit/roles'
+import { eventConfigs } from '@countryconfig/events'
 
-type Role = {
-  id: string
-  label: MessageDescriptor
-  scopes: EncodedScope[]
-}
-
-export const roles: Role[] = [
+const roles: Roles = [
   {
     id: 'REGISTRATION_AGENT',
-    label: {
-      defaultMessage: 'Registration Officer',
-      description: 'Name for user role Registration Officer',
-      id: 'userRole.registrationOfficer'
-    },
     scopes: defineScopes([
       { type: 'performance.read' },
       { type: 'organisation.read-locations', options: { accessLevel: 'administrativeArea' } },
@@ -58,11 +48,6 @@ export const roles: Role[] = [
   },
   {
     id: 'LOCAL_REGISTRAR',
-    label: {
-      defaultMessage: 'Registrar',
-      description: 'Name for user role Registrar',
-      id: 'userRole.localRegistrar'
-    },
     scopes: defineScopes([
       { type: 'profile.electronic-signature' },
       { type: 'performance.read' },
@@ -98,11 +83,6 @@ export const roles: Role[] = [
   },
   {
     id: 'LOCAL_SYSTEM_ADMIN',
-    label: {
-      defaultMessage: 'Administrator',
-      description: 'Name for user role Administrator',
-      id: 'userRole.administrator'
-    },
     scopes: [
       ...defineScopes([
         { type: 'organisation.read-locations', options: { accessLevel: 'administrativeArea' } },
@@ -115,11 +95,6 @@ export const roles: Role[] = [
   },
   {
     id: 'NATIONAL_SYSTEM_ADMIN',
-    label: {
-      defaultMessage: 'National Administrator',
-      description: 'Name for user role National Administrator',
-      id: 'userRole.nationalAdministrator'
-    },
     scopes: [
       ...defineScopes([
         { type: 'config.update-all' },
@@ -152,11 +127,6 @@ export const roles: Role[] = [
   },
   {
     id: 'PERFORMANCE_MANAGER',
-    label: {
-      defaultMessage: 'Operations Manager',
-      description: 'Name for user role Operations Manager',
-      id: 'userRole.operationsManager'
-    },
     scopes: defineScopes([
       { type: 'performance.read' },
       { type: 'organisation.read-locations' },
@@ -170,7 +140,6 @@ export const roles: Role[] = [
   },
   {
     id: 'NATIONAL_REGISTRAR',
-    label: { defaultMessage: 'Registrar General', description: 'Name for user role Registrar General', id: 'userRole.registrarGeneral' },
     scopes: defineScopes([
       { type: 'profile.electronic-signature' },
       { type: 'performance.read' },
@@ -199,11 +168,6 @@ export const roles: Role[] = [
   },
   {
     id: 'PROVINCIAL_REGISTRAR',
-    label: {
-      defaultMessage: 'Provincial Registrar',
-      description: 'Name for user role Provincial Registrar',
-      id: 'userRole.provincialRegistrar'
-    },
     scopes: defineScopes([
       { type: 'organisation.read-locations', options: { accessLevel: 'administrativeArea' } },
       { type: 'user.read', options: { accessLevel: 'administrativeArea' } },
@@ -232,11 +196,6 @@ export const roles: Role[] = [
   },
   {
     id: 'HOSPITAL_CLERK',
-    label: {
-      defaultMessage: 'Hospital Official',
-      description: 'Name for user role Hospital Official',
-      id: 'userRole.hospitalClerk'
-    },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
@@ -251,11 +210,6 @@ export const roles: Role[] = [
   },
   {
     id: 'HEALTH_ADMINISTRATOR',
-    label: {
-      defaultMessage: 'Health Administrator',
-      description: 'Name for user role Health Administrator',
-      id: 'userRole.healthAdministrator'
-    },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
@@ -266,11 +220,6 @@ export const roles: Role[] = [
   },
   {
     id: 'COMMUNITY_LEADER',
-    label: {
-      defaultMessage: 'Community Leader',
-      description: 'Name for user role Community Leader',
-      id: 'userRole.communityLeader'
-    },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'record.search', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
@@ -283,11 +232,6 @@ export const roles: Role[] = [
   },
   {
     id: 'EMBASSY_OFFICIAL',
-    label: {
-      defaultMessage: 'Embassy Official',
-      description: 'Name for user role Embassy Official',
-      id: 'userRole.embassyOffical'
-    },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'escalated', 'pending-updates', 'pending-certification', 'potential-duplicate'] } },
@@ -304,11 +248,6 @@ export const roles: Role[] = [
   },
   {
     id: 'QA_HOSPITAL_CLERK',
-    label: {
-      defaultMessage: 'QA Hospital Official',
-      description: 'Name for user role QA Hospital Official. Used for regression testing',
-      id: 'userRole.hospitalClerk'
-    },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
@@ -336,11 +275,6 @@ export const roles: Role[] = [
      * See https://github.com/opencrvs/opencrvs-core/issues/13287
      */
     id: 'FIELD_AGENT',
-    label: {
-      defaultMessage: 'Field Agent',
-      description: 'Name for user role Field Agent',
-      id: 'userRole.fieldAgent'
-    },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-validation'] } },
@@ -351,3 +285,5 @@ export const roles: Role[] = [
     ])
   }
 ]
+
+export default defineRoles(roles, eventConfigs)

@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import { ActionType } from './ActionType'
 
 const AuditLogEntryBase = z.object({

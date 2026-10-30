@@ -11,6 +11,11 @@
 - Birth has its own notification form (`src/events/birth/forms/notificationForm.ts`) on an explicit `NOTIFY` action.
 - Death has an explicit `NOTIFY` action, with its declaration form and review made optional through `toNotificationForm` and `toNotificationReview`.
 
+### Improvements
+
+- Moved `roles.ts` and the `/config/roles` handler from `src/data-seeding/roles/` to `src/api/roles/`. Roles are configuration served from `/config/roles`, not seed data. The endpoint is unchanged; if you have edited `roles.ts`, carry your changes over to the new location. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+- Removed `label` from the roles in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to from `src/translations/countryconfig.csv`. Nothing read them: roles are named by the `event.history.role` message in `client.csv`, keyed by role id. You can delete them from your own roles and `countryconfig.csv`; leaving them in does no harm. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+
 ## 2.1.0 Release Candidate
 
 ### Breaking changes

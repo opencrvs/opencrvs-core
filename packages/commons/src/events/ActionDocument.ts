@@ -13,7 +13,7 @@ import * as z from 'zod/v4'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { UUID } from '../uuid'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import { DocumentPath } from '../documents'
 import { ActionStatus } from './ActionStatus'
 

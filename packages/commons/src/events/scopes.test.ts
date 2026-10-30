@@ -15,7 +15,7 @@ import {
   isActionInScope,
   RECORD_WRITE_SCOPES
 } from './scopes'
-import { encodeScope, UserScopeV2 } from '../scopes'
+import { encodeScope, UserScopeV2 } from '../users/scopes'
 import { ActionType } from './ActionType'
 import {
   EventIndexWithAdministrativeHierarchy,

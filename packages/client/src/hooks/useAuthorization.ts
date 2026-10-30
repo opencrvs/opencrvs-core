@@ -11,7 +11,6 @@
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
-  findScope,
   User,
   Location,
   hasScope as hasScopeFromCommons,
@@ -115,12 +114,7 @@ export function usePermissions() {
     })
   }
 
-  const creatableRoleIds = findScope(userScopes ?? [], 'user.create')?.options
-    ?.role
-
-  const canCreateUser = Array.isArray(creatableRoleIds)
-    ? creatableRoleIds.length > 0
-    : hasScope('user.create')
+  const canCreateUser = hasScope('user.create')
 
   const organisationReadLocationsScopes = getAcceptedScopesByType({
     acceptedScopes: ['organisation.read-locations'],

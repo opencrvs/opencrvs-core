@@ -58,7 +58,7 @@ import {
 } from '@countryconfig/api/dashboards/registrations-proxy'
 import { locationsHandler } from './data-seeding/locations/handler'
 import { certificateHandler } from './api/certificates/handler'
-import { rolesHandler } from './data-seeding/roles/handler'
+import { rolesHandler } from './api/roles/handler'
 import { usersHandler } from './data-seeding/employees/handler'
 import { applicationConfigHandler } from './api/application/handler'
 import { handlebarsHandler } from './certificate/handlebars/handler'

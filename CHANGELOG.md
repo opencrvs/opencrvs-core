@@ -213,6 +213,7 @@ The toolkit and the country configuration template work with any container regis
 
 ### Improvements
 
+- Roles no longer need a `label`. Nothing read it: the client names roles with the `event.history.role` message in `client.csv`, keyed by role id. The data seeder no longer rejects a role without a `label`, and ignores one that is still there. Country configurations can delete `label` from each role in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to in `countryconfig.csv`. A role id that `event.history.role` does not list is shown as "Unknown". [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
 - Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
