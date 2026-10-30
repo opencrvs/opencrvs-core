@@ -2359,8 +2359,10 @@ components:
                 description: Identifier of the version, unique within the event (e.g.
                   "birth-v2").
               effectiveFrom:
+                default: 0001-01-01
                 description: Date (YYYY-MM-DD) from which this version is effective. A version
-                  without one is effective from the beginning of time.
+                  without one is effective from the beginning of time
+                  ('0001-01-01').
                 type: string
                 format: date
                 pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
@@ -2585,6 +2587,7 @@ components:
                   $ref: "#/components/schemas/Conditional"
             required:
               - id
+              - effectiveFrom
               - title
               - summary
               - actions
@@ -2592,7 +2595,8 @@ components:
               - analytics
             additionalProperties: false
           description: Versions of the event configuration, each effective from its
-            `effectiveFrom`.
+            `effectiveFrom`. An event configured without versions has a single
+            version, with id 'default' and `effectiveFrom` '0001-01-01'.
       required:
         - id
         - label
@@ -2943,6 +2947,17 @@ components:
                   fieldType:
                     type: string
                     const: field
+                  defaultValue:
+                    description: Value the field opens with in advanced search. Omitted or true uses
+                      the declaration form's defaultValue, false opens the field
+                      empty, and any other value opens it with that value. Only
+                      text, number and date fields take a value; every other
+                      field type, and date fields searched as a range, only
+                      accept true or false.
+                    type:
+                      - boolean
+                      - string
+                      - number
                 required:
                   - config
                   - fieldId
@@ -14899,8 +14914,7 @@ components:
         notificationForm:
           description: Notification form configuration. Its fields must be a subset of the
             declaration form fields, with matching types. The values submitted
-            on the notification form pre-fill the declaration. If not defined,
-            the declare action's declaration is used (with all fields optional).
+            on the notification form pre-fill the declaration.
           $ref: "#/components/schemas/DeclarationFormConfig"
         review:
           type: object
@@ -14918,9 +14932,7 @@ components:
             - fields
           additionalProperties: false
           description: Review page configuration for the notify action. Values of its
-            fields are stored as the NOTIFY action annotation. If not defined,
-            defineConfig generates it from the declare action's review (with all
-            fields optional).
+            fields are stored as the NOTIFY action annotation.
         form:
           description: Fields rendered on the action confirmation dialog. Submitted values
             are stored in the action annotation and shown in the audit history.
@@ -14931,6 +14943,7 @@ components:
         - label
         - flags
         - type
+        - notificationForm
         - review
       additionalProperties: false
       description: Configuration for the notify action, including the notification
