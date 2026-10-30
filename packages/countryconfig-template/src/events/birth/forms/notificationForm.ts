@@ -15,8 +15,7 @@ import {
   field,
   defineFormPage,
   FieldConfigInput,
-  PageTypes,
-  or
+  PageTypes
 } from '@opencrvs/toolkit/events'
 import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
 import {
@@ -29,7 +28,7 @@ import {
   invalidNameValidator,
   MAX_NAME_LENGTH
 } from '../validators'
-import { PHONE_NUMBER_REGEX } from './pages/informant'
+import { mother } from './pages/mother'
 
 /**
  * Child fields captured on a birth notification. The fields are taken from the
@@ -133,6 +132,22 @@ const differentFields: FieldConfigInput[] = [
   }
 ]
 
+/**
+ * Mother's ID fields are picked from the declaration form. `requireMotherDetails`
+ * in their conditionals is always true here, as the notification form has
+ * neither the informant's relation nor the "details not available" checkbox.
+ *
+ * The ID type is optional on a notification, so notifications without the
+ * mother's ID stay valid. Once a type is chosen, its ID number is required.
+ */
+const motherIdFields = mother.fields
+  .filter(({ id }) =>
+    ['mother.idType', 'mother.nid', 'mother.passport', 'mother.brn'].includes(
+      id
+    )
+  )
+  .map((f) => (f.id === 'mother.idType' ? { ...f, required: false } : f))
+
 const childPage = defineFormPage({
   id: 'child',
   type: PageTypes.enum.FORM,
@@ -197,46 +212,7 @@ const mothersPage = defineFormPage({
         id: 'event.birth.action.declare.form.section.person.field.dob.label'
       }
     },
-    {
-      id: 'informant.phoneNo',
-      type: FieldType.PHONE,
-      required: false,
-      secured: true,
-      label: {
-        defaultMessage: 'Phone number',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.phoneNo.label'
-      },
-      validation: [
-        {
-          message: {
-            defaultMessage:
-              'Must be a valid 10 digit number that starts with 0(7|9)',
-            description:
-              'The error message that appears on phone numbers where the first two characters must be 07 or 09, and length must be 10',
-            id: 'event.birth.action.declare.form.section.informant.field.phoneNo.error'
-          },
-          validator: or(
-            field('informant.phoneNo').matches(PHONE_NUMBER_REGEX),
-            field('informant.phoneNo').isFalsy()
-          )
-        }
-      ]
-    },
-    {
-      id: 'informant.email',
-      type: FieldType.EMAIL,
-      required: true,
-      secured: true,
-      label: {
-        defaultMessage: 'Email',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.email.label'
-      },
-      configuration: {
-        maxLength: 255
-      }
-    }
+    ...motherIdFields
   ]
 })
 
