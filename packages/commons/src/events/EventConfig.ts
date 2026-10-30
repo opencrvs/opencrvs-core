@@ -413,7 +413,8 @@ function validateVersionList(
   ctx: z.RefinementCtx<VersionedEventConfig>
 ) {
   const ids = new Set<string>()
-  const effectiveFroms = new Set<string>()
+  /** Id of the first version with each `effectiveFrom` */
+  const versionIdByEffectiveFrom = new Map<string, string>()
 
   config.versions.forEach((version, index) => {
     if (ids.has(version.id)) {
@@ -425,17 +426,22 @@ function validateVersionList(
     }
     ids.add(version.id)
 
-    if (effectiveFroms.has(version.effectiveFrom)) {
+    const sameEffectiveFromId = versionIdByEffectiveFrom.get(
+      version.effectiveFrom
+    )
+    if (sameEffectiveFromId !== undefined) {
+      const versionIds = `'${sameEffectiveFromId}', '${version.id}'`
       ctx.addIssue({
         code: 'custom',
         message:
           version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
-            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}'. Each version must have a different \`effectiveFrom\`.`
-            : `Event '${config.id}' has more than one version without \`effectiveFrom\`. At most one version may omit it.`,
+            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}' (${versionIds}). Each version must have a different \`effectiveFrom\`.`
+            : `Event '${config.id}' has more than one version without \`effectiveFrom\` (${versionIds}). At most one version may omit it.`,
         path: ['versions', index, 'effectiveFrom']
       })
+    } else {
+      versionIdByEffectiveFrom.set(version.effectiveFrom, version.id)
     }
-    effectiveFroms.add(version.effectiveFrom)
   })
 }
 

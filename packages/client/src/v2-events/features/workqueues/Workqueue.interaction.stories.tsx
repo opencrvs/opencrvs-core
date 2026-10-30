@@ -692,12 +692,11 @@ export const WorkqueueGoesOfflineWhileLoading: Story = {
 // How it works:
 //   1. MSW count handler returns initialCount (3) on the first call.
 //   2. MSW search handler returns 3 events on the first call.
-//   3. The play function manually invalidates the count cache – simulating
-//      what the 20-second polling would do – and MSW now returns updatedCount (4).
-//   4. The setQueryDefaults interceptor in count.ts detects the change and
-//      calls invalidateWorkqueueSearchQueries('recent').
-//   5. MSW search handler now returns 4 events.
-//   6. The list shows 4 rows without any user interaction.
+//   3. MSW now returns updatedCount (4) and 4 events, and the play function
+//      invalidates the counts – what the 20-second count poll does.
+//   4. The count queryFn in count.ts sees the 'recent' count change and
+//      refetches the workqueue on screen.
+//   5. The list shows 4 rows without any user interaction.
 // ---------------------------------------------------------------------------
 
 let autoRefreshDataChanged = false
@@ -930,11 +929,12 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
     await step(
       'After count changes workqueue list auto-refreshes to 4 rows',
       async () => {
+        // A count change joins a queue fetch already in flight, so let the
+        // mount's own refetch land before the server data changes.
+        await waitFor(async () => expect(queryClient.isFetching()).toBe(0))
         autoRefreshDataChanged = true
 
-        // Force an immediate count refetch – this is what the 20-second polling
-        // interval does naturally. The useEffect in Workqueues detects the
-        // change and triggers invalidateWorkqueueSearchQueries('recent').
+        // What the count poll does, without waiting 20 seconds for it.
         await queryClient.invalidateQueries({
           queryKey: trpcOptionsProxy.workqueue.count.queryKey()
         })
