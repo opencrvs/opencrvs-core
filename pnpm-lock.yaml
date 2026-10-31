@@ -33,7 +33,7 @@ overrides:
   '@trpc/server': 11.8.0
   node-gyp>glob: 10.5.0
   cacache>glob: 10.5.0
-  read-package-json>glob: 10.5.0
+  read-package-json>glob: 14.0.2
   lerna>minimatch: 3.1.5
   '@lerna/create>minimatch': 3.1.5
   nx>minimatch: 9.0.9
@@ -6231,6 +6231,7 @@ packages:
   '@smithy/core@3.36.0':
     resolution: {integrity: sha512-3hJiwG1F5t1SoXqp/yOCmYXziyx7ZVqF63S5W6YU201e/qwVaHPex+E/3vvyY9a3ORq/b+BydeNZpP2saQ9X2g==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.5.2':
     resolution: {integrity: sha512-A9uSdn72ozbRUSit0eib0TW7nXuNPlaeM0zcGkJ+nE6tFcSDbnmtwoxbTCFBukVQcszDAyvsd7+rTduPTXpygg==}
