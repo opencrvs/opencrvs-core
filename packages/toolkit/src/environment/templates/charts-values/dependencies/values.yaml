@@ -46,7 +46,14 @@ rustfs:
   {{#if s3_migrate_from_minio_to_rustfs}}
   host_data_path: /data/minio
   {{/if}}
-
+  {{#if restore_enabled}}
+  restore:
+    type: {{restore_type}}
+  {{/if}}
+  {{#if backup_enabled}}
+  backup:
+    type: {{backup_type}}
+  {{/if}}
 {{/if}}
 
 elasticsearch:

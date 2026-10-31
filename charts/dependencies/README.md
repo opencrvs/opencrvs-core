@@ -294,7 +294,7 @@ Adjust schedules, server credentials, and directories as needed for your deploym
 
 ## RustFS
 
-RustFS is an open-source S3 object store that the chart can deploy as an alternative to MinIO. It is disabled by default. The documents service only speaks S3, and [packages/documents/README.md](../../packages/documents/README.md) lists the version of RustFS that it was tried on, and what to check when you change the store.
+RustFS is an open-source S3 object store that the chart can deploy as an alternative to MinIO. It is disabled by default.
 
 Enabling RustFS does not replace MinIO. RustFS runs beside it, as a StatefulSet with a Service and a volume of its own, and serves the S3 API on port 3535 and the console on port 3536, as MinIO does. Set `minio.enabled: false` when nothing uses MinIO any more.
 
@@ -308,7 +308,6 @@ To replace MinIO with RustFS on the data of MinIO, set `minio.enabled: false` an
 - **Keep the PVC of MinIO (`storage_type: pvc`).** When MinIO is disabled, `helm upgrade` removes the `minio` PVC that it created, and the volume behind it goes too if its reclaim policy is `Delete`. The chart marks the PVC with `helm.sh/resource-policy: keep`, but only an upgrade made while MinIO is still enabled applies that. Before disabling MinIO with an earlier version of the chart, run `kubectl annotate pvc minio helm.sh/resource-policy=keep` and `kubectl patch pv <volume of the PVC> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'`.
 - **MinIO must be stopped before RustFS starts.** `helm upgrade` creates the RustFS StatefulSet before it deletes the one of MinIO. Scale MinIO down first (`kubectl scale statefulset minio --replicas=0`), or deploy in two steps, so that the two never run on the same data.
 - **Keep the credentials.** RustFS reads the IAM data of MinIO with the root credentials, so `s3-opencrvs-users` must not change.
-- With `storage_type: pvc` the PVC `minio` is rendered by the RustFS template, with `helm.sh/resource-policy: keep`, so that Helm never deletes the data.
 - Point the services chart at RustFS afterwards, see [Use RustFS from the OpenCRVS services](#use-rustfs-from-the-opencrvs-services).
 
 ### Configuration options

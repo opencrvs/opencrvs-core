@@ -759,11 +759,10 @@ export async function runSetupEnvironment() {
     } else {
       s3_migrate_from_minio_to_rustfs = await confirm({
         message:
-          kleur
-            .bold()
-            .yellow("Don't forget to backup your data before migration") +
-          '\nMinIO is deprecated as backend storage and will not be supported in future releases.' +
-          '\nRustFS is presented as in-place replacement for MinIO, would you like to run migration during next dependencies deployment?',
+          `${kleur.bold('Deprecation notice:')} MinIO is deprecated and will not be supported in future releases.\n` +
+          'RustFS is its in-place replacement.\n' +
+          `${kleur.bold().red('Back up your data before migrating!')}\n\n` +
+          `Migrate from ${kleur.bold().cyan('MinIO to RustFS')} during the next dependencies deployment?`,
         default: process.env.S3_MIGRATE_FROM_MINIO_TO_RUSTFS === 'true'
       })
       s3_backend = s3_migrate_from_minio_to_rustfs ? 'rustfs' : 'minio'
@@ -893,7 +892,8 @@ export async function runSetupEnvironment() {
     process.env.MONITORING_ENABLED || existingMonitoringEnabled?.value
   const monitoring_enabled = await confirm({
     message:
-      'Enable monitoring (Kibana, APM, Filebeat, Metricbeat, Elastalert, OpenTelemetry Collector and tracing)? Disable it if this environment does not need its own monitoring stack.',
+      `${kleur.bold('Monitoring stack:')} Kibana, APM, Filebeat, Metricbeat, Elastalert, OpenTelemetry Collector and tracing.\n\n` +
+      'Enable monitoring for this environment?',
     default: monitoringDefault ? monitoringDefault === 'true' : true
   })
 
