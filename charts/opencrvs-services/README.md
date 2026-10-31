@@ -148,12 +148,12 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>s3.admin_username</td>
             <td><code>n/a</code></td>
-            <td>Access key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>minio.admin_username</code>.</td>
+            <td>Access key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>minio.admin_username</code>, or <code>rustfs.admin_username</code> when it deploys RustFS and not MinIO.</td>
         </tr>
         <tr>
             <td>s3.admin_password</td>
             <td><code>n/a</code></td>
-            <td>Secret key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>minio.admin_password</code>.</td>
+            <td>Secret key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>minio.admin_password</code>, or <code>rustfs.admin_password</code> when it deploys RustFS and not MinIO.</td>
         </tr>
         <tr>
             <td>s3.users_secret</td>

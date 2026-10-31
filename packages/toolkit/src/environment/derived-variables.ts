@@ -179,5 +179,19 @@ export const derivedVariables = [
     valueType: 'VARIABLE',
     type: 'disabled',
     scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'S3_BACKEND',
+    valueLabel: 'S3_BACKEND',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'S3_MIGRATE_FROM_MINIO_TO_RUSTFS',
+    valueLabel: 'S3_MIGRATE_FROM_MINIO_TO_RUSTFS',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
   }
 ] as const

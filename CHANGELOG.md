@@ -202,6 +202,14 @@ The data cleanup job now empties the bucket and keeps it, where it removed the b
 
 A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
+#### RustFS as an object store of the dependencies chart
+
+The dependencies chart can deploy RustFS, an open-source S3 object store, beside MinIO. It is off by default (`rustfs.enabled: false`), so an upgrade changes nothing. RustFS has hostnames (`rustfs.<hostname>` and `rustfs-console.<hostname>`), a Service and a volume of its own, and takes the credentials of MinIO from the `s3-opencrvs-users` secret. To use it, enable it and point `s3.host` and `s3.public_endpoint` of the services chart at it. See [RustFS](charts/dependencies/README.md#rustfs) in the README of the chart.
+
+RustFS can take over the data of MinIO in place. Set `minio.enabled: false` and point RustFS at the volume of MinIO: `rustfs.host_data_path: /data/minio` for host path storage, or `rustfs.pvc.name: minio` with `rustfs.pvc.use_existing_claim: true` for a PVC. The chart refuses to render when both stores are enabled on the same path or PVC, and the PVC of MinIO now has `helm.sh/resource-policy: keep`. Keep these values in later releases, back up the data first, and see [Migrate from MinIO in place](charts/dependencies/README.md#migrate-from-minio-in-place). The toolkit starts new environments on RustFS, and asks an environment that runs MinIO whether to migrate, writing `rustfs.host_data_path: /data/minio` for host path storage.
+
+Backup and restore work for RustFS as they do for MinIO, with the same scripts, the same settings under `rustfs.backup` and `rustfs.restore`, and the same place on the backup server, so a `dump` of one store restores into the other. Only one store is backed up and restored at a time, RustFS when it is enabled, also when MinIO is enabled too. The scripts moved to `files/s3`, and the ConfigMap `minio-scripts` is now `s3-scripts`. The `rsync` sidecar of the differential backup, in the pod of MinIO too, now runs as root and copies the SSH key at start, so an upgrade restarts the MinIO pod when `minio.backup.type` or `minio.restore.type` is `differential`. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
 #### Container registry other than Docker Hub
 
 The toolkit and the country configuration template work with any container registry that implements the OCI Registry v2 API, for example GHCR. The `DOCKERHUB_ACCOUNT`, `DOCKERHUB_REPO`, `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets are renamed to `REGISTRY_ORGANISATION`, `REGISTRY_REPOSITORY`, `REGISTRY_USERNAME` and `REGISTRY_TOKEN`. The new repository variable `REGISTRY_HOST` (default `docker.io`) sets the registry, and the pull secret `dockerhub-credentials` is now `registry-credentials`. `environment:init` asks for these and checks them with the Registry v2 API. `check-before-build.sh` now takes `REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]`. [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
@@ -223,6 +231,13 @@ The toolkit and the country configuration template work with any container regis
 ### Bug fixes
 
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
+
+## 2.1.1
+
+### Improvements
+
+- Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
+
 
 ## 2.1.0
 

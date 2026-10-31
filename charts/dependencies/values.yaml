@@ -411,6 +411,7 @@ minio:
   # Admin username and password for MinIO. When both are set, they are used even if `use_default_credentials` is `true`.
   # If `use_default_credentials` is `false` and they are not set, random ones are generated. Set both or none.
   # They are written to the secret s3-opencrvs-users when it does not exist yet, and an existing secret is left as it is.
+  # These three values are read unless RustFS is enabled and MinIO is not, when those of `rustfs` are read.
   # admin_username: minioadmin
   # admin_password: minioadmin
 
@@ -432,6 +433,7 @@ minio:
   # node_port: 30535         # exposes port 3535
   # node_port_console: 30536 # exposes port 3536
 
+  # Backup and restore of MinIO are not used while RustFS is enabled, see `rustfs.backup`.
   backup:
     # Enable or disable backup functionality for MinIO.
     enabled: false
@@ -456,6 +458,122 @@ minio:
 
   restore:
     # Enable or disable restore functionality for MinIO.
+    enabled: false
+
+    # Restore type:
+    # "dump" - restore from encrypted archive;
+    # "differential" - rsync filesystem from remote backup server.
+    type: dump
+
+    # Name of the Kubernetes secret containing backup server SSH credentials.
+    # server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
+
+    # Cron schedule for restore job.
+    # schedule: "0 3 * * *"
+
+rustfs:
+  # Enable or disable RustFS deployment.
+  # RustFS is an open-source S3 object store, an alternative to MinIO. It has
+  # hostnames, a volume and a Service of its own, so it can run beside MinIO.
+  # Point the OpenCRVS services at it with `s3.host` and `s3.public_endpoint`.
+  enabled: false
+  image:
+    repository: rustfs/rustfs
+    tag: '1.0.1'
+  # User ID inside rustfs container:
+  run_as_id: 10001
+  # Port of the S3 API, the same as MinIO's, so that `s3.port` of the OpenCRVS
+  # services chart does not change when it is pointed at RustFS.
+  port: 3535
+  network_policy:
+    ingress_mode: private
+    rules:
+      # network_policy.ingress_mode only scopes to the service's single `port`
+      # value (the S3 API). Ingress for the console (port 3536) is opened
+      # explicitly below, as for MinIO.
+      - name: allow-console-ingress
+        policyTypes:
+          - Ingress
+        ingress:
+          - ports:
+              - protocol: TCP
+                port: 3536
+
+  # Use default credentials (username: rustfsadmin, password: rustfsadmin).
+  # Highly discouraged for production environments.
+  use_default_credentials: true
+  # Admin username and password for RustFS. When both are set, they are used even if `use_default_credentials` is `true`.
+  # If `use_default_credentials` is `false` and they are not set, random ones are generated. Set both or none.
+  # They are written to the secret s3-opencrvs-users when it does not exist yet, and an existing secret is left as it is.
+  # These three values are read only when RustFS is enabled and MinIO is not. Otherwise those of `minio` are read.
+  # admin_username: rustfsadmin
+  # admin_password: rustfsadmin
+  # RustFS has a single root identity, built from S3_ADMIN_ACCESS_KEY and
+  # S3_ADMIN_SECRET_KEY of the secret, so S3_ACCESS_KEY and S3_SECRET_KEY, which
+  # the documents service uses, must hold the same values. The generated secret does.
+
+  console:
+    # The admin console, on port 3536 and on rustfs-console.<hostname>.
+    # Users log in with S3_ADMIN_ACCESS_KEY and S3_ADMIN_SECRET_KEY.
+    enabled: true
+
+  # storage_type: host_path
+  # PVC Configuration
+  pvc:
+    # storage_class: "default"
+    access_mode: 'ReadWriteOnce'
+    storage_size: '10Gi'
+    # Name of the PVC.
+    name: rustfs
+    # false: the chart creates the PVC `name`.
+    # true: the PVC `name` already exists, for example `minio` to take over the data of MinIO,
+    # the chart does not create it and the other `pvc` settings are not used.
+    # MinIO must not use the same PVC at once.
+    use_existing_claim: false
+
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  # Set it to the path of MinIO (`/data/minio`) to take over the data of MinIO in place.
+  # MinIO must not use the same path at once.
+  host_data_path: /data/rustfs
+
+  # Node selector for RustFS pods, usually used to keep data persistent on specified nodes.
+  node_selector: {}
+
+  # Fixed NodePorts, only used when `service_type` is `NodePort`.
+  # node_port: 30535         # exposes port 3535
+  # node_port_console: 30536 # exposes port 3536
+
+  # Backup and restore work as they do for MinIO, and write to the same place on the backup server.
+  # They run for one store at a time, and RustFS is preferred: while RustFS is enabled, MinIO is not
+  # backed up or restored, also when it is enabled too.
+  backup:
+    # Enable or disable backup functionality for RustFS.
+    enabled: false
+
+    # Backup type:
+    # "dump" - creates a full filesystem dump;
+    # "differential" - rsync the filesystem to a remote backup server.
+    type: dump
+
+    # Name of the Kubernetes secret containing backup server SSH credentials.
+    # server_secret: backup-server-ssh-credentials
+
+    # Host:
+    # host: backup server hostname or IP
+
+    # Cron schedule to run backup job (format: "MIN HOUR DAY MONTH WEEKDAY").
+    # schedule: "0 1 * * *"
+
+    # Directory on backup server where encrypted backups are stored.
+    # If not set, use global backup_server_dir.
+    # server_dir: "n/a"
+
+  restore:
+    # Enable or disable restore functionality for RustFS.
     enabled: false
 
     # Restore type:

@@ -725,6 +725,55 @@ export async function runSetupEnvironment() {
     }
   }
 
+  // S3 object storage. MinIO is deprecated: a new environment starts on RustFS,
+  // and an environment that runs MinIO is asked whether the next dependencies
+  // deployment replaces it with RustFS, which takes over the data of MinIO in place.
+  log('')
+  const existingS3Backend = findExistingValue(
+    'S3_BACKEND',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const existingS3Migrate = findExistingValue(
+    'S3_MIGRATE_FROM_MINIO_TO_RUSTFS',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  let s3_backend: 'minio' | 'rustfs' = 'rustfs'
+  let s3_migrate_from_minio_to_rustfs = false
+  if (environment_exists) {
+    if (existingS3Backend?.value === 'rustfs') {
+      // Already answered, and kept as it is: once migrated, RustFS keeps using the
+      // volume of MinIO
+      s3_migrate_from_minio_to_rustfs = existingS3Migrate?.value === 'true'
+      log(
+        kleur.bold().green('✔'),
+        kleur
+          .bold()
+          .grey(
+            `Environment ${environment} already uses RustFS, skipping MinIO migration question`
+          )
+      )
+    } else {
+      s3_migrate_from_minio_to_rustfs = await confirm({
+        message:
+          `${kleur.bold('Deprecation notice:')} MinIO is deprecated and will not be supported in future releases.\n` +
+          'RustFS is its in-place replacement.\n' +
+          `${kleur.bold().red('Back up your data before migrating!')}\n\n` +
+          `Migrate from ${kleur.bold().cyan('MinIO to RustFS')} during the next dependencies deployment?`,
+        default: process.env.S3_MIGRATE_FROM_MINIO_TO_RUSTFS === 'true'
+      })
+      s3_backend = s3_migrate_from_minio_to_rustfs ? 'rustfs' : 'minio'
+      if (!s3_migrate_from_minio_to_rustfs) {
+        log(
+          kleur.bold().green('✔'),
+          kleur.bold().yellow('MinIO is kept, no migration to RustFS')
+        )
+      }
+    }
+  }
   // Backup and restore configuration
   let backupHost =
     findExistingValue('BACKUP_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues)
@@ -843,7 +892,8 @@ export async function runSetupEnvironment() {
     process.env.MONITORING_ENABLED || existingMonitoringEnabled?.value
   const monitoring_enabled = await confirm({
     message:
-      'Enable monitoring (Kibana, APM, Filebeat, Metricbeat, Elastalert, OpenTelemetry Collector and tracing)? Disable it if this environment does not need its own monitoring stack.',
+      `${kleur.bold('Monitoring stack:')} Kibana, APM, Filebeat, Metricbeat, Elastalert, OpenTelemetry Collector and tracing.\n\n` +
+      'Enable monitoring for this environment?',
     default: monitoringDefault ? monitoringDefault === 'true' : true
   })
 
@@ -955,6 +1005,22 @@ export async function runSetupEnvironment() {
     type: 'VARIABLE' as const,
     didExist: existingMonitoringEnabled,
     value: monitoring_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  // Read back on the next run, to not ask again about an environment that
+  // already uses RustFS, and to keep the volume of MinIO for one that migrated
+  derivedUpdates.push({
+    name: 'S3_BACKEND',
+    type: 'VARIABLE' as const,
+    didExist: existingS3Backend,
+    value: s3_backend,
+    scope: 'ENVIRONMENT' as const
+  })
+  derivedUpdates.push({
+    name: 'S3_MIGRATE_FROM_MINIO_TO_RUSTFS',
+    type: 'VARIABLE' as const,
+    didExist: existingS3Migrate,
+    value: s3_migrate_from_minio_to_rustfs ? 'true' : 'false',
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)
@@ -1565,6 +1631,8 @@ export async function runSetupEnvironment() {
     environment_type: environment_type,
     two_fa_enabled,
     monitoring_enabled,
+    rustfs_enabled: s3_backend === 'rustfs',
+    s3_migrate_from_minio_to_rustfs,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',
