@@ -15,7 +15,7 @@ import superjson from 'superjson'
 import {
   ActionStatus,
   ActionType,
-  Draft,
+  RemoteDraft,
   FieldConfig,
   generateEventDocument,
   generateWorkqueues,
@@ -72,10 +72,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const spy = fn()
 
 function createDraftHandlers() {
-  const draftList = fn<() => Draft[]>(() => [])
+  const draftList = fn<() => RemoteDraft[]>(() => [])
   return [
     tRPCMsw.event.draft.create.mutation((req) => {
-      const response: Draft = {
+      const response: RemoteDraft = {
         id: 'test-draft-id' as UUID,
         eventId: req.eventId as UUID,
         transactionId: req.transactionId,
@@ -84,8 +84,9 @@ function createDraftHandlers() {
           ...req,
           originalActionId: req.originalActionId as UUID,
           declaration: (req.declaration ||
-            {}) as Draft['action']['declaration'],
-          annotation: (req.annotation || {}) as Draft['action']['annotation'],
+            {}) as RemoteDraft['action']['declaration'],
+          annotation: (req.annotation ||
+            {}) as RemoteDraft['action']['annotation'],
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',
@@ -305,6 +306,15 @@ export const DraftShownInForm: Story = {
     await waitFor(
       async () =>
         userEvent.click(await canvas.findByRole('button', { name: /Drafts/ })),
+      { timeout: 5000 }
+    )
+    // The drafts list is keyed on the outbox size, so it remounts once the
+    // draft leaves the outbox. Clicking a row before that hits a detached node.
+    await waitFor(
+      async () =>
+        expect(
+          await canvas.findByTestId('navigation_workqueue_outbox')
+        ).toHaveTextContent(/^Outbox$/),
       { timeout: 5000 }
     )
     await userEvent.click(await canvas.findByText('Clearly Draft'))

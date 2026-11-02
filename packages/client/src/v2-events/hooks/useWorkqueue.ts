@@ -17,9 +17,11 @@ import {
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { taggedSearchOptions } from '@client/v2-events/features/events/useEvents/procedures/search'
+import { WORKQUEUE_POLL_INTERVAL } from '@client/v2-events/features/events/useEvents/procedures/count'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 import { useEvents } from '../features/events/useEvents/useEvents'
-import { queryClient, useTRPC } from '../trpc'
+import { queryClient } from '../trpc'
 import { useUsers } from './useUsers'
 
 function getDeserializedQuery(
@@ -60,24 +62,16 @@ export const useWorkqueue = (workqueueSlug: string) => {
       }
       return {
         useSuspenseQuery: () =>
-          searchEvent.useSuspenseQuery(searchInput, {
-            // Tag with workqueueSlug in meta so invalidateWorkqueueSearchQueries()
-            // can target this query without extending the cache key.
-            meta: { workqueueSlug },
-            refetchInterval: 20000
-          }),
-        useQuery: () =>
-          searchEvent.useQuery(searchInput, {
-            meta: { workqueueSlug },
-            refetchInterval: 10000
-          })
+          searchEvent.useSuspenseQuery(
+            searchInput,
+            ['workqueue', workqueueSlug],
+            { refetchInterval: WORKQUEUE_POLL_INTERVAL }
+          )
       }
     },
     getCount: {
       useSuspenseQuery: () =>
-        useGetEventCountsByWorkqueue().useSuspenseQuery(deserializedQueries),
-      useQuery: () =>
-        useGetEventCountsByWorkqueue().useQuery(deserializedQueries)
+        useGetEventCountsByWorkqueue().useSuspenseQuery(deserializedQueries)
     }
   }
 }
@@ -87,7 +81,6 @@ export function useWorkqueues() {
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
   const workqueues = useCountryConfigWorkqueueConfigurations()
-  const trpc = useTRPC()
 
   const prefetch = useCallback(async () => {
     return Promise.all(
@@ -98,23 +91,23 @@ export function useWorkqueues() {
           limit: 10,
           sort: [{ field: 'updatedAt', direction: 'desc' as const }]
         }
-        const options = trpc.event.search.queryOptions(searchInput)
+        const options = taggedSearchOptions(searchInput, [
+          'workqueue',
+          workqueueConfig.slug
+        ])
+        const { queryKey } = options
 
-        const data = queryClient.getQueryData(options.queryKey)
-        const isFetching =
-          queryClient.isFetching({ queryKey: options.queryKey }) > 0
+        const data = queryClient.getQueryData(queryKey)
+        const isFetching = queryClient.isFetching({ queryKey }) > 0
 
         if (data || isFetching) {
           return
         }
 
-        return queryClient.prefetchQuery({
-          ...options,
-          meta: { workqueueSlug: workqueueConfig.slug }
-        })
+        return queryClient.prefetchQuery(options)
       })
     )
-  }, [workqueues, user, trpc])
+  }, [workqueues, user])
 
   return {
     prefetch

@@ -11,9 +11,9 @@
 import { useMemo } from 'react'
 import {
   ActionType,
-  EventIndex,
-  WorkqueueActionType
+  EventIndex
 } from '@opencrvs/commons/client'
+import { WorkqueueCtaType } from './utils'
 import {
   useAssignmentActionConfigurationResolver,
   useEventActionConfigurationResolver
@@ -32,7 +32,7 @@ import { useCustomActionConfigs } from './useCustomActionConfigs'
  */
 export function useGetWorkqueueActionConfiguration(
   event: EventIndex,
-  actionType: WorkqueueActionType
+  actionType: WorkqueueCtaType
 ) {
   const { resolveAction } = useEventActionConfigurationResolver(event)
 

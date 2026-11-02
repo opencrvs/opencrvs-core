@@ -1547,7 +1547,7 @@ export const tennisClubMembershipEvent = defineConfig({
         field('applicant.name', {
           validations: [],
           conditionals: [],
-          useFormDefaultValue: false
+          defaultValue: false
         }).fuzzy(),
         field('applicant.dob').range()
       ]
@@ -1559,7 +1559,7 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'event.tennis-club-membership.search.recommender'
       },
       fields: [
-        field('recommender.name', { useFormDefaultValue: false }).fuzzy(),
+        field('recommender.name', { defaultValue: false }).fuzzy(),
         {
           fieldId: 'recommender.id',
           fieldType: 'field',

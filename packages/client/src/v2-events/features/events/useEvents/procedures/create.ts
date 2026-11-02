@@ -26,7 +26,6 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
-  refetchAllSearchQueries,
   setEventData,
   updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
@@ -119,10 +118,11 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
     return optimisticEvent
   },
-  onSuccess: async (response, _variables, context) => {
+  onSuccess: (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    // Explicitly update local event index to make it accessible when created in offline mode.
+    // Seed the local by-id index under both ids so the record stays resolvable
+    // when it was created offline: `setEventData` only writes `event.get`.
     updateLocalEventIndex(response.id, response)
     updateLocalEventIndex(context.transactionId, response)
 
@@ -132,7 +132,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       setDraft({ ...draft, eventId: response.id })
     }
 
-    await refetchAllSearchQueries()
+    // A CREATED event is never indexed, so no search can change.
   },
   meta: { actionType: ActionType.CREATE }
 })
