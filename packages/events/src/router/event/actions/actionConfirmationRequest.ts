@@ -66,7 +66,7 @@ export async function requestActionConfirmation(
         'Content-Type': 'application/json',
         Authorization: token
       },
-      signal: AbortSignal.timeout(ACTION_CONFIRMATION_TIMEOUT_MS)
+      timeout: ACTION_CONFIRMATION_TIMEOUT_MS
     })
 
     const statusCode = res.status
