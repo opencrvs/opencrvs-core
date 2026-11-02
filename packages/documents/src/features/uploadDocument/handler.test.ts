@@ -9,19 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
+import { toDocumentPath } from '@opencrvs/commons'
 
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { env } from '../../s3/constants'
+import {
+  ensureDefaultBucket,
+  putObject,
+  statObjectIfExists
+} from '../../s3/client'
+import { getObject } from '../../../test/s3'
 
-const putObjectMock = jest.fn()
-const statObjectIfExistsMock = jest.fn()
-jest.mock('../../s3/client', () => {
-  return {
-    __esModule: true,
-    putObject: (...args: unknown[]) => putObjectMock(...args),
-    statObjectIfExists: (...args: unknown[]) => statObjectIfExistsMock(...args)
-  }
+beforeEach(async () => {
+  await ensureDefaultBucket()
 })
 
 describe('fileExistsHandler', () => {
@@ -33,16 +34,19 @@ describe('fileExistsHandler', () => {
     subject: '123123'
   })
 
+  const path = 'event-12345'
+  const transactionId = 'transaction-12345'
+
   beforeEach(async () => {
-    putObjectMock.mockClear()
-    statObjectIfExistsMock.mockReset().mockResolvedValue({ metadata: {} })
+    // Only a lookup of this key answers 200
+    await putObject(`${path}/${transactionId}.txt`, Buffer.from(''))
+  })
+
+  beforeEach(async () => {
     server = await createServer()
   })
 
   it('Separates bucket from file paths with multiple directories', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${env.S3_BUCKET}/${path}/${transactionId}.txt`,
@@ -50,17 +54,11 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
 
   it('Separates bucket from file', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${env.S3_BUCKET}/${path}/${transactionId}.txt`,
@@ -69,16 +67,10 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
   it('handles explicit "/" as start of of file path', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       // double slash is handled
@@ -88,16 +80,10 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
   it('Handles missing bucket from file paths with multiple directories', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${path}/${transactionId}.txt`,
@@ -105,17 +91,11 @@ describe('fileExistsHandler', () => {
         authorization: `Bearer ${token}`
       }
     })
-
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
 
   it('Handles missing bucket from file', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       url: `/files/${path}/${transactionId}.txt`,
@@ -124,16 +104,10 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
   it('handles explicit "/" without bucket as start of of file path', async () => {
-    const path = 'event-12345'
-    const transactionId = 'transaction-12345'
-
     const res = await server.server.inject({
       method: 'GET',
       // double slash is handled
@@ -143,18 +117,13 @@ describe('fileExistsHandler', () => {
       }
     })
 
-    const [filename] = statObjectIfExistsMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
   })
 
   it('answers 404 when the object does not exist', async () => {
-    statObjectIfExistsMock.mockResolvedValue(null)
-
     const res = await server.server.inject({
       method: 'GET',
-      url: `/files/event-12345/transaction-12345.txt`,
+      url: `/files/event-12345/missing.txt`,
       headers: {
         authorization: `Bearer ${token}`
       }
@@ -174,9 +143,6 @@ describe('fileUploadHandler', () => {
   })
 
   beforeEach(async () => {
-    putObjectMock.mockClear()
-    // By default the key is free, which is the ordinary case for a new upload.
-    statObjectIfExistsMock.mockReset().mockResolvedValue(null)
     server = await createServer()
   })
 
@@ -221,11 +187,12 @@ describe('fileUploadHandler', () => {
     })
 
     expect(res.payload).toEqual(`${path}/${transactionId}.txt`)
-
-    const [filename] = putObjectMock.mock.calls[0]
-    expect(filename).toBe(`${path}/${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
+    expect(await getObject(`${path}/${transactionId}.txt`)).toEqual({
+      contentType: 'text/plain',
+      metadata: { 'created-by': '123123' },
+      body: 'test upload'
+    })
   })
 
   it('returns file path without bucket prefix', async () => {
@@ -248,11 +215,8 @@ describe('fileUploadHandler', () => {
     })
 
     expect(res.payload).toEqual(`${transactionId}.txt`)
-
-    const [filename] = putObjectMock.mock.calls[0]
-    expect(filename).toBe(`${transactionId}.txt`)
-
     expect(res.statusCode).toBe(200)
+    expect(await statObjectIfExists(`${transactionId}.txt`)).not.toBeNull()
   })
 
   const uploadTo = (transactionId: string) => {
@@ -275,25 +239,28 @@ describe('fileUploadHandler', () => {
   }
 
   it('refuses to replace a file uploaded by someone else', async () => {
-    statObjectIfExistsMock.mockResolvedValue({
+    await putObject('transaction-3.txt', Buffer.from('original'), {
       metadata: { 'created-by': 'another-user' }
     })
 
     const res = await uploadTo('transaction-3')
 
     expect(res.statusCode).toBe(403)
-    expect(putObjectMock).not.toHaveBeenCalled()
+    expect(await getObject('transaction-3.txt')).toMatchObject({
+      metadata: { 'created-by': 'another-user' },
+      body: 'original'
+    })
   })
 
   it('lets the original uploader replace their own file', async () => {
-    statObjectIfExistsMock.mockResolvedValue({
+    await putObject('transaction-4.txt', Buffer.from('original'), {
       metadata: { 'created-by': '123123' }
     })
 
     const res = await uploadTo('transaction-4')
 
     expect(res.statusCode).toBe(200)
-    expect(putObjectMock).toHaveBeenCalled()
+    expect((await getObject('transaction-4.txt')).body).toBe('test upload')
   })
 
   it('persists the client-reported content type so extensions the object store cannot infer (e.g. .jfif) stay renderable', async () => {
@@ -320,7 +287,7 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
     expect(res.payload).toEqual(`${transactionId}.jfif`)
 
-    const { contentType } = putObjectMock.mock.calls[0][2]
+    const { contentType } = await getObject(`${transactionId}.jfif`)
     expect(contentType).toBe('image/jpeg')
   })
 })
@@ -352,5 +319,10 @@ describe('verify document uploader handler', () => {
     })
 
     expect(res.statusCode).toBe(200)
+    const { refUrl } = JSON.parse(res.payload)
+    expect(await getObject(toDocumentPath(refUrl))).toMatchObject({
+      contentType: 'image/png',
+      metadata: { 'created-by': '123123' }
+    })
   })
 })
