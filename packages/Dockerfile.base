@@ -2,10 +2,16 @@
 # https://opencrvsworkspace.slack.com/archives/C07M2FETFFB/p1781856414463509
 FROM node:22.22.3-slim
 
-RUN apt-get update && apt-get upgrade -y
-
-RUN apt-get clean && \
+# CI sets this to the current date. A new value makes the build skip the
+# cached upgrade layer, so that new Debian security fixes get installed.
+ARG APT_UPGRADE_DATE
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
+# Services run through pnpm. The npm that comes with the node image is not used
+# and only adds vulnerabilities to the image.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 # The pnpm version is pinned by the packageManager field in package.json
 RUN corepack enable pnpm
