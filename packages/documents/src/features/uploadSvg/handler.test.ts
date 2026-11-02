@@ -23,7 +23,7 @@ describe('verify svg uploader handler', () => {
     audience: 'opencrvs:documents-user',
     subject: '123123123'
   })
-  beforeAll(async () => {
+  beforeEach(async () => {
     await ensureDefaultBucket()
   })
 

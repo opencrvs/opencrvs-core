@@ -50,13 +50,13 @@ const storeError = (name: string, httpStatusCode: number) =>
 const sentCommands = (type: new (...args: never[]) => unknown) =>
   send.mock.calls.map(([command]) => command).filter((c) => c instanceof type)
 
-/** A prefix no other test writes to, so the tests do not see each other's objects. */
+/** A record's prefix, shaped like the ones the service stores attachments under. */
 const newPrefix = () => `events/${randomUUID()}/`
 
 const anonymousGet = (key: string) =>
   fetch(`${env.S3_ENDPOINT}/${env.S3_BUCKET}/${key}`)
 
-beforeAll(async () => {
+beforeEach(async () => {
   await ensureDefaultBucket()
 })
 
@@ -70,7 +70,7 @@ afterAll(() => {
 
 describe('ensureDefaultBucket', () => {
   it('creates the bucket when it does not exist', async () => {
-    // Nothing is stored yet, as this is the first test of the file
+    // The bucket of this test holds nothing yet, so the store lets it be deleted
     await s3.send(new DeleteBucketCommand({ Bucket: env.S3_BUCKET }))
 
     await ensureDefaultBucket()

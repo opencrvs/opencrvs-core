@@ -18,8 +18,23 @@ process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
 process.env.NODE_ENV = 'TEST'
 
 /*
- * Each test file gets a bucket of its own in the RustFS that global-setup.ts
- * starts, so files that run in parallel do not see each other's objects. Tests
- * that need the bucket create it with ensureDefaultBucket.
+ * envalid freezes the settings it reads, so the tests get a copy of them that
+ * they may change.
  */
-process.env.S3_BUCKET = `test-${randomUUID()}`
+jest.mock('@documents/s3/constants', () => {
+  const actual = jest.requireActual('@documents/s3/constants')
+  return { ...actual, env: { ...actual.env } }
+})
+
+/*
+ * Each test gets a bucket of its own in the RustFS that global-setup.ts starts,
+ * so no test sees the objects of another, whether it runs before it or in
+ * parallel with it. Tests that need the bucket create it with
+ * ensureDefaultBucket.
+ */
+beforeEach(() => {
+  const { env } = jest.requireMock<{ env: { S3_BUCKET: string } }>(
+    '@documents/s3/constants'
+  )
+  env.S3_BUCKET = `test-${randomUUID()}`
+})

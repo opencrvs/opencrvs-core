@@ -27,7 +27,7 @@ const open = async (url: string) => (await fetch(url)).text()
 
 let server: Awaited<ReturnType<typeof createServer>>
 
-beforeAll(async () => {
+beforeEach(async () => {
   await ensureDefaultBucket()
 })
 

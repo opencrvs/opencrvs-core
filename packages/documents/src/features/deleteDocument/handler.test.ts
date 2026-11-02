@@ -46,12 +46,12 @@ const store = (key: string, createdBy = 'someone') =>
 let server: Awaited<ReturnType<typeof createServer>>
 let eventId: string
 
-beforeAll(async () => {
+beforeEach(async () => {
   await ensureDefaultBucket()
 })
 
 beforeEach(async () => {
-  // A record of its own for each test, so no test sees another's objects
+  // The record whose attachments the test stores and deletes
   eventId = randomUUID()
   server = await createServer()
 })

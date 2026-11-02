@@ -16,7 +16,7 @@ import { getObject } from '../../../test/s3'
 describe('verify document uploader handler', () => {
   let server: any
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await ensureDefaultBucket()
   })
 

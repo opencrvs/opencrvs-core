@@ -21,7 +21,7 @@ import {
 } from '../../s3/client'
 import { getObject } from '../../../test/s3'
 
-beforeAll(async () => {
+beforeEach(async () => {
   await ensureDefaultBucket()
 })
 
@@ -37,7 +37,7 @@ describe('fileExistsHandler', () => {
   const path = 'event-12345'
   const transactionId = 'transaction-12345'
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Only a lookup of this key answers 200
     await putObject(`${path}/${transactionId}.txt`, Buffer.from(''))
   })
