@@ -17,15 +17,8 @@ RUN apt-get update && apt-get upgrade -y && \
 
 # testland and mosip use npm and npx. The npm that comes with the node image
 # bundles vulnerable packages (tar, pacote, sigstore and others).
-# npm 11.21.1 itself bundles undici 6.29.0, which has HIGH CVEs. Replace it
-# with 6.29.1 until an npm release bundles the fixed version.
+# The undici that npm 11.21.1 bundles is ignored in .trivyignore.yaml.
 RUN npm install -g npm@11.21.1 && \
-    npm pack undici@6.29.1 --pack-destination /tmp && \
-    rm -rf /usr/local/lib/node_modules/npm/node_modules/undici && \
-    mkdir /usr/local/lib/node_modules/npm/node_modules/undici && \
-    tar -xzf /tmp/undici-6.29.1.tgz --strip-components=1 \
-      -C /usr/local/lib/node_modules/npm/node_modules/undici && \
-    rm /tmp/undici-6.29.1.tgz && \
     npm cache clean --force
 
 # The pnpm version is pinned by the packageManager field in package.json
