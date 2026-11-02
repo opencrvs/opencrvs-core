@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
+import { toDocumentPath } from '@opencrvs/commons'
 
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -319,8 +320,7 @@ describe('verify document uploader handler', () => {
 
     expect(res.statusCode).toBe(200)
     const { refUrl } = JSON.parse(res.payload)
-    const key = refUrl.slice(`/${env.S3_BUCKET}/`.length)
-    expect(await getObject(key)).toMatchObject({
+    expect(await getObject(toDocumentPath(refUrl))).toMatchObject({
       contentType: 'image/png',
       metadata: { 'created-by': '123123' }
     })

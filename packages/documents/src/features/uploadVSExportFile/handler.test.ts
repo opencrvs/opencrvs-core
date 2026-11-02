@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
+import { toDocumentPath } from '@opencrvs/commons'
 import { ensureDefaultBucket } from '../../s3/client'
-import { env } from '../../s3/constants'
 import { getObject } from '../../../test/s3'
 
 describe('verify document uploader handler', () => {
@@ -34,8 +34,7 @@ describe('verify document uploader handler', () => {
 
     expect(res.statusCode).toBe(200)
     const { refUrl } = JSON.parse(res.payload)
-    const key = refUrl.slice(`/${env.S3_BUCKET}/`.length)
-    expect(await getObject(key)).toMatchObject({
+    expect(await getObject(toDocumentPath(refUrl))).toMatchObject({
       contentType: 'text/csv',
       body: 'name,count\nbirths,2\n'
     })
