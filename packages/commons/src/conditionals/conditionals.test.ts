@@ -28,7 +28,7 @@ import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { EncodedScope, TokenUserType } from '../authentication'
+import { EncodedScope, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import { EventStatus, InherentFlags } from '../client'
 

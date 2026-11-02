@@ -10,19 +10,16 @@
  */
 import { describe, expect, it } from 'vitest'
 import { encodeScope } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclaredRoles, parseRoles, RoleRead } from './roles'
 
 const CONFIGURE = encodeScope({ type: 'config.update-all' })
+const TENNIS_CLUB = tennisClubMembershipEvent.id
 
 /** A raw role of the shape a country config serves. */
 function record(overrides: Record<string, unknown> = {}) {
   return {
     id: 'LOCAL_REGISTRAR',
-    label: {
-      defaultMessage: 'Local Registrar',
-      description: 'The role',
-      id: 'role.localRegistrar'
-    },
     scopes: [CONFIGURE],
     ...overrides
   }
@@ -82,24 +79,59 @@ describe('a role that parsed', () => {
     })
   })
 
+  it('is accepted with a label left over from an older country config', () => {
+    const labelled = record({
+      label: {
+        defaultMessage: 'Local Registrar',
+        description: 'The role',
+        id: 'userRole.localRegistrar'
+      }
+    })
+
+    expect(read([labelled]).problems).toEqual([])
+  })
+
   it('is rejected for a scope that names an event the country config does not declare', () => {
     const scoped = encodeScope({
       type: 'record.declare',
       options: { event: ['v2.nonsense'] }
     })
 
-    expect(parseRoles([record({ scopes: [scoped] })], ['v2.birth']))
-      .toMatchObject({ problems: [{ kind: 'roleUnparsed' }] })
+    expect(
+      parseRoles([record({ scopes: [scoped] })], [tennisClubMembershipEvent])
+    ).toMatchObject({ problems: [{ kind: 'roleUnparsed' }] })
   })
 
   it('is accepted for a scope that names one it does', () => {
     const scoped = encodeScope({
       type: 'record.declare',
-      options: { event: ['v2.birth'] }
+      options: { event: [TENNIS_CLUB] }
     })
 
-    expect(parseRoles([record({ scopes: [scoped] })], ['v2.birth']))
-      .toMatchObject({ problems: [] })
+    expect(
+      parseRoles([record({ scopes: [scoped] })], [tennisClubMembershipEvent])
+    ).toMatchObject({ problems: [] })
+  })
+
+  it('is rejected for notifying and declaring the same event', () => {
+    const scopes = [
+      encodeScope({ type: 'record.notify', options: { event: [TENNIS_CLUB] } }),
+      encodeScope({ type: 'record.declare', options: { event: [TENNIS_CLUB] } })
+    ]
+
+    expect(
+      parseRoles([record({ scopes })], [tennisClubMembershipEvent])
+    ).toMatchObject({
+      problems: [
+        {
+          kind: 'roleUnparsed',
+          role: { position: 1, id: 'LOCAL_REGISTRAR' },
+          message: expect.stringContaining(
+            'record.notify and record.declare are both granted'
+          )
+        }
+      ]
+    })
   })
 })
 

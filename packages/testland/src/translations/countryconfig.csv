@@ -695,20 +695,6 @@ unit.minutes,Minutes,Minutes,Minutes
 unit.months,Months,Months,Mois
 unit.weeks,Weeks,Weeks,Semaines
 unit.years,Years,Years,Années
-userRole.administrator,Name for user role Administrator,Administrator,Administrateur
-userRole.communityLeader,Name for user role Community Leader,Community Leader,Leader communautaire
-userRole.embassyOffical,Name for the user role Embassy Official,Embassy Official,Officiel d'ambassade
-userRole.fieldAgent,Name for user role Field Agent,Field Agent,Agent de terrain
-userRole.healthAdministrator,Name for user role Health Administrator,Health Administrator,Administrateur de santé
-userRole.hospitalClerk,Name for user role Hospital Clerk,Hospital Official,Officiel de l'hôpital
-userRole.localRegistrar,Name for user role Registrar,Registrar,Registraire
-userRole.localSystemAdmin,Name for user role Local System Admin,Local System Admin,Administrateur système local
-userRole.nationalAdministrator,Name for user role National Administrator,National Administrator,Administrateur national
-userRole.operationsManager,Name for user role Operations Manager,Operations Manager,Responsable des opérations
-userRole.provincialRegistrar,Name for user role Provincial Registrar,Provincial Registrar,Registraire provincial
-userRole.registrarGeneral, Name for user role Registrar General,Registrar General,Registraire général
-userRole.registrationAgent,Name for user role Registration Agent,Registration Agent,Agent d'enregistrement
-userRole.registrationOfficer,Name for user role Registration Officer,Registration Officer,Agent d'enregistrement
 v2.event.death.action.declare.form.section.deceased.field.addressHelper.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
 v2.event.death.action.declare.form.section.deceased.field.age.checkbox.label,This is the label for the field,Exact date of birth unknown,Date de naissance exacte inconnue
 v2.event.death.action.declare.form.section.deceased.field.age.postfix,This is the postfix for age field,years,ans

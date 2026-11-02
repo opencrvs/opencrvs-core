@@ -26,7 +26,7 @@ import {
 } from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
-import { TokenUserType } from '../../authentication'
+import { TokenUserType } from '../../users/authentication'
 import { EventDocument } from '../EventDocument'
 
 /* eslint-disable max-lines */

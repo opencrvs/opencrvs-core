@@ -42,7 +42,7 @@ import {
   getPendingAction,
   omitHiddenPaginatedFields
 } from './utils'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import {
   createPrng,
   field,

@@ -21,7 +21,7 @@ import {
   Location,
   UserWithResolvedHierarchy
 } from './locations'
-import { RecordScopeV2, UserScopeV2 } from 'src/scopes'
+import { RecordScopeV2, UserScopeV2 } from 'src/users/scopes'
 import { UUID } from 'src/uuid'
 
 describe('canAccessEventWithScope()', () => {

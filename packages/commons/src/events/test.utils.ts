@@ -84,7 +84,7 @@ import {
   encodeScope,
   ITokenPayload,
   TokenUserType
-} from '../authentication'
+} from '../users/authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
