@@ -1261,6 +1261,65 @@ describe('"event" conditionals', () => {
         )
       ).toBe(false)
     })
+
+    it('counts a Requested and Accepted pair as a single action', () => {
+      const [acceptedPrint] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...acceptedPrint,
+        id: 'a0' as UUID,
+        status: ActionStatus.Requested
+      }
+      const eventWithOnePrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            requestedPrint,
+            { ...acceptedPrint, originalActionId: requestedPrint.id }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(2),
+          eventWithOnePrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+          eventWithOnePrint
+        )
+      ).toBe(true)
+    })
+
+    it('does not count pending or rejected actions', () => {
+      const [print] = baseEvent.$event.actions
+      const eventWithoutAcceptedPrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            { ...print, status: ActionStatus.Requested },
+            { ...print, id: 'a2' as UUID, status: ActionStatus.Rejected }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(1),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+    })
   })
 })
 
