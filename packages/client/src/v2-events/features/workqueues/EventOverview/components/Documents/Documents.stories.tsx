@@ -26,6 +26,7 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue,
   generateActionDocument,
+  generateActionDocuments,
   generateRandomDatetime,
   getCurrentEventState,
   getDeclaration,
@@ -213,7 +214,7 @@ const eventWithDocuments: EventDocument = {
       defaults: { ...actionDefaults, declaration: {} }
     }),
     assigned(),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -226,7 +227,7 @@ const eventWithDocuments: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.EDIT,
       defaults: {
@@ -252,7 +253,7 @@ const eventWithoutDocuments: EventDocument = {
       defaults: { ...actionDefaults, declaration: {} }
     }),
     assigned(),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -315,7 +316,7 @@ const eventWithManyDocuments: EventDocument = {
       defaults: { ...actionDefaults, declaration: {} }
     }),
     assigned(),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -328,7 +329,7 @@ const eventWithManyDocuments: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.REGISTER,
       defaults: {

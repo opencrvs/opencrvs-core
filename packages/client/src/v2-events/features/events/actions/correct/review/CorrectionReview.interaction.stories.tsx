@@ -17,6 +17,7 @@ import {
   ActionType,
   EventDocument,
   generateActionDocument,
+  generateActionDocuments,
   generateTrackingId,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
@@ -205,7 +206,7 @@ const tennisClubMembershipEventWithCorrectionRequestThenCustomAction: EventDocum
         action: ActionType.CREATE,
         defaults: { ...actionDefaults, createdAt: '2025-01-23T05:30:00.000Z' }
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: { ...actionDefaults, createdAt: '2025-01-23T05:31:00.000Z' },
@@ -215,12 +216,12 @@ const tennisClubMembershipEventWithCorrectionRequestThenCustomAction: EventDocum
           'recommender.name': { firstname: 'Euan', surname: 'Millar' }
         }
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.REGISTER,
         defaults: { ...actionDefaults, createdAt: '2025-01-23T05:32:00.000Z' }
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.REQUEST_CORRECTION,
         defaults: { ...actionDefaults, createdAt: '2025-01-23T05:33:00.000Z' },
@@ -228,7 +229,7 @@ const tennisClubMembershipEventWithCorrectionRequestThenCustomAction: EventDocum
           'applicant.name': { firstname: 'Corrected', surname: 'Name' }
         }
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.CUSTOM,
         defaults: { ...actionDefaults, createdAt: '2025-01-24T05:35:27.689Z' }
@@ -372,7 +373,7 @@ const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
         createdAt: '2025-01-23T05:30:00.000Z'
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: {
@@ -385,7 +386,7 @@ const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
         'recommender.name': { firstname: 'Euan', surname: 'Millar' }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.REGISTER,
       defaults: {
@@ -393,7 +394,7 @@ const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
         createdAt: '2025-01-23T05:32:00.000Z'
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.REQUEST_CORRECTION,
       defaults: {
@@ -407,7 +408,7 @@ const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.APPROVE_CORRECTION,
       defaults: {
@@ -423,7 +424,7 @@ const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.REQUEST_CORRECTION,
       defaults: {

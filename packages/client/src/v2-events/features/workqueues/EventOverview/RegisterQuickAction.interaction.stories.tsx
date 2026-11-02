@@ -21,6 +21,7 @@ import {
   TestUserRole,
   tennisClubMembershipEvent,
   generateActionDocument,
+  generateActionDocuments,
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons/client'
@@ -106,7 +107,7 @@ export const ShowToastOnDuplicateDetectedOnRegisterQuickAction: Story = {
               ...eventDocument,
               actions: [
                 ...eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.REGISTER
                 }),

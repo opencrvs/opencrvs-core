@@ -43,7 +43,7 @@ The `Accepted`/`Rejected` action points back to the `Requested` one through `ori
 
 All other actions (`CREATE`, `ASSIGN`, `UNASSIGN`, `READ`, `DUPLICATE_DETECTED`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`) are stored directly as `Accepted`, with no `Requested` counterpart.
 
-Only `Accepted` actions change the event state (see `getAcceptedActions`). A record's action list therefore usually contains both the `Requested` and `Accepted` copy of each confirmable action, so look actions up by type **and** status rather than by type or position. `generateEventDocument` in [test.utils.ts](./test.utils.ts) produces the same pairs, so tests see realistic data by default.
+Only `Accepted` actions change the event state (see `getAcceptedActions`). A record's action list therefore usually contains both the `Requested` and `Accepted` copy of each confirmable action, so look actions up by type **and** status rather than by type or position. `generateEventDocument` and `generateActionDocuments` in [test.utils.ts](./test.utils.ts) produce the same pairs, so tests see realistic data by default. `generateActionDocument` builds a single action with an explicit status, for edge cases such as pending or rejected requests.
 
 #### Quick actions
 

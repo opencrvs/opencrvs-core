@@ -1008,6 +1008,13 @@ export function eventPayloadGenerator(
   }
 }
 
+/**
+ * Generates a single action document with exactly the given status (Accepted by default).
+ *
+ * For realistic data use `generateActionDocuments`, which also creates the Requested
+ * action the events service stores for a confirmable action. Use this one for edge
+ * cases, such as pending or rejected requests, or actions without an original request.
+ */
 export function generateActionDocument<T extends ActionType>({
   configuration,
   action,
@@ -1127,6 +1134,49 @@ function isConfirmableAction(
   return ConfirmableActions.some((confirmable) => confirmable === type)
 }
 
+/**
+ * Generates the action documents the events service stores for a single action.
+ *
+ * Mirrors the events service: a confirmable action is first stored as Requested,
+ * carrying the declaration and annotation, and then confirmed by a separate
+ * Accepted action that points back to it through originalActionId. Other actions
+ * are stored once, as Accepted.
+ *
+ * The Accepted action keeps the generated (or given) `id`, since references such
+ * as `requestId` of APPROVE_CORRECTION point to the accepted action.
+ *
+ * Use `generateActionDocument` instead to build a single action with an explicit status.
+ */
+export function generateActionDocuments<T extends ActionType>(
+  args: Parameters<typeof generateActionDocument<T>>[0]
+): ActionDocument[] {
+  const actionDocument = generateActionDocument(args)
+
+  if (!isConfirmableAction(actionDocument.type)) {
+    return [actionDocument]
+  }
+
+  const requestedAction = {
+    ...actionDocument,
+    id: getUUID(),
+    transactionId: getUUID(),
+    status: ActionStatus.Requested
+  }
+
+  const acceptedAction = {
+    ...actionDocument,
+    status: ActionStatus.Accepted,
+    originalActionId: requestedAction.id,
+    createdAt: new Date(
+      new Date(actionDocument.createdAt).getTime() + 1
+    ).toISOString(),
+    declaration: {},
+    annotation: {}
+  }
+
+  return [requestedAction, acceptedAction]
+}
+
 export function generateRandomDatetime(
   rng: () => number,
   start: Date,
@@ -1183,7 +1233,7 @@ export function generateEventDocument({
         i
       )
 
-      const actionDocument = generateActionDocument({
+      return generateActionDocuments({
         configuration,
         action: action.type,
         defaults: {
@@ -1195,31 +1245,6 @@ export function generateEventDocument({
         },
         declarationOverrides: action.declarationOverrides
       })
-
-      if (!isConfirmableAction(actionDocument.type)) {
-        return [actionDocument]
-      }
-
-      // Mirrors the events service: a confirmable action is first stored as Requested,
-      // carrying the declaration and annotation, and then confirmed by a separate
-      // Accepted action that points back to it through originalActionId.
-      const requestedAction = {
-        ...actionDocument,
-        status: ActionStatus.Requested
-      }
-
-      const acceptedAction = {
-        ...actionDocument,
-        id: getUUID(),
-        transactionId: getUUID(),
-        status: ActionStatus.Accepted,
-        originalActionId: requestedAction.id,
-        createdAt: new Date(createdAt.getTime() + 1).toISOString(),
-        declaration: {},
-        annotation: {}
-      }
-
-      return [requestedAction, acceptedAction]
     }),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.

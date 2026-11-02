@@ -26,6 +26,7 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
+  generateActionDocuments,
   generateTranslationConfig,
   FieldUpdateValue,
   withDeclaration,
@@ -179,7 +180,7 @@ const overriddenEvent = {
       configuration: overriddenEventConfig,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -190,7 +191,7 @@ const overriddenEvent = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.REGISTER,
       defaults: { declaration: {} }
@@ -283,7 +284,7 @@ export const CleanedUpCorrectionPayload: Story = {
                 ...overriddenEvent,
                 actions: [
                   ...overriddenEvent.actions,
-                  generateActionDocument({
+                  ...generateActionDocuments({
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {
@@ -305,7 +306,7 @@ export const CleanedUpCorrectionPayload: Story = {
             ...overriddenEvent,
             actions: [
               ...overriddenEvent.actions,
-              generateActionDocument({
+              ...generateActionDocuments({
                 configuration: overriddenEventConfig,
                 action: ActionType.APPROVE_CORRECTION
               })
