@@ -26,6 +26,7 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue,
   generateActionDocument,
+  generateActionDocuments,
   generateRandomDatetime,
   getCurrentEventState,
   getDeclaration,
@@ -213,7 +214,7 @@ const eventWithDocuments: EventDocument = {
       defaults: { ...actionDefaults, declaration: {} }
     }),
     assigned(),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -226,7 +227,7 @@ const eventWithDocuments: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.EDIT,
       defaults: {
@@ -252,7 +253,7 @@ const eventWithoutDocuments: EventDocument = {
       defaults: { ...actionDefaults, declaration: {} }
     }),
     assigned(),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -315,7 +316,7 @@ const eventWithManyDocuments: EventDocument = {
       defaults: { ...actionDefaults, declaration: {} }
     }),
     assigned(),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -328,7 +329,7 @@ const eventWithManyDocuments: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.REGISTER,
       defaults: {
@@ -343,20 +344,15 @@ const eventWithManyDocuments: EventDocument = {
   ]
 }
 
-// Applies `defaults` last, since the generator replaces e.g. a correction's `requestId`.
-function storyAction<T extends ActionType>(
+function storyActions<T extends ActionType>(
   type: T,
   defaults: Partial<Extract<ActionDocument, { type: T }>> = {}
-): ActionDocument {
-  const overrides = { ...actionDefaults, declaration: {}, ...defaults }
-  return {
-    ...generateActionDocument({
-      configuration: eventConfig,
-      action: type,
-      defaults: overrides
-    }),
-    ...overrides
-  } as ActionDocument
+) {
+  return generateActionDocuments({
+    configuration: eventConfig,
+    action: type,
+    defaults: { ...actionDefaults, declaration: {}, ...defaults }
+  })
 }
 
 function storyFile(path: string): FileFieldValue {
@@ -378,14 +374,14 @@ const eventWithEditedIdentityDocuments: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    storyAction(ActionType.CREATE),
+    ...storyActions(ActionType.CREATE),
     assigned(),
-    storyAction(ActionType.DECLARE, {
+    ...storyActions(ActionType.DECLARE, {
       createdAt: '2024-03-01T09:00:00.000Z',
       declaration: { ...applicant, [IDENTITY_DOCS_FIELD_ID]: identityDocuments }
     }),
-    ...[ActionType.EDIT, ActionType.DECLARE].map((type) =>
-      storyAction(type, {
+    ...[ActionType.EDIT, ActionType.DECLARE].flatMap((type) =>
+      storyActions(type, {
         createdAt: '2024-03-10T09:00:00.000Z',
         declaration: {
           [IDENTITY_DOCS_FIELD_ID]: [
@@ -399,37 +395,43 @@ const eventWithEditedIdentityDocuments: EventDocument = {
   ]
 }
 
-const correctionRequest = storyAction(ActionType.REQUEST_CORRECTION, {
+const correctionRequestPair = storyActions(ActionType.REQUEST_CORRECTION, {
   createdAt: '2024-03-10T09:00:00.000Z',
   declaration: { [SUPPORTING_DOC_FIELD_ID]: storyFile('requested.png') }
 })
 
-const directCorrection = storyAction(ActionType.REQUEST_CORRECTION, {
+const directCorrectionPair = storyActions(ActionType.REQUEST_CORRECTION, {
   createdAt: '2024-03-20T09:00:00.000Z',
   declaration: { [SUPPORTING_DOC_FIELD_ID]: storyFile('direct.png') }
 })
+
+// Approvals and rejections refer to the accepted request
+const [, acceptedCorrectionRequest] = correctionRequestPair
+const [, acceptedDirectCorrection] = directCorrectionPair
 
 // A rejected correction request, then a direct correction (a request its requester approved immediately).
 const eventWithCorrections: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    storyAction(ActionType.CREATE),
+    ...storyActions(ActionType.CREATE),
     assigned(),
-    storyAction(ActionType.DECLARE, {
+    ...storyActions(ActionType.DECLARE, {
       createdAt: '2024-03-01T09:00:00.000Z',
       declaration: applicant
     }),
-    storyAction(ActionType.REGISTER, { createdAt: '2024-03-02T09:00:00.000Z' }),
-    correctionRequest,
-    storyAction(ActionType.REJECT_CORRECTION, {
-      createdAt: '2024-03-11T09:00:00.000Z',
-      requestId: correctionRequest.id
+    ...storyActions(ActionType.REGISTER, {
+      createdAt: '2024-03-02T09:00:00.000Z'
     }),
-    directCorrection,
-    storyAction(ActionType.APPROVE_CORRECTION, {
+    ...correctionRequestPair,
+    ...storyActions(ActionType.REJECT_CORRECTION, {
+      createdAt: '2024-03-11T09:00:00.000Z',
+      requestId: acceptedCorrectionRequest.id
+    }),
+    ...directCorrectionPair,
+    ...storyActions(ActionType.APPROVE_CORRECTION, {
       createdAt: '2024-03-20T09:00:00.000Z',
-      requestId: directCorrection.id,
+      requestId: acceptedDirectCorrection.id,
       content: { immediateCorrection: true }
     }),
     assigned()

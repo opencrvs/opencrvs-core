@@ -24,6 +24,7 @@ import {
   EventDocument,
   FieldType,
   generateActionDocument,
+  generateActionDocuments,
   generateRandomDatetime,
   getCurrentEventState,
   getUUID,
@@ -130,7 +131,7 @@ const registeredEvent: EventDocument = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -141,7 +142,7 @@ const registeredEvent: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.REGISTER,
       defaults: {
@@ -153,7 +154,7 @@ const registeredEvent: EventDocument = {
       }
     }),
 
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.EDIT,
       defaults: {

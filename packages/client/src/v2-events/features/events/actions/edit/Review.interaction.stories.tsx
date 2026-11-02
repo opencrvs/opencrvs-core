@@ -29,6 +29,7 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
+  generateActionDocuments,
   getUUID,
   user
 } from '@opencrvs/commons/client'
@@ -119,11 +120,11 @@ function declareReturningDuplicate() {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.EDIT
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE
       }),
@@ -145,7 +146,7 @@ function editAccepted() {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.EDIT
       })
@@ -320,8 +321,8 @@ function eventWithActions(...types: ActionType[]) {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      ...types.map((type) =>
-        generateActionDocument({
+      ...types.flatMap((type) =>
+        generateActionDocuments({
           configuration: tennisClubMembershipEvent,
           action: type
         })

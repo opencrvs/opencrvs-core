@@ -19,6 +19,7 @@ import {
   getUUID,
   tennisClubMembershipEvent,
   generateActionDocument,
+  generateActionDocuments,
   createPrng,
   UUID,
   EventDocument,
@@ -171,7 +172,7 @@ const createAction = generateActionDocument({
   }
 })
 
-const declareAction = generateActionDocument({
+const declareActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   rng: prng,
@@ -181,7 +182,7 @@ const declareAction = generateActionDocument({
   }
 })
 
-const registerAction = generateActionDocument({
+const registerActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
   rng: prng,
@@ -209,7 +210,7 @@ export const Declared: Story = {
 const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
-  actions: [createAction, declareAction, registerAction],
+  actions: [createAction, ...declareActionPair, ...registerActionPair],
   createdAt: createActionCreatedAt,
   id: generateUuid(prng),
   updatedAt: addDays(new Date(createActionCreatedAt), 3).toISOString()

@@ -16,7 +16,7 @@ import {
   ActionType,
   ConditionalType,
   flag,
-  generateActionDocument,
+  generateActionDocuments,
   not,
   tennisClubMembershipEvent,
   UUID
@@ -136,7 +136,7 @@ const lockedEvent = {
   id: '5e6f2a8b-3c4d-4e5f-8a9b-0c1d2e3f4a5b' as UUID,
   actions: [
     ...tennisClubMembershipEventWithCorrectionRequest.actions,
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: configurationWithConditional,
       action: ActionType.CUSTOM
     })

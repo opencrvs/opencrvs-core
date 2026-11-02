@@ -20,6 +20,7 @@ import { EventStatus } from '../EventMetadata'
 import { InherentFlags } from '../Flag'
 import {
   generateActionDocument,
+  generateActionDocuments,
   generateEventDocument,
   generateUuid,
   TestUserRole
@@ -44,24 +45,27 @@ describe('getCurrentEventState()', () => {
       ]
     })
 
+    const [, declareRequest, declareAccept, registerRequest, registerAccept] =
+      event.actions
+
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
 
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
-      createdAt: event.actions[1].createdAt,
-      createdBy: event.actions[1].createdBy,
-      createdByUserType: event.actions[1].createdByUserType,
-      createdAtLocation: event.actions[1].createdAtLocation,
-      createdByRole: event.actions[1].createdByRole,
-      acceptedAt: event.actions[1].createdAt
+      createdAt: declareRequest.createdAt,
+      createdBy: declareRequest.createdBy,
+      createdByUserType: declareRequest.createdByUserType,
+      createdAtLocation: declareRequest.createdAtLocation,
+      createdByRole: declareRequest.createdByRole,
+      acceptedAt: declareAccept.createdAt
     })
 
     expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
-      createdAt: event.actions[2].createdAt,
-      createdBy: event.actions[2].createdBy,
-      createdByUserType: event.actions[1].createdByUserType,
-      createdAtLocation: event.actions[2].createdAtLocation,
-      createdByRole: event.actions[2].createdByRole,
-      acceptedAt: event.actions[2].createdAt
+      createdAt: registerRequest.createdAt,
+      createdBy: registerRequest.createdBy,
+      createdByUserType: registerRequest.createdByUserType,
+      createdAtLocation: registerRequest.createdAtLocation,
+      createdByRole: registerRequest.createdByRole,
+      acceptedAt: registerAccept.createdAt
     })
   })
 
@@ -100,88 +104,6 @@ describe('getCurrentEventState()', () => {
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toBe(undefined)
 
     expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toBe(undefined)
-  })
-
-  test('legalStatuses are shown when requests have been accepted async', () => {
-    const actions = [
-      generateActionDocument({
-        configuration: tennisClubMembershipEvent,
-        action: ActionType.CREATE
-      }),
-      ...[ActionType.DECLARE, ActionType.REGISTER].flatMap((action, i) => [
-        generateActionDocument({
-          configuration: tennisClubMembershipEvent,
-          action,
-          defaults: {
-            status: ActionStatus.Requested,
-            // While running tests we need to make sure that the timestamps are different. Using current date causes false positives.
-            createdAt: `2023-01-01T00:0${i}:00.000Z`
-          }
-        }),
-        generateActionDocument({
-          configuration: tennisClubMembershipEvent,
-          action,
-          defaults: {
-            status: ActionStatus.Accepted,
-            createdAt: `2023-01-01T00:0${i + 1}:00.000Z`
-          }
-        })
-      ])
-    ]
-
-    const event = {
-      trackingId: getUUID(),
-      type: tennisClubMembershipEvent.id,
-      actions,
-      createdAt: new Date(Date.now()).toISOString(),
-      id: getUUID(),
-
-      updatedAt: new Date(Date.now()).toISOString()
-    }
-
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
-
-    const declareRequest = actions.find(
-      (action) =>
-        action.type === ActionType.DECLARE &&
-        action.status === ActionStatus.Requested
-    )
-
-    const declareAccept = actions.find(
-      (action) =>
-        action.type === ActionType.DECLARE &&
-        action.status === ActionStatus.Accepted
-    )
-
-    const registerRequest = actions.find(
-      (action) =>
-        action.type === ActionType.REGISTER &&
-        action.status === ActionStatus.Requested
-    )
-
-    const registerAccept = actions.find(
-      (action) =>
-        action.type === ActionType.REGISTER &&
-        action.status === ActionStatus.Accepted
-    )
-
-    expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
-      createdAt: declareRequest?.createdAt,
-      createdBy: declareRequest?.createdBy,
-      createdByUserType: declareRequest?.createdByUserType,
-      createdAtLocation: declareRequest?.createdAtLocation,
-      createdByRole: declareRequest?.createdByRole,
-      acceptedAt: declareAccept?.createdAt
-    })
-
-    expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
-      createdAt: registerRequest?.createdAt,
-      createdBy: registerRequest?.createdBy,
-      createdByUserType: registerRequest?.createdByUserType,
-      createdAtLocation: registerRequest?.createdAtLocation,
-      createdByRole: registerRequest?.createdByRole,
-      acceptedAt: registerAccept?.createdAt
-    })
   })
 
   test('Sets timestamps correctly when legal statuses were accepted async', () => {
@@ -487,7 +409,7 @@ describe('getCurrentEventState()', () => {
           configuration: tennisClubMembershipEvent,
           action: ActionType.CREATE
         }),
-        generateActionDocument({
+        ...generateActionDocuments({
           configuration: tennisClubMembershipEvent,
           action: ActionType.DECLARE,
           defaults: {
@@ -1435,7 +1357,7 @@ describe('address state transitions', () => {
       configuration: tennisClubMembershipEvent,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: {
@@ -1447,7 +1369,7 @@ describe('address state transitions', () => {
   test('should persist optional "village" field in address, even if it is not included in payload', () => {
     const actions = [
       ...initialActions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
@@ -1481,7 +1403,7 @@ describe('address state transitions', () => {
 
     const actions = [
       ...initialActions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
@@ -1700,6 +1622,14 @@ describe('archive/unarchive status resolution', () => {
 })
 
 describe('revoke/reinstate status resolution', () => {
+  function revokeActions(event: EventDocument, status: ActionStatus) {
+    return event.actions.filter(
+      (action) =>
+        action.type === ActionType.REVOKE_REGISTRATION &&
+        action.status === status
+    )
+  }
+
   test('status is REVOKED after a registered record is revoked', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,
@@ -1712,14 +1642,15 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.READ }
       ]
     })
-    const revokeAction = event.actions[3]
+    const [revokeRequest] = revokeActions(event, ActionStatus.Requested)
+    const [revokeAccept] = revokeActions(event, ActionStatus.Accepted)
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
     expect(state.legalStatuses.REVOKED).toMatchObject({
-      createdAt: revokeAction.createdAt,
-      createdBy: revokeAction.createdBy,
-      acceptedAt: revokeAction.createdAt
+      createdAt: revokeRequest.createdAt,
+      createdBy: revokeRequest.createdBy,
+      acceptedAt: revokeAccept.createdAt
     })
     expect(state.legalStatuses.REGISTERED).toBeDefined()
   })
@@ -1754,12 +1685,14 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.REVOKE_REGISTRATION }
       ]
     })
-    const latestRevokeAction = event.actions[5]
+    const latestRevokeRequest = revokeActions(event, ActionStatus.Requested).at(
+      -1
+    )
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
     expect(state.legalStatuses.REVOKED?.createdAt).toBe(
-      latestRevokeAction.createdAt
+      latestRevokeRequest?.createdAt
     )
   })
 

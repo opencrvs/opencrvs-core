@@ -19,6 +19,7 @@ import {
   EventDocument,
   EventDocumentOnlyLastAction,
   generateActionDocument,
+  generateActionDocuments,
   generateTrackingId,
   getCurrentEventState,
   getUUID,
@@ -50,7 +51,7 @@ const createAction = generateActionDocument({
   defaults: { createdBy: localRegistrar.v2.id }
 })
 
-const declareAction = generateActionDocument({
+const declareActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: { createdBy: localRegistrar.v2.id }
@@ -87,13 +88,18 @@ const baseDoc = {
 /** Unassigned, flagged as a potential duplicate of a record outside jurisdiction. */
 const eventUnassigned: EventDocument = {
   ...baseDoc,
-  actions: [createAction, declareAction, duplicateDetectedAction]
+  actions: [createAction, ...declareActionPair, duplicateDetectedAction]
 }
 
 /** Assigned to the local registrar; the match is still outside their jurisdiction. */
 const eventAssigned: EventDocument = {
   ...baseDoc,
-  actions: [createAction, declareAction, duplicateDetectedAction, assignAction]
+  actions: [
+    createAction,
+    ...declareActionPair,
+    duplicateDetectedAction,
+    assignAction
+  ]
 }
 
 /*

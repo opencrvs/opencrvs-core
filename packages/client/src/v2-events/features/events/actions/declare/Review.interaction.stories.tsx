@@ -23,6 +23,7 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
+  generateActionDocuments,
   getUUID,
   EventDocument,
   ActionInput
@@ -136,7 +137,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               ...declarationTrpcMsw.eventDocument,
               actions: [
                 ...declarationTrpcMsw.eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DECLARE
                 })
@@ -589,7 +590,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
               ...currentDocument,
               actions: [
                 ...currentDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   declarationOverrides: {
                     ...(ActionInput.safeParse(action).data?.declaration ?? {})
@@ -692,7 +693,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
               ...eventDocument,
               actions: [
                 ...eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DECLARE
                 }),

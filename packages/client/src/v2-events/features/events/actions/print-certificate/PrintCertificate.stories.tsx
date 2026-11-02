@@ -15,7 +15,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import {
   ActionType,
-  generateActionDocument,
+  generateActionDocuments,
   generateEventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -66,7 +66,7 @@ export const CollectorForm: Story = {
   }
 }
 
-const printActionWithSelections = generateActionDocument({
+const printActionPairWithSelections = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.PRINT_CERTIFICATE,
   defaults: {
@@ -91,7 +91,7 @@ const registeredEvent = generateEventDocument({
 
 const alreadyPrintedEvent = {
   ...registeredEvent,
-  actions: registeredEvent.actions.concat(printActionWithSelections)
+  actions: registeredEvent.actions.concat(printActionPairWithSelections)
 }
 
 export const FormSetup: Story = {
