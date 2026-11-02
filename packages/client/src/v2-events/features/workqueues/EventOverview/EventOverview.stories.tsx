@@ -194,7 +194,7 @@ export const Overview: Story = {
             return [
               generateEventDraftDocument({
                 eventId: defaultEvent.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -238,7 +238,7 @@ export const OverviewMobile: Story = {
             return [
               generateEventDraftDocument({
                 eventId: defaultEvent.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Amelie',
@@ -431,7 +431,7 @@ export const WithSystemUserActions: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -725,7 +725,7 @@ export const WithVariousUserRoles: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Sara',

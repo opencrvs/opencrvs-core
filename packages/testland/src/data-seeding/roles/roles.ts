@@ -37,7 +37,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.archive', options: { notifiedIn: 'administrativeArea' } },
@@ -78,7 +78,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.unarchive', options: { declaredIn: 'administrativeArea' } },
@@ -181,7 +181,7 @@ export const roles: Role[] = [
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-feedback-registrar-general', 'potential-duplicate', 'registration-registrar-general'] } },
       { type: 'record.read' },
       { type: 'record.create' },
-      { type: 'record.edit' },
+      { type: 'record.edit', options: { status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.declare' },
       { type: 'record.reject' },
       { type: 'record.archive' },
@@ -245,7 +245,7 @@ export const roles: Role[] = [
       { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { status: ['NOTIFIED'] } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
+      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user', status: ['NOTIFIED'] } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])
   },
@@ -277,7 +277,7 @@ export const roles: Role[] = [
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent'] } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
-      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.edit', options: { placeOfEvent: 'administrativeArea', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } }
     ])
   },
@@ -295,7 +295,7 @@ export const roles: Role[] = [
       { type: 'record.create', options: { placeOfEvent: 'all' } },
       { type: 'record.read', options: { placeOfEvent: 'all', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'all' } },
-      { type: 'record.edit', options: { placeOfEvent: 'all' } },
+      { type: 'record.edit', options: { placeOfEvent: 'all', status: ['NOTIFIED', 'DECLARED'] } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE'], placeOfEvent: 'all' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY'], placeOfEvent: 'all' } },
       { type: 'record.print-certified-copies', options: { placeOfEvent: 'all' } },
@@ -317,7 +317,7 @@ export const roles: Role[] = [
       { type: 'record.read', options: { event: ['birth', 'death', 'adoption', 'tennis-club-membership'], placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { status: ['NOTIFIED'] } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
+      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user', status: ['NOTIFIED'] } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])
   },

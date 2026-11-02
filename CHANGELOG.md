@@ -180,6 +180,16 @@ Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATIO
 
 A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Default values for advanced search fields
+
+Advanced search fields open with the declaration form's `defaultValue`, so a name defaulting to the logged-in user's name shows up pre-filled and counts towards the search. Set `defaultValue` on a search field to change that:
+
+- omitted or `true` keeps the form's default, e.g. an address defaulting to the user's area
+- `false` opens the field empty, e.g. `field('applicant.name', { defaultValue: false }).fuzzy()`
+- a text, number or date value opens the field with that value, e.g. `field('applicant.email', { defaultValue: 'applicant@example.com' }).exact()`
+
+Only TEXT, TEXTAREA, EMAIL, PHONE, ID, SELECT, RADIO_GROUP, COUNTRY, LOCATION, ADMINISTRATIVE_AREA, NUMBER and DATE fields take a value. Other field types, such as NAME and ADDRESS, and dates searched as a range accept only `true` or `false`. Fields using `config.searchFields` don't support `defaultValue`. An event configuration that breaks these rules fails validation. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
+
 #### Documents service speaks plain S3
 
 The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys. **The settings were renamed, so check [Object store settings renamed from `MINIO_*` to `S3_*`](#object-store-settings-renamed-from-minio_-to-s3_) before you upgrade.**
@@ -203,10 +213,12 @@ The toolkit and the country configuration template work with any container regis
 
 ### Improvements
 
+- Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
 - `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
+- `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
 
 ### Bug fixes
 
