@@ -44,24 +44,27 @@ describe('getCurrentEventState()', () => {
       ]
     })
 
+    const [, declareRequest, declareAccept, registerRequest, registerAccept] =
+      event.actions
+
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
 
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
-      createdAt: event.actions[1].createdAt,
-      createdBy: event.actions[1].createdBy,
-      createdByUserType: event.actions[1].createdByUserType,
-      createdAtLocation: event.actions[1].createdAtLocation,
-      createdByRole: event.actions[1].createdByRole,
-      acceptedAt: event.actions[1].createdAt
+      createdAt: declareRequest.createdAt,
+      createdBy: declareRequest.createdBy,
+      createdByUserType: declareRequest.createdByUserType,
+      createdAtLocation: declareRequest.createdAtLocation,
+      createdByRole: declareRequest.createdByRole,
+      acceptedAt: declareAccept.createdAt
     })
 
     expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
-      createdAt: event.actions[2].createdAt,
-      createdBy: event.actions[2].createdBy,
-      createdByUserType: event.actions[1].createdByUserType,
-      createdAtLocation: event.actions[2].createdAtLocation,
-      createdByRole: event.actions[2].createdByRole,
-      acceptedAt: event.actions[2].createdAt
+      createdAt: registerRequest.createdAt,
+      createdBy: registerRequest.createdBy,
+      createdByUserType: registerRequest.createdByUserType,
+      createdAtLocation: registerRequest.createdAtLocation,
+      createdByRole: registerRequest.createdByRole,
+      acceptedAt: registerAccept.createdAt
     })
   })
 
@@ -1712,14 +1715,14 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.READ }
       ]
     })
-    const revokeAction = event.actions[3]
+    const [revokeRequest, revokeAccept] = event.actions.slice(5, 7)
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
     expect(state.legalStatuses.REVOKED).toMatchObject({
-      createdAt: revokeAction.createdAt,
-      createdBy: revokeAction.createdBy,
-      acceptedAt: revokeAction.createdAt
+      createdAt: revokeRequest.createdAt,
+      createdBy: revokeRequest.createdBy,
+      acceptedAt: revokeAccept.createdAt
     })
     expect(state.legalStatuses.REGISTERED).toBeDefined()
   })
@@ -1754,12 +1757,12 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.REVOKE_REGISTRATION }
       ]
     })
-    const latestRevokeAction = event.actions[5]
+    const latestRevokeRequest = event.actions[9]
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
     expect(state.legalStatuses.REVOKED?.createdAt).toBe(
-      latestRevokeAction.createdAt
+      latestRevokeRequest.createdAt
     )
   })
 

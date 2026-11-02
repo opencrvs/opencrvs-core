@@ -44,7 +44,11 @@ import {
   RevokeRegistrationActionInput,
   ReinstateRegistrationActionInput
 } from './ActionInput'
-import { ActionType, DeclarationUpdateActions } from './ActionType'
+import {
+  ActionType,
+  ConfirmableActions,
+  DeclarationUpdateActions
+} from './ActionType'
 import { Draft } from './Draft'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
@@ -1117,6 +1121,12 @@ export function generateActionDocument<T extends ActionType>({
   }
 }
 
+function isConfirmableAction(
+  type: ActionType
+): type is (typeof ConfirmableActions)[number] {
+  return ConfirmableActions.some((confirmable) => confirmable === type)
+}
+
 export function generateRandomDatetime(
   rng: () => number,
   start: Date,
@@ -1161,8 +1171,19 @@ export function generateEventDocument({
   return {
     trackingId: generateTrackingId(rng),
     type: configuration.id,
-    actions: actions.map((action, i) =>
-      generateActionDocument({
+    actions: actions.flatMap((action, i) => {
+      const createdAt = addDays(
+        new Date(
+          generateRandomDatetime(
+            rng,
+            new Date(2025, 0, 1),
+            new Date(2025, 11, 31)
+          )
+        ),
+        i
+      )
+
+      const actionDocument = generateActionDocument({
         configuration,
         action: action.type,
         defaults: {
@@ -1170,20 +1191,36 @@ export function generateEventDocument({
           createdAtLocation: action.user?.primaryOfficeId,
           assignedTo: action.user?.assignedTo,
           createdByRole: action.user?.role,
-          createdAt: addDays(
-            new Date(
-              generateRandomDatetime(
-                rng,
-                new Date(2025, 0, 1),
-                new Date(2025, 11, 31)
-              )
-            ),
-            i
-          ).toISOString()
+          createdAt: createdAt.toISOString()
         },
         declarationOverrides: action.declarationOverrides
       })
-    ),
+
+      if (!isConfirmableAction(actionDocument.type)) {
+        return [actionDocument]
+      }
+
+      // Mirrors the events service: a confirmable action is first stored as Requested,
+      // carrying the declaration and annotation, and then confirmed by a separate
+      // Accepted action that points back to it through originalActionId.
+      const requestedAction = {
+        ...actionDocument,
+        status: ActionStatus.Requested
+      }
+
+      const acceptedAction = {
+        ...actionDocument,
+        id: getUUID(),
+        transactionId: getUUID(),
+        status: ActionStatus.Accepted,
+        originalActionId: requestedAction.id,
+        createdAt: new Date(createdAt.getTime() + 1).toISOString(),
+        declaration: {},
+        annotation: {}
+      }
+
+      return [requestedAction, acceptedAction]
+    }),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 1000).toISOString(),
