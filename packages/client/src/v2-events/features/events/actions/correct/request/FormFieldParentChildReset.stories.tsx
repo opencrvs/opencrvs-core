@@ -26,6 +26,7 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
+  generateActionDocuments,
   generateTranslationConfig,
   FieldUpdateValue,
   withDeclaration,
@@ -194,7 +195,7 @@ const overridenActions = [
     configuration: overriddenEventConfig,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
@@ -206,7 +207,7 @@ const overridenActions = [
       }
     }
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.REGISTER,
     defaults: { declaration: {} }
@@ -278,7 +279,7 @@ export const FormFieldParentChildReset: Story = {
                 ...overridenEvent,
                 actions: [
                   ...overridenEvent.actions,
-                  generateActionDocument({
+                  ...generateActionDocuments({
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {

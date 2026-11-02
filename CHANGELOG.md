@@ -170,6 +170,17 @@ Update the client translations:
   | `MINIO_ACCESS_KEY` | `S3_ACCESS_KEY` |
   | `MINIO_SECRET_KEY` | `S3_SECRET_KEY` |
 
+#### `event.hasAction` counts only accepted actions
+
+`event.hasAction(...)` and its `minCount`, `maxCount`, `withFields` and `withTemplate` variants now match only actions with status `Accepted`. Before, an action awaiting confirmation (`Requested`) or refused by the country configuration (`Rejected`) counted too, and an action confirmed synchronously counted twice, once for its `Requested` and once for its `Accepted` document. A confirmed action is matched with the details of its request (`createdBy`, `createdByRole`, `createdAtLocation`, `declaration`, `annotation`, `content`), so `withTemplate` and `withFields` match what they matched before, also when the country configuration confirms the action asynchronously.
+
+Check conditionals that rely on the old counting:
+
+- `hasAction(PRINT_CERTIFICATE).maxCount(n)` now allows `n` confirmed prints, where a single synchronously confirmed print used to count as two.
+- `not(event.hasAction(DECLARE))` is now true while a `DECLARE` awaits confirmation, so actions hidden by it show again until the declaration is accepted.
+
+[#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
+
 ### New features
 
 #### `REVOKED` status with revoke and reinstate registration actions

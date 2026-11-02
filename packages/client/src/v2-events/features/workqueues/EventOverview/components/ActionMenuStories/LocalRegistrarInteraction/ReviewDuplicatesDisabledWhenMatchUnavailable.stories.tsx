@@ -18,6 +18,7 @@ import {
   createPrng,
   EventDocument,
   generateActionDocument,
+  generateActionDocuments,
   generateTrackingId,
   getCurrentEventState,
   getUUID,
@@ -50,7 +51,7 @@ const createAction = generateActionDocument({
   defaults: { createdBy: localRegistrar.v2.id }
 })
 
-const declareAction = generateActionDocument({
+const declareActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: { createdBy: localRegistrar.v2.id }
@@ -83,7 +84,12 @@ const eventUnderReview: EventDocument = {
   trackingId,
   createdAt: new Date(Date.now() - 1000).toISOString(),
   updatedAt: new Date(Date.now() - 1000).toISOString(),
-  actions: [createAction, declareAction, duplicateDetectedAction, assignAction]
+  actions: [
+    createAction,
+    ...declareActionPair,
+    duplicateDetectedAction,
+    assignAction
+  ]
 }
 
 /** The record `eventUnderReview` was matched against. */
@@ -98,7 +104,7 @@ const matchedEvent: EventDocument = {
       configuration: tennisClubMembershipEvent,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE
     })

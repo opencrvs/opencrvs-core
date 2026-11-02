@@ -19,7 +19,7 @@ import {
   ActionStatus,
   ActionType,
   EventDocument,
-  generateActionDocument,
+  generateActionDocuments,
   getCurrentEventState,
   getUUID,
   tennisClubMembershipEvent,
@@ -77,15 +77,46 @@ function at(minute: number) {
   return new Date(Date.UTC(2024, 2, 1, 10, minute, 0)).toISOString()
 }
 
-function action<T extends ActionType>(
+/** The actions stored for `type` when the local registrar performs it at `minute`. */
+function storyActions<T extends ActionType>(
   type: T,
   minute: number,
   defaults: Partial<Extract<ActionDocument, { type: T }>> = {}
 ) {
-  return generateActionDocument({
+  return generateActionDocuments({
     configuration: config,
     action: type,
     defaults: { ...actionDefaults, createdAt: at(minute), ...defaults }
+  })
+}
+
+/**
+ * A confirmable action requested by the local registrar at `minute` and, unless
+ * still pending, confirmed asynchronously by the external system a minute later.
+ */
+function confirmableAction<T extends ActionType>(
+  type: T,
+  minute: number,
+  status: ActionStatus,
+  defaults: Partial<Extract<ActionDocument, { type: T }>> = {}
+) {
+  return generateActionDocuments({
+    configuration: config,
+    action: type,
+    defaults: { ...actionDefaults, createdAt: at(minute), ...defaults },
+    confirmation: {
+      status,
+      // An asynchronous confirmation arrives in a transaction of its own.
+      // A pending request has no confirmation yet.
+      defaults:
+        status === ActionStatus.Requested
+          ? undefined
+          : {
+              ...systemActor,
+              createdAt: at(minute + 1),
+              transactionId: getUUID()
+            }
+    }
   })
 }
 
@@ -97,46 +128,57 @@ const registrationWaitingEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    action(ActionType.CREATE, 0, { declaration: {} }),
-    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
-    action(ActionType.DECLARE, 2, {
+    ...storyActions(ActionType.CREATE, 0, { declaration: {} }),
+    ...storyActions(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    ...storyActions(ActionType.DECLARE, 2, {
       declaration: {
         'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
       }
     }),
-    action(ActionType.REGISTER, 3, { status: ActionStatus.Requested })
+    ...confirmableAction(ActionType.REGISTER, 3, ActionStatus.Requested)
   ]
 }
 
-const requestCorrection = action(ActionType.REQUEST_CORRECTION, 4, {
-  declaration: {
-    'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
-  }
-})
-const approveCorrection = action(ActionType.APPROVE_CORRECTION, 5, {
-  status: ActionStatus.Requested,
-  content: { immediateCorrection: true }
-})
-// generateActionDocument forces a random requestId; point it at the request so
-// the pair is recognised as an immediate correction.
-if (approveCorrection.type === ActionType.APPROVE_CORRECTION) {
-  approveCorrection.requestId = requestCorrection.id
+/**
+ * The REQUEST_CORRECTION of an immediate correction, confirmed synchronously:
+ * the client keeps the assignment between request and approval, and the events
+ * service accepts no asynchronous confirmation when the assignment is kept.
+ * Only the APPROVE_CORRECTION that follows can be confirmed asynchronously.
+ */
+function immediateCorrectionRequest() {
+  return storyActions(ActionType.REQUEST_CORRECTION, 4, {
+    declaration: {
+      'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
+    }
+  })
 }
+
+const requestCorrectionPair = immediateCorrectionRequest()
+// The approval refers to the accepted request
+const [, acceptedRequestCorrection] = requestCorrectionPair
 
 const correctionWaitingEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    action(ActionType.CREATE, 0, { declaration: {} }),
-    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
-    action(ActionType.DECLARE, 2, {
+    ...storyActions(ActionType.CREATE, 0, { declaration: {} }),
+    ...storyActions(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    ...storyActions(ActionType.DECLARE, 2, {
       declaration: {
         'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
       }
     }),
-    action(ActionType.REGISTER, 3),
-    requestCorrection,
-    approveCorrection
+    ...storyActions(ActionType.REGISTER, 3),
+    ...requestCorrectionPair,
+    ...confirmableAction(
+      ActionType.APPROVE_CORRECTION,
+      6,
+      ActionStatus.Requested,
+      {
+        content: { immediateCorrection: true },
+        requestId: acceptedRequestCorrection.id
+      }
+    )
   ]
 }
 
@@ -146,27 +188,18 @@ const correctionWaitingEvent: EventDocument = {
  * points at the request, but it carries a different transactionId, as the async
  * confirmation does). The audit shows the completed "Registered" row.
  */
-const finishedRegisterRequest = action(ActionType.REGISTER, 3, {
-  status: ActionStatus.Requested
-})
-const finishedRegisterAccepted = action(ActionType.REGISTER, 4, {
-  ...systemActor,
-  originalActionId: finishedRegisterRequest.id
-})
-
 const registrationFinishedEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    action(ActionType.CREATE, 0, { declaration: {} }),
-    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
-    action(ActionType.DECLARE, 2, {
+    ...storyActions(ActionType.CREATE, 0, { declaration: {} }),
+    ...storyActions(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    ...storyActions(ActionType.DECLARE, 2, {
       declaration: {
         'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
       }
     }),
-    finishedRegisterRequest,
-    finishedRegisterAccepted
+    ...confirmableAction(ActionType.REGISTER, 3, ActionStatus.Accepted)
   ]
 }
 
@@ -174,42 +207,32 @@ const registrationFinishedEvent: EventDocument = {
  * A direct correction whose external validation has finished: the `Requested`
  * APPROVE_CORRECTION is now followed by an `Accepted` one.
  */
-const finishedRequestCorrection = action(ActionType.REQUEST_CORRECTION, 4, {
-  declaration: {
-    'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
-  }
-})
-const finishedApproveRequested = action(ActionType.APPROVE_CORRECTION, 5, {
-  status: ActionStatus.Requested,
-  content: { immediateCorrection: true }
-})
-const finishedApproveAccepted = action(ActionType.APPROVE_CORRECTION, 6, {
-  ...systemActor,
-  content: { immediateCorrection: true },
-  originalActionId: finishedApproveRequested.id
-})
-if (finishedApproveRequested.type === ActionType.APPROVE_CORRECTION) {
-  finishedApproveRequested.requestId = finishedRequestCorrection.id
-}
-if (finishedApproveAccepted.type === ActionType.APPROVE_CORRECTION) {
-  finishedApproveAccepted.requestId = finishedRequestCorrection.id
-}
+const finishedRequestCorrectionPair = immediateCorrectionRequest()
+// The approval refers to the accepted request
+const [, finishedAcceptedRequestCorrection] = finishedRequestCorrectionPair
 
 const correctionFinishedEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    action(ActionType.CREATE, 0, { declaration: {} }),
-    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
-    action(ActionType.DECLARE, 2, {
+    ...storyActions(ActionType.CREATE, 0, { declaration: {} }),
+    ...storyActions(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    ...storyActions(ActionType.DECLARE, 2, {
       declaration: {
         'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
       }
     }),
-    action(ActionType.REGISTER, 3),
-    finishedRequestCorrection,
-    finishedApproveRequested,
-    finishedApproveAccepted
+    ...storyActions(ActionType.REGISTER, 3),
+    ...finishedRequestCorrectionPair,
+    ...confirmableAction(
+      ActionType.APPROVE_CORRECTION,
+      6,
+      ActionStatus.Accepted,
+      {
+        content: { immediateCorrection: true },
+        requestId: finishedAcceptedRequestCorrection.id
+      }
+    )
   ]
 }
 
@@ -219,28 +242,18 @@ const correctionFinishedEvent: EventDocument = {
  * as the async rejection carries). The audit shows a single "Registration
  * failed" row with a rejected status badge — no separate waiting row.
  */
-const rejectedRegisterRequest = action(ActionType.REGISTER, 3, {
-  status: ActionStatus.Requested
-})
-const rejectedRegisterRejected = action(ActionType.REGISTER, 4, {
-  ...systemActor,
-  status: ActionStatus.Rejected,
-  originalActionId: rejectedRegisterRequest.id
-})
-
 const registrationRejectedEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    action(ActionType.CREATE, 0, { declaration: {} }),
-    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
-    action(ActionType.DECLARE, 2, {
+    ...storyActions(ActionType.CREATE, 0, { declaration: {} }),
+    ...storyActions(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    ...storyActions(ActionType.DECLARE, 2, {
       declaration: {
         'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
       }
     }),
-    rejectedRegisterRequest,
-    rejectedRegisterRejected
+    ...confirmableAction(ActionType.REGISTER, 3, ActionStatus.Rejected)
   ]
 }
 
@@ -250,43 +263,32 @@ const registrationRejectedEvent: EventDocument = {
  * correction row with a rejected status badge, and it can be expanded to reveal
  * the rejection.
  */
-const rejectedRequestCorrection = action(ActionType.REQUEST_CORRECTION, 4, {
-  declaration: {
-    'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
-  }
-})
-const rejectedApproveRequested = action(ActionType.APPROVE_CORRECTION, 5, {
-  status: ActionStatus.Requested,
-  content: { immediateCorrection: true }
-})
-const rejectedApproveRejected = action(ActionType.APPROVE_CORRECTION, 6, {
-  ...systemActor,
-  status: ActionStatus.Rejected,
-  content: { immediateCorrection: true },
-  originalActionId: rejectedApproveRequested.id
-})
-if (rejectedApproveRequested.type === ActionType.APPROVE_CORRECTION) {
-  rejectedApproveRequested.requestId = rejectedRequestCorrection.id
-}
-if (rejectedApproveRejected.type === ActionType.APPROVE_CORRECTION) {
-  rejectedApproveRejected.requestId = rejectedRequestCorrection.id
-}
+const rejectedRequestCorrectionPair = immediateCorrectionRequest()
+// The approval refers to the accepted request
+const [, rejectedAcceptedRequestCorrection] = rejectedRequestCorrectionPair
 
 const correctionRejectedEvent: EventDocument = {
   ...tennisClubMembershipEventDocument,
   id: getUUID(),
   actions: [
-    action(ActionType.CREATE, 0, { declaration: {} }),
-    action(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
-    action(ActionType.DECLARE, 2, {
+    ...storyActions(ActionType.CREATE, 0, { declaration: {} }),
+    ...storyActions(ActionType.ASSIGN, 1, { assignedTo: localRegistrarId }),
+    ...storyActions(ActionType.DECLARE, 2, {
       declaration: {
         'applicant.name': { firstname: 'Danny', surname: 'Drinkwater' }
       }
     }),
-    action(ActionType.REGISTER, 3),
-    rejectedRequestCorrection,
-    rejectedApproveRequested,
-    rejectedApproveRejected
+    ...storyActions(ActionType.REGISTER, 3),
+    ...rejectedRequestCorrectionPair,
+    ...confirmableAction(
+      ActionType.APPROVE_CORRECTION,
+      6,
+      ActionStatus.Rejected,
+      {
+        content: { immediateCorrection: true },
+        requestId: rejectedAcceptedRequestCorrection.id
+      }
+    )
   ]
 }
 

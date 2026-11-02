@@ -14,6 +14,7 @@ import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
 import {
+  Action,
   ActionBase,
   ActionDocument,
   ActionStatus,
@@ -44,7 +45,11 @@ import {
   RevokeRegistrationActionInput,
   ReinstateRegistrationActionInput
 } from './ActionInput'
-import { ActionType, DeclarationUpdateActions } from './ActionType'
+import {
+  ActionType,
+  ConfirmableActions,
+  DeclarationUpdateActions
+} from './ActionType'
 import { Draft, DraftInput, RemoteDraft } from './Draft'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
@@ -1004,6 +1009,13 @@ export function eventPayloadGenerator(
   }
 }
 
+/**
+ * Generates a single action document with exactly the given status (Accepted by default).
+ *
+ * For realistic data use `generateActionDocuments`, which also creates the Requested
+ * action the events service stores for a confirmable action. Use this one for edge
+ * cases, such as pending or rejected requests, or actions without an original request.
+ */
 export function generateActionDocument<T extends ActionType>({
   configuration,
   action,
@@ -1053,9 +1065,9 @@ export function generateActionDocument<T extends ActionType>({
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {
+        content: { comment: 'Test comment' },
         ...actionBase,
-        type: action,
-        content: { comment: 'Test comment' }
+        type: action
       }
     case ActionType.CUSTOM:
       return {
@@ -1076,9 +1088,9 @@ export function generateActionDocument<T extends ActionType>({
       }
     }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action, content: { reason: 'Archive' } }
+      return { content: { reason: 'Archive' }, ...actionBase, type: action }
     case ActionType.REJECT:
-      return { ...actionBase, type: action, content: { reason: 'Reject' } }
+      return { content: { reason: 'Reject' }, ...actionBase, type: action }
 
     case ActionType.PRINT_CERTIFICATE: {
       const printActionDefaults = defaults as
@@ -1091,13 +1103,13 @@ export function generateActionDocument<T extends ActionType>({
       }
     }
     case ActionType.APPROVE_CORRECTION:
-      return { ...actionBase, requestId: getUUID(), type: action }
+      return { requestId: getUUID(), ...actionBase, type: action }
     case ActionType.REJECT_CORRECTION:
       return {
-        ...actionBase,
         requestId: getUUID(),
-        type: action,
-        content: { reason: 'Correction rejection' }
+        content: { reason: 'Correction rejection' },
+        ...actionBase,
+        type: action
       }
     case ActionType.DUPLICATE_DETECTED: {
       const duplicateActionDefaults = defaults as
@@ -1115,6 +1127,134 @@ export function generateActionDocument<T extends ActionType>({
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }
+}
+
+type GenerateActionDocumentsArgs<T extends ActionType> = Parameters<
+  typeof generateActionDocument<T>
+>[0]
+
+type ActionConfirmation<S extends ActionStatus> = {
+  status: S
+  defaults?: Partial<ActionBase>
+}
+
+function isConfirmableAction(
+  type: ActionType
+): type is (typeof ConfirmableActions)[number] {
+  return ConfirmableActions.some((confirmable) => confirmable === type)
+}
+
+/**
+ * Generates the action documents the events service stores for a single action.
+ *
+ * Mirrors the events service: a confirmable action is first stored as Requested,
+ * carrying the declaration and annotation, and then confirmed by a separate
+ * Accepted (or Rejected) action that points back to it through originalActionId.
+ * Other actions are stored once, as Accepted.
+ *
+ * `confirmation.status` picks the outcome of a confirmable action:
+ * - Accepted (default): [Requested, Accepted]
+ * - Rejected: [Requested, Rejected]
+ * - Requested: [Requested], i.e. still waiting for confirmation
+ *
+ * By default the request is confirmed synchronously, so both actions share the
+ * `transactionId`. `confirmation.defaults` apply to the confirming action only,
+ * e.g. a system user and a `transactionId` of its own for an asynchronous confirmation.
+ *
+ * The confirming action keeps the generated (or given) `id`, since references such
+ * as `requestId` of APPROVE_CORRECTION point to the accepted action.
+ *
+ * Use `generateActionDocument` instead to build a single action with an explicit status.
+ *
+ * Only a rejection yields an AsyncRejectActionDocument, so the result is typed
+ * as `ActionDocument[]` when `confirmation.status` is known not to be Rejected.
+ */
+export function generateActionDocuments<T extends ActionType>(
+  args: GenerateActionDocumentsArgs<T> & {
+    confirmation: ActionConfirmation<typeof ActionStatus.Rejected>
+  }
+): Action[]
+export function generateActionDocuments<T extends ActionType>(
+  args: GenerateActionDocumentsArgs<T> & {
+    confirmation?: Partial<
+      ActionConfirmation<
+        typeof ActionStatus.Accepted | typeof ActionStatus.Requested
+      >
+    >
+  }
+): ActionDocument[]
+export function generateActionDocuments<T extends ActionType>(
+  args: GenerateActionDocumentsArgs<T> & {
+    confirmation?: Partial<ActionConfirmation<ActionStatus>>
+  }
+): Action[]
+export function generateActionDocuments<T extends ActionType>({
+  confirmation,
+  ...args
+}: GenerateActionDocumentsArgs<T> & {
+  confirmation?: Partial<ActionConfirmation<ActionStatus>>
+}): Action[] {
+  const actionDocument = generateActionDocument(args)
+
+  if (!isConfirmableAction(actionDocument.type)) {
+    return [actionDocument]
+  }
+
+  if (args.defaults?.status !== undefined) {
+    throw new Error(
+      `generateActionDocuments: set the status of ${actionDocument.type} with confirmation.status, not defaults.status`
+    )
+  }
+
+  const status = confirmation?.status ?? ActionStatus.Accepted
+
+  if (status === ActionStatus.Requested) {
+    if (confirmation?.defaults) {
+      throw new Error(
+        'generateActionDocuments: confirmation.defaults have no confirming action to apply to while the request is pending'
+      )
+    }
+    return [{ ...actionDocument, status: ActionStatus.Requested }]
+  }
+
+  const requestedAction = {
+    ...actionDocument,
+    id: getUUID(),
+    status: ActionStatus.Requested
+  }
+
+  const confirmingAction = {
+    ...actionDocument,
+    originalActionId: requestedAction.id,
+    createdAt: new Date(
+      new Date(actionDocument.createdAt).getTime() + 1
+    ).toISOString(),
+    ...confirmation?.defaults
+  }
+
+  if (status === ActionStatus.Rejected) {
+    // A rejection carries no declaration or annotation, see AsyncRejectActionDocument
+    const { declaration, annotation, ...rejectedAction } = confirmingAction
+
+    return [
+      requestedAction,
+      {
+        ...rejectedAction,
+        type: actionDocument.type,
+        status: ActionStatus.Rejected
+      }
+    ]
+  }
+
+  return [
+    requestedAction,
+    {
+      ...confirmingAction,
+      status: ActionStatus.Accepted,
+      declaration: {},
+      annotation: {}
+    }
+  ]
 }
 
 export function generateRandomDatetime(
@@ -1161,8 +1301,19 @@ export function generateEventDocument({
   return {
     trackingId: generateTrackingId(rng),
     type: configuration.id,
-    actions: actions.map((action, i) =>
-      generateActionDocument({
+    actions: actions.flatMap((action, i) => {
+      const createdAt = addDays(
+        new Date(
+          generateRandomDatetime(
+            rng,
+            new Date(2025, 0, 1),
+            new Date(2025, 11, 31)
+          )
+        ),
+        i
+      )
+
+      return generateActionDocuments({
         configuration,
         action: action.type,
         defaults: {
@@ -1170,20 +1321,11 @@ export function generateEventDocument({
           createdAtLocation: action.user?.primaryOfficeId,
           assignedTo: action.user?.assignedTo,
           createdByRole: action.user?.role,
-          createdAt: addDays(
-            new Date(
-              generateRandomDatetime(
-                rng,
-                new Date(2025, 0, 1),
-                new Date(2025, 11, 31)
-              )
-            ),
-            i
-          ).toISOString()
+          createdAt: createdAt.toISOString()
         },
         declarationOverrides: action.declarationOverrides
       })
-    ),
+    }),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 1000).toISOString(),
