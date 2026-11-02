@@ -23,7 +23,6 @@ import {
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { summaryMessages } from '../../EventSummary'
 import { ActionTypeSpecificContent } from './components'
 import { SystemUpdatedFields } from './components/SystemUpdatedFields'
 
@@ -212,11 +211,7 @@ export function EventHistoryDialog({
           ]}
           content={[
             {
-              configVersion:
-                fullEvent.configVersionId ??
-                intl.formatMessage(
-                  summaryMessages.configVersion.emptyValueMessage
-                )
+              configVersion: fullEvent.configVersionId
             }
           ]}
           noResultText=" "

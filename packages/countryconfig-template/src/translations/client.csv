@@ -625,7 +625,6 @@ event.not.downloaded,Shown when user tries to perform an action on event that is
 event.summary.assignedTo.empty,Not assigned message,Not assigned,Non assigné
 event.summary.assignedTo.label,Assigned to label,Assigned to,Assigné à
 event.summary.assignedTo.value,Assigned to value,{event.assignedTo},{event.assignedTo}
-event.summary.configVersion.empty,Shown when the record was created before event configurations had versions,Created before versioning,Créé avant le versionnage
 event.summary.configVersion.label,Label for the id of the event configuration version the record was created under,Configuration version,Version de configuration
 event.summary.event.label,Label for the event field,Event,Événement
 event.summary.flags.label,Flags of the event,Flags,Drapeaux

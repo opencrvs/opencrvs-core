@@ -11,7 +11,7 @@
  */
 import { defineConfig } from './defineConfig'
 import {
-  DEFAULT_EVENT_CONFIG_VERSION_ID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   EventConfigInput,
   resolveEventConfig,
   VersionedEventConfig
@@ -197,7 +197,7 @@ describe('defineConfig()', () => {
       ...versionFields
     } = tennisClubMembershipEvent
 
-    const v1 = { ...versionFields, id: 'v1' }
+    const v1 = { ...versionFields, id: 'initial' }
     const v2 = { ...versionFields, id: 'v2', effectiveFrom: '2027-03-01' }
 
     it('should accept two versions with distinct ids and dates', () => {
@@ -208,16 +208,16 @@ describe('defineConfig()', () => {
         versions: [v1, v2]
       })
 
-      expect(config.versions.map(({ id }) => id)).toEqual(['v1', 'v2'])
+      expect(config.versions.map(({ id }) => id)).toEqual(['initial', 'v2'])
       expect(config.versions[1].effectiveFrom).toBe('2027-03-01')
       expect(config).toMatchObject({ id: eventId, label, advancedSearch })
     })
 
-    it('should take an event without versions as one version with id `default`, effective from the beginning of time', () => {
+    it('should take an event without versions as one version with id `initial`, effective from the beginning of time', () => {
       const config = defineConfig(tennisClubMembershipEvent)
 
       expect(config.versions).toHaveLength(1)
-      expect(config.versions[0].id).toBe(DEFAULT_EVENT_CONFIG_VERSION_ID)
+      expect(config.versions[0].id).toBe(INITIAL_EVENT_CONFIG_VERSION_ID)
       expect(config.versions[0].effectiveFrom).toBe('0001-01-01')
       expect(config).not.toHaveProperty('actions')
     })
@@ -228,10 +228,10 @@ describe('defineConfig()', () => {
           id: eventId,
           label,
           advancedSearch,
-          versions: [v1, { ...v2, id: 'v1' }]
+          versions: [v1, { ...v2, id: 'initial' }]
         })
       ).toThrow(
-        `Event '${eventId}' has more than one version with id 'v1'. Each version must have a different id.`
+        `Event '${eventId}' has more than one version with id 'initial'. Each version must have a different id.`
       )
     })
 
@@ -247,7 +247,7 @@ describe('defineConfig()', () => {
           ]
         })
       ).toThrow(
-        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2020-01-01' ('v1', 'v2'). Each version must have a different \`effectiveFrom\`.`
+        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2020-01-01' ('initial', 'v2'). Each version must have a different \`effectiveFrom\`.`
       )
     })
 
@@ -260,7 +260,7 @@ describe('defineConfig()', () => {
           versions: [v1, { ...v2, effectiveFrom: undefined }]
         })
       ).toThrow(
-        `Event '${eventId}' has more than one version without \`effectiveFrom\` ('v1', 'v2'). At most one version may omit it.`
+        `Event '${eventId}' has more than one version without \`effectiveFrom\` ('initial', 'v2'). At most one version may omit it.`
       )
     })
 
@@ -284,6 +284,17 @@ describe('defineConfig()', () => {
           versions: [{ ...v1, effectiveFrom: '2020-01-01' }, v2]
         })
       ).not.toThrow()
+    })
+
+    it("should reject versions without 'initial', which records created before versioning use", () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, id: 'v1' }, v2]
+        })
+      ).toThrow(`Event '${eventId}' has no version 'initial'.`)
     })
 
     it('should report an invalid version under its index', () => {

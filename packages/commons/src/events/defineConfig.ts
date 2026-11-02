@@ -11,7 +11,7 @@
 
 import * as z from 'zod/v4'
 import {
-  DEFAULT_EVENT_CONFIG_VERSION_ID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   EventConfig,
   EventConfigInput,
   VersionedEventConfig,
@@ -93,7 +93,7 @@ function toVersionedInput(
     id,
     label,
     advancedSearch,
-    versions: [{ ...version, id: DEFAULT_EVENT_CONFIG_VERSION_ID }]
+    versions: [{ ...version, id: INITIAL_EVENT_CONFIG_VERSION_ID }]
   }
 }
 
@@ -119,6 +119,27 @@ function validateVersionInEffectToday(
   }
 }
 
+/**
+ * Records created before versioning are stamped with the initial version, so an event
+ * must keep it once it defines `versions`.
+ */
+function validateInitialVersionKept(
+  config: VersionedEventConfig,
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  const hasInitialVersion = config.versions.some(
+    ({ id }) => id === INITIAL_EVENT_CONFIG_VERSION_ID
+  )
+
+  if (!hasInitialVersion) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' has no version '${INITIAL_EVENT_CONFIG_VERSION_ID}'. Records created before versioning are stamped with it, so keep the configuration from before versioning as the version with id '${INITIAL_EVENT_CONFIG_VERSION_ID}'.`,
+      path: ['versions']
+    })
+  }
+}
+
 const EventConfigDefinition = z
   .custom<EventConfigInput | VersionedEventConfigInput>()
   .superRefine((config, ctx) => {
@@ -135,11 +156,12 @@ const EventConfigDefinition = z
   .transform(toVersionedInput)
   .pipe(VersionedEventConfig)
   .superRefine(validateVersionInEffectToday)
+  .superRefine(validateInitialVersionKept)
 
 /**
  * Validates an event configuration. Accepts an event with `versions`, or, as before
  * versioning, an event without them, which is taken as a single version with id
- * `default`, effective from the beginning of time.
+ * `initial`, effective from the beginning of time.
  */
 export const defineConfig = (
   config: EventConfigInput | VersionedEventConfigInput

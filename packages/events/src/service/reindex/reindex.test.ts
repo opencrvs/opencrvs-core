@@ -162,7 +162,8 @@ beforeEach(async () => {
       transactionId: getUUID(),
       trackingId: event.trackingId,
       createdAt: event.createdAt,
-      updatedAt: event.updatedAt
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
     })
     .returning('id')
     .executeTakeFirst()
@@ -208,7 +209,8 @@ beforeEach(async () => {
       transactionId: getUUID(),
       trackingId: draftDocument.trackingId,
       createdAt: draftDocument.createdAt,
-      updatedAt: draftDocument.updatedAt
+      updatedAt: draftDocument.updatedAt,
+      configVersionId: draftDocument.configVersionId
     })
     .returning('id')
     .executeTakeFirst()
@@ -466,7 +468,8 @@ test('runReindex skips events that cannot be read and reports them in its status
       transactionId: getUUID(),
       trackingId: getUUID(),
       createdAt: event.createdAt,
-      updatedAt: event.updatedAt
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
     })
     .returning('id')
     .executeTakeFirstOrThrow()

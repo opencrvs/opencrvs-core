@@ -29,7 +29,8 @@ import {
   createPrng,
   AssignmentStatus,
   TestUserRole,
-  versionedTennisClubMembershipEvent
+  versionedTennisClubMembershipEvent,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -245,6 +246,7 @@ export function getMockEvent(
     createdAt: '2025-04-18T08:34:20.711Z',
     updatedAt: '2025-04-18T10:40:59.442Z',
     trackingId: '75HT9J',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     actions: actions
       .filter((action) => Object.keys(getMockActions(userId)).includes(action))
       .map((action) => {

@@ -32,7 +32,7 @@ import Schema from './schema/Database'
 const STREAM_BATCH_SIZE = 1000
 
 function toEventDocument(
-  { eventType, configVersionId, ...event }: Events,
+  { eventType, ...event }: Events,
   actions: EventActions[]
 ) {
   const notNullActions = actions.map(({ actionType, ...action }) =>
@@ -45,7 +45,6 @@ function toEventDocument(
   return EventDocument.parse({
     ...event,
     type: eventType,
-    ...(configVersionId && { configVersionId }),
     actions: notNullActions
   })
 }
@@ -77,11 +76,10 @@ export async function getEventsByIdsInTrx(
     .execute()) as (Events & { actions: EventActions[] })[]
 
   return events.map(
-    ({ configVersionId, ...event }) =>
+    (event) =>
       ({
         ...event,
         type: event.eventType,
-        ...(configVersionId && { configVersionId }),
         actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
           return {
             ...rest,

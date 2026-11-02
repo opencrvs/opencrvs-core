@@ -230,8 +230,11 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
 
 type EventLevelField = keyof typeof eventLevelFields
 
-/** Id of the version of an event configured without `versions`. */
-export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+/**
+ * Id of the version of an event configured without `versions`, i.e. the configuration
+ * before versioning. Records created before versioning are stamped with it.
+ */
+export const INITIAL_EVENT_CONFIG_VERSION_ID = 'initial'
 
 /** `effectiveFrom` of a version configured without one. */
 export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
@@ -361,14 +364,14 @@ export function findEventConfigForRecord(
   config: VersionedEventConfig,
   record: { configVersionId?: string }
 ): EventConfig | undefined {
-  const versionId = record.configVersionId ?? getEarliestVersion(config).id
+  // Records indexed or cached before versioning have no stamp
+  const versionId = record.configVersionId ?? INITIAL_EVENT_CONFIG_VERSION_ID
   const version = config.versions.find(({ id }) => id === versionId)
   return version && toEventConfig(config, version)
 }
 
 /**
- * @returns the configuration of the version a record is stamped with. A record created
- * before versioning has no stamp and uses the earliest version.
+ * @returns the configuration of the version a record is stamped with.
  * @throws when the record's version is no longer configured.
  */
 export function getEventConfigForRecord(
@@ -498,7 +501,7 @@ export const VersionedEventConfig: z.ZodType<
       .array(_EventConfigVersion)
       .min(1)
       .describe(
-        `Versions of the event configuration, each effective from its \`effectiveFrom\`. An event configured without versions has a single version, with id '${DEFAULT_EVENT_CONFIG_VERSION_ID}' and \`effectiveFrom\` '${DEFAULT_EFFECTIVE_FROM}'.`
+        `Versions of the event configuration, each effective from its \`effectiveFrom\`. An event configured without versions has a single version, with id '${INITIAL_EVENT_CONFIG_VERSION_ID}' and \`effectiveFrom\` '${DEFAULT_EFFECTIVE_FROM}'.`
       )
   })
   .superRefine((config, ctx) => {

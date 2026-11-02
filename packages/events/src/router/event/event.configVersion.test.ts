@@ -29,7 +29,6 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
-import { getClient } from '@events/storage/postgres/events'
 
 const PAST = '2010-01-01'
 const FUTURE = '2999-01-01'
@@ -293,19 +292,17 @@ describe('the event configuration version of a record', () => {
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 
-  test('a record created before versioning uses the earliest version', async () => {
-    useVersions(version('v1'))
+  test('a record of the initial version keeps it when an earlier version is added', async () => {
+    useVersions(version('initial'))
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, CUSTOM_ACTION_SCOPES)
     const declared = await createEvent(client, generator, [ActionType.DECLARE])
-    await getClient()
-      .updateTable('events')
-      .set({ configVersionId: null })
-      .where('id', '=', declared.id)
-      .execute()
 
-    // Only the earliest version has the custom action.
-    useVersions(withCustomAction(version('v1')), version('v2', PAST))
+    // e.g. a version for digitising legacy records. Only the initial version has the custom action.
+    useVersions(
+      withCustomAction(version('initial', PAST)),
+      version('legacy-1980', '1980-01-01')
+    )
 
     await expect(
       client.event.actions.custom.request({
@@ -315,7 +312,7 @@ describe('the event configuration version of a record', () => {
         customActionType: CUSTOM_ACTION_TYPE,
         annotation: {}
       })
-    ).resolves.not.toHaveProperty('configVersionId')
+    ).resolves.toMatchObject({ configVersionId: 'initial' })
   })
 
   test("search drops the fields secured in the record's version", async () => {

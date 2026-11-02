@@ -80,7 +80,7 @@ export const EventMetadata = z.object({
     .string()
     .optional()
     .describe(
-      'Id of the event configuration version the record was created under. Absent for records created before versioning, which use the earliest version.'
+      "Id of the event configuration version the record was created under. Absent in records indexed before versioning, which use version 'initial'."
     ),
   status: EventStatus,
   legalStatuses: LegalStatuses.describe(

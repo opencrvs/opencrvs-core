@@ -60,10 +60,7 @@ function assertEventsConfigured(
         message: `No configuration found for event type: ${type}`
       })
     }
-    if (
-      configVersionId &&
-      !config.versions.some(({ id }) => id === configVersionId)
-    ) {
+    if (!config.versions.some(({ id }) => id === configVersionId)) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: `Event '${type}' has no version '${configVersionId}'`
@@ -92,8 +89,7 @@ export async function bulkImportEvents(
       {
         ...omit(event, 'type'),
         eventType,
-        transactionId,
-        configVersionId: event.configVersionId ?? null
+        transactionId
       },
       eventActions
     )

@@ -40,9 +40,8 @@ export const EventDocument = z
       ),
     configVersionId: z
       .string()
-      .optional()
       .describe(
-        'Id of the event configuration version the record was created under. Every action on the record uses that version. Absent for records created before versioning, which use the earliest version.'
+        "Id of the event configuration version the record was created under. Every action on the record uses that version. Records created before versioning have 'initial'."
       )
   })
   .meta({ id: 'EventDocument' })

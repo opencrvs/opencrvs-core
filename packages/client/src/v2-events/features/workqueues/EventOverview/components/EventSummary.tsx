@@ -19,7 +19,8 @@ import {
   EventIndex,
   EventDocument,
   isFieldSecured,
-  FieldValue
+  FieldValue,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -108,12 +109,6 @@ const messages = {
       defaultMessage: 'Configuration version',
       description:
         'Label for the id of the event configuration version the record was created under'
-    },
-    emptyValueMessage: {
-      id: 'event.summary.configVersion.empty',
-      defaultMessage: 'Created before versioning',
-      description:
-        'Shown when the record was created before event configurations had versions'
     }
   },
   registrationNumber: {
@@ -288,10 +283,8 @@ export function EventSummary({
           key="configVersion"
           data-testid="configVersion"
           label={intl.formatMessage(messages.configVersion.label)}
-          placeholder={intl.formatMessage(
-            messages.configVersion.emptyValueMessage
-          )}
-          value={eventIndex.configVersionId}
+          // Records indexed before versioning have no id
+          value={eventIndex.configVersionId ?? INITIAL_EVENT_CONFIG_VERSION_ID}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)

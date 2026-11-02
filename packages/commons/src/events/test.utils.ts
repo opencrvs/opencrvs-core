@@ -53,7 +53,7 @@ import {
 import { Draft, DraftInput, RemoteDraft } from './Draft'
 import {
   DEFAULT_EFFECTIVE_FROM,
-  DEFAULT_EVENT_CONFIG_VERSION_ID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   EventConfig,
   EventConfigInput,
   resolveEventConfig,
@@ -1307,6 +1307,7 @@ export function generateEventDocument({
 }): EventDocument {
   return {
     trackingId: generateTrackingId(rng),
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     type: configuration.id,
     actions: actions.flatMap((action, i) => {
       const createdAt = addDays(
@@ -1672,7 +1673,7 @@ export function toVersionedEventConfig({
     versions: [
       {
         ...version,
-        id: DEFAULT_EVENT_CONFIG_VERSION_ID,
+        id: INITIAL_EVENT_CONFIG_VERSION_ID,
         effectiveFrom: DEFAULT_EFFECTIVE_FROM
       }
     ]

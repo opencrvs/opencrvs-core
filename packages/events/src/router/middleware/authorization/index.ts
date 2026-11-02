@@ -266,7 +266,7 @@ function canAccessEventWithInputScopes(
     TrpcContext & {
       eventId: UUID
       eventType: string
-      configVersionId: string | undefined
+      configVersionId: string
     },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
