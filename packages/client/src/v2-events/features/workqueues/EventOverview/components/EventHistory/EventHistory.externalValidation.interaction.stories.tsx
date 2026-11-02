@@ -106,12 +106,16 @@ function confirmableAction<T extends ActionType>(
     defaults: { ...actionDefaults, createdAt: at(minute), ...defaults },
     confirmation: {
       status,
-      // An asynchronous confirmation arrives in a transaction of its own
-      defaults: {
-        ...systemActor,
-        createdAt: at(minute + 1),
-        transactionId: getUUID()
-      }
+      // An asynchronous confirmation arrives in a transaction of its own.
+      // A pending request has no confirmation yet.
+      defaults:
+        status === ActionStatus.Requested
+          ? undefined
+          : {
+              ...systemActor,
+              createdAt: at(minute + 1),
+              transactionId: getUUID()
+            }
     }
   })
 }
@@ -135,16 +139,21 @@ const registrationWaitingEvent: EventDocument = {
   ]
 }
 
-const requestCorrectionPair = confirmableAction(
-  ActionType.REQUEST_CORRECTION,
-  4,
-  ActionStatus.Accepted,
-  {
+/**
+ * The REQUEST_CORRECTION of an immediate correction, confirmed synchronously:
+ * the client keeps the assignment between request and approval, and the events
+ * service accepts no asynchronous confirmation when the assignment is kept.
+ * Only the APPROVE_CORRECTION that follows can be confirmed asynchronously.
+ */
+function immediateCorrectionRequest() {
+  return storyActions(ActionType.REQUEST_CORRECTION, 4, {
     declaration: {
       'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
     }
-  }
-)
+  })
+}
+
+const requestCorrectionPair = immediateCorrectionRequest()
 // The approval refers to the accepted request
 const [, acceptedRequestCorrection] = requestCorrectionPair
 
@@ -198,16 +207,7 @@ const registrationFinishedEvent: EventDocument = {
  * A direct correction whose external validation has finished: the `Requested`
  * APPROVE_CORRECTION is now followed by an `Accepted` one.
  */
-const finishedRequestCorrectionPair = confirmableAction(
-  ActionType.REQUEST_CORRECTION,
-  4,
-  ActionStatus.Accepted,
-  {
-    declaration: {
-      'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
-    }
-  }
-)
+const finishedRequestCorrectionPair = immediateCorrectionRequest()
 // The approval refers to the accepted request
 const [, finishedAcceptedRequestCorrection] = finishedRequestCorrectionPair
 
@@ -263,16 +263,7 @@ const registrationRejectedEvent: EventDocument = {
  * correction row with a rejected status badge, and it can be expanded to reveal
  * the rejection.
  */
-const rejectedRequestCorrectionPair = confirmableAction(
-  ActionType.REQUEST_CORRECTION,
-  4,
-  ActionStatus.Accepted,
-  {
-    declaration: {
-      'applicant.name': { firstname: 'Daniel', surname: 'Drinkwater' }
-    }
-  }
-)
+const rejectedRequestCorrectionPair = immediateCorrectionRequest()
 // The approval refers to the accepted request
 const [, rejectedAcceptedRequestCorrection] = rejectedRequestCorrectionPair
 

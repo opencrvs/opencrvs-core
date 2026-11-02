@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  ActionDocument,
   ActionType,
   DocumentPath,
   generateActionDocuments,
@@ -20,7 +19,7 @@ import { getFilepathsFromActionDocument } from './cache'
 describe('getFilepathsFromActionDocument', () => {
   test('extracts document and signature filepaths', () => {
     const filepaths = getFilepathsFromActionDocument([
-      ...(generateActionDocuments({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
@@ -33,7 +32,7 @@ describe('getFilepathsFromActionDocument', () => {
             type: 'jpg'
           }
         }
-      }) as ActionDocument[])
+      })
     ])
 
     expect(filepaths).toContain('signature.png')

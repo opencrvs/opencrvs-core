@@ -1050,10 +1050,6 @@ export function generateActionDocument<T extends ActionType>({
     ...defaults
   } satisfies ActionBase
 
-  const correctionDefaults = defaults as
-    | Partial<Extract<ActionDocument, { requestId: string }>>
-    | undefined
-
   switch (action) {
     case ActionType.READ:
     case ActionType.MARK_AS_NOT_DUPLICATE:
@@ -1069,9 +1065,9 @@ export function generateActionDocument<T extends ActionType>({
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {
+        content: { comment: 'Test comment' },
         ...actionBase,
-        type: action,
-        content: { comment: 'Test comment' }
+        type: action
       }
     case ActionType.CUSTOM:
       return {
@@ -1092,9 +1088,9 @@ export function generateActionDocument<T extends ActionType>({
       }
     }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action, content: { reason: 'Archive' } }
+      return { content: { reason: 'Archive' }, ...actionBase, type: action }
     case ActionType.REJECT:
-      return { ...actionBase, type: action, content: { reason: 'Reject' } }
+      return { content: { reason: 'Reject' }, ...actionBase, type: action }
 
     case ActionType.PRINT_CERTIFICATE: {
       const printActionDefaults = defaults as
@@ -1107,17 +1103,13 @@ export function generateActionDocument<T extends ActionType>({
       }
     }
     case ActionType.APPROVE_CORRECTION:
-      return {
-        ...actionBase,
-        requestId: correctionDefaults?.requestId ?? getUUID(),
-        type: action
-      }
+      return { requestId: getUUID(), ...actionBase, type: action }
     case ActionType.REJECT_CORRECTION:
       return {
+        requestId: getUUID(),
+        content: { reason: 'Correction rejection' },
         ...actionBase,
-        requestId: correctionDefaults?.requestId ?? getUUID(),
-        type: action,
-        content: { reason: 'Correction rejection' }
+        type: action
       }
     case ActionType.DUPLICATE_DETECTED: {
       const duplicateActionDefaults = defaults as
@@ -1135,6 +1127,15 @@ export function generateActionDocument<T extends ActionType>({
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }
+}
+
+type GenerateActionDocumentsArgs<T extends ActionType> = Parameters<
+  typeof generateActionDocument<T>
+>[0]
+
+type ActionConfirmation<S extends ActionStatus> = {
+  status: S
+  defaults?: Partial<ActionBase>
 }
 
 function isConfirmableAction(
@@ -1164,12 +1165,34 @@ function isConfirmableAction(
  * as `requestId` of APPROVE_CORRECTION point to the accepted action.
  *
  * Use `generateActionDocument` instead to build a single action with an explicit status.
+ *
+ * Only a rejection yields an AsyncRejectActionDocument, so the result is typed
+ * as `ActionDocument[]` when `confirmation.status` is known not to be Rejected.
  */
+export function generateActionDocuments<T extends ActionType>(
+  args: GenerateActionDocumentsArgs<T> & {
+    confirmation: ActionConfirmation<typeof ActionStatus.Rejected>
+  }
+): Action[]
+export function generateActionDocuments<T extends ActionType>(
+  args: GenerateActionDocumentsArgs<T> & {
+    confirmation?: Partial<
+      ActionConfirmation<
+        typeof ActionStatus.Accepted | typeof ActionStatus.Requested
+      >
+    >
+  }
+): ActionDocument[]
+export function generateActionDocuments<T extends ActionType>(
+  args: GenerateActionDocumentsArgs<T> & {
+    confirmation?: Partial<ActionConfirmation<ActionStatus>>
+  }
+): Action[]
 export function generateActionDocuments<T extends ActionType>({
   confirmation,
   ...args
-}: Parameters<typeof generateActionDocument<T>>[0] & {
-  confirmation?: { status?: ActionStatus; defaults?: Partial<ActionBase> }
+}: GenerateActionDocumentsArgs<T> & {
+  confirmation?: Partial<ActionConfirmation<ActionStatus>>
 }): Action[] {
   const actionDocument = generateActionDocument(args)
 
@@ -1177,9 +1200,20 @@ export function generateActionDocuments<T extends ActionType>({
     return [actionDocument]
   }
 
+  if (args.defaults?.status !== undefined) {
+    throw new Error(
+      `generateActionDocuments: set the status of ${actionDocument.type} with confirmation.status, not defaults.status`
+    )
+  }
+
   const status = confirmation?.status ?? ActionStatus.Accepted
 
   if (status === ActionStatus.Requested) {
+    if (confirmation?.defaults) {
+      throw new Error(
+        'generateActionDocuments: confirmation.defaults have no confirming action to apply to while the request is pending'
+      )
+    }
     return [{ ...actionDocument, status: ActionStatus.Requested }]
   }
 

@@ -100,6 +100,28 @@ describe('generateActionDocuments()', () => {
     expect(request.id).not.toBe(id)
     expect(accept.id).toBe(id)
   })
+  it('refuses a status in defaults of a confirmable action', () => {
+    expect(() =>
+      generateActionDocuments({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        defaults: { status: ActionStatus.Requested }
+      })
+    ).toThrow('confirmation.status')
+  })
+
+  it('refuses confirmation defaults while the request is pending', () => {
+    expect(() =>
+      generateActionDocuments({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.DECLARE,
+        confirmation: {
+          status: ActionStatus.Requested,
+          defaults: { createdBy: 'system' }
+        }
+      })
+    ).toThrow('pending')
+  })
 })
 
 describe('generateActionDocument()', () => {
@@ -112,5 +134,20 @@ describe('generateActionDocument()', () => {
     })
 
     expect(approval).toMatchObject({ requestId })
+  })
+  it.each([
+    ActionType.EDIT,
+    ActionType.ARCHIVE,
+    ActionType.REJECT,
+    ActionType.REJECT_CORRECTION
+  ])('keeps the given content of %s', (action) => {
+    const content = { reason: 'Given', comment: 'Given' }
+    const actionDocument = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action,
+      defaults: { content }
+    })
+
+    expect(actionDocument).toMatchObject({ content })
   })
 })

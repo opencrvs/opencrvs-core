@@ -234,9 +234,8 @@ export const DuplicateWithSameLabels: Story = {
           ...mockOriginalEvent,
           actions: mockOriginalEvent.actions.map((x) => {
             if (
-              (x.type === ActionType.DECLARE ||
-                x.type === ActionType.REGISTER) &&
-              'declaration' in x
+              x.type === ActionType.DECLARE ||
+              x.type === ActionType.REGISTER
             ) {
               return {
                 ...x,
@@ -254,9 +253,8 @@ export const DuplicateWithSameLabels: Story = {
           ...mockDuplicateEvent,
           actions: mockDuplicateEvent.actions.map((x) => {
             if (
-              (x.type === ActionType.DECLARE ||
-                x.type === ActionType.REGISTER) &&
-              'declaration' in x
+              x.type === ActionType.DECLARE ||
+              x.type === ActionType.REGISTER
             ) {
               return {
                 ...x,

@@ -1622,6 +1622,14 @@ describe('archive/unarchive status resolution', () => {
 })
 
 describe('revoke/reinstate status resolution', () => {
+  function revokeActions(event: EventDocument, status: ActionStatus) {
+    return event.actions.filter(
+      (action) =>
+        action.type === ActionType.REVOKE_REGISTRATION &&
+        action.status === status
+    )
+  }
+
   test('status is REVOKED after a registered record is revoked', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,
@@ -1634,7 +1642,8 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.READ }
       ]
     })
-    const [revokeRequest, revokeAccept] = event.actions.slice(5, 7)
+    const [revokeRequest] = revokeActions(event, ActionStatus.Requested)
+    const [revokeAccept] = revokeActions(event, ActionStatus.Accepted)
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
@@ -1676,12 +1685,14 @@ describe('revoke/reinstate status resolution', () => {
         { type: ActionType.REVOKE_REGISTRATION }
       ]
     })
-    const latestRevokeRequest = event.actions[9]
+    const latestRevokeRequest = revokeActions(event, ActionStatus.Requested).at(
+      -1
+    )
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REVOKED)
     expect(state.legalStatuses.REVOKED?.createdAt).toBe(
-      latestRevokeRequest.createdAt
+      latestRevokeRequest?.createdAt
     )
   })
 
