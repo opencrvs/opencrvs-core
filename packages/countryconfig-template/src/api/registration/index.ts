@@ -20,9 +20,7 @@ import { GATEWAY_URL } from '@countryconfig/constants'
 import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
 
-export interface ActionConfirmationRequest extends Hapi.Request {
-  payload: EventDocument
-}
+export type ActionConfirmationRequest = Hapi.Request<{ Payload: EventDocument }>
 
 /**
  * Handler for event registration confirmation.
