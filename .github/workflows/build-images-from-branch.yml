@@ -94,7 +94,7 @@ jobs:
           echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
 
           # Makes the base image install new Debian security fixes once a day
-          echo "apt-cache-key=$(date -u +%F)" >> $GITHUB_OUTPUT
+          echo "apt-cache-date=$(date -u +%F)" >> $GITHUB_OUTPUT
 
       - name: Set architecture label
         id: arch_label
@@ -140,7 +140,7 @@ jobs:
           with: |
             file: packages/Dockerfile.base
             build-args: |
-              APT_CACHE_KEY=${{ steps.set-version-and-branch.outputs.apt-cache-key }}
+              APT_CACHE_DATE=${{ steps.set-version-and-branch.outputs.apt-cache-date }}
             provenance: false
             push: true
             context: .

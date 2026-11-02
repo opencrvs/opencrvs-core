@@ -2,14 +2,16 @@
 # https://opencrvsworkspace.slack.com/archives/C07M2FETFFB/p1781856414463509
 FROM node:22.22.3-slim
 
-# Do not remove APT_CACHE_KEY. No command reads it, but its value
+# Do not remove APT_CACHE_DATE. No command reads it, but its value
 # changes the cache key of the commands that follow it.
 # CI sets it to the current date. When the date changes, Docker does not
 # use the cached upgrade layer and runs apt-get upgrade again.
 # This gives two good results:
 # - Each day, the image gets the new Debian security fixes.
 # - Builds on the same day use the cache, so they are fast.
-ARG APT_CACHE_KEY
+# Do not put KEY, SECRET or TOKEN in the name. The Docker check
+# SecretsUsedInArgOrEnv then reports the arg as sensitive data.
+ARG APT_CACHE_DATE
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get clean && \
