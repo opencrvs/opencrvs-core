@@ -485,7 +485,7 @@ jobs:
   trigger-perf-test:
     name: Trigger performance tests in perftest environment
     needs: [base, merge-services-manifest, merge-testland-assets-manifest]
-    if: success() && github.event_name == 'push' && github.ref_name == 'develop'
+    if: success() && github.event_name != 'pull_request' && needs.base.outputs.branch == 'develop'
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/github-script@v9
