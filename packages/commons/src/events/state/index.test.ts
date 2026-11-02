@@ -20,6 +20,7 @@ import { EventStatus } from '../EventMetadata'
 import { InherentFlags } from '../Flag'
 import {
   generateActionDocument,
+  generateActionDocuments,
   generateEventDocument,
   generateUuid,
   TestUserRole
@@ -408,7 +409,7 @@ describe('getCurrentEventState()', () => {
           configuration: tennisClubMembershipEvent,
           action: ActionType.CREATE
         }),
-        generateActionDocument({
+        ...generateActionDocuments({
           configuration: tennisClubMembershipEvent,
           action: ActionType.DECLARE,
           defaults: {
@@ -1356,7 +1357,7 @@ describe('address state transitions', () => {
       configuration: tennisClubMembershipEvent,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: {
@@ -1368,7 +1369,7 @@ describe('address state transitions', () => {
   test('should persist optional "village" field in address, even if it is not included in payload', () => {
     const actions = [
       ...initialActions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
@@ -1402,7 +1403,7 @@ describe('address state transitions', () => {
 
     const actions = [
       ...initialActions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {

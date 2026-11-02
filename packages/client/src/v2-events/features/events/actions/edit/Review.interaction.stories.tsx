@@ -321,8 +321,8 @@ function eventWithActions(...types: ActionType[]) {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      ...types.map((type) =>
-        generateActionDocument({
+      ...types.flatMap((type) =>
+        generateActionDocuments({
           configuration: tennisClubMembershipEvent,
           action: type
         })
