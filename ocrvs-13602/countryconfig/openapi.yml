@@ -187,10 +187,10 @@ components:
           type: string
           description: System-generated tracking identifier used to look up the event.
         configVersionId:
-          description: Id of the event configuration version the record was created under.
-            Every action on the record uses that version. Absent for records
-            created before versioning, which use the earliest version.
           type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -198,6 +198,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
     ActionDocument:
       oneOf:
         - $ref: "#/components/schemas/CreatedAction"
@@ -2601,7 +2602,7 @@ components:
             additionalProperties: false
           description: Versions of the event configuration, each effective from its
             `effectiveFrom`. An event configured without versions has a single
-            version, with id 'default' and `effectiveFrom` '0001-01-01'.
+            version, with id 'initial' and `effectiveFrom` '0001-01-01'.
       required:
         - id
         - label
@@ -16062,10 +16063,10 @@ components:
           type: string
           description: System-generated tracking identifier used to look up the event.
         configVersionId:
-          description: Id of the event configuration version the record was created under.
-            Every action on the record uses that version. Absent for records
-            created before versioning, which use the earliest version.
           type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -16073,6 +16074,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
       additionalProperties: false
     ActionDocumentOutput:
       oneOf:
