@@ -14,6 +14,7 @@ import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
 import {
+  Action,
   ActionBase,
   ActionDocument,
   ActionStatus,
@@ -1049,6 +1050,10 @@ export function generateActionDocument<T extends ActionType>({
     ...defaults
   } satisfies ActionBase
 
+  const correctionDefaults = defaults as
+    | Partial<Extract<ActionDocument, { requestId: string }>>
+    | undefined
+
   switch (action) {
     case ActionType.READ:
     case ActionType.MARK_AS_NOT_DUPLICATE:
@@ -1102,11 +1107,15 @@ export function generateActionDocument<T extends ActionType>({
       }
     }
     case ActionType.APPROVE_CORRECTION:
-      return { ...actionBase, requestId: getUUID(), type: action }
+      return {
+        ...actionBase,
+        requestId: correctionDefaults?.requestId ?? getUUID(),
+        type: action
+      }
     case ActionType.REJECT_CORRECTION:
       return {
         ...actionBase,
-        requestId: getUUID(),
+        requestId: correctionDefaults?.requestId ?? getUUID(),
         type: action,
         content: { reason: 'Correction rejection' }
       }
@@ -1139,42 +1148,79 @@ function isConfirmableAction(
  *
  * Mirrors the events service: a confirmable action is first stored as Requested,
  * carrying the declaration and annotation, and then confirmed by a separate
- * Accepted action that points back to it through originalActionId. Other actions
- * are stored once, as Accepted.
+ * Accepted (or Rejected) action that points back to it through originalActionId.
+ * Other actions are stored once, as Accepted.
  *
- * The Accepted action keeps the generated (or given) `id`, since references such
+ * `confirmation.status` picks the outcome of a confirmable action:
+ * - Accepted (default): [Requested, Accepted]
+ * - Rejected: [Requested, Rejected]
+ * - Requested: [Requested], i.e. still waiting for confirmation
+ *
+ * By default the request is confirmed synchronously, so both actions share the
+ * `transactionId`. `confirmation.defaults` apply to the confirming action only,
+ * e.g. a system user and a `transactionId` of its own for an asynchronous confirmation.
+ *
+ * The confirming action keeps the generated (or given) `id`, since references such
  * as `requestId` of APPROVE_CORRECTION point to the accepted action.
  *
  * Use `generateActionDocument` instead to build a single action with an explicit status.
  */
-export function generateActionDocuments<T extends ActionType>(
-  args: Parameters<typeof generateActionDocument<T>>[0]
-): ActionDocument[] {
+export function generateActionDocuments<T extends ActionType>({
+  confirmation,
+  ...args
+}: Parameters<typeof generateActionDocument<T>>[0] & {
+  confirmation?: { status?: ActionStatus; defaults?: Partial<ActionBase> }
+}): Action[] {
   const actionDocument = generateActionDocument(args)
 
   if (!isConfirmableAction(actionDocument.type)) {
     return [actionDocument]
   }
 
+  const status = confirmation?.status ?? ActionStatus.Accepted
+
+  if (status === ActionStatus.Requested) {
+    return [{ ...actionDocument, status: ActionStatus.Requested }]
+  }
+
   const requestedAction = {
     ...actionDocument,
     id: getUUID(),
-    transactionId: getUUID(),
     status: ActionStatus.Requested
   }
 
-  const acceptedAction = {
+  const confirmingAction = {
     ...actionDocument,
-    status: ActionStatus.Accepted,
     originalActionId: requestedAction.id,
     createdAt: new Date(
       new Date(actionDocument.createdAt).getTime() + 1
     ).toISOString(),
-    declaration: {},
-    annotation: {}
+    ...confirmation?.defaults
   }
 
-  return [requestedAction, acceptedAction]
+  if (status === ActionStatus.Rejected) {
+    // A rejection carries no declaration or annotation, see AsyncRejectActionDocument
+    const { declaration, annotation, ...rejectedAction } = confirmingAction
+
+    return [
+      requestedAction,
+      {
+        ...rejectedAction,
+        type: actionDocument.type,
+        status: ActionStatus.Rejected
+      }
+    ]
+  }
+
+  return [
+    requestedAction,
+    {
+      ...confirmingAction,
+      status: ActionStatus.Accepted,
+      declaration: {},
+      annotation: {}
+    }
+  ]
 }
 
 export function generateRandomDatetime(
