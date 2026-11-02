@@ -16,7 +16,8 @@ import {
   EventDocument,
   EventState,
   FieldConfig,
-  FieldType
+  FieldType,
+  getEventWithCompleteAcceptedActions
 } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useOnlineStatus } from '../../../utils'
@@ -32,7 +33,7 @@ export const useCertificateTemplateSelectorFieldConfig = (
   const isOnline = useOnlineStatus()
   const declarationWithEventMetadata = {
     $form: declaration,
-    $event: event,
+    $event: getEventWithCompleteAcceptedActions(event),
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline
   } satisfies ConditionalParameters
