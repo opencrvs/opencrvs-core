@@ -276,14 +276,15 @@ describe('removeObjects', () => {
     await expect(removeObjects([])).resolves.toBeUndefined()
   })
 
-  it('deletes more keys than one request may name', async () => {
+  it('deletes more than 1000 keys, the most one delete request accepts', async () => {
     const prefix = newPrefix()
-    // A store refuses a delete request that names more than 1000 keys
     const toDelete = keys(prefix, 2500)
-    // Deleting a key that does not exist succeeds, so only a few are stored
+
+    // S3 gives OK with 'deleting' files that have never existed, so lets only add 2 real keys
     await putObject(toDelete[0], Buffer.from(''))
     await putObject(toDelete[2499], Buffer.from(''))
 
+    // ...and then 'delete' 2500 keys
     await removeObjects(toDelete)
 
     expect(await listObjectKeys(prefix)).toEqual([])
