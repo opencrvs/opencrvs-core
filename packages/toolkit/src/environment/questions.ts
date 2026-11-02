@@ -54,9 +54,6 @@ function validateRegistryHost(input: string): true | string {
     : 'Please enter a registry host without protocol or path (e.g. docker.io, ghcr.io)'
 }
 
-// The DOCKER_* and DOCKERHUB_* secrets are the previous names of the REGISTRY_* secrets
-export const registryQuestions = [
-
 const GITHUB_REPOSITORY_PATTERN =
   /^(?:(?:https:\/\/|git@)github\.com[/:])?([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/
 
@@ -69,7 +66,8 @@ function toGithubRepositorySlug(input: string) {
   return match ? `${match[1]}/${match[2]}` : undefined
 }
 
-export const dockerhubQuestions = [
+// The DOCKER_* and DOCKERHUB_* secrets are the previous names of the REGISTRY_* secrets
+export const registryQuestions = [
   {
     name: 'registryHost',
     type: 'text' as const,

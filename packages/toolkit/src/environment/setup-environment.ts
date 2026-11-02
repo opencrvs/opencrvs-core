@@ -992,7 +992,6 @@ export async function runSetupEnvironment() {
     value: two_fa_enabled ? 'true' : 'false',
     scope: 'ENVIRONMENT' as const
   })
-<<<<<<< HEAD
   // Read by the deployment workflows (vars.MONITORING_ENABLED) to decide
   // whether the OpenTelemetry Collector is installed
   derivedUpdates.push({
@@ -1000,14 +999,14 @@ export async function runSetupEnvironment() {
     type: 'VARIABLE' as const,
     didExist: existingMonitoringEnabled,
     value: monitoring_enabled ? 'true' : 'false',
-=======
+    scope: 'ENVIRONMENT' as const
+  })
   derivedUpdates.push({
     name: 'E2E_ENABLED',
     type: 'VARIABLE' as const,
     didExist: existingE2EEnabled,
     // Only store 'false' to switch off an environment that previously had e2e enabled
     value: e2e_enabled ? 'true' : existingE2EEnabled ? 'false' : null,
->>>>>>> 7f10d280ee (feat: Add e2e tests for countryconfig)
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)
