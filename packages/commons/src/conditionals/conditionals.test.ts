@@ -1407,6 +1407,151 @@ describe('"event" conditionals', () => {
   })
 })
 
+describe('date comparisons against an action', () => {
+  const DAY = 24 * 60 * 60 * 1000
+  const today = new Date()
+  const daysAgo = (n: number) => new Date(today.getTime() - n * DAY)
+  // The event happened 45 days ago; day N after it is (45 - N) days ago.
+  const dob = formatISO(daysAgo(45), { representation: 'date' })
+  const onDay = (n: number) => daysAgo(45 - n).toISOString()
+
+  const action = (
+    type: ActionType,
+    day: number,
+    extra: Record<string, unknown> = {}
+  ) => ({
+    id: `${type}-${day}` as UUID,
+    type,
+    createdAt: onDay(day),
+    createdBy: '12345',
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: 'some-role',
+    declaration: {},
+    createdAtLocation: '123456' as UUID,
+    status: ActionStatus.Accepted,
+    transactionId: '123456',
+    ...extra
+  })
+
+  const params = (actions: ReturnType<typeof action>[]) => ({
+    $now: formatISO(today, { representation: 'date' }),
+    $online: false,
+    $form: { 'child.dob': dob },
+    $event: {
+      id: '123' as UUID,
+      type: 'birth',
+      trackingId: 'TEST12',
+      createdAt: onDay(0),
+      updatedAt: onDay(0),
+      actions
+    }
+  })
+
+  const onTimeIfDeclaredWithin30Days = field('child.dob')
+    .isAfter()
+    .days(30)
+    .before(event.firstAction(ActionType.DECLARE))
+
+  it('compares against today until the action has happened', () => {
+    expect(validate(onTimeIfDeclaredWithin30Days, params([]))).toBe(false)
+  })
+
+  it('compares against the first matching action', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([
+          action(ActionType.DECLARE, 10),
+          action(ActionType.REJECT, 40),
+          action(ActionType.DECLARE, 44)
+        ])
+      )
+    ).toBe(true)
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([action(ActionType.DECLARE, 31)])
+      )
+    ).toBe(false)
+  })
+
+  it('compares against the last matching action', () => {
+    const lastDeclare = field('child.dob')
+      .isAfter()
+      .days(30)
+      .before(event.lastAction(ActionType.DECLARE))
+    expect(
+      validate(
+        lastDeclare,
+        params([action(ActionType.DECLARE, 10), action(ActionType.DECLARE, 44)])
+      )
+    ).toBe(false)
+  })
+
+  it('takes whichever of several action types came first', () => {
+    const notifyOrDeclare = field('child.dob')
+      .isAfter()
+      .days(30)
+      .before(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))
+    expect(
+      validate(
+        notifyOrDeclare,
+        params([action(ActionType.NOTIFY, 5), action(ActionType.DECLARE, 40)])
+      )
+    ).toBe(true)
+  })
+
+  it('matches custom actions by customActionType', () => {
+    const received = field('child.dob')
+      .isAfter()
+      .days(30)
+      .before(
+        event.firstAction({
+          type: ActionType.CUSTOM,
+          customActionType: 'RECEIVE'
+        })
+      )
+    expect(
+      validate(
+        received,
+        params([
+          action(ActionType.CUSTOM, 5, { customActionType: 'OTHER' }),
+          action(ActionType.CUSTOM, 40, { customActionType: 'RECEIVE' })
+        ])
+      )
+    ).toBe(false)
+    expect(
+      validate(
+        received,
+        params([action(ActionType.CUSTOM, 5, { customActionType: 'RECEIVE' })])
+      )
+    ).toBe(true)
+  })
+
+  it('skips rejected actions', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([
+          action(ActionType.DECLARE, 10, { status: ActionStatus.Rejected }),
+          action(ActionType.DECLARE, 40)
+        ])
+      )
+    ).toBe(false)
+  })
+
+  it('compares after the action with .after()', () => {
+    const declaredWithin = field('child.dob')
+      .isBefore()
+      .days(30)
+      .after(event.firstAction(ActionType.DECLARE))
+    // dob is before declaration + 30 days: always true for a past dob
+    expect(
+      validate(declaredWithin, params([action(ActionType.DECLARE, 10)]))
+    ).toBe(true)
+  })
+})
+
 describe('"valid name" conditionals', () => {
   describe('Valid names', () => {
     it('Only firstname and surname', () => {

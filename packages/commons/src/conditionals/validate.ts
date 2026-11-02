@@ -16,8 +16,17 @@ import * as z from 'zod/v4'
 import { $ZodIssue } from 'zod/v4/core'
 import { formatISO, isAfter, isBefore } from 'date-fns'
 
-import { ConditionalParameters, JSONSchema } from './conditionals'
-import { ActionUpdate, EventState } from '../events/ActionDocument'
+import {
+  ActionDateReference,
+  ConditionalParameters,
+  isActionDateReference,
+  JSONSchema
+} from './conditionals'
+import {
+  ActionStatus,
+  ActionUpdate,
+  EventState
+} from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import {
@@ -100,6 +109,27 @@ function resolveDataPath(
   }
 
   return current
+}
+
+function resolveActionDate(
+  event: EventDocument | undefined,
+  { match, occurrence }: ActionDateReference['$action']
+): string | undefined {
+  const dates = (event?.actions ?? [])
+    .filter(({ status }) => status !== ActionStatus.Rejected)
+    .filter((action) =>
+      match.some(
+        ({ type, customActionType }) =>
+          action.type === type &&
+          (!customActionType ||
+            ('customActionType' in action &&
+              action.customActionType === customActionType))
+      )
+    )
+    .map(({ createdAt }) => createdAt)
+    .sort()
+
+  return occurrence === 'first' ? dates[0] : dates[dates.length - 1]
 }
 
 /** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
@@ -217,6 +247,10 @@ export function runClientFunction(
  *       }
  *    }
  * }
+ *
+ * The reference date can also be the date of an action on the event, resolved
+ * against $event. Until such an action exists, it defaults to $now:
+ *   "referenceDate": { "$action": { "match": [{ "type": "DECLARE" }], "occurrence": "first" } }
  */
 ajv.addKeyword({
   keyword: 'daysFromDate',
@@ -228,7 +262,7 @@ ajv.addKeyword({
     schema: {
       days: number
       clause: 'after' | 'before'
-      referenceDate?: string | { $data: string }
+      referenceDate?: string | { $data: string } | ActionDateReference
     },
     data: string,
     _: unknown,
@@ -257,6 +291,11 @@ ajv.addKeyword({
     }
 
     let referenceDate = schema.referenceDate
+
+    if (isActionDateReference(referenceDate)) {
+      const rootData = dataContext.rootData as { $event?: EventDocument }
+      referenceDate = resolveActionDate(rootData.$event, referenceDate.$action)
+    }
 
     if (
       referenceDate &&

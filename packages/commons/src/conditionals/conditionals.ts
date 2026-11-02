@@ -18,6 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
+import type { ActionType } from '../events/ActionType'
 import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
 import { userReferenceFunctions } from '../users/userReferences'
 import type { ClientFunctionContext } from './validate'
@@ -268,6 +269,21 @@ export function isEventFieldReference(
   return typeof value === 'object' && value !== null && '$$event' in value
 }
 
+export type ActionMatcher = { type: ActionType; customActionType?: string }
+
+export type ActionDateReference = {
+  $action: {
+    match: ActionMatcher[]
+    occurrence: 'first' | 'last'
+  }
+}
+
+export function isActionDateReference(
+  value: unknown
+): value is ActionDateReference {
+  return typeof value === 'object' && value !== null && '$action' in value
+}
+
 /**
  * This function will output JSONSchema which looks for example like this:
  * @example
@@ -459,7 +475,7 @@ export function createFieldConditionals(fieldId: string) {
     field: FieldReference,
     days: number,
     clause: 'before' | 'after',
-    referenceDate?: string
+    referenceDate?: string | ActionDateReference
   ) => ({
     type: 'object',
     properties: {
@@ -546,7 +562,11 @@ export function createFieldConditionals(fieldId: string) {
           },
           fromNow: () => {
             return defineFormConditional(getDayRange(this, days, 'after'))
-          }
+          },
+          before: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, -days, 'after', action)),
+          after: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, days, 'after', action))
         }),
         date: (date: string | FieldReference) => {
           if (isFieldReference(date)) {
@@ -595,7 +615,11 @@ export function createFieldConditionals(fieldId: string) {
           },
           fromNow: () => {
             return defineFormConditional(getDayRange(this, -days, 'before'))
-          }
+          },
+          before: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, -days, 'before', action)),
+          after: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, days, 'before', action))
         }),
         date: (date: `${string}-${string}-${string}` | FieldReference) => {
           if (isFieldReference(date)) {
