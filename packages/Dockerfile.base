@@ -2,18 +2,31 @@
 # https://opencrvsworkspace.slack.com/archives/C07M2FETFFB/p1781856414463509
 FROM node:22.22.3-slim
 
-# Do not remove APT_UPGRADE_DATE. No command reads it, but its value
+# Do not remove APT_CACHE_KEY. No command reads it, but its value
 # changes the cache key of the commands that follow it.
 # CI sets it to the current date. When the date changes, Docker does not
 # use the cached upgrade layer and runs apt-get upgrade again.
 # This gives two good results:
 # - Each day, the image gets the new Debian security fixes.
 # - Builds on the same day use the cache, so they are fast.
-ARG APT_UPGRADE_DATE
+ARG APT_CACHE_KEY
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
+# testland and mosip use npm and npx. The npm that comes with the node image
+# bundles vulnerable packages (tar, pacote, sigstore and others).
+# npm 11.21.1 itself bundles undici 6.29.0, which has HIGH CVEs. Replace it
+# with 6.29.1 until an npm release bundles the fixed version.
+RUN npm install -g npm@11.21.1 && \
+    npm pack undici@6.29.1 --pack-destination /tmp && \
+    rm -rf /usr/local/lib/node_modules/npm/node_modules/undici && \
+    mkdir /usr/local/lib/node_modules/npm/node_modules/undici && \
+    tar -xzf /tmp/undici-6.29.1.tgz --strip-components=1 \
+      -C /usr/local/lib/node_modules/npm/node_modules/undici && \
+    rm /tmp/undici-6.29.1.tgz && \
+    npm cache clean --force
 
 # The pnpm version is pinned by the packageManager field in package.json
 RUN corepack enable pnpm
