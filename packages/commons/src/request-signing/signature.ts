@@ -202,3 +202,38 @@ export async function verifyCoreRequest(
   }
   return result
 }
+
+/** The private key core signs with, and the kid that names its public key. */
+export interface CoreSigningKey {
+  privateKey: KeyObject
+  keyid: string
+}
+
+/**
+ * Adds core's signature to a fetch request. The body must be sent exactly as
+ * given; a request without one is signed as having an empty body.
+ */
+export function withCoreSignature(
+  key: CoreSigningKey,
+  url: string | URL,
+  init: {
+    method?: string
+    body?: string
+    headers?: Record<string, string>
+  } = {}
+) {
+  const { pathname, search } = new URL(url)
+  return {
+    ...init,
+    headers: {
+      ...init.headers,
+      ...signCoreRequest({
+        method: init.method ?? 'GET',
+        path: pathname,
+        query: search,
+        body: init.body,
+        ...key
+      })
+    }
+  }
+}

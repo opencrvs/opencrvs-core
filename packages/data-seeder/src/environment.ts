@@ -14,5 +14,9 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_HOST: url({ devDefault: 'http://localhost:3040' }),
   GATEWAY_HOST: url({ devDefault: 'http://localhost:7070' }),
   SUPER_USER_PASSWORD: str({ devDefault: 'password' }),
+  CORE_REQUEST_SIGNING_KEY_PATH: str({
+    devDefault: '../../.secrets/core-request-signing-key.pem',
+    desc: 'Ed25519 private key that core signs its requests to country config with'
+  }),
   ACTIVATE_USERS: bool({ devDefault: true })
 })

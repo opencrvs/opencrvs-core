@@ -40,7 +40,6 @@ export async function unassignRecord({
 }) {
   const event = await getEventById(input.eventId)
   const configuration = await getEventConfigurationById({
-    token,
     eventType: event.type
   })
 

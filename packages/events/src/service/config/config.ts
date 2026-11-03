@@ -10,18 +10,25 @@
  */
 
 import fetch from 'node-fetch'
-import { array } from 'zod'
+import { array, object, string } from 'zod'
 import {
   ApplicationConfig,
   getOrThrow,
   logger,
   resolveEventConfig,
   Role,
-  TokenWithBearer,
   VersionedEventConfig,
   WorkqueueConfig
 } from '@opencrvs/commons'
+import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
+import { coreSigningKey } from '@events/request-signing'
+
+/** Reads a configuration endpoint of country config, signed as core. */
+async function fetchConfig(path: string) {
+  const url = new URL(path, env.COUNTRY_CONFIG_URL)
+  return fetch(url, withCoreSignature(coreSigningKey, url))
+}
 /**
  * Configuration is served from countryconfig, which can be deployed
  * independently of the events service (e.g. a Kubernetes rollout that updates
@@ -30,18 +37,15 @@ import { env } from '@events/environment'
  * while bounding how stale it can be to `EVENT_CONFIG_CACHE_TTL_MS` — no events
  * restart is required to pick up a config change.
  */
-function createTtlConfigCache<T>(
-  label: string,
-  fetcher: (token: TokenWithBearer) => Promise<T>
-) {
+function createTtlConfigCache<T>(label: string, fetcher: () => Promise<T>) {
   let value: T | null = null
   let fetchedAt = 0
   let inFlight: Promise<T> | null = null
 
-  return async function getCached(token: TokenWithBearer): Promise<T> {
+  return async function getCached(): Promise<T> {
     // In development always fetch, so config changes are picked up immediately.
     if (!env.isProduction) {
-      return fetcher(token)
+      return fetcher()
     }
 
     if (
@@ -55,7 +59,7 @@ function createTtlConfigCache<T>(
     // stampede countryconfig from the many call sites.
     if (!inFlight) {
       logger.info(`Refetching ${label} from countryconfig`)
-      inFlight = fetcher(token)
+      inFlight = fetcher()
         .then((fetched) => {
           value = fetched
           fetchedAt = Date.now()
@@ -84,13 +88,8 @@ function createTtlConfigCache<T>(
   }
 }
 
-async function getEventConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
+async function getEventConfigurations() {
+  const res = await fetchConfig('/config/events')
 
   if (!res.ok) {
     throw new Error(
@@ -113,48 +112,29 @@ export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
 /**
  * @returns the configuration of each event, at the version that applies (see `resolveEventConfig`).
  */
-export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  const configurations = await getInMemoryVersionedEventConfigurations(token)
+export async function getInMemoryEventConfigurations() {
+  const configurations = await getInMemoryVersionedEventConfigurations()
   return configurations.map(resolveEventConfig)
 }
 
-async function findEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  const configurations = await getInMemoryEventConfigurations(token)
+async function findEventConfigurationById(eventType: string) {
+  const configurations = await getInMemoryEventConfigurations()
   return configurations.find((config) => config.id === eventType)
 }
 
 export async function getEventConfigurationById({
-  eventType,
-  token
+  eventType
 }: {
   eventType: string
-  token: TokenWithBearer
 }) {
   return getOrThrow(
-    await findEventConfigurationById({
-      eventType,
-      token
-    }),
+    await findEventConfigurationById(eventType),
     `No configuration found for event type: ${eventType}`
   )
 }
 
-async function getWorkqueueConfigurations(token: TokenWithBearer) {
-  const res = await fetch(
-    new URL('/config/workqueues', env.COUNTRY_CONFIG_URL),
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    }
-  )
+async function getWorkqueueConfigurations() {
+  const res = await fetchConfig('/config/workqueues')
 
   if (!res.ok) {
     throw new Error('Failed to fetch workqueue config')
@@ -173,11 +153,7 @@ export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
 )
 
 export async function getRoles() {
-  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+  const res = await fetchConfig('/config/roles')
 
   if (!res.ok) {
     throw new Error('Failed to fetch roles config')
@@ -186,15 +162,47 @@ export async function getRoles() {
   return array(Role).parse(await res.json())
 }
 
-export async function getApplicationConfig() {
-  const res = await fetch(
-    new URL('/config/application', env.COUNTRY_CONFIG_URL),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
+async function fetchApplicationConfig(): Promise<unknown> {
+  const res = await fetchConfig('/config/application')
 
   if (!res.ok) {
     throw new Error(`Failed to fetch application config: ${res.status}`)
   }
 
-  return ApplicationConfig.parse(await res.json())
+  return res.json()
 }
+
+export async function getApplicationConfig() {
+  return ApplicationConfig.parse(await fetchApplicationConfig())
+}
+
+/**
+ * The application configuration as the client gets it: validated, but with
+ * the fields core does not know kept, because a country config may add some
+ * for its own client code.
+ */
+export async function getClientApplicationConfig() {
+  return ApplicationConfig.loose().parse(await fetchApplicationConfig())
+}
+
+/** Certificate templates are opaque to core, apart from their id. */
+const CertificateConfig = object({ id: string() }).passthrough()
+
+async function getCertificateConfigurations() {
+  const res = await fetchConfig('/certificates')
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch certificates config: ${res.status}`)
+  }
+
+  return array(CertificateConfig).parse(await res.json())
+}
+
+/**
+ * @returns certificate configurations, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+export const getInMemoryCertificateConfigurations = createTtlConfigCache(
+  'certificate configurations',
+  getCertificateConfigurations
+)

@@ -73,8 +73,8 @@ async function main() {
   const token = await getToken()
 
   const sources: SeedSources = {
-    users: await readUsers(token),
-    roles: await readRoles(token),
+    users: await readUsers(),
+    roles: await readRoles(),
     locations: await readLocations(),
     applicationConfig: await readApplicationConfig()
   }

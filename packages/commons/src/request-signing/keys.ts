@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import type { CoreSigningKey } from './signature'
 import {
   createHash,
   createPrivateKey,
@@ -55,7 +56,7 @@ export function toPublicJwk(key: KeyObject): PublicJwk {
 }
 
 /** Reads the private key that core signs its requests to country config with. */
-export function loadCoreSigningKey(pem: string | Buffer) {
+export function loadCoreSigningKey(pem: string | Buffer): CoreSigningKey {
   const privateKey = createPrivateKey(pem)
   if (privateKey.asymmetricKeyType !== 'ed25519') {
     throw new Error(

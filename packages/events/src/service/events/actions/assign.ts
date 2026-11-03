@@ -33,7 +33,6 @@ export async function assignRecord({
 }) {
   const storedEvent = await getEventById(input.eventId)
   const configuration = await getEventConfigurationById({
-    token,
     eventType: storedEvent.type
   })
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)

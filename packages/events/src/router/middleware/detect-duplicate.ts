@@ -58,7 +58,7 @@ export const detectDuplicate: MiddlewareFunction<
     })
   }
   const { user, token } = ctx
-  const configs = await getInMemoryEventConfigurations(token)
+  const configs = await getInMemoryEventConfigurations()
   const storedEvent = ctx.event
   const config = configs.find((c) => c.id === storedEvent.type)
 

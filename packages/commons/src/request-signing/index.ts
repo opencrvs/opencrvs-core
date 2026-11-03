@@ -13,10 +13,12 @@ export {
   MAX_SIGNATURE_AGE_SECONDS,
   signCoreRequest,
   verifyCoreRequest,
-  verifyCoreSignature
+  verifyCoreSignature,
+  withCoreSignature
 } from './signature'
 export type {
   CoreRequest,
+  CoreSigningKey,
   CoreRequestSignatureHeaders,
   CoreRequestVerification,
   FindPublicKey,

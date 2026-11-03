@@ -13,7 +13,6 @@ import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
-import { getServiceToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
 import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
@@ -31,10 +30,7 @@ appModulePath.addPath(path.join(__dirname, '../'))
 export async function main() {
   try {
     await ensureConnection()
-    const serviceToken = await getServiceToken()
-    const configurations = await getInMemoryEventConfigurations(
-      `Bearer ${serviceToken}`
-    )
+    const configurations = await getInMemoryEventConfigurations()
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)

@@ -15,7 +15,8 @@ import {
   CoreRequestSignatureHeaders,
   REJECTION,
   signCoreRequest,
-  verifyCoreRequest
+  verifyCoreRequest,
+  withCoreSignature
 } from './signature'
 
 /* The examples published in opencrvs-core#14240. */
@@ -280,5 +281,64 @@ describe('signCoreRequest', () => {
       now
     )
     expect(result).toEqual({ valid: true, keyid: 'test-key' })
+  })
+})
+
+describe('withCoreSignature', () => {
+  const { privateKey, publicKey } = generateKeyPairSync('ed25519')
+  const key = { privateKey, keyid: 'test-key' }
+  const findKey = keysById({ 'test-key': publicKey })
+
+  function received(url: string, init: RequestInit): CoreRequest {
+    const { pathname, search } = new URL(url)
+    return {
+      method: init.method ?? 'GET',
+      path: pathname,
+      query: search,
+      rawBody: Buffer.from((init.body as string | undefined) ?? ''),
+      headers: Object.fromEntries(
+        Object.entries(init.headers as Record<string, string>).map(
+          ([name, value]) => [name.toLowerCase(), value]
+        )
+      )
+    }
+  }
+
+  it('signs a GET to the URL it is sent to, including its query', async () => {
+    const url = 'http://countryconfig:3040/config/events?lang=en'
+    const init = withCoreSignature(key, url)
+
+    expect(await verifyCoreRequest(received(url, init), findKey)).toEqual({
+      valid: true,
+      keyid: 'test-key'
+    })
+  })
+
+  it('signs a POST body and keeps the other headers', async () => {
+    const url = new URL('http://countryconfig:3040/trigger/user/2fa')
+    const init = withCoreSignature(key, url, {
+      method: 'POST',
+      body: JSON.stringify({ code: '123456' }),
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    expect(init.headers).toMatchObject({ 'Content-Type': 'application/json' })
+    expect(
+      await verifyCoreRequest(received(url.toString(), init), findKey)
+    ).toEqual({ valid: true, keyid: 'test-key' })
+  })
+
+  it('signs the path as fetch sends it, after URL normalisation', async () => {
+    const init = withCoreSignature(
+      key,
+      'http://countryconfig:3040/config/../config/events'
+    )
+
+    expect(
+      await verifyCoreRequest(
+        received('http://countryconfig:3040/config/events', init),
+        findKey
+      )
+    ).toEqual({ valid: true, keyid: 'test-key' })
   })
 })

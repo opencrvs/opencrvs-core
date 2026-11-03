@@ -264,7 +264,7 @@ function canAccessEventWithInputScopes(
     TrpcContext & { eventId: UUID; eventType: string },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
-    const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+    const eventConfigs = await getInMemoryEventConfigurations()
 
     // Since determining access requires knowing the event type, we need to parse the input before we can check access.
     // default .input(...) throws 400, which is something that we want to return only if the user should have access.
@@ -482,7 +482,7 @@ export const userCanCreateEvent: MiddlewareFunction<
   TrpcContext,
   unknown
 > = async ({ next, ctx, getRawInput }) => {
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+  const eventConfigs = await getInMemoryEventConfigurations()
 
   if (!hasScope(ctx.token, 'record.create')) {
     throw new TRPCError({ code: 'FORBIDDEN' })

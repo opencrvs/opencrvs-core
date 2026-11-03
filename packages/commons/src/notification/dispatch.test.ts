@@ -9,9 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { generateKeyPairSync } from 'node:crypto'
 import { logger } from '../logger'
+import { verifyCoreRequest } from '../request-signing/signature'
 import { triggerUserEventNotification } from './dispatch'
 import { TriggerEvent } from './UserNotifications'
+
+const { privateKey, publicKey } = generateKeyPairSync('ed25519')
+const signingKey = { privateKey, keyid: 'test-key' }
 
 const recipient = {
   name: { firstname: 'John', surname: 'Doe' },
@@ -33,6 +38,42 @@ describe('triggerUserEventNotification', () => {
     errorSpy.mockRestore()
   })
 
+  it('signs the request as core, with no Authorization header', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 200 })
+    const payload = { recipient, token: 'a-token' }
+
+    await triggerUserEventNotification({
+      event: TriggerEvent.PASSWORD_RESET_LINK,
+      payload,
+      countryConfigUrl: 'http://countryconfig:3040',
+      signingKey
+    })
+
+    const [url, init] = fetchMock.mock.calls[0]
+    const headers = init.headers as Record<string, string>
+    expect(url.toString()).toBe(
+      'http://countryconfig:3040/trigger/user/password-reset-link'
+    )
+    expect(headers).not.toHaveProperty('Authorization')
+    expect(
+      await verifyCoreRequest(
+        {
+          method: init.method,
+          path: '/trigger/user/password-reset-link',
+          query: '',
+          rawBody: Buffer.from(init.body),
+          headers: {
+            'content-digest': headers['Content-Digest'],
+            'signature-input': headers['Signature-Input'],
+            signature: headers.Signature
+          }
+        },
+        async (keyid) => (keyid === 'test-key' ? publicKey : undefined)
+      )
+    ).toEqual({ valid: true, keyid: 'test-key' })
+    expect(JSON.parse(init.body)).toEqual(payload)
+  })
+
   it('does not log when the dispatch succeeds', async () => {
     const jsonMock = jest.fn()
     fetchMock.mockResolvedValue({ ok: true, status: 200, json: jsonMock })
@@ -41,7 +82,7 @@ describe('triggerUserEventNotification', () => {
       event: TriggerEvent.PASSWORD_RESET_LINK,
       payload: { recipient, token: 'a-token' },
       countryConfigUrl: 'http://countryconfig',
-      authHeader: { Authorization: 'Bearer x' }
+      signingKey
     })
 
     expect(response.ok).toBe(true)
@@ -61,7 +102,7 @@ describe('triggerUserEventNotification', () => {
       event: TriggerEvent.USERNAME_REMINDER_LINK,
       payload: { recipient, token: 'a-token' },
       countryConfigUrl: 'http://countryconfig',
-      authHeader: { Authorization: 'Bearer x' }
+      signingKey
     })
 
     expect(response.ok).toBe(false)
@@ -88,7 +129,7 @@ describe('triggerUserEventNotification', () => {
       event: TriggerEvent.ALL_USER_NOTIFICATION,
       payload: { recipient, subject: 'subj', body: 'body' },
       countryConfigUrl: 'http://countryconfig',
-      authHeader: { Authorization: 'Bearer x' }
+      signingKey
     })
 
     expect(errorSpy).toHaveBeenCalledTimes(1)

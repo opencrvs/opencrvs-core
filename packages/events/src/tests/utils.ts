@@ -325,6 +325,13 @@ export async function createServiceTokenTestClient() {
   return createCallerFactory(appRouter)(ctx)
 }
 
+export async function createUnauthenticatedTestClient() {
+  const ctx = await createContext({
+    req: { headers: {} } as unknown as IncomingMessage
+  })
+  return createCallerFactory(appRouter)(ctx)
+}
+
 export function createTestClient(
   user: CreatedUser,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES

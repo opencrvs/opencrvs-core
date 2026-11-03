@@ -282,7 +282,7 @@ export async function assertCanReviewDuplicatesOf(
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
     'record.review-duplicates'
   ])
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+  const eventConfigs = await getInMemoryEventConfigurations()
 
   const access = await Promise.all(
     duplicateEventIds.map(async (duplicateEventId) => {

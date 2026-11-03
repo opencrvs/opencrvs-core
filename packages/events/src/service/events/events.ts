@@ -116,8 +116,7 @@ export async function throwConflictIfActionNotAllowed(
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
   const eventConfiguration = await getEventConfigurationById({
-    eventType: event.type,
-    token
+    eventType: event.type
   })
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)

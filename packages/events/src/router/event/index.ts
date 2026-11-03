@@ -154,9 +154,7 @@ export const eventRouter = router({
       .input(z.void())
       .use(middleware.reuseEventConfigResponse)
       .output(z.array(VersionedEventConfig))
-      .query(async (options) =>
-        getInMemoryVersionedEventConfigurations(options.ctx.token)
-      )
+      .query(async () => getInMemoryVersionedEventConfigurations())
   }),
   create: userAndSystemProcedure
     .meta({
@@ -175,7 +173,6 @@ export const eventRouter = router({
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
       const config = await getEventConfigurationById({
-        token: ctx.token,
         eventType: input.type
       })
 
@@ -220,7 +217,6 @@ export const eventRouter = router({
     .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
-        token: ctx.token,
         eventType
       })
 
@@ -481,7 +477,6 @@ export const eventRouter = router({
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
           const configuration = await getEventConfigurationById({
-            token,
             eventType: event.type
           })
           const result = await markAsDuplicate(
@@ -517,7 +512,6 @@ export const eventRouter = router({
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
           const configuration = await getEventConfigurationById({
-            token,
             eventType: event.type
           })
           const result = await markNotDuplicate(
@@ -561,7 +555,7 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+      const eventConfigs = await getInMemoryEventConfigurations()
 
       const result = await findRecordsByQuery({
         search: input,
@@ -594,5 +588,5 @@ export const eventRouter = router({
     .use(middleware.allowedWithAnyOfScopes(['record.import']))
     .input(z.array(EventDocument))
     .output(z.any())
-    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token))
+    .mutation(async ({ input }) => bulkImportEvents(input))
 })
