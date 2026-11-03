@@ -27,13 +27,39 @@ types.setTypeParser(types.builtins.TIMESTAMPTZ, (str) =>
 
 let db: Kysely<Schema> | undefined
 let pool: Pool | undefined
+let lockPool: Pool | undefined
+let poolConnectionString: string | undefined
 
 export const getPool = (connectionString = env.EVENTS_POSTGRES_URL) => {
   if (!pool) {
     pool = new Pool({ connectionString })
+    poolConnectionString = connectionString
   }
 
   return pool
+}
+
+/**
+ * Connections that hold event locks (see `withEventLock`). A lock holds its connection
+ * while the country config answers an action request, so they come from their own pool
+ * and never take connections that queries need.
+ */
+export function getLockPool() {
+  if (!lockPool) {
+    lockPool = new Pool({
+      connectionString: poolConnectionString ?? env.EVENTS_POSTGRES_URL,
+      max: 20
+    })
+  }
+
+  return lockPool
+}
+
+/** Closes the lock pool, so that tests can drop their database. */
+export async function endLockPool() {
+  const current = lockPool
+  lockPool = undefined
+  await current?.end()
 }
 
 export function getClient() {
@@ -57,6 +83,7 @@ export function getClient() {
 export function resetServer() {
   db = undefined
   pool = undefined
+  poolConnectionString = undefined
 }
 
 export async function ensureConnection() {

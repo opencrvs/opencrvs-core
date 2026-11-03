@@ -29,7 +29,6 @@ import {
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
-  getPendingAction,
   ActionInputWithType,
   EventConfig,
   BaseActionInput
@@ -41,6 +40,7 @@ import {
   setBearerForToken
 } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
+import { withEventLock } from '@events/storage/postgres/events/locks'
 
 import {
   getEventById,
@@ -204,6 +204,46 @@ export async function defaultRequestHandler(
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
+  // Only one action request on an event runs at a time. Without the lock, two requests that
+  // arrive together could both pass the check below before either has stored its requested
+  // action, and both would reach the country config.
+  const locked = await withEventLock(input.eventId, async () =>
+    requestAction(
+      input,
+      user,
+      token,
+      event,
+      configuration,
+      actionConfirmationResponseSchema
+    )
+  )
+
+  if (!locked.acquired) {
+    logger.warn(
+      {
+        eventId: input.eventId,
+        actionType: input.type,
+        transactionId: input.transactionId
+      },
+      'Action request refused: another action request on the event is in progress'
+    )
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${input.type}' cannot be requested while another action request on the event is in progress`
+    })
+  }
+
+  return locked.result
+}
+
+async function requestAction(
+  input: ActionInputWithType,
+  user: TrpcUserContext,
+  token: TokenWithBearer,
+  event: EventDocument,
+  configuration: EventConfig,
+  actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
+) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
   const eventWithRequestedAction = await addAction(input, {
@@ -214,7 +254,24 @@ export async function defaultRequestHandler(
     configuration
   })
 
-  const requestedAction = getPendingAction(eventWithRequestedAction.actions)
+  // Look the requested action up by this request's own identity. The event can hold other
+  // requested actions without an outcome, e.g. from an earlier request whose confirmation
+  // failed, and they must not stop this request from finding its own.
+  // The insert is idempotent on (transaction id, action type, status), so a retry of this
+  // request finds the action stored by its first attempt.
+  const requestedAction = eventWithRequestedAction.actions.find(
+    (action) =>
+      action.status === ActionStatus.Requested &&
+      action.transactionId === input.transactionId &&
+      action.type === input.type
+  )
+
+  if (!requestedAction) {
+    throw new Error(
+      `Requested action not found for transaction '${input.transactionId}' and action '${input.type}'`
+    )
+  }
+
   const eventActionToken = await getActionConfirmationToken(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
