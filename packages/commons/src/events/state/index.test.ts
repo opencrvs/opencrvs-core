@@ -828,7 +828,6 @@ describe('correction requests', () => {
     expect(applicantName.firstname).toBe('John')
     expect(applicantName.surname).toBe('Doe')
   })
-
   test('proposed correction data is applied after the correction request is approved', () => {
     const state = getCurrentEventState(
       {
@@ -1838,6 +1837,41 @@ describe('current state is the data of the act behind the status, plus later edi
     expect(state.declaration).toEqual({
       'applicant.name': declaredName,
       'applicant.email': 'edited@example.com'
+    })
+  })
+
+  test('REGISTERED: register data plus corrections', () => {
+    const correctionRequest = acceptedAction(ActionType.REQUEST_CORRECTION, 4, {
+      'applicant.name': correctedName
+    })
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.DECLARE, 1, {
+        'applicant.name': declaredName,
+        'applicant.email': 'declared@example.com'
+      }),
+      acceptedAction(ActionType.REGISTER, 2, {
+        'applicant.email': 'registered@example.com'
+      }),
+      correctionRequest,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.APPROVE_CORRECTION,
+        declarationOverrides: {},
+        defaults: {
+          createdAt: '2025-01-01T00:00:05.000Z',
+          declaration: {},
+          requestId: correctionRequest.id
+        }
+      })
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.REGISTERED)
+    expect(state.declaration).toEqual({
+      'applicant.name': correctedName,
+      'applicant.email': 'registered@example.com'
     })
   })
 
