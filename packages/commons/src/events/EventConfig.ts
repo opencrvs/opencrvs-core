@@ -328,12 +328,12 @@ export function getEventConfigOfVersion(
   )
 }
 
-/** Orders versions by `effectiveFrom`, a version without one first. */
+/** Orders versions by `effectiveFrom`, earliest first. */
 export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
-  return (a.effectiveFrom ?? '').localeCompare(b.effectiveFrom ?? '')
+  return a.effectiveFrom.localeCompare(b.effectiveFrom)
 }
 
-/** @returns the version effective from the beginning of time, or else the earliest. */
+/** @returns the version that takes effect earliest. */
 function getEarliestVersion(config: VersionedEventConfig) {
   return [...config.versions].sort(byEffectiveFrom)[0]
 }
@@ -341,8 +341,7 @@ function getEarliestVersion(config: VersionedEventConfig) {
 /**
  * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
  * after the date of `now` in `timeZone`, the country's time zone, since versions take
- * effect at its midnight. A version without `effectiveFrom` is effective from the
- * beginning of time. Undefined when every version takes effect later.
+ * effect at its midnight. Undefined when every version takes effect later.
  */
 export function resolveEffectiveVersion(
   config: VersionedEventConfig,
@@ -351,7 +350,7 @@ export function resolveEffectiveVersion(
 ): EventConfigVersion | undefined {
   const today = toPlainDateInTimeZone(now, timeZone)
   return config.versions
-    .filter(({ effectiveFrom }) => !effectiveFrom || effectiveFrom <= today)
+    .filter(({ effectiveFrom }) => effectiveFrom <= today)
     .sort(byEffectiveFrom)
     .at(-1)
 }

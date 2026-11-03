@@ -1758,6 +1758,7 @@ describe('current state is the data of the act behind the status, plus later edi
   function eventWith(actions: EventDocument['actions']): EventDocument {
     return {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       id: getUUID(),
       createdAt: '2025-01-01T00:00:00.000Z',
