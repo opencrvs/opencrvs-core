@@ -30,6 +30,7 @@ import {
   shouldForwardBirthRegistrationToMosip
 } from '../../events/mosip'
 import { logger } from '@countryconfig/logger'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 
 export function getEventsHandler(_: Hapi.Request, h: Hapi.ResponseToolkit) {
   return h.response(eventConfigs).code(200)
@@ -49,7 +50,7 @@ export async function onAnyActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
 
   await sendInformantNotification({ event, token })
@@ -61,7 +62,7 @@ export async function onBirthActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   await sendInformantNotification({ event, token })
 
@@ -133,7 +134,7 @@ export async function onBirthCorrectionActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   await sendInformantNotification({ event, token })
 
@@ -254,7 +255,7 @@ export async function onDeathActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   await sendInformantNotification({ event, token })
 

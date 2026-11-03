@@ -77,7 +77,8 @@ import {
 } from '@opencrvs/toolkit/events'
 
 import { onRegisterHandler } from './api/registration'
-import { isServiceToken } from '@opencrvs/toolkit/authentication'
+import { coreRequestAuth } from '@opencrvs/toolkit/request-signing'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 import { workqueueconfigHandler } from './api/workqueue/handler'
 import getUserNotificationRoutes from './config/routes/userNotificationRoutes'
 import {
@@ -192,6 +193,11 @@ export async function createServer() {
   server.listener.requestTimeout = THIRTY_MINUTES_IN_MILLISECONDS
 
   await server.register(getPlugins())
+  // `auth: 'core'` accepts only requests that core signed.
+  await server.register({
+    plugin: coreRequestAuth,
+    options: { jwksUrl: new URL('/.well-known/jwks.json', AUTH_URL).toString() }
+  })
 
   let publicKey = await getPublicKey()
   let publicKeyUpdatedAt = Date.now()
@@ -254,6 +260,7 @@ export async function createServer() {
     path: '/certificates',
     handler: certificateHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'certificates'],
       description: 'Returns certificate metadata'
     }
@@ -389,7 +396,7 @@ export async function createServer() {
     path: '/config/application',
     handler: applicationConfigHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'application-config'],
       description: 'Returns default application configuration'
     }
@@ -400,7 +407,7 @@ export async function createServer() {
     path: '/config/workqueues',
     handler: workqueueconfigHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'workqueue'],
       description: 'Returns workqueue configurations'
     }
@@ -411,7 +418,7 @@ export async function createServer() {
     path: '/config/locations',
     handler: locationsHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'locations'],
       description: 'Returns the locations metadata'
     }
@@ -422,7 +429,7 @@ export async function createServer() {
     path: '/config/roles',
     handler: rolesHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'user-roles'],
       description: 'Returns user roles metadata'
     }
@@ -433,6 +440,7 @@ export async function createServer() {
     path: '/config/users',
     handler: usersHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'users'],
       description: 'Returns users metadata'
     }
@@ -499,7 +507,7 @@ export async function createServer() {
     path: '/config/events',
     handler: getEventsHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Serves custom events'
     }
@@ -510,6 +518,7 @@ export async function createServer() {
     path: `/trigger/events/{event}/actions/${ActionType.CUSTOM}`,
     handler: onCustomActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event custom action'
     }
@@ -520,6 +529,7 @@ export async function createServer() {
     path: '/trigger/events/{event}/actions/{action}',
     handler: onAnyActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -530,6 +540,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.TENNIS_CLUB_MEMBERSHIP}/actions/${ActionType.REGISTER}`,
     handler: onRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -540,6 +551,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.Birth}/actions/${ActionType.REGISTER}`,
     handler: onRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -550,6 +562,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.Death}/actions/${ActionType.REGISTER}`,
     handler: onRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -562,10 +575,7 @@ export async function createServer() {
     path: '/trigger/telemetry',
     handler: telemetryHandler,
     options: {
-      // Authenticated with the default JWT strategy: the events worker sends an
-      // OpenCRVS bearer token (audience includes opencrvs:countryconfig-user),
-      // which is verified against the auth public key fetched on startup — so we
-      // know the report came from a legitimate core service.
+      auth: 'core',
       tags: ['api', 'triggers'],
       validate: {
         payload: telemetrySchema
@@ -580,34 +590,11 @@ export async function createServer() {
     path: '/trigger/system/ready',
     handler: systemReadyHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'integration'],
       description:
         'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
     }
-  })
-
-  /*
-   * Core uses a special 'service token' to prove the request originated from core.
-   * The token is only a proof of origin and carries no scopes.
-   *
-   * Action confirmation requests check here that the token is present.
-   */
-  server.ext('onPostAuth', (request, h) => {
-    const isActionConfirmationRequest =
-      request.method === 'post' &&
-      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
-
-    if (
-      isActionConfirmationRequest &&
-      !isServiceToken(request.auth.credentials)
-    ) {
-      logger.warn(
-        'Action confirmation: rejected a request that is not from the core service token'
-      )
-      return h.response({ error: 'forbidden' }).code(403).takeover()
-    }
-
-    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {
@@ -664,8 +651,13 @@ export async function createServer() {
     const now = Date.now()
     // Sync locations at most once per hour rather than every call
     if (now - lastLocationSyncAt > ONE_HOUR_MS) {
+      const token = await getCoreApiToken()
+      if (!token) {
+        logger.warn('Reindex: no token for core, locations not synced.')
+        return
+      }
       const url = new URL('events', GATEWAY_URL).toString()
-      const apiClient = createClient(url, req.headers.authorization)
+      const apiClient = createClient(url, `Bearer ${token}`)
       const locations = await apiClient.locations.list.query()
       const administrativeAreas =
         await apiClient.administrativeAreas.list.query()

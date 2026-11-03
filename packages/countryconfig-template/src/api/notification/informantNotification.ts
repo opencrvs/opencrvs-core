@@ -56,9 +56,10 @@ const resolveName = (name: FieldUpdateValue) => {
 
 async function findCrvsOfficeName(
   locationId: UUID | null | undefined,
-  token: string
+  token: string | undefined
 ): Promise<string | undefined> {
-  if (!locationId) {
+  // Without a token for core, the notification goes out without the office name.
+  if (!locationId || !token) {
     return undefined
   }
 
@@ -94,7 +95,7 @@ function getInformant(eventType: string, declaration: Record<string, any>) {
 
 async function getNotificationParams(
   event: EventDocument,
-  token: string,
+  token: string | undefined,
   registrationNumber?: string
 ): Promise<NotificationParams> {
   const pendingAction = getPendingAction(event.actions)
@@ -207,7 +208,7 @@ export async function sendInformantNotification({
   registrationNumber
 }: {
   event: EventDocument
-  token: string
+  token: string | undefined
   registrationNumber?: string
 }) {
   try {

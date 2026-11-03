@@ -11,6 +11,11 @@
 
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 
+// Core's requests carry no token; country config uses its own system client.
+vi.mock('../core-api-token', () => ({
+  getCoreApiToken: vi.fn().mockResolvedValue('mock-token')
+}))
+
 vi.mock(import('./constant'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
@@ -64,52 +69,30 @@ vi.mock('nanoid', () => {
 })
 
 import fetch from 'node-fetch'
-import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 import { informantNotificationTestData } from './testData'
 import { createServer } from '../../index'
+import { asCore, publishCoreKey } from '../../tests/core-request'
 
 describe('User notification - sms', () => {
   let server: any
 
   beforeEach(async () => {
     ;(fetch as any).mockClear()
+    publishCoreKey()
     server = await createServer()
   })
 
   informantNotificationTestData.forEach(
     ({ eventType, actionType, eventDocument }) =>
       it(`${eventType} - ${actionType}`, async () => {
-        await server.server.inject({
-          method: 'POST',
-          url: `/trigger/events/${eventType}/actions/${actionType}`,
-          payload: eventDocument,
-          auth: {
-            strategy: 'jwt',
-            // Action confirmation requests are only accepted from core's
-            // service token (see the onPostAuth guard in ../../index).
-            credentials: { sub: SERVICE_USER_ID },
-            artifacts: { token: 'mock-token' }
-          }
-        })
+        await server.server.inject(
+          asCore(
+            'POST',
+            `/trigger/events/${eventType}/actions/${actionType}`,
+            eventDocument
+          )
+        )
         expect((fetch as any).mock.calls[1][1].body).toMatchSnapshot()
       })
   )
-
-  it('rejects an action confirmation request that is not from the service token', async () => {
-    const { eventType, actionType, eventDocument } =
-      informantNotificationTestData[0]
-
-    const response = await server.server.inject({
-      method: 'POST',
-      url: `/trigger/events/${eventType}/actions/${actionType}`,
-      payload: eventDocument,
-      auth: {
-        strategy: 'jwt',
-        credentials: { sub: 'f8b1a0c2-3d4e-4f5a-8b6c-7d8e9f0a1b2c' },
-        artifacts: { token: 'mock-token' }
-      }
-    })
-
-    expect(response.statusCode).toBe(403)
-  })
 })

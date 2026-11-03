@@ -12,6 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import { eventConfigs } from '@countryconfig/events'
 import { sendInformantNotification } from '../notification/informantNotification'
 import { ActionConfirmationRequest } from '../registration'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 
 export function getEventsHandler(_: Hapi.Request, h: Hapi.ResponseToolkit) {
   return h.response(eventConfigs).code(200)
@@ -31,7 +32,7 @@ export async function onAnyActionHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
 
   await sendInformantNotification({ event, token })

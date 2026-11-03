@@ -19,6 +19,7 @@ import {
 import { GATEWAY_URL } from '@countryconfig/constants'
 import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 
 export type ActionConfirmationRequest = Hapi.Request<{ Payload: EventDocument }>
 
@@ -50,7 +51,7 @@ export async function onRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const eventId = event.id
   const action = getPendingAction(event.actions)

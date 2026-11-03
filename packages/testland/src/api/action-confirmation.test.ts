@@ -67,82 +67,87 @@ vi.mock('nanoid', () => {
 })
 
 import fetch from 'node-fetch'
-import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 import {
   informantNotificationTestData,
   userNotificationTestData
 } from './notification/testData'
 import { createServer } from '../index'
+import { asCore, publishCoreKey } from '../tests/core-request'
 
 const [{ eventType, actionType, eventDocument }] = informantNotificationTestData
 const confirmationUrl = `/trigger/events/${eventType}/actions/${actionType}`
 
 /*
- * A token a logged-in registrar could hold. It authenticates fine, it just did
- * not come from core, which is what the guard is there to tell apart.
+ * What a logged-in registrar could send. Its token may be valid, it just did
+ * not come from core, which is what `auth: 'core'` is there to tell apart.
  */
-const registrarCredentials = {
-  sub: '3fb1d1ed-63c5-4d3f-bb9f-7ca44d09e70a',
-  scope: ['record.register']
-}
+const registrarAuthorization = 'Bearer registrar.access.token'
 
-describe('Action confirmation requests are only accepted from core', () => {
+describe('Requests that only core may send', () => {
   let server: any
 
   beforeEach(async () => {
+    publishCoreKey()
     server = await createServer()
     // Clear the calls made while the server was starting up.
     ;(fetch as any).mockClear()
   })
 
-  it('rejects a confirmation request carrying a token other than the service token', async () => {
+  it('rejects an action confirmation from a registrar', async () => {
     const response = await server.server.inject({
       method: 'POST',
       url: confirmationUrl,
       payload: eventDocument,
-      auth: {
-        strategy: 'jwt',
-        credentials: registrarCredentials,
-        artifacts: { token: 'mock-token' }
-      }
+      headers: { Authorization: registrarAuthorization }
     })
 
     expect(response.statusCode).toBe(403)
-    expect(response.result).toEqual({ error: 'forbidden' })
     // The handler never ran, so no informant was notified.
     expect(fetch as any).not.toHaveBeenCalled()
   })
 
-  it('lets the same request through when it carries the service token', async () => {
-    const response = await server.server.inject({
-      method: 'POST',
-      url: confirmationUrl,
-      payload: eventDocument,
-      auth: {
-        strategy: 'jwt',
-        credentials: { sub: SERVICE_USER_ID },
-        artifacts: { token: 'mock-token' }
-      }
-    })
+  it('accepts an action confirmation that core signed', async () => {
+    const response = await server.server.inject(
+      asCore('POST', confirmationUrl, eventDocument)
+    )
 
     expect(response.statusCode).not.toBe(403)
     expect(fetch as any).toHaveBeenCalled()
   })
 
-  it('leaves routes other than action confirmation to their own authorization', async () => {
+  it('rejects an action confirmation whose body was changed after signing', async () => {
+    const response = await server.server.inject({
+      ...asCore('POST', confirmationUrl, eventDocument),
+      payload: JSON.stringify({ ...eventDocument, id: 'another-event' })
+    })
+
+    expect(response.statusCode).toBe(403)
+    expect(fetch as any).not.toHaveBeenCalled()
+  })
+
+  it('rejects a user notification that core did not sign', async () => {
     const [{ event, payload }] = userNotificationTestData
 
     const response = await server.server.inject({
       method: 'POST',
       url: `/trigger/user/${event}`,
       payload,
-      auth: {
-        strategy: 'jwt',
-        credentials: registrarCredentials,
-        artifacts: { token: 'mock-token' }
-      }
+      headers: { Authorization: registrarAuthorization }
     })
 
-    expect(response.statusCode).not.toBe(403)
+    expect(response.statusCode).toBe(403)
+  })
+
+  it.each([
+    '/config/events',
+    '/config/roles',
+    '/config/users',
+    '/certificates'
+  ])('serves %s to core only', async (url) => {
+    const unsigned = await server.server.inject({ method: 'GET', url })
+    const signed = await server.server.inject(asCore('GET', url))
+
+    expect(unsigned.statusCode).toBe(403)
+    expect(signed.statusCode).toBe(200)
   })
 })

@@ -53,20 +53,15 @@ const REQUIRED_PUBLIC_ENDPOINTS: readonly EndpointCheck[] = [
   { method: 'GET', path: '/content/client' },
   { method: 'GET', path: '/content/login' },
   { method: 'GET', path: '/content/map.geojson' },
-  { method: 'GET', path: '/content/country-logo' },
-  { method: 'GET', path: '/config/application' },
-  { method: 'GET', path: '/config/workqueues' },
-  { method: 'GET', path: '/config/locations' },
-  { method: 'GET', path: '/config/roles' },
-  { method: 'GET', path: '/config/events' }
+  { method: 'GET', path: '/content/country-logo' }
 ]
 
 /** Made-up path segment used to probe parameterised routes we can't enumerate. */
 const PROBE_SEGMENT = 'verify-endpoints-probe'
 
 /**
- * User-notification trigger events. Core forwards an authenticated token to
- * each of these, so a country config must never process them unauthenticated.
+ * User-notification trigger events. Only core may send these (`auth: 'core'`),
+ * so a country config must never process an unsigned one.
  *
  * Kept in sync with `TriggerEvent` in `@opencrvs/commons/notification` by the
  * compile-time guard below.
@@ -108,14 +103,19 @@ const SECURED_ENDPOINTS: readonly EndpointCheck[] = [
     label: '/certificates/{id}'
   },
   { method: 'GET', path: '/certificates' },
+  { method: 'GET', path: '/config/application' },
+  { method: 'GET', path: '/config/workqueues' },
+  { method: 'GET', path: '/config/locations' },
+  { method: 'GET', path: '/config/roles' },
+  { method: 'GET', path: '/config/events' },
   { method: 'GET', path: '/config/users' }
 ]
 
 /**
- * Used only when `/config/events` cannot be fetched, so the event action
- * triggers are still checked against their route patterns.
+ * Event action triggers, checked by route pattern. The real event ids are not
+ * known here: `/config/events` serves only requests that core signed.
  */
-const FALLBACK_EVENT_TRIGGERS: readonly EndpointCheck[] = [
+const EVENT_TRIGGERS: readonly EndpointCheck[] = [
   {
     method: 'POST',
     path: `/trigger/events/${PROBE_SEGMENT}/actions/${PROBE_SEGMENT}`,
@@ -162,60 +162,6 @@ async function requestStatus(
     return response.status
   } catch {
     return 'error'
-  }
-}
-
-interface EventTriggerConfig {
-  id: string
-  actions: string[]
-}
-
-/** One version of an event. Only its action types are needed here. */
-const ServedEventConfigVersion = z.object({
-  actions: z.array(z.object({ type: z.string() }))
-})
-
-/**
- * One event from `GET /config/events`. It comes in two shapes:
- * - `{ id, versions: [{ actions }] }` from toolkit 2.2 and later
- * - `{ id, actions }` from older toolkits, which have no versions
- */
-const ServedEventConfig = z.union([
-  z.object({ id: z.string(), versions: z.array(ServedEventConfigVersion) }),
-  ServedEventConfigVersion.extend({ id: z.string() })
-])
-
-function toEventTriggerConfig(
-  config: z.infer<typeof ServedEventConfig>
-): EventTriggerConfig {
-  // A trigger may use an action from any version, so collect them all
-  const versions = 'versions' in config ? config.versions : [config]
-  const actions = versions.flatMap((version) =>
-    version.actions.map(({ type }) => type)
-  )
-  return { id: config.id, actions: Array.from(new Set(actions)) }
-}
-
-/**
- * Fetches the event configuration so the event action triggers can be checked
- * against the real event ids and action types. Returns `null` if the endpoint
- * is unreachable or does not return the expected shape.
- */
-export async function fetchEventConfigs(
-  baseUrl: string
-): Promise<EventTriggerConfig[] | null> {
-  try {
-    const response = await fetch(`${baseUrl}/config/events`, {
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
-    })
-    if (!response.ok) {
-      return null
-    }
-    const parsed = z.array(ServedEventConfig).safeParse(await response.json())
-
-    return parsed.success ? parsed.data.map(toEventTriggerConfig) : null
-  } catch {
-    return null
   }
 }
 
@@ -521,66 +467,13 @@ export async function runVerifyEndpoints(
 
   console.log()
   console.log(bold('Event action triggers (must be absent or require auth):'))
-  const events = await fetchEventConfigs(baseUrl)
-  if (!events) {
-    console.log(
-      '  ' +
-        yellow(
-          'Could not read /config/events; falling back to route-pattern checks.'
-        )
-    )
-    for (const check of FALLBACK_EVENT_TRIGGERS) {
-      const status = await requestStatus(
-        `${baseUrl}${check.path}`,
-        check.method
-      )
-      const ok = requiresAuthOrAbsent(status)
-      if (!ok) {
-        failures++
-      }
-      console.log(line(ok, endpointLabel(check), securedDetail(status)))
+  for (const check of EVENT_TRIGGERS) {
+    const status = await requestStatus(`${baseUrl}${check.path}`, check.method)
+    const ok = requiresAuthOrAbsent(status)
+    if (!ok) {
+      failures++
     }
-  } else if (events.length === 0) {
-    console.log('  ' + yellow('No events configured.'))
-  } else {
-    for (const event of events) {
-      // Fall back to a made-up action when an event declares none, so the
-      // route is still exercised.
-      const actions = event.actions.length ? event.actions : [PROBE_SEGMENT]
-      const failed: Array<{ action: string; status: CheckStatus }> = []
-      for (const action of actions) {
-        const status = await requestStatus(
-          `${baseUrl}/trigger/events/${event.id}/actions/${action}`,
-          'POST'
-        )
-        if (!requiresAuthOrAbsent(status)) {
-          failed.push({ action, status })
-        }
-      }
-      const pattern = `POST /trigger/events/${event.id}/actions/{action}`
-      if (failed.length === 0) {
-        console.log(
-          line(true, pattern, `${actions.length} action(s) — all require auth`)
-        )
-      } else {
-        for (const failure of failed) {
-          failures++
-          console.log(
-            line(
-              false,
-              `POST /trigger/events/${event.id}/actions/${failure.action}`,
-              securedDetail(failure.status)
-            )
-          )
-        }
-        const okCount = actions.length - failed.length
-        if (okCount > 0) {
-          console.log(
-            line(true, pattern, `${okCount} other action(s) require auth`)
-          )
-        }
-      }
-    }
+    console.log(line(ok, endpointLabel(check), securedDetail(status)))
   }
 
   console.log()
