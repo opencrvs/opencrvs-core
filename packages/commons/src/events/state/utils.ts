@@ -28,9 +28,17 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
     (action) => action.status === ActionStatus.Accepted
   )
 
-  const request = filtered.find(
-    (action) => action.status === ActionStatus.Requested
-  )
+  // The request the accepted action resolves. An event can also hold earlier requests
+  // that never got an outcome, e.g. when the country config confirmation failed and the
+  // record was submitted again, so the first requested action is only a fallback for
+  // accepted actions stored without a link to their request.
+  const request =
+    filtered.find(
+      (action) =>
+        action.status === ActionStatus.Requested &&
+        accept?.originalActionId !== undefined &&
+        action.id === accept.originalActionId
+    ) ?? filtered.find((action) => action.status === ActionStatus.Requested)
 
   const reject = filtered.find(
     (action) => action.status === ActionStatus.Rejected
