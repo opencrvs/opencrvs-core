@@ -108,7 +108,8 @@ export function getDeclarationFields(
  * @returns the declaration fields of every version of the event, one per id: what any
  * record of the event can hold, whichever version it was created under. Where versions
  * define an id differently, the newest version's field is kept.
- * @TODO: reject a field id whose type differs between versions in `defineConfig` (#13973).
+ *
+ * Known limitation: a field id must keep its type in every version until #14335.
  */
 export function getDeclarationFieldsOfAllVersions(
   config: VersionedEventConfig

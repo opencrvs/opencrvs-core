@@ -215,8 +215,6 @@ describe('getDeclarationFieldsOfAllVersions()', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  // https://github.com/opencrvs/opencrvs-core/issues/13973
-  // The ticket avobe will restrict multiple field type for same id
   it("keeps the newest version's field when versions define an id differently", () => {
     const fields = getDeclarationFieldsOfAllVersions({
       ...eventLevel,
