@@ -24,7 +24,8 @@ import {
   UUID,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -118,7 +119,7 @@ export const SaveAndExit: Story = {
         drafts: createDraftHandlers(),
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ],
         workqueues: [
@@ -245,7 +246,7 @@ export const DraftShownInForm: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.search.query((input) => {
             return {

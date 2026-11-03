@@ -18,7 +18,8 @@ import {
   getCurrentEventState,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -110,7 +111,7 @@ describe('declaration updates with a flag-gated field', () => {
 
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
-        HttpResponse.json([eventWithFlagGatedEmail])
+        HttpResponse.json([toVersionedEventConfig(eventWithFlagGatedEmail)])
       )
     )
   })
