@@ -50,7 +50,8 @@ import {
   TestUserRole,
   TokenUserType,
   UUID,
-  ChildOnboardingEvent
+  ChildOnboardingEvent,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,
@@ -333,7 +334,7 @@ const preview: Preview = {
       ]
 
       offlineConfigs.forEach((config) => {
-        addLocalEventConfig(config)
+        addLocalEventConfig(toVersionedEventConfig(config))
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

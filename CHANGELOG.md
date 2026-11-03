@@ -107,6 +107,38 @@ Core 2.2 reads event configurations only in the new shape, so **a country config
 
 [#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
 
+#### Event configurations are versioned with `effectiveFrom`
+
+An event configuration can now have several versions, each effective from a date. `defineConfig` takes them under `versions`, and fields shared by every version (`id`, `label`, `advancedSearch`) stay at the top level:
+
+```ts
+defineConfig({
+  id: 'birth',
+  label: { ... },
+  versions: [
+    { id: 'v1', actions: [ ... ] },
+    { id: 'v2', effectiveFrom: '2027-01-01', actions: [ ... ] }
+  ]
+})
+```
+
+A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event. For now, the first version applies to every record.
+
+`defineConfig` still accepts a flat configuration and wraps it in a single version, so existing event configurations need no change. It now returns a `VersionedEventConfig` instead of an `EventConfig`, though, so code that reads a version's fields off its result stops compiling:
+
+| Before                                | After                                                     |
+| ------------------------------------- | --------------------------------------------------------- |
+| `birthEvent.actions`                  | `resolveEventConfig(birthEvent).actions`                  |
+| `getCurrentEventState(e, birthEvent)` | `getCurrentEventState(e, resolveEventConfig(birthEvent))` |
+
+Core 2.2 reads event configurations only in the versioned shape, so a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading. Upgrade core and the country config together.
+
+`opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
+
+**`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `default` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601)
+
 #### The `incomplete` flag is removed
 
 `InherentFlags.INCOMPLETE` mirrored the `NOTIFIED` status, so it has been removed [#13985](https://github.com/opencrvs/opencrvs-core/issues/13985). References to `InherentFlags.INCOMPLETE` no longer compile. References written as the string `'incomplete'` (for example in encoded scope strings such as `record.read[flags=incomplete]`) still parse, but match nothing. Switch to the `NOTIFIED` status instead (`status` in workqueues and scope options, `event.status` in conditionals).
@@ -170,6 +202,17 @@ Update the client translations:
   | `MINIO_ACCESS_KEY` | `S3_ACCESS_KEY` |
   | `MINIO_SECRET_KEY` | `S3_SECRET_KEY` |
 
+#### `event.hasAction` counts only accepted actions
+
+`event.hasAction(...)` and its `minCount`, `maxCount`, `withFields` and `withTemplate` variants now match only actions with status `Accepted`. Before, an action awaiting confirmation (`Requested`) or refused by the country configuration (`Rejected`) counted too, and an action confirmed synchronously counted twice, once for its `Requested` and once for its `Accepted` document. A confirmed action is matched with the details of its request (`createdBy`, `createdByRole`, `createdAtLocation`, `declaration`, `annotation`, `content`), so `withTemplate` and `withFields` match what they matched before, also when the country configuration confirms the action asynchronously.
+
+Check conditionals that rely on the old counting:
+
+- `hasAction(PRINT_CERTIFICATE).maxCount(n)` now allows `n` confirmed prints, where a single synchronously confirmed print used to count as two.
+- `not(event.hasAction(DECLARE))` is now true while a `DECLARE` awaits confirmation, so actions hidden by it show again until the declaration is accepted.
+
+[#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
+
 ### New features
 
 #### `REVOKED` status with revoke and reinstate registration actions
@@ -213,10 +256,12 @@ The toolkit and the country configuration template work with any container regis
 
 ### Improvements
 
+- Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
 - `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
+- `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
 
 ### Bug fixes
 

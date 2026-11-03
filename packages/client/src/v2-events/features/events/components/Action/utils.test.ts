@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionStatus,
   ActionType,
   ActionUpdate,
+  ConfirmableActions,
   EventDocument,
   generateEventDocument,
   tennisClubMembershipEvent
@@ -24,20 +26,31 @@ const notifyAnnotation = {
 }
 
 function generateEvent(
-  actions: { type: ActionType; annotation: ActionUpdate }[]
+  actions: {
+    type: (typeof ConfirmableActions)[number]
+    annotation: ActionUpdate
+  }[]
 ): EventDocument {
   const event = generateEventDocument({
     configuration: tennisClubMembershipEvent,
     actions: [{ type: ActionType.CREATE }, ...actions]
   })
 
+  // The annotation is carried by the Requested action, its Accepted counterpart has none.
+  const requestedActions = event.actions.filter(
+    ({ status }) => status === ActionStatus.Requested
+  )
+
   return {
     ...event,
-    actions: event.actions.map((action, index) =>
-      index === 0
-        ? action
-        : { ...action, annotation: actions[index - 1].annotation }
-    )
+    actions: event.actions.map((action) => {
+      const index = requestedActions.indexOf(action)
+      if (index === -1) {
+        // CREATE and Accepted copies are left as is
+        return action
+      }
+      return { ...action, annotation: actions[index].annotation }
+    })
   }
 }
 

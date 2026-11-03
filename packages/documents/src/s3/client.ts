@@ -101,8 +101,9 @@ export async function ensureDefaultBucketIsPrivate() {
       new DeleteBucketPolicyCommand({ Bucket: env.S3_BUCKET })
     )
   } catch (error) {
-    // Nothing to remove, which is the state that we want. The SDK has no class
-    // for this error, so it is known by its name.
+    // Nothing to remove, which is the state that we want. SeaweedFS answers
+    // this, where RustFS and MinIO answer 204. The SDK has no class for this
+    // error, so it is known by its name.
     if ((error as { name?: string }).name !== 'NoSuchBucketPolicy') {
       throw error
     }

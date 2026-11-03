@@ -24,7 +24,8 @@ import {
   UUID,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -118,7 +119,7 @@ export const SaveAndExit: Story = {
         drafts: createDraftHandlers(),
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ],
         workqueues: [
@@ -245,7 +246,7 @@ export const DraftShownInForm: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.search.query((input) => {
             return {
@@ -306,6 +307,15 @@ export const DraftShownInForm: Story = {
     await waitFor(
       async () =>
         userEvent.click(await canvas.findByRole('button', { name: /Drafts/ })),
+      { timeout: 5000 }
+    )
+    // The drafts list is keyed on the outbox size, so it remounts once the
+    // draft leaves the outbox. Clicking a row before that hits a detached node.
+    await waitFor(
+      async () =>
+        expect(
+          await canvas.findByTestId('navigation_workqueue_outbox')
+        ).toHaveTextContent(/^Outbox$/),
       { timeout: 5000 }
     )
     await userEvent.click(await canvas.findByText('Clearly Draft'))

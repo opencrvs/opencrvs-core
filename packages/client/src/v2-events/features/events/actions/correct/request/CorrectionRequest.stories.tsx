@@ -13,6 +13,7 @@ import {
   ActionStatus,
   ActionType,
   generateActionDocument,
+  generateActionDocuments,
   tennisClubMembershipEvent,
   ChildOnboardingEvent,
   TestUserRole,
@@ -44,7 +45,7 @@ const createAction = generateActionDocument({
   action: ActionType.CREATE
 })
 
-const declarationActionWithAge = generateActionDocument({
+const declarationActionPairWithAge = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: {
@@ -75,7 +76,7 @@ const declarationActionWithAge = generateActionDocument({
   }
 })
 
-const declarationActionWithDob = generateActionDocument({
+const declarationActionPairWithDob = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: {
@@ -85,7 +86,7 @@ const declarationActionWithDob = generateActionDocument({
   }
 })
 
-const registerAction = generateActionDocument({
+const registerActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
   defaults: {
@@ -99,7 +100,11 @@ const eventCorrectionAgeToDob = {
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  actions: [createAction, declarationActionWithAge, registerAction]
+  actions: [
+    createAction,
+    ...declarationActionPairWithAge,
+    ...registerActionPair
+  ]
 }
 
 const correctionDraftAgeToDob = {
@@ -147,7 +152,11 @@ const eventCorrectionDobToAge = {
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  actions: [createAction, declarationActionWithDob, registerAction]
+  actions: [
+    createAction,
+    ...declarationActionPairWithDob,
+    ...registerActionPair
+  ]
 }
 
 const correctionDraftDobToAge = {
@@ -200,11 +209,11 @@ const eventCorrectionAddress = {
       configuration: ChildOnboardingEvent,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: ChildOnboardingEvent,
       action: ActionType.DECLARE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: ChildOnboardingEvent,
       action: ActionType.REGISTER
     })

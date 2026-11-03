@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useMemo } from 'react'
-import {
-  ActionType,
-  EventIndex
-} from '@opencrvs/commons/client'
+import { ActionType, EventIndex } from '@opencrvs/commons/client'
 import { WorkqueueCtaType } from './utils'
 import {
   useAssignmentActionConfigurationResolver,

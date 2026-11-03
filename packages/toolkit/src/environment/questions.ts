@@ -133,37 +133,39 @@ export const githubQuestions = [
     scope: 'REPOSITORY' as const
   }
 ]
+export const githubApprovalRequiredQuestion = {
+  name: 'approvalRequired',
+  type: 'select' as const,
+  message:
+    'Would you like to enable approvals process for GitHub action workflows?',
+  choices: [
+    {
+      title: 'True',
+      value: 'true'
+    },
+    {
+      title: 'False',
+      value: 'false'
+    }
+  ],
+  valueType: 'VARIABLE' as const,
+  validate: notEmpty,
+  valueLabel: 'APPROVAL_REQUIRED',
+  initial: process.env.APPROVAL_REQUIRED,
+  scope: 'ENVIRONMENT' as const
+}
+export const githubApproversQuestion = {
+  name: 'githubApprovers',
+  type: 'text' as const,
+  message: 'Please provide/update list of approvers?',
+  initial: process.env.GH_APPROVERS,
+  valueType: 'VARIABLE' as const,
+  valueLabel: 'GH_APPROVERS',
+  scope: 'REPOSITORY' as const
+}
 export const githubOtherQuestions = [
-  {
-    name: 'githubApprovers',
-    type: 'text' as const,
-    message: 'Please provide/update list of production approvers?',
-    initial: process.env.GH_APPROVERS,
-    valueType: 'VARIABLE' as const,
-    valueLabel: 'GH_APPROVERS',
-    scope: 'REPOSITORY' as const
-  },
-  {
-    name: 'approvalRequired',
-    type: 'select' as const,
-    message:
-      'Would you like to enable approvals process for GitHub action workflows?',
-    choices: [
-      {
-        title: 'True',
-        value: 'true'
-      },
-      {
-        title: 'False',
-        value: 'false'
-      }
-    ],
-    valueType: 'VARIABLE' as const,
-    validate: notEmpty,
-    valueLabel: 'APPROVAL_REQUIRED',
-    initial: process.env.APPROVAL_REQUIRED,
-    scope: 'ENVIRONMENT' as const
-  }
+  githubApprovalRequiredQuestion,
+  githubApproversQuestion
 ]
 export const githubTokenQuestion = [
   {

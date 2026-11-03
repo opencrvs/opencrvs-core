@@ -16,10 +16,12 @@ import {
   ActionType,
   createPrng,
   generateActionDocument,
+  generateActionDocuments,
   generateUuid,
   tennisClubMembershipEvent,
   generateTrackingId,
-  ActionDocument
+  ActionDocument,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -53,7 +55,7 @@ const actions = [
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: tennisClubMembershipEvent,
     action: ActionType.DECLARE,
     defaults: {
@@ -140,6 +142,19 @@ export const MarkAsNotDuplicateAndRegister: Story = {
           tRPCMsw.event.actions.duplicate.markNotDuplicate.mutation(() => ({
             ...mockOriginalEvent,
             actions: [...actions, markNotDuplicateAction]
+          })),
+          // The write refetches the record's by-id search, which must find it.
+          tRPCMsw.event.search.query(() => ({
+            results: [
+              getCurrentEventState(
+                {
+                  ...mockOriginalEvent,
+                  actions: [...actions, markNotDuplicateAction]
+                },
+                tennisClubMembershipEvent
+              )
+            ],
+            total: 1
           }))
         ]
       }

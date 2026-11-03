@@ -119,6 +119,38 @@ export async function rejectViaApi(
   })
 }
 
+/**
+ * Assigns the event to the token's user and applies `declaration` as an edit,
+ * the same edit + declare sequence the client sends for "Declare with edits".
+ * The event is left unassigned.
+ */
+export async function editAndDeclareViaApi(
+  token: string,
+  eventId: string,
+  declaration: Record<string, unknown>
+) {
+  await assignToSelf(token, eventId)
+  const client = getClient(token)
+  const annotation = {
+    'review.comment': faker.lorem.sentence(),
+    'review.signature': await uploadFile(getSignatureFile(), token)
+  }
+
+  await client.event.actions.edit.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration,
+    annotation,
+    keepAssignmentIfAccepted: true
+  })
+  await client.event.actions.declare.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration,
+    annotation
+  })
+}
+
 /** Assigns the event to the token's user and archives it. */
 export async function archiveViaApi(token: string, eventId: string) {
   await assignToSelf(token, eventId)
