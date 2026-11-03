@@ -29,13 +29,19 @@ test('Custom field works offline in a form not opened before', async ({
     await login(page, CREDENTIALS.REGISTRAR)
     await expect(page.locator('#content-name')).toHaveText('Assigned to you')
 
+    /*
+     * The response has `Vary: origin`, and the module request of the browser
+     * sends an `Origin` header but `caches.match` does not, so the Vary check
+     * must be skipped here.
+     */
     await expect
       .poll(
         async () =>
-          page.evaluate(
-            async (url) => Boolean(await caches.match(url)),
-            SKILL_LEVEL_MODULE
-          ),
+          page.evaluate(async (url) => {
+            const cached = await caches.match(url, { ignoreVary: true })
+            const contentType = cached?.headers.get('content-type') ?? ''
+            return contentType.includes('javascript')
+          }, SKILL_LEVEL_MODULE),
         { timeout: 30000 }
       )
       .toBe(true)
