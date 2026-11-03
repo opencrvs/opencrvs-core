@@ -589,6 +589,8 @@ error.search,The error message shown when a search query fails,An error occurred
 error.somethingWentWrong,Error description,Something went wrong.,Quelque chose s'est mal passé.
 error.title,Error title,Oops!,Oups !
 error.title.unauthorized,Error title unauthorized,Unauthorized!,Non autorisé !
+error.unknownConfigVersion,Title shown when a record was created under a configuration version that is no longer configured,This record cannot be opened,Cet enregistrement ne peut pas être ouvert
+error.unknownConfigVersionDescription,Description shown when a record was created under a configuration version that is no longer configured,"Record {trackingId} was created under version {version} of the {event} configuration, which is not available. Refresh the page; if this continues, please contact your system administrator.","L'enregistrement {trackingId} a été créé avec la version {version} de la configuration {event}, qui n'est pas disponible. Actualisez la page ; si le problème persiste, veuillez contacter votre administrateur système."
 error.weAreTryingToFixThisError,Error description,This page could not be found,"Ce n'est pas vous, c'est nous. C'est notre faute."
 errors.notAssigned,User not assigned error toast message,You've been unassigned from the event,Vous avez été désassigné de l'événement
 errors.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer

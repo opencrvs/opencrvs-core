@@ -11,15 +11,18 @@
 import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import {
   EventConfig,
+  findEventConfigForRecord,
   getEventConfigById,
-  getEventConfigForRecord,
   resolveEventConfigInTimeZone,
   VersionedEventConfig
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { getOfflineData } from '@client/offline/selectors'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
 
 /**
  * Event configuration only changes when countryconfig is deployed, so refetching it with staleTime 0 causes lots of unnecessary calls.
@@ -88,18 +91,41 @@ export function useEventConfiguration(eventIdentifier: string): {
   return { eventConfiguration }
 }
 
+/** A record, as far as resolving its configuration version is concerned */
+interface VersionedRecord {
+  type: string
+  configVersionId?: string
+  trackingId?: string
+}
+
 /**
  * @returns the configuration of the version `record` was created under. Every action on
  * a record uses that version.
+ * When that version is not configured, shows an error page naming the record, the event
+ * and the version.
  */
-export function useEventConfigurationForRecord(record: {
-  type: string
-  configVersionId?: string
-}): { eventConfiguration: EventConfig } {
-  return {
-    eventConfiguration: getEventConfigForRecord(
-      useVersionedEventConfiguration(record.type),
-      record
-    )
+export function useEventConfigurationForRecord(record: VersionedRecord): {
+  eventConfiguration: EventConfig
+} {
+  const intl = useIntl()
+  const versionedConfig = useVersionedEventConfiguration(record.type)
+  const eventConfiguration = findEventConfigForRecord(versionedConfig, record)
+
+  if (eventConfiguration) {
+    return { eventConfiguration }
   }
+
+  return throwStructuredError({
+    title: intl.formatMessage(errorMessages.unknownConfigVersion),
+    message: intl.formatMessage(errorMessages.unknownConfigVersionDescription, {
+      trackingId: record.trackingId ?? '',
+      version: record.configVersionId ?? '',
+      event: intl.formatMessage(versionedConfig.label)
+    }),
+    redirection: {
+      label: intl.formatMessage(buttonMessages.refresh),
+      path: window.location.pathname + window.location.search
+    },
+    variant: 'notice'
+  })
 }
