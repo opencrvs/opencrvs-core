@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch, { Response } from 'node-fetch'
+import fetch from 'node-fetch'
 import {
   AUTH_URL,
   COUNTRY_CONFIG_CLIENT_ID,
@@ -35,27 +35,28 @@ export async function getCoreApiToken(): Promise<string | undefined> {
     return cached.token
   }
 
-  const response = await fetch(new URL('/token', AUTH_URL), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: COUNTRY_CONFIG_CLIENT_ID,
-      client_secret: COUNTRY_CONFIG_CLIENT_SECRET,
-      grant_type: 'client_credentials'
+  try {
+    const response = await fetch(new URL('/token', AUTH_URL), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: COUNTRY_CONFIG_CLIENT_ID,
+        client_secret: COUNTRY_CONFIG_CLIENT_SECRET,
+        grant_type: 'client_credentials'
+      })
     })
-  }).catch((error: unknown) => error)
-  if (!(response instanceof Response) || !response.ok) {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    const { access_token: token } = (await response.json()) as {
+      access_token: string
+    }
+    cached = { token, fetchedAt: Date.now() }
+    return token
+  } catch (error) {
     logger.error(
-      `Could not get a token for the country config system client: ${
-        response instanceof Response ? response.status : String(response)
-      }`
+      `Could not get a token for the country config system client: ${String(error)}`
     )
     return undefined
   }
-
-  const { access_token: token } = (await response.json()) as {
-    access_token: string
-  }
-  cached = { token, fetchedAt: Date.now() }
-  return token
 }
