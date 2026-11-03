@@ -23,9 +23,10 @@ import {
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { Custom, preloadCustomFields } from './Custom'
 
+/** Test-only custom field modules, in the form that country config gives them */
 function fixture(name: string) {
   return fileURLToPath(
-    new URL(`./custom-field-fixtures/${name}`, import.meta.url)
+    new URL(`./__fixtures__/custom-field/${name}`, import.meta.url)
   )
 }
 
