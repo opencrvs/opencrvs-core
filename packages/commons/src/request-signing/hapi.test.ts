@@ -137,7 +137,6 @@ describe('core auth strategy', () => {
     })
   })
 
-
   it('returns 403 for a request with a user token and no signature', async () => {
     const res = await server.inject({
       method: 'GET',

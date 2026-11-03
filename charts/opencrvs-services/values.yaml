@@ -145,6 +145,8 @@ certs:
   {}
   # cert_file: File with certificate
   # key_file: File with key
+  # request_signing_key_file: File with the Ed25519 key core signs requests
+  #   to country config with. Generated on install when not set.
 
 ingress:
   # Access OpenCRVS services at https://<hostname>/

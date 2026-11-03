@@ -46,6 +46,8 @@ spec:
               value: /secrets/private-key.pem
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
+            - name: CORE_REQUEST_SIGNING_KEY_PATH
+              value: /secrets/core-request-signing-key.pem
             - name: CONFIG_SMS_CODE_EXPIRY_SECONDS
               value: '600'
             - name: CONFIG_TOKEN_EXPIRY_SECONDS
@@ -71,6 +73,9 @@ spec:
             - mountPath: /secrets/private-key.pem
               name: private-key
               subPath: private-key.pem
+            - mountPath: /secrets/core-request-signing-key.pem
+              name: core-request-signing-key
+              subPath: core-request-signing-key.pem
       restartPolicy: Always
       volumes:
         - configMap:
@@ -82,6 +87,9 @@ spec:
         - secret:
             secretName: {{ .Release.Name }}-key-tls
           name: private-key
+        - name: core-request-signing-key
+          secret:
+            secretName: {{ .Release.Name }}-core-request-signing-key
 
 {{- include "service-account-helper" (dict "service_name" "auth" "Values" .Values) }}
 

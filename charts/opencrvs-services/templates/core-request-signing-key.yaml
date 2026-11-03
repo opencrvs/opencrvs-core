@@ -1,0 +1,24 @@
+{{- /*
+The Ed25519 key core signs its requests to country config with. Auth publishes
+its public key at /.well-known/jwks.json. A plain resource rather than a
+pre-install hook, so that an upgrade from a release without it creates it; the
+lookup keeps the key across upgrades.
+*/ -}}
+{{- $name := printf "%s-core-request-signing-key" .Release.Name }}
+{{- $existing := lookup "v1" "Secret" .Release.Namespace $name }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $name }}
+  annotations:
+    "helm.sh/resource-policy": keep
+type: Opaque
+data:
+  {{- if .Values.certs.request_signing_key_file }}
+  core-request-signing-key.pem: {{ .Files.Get .Values.certs.request_signing_key_file | b64enc }}
+  {{- else if $existing }}
+  core-request-signing-key.pem: {{ index $existing.data "core-request-signing-key.pem" }}
+  {{- else }}
+  core-request-signing-key.pem: {{ genPrivateKey "ed25519" | b64enc }}
+  {{- end }}

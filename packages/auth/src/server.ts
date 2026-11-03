@@ -61,6 +61,7 @@ import sendUserNameHandler, {
 import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
+import { jwksHandler } from '@auth/features/wellKnown/handler'
 import serviceTokenHandler from './features/serviceToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
@@ -122,6 +123,17 @@ export async function createServer() {
     handler: getPublicKey,
     options: {
       tags: ['api']
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/.well-known/jwks.json',
+    handler: jwksHandler,
+    options: {
+      auth: false,
+      tags: ['api'],
+      description:
+        'Public keys of core: the JWT key and the keys that sign requests to country config'
     }
   })
 
