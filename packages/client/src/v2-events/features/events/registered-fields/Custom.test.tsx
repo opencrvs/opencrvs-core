@@ -10,11 +10,17 @@
  */
 import { fileURLToPath } from 'node:url'
 import React from 'react'
+import { cloneDeep } from 'lodash'
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
+import {
+  FieldType,
+  getDeclaration,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { Custom } from './Custom'
+import { Custom, preloadCustomFields } from './Custom'
 
 function fixture(name: string) {
   return fileURLToPath(
@@ -115,5 +121,42 @@ describe('Custom field', () => {
 
     expect(await screen.findByText('Error loading component')).toBeTruthy()
     expect(screen.getByText('Sibling field')).toBeTruthy()
+  })
+
+  it('preloads each custom field module of the events once', async () => {
+    const src = fixture('preload.js')
+    const event = cloneDeep(tennisClubMembershipEvent)
+    const [firstPage, secondPage] = getDeclaration(event).pages
+    for (const [index, page] of [firstPage, secondPage].entries()) {
+      page.fields.push({
+        id: `custom.field${index}`,
+        type: FieldType._EXPERIMENTAL_CUSTOM,
+        src,
+        label: { id: 'custom.label', defaultMessage: 'Custom', description: '' }
+      })
+    }
+
+    await preloadCustomFields([event, event])
+
+    const calls = () =>
+      (globalThis as { preloadFactoryCalls?: number }).preloadFactoryCalls
+    expect(calls()).toBe(1)
+
+    renderWithTheme(<Custom.Output id="custom" src={src} value={1} />)
+    expect(await screen.findByText('Preloaded field')).toBeTruthy()
+    expect(calls()).toBe(1)
+  })
+
+  it('does not fail the preload when a module cannot be loaded', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const event = cloneDeep(tennisClubMembershipEvent)
+    getDeclaration(event).pages[0].fields.push({
+      id: 'custom.missing',
+      type: FieldType._EXPERIMENTAL_CUSTOM,
+      src: fixture('missing-preload.js'),
+      label: { id: 'custom.label', defaultMessage: 'Custom', description: '' }
+    })
+
+    await expect(preloadCustomFields([event])).resolves.toBeUndefined()
   })
 })

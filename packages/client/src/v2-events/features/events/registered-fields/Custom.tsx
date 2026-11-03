@@ -14,8 +14,13 @@ import * as jsxRuntime from 'react/jsx-runtime'
 import { Pill, Spinner } from '@opencrvs/components'
 import {
   CUSTOM_FIELD_EXTERNALS_GLOBAL,
+  CustomField,
   CustomFieldExternalModule,
-  CustomFieldValue
+  CustomFieldValue,
+  EventConfig,
+  FieldConfig,
+  FieldType,
+  findAllFields
 } from '@opencrvs/commons/client'
 
 interface InputProps {
@@ -107,6 +112,26 @@ async function loadModule(src: string) {
   })
   loadedModules.set(src, loading)
   return loading
+}
+
+/**
+ * Loads the custom field modules of all events ahead of time. The service
+ * worker caches them, so the fields work offline also in a form that the
+ * user has not opened yet.
+ */
+export async function preloadCustomFields(eventConfigs: EventConfig[]) {
+  const sources = new Set(
+    eventConfigs
+      .flatMap(findAllFields)
+      .filter(
+        (field: FieldConfig): field is CustomField =>
+          field.type === FieldType._EXPERIMENTAL_CUSTOM
+      )
+      .map(({ src }) => src)
+  )
+
+  // A failed load is tried again when the field mounts
+  await Promise.allSettled([...sources].map(loadModule))
 }
 
 function LoadError() {

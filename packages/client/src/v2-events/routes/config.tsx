@@ -26,6 +26,7 @@ import { buildLoginUrl } from '@client/components/VersionMismatchModal'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
+import { preloadCustomFields } from '@client/v2-events/features/events/registered-fields/Custom'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
 import * as Notify from '@client/v2-events/features/events/actions/notify'
@@ -104,6 +105,10 @@ function PrefetchQueries() {
         })
       }
     }
+    void queryClient
+      .ensureQueryData(trpcOptionsProxy.event.config.get.queryOptions())
+      .then(preloadCustomFields)
+
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
   }, [prefetch])

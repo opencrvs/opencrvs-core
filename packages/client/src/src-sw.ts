@@ -62,6 +62,14 @@ registerRoute(/http(.+)conditionals\.js$/, new NetworkFirst())
 registerRoute(/http(.+)config$/, new NetworkFirst())
 // This caches certificates fetched from the countryconfig microservice
 registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
+// This caches other scripts fetched from country config, such as custom field modules
+registerRoute(
+  ({ request, url }) =>
+    request.destination === 'script' &&
+    url.origin === self.location.origin &&
+    url.pathname.startsWith('/api/countryconfig/'),
+  new NetworkFirst()
+)
 
 // Refuses to cache an app-shell response under a document's URL, and drops one already cached.
 const documentsOnly: WorkboxPlugin = {
