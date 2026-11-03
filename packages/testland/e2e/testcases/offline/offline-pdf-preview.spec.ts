@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { goToSection, login, uploadImage } from '@e2e/support/helpers'
 import {
@@ -16,6 +16,7 @@ import {
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
 import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { hasPrecachedBuildAssets } from '@e2e/support/service-worker'
 
 const PDF_FIXTURE = './e2e/assets/sample.pdf'
 
@@ -24,49 +25,6 @@ const PDF_FIXTURE = './e2e/assets/sample.pdf'
  * A preview opened offline only works if the service worker precached it.
  * Workbox builds its precache from `injectManifest.globPatterns` in `packages/client/vite.config.ts`
  */
-
-/*
- * Workbox precaches during the service worker's install event, which can land after
- * the page itself has loaded, so poll for a while before concluding there is none.
- */
-async function hasPrecachedBuildAssets(page: Page) {
-  const deadline = Date.now() + 30 * 1000
-
-  while (Date.now() < deadline) {
-    const precached = await page.evaluate(async () => {
-      if (!('caches' in window)) {
-        return false
-      }
-
-      const cacheNames = await caches.keys()
-
-      for (const cacheName of cacheNames.filter((name) =>
-        name.includes('precache')
-      )) {
-        const cache = await caches.open(cacheName)
-        const requests = await cache.keys()
-
-        if (
-          requests.some((request) =>
-            new URL(request.url).pathname.startsWith('/assets/')
-          )
-        ) {
-          return true
-        }
-      }
-
-      return false
-    })
-
-    if (precached) {
-      return true
-    }
-
-    await page.waitForTimeout(1000)
-  }
-
-  return false
-}
 
 test('A PDF attached offline can be previewed offline', async ({ page }) => {
   await login(page, CREDENTIALS.REGISTRATION_OFFICER)
