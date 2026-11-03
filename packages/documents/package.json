@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first  nodemon --exec tsx src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "jest --coverage --silent --noStackTrace",
+    "test": "NODE_OPTIONS=\"${NODE_OPTIONS:+$NODE_OPTIONS }--experimental-vm-modules\" jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
@@ -74,6 +74,10 @@
       "^.+\\.tsx?$": [
         "@swc/jest",
         {
+          "module": {
+            "type": "commonjs",
+            "ignoreDynamic": true
+          },
           "jsc": {
             "experimental": {
               "plugins": [

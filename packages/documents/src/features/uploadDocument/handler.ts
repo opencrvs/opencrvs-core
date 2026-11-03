@@ -17,7 +17,6 @@ import {
   joinUrlPaths,
   logger
 } from '@opencrvs/commons'
-import { fromBuffer } from 'file-type'
 import { v4 as uuid } from 'uuid'
 
 import { badRequest, forbidden } from '@hapi/boom'
@@ -146,7 +145,11 @@ export async function documentUploadHandler(
   try {
     const base64String = payload.fileData.split(',')[1]
     const base64Decoded = Buffer.from(base64String, 'base64')
-    const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
+    const { fileTypeFromBuffer } = await import('file-type')
+    const fileType = await fileTypeFromBuffer(base64Decoded)
+    if (!fileType) {
+      throw new Error('Unable to determine file type')
+    }
     const generateFileName = `${ref}.${fileType.ext}`
 
     await putObject(generateFileName, base64Decoded, {
