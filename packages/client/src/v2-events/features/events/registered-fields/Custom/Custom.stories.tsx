@@ -17,8 +17,8 @@ import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
-import { Review } from '../components/Review'
+import { withValidatorContext } from '../../../../../../.storybook/decorators'
+import { Review } from '../../components/Review'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Custom',
