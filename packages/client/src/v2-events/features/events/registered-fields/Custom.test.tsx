@@ -17,7 +17,8 @@ import { ThemeProvider } from 'styled-components'
 import {
   FieldType,
   getDeclaration,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { Custom, preloadCustomFields } from './Custom'
@@ -136,7 +137,10 @@ describe('Custom field', () => {
       })
     }
 
-    await preloadCustomFields([event, event])
+    await preloadCustomFields([
+      toVersionedEventConfig(event),
+      toVersionedEventConfig(event)
+    ])
 
     const calls = () =>
       (globalThis as { preloadFactoryCalls?: number }).preloadFactoryCalls
@@ -145,6 +149,30 @@ describe('Custom field', () => {
     renderWithTheme(<Custom.Output id="custom" src={src} value={1} />)
     expect(await screen.findByText('Preloaded field')).toBeTruthy()
     expect(calls()).toBe(1)
+  })
+
+  it('preloads the custom field modules of every version of an event', async () => {
+    const src = fixture('preload-later-version.js')
+    const laterVersion = cloneDeep(tennisClubMembershipEvent)
+    getDeclaration(laterVersion).pages[0].fields.push({
+      id: 'custom.later',
+      type: FieldType._EXPERIMENTAL_CUSTOM,
+      src,
+      label: { id: 'custom.label', defaultMessage: 'Custom', description: '' }
+    })
+    const config = toVersionedEventConfig(tennisClubMembershipEvent)
+    config.versions.push({
+      ...toVersionedEventConfig(laterVersion).versions[0],
+      id: 'later',
+      effectiveFrom: '2030-01-01'
+    })
+
+    await preloadCustomFields([config])
+
+    expect(
+      (globalThis as { laterVersionFactoryCalls?: number })
+        .laterVersionFactoryCalls
+    ).toBe(1)
   })
 
   it('does not fail the preload when a module cannot be loaded', async () => {
@@ -157,6 +185,8 @@ describe('Custom field', () => {
       label: { id: 'custom.label', defaultMessage: 'Custom', description: '' }
     })
 
-    await expect(preloadCustomFields([event])).resolves.toBeUndefined()
+    await expect(
+      preloadCustomFields([toVersionedEventConfig(event)])
+    ).resolves.toBeUndefined()
   })
 })

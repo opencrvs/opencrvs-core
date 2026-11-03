@@ -17,10 +17,11 @@ import {
   CustomField,
   CustomFieldExternalModule,
   CustomFieldValue,
-  EventConfig,
   FieldConfig,
   FieldType,
-  findAllFields
+  findAllFields,
+  getEventConfigOfVersion,
+  VersionedEventConfig
 } from '@opencrvs/commons/client'
 
 interface InputProps {
@@ -115,13 +116,20 @@ async function loadModule(src: string) {
 }
 
 /**
- * Loads the custom field modules of all events ahead of time. The service
- * worker caches them, so the fields work offline also in a form that the
- * user has not opened yet.
+ * Loads the custom field modules of all versions of all events ahead of time.
+ * The service worker caches them, so the fields work offline also in a form
+ * that the user has not opened yet.
  */
-export async function preloadCustomFields(eventConfigs: EventConfig[]) {
+export async function preloadCustomFields(
+  eventConfigs: VersionedEventConfig[]
+) {
   const sources = new Set(
     eventConfigs
+      .flatMap((config) =>
+        config.versions.map((version) =>
+          getEventConfigOfVersion(config, version)
+        )
+      )
       .flatMap(findAllFields)
       .filter(
         (field: FieldConfig): field is CustomField =>
