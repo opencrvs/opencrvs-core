@@ -483,16 +483,12 @@ export const eventRouter = router({
 
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
-          const configuration = await getEventConfigurationForRecord({
-            event: event,
-            token
-          })
           const result = await markAsDuplicate(
             event,
             options.input,
             user,
             token,
-            configuration
+            await getEventConfigurationForRecord({ event, token })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -519,16 +515,12 @@ export const eventRouter = router({
 
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
-          const configuration = await getEventConfigurationForRecord({
-            event: event,
-            token
-          })
           const result = await markNotDuplicate(
             event,
             options.input,
             user,
             token,
-            configuration
+            await getEventConfigurationForRecord({ event, token })
           )
           await writeAuditLog({
             clientId: user.id,
