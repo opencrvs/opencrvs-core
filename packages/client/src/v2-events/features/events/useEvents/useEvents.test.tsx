@@ -26,8 +26,8 @@ import {
   EventInput,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent,
-  UUID
+  UUID,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
@@ -116,7 +116,7 @@ const server = setupServer(
   ),
 
   tRPCMsw.event.config.get.query(() => {
-    return [tennisClubMembershipEvent]
+    return [versionedTennisClubMembershipEvent]
   }),
 
   tRPCMsw.administrativeAreas.list.query(() => [])

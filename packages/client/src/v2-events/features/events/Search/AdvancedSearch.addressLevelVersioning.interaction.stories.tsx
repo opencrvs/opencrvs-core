@@ -34,7 +34,10 @@ import {
   withDeclaration,
   getDeclaration,
   getDeclarationPages,
-  DeclarationFormConfig
+  DeclarationFormConfig,
+  toVersionedEventConfig,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { toNamedVersions } from '@client/v2-events/VersionedLocation'
 import * as selectEvent from '@client/v2-events/select-event'
@@ -221,9 +224,9 @@ const mswConfig = {
   handlers: {
     events: [
       tRPCMsw.event.config.get.query(() => [
-        childOnboardingWithAddressSearch,
-        tennisClubMembershipEvent,
-        footballClubMembershipEvent
+        toVersionedEventConfig(childOnboardingWithAddressSearch),
+        versionedTennisClubMembershipEvent,
+        versionedFootballClubMembershipEvent
       ])
     ],
     eventLocations: [

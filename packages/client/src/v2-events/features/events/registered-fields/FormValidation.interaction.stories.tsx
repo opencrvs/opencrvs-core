@@ -17,7 +17,8 @@ import {
   ActionType,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -70,7 +71,7 @@ const parameters = {
     handlers: {
       events: [
         tRPCMsw.event.config.get.query(() => {
-          return [tennisClubMembershipEvent]
+          return [versionedTennisClubMembershipEvent]
         })
       ],
       workqueues: [
