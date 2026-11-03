@@ -12,9 +12,8 @@
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import { z } from 'zod'
-import { logger, TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
-  ActionDocument,
   ActionInputWithType,
   ActionStatus,
   ActionType,
@@ -426,39 +425,6 @@ export async function processAction(
   // Only send the event to Elasticsearch if it is not a draft
   await ensureEventIndexed(updatedEvent, configuration)
   return updatedEvent
-}
-
-/**
- * Removes a requested action whose request failed before it was accepted or rejected.
- * A requested action left behind would block every later action request on the event.
- *
- * Never throws, so that the error of the failed request is the one reported.
- */
-export async function discardFailedActionRequest(
-  eventId: UUID,
-  action: ActionDocument
-) {
-  const context = {
-    eventId,
-    actionId: action.id,
-    actionType: action.type,
-    transactionId: action.transactionId
-  }
-
-  try {
-    const deleted = await eventsRepo.deleteUnresolvedRequestedAction(action.id)
-    if (!deleted) {
-      logger.warn(
-        context,
-        'Failed action request was not discarded: the requested action is already resolved or removed'
-      )
-    }
-  } catch (error) {
-    logger.error(
-      { ...context, error },
-      'Failed to discard the requested action of a failed request. It will block other action requests on the event until it is removed.'
-    )
-  }
 }
 
 type AsyncRejectActionInput = Pick<

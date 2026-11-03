@@ -10,7 +10,6 @@
  */
 
 import { HttpResponse, http } from 'msw'
-import { TRPCError } from '@trpc/server'
 import { ActionType, ActionStatus, getUUID } from '@opencrvs/commons'
 import {
   createTestClient,
@@ -168,44 +167,4 @@ test('async reject of an undeclared event does not index it', async () => {
   await expect(
     esClient.exists({ index: getEventIndexName(event.type), id: event.id })
   ).resolves.toBe(false)
-})
-
-test('new submission while async request is unresolved: refused, unresolved request kept', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-  const event = await client.event.create(generator.event.create())
-
-  mockDeclareApi(202)
-
-  const data = generator.event.actions.declare(event.id)
-  const requestResponse = await client.event.actions.declare.request(data)
-  const actionId = getDeclareActionId(requestResponse.actions)
-
-  await expect(
-    client.event.actions.declare.request({
-      ...data,
-      transactionId: getUUID()
-    })
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'CONFLICT',
-      message: `Action 'DECLARE' cannot be requested while another action request on the event is waiting for the country config: DECLARE (${actionId})`
-    })
-  )
-
-  const ccClient = createCountryConfigClient(user, event.id, actionId)
-  const response = await ccClient.event.actions.declare.accept({
-    ...data,
-    actionId,
-    transactionId: getUUID()
-  })
-
-  const declareActions = response.actions.filter(
-    (a) => a.type === ActionType.DECLARE
-  )
-  expect(declareActions).toHaveLength(2)
-  expect(declareActions.at(-1)).toMatchObject({
-    status: ActionStatus.Accepted,
-    originalActionId: actionId
-  })
 })

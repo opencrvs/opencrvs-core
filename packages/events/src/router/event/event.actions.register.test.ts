@@ -352,8 +352,11 @@ describe('Request and confirmation flow', () => {
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
-      // The requested action of a failed request is discarded
-      expect(registerActions).toEqual([])
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        })
+      ])
     })
 
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
@@ -407,8 +410,11 @@ describe('Request and confirmation flow', () => {
       const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
-      // The requested action of a failed request is discarded
-      expect(registerActions).toEqual([])
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        })
+      ])
     })
   })
 

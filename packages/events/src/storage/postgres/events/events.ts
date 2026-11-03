@@ -231,30 +231,6 @@ export const createAction = async (action: NewEventActions) => {
   })
 }
 
-/**
- * Deletes a requested action, but only while no accepted or rejected action refers to it.
- * @returns true if the action was deleted
- */
-export async function deleteUnresolvedRequestedAction(actionId: UUID) {
-  const db = getClient()
-  const result = await db
-    .deleteFrom('eventActions')
-    .where('id', '=', actionId)
-    .where('status', '=', ActionStatus.Requested)
-    .where(({ not, exists, selectFrom }) =>
-      not(
-        exists(
-          selectFrom('eventActions as resolution')
-            .select('resolution.id')
-            .whereRef('resolution.originalActionId', '=', 'eventActions.id')
-        )
-      )
-    )
-    .executeTakeFirst()
-
-  return result.numDeletedRows > 0
-}
-
 async function getOrCreateEventInTrx(
   input: NewEvents & Omit<NewEventActions, 'actionType' | 'eventId' | 'status'>,
   trx: Kysely<Schema>

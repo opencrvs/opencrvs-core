@@ -11,12 +11,7 @@
 
 import { HttpResponse, http } from 'msw'
 import { TRPCError } from '@trpc/server'
-import {
-  ActionDocument,
-  ActionStatus,
-  ActionType,
-  getUUID
-} from '@opencrvs/commons'
+import { ActionDocument, ActionStatus, ActionType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -33,19 +28,6 @@ function mockDeclareApi(status: number, body: Record<string, unknown> = {}) {
         )
     )
   )
-}
-
-function mockDeclareApiNetworkError() {
-  return mswServer.use(
-    http.post(
-      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
-      () => HttpResponse.error()
-    )
-  )
-}
-
-function getDeclareActions(actions: { type: ActionType }[]) {
-  return actions.filter((a) => a.type === ActionType.DECLARE)
 }
 
 function findDeclareAction(
@@ -245,118 +227,5 @@ describe('Synchronous confirmation - CC response payload', () => {
 
     expect(rejectedAction?.status).toEqual(ActionStatus.Rejected)
     expect(rejectedAction?.declaration).toEqual({})
-  })
-})
-
-describe('Synchronous confirmation - failed requests', () => {
-  test('CC responds with HTTP 500: requested action is discarded', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockDeclareApi(500)
-
-    await expect(
-      client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, { keepAssignment: true })
-      )
-    ).rejects.toThrow(
-      'Unexpected failure from country config action confirmation API'
-    )
-
-    const { actions } = await client.event.get(event.id)
-    expect(getDeclareActions(actions)).toEqual([])
-  })
-
-  test('CC is unreachable: requested action is discarded', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockDeclareApiNetworkError()
-
-    await expect(
-      client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, { keepAssignment: true })
-      )
-    ).rejects.toThrow(
-      'Unexpected failure from country config action confirmation API'
-    )
-
-    const { actions } = await client.event.get(event.id)
-    expect(getDeclareActions(actions)).toEqual([])
-  })
-
-  test('CC sends invalid payload: requested action is discarded', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-
-    mockDeclareApi(200, { unknownField: 'not-in-schema' })
-
-    await expect(
-      client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, { keepAssignment: true })
-      )
-    ).rejects.toThrow(
-      'Invalid payload received from country config action confirmation API'
-    )
-
-    const { actions } = await client.event.get(event.id)
-    expect(getDeclareActions(actions)).toEqual([])
-  })
-
-  test('replayed request after CC failure: accepted', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-    const data = generator.event.actions.declare(event.id, {
-      keepAssignment: true
-    })
-
-    mockDeclareApi(500)
-    await expect(client.event.actions.declare.request(data)).rejects.toThrow()
-
-    mockDeclareApi(200)
-    const response = await client.event.actions.declare.request(data)
-
-    const requested = findDeclareAction(
-      response.actions,
-      ActionStatus.Requested
-    )
-    expect(getDeclareActions(response.actions)).toHaveLength(2)
-    expect(
-      findDeclareAction(response.actions, ActionStatus.Accepted)
-    ).toMatchObject({
-      transactionId: data.transactionId,
-      originalActionId: requested?.id
-    })
-  })
-
-  test('new submission after CC failure: accepted', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-    const data = generator.event.actions.declare(event.id, {
-      keepAssignment: true
-    })
-
-    mockDeclareApi(500)
-    await expect(client.event.actions.declare.request(data)).rejects.toThrow()
-
-    mockDeclareApi(200)
-    const response = await client.event.actions.declare.request({
-      ...data,
-      transactionId: getUUID()
-    })
-
-    const requested = findDeclareAction(
-      response.actions,
-      ActionStatus.Requested
-    )
-    expect(getDeclareActions(response.actions)).toHaveLength(2)
-    expect(
-      findDeclareAction(response.actions, ActionStatus.Accepted)
-    ).toMatchObject({ originalActionId: requested?.id })
   })
 })
