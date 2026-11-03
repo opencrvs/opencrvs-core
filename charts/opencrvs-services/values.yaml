@@ -147,6 +147,8 @@ certs:
   # key_file: File with key
   # request_signing_key_file: File with the Ed25519 key core signs requests
   #   to country config with. Generated on install when not set.
+  # previous_request_signing_key_file: While the request-signing key changes,
+  #   the old key. Auth keeps publishing it so requests it signed still pass.
 
 ingress:
   # Access OpenCRVS services at https://<hostname>/

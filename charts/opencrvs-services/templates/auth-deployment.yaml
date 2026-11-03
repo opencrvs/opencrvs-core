@@ -48,6 +48,10 @@ spec:
               value: /secrets/public-key.pem
             - name: CORE_REQUEST_SIGNING_KEY_PATH
               value: /secrets/core-request-signing-key.pem
+          {{- if .Values.certs.previous_request_signing_key_file }}
+            - name: CORE_REQUEST_SIGNING_PREVIOUS_KEY_PATH
+              value: /secrets/core-request-signing-previous-key.pem
+          {{- end }}
             - name: CONFIG_SMS_CODE_EXPIRY_SECONDS
               value: '600'
             - name: CONFIG_TOKEN_EXPIRY_SECONDS
@@ -76,6 +80,11 @@ spec:
             - mountPath: /secrets/core-request-signing-key.pem
               name: core-request-signing-key
               subPath: core-request-signing-key.pem
+          {{- if .Values.certs.previous_request_signing_key_file }}
+            - mountPath: /secrets/core-request-signing-previous-key.pem
+              name: core-request-signing-key
+              subPath: core-request-signing-previous-key.pem
+          {{- end }}
       restartPolicy: Always
       volumes:
         - configMap:

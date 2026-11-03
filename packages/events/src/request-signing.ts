@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { readFileSync } from 'fs'
-import { loadCoreSigningKey } from '@opencrvs/commons/request-signing'
+import { loadCoreSigningKeyFile } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
 
 /** The key events signs its requests to country config with. */
-export const coreSigningKey = loadCoreSigningKey(
-  readFileSync(env.CORE_REQUEST_SIGNING_KEY_PATH)
+export const coreSigningKey = loadCoreSigningKeyFile(
+  env.CORE_REQUEST_SIGNING_KEY_PATH
 )

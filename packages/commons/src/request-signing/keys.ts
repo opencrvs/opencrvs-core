@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { CoreSigningKey } from './signature'
+import { readFileSync } from 'node:fs'
 import {
   createHash,
   createPrivateKey,
@@ -16,13 +17,11 @@ import {
   KeyObject
 } from 'node:crypto'
 
-/** RFC 7638: the members that identify a key, by key type. */
-const THUMBPRINT_MEMBERS: Record<string, string[]> = {
-  OKP: ['crv', 'kty', 'x'],
-  RSA: ['e', 'kty', 'n']
+/** By key type: the members that identify a key (RFC 7638) and its algorithm. */
+const KEY_TYPES: Record<string, { members: string[]; alg: string }> = {
+  OKP: { members: ['crv', 'kty', 'x'], alg: 'EdDSA' },
+  RSA: { members: ['e', 'kty', 'n'], alg: 'RS256' }
 }
-
-const ALGORITHMS: Record<string, string> = { OKP: 'EdDSA', RSA: 'RS256' }
 
 export interface PublicJwk {
   kty: string
@@ -39,19 +38,19 @@ export interface PublicJwk {
 export function toPublicJwk(key: KeyObject): PublicJwk {
   const publicKey = key.type === 'public' ? key : createPublicKey(key)
   const jwk = publicKey.export({ format: 'jwk' }) as Record<string, string>
-  const members = THUMBPRINT_MEMBERS[jwk.kty]
-  if (!members) {
+  const keyType = KEY_TYPES[jwk.kty]
+  if (!keyType) {
     throw new Error(`Cannot publish a ${jwk.kty} key`)
   }
   const canonical = JSON.stringify(
-    Object.fromEntries(members.map((name) => [name, jwk[name]]))
+    Object.fromEntries(keyType.members.map((name) => [name, jwk[name]]))
   )
   return {
     ...jwk,
     kty: jwk.kty,
     kid: createHash('sha256').update(canonical).digest('base64url'),
     use: 'sig',
-    alg: ALGORITHMS[jwk.kty]
+    alg: keyType.alg
   }
 }
 
@@ -64,4 +63,9 @@ export function loadCoreSigningKey(pem: string | Buffer): CoreSigningKey {
     )
   }
   return { privateKey, keyid: toPublicJwk(privateKey).kid }
+}
+
+/** Reads the signing key from a PEM file. */
+export function loadCoreSigningKeyFile(path: string): CoreSigningKey {
+  return loadCoreSigningKey(readFileSync(path))
 }

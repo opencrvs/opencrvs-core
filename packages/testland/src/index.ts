@@ -207,7 +207,6 @@ export async function createServer() {
   server.listener.requestTimeout = THIRTY_MINUTES_IN_MILLISECONDS
 
   await server.register(getPlugins())
-  // `auth: 'core'` accepts only requests that core signed.
   await server.register({
     plugin: coreRequestAuth,
     options: { jwksUrl: new URL('/.well-known/jwks.json', AUTH_URL).toString() }

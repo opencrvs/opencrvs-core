@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import {
   CoreSigningKey,
-  loadCoreSigningKey,
+  loadCoreSigningKeyFile,
   withCoreSignature
 } from '@opencrvs/commons/request-signing'
 import { env } from './environment'
@@ -21,8 +20,6 @@ let signingKey: CoreSigningKey | undefined
 
 /** Reads seed data from country config, signed as core. */
 export function fetchCountryConfig(url: string | URL) {
-  signingKey ??= loadCoreSigningKey(
-    readFileSync(env.CORE_REQUEST_SIGNING_KEY_PATH)
-  )
+  signingKey ??= loadCoreSigningKeyFile(env.CORE_REQUEST_SIGNING_KEY_PATH)
   return fetch(url, withCoreSignature(signingKey, url))
 }

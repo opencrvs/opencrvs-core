@@ -25,7 +25,7 @@ export type {
   SignCoreRequestInput
 } from './signature'
 export { createCoreKeyList } from './key-list'
-export { loadCoreSigningKey, toPublicJwk } from './keys'
+export { loadCoreSigningKey, loadCoreSigningKeyFile, toPublicJwk } from './keys'
 export type { PublicJwk } from './keys'
 export { coreRequestAuth } from './hapi'
 export type { CoreCredentials, CoreRequestAuthOptions } from './hapi'
