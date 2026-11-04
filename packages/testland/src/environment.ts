@@ -91,6 +91,7 @@ export const env = cleanEnv(process.env, {
     desc: 'URL for signing raw JWTs for verifiable credentials issuance'
   }),
   REFERENCE_DATA_DATABASE_URL: url({
+    default: undefined,
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `reference_data.icd10`. See `/infrastructure/postgres/setup-reference-data.sh` for how the default database is set up for your country.'
