@@ -19,7 +19,9 @@ import {
   status,
   not,
   flag,
-  InherentFlags
+  InherentFlags,
+  toNotificationForm,
+  toNotificationReview
 } from '@opencrvs/toolkit/events'
 import {
   DEATH_DECLARATION_REVIEW,
@@ -235,6 +237,8 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.action.notify.label'
       },
+      notificationForm: toNotificationForm(DEATH_DECLARATION_FORM),
+      review: toNotificationReview(DEATH_DECLARATION_REVIEW),
       form: [
         {
           id: 'comments',

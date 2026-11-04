@@ -40,6 +40,7 @@ import {
   getDeclaration,
   getDeclarationFields,
   getNotificationFields,
+  getNotificationForm,
   getVisibleVerificationPageIds,
   isFieldVisible,
   isPageVisible,
@@ -332,30 +333,35 @@ export function validateNotifyAction({
   context: ValidatorContext
   actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
 }) {
-  const formFields =
-    actionType === ActionType.NOTIFY
-      ? getNotificationFields(eventConfig)
-      : getDeclarationFields(eventConfig)
-
   const notifyConfig = getActionConfig({
     eventConfiguration: eventConfig,
     actionType: ActionType.NOTIFY
   })
 
-  if (!notifyConfig) {
-    throw new Error('Notify action config not found!')
+  if (actionType === ActionType.NOTIFY && !notifyConfig) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Event '${eventConfig.id}' has no ${ActionType.NOTIFY} action.`
+    })
   }
 
-  const notifyAnnotationFields = getActionAnnotationFields(notifyConfig)
+  const formFields =
+    actionType === ActionType.NOTIFY
+      ? getNotificationFields(eventConfig)
+      : getDeclarationFields(eventConfig)
+
+  const notifyAnnotationFields = notifyConfig
+    ? getActionAnnotationFields(notifyConfig)
+    : []
 
   // NOTIFY annotation comes from its own review and dialog fields.
-  // EDIT keeps the DECLARE review fields, plus the NOTIFY dialog fields for "notify with edits".
+  // EDIT accepts both, since the edit review shows the DECLARE or the NOTIFY review depending on the user.
   const reviewFields =
     actionType === ActionType.NOTIFY
       ? notifyAnnotationFields
       : [
           ...getActionReviewFields(eventConfig, ActionType.DECLARE),
-          ...getActionFormFields(eventConfig, ActionType.NOTIFY)
+          ...notifyAnnotationFields
         ]
 
   const mergedDeclaration: EventState = deepMerge(
@@ -423,18 +429,13 @@ export function validateNotifyAction({
     }
   )
 
-  const notificationForm =
-    actionType === ActionType.NOTIFY && notifyConfig.type === ActionType.NOTIFY
-      ? notifyConfig.notificationForm
-      : undefined
-
-  if (!notificationForm || declarationErrors.length > 0) {
+  if (actionType === ActionType.EDIT || declarationErrors.length > 0) {
     return [...annotationErrors, ...declarationErrors]
   }
 
   const { cleanedDeclaration, invalidKeys, fieldErrors } =
     getDeclarationFormErrors({
-      form: notificationForm,
+      form: getNotificationForm(eventConfig),
       completeDeclaration,
       declarationUpdate: declaration,
       context

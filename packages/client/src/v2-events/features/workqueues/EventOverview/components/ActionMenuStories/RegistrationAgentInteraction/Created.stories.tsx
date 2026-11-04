@@ -38,7 +38,6 @@ const createdScenariosForRegistrationAgent: Scenario[] = [
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
     expected: {
       ...getHiddenActions(),
-      ['Send an application']: AssertType.ENABLED,
       ['Delete']: AssertType.ENABLED
     }
   }
@@ -59,7 +58,6 @@ export const CreatedByOtherUser = createdByOtherUserScenario({
   role: TestUserRole.enum.LOCAL_REGISTRAR,
   expected: {
     ...getHiddenActions(),
-    ['Send an application']: AssertType.DISABLED,
     ['Delete']: AssertType.DISABLED
   }
 })

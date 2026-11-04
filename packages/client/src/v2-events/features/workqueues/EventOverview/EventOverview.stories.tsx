@@ -28,6 +28,7 @@ import {
   UUID,
   TestUserRole,
   generateActionDocument,
+  generateActionDocuments,
   ActionDocument,
   generateUuid,
   generateTrackingId,
@@ -104,7 +105,7 @@ const duplicateEvent = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: actionDefaults
@@ -194,7 +195,7 @@ export const Overview: Story = {
             return [
               generateEventDraftDocument({
                 eventId: defaultEvent.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -238,7 +239,7 @@ export const OverviewMobile: Story = {
             return [
               generateEventDraftDocument({
                 eventId: defaultEvent.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Amelie',
@@ -431,7 +432,7 @@ export const WithSystemUserActions: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -725,7 +726,7 @@ export const WithVariousUserRoles: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Sara',
@@ -783,7 +784,7 @@ const annotationUpdateOnValidateEvent = {
         createdAt: actionDefaults.createdAt
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       action: ActionType.DECLARE,
       configuration: tennisClubMembershipEvent,
       defaults: {
@@ -850,7 +851,7 @@ const annotationChangeDuringRegisterEvent = {
       configuration: tennisClubMembershipEvent,
       defaults: actionDefaults
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       action: ActionType.DECLARE,
       configuration: tennisClubMembershipEvent,
       defaults: {

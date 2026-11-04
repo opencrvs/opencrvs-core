@@ -15,6 +15,7 @@ import {
   NonSearchableEventMetadataTimeFieldIdInput,
   AdvancedSearchConfig
 } from '../event-config/event-configuration'
+import { ActionStatus } from './ActionStatus'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
 import { EventStatus } from './EventMetadata'
@@ -46,7 +47,10 @@ function eventFn(
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
   /**
-   * Checks if the event contains a specific action type.
+   * Checks if the event contains a specific accepted action type.
+   * Only Accepted actions are matched: a confirmable action is stored as a
+   * Requested and an Accepted action, and a pending or rejected request must
+   * not count as the action having happened.
    * Can be used directly as a conditional or chained with additional methods.
    * @param action - The action type to check for.
    */
@@ -64,9 +68,12 @@ const event = Object.assign(eventFn, {
                 properties: {
                   type: {
                     const: action
+                  },
+                  status: {
+                    const: ActionStatus.Accepted
                   }
                 },
-                required: ['type']
+                required: ['type', 'status']
               }
             }
           },
@@ -80,9 +87,10 @@ const event = Object.assign(eventFn, {
       additionalFields?: Record<string, unknown>
     ) => {
       const actionProperties: Record<string, unknown> = {
-        type: { const: action }
+        type: { const: action },
+        status: { const: ActionStatus.Accepted }
       }
-      const requiredFields = ['type']
+      const requiredFields = ['type', 'status']
 
       if (additionalFields) {
         Object.entries(additionalFields).forEach(([key, value]) => {

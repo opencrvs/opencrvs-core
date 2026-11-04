@@ -56,7 +56,6 @@ import {
   DeclareActionConfig
 } from './ActionConfig'
 import { DeclarationFormConfig, FormConfig } from './FormConfig'
-import { deriveNotificationForm } from './notificationFormFallback'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import {
@@ -101,9 +100,9 @@ export function getDeclarationFields(
 }
 
 /**
- * @returns the notification form configured on the NOTIFY action, or undefined when none is configured.
+ * @returns the notification form of the NOTIFY action, or undefined when the event has no NOTIFY action.
  */
-function getConfiguredNotificationForm(configuration: EventConfig) {
+function findNotificationForm(configuration: EventConfig) {
   const notifyAction = configuration.actions.find(
     (action) => action.type === ActionType.NOTIFY
   )
@@ -114,36 +113,20 @@ function getConfiguredNotificationForm(configuration: EventConfig) {
 }
 
 /**
- * Derived notification forms are cached per configuration, since deriving one copies the whole declaration.
- */
-const derivedNotificationForms = new WeakMap<
-  EventConfig,
-  DeclarationFormConfig
->()
-
-/**
- * @returns the notification form of the event: the one configured on the NOTIFY action,
- * or the declaration with every field optional when none is configured.
- *
- * The fallback is derived here rather than in `defineConfig`, so that it is not part of the
- * served event configuration.
+ * @returns the notification form configured on the NOTIFY action.
+ * @throws when the event has no NOTIFY action.
  */
 export function getNotificationForm(
   configuration: EventConfig
 ): DeclarationFormConfig {
-  const configured = getConfiguredNotificationForm(configuration)
-  if (configured) {
-    return configured
+  const notificationForm = findNotificationForm(configuration)
+  if (!notificationForm) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.NOTIFY} action.`
+    )
   }
 
-  const cached = derivedNotificationForms.get(configuration)
-  if (cached) {
-    return cached
-  }
-
-  const derived = deriveNotificationForm(getDeclaration(configuration))
-  derivedNotificationForms.set(configuration, derived)
-  return derived
+  return notificationForm
 }
 
 export function getNotificationFields(
@@ -717,10 +700,8 @@ export function isWriteAction(actionType: ActionType): boolean {
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
-    // Only a configured notification form: a derived one repeats the declaration fields.
-    ...(getConfiguredNotificationForm(config)?.pages.flatMap(
-      ({ fields }) => fields
-    ) ?? []),
+    ...(findNotificationForm(config)?.pages.flatMap(({ fields }) => fields) ??
+      []),
     ...getAllAnnotationFields(config)
   ])
 }
@@ -940,12 +921,68 @@ export function getCompleteActionDeclaration<
   return deepMerge(declaration, action.declaration)
 }
 
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(isAcceptedAction).map((action) => ({
+/**
+ * Completes an Accepted action's declaration and annotation with those of its
+ * original Requested action (the Accepted action's own values win).
+ */
+function completeAcceptedAction(
+  event: EventDocument,
+  action: ActionDocument
+): ActionDocument {
+  return {
     ...action,
     declaration: getCompleteActionDeclaration({}, event, action),
     annotation: getCompleteActionAnnotation(event, action)
-  }))
+  }
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions
+    .filter(isAcceptedAction)
+    .map((action) => completeAcceptedAction(event, action))
+}
+
+/**
+ * Returns the event with each Accepted action completed with the details of
+ * its original Requested action: who requested it, where, and the request's
+ * declaration, annotation and content (the Accepted action's own values win).
+ *
+ * `$event` conditionals match Accepted actions only, but an Accepted action
+ * does not carry everything its request did. A synchronous confirmation drops
+ * the request's annotation; an asynchronous `accept` is created by the system
+ * user and carries only what the country configuration sent. Without this,
+ * `event.hasAction(...).withTemplate(...)` / `.withFields(...)` would stop
+ * matching fields that matched the Requested action.
+ */
+export function getEventWithCompleteAcceptedActions(
+  event: EventDocument
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.map((action) => {
+      if (!isAcceptedAction(action) || !action.originalActionId) {
+        return action
+      }
+      const requestedAction = event.actions.find(
+        ({ id }) => id === action.originalActionId
+      )
+      if (requestedAction?.status !== ActionStatus.Requested) {
+        return action
+      }
+      const content = getCompleteActionContent(event, action)
+      // Request and acceptance are the same action type, so the merged
+      // content keeps the action's shape.
+      return {
+        ...completeAcceptedAction(event, action),
+        // Who requested the action, as getActionUpdateMetadata resolves it.
+        createdBy: requestedAction.createdBy,
+        createdByRole: requestedAction.createdByRole,
+        createdByUserType: requestedAction.createdByUserType,
+        createdAtLocation: requestedAction.createdAtLocation,
+        ...(content ? { content } : {})
+      } as ActionDocument
+    })
+  }
 }
 
 // Action types that are not taken into the aggregate values

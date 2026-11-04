@@ -38,7 +38,6 @@ const createdScenariosForFieldAgent: Scenario[] = [
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
     expected: {
       ...getHiddenActions(),
-      ['Send an application']: AssertType.ENABLED,
       ['Delete']: AssertType.ENABLED
     }
   }
@@ -62,7 +61,6 @@ export const CreatedByOtherUser = createdByOtherUserScenario({
   role: TestUserRole.enum.FIELD_AGENT,
   expected: {
     ...getHiddenActions(),
-    ['Send an application']: AssertType.DISABLED,
     ['Delete']: AssertType.DISABLED
   }
 })

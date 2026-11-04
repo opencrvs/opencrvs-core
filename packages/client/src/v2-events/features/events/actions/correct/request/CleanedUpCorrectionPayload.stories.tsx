@@ -26,10 +26,12 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
+  generateActionDocuments,
   generateTranslationConfig,
   FieldUpdateValue,
   withDeclaration,
-  getDeclaration
+  getDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -179,7 +181,7 @@ const overriddenEvent = {
       configuration: overriddenEventConfig,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -190,7 +192,7 @@ const overriddenEvent = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.REGISTER,
       defaults: { declaration: {} }
@@ -208,7 +210,7 @@ const draft = generator.event.draft({
 export const CleanedUpCorrectionPayload: Story = {
   beforeEach: () => {
     useEventFormData.setState({ formValues: {} })
-    addLocalEventConfig(overriddenEventConfig)
+    addLocalEventConfig(toVersionedEventConfig(overriddenEventConfig))
     setEventData(overriddenEvent.id, overriddenEvent)
   },
   loaders: [
@@ -263,7 +265,11 @@ export const CleanedUpCorrectionPayload: Story = {
     },
     msw: {
       handlers: {
-        events: [tRPCMsw.event.config.get.query(() => [overriddenEventConfig])],
+        events: [
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(overriddenEventConfig)
+          ])
+        ],
         event: [tRPCMsw.event.get.query(() => overriddenEvent)],
         actions: [
           tRPCMsw.event.actions.correction.request.request.mutation(
@@ -283,7 +289,7 @@ export const CleanedUpCorrectionPayload: Story = {
                 ...overriddenEvent,
                 actions: [
                   ...overriddenEvent.actions,
-                  generateActionDocument({
+                  ...generateActionDocuments({
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {
@@ -305,7 +311,7 @@ export const CleanedUpCorrectionPayload: Story = {
             ...overriddenEvent,
             actions: [
               ...overriddenEvent.actions,
-              generateActionDocument({
+              ...generateActionDocuments({
                 configuration: overriddenEventConfig,
                 action: ActionType.APPROVE_CORRECTION
               })

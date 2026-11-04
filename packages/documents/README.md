@@ -19,7 +19,7 @@ The defaults match the store that `docker-compose.dev-deps.yml` starts for devel
 
 ## Object stores
 
-The service has no code that is specific to a store, and does not check which one it talks to. It was tried by hand, once, against the stores below. Nothing in CI runs it against them, so a newer version, or a store that is not listed, may behave differently.
+The service has no code that is specific to a store, and does not check which one it talks to. It was tried by hand, once, against the stores below. Its unit tests run against RustFS, at the version in the table, in a container that `test/global-setup.ts` starts, so running them needs Docker. Nothing in CI runs it against the other stores, so a newer version, or a store that is not listed, may behave differently.
 
 | Store     | Kind                     | Tried on   | Version                                               |
 | --------- | ------------------------ | ---------- | ----------------------------------------------------- |

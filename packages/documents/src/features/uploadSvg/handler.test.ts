@@ -9,15 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
+import { toDocumentPath } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-
-jest.mock('../../s3/client', () => {
-  return {
-    __esModule: true,
-    putObject: async () => {}
-  }
-})
+import { ensureDefaultBucket } from '../../s3/client'
+import { getObject } from '../../../test/s3'
 
 describe('verify svg uploader handler', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -27,6 +23,10 @@ describe('verify svg uploader handler', () => {
     audience: 'opencrvs:documents-user',
     subject: '123123123'
   })
+  beforeEach(async () => {
+    await ensureDefaultBucket()
+  })
+
   beforeEach(async () => {
     server = await createServer()
   })
@@ -80,5 +80,10 @@ describe('verify svg uploader handler', () => {
     })
 
     expect(res.statusCode).toBe(200)
+    const { refUrl } = JSON.parse(res.payload)
+    expect(await getObject(toDocumentPath(refUrl))).toMatchObject({
+      contentType: 'image/svg+xml',
+      metadata: { 'created-by': '123123123' }
+    })
   })
 })
