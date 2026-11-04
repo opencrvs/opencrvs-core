@@ -23,6 +23,8 @@ export async function verifySignedByCore(request: Request) {
       rawBody: Buffer.from(await request.clone().arrayBuffer()),
       headers: Object.fromEntries(request.headers)
     },
+    // FindPublicKey is async; the test key needs no lookup.
+    // eslint-disable-next-line @typescript-eslint/require-await
     async (keyid) =>
       keyid === coreSigningKey.keyid
         ? createPublicKey(coreSigningKey.privateKey)
