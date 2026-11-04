@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DocumentPath, FullDocumentPath } from '@opencrvs/commons/client'
+import { DocumentPath, FullDocumentPath, UUID } from '@opencrvs/commons/client'
 import { isExpectedAccessError, trpcClient } from '@client/v2-events/trpc'
 
 /* Must match the one defined src-sw.ts */
@@ -129,8 +129,15 @@ export async function getCache(cacheName: string) {
   return caches.open(cacheKey)
 }
 
-function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  return trpcClient.event.file.getPresignedUrl.query({ filePath })
+/**
+ * `eventId` names the record the file belongs to. The server needs it for
+ * files stored outside `events/{eventId}/`, e.g. a signature on an action.
+ */
+function getPresignedUrl(
+  filePath: DocumentPath | FullDocumentPath,
+  eventId?: UUID
+) {
+  return trpcClient.event.file.getPresignedUrl.query({ filePath, eventId })
 }
 
 /**
@@ -148,10 +155,10 @@ async function getCachedUrls(cache: Cache) {
  */
 export async function precacheFile(
   path: DocumentPath | FullDocumentPath,
-  cache?: Cache
+  { cache, eventId }: { cache?: Cache; eventId?: UUID } = {}
 ) {
   try {
-    const presignedUrl = (await getPresignedUrl(path)).presignedURL
+    const presignedUrl = (await getPresignedUrl(path, eventId)).presignedURL
     const file = await fetchFileFromUrl(presignedUrl, path)
 
     if (file) {
@@ -174,7 +181,8 @@ function toAbsoluteUrl(url: string) {
  * @see precacheFile for undiscriminated fetching and re-caching.
  */
 export async function precacheFiles(
-  paths: (DocumentPath | FullDocumentPath)[]
+  paths: (DocumentPath | FullDocumentPath)[],
+  eventId?: UUID
 ) {
   if (paths.length === 0) {
     return
@@ -196,5 +204,7 @@ export async function precacheFiles(
     return
   }
 
-  await Promise.all(missingFiles.map(async (path) => precacheFile(path, cache)))
+  await Promise.all(
+    missingFiles.map(async (path) => precacheFile(path, { cache, eventId }))
+  )
 }
