@@ -15,6 +15,7 @@ import {
   DocumentPath,
   EventDocumentOnlyLastAction,
   getUUID,
+  parseDocumentPath,
   UUID
 } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
@@ -39,7 +40,6 @@ import {
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
 import {
   userOnlyProcedure,
   router,
@@ -70,6 +70,7 @@ import {
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { presignFile, sweepUnreferencedFiles } from '@events/service/files'
+import { authorizeFileRead } from '@events/service/files/authorize'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -335,47 +336,27 @@ export const eventRouter = router({
   }),
   file: router({
     getPresignedUrl: userAndSystemProcedure
-      // eventId lives inside events/{eventId}/... paths already — a separate
-      // field would be redundant, and meaningless for users/ or bare-uuid paths
-      .input(z.object({ filePath: DocumentPath }))
+      .input(
+        z.object({
+          filePath: DocumentPath,
+          // The record a file outside events/{eventId}/ belongs to, e.g. a
+          // signature on one of its actions or a pre-2.0 attachment
+          eventId: UUID.optional()
+        })
+      )
       .output(z.object({ presignedURL: z.string() }))
       .query(async ({ input, ctx }) => {
-        const { filePath } = input
-        const [firstSegment, secondSegment] = filePath.split('/')
+        const file = parseDocumentPath(input.filePath)
 
-        /*
-         * Record ownership isn't known to documents-service, so it's checked
-         * here instead. `events/{eventId}/...` is record-bound; `users/{userId}/...`
-         * and bare `{uuid}.{ext}` (pre-2.0 legacy) aren't.
-         */
-        if (firstSegment === 'events') {
-          const eventId = UUID.safeParse(secondSegment).data
-
-          if (!eventId) {
-            throw new TRPCError({
-              code: 'BAD_REQUEST',
-              message: `Invalid event id in file path: ${filePath}`
-            })
-          }
-
-          /*
-           * No eventId input exists here for .use() to parse — it comes from
-           * the path above. The middleware is invoked directly instead, with
-           * just the fields it reads: ctx, getRawInput, next.
-           */
-          await middleware.canAccessEventWithScopes(['record.read'])({
-            ctx,
-            getRawInput: () => ({ eventId }),
-            next: (opts: unknown) => opts
-          } as unknown as MiddlewareOptions)
-        } else if (firstSegment !== 'users' && filePath.includes('/')) {
+        if (!file) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: `Unrecognized file path: ${filePath}`
+            message: `Unrecognized file path: ${input.filePath}`
           })
         }
 
-        return presignFile(filePath, ctx.token)
+        await authorizeFileRead({ file, eventId: input.eventId, ctx })
+        return presignFile(file.path, ctx.token)
       })
   }),
   actions: router({

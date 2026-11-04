@@ -10,12 +10,31 @@
  */
 import { TRPCError } from '@trpc/server'
 import {
+  ActionType,
   DocumentPath,
   encodeScope,
   generateUuid,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  UUID
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase,
+  TEST_SYSTEM_ID
+} from '@events/tests/utils'
+import { updateUserById } from '@events/storage/postgres/events/users'
+
+const readTennisClub = encodeScope({
+  type: 'record.read',
+  options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+})
+
+const presigned = { presignedURL: expect.any(String) }
+
+// The file path generated for every FILE field in test declarations
+const DECLARED_FILE = '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath
 
 describe('event.file.getPresignedUrl', () => {
   test('presigns a file under events/{eventId}/... when the caller has record.read on that event', async () => {
@@ -83,28 +102,6 @@ describe('event.file.getPresignedUrl', () => {
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 
-  test('presigns a users/{userId}/... path without requiring any record scope', async () => {
-    const { user } = await setupTestCase()
-    const client = createTestClient(user, [])
-
-    await expect(
-      client.event.file.getPresignedUrl({
-        filePath: `users/${user.id}/avatar.png` as DocumentPath
-      })
-    ).resolves.toMatchObject({ presignedURL: expect.any(String) })
-  })
-
-  test('presigns a bare {uuid}.ext legacy path without requiring any record scope', async () => {
-    const { user } = await setupTestCase()
-    const client = createTestClient(user, [])
-
-    await expect(
-      client.event.file.getPresignedUrl({
-        filePath: `${generateUuid()}.png` as DocumentPath
-      })
-    ).resolves.toMatchObject({ presignedURL: expect.any(String) })
-  })
-
   test('rejects an unrecognized file path shape', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [])
@@ -114,5 +111,201 @@ describe('event.file.getPresignedUrl', () => {
         filePath: 'some-other-folder/file.png' as DocumentPath
       })
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  test.each([
+    (id: string) => `users/../events/${id}/${generateUuid()}.png`,
+    (id: string) => `events/${generateUuid()}/../${id}/${generateUuid()}.png`,
+    (id: string) => `users/%2e%2e/events/${id}/${generateUuid()}.png`
+  ])('rejects a path that resolves to another key (%#)', async (toPath) => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+
+    await expect(
+      client.event.file.getPresignedUrl({
+        filePath: toPath(generateUuid()) as DocumentPath
+      })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  describe('user files', () => {
+    test("presigns the caller's own signature", async () => {
+      const { user } = await setupTestCase()
+      const signature = `users/${user.id}/${generateUuid()}.png`
+      await updateUserById(user.id as UUID, { signaturePath: signature })
+
+      await expect(
+        createTestClient(user, []).event.file.getPresignedUrl({
+          filePath: signature as DocumentPath
+        })
+      ).resolves.toMatchObject(presigned)
+    })
+
+    test("presigns another user's avatar without any scope", async () => {
+      const { user, users } = await setupTestCase()
+      const avatar = `users/${users[1].id}/${generateUuid()}.jpg`
+      await updateUserById(users[1].id as UUID, { profileImagePath: avatar })
+
+      await expect(
+        createTestClient(user, []).event.file.getPresignedUrl({
+          filePath: avatar as DocumentPath
+        })
+      ).resolves.toMatchObject(presigned)
+    })
+
+    test("presigns a migrated user's bare avatar without any scope", async () => {
+      const { user, users } = await setupTestCase()
+      const avatar = `${generateUuid()}.jpg`
+      await updateUserById(users[1].id as UUID, { profileImagePath: avatar })
+
+      await expect(
+        createTestClient(user, []).event.file.getPresignedUrl({
+          filePath: avatar as DocumentPath
+        })
+      ).resolves.toMatchObject(presigned)
+    })
+
+    test("rejects another user's signature without user.read", async () => {
+      const { user, users } = await setupTestCase()
+      const signature = `users/${users[1].id}/${generateUuid()}.png`
+      await updateUserById(users[1].id as UUID, { signaturePath: signature })
+
+      await expect(
+        createTestClient(user, []).event.file.getPresignedUrl({
+          filePath: signature as DocumentPath
+        })
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+
+    test("presigns another user's signature with user.read", async () => {
+      const { user, users } = await setupTestCase()
+      const signature = `users/${users[1].id}/${generateUuid()}.png`
+      await updateUserById(users[1].id as UUID, { signaturePath: signature })
+
+      await expect(
+        createTestClient(user, [
+          encodeScope({ type: 'user.read' })
+        ]).event.file.getPresignedUrl({ filePath: signature as DocumentPath })
+      ).resolves.toMatchObject(presigned)
+    })
+
+    test("rejects a user's avatar for a system client", async () => {
+      const { users } = await setupTestCase()
+      const avatar = `users/${users[1].id}/${generateUuid()}.jpg`
+      await updateUserById(users[1].id as UUID, { profileImagePath: avatar })
+
+      await expect(
+        createSystemTestClient(TEST_SYSTEM_ID, [
+          readTennisClub
+        ]).event.file.getPresignedUrl({ filePath: avatar as DocumentPath })
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+
+    test('rejects a users/ path no user owns', async () => {
+      const { user } = await setupTestCase()
+
+      await expect(
+        createTestClient(user, []).event.file.getPresignedUrl({
+          filePath: `users/${user.id}/${generateUuid()}.png` as DocumentPath
+        })
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+  })
+
+  describe('files referenced by a record (eventId)', () => {
+    test("presigns the creator's signature via eventId, without user.read", async () => {
+      const { user, users, generator } = await setupTestCase()
+      const event = await createTestClient(user).event.create(
+        generator.event.create()
+      )
+      const reader = createTestClient(users[1], [readTennisClub])
+
+      await expect(
+        reader.event.file.getPresignedUrl({
+          filePath: user.signature,
+          eventId: event.id
+        })
+      ).resolves.toMatchObject(presigned)
+    })
+
+    test("rejects the creator's signature without eventId or user.read", async () => {
+      const { user, users, generator } = await setupTestCase()
+      await createTestClient(user).event.create(generator.event.create())
+      const reader = createTestClient(users[1], [readTennisClub])
+
+      await expect(
+        reader.event.file.getPresignedUrl({ filePath: user.signature })
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+
+    test("rejects the creator's signature when record.read is for another event type", async () => {
+      const { user, users, generator } = await setupTestCase()
+      const event = await createTestClient(user).event.create(
+        generator.event.create()
+      )
+      const reader = createTestClient(users[1], [
+        encodeScope({ type: 'record.read', options: { event: ['birth'] } })
+      ])
+
+      await expect(
+        reader.event.file.getPresignedUrl({
+          filePath: user.signature,
+          eventId: event.id
+        })
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+
+    test('presigns a bare attachment the record declares, via eventId', async () => {
+      const { user, users, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
+      const reader = createTestClient(users[1], [readTennisClub])
+
+      await expect(
+        reader.event.file.getPresignedUrl({
+          filePath: DECLARED_FILE,
+          eventId: event.id
+        })
+      ).resolves.toMatchObject(presigned)
+    })
+
+    test('rejects a bare path the record does not reference', async () => {
+      const { user, users, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
+      const reader = createTestClient(users[1], [readTennisClub])
+
+      await expect(
+        reader.event.file.getPresignedUrl({
+          filePath: `${generateUuid()}.png` as DocumentPath,
+          eventId: event.id
+        })
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+
+    test('presigns a referenced bare attachment for a system client', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
+
+      await expect(
+        createSystemTestClient(TEST_SYSTEM_ID, [
+          readTennisClub
+        ]).event.file.getPresignedUrl({
+          filePath: DECLARED_FILE,
+          eventId: event.id
+        })
+      ).resolves.toMatchObject(presigned)
+    })
+  })
+
+  test('rejects an unowned bare path without eventId', async () => {
+    const { user } = await setupTestCase()
+
+    await expect(
+      createTestClient(user, []).event.file.getPresignedUrl({
+        filePath: `${generateUuid()}.png` as DocumentPath
+      })
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
   })
 })

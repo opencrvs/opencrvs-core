@@ -520,3 +520,19 @@ export async function activateUserWithCredentials(
       .execute()
   })
 }
+
+/**
+ * Finds the user whose avatar or signature is stored under `path`.
+ */
+export async function getUserByFilePath(path: string) {
+  return getClient()
+    .selectFrom('users')
+    .select(['users.id', 'users.signaturePath', 'users.profileImagePath'])
+    .where((eb) =>
+      eb.or([
+        eb('users.signaturePath', '=', path),
+        eb('users.profileImagePath', '=', path)
+      ])
+    )
+    .executeTakeFirst()
+}
