@@ -347,6 +347,13 @@ elastalert:
   image:
     repository: jertel/elastalert2
     tag: 2.25.0
+  network_policy:
+    # ElastAlert listens on no port and has no ingress, it only calls out: to
+    # Elasticsearch, and to its notification target (countryconfig /email for
+    # post2, or an SMTP server for email). The target is environment specific and
+    # can be in another namespace (countryconfig usually is) or on the public
+    # internet (SMTP), so egress is not restricted.
+    egress_mode: full
   # Create configmap with custom rules for elastalert
   # custom_rules_configmap:
   env:
