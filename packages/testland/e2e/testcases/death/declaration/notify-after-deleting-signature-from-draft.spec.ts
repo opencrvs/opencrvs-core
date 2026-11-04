@@ -85,32 +85,24 @@ test('Hospital official notifies a death after deleting a previously persisted s
     await expect(page.getByRole('dialog')).not.toBeVisible()
   })
 
-  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
-  await test.step.skip(
-    'Save & Exit to persist the signature in a draft',
-    async () => {
-      await page.getByRole('button', { name: 'Action' }).click()
-      await page.getByText('Save & Exit', { exact: true }).click()
+  await test.step('Save & Exit to persist the signature in a draft', async () => {
+    await page.getByRole('button', { name: 'Action' }).click()
+    await page.getByText('Save & Exit', { exact: true }).click()
 
-      const draftResponse = page.waitForResponse(
-        (res) => res.url().includes('event.draft.create') && res.ok()
-      )
+    const draftResponse = page.waitForResponse(
+      (res) => res.url().includes('event.draft.create') && res.ok()
+    )
 
-      await page.getByRole('button', { name: 'Confirm' }).click()
-      await draftResponse
-    }
-  )
+    await page.getByRole('button', { name: 'Confirm' }).click()
+    await draftResponse
+  })
 
-  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
-  await test.step.skip(
-    'Reopen the draft from the Drafts workqueue',
-    async () => {
-      await page.getByRole('button', { name: 'Drafts' }).click()
-      await getRowByTitle(page, formattedDeceasedName)
-        .getByRole('button', { name: 'Update' })
-        .click()
-    }
-  )
+  await test.step('Reopen the draft from the Drafts workqueue', async () => {
+    await page.getByRole('button', { name: 'Drafts' }).click()
+    await getRowByTitle(page, formattedDeceasedName)
+      .getByRole('button', { name: 'Update' })
+      .click()
+  })
 
   await test.step('Delete the persisted signature', async () => {
     await page.getByRole('button', { name: 'Delete', exact: true }).click()

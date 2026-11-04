@@ -69,8 +69,7 @@ test.describe('Draft birth declarations show the Record tab to their own creator
     await page.close()
   })
 
-  // @TODO: Saving a notification as a draft is not supported yet, see https://github.com/opencrvs/opencrvs-core/issues/14036
-  test.skip('Hospital Official sees the Record tab on their own draft after selecting their health facility', async () => {
+  test('Hospital Official sees the Record tab on their own draft after selecting their health facility', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
     // Hospital officials can only notify, so they get the notify flow
     await startBirthNotification(page)

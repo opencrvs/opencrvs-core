@@ -29,7 +29,10 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import {
+  canSaveDraft,
+  useDrafts
+} from '@client/v2-events/features/drafts/useDrafts'
 import { isTemporaryId, recordAnchorDate } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -134,11 +137,14 @@ export function ActionFlowPages({
     <FormLayout
       backAction={backAction}
       route={route}
-      onSaveAndExit={async () =>
-        handleSaveAndExit(() => {
-          drafts.submitLocalDraft()
-          closeActionView(searchParams.backTo)
-        })
+      onSaveAndExit={
+        canSaveDraft(event)
+          ? async () =>
+              handleSaveAndExit(() => {
+                drafts.submitLocalDraft()
+                closeActionView(searchParams.backTo)
+              })
+          : undefined
       }
     >
       {modal}

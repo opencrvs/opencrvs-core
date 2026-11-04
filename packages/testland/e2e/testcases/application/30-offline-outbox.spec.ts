@@ -16,7 +16,8 @@ import {
   formatName,
   getRandomDate,
   goToSection,
-  login
+  login,
+  waitForActionResponses
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
@@ -45,13 +46,14 @@ test('30: Validate user can send multiple complete and incomplete records offlin
     await goToSection(page, 'review')
     await page.getByTestId('exit-button').click()
 
-    // Going offline before the discarded draft is deleted would queue the
-    // deletion in the outbox, next to the declarations this test expects there
-    const deleteResponse = page.waitForResponse(
-      (res) => res.url().includes('event.delete') && res.ok()
+    // Exit's delete must settle, including its drafts refetch, before going
+    // offline, or 30.4 finds it in the outbox.
+    await waitForActionResponses(page, ['event.delete'], () =>
+      page.getByRole('button', { name: 'Confirm', exact: true }).click()
     )
-    await page.getByRole('button', { name: 'Confirm', exact: true }).click()
-    await deleteResponse
+    await expect(page.getByRole('button', { name: 'Outbox' })).toHaveText(
+      'Outbox'
+    )
 
     await page.context().setOffline(true)
   })

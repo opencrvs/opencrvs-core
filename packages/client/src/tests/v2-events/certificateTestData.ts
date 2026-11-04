@@ -148,7 +148,7 @@ export const tennisClubMembershipDuplicateCertificate: CertificateTemplateConfig
         type: 'SHOW',
         conditional: event
           .hasAction('PRINT_CERTIFICATE')
-          .withFields({ templateId: 'tennis-club-membership-certificate' })
+          .withTemplate('tennis-club-membership-certificate')
           .minCount(1)
       }
     ]

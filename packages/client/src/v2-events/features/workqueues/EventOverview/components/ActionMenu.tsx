@@ -42,7 +42,7 @@ import { ActionMenuItem } from '../../Actions/utils'
 const DEFAULT_ACTION_ORDER = [
   ActionType.ASSIGN,
   ActionType.REGISTER,
-  ActionType.DECLARE,
+  ClientSpecificAction.CONTINUE_DRAFT,
   ActionType.EDIT,
   ActionType.REJECT,
   ActionType.ARCHIVE,
@@ -81,6 +81,11 @@ export function sortActions(
     // at the same time, sort it at the same position as `REQUEST_CORRECTION`.
     if (item.type === ClientSpecificAction.REVIEW_CORRECTION_REQUEST) {
       return actionOrder.indexOf(ActionType.REQUEST_CORRECTION)
+    }
+
+    // `CONTINUE_DRAFT` stands in for `DECLARE` in the menu, so it takes its configured position
+    if (item.type === ClientSpecificAction.CONTINUE_DRAFT) {
+      return actionOrder.indexOf(ActionType.DECLARE)
     }
 
     if ('customActionType' in item && item.customActionType) {
