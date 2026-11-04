@@ -13,15 +13,6 @@ import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
 
 jest.setMock('node-fetch', { default: fetch })
-jest.mock(
-  'file-type',
-  () => ({
-    fileTypeFromBuffer: jest
-      .fn()
-      .mockResolvedValue({ ext: 'png', mime: 'image/png' })
-  }),
-  { virtual: true }
-)
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
 process.env.NODE_ENV = 'TEST'
