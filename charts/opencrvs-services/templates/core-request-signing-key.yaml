@@ -4,9 +4,11 @@ its public key at /.well-known/jwks.json. A plain resource rather than a
 pre-install hook, so that an upgrade from a release without it creates it; the
 lookup keeps the key across upgrades. `helm template` and GitOps renders
 cannot look up, so they get a new key on every render; pin the key with
-certs.request_signing_key_file there.
+certs.request_signing_key_file there. The name does not include the release:
+jobs rendered on their own with `helm template --show-only` (e2e's data seed)
+get the default release name and must still find the secret.
 */ -}}
-{{- $name := printf "%s-core-request-signing-key" .Release.Name }}
+{{- $name := "opencrvs-core-request-signing-key" }}
 {{- $existing := lookup "v1" "Secret" .Release.Namespace $name }}
 ---
 apiVersion: v1

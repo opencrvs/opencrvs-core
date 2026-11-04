@@ -98,7 +98,7 @@ spec:
           name: private-key
         - name: core-request-signing-key
           secret:
-            secretName: {{ .Release.Name }}-core-request-signing-key
+            secretName: opencrvs-core-request-signing-key
 
 {{- include "service-account-helper" (dict "service_name" "auth" "Values" .Values) }}
 

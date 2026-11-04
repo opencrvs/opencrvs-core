@@ -78,7 +78,7 @@ spec:
                 path: public-key.pem
         - name: core-request-signing-key
           secret:
-            secretName: {{ .Release.Name }}-core-request-signing-key
+            secretName: opencrvs-core-request-signing-key
 
 {{- include "service-account-helper" (dict "service_name" "events" "Values" .Values) }}
 
