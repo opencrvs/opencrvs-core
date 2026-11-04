@@ -10,11 +10,13 @@
  */
 import { TRPCError } from '@trpc/server'
 import {
+  DocumentPath,
   getFilePathsFromEvent,
   ParsedDocumentPath,
   TokenUserType,
   UUID
 } from '@opencrvs/commons'
+import { ActionDocument, EventDocument } from '@opencrvs/commons/events'
 import { TrpcContext } from '@events/context'
 import {
   canAccessEventWithScopes,
@@ -22,6 +24,7 @@ import {
 } from '@events/router/middleware'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
+import { getDraftsByEventIdAndUserId } from '@events/storage/postgres/events/drafts'
 import { getUserByFilePath } from '@events/storage/postgres/events/users'
 
 /*
@@ -73,27 +76,61 @@ async function canReadUserFile(ctx: TrpcContext, file: ParsedDocumentPath) {
 }
 
 /**
- * A file the record names, either as a field value or as the signature of the
- * user who performed one of its actions.
+ * The caller's own unsubmitted actions on the record. A file uploaded into a
+ * draft is named only there until the action is submitted.
  */
-async function isReferencedByEvent(eventId: UUID, file: ParsedDocumentPath) {
-  const event = await getEventById(eventId)
+async function getOwnDraftActions(ctx: TrpcContext, eventId: UUID) {
+  if (ctx.user.type !== TokenUserType.enum.user) {
+    return []
+  }
 
+  const drafts = await getDraftsByEventIdAndUserId(eventId, ctx.user.id)
+
+  return drafts
+    .map((draft) => ActionDocument.safeParse({ ...draft.action, id: draft.id }))
+    .flatMap((parsed) => (parsed.success ? [parsed.data] : []))
+}
+
+/**
+ * Whether the record's actions name the file, either as a field value or as
+ * the signature of the user who performed one of them.
+ */
+function namesFile(event: EventDocument, path: DocumentPath) {
   return (
-    getFilePathsFromEvent(event).includes(file.path) ||
+    getFilePathsFromEvent(event).includes(path) ||
     event.actions.some(
       (action) =>
-        'createdBySignature' in action &&
-        action.createdBySignature === file.path
+        'createdBySignature' in action && action.createdBySignature === path
     )
   )
+}
+
+/**
+ * A file the record names, in its submitted actions or the caller's drafts.
+ */
+async function isReferencedByEvent(
+  ctx: TrpcContext,
+  eventId: UUID,
+  file: ParsedDocumentPath
+) {
+  const event = await getEventById(eventId)
+
+  // Most files are in submitted actions, so drafts are only queried when not
+  if (namesFile(event, file.path)) {
+    return true
+  }
+
+  const draftActions = await getOwnDraftActions(ctx, eventId)
+
+  return namesFile({ ...event, actions: draftActions }, file.path)
 }
 
 /**
  * Throws unless the caller may read `file`. documents-service signs whatever
  * it's given, so this is the only check on file reads.
  *
- * - `events/{eventId}/...` needs record.read on that event.
+ * - `events/{eventId}/...` needs record.read on that event, which must
+ *   reference the file.
  * - Any other file must belong to a user the caller may read it from, or be
  *   referenced by the record `eventId` names, which the caller must be able
  *   to read.
@@ -107,9 +144,15 @@ export async function authorizeFileRead({
   eventId?: UUID
   ctx: TrpcContext
 }): Promise<void> {
-  // Record attachment: allowed if the caller can read the event in its path
+  // Record attachment: the caller must read the event in its path (throws if not)
   if (file.kind === 'event') {
-    return assertCanReadEvent(ctx, file.eventId)
+    await assertCanReadEvent(ctx, file.eventId)
+    // ...and the event, or the caller's draft of it, must reference this file
+    if (await isReferencedByEvent(ctx, file.eventId, file)) {
+      return
+    }
+
+    throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
   // User file: allowed if it's an avatar, the caller's own, or a user they may read
@@ -121,7 +164,7 @@ export async function authorizeFileRead({
   if (eventId) {
     await assertCanReadEvent(ctx, eventId)
     // ...and that record must reference this exact file
-    if (await isReferencedByEvent(eventId, file)) {
+    if (await isReferencedByEvent(ctx, eventId, file)) {
       return
     }
   }
