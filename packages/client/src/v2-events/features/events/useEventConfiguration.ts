@@ -94,7 +94,7 @@ export function useEventConfiguration(eventIdentifier: string): {
  */
 export function useEventConfigurationForRecord(record: {
   type: string
-  configVersionId?: string
+  configVersionId: string
 }): { eventConfiguration: EventConfig } {
   return {
     eventConfiguration: getEventConfigForRecord(

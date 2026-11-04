@@ -196,7 +196,7 @@ describe('defineConfig()', () => {
       ...versionFields
     } = tennisClubMembershipEvent
 
-    const v1 = { ...versionFields, id: 'initial' }
+    const v1 = { ...versionFields, id: INITIAL_EVENT_CONFIG_VERSION_ID }
     const v2 = { ...versionFields, id: 'v2', effectiveFrom: '2027-03-01' }
 
     it('should accept two versions with distinct ids and dates', () => {
@@ -207,7 +207,10 @@ describe('defineConfig()', () => {
         versions: [v1, v2]
       })
 
-      expect(config.versions.map(({ id }) => id)).toEqual(['initial', 'v2'])
+      expect(config.versions.map(({ id }) => id)).toEqual([
+        INITIAL_EVENT_CONFIG_VERSION_ID,
+        'v2'
+      ])
       expect(config.versions[1].effectiveFrom).toBe('2027-03-01')
       expect(config).toMatchObject({ id: eventId, label, advancedSearch })
     })
@@ -227,7 +230,7 @@ describe('defineConfig()', () => {
           id: eventId,
           label,
           advancedSearch,
-          versions: [v1, { ...v2, id: 'initial' }]
+          versions: [v1, { ...v2, id: INITIAL_EVENT_CONFIG_VERSION_ID }]
         })
       ).toThrow(
         `Event '${eventId}' has more than one version with id 'initial'. Each version must have a different id.`

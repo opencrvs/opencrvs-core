@@ -361,11 +361,11 @@ export function resolveEffectiveVersion(
  */
 export function findEventConfigForRecord(
   config: VersionedEventConfig,
-  record: { configVersionId?: string }
+  record: { configVersionId: string }
 ): EventConfig | undefined {
-  // Records indexed or cached before versioning have no stamp
-  const versionId = record.configVersionId ?? INITIAL_EVENT_CONFIG_VERSION_ID
-  const version = config.versions.find(({ id }) => id === versionId)
+  const version = config.versions.find(
+    ({ id }) => id === record.configVersionId
+  )
   return version && toEventConfig(config, version)
 }
 
@@ -375,7 +375,7 @@ export function findEventConfigForRecord(
  */
 export function getEventConfigForRecord(
   config: VersionedEventConfig,
-  record: { configVersionId?: string }
+  record: { configVersionId: string }
 ): EventConfig {
   return getOrThrow(
     findEventConfigForRecord(config, record),

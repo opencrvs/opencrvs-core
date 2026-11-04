@@ -37,15 +37,6 @@ const config: VersionedEventConfig = {
   ]
 }
 
-// A version added for legacy records takes effect before the initial one.
-const configWithLegacyVersion: VersionedEventConfig = {
-  ...eventLevel,
-  versions: [
-    { ...base, id: 'initial', effectiveFrom: '2000-01-01' },
-    { ...base, id: 'legacy-1980', effectiveFrom: '1980-01-01' }
-  ]
-}
-
 describe('resolveEffectiveVersion()', () => {
   it('returns the version with the latest effectiveFrom not after the date', () => {
     expect(
@@ -119,12 +110,6 @@ describe('getEventConfigForRecord()', () => {
     )
   })
 
-  it("uses version 'initial' for a record indexed before versioning, even when an earlier version is added", () => {
-    expect(getEventConfigForRecord(configWithLegacyVersion, {})).toBe(
-      getEventConfigOfVersion(configWithLegacyVersion, 'initial')
-    )
-  })
-
   it('returns the same object for the same version, so caches keyed on the configuration hit', () => {
     const record = { configVersionId: 'v2' }
     expect(getEventConfigForRecord(config, record)).toBe(
@@ -137,12 +122,6 @@ describe('findEventConfigForRecord()', () => {
   it('finds the version the record is stamped with', () => {
     expect(findEventConfigForRecord(config, { configVersionId: 'v1' })).toBe(
       getEventConfigOfVersion(config, 'v1')
-    )
-  })
-
-  it("finds version 'initial' for a record indexed before versioning", () => {
-    expect(findEventConfigForRecord(configWithLegacyVersion, {})).toBe(
-      getEventConfigOfVersion(configWithLegacyVersion, 'initial')
     )
   })
 
