@@ -116,7 +116,13 @@ export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
-  fieldType: z.literal('field')
+  fieldType: z.literal('field'),
+  defaultValue: z
+    .union([z.boolean(), z.string(), z.number()])
+    .optional()
+    .describe(
+      `Value the field opens with in advanced search. Omitted or true uses the declaration form's defaultValue, false opens the field empty, and any other value opens it with that value. Only text, number and date fields take a value; every other field type, and date fields searched as a range, only accept true or false.`
+    )
 })
 
 /**

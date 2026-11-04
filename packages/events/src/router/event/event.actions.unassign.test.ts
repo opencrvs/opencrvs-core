@@ -163,7 +163,12 @@ test(`Can unassign record that is assigned to someone else, if user has unassign
         event: ['birth', 'death', 'tennis-club-membership']
       }
     }),
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
   const { user: user2 } = await setupTestCase()
   const client2 = createTestClient(user2)
@@ -194,7 +199,12 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
         event: ['birth', 'death', 'tennis-club-membership']
       }
     }),
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const originalEvent = await client.event.create(generator.event.create())
@@ -247,7 +257,12 @@ test(`${ActionType.UNASSIGN} is idempotent`, async () => {
         event: ['birth', 'death', 'tennis-club-membership']
       }
     }),
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const originalEvent = await client.event.create(generator.event.create())

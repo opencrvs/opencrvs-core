@@ -13,6 +13,8 @@ import {
   ConditionalType,
   defineConfig,
   or,
+  toNotificationForm,
+  toNotificationReview,
   user
 } from '@opencrvs/toolkit/events'
 import {
@@ -119,6 +121,8 @@ export const adoptionEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.adoption.action.notify.label'
       },
+      notificationForm: toNotificationForm(ADOPTION_DECLARATION_FORM),
+      review: toNotificationReview(ADOPTION_DECLARATION_REVIEW),
       form: [
         {
           id: 'comments',

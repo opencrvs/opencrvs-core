@@ -448,6 +448,7 @@ event.tennis-club-membership.action.form.section.passportDetails.label,Field for
 event.tennis-club-membership.action.form.section.refugeeNumberDetails.label,Field for entering Refugee Number details,Refugee Number Details,Refugee Number Details
 event.tennis-club-membership.action.form.section.relationshipToMember.label,This is the label for the relationship to member field,Relationship to Member,Relationship to Member
 event.tennis-club-membership.action.form.section.signedAffidavit.label,This is the label for uploading a signed affidavit,Signed Affidavit (Optional),Signed Affidavit (Optional)
+event.tennis-club-membership.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.tennis-club-membership.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.tennis-club-membership.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
 event.tennis-club-membership.action.read.label,Title of the review page,Read,Lire

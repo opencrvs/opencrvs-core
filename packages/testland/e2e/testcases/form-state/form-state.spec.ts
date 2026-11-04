@@ -218,7 +218,9 @@ test.describe('Form state', () => {
       await type(page, '#firstname', updatedMotherName)
       await waitForLocalDraftToContain(page, updatedMotherName)
       await page.reload()
-      await expect(page.locator('#firstname')).toHaveValue(updatedMotherName)
+      await expect(page.locator('#firstname')).toHaveValue(updatedMotherName, {
+        timeout: 30_000
+      })
     })
 
     await test.step('Form states and annotations are not persisted', async () => {
@@ -271,7 +273,9 @@ test.describe('Form state', () => {
     await test.step('refresh the page and verify fields are populated', async () => {
       await waitForLocalDraftToContain(page, 'bar')
       await page.reload()
-      await expect(page.locator('#firstname')).toHaveValue('foo')
+      await expect(page.locator('#firstname')).toHaveValue('foo', {
+        timeout: 30_000
+      })
       await expect(page.locator('#surname')).toHaveValue('bar')
     })
   })

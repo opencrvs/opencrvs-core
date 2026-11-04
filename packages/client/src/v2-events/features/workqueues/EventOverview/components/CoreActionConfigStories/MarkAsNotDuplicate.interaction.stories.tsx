@@ -18,6 +18,7 @@ import {
   createPrng,
   flag,
   generateActionDocument,
+  generateActionDocuments,
   generateUuid,
   not,
   tennisClubMembershipEvent,
@@ -96,7 +97,7 @@ const actions = [
     configuration,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration,
     action: ActionType.DECLARE,
     defaults: {

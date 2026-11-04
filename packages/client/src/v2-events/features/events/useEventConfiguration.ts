@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { EventConfig } from '@opencrvs/commons/client'
+import { EventConfig, resolveEventConfig } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 
 /**
@@ -18,19 +19,22 @@ import { useTRPC } from '@client/v2-events/trpc'
 const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
 
 /**
- * Fetches configured events and finds a matching event
- * @returns a list of event configurations
+ * Fetches configured events
+ * @returns a list of event configurations, each at the version that applies (see `resolveEventConfig`)
  */
 export function useEventConfigurations() {
   const trpc = useTRPC()
 
-  const config = useSuspenseQuery({
+  const versionedConfigs = useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
     queryKey: trpc.event.config.get.queryKey(),
     staleTime: import.meta.env.PROD ? EVENT_CONFIGURATION_STALE_TIME_MS : 0
   }).data
 
-  return config
+  return useMemo(
+    () => versionedConfigs.map(resolveEventConfig),
+    [versionedConfigs]
+  )
 }
 
 /**

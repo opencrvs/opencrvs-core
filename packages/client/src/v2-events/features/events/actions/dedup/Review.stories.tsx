@@ -14,6 +14,7 @@ import {
   ActionType,
   createPrng,
   generateActionDocument,
+  generateActionDocuments,
   generateUuid,
   tennisClubMembershipEvent,
   generateTrackingId,
@@ -123,7 +124,7 @@ const actions = [
     configuration: overriddenEventConfig,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
@@ -133,7 +134,7 @@ const actions = [
       }
     }
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.REGISTER,
     defaults: {
@@ -164,8 +165,9 @@ const mockOriginalEvent = {
 const mockDuplicateEvent = {
   trackingId: duplicates[0].trackingId,
   type: overriddenEventConfig.id,
-  actions: actions.slice(0, 2).concat(
-    generateActionDocument({
+  // CREATE and the Requested + Accepted DECLARE pair
+  actions: actions.slice(0, 3).concat(
+    generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.REGISTER,
       defaults: {

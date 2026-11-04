@@ -29,9 +29,13 @@ import {
   deepMerge,
   encodeScope,
   getDeclarationFields,
-  withDeclaration
+  withDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
@@ -281,7 +285,10 @@ describe('Action updates', () => {
 
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
+        return HttpResponse.json([
+          toVersionedEventConfig(multiFileConfig),
+          versionedTennisClubMembershipEvent
+        ])
       }),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         fileExistsMock(

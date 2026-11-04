@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
+import {
+  toNotificationForm,
+  toNotificationReview
+} from '../events/toNotificationForm'
 import { ActionType, DeclarationActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
@@ -24,7 +29,7 @@ import {
 import { Clause, EventConfig } from '../events'
 import { and, field as dedupField } from '../events/deduplication'
 
-export const tennisClubMembershipEvent = defineConfig({
+export const versionedTennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
   declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
@@ -85,6 +90,8 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.notify.label'
       },
+      notificationForm: toNotificationForm(TENNIS_CLUB_DECLARATION_FORM),
+      review: toNotificationReview(TENNIS_CLUB_DECLARATION_REVIEW),
       flags: [
         {
           id: 'health-worker-notified',
@@ -400,6 +407,11 @@ export const tennisClubMembershipEvent = defineConfig({
     }
   ]
 })
+
+/** The configuration of the first version of `versionedTennisClubMembershipEvent`. */
+export const tennisClubMembershipEvent = resolveEventConfig(
+  versionedTennisClubMembershipEvent
+)
 
 /** @knipignore */
 export function tennisClubMembershipEventWithDedupCheck(

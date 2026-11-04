@@ -24,6 +24,7 @@ import {
   EventDocument,
   FieldType,
   generateActionDocument,
+  generateActionDocuments,
   generateRandomDatetime,
   getCurrentEventState,
   getUUID,
@@ -31,7 +32,8 @@ import {
   TestUserRole,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -130,7 +132,7 @@ const registeredEvent: EventDocument = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -141,7 +143,7 @@ const registeredEvent: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.REGISTER,
       defaults: {
@@ -153,7 +155,7 @@ const registeredEvent: EventDocument = {
       }
     }),
 
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.EDIT,
       defaults: {
@@ -218,7 +220,7 @@ export const ShowsEventDependentFieldInUpdateDetails: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [eventConfig]
+            return [toVersionedEventConfig(eventConfig)]
           }),
           tRPCMsw.event.get.query(() => {
             return registeredEvent

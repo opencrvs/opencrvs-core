@@ -9,9 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Draft, DraftInput, UUID } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import {
+  DraftInput,
+  EventDocument,
+  EventStatus,
+  getStatusFromActions,
+  RemoteDraft,
+  UUID
+} from '@opencrvs/commons'
 import { UserContext } from '@opencrvs/commons'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+
+/**
+ * Drafts are only saved on a new record, before it is notified or declared.
+ * See `DraftInput` for why.
+ */
+export function throwConflictIfDraftNotAllowed(event: EventDocument) {
+  const status = getStatusFromActions(event.actions)
+
+  if (status !== EventStatus.enum.CREATED) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Drafts can only be saved on a record that has not been notified or declared yet. The record is ${status}.`
+    })
+  }
+}
 
 export const createDraft = async (
   input: DraftInput,
@@ -24,7 +47,7 @@ export const createDraft = async (
     user: UserContext
     transactionId: string
   }
-): Promise<Draft> => {
+): Promise<RemoteDraft> => {
   const draft = await draftsRepo.createDraft({
     eventId,
     transactionId,
