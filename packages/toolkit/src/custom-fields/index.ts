@@ -26,7 +26,7 @@
 import {
   CUSTOM_FIELD_EXTERNALS_GLOBAL,
   CUSTOM_FIELD_EXTERNAL_MODULES
-} from '@opencrvs/commons/events/CustomFieldExternals'
+} from '@opencrvs/commons/events'
 
 export interface CustomFieldInputProps<
   Value = unknown,
