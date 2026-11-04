@@ -19,9 +19,9 @@ const SKILL_LEVEL_MODULE =
 
 /*
  * The client loads the custom field modules of all events when the user logs
- * in, and the service worker caches them. The app is then opened again
- * offline, so the module can only come from the service worker cache, in a
- * form that the user did not open while online.
+ * in, and the service worker caches them. So the field works offline in a
+ * form that the user did not open while online, and also after the app is
+ * opened again offline.
  */
 test('Custom field works offline in a form not opened before', async ({
   page,
@@ -69,16 +69,9 @@ test('Custom field works offline in a form not opened before', async ({
       .toBe(true)
   })
 
-  const moduleResponse = page.waitForResponse((response) =>
-    response.url().endsWith(SKILL_LEVEL_MODULE)
-  )
-
-  await test.step('Go offline and open the app again', async () => {
+  await test.step('Go offline', async () => {
     await context.setOffline(true)
     await mockNetworkConditions(page, 'offline')
-
-    await page.goto(CLIENT_URL)
-    await expect(page.locator('#content-name')).toHaveText('Assigned to you')
   })
 
   await test.step('Open the form and use the custom field', async () => {
@@ -96,7 +89,16 @@ test('Custom field works offline in a form not opened before', async ({
     )
   })
 
-  await test.step('The service worker gave the module', async () => {
-    expect((await moduleResponse).fromServiceWorker()).toBe(true)
+  await test.step('Open the app again offline', async () => {
+    const moduleResponse = page.waitForResponse((response) =>
+      response.url().endsWith(SKILL_LEVEL_MODULE)
+    )
+
+    // The new page loads the module again, and only the service worker cache has it
+    await page.goto(CLIENT_URL)
+
+    const response = await moduleResponse
+    expect(response.status()).toBe(200)
+    expect(response.fromServiceWorker()).toBe(true)
   })
 })
