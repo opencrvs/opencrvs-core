@@ -195,47 +195,6 @@ type ActionProcedure = {
   }>
 }
 
-export async function defaultRequestHandler(
-  input: ActionInputWithType,
-  user: TrpcUserContext,
-  token: TokenWithBearer,
-  event: EventDocument,
-  configuration: EventConfig,
-  // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
-  actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
-) {
-  // Only one action request on an event runs at a time. Without the lock, two requests that
-  // arrive together could both pass the check below before either has stored its requested
-  // action, and both would reach the country config.
-  const locked = await withEventLock(input.eventId, async () =>
-    requestAction(
-      input,
-      user,
-      token,
-      event,
-      configuration,
-      actionConfirmationResponseSchema
-    )
-  )
-
-  if (!locked.acquired) {
-    logger.warn(
-      {
-        eventId: input.eventId,
-        actionType: input.type,
-        transactionId: input.transactionId
-      },
-      'Action request refused: another action request on the event is in progress'
-    )
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: `Action '${input.type}' cannot be requested while another action request on the event is in progress`
-    })
-  }
-
-  return locked.result
-}
-
 async function requestAction(
   input: ActionInputWithType,
   user: TrpcUserContext,
@@ -360,6 +319,47 @@ async function requestAction(
     },
     { event, user, token, status, configuration }
   )
+}
+
+export async function defaultRequestHandler(
+  input: ActionInputWithType,
+  user: TrpcUserContext,
+  token: TokenWithBearer,
+  event: EventDocument,
+  configuration: EventConfig,
+  // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
+  actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
+) {
+  // Only one action request on an event runs at a time. Without the lock, two requests that
+  // arrive together could both pass the check below before either has stored its requested
+  // action, and both would reach the country config.
+  const locked = await withEventLock(input.eventId, async () =>
+    requestAction(
+      input,
+      user,
+      token,
+      event,
+      configuration,
+      actionConfirmationResponseSchema
+    )
+  )
+
+  if (!locked.acquired) {
+    logger.warn(
+      {
+        eventId: input.eventId,
+        actionType: input.type,
+        transactionId: input.transactionId
+      },
+      'Action request refused: another action request on the event is in progress'
+    )
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${input.type}' cannot be requested while another action request on the event is in progress`
+    })
+  }
+
+  return locked.result
 }
 
 /**
