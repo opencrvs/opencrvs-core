@@ -288,17 +288,6 @@ describe('defineConfig()', () => {
       ).not.toThrow()
     })
 
-    it("should reject versions without 'initial', which records created before versioning use", () => {
-      expect(() =>
-        defineConfig({
-          id: eventId,
-          label,
-          advancedSearch,
-          versions: [{ ...v1, id: 'v1' }, v2]
-        })
-      ).toThrow(`Event '${eventId}' has no version 'initial'.`)
-    })
-
     it('should report an invalid version under its index', () => {
       const result = VersionedEventConfig.safeParse({
         id: eventId,

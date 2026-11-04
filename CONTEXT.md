@@ -29,7 +29,7 @@ One version of an event configuration, taking effect at midnight in the country 
 _Avoid_: form version, revision
 
 **Initial version**:
-The configuration version every record created before versioning belongs to. An event configuration always keeps it.
+The single configuration version of an event configured without versions. Every record created before versioning belongs to it.
 _Avoid_: default version, legacy version, v1
 
 **Stamped version**:
