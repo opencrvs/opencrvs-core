@@ -11,11 +11,6 @@
 
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 
-// Core's requests carry no token; country config uses its own system client.
-vi.mock('../core-api-token', () => ({
-  getCoreApiToken: vi.fn().mockResolvedValue('mock-token')
-}))
-
 vi.mock('node-fetch', () => {
   return {
     default: vi.fn().mockResolvedValue({
@@ -55,7 +50,7 @@ vi.mock('nodemailer', () => {
 })
 
 import { createServer } from '../../index'
-import { asCore, publishCoreKey } from '../../tests/core-request'
+import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 
 import { informantNotificationTestData } from './testData'
 
@@ -73,20 +68,24 @@ describe('Informant notification - Email', () => {
       id: OFFICE_ID,
       name: OFFICE_NAME
     })
-    publishCoreKey()
     server = await createServer()
   })
 
   informantNotificationTestData.forEach(
     ({ eventType, actionType, eventDocument }) =>
       it(`${eventType} - ${actionType}`, async () => {
-        await server.server.inject(
-          asCore(
-            'POST',
-            `/trigger/events/${eventType}/actions/${actionType}`,
-            eventDocument
-          )
-        )
+        await server.server.inject({
+          method: 'POST',
+          url: `/trigger/events/${eventType}/actions/${actionType}`,
+          payload: eventDocument,
+          auth: {
+            strategy: 'jwt',
+            // Action confirmation requests are only accepted from core's
+            // service token (see the onPostAuth guard in ../../index).
+            credentials: { sub: SERVICE_USER_ID },
+            artifacts: { token: 'mock-token' }
+          }
+        })
 
         expect(sendMailMock).toHaveBeenCalledTimes(1)
         expect(sendMailMock.mock.calls[0][0]).toMatchSnapshot()
@@ -97,13 +96,16 @@ describe('Informant notification - Email', () => {
     informantNotificationTestData
 
   function trigger(payload: unknown) {
-    return server.server.inject(
-      asCore(
-        'POST',
-        `/trigger/events/${eventType}/actions/${actionType}`,
-        payload
-      )
-    )
+    return server.server.inject({
+      method: 'POST',
+      url: `/trigger/events/${eventType}/actions/${actionType}`,
+      payload,
+      auth: {
+        strategy: 'jwt',
+        credentials: { sub: SERVICE_USER_ID },
+        artifacts: { token: 'mock-token' }
+      }
+    })
   }
 
   it('notifies with an empty office name when the office lookup fails', async () => {

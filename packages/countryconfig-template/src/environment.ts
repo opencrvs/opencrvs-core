@@ -22,16 +22,6 @@ export const env = cleanEnv(process.env, {
   TWO_FA_ENABLED: bool({ default: true }),
   OPENCRVS_ENVIRONMENT: str({ devDefault: 'development' }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
-  COUNTRY_CONFIG_CLIENT_ID: str({
-    default: '',
-    devDefault: '3c726498-2b2f-47ae-8e53-f6e406a0de13',
-    desc: "OpenCRVS system client ID that country config calls core with, e.g. to read locations after an action confirmation. Core's requests to country config carry no token. Leave empty to skip those calls."
-  }),
-  COUNTRY_CONFIG_CLIENT_SECRET: str({
-    default: '',
-    devDefault: '0fe62f63-657a-40fb-a406-cec6657dc0cc',
-    desc: 'OpenCRVS system client secret for COUNTRY_CONFIG_CLIENT_ID.'
-  }),
   ANALYTICS_DATABASE_URL: url({
     devDefault:
       'postgres://events_analytics:analytics_password@localhost:5432/events',
