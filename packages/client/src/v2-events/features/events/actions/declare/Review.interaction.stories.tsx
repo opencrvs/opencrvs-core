@@ -23,9 +23,11 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
+  generateActionDocuments,
   getUUID,
   EventDocument,
-  ActionInput
+  ActionInput,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -136,7 +138,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               ...declarationTrpcMsw.eventDocument,
               actions: [
                 ...declarationTrpcMsw.eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DECLARE
                 })
@@ -432,7 +434,7 @@ export const ChangeFieldInReview: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
     updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
@@ -458,7 +460,7 @@ export const ChangeFieldInReview: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
@@ -553,7 +555,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     currentDocument = eventDocument
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(currentDocument.id, currentDocument)
     updateLocalEventIndex(currentDocument.id, currentDocument)
   },
@@ -579,7 +581,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return currentDocument
@@ -589,7 +591,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
               ...currentDocument,
               actions: [
                 ...currentDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   declarationOverrides: {
                     ...(ActionInput.safeParse(action).data?.declaration ?? {})
@@ -656,7 +658,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
     updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
@@ -682,7 +684,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
@@ -692,7 +694,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
               ...eventDocument,
               actions: [
                 ...eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DECLARE
                 }),

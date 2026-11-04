@@ -16,6 +16,7 @@ import {
   CHILD_ONBOARDING_EVENT,
   ConditionalType,
   defineConfig,
+  resolveEventConfig,
   defineDeclarationForm,
   defineFormPage,
   encodeScope,
@@ -31,7 +32,8 @@ import {
   getDeclarationFields,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -159,20 +161,22 @@ describe('Overwriting parent field', () => {
   })
 
   const modifiedChildOnboardingEvent = withDeclaration(
-    defineConfig({
-      ...ChildOnboardingEvent,
-      actions: [
-        ...ChildOnboardingEvent.actions,
-        {
-          type: ActionType.REQUEST_CORRECTION,
-          label: generateTranslationConfig('Correct record'),
-          correctionForm: {
+    resolveEventConfig(
+      defineConfig({
+        ...ChildOnboardingEvent,
+        actions: [
+          ...ChildOnboardingEvent.actions,
+          {
+            type: ActionType.REQUEST_CORRECTION,
             label: generateTranslationConfig('Correct record'),
-            pages: []
+            correctionForm: {
+              label: generateTranslationConfig('Correct record'),
+              pages: []
+            }
           }
-        }
-      ]
-    }),
+        ]
+      })
+    ),
     defineDeclarationForm({
       ...getDeclaration(ChildOnboardingEvent),
       pages: [...getDeclarationPages(ChildOnboardingEvent), informant]
@@ -181,7 +185,9 @@ describe('Overwriting parent field', () => {
   it('should overwrite informant.relation via REQUEST_CORRECTION action', async () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([modifiedChildOnboardingEvent])
+        return HttpResponse.json([
+          toVersionedEventConfig(modifiedChildOnboardingEvent)
+        ])
       }),
       http.post(
         `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,
@@ -304,20 +310,22 @@ describe('Search index should reflect corrected null informant fields', () => {
   })
 
   const modifiedChildOnboardingEvent = withDeclaration(
-    defineConfig({
-      ...ChildOnboardingEvent,
-      actions: [
-        ...ChildOnboardingEvent.actions,
-        {
-          type: ActionType.REQUEST_CORRECTION,
-          label: generateTranslationConfig('Correct record'),
-          correctionForm: {
+    resolveEventConfig(
+      defineConfig({
+        ...ChildOnboardingEvent,
+        actions: [
+          ...ChildOnboardingEvent.actions,
+          {
+            type: ActionType.REQUEST_CORRECTION,
             label: generateTranslationConfig('Correct record'),
-            pages: []
+            correctionForm: {
+              label: generateTranslationConfig('Correct record'),
+              pages: []
+            }
           }
-        }
-      ]
-    }),
+        ]
+      })
+    ),
     defineDeclarationForm({
       ...getDeclaration(ChildOnboardingEvent),
       pages: [...getDeclarationPages(ChildOnboardingEvent), informant]
@@ -326,7 +334,9 @@ describe('Search index should reflect corrected null informant fields', () => {
   it('should not return record when searching by informant.name after correction sets it to null', async () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([modifiedChildOnboardingEvent])
+        return HttpResponse.json([
+          toVersionedEventConfig(modifiedChildOnboardingEvent)
+        ])
       }),
       http.post(
         `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,

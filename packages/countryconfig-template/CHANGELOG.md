@@ -2,6 +2,10 @@
 
 ## 2.2.0 Release Candidate
 
+### Breaking changes
+
+- Edit rights now depend on the record's status. Every `record.edit` scope sets the `status` option: `['NOTIFIED']` for roles holding `record.notify`, `['NOTIFIED', 'DECLARED']` for roles holding `record.declare`. A role holding `record.notify` must not hold `record.declare` or a `record.edit` that can match a DECLARED record. A `record.edit` with no `status` matches every status, and `notifiedBy: 'user'` still matches after the notification is declared, so the notifier could edit the declaration. Role scopes are served from `/config/roles`, so no data migration is needed. [#13983](https://github.com/opencrvs/opencrvs-core/issues/13983)
+
 ### New features
 
 - Birth has its own notification form (`src/events/birth/forms/notificationForm.ts`) on an explicit `NOTIFY` action.

@@ -21,8 +21,10 @@ import {
   TestUserRole,
   tennisClubMembershipEvent,
   generateActionDocument,
+  generateActionDocuments,
   getCurrentEventState,
-  getUUID
+  getUUID,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -86,7 +88,7 @@ export const ShowToastOnDuplicateDetectedOnRegisterQuickAction: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
@@ -106,7 +108,7 @@ export const ShowToastOnDuplicateDetectedOnRegisterQuickAction: Story = {
               ...eventDocument,
               actions: [
                 ...eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.REGISTER
                 }),
@@ -130,7 +132,7 @@ export const ShowToastOnDuplicateDetectedOnRegisterQuickAction: Story = {
     // Clear any toast left over from a previous story so this test only asserts
     // on toasts raised by its own play function.
     toast.remove()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
   },
   play: async ({ canvasElement, step }) => {

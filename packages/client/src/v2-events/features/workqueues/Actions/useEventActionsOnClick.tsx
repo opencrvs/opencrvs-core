@@ -17,6 +17,7 @@ import {
   getUUID,
   ClientSpecificAction,
   getOrThrow,
+  RemoteDraft,
   WorkqueueActionType,
   AssignmentStatus,
   getAssignmentStatus,
@@ -35,6 +36,9 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useAuthentication } from '@client/utils/userUtils'
+
+/** Actions whose drafts can be saved to the server */
+export type DraftActionType = RemoteDraft['action']['type']
 
 /**
  * Given an event,
@@ -63,9 +67,27 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   const eventId = event.id
 
+  /** Opens the user's draft of the event in the flow of the draft's action */
+  const continueDraft = useCallback(
+    (draftActionType: DraftActionType, backTo?: string) => {
+      clearEphemeralFormState()
+
+      const route =
+        draftActionType === ActionType.NOTIFY
+          ? ROUTES.V2.EVENTS.NOTIFY.REVIEW
+          : ROUTES.V2.EVENTS.DECLARE.REVIEW
+
+      return navigate(route.buildPath({ eventId }, { backTo }))
+    },
+    [eventId, clearEphemeralFormState, navigate]
+  )
+
   const onClick = useCallback(
     async (
-      actionType: WorkqueueActionType | ClientSpecificAction,
+      actionType: Exclude<
+        WorkqueueActionType | ClientSpecificAction,
+        typeof ClientSpecificAction.CONTINUE_DRAFT
+      >,
       backTo?: string
     ) => {
       switch (actionType) {
@@ -161,6 +183,7 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   return {
     onClick,
+    continueDraft,
     modals: [deleteModal, rejectionModal, quickActionModal]
   }
 }

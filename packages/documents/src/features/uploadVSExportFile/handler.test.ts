@@ -9,15 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
-jest.mock('../../s3/client', () => {
-  return {
-    __esModule: true,
-    putObject: async () => {}
-  }
-})
+import { toDocumentPath } from '@opencrvs/commons'
+import { ensureDefaultBucket } from '../../s3/client'
+import { getObject } from '../../../test/s3'
 
 describe('verify document uploader handler', () => {
   let server: any
+
+  beforeEach(async () => {
+    await ensureDefaultBucket()
+  })
+
   beforeEach(async () => {
     server = await createServer()
   })
@@ -26,12 +28,15 @@ describe('verify document uploader handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/upload-vs-export',
-      payload: {
-        fileData:
-          'RVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
-      }
+      payload: 'name,count\nbirths,2\n',
+      headers: { 'content-type': 'text/csv' }
     })
 
     expect(res.statusCode).toBe(200)
+    const { refUrl } = JSON.parse(res.payload)
+    expect(await getObject(toDocumentPath(refUrl))).toMatchObject({
+      contentType: 'text/csv',
+      body: 'name,count\nbirths,2\n'
+    })
   })
 })

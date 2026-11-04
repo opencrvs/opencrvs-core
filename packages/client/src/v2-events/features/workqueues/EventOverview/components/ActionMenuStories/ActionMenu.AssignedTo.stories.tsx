@@ -19,7 +19,8 @@ import {
   getCurrentEventState,
   AssignmentStatus,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 
 import { AppRouter } from '@client/v2-events/trpc'
@@ -104,7 +105,7 @@ export const AssignedTo: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(event.id, event)
   },
   play: async () => {
