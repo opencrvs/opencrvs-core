@@ -17962,10 +17962,9 @@ components:
           type: string
           description: The type of event, such as birth, death, or marriage.
         configVersionId:
-          description: Id of the event configuration version the record was created under.
-            Absent in records indexed before versioning, which use version
-            'initial'.
           type: string
+          description: Id of the event configuration version the record was created under.
+            Records created before versioning have 'initial'.
         status:
           type: string
           enum:
@@ -19060,6 +19059,7 @@ components:
       required:
         - id
         - type
+        - configVersionId
         - status
         - legalStatuses
         - createdAt
