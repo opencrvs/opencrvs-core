@@ -16,7 +16,6 @@ import {
   EventDocument,
   getEventConfigById,
   getEventConfigForRecord,
-  getOrThrow,
   logger,
   resolveEventConfigInTimeZone,
   Role,
@@ -151,34 +150,6 @@ export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
   ])
   return configurations.map((config) =>
     resolveEventConfigInTimeZone(config, timeZone)
-  )
-}
-
-async function findEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  const configurations = await getInMemoryEventConfigurations(token)
-  return configurations.find((config) => config.id === eventType)
-}
-
-/** @knipignore */
-export async function getEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  return getOrThrow(
-    await findEventConfigurationById({
-      eventType,
-      token
-    }),
-    `No configuration found for event type: ${eventType}`
   )
 }
 

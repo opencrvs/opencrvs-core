@@ -78,9 +78,8 @@ export const EventMetadata = z.object({
     .describe('The type of event, such as birth, death, or marriage.'),
   configVersionId: z
     .string()
-    .optional()
     .describe(
-      "Id of the event configuration version the record was created under. Absent in records indexed before versioning, which use version 'initial'."
+      "Id of the event configuration version the record was created under. Records created before versioning have 'initial'."
     ),
   status: EventStatus,
   legalStatuses: LegalStatuses.describe(

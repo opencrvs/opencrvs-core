@@ -1440,6 +1440,8 @@ export const eventQueryDataGenerator = (
   return {
     id: overrides.id ?? generateUuid(rng),
     type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
+    configVersionId:
+      overrides.configVersionId ?? INITIAL_EVENT_CONFIG_VERSION_ID,
     status: overrides.status ?? pickRandom(rng, EventStatus.options),
     createdAt: overrides.createdAt ?? createdAt,
     createdByUserType: overrides.createdByUserType ?? 'user',

@@ -94,7 +94,7 @@ export function useEventConfiguration(eventIdentifier: string): {
 /** A record, as far as resolving its configuration version is concerned */
 interface VersionedRecord {
   type: string
-  configVersionId?: string
+  configVersionId: string
   trackingId?: string
 }
 
@@ -119,7 +119,7 @@ export function useEventConfigurationForRecord(record: VersionedRecord): {
     title: intl.formatMessage(errorMessages.unknownConfigVersion),
     message: intl.formatMessage(errorMessages.unknownConfigVersionDescription, {
       trackingId: record.trackingId ?? '',
-      version: record.configVersionId ?? '',
+      version: record.configVersionId,
       event: intl.formatMessage(versionedConfig.label)
     }),
     redirection: {

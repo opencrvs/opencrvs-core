@@ -132,18 +132,10 @@ async function reindexSearch(
   let failure: Error | undefined
 
   /*
-   * Records that still cannot be read after retrying, or whose configuration
-   * cannot be resolved, are skipped, so one bad record does not fail the whole
-   * reindex. The skip is reported in the run's progress, so the records can be
-   * fixed and reindexed.
+   * Records that still cannot be read after retrying are skipped, so one bad
+   * record does not fail the whole reindex. The skip is reported in the run's
+   * progress, so the records can be fixed and reindexed.
    */
-  function reportSkipped(message: string, skipped: SkippedEvent[]) {
-    for (const { id, error } of skipped) {
-      logger.error({ message, eventId: id, error })
-    }
-    onEventsSkipped?.(skipped)
-  }
-
   async function fetchEvents(ids: UUID[]): Promise<EventDocument[]> {
     try {
       return await withRetry(async () => getEventsByIdsInTrx(getClient(), ids))
@@ -155,34 +147,23 @@ async function reindexSearch(
         throw err
       }
 
-      reportSkipped('Skipping event that could not be read', skipped)
+      for (const { id, error } of skipped) {
+        logger.error({
+          message: 'Skipping event that could not be read',
+          eventId: id,
+          error
+        })
+      }
+      onEventsSkipped?.(skipped)
       return events
     }
   }
 
-  // For example, a record stamped with a version that is no longer configured.
-  function withoutUnindexableEvents(batch: EventDocument[]) {
-    const skipped: SkippedEvent[] = []
-    const indexable = batch.filter((event) => {
-      try {
-        getConfigForRecord(configurations, event)
-        return true
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err)
-        skipped.push({ id: event.id, error })
-        return false
-      }
-    })
-    if (skipped.length > 0) {
-      reportSkipped('Skipping event that could not be indexed', skipped)
-    }
-    return indexable
-  }
-
-  async function writeBatch(fetched: EventDocument[]) {
-    const batch = withoutUnindexableEvents(fetched)
-    if (batch.length === 0) {
-      return
+  async function writeBatch(batch: EventDocument[]) {
+    // A record stamped with a version that is no longer configured fails the reindex
+    // rather than drop out of search. Checked before writing, as retrying cannot fix it.
+    for (const event of batch) {
+      getConfigForRecord(configurations, event)
     }
 
     const start = new Date()
@@ -337,7 +318,7 @@ export async function runReindex(token: TokenWithBearer) {
   await updateReindexingProgress(runId, getProgress())
   if (skippedEvents.length > 0) {
     logger.error(
-      `Reindex skipped ${skippedEvents.length} records that could not be read or indexed`
+      `Reindex skipped ${skippedEvents.length} records that could not be read`
     )
   }
 

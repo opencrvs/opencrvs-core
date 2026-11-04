@@ -196,7 +196,7 @@ describe('defineConfig()', () => {
       ...versionFields
     } = tennisClubMembershipEvent
 
-    const v1 = { ...versionFields, id: 'initial' }
+    const v1 = { ...versionFields, id: INITIAL_EVENT_CONFIG_VERSION_ID }
     const v2 = { ...versionFields, id: 'v2', effectiveFrom: '2027-03-01' }
 
     it('should accept two versions with distinct ids and dates', () => {
@@ -207,7 +207,10 @@ describe('defineConfig()', () => {
         versions: [v1, v2]
       })
 
-      expect(config.versions.map(({ id }) => id)).toEqual(['initial', 'v2'])
+      expect(config.versions.map(({ id }) => id)).toEqual([
+        INITIAL_EVENT_CONFIG_VERSION_ID,
+        'v2'
+      ])
       expect(config.versions[1].effectiveFrom).toBe('2027-03-01')
       expect(config).toMatchObject({ id: eventId, label, advancedSearch })
     })
@@ -227,7 +230,7 @@ describe('defineConfig()', () => {
           id: eventId,
           label,
           advancedSearch,
-          versions: [v1, { ...v2, id: 'initial' }]
+          versions: [v1, { ...v2, id: INITIAL_EVENT_CONFIG_VERSION_ID }]
         })
       ).toThrow(
         `Event '${eventId}' has more than one version with id 'initial'. Each version must have a different id.`
@@ -274,6 +277,27 @@ describe('defineConfig()', () => {
       ).toThrow(`Event '${eventId}' has no version in effect today`)
     })
 
+    it('should reject a version until its date has begun in every time zone, as the country may be west of UTC', () => {
+      // 2026-11-04 in UTC, still 2026-11-03 in UTC−12
+      jest.useFakeTimers('modern')
+      jest.setSystemTime(new Date('2026-11-04T10:00:00.000Z'))
+      const versionsFrom = (effectiveFrom: string) => ({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [{ ...v1, effectiveFrom }]
+      })
+
+      try {
+        expect(() => defineConfig(versionsFrom('2026-11-04'))).toThrow(
+          `Event '${eventId}' has no version in effect today (2026-11-03, UTC−12`
+        )
+        expect(() => defineConfig(versionsFrom('2026-11-03'))).not.toThrow()
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
     it('should accept an event whose earliest version took effect in the past', () => {
       expect(() =>
         defineConfig({
@@ -283,17 +307,6 @@ describe('defineConfig()', () => {
           versions: [{ ...v1, effectiveFrom: '2020-01-01' }, v2]
         })
       ).not.toThrow()
-    })
-
-    it("should reject versions without 'initial', which records created before versioning use", () => {
-      expect(() =>
-        defineConfig({
-          id: eventId,
-          label,
-          advancedSearch,
-          versions: [{ ...v1, id: 'v1' }, v2]
-        })
-      ).toThrow(`Event '${eventId}' has no version 'initial'.`)
     })
 
     it('should report an invalid version under its index', () => {

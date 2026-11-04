@@ -13,6 +13,7 @@ import {
   ActionType,
   EventDocumentOnlyLastAction,
   EventIndex,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   tennisClubMembershipEvent,
   toVersionedEventConfig
 } from '@opencrvs/commons/client'
@@ -55,7 +56,8 @@ it('CREATE offline: the new record resolves by its temporary id', () => {
 
   defaultsOf(trpcOptionsProxy.event.create.mutationKey()).onMutate({
     transactionId,
-    type: tennisClubMembershipEvent.id
+    type: tennisClubMembershipEvent.id,
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
   })
 
   expect(findLocalEventIndex(transactionId)?.id).toBe(transactionId)

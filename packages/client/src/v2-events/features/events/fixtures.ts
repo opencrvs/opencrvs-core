@@ -40,6 +40,7 @@ export const storybookEventId = UUID.parse(
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: getUUID(),
   type: TENNIS_CLUB_MEMBERSHIP,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   trackingId: 'TEST12',
   status: EventStatus.enum.CREATED,
   createdAt: '2023-03-01T00:00:00.000Z',

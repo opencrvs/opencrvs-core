@@ -109,6 +109,9 @@ export function getDeclarationFields(
  * record of the event can hold, whichever version it was created under. Where versions
  * define an id differently, the newest version's field is kept.
  *
+ * Used to build the search index mapping: records of every version share one index per
+ * event, so its mapping must hold the fields of all of them. Goes away once each version
+ * gets its own index (#14335).
  * Known limitation: a field id must keep its type in every version until #14335.
  */
 export function getDeclarationFieldsOfAllVersions(

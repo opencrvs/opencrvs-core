@@ -47,12 +47,6 @@ const messages = defineMessages({
     description: 'table header for `duplicate of` in record audit',
     id: 'constants.duplicateOf'
   },
-  configVersion: {
-    defaultMessage: 'Configuration version',
-    description:
-      'Label for the id of the event configuration version the record was created under',
-    id: 'event.history.modal.configVersion'
-  },
   awaitingConfirmationBanner: {
     defaultMessage:
       'This action has been initiated, but is still awaiting confirmation from an external system.',
@@ -197,23 +191,6 @@ export function EventHistoryDialog({
             }
           ]}
           content={[{ duplicateOf }]}
-          noResultText=" "
-        />
-      )}
-      {action.type === ActionType.CREATE && (
-        <Table
-          columns={[
-            {
-              key: 'configVersion',
-              label: intl.formatMessage(messages.configVersion),
-              width: 100
-            }
-          ]}
-          content={[
-            {
-              configVersion: fullEvent.configVersionId
-            }
-          ]}
           noResultText=" "
         />
       )}

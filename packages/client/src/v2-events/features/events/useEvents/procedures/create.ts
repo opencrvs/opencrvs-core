@@ -23,7 +23,7 @@ import {
   UUID,
   AssignedAction,
   getTokenPayload,
-  INITIAL_EVENT_CONFIG_VERSION_ID
+  getOrThrow
 } from '@opencrvs/commons/client'
 
 import {
@@ -79,9 +79,11 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
-      // Stamped by the server. Until then, a stand-in that resolves like an unstamped record.
-      configVersionId:
-        newEvent.configVersionId ?? INITIAL_EVENT_CONFIG_VERSION_ID,
+      // The client creates a record under the version in effect today, so it always has one
+      configVersionId: getOrThrow(
+        newEvent.configVersionId,
+        `Event '${newEvent.type}' is created without a configuration version`
+      ),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       actions: [

@@ -17,6 +17,7 @@ import {
   EventConfigVersion,
   FieldType,
   getUUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP,
   toVersionedEventConfig,
   VersionedEventConfig
@@ -297,14 +298,14 @@ describe('the event configuration version of a record', () => {
   })
 
   test('a record of the initial version keeps it when an earlier version is added', async () => {
-    useVersions(version('initial'))
+    useVersions(version(INITIAL_EVENT_CONFIG_VERSION_ID))
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, CUSTOM_ACTION_SCOPES)
     const declared = await createEvent(client, generator, [ActionType.DECLARE])
 
     // e.g. a version for digitising legacy records. Only the initial version has the custom action.
     useVersions(
-      withCustomAction(version('initial', PAST)),
+      withCustomAction(version(INITIAL_EVENT_CONFIG_VERSION_ID, PAST)),
       version('legacy-1980', '1980-01-01')
     )
 
@@ -316,7 +317,9 @@ describe('the event configuration version of a record', () => {
         customActionType: CUSTOM_ACTION_TYPE,
         annotation: {}
       })
-    ).resolves.toMatchObject({ configVersionId: 'initial' })
+    ).resolves.toMatchObject({
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
+    })
   })
 
   test("search drops the fields secured in the record's version", async () => {

@@ -19,8 +19,7 @@ import {
   EventIndex,
   EventDocument,
   isFieldSecured,
-  FieldValue,
-  INITIAL_EVENT_CONFIG_VERSION_ID
+  FieldValue
 } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -283,8 +282,7 @@ export function EventSummary({
           key="configVersion"
           data-testid="configVersion"
           label={intl.formatMessage(messages.configVersion.label)}
-          // Records indexed before versioning have no id
-          value={eventIndex.configVersionId ?? INITIAL_EVENT_CONFIG_VERSION_ID}
+          value={eventIndex.configVersionId}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
