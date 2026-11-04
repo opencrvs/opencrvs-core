@@ -92,11 +92,8 @@ function EventSelector() {
   const createEvent = events.useCreateEvent()
   const user = useSelector(getUserDetails)
 
-  // An event without a version in effect today cannot be declared, so it is not offered.
   const allowedEventConfigurations = versionedEventConfigurations.filter(
-    (config) =>
-      canUserCreateEvent(scopes, config.id) &&
-      resolveEffectiveVersion(config, new Date(), timeZone)
+    ({ id }) => canUserCreateEvent(scopes, id)
   )
 
   function handleContinue() {

@@ -97,23 +97,23 @@ function toVersionedInput(
   }
 }
 
+/** The westernmost time zone, UTC−12: the last to begin each day. */
+const WESTERNMOST_TIME_ZONE = 'Etc/GMT+12'
+
 /**
  * An event must have a version in effect today, so that it can be declared once it
- * is configured. Without the country's time zone at hand, today is taken in UTC, while
- * versions take effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`).
- * Around midnight the two dates differ by a day:
- *  - east of UTC (e.g. UTC+14), a version taking effect on the country's today is rejected
- *    until UTC catches up;
- *  - west of UTC, a version taking effect on UTC's today passes, but the event has no
- *    version in effect until the country's midnight.
- * To stay clear of it, never set `effectiveFrom` of an event's only version to a date that
- * has not yet begun in the country: schedule it a day ahead, or deploy after the country's midnight.
+ * is configured, and core can rely on one being in effect. Versions take effect at
+ * midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`), which is not at hand
+ * here, so today is taken in UTC−12: a version in effect there is in effect in every
+ * country. East of it, a version taking effect on the country's today is rejected
+ * until UTC−12 catches up, up to 26 hours later in UTC+14. To stay clear of it,
+ * schedule an event's only version a day ahead.
  */
 function validateVersionInEffectToday(
   config: VersionedEventConfig,
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  const today = toPlainDateInTimeZone(new Date(), 'UTC')
+  const today = toPlainDateInTimeZone(new Date(), WESTERNMOST_TIME_ZONE)
   const isAnyVersionInEffect = config.versions.some(
     ({ effectiveFrom }) => effectiveFrom <= today
   )
@@ -121,7 +121,7 @@ function validateVersionInEffectToday(
   if (!isAnyVersionInEffect) {
     ctx.addIssue({
       code: 'custom',
-      message: `Event '${config.id}' has no version in effect today (${today}, UTC). At least one version must omit \`effectiveFrom\` or take effect on or before today.`,
+      message: `Event '${config.id}' has no version in effect today (${today}, UTC−12, the last time zone to begin the day). At least one version must omit \`effectiveFrom\` or take effect on or before that date.`,
       path: ['versions']
     })
   }

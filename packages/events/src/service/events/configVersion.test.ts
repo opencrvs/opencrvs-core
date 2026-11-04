@@ -49,7 +49,7 @@ describe('resolveVersionForNewRecord()', () => {
     ).toBe('v2')
   })
 
-  it('rejects with 409, naming the date, when the client chose none and none is in effect', () => {
+  it('throws, naming the date, when the client chose none and none is in effect', () => {
     expect(() =>
       resolveVersionForNewRecord(
         config,
@@ -57,12 +57,7 @@ describe('resolveVersionForNewRecord()', () => {
         new Date('2019-06-01T10:00:00.000Z'),
         'UTC'
       )
-    ).toThrow(
-      expect.objectContaining({
-        code: 'CONFLICT',
-        message: `Event '${config.id}' has no version in effect on 2019-06-01`
-      })
-    )
+    ).toThrow(`Event '${config.id}' has no version in effect on 2019-06-01`)
   })
 
   it('accepts a version taking effect a few minutes from now, as the client clock may be ahead', () => {

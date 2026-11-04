@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import {
+  getOrThrow,
   resolveEffectiveVersion,
   toPlainDateInTimeZone,
   VersionedEventConfig
@@ -27,7 +28,7 @@ const CLOCK_SKEW_MS = 5 * 60 * 1000
  * @throws {TRPCError}
  *  - HTTP 400 when the client's version is not configured
  *  - HTTP 400 when the client's version takes effect in the future (beyond clock drift)
- *  - HTTP 409 when no version was chosen and none is in effect yet
+ * @throws {Error} when no version was chosen and none is in effect, which `defineConfig` rules out
  */
 export function resolveVersionForNewRecord(
   config: VersionedEventConfig,
@@ -36,14 +37,10 @@ export function resolveVersionForNewRecord(
   timeZone: string
 ) {
   if (!configVersionId) {
-    const version = resolveEffectiveVersion(config, now, timeZone)
-    if (!version) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        message: `Event '${config.id}' has no version in effect on ${toPlainDateInTimeZone(now, timeZone)}`
-      })
-    }
-    return version
+    return getOrThrow(
+      resolveEffectiveVersion(config, now, timeZone),
+      `Event '${config.id}' has no version in effect on ${toPlainDateInTimeZone(now, timeZone)}`
+    )
   }
 
   const version = config.versions.find(({ id }) => id === configVersionId)

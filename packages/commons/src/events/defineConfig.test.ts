@@ -277,6 +277,26 @@ describe('defineConfig()', () => {
       ).toThrow(`Event '${eventId}' has no version in effect today`)
     })
 
+    it('should reject a version until its date has begun in every time zone, as the country may be west of UTC', () => {
+      // 2026-11-04 in UTC, still 2026-11-03 in UTC−12
+      jest.useFakeTimers({ now: new Date('2026-11-04T10:00:00.000Z') })
+      const versionsFrom = (effectiveFrom: string) => ({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [{ ...v1, effectiveFrom }]
+      })
+
+      try {
+        expect(() => defineConfig(versionsFrom('2026-11-04'))).toThrow(
+          `Event '${eventId}' has no version in effect today (2026-11-03, UTC−12`
+        )
+        expect(() => defineConfig(versionsFrom('2026-11-03'))).not.toThrow()
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
     it('should accept an event whose earliest version took effect in the past', () => {
       expect(() =>
         defineConfig({

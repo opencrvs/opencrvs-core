@@ -333,11 +333,6 @@ export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
   return a.effectiveFrom.localeCompare(b.effectiveFrom)
 }
 
-/** @returns the version that takes effect earliest. */
-function getEarliestVersion(config: VersionedEventConfig) {
-  return [...config.versions].sort(byEffectiveFrom)[0]
-}
-
 /**
  * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
  * after the date of `now` in `timeZone`, the country's time zone, since versions take
@@ -385,8 +380,8 @@ export function getEventConfigForRecord(
 
 /**
  * @returns the configuration of the version in effect today in `timeZone`, the
- * country's time zone (the earliest, when every version takes effect later). For a
- * record, use `getEventConfigForRecord` instead.
+ * country's time zone. For a record, use `getEventConfigForRecord` instead.
+ * @throws when no version is in effect today, which `defineConfig` rules out.
  */
 export function resolveEventConfigInTimeZone(
   config: VersionedEventConfig,
@@ -394,8 +389,10 @@ export function resolveEventConfigInTimeZone(
 ): EventConfig {
   return toEventConfig(
     config,
-    resolveEffectiveVersion(config, new Date(), timeZone) ??
-      getEarliestVersion(config)
+    getOrThrow(
+      resolveEffectiveVersion(config, new Date(), timeZone),
+      `Event '${config.id}' has no version in effect today`
+    )
   )
 }
 

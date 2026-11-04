@@ -126,7 +126,7 @@ A version without `effectiveFrom` is effective from the beginning of time. Versi
 
 A version takes effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`). A record is created under the version in effect that day and keeps it for its whole life: every action on the record uses that version, even after a newer one takes effect. A record created offline keeps the version in effect when the user created it. The record stores the version's id as `configVersionId`.
 
-An event must have a version in effect today, and `defineConfig` rejects one that does not. It checks the date in UTC, so around midnight it can be a day off the country's date: never give an event's only version an `effectiveFrom` that has not yet begun in the country.
+An event must have a version in effect today, and `defineConfig` rejects one that does not. It takes today in UTC−12, the last time zone to begin the day, so that the version is in effect whatever the country's time zone: east of it, a version taking effect today is rejected until midnight in UTC−12. Schedule an event's only version a day ahead.
 
 Records created before 2.2 are stamped with `initial`, the id `defineConfig` gives an event configured without versions. When you add `versions` to an existing event, give the version holding your current configuration the id `initial`, as above. Otherwise those records point at a version that does not exist: they fail to open, and the search reindex fails, naming the missing version. Never remove or rename a version that records use.
 
@@ -143,7 +143,7 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 **`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
 
-**Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect, and the call fails with HTTP 409 when there is none. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
+**Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
 
 [#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602)
 
