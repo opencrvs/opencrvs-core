@@ -12,11 +12,7 @@ import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
-import {
-  ActionDocument,
-  ActionType,
-  AddressType
-} from '@opencrvs/toolkit/events'
+import { Action, ActionType, AddressType } from '@opencrvs/toolkit/events'
 import { getToken, login } from '@e2e/support/helpers'
 import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-mother-father'
@@ -99,7 +95,7 @@ test('Corrected place of birth (PRIVATE_HOME → HEALTH_FACILITY) is not shown s
       })
 
     const acceptedRequest = requestRes.actions.find(
-      (action: ActionDocument) =>
+      (action: Action) =>
         action.type === ActionType.REQUEST_CORRECTION &&
         action.status === 'Accepted'
     )
@@ -223,7 +219,7 @@ test('Corrected place of birth (HEALTH_FACILITY → PRIVATE_HOME) is not shown s
       })
 
     const acceptedRequest = requestRes.actions.find(
-      (action: ActionDocument) =>
+      (action: Action) =>
         action.type === ActionType.REQUEST_CORRECTION &&
         action.status === 'Accepted'
     )

@@ -30,7 +30,7 @@ import {
 } from './locations'
 import { UserContext } from '../users/User'
 import { EventIndex } from './EventIndex'
-import { UUID } from 'src/uuid'
+import { UUID } from '../uuid'
 
 type AlwaysAllowed = null
 

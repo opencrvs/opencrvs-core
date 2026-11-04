@@ -18,7 +18,8 @@ import {
 } from '@e2e/support/birth/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import {
-  ActionDocument,
+  Action,
+  RegisterAction,
   ActionType,
   ActionUpdate,
   AddressType
@@ -219,7 +220,7 @@ export async function createDeclaration(
   })
 
   const registerAction = registerRes.actions.find(
-    (action: ActionDocument) => action.type === 'REGISTER'
+    (action: Action): action is RegisterAction => action.type === 'REGISTER'
   )
 
   return {

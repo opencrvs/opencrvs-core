@@ -1,25 +1,24 @@
 {
   "compilerOptions": {
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM"],
     "target": "es2016",
     "module": "node16",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "rootDir": "./src",
-    "outDir": "dist",
+    "noEmit": true,
+    // Workspace packages resolve to their source, so neither has to be built.
     "paths": {
       "@events/*": ["../events/src/*"],
+      "@opencrvs/events/router": ["../events/src/router/index.ts"],
+      "@opencrvs/commons": ["../commons/src/index.ts"],
+      "@opencrvs/commons/*": ["../commons/src/*"],
       "@opencrvs/commons/conditionals": [
         "../commons/src/conditionals/conditionals.ts"
       ],
       "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
-      "@opencrvs/commons/authentication": [
-        "../commons/src/authentication.ts"
-      ],
+      "@opencrvs/commons/authentication": ["../commons/src/authentication.ts"],
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
       "@opencrvs/commons/events/deduplication": [
         "../commons/src/events/deduplication.ts"
@@ -35,7 +34,6 @@
       ]
     }
   },
-  "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
   "include": ["src/**/*.ts"],
   "exclude": ["**/node_modules/**", "dist"]
 }

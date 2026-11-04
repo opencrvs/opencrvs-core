@@ -18,10 +18,11 @@ import {
 } from '@e2e/support/birth/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import {
-  ActionDocument,
+  Action,
   ActionType,
   ActionUpdate,
-  AddressType
+  AddressType,
+  RegisterAction
 } from '@opencrvs/toolkit/events'
 import { getSignatureFile, uploadFile } from './utils'
 import { subYears, format } from 'date-fns'
@@ -240,12 +241,12 @@ export async function createDeclaration(
   })
 
   const registerAction = registerRes.actions.find(
-    (action: ActionDocument) =>
+    (action: Action): action is RegisterAction =>
       action.type === 'REGISTER' && action.status === 'Accepted'
   )
 
   const registerRequestAction = registerRes.actions.find(
-    (action: ActionDocument) =>
+    (action: Action): action is RegisterAction =>
       action.type === 'REGISTER' && action.status === 'Requested'
   )
 
