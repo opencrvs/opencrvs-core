@@ -10,6 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
+import { expect, within } from 'storybook/test'
 import {
   toVersionedEventConfig,
   tennisClubMembershipEvent
@@ -74,4 +75,47 @@ export const EventSelectionWithCreateScopeForAllEventTypes: Story = {
       await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ]
+}
+
+const deathConfig = {
+  ...tennisClubMembershipEvent,
+  id: 'death',
+  label: {
+    id: 'death',
+    defaultMessage: 'Death',
+    description: 'death'
+  }
+}
+
+export const EventSelectionWithAnEventNotYetInEffect: Story = {
+  beforeEach: () => {
+    const death = toVersionedEventConfig(deathConfig)
+    // In the scope, but not shown: its only version takes effect in the future.
+    const deathNotYetInEffect = {
+      ...death,
+      versions: death.versions.map((version) => ({
+        ...version,
+        effectiveFrom: '2999-01-01'
+      }))
+    }
+    addLocalEventConfig(toVersionedEventConfig(birthConfig))
+    addLocalEventConfig(deathNotYetInEffect)
+  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        tokenWithCreateScopeForAllEventTypes
+      )
+
+      // Ensure state is stable before seeding the mutation cache
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(await canvas.findByText('Birth')).toBeInTheDocument()
+    await expect(canvas.queryByText('Death')).not.toBeInTheDocument()
+  }
 }
