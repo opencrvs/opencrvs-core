@@ -13,7 +13,7 @@ import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 import { getIntegrationCreatorToken } from '@events/service/auth'
 
 const MAX_ATTEMPTS = 10
@@ -40,7 +40,7 @@ async function attemptSystemReady() {
     // The signature proves the request comes from core. The bootstrap token
     // is not a credential for this request: country config uses it to
     // register its integrations with events. #14241 replaces it.
-    ...withCoreSignature(coreSigningKey, url, {
+    ...withCoreSignature(getCoreSigningKey(), url, {
       headers: { Authorization: `Bearer ${bootstrapToken}` }
     }),
     timeout: REQUEST_TIMEOUT_MS

@@ -12,7 +12,7 @@
 import { logger, joinUrl } from '@opencrvs/commons'
 import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 import { collectTelemetryMetrics, TelemetryMetrics } from './metrics'
 
 /** Metrics map size limits enforced by the telemetry ingest endpoint. */
@@ -82,7 +82,7 @@ export async function sendTelemetryReport(
     const url = joinUrl(env.COUNTRY_CONFIG_URL, 'trigger/telemetry')
     response = await fetch(
       url,
-      withCoreSignature(coreSigningKey, url, {
+      withCoreSignature(getCoreSigningKey(), url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(report)

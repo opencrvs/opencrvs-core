@@ -22,12 +22,12 @@ import {
 } from '@opencrvs/commons'
 import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 
 /** Reads a configuration endpoint of country config, signed as core. */
 async function fetchConfig(path: string) {
   const url = new URL(path, env.COUNTRY_CONFIG_URL)
-  return fetch(url, withCoreSignature(coreSigningKey, url))
+  return fetch(url, withCoreSignature(getCoreSigningKey(), url))
 }
 /**
  * Configuration is served from countryconfig, which can be deployed

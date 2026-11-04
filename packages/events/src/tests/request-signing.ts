@@ -10,7 +10,7 @@
  */
 import { createPublicKey } from 'crypto'
 import { verifyCoreRequest } from '@opencrvs/commons/request-signing'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 
 /** Verifies a request intercepted by msw the way country config would. */
 export async function verifySignedByCore(request: Request) {
@@ -26,8 +26,8 @@ export async function verifySignedByCore(request: Request) {
     // FindPublicKey is async; the test key needs no lookup.
     // eslint-disable-next-line @typescript-eslint/require-await
     async (keyid) =>
-      keyid === coreSigningKey.keyid
-        ? createPublicKey(coreSigningKey.privateKey)
+      keyid === getCoreSigningKey().keyid
+        ? createPublicKey(getCoreSigningKey().privateKey)
         : undefined
   )
 }

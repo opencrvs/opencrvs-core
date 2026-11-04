@@ -17,7 +17,7 @@ import {
   logger
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 
 const CODE_EXPIRY_SECONDS = 300
 
@@ -116,7 +116,7 @@ export async function generateAndSendVerificationCode({
         code: verificationCode
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      signingKey: coreSigningKey
+      signingKey: getCoreSigningKey()
     })
   }
 }

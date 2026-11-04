@@ -8,10 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { loadCoreSigningKeyFile } from '@opencrvs/commons/request-signing'
+import {
+  CoreSigningKey,
+  loadCoreSigningKeyFile
+} from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
 
-/** The key events signs its requests to country config with. */
-export const coreSigningKey = loadCoreSigningKeyFile(
-  env.CORE_REQUEST_SIGNING_KEY_PATH
-)
+let coreSigningKey: CoreSigningKey | undefined
+
+/**
+ * The key events signs its requests to country config with. Read on first
+ * use, so importing the router (e.g. to generate the OpenAPI document) needs
+ * no key; `main` reads it at startup so a missing key still stops the service.
+ */
+export function getCoreSigningKey() {
+  coreSigningKey ??= loadCoreSigningKeyFile(env.CORE_REQUEST_SIGNING_KEY_PATH)
+  return coreSigningKey
+}

@@ -30,7 +30,7 @@ import {
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 import {
   getSystemByLegacyId,
   getSystemClientById
@@ -207,7 +207,7 @@ async function handleUsernameUpdate(
       newUsername
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL,
-    signingKey: coreSigningKey
+    signingKey: getCoreSigningKey()
   })
 }
 
@@ -342,7 +342,7 @@ async function sendCredentialsNotification(
         temporaryPassword: password
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      signingKey: coreSigningKey
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(`Unable to send ${event} notification for error : ${err}`)
@@ -663,7 +663,7 @@ export async function sendResetPasswordInvite(
         }
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      signingKey: coreSigningKey
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(`Unable to send reset password notification for error: ${err}`)
@@ -689,7 +689,7 @@ export async function sendUsernameReminder(userId: UUID): Promise<void> {
         username: user.username
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      signingKey: coreSigningKey
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(

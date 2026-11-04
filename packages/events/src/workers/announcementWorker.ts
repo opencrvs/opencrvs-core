@@ -15,7 +15,7 @@ import {
   triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { coreSigningKey } from '@events/request-signing'
+import { getCoreSigningKey } from '@events/request-signing'
 import { getClient } from '@events/storage/postgres/events'
 import {
   getNextProcessableAnnouncement,
@@ -82,7 +82,7 @@ export async function processNextAnnouncement() {
         }
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      signingKey: coreSigningKey
+      signingKey: getCoreSigningKey()
     })
 
     if (res.ok) {
