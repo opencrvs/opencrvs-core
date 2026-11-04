@@ -279,7 +279,8 @@ describe('defineConfig()', () => {
 
     it('should reject a version until its date has begun in every time zone, as the country may be west of UTC', () => {
       // 2026-11-04 in UTC, still 2026-11-03 in UTC−12
-      jest.useFakeTimers({ now: new Date('2026-11-04T10:00:00.000Z') })
+      jest.useFakeTimers('modern')
+      jest.setSystemTime(new Date('2026-11-04T10:00:00.000Z'))
       const versionsFrom = (effectiveFrom: string) => ({
         id: eventId,
         label,
