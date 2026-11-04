@@ -7,6 +7,8 @@ metadata:
   labels:
     app: minio
   name: minio
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   {{- if .Values.minio.pvc.storage_class }}
   storageClassName: {{ .Values.minio.pvc.storage_class | quote }}
@@ -158,38 +160,8 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: minio
-      {{- if eq (include "minio.use_rsync" .) "true" }}
-        - image: {{ include "opencrvs.imageReference" .Values.utilities }}
-          name: rsync
-          command: ["sleep", "infinity"]
-          env:
-            - name: BACKUP_USER
-              valueFrom:
-                secretKeyRef:
-                {{- if (eq (include "minio.backup_enabled" .) "true") }}
-                  name: {{ default .Values.backup.backup_server_secret .Values.minio.backup.server_secret}}
-                {{- else }}
-                  name: {{ default .Values.restore.backup_server_secret .Values.minio.restore.server_secret}}
-                {{- end }}
-                  key: user
-            - name: BACKUP_HOST
-              {{- if (eq (include "minio.backup_enabled" .) "true") }}
-              value: {{ default .Values.backup.host .Values.minio.backup.host }}
-              {{- else }}
-              value: {{ default .Values.restore.host .Values.minio.restore.host }}
-              {{- end }}
-            - name: BACKUP_REMOTE_DIR
-              {{- if (eq (include "minio.backup_enabled" .) "true") }}
-              value: {{ default .Values.backup.backup_server_dir .Values.minio.backup.server_dir }}
-              {{- else }}
-              value: {{ default .Values.restore.backup_server_dir .Values.minio.restore.server_dir }}
-              {{- end }}
-          volumeMounts:
-            - mountPath: /data
-              name: minio
-            - name: backup-ssh-key
-              mountPath: /root/.ssh
-              readOnly: true
+      {{- if and (eq (include "s3.use_rsync" .) "true") (eq (include "s3.store" .) "minio") }}
+        {{- include "s3.rsync_container" . | nindent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:
@@ -202,20 +174,8 @@ spec:
             path: {{ .Values.minio.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
-      {{- if eq (include "minio.use_rsync" .) "true" }}
-      # If backup or restore enabled -> Define key for backup
-      {{- $ssh_secret := default .Values.backup.backup_server_secret .Values.minio.backup.server_secret }}
-      # If restore enabled -> use key for restore
-      {{- if (eq (include "minio.restore_enabled" .) "true") }}
-      {{- $ssh_secret = default .Values.restore.backup_server_secret .Values.minio.restore.server_secret }}
-      {{- end }}
-        - name: backup-ssh-key
-          secret:
-            secretName: {{ $ssh_secret }}
-            defaultMode: 0400
-            items:
-              - key: ssh_key
-                path: id_rsa
+      {{- if and (eq (include "s3.use_rsync" .) "true") (eq (include "s3.store" .) "minio") }}
+        {{- include "s3.rsync_volume" . | nindent 8 }}
       {{- end }}
 
 {{ include "network-policy-rules" (dict "service_name" "minio"  "Values" .Values) }}

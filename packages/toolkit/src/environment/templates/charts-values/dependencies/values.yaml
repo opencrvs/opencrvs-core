@@ -26,6 +26,9 @@ node_selector:
   role: data1
 
 minio:
+  {{#if rustfs_enabled}}
+  enabled: false
+  {{/if}}
   use_default_credentials: false
   {{#if restore_enabled}}
   restore:
@@ -35,6 +38,23 @@ minio:
   backup:
     type: {{backup_type}}
   {{/if}}
+
+{{#if rustfs_enabled}}
+rustfs:
+  enabled: true
+  use_default_credentials: false
+  {{#if s3_migrate_from_minio_to_rustfs}}
+  host_data_path: /data/minio
+  {{/if}}
+  {{#if restore_enabled}}
+  restore:
+    type: {{restore_type}}
+  {{/if}}
+  {{#if backup_enabled}}
+  backup:
+    type: {{backup_type}}
+  {{/if}}
+{{/if}}
 
 elasticsearch:
   use_default_credentials: false

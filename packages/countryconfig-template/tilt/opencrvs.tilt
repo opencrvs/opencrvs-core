@@ -50,7 +50,7 @@ def setup_opencrvs(
         opencrvs_configuration_file = './tilt/examples/opencrvs-services/values-secure.yaml'
     else:
         print("""🔑 Deploying OpenCRVS and Dependencies in non-secure mode
-        - Minio admin user/password: minioadmin/minioadmin
+        - RustFS admin user/password: rustfsadmin/rustfsadmin
         - Postgres admin user/password: postgres/postgres
         - Authentication for Redis, MongoDB and Elasticsearch is disabled""")
         deps_configuration_file = './tilt/examples/dependencies/values.yaml'

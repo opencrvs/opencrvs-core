@@ -46,8 +46,8 @@ service_type: NodePort
 # Tilt renders the chart with `helm template`, which cannot see a secret in the cluster, so the chart
 # creates the secret s3-opencrvs-users from them.
 s3:
-  admin_username: minioadmin
-  admin_password: minioadmin
+  admin_username: rustfsadmin
+  admin_password: rustfsadmin
 
 data_seed:
   enabled: false
