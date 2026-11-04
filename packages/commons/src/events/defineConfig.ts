@@ -99,7 +99,15 @@ function toVersionedInput(
 
 /**
  * An event must have a version in effect today, so that it can be declared once it
- * is configured. Without the country's time zone at hand, today is taken in UTC.
+ * is configured. Without the country's time zone at hand, today is taken in UTC, while
+ * versions take effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`).
+ * Around midnight the two dates differ by a day:
+ *  - east of UTC (e.g. UTC+14), a version taking effect on the country's today is rejected
+ *    until UTC catches up;
+ *  - west of UTC, a version taking effect on UTC's today passes, but the event has no
+ *    version in effect until the country's midnight.
+ * To stay clear of it, never set `effectiveFrom` of an event's only version to a date that
+ * has not yet begun in the country: schedule it a day ahead, or deploy after the country's midnight.
  */
 function validateVersionInEffectToday(
   config: VersionedEventConfig,

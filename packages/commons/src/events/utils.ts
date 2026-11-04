@@ -108,6 +108,10 @@ export function getDeclarationFields(
  * @returns the declaration fields of every version of the event, one per id: what any
  * record of the event can hold, whichever version it was created under. Where versions
  * define an id differently, the newest version's field is kept.
+ *
+ * Used to build the search index mapping: records of every version share one index per
+ * event, so its mapping must hold the fields of all of them. Goes away once each version
+ * gets its own index (#14335).
  * @TODO: reject a field id whose type differs between versions in `defineConfig` (#13973).
  */
 export function getDeclarationFieldsOfAllVersions(

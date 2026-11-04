@@ -125,7 +125,7 @@ describe('getEventConfigForRecord()', () => {
     )
   })
 
-  it('gives the same configuration object for the same version', () => {
+  it('returns the same object for the same version, so caches keyed on the configuration hit', () => {
     const record = { configVersionId: 'v2' }
     expect(getEventConfigForRecord(config, record)).toBe(
       getEventConfigForRecord(config, record)
