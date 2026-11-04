@@ -30,7 +30,13 @@ processors:
   - add_host_metadata:
       netinfo.enabled: true
 
+  # Only decode messages that look like JSON. Plain-text lines (system module
+  # auth.log/syslog, nginx, backup/restore jobs) are left untouched. Without this
+  # guard every such event gets a bogus `error.message: "parsing input as JSON: ..."`.
   - decode_json_fields:
+      when:
+        regexp:
+          message: '^\s*\{'
       fields: ['message']
       process_array: false
       max_depth: 1
