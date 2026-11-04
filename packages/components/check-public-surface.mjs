@@ -10,7 +10,7 @@
  */
 
 // Keeps @opencrvs/components a single entry point. See
-// docs/adr/0004-components-single-entry-point.md before changing ENTRY_POINTS.
+// docs/adr/0005-components-single-entry-point.md before changing ENTRY_POINTS.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
