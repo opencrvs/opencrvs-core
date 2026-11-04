@@ -62,15 +62,23 @@ export async function fileExists(path: DocumentPath | string, token: string) {
 }
 
 export async function presignFile(path: DocumentPath, token: string) {
-  const res = await fetch(
-    new URL(joinUrlPaths('/presigned-url', path), env.DOCUMENTS_URL),
-    {
-      method: 'GET',
-      headers: {
-        Authorization: token
-      }
+  const requestPath = joinUrlPaths('/presigned-url', path)
+  const url = new URL(requestPath, env.DOCUMENTS_URL)
+
+  /*
+   * URL resolution collapses `.`/`..` segments (encoded ones too), so the key
+   * documents-service signs could differ from the one that was authorized.
+   */
+  if (url.pathname !== requestPath) {
+    throw new Error(`Refusing to presign a non-canonical path: ${path}`)
+  }
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: token
     }
-  )
+  })
 
   if (!res.ok) {
     throw new Error(

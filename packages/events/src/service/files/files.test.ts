@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
-import { getUploadPath } from '@events/service/files'
+import { DocumentPath, UUID } from '@opencrvs/commons'
+import { getUploadPath, presignFile } from '@events/service/files'
 
 const eventId = '105b69b3-415f-4e53-b912-ef71484cb6c0' as UUID
 
@@ -53,4 +53,31 @@ describe('getUploadPath', () => {
       })
     ).toThrow(/eventId or path/)
   })
+})
+
+describe('presignFile', () => {
+  const token = 'Bearer test-token'
+
+  test.each([
+    `events/${eventId}/proof.png`,
+    `users/${eventId}/signature.png`,
+    `${eventId}.png`
+  ])('presigns the canonical path %s', async (path) => {
+    await expect(
+      presignFile(path as DocumentPath, token)
+    ).resolves.toMatchObject({ presignedURL: expect.any(String) })
+  })
+
+  test.each([
+    `users/../events/${eventId}/proof.png`,
+    `users/%2e%2e/events/${eventId}/proof.png`,
+    `events/${eventId}/./proof.png`
+  ])(
+    'refuses %s, which the URL would resolve to a different key',
+    async (path) => {
+      await expect(presignFile(path as DocumentPath, token)).rejects.toThrow(
+        `Refusing to presign a non-canonical path: ${path}`
+      )
+    }
+  )
 })
