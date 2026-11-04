@@ -26,7 +26,10 @@ import {
   UUID,
   user,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-  V2_DEFAULT_MOCK_LOCATIONS
+  V2_DEFAULT_MOCK_LOCATIONS,
+  toVersionedEventConfig,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import {
   VersionedLocation,
@@ -206,9 +209,9 @@ const mswConfig = {
     events: [
       tRPCMsw.event.config.get.query(() => {
         return [
-          childOnboardingWithHealthFacilitySearch,
-          tennisClubMembershipEvent,
-          footballClubMembershipEvent
+          toVersionedEventConfig(childOnboardingWithHealthFacilitySearch),
+          versionedTennisClubMembershipEvent,
+          versionedFootballClubMembershipEvent
         ]
       })
     ],

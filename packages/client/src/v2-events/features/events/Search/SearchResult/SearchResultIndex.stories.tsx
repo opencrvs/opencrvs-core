@@ -19,7 +19,9 @@ import {
   generateEventDocument,
   getCurrentEventState,
   TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -84,8 +86,8 @@ const longPillStoryParams = {
     handlers: {
       events: [
         tRPCMsw.event.config.get.query(() => [
-          tennisClubMembershipEvent,
-          footballClubMembershipEvent
+          versionedTennisClubMembershipEvent,
+          versionedFootballClubMembershipEvent
         ]),
         tRPCMsw.event.search.query(() => ({
           results: [

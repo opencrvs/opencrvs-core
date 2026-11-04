@@ -14,7 +14,11 @@ import React from 'react'
 import styled from 'styled-components'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -87,7 +91,7 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
       handlers: {
         event: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ]
       }

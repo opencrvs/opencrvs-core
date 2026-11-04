@@ -10,7 +10,7 @@
  */
 
 import { expect, test, vi, type Mock } from 'vitest'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import { getInMemoryVersionedEventConfigurations } from '@events/service/config/config'
 import { reuseEventConfigResponse } from './reuse-event-config-response'
 
 const env = vi.hoisted(() => ({ isProduction: true }))
@@ -18,10 +18,10 @@ const env = vi.hoisted(() => ({ isProduction: true }))
 vi.mock('@events/environment', () => ({ env }))
 
 vi.mock('@events/service/config/config', () => ({
-  getInMemoryEventConfigurations: vi.fn()
+  getInMemoryVersionedEventConfigurations: vi.fn()
 }))
 
-const mockedGetConfigurations = getInMemoryEventConfigurations as Mock
+const mockedGetConfigurations = getInMemoryVersionedEventConfigurations as Mock
 
 type MiddlewareOptions = Parameters<typeof reuseEventConfigResponse>[0]
 

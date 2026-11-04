@@ -19,6 +19,7 @@ import {
   EventIndex,
   QueryType,
   tennisClubMembershipEvent,
+  toVersionedEventConfig,
   WorkqueueCountInput
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -170,7 +171,7 @@ beforeEach(() => {
     keys: vi.fn().mockResolvedValue([])
   } as unknown as CacheStorage
   queryClient.clear()
-  addLocalEventConfig(tennisClubMembershipEvent)
+  addLocalEventConfig(toVersionedEventConfig(tennisClubMembershipEvent))
 })
 
 afterEach(() => {

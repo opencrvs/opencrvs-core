@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -33,7 +34,8 @@ import {
   getUUID,
   tennisClubMembershipEvent,
   TestUserRole,
-  withDeclaration
+  withDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -447,7 +449,9 @@ async function findDocumentRows(canvasElement: HTMLElement, name: string) {
 function handlersFor(event: EventDocument) {
   return {
     events: [
-      tRPCMsw.event.config.get.query(() => [eventConfig]),
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(eventConfig)
+      ]),
       tRPCMsw.event.get.query(() => event),
       tRPCMsw.event.search.query(() => ({
         results: [getCurrentEventState(event, eventConfig)],
