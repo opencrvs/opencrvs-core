@@ -5,6 +5,8 @@
 ### Upgrade guidance
 
 #### Outbox: empty it before you deploy
+- The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
+- Fix monitoring alerts that could never fire. Filebeat dropped the `input` field, which the system module's ingest pipeline needs to route events, so `auth.log` and `syslog` lines were never parsed (no `event.outcome`, `user.name`, `source.ip`) and the "Successful SSH login" rule could not match. It also dropped `kubernetes.container.name`, which the "Errors in backup logs" and "Errors in restore logs" Kibana rules query. In ElastAlert, `log-alert` now matches the shipped "Errors in backup logs" rule and also notifies about failed backups and restores ("Backup job failed", "Restore job failed", "Errors in restore logs"), which had no ElastAlert rule, and `service alert` reads the alert history index Kibana actually writes to and renders its email body. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment: the chart does not restart them when their configuration changes.
 
 2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
 

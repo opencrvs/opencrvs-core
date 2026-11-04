@@ -156,7 +156,6 @@ processors:
       fields:
         - agent
         - ecs
-        - input
         - host.ip
         - host.mac
         - host.os
@@ -179,7 +178,6 @@ processors:
         - container.runtime
         - time
         - kubernetes.node.name
-        - kubernetes.container.name
         - kubernetes.labels.pod-template-hash
         - level
       ignore_missing: true

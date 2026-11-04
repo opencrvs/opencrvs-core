@@ -6,11 +6,19 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Notifies about failed backups and restores. Covers these Kibana rules from kibana/config.ndjson:
+#   - "Errors in backup logs":  logs threshold rule,    context key logs__alert__document__count
+#   - "Backup job failed" and "Restore job failed": custom threshold rules, context key observability__rules__custom_threshold
+#   - "Errors in restore logs": Elasticsearch query rule, context key __es-query
 name: 'log-alert'
 type: 'frequency'
-index: 'kibana-alert-history-default'
+index: 'kibana-alert-history-*'
 is_enabled: true
 num_events: 1
+# realert is applied per query_key value, so the Kibana rules above do not
+# silence each other when they fire within the same 5 minutes.
+query_key: rule.name
 realert:
   minutes: 5
 terms_size: 50
@@ -26,7 +34,16 @@ filter:
       should:
         - term:
             rule.name.keyword:
-              value: 'Error in backup logs'
+              value: 'Errors in backup logs'
+        - term:
+            rule.name.keyword:
+              value: 'Backup job failed'
+        - term:
+            rule.name.keyword:
+              value: 'Restore job failed'
+        - term:
+            rule.name.keyword:
+              value: 'Errors in restore logs'
       minimum_should_match: 1
 
 alert:
@@ -38,7 +55,7 @@ email:
 http_post2_url: '${HTTP_POST2_ALERT_URL}'
 http_post2_payload:
   subject: '{% raw %}{{DOMAIN}}{% endraw %}: {{rule.name}} 🚨'
-  html: 'Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}. Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %} to view the alert.'
+  html: "Reason: {% if kibana.alert.context.observability__rules__custom_threshold is defined %}{{kibana.alert.context.observability__rules__custom_threshold.reason | trim('.')}}{% elif kibana.alert.context['__es-query'] is defined %}{{kibana.alert.context['__es-query'].conditions}}{% else %}{{kibana.alert.context.logs__alert__document__count.conditions}}{% endif %}. Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %} to view the alert."
   from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
 
@@ -48,7 +65,7 @@ alert_text_type: alert_text_jinja
 email_format: 'html'
 
 alert_text: |
-  <p>Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}.</p>
+  <p>Reason: {% if kibana.alert.context.observability__rules__custom_threshold is defined %}{{kibana.alert.context.observability__rules__custom_threshold.reason | trim('.')}}{% elif kibana.alert.context['__es-query'] is defined %}{{kibana.alert.context['__es-query'].conditions}}{% else %}{{kibana.alert.context.logs__alert__document__count.conditions}}{% endif %}.</p>
 
   <p>Open Kibana:</p>
   <p><a href="https://kibana.${DOMAIN}">https://kibana.${DOMAIN}</a></p>
