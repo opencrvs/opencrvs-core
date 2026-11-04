@@ -27,7 +27,7 @@ test('Custom field works offline in a form not opened before', async ({
   page,
   context
 }) => {
-  await test.step('Log in and wait until the module is cached', async () => {
+  await test.step('Log in, open the app again and wait until the module is cached', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     await expect(page.locator('#content-name')).toHaveText('Assigned to you')
 
@@ -39,6 +39,17 @@ test('Custom field works offline in a form not opened before', async ({
       !(await hasPrecachedBuildAssets(page)),
       'The development server serves the client without a precache, so the app cannot open offline.'
     )
+
+    /*
+     * On the first visit, the app loads its country config before the service
+     * worker is active, so the service worker does not cache it. The app is
+     * opened again online, as a user does before they go offline.
+     */
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready
+    })
+    await page.goto(CLIENT_URL)
+    await expect(page.locator('#content-name')).toHaveText('Assigned to you')
 
     /*
      * The response has `Vary: origin`, and the module request of the browser
