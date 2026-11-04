@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Button, Icon } from '@opencrvs/components'
 import { useNavigate, useNavigationType } from 'react-router-dom'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { useHomePage } from '@client/hooks/useHomePage'
 
 export function HistoryNavigator({

@@ -24,11 +24,16 @@ import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName } from '@client/utils/userUtils'
 import { trpcOptionsProxy } from '@client/v2-events/trpc'
 import { BackgroundWrapper } from '@client/views/common/Common'
-import { Box, Link, Stack, Toast } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
+import {
+  Box,
+  Link,
+  Stack,
+  Toast,
+  Button,
+  Icon,
+  InputField,
+  PasswordInput
+} from '@opencrvs/components'
 import React, {
   ChangeEvent,
   FocusEventHandler,

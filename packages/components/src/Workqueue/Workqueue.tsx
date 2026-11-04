@@ -10,13 +10,11 @@
  */
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { grid } from '../grid'
-import { IColumn, IActionObject } from './types'
+import { grid, ITheme } from '../tokens'
+import { IColumn, IActionObject, IAction } from './types'
 import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
-import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
-import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
 import { useWindowSize } from '../hooks'
 

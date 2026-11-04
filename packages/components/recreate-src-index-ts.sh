@@ -31,8 +31,6 @@ done >> index.ts
 # Append file footer to to index.ts
 cat >> index.ts <<- EOM
 
-export * from './colors'
-export * from './fonts'
-export * from './grid'
-export * from './theme'
+export * from './hooks'
+export * from './tokens'
 EOM

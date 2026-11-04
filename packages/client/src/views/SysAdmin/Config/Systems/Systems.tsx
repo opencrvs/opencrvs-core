@@ -26,12 +26,13 @@ import {
   TextInput,
   Toast,
   Dialog,
-  ToggleMenu
+  ToggleMenu,
+  Button,
+  Content,
+  Icon,
+  Text,
+  CopyButton
 } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -40,7 +41,6 @@ import {
   IntegrationItem,
   IntegrationDetails
 } from './useIntegrations'
-import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
