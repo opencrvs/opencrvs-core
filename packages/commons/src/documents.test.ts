@@ -72,6 +72,14 @@ describe('parseDocumentPath', () => {
     })
   })
 
+  it('parses a new user signature under a temporary id, with no user id', () => {
+    expect(parseDocumentPath(`users/tmp-${eventId}/${file}`)).toEqual({
+      kind: 'user',
+      userId: null,
+      path: `users/tmp-${eventId}/${file}`
+    })
+  })
+
   it.each([file, 'avatar.jpg', 'signature-2.png'])(
     'parses a bare legacy path %s',
     (value) => {
@@ -86,6 +94,9 @@ describe('parseDocumentPath', () => {
     `events/${eventId}/%2e%2e%2F${file}`,
     `events/${eventId}/./${file}`,
     `events/not-a-uuid/${file}`,
+    `events/tmp-${eventId}/${file}`,
+    `users/tmp-not-a-uuid/${file}`,
+    `users/tmp-${eventId}/../${file}`,
     `events//${file}`,
     `/events/${eventId}/${file}`,
     `events/${eventId}/nested/${file}`,

@@ -95,11 +95,13 @@ export function isAttachmentPath(value: string): value is AttachmentPath {
  * A storage key in one of the shapes the system writes, with its owner:
  * - `events/{eventId}/{file}`: a record attachment
  * - `users/{userId}/{file}`: a user's avatar or signature
+ * - `users/tmp-{uuid}/{file}`: a signature uploaded while creating a user,
+ *   before the user had an id (userId is null)
  * - `{file}`: a key from before attachment prefixes existed (record or user)
  */
 export type ParsedDocumentPath =
   | { kind: 'event'; eventId: UUID; path: DocumentPath }
-  | { kind: 'user'; userId: UUID; path: DocumentPath }
+  | { kind: 'user'; userId: UUID | null; path: DocumentPath }
   | { kind: 'legacy'; path: DocumentPath }
 
 /**
@@ -128,7 +130,23 @@ export function parseDocumentPath(value: string): ParsedDocumentPath | null {
 
   const [prefix, ownerId, file] = segments
   // Same check as UUID, without importing it at runtime (it pulls in `uuid`)
-  if (!z.uuid().safeParse(ownerId).success || !FILE_SEGMENT.test(file)) {
+  const isUuid = (id: string) => z.uuid().safeParse(id).success
+
+  if (!FILE_SEGMENT.test(file)) {
+    return null
+  }
+
+  // The user form uploads the signature under a temporary id that is never replaced
+  // TODO: remove once new users' files are stored under their real id and existing tmp- paths are migrated
+  if (
+    prefix === 'users' &&
+    ownerId.startsWith('tmp-') &&
+    isUuid(ownerId.slice('tmp-'.length))
+  ) {
+    return { kind: 'user', userId: null, path }
+  }
+
+  if (!isUuid(ownerId)) {
     return null
   }
 
