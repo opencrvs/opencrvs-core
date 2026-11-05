@@ -53,10 +53,9 @@ services:
       #    - '1358:1358'
       #  links:
       #    - elasticsearch
-  minio:
+  rustfs:
     ports:
       - "3535:3535"
       - "3536:3536"
     volumes:
-      - "./data/minio:/data"
-    command: server --address ":3535" --console-address ":3536" /data
+      - "./data/rustfs:/data"
