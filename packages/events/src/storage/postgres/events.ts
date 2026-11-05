@@ -28,12 +28,10 @@ types.setTypeParser(types.builtins.TIMESTAMPTZ, (str) =>
 let db: Kysely<Schema> | undefined
 let pool: Pool | undefined
 let lockPool: Pool | undefined
-let poolConnectionString: string | undefined
 
 export const getPool = (connectionString = env.EVENTS_POSTGRES_URL) => {
   if (!pool) {
     pool = new Pool({ connectionString })
-    poolConnectionString = connectionString
   }
 
   return pool
@@ -47,7 +45,7 @@ export const getPool = (connectionString = env.EVENTS_POSTGRES_URL) => {
 export function getLockPool() {
   if (!lockPool) {
     lockPool = new Pool({
-      connectionString: poolConnectionString ?? env.EVENTS_POSTGRES_URL,
+      connectionString: getPool().options.connectionString,
       max: 20
     })
   }
@@ -83,7 +81,6 @@ export function getClient() {
 export function resetServer() {
   db = undefined
   pool = undefined
-  poolConnectionString = undefined
 }
 
 export async function ensureConnection() {

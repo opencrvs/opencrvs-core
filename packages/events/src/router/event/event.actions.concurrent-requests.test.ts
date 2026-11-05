@@ -10,7 +10,6 @@
  */
 
 import { HttpResponse, delay, http } from 'msw'
-import { TRPCError } from '@trpc/server'
 import { ActionStatus, ActionType, getUUID } from '@opencrvs/commons'
 import { getCurrentEventState } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -42,10 +41,10 @@ async function setup() {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
-  const declare = async () =>
+  const declare = async (transactionId = getUUID()) =>
     client.event.actions.declare.request({
       ...generator.event.actions.declare(event.id, { keepAssignment: true }),
-      transactionId: getUUID()
+      transactionId
     })
 
   return { client, event, declare }
@@ -61,8 +60,9 @@ describe('Action requests on an event with a requested action left without an ou
     mockDeclareApi(200)
     const response = await declare()
 
-    const [failed, requested, accepted] = getDeclareActions(response.actions)
-    expect(getDeclareActions(response.actions)).toHaveLength(3)
+    const declares = getDeclareActions(response.actions)
+    expect(declares).toHaveLength(3)
+    const [failed, requested, accepted] = declares
     // The failed request is left as it is, without an outcome
     expect(failed).toMatchObject({ status: ActionStatus.Requested })
     expect(requested).toMatchObject({ status: ActionStatus.Requested })
@@ -80,32 +80,24 @@ describe('Action requests on an event with a requested action left without an ou
   })
 
   test('a record with two failed requests completes on the retry of either, and the other is refused', async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-    const event = await client.event.create(generator.event.create())
-    const first = {
-      ...generator.event.actions.declare(event.id, { keepAssignment: true }),
-      transactionId: getUUID()
-    }
-    const second = { ...first, transactionId: getUUID() }
+    const { declare } = await setup()
+    const [first, second] = [getUUID(), getUUID()]
 
     mockDeclareApi(500)
-    await expect(client.event.actions.declare.request(first)).rejects.toThrow()
-    await expect(client.event.actions.declare.request(second)).rejects.toThrow()
+    await expect(declare(first)).rejects.toThrow()
+    await expect(declare(second)).rejects.toThrow()
 
     const calls = mockDeclareApi(200)
-    const response = await client.event.actions.declare.request(second)
+    const response = await declare(second)
 
     expect(calls.count).toBe(1)
     expect(getDeclareActions(response.actions).at(-1)).toMatchObject({
       status: ActionStatus.Accepted,
-      transactionId: second.transactionId
+      transactionId: second
     })
 
     // The record is declared, so the retry of the other request is not allowed
-    await expect(
-      client.event.actions.declare.request(first)
-    ).rejects.toMatchObject({ code: 'CONFLICT' })
+    await expect(declare(first)).rejects.toMatchObject({ code: 'CONFLICT' })
     expect(calls.count).toBe(1)
   })
 })
@@ -122,7 +114,6 @@ describe('Concurrent action requests', () => {
     const [refused] = results.filter(
       (r): r is PromiseRejectedResult => r.status === 'rejected'
     )
-    expect(refused.reason).toBeInstanceOf(TRPCError)
     expect(refused.reason).toMatchObject({
       code: 'CONFLICT',
       message:

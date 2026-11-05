@@ -213,11 +213,8 @@ async function requestAction(
     configuration
   })
 
-  // Look the requested action up by this request's own identity. The event can hold other
-  // requested actions without an outcome, e.g. from an earlier request whose confirmation
-  // failed, and they must not stop this request from finding its own.
-  // The insert is idempotent on (transaction id, action type, status), so a retry of this
-  // request finds the action stored by its first attempt.
+  // Find this request's own action: other requested actions may remain from earlier failed
+  // confirmations. The insert is idempotent, so a retry finds the action of its first attempt.
   const requestedAction = eventWithRequestedAction.actions.find(
     (action) =>
       action.status === ActionStatus.Requested &&

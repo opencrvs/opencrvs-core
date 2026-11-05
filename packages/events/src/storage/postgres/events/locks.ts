@@ -29,27 +29,30 @@ export async function withEventLock<T>(
   eventId: UUID,
   fn: () => Promise<T>
 ): Promise<{ acquired: false } | { acquired: true; result: T }> {
+  const lockKey = [ACTION_REQUEST_LOCK_NAMESPACE, eventId]
   const client = await getLockPool().connect()
+  let acquired = false
   let releaseError: Error | undefined
 
   try {
     const { rows } = await client.query<{ acquired: boolean }>(
       'SELECT pg_try_advisory_lock($1, hashtext($2)) AS acquired',
-      [ACTION_REQUEST_LOCK_NAMESPACE, eventId]
+      lockKey
     )
+    acquired = rows[0].acquired
 
-    if (!rows[0].acquired) {
+    if (!acquired) {
       return { acquired: false }
     }
 
-    try {
-      return { acquired: true, result: await fn() }
-    } finally {
+    return { acquired: true, result: await fn() }
+  } finally {
+    if (acquired) {
       try {
-        await client.query('SELECT pg_advisory_unlock($1, hashtext($2))', [
-          ACTION_REQUEST_LOCK_NAMESPACE,
-          eventId
-        ])
+        await client.query(
+          'SELECT pg_advisory_unlock($1, hashtext($2))',
+          lockKey
+        )
       } catch (error) {
         // Destroying the connection below ends the session, which releases the lock.
         releaseError = error as Error
@@ -59,7 +62,6 @@ export async function withEventLock<T>(
         )
       }
     }
-  } finally {
     client.release(releaseError)
   }
 }
