@@ -72,25 +72,6 @@ export function useEventConfigurations() {
   )
 }
 
-/**
- * Fetches configured events and finds a matching event
- * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
- * @returns event configuration
- */
-export function useEventConfiguration(eventIdentifier: string): {
-  eventConfiguration: EventConfig
-} {
-  const config = useEventConfigurations()
-  const eventConfiguration = config.find(
-    (event) => event.id === eventIdentifier
-  )
-  if (!eventConfiguration) {
-    throw new Error('Event configuration not found')
-  }
-
-  return { eventConfiguration }
-}
-
 /** A record, as far as resolving its configuration version is concerned */
 interface VersionedRecord {
   type: string

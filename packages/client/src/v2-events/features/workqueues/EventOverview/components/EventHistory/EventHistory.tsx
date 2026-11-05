@@ -48,7 +48,7 @@ import {
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { resolveLocationName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
@@ -450,7 +450,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const validatorContext = useValidatorContext(fullEvent)
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
 
   const intl = useIntl()
   const theme = useTheme()

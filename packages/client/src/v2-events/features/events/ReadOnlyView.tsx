@@ -34,7 +34,7 @@ import {
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -82,9 +82,8 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
 
   const { useRemoteDraftByEventId } = useDrafts()
   const draft = useRemoteDraftByEventId(event.id)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
 
   const eventStateWithDraft = useMemo(() => {
     const eventState = getCurrentEventState(event, configuration)

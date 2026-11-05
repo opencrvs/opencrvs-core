@@ -22,7 +22,7 @@ import {
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
 
@@ -63,7 +63,7 @@ export function SystemUpdatedFields({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
   const fields = getDeclarationFields(eventConfiguration)
   const currentState = getCurrentEventState(fullEvent, eventConfiguration)
   const anchor = recordAnchorDate(currentState)
@@ -75,7 +75,11 @@ export function SystemUpdatedFields({
     }
     // Skip fields that already appear in the action's reviewable content.
     if (
-      isFieldDisplayedOnReview(field, currentState.declaration, validatorContext)
+      isFieldDisplayedOnReview(
+        field,
+        currentState.declaration,
+        validatorContext
+      )
     ) {
       return []
     }

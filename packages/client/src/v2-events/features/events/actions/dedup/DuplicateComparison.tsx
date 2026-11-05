@@ -49,7 +49,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -163,7 +163,8 @@ export function DuplicateComparison({
   )
 
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-  const { eventConfiguration } = useEventConfiguration(originalEventState.type)
+  const { eventConfiguration } =
+    useEventConfigurationForRecord(originalEventState)
 
   const flattenedPotentialDuplicateEvent = flattenEventIndex(
     potentialDuplicateEventState
