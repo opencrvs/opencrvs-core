@@ -54,17 +54,45 @@ describe('Custom field', () => {
 
   it('renders the Output of the module', async () => {
     renderWithTheme(
-      <Custom.Output id="custom" src={fixture('counter.js')} value={42} />
+      <Custom.Output
+        configuration={undefined}
+        id="custom"
+        src={fixture('counter.js')}
+        value={42}
+      />
     )
 
     expect(await screen.findByText('Value is 42')).toBeTruthy()
   })
 
+  it('gives the configuration to the Output of the module', async () => {
+    renderWithTheme(
+      <Custom.Output
+        configuration={{ unit: 'points' }}
+        id="custom"
+        src={fixture('counter.js')}
+        value={42}
+      />
+    )
+
+    expect(await screen.findByText('Value is 42 points')).toBeTruthy()
+  })
+
   it('calls the factory of a module only once', async () => {
     renderWithTheme(
       <>
-        <Custom.Output id="first" src={fixture('counter.js')} value={1} />
-        <Custom.Output id="second" src={fixture('counter.js')} value={2} />
+        <Custom.Output
+          configuration={undefined}
+          id="first"
+          src={fixture('counter.js')}
+          value={1}
+        />
+        <Custom.Output
+          configuration={undefined}
+          id="second"
+          src={fixture('counter.js')}
+          value={2}
+        />
       </>
     )
 
@@ -78,6 +106,7 @@ describe('Custom field', () => {
   it('shares the React of the client before a bundled module loads', async () => {
     renderWithTheme(
       <Custom.Output
+        configuration={undefined}
         id="custom"
         src={fixture('shared-externals.js')}
         value={1}
@@ -93,7 +122,12 @@ describe('Custom field', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     renderWithTheme(
-      <Custom.Output id="custom" src={fixture('named-exports.js')} value={1} />
+      <Custom.Output
+        configuration={undefined}
+        id="custom"
+        src={fixture('named-exports.js')}
+        value={1}
+      />
     )
 
     expect(await screen.findByText('Error loading component')).toBeTruthy()
@@ -103,7 +137,12 @@ describe('Custom field', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     renderWithTheme(
-      <Custom.Output id="custom" src={fixture('missing.js')} value={1} />
+      <Custom.Output
+        configuration={undefined}
+        id="custom"
+        src={fixture('missing.js')}
+        value={1}
+      />
     )
 
     expect(await screen.findByText('Error loading component')).toBeTruthy()
@@ -114,7 +153,12 @@ describe('Custom field', () => {
 
     renderWithTheme(
       <>
-        <Custom.Output id="custom" src={fixture('throws.js')} value={1} />
+        <Custom.Output
+          configuration={undefined}
+          id="custom"
+          src={fixture('throws.js')}
+          value={1}
+        />
         <span>{'Sibling field'}</span>
       </>
     )
@@ -145,7 +189,14 @@ describe('Custom field', () => {
       (globalThis as { preloadFactoryCalls?: number }).preloadFactoryCalls
     expect(calls()).toBe(1)
 
-    renderWithTheme(<Custom.Output id="custom" src={src} value={1} />)
+    renderWithTheme(
+      <Custom.Output
+        configuration={undefined}
+        id="custom"
+        src={src}
+        value={1}
+      />
+    )
     expect(await screen.findByText('Preloaded field')).toBeTruthy()
     expect(calls()).toBe(1)
   })

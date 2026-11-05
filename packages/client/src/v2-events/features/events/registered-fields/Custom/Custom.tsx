@@ -37,6 +37,7 @@ interface OutputProps {
   id: string
   src: string
   value?: unknown
+  configuration: unknown
 }
 
 interface CustomFieldModule {

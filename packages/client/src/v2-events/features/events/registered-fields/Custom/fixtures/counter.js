@@ -28,8 +28,9 @@ export default function createCounterField({ React }) {
     )
   }
 
-  function Output({ value }) {
-    return React.createElement('span', null, 'Value is ' + value)
+  function Output({ value, configuration }) {
+    const unit = configuration?.unit ? ' ' + configuration.unit : ''
+    return React.createElement('span', null, 'Value is ' + value + unit)
   }
 
   return { Input, Output }

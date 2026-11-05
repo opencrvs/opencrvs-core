@@ -50,15 +50,20 @@ function Input({
   )
 }
 
-function Output({ id, value }: CustomFieldOutputProps<number>) {
+function Output({
+  id,
+  value,
+  configuration
+}: CustomFieldOutputProps<number, Configuration>) {
   if (typeof value !== 'number') {
     return null
   }
+  const max = configuration?.max ?? DEFAULT_MAX
   return (
     <span id={id}>
       {'★'.repeat(value)}
-      {'☆'.repeat(Math.max(DEFAULT_MAX - value, 0))}{' '}
-      <SkillLabel level={value} max={DEFAULT_MAX} />
+      {'☆'.repeat(Math.max(max - value, 0))}{' '}
+      <SkillLabel level={value} max={max} />
     </span>
   )
 }

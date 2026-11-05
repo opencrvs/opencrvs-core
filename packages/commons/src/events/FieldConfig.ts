@@ -1308,7 +1308,7 @@ const CustomField = BaseField.extend({
   configuration: z
     .unknown()
     .optional()
-    .describe('Passed as is to the Input component of the module')
+    .describe('Passed as is to the Input and Output components of the module')
 }).meta({
   description:
     'An experimental custom field that is defined by an ES module, e.g. one served by the country config',

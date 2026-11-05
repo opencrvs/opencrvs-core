@@ -40,9 +40,13 @@ export interface CustomFieldInputProps<
   configuration: Configuration
 }
 
-export interface CustomFieldOutputProps<Value = unknown> {
+export interface CustomFieldOutputProps<
+  Value = unknown,
+  Configuration = unknown
+> {
   id: string
   value?: Value
+  configuration: Configuration
 }
 
 const NAMESPACE = 'opencrvs-custom-field-external'
