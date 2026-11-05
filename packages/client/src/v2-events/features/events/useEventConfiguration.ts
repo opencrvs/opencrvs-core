@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
@@ -109,4 +109,22 @@ export function useEventConfigurationForRecord(record: VersionedRecord): {
     },
     variant: 'notice'
   })
+}
+
+/**
+ * @returns a function giving the configuration of the version a record was created
+ * under, or undefined when that version is not cached. For code that handles records
+ * outside a record page (actions, drafts, validation).Meanwhile, a record page uses
+ * `useEventConfigurationForRecord`.
+ */
+export function useEventConfigurationResolver() {
+  const versionedConfigs = useVersionedEventConfigurations()
+
+  return useCallback(
+    (record: VersionedRecord): EventConfig | undefined => {
+      const config = versionedConfigs.find(({ id }) => id === record.type)
+      return config && findEventConfigForRecord(config, record)
+    },
+    [versionedConfigs]
+  )
 }
