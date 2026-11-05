@@ -13,11 +13,12 @@ import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
   ApplicationConfig,
-  EventConfig,
   getOrThrow,
   logger,
+  resolveEventConfig,
   Role,
   TokenWithBearer,
+  VersionedEventConfig,
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -97,17 +98,25 @@ async function getEventConfigurations(token: TokenWithBearer) {
     )
   }
 
-  return array(EventConfig).parse(await res.json())
+  return array(VersionedEventConfig).parse(await res.json())
 }
 
 /**
- * @returns event configurations, cached in production for up to
+ * @returns event configurations with every version, cached in production for up to
  * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
  */
-export const getInMemoryEventConfigurations = createTtlConfigCache(
+export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
   'event configurations',
   getEventConfigurations
 )
+
+/**
+ * @returns the configuration of each event, at the version that applies (see `resolveEventConfig`).
+ */
+export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
+  const configurations = await getInMemoryVersionedEventConfigurations(token)
+  return configurations.map(resolveEventConfig)
+}
 
 async function findEventConfigurationById({
   eventType,

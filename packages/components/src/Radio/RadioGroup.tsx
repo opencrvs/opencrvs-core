@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { RadioButton } from './RadioButton'
 import { NoticeWrapper } from '../DateField'
-import { InputLabel } from '../InputField/InputLabel'
+import { InputLabel } from '../InputField'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -122,9 +122,7 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={
-                  props.onChange as (
-                    value: string | number | boolean
-                  ) => void
+                  props.onChange as (value: string | number | boolean) => void
                 }
               />
               {nestedFields &&
@@ -158,9 +156,7 @@ export const RadioGroup = ({
                 }
                 selected={value}
                 onChange={
-                  props.onChange as (
-                    value: string | number | boolean
-                  ) => void
+                  props.onChange as (value: string | number | boolean) => void
                 }
               />
             </div>

@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  tennisClubMembershipEvent,
   EventDocument,
-  EventIndex
+  EventIndex,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -31,7 +31,7 @@ describe('deleteLocalEvent', () => {
       keys: vi.fn().mockResolvedValue([])
     } as unknown as CacheStorage
     queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
   })
 
   afterAll(() => {
@@ -62,7 +62,7 @@ describe('deleteLocalEvent', () => {
 describe('updateLocalEventIndex', () => {
   beforeEach(() => {
     queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
   })
 
   afterAll(() => {

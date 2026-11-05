@@ -15,7 +15,7 @@ import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import {
   TimeField as TimeFieldComponent,
   ITimeFieldProps as TimeFieldProps
-} from '@opencrvs/components/lib/TimeField'
+} from '@opencrvs/components'
 import { TimeValue } from '@opencrvs/commons/client'
 
 const messages = defineMessages({

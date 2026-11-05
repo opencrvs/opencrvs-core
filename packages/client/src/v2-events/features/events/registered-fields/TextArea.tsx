@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { TextArea as TextAreaComponent } from '@opencrvs/components/lib/TextArea'
+import { TextArea as TextAreaComponent } from '@opencrvs/components'
 import { Text } from './Text'
 
 interface TextAreaProps

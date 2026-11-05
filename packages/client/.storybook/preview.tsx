@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { getTheme } from '@opencrvs/components'
 import type { Preview } from '@storybook/react-vite'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import { configure } from 'storybook/test'
@@ -50,7 +50,8 @@ import {
   TestUserRole,
   TokenUserType,
   UUID,
-  ChildOnboardingEvent
+  ChildOnboardingEvent,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,
@@ -333,7 +334,7 @@ const preview: Preview = {
       ]
 
       offlineConfigs.forEach((config) => {
-        addLocalEventConfig(config)
+        addLocalEventConfig(toVersionedEventConfig(config))
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

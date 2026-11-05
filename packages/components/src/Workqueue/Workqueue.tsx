@@ -10,13 +10,16 @@
  */
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { grid } from '../grid'
-import { IColumn, IActionObject } from './types'
+import { grid, ITheme } from '../tokens'
+import {
+  ColumnContentAlignment,
+  IColumn,
+  IActionObject,
+  IAction
+} from './types'
 import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
-import { ITheme } from '../theme'
-import { SortIcon } from '../icons/SortIcon'
-import { IAction } from '../common-types'
+import { SortIcon } from '../icons'
 import { ListItemAction } from './components/ListItemAction'
 import { useWindowSize } from '../hooks'
 
@@ -86,12 +89,6 @@ const ColumnTitleWrapper = styled.div<{ alignment?: string }>`
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
 `
-
-export enum ColumnContentAlignment {
-  LEFT = 'left',
-  RIGHT = 'right',
-  CENTER = 'center'
-}
 
 export enum COLUMNS {
   ICON_WITH_NAME = 'iconWithName',

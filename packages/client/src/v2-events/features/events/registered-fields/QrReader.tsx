@@ -10,7 +10,7 @@
  */
 import { useIntl } from 'react-intl'
 import React from 'react'
-import { QrReader as QrReaderUI } from '@opencrvs/components/lib/IdReader/readers/QrReader/QrReader'
+import { QrReader as QrReaderUI } from '@opencrvs/components'
 import { QrReaderField, QrReaderFieldValue } from '@opencrvs/commons/client'
 import {
   tutorialMessages,

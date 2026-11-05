@@ -11,7 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
+import { Check, Cross } from '@opencrvs/components/icons'
 import {
   Dialog,
   Text,

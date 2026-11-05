@@ -27,8 +27,8 @@ import {
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
+  Dialog,
   Button,
   Content,
   ContentSize,

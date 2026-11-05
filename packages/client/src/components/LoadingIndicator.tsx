@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ConnectionError } from '@opencrvs/components/lib/icons'
+import { Spinner } from '@opencrvs/components'
+import { ConnectionError } from '@opencrvs/components/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { errorMessages, constantsMessages } from '@client/i18n/messages'

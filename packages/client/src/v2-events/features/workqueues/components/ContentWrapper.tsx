@@ -10,10 +10,13 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { NoResultText } from '@opencrvs/components/lib/Workqueue'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Text } from '@opencrvs/components'
+import {
+  Content,
+  ContentSize,
+  NoResultText,
+  Pagination,
+  Text
+} from '@opencrvs/components'
 import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
 import { useOnlineStatus } from '@client/utils'
 

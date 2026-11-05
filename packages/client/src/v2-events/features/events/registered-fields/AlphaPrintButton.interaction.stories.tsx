@@ -28,7 +28,8 @@ import {
   not,
   FieldConditional,
   ValidatorContext,
-  generateEventDocument
+  generateEventDocument,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -61,7 +62,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
       handlers: {
         event: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ]
       }

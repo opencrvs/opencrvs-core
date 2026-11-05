@@ -13,7 +13,7 @@ import { DocsContainer } from '@storybook/addon-docs/blocks'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import WebFont from 'webfontloader'
 import type { Preview } from '@storybook/react-vite'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { getTheme } from '@opencrvs/components'
 
 const theme = getTheme()
 

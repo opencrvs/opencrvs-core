@@ -9,10 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Button, Toast, Dialog } from '@opencrvs/components'
+import {
+  Button,
+  Toast,
+  Dialog,
+  InputField,
+  TextInput
+} from '@opencrvs/components'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'

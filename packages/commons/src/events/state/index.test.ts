@@ -13,7 +13,7 @@ import { deepDropNulls, getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID, UUID } from '../../uuid'
 import { DocumentPath } from '../../documents'
-import { ActionStatus, EventState } from '../ActionDocument'
+import { ActionStatus, ActionUpdate, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
 import { EventStatus } from '../EventMetadata'
@@ -1716,5 +1716,198 @@ describe('revoke/reinstate status resolution', () => {
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(state.status).toBe(EventStatus.enum.REGISTERED)
     expect(state.legalStatuses.REVOKED).toBeUndefined()
+  })
+})
+
+describe('current state is the data of the act behind the status, plus later edits or corrections', () => {
+  function acceptedAction(
+    type: ActionType,
+    second: number,
+    declaration: ActionUpdate = {}
+  ) {
+    return generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: type,
+      declarationOverrides: {},
+      defaults: {
+        createdAt: `2025-01-01T00:00:${String(second).padStart(2, '0')}.000Z`,
+        declaration
+      }
+    })
+  }
+
+  function eventWith(actions: EventDocument['actions']): EventDocument {
+    return {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      id: getUUID(),
+      createdAt: '2025-01-01T00:00:00.000Z',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      actions
+    }
+  }
+
+  const notifiedName = { firstname: 'Notified', surname: 'Name' }
+  const declaredName = { firstname: 'Declared', surname: 'Name' }
+  const correctedName = { firstname: 'Corrected', surname: 'Name' }
+
+  test('NOTIFIED: notify data plus edits', () => {
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.NOTIFY, 1, {
+        'applicant.name': notifiedName,
+        'applicant.email': 'notified@example.com'
+      }),
+      acceptedAction(ActionType.EDIT, 2, {
+        'applicant.email': 'edited@example.com'
+      })
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.NOTIFIED)
+    expect(state.declaration).toEqual({
+      'applicant.name': notifiedName,
+      'applicant.email': 'edited@example.com'
+    })
+  })
+
+  test('DECLARED: declare data plus edits', () => {
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.NOTIFY, 1, {
+        'applicant.name': notifiedName
+      }),
+      acceptedAction(ActionType.DECLARE, 2, {
+        'applicant.name': declaredName,
+        'applicant.email': 'declared@example.com'
+      }),
+      acceptedAction(ActionType.EDIT, 3, {
+        'applicant.email': 'edited@example.com'
+      })
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.DECLARED)
+    expect(state.declaration).toEqual({
+      'applicant.name': declaredName,
+      'applicant.email': 'edited@example.com'
+    })
+  })
+
+  test('ARCHIVED after notify: notify data plus edits', () => {
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.NOTIFY, 1, {
+        'applicant.name': notifiedName,
+        'applicant.email': 'notified@example.com'
+      }),
+      acceptedAction(ActionType.EDIT, 2, {
+        'applicant.email': 'edited@example.com'
+      }),
+      acceptedAction(ActionType.ARCHIVE, 3)
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.ARCHIVED)
+    expect(state.declaration).toEqual({
+      'applicant.name': notifiedName,
+      'applicant.email': 'edited@example.com'
+    })
+  })
+
+  test('ARCHIVED after declare: declare data plus edits', () => {
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.DECLARE, 1, {
+        'applicant.name': declaredName,
+        'applicant.email': 'declared@example.com'
+      }),
+      acceptedAction(ActionType.EDIT, 2, {
+        'applicant.email': 'edited@example.com'
+      }),
+      acceptedAction(ActionType.ARCHIVE, 3)
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.ARCHIVED)
+    expect(state.declaration).toEqual({
+      'applicant.name': declaredName,
+      'applicant.email': 'edited@example.com'
+    })
+  })
+
+  test('REGISTERED: register data plus corrections', () => {
+    const correctionRequest = acceptedAction(ActionType.REQUEST_CORRECTION, 4, {
+      'applicant.name': correctedName
+    })
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.DECLARE, 1, {
+        'applicant.name': declaredName,
+        'applicant.email': 'declared@example.com'
+      }),
+      acceptedAction(ActionType.REGISTER, 2, {
+        'applicant.email': 'registered@example.com'
+      }),
+      correctionRequest,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.APPROVE_CORRECTION,
+        declarationOverrides: {},
+        defaults: {
+          createdAt: '2025-01-01T00:00:05.000Z',
+          declaration: {},
+          requestId: correctionRequest.id
+        }
+      })
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.REGISTERED)
+    expect(state.declaration).toEqual({
+      'applicant.name': correctedName,
+      'applicant.email': 'registered@example.com'
+    })
+  })
+
+  test('REVOKED: register data plus corrections', () => {
+    const correctionRequest = acceptedAction(ActionType.REQUEST_CORRECTION, 4, {
+      'applicant.name': correctedName
+    })
+    const event = eventWith([
+      acceptedAction(ActionType.CREATE, 0),
+      acceptedAction(ActionType.DECLARE, 1, {
+        'applicant.name': declaredName,
+        'applicant.email': 'declared@example.com'
+      }),
+      acceptedAction(ActionType.REGISTER, 2, {
+        'applicant.email': 'registered@example.com'
+      }),
+      correctionRequest,
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.APPROVE_CORRECTION,
+        declarationOverrides: {},
+        defaults: {
+          createdAt: '2025-01-01T00:00:05.000Z',
+          declaration: {},
+          requestId: correctionRequest.id
+        }
+      }),
+      acceptedAction(ActionType.REVOKE_REGISTRATION, 6)
+    ])
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.REVOKED)
+    expect(state.declaration).toEqual({
+      'applicant.name': correctedName,
+      'applicant.email': 'registered@example.com'
+    })
   })
 })
