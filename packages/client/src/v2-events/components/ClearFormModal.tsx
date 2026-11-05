@@ -10,9 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { Dialog } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Stack, Text } from '@opencrvs/components'
+import { Dialog, Button, Stack, Text } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 
 const clearFormModalMessages = defineMessages({

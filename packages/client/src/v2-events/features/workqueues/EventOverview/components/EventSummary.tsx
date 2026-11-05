@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { List } from '@opencrvs/components/lib/List'
+import { List } from '@opencrvs/components'
 import {
   EventConfig,
   getDeclarationFields,
@@ -100,14 +100,6 @@ const messages = {
       id: 'event.summary.trackingId.value',
       defaultMessage: '{event.trackingId}',
       description: 'Tracking id value'
-    }
-  },
-  configVersion: {
-    label: {
-      id: 'event.summary.configVersion.label',
-      defaultMessage: 'Configuration version',
-      description:
-        'Label for the id of the event configuration version the record was created under'
     }
   },
   registrationNumber: {
@@ -277,12 +269,6 @@ export function EventSummary({
             messages.registrationNumber.emptyValueMessage
           )}
           value={intl.formatMessage(messages.registrationNumber.value, event)}
-        />
-        <List.Item
-          key="configVersion"
-          data-testid="configVersion"
-          label={intl.formatMessage(messages.configVersion.label)}
-          value={eventIndex.configVersionId}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)

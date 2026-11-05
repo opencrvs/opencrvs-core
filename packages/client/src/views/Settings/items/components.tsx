@@ -10,8 +10,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ListItemProps } from '@opencrvs/components/lib/List'
+import { LinkButton } from '@opencrvs/components/legacy'
+import { ListItemProps } from '@opencrvs/components'
 
 export const DynamicHeightLinkButton = styled(LinkButton)`
   height: auto;

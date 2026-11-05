@@ -19,9 +19,10 @@ import subYears from 'date-fns/subYears'
 import { DateRangeFieldValue, PlainDate } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
-  IDateFieldProps as DateFieldProps
-} from '@opencrvs/components/lib/DateField'
-import { Checkbox, Link } from '@opencrvs/components'
+  IDateFieldProps as DateFieldProps,
+  Checkbox,
+  Link
+} from '@opencrvs/components'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 
 interface DateRangeInternalValue {
@@ -235,11 +236,11 @@ function DateRangeInput({
           <DateRangePicker
             closeModalFromHOC={() => setModalVisible(false)}
             endDate={
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+               
               (dateRange.end && new Date(dateRange.end)) || new Date(Date.now())
             }
             startDate={
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+               
               (dateRange.start && new Date(dateRange.start)) ||
               startOfMonth(subYears(new Date(Date.now()), 1))
             }

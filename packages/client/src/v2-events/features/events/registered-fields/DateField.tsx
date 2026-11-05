@@ -21,7 +21,7 @@ import {
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
-} from '@opencrvs/components/lib/DateField'
+} from '@opencrvs/components'
 import { StringifierContext } from './RegisteredField'
 
 export const messages = defineMessages({
@@ -108,7 +108,7 @@ function stringify(
   }
 
   // Technically it can be any other string
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+   
   return String(value ?? '')
 }
 

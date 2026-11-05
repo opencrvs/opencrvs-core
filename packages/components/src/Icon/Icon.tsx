@@ -10,7 +10,7 @@
  */
 
 import * as React from 'react'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 import * as icons from './all-icons'
 import { IconWeight } from 'phosphor-react'
 
@@ -20,10 +20,12 @@ enum IconSize {
   large = 24
 }
 
+export type IconName = keyof typeof icons
+
 type IconColor = keyof typeof colors | 'currentColor'
 
 export type IconProps = {
-  name: keyof typeof icons
+  name: IconName
   size?: keyof typeof IconSize
   color?: IconColor
   weight?: IconWeight

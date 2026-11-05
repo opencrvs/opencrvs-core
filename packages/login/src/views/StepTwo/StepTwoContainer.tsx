@@ -11,17 +11,22 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { Field, Form } from 'react-final-form'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  InputField,
+  TextInput,
+  Text,
+  Box,
+  Toast,
+  Stack,
+  Button
+} from '@opencrvs/components'
+import { CountryLogo } from '@opencrvs/components/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
-import { Text } from '@opencrvs/components/lib/Text'
 
 import * as actions from '@login/login/actions'
 import { IVerifyCodeNumbers, resetSubmissionError } from '@login/login/actions'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { Box } from '@opencrvs/components/lib/Box'
 import {
   getResentAuthenticationCode,
   getStepOneDetails,
@@ -29,11 +34,8 @@ import {
   getsubmitting,
   selectApplicationName
 } from '@login/login/selectors'
-import { Toast } from '@opencrvs/components'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { Stack } from '@opencrvs/components/lib/Stack/Stack'
-import { Button } from '@opencrvs/components/lib/Button'
 import { NotificationEvent } from '@login/utils/authApi'
 
 const FORM_NAME = 'STEP_TWO'

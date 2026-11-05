@@ -15,8 +15,7 @@ import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { IStoreState } from '@client/store'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { Link } from '@opencrvs/components/lib/Link'
+import { Toast, Link } from '@opencrvs/components'
 import {
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
