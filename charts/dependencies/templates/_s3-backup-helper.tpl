@@ -85,6 +85,10 @@ the group can read.
 {{- define "s3.rsync_container" -}}
 {{- $store := include "s3.store" . }}
 {{- $s3 := index .Values (include "s3.store" .) }}
+{{- /* Restore enabled -> use values for restore, backup otherwise */}}
+{{- $mode := ternary "restore" "backup" (eq (include "s3.restore_enabled" .) "true") }}
+{{- $global := index .Values $mode }}
+{{- $local := index $s3 $mode }}
 - image: {{ include "opencrvs.imageReference" .Values.utilities }}
   name: rsync
   command:
@@ -97,24 +101,12 @@ the group can read.
     - name: BACKUP_USER
       valueFrom:
         secretKeyRef:
-        {{- if (eq (include "s3.backup_enabled" .) "true") }}
-          name: {{ default .Values.backup.backup_server_secret $s3.backup.server_secret }}
-        {{- else }}
-          name: {{ default .Values.restore.backup_server_secret $s3.restore.server_secret }}
-        {{- end }}
+          name: {{ default $global.backup_server_secret $local.server_secret }}
           key: user
     - name: BACKUP_HOST
-      {{- if (eq (include "s3.backup_enabled" .) "true") }}
-      value: {{ default .Values.backup.host $s3.backup.host }}
-      {{- else }}
-      value: {{ default .Values.restore.host $s3.restore.host }}
-      {{- end }}
+      value: {{ default $global.host $local.host }}
     - name: BACKUP_REMOTE_DIR
-      {{- if (eq (include "s3.backup_enabled" .) "true") }}
-      value: {{ default .Values.backup.backup_server_dir $s3.backup.server_dir }}
-      {{- else }}
-      value: {{ default .Values.restore.backup_server_dir $s3.restore.server_dir }}
-      {{- end }}
+      value: {{ default $global.backup_server_dir $local.server_dir }}
   volumeMounts:
     - mountPath: /data
       name: {{ $store }}
@@ -131,15 +123,11 @@ it in the volumes of the StatefulSet with nindent.
 */}}
 {{- define "s3.rsync_volume" -}}
 {{- $s3 := index .Values (include "s3.store" .) }}
-{{- /* If backup or restore enabled -> Define key for backup */}}
-{{- $ssh_secret := default .Values.backup.backup_server_secret $s3.backup.server_secret }}
-{{- /* If restore enabled -> use key for restore */}}
-{{- if (eq (include "s3.restore_enabled" .) "true") }}
-{{- $ssh_secret = default .Values.restore.backup_server_secret $s3.restore.server_secret }}
-{{- end }}
+{{- /* Restore enabled -> use key for restore, backup otherwise */}}
+{{- $mode := ternary "restore" "backup" (eq (include "s3.restore_enabled" .) "true") }}
 - name: backup-ssh-key
   secret:
-    secretName: {{ $ssh_secret }}
+    secretName: {{ default (index .Values $mode).backup_server_secret (index $s3 $mode).server_secret }}
     defaultMode: 0400
     items:
       - key: ssh_key
