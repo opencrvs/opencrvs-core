@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.7 Release Candidate
+
+### Security
+
+- Fixes a security vulnerability. Details will be published in a security advisory.
+
 ## 2.0.6
 
 ### Improvements
