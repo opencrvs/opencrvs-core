@@ -17,6 +17,10 @@ jest.setMock('node-fetch', { default: fetch })
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
 process.env.NODE_ENV = 'TEST'
 
+// The store of this Jest project, which global-setup.ts started
+process.env.S3_ENDPOINT = process.env[`S3_ENDPOINT_${globalThis.S3_STORE}`]
+process.env.S3_PUBLIC_ENDPOINT = process.env.S3_ENDPOINT
+
 /*
  * envalid freezes the settings it reads, so the tests get a copy of them that
  * they may change.
@@ -27,7 +31,7 @@ jest.mock('@documents/s3/constants', () => {
 })
 
 /*
- * Each test gets a bucket of its own in the RustFS that global-setup.ts starts,
+ * Each test gets a bucket of its own in the store that global-setup.ts starts,
  * so no test sees the objects of another, whether it runs before it or in
  * parallel with it. Tests that need the bucket create it with
  * ensureDefaultBucket.

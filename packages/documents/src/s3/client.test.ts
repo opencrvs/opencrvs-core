@@ -32,8 +32,8 @@ import { Readable } from 'stream'
 import { getObject, s3 } from '../../test/s3'
 
 /*
- * These tests run against the RustFS that test/global-setup.ts starts. The
- * spy passes every request through to it, except where a test makes the store
+ * These tests run against each store that test/global-setup.ts starts. The
+ * spy passes every request through to the store, except where a test makes the store
  * fail in a way that a real store cannot be made to.
  */
 const send = jest.spyOn(S3Client.prototype, 'send') as unknown as jest.Mock
@@ -90,8 +90,8 @@ describe('ensureDefaultBucket', () => {
   })
 
   it('accepts a bucket that another replica created first', async () => {
-    // The check runs before the other replica creates the bucket. RustFS
-    // answers 200 to the create.
+    // The check runs before the other replica creates the bucket. The create
+    // then goes to the real store, which already has the bucket.
     send.mockRejectedValueOnce(storeError('NotFound', 404))
 
     await expect(ensureDefaultBucket()).resolves.toBeUndefined()

@@ -14,7 +14,7 @@ import { signFileUrl } from '@documents/s3/sign'
 
 /*
  * Signing is local: it needs no store, only the credentials and the address
- * that browsers will use. Only the first test opens a URL, against the RustFS
+ * that browsers will use. Only the first test opens a URL, against the store
  * that test/global-setup.ts starts.
  */
 describe('signFileUrl', () => {
