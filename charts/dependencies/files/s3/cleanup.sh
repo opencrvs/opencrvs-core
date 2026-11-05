@@ -12,20 +12,20 @@
 . /scripts/ensure-alpine-utils.sh
 
 ensure_alpine_utils || exit 1
-MINIO_ALIAS=local-cleanup
+S3_ALIAS=local-cleanup
 
-mcli alias set "$MINIO_ALIAS" http://minio:3535 "$S3_ADMIN_ACCESS_KEY" "$S3_ADMIN_SECRET_KEY"
+mcli alias set "$S3_ALIAS" "$S3_ENDPOINT" "$S3_ADMIN_ACCESS_KEY" "$S3_ADMIN_SECRET_KEY"
 
 # Figure out buckets to back up
 if [ -z "$BUCKETS" ]; then
 # All buckets
-BUCKETS=$(mcli ls --json "$MINIO_ALIAS" | jq -r .key | sed 's:/$::')
+BUCKETS=$(mcli ls --json "$S3_ALIAS" | jq -r .key | sed 's:/$::')
 fi
 
-echo "Cleanup MinIO buckets: $BUCKETS"
+echo "Cleanup S3 buckets: $BUCKETS"
 for bucket in $BUCKETS; do
   echo "Backing up bucket: $bucket"
-  mcli rm --recursive --force "$MINIO_ALIAS/$bucket"
-  mcli rb "$MINIO_ALIAS/$bucket"
-  [ "${make_bucket:-true}" = "true" ] && mcli mb "$MINIO_ALIAS/$bucket"
+  mcli rm --recursive --force "$S3_ALIAS/$bucket"
+  mcli rb "$S3_ALIAS/$bucket"
+  [ "${make_bucket:-true}" = "true" ] && mcli mb "$S3_ALIAS/$bucket"
 done

@@ -1,5 +1,5 @@
-{{ if and .Values.minio.enabled (eq (include "minio.backup_enabled" .) "true") }}
-{{- if eq .Values.minio.backup.type "dump" }}
+{{ if and .Values.rustfs.enabled (eq (include "rustfs.backup_enabled" .) "true") }}
+{{- if eq .Values.rustfs.backup.type "dump" }}
 ---
 apiVersion: batch/v1
 {{ if .Values.backup.cronjob }}
@@ -8,13 +8,13 @@ kind: CronJob
 kind: Job
 {{- end }}
 metadata:
-  name: minio-backup
+  name: rustfs-backup
   labels:
-    app: minio
+    app: rustfs
     job-type: backup
 spec:
   {{ if .Values.backup.cronjob }}
-  schedule: {{ .Values.minio.backup_schedule | default .Values.backup.schedule }}
+  schedule: {{ .Values.rustfs.backup_schedule | default .Values.backup.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
   {{- end }}
@@ -24,10 +24,10 @@ spec:
       template:
         metadata:
           labels:
-            app: minio
+            app: rustfs
             job-type: backup
         spec:
-          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.rustfs) | nindent 10 }}
           restartPolicy: OnFailure
           containers:
             - name: backup
@@ -44,6 +44,8 @@ spec:
                     secretKeyRef:
                       name: s3-opencrvs-users
                       key: S3_ADMIN_SECRET_KEY
+                - name: S3_ENDPOINT
+                  value: http://rustfs:{{ .Values.rustfs.port }}
                 - name: ENCRYPT_PASS
                   valueFrom:
                     secretKeyRef:
@@ -55,16 +57,16 @@ spec:
                       name: {{ .Values.backup.backup_server_secret }}
                       key: user
                 - name: BACKUP_HOST
-                  value: {{ default .Values.backup.host .Values.minio.backup.host }}
+                  value: {{ default .Values.backup.host .Values.rustfs.backup.host }}
                 - name: BACKUP_REMOTE_DIR
-                  value: "{{ .Values.minio.backup_server_dir | default .Values.backup.backup_server_dir }}"
+                  value: "{{ .Values.rustfs.backup_server_dir | default .Values.backup.backup_server_dir }}"
               {{- include "render-env-vars" (dict "service_name" "backup" "Values" .Values) | nindent 4 }}
               volumeMounts:
                 - name: backup-ssh-key
                   mountPath: /ssh
                   readOnly: true
                 - mountPath: /scripts
-                  name: minio-scripts
+                  name: s3-scripts
           volumes:
             - name: backup-ssh-key
               secret:
@@ -73,12 +75,12 @@ spec:
                 items:
                   - key: ssh_key
                     path: ssh_key
-            - name: minio-scripts
+            - name: s3-scripts
               configMap:
-                name: minio-scripts
+                name: s3-scripts
                 defaultMode: 0755
 {{- end }}
-{{- if eq .Values.minio.backup.type "differential" }}
+{{- if eq .Values.rustfs.backup.type "differential" }}
 ---
 apiVersion: batch/v1
 {{ if .Values.backup.cronjob }}
@@ -87,13 +89,13 @@ kind: CronJob
 kind: Job
 {{- end }}
 metadata:
-  name: minio-backup
+  name: rustfs-backup
   labels:
     app: backup-runner
     job-type: backup
 spec:
   {{ if .Values.backup.cronjob }}
-  schedule: {{ default .Values.backup.schedule .Values.minio.backup.schedule }}
+  schedule: {{ default .Values.backup.schedule .Values.rustfs.backup.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
   {{- end }}
@@ -106,7 +108,7 @@ spec:
             app: backup-runner
             job-type: backup
         spec:
-          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.rustfs) | nindent 10 }}
           serviceAccountName: backup-runner
           containers:
             - name: runner
@@ -115,8 +117,8 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  kubectl exec minio-0 -c rsync -- \
-                    /bin/sh -c "rsync -avz --exclude='.minio.sys/config/iam/' -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' /data/ \$BACKUP_USER@\$BACKUP_HOST:\$BACKUP_REMOTE_DIR/minio"
+                  kubectl exec rustfs-0 -c rsync -- \
+                    /bin/sh -c "rsync -avz --exclude='.minio.sys/config/iam/' --exclude='.rustfs.sys/config/iam/' -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' /data/ \$BACKUP_USER@\$BACKUP_HOST:\$BACKUP_REMOTE_DIR/minio"
           restartPolicy: OnFailure
 {{- end }}
 {{- end }}

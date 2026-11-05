@@ -685,7 +685,7 @@ normalise_configuration() {
 configure_public_domains() {
 
   local s3_public_url
-  s3_public_url="$(strip_scheme "${S3_PUBLIC_URL:-minio.$DOMAIN}")"
+  s3_public_url="$(strip_scheme "${S3_PUBLIC_URL:-rustfs.$DOMAIN}")"
 
   PUBLIC_DOMAINS=(
     "gateway.$DOMAIN"

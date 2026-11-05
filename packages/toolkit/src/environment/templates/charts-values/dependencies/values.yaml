@@ -25,8 +25,9 @@ storage_type: host_path
 node_selector:
   role: data1
 
-minio:
+rustfs:
   use_default_credentials: false
+  host_data_path: {{rustfs_host_data_path}}
   {{#if restore_enabled}}
   restore:
     type: {{restore_type}}

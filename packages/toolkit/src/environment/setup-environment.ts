@@ -725,6 +725,22 @@ export async function runSetupEnvironment() {
     }
   }
 
+  // Where RustFS keeps its data. A new environment starts on RustFS in
+  // /data/rustfs. An environment that already exists ran MinIO, so RustFS takes over
+  // /data/minio in place. The directory is not renamed, because the running MinIO
+  // would lose it before the deployment replaces it. The value is decided once and
+  // read back on the next run, otherwise an environment created on RustFS would
+  // look like an existing one from then on.
+  const existingRustfsHostDataPath = findExistingValue(
+    'RUSTFS_HOST_DATA_PATH',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const rustfs_host_data_path =
+    existingRustfsHostDataPath?.value ||
+    (environment_exists ? '/data/minio' : '/data/rustfs')
+
   // Backup and restore configuration
   let backupHost =
     findExistingValue('BACKUP_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues)
@@ -955,6 +971,15 @@ export async function runSetupEnvironment() {
     type: 'VARIABLE' as const,
     didExist: existingMonitoringEnabled,
     value: monitoring_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  // Read back on the next run, to keep the volume of MinIO for an environment
+  // that migrated
+  derivedUpdates.push({
+    name: 'RUSTFS_HOST_DATA_PATH',
+    type: 'VARIABLE' as const,
+    didExist: existingRustfsHostDataPath,
+    value: rustfs_host_data_path,
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)
@@ -1565,6 +1590,7 @@ export async function runSetupEnvironment() {
     environment_type: environment_type,
     two_fa_enabled,
     monitoring_enabled,
+    rustfs_host_data_path,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',

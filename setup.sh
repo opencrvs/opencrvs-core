@@ -153,8 +153,8 @@ openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .se
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
 
-mkdir -p data/minio
-chmod 775 data/minio
+mkdir -p data/rustfs
+chmod 775 data/rustfs
 mkdir -p data/postgres
 chmod 775 data/postgres
 
