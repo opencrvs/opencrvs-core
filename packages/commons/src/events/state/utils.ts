@@ -28,9 +28,14 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
     (action) => action.status === ActionStatus.Accepted
   )
 
-  const request = filtered.find(
-    (action) => action.status === ActionStatus.Requested
-  )
+  // Prefer the request the accepted action resolves: earlier requests may have no outcome.
+  // Fall back to the first one for accepted actions stored without `originalActionId`.
+  const request =
+    filtered.find(
+      (action) =>
+        action.status === ActionStatus.Requested &&
+        action.id === accept?.originalActionId
+    ) ?? filtered.find((action) => action.status === ActionStatus.Requested)
 
   const reject = filtered.find(
     (action) => action.status === ActionStatus.Rejected

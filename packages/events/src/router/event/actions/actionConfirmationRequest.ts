@@ -21,6 +21,12 @@ export const ActionConfirmationResponse = {
 
 export type ActionConfirmationResponse = keyof typeof ActionConfirmationResponse
 
+/**
+ * A request that never gets a response would keep its requested action open,
+ * which blocks every other action request on the event.
+ */
+const ACTION_CONFIRMATION_TIMEOUT_MS = 60_000
+
 const ActionConfirmationResponseCodes = {
   400: ActionConfirmationResponse.Rejected,
   200: ActionConfirmationResponse.Success,
@@ -59,7 +65,8 @@ export async function requestActionConfirmation(
       headers: {
         'Content-Type': 'application/json',
         Authorization: token
-      }
+      },
+      timeout: ACTION_CONFIRMATION_TIMEOUT_MS
     })
 
     const statusCode = res.status

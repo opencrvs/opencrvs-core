@@ -13,6 +13,7 @@ import { inject, vi } from 'vitest'
 import { getDeclarationFields } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  endLockPool,
   getPool,
   resetServer as resetEventsPostgresServer
 } from '@events/storage/postgres/events'
@@ -71,6 +72,7 @@ async function dropPostgresDatabase() {
     await currentPool.end()
     currentPool = null
   }
+  await endLockPool()
   resetEventsPostgresServer()
 
   const clusterClient = getClusterClient()
