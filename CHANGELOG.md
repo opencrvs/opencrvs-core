@@ -145,6 +145,8 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 **Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
 
+The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionId}`.
+
 [#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602)
 
 #### The `incomplete` flag is removed
