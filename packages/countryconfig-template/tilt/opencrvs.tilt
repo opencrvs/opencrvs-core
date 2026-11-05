@@ -32,7 +32,7 @@ def setup_opencrvs(
         core_images_tag: OpenCRVS core images tag to use for deployment
         countryconfig_image_name: Countryconfig image repository (e.g. your container registry repository or Farajaland demo repository)
         countryconfig_image_tag: Countryconfig image tag to use for deployment
-        dependencies_namespace: Kubernetes namespace for dependencies (e.g. MongoDB, MinIO, Elasticsearch)
+        dependencies_namespace: Kubernetes namespace for dependencies (e.g. MongoDB, RustFS, Elasticsearch)
         opencrvs_namespace: Kubernetes namespace for OpenCRVS services
         security_enabled: If true, OpenCRVS and dependencies will be deployed in secure mode with authentication enabled. If false, OpenCRVS and dependencies will be deployed in non-secure mode with default passwords and no authentication.
         monitoring_enabled: If true, monitoring components like Kibana will be deployed together with dependencies
@@ -50,7 +50,7 @@ def setup_opencrvs(
         opencrvs_configuration_file = './tilt/examples/opencrvs-services/values-secure.yaml'
     else:
         print("""🔑 Deploying OpenCRVS and Dependencies in non-secure mode
-        - Minio admin user/password: minioadmin/minioadmin
+        - RustFS admin user/password: rustfsadmin/rustfsadmin
         - Postgres admin user/password: postgres/postgres
         - Authentication for Redis, MongoDB and Elasticsearch is disabled""")
         deps_configuration_file = './tilt/examples/dependencies/values.yaml'
@@ -66,7 +66,7 @@ def setup_opencrvs(
         opencrvs_values.append('./tilt/helm/opencrvs-services/values.yaml')
 
     # Deploy dependencies
-    print("🚀 Deploying dependencies: mongo, minio, elasticsearch...")
+    print("🚀 Deploying dependencies: mongo, rustfs, elasticsearch...")
     dependencies_chart_path = '{}/charts/dependencies'.format(opencrvs_chart_repo)
     k8s_yaml(helm(dependencies_chart_path,
         namespace=dependencies_namespace,

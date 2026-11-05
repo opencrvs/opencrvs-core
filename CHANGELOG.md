@@ -245,6 +245,14 @@ The data cleanup job now empties the bucket and keeps it, where it removed the b
 
 A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
+#### RustFS replaces MinIO in the dependencies chart
+
+The dependencies chart deploys RustFS, an open-source S3 object store, and no longer deploys MinIO. The `minio` values are not read any more, so move your settings to `rustfs`. RustFS has hostnames (`rustfs.<hostname>` and `rustfs-console.<hostname>`), a Service (`rustfs`) and credentials defaults of its own (`rustfsadmin`), and keeps the S3 port 3535 and the console port 3536. An existing `s3-opencrvs-users` secret is left as it is. Point `s3.host` and `s3.public_endpoint` of the services chart at RustFS, they now default to it. Docker Compose, the Tilt setup and the documents service defaults follow, and the data directory of the development environment is `data/rustfs`.
+
+RustFS can take over the data of MinIO in place. Set `rustfs.host_data_path: /data/minio` for host path storage, or `rustfs.pvc.name: minio` (with the `storage_class`, `storage_size` and `access_mode` of `minio.pvc`) for a PVC, keep these values in later releases, scale MinIO down and back up the data first, and see [Migrate from MinIO](charts/dependencies/README.md#migrate-from-minio). The toolkit asks an existing environment whether to migrate, stores the answer as the variable `S3_MIGRATION`, and writes `rustfs.host_data_path: /data/minio` when it is `true`.
+
+The backup and restore jobs are `rustfs-backup` and `rustfs-restore`, and their scripts moved to `files/s3`. The ConfigMap `minio-scripts` is now `s3-scripts`. The `rsync` sidecar of the differential backup runs as root and copies the SSH key at start. Backups of earlier versions keep their names on the backup server, and restore into RustFS. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
 #### Container registry other than Docker Hub
 
 The toolkit and the country configuration template work with any container registry that implements the OCI Registry v2 API, for example GHCR. The `DOCKERHUB_ACCOUNT`, `DOCKERHUB_REPO`, `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets are renamed to `REGISTRY_ORGANISATION`, `REGISTRY_REPOSITORY`, `REGISTRY_USERNAME` and `REGISTRY_TOKEN`. The new repository variable `REGISTRY_HOST` (default `docker.io`) sets the registry, and the pull secret `dockerhub-credentials` is now `registry-credentials`. `environment:init` asks for these and checks them with the Registry v2 API. `check-before-build.sh` now takes `REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]`. [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)

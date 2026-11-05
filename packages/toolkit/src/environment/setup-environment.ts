@@ -725,6 +725,40 @@ export async function runSetupEnvironment() {
     }
   }
 
+  // S3 object storage. MinIO is not supported any more, RustFS replaces it. A new
+  // environment starts on RustFS. An environment that already exists ran MinIO, and
+  // is asked whether RustFS takes over the data of MinIO in place. The answer is
+  // read back on the next run, and kept, because once migrated RustFS keeps using
+  // the volume of MinIO.
+  log('')
+  const existingS3Migration = findExistingValue(
+    'S3_MIGRATION',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  let s3_migration = false
+  if (existingS3Migration) {
+    s3_migration = existingS3Migration.value === 'true'
+    log(
+      kleur.bold().green('✔'),
+      kleur
+        .bold()
+        .grey(
+          `Environment ${environment} already answered the MinIO migration question: ${s3_migration ? 'migrate' : 'no migration'}`
+        )
+    )
+  } else if (environment_exists) {
+    s3_migration = await confirm({
+      message:
+        `${kleur.bold('Deprecation notice:')} MinIO is not supported any more, the dependencies chart deploys RustFS.\n` +
+        'RustFS takes over the data of MinIO in place.\n' +
+        `${kleur.bold().red('Back up your data before migrating!')}\n\n` +
+        `Migrate from ${kleur.bold().cyan('MinIO to RustFS')} during the next dependencies deployment?`,
+      default: process.env.S3_MIGRATION === 'true'
+    })
+  }
+
   // Backup and restore configuration
   let backupHost =
     findExistingValue('BACKUP_HOST', 'VARIABLE', 'ENVIRONMENT', existingValues)
@@ -955,6 +989,15 @@ export async function runSetupEnvironment() {
     type: 'VARIABLE' as const,
     didExist: existingMonitoringEnabled,
     value: monitoring_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  // Read back on the next run, to not ask again, and to keep the volume of MinIO
+  // for an environment that migrated
+  derivedUpdates.push({
+    name: 'S3_MIGRATION',
+    type: 'VARIABLE' as const,
+    didExist: existingS3Migration,
+    value: s3_migration ? 'true' : 'false',
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)
@@ -1565,6 +1608,7 @@ export async function runSetupEnvironment() {
     environment_type: environment_type,
     two_fa_enabled,
     monitoring_enabled,
+    s3_migration,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',

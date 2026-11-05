@@ -25,8 +25,12 @@ storage_type: host_path
 node_selector:
   role: data1
 
-minio:
+rustfs:
   use_default_credentials: false
+  {{#if s3_migration}}
+  # RustFS takes over the data of MinIO in place
+  host_data_path: /data/minio
+  {{/if}}
   {{#if restore_enabled}}
   restore:
     type: {{restore_type}}

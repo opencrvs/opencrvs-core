@@ -179,5 +179,12 @@ export const derivedVariables = [
     valueType: 'VARIABLE',
     type: 'disabled',
     scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'S3_MIGRATION',
+    valueLabel: 'S3_MIGRATION',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
   }
 ] as const
