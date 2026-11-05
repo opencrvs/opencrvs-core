@@ -14,14 +14,18 @@ import { v4 as uuid } from 'uuid'
 import {
   DocumentPath,
   FullDocumentPath,
-  joinUrlPaths,
-  joinValues
+  joinValues,
+  UUID
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient } from '@client/v2-events/trpc'
+import {
+  isExpectedAccessError,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -108,27 +112,33 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 export const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  const url = joinUrlPaths('/api/presigned-url', filePath)
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  const res = await response.json()
-  return res
+/**
+ * `eventId` names the record the file belongs to. The server needs it for
+ * files stored outside `events/{eventId}/`, e.g. a signature on an action.
+ */
+function getPresignedUrl(
+  filePath: DocumentPath | FullDocumentPath,
+  eventId?: UUID
+) {
+  return trpcClient.event.file.getPresignedUrl.query({ filePath, eventId })
 }
 
-export async function precacheFile(path: DocumentPath | FullDocumentPath) {
-  const presignedUrl = (await getPresignedUrl(path)).presignedURL
+export async function precacheFile(
+  path: DocumentPath | FullDocumentPath,
+  { eventId }: { eventId?: UUID } = {}
+) {
+  try {
+    const presignedUrl = (await getPresignedUrl(path, eventId)).presignedURL
+    const file = await fetchFileFromUrl(presignedUrl, path)
 
-  const file = await fetchFileFromUrl(presignedUrl, path)
-
-  if (file) {
-    await cacheFile({ url: path, file })
+    if (file) {
+      await cacheFile({ url: path, file })
+    }
+  } catch (error) {
+    if (!isExpectedAccessError(error)) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to precache file', error)
+    }
   }
 }
 

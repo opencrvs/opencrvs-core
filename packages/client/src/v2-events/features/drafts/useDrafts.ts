@@ -49,11 +49,20 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    const filenames = drafts.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action])
+    // Each draft's files are fetched with the id of the record it belongs to
+    const files = drafts.flatMap((draft) =>
+      getFilepathsFromActionDocument([draft.action]).map((filename) => ({
+        filename,
+        eventId: draft.eventId
+      }))
     )
 
-    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
+    // precacheFile catches its own errors, so one failed file doesn't stop the rest
+    await Promise.all(
+      files.map(async ({ filename, eventId }) =>
+        precacheFile(filename, { eventId })
+      )
+    )
 
     const missingEventsToDownload = drafts
       .filter((event) => !findLocalEventDocument(event.eventId))

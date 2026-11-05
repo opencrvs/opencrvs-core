@@ -120,11 +120,11 @@ const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:filePath*', (req) => {
+    trpcMsw.event.file.getPresignedUrl.query((input) => {
       spies.presignFile++
-      return HttpResponse.json({
-        presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-      })
+      return {
+        presignedURL: `http://localhost:3535/ocrvs/${input.filePath}`
+      }
     }),
     http.get('http://localhost:3535/ocrvs/:id', () => {
       spies.fetchFile++

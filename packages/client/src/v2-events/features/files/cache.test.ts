@@ -12,6 +12,7 @@ import {
   ActionType,
   DocumentPath,
   generateActionDocument,
+  generateEventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { getFilepathsFromActionDocument } from './cache'
@@ -37,5 +38,29 @@ describe('getFilepathsFromActionDocument', () => {
 
     expect(filepaths).toContain('signature.png')
     expect(filepaths).toContain('image.jpg')
+  })
+})
+
+describe('cacheFiles', () => {
+  test("passes the record's id so files outside events/ can be authorized", async () => {
+    // ./useFileUpload may already be imported by the test setup, so a normal
+    // vi.mock can't replace precacheFile. Reset modules and import it fresh
+    // after mocking.
+    vi.resetModules()
+    vi.doMock('./useFileUpload', () => ({ precacheFile: vi.fn() }))
+    const { precacheFile } = await import('./useFileUpload')
+    const { cacheFiles } = await import('./cache')
+
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+    })
+
+    await cacheFiles(event)
+
+    expect(precacheFile).toHaveBeenCalled()
+    for (const [, options] of vi.mocked(precacheFile).mock.calls) {
+      expect(options).toEqual({ eventId: event.id })
+    }
   })
 })
