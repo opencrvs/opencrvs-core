@@ -124,3 +124,20 @@ export async function deleteDraftsByUserIdInTrx(
     .where('createdBy', '=', userId)
     .execute()
 }
+
+/**
+ * The drafts one user has saved for one record.
+ */
+export async function getDraftsByEventIdAndUserId(
+  eventId: UUID,
+  createdBy: string
+) {
+  const drafts = await getClient()
+    .selectFrom('eventActionDrafts')
+    .where('eventId', '=', eventId)
+    .where('createdBy', '=', createdBy)
+    .selectAll()
+    .execute()
+
+  return z.array(Draft).parse(drafts.map(toDraftDocument) satisfies Draft[])
+}
