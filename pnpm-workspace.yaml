@@ -49,7 +49,7 @@ overrides:
   tar: '7.5.21'
   '@trpc/server': '11.8.0'
   'node-gyp>glob': '10.5.0'
-  'cacache>glob': '10.5.0'
+  'cacache>glob': '14.0.2'
   'read-package-json>glob': '10.5.0'
   'lerna>minimatch': '3.1.5'
   '@lerna/create>minimatch': '3.1.5'
