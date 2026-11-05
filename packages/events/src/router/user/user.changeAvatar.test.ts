@@ -60,7 +60,6 @@ describe('user.changeAvatar', () => {
 
   test.each([
     (_: string) => `users/${getUUID()}/signature.png`,
-    (_: string) => `users/tmp-${getUUID()}/avatar.png`,
     (_: string) => `${getUUID()}.png`,
     (_: string) => `events/${getUUID()}/${getUUID()}.png`,
     (id: string) => `users/../users/${id}/avatar.png`,

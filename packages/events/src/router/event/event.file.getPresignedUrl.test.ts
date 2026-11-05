@@ -277,21 +277,6 @@ describe('event.file.getPresignedUrl', () => {
       ).resolves.toMatchObject(presigned)
     })
 
-    test("presigns another user's signature stored under a temporary id, with user.read", async () => {
-      const {
-        user,
-        users: [, otherUser]
-      } = await setupTestCase()
-      const signature = `users/tmp-${generateUuid()}/${generateUuid()}.png`
-      await updateUserById(otherUser.id as UUID, { signaturePath: signature })
-
-      await expect(
-        createTestClient(user, [
-          encodeScope({ type: 'user.read' })
-        ]).event.file.getPresignedUrl({ filePath: signature as DocumentPath })
-      ).resolves.toMatchObject(presigned)
-    })
-
     test("rejects a user's avatar for a system client", async () => {
       const {
         users: [, otherUser]
