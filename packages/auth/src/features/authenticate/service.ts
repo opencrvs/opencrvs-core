@@ -44,6 +44,8 @@ import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
+import { coreSigningKey } from '@auth/request-signing'
+import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
 import { createFamily } from '@auth/features/refresh/family'
 
@@ -366,8 +368,10 @@ export function verifyRefreshToken(token: string) {
 }
 
 export async function getUserRoleScopeMapping() {
+  const url = joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
   const roles = await fetchJSON<Roles>(
-    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
+    url,
+    withCoreSignature(coreSigningKey, url)
   )
 
   return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {

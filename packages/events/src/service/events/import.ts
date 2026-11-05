@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { omit } from 'lodash'
-import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
+import { EventDocument, getUUID } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import { getInMemoryEventConfigurations } from '../config/config'
 import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
@@ -38,12 +38,11 @@ function mapEventActions(actions: EventDocument['actions']) {
 }
 
 export async function bulkImportEvents(
-  events: EventDocument[],
-  token: TokenWithBearer
+  events: EventDocument[]
 ): Promise<BulkResponse> {
   const toIndex = []
 
-  const eventConfigs = await getInMemoryEventConfigurations(token)
+  const eventConfigs = await getInMemoryEventConfigurations()
 
   for (const eventDocument of events) {
     const transactionId = getUUID()

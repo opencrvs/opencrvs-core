@@ -50,7 +50,7 @@ export function customActionProcedures() {
           return ctx.event
         }
 
-        const configs = await getInMemoryEventConfigurations(token)
+        const configs = await getInMemoryEventConfigurations()
         const event = await getEventById(input.eventId)
         const config = configs.find((c) => c.id === event.type)
 

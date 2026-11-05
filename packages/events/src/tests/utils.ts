@@ -34,7 +34,6 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
-  SERVICE_USER_ID,
   SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
@@ -311,17 +310,11 @@ export function createSystemTestClient(
   return caller
 }
 
-export async function createServiceTokenTestClient() {
-  const token = createTestToken({
-    userId: SERVICE_USER_ID as UUID,
-    scopes: [],
-    userType: TokenUserType.enum.system
-  })
 
+export async function createUnauthenticatedTestClient() {
   const ctx = await createContext({
-    req: { headers: { authorization: token } } as unknown as IncomingMessage
+    req: { headers: {} } as unknown as IncomingMessage
   })
-
   return createCallerFactory(appRouter)(ctx)
 }
 

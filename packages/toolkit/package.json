@@ -14,6 +14,7 @@
     "./telemetry": "./dist/telemetry/index.js",
     "./scopes": "./dist/scopes/index.js",
     "./authentication": "./dist/authentication/index.js",
+    "./request-signing": "./dist/request-signing/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
     "./notification": "./dist/notification/index.js"
@@ -30,6 +31,7 @@
     "url": "git+https://github.com/opencrvs/opencrvs-core.git"
   },
   "dependencies": {
+    "@hapi/boom": "^10.0.1",
     "@inquirer/prompts": "^8.3.0",
     "@octokit/core": "4.2.1",
     "@trpc/client": "11.4.3",

@@ -74,7 +74,54 @@ Users will see two kinds of revoked record: ones revoked before the move show as
 
 [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Core signs its requests to country config: migrate your country config
+
+Core no longer sends a token with its requests to country config. It signs each request instead ([RFC 9421](https://www.rfc-editor.org/rfc/rfc9421)), and country config checks the signature with the toolkit's `core` auth strategy. The service token is gone, so a country config that still checks it rejects every action confirmation after the upgrade.
+
+1. **Signing key.** Core signs with an Ed25519 key that auth, events and the data-seed job read from `CORE_REQUEST_SIGNING_KEY_PATH`. The Helm chart creates it as the secret `opencrvs-core-request-signing-key`, on install and on the upgrade, and keeps it across upgrades. To provide your own key, set `certs.request_signing_key_file`; do so if you render the chart with `helm template` or a GitOps tool, which cannot keep the generated key and make a new one on every render. To change the key, set the new key in `certs.request_signing_key_file` and the old one in `certs.previous_request_signing_key_file`, deploy, and remove the old key once every service runs with the new one. Locally, `pnpm dev` creates `.secrets/core-request-signing-key.pem`. Auth publishes the public key at `GET /.well-known/jwks.json`.
+
+2. **Register the `core` strategy.**
+
+   ```ts
+   import { coreRequestAuth } from '@opencrvs/toolkit/request-signing'
+
+   await server.register({
+     plugin: coreRequestAuth,
+     options: {
+       jwksUrl: new URL('/.well-known/jwks.json', AUTH_URL).toString()
+     }
+   })
+   ```
+
+3. **Routes.** Set `auth: 'core'` on every route that only core calls:
+
+   - every `/config/*` route, including `/config/users` and `/config/locations`, which used `auth: false` or a user token
+   - `/certificates`
+   - `/trigger/events/{event}/actions/{action}` and every event-specific action route
+   - `/trigger/user/*`
+   - `/trigger/telemetry` and `/trigger/system/ready`
+
+   Other routes keep their current auth. A route with `auth: 'core'` must let Hapi read the body, so it cannot use `payload: { output: 'stream' }`.
+
+4. **Remove the service token checks.** `isServiceToken` and `SERVICE_USER_ID` are removed from `@opencrvs/toolkit/authentication`. Delete the checks that use them; `auth: 'core'` replaces them.
+
+5. **Calls from country config to core.** A handler of a request from core no longer gets a token: `request.auth.artifacts.token` and `request.headers.authorization` are empty. If your handlers call core, for example to read locations or to call MOSIP, give country config a system client of its own: declare an integration with the scopes it needs and get a token with `POST /auth/token`. The template does this with `COUNTRY_CONFIG_CLIENT_ID` and `COUNTRY_CONFIG_CLIENT_SECRET`; see `src/api/core-api-token.ts`.
+
+6. **Check.** Run `npx @opencrvs/toolkit verify-endpoints` against your country config. The `/config/*` endpoints must now reject a request that core did not sign.
+
+[#14240](https://github.com/opencrvs/opencrvs-core/issues/14240)
+
 ### Breaking changes
+
+#### Core's requests to country config are signed, and the service token is removed
+
+See [Upgrade guidance](#core-signs-its-requests-to-country-config-migrate-your-country-config) for the country config changes.
+
+- `GET /internal/service-token` is removed from auth, with `isServiceToken` and `SERVICE_USER_ID` from `@opencrvs/toolkit/authentication`.
+- `triggerUserEventNotification` from `@opencrvs/toolkit/notification` takes the core `signingKey` instead of an `authHeader`.
+- Gateway's `GET /forms` is removed. Gateway's `GET /config` and `GET /publicConfig` read the application configuration and the certificates from events, and gateway no longer calls country config.
+
+[#14240](https://github.com/opencrvs/opencrvs-core/issues/14240)
 
 #### `POST /auth/token` no longer accepts parameters in the query string
 

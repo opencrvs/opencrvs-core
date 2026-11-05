@@ -91,8 +91,6 @@ spec:
               value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
             - name: EVENTS_URL
               value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
-            - name: COUNTRY_CONFIG_URL
-              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
           {{- include "render-env-vars" (dict "service_name" "gateway" "Values" .Values) }}
           {{- include "resources-helper" (dict "service_name" "gateway" "Values" .Values) | indent 10 }}
           {{- include "probes-helper" (dict "service_name" "gateway" "Values" .Values) | indent 10 }}

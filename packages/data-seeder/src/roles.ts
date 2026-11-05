@@ -14,13 +14,13 @@ import {
   joinUrl,
   VersionedEventConfig
 } from '@opencrvs/commons'
-import fetch from 'node-fetch'
 import { z } from 'zod'
 import { env } from './environment'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import { formatUnwrittenFailure } from './seed-failure'
 import { raise } from './utils'
 import { Read } from './read'
+import { fetchCountryConfig } from './country-config'
 
 const RoleRecordSchema = (eventIds: string[]) =>
   z.object({
@@ -167,18 +167,13 @@ export function parseRoles(document: unknown, eventIds: string[]): RoleRead {
   }
 }
 
-export async function readRoles(token: string): Promise<RoleRead> {
+export async function readRoles(): Promise<RoleRead> {
   const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
   const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
-    fetch(rolesUrl),
-    fetch(eventsUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
+    fetchCountryConfig(rolesUrl),
+    fetchCountryConfig(eventsUrl)
   ])
 
   if (!rolesResponse.ok) {

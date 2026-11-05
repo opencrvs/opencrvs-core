@@ -56,7 +56,7 @@ export function declareActionProcedures() {
           return ctx.event
         }
 
-        const configs = await getInMemoryEventConfigurations(token)
+        const configs = await getInMemoryEventConfigurations()
         const event = ctx.event
 
         const config = configs.find((c) => c.id === event.type)

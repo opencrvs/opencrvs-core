@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { getOfficeExternalId, raise } from './utils'
 
 import { CreateUserInputInternal } from '@opencrvs/commons'
 import { createInitialisationClient } from './initialisation-client'
+import { fetchCountryConfig } from './country-config'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import {
   CREATING_INITIAL_USERS,
@@ -206,15 +206,9 @@ export function parseUsers(document: unknown): UserRead {
   }
 }
 
-export async function readUsers(token: string): Promise<UserRead> {
+export async function readUsers(): Promise<UserRead> {
   const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    }
-  })
+  const res = await fetchCountryConfig(url)
 
   if (!res.ok) {
     raise(formatUnwrittenFailure(`Expected to get the users from ${url}`))

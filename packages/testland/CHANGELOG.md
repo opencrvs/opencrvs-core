@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0 Release Candidate
+
+### Breaking changes
+
+- Routes that only core calls use the toolkit's `core` auth strategy (`auth: 'core'`): every `/config/*` route, `/certificates`, `/trigger/events/*`, `/trigger/user/*`, `/trigger/telemetry` and `/trigger/system/ready`. Core signs these requests and sends no token, and the `isServiceToken` checks are gone. To call core from those handlers, country config uses a system client of its own: set `COUNTRY_CONFIG_CLIENT_ID` and `COUNTRY_CONFIG_CLIENT_SECRET` together to declare it as the "Country config" integration. Without them, informant notifications leave out the office name, the analytics location sync is skipped and the MOSIP calls fail. [#14240](https://github.com/opencrvs/opencrvs-core/issues/14240)
+
 ## 2.1.0 Release Candidate
 
 ### Breaking changes

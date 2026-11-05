@@ -425,12 +425,10 @@ export const userRouter = router({
       }
 
       const nonce = generateNonce()
-      const rawToken = ctx.token.replace('Bearer ', '')
       const user = await getUser(ctx.user.id)
 
       await generateAndSendVerificationCode({
         nonce,
-        token: rawToken,
         notificationEvent: 'change-email-address',
         recipientName: user.name,
         phoneNumber: user.mobile,
@@ -455,12 +453,10 @@ export const userRouter = router({
       }
 
       const nonce = generateNonce()
-      const rawToken = ctx.token.replace('Bearer ', '')
       const user = await getUser(ctx.user.id)
 
       await generateAndSendVerificationCode({
         nonce,
-        token: rawToken,
         notificationEvent: 'change-phone-number',
         recipientName: user.name,
         phoneNumber: user.mobile,
@@ -690,7 +686,7 @@ export const userRouter = router({
     .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
-      await sendUsernameReminder(userId, ctx.token)
+      await sendUsernameReminder(userId)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       await writeAuditLog({
         operation: 'user.username_reminder_by_admin',
@@ -706,15 +702,11 @@ export const userRouter = router({
       const userId = UUID.parse(input)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       const adminUser = await getUser(auditLogIdentifiers.sub)
-      await sendResetPasswordInvite(
-        userId,
-        {
-          id: adminUser.id,
-          name: adminUser.name,
-          role: adminUser.role
-        },
-        ctx.token
-      )
+      await sendResetPasswordInvite(userId, {
+        id: adminUser.id,
+        name: adminUser.name,
+        role: adminUser.role
+      })
       await writeAuditLog({
         operation: 'user.password_reset_by_admin',
         requestData: { subjectId: userId },
