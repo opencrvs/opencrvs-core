@@ -52,7 +52,7 @@ overrides:
   'cacache>glob': '10.5.0'
   'read-package-json>glob': '10.5.0'
   'lerna>minimatch': '3.1.5'
-  '@lerna/create>minimatch': '3.1.5'
+  '@lerna/create>minimatch': '11.0.1'
   'nx>minimatch': '9.0.9'
   '@nx/devkit>minimatch': '9.0.9'
   jws: '3.2.3'
