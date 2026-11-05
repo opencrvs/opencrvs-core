@@ -108,6 +108,10 @@ function PrefetchQueries() {
     void queryClient
       .ensureQueryData(trpcOptionsProxy.event.config.get.queryOptions())
       .then(preloadCustomFields)
+      .catch((error: unknown) => {
+        // eslint-disable-next-line no-console
+        console.warn('Could not preload custom fields:', error)
+      })
 
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
