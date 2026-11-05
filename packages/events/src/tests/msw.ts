@@ -114,6 +114,13 @@ const handlers = [
   http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
+  // presignFile, event.file.getPresignedUrl.test.ts
+  http.get(`${env.DOCUMENTS_URL}/presigned-url/:filePath*`, () => {
+    return HttpResponse.json({
+      presignedURL:
+        'http://localhost:3535/ocrvs/mock-presigned-url.png?X-Amz-Signature=test'
+    })
+  }),
   http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
     return HttpResponse.json([])
   }),
