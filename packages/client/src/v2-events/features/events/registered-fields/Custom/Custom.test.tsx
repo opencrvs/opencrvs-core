@@ -148,6 +148,40 @@ describe('Custom field', () => {
     expect(await screen.findByText('Error loading component')).toBeTruthy()
   })
 
+  it('imports the module from a new URL after a failed import', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined)
+    // A file URL, so that the retry URL is also one that Node can import
+    const src = 'file:///missing/retry.js'
+
+    const first = renderWithTheme(
+      <Custom.Output
+        configuration={undefined}
+        id="custom"
+        src={src}
+        value={1}
+      />
+    )
+    expect(await screen.findByText('Error loading component')).toBeTruthy()
+    first.unmount()
+
+    renderWithTheme(
+      <Custom.Output
+        configuration={undefined}
+        id="custom"
+        src={src}
+        value={1}
+      />
+    )
+    expect(await screen.findByText('Error loading component')).toBeTruthy()
+
+    const errors = consoleError.mock.calls.map((call) => String(call[1]))
+    expect(errors).toHaveLength(2)
+    expect(errors[0]).toContain(`'${src}'`)
+    expect(errors[1]).toContain(`'${src}?retry=1'`)
+  })
+
   it('keeps a render error inside the field', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
 

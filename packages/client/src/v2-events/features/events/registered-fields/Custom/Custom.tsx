@@ -56,6 +56,9 @@ interface CustomFieldModuleContext {
 
 const loadedModules = new Map<string, Promise<CustomFieldModule>>()
 
+/** How many times the import of each module has failed */
+const failedImports = new Map<string, number>()
+
 const externals: Record<CustomFieldExternalModule, unknown> = {
   react: React,
   'react/jsx-runtime': jsxRuntime,
@@ -71,10 +74,28 @@ function shareExternals() {
   Object.assign(globalThis, { [CUSTOM_FIELD_EXTERNALS_GLOBAL]: externals })
 }
 
+/**
+ * The browser keeps a failed import in its module map, and a new import of the
+ * same URL fails again without a new request. So after a failure, the next
+ * import uses a different URL. The service worker removes the `retry`
+ * parameter from its cache key.
+ */
+function importUrl(src: string) {
+  const failures = failedImports.get(src) ?? 0
+  if (failures === 0) {
+    return src
+  }
+  const url = new URL(src, window.location.href)
+  url.searchParams.set('retry', String(failures))
+  return url.href
+}
+
 async function importModule(src: string): Promise<CustomFieldModule> {
   shareExternals()
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const imported: { default?: unknown } = await import(/* @vite-ignore */ src)
+  const imported: { default?: unknown } = await import(
+    /* @vite-ignore */ importUrl(src)
+  )
 
   if (typeof imported.default !== 'function') {
     throw new Error(
@@ -110,6 +131,7 @@ async function loadModule(src: string) {
   const loading = importModule(src).catch((error: unknown) => {
     // Let the next mount try again, e.g. after a network error
     loadedModules.delete(src)
+    failedImports.set(src, (failedImports.get(src) ?? 0) + 1)
     throw error
   })
   loadedModules.set(src, loading)
