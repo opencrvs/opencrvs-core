@@ -28,6 +28,7 @@ import {
   UUID,
   TestUserRole,
   generateActionDocument,
+  generateActionDocuments,
   ActionDocument,
   generateUuid,
   generateTrackingId,
@@ -104,7 +105,7 @@ const duplicateEvent = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: actionDefaults
@@ -783,7 +784,7 @@ const annotationUpdateOnValidateEvent = {
         createdAt: actionDefaults.createdAt
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       action: ActionType.DECLARE,
       configuration: tennisClubMembershipEvent,
       defaults: {
@@ -850,7 +851,7 @@ const annotationChangeDuringRegisterEvent = {
       configuration: tennisClubMembershipEvent,
       defaults: actionDefaults
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       action: ActionType.DECLARE,
       configuration: tennisClubMembershipEvent,
       defaults: {

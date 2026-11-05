@@ -10,14 +10,14 @@
  */
 import * as React from 'react'
 import { withTheme } from 'styled-components'
-import { ITheme } from '../../theme'
-import { IDataPoint } from '../../chart-datapoint-types'
+import { ITheme } from '../../tokens'
+import { IBarDataPoint } from '../../Bar'
 
 export interface ICustomizedAxisTick {
   x: number
   y: number
   stroke: number
-  payload: IDataPoint
+  payload: IBarDataPoint
   totalValue: number
 }
 

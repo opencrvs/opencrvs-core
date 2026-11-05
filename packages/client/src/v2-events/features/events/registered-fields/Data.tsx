@@ -28,7 +28,7 @@ import {
   todayISO,
   PlainDate
 } from '@opencrvs/commons/client'
-import { List } from '@opencrvs/components/lib/List'
+import { List } from '@opencrvs/components'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'

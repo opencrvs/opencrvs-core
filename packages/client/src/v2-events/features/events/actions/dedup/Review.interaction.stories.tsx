@@ -16,6 +16,7 @@ import {
   ActionType,
   createPrng,
   generateActionDocument,
+  generateActionDocuments,
   generateUuid,
   tennisClubMembershipEvent,
   generateTrackingId,
@@ -54,7 +55,7 @@ const actions = [
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: tennisClubMembershipEvent,
     action: ActionType.DECLARE,
     defaults: {

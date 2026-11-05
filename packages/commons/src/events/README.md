@@ -30,6 +30,21 @@ Outside of the declaration, actions may include form(s) for gathering additional
 
 When an event is submitted for the first time, **in full**, as defined in the event configuration, it receives the status `DECLARED`. [Statuses and flags](./EventMetadata.ts) restrict which actions can take place next.
 
+#### Action status
+
+Every stored action carries an [ActionStatus](./ActionStatus.ts): `Requested`, `Accepted` or `Rejected`.
+
+[Confirmable actions](./ActionType.ts) (`ConfirmableActions`: `NOTIFY`, `DECLARE`, `EDIT`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `PRINT_CERTIFICATE`, `REQUEST_CORRECTION`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and `CUSTOM`) are stored in two steps:
+
+1. A `Requested` action is written first. It holds the user's declaration, annotation and content, and the metadata of the user who performed it (`createdBy`, `createdAtLocation`, ...).
+2. Country config's action confirmation API is called. A `200` stores an `Accepted` action, a `400` stores a `Rejected` action. A `202` leaves the `Requested` action pending until the country config calls the `accept` or `reject` endpoint.
+
+The `Accepted`/`Rejected` action points back to the `Requested` one through `originalActionId`. Its declaration and annotation are empty unless the confirmation response provided some. Use `getCompleteActionDeclaration`, `getCompleteActionAnnotation` and `getCompleteActionContent` to read the merged values, rather than reading either action on its own.
+
+All other actions (`CREATE`, `ASSIGN`, `UNASSIGN`, `READ`, `DUPLICATE_DETECTED`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`) are stored directly as `Accepted`, with no `Requested` counterpart.
+
+Only `Accepted` actions change the event state (see `getAcceptedActions`). A record's action list therefore usually contains both the `Requested` and `Accepted` copy of each confirmable action, so look actions up by type **and** status rather than by type or position. `generateEventDocument` and `generateActionDocuments` in [test.utils.ts](./test.utils.ts) produce the same pairs, so tests see realistic data by default. `generateActionDocument` builds a single action with an explicit status, for edge cases such as pending or rejected requests.
+
 #### Quick actions
 
 Some actions have their own complete flow on the UI, this includes:

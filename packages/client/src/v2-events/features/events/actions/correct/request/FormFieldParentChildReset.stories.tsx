@@ -26,10 +26,12 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
+  generateActionDocuments,
   generateTranslationConfig,
   FieldUpdateValue,
   withDeclaration,
-  getDeclaration
+  getDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -194,7 +196,7 @@ const overridenActions = [
     configuration: overriddenEventConfig,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
@@ -206,7 +208,7 @@ const overridenActions = [
       }
     }
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.REGISTER,
     defaults: { declaration: {} }
@@ -225,7 +227,7 @@ export const FormFieldParentChildReset: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(overriddenEventConfig)
+    addLocalEventConfig(toVersionedEventConfig(overriddenEventConfig))
     setEventData(overridenEvent.id, overridenEvent)
   },
   parameters: {
@@ -253,7 +255,7 @@ export const FormFieldParentChildReset: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [overriddenEventConfig]
+            return [toVersionedEventConfig(overriddenEventConfig)]
           })
         ],
         event: [
@@ -278,7 +280,7 @@ export const FormFieldParentChildReset: Story = {
                 ...overridenEvent,
                 actions: [
                   ...overridenEvent.actions,
-                  generateActionDocument({
+                  ...generateActionDocuments({
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {

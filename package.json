@@ -10,7 +10,7 @@
   "engines": {
     "node": "22.x.x"
   },
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@10.34.9",
   "scripts": {
     "postinstall": "node development-environment/link-ts6-api.js",
     "start": "lerna run build --scope @opencrvs/toolkit --scope @opencrvs/mosip --include-dependencies && lerna run --stream --concurrency 99 $OTHER_LERNA_FLAGS --ignore @opencrvs/countryconfig-template start",

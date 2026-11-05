@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Table } from '@opencrvs/components/lib/Table'
+import { Table, ColumnContentAlignment } from '@opencrvs/components'
 import {
   ActionDocument,
   EventDocument,
@@ -19,7 +19,6 @@ import {
   isFieldVisible,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'

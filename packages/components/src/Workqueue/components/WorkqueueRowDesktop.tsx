@@ -10,7 +10,12 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IActionObject, ColumnContentAlignment, IAction, IColumn } from '..'
+import {
+  IActionObject,
+  ColumnContentAlignment,
+  IAction,
+  IColumn
+} from '../types'
 
 export interface IWorkqueueRow {
   displayItems: Array<Record<string, unknown>>

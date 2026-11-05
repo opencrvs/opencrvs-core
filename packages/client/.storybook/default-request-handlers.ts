@@ -24,13 +24,13 @@ import {
   generateWorkqueues,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  tennisClubMembershipEvent,
-  footballClubMembershipEvent,
-  libraryMembershipEvent,
   TestUserRole,
   AuditLogEntry,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-  V2_DEFAULT_MOCK_LOCATIONS
+  V2_DEFAULT_MOCK_LOCATIONS,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent,
+  versionedLibraryMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -87,9 +87,9 @@ export const handlers = {
   events: [
     tRPCMsw.event.config.get.query(() => {
       return [
-        tennisClubMembershipEvent,
-        footballClubMembershipEvent,
-        libraryMembershipEvent
+        versionedTennisClubMembershipEvent,
+        versionedFootballClubMembershipEvent,
+        versionedLibraryMembershipEvent
       ]
     })
   ],
