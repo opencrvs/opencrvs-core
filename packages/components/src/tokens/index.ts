@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/**
- * @deprecated Please use a stricter type.
- */
-export interface IDynamicValues {
-  [key: string]: string
-}
-
-export { ColumnContentAlignment } from './Workqueue'
-export type { IColumn, IAction, IActionObject } from './Workqueue'
+export * from './colors'
+export * from './fonts'
+export * from './grid'
+export * from './theme'

@@ -10,15 +10,18 @@
  */
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  InputField,
+  TextInput,
+  WarningMessage,
+  Frame,
+  Content,
+  ContentSize,
+  AppBar,
+  Button,
+  Icon
+} from '@opencrvs/components'
+import { TickOff, TickOn } from '@opencrvs/components/icons'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'

@@ -17,21 +17,10 @@ import {
   joinUrlPaths,
   logger
 } from '@opencrvs/commons'
-import { fromBuffer } from 'file-type'
-import { v4 as uuid } from 'uuid'
 
 import { badRequest, forbidden } from '@hapi/boom'
 import { Readable } from 'stream'
 import { z } from 'zod'
-export interface IDocumentPayload {
-  fileData: string
-  metaData?: Record<string, string>
-}
-
-export type IFileInfo = {
-  ext: string
-  mime: string
-}
 
 const HapiSchema = z.object({
   filename: z.string().min(1, 'Filename is required'),
@@ -128,38 +117,4 @@ export async function fileExistsHandler(
   }
 
   return h.response().code(200)
-}
-
-export async function documentUploadHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
-  if (!userId)
-    return Promise.reject(
-      new Error(
-        `request failed: Authorization token is missing or does not contain a valid user ID.`
-      )
-    )
-  const payload = request.payload as IDocumentPayload
-  const ref = uuid()
-  try {
-    const base64String = payload.fileData.split(',')[1]
-    const base64Decoded = Buffer.from(base64String, 'base64')
-    const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
-    const generateFileName = `${ref}.${fileType.ext}`
-
-    await putObject(generateFileName, base64Decoded, {
-      contentType: fileType.mime,
-      metadata: { ...payload.metaData, 'created-by': userId }
-    })
-
-    return h
-      .response({ refUrl: `/${env.S3_BUCKET}/${generateFileName}` })
-      .code(200)
-  } catch (error) {
-    return Promise.reject(
-      new Error(`request failed: ${(error as Error).message}`)
-    )
-  }
 }

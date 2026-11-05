@@ -36,7 +36,7 @@ interface ControlProps {
   rotateLeft: () => void
 }
 
-const PanControls = ({ zoomIn, zoomOut, rotateLeft }: ControlProps) => {
+export const PanControls = ({ zoomIn, zoomOut, rotateLeft }: ControlProps) => {
   return (
     <ControlsContainer>
       <Button type="icon" size="medium" onClick={zoomIn}>
@@ -51,5 +51,3 @@ const PanControls = ({ zoomIn, zoomOut, rotateLeft }: ControlProps) => {
     </ControlsContainer>
   )
 }
-
-export default PanControls
