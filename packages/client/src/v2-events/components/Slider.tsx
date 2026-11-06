@@ -10,7 +10,7 @@
  */
 import styled from 'styled-components'
 import React from 'react'
-import { Square } from '@opencrvs/components/lib/icons'
+import { Square } from '@opencrvs/components/icons'
 
 const SliderContainer = styled.div`
   width: min(600px, 90%);
