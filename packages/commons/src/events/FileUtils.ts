@@ -19,31 +19,42 @@ function carriesFieldValues(action: Action): action is ActionDocument {
   return 'declaration' in action
 }
 
-export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
-  const filepaths = event.actions
-    .filter(carriesFieldValues)
-    .flatMap((action) => {
-      const declarationValues = Object.values(action.declaration)
-      const annotationValues = Object.values(action.annotation ?? {})
+/**
+ * Every file an action's values name, whatever field they're in. Reads and
+ * writes must agree on this, so a record can't name a file that slips past
+ * the check on write but is signed on read.
+ */
+export function getFilePathsFromValues({
+  declaration,
+  annotation
+}: {
+  declaration: Record<string, unknown>
+  annotation?: Record<string, unknown> | null
+}): DocumentPath[] {
+  const values = [
+    ...Object.values(declaration),
+    ...Object.values(annotation ?? {})
+  ]
 
-      const actionFilePaths = [
-        ...declarationValues,
-        ...annotationValues
-      ].flatMap((value) => {
-        const fileParsed = FileFieldValue.safeParse(value)
-        if (fileParsed.success) {
-          return [fileParsed.data.path]
-        }
+  return uniq(
+    values.flatMap((value) => {
+      const fileParsed = FileFieldValue.safeParse(value)
+      if (fileParsed.success) {
+        return [fileParsed.data.path]
+      }
 
-        const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-        if (fileOptionParsed.success) {
-          return fileOptionParsed.data.map((val) => val.path)
-        }
+      const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
+      if (fileOptionParsed.success) {
+        return fileOptionParsed.data.map((val) => val.path)
+      }
 
-        return []
-      })
-
-      return actionFilePaths
+      return []
     })
-  return uniq(filepaths)
+  )
+}
+
+export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
+  return uniq(
+    event.actions.filter(carriesFieldValues).flatMap(getFilePathsFromValues)
+  )
 }

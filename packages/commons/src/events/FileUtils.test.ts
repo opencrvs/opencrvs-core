@@ -10,7 +10,7 @@
  */
 
 import { EventDocument } from './EventDocument'
-import { getFilePathsFromEvent } from './FileUtils'
+import { getFilePathsFromEvent, getFilePathsFromValues } from './FileUtils'
 
 test('file references finder returns all file references from action document', () => {
   const data = {
@@ -225,4 +225,42 @@ test('file references finder counts files named by a synchronously rejected acti
     'events/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
     'events/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
   ])
+})
+
+test('file references finder reads single and multi-file values from declaration and annotation', () => {
+  expect(
+    getFilePathsFromValues({
+      declaration: {
+        'applicant.image': {
+          path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/a.jpeg',
+          type: 'image/jpeg',
+          originalFilename: 'a.jpeg'
+        },
+        'applicant.name': 'not a file',
+        'documents.proof': [
+          {
+            path: 'b.png',
+            type: 'image/png',
+            originalFilename: 'b.png',
+            option: 'PASSPORT'
+          }
+        ]
+      },
+      annotation: {
+        'review.signature': {
+          path: 'users/0f1e2d3c-4b5a-4968-8776-655443322110/c.png',
+          type: 'image/png',
+          originalFilename: 'c.png'
+        }
+      }
+    })
+  ).toEqual([
+    'events/105b69b3-415f-4e53-b912-ef71484cb6c0/a.jpeg',
+    'b.png',
+    'users/0f1e2d3c-4b5a-4968-8776-655443322110/c.png'
+  ])
+})
+
+test('file references finder accepts actions without annotation', () => {
+  expect(getFilePathsFromValues({ declaration: {} })).toEqual([])
 })
