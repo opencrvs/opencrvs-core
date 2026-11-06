@@ -6,6 +6,11 @@
 
 - Fixes two security vulnerabilities. Details will be published in security advisories.
 
+### Breaking changes
+
+- `event.file.getPresignedUrl` is deprecated in favour of `event.files.presign({ eventId })` and `user.files.presign({ userIds })`, which return presigned URLs keyed by the stored path. `getPresignedUrl` takes an `eventId` for files stored outside `events/{eventId}/`.
+- Upload record attachments with `path: events/{eventId}/`.
+
 ### Bug fixes
 
 - `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
