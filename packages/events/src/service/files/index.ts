@@ -19,7 +19,9 @@ import {
   DocumentPath,
   eventAttachmentPath,
   getFilePathsFromEvent,
+  getFilePathsFromValues,
   joinUrlPaths,
+  parseDocumentPath,
   logger,
   EventDocument,
   UUID
@@ -163,6 +165,34 @@ export async function sweepUnreferencedFiles(
         .map(({ file }) => file)
         .join(', ')}`
     )
+  }
+}
+
+/**
+ * Throws unless every file the values name is stored under the record's own
+ * prefix, or is already named by the record (e.g. a pre-2.0 key carried over
+ * by a correction). A record's readers can presign every file it names, so a
+ * record must not be able to name anyone else's.
+ */
+export function assertFilesBelongToEvent(
+  event: EventDocument,
+  values: {
+    declaration: Record<string, unknown>
+    annotation?: Record<string, unknown> | null
+  }
+) {
+  const namedByRecord = getFilePathsFromEvent(event)
+
+  for (const path of getFilePathsFromValues(values)) {
+    const file = parseDocumentPath(path)
+    const isOwnAttachment = file?.kind === 'event' && file.eventId === event.id
+
+    if (!isOwnAttachment && !namedByRecord.includes(path)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File does not belong to this record: ${path}`
+      })
+    }
   }
 }
 

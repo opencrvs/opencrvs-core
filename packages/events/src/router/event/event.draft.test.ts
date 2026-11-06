@@ -252,7 +252,7 @@ describe('Delete document references in drafts as side-effect', () => {
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
+            path: `events/${event.id}/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: generateUuid(rng),
@@ -316,9 +316,7 @@ test('deletes the events orphaned by a primary office change', async () => {
 
   mswServer.use(
     http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, ({ request }) => {
-      sweptPrefixes.push(
-        new URL(request.url).pathname.replace('/prefix/', '')
-      )
+      sweptPrefixes.push(new URL(request.url).pathname.replace('/prefix/', ''))
       return HttpResponse.json({ deleted: 0 })
     })
   )
@@ -363,4 +361,52 @@ test('the sweep looks for files under the record prefix', async () => {
   })
 
   expect(listedPrefixes).toEqual([`events/${event.id}/`])
+})
+
+describe('Draft file binding', () => {
+  async function draftWithImage(makePath: (eventId: string) => string) {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+    const path = makePath(event.id)
+
+    const draft = client.event.draft.create({
+      type: ActionType.DECLARE,
+      declaration: {
+        ...generator.event.actions.declare(event.id).declaration,
+        'applicant.image': {
+          type: 'image/png',
+          originalFilename: 'image.png',
+          path: path as DocumentPath
+        }
+      },
+      transactionId: generateUuid(),
+      eventId: event.id,
+      status: ActionStatus.Requested
+    })
+
+    return { draft, path }
+  }
+
+  test("accepts a file under the record's own prefix", async () => {
+    const { draft } = await draftWithImage(
+      (eventId) => `events/${eventId}/${generateUuid()}.png`
+    )
+
+    await expect(draft).resolves.toMatchObject({
+      action: { type: ActionType.DECLARE }
+    })
+  })
+
+  test.each([
+    ["another record's prefix", () => `events/${generateUuid()}/x.png`],
+    ["a user's prefix", () => `users/${generateUuid()}/x.png`],
+    ['a bare key the record does not name', () => `${generateUuid()}.png`]
+  ])('rejects a file under %s', async (_, makePath) => {
+    const { draft, path } = await draftWithImage(makePath)
+
+    await expect(draft).rejects.toThrow(
+      `File does not belong to this record: ${path}`
+    )
+  })
 })
