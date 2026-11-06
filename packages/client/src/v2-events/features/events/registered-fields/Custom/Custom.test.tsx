@@ -20,7 +20,7 @@ import {
   tennisClubMembershipEvent,
   toVersionedEventConfig
 } from '@opencrvs/commons/client'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { getTheme } from '@opencrvs/components'
 import { Custom, preloadCustomFields } from './Custom'
 
 /** Test-only custom field modules, in the form that country config gives them */
