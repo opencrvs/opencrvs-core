@@ -22,7 +22,7 @@ import {
   isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
@@ -46,7 +46,7 @@ export function PrintCertificate({
   action: PrintCertificateAction
   validatorContext: ValidatorContext
 }) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
 

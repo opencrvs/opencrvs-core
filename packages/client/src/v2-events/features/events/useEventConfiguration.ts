@@ -8,18 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import {
   EventConfig,
+  findEventConfigForRecord,
   getEventConfigById,
-  getEventConfigForRecord,
   resolveEventConfigInTimeZone,
+  toPlainDateInTimeZone,
   VersionedEventConfig
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { getOfflineData } from '@client/offline/selectors'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
 
 /**
  * Event configuration only changes when countryconfig is deployed, so refetching it with staleTime 0 causes lots of unnecessary calls.
@@ -29,6 +33,36 @@ const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
 /** @returns the country's time zone (IANA), in which configuration versions take effect. */
 export function useCountryTimeZone() {
   return useSelector(getOfflineData).config.SYSTEM_IANA_TIMEZONE
+}
+
+/** How often `useCountryToday` checks the date in the country. */
+const TODAY_CHECK_INTERVAL_MS = 60 * 1000
+
+/**
+ * @returns the current time, updated only when the date changes in the country's
+ * time zone. Components that depend on today's date render again at midnight,
+ * not every minute.
+ */
+function useCountryToday() {
+  const timeZone = useCountryTimeZone()
+  const [today, setToday] = useState(() => new Date())
+
+  useEffect(() => {
+    function update() {
+      const now = new Date()
+      setToday((previous) =>
+        toPlainDateInTimeZone(previous, timeZone) ===
+        toPlainDateInTimeZone(now, timeZone)
+          ? previous
+          : now
+      )
+    }
+    update()
+    const intervalId = setInterval(update, TODAY_CHECK_INTERVAL_MS)
+    return () => clearInterval(intervalId)
+  }, [timeZone])
+
+  return today
 }
 
 /**
@@ -59,47 +93,72 @@ function useVersionedEventConfiguration(eventIdentifier: string) {
 export function useEventConfigurations() {
   const versionedConfigs = useVersionedEventConfigurations()
   const timeZone = useCountryTimeZone()
+  const today = useCountryToday()
 
+  // Resolved again when the date changes, so a version takes effect without a reload.
   return useMemo(
     () =>
       versionedConfigs.map((config) =>
-        resolveEventConfigInTimeZone(config, timeZone)
+        resolveEventConfigInTimeZone(config, timeZone, today)
       ),
-    [versionedConfigs, timeZone]
+    [versionedConfigs, timeZone, today]
   )
 }
 
-/**
- * Fetches configured events and finds a matching event
- * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
- * @returns event configuration
- */
-export function useEventConfiguration(eventIdentifier: string): {
-  eventConfiguration: EventConfig
-} {
-  const config = useEventConfigurations()
-  const eventConfiguration = config.find(
-    (event) => event.id === eventIdentifier
-  )
-  if (!eventConfiguration) {
-    throw new Error('Event configuration not found')
-  }
-
-  return { eventConfiguration }
+/** A record, as far as resolving its configuration version is concerned */
+interface VersionedRecord {
+  type: string
+  configVersionId: string
+  trackingId?: string
 }
 
 /**
  * @returns the configuration of the version `record` was created under. Every action on
  * a record uses that version.
+ * When that version is not configured, shows an error page naming the record, the event
+ * and the version.
  */
-export function useEventConfigurationForRecord(record: {
-  type: string
-  configVersionId: string
-}): { eventConfiguration: EventConfig } {
-  return {
-    eventConfiguration: getEventConfigForRecord(
-      useVersionedEventConfiguration(record.type),
-      record
-    )
+export function useEventConfigurationForRecord(record: VersionedRecord): {
+  eventConfiguration: EventConfig
+} {
+  const intl = useIntl()
+  const versionedConfig = useVersionedEventConfiguration(record.type)
+  const eventConfiguration = findEventConfigForRecord(versionedConfig, record)
+
+  if (eventConfiguration) {
+    return { eventConfiguration }
   }
+
+  return throwStructuredError({
+    title: intl.formatMessage(errorMessages.unknownConfigVersion),
+    message: intl.formatMessage(errorMessages.unknownConfigVersionDescription, {
+      trackingId: record.trackingId ?? '',
+      version: record.configVersionId,
+      event: intl.formatMessage(versionedConfig.label)
+    }),
+    redirection: {
+      label: intl.formatMessage(buttonMessages.refresh),
+      path: window.location.pathname + window.location.search
+    },
+    variant: 'notice'
+  })
+}
+
+/**
+ * @returns a function giving the configuration of the version a record was created
+ * under, or undefined when that version is not cached. For code that handles records
+ * outside a record page (actions, drafts, validation, workqueue and search rows). A
+ * record page uses
+ * `useEventConfigurationForRecord`.
+ */
+export function useEventConfigurationResolver() {
+  const versionedConfigs = useVersionedEventConfigurations()
+
+  return useCallback(
+    (record: VersionedRecord): EventConfig | undefined => {
+      const config = versionedConfigs.find(({ id }) => id === record.type)
+      return config && findEventConfigForRecord(config, record)
+    },
+    [versionedConfigs]
+  )
 }

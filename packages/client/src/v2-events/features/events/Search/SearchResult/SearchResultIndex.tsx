@@ -18,9 +18,10 @@ import { useLocation } from 'react-router-dom'
 import {
   EventState,
   mandatoryColumns,
-  ActionType
+  ActionType,
+  getEventConfigById
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
@@ -39,7 +40,8 @@ export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const location = useLocation()
-  const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
+  // Search spans every version, and its form is the same in each: use today's.
+  const eventConfig = getEventConfigById(useEventConfigurations(), eventType)
   const adminStructure = useAdminStructure()
 
   const fields = useMemo(() => {
@@ -105,7 +107,6 @@ export const SearchResultIndex = () => {
     <SearchResultComponent
       action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
-      eventConfigs={[eventConfig]}
       queryData={queryData.results}
       tabBarContent={
         <SearchCriteriaPanel

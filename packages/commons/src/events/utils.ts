@@ -112,7 +112,7 @@ export function getDeclarationFields(
  * Used to build the search index mapping: records of every version share one index per
  * event, so its mapping must hold the fields of all of them. Goes away once each version
  * gets its own index (#14335).
- * @TODO: reject a field id whose type differs between versions in `defineConfig` (#13973).
+ * Known limitation: a field id must keep its type in every version until #14335.
  */
 export function getDeclarationFieldsOfAllVersions(
   config: VersionedEventConfig

@@ -22,7 +22,6 @@ import {
   EventConfig,
   deepDropNulls,
   applyDraftToEventIndex,
-  getEventConfigById,
   Draft
 } from '@opencrvs/commons/client'
 import { WorkqueueCtaType } from '@client/v2-events/features/workqueues/Actions/utils'
@@ -33,6 +32,7 @@ import { ActionCta } from '../ActionCta'
 import RetryButton from '../../../../components/RetryButton'
 import { OutboxEventIndex } from '../../useEvents/outbox'
 import { SearchResultItemTitle } from './SearchResultItemTitle'
+import { UnknownConfigVersionTitle } from './UnknownConfigVersionTitle'
 
 const messages = defineMessages({
   noRecord: {
@@ -400,13 +400,13 @@ function buildAvailableActionComponents({
  */
 export function enrichEventsForWorkueue({
   events,
-  eventConfigs,
+  findEventConfiguration,
   drafts,
   outbox,
   getEventTitle
 }: {
   events: EventIndex[]
-  eventConfigs: EventConfig[]
+  findEventConfiguration: (event: EventIndex) => EventConfig | undefined
   drafts: Draft[]
   outbox: OutboxEventIndex[]
   getEventTitle: (
@@ -418,11 +418,12 @@ export function enrichEventsForWorkueue({
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
 }[] {
   return events.map((event) => {
-    const eventConfig = getEventConfigById(eventConfigs, event.type)
+    const eventConfig = findEventConfiguration(event)
     const draft = first(drafts.filter((d) => d.eventId === event.id))
-    const eventWithDraft = draft
-      ? deepDropNulls(applyDraftToEventIndex(event, draft, eventConfig))
-      : event
+    const eventWithDraft =
+      draft && eventConfig
+        ? deepDropNulls(applyDraftToEventIndex(event, draft, eventConfig))
+        : event
     const localEventStatus = getLocalEventStatus({
       eventId: eventWithDraft.id,
       currentStatus: eventWithDraft.status,
@@ -430,7 +431,9 @@ export function enrichEventsForWorkueue({
       drafts
     })
 
-    const { title } = getEventTitle(eventConfig, eventWithDraft)
+    const title = eventConfig
+      ? getEventTitle(eventConfig, eventWithDraft).title
+      : null
     return {
       enrichedEvent: { ...eventWithDraft, title },
       localEventStatus
@@ -443,7 +446,7 @@ export function enrichEventsForWorkueue({
  */
 export function processEventsToRows({
   enrichedEvents,
-  eventConfigs,
+  findEventConfiguration,
   outbox,
   action,
   isWideScreen,
@@ -454,7 +457,7 @@ export function processEventsToRows({
     enrichedEvent: EventIndex & { title: string | null }
     localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
   }[]
-  eventConfigs: EventConfig[]
+  findEventConfiguration: (event: EventIndex) => EventConfig | undefined
   outbox: OutboxEventIndex[]
   action?: { type: WorkqueueCtaType }
   isWideScreen: boolean
@@ -462,7 +465,16 @@ export function processEventsToRows({
   intl: IntlShape
 }) {
   return enrichedEvents.map(({ enrichedEvent, localEventStatus }) => {
-    const eventConfig = getEventConfigById(eventConfigs, enrichedEvent.type)
+    const eventConfig = findEventConfiguration(enrichedEvent)
+
+    if (!eventConfig) {
+      // The record's version is not configured, so show none of its details or actions
+      return {
+        id: enrichedEvent.id,
+        actions: [],
+        title: <UnknownConfigVersionTitle event={enrichedEvent} />
+      }
+    }
 
     const actionComponents = buildAvailableActionComponents({
       event: enrichedEvent,
