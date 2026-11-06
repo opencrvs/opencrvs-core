@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test } from '@playwright/test'
+import { expect, Page, test } from '@playwright/test'
 import { login } from '@e2e/support/helpers'
 import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
 import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
@@ -17,27 +17,66 @@ import { hasPrecachedBuildAssets } from '@e2e/support/service-worker'
 const SKILL_LEVEL_MODULE =
   '/api/countryconfig/static/custom-fields/skill-level.js'
 
+const SKIP_ON_DEVELOPMENT_SERVER =
+  'The development server serves the client without a precache, so the app cannot work offline.'
+
+async function openTennisClubForm(page: Page) {
+  await page.click('#header-new-event')
+  await page.getByLabel('Tennis club membership application').click()
+  await page.getByRole('button', { name: 'Continue' }).click()
+}
+
 /*
- * The client loads the custom field modules of all events when the user logs
- * in, and the service worker caches them. So the field works offline in a
- * form that the user did not open while online, and also after the app is
- * opened again offline.
+ * The app shows the loading screen until the custom field modules of all
+ * events are loaded. So when the user sees the workqueue, the forms work also
+ * if the user then goes offline.
  */
-test('Custom field works offline in a form not opened before', async ({
+test('Custom field works offline right after the app opens', async ({
+  page,
+  context
+}) => {
+  await test.step('Log in', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await expect(page.locator('#content-name')).toHaveText('Assigned to you')
+    test.skip(
+      !(await hasPrecachedBuildAssets(page)),
+      SKIP_ON_DEVELOPMENT_SERVER
+    )
+  })
+
+  await test.step('Go offline', async () => {
+    await context.setOffline(true)
+    await mockNetworkConditions(page, 'offline')
+  })
+
+  await test.step('Open a form not opened before and use the custom field', async () => {
+    await openTennisClubForm(page)
+
+    await expect(page.getByRole('radio')).toHaveCount(5)
+    await expect(page.getByText('Error loading component')).not.toBeVisible()
+
+    await page.getByRole('radio', { name: '3 of 5' }).click()
+    await expect(page.getByRole('radio', { name: '3 of 5' })).toHaveAttribute(
+      'aria-checked',
+      'true'
+    )
+  })
+})
+
+/*
+ * The service worker caches the custom field modules, so the app loads them
+ * also when it is opened again offline.
+ */
+test('Custom field module loads from the cache when the app opens again offline', async ({
   page,
   context
 }) => {
   await test.step('Log in, open the app again and wait until the module is cached', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     await expect(page.locator('#content-name')).toHaveText('Assigned to you')
-
-    /*
-     * Against the local development server the client is served by Vite with
-     * no precache, so the app cannot open offline.
-     */
     test.skip(
       !(await hasPrecachedBuildAssets(page)),
-      'The development server serves the client without a precache, so the app cannot open offline.'
+      SKIP_ON_DEVELOPMENT_SERVER
     )
 
     /*
@@ -72,21 +111,6 @@ test('Custom field works offline in a form not opened before', async ({
   await test.step('Go offline', async () => {
     await context.setOffline(true)
     await mockNetworkConditions(page, 'offline')
-  })
-
-  await test.step('Open the form and use the custom field', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Tennis club membership application').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-
-    await expect(page.getByRole('radio')).toHaveCount(5)
-    await expect(page.getByText('Error loading component')).not.toBeVisible()
-
-    await page.getByRole('radio', { name: '3 of 5' }).click()
-    await expect(page.getByRole('radio', { name: '3 of 5' })).toHaveAttribute(
-      'aria-checked',
-      'true'
-    )
   })
 
   await test.step('Open the app again offline', async () => {
