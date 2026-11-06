@@ -107,7 +107,6 @@ export const SearchResultIndex = () => {
     <SearchResultComponent
       action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
-      eventConfigs={[eventConfig]}
       queryData={queryData.results}
       tabBarContent={
         <SearchCriteriaPanel

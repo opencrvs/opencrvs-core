@@ -1009,6 +1009,9 @@ search.noResultFor,The no result text,No results for ”{param}”,Aucun résult
 search.noResultForSearchTerm,The no result text,No results for “{searchTerm}”,Pas de résultats pour “{searchTerm}”
 search.placeholder,Placeholder text of search input,Name of query,Nom de la requête
 search.quickSearch.result.title,Quick search result title,Search result for “{searchTerm}”,résultat de la recherche pour “{searchTerm}”
+search.result.unknownConfigVersion.description,Second line of a workqueue or search row whose record was created under a configuration version that is not available,Unknown configuration version,Version de configuration inconnue
+search.result.unknownConfigVersion.details,Shown on hover over a workqueue or search row whose record was created under a configuration version that is not available,"Record {trackingId} was created under version: ""{version}"" of the {event} configuration, which is not available. Please contact your system administrator.","L'enregistrement {trackingId} a été créé avec la version : « {version} » de la configuration {event}, qui n'est pas disponible. Veuillez contacter votre administrateur système."
+search.result.unknownConfigVersion.title,Shown in place of a workqueue or search row when the record was created under a configuration version that is not available,{trackingId} cannot be shown,{trackingId} ne peut pas être affiché
 searchField.indicators.clearButton,Clear button text,Clear,Effacer
 searchField.indicators.clearModal.cancel,Cancel button for clear confirmation modal,Cancel,Annuler
 searchField.indicators.clearModal.confirm,Confirm button for clear confirmation modal,Confirm,Confirmer

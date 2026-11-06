@@ -114,7 +114,8 @@ export function useEventConfigurationForRecord(record: VersionedRecord): {
 /**
  * @returns a function giving the configuration of the version a record was created
  * under, or undefined when that version is not cached. For code that handles records
- * outside a record page (actions, drafts, validation).Meanwhile, a record page uses
+ * outside a record page (actions, drafts, validation, workqueue and search rows). A
+ * record page uses
  * `useEventConfigurationForRecord`.
  */
 export function useEventConfigurationResolver() {

@@ -39,7 +39,6 @@ function QuickSearchComponent({ term }: { term: string }) {
     <SearchResultComponent
       action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
-      eventConfigs={eventConfigurations}
       queryData={queryData.results}
       title={intl.formatMessage(
         {

@@ -22,7 +22,10 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { createTestStore } from '@client/tests/util'
-import { useEventConfigurationForRecord } from './useEventConfiguration'
+import {
+  useEventConfigurationForRecord,
+  useEventConfigurationResolver
+} from './useEventConfiguration'
 
 const [base] = versionedTennisClubMembershipEvent.versions
 
@@ -131,5 +134,33 @@ describe('useEventConfigurationForRecord', () => {
     const { message } = JSON.parse(errors[0].message)
     expect(message).toContain('TRACK01')
     expect(message).toContain('removed-version')
+  })
+})
+
+describe('useEventConfigurationResolver', () => {
+  it("resolves the record's version", async () => {
+    vi.setSystemTime(new Date('2030-06-01T00:00:00Z'))
+    const wrapper = await createWrapper()
+
+    const { result } = renderHook(() => useEventConfigurationResolver(), {
+      wrapper
+    })
+
+    await waitFor(() => expect(result.current).toBeTypeOf('function'))
+    expect(result.current(record)?.title).toEqual(base.title)
+  })
+
+  it('gives undefined when the version is not configured', async () => {
+    vi.setSystemTime(new Date('2030-06-01T00:00:00Z'))
+    const wrapper = await createWrapper()
+
+    const { result } = renderHook(() => useEventConfigurationResolver(), {
+      wrapper
+    })
+
+    await waitFor(() => expect(result.current).toBeTypeOf('function'))
+    expect(
+      result.current({ ...record, configVersionId: 'removed-version' })
+    ).toBeUndefined()
   })
 })

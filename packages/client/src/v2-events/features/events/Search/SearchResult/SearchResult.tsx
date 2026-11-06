@@ -17,7 +17,6 @@ import styled from 'styled-components'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventIndex,
-  EventConfig,
   WorkqueueColumn,
   TranslationConfig
 } from '@opencrvs/commons/client'
@@ -27,6 +26,7 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components'
+import { useEventConfigurationResolver } from '@client/v2-events/features/events/useEventConfiguration'
 import { WorkqueueCtaType } from '@client/v2-events/features/workqueues/Actions/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -49,7 +49,6 @@ const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
 export const SearchResultComponent = ({
   columns,
   queryData: events,
-  eventConfigs,
   limit = 10,
   offset = 0,
   title: contentTitle,
@@ -60,7 +59,6 @@ export const SearchResultComponent = ({
   paginationVisibleOffline
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
   queryData: EventIndex[]
   limit?: number
   offset?: number
@@ -100,6 +98,7 @@ export const SearchResultComponent = ({
   const { useOutbox } = useEvents()
   const { useDisplayableDrafts } = useDrafts()
   const { getEventTitle } = useEventTitle()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   const outbox = useOutbox()
   const drafts = useDisplayableDrafts()
@@ -129,7 +128,7 @@ export const SearchResultComponent = ({
     const enrichedEvents = enrichEventsForWorkueue({
       getEventTitle,
       events,
-      eventConfigs,
+      findEventConfiguration,
       drafts,
       outbox
     })
@@ -143,7 +142,7 @@ export const SearchResultComponent = ({
 
     return processEventsToRows({
       enrichedEvents: orderedEvents,
-      eventConfigs,
+      findEventConfiguration,
       outbox,
       action,
       isWideScreen,
@@ -152,7 +151,7 @@ export const SearchResultComponent = ({
     })
   }, [
     events,
-    eventConfigs,
+    findEventConfiguration,
     drafts,
     outbox,
     action,
