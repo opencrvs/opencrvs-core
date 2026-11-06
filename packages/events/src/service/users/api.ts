@@ -253,9 +253,9 @@ async function deleteDraftsAndOrphanedEventsInTrx(
  *
  * TODO: remove once new users' files are stored under their real id and the
  * existing `users/tmp-` paths are migrated, along with `allowTemporary` in
- * `assertOwnSignaturePath`.
+ * `assertOwnSignaturePath` and its use in `getReadableUserFiles`.
  */
-function isTemporaryUserFile(path: string) {
+export function isTemporaryUserFile(path: string) {
   const prefix = 'users/tmp-'
 
   return (

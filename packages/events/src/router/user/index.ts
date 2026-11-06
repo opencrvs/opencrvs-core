@@ -45,6 +45,8 @@ import {
 } from '@events/router/trpc'
 import { getApplicationConfig, getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
+import { presignFiles } from '@events/service/files'
+import { getReadableUserFiles } from '@events/service/users/files'
 import {
   updatePasswordHash,
   updateUserById
@@ -744,5 +746,18 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => {
       return verifyPasswordById(ctx.user.id, input.password)
     }),
+  files: router({
+    /**
+     * Presigned URLs for the users' avatars, and for the signatures the caller
+     * may read, keyed by the path stored on the user.
+     */
+    presign: userOnlyProcedure
+      // Same limit as user.list
+      .input(z.object({ userIds: z.array(UUID).min(1).max(100) }))
+      .output(z.record(z.string(), z.string()))
+      .query(async ({ input, ctx }) =>
+        presignFiles(await getReadableUserFiles(ctx, input.userIds), ctx.token)
+      )
+  }),
   audit: auditRouter
 })
