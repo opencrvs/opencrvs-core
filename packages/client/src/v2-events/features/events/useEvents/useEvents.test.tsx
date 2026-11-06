@@ -27,7 +27,8 @@ import {
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  versionedTennisClubMembershipEvent
+  versionedTennisClubMembershipEvent,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
@@ -67,6 +68,7 @@ const createHandler = trpcHandler(async ({ request }) => {
     type: TENNIS_CLUB_MEMBERSHIP,
     id: '_REAL_UUID_' as UUID,
     trackingId: 'TEST12',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
@@ -195,7 +197,8 @@ describe('events that have unsynced actions', () => {
     await Promise.resolve(
       createEventHook.result.current.mutate({
         type: TENNIS_CLUB_MEMBERSHIP,
-        transactionId: '_TEST_TRANSACTION_'
+        transactionId: '_TEST_TRANSACTION_',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
       })
     )
 
@@ -216,7 +219,8 @@ describe('events that have unsynced actions', () => {
   }) => {
     await createEventHook.result.current.mutateAsync({
       type: TENNIS_CLUB_MEMBERSHIP,
-      transactionId: '_TEST_TRANSACTION_'
+      transactionId: '_TEST_TRANSACTION_',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
     })
     // Wait for backend to sync
     await waitFor(() =>
@@ -252,7 +256,8 @@ describe('events that have unsynced actions', () => {
 
     await createEventHook.result.current.mutateAsync({
       type: TENNIS_CLUB_MEMBERSHIP,
-      transactionId: '_TEST_TRANSACTION_'
+      transactionId: '_TEST_TRANSACTION_',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
     })
 
     expect(localDraftStore.getState().draft?.eventId).toBe('_REAL_UUID_')
@@ -263,7 +268,8 @@ describe('events that have unsynced actions', () => {
   }) => {
     await createEventHook.result.current.mutateAsync({
       type: TENNIS_CLUB_MEMBERSHIP,
-      transactionId: 'tmp-test-event'
+      transactionId: 'tmp-test-event',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
     })
 
     const send =

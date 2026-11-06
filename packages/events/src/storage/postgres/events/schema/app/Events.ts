@@ -20,6 +20,9 @@ export default interface EventsTable {
   createdAt: ColumnType<string, string | undefined, string>
 
   updatedAt: ColumnType<string, string | undefined, string>
+
+  /** Id of the event configuration version the record was created under. 'initial' for records created before versioning. */
+  configVersionId: ColumnType<string, string, string>
 }
 
 export type Events = Selectable<EventsTable>

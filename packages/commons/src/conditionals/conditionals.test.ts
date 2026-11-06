@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from '../events/EventConfig'
 import { validate, compileClientFunction } from './validate'
 import {
   user,
@@ -1120,6 +1121,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1157,6 +1159,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [

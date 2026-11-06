@@ -31,7 +31,8 @@ import {
   FieldUpdateValue,
   withDeclaration,
   getDeclaration,
-  toVersionedEventConfig
+  toVersionedEventConfig,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -172,6 +173,7 @@ const overriddenEventConfig = withDeclaration(
 // --- Event data ---
 const overriddenEvent = {
   trackingId: generateUuid(),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: overriddenEventConfig.id,
   id: generateUuid(),
   createdAt: new Date().toISOString(),

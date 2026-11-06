@@ -4,6 +4,38 @@ Civil registration and vital statistics (CRVS) platform: records of vital events
 
 ## Language
 
+### Records and events
+
+**Vital event**:
+Something that happens in a person's life and is registered: a birth, a death, a marriage. It happens once, in the world, whether or not anyone records it.
+_Avoid_: life event, event (alone, it is ambiguous)
+
+**Record**:
+The case the system holds about one vital event: its declaration, its actions and its status, from creation to archival. One vital event may end up with several records, which is what deduplication catches.
+_Avoid_: event in prose (code and API identifiers keep `event`, for historical reasons), application, case, declaration (that is the record's submitted data)
+
+**Event type**:
+The kind of vital event a record is about, such as birth or death, each configured by the country.
+_Avoid_: event, record type
+
+### Event configuration versioning
+
+**Event configuration**:
+What the country configures for one event type: its forms, its actions, and how its records are shown and searched. Has one or more configuration versions.
+_Avoid_: form config
+
+**Configuration version**:
+One version of an event configuration, taking effect at midnight in the country on its effective-from date. A version stays configured after a newer one takes effect, because the records created under it still use it.
+_Avoid_: form version, revision
+
+**Initial version**:
+The single configuration version of an event configured without versions. Every record created before versioning belongs to it.
+_Avoid_: default version, legacy version, v1
+
+**Stamped version**:
+The configuration version a record was created under, fixed for the life of the record. Every action on the record uses it, whatever version is in effect when the action is taken.
+_Avoid_: record version, current version, effective version (that is the version in effect on a date)
+
 ### Location versioning
 
 **Anchor date**:

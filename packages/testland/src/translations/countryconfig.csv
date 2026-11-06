@@ -311,6 +311,8 @@ event.birth.summary.banner.sealed.title,Heading of the info box shown when a rec
 event.birth.summary.child.dob.empty,Label for date of birth not available,No date of birth,Pas de date de naissance
 event.birth.summary.child.placeOfBirth.empty,Label for place of birth not available,No place of birth,Pas de lieu de naissance
 event.birth.summary.child.placeOfBirth.label,Label for place of birth,Place of birth,Lieu de naissance
+event.birth.summary.configVersion.label,Label for the id of the event configuration version the record was created under,Configuration version,Version de configuration
+event.birth.summary.configVersion.value,Id of the event configuration version the record was created under,{event.configVersionId},{event.configVersionId}
 event.birth.summary.event.registeredAt.empty,This is shown when there is no registration date,No registration date,Aucune date d'enregistrement
 event.birth.summary.event.registeredAt.label,This is the label for the registration date,Registration date,Date d'enregistrement
 event.birth.summary.event.registeredAt.value,This is the registration date value,"{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}","{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}"

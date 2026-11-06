@@ -27,7 +27,8 @@ import {
   UUID,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
@@ -155,6 +156,7 @@ const actions = [
 
 const mockOriginalEvent = {
   trackingId: generateTrackingId(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: overriddenEventConfig.id,
   actions,
   createdAt: new Date(Date.now()).toISOString(),
@@ -164,6 +166,7 @@ const mockOriginalEvent = {
 
 const mockDuplicateEvent = {
   trackingId: duplicates[0].trackingId,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: overriddenEventConfig.id,
   // CREATE and the Requested + Accepted DECLARE pair
   actions: actions.slice(0, 3).concat(
