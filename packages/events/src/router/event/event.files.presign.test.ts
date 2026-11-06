@@ -126,10 +126,11 @@ describe('event.files.presign', () => {
     } = await setupTestCase()
     const signature = `users/tmp-${getUUID()}/${getUUID()}.png`
     await updateUserById(user.id as UUID, { signaturePath: signature })
-    const event = await createTestClient({
-      ...user,
-      signature: signature as DocumentPath
-    }).event.create(generator.event.create())
+    // The client reads the signature from the user it's given, not the database
+    const signer = { ...user, signature: signature as DocumentPath }
+    const event = await createTestClient(signer).event.create(
+      generator.event.create()
+    )
 
     const urls = await createTestClient(otherUser, [
       readTennisClub

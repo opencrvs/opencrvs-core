@@ -53,8 +53,17 @@ export function getFilePathsFromValues({
   )
 }
 
+/**
+ * Every file the record names: its actions' field values and the signatures
+ * of the users who performed them.
+ */
 export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
   return uniq(
-    event.actions.filter(carriesFieldValues).flatMap(getFilePathsFromValues)
+    event.actions.flatMap((action) => [
+      ...(carriesFieldValues(action) ? getFilePathsFromValues(action) : []),
+      ...('createdBySignature' in action && action.createdBySignature
+        ? [action.createdBySignature]
+        : [])
+    ])
   )
 }

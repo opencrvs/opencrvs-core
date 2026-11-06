@@ -109,6 +109,13 @@ export type ParsedDocumentPath =
  */
 const FILE_SEGMENT = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/
 
+// A regex test rather than the UUID schema: this runs for every path signed
+const UUID_PATTERN = z.regexes.uuid()
+
+function isUuid(value: string): value is UUID {
+  return UUID_PATTERN.test(value)
+}
+
 /**
  * Parses a storage key strictly. Returns null for anything that isn't exactly
  * one of the known shapes, so authorization and the key that gets used are
@@ -116,7 +123,7 @@ const FILE_SEGMENT = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/
  */
 export function parseDocumentPath(value: string): ParsedDocumentPath | null {
   const segments = value.split('/')
-  const path = value as DocumentPath
+  const path = DocumentPath.parse(value)
 
   if (segments.length === 1) {
     return FILE_SEGMENT.test(value) ? { kind: 'legacy', path } : null
@@ -127,17 +134,17 @@ export function parseDocumentPath(value: string): ParsedDocumentPath | null {
   }
 
   const [prefix, ownerId, file] = segments
-  // Same check as UUID, without importing it at runtime (it pulls in `uuid`)
-  if (!z.uuid().safeParse(ownerId).success || !FILE_SEGMENT.test(file)) {
+
+  if (!isUuid(ownerId) || !FILE_SEGMENT.test(file)) {
     return null
   }
 
   if (prefix === 'events') {
-    return { kind: 'event', eventId: ownerId as UUID, path }
+    return { kind: 'event', eventId: ownerId, path }
   }
 
   if (prefix === 'users') {
-    return { kind: 'user', userId: ownerId as UUID, path }
+    return { kind: 'user', userId: ownerId, path }
   }
 
   return null

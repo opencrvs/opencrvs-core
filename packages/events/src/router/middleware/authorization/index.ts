@@ -582,27 +582,25 @@ export function canCreateUserWithScopes(scopes: UserScopeType[]) {
   return fn
 }
 
-export const userCanReadOtherUser: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext & UUID,
-  UUID
-> = async ({ next, ctx, input }) => {
+/**
+ * Throws unless the caller may read the user: their own user, or one within
+ * reach of their user.read scope.
+ */
+export async function assertCanReadOtherUser(ctx: TrpcContext, userId: UUID) {
   const { token, user: userReading } = ctx
 
   const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
 
-  const isRequestingOwnUser = userReading.id === input
+  const isRequestingOwnUser = userReading.id === userId
 
   if (acceptedScopes.length === 0 && !isRequestingOwnUser) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  const otherUser = await getUser(input)
+  const otherUser = await getUser(userId)
 
   if (isRequestingOwnUser) {
-    return next()
+    return
   }
 
   if (acceptedScopes.length === 0) {
@@ -630,7 +628,16 @@ export const userCanReadOtherUser: MiddlewareFunction<
   if (!hasAccess) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
+}
 
+export const userCanReadOtherUser: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & UUID,
+  UUID
+> = async ({ next, ctx, input }) => {
+  await assertCanReadOtherUser(ctx, input)
   return next()
 }
 

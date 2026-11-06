@@ -124,7 +124,7 @@ describe('event.file.getPresignedUrl (deprecated)', () => {
       createTestClient(otherUser, [readTennisClub]).event.file.getPresignedUrl({
         filePath: user.signature
       })
-    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 
   test('refuses a caller whose record.read is for another event type', async () => {

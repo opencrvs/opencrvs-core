@@ -10,12 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import {
-  DocumentPath,
-  EventDocumentOnlyLastAction,
-  getUUID,
-  UUID
-} from '@opencrvs/commons'
+import { EventDocumentOnlyLastAction, getUUID } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -69,13 +64,8 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import {
   assertFilesBelongToEvent,
-  presignFiles,
   sweepUnreferencedFiles
 } from '@events/service/files'
-import {
-  assertCanReadEventFile,
-  getReadableEventFiles
-} from '@events/service/files/authorize'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -85,6 +75,7 @@ import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 import { createAndNotifyProcedure } from './actions/createAndNotify'
+import { fileRouter, filesRouter } from './files'
 
 export const eventRouter = router({
   /*
@@ -341,43 +332,8 @@ export const eventRouter = router({
         return currentDraft
       })
   }),
-  file: router({
-    /**
-     * @deprecated Use `files.presign`, which signs every file the record
-     * names in one call. Kept so existing integrations keep working.
-     */
-    getPresignedUrl: userAndSystemProcedure
-      .input(
-        z.object({
-          filePath: DocumentPath,
-          // The record the file belongs to; implied by events/{eventId}/ paths
-          eventId: UUID.optional()
-        })
-      )
-      .output(z.object({ presignedURL: z.string() }))
-      .query(async ({ input, ctx }) => {
-        const path = await assertCanReadEventFile(ctx, input)
-        const urls = await presignFiles([path], ctx.token)
-
-        return { presignedURL: urls[path] }
-      })
-  }),
-  files: router({
-    /**
-     * Presigned URLs for every file the record names, keyed by the path the
-     * record stores, so the client can cache each file under that path.
-     */
-    presign: userAndSystemProcedure
-      .input(z.object({ eventId: UUID }))
-      .use(middleware.canAccessEventWithScopes(['record.read']))
-      .output(z.record(z.string(), z.string()))
-      .query(async ({ ctx }) => {
-        const event = await getEventById(ctx.eventId)
-        const paths = await getReadableEventFiles(ctx, event)
-
-        return presignFiles(paths, ctx.token)
-      })
-  }),
+  file: fileRouter,
+  files: filesRouter,
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     createAndNotify: router(createAndNotifyProcedure()),

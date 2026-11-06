@@ -10,21 +10,13 @@
  */
 import { DocumentPath, logger, UUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
-import { userCanReadOtherUser } from '@events/router/middleware'
+import { assertCanReadOtherUser } from '@events/router/middleware'
 import { isSignableKey } from '@events/service/files/authorize'
 import { getUsersById, isUser } from '@events/service/users/api'
 
-/*
- * The middleware is invoked directly, once per user, so it gets just the
- * input it reads.
- */
-async function canReadOtherUser(ctx: TrpcContext, otherUserId: UUID) {
+async function canReadOtherUser(ctx: TrpcContext, userId: UUID) {
   try {
-    await userCanReadOtherUser({
-      ctx,
-      input: otherUserId,
-      next: (opts: unknown) => opts
-    } as unknown as Parameters<typeof userCanReadOtherUser>[0])
+    await assertCanReadOtherUser(ctx, userId)
     return true
   } catch {
     return false
