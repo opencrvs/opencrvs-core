@@ -116,13 +116,19 @@ defineConfig({
   id: 'birth',
   label: { ... },
   versions: [
-    { id: 'v1', actions: [ ... ] },
+    { id: 'initial', actions: [ ... ] },
     { id: 'v2', effectiveFrom: '2027-01-01', actions: [ ... ] }
   ]
 })
 ```
 
-A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event. For now, the first version applies to every record.
+A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event.
+
+A version takes effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`). A record is created under the version in effect that day and keeps it for its whole life: every action on the record uses that version, even after a newer one takes effect. A record created offline keeps the version in effect when the user created it. The record stores the version's id as `configVersionId`.
+
+An event must have a version in effect today, and `defineConfig` rejects one that does not. It takes today in UTC−12, the last time zone to begin the day, so that the version is in effect whatever the country's time zone: east of it, a version taking effect today is rejected until midnight in UTC−12. Schedule an event's only version a day ahead.
+
+Records created before 2.2 are stamped with `initial`, the id `defineConfig` gives an event configured without versions. When you add `versions` to an existing event, give the version holding your current configuration the id `initial`, as above. Otherwise those records point at a version that does not exist: they fail to open, and the search reindex fails, naming the missing version. Never remove or rename a version that records use.
 
 `defineConfig` still accepts a flat configuration and wraps it in a single version, so existing event configurations need no change. It now returns a `VersionedEventConfig` instead of an `EventConfig`, though, so code that reads a version's fields off its result stops compiling:
 
@@ -135,9 +141,13 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 `opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
 
-**`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `default` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
+**`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
 
-[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601)
+**Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
+
+The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionId}`.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602)
 
 #### The `incomplete` flag is removed
 

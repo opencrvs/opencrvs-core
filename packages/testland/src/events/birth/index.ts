@@ -188,6 +188,21 @@ export const birthEvent = defineConfig({
     ],
     fields: [
       {
+        id: 'configVersion',
+        label: {
+          defaultMessage: 'Configuration version',
+          description:
+            'Label for the id of the event configuration version the record was created under',
+          id: 'event.birth.summary.configVersion.label'
+        },
+        value: {
+          defaultMessage: '{event.configVersionId}',
+          description:
+            'Id of the event configuration version the record was created under',
+          id: 'event.birth.summary.configVersion.value'
+        }
+      },
+      {
         fieldId: 'child.nid',
         conditionals: [
           {

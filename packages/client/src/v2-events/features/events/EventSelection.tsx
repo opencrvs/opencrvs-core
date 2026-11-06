@@ -28,13 +28,18 @@ import {
 } from '@opencrvs/components'
 import {
   canUserCreateEvent,
-  canUserNotifyEvent
+  canUserNotifyEvent,
+  getOrThrow,
+  resolveEffectiveVersion
 } from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { useEventConfigurations } from './useEventConfiguration'
+import {
+  useCountryTimeZone,
+  useVersionedEventConfigurations
+} from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
@@ -82,7 +87,8 @@ function EventSelector() {
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
-  const eventConfigurations = useEventConfigurations()
+  const versionedEventConfigurations = useVersionedEventConfigurations()
+  const timeZone = useCountryTimeZone()
   const events = useEvents()
   const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
@@ -90,8 +96,8 @@ function EventSelector() {
   const createEvent = events.useCreateEvent()
   const user = useSelector(getUserDetails)
 
-  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    canUserCreateEvent(scopes, id)
+  const allowedEventConfigurations = versionedEventConfigurations.filter(
+    ({ id }) => canUserCreateEvent(scopes, id)
   )
 
   function handleContinue() {
@@ -99,20 +105,22 @@ function EventSelector() {
       return setNoEventSelectedError(true)
     }
 
-    const eventConfig = allowedEventConfigurations.find(
-      ({ id }) => id === eventType
+    const eventConfig = getOrThrow(
+      allowedEventConfigurations.find(({ id }) => id === eventType),
+      `Configuration for event '${eventType}' not found`
     )
-
-    if (!eventConfig) {
-      throw new Error(`Configuration for event '${eventType}' not found`)
-    }
+    const version = getOrThrow(
+      resolveEffectiveVersion(eventConfig, new Date(), timeZone),
+      `Event '${eventType}' has no version in effect today`
+    )
 
     const eventId = createTemporaryId()
 
     createEvent.mutate({
       type: eventType,
       transactionId: eventId,
-      createdAtLocation: user?.primaryOfficeId
+      createdAtLocation: user?.primaryOfficeId,
+      configVersionId: version.id
     })
 
     clearForm()

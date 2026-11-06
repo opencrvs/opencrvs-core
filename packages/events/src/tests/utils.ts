@@ -41,7 +41,8 @@ import {
   TokenWithBearer,
   User,
   UserFilter,
-  UUID
+  UUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
@@ -657,7 +658,8 @@ export async function seedEvent(
       .values({
         eventType: eventConfig.id,
         transactionId: getUUID(),
-        trackingId: getUUID()
+        trackingId: getUUID(),
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
       })
       .returning(['id'])
       .executeTakeFirstOrThrow()
