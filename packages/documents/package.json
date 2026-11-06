@@ -67,52 +67,5 @@
       "prettier --write",
       "eslint -c eslint.config.js --fix"
     ]
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": [
-        "@swc/jest",
-        {
-          "jsc": {
-            "experimental": {
-              "plugins": [
-                [
-                  "@swc-contrib/mut-cjs-exports",
-                  {}
-                ]
-              ]
-            }
-          }
-        }
-      ]
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "testEnvironment": "node",
-    "testTimeout": 60000,
-    "globalSetup": "./test/global-setup.ts",
-    "globalTeardown": "./test/global-teardown.ts",
-    "setupFilesAfterEnv": [
-      "./test/setupJest.ts"
-    ],
-    "modulePaths": [
-      "<rootDir>"
-    ],
-    "moduleNameMapper": {
-      "@documents/(.*)": "<rootDir>/src/$1"
-    },
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ]
   }
 }

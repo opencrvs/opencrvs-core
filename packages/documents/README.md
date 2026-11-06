@@ -19,7 +19,7 @@ The defaults match the store that `docker-compose.dev-deps.yml` starts for devel
 
 ## Object stores
 
-The service has no code that is specific to a store, and does not check which one it talks to. It was tried by hand, once, against the stores below. Its unit tests run against RustFS, at the version in the table, in a container that `test/global-setup.ts` starts, so running them needs Docker. Nothing in CI runs it against the other stores, so a newer version, or a store that is not listed, may behave differently.
+The service has no code that is specific to a store, and does not check which one it talks to. It was tried by hand, once, against the stores below. Its unit tests run against MinIO and against RustFS, at the versions in the table. `test/global-setup.ts` starts a container for each store, so running the tests needs Docker. Each Jest project in `jest.config.js` runs all the tests against one store. To run against one store only, use `pnpm test --selectProjects minio` or `--selectProjects rustfs`. Nothing in CI runs the service against SeaweedFS, so a newer version, or a store that is not listed, may behave differently.
 
 | Store     | Kind                     | Tried on   | Version                                               |
 | --------- | ------------------------ | ---------- | ----------------------------------------------------- |

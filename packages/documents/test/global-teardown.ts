@@ -9,5 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export default async function teardown() {
-  await globalThis.__RUSTFS__?.stop()
+  await Promise.all(
+    (globalThis.__S3_STORES__ ?? []).map((container) => container.stop())
+  )
 }

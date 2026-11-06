@@ -12,5 +12,8 @@ import type { StartedTestContainer } from 'testcontainers'
 
 declare global {
   // eslint-disable-next-line no-var
-  var __RUSTFS__: StartedTestContainer | undefined
+  var __S3_STORES__: StartedTestContainer[] | undefined
+  /** The store that the Jest project runs against, set in jest.config.js */
+  // eslint-disable-next-line no-var
+  var S3_STORE: 'RUSTFS' | 'MINIO'
 }
