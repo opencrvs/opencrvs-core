@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import React, { PropsWithChildren, Suspense } from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { setupServer } from 'msw/node'
@@ -24,7 +24,8 @@ import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { createTestStore } from '@client/tests/util'
 import {
   useEventConfigurationForRecord,
-  useEventConfigurationResolver
+  useEventConfigurationResolver,
+  useEventConfigurations
 } from './useEventConfiguration'
 
 const [base] = versionedTennisClubMembershipEvent.versions
@@ -162,5 +163,26 @@ describe('useEventConfigurationResolver', () => {
     expect(
       result.current({ ...record, configVersionId: 'removed-version' })
     ).toBeUndefined()
+  })
+})
+
+describe('useEventConfigurations', () => {
+  it('switches to the version that takes effect at midnight in the country, without a reload', async () => {
+    // 23:30 on 2030-01-01 in Dhaka
+    vi.setSystemTime(new Date('2030-01-01T17:30:00Z'))
+    const wrapper = await createWrapper()
+
+    const { result } = renderHook(() => useEventConfigurations(), { wrapper })
+    await waitFor(() => expect(result.current[0].title).toEqual(base.title))
+
+    // 00:30 on 2030-01-02 in Dhaka, with the tab left open
+    act(() => {
+      vi.setSystemTime(new Date('2030-01-01T18:30:00Z'))
+      vi.advanceTimersByTime(60 * 1000)
+    })
+
+    await waitFor(() =>
+      expect(result.current[0].title.defaultMessage).toBe('Title of v2')
+    )
   })
 })

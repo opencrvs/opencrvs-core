@@ -379,19 +379,21 @@ export function getEventConfigForRecord(
 }
 
 /**
- * @returns the configuration of the version in effect today in `timeZone`, the
- * country's time zone. For a record, use `getEventConfigForRecord` instead.
- * @throws when no version is in effect today, which `defineConfig` rules out.
+ * @returns the configuration of the version in effect on the date of `now` (today by
+ * default) in `timeZone`, the country's time zone. For a record, use
+ * `getEventConfigForRecord` instead.
+ * @throws when no version is in effect on that date, which `defineConfig` rules out.
  */
 export function resolveEventConfigInTimeZone(
   config: VersionedEventConfig,
-  timeZone: string
+  timeZone: string,
+  now: Date = new Date()
 ): EventConfig {
   return toEventConfig(
     config,
     getOrThrow(
-      resolveEffectiveVersion(config, new Date(), timeZone),
-      `Event '${config.id}' has no version in effect today`
+      resolveEffectiveVersion(config, now, timeZone),
+      `Event '${config.id}' has no version in effect on ${now.toISOString()}`
     )
   )
 }
