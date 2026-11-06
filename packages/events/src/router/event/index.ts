@@ -10,12 +10,10 @@
  */
 
 import * as z from 'zod/v4'
-import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   EventDocumentOnlyLastAction,
   getUUID,
-  parseDocumentPath,
   UUID
 } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
@@ -71,10 +69,13 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import {
   assertFilesBelongToEvent,
-  presignFile,
+  presignFiles,
   sweepUnreferencedFiles
 } from '@events/service/files'
-import { authorizeFileRead } from '@events/service/files/authorize'
+import {
+  assertCanReadEventFile,
+  getReadableEventFiles
+} from '@events/service/files/authorize'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -341,28 +342,40 @@ export const eventRouter = router({
       })
   }),
   file: router({
+    /**
+     * @deprecated Use `files.presign`, which signs every file the record
+     * names in one call. Kept so existing integrations keep working.
+     */
     getPresignedUrl: userAndSystemProcedure
       .input(
         z.object({
           filePath: DocumentPath,
-          // The record a file outside events/{eventId}/ belongs to, e.g. a
-          // signature on one of its actions or a pre-2.0 attachment
+          // The record the file belongs to; implied by events/{eventId}/ paths
           eventId: UUID.optional()
         })
       )
       .output(z.object({ presignedURL: z.string() }))
       .query(async ({ input, ctx }) => {
-        const file = parseDocumentPath(input.filePath)
+        const path = await assertCanReadEventFile(ctx, input)
+        const urls = await presignFiles([path], ctx.token)
 
-        if (!file) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Unrecognized file path: ${input.filePath}`
-          })
-        }
+        return { presignedURL: urls[path] }
+      })
+  }),
+  files: router({
+    /**
+     * Presigned URLs for every file the record names, keyed by the path the
+     * record stores, so the client can cache each file under that path.
+     */
+    presign: userAndSystemProcedure
+      .input(z.object({ eventId: UUID }))
+      .use(middleware.canAccessEventWithScopes(['record.read']))
+      .output(z.record(z.string(), z.string()))
+      .query(async ({ ctx }) => {
+        const event = await getEventById(ctx.eventId)
+        const paths = await getReadableEventFiles(ctx, event)
 
-        await authorizeFileRead({ file, eventId: input.eventId, ctx })
-        return presignFile(file.path, ctx.token)
+        return presignFiles(paths, ctx.token)
       })
   }),
   actions: router({

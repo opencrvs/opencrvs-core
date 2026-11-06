@@ -63,32 +63,38 @@ export async function fileExists(path: DocumentPath | string, token: string) {
   return true
 }
 
-export async function presignFile(path: DocumentPath, token: string) {
-  const requestPath = joinUrlPaths('/presigned-url', path)
-  const url = new URL(requestPath, env.DOCUMENTS_URL)
-
-  /*
-   * URL resolution collapses `.`/`..` segments (encoded ones too), so the key
-   * documents-service signs could differ from the one that was authorized.
-   */
-  if (url.pathname !== requestPath) {
-    throw new Error(`Refusing to presign a non-canonical path: ${path}`)
+/**
+ * Presigns every path in one request, keyed by path. documents-service signs
+ * whatever it's given, so callers must only pass paths the caller may read.
+ */
+export async function presignFiles(
+  paths: DocumentPath[],
+  token: string
+): Promise<Record<DocumentPath, string>> {
+  if (paths.length === 0) {
+    return {}
   }
 
-  const res = await fetch(url, {
-    method: 'GET',
+  const res = await fetch(new URL('/presigned-urls', env.DOCUMENTS_URL), {
+    method: 'POST',
     headers: {
+      'Content-Type': 'application/json',
       Authorization: token
-    }
+    },
+    body: JSON.stringify({ filenames: paths })
   })
 
   if (!res.ok) {
-    throw new Error(
-      `Failed to presign file ${path}: ${res.status} ${res.statusText}`
-    )
+    throw new Error(`Failed to presign files: ${res.status} ${res.statusText}`)
   }
 
-  return res.json() as Promise<{ presignedURL: string }>
+  // documents-service answers in the order it was asked
+  const urls = (await res.json()) as string[]
+
+  return Object.fromEntries(paths.map((path, i) => [path, urls[i]])) as Record<
+    DocumentPath,
+    string
+  >
 }
 
 export async function listFiles(path: string, token: string) {
