@@ -88,7 +88,6 @@ test.describe('POST /api/events/events/{eventId}/notify', () => {
         surname: faker.person.lastName()
       },
       'mother.dob': '1998-05-05',
-      'informant.email': 'mothers@email.com',
       ...overrides
     }
   }

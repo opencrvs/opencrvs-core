@@ -90,3 +90,68 @@ describe('getSubmissionForm', () => {
     expect(clean('editAndDeclare')).toEqual({})
   })
 })
+
+describe('getCleanedDeclarationDiff with fields not in the submitted form', () => {
+  const filledName = { firstname: 'Jane', surname: 'Doe' }
+
+  // A notification form with only the applicant's name
+  const declaration = getDeclaration(eventConfiguration)
+  const notificationForm = {
+    ...declaration,
+    pages: getDeclarationPages(eventConfiguration)
+      .slice(0, 1)
+      .map((page) => ({
+        ...page,
+        fields: page.fields.filter(({ id }) => id === 'applicant.name')
+      }))
+  }
+
+  it('drops a declaration-only field from a notification', () => {
+    const result = getCleanedDeclarationDiff({
+      eventConfiguration,
+      form: notificationForm,
+      originalDeclaration: undefined,
+      declarationDiff: {
+        'applicant.name': filledName,
+        'applicant.email': 'jane@example.com'
+      },
+      validatorContext
+    })
+
+    expect(result).toEqual({ 'applicant.name': filledName })
+  })
+
+  it('drops a cleared declaration-only field from a notification', () => {
+    const result = getCleanedDeclarationDiff({
+      eventConfiguration,
+      form: notificationForm,
+      originalDeclaration: {
+        'applicant.name': filledName,
+        'applicant.email': 'jane@example.com'
+      },
+      declarationDiff: {
+        'applicant.name': { firstname: 'John', surname: 'Doe' },
+        'applicant.email': null
+      },
+      validatorContext
+    })
+
+    expect(result).toEqual({
+      'applicant.name': { firstname: 'John', surname: 'Doe' }
+    })
+  })
+
+  it('drops a field that is in no form of the event', () => {
+    const result = getCleanedDeclarationDiff({
+      eventConfiguration,
+      originalDeclaration: {},
+      declarationDiff: {
+        'applicant.email': 'jane@example.com',
+        'unknown.field': 'value'
+      },
+      validatorContext
+    })
+
+    expect(result).toEqual({ 'applicant.email': 'jane@example.com' })
+  })
+})
