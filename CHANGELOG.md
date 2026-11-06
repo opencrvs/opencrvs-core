@@ -6,7 +6,11 @@
 
 #### Outbox: empty it before you deploy
 
-2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
+- The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
+- Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment.
+- Fix ElastAlert notifications being blocked by the default-deny egress network policy.
+
+  2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
 
 Before the deploy, instruct every user, working offline in particular, to connect and wait until their outbox is empty. Anything still queued afterwards must be entered again. Users who had OpenCRVS open during the deploy should reload the page; until they do, the old version can fail to show records.
 
