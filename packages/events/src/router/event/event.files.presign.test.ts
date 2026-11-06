@@ -27,6 +27,7 @@ import {
 } from '@events/tests/utils'
 import { buildAction } from '@events/service/events/events'
 import * as eventsRepo from '@events/storage/postgres/events/events'
+import { updateUserById } from '@events/storage/postgres/events/users'
 
 const readTennisClub = encodeScope({
   type: 'record.read',
@@ -115,6 +116,26 @@ describe('event.files.presign', () => {
     ]).event.files.presign({ eventId: event.id })
 
     expect(urls).toMatchObject({ [user.signature]: expect.any(String) })
+  })
+
+  test('includes a signature uploaded under a temporary user id', async () => {
+    const {
+      user,
+      users: [, otherUser],
+      generator
+    } = await setupTestCase()
+    const signature = `users/tmp-${getUUID()}/${getUUID()}.png`
+    await updateUserById(user.id as UUID, { signaturePath: signature })
+    const event = await createTestClient({
+      ...user,
+      signature: signature as DocumentPath
+    }).event.create(generator.event.create())
+
+    const urls = await createTestClient(otherUser, [
+      readTennisClub
+    ]).event.files.presign({ eventId: event.id })
+
+    expect(urls).toMatchObject({ [signature]: expect.any(String) })
   })
 
   test('includes a pre-2.0 key the record names', async () => {

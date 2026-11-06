@@ -8,19 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  DocumentPath,
-  logger,
-  parseDocumentPath,
-  UUID
-} from '@opencrvs/commons'
+import { DocumentPath, logger, UUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { userCanReadOtherUser } from '@events/router/middleware'
-import {
-  getUsersById,
-  isTemporaryUserFile,
-  isUser
-} from '@events/service/users/api'
+import { isSignableKey } from '@events/service/files/authorize'
+import { getUsersById, isUser } from '@events/service/users/api'
 
 /*
  * The middleware is invoked directly, once per user, so it gets just the
@@ -37,16 +29,6 @@ async function canReadOtherUser(ctx: TrpcContext, otherUserId: UUID) {
   } catch {
     return false
   }
-}
-
-function isValidKey(path: DocumentPath) {
-  const valid = parseDocumentPath(path) !== null || isTemporaryUserFile(path)
-
-  if (!valid) {
-    logger.warn(`Not presigning user file with an invalid key: ${path}`)
-  }
-
-  return valid
 }
 
 /**
@@ -81,5 +63,5 @@ export async function getReadableUserFiles(
     })
   )
 
-  return files.flat().filter(isValidKey)
+  return files.flat().filter(isSignableKey)
 }

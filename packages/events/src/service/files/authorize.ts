@@ -13,6 +13,7 @@ import { uniq } from 'lodash'
 import {
   DocumentPath,
   getFilePathsFromEvent,
+  logger,
   parseDocumentPath,
   TokenUserType,
   UUID
@@ -22,6 +23,7 @@ import { TrpcContext } from '@events/context'
 import { canAccessEventWithScopes } from '@events/router/middleware'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
+import { isTemporaryUserFile } from '@events/service/users/api'
 import { getDraftsByEventIdAndUserId } from '@events/storage/postgres/events/drafts'
 
 /**
@@ -55,12 +57,24 @@ function getNamedFiles(event: EventDocument): DocumentPath[] {
 }
 
 /**
+ * Whether a stored path is a storage key the system writes. Anything else is
+ * left out of presigning, so a malformed value can't be resolved into some
+ * other key when it is signed.
+ */
+export function isSignableKey(path: DocumentPath) {
+  const signable = parseDocumentPath(path) !== null || isTemporaryUserFile(path)
+
+  if (!signable) {
+    logger.warn(`Not presigning a file with an invalid key: ${path}`)
+  }
+
+  return signable
+}
+
+/**
  * The files a caller who may read the record may also read: those its
  * actions and the caller's own drafts name. Whoever may read a record may
  * read what it names, so the path itself is never what grants access.
- *
- * Paths that aren't a valid storage key are left out, so a malformed value
- * can't be resolved into some other key when it is signed.
  */
 export async function getReadableEventFiles(
   ctx: TrpcContext,
@@ -71,7 +85,7 @@ export async function getReadableEventFiles(
   return uniq([
     ...getNamedFiles(event),
     ...getNamedFiles({ ...event, actions: draftActions })
-  ]).filter((path) => parseDocumentPath(path) !== null)
+  ]).filter(isSignableKey)
 }
 
 /*
