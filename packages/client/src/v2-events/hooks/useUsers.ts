@@ -19,7 +19,8 @@ import {
   TokenUserType,
   UserOrSystem,
   UserOrSystemSummary,
-  UserSummary
+  UserSummary,
+  UUID
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -33,7 +34,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFile, precacheFiles } from '../cache'
+import { precacheFiles, precacheUserFiles } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -65,7 +66,7 @@ setQueryDefaults<
       (file): file is DocumentPath => !!file
     )
 
-    await precacheFiles(files)
+    await precacheFiles(files, { userId: user.id as UUID })
 
     return deepDropNulls({
       ...user,
@@ -111,19 +112,14 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         ] as (typeof params)[0]['queryKey']
       })
 
-      // Use all settled in order to finish all queries in failure states.
-      // Technically this could be replaced with precacheFiles but during review, we deemed it more safe to keep the existing functionality.
-      // If the reason above is not up to date, feel free to refactor.
-      await Promise.allSettled(
-        freshUsers.map(async (user) => {
-          if (user.type === TokenUserType.enum.system) {
-            return user
-          }
-          if (user.avatar) {
-            await precacheFile(user.avatar)
-          }
-          return user
-        })
+      // One call for every avatar; a failure is logged, not thrown, so the
+      // users still load
+      await precacheUserFiles(
+        freshUsers.flatMap((user) =>
+          user.type === TokenUserType.enum.user && user.avatar
+            ? [user.id as UUID]
+            : []
+        )
       )
 
       for (const user of freshUsers) {

@@ -64,7 +64,7 @@ export async function cacheFilesFromEventDocument(event: EventDocument) {
   const actions = getAcceptedActions(event)
   const fileNames = getFilepathsFromActionDocument(actions)
 
-  return precacheFiles(fileNames, event.id)
+  return precacheFiles(fileNames, { eventId: event.id })
 }
 
 export async function removeCachedFiles(event: EventDocument) {

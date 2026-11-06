@@ -88,7 +88,7 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
 
         const filenames = getFilepathsFromActionDocument([draft.action])
 
-        await precacheFiles(filenames, draft.eventId)
+        await precacheFiles(filenames, { eventId: draft.eventId })
       })
     )
 
