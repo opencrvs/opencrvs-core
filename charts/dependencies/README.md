@@ -8,7 +8,7 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
   - Postgres
   - Elasticsearch
   - Redis
-  - MinIO
+  - RustFS
 - Observability (Monitoring and Logging):
   - Kibana
   - Logstash
@@ -27,30 +27,30 @@ Any particular service within this helm chart can be disabled by setting `<servi
 
 ## Global configuration options
 
-| Parameter                           | Type   | Default                            | Description                                                                                                                                                                                                                                                                          |
-| ----------------------------------- | ------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| hostname                            | string | farajaland.dev                     | All chart services will be available under specified domain. Exposed services are MinIO and Kibana, if Monitoring is enabled                                                                                                                                                         |
-| ingress.ssl_enabled                 | bool   | false                              | Enable or disable https endpoint, by default all http traffic is routed to https                                                                                                                                                                                                     |
-| ingress.tls_resolver                | string | ` `                                | If traefik was deployed with custom resolver, please define resolver name here. Resolver will be attached to Traefik CRD IngressRoute, otherwise default Traefik SSL Certificate will be used.                                                                                       |
-| ingress.tls_secret_name             | string | ` `                                | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                                                                                                                |
-| ingress.admin_console_allowlist     | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the MinIO console and Kibana, enforced via a Traefik `ipAllowList` middleware. Leave empty to leave these admin consoles publicly reachable. Does not restrict the MinIO S3 API route - use `application_allowlist` below to restrict that. |
-| ingress.application_allowlist       | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the MinIO S3 API route, enforced via a Traefik `ipAllowList` middleware. `admin_console_allowlist` is always merged in. Leave empty to leave the MinIO API publicly reachable.                                                              |
-| network_policy.enabled              | bool   | `true`                             | Render Kubernetes NetworkPolicy resources for dependency workloads. Requires a CNI provider that enforces NetworkPolicy.                                                                                                                                                             |
-| network_policy.ingress_mode         | string | `deny`                             | Baseline policy for ingress to dependency pods: `deny` (default, requires another NetworkPolicy to allow it), `private` (allow only RFC1918 private ranges), or `full` (unrestricted).                                                                                               |
-| network_policy.egress_mode          | string | `deny`                             | Baseline policy for egress from dependency pods. Same modes as `ingress_mode`, applied to egress. DNS (53) is always allowed except in `full` mode.                                                                                                                                  |
-| network_policy.allow_same_namespace | bool   | `true`                             | Allow dependency pods in the same namespace to communicate with each other.                                                                                                                                                                                                          |
-| network_policy.allowed_namespaces   | list   | `[]`                               | Namespaces allowed to reach dependency pods (e.g. the opencrvs-services namespace). When set, dependency pods accept ingress on any port from every pod in each listed namespace, so the OpenCRVS application keeps working once ingress is denied by default.                       |
-| timezone                            | string | ` `                                | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                                                                                                          |
-| storage_type                        | string | `pvc`                              | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                                                                                                         |
-| platform.imagePullSecrets           | list   | `[]`                               | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                                                                                                          |
-| node_selector                       | dict   | `{}`                               | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                                                                                                             |
-| monitoring.enabled                  | bool   | `false`                            | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                                                                                                          |
-| priority_class.enabled              | bool   | `false`                            | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                                                                                                           |
-| backup.enabled                      | bool   | `true`                             | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                                                                                                                 |
-| restore.enabled                     | bool   | `true`                             | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                                                                                                                 |
-| service_type                        | string | `ClusterIP`                        | Kubernetes Service type for datastore Services (Postgres, Elasticsearch, Kibana, Redis, MinIO), e.g. `ClusterIP` or `NodePort`. Applies to all of them; there is no per-service override.                                                                                            |
-| utilities.image.repository          | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                                                                                                                                           |
-| utilities.image.tag                 | string | `v2.1.0`                           | Shared utilities image tag used by helper jobs and init containers.                                                                                                                                                                                                                  |
+| Parameter                           | Type   | Default                            | Description                                                                                                                                                                                                                                                                            |
+| ----------------------------------- | ------ | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| hostname                            | string | farajaland.dev                     | All chart services will be available under specified domain. Exposed services are RustFS and Kibana, if Monitoring is enabled                                                                                                                                                          |
+| ingress.ssl_enabled                 | bool   | false                              | Enable or disable https endpoint, by default all http traffic is routed to https                                                                                                                                                                                                       |
+| ingress.tls_resolver                | string | ` `                                | If traefik was deployed with custom resolver, please define resolver name here. Resolver will be attached to Traefik CRD IngressRoute, otherwise default Traefik SSL Certificate will be used.                                                                                         |
+| ingress.tls_secret_name             | string | ` `                                | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                                                                                                                  |
+| ingress.admin_console_allowlist     | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the RustFS console and Kibana, enforced via a Traefik `ipAllowList` middleware. Leave empty to leave these admin consoles publicly reachable. Does not restrict the RustFS S3 API route - use `application_allowlist` below to restrict that. |
+| ingress.application_allowlist       | list   | `[]`                               | Source IP ranges (CIDR) allowed to reach the RustFS S3 API route, enforced via a Traefik `ipAllowList` middleware. `admin_console_allowlist` is always merged in. Leave empty to leave the RustFS API publicly reachable.                                                              |
+| network_policy.enabled              | bool   | `true`                             | Render Kubernetes NetworkPolicy resources for dependency workloads. Requires a CNI provider that enforces NetworkPolicy.                                                                                                                                                               |
+| network_policy.ingress_mode         | string | `deny`                             | Baseline policy for ingress to dependency pods: `deny` (default, requires another NetworkPolicy to allow it), `private` (allow only RFC1918 private ranges), or `full` (unrestricted).                                                                                                 |
+| network_policy.egress_mode          | string | `deny`                             | Baseline policy for egress from dependency pods. Same modes as `ingress_mode`, applied to egress. DNS (53) is always allowed except in `full` mode.                                                                                                                                    |
+| network_policy.allow_same_namespace | bool   | `true`                             | Allow dependency pods in the same namespace to communicate with each other.                                                                                                                                                                                                            |
+| network_policy.allowed_namespaces   | list   | `[]`                               | Namespaces allowed to reach dependency pods (e.g. the opencrvs-services namespace). When set, dependency pods accept ingress on any port from every pod in each listed namespace, so the OpenCRVS application keeps working once ingress is denied by default.                         |
+| timezone                            | string | ` `                                | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                                                                                                            |
+| storage_type                        | string | `pvc`                              | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                                                                                                           |
+| platform.imagePullSecrets           | list   | `[]`                               | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                                                                                                            |
+| node_selector                       | dict   | `{}`                               | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                                                                                                               |
+| monitoring.enabled                  | bool   | `false`                            | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                                                                                                            |
+| priority_class.enabled              | bool   | `false`                            | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                                                                                                             |
+| backup.enabled                      | bool   | `true`                             | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                                                                                                                   |
+| restore.enabled                     | bool   | `true`                             | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                                                                                                                   |
+| service_type                        | string | `ClusterIP`                        | Kubernetes Service type for datastore Services (Postgres, Elasticsearch, Kibana, Redis, RustFS), e.g. `ClusterIP` or `NodePort`. Applies to all of them; there is no per-service override.                                                                                             |
+| utilities.image.repository          | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                                                                                                                                             |
+| utilities.image.tag                 | string | `v2.1.0`                           | Shared utilities image tag used by helper jobs and init containers.                                                                                                                                                                                                                    |
 
 ## Network Policies
 
@@ -77,7 +77,7 @@ The same-namespace allow policy is intended as a practical first hardening step:
 
 `<service>.network_policy.ingress_mode`/`egress_mode` are a shortcut for opting one service into `private` or `full` access without writing out an ingress/egress rule under `rules`/`custom_rules` — independent of the global `network_policy.ingress_mode`/`egress_mode`, which control whether the chart-wide baseline policies are rendered at all. For ingress, `private`/`full` accept traffic from RFC1918 ranges/any source respectively, scoped to the service's own `port` value; it renders nothing if `port` is not set, rather than silently opening every port. For egress, `private`/`full` accept traffic to RFC1918 ranges/any destination on any port, since a service's own port doesn't describe what it calls out to.
 
-The dependencies chart and the opencrvs-services chart are typically deployed to separate namespaces (see the default `*.host` values in `charts/opencrvs-services/values.yaml`, e.g. `redis-0.redis.opencrvs-deps-dev.svc.cluster.local`). While `network_policy.ingress_mode` is `deny` (the default), application pods (auth, gateway, events, etc.) can no longer reach Postgres, Elasticsearch, MinIO or Redis unless the opencrvs-services release namespace is listed in `network_policy.allowed_namespaces`. This rule allows all ports from every pod in each listed namespace, rather than requiring a separate rule per service/port pair.
+The dependencies chart and the opencrvs-services chart are typically deployed to separate namespaces (see the default `*.host` values in `charts/opencrvs-services/values.yaml`, e.g. `redis-0.redis.opencrvs-deps-dev.svc.cluster.local`). While `network_policy.ingress_mode` is `deny` (the default), application pods (auth, gateway, events, etc.) can no longer reach Postgres, Elasticsearch, RustFS or Redis unless the opencrvs-services release namespace is listed in `network_policy.allowed_namespaces`. This rule allows all ports from every pod in each listed namespace, rather than requiring a separate rule per service/port pair.
 
 Example:
 
@@ -92,7 +92,7 @@ Service-specific rules follow Kubernetes `NetworkPolicy.spec` syntax, except `po
 Example — open ingress for a service's own port, custom egress via `rules`:
 
 ```yaml
-minio:
+rustfs:
   network_policy:
     rules:
       - name: allow-console-ingress
@@ -116,11 +116,11 @@ minio:
                 port: 443 # apk mirrors are sometimes HTTP-only, so both are opened
 ```
 
-Each rule must define `name`; the chart uses it to generate deterministic `NetworkPolicy` resource names. `ingress_mode: full` is a shortcut for the same shape, but only supports a single port (the service's `port` value) — write a `rules` entry instead when a service listens on more than one port, as MinIO does.
+Each rule must define `name`; the chart uses it to generate deterministic `NetworkPolicy` resource names. `ingress_mode: full` is a shortcut for the same shape, but only supports a single port (the service's `port` value) — write a `rules` entry instead when a service listens on more than one port, as RustFS does.
 
 For backup and restore jobs, external backup server access must be allowed explicitly. Standard Kubernetes `NetworkPolicy` supports IP blocks, pod selectors, namespace selectors, and ports; it does not support DNS/FQDN destinations.
 
-To handle this, the chart computes an `ipBlock` egress rule (`<host>/32`, TCP port 22) for Postgres and MinIO directly from the resolved backup/restore host (`backup.host`, `restore.host`, `postgres.backup.host`, `postgres.restore.host`, `minio.backup.host`, `minio.restore.host`), rendered only when the corresponding `backup.enabled`/`restore.enabled` flag is true. **This requires the host value to be a literal IP address** — if you configure a DNS hostname instead, the generated `ipBlock.cidr` will be invalid and the policy will not match traffic to that host.
+To handle this, the chart computes an `ipBlock` egress rule (`<host>/32`, TCP port 22) for Postgres and RustFS directly from the resolved backup/restore host (`backup.host`, `restore.host`, `postgres.backup.host`, `postgres.restore.host`, `rustfs.backup.host`, `rustfs.restore.host`), rendered only when the corresponding `backup.enabled`/`restore.enabled` flag is true. **This requires the host value to be a literal IP address** — if you configure a DNS hostname instead, the generated `ipBlock.cidr` will be invalid and the policy will not match traffic to that host.
 
 ### Service connections
 
@@ -131,7 +131,7 @@ Applies once `network_policy.enabled: true`. Every dependency pod always accepts
 | Postgres                                               | 5432                       | any source (`ingress_mode: full`)                         | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
 | Elasticsearch                                          | 9200                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | Redis                                                  | 6379                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
-| MinIO                                                  | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
+| RustFS                                                 | 3535 (API), 3536 (console) | 3536 only, any source (`rules`) — API stays baseline-only | 80, 443 (package installs); backup/restore host:22 when backup/restore enabled                             |
 | Kibana                                                 | 5601                       | any source (`ingress_mode: full`)                         | —                                                                                                          |
 | Filebeat, Metricbeat, Logstash, APM Server, Elastalert | —                          | —                                                         | —                                                                                                          |
 | postgres-restore-runner (differential restore)         | —                          | —                                                         | 80, 443 (package installs); restore host:22 when restore enabled                                           |
@@ -139,9 +139,9 @@ Applies once `network_policy.enabled: true`. Every dependency pod always accepts
 
 `ingress_mode: full` opens a service to any source, not just Traefik — narrow it with an explicit `rules` entry (e.g. a `namespaceSelector` for `traefik`), or use `ingress_mode: private` to restrict to RFC1918 ranges, if `full` is too broad for your deployment.
 
-Postgres, MinIO and the differential `postgres-restore-runner` pod also get an unconditional `allow-package-repo-egress` rule (`0.0.0.0/0:80,443`) so that runtime package installation (see [Air-Gap Installation](#air-gap-installation)) keeps working when egress is denied by default — port 80 is included since some apt/apk mirrors are HTTP-only. This rule is intentionally broad: it also permits port 80/443 egress to other pods/namespaces in the cluster, not just the internet. Elasticsearch does not get this rule since it has no backup path and installs no packages at runtime in this chart.
+Postgres, RustFS and the differential `postgres-restore-runner` pod also get an unconditional `allow-package-repo-egress` rule (`0.0.0.0/0:80,443`) so that runtime package installation (see [Air-Gap Installation](#air-gap-installation)) keeps working when egress is denied by default — port 80 is included since some apt/apk mirrors are HTTP-only. This rule is intentionally broad: it also permits port 80/443 egress to other pods/namespaces in the cluster, not just the internet. Elasticsearch does not get this rule since it has no backup path and installs no packages at runtime in this chart.
 
-Differential-type backup/restore automation (`postgres-on-deploy`, `postgres-backup-diff`, `postgres-backup-full`, `postgres-restore`, `minio-backup`, `minio-restore`) drives the actual backup/restore by issuing `kubectl exec`/`scale`/`delete`/`apply` against the Kubernetes API server — it never talks to the Postgres/MinIO pods over the network directly, since `kubectl exec` is proxied through the API server. These pods are labeled `app: backup-runner` (not `app: postgres`/`app: minio`) and get their own unconditional `backup-runner-allow-egress` rule for that access, rather than relying on incidental coverage from the package-repo rule.
+Differential-type backup/restore automation (`postgres-on-deploy`, `postgres-backup-diff`, `postgres-backup-full`, `postgres-restore`, `rustfs-backup`, `rustfs-restore`) drives the actual backup/restore by issuing `kubectl exec`/`scale`/`delete`/`apply` against the Kubernetes API server — it never talks to the Postgres/RustFS pods over the network directly, since `kubectl exec` is proxied through the API server. These pods are labeled `app: backup-runner` (not `app: postgres`/`app: rustfs`) and get their own unconditional `backup-runner-allow-egress` rule for that access, rather than relying on incidental coverage from the package-repo rule.
 
 `backup-runner-allow-egress` intentionally allows all ports, not just 443. The `kubernetes` Service in the `default` namespace exposes port 443, but many CNIs enforce egress `NetworkPolicy` against the _post-DNAT_ destination — i.e. the API server's real `targetPort` (commonly 6443 on kubeadm-style clusters), not the Service's port — so a rule scoped to `port: 443` can silently fail to match. Run `kubectl get endpoints kubernetes -n default` to see the actual port on your cluster if you'd rather scope this down.
 
@@ -204,54 +204,102 @@ This section allows you to configure the deployment and authentication settings 
 | node_port               | int     | `n/a`                                           | Fixed NodePort to expose port `9200` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                       |
 | node_port_transport     | int     | `n/a`                                           | Fixed NodePort to expose port `9300` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                       |
 
-## MinIO
+## RustFS
+
+RustFS is the open-source S3 object store that the chart deploys. It replaces MinIO, which the chart does not deploy any more. It runs as a StatefulSet with a Service and a volume, and serves the S3 API on port 3535 and the console on port 3536.
+
+RustFS is backed up and restored by the jobs described in [Backup and restore of the S3 store](#backup-and-restore-of-the-s3-store).
+
+### Migrate from MinIO
+
+An environment that ran MinIO keeps its objects when RustFS takes over the volume of MinIO in place. RustFS adopts the buckets and the objects in the volume, and `.minio.sys` stays beside its own `.rustfs.sys`. Point RustFS at the volume of MinIO with the settings of your storage type:
+
+```yaml
+# storage_type: host_path
+rustfs:
+  host_data_path: /data/minio # the value of minio.host_data_path
+
+# storage_type: pvc
+rustfs:
+  pvc:
+    name: minio # the PVC that MinIO used
+    # Copy storage_class, storage_size and access_mode of minio.pvc, unchanged
+```
+
+Keep these values in later releases, otherwise RustFS stops using that volume.
+
+- **Back up the data first.** After RustFS has written to the volume, going back to MinIO is not clean: MinIO does not see the user metadata (such as `created-by`) of the objects that RustFS wrote. A copy of the volume taken before the migration is the way back.
+- **MinIO must be stopped before RustFS starts.** `helm upgrade` creates the RustFS StatefulSet before it deletes the one of MinIO. Scale MinIO down first (`kubectl scale statefulset minio --replicas=0`), so that the two never run on the same data.
+- **The PVC is kept.** With `pvc.name: minio` the chart renders the PVC `minio` itself, so Helm updates the PVC of the previous release instead of deleting it. Its `storage_class` and `storage_size` must be those of `minio.pvc`: Helm cannot change the storage class of a PVC.
+- **Keep the credentials.** RustFS reads the IAM data of MinIO with the root credentials, so `s3-opencrvs-users` must not change.
+- **Hostnames change.** The S3 API is now on `rustfs.<hostname>` and the console on `rustfs-console.<hostname>`. Point `s3.host` and `s3.public_endpoint` of the services chart at them, see [Use RustFS from the OpenCRVS services](#use-rustfs-from-the-opencrvs-services).
+- The `minio` values of `values.yaml` are not read any more, so move the settings that you had there to `rustfs`.
+
+The toolkit asks whether to migrate when `environment:init` runs on an existing environment, and writes these values when the answer is yes.
 
 ### Configuration options
 
-| Key                     | Type   | Default value                   | Description                                                                                                                                                        |
-| ----------------------- | ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| enabled                 | bool   | true                            | Enable or disable minio service                                                                                                                                    |
-| image.repository        | string | `ghcr.io/opencrvs/minio`        | MinIO Docker image repository.                                                                                                                                     |
-| image.tag               | string | `release.2025-06-13t11-33-47z`  | MinIO Docker image tag.                                                                                                                                            |
-| use_default_credentials | bool   | true                            | Use `minioadmin` / `minioadmin`, unless `admin_username` and `admin_password` are set. If `false` and they are not set, random ones are generated.                 |
-| admin_username          | string | `n/a`                           | MinIO administrator username. Used even if `use_default_credentials` is `true`. Set together with `admin_password`.                                                |
-| admin_password          | string | `n/a`                           | MinIO administrator password. Used even if `use_default_credentials` is `true`. Set together with `admin_username`.                                                |
-| storage_type            | string | `global storage_type`           | Optional MinIO-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
-| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                             |
-| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                                              |
-| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                                         |
-| host_data_path          | string | `/data/minio`                   | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                            |
-| node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                           |
-| backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                                                |
-| backup.enabled          | string | `false`                         | Backup enabled or disabled, section has higher priority over global `backup` section                                                                               |
-| backup.type             | string | `dump`                          | `dump` is a full filesystem dump, `differential` is rsync from MinIO filesystem on remote backup server                                                            |
-| backup.server_secret    | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials                                                                                                       |
-| backup.schedule         | string | `0 1 * * *`                     | Time to run backup job, if not defined then value from `backup.schedule` is used                                                                                   |
-| backup.server_dir       | string | `n/a`                           | Directory on backup server for encrypted archive backups or filesystem rsync. Uses global value if not set                                                         |
-| restore.{}              | dict   | `{}`                            | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README                                              |
-| restore.enabled         | string | `false`                         | Enables restore functionality; section overrides global `restore` settings.                                                                                        |
-| restore.type            | string | `dump`                          | Restore method: `dump` (from encrypted archive) or `differential` (same as for backup)                                                                             |
-| restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared                          |
-| restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used                                                                                |
-| node_port               | int    | `n/a`                           | Fixed NodePort to expose port `3535` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                               |
-| node_port_console       | int    | `n/a`                           | Fixed NodePort to expose port `3536` (console) on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                     |
+| Key                     | Type   | Default value                   | Description                                                                                                                                                                                         |
+| ----------------------- | ------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| enabled                 | bool   | true                            | Enable or disable the rustfs service                                                                                                                                                                |
+| image.repository        | string | `rustfs/rustfs`                 | RustFS Docker image repository.                                                                                                                                                                     |
+| image.tag               | string | `1.0.1`                         | RustFS Docker image tag.                                                                                                                                                                            |
+| use_default_credentials | bool   | true                            | Use `rustfsadmin` / `rustfsadmin`, unless `admin_username` and `admin_password` are set. If `false` and they are not set, random ones are generated. See [RustFS Credentials](#rustfs-credentials). |
+| admin_username          | string | `n/a`                           | RustFS administrator username. Used even if `use_default_credentials` is `true`. Set together with `admin_password`.                                                                                |
+| admin_password          | string | `n/a`                           | RustFS administrator password. Used even if `use_default_credentials` is `true`. Set together with `admin_username`.                                                                                |
+| port                    | int    | `3535`                          | Port of the S3 API. The console always listens on `3536`.                                                                                                                                           |
+| console.enabled         | bool   | true                            | Serve the admin console on port `3536` and on `rustfs-console.<hostname>`. Users log in with `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`.                                                       |
+| storage_type            | string | `global storage_type`           | Optional RustFS-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`.                                                                                      |
+| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                                                              |
+| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for the RustFS data volume                                                                                                                                             |
+| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                                                                          |
+| pvc.name                | string | `rustfs`                        | Name of the PVC of the RustFS data volume. Set it to `minio` to keep the data of an existing MinIO, see [Migrate from MinIO](#migrate-from-minio).                                                  |
+| host_data_path          | string | `/data/rustfs`                  | Path to persistent data on the host when `storage_type` is `host_path`. Set it to `/data/minio` to keep the data of an existing MinIO, see [Migrate from MinIO](#migrate-from-minio).               |
+| node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                            |
+| backup.enabled          | bool   | `false`                         | Enable backup of RustFS. The global `backup.enabled` also enables it. See [Backup and restore of the S3 store](#backup-and-restore-of-the-s3-store).                                                |
+| backup.type             | string | `dump`                          | `dump` is a dump of the buckets through the S3 API, `differential` is rsync of the data directory to the backup server.                                                                             |
+| backup.server_secret    | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials.                                                                                                                                       |
+| backup.host             | string | `n/a`                           | Backup server hostname or IP. Uses the global `backup.host` if not set.                                                                                                                             |
+| backup.schedule         | string | `0 1 * * *`                     | Time to run backup job, if not defined then value from `backup.schedule` is used.                                                                                                                   |
+| backup.server_dir       | string | `n/a`                           | Directory on the backup server. Uses the global value if not set.                                                                                                                                   |
+| restore.enabled         | bool   | `false`                         | Enable restore of RustFS. The global `restore.enabled` also enables it.                                                                                                                             |
+| restore.type            | string | `dump`                          | `dump` (from the encrypted archive) or `differential`, the same as for backup.                                                                                                                      |
+| restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials.                                                                                                                                       |
+| restore.host            | string | `n/a`                           | Backup server hostname or IP. Uses the global `restore.host` if not set.                                                                                                                            |
+| restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used.                                                                                                                |
+| env                     | dict   | `{}`                            | Extra environment variables for the RustFS container, see the [RustFS configuration](https://docs.rustfs.com) for the `RUSTFS_*` variables.                                                         |
+| node_port               | int    | `n/a`                           | Fixed NodePort to expose port `3535` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                                                |
+| node_port_console       | int    | `n/a`                           | Fixed NodePort to expose port `3536` (console) on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                                      |
 
-### MinIO Credentials
+### RustFS hostnames
+
+The S3 API is served on `rustfs.<hostname>` and the console on `rustfs-console.<hostname>`. `ingress.application_allowlist` and `ingress.admin_console_allowlist` apply to them.
+
+The subdomain of a hostname must not be the name of another environment that shares the domain. Document URLs are signed for the S3 hostname, and a feature environment that is named `rustfs` would serve its own client on `rustfs.<hostname>`.
+
+### RustFS Credentials
 
 The chart writes the credentials to the secret `s3-opencrvs-users` when the secret does not exist. The first rule that fits applies:
 
 1. The secret exists: the chart leaves it as it is, and the values below are not read.
 2. The secret `minio-opencrvs-users` of an earlier version exists: the chart creates `s3-opencrvs-users` from it, with the new key names and the same values, and leaves the old secret in place.
 3. `admin_username` and `admin_password` are set: the chart uses them, whatever `use_default_credentials` is.
-4. `use_default_credentials` is `true`: the chart uses `minioadmin` and `minioadmin`.
+4. `use_default_credentials` is `true`: the chart uses `rustfsadmin` and `rustfsadmin`, which is highly discouraged for production environments.
 5. Otherwise the chart generates a random username and a random password.
 
-Setting only one of `admin_username` and `admin_password` fails the installation with `minio.admin_username and minio.admin_password must be set together`. MinIO and the backup and restore jobs always read the credentials from the secret, so read the generated ones from it.
+Setting only one of `admin_username` and `admin_password` fails the installation with `rustfs.admin_username and rustfs.admin_password must be set together`. RustFS and the backup and restore jobs always read the credentials from the secret, so read the generated ones from it.
 
-MinIO defaults to minioadmin and minioadmin as the access key and secret key respectively.
-MinIO strongly discourages use of the default credentials regardless of deployment environment.
-Check official documentation for more details:
-https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html
+RustFS has a single root identity, built from `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY` of the secret. The documents service signs with `S3_ACCESS_KEY` and `S3_SECRET_KEY`, so they must hold the same values. The generated secret does.
+
+### Use RustFS from the OpenCRVS services
+
+Point the services chart at the Service and at the public hostname of RustFS. The credentials and the port stay as they are:
+
+```yaml
+s3:
+  host: rustfs-0.rustfs.<dependencies namespace>.svc.cluster.local
+  public_endpoint: https://rustfs.<hostname>
+```
 
 Values are stored as a Kubernetes secret `s3-opencrvs-users` in dependencies namespace. Copy secret object as is into OpenCRVS application namespace to make it accessible by services:
 
@@ -280,10 +328,14 @@ Reference secret values within `values.yaml`:
 ```yaml
 documents:
   secrets:
-    minio-secret:
+    s3-secret:
       - S3_ACCESS_KEY
       - S3_SECRET_KEY
 ```
+
+### Volume permissions
+
+RustFS runs as the user `rustfs`, `10001:10001`, not as root. With `storage_type: pvc` the kubelet hands the volume to that group (`fsGroup`). With `storage_type: host_path` the kubelet does not, so an init container, `fix-permissions`, changes the owner of the directory to `10001:10001`. It first checks the owner of the top directory with one `stat`, and does nothing when that is already `10001`. It hands the top directory over last, so a run that stopped half way is done again at the next start. The data of MinIO belongs to root, so a [migration from MinIO](#migrate-from-minio) walks through it once. The directory must be on a file system that allows it.
 
 ### Backup and Restore Section Reference
 
@@ -368,9 +420,9 @@ Start from the default Postgres image and add:
 - `rsync`
 - `pgbackrest`
 
-### MinIO image
+### Utilities image
 
-Start from the default MinIO image and add:
+The backup and restore jobs of RustFS run in the utilities image. Start from it and add:
 
 - `bash`
 - `curl`
@@ -385,12 +437,21 @@ After publishing the custom images, point the chart to them through:
 
 - `postgres.image.repository`
 - `postgres.image.tag`
-- `minio.image.repository`
-- `minio.image.tag`
+- `utilities.image.repository`
+- `utilities.image.tag`
+
+## Backup and restore of the S3 store
+
+RustFS is backed up and restored by the jobs `rustfs-backup` and `rustfs-restore`, with the scripts in `files/s3`. The settings are `rustfs.backup`, `rustfs.restore` and the global `backup` and `restore`.
+
+- **`dump`** reads the buckets through the S3 API with `mcli`, packs them into one archive, encrypts it and copies it to the backup server. The restore empties the buckets and writes the archive back. It works with any S3 store.
+- **`differential`** runs rsync in the `rsync` sidecar of the RustFS pod and copies the data directory to the backup server, `<server_dir>/minio`. It leaves out the IAM configuration of the store (`.minio.sys/config/iam/` and `.rustfs.sys/config/iam/`). The restore copies the files back into the running store and hands them to `10001:10001`, the user that RustFS runs as, because the backup server does not keep the owner of a file and RustFS does not start on files that it does not own. The sidecar runs as root and copies the SSH key before it uses it, because the kubelet makes a secret readable for the group of the pod (`fsGroup`) and ssh refuses such a key.
+
+The archive is `<server_dir>/<date>/minio_backup_<date>.tar.gz.enc` and the data directory is `<server_dir>/minio`. These names come from the MinIO versions of the chart and are kept, so that the backups of an earlier version are found and restore into RustFS.
 
 ## Storage Configuration
 
-This chart supports flexible data persistence for **Elasticsearch, Postgres, and MinIO**.  
+This chart supports flexible data persistence for **Elasticsearch, Postgres, and RustFS**.  
 You control persistence using the `storage_type` option, which can be set **globally** (`storage_type`) or per datastore (e.g. `elasticsearch.storage_type`).
 
 - **`storage_type`**, available options:
@@ -417,14 +478,14 @@ elasticsearch:
     storage_class: 'azurefile-premium' # Optional: specify a StorageClass or leave as "" for default
 ```
 
-#### Use hostPath for MinIO data (legacy volumes, on-prem, etc):
+#### Use hostPath for RustFS data (legacy volumes, on-prem, etc):
 
 ```yaml
-minio:
+rustfs:
   storage_type: host_path # Store data on filesystem (default)
   node_selector:
     role: data2 # Store data on worker node instead of master, default is 'data1'
-  host_data_path: /data/minio # default value
+  host_data_path: /data/rustfs # default value
 ```
 
 ---
@@ -621,7 +682,7 @@ Supported datastores:
 
 - Elasticsearch
 - PostgreSQL
-- MinIO
+- RustFS
 
 Each datastore has its own backup job, configured as a Kubernetes `CronJob`.
 Backup settings are defined in the `backup` section of the chart values.

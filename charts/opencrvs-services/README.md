@@ -127,8 +127,8 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         </tr>
         <tr>
             <td>s3.host</td>
-            <td>minio-0.minio.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>Hostname of the S3 object store. The default is the MinIO that the dependencies chart deploys.</td>
+            <td>rustfs-0.rustfs.opencrvs-deps-dev.svc.cluster.local</td>
+            <td>Hostname of the S3 object store. The default is the RustFS that the dependencies chart deploys.</td>
         </tr>
         <tr>
             <td>s3.port</td>
@@ -142,18 +142,18 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         </tr>
         <tr>
             <td>s3.public_endpoint</td>
-            <td><code>minio.&ltopencrvs hostname&gt</code> with <code>http</code> or <code>https</code>, following <code>subdomain_separator</code></td>
-            <td>URL that browsers use to reach the S3 object store, with the protocol, for example <code>https://s3.example.org</code>. Presigned document URLs are signed for it. The default is where the dependencies chart exposes MinIO, with <code>https</code> if <code>ingress.ssl_enabled</code> is true. Set it for a store that is exposed elsewhere, or that has the same address inside and outside the cluster.</td>
+            <td><code>rustfs.&ltopencrvs hostname&gt</code> with <code>http</code> or <code>https</code>, following <code>subdomain_separator</code></td>
+            <td>URL that browsers use to reach the S3 object store, with the protocol, for example <code>https://s3.example.org</code>. Presigned document URLs are signed for it. The default is where the dependencies chart exposes RustFS, with <code>https</code> if <code>ingress.ssl_enabled</code> is true. Set it for a store that is exposed elsewhere, or that has the same address inside and outside the cluster.</td>
         </tr>
         <tr>
             <td>s3.admin_username</td>
             <td><code>n/a</code></td>
-            <td>Access key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>minio.admin_username</code>.</td>
+            <td>Access key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>rustfs.admin_username</code>.</td>
         </tr>
         <tr>
             <td>s3.admin_password</td>
             <td><code>n/a</code></td>
-            <td>Secret key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>minio.admin_password</code>.</td>
+            <td>Secret key of the S3 object store administrator. Used to create users_secret when it does not exist yet, and required then: installation fails without it. It is the value that the dependencies chart got as <code>rustfs.admin_password</code>.</td>
         </tr>
         <tr>
             <td>s3.users_secret</td>
@@ -712,7 +712,7 @@ This is a plain IP allowlist, not geo-aware — it admits any request from the l
 
 ### Restricting admin consoles
 
-Similarly, the Metabase admin console (and, in the dependencies chart, the MinIO console and Kibana) are admin consoles reachable by anyone who can resolve their hostname. Set `ingress.admin_console_allowlist` to the CIDR ranges that should be allowed to reach these consoles (e.g. office/VPN egress IPs) — this can stay narrower than `application_allowlist`, since admin consoles usually only need to be reachable by ops staff rather than the whole country:
+Similarly, the Metabase admin console (and, in the dependencies chart, the RustFS console and Kibana) are admin consoles reachable by anyone who can resolve their hostname. Set `ingress.admin_console_allowlist` to the CIDR ranges that should be allowed to reach these consoles (e.g. office/VPN egress IPs) — this can stay narrower than `application_allowlist`, since admin consoles usually only need to be reachable by ops staff rather than the whole country:
 
 ```yaml
 ingress:
@@ -722,7 +722,7 @@ ingress:
 
 The public dashboards on the Metabase host are left untouched, since the Performance page embeds them for every user: `/public/`, `/app/` (static assets), `/api/public/`, `/api/geojson/` (custom region maps) and `/api/session/properties` follow `application_allowlist` instead, and everything else on the host is the admin console.
 
-Set the same key in the dependencies chart's `values.yaml` to also restrict the MinIO console and Kibana (the S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
+Set the same key in the dependencies chart's `values.yaml` to also restrict the RustFS console and Kibana (the S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
 
 # Authentication configuration
 
