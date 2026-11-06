@@ -44,7 +44,7 @@ import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
-import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
+import type { AppRouter, InternalRouter } from '@opencrvs/events/router'
 import { createFamily } from '@auth/features/refresh/family'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)

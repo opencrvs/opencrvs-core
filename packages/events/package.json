@@ -86,8 +86,11 @@
     "yaml": "^2.7.1"
   },
   "exports": {
-    "./src/router": {
-      "types": "./build/types/router/index.d.ts"
+    "./router": {
+      "types": [
+        "./build/types/router/index.d.ts",
+        "./src/router/index.ts"
+      ]
     }
   },
   "lint-staged": {

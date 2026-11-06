@@ -10,8 +10,7 @@
  */
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import superjson from 'superjson'
-// @ts-ignore - This is a workaround to allow the import of the AppRouter type from the events package.
-import { AppRouter } from '@opencrvs/events/build/types/router'
+import type { AppRouter } from '@opencrvs/events/router'
 
 /**
  * Creates a tRPC client with the specified base URL and authorization token.
