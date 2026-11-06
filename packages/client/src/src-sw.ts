@@ -62,6 +62,30 @@ registerRoute(/http(.+)conditionals\.js$/, new NetworkFirst())
 registerRoute(/http(.+)config$/, new NetworkFirst())
 // This caches certificates fetched from the countryconfig microservice
 registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
+/*
+ * The client adds a `retry` parameter when it imports a custom field module
+ * again after a failed import. The module is cached under its URL without the
+ * parameter, so that the client finds it offline with its usual URL.
+ */
+const ignoreRetryParameter: WorkboxPlugin = {
+  cacheKeyWillBeUsed: async ({ request }) => {
+    const url = new URL(request.url)
+    if (!url.searchParams.has('retry')) {
+      return request
+    }
+    url.searchParams.delete('retry')
+    return url.href
+  }
+}
+
+// This caches other scripts fetched from country config, such as custom field modules
+registerRoute(
+  ({ request, url }) =>
+    request.destination === 'script' &&
+    url.origin === self.location.origin &&
+    url.pathname.startsWith('/api/countryconfig/'),
+  new NetworkFirst({ plugins: [ignoreRetryParameter] })
+)
 
 // Refuses to cache an app-shell response under a document's URL, and drops one already cached.
 const documentsOnly: WorkboxPlugin = {
