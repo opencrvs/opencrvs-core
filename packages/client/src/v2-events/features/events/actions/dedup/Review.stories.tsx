@@ -470,7 +470,7 @@ export const ComparisonAcrossConfigVersions: Story = {
 
     // On a narrow screen each cell also shows its column name, the record's tracking ID
     async function expectNoValue(cell: HTMLElement, trackingId: string) {
-      await expect(cell.textContent?.replace(trackingId, '').trim()).toBe('')
+      await expect(cell.textContent.replace(trackingId, '').trim()).toBe('')
     }
 
     await step(
