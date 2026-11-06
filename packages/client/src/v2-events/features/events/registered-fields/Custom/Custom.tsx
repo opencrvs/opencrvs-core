@@ -138,14 +138,8 @@ async function loadModule(src: string) {
   return loading
 }
 
-/**
- * Loads the custom field modules of all versions of all events ahead of time.
- * The service worker caches them, so the fields work offline also in a form
- * that the user has not opened yet.
- */
-export async function preloadCustomFields(
-  eventConfigs: VersionedEventConfig[]
-) {
+/** The module URLs of the custom fields in all versions of all events */
+export function findCustomFieldSources(eventConfigs: VersionedEventConfig[]) {
   const sources = new Set(
     eventConfigs
       .flatMap((config) =>
@@ -160,9 +154,16 @@ export async function preloadCustomFields(
       )
       .map(({ src }) => src)
   )
+  return [...sources].sort()
+}
 
+/**
+ * Loads custom field modules ahead of time. The service worker caches them,
+ * so the fields work offline also in a form that the user has not opened yet.
+ */
+export async function preloadCustomFields(sources: string[]) {
   // A failed load is tried again when the field mounts
-  await Promise.allSettled([...sources].map(loadModule))
+  await Promise.allSettled(sources.map(loadModule))
 }
 
 function LoadError() {

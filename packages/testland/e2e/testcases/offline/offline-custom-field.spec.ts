@@ -27,9 +27,9 @@ async function openTennisClubForm(page: Page) {
 }
 
 /*
- * The app shows the loading screen until the custom field modules of all
- * events are loaded. So when the user sees the workqueue, the forms work also
- * if the user then goes offline.
+ * The workqueue renders only after the custom field modules of all events are
+ * loaded, as it does with the event configuration. So when the user sees the
+ * workqueue, the forms work also if the user then goes offline.
  */
 test('Custom field works offline right after the app opens', async ({
   page,

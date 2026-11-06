@@ -19,17 +19,24 @@ import { useTRPC } from '@client/v2-events/trpc'
 const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
 
 /**
- * Fetches configured events
- * @returns a list of event configurations, each at the version that applies (see `resolveEventConfig`)
+ * Fetches configured events with all their versions
  */
-export function useEventConfigurations() {
+export function useVersionedEventConfigurations() {
   const trpc = useTRPC()
 
-  const versionedConfigs = useSuspenseQuery({
+  return useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
     queryKey: trpc.event.config.get.queryKey(),
     staleTime: import.meta.env.PROD ? EVENT_CONFIGURATION_STALE_TIME_MS : 0
   }).data
+}
+
+/**
+ * Fetches configured events
+ * @returns a list of event configurations, each at the version that applies (see `resolveEventConfig`)
+ */
+export function useEventConfigurations() {
+  const versionedConfigs = useVersionedEventConfigurations()
 
   return useMemo(
     () => versionedConfigs.map(resolveEventConfig),

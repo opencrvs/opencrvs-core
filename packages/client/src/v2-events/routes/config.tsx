@@ -26,7 +26,6 @@ import { buildLoginUrl } from '@client/components/VersionMismatchModal'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
-import { WaitForCustomFields } from '@client/v2-events/components/WaitForCustomFields'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
 import * as Notify from '@client/v2-events/features/events/actions/notify'
@@ -235,9 +234,7 @@ export const routesConfig = {
             storeIdentifier={currentUser.id}
             userCacheKey={`${currentUser.primaryOfficeId}:${currentUser.role}`}
           >
-            <WaitForCustomFields>
-              <Outlet />
-            </WaitForCustomFields>
+            <Outlet />
             <Debug />
             <Toaster />
             <PrefetchQueries />

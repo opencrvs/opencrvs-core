@@ -21,7 +21,7 @@ import {
   toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
-import { Custom, preloadCustomFields } from './Custom'
+import { Custom, findCustomFieldSources, preloadCustomFields } from './Custom'
 
 /** Test-only custom field modules, in the form that country config gives them */
 function fixture(name: string) {
@@ -214,10 +214,12 @@ describe('Custom field', () => {
       })
     }
 
-    await preloadCustomFields([
-      toVersionedEventConfig(event),
-      toVersionedEventConfig(event)
-    ])
+    await preloadCustomFields(
+      findCustomFieldSources([
+        toVersionedEventConfig(event),
+        toVersionedEventConfig(event)
+      ])
+    )
 
     const calls = () =>
       (globalThis as { preloadFactoryCalls?: number }).preloadFactoryCalls
@@ -251,7 +253,7 @@ describe('Custom field', () => {
       effectiveFrom: '2030-01-01'
     })
 
-    await preloadCustomFields([config])
+    await preloadCustomFields(findCustomFieldSources([config]))
 
     expect(
       (globalThis as { laterVersionFactoryCalls?: number })
@@ -270,7 +272,9 @@ describe('Custom field', () => {
     })
 
     await expect(
-      preloadCustomFields([toVersionedEventConfig(event)])
+      preloadCustomFields(
+        findCustomFieldSources([toVersionedEventConfig(event)])
+      )
     ).resolves.toBeUndefined()
   })
 })

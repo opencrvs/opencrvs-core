@@ -9,4 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export { Custom, preloadCustomFields } from './Custom'
+export { Custom, findCustomFieldSources, preloadCustomFields } from './Custom'

@@ -27,6 +27,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events/useAllWorkqueueConfigurations'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { usePreloadCustomFields } from '@client/v2-events/features/events/usePreloadCustomFields'
 import { emptyMessage } from '@client/v2-events/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { Hamburger } from '../sidebar/Hamburger'
@@ -73,6 +74,7 @@ export function WorkqueueLayout({
   children: React.ReactNode
   title?: string
 }) {
+  usePreloadCustomFields()
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
