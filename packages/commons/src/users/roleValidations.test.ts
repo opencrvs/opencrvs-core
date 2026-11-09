@@ -9,19 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  footballClubMembershipEvent,
-  tennisClubMembershipEvent
+  versionedFootballClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '../fixtures'
+import { ActionType } from '../events/ActionType'
+import { VersionedEventConfig } from '../events/EventConfig'
 import { Role } from './Role'
 import { validateRole, validateRoles } from './roleValidations'
 import { encodeScope, Scope } from './scopes'
 
 /** Configures a NOTIFY action. */
-const TENNIS_CLUB = tennisClubMembershipEvent.id
+const TENNIS_CLUB = versionedTennisClubMembershipEvent.id
 /** Configures no NOTIFY action. */
-const FOOTBALL_CLUB = footballClubMembershipEvent.id
+const FOOTBALL_CLUB = versionedFootballClubMembershipEvent.id
 
-const eventConfigs = [tennisClubMembershipEvent, footballClubMembershipEvent]
+const eventConfigs = [
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
+]
 
 function role(...scopes: Scope[]) {
   return { id: 'COMMUNITY_LEADER', scopes: scopes.map(encodeScope) }
@@ -66,7 +71,7 @@ describe('record.notify together with record.declare', () => {
             options: { event: [TENNIS_CLUB, FOOTBALL_CLUB] }
           }
         ),
-        [tennisClubMembershipEvent]
+        [versionedTennisClubMembershipEvent]
       )
     ).toContain(
       `record.notify and record.declare are both granted for events: ${TENNIS_CLUB}. A role can notify or declare an event, not both.`
@@ -103,7 +108,7 @@ describe('record.notify together with record.declare', () => {
     expect(
       validateRole(
         role({ type: 'record.notify' }, { type: 'record.declare' }),
-        [tennisClubMembershipEvent]
+        [versionedTennisClubMembershipEvent]
       )
     ).toEqual([
       'record.notify and record.declare are both granted for all events. A role can notify or declare an event, not both.'
@@ -235,12 +240,37 @@ describe('record.notify for an event without a NOTIFY action', () => {
     ).toEqual([])
   })
 
-  it('is reported for each such event when the scope covers every event', () => {
+  it('is accepted when any version of the event configures NOTIFY', () => {
+    const [version] = versionedTennisClubMembershipEvent.versions
+    const notifyOnlyInFirstVersion: VersionedEventConfig = {
+      ...versionedTennisClubMembershipEvent,
+      versions: [
+        version,
+        {
+          ...version,
+          id: 'without-notify',
+          effectiveFrom: '2030-01-01',
+          actions: version.actions.filter(
+            ({ type }) => type !== ActionType.NOTIFY
+          )
+        }
+      ]
+    }
+
     expect(
-      validateRole(role({ type: 'record.notify' }), eventConfigs)
-    ).toEqual([
-      `record.notify is granted for events without a NOTIFY action: ${FOOTBALL_CLUB}`
-    ])
+      validateRole(
+        role({ type: 'record.notify', options: { event: [TENNIS_CLUB] } }),
+        [notifyOnlyInFirstVersion]
+      )
+    ).toEqual([])
+  })
+
+  it('is reported for each such event when the scope covers every event', () => {
+    expect(validateRole(role({ type: 'record.notify' }), eventConfigs)).toEqual(
+      [
+        `record.notify is granted for events without a NOTIFY action: ${FOOTBALL_CLUB}`
+      ]
+    )
   })
 })
 
@@ -283,7 +313,7 @@ describe('validateRoles()', () => {
           role({ type: 'record.notify' }, { type: 'record.declare' }),
           { id: 'LOCAL_REGISTRAR', scopes: [unknownEvent] }
         ],
-        [tennisClubMembershipEvent]
+        [versionedTennisClubMembershipEvent]
       )
     ).toThrow(
       [

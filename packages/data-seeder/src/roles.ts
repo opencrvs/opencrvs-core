@@ -11,9 +11,9 @@
 import {
   decodeScope,
   EncodedScope,
-  EventConfig,
   joinUrl,
-  validateRole
+  validateRole,
+  VersionedEventConfig
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { z } from 'zod'
@@ -70,7 +70,7 @@ export interface DeclaredRole {
 function readRole(
   record: unknown,
   position: number,
-  eventConfigs: EventConfig[]
+  eventConfigs: VersionedEventConfig[]
 ): ParsedRole | RoleProblem {
   const parsed = RoleRecordSchema.safeParse(record)
 
@@ -117,7 +117,7 @@ function duplicateRoleIds(roles: ParsedRole[]): RoleProblem[] {
 
 export function parseRoles(
   document: unknown,
-  eventConfigs: EventConfig[]
+  eventConfigs: VersionedEventConfig[]
 ): RoleRead {
   const list = ListSchema.safeParse(document)
 
@@ -178,7 +178,7 @@ export async function readRoles(token: string): Promise<RoleRead> {
     )
   }
 
-  const eventsConfig = (await eventsResponse.json()) as EventConfig[]
+  const eventsConfig = (await eventsResponse.json()) as VersionedEventConfig[]
 
   return parseRoles(await rolesResponse.json(), eventsConfig)
 }

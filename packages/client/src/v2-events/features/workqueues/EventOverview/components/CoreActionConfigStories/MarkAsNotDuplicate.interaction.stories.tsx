@@ -18,10 +18,12 @@ import {
   createPrng,
   flag,
   generateActionDocument,
+  generateActionDocuments,
   generateUuid,
   not,
   tennisClubMembershipEvent,
-  generateTrackingId
+  generateTrackingId,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -96,7 +98,7 @@ const actions = [
     configuration,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration,
     action: ActionType.DECLARE,
     defaults: {
@@ -143,6 +145,7 @@ const actions = [
 
 const mockOriginalEvent = {
   trackingId: generateTrackingId(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   actions,
   createdAt: new Date(Date.now()).toISOString(),
@@ -152,6 +155,7 @@ const mockOriginalEvent = {
 
 const mockDuplicateEvent = {
   trackingId: duplicates[0].trackingId,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   actions: actions.slice(0, 2),
   createdAt: new Date(Date.now()).toISOString(),

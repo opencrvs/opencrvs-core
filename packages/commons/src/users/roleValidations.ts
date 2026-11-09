@@ -10,7 +10,7 @@
  */
 import { uniq } from 'lodash'
 import { ActionType } from '../events/ActionType'
-import { EventConfig } from '../events/EventConfig'
+import { VersionedEventConfig } from '../events/EventConfig'
 import { EventStatus } from '../events/EventStatus'
 import { Role, Roles } from './Role'
 import { decodeScope, getScopeOptionValue, Scope, ScopeType } from './scopes'
@@ -66,7 +66,7 @@ function canEditDeclared(scope: Scope) {
   return status === undefined || status.includes(EventStatus.enum.DECLARED)
 }
 
-function validateEventIds(role: Role, eventConfigs: EventConfig[]) {
+function validateEventIds(role: Role, eventConfigs: VersionedEventConfig[]) {
   const eventIds = eventConfigs.map(({ id }) => id)
 
   return role.scopes.flatMap((scope) => {
@@ -77,7 +77,9 @@ function validateEventIds(role: Role, eventConfigs: EventConfig[]) {
     ).filter((id) => !eventIds.includes(id))
 
     return unknownIds.length > 0
-      ? [`Scope "${scope}" contains invalid event IDs: ${unknownIds.join(', ')}`]
+      ? [
+          `Scope "${scope}" contains invalid event IDs: ${unknownIds.join(', ')}`
+        ]
       : []
   })
 }
@@ -112,16 +114,19 @@ function validateNoNotifyAndEditDeclared(role: Role) {
     : []
 }
 
+/** An event has a NOTIFY action when any of its versions configures one. */
 function validateNotifyConfigExistsIfItsUsedInRole(
   role: Role,
-  eventConfigs: EventConfig[]
+  eventConfigs: VersionedEventConfig[]
 ) {
   const notified = eventsWithScope(role, 'record.notify')
 
   const withoutNotifyAction = eventConfigs
     .filter(({ id }) => notified === 'all' || notified.includes(id))
-    .filter(({ actions }) =>
-      actions.every(({ type }) => type !== ActionType.NOTIFY)
+    .filter(({ versions }) =>
+      versions.every(({ actions }) =>
+        actions.every(({ type }) => type !== ActionType.NOTIFY)
+      )
     )
     .map(({ id }) => id)
 
@@ -135,7 +140,7 @@ function validateNotifyConfigExistsIfItsUsedInRole(
 /**
  * @returns a message for each rule the role breaks, empty when it is valid.
  */
-export function validateRole(role: Role, eventConfigs: EventConfig[]) {
+export function validateRole(role: Role, eventConfigs: VersionedEventConfig[]) {
   return [
     ...validateEventIds(role, eventConfigs),
     ...validateNotifyConfigExistsIfItsUsedInRole(role, eventConfigs),
@@ -151,7 +156,10 @@ export function validateRole(role: Role, eventConfigs: EventConfig[]) {
  * @param eventConfigs Array of event configurations, which are needed to run validations for scopes.
  * @throws Error if roles are invalid.
  */
-export function validateRoles(roles: Roles, eventConfigs: EventConfig[]) {
+export function validateRoles(
+  roles: Roles,
+  eventConfigs: VersionedEventConfig[]
+) {
   const validationErrors = roles.flatMap((role) =>
     validateRole(role, eventConfigs).map(
       (error) => `- Role '${role.id}': ${error}`

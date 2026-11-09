@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
 import {
   defineFormPage,
@@ -239,7 +240,7 @@ const CHILD_ONBOARDING_DECLARATION_FORM = defineDeclarationForm({
   pages: [child, mother]
 })
 
-export const ChildOnboardingEvent = defineConfig({
+export const versionedChildOnboardingEvent = defineConfig({
   id: CHILD_ONBOARDING_EVENT,
   title: generateTranslationConfig(
     '{child.name.firstname} {child.name.surname}'
@@ -267,3 +268,8 @@ export const ChildOnboardingEvent = defineConfig({
   ],
   advancedSearch: []
 })
+
+/** The configuration of the first version of `versionedChildOnboardingEvent`. */
+export const ChildOnboardingEvent = resolveEventConfig(
+  versionedChildOnboardingEvent
+)

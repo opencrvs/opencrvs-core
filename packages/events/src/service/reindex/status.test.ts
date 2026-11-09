@@ -19,7 +19,10 @@ import {
   TokenUserType,
   encodeScope
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestToken,
@@ -51,7 +54,7 @@ const failingPostHandler = http.post(
 
 const singleEventConfigHandler = http.get(
   `${env.COUNTRY_CONFIG_URL}/config/events`,
-  () => HttpResponse.json([tennisClubMembershipEvent])
+  () => HttpResponse.json([versionedTennisClubMembershipEvent])
 )
 
 const reindexToken = createTestToken({
@@ -81,7 +84,8 @@ beforeEach(async () => {
       transactionId: getUUID(),
       trackingId: event.trackingId,
       createdAt: event.createdAt,
-      updatedAt: event.updatedAt
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
     })
     .returning('id')
     .executeTakeFirst()

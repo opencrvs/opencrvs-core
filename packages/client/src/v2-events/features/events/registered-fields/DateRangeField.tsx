@@ -19,9 +19,10 @@ import subYears from 'date-fns/subYears'
 import { DateRangeFieldValue, PlainDate } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
-  IDateFieldProps as DateFieldProps
-} from '@opencrvs/components/lib/DateField'
-import { Checkbox, Link } from '@opencrvs/components'
+  IDateFieldProps as DateFieldProps,
+  Checkbox,
+  Link
+} from '@opencrvs/components'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 
 interface DateRangeInternalValue {

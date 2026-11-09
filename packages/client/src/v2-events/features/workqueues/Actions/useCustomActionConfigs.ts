@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -50,7 +50,7 @@ export function useCustomActionConfigs(event: EventIndex): {
     'Authentication is not available but is required'
   )
 
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { customActionModal, onCustomAction } = useCustomActionModal(
     event.id,
     eventConfiguration

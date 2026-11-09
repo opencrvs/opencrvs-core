@@ -13,7 +13,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { capitalize } from 'lodash'
-import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
+import { Pill, Link as StyledLink } from '@opencrvs/components'
 import {
   EventConfig,
   EventState,

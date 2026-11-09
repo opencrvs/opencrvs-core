@@ -8,20 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { tennisClubMembershipEvent } from '../fixtures'
+import { versionedTennisClubMembershipEvent } from '../fixtures'
 import { defineRoles } from './Role'
 import { encodeScope } from './scopes'
 
 const declareTennisClub = encodeScope({
   type: 'record.declare',
-  options: { event: [tennisClubMembershipEvent.id] }
+  options: { event: [versionedTennisClubMembershipEvent.id] }
 })
 
 describe('defineRoles()', () => {
   it('returns the roles when they are valid', () => {
     const roles = [{ id: 'LOCAL_REGISTRAR', scopes: [declareTennisClub] }]
 
-    expect(defineRoles(roles, [tennisClubMembershipEvent])).toEqual(roles)
+    expect(defineRoles(roles, [versionedTennisClubMembershipEvent])).toEqual(
+      roles
+    )
   })
 
   it('throws for invalid roles, so a country config fails as it loads them', () => {
@@ -36,7 +38,7 @@ describe('defineRoles()', () => {
     ]
 
     expect(() =>
-      defineRoles(notifyAndDeclare, [tennisClubMembershipEvent])
+      defineRoles(notifyAndDeclare, [versionedTennisClubMembershipEvent])
     ).toThrow(
       "Role 'COMMUNITY_LEADER': record.notify and record.declare are both granted for all events"
     )

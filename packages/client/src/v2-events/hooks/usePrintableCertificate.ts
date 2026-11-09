@@ -22,11 +22,11 @@ import {
   EventState,
   FieldType,
   getAcceptedActions,
+  getCompleteActionContent,
   getCurrentEventState,
   getDeclarationFields,
   isS3Url,
   LanguageConfig,
-  PrintCertificateAction,
   UserOrSystemSummary,
   UUID
 } from '@opencrvs/commons/client'
@@ -64,6 +64,24 @@ async function replaceS3UrlWithBase64(
   return declarationClone
 }
 
+/**
+ * Counts the confirmed prints of a certificate template. Only Accepted prints
+ * count: a print confirmed synchronously is stored as a Requested and an
+ * Accepted action, and a pending or rejected print was not printed. The
+ * template is read from the request, since a print accepted asynchronously
+ * carries no content of its own.
+ */
+export function countPrintsOfTemplate(
+  event: EventDocument,
+  templateId: string | undefined
+) {
+  return getAcceptedActions(event).filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      getCompleteActionContent(event, action)?.templateId === templateId
+  ).length
+}
+
 export const usePrintableCertificate = ({
   event,
   config,
@@ -87,12 +105,10 @@ export const usePrintableCertificate = ({
     event,
     eventConfiguration
   )
-  const copiesPrintedForTemplate = event.actions.filter(
-    (action) =>
-      action.type === ActionType.PRINT_CERTIFICATE &&
-      (action as PrintCertificateAction).content?.templateId ===
-        certificateConfig?.id
-  ).length
+  const copiesPrintedForTemplate = countPrintsOfTemplate(
+    event,
+    certificateConfig?.id
+  )
 
   const modifiedMetadata = {
     ...metadata,

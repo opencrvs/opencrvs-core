@@ -10,11 +10,11 @@
  */
 import { describe, expect, it } from 'vitest'
 import { encodeScope } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { versionedTennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclaredRoles, parseRoles, RoleRead } from './roles'
 
 const CONFIGURE = encodeScope({ type: 'config.update-all' })
-const TENNIS_CLUB = tennisClubMembershipEvent.id
+const TENNIS_CLUB = versionedTennisClubMembershipEvent.id
 
 /** A raw role of the shape a country config serves. */
 function record(overrides: Record<string, unknown> = {}) {
@@ -61,7 +61,9 @@ describe('a role that did not parse', () => {
   })
 
   it('declares no scopes, because what it grants is unknown', () => {
-    expect(getDeclaredRoles(read(broken)).get('SOCIAL_WORKER')?.scopes).toBeUndefined()
+    expect(
+      getDeclaredRoles(read(broken)).get('SOCIAL_WORKER')?.scopes
+    ).toBeUndefined()
   })
 
   it('is named by position alone when no id could be read', () => {
@@ -98,7 +100,10 @@ describe('a role that parsed', () => {
     })
 
     expect(
-      parseRoles([record({ scopes: [scoped] })], [tennisClubMembershipEvent])
+      parseRoles(
+        [record({ scopes: [scoped] })],
+        [versionedTennisClubMembershipEvent]
+      )
     ).toMatchObject({ problems: [{ kind: 'roleUnparsed' }] })
   })
 
@@ -109,7 +114,10 @@ describe('a role that parsed', () => {
     })
 
     expect(
-      parseRoles([record({ scopes: [scoped] })], [tennisClubMembershipEvent])
+      parseRoles(
+        [record({ scopes: [scoped] })],
+        [versionedTennisClubMembershipEvent]
+      )
     ).toMatchObject({ problems: [] })
   })
 
@@ -120,7 +128,7 @@ describe('a role that parsed', () => {
     ]
 
     expect(
-      parseRoles([record({ scopes })], [tennisClubMembershipEvent])
+      parseRoles([record({ scopes })], [versionedTennisClubMembershipEvent])
     ).toMatchObject({
       problems: [
         {
@@ -138,8 +146,12 @@ describe('a role that parsed', () => {
 describe('an id declared more than once', () => {
   it('is one problem, however many times it repeats', () => {
     expect(
-      read([record(), record({ id: 'NATIONAL_SYSTEM_ADMIN' }), record(), record()])
-        .problems
+      read([
+        record(),
+        record({ id: 'NATIONAL_SYSTEM_ADMIN' }),
+        record(),
+        record()
+      ]).problems
     ).toEqual([{ kind: 'duplicateRoleId', id: 'LOCAL_REGISTRAR' }])
   })
 })

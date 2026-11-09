@@ -15,8 +15,8 @@ import { env } from './environment'
 import { server } from './server'
 import { getServiceToken } from './service/auth'
 import {
-  getInMemoryEventConfigurations,
-  getInMemoryRoles
+  getInMemoryRoles,
+  getInMemoryVersionedEventConfigurations
 } from './service/config/config'
 import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
@@ -36,7 +36,7 @@ export async function main() {
     await ensureConnection()
     const serviceToken = await getServiceToken()
     const token: TokenWithBearer = `Bearer ${serviceToken}`
-    const configurations = await getInMemoryEventConfigurations(token)
+    const configurations = await getInMemoryVersionedEventConfigurations(token)
 
     // Fetch roles here to validate them early on
     await getInMemoryRoles(token)

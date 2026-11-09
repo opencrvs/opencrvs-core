@@ -28,10 +28,12 @@ import {
   UUID,
   TestUserRole,
   generateActionDocument,
+  generateActionDocuments,
   ActionDocument,
   generateUuid,
   generateTrackingId,
-  generateRandomSignature
+  generateRandomSignature,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -104,7 +106,7 @@ const duplicateEvent = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: actionDefaults
@@ -783,7 +785,7 @@ const annotationUpdateOnValidateEvent = {
         createdAt: actionDefaults.createdAt
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       action: ActionType.DECLARE,
       configuration: tennisClubMembershipEvent,
       defaults: {
@@ -805,6 +807,7 @@ const annotationUpdateOnValidateEvent = {
     })
   ],
   trackingId: generateTrackingId(rng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   updatedAt: actionDefaults.createdAt,
   createdAt: actionDefaults.createdAt
 }
@@ -850,7 +853,7 @@ const annotationChangeDuringRegisterEvent = {
       configuration: tennisClubMembershipEvent,
       defaults: actionDefaults
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       action: ActionType.DECLARE,
       configuration: tennisClubMembershipEvent,
       defaults: {
@@ -896,6 +899,7 @@ const annotationChangeDuringRegisterEvent = {
     })
   ],
   trackingId: generateTrackingId(rng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   updatedAt: actionDefaults.createdAt,
   createdAt: actionDefaults.createdAt
 }
@@ -945,6 +949,7 @@ const immediateCorrectionsAtPageBoundaryEvent = {
   id: getUUID() as UUID,
   type: 'tennis-club-membership',
   trackingId: generateTrackingId(createPrng(99)),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: actionDefaults.createdAt,
   updatedAt: actionDefaults.createdAt,
   actions: [

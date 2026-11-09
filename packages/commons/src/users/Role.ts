@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { EncodedScope } from './scopes'
-import { EventConfig } from '../events/EventConfig'
+import { VersionedEventConfig } from '../events/EventConfig'
 import { validateRoles } from './roleValidations'
 
 export const Role = z.object({
@@ -27,7 +27,10 @@ export type Roles = z.infer<typeof Roles>
  * @param roles Array of roles in object format.
  * @param eventConfigs Array of event configurations, which are needed to run validations for scopes.
  */
-export function defineRoles(roles: Roles, eventConfigs: EventConfig[]) {
+export function defineRoles(
+  roles: Roles,
+  eventConfigs: VersionedEventConfig[]
+) {
   validateRoles(roles, eventConfigs)
   return Roles.parse(roles)
 }

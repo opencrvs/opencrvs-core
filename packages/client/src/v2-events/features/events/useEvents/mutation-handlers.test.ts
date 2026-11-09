@@ -13,7 +13,9 @@ import {
   ActionType,
   EventDocumentOnlyLastAction,
   EventIndex,
-  tennisClubMembershipEvent
+  INITIAL_EVENT_CONFIG_VERSION_ID,
+  tennisClubMembershipEvent,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -46,7 +48,7 @@ beforeEach(() => {
     keys: vi.fn().mockResolvedValue([])
   } as unknown as CacheStorage
   queryClient.clear()
-  addLocalEventConfig(tennisClubMembershipEvent)
+  addLocalEventConfig(toVersionedEventConfig(tennisClubMembershipEvent))
 })
 
 it('CREATE offline: the new record resolves by its temporary id', () => {
@@ -54,7 +56,8 @@ it('CREATE offline: the new record resolves by its temporary id', () => {
 
   defaultsOf(trpcOptionsProxy.event.create.mutationKey()).onMutate({
     transactionId,
-    type: tennisClubMembershipEvent.id
+    type: tennisClubMembershipEvent.id,
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
   })
 
   expect(findLocalEventIndex(transactionId)?.id).toBe(transactionId)

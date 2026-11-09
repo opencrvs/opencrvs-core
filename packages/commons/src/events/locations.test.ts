@@ -11,6 +11,7 @@
 
 /* eslint-disable max-lines */
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from './EventConfig'
 import { SystemContext, UserContext } from '../users/User'
 import {
   AdministrativeArea,
@@ -35,6 +36,7 @@ describe('canAccessEventWithScope()', () => {
 
   const notifiedEvent = {
     type: 'birth',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     id: generateUuid(rng),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -60,6 +62,7 @@ describe('canAccessEventWithScope()', () => {
   const declaredEvent = {
     id: generateUuid(rng),
     type: 'birth',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     status: 'DECLARED' as const,
@@ -347,6 +350,7 @@ describe('canAccessEventWithScope()', () => {
     describe('createdIn', () => {
       const undeclaredEvent = {
         type: 'birth',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         id: generateUuid(rng),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

@@ -10,7 +10,7 @@
     "node": "22.x.x"
   },
   "license": "MPL-2.0",
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@10.34.9",
   "scripts": {
     "dev": "pnpm start",
     "test": "vitest",

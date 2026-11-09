@@ -26,7 +26,7 @@ import {
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
@@ -55,7 +55,7 @@ export function useEventActionsOnClick(event: EventIndex) {
     deleteDeclaration,
     modal: deleteModal
   } = useEventFormNavigation()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { handleRejection, rejectionModal } = useRejectionModal(
     event.id,
     event.type

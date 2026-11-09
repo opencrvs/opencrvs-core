@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  Avatar as AvatarComponent,
-  AvatarProps
-} from '@opencrvs/components/lib/Avatar'
+import { Avatar as AvatarComponent, AvatarProps } from '@opencrvs/components'
 import { DocumentPath } from '@opencrvs/commons/client'
 import { toFileUrl } from '@client/v2-events/cache'
 
