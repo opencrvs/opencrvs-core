@@ -312,8 +312,8 @@ The toolkit and the country configuration template work with any container regis
 ### Bug fixes
 
 - The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
-- Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment.
-- Fix ElastAlert notifications being blocked by the default-deny egress network policy.
+- Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
+- Fix ElastAlert notifications being blocked by the default-deny egress network policy. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
 
 ## 2.1.1
 
