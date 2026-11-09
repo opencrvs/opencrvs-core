@@ -22,7 +22,7 @@ import {
   RecordScopeV2,
   ScopeType,
   UserScopeV2
-} from '../scopes'
+} from '../users/scopes'
 import {
   canAccessOtherUserWithScopes,
   EventIndexWithAdministrativeHierarchy,

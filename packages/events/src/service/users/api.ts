@@ -26,7 +26,8 @@ import {
   eventAttachmentPath,
   isUUID,
   logger,
-  triggerUserEventNotification
+  triggerUserEventNotification,
+  TokenWithBearer
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
@@ -58,7 +59,7 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { deleteFilesByPrefix } from '@events/service/files'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '@events/storage/postgres/events/schema/Database'
-import { getRoles } from '../config/config'
+import { getInMemoryRoles } from '../config/config'
 import {
   generateRandomPassword,
   generateUsername,
@@ -603,7 +604,10 @@ export async function verifyPasswordById(
   }
 }
 
-export async function verifyUser(input: { mobile?: string; email?: string }) {
+export async function verifyUser(
+  input: { mobile?: string; email?: string },
+  token: TokenWithBearer
+) {
   const user = await getUserByMobileOrEmail(
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
@@ -619,7 +623,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
   const securityQuestionKey =
     questions[Math.floor(Math.random() * questions.length)].questionKey
 
-  const roles = await getRoles()
+  const roles = await getInMemoryRoles(token)
   const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
 
   return {
