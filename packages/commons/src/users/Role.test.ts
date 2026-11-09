@@ -8,13 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ZodError } from 'zod'
 import { versionedTennisClubMembershipEvent } from '../fixtures'
-import { defineRoles } from './Role'
+import { defineRoles, Role, Roles } from './Role'
 import { encodeScope } from './scopes'
 
 const declareTennisClub = encodeScope({
   type: 'record.declare',
   options: { event: [versionedTennisClubMembershipEvent.id] }
+})
+
+describe('Role', () => {
+  it('rejects an empty id', () => {
+    expect(Role.safeParse({ id: '', scopes: [] }).success).toBe(false)
+  })
+
+  it('rejects a scope that does not decode', () => {
+    const result = Role.safeParse({
+      id: 'LOCAL_REGISTRAR',
+      scopes: [declareTennisClub, 'record.declare-birth']
+    })
+
+    expect(result.error?.issues).toEqual([
+      expect.objectContaining({
+        path: ['scopes', 1],
+        message: 'Invalid scope: "record.declare-birth"'
+      })
+    ])
+  })
 })
 
 describe('defineRoles()', () => {
@@ -42,5 +63,13 @@ describe('defineRoles()', () => {
     ).toThrow(
       "Role 'COMMUNITY_LEADER': record.notify and record.declare are both granted for all events"
     )
+  })
+
+  it('parses the roles before it validates them', () => {
+    const withoutScopes = [{ id: 'LOCAL_REGISTRAR' }] as unknown as Roles
+
+    expect(() =>
+      defineRoles(withoutScopes, [versionedTennisClubMembershipEvent])
+    ).toThrow(ZodError)
   })
 })

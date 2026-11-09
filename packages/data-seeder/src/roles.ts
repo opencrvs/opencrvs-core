@@ -9,33 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  decodeScope,
   EncodedScope,
   joinUrl,
+  Role,
   validateRole,
   VersionedEventConfig
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
-import { z } from 'zod'
 import { env } from './environment'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import { formatUnwrittenFailure } from './seed-failure'
 import { raise } from './utils'
 import { Read } from './read'
-
-const RoleRecordSchema = z.object({
-  id: z.string().min(1),
-  scopes: z.array(
-    EncodedScope.superRefine((scope, ctx) => {
-      if (!decodeScope(scope)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Invalid scope: "${scope}"`
-        })
-      }
-    })
-  )
-})
 
 export interface ParsedRole {
   position: number
@@ -72,7 +57,7 @@ function readRole(
   position: number,
   eventConfigs: VersionedEventConfig[]
 ): ParsedRole | RoleProblem {
-  const parsed = RoleRecordSchema.safeParse(record)
+  const parsed = Role.safeParse(record)
 
   if (!parsed.success) {
     return {

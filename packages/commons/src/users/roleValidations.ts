@@ -61,7 +61,7 @@ function describeEvents(events: string[] | 'all') {
 }
 
 /** A `record.edit` scope without a `status` option matches every status. */
-function canEditDeclared(scope: Scope) {
+function matchesDeclared(scope: Scope) {
   const status = getScopeOptionValue(scope, 'status')
   return status === undefined || status.includes(EventStatus.enum.DECLARED)
 }
@@ -103,7 +103,7 @@ function validateNoNotifyAndEditDeclared(role: Role) {
   const events = describeEvents(
     overlap(
       eventsWithScope(role, 'record.notify'),
-      eventsWithScope(role, 'record.edit', canEditDeclared)
+      eventsWithScope(role, 'record.edit', matchesDeclared)
     )
   )
 

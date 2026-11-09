@@ -288,6 +288,37 @@ describe('scopes that do not decode', () => {
   })
 })
 
+describe('validateRole()', () => {
+  it('reports every rule a role breaks', () => {
+    const unknownEvent = encodeScope({
+      type: 'record.declare',
+      options: { event: ['v2.x'] }
+    })
+
+    expect(
+      validateRole(
+        {
+          id: 'COMMUNITY_LEADER',
+          scopes: [
+            ...role(
+              { type: 'record.notify' },
+              { type: 'record.declare' },
+              { type: 'record.edit' }
+            ).scopes,
+            unknownEvent
+          ]
+        },
+        eventConfigs
+      )
+    ).toEqual([
+      `Scope "${unknownEvent}" contains invalid event IDs: v2.x`,
+      `record.notify is granted for events without a NOTIFY action: ${FOOTBALL_CLUB}`,
+      'record.notify and record.declare are both granted for all events. A role can notify or declare an event, not both.',
+      "record.notify and a record.edit that can match DECLARED records are both granted for all events. Limit the role's record.edit to status NOTIFIED."
+    ])
+  })
+})
+
 describe('validateRoles()', () => {
   it('accepts valid roles', () => {
     expect(() =>

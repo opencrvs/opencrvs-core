@@ -9,13 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { EncodedScope } from './scopes'
+import { decodeScope, EncodedScope } from './scopes'
 import { VersionedEventConfig } from '../events/EventConfig'
 import { validateRoles } from './roleValidations'
 
 export const Role = z.object({
-  id: z.string(),
-  scopes: z.array(EncodedScope)
+  id: z.string().min(1),
+  scopes: z.array(
+    EncodedScope.superRefine((scope, ctx) => {
+      if (!decodeScope(scope)) {
+        ctx.addIssue({ code: 'custom', message: `Invalid scope: "${scope}"` })
+      }
+    })
+  )
 })
 export type Role = z.infer<typeof Role>
 export const Roles = z.array(Role)
@@ -31,6 +37,7 @@ export function defineRoles(
   roles: Roles,
   eventConfigs: VersionedEventConfig[]
 ) {
-  validateRoles(roles, eventConfigs)
-  return Roles.parse(roles)
+  const parsed = Roles.parse(roles)
+  validateRoles(parsed, eventConfigs)
+  return parsed
 }

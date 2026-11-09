@@ -183,7 +183,7 @@ A user whose role holds `record.notify` for an event type now fills in the notif
 - **Editing a notified record** uses the notification form too, and "Notify with edits" requires its required fields.
 - **The declare flow** only offers Declare and Register, and requires `record.declare`.
 
-A role should hold either `record.notify` or `record.declare` for an event type, not both. A role holding both now gets only the notify flow for that event type. Remove one of the two scopes.
+A role should hold either `record.notify` or `record.declare` for an event type, not both. Core now rejects a role that holds both for the same event type. Remove one of the two scopes. See "Core checks roles when it loads them".
 
 Update the client translations:
 
@@ -191,6 +191,30 @@ Update the client translations:
 - Rename `review.declare.incomplete.confirmModal.title` to `review.notify.confirmModal.title` ("Notify event?").
 - Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
 - `buttons.deleteDeclaration`, `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
+
+#### Core checks roles when it loads them
+
+The events service now checks the roles that country config serves at `GET /config/roles`. When a role breaks one of these rules, the events service does not start, and the error names each role and each problem [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981):
+
+- Each event type in a scope must be a configured event.
+- A role must not hold `record.notify` and `record.declare` for the same event type.
+- A role that holds `record.notify` for an event type must not hold a `record.edit` that can match `DECLARED` records of that event type. Limit that `record.edit` to the status `NOTIFIED`.
+- Each event type that a role holds `record.notify` for must have a `NOTIFY` action.
+
+To find these problems before you deploy, wrap the roles in `src/api/roles/roles.ts` with `defineRoles` from `@opencrvs/toolkit/roles`. It checks the same rules when the country config loads the roles, so a country config with invalid roles does not start:
+
+```ts
+import { defineRoles, Roles } from '@opencrvs/toolkit/roles'
+import { eventConfigs } from '@countryconfig/events'
+
+const roles: Roles = [
+  // ...
+]
+
+export default defineRoles(roles, eventConfigs)
+```
+
+The data seeder checks the same rules, and reports each role that breaks them.
 
 #### Object store settings renamed from `MINIO_*` to `S3_*`
 

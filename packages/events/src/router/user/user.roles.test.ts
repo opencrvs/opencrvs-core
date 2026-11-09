@@ -21,10 +21,16 @@ import { env } from '@events/environment'
 import { mswServer } from '../../tests/msw'
 
 const mockRoles = [
-  { id: 'REGISTRATION_AGENT', scopes: ['record.declare-birth'] },
+  {
+    id: 'REGISTRATION_AGENT',
+    scopes: [encodeScope({ type: 'record.declare' })]
+  },
   {
     id: 'LOCAL_REGISTRAR',
-    scopes: ['record.declare-birth', 'record.register-birth']
+    scopes: [
+      encodeScope({ type: 'record.declare' }),
+      encodeScope({ type: 'record.register' })
+    ]
   }
 ]
 
