@@ -26,7 +26,7 @@ import {
   startBirthNotification
 } from '@e2e/support/birth/notify'
 
-// https://github.com/opencrvs/mosip/blob/release-v1.8.0/docs/mock-identities.json#L24
+// Identity of John Dino Doe in packages/mosip-api/docs/mock-identities.json
 const MOCK_NID = '1234567892'
 
 test("Hospital official authenticates the mother's National ID on a birth notification", async ({
