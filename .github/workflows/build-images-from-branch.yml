@@ -487,23 +487,3 @@ jobs:
               }
             })
             console.log(result);
-  trigger-perf-test:
-    name: Trigger performance tests in perftest environment
-    needs: [base, merge-services-manifest, merge-testland-assets-manifest]
-    if: success() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref_name == 'develop'))
-    runs-on: ubuntu-26.04
-    steps:
-      - uses: actions/github-script@v9
-        with:
-          github-token: ${{ secrets.PERF_TEST_INFRA_WORKFLOW_TOKEN }}
-          script: |
-            await github.rest.repos.createDispatchEvent({
-              owner: 'opencrvs',
-              repo: 'opencrvs-countryconfig-perf-test-infra',
-              event_type: 'run_perf_test',
-              client_payload: {
-                actor: '${{ github.actor }}',
-                'core-image-tag': '${{ needs.base.outputs.version }}',
-                'core-commit': '${{ github.sha }}'
-              }
-            })
