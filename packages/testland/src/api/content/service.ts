@@ -32,7 +32,7 @@ export type CSVRow = { id: string; description: string } & Record<
  * `client.csv` holds the copy core's client package declares,
  * and is kept in sync by `opencrvs upgrade`.
  * `countryconfig.csv` holds the copy this country config
- * declares itself — event, form, field, workqueue, role and certificate
+ * declares itself — event, form, field, workqueue and certificate
  * labels — and is never touched by an upgrade.
  * The client asks for one bundle, so the two are merged back together here.
  */
