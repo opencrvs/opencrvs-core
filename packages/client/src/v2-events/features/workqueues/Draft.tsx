@@ -52,6 +52,10 @@ export function Draft() {
       const configuration = findEventConfiguration(event)
       // A record of an unknown version cannot be shown
       if (!configuration) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Draft of event ${event.id} is hidden: its configuration version "${event.configVersionId}" is not available.`
+        )
         return []
       }
 

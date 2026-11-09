@@ -85,6 +85,12 @@ export function useOutbox() {
 
         const eventConfiguration = findEventConfiguration(event)
         if (!eventConfiguration) {
+          // The mutation stays in the queue and is still sent. Only its row
+          // is hidden.
+          // eslint-disable-next-line no-console
+          console.error(
+            `Outbox entry of event ${event.id} is hidden: its configuration version "${event.configVersionId}" is not available.`
+          )
           return null
         }
 
