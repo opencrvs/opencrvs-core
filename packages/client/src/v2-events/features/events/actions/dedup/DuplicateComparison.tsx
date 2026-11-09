@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
   DeclarationFormConfig,
+  EventConfig,
   EventDocument,
   EventIndex,
   EventState,
@@ -49,7 +50,6 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
-import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -155,9 +155,12 @@ const hideFieldTypes = [
  * One column of the comparison. Each record renders with the configuration
  * version it was created under.
  */
-function useComparisonSide(event: EventDocument, eventState: EventIndex) {
+function useComparisonSide(
+  event: EventDocument,
+  eventState: EventIndex,
+  eventConfiguration: EventConfig
+) {
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration } = useEventConfigurationForRecord(eventState)
   const declaration = eventState.declaration
   const pages = getDeclarationPages(eventConfiguration)
   const fieldsById = new Map(
@@ -224,25 +227,34 @@ function useComparisonSide(event: EventDocument, eventState: EventIndex) {
 
 export function DuplicateComparison({
   originalEvent,
-  potentialDuplicateEvent,
+  originalEventConfiguration,
   originalEventState,
+  potentialDuplicateEvent,
+  potentialDuplicateEventConfiguration,
   potentialDuplicateEventState
 }: {
   originalEvent: EventDocument
-  potentialDuplicateEvent: EventDocument
+  originalEventConfiguration: EventConfig
   originalEventState: EventIndex
+  potentialDuplicateEvent: EventDocument
+  potentialDuplicateEventConfiguration: EventConfig
   potentialDuplicateEventState: EventIndex
 }) {
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-  const original = useComparisonSide(originalEvent, originalEventState)
+  const original = useComparisonSide(
+    originalEvent,
+    originalEventState,
+    originalEventConfiguration
+  )
   const potentialDuplicate = useComparisonSide(
     potentialDuplicateEvent,
-    potentialDuplicateEventState
+    potentialDuplicateEventState,
+    potentialDuplicateEventConfiguration
   )
 
-  // Pages and fields from both versions(original and porential duplicate)
-  // The version pinned by original wins on page title, order and label
+  // Pages and fields from both versions (original and potential duplicate).
+  // The version of the original wins on page title, order and label.
   const unionPages = [
     ...original.pages,
     ...potentialDuplicate.pages.filter(

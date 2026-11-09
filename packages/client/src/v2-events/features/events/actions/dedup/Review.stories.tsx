@@ -505,9 +505,6 @@ export const ComparisonAcrossConfigVersions: Story = {
 
 export const DuplicateOfUnknownConfigVersion: Story = {
   parameters: {
-    // The error page is shown by an error boundary, which React still reports as unhandled
-    test: { dangerouslyIgnoreUnhandledErrors: true },
-    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath({
@@ -532,20 +529,35 @@ export const DuplicateOfUnknownConfigVersion: Story = {
       configVersionId: 'removed-version'
     })
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    const comparisonTab = await canvas.findByRole('button', {
-      name: new RegExp(potentialDuplicateOfV1.trackingId, 'i')
-    })
-    await userEvent.click(comparisonTab)
 
-    await canvas.findByText('This record cannot be opened')
-    await expect(
-      await canvas.findByText(
-        new RegExp(
-          `Record ${potentialDuplicateOfV1.trackingId} was created under version removed-version`
-        )
-      )
-    ).toBeInTheDocument()
+    await step(
+      'The tab of the potential duplicate is disabled, and a line under the tabs says why',
+      async () => {
+        await expect(
+          await canvas.findByRole('button', {
+            name: new RegExp(potentialDuplicateOfV1.trackingId, 'i')
+          })
+        ).toBeDisabled()
+        await expect(
+          await canvas.findByText(
+            `${potentialDuplicateOfV1.trackingId} cannot be compared: its configuration version "removed-version" is not available.`
+          )
+        ).toBeVisible()
+      }
+    )
+
+    await step(
+      'The record under review and its actions stay available',
+      async () => {
+        await expect(
+          await canvas.findByRole('button', { name: /Not a duplicate/i })
+        ).toBeInTheDocument()
+        await expect(
+          canvas.queryByText('This record cannot be opened')
+        ).not.toBeInTheDocument()
+      }
+    )
   }
 }
