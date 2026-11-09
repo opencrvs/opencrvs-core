@@ -17,7 +17,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/EventConfig"
+                  $ref: "#/components/schemas/VersionedEventConfig"
   /trigger/events/{eventType}/actions/{actionType}:
     post:
       tags:
@@ -186,6 +186,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -193,6 +198,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
     ActionDocument:
       oneOf:
         - $ref: "#/components/schemas/CreatedAction"
@@ -2333,249 +2339,278 @@ components:
         - status
         - type
         - customActionType
-    EventConfig:
+    VersionedEventConfig:
       type: object
       properties:
         id:
           type: string
           description: Machine-readable identifier of the event (e.g. "birth", "death").
-        dateOfEvent:
-          description: Reference to the field capturing the date of the event (e.g. date
-            of birth). Defaults to the event creation date if unspecified.
-          anyOf:
-            - type: object
-              properties:
-                $$field:
-                  type: string
-                  description: Id of the field to reference
-                $$subfield:
-                  default: []
-                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  type: array
-                  items:
-                    type: string
-                $$code:
-                  description: Serialised client-side function body. When present the expression
-                    is evaluated rather than dereferenced.
-                  type: string
-              required:
-                - $$field
-                - $$subfield
-              additionalProperties: false
-              description: Reference to a field value, with an optional client-side
-                computation applied.
-            - type: object
-              properties:
-                $$event:
-                  type: string
-                  enum:
-                    - createdAt
-                    - updatedAt
-                    - legalStatuses.NOTIFIED.createdAt
-                    - legalStatuses.NOTIFIED.acceptedAt
-                    - legalStatuses.DECLARED.createdAt
-                    - legalStatuses.DECLARED.acceptedAt
-                    - legalStatuses.REGISTERED.createdAt
-                    - legalStatuses.REGISTERED.acceptedAt
-              required:
-                - $$event
-              additionalProperties: false
-              description: Reference to a field defined in the event metadata, using the field
-                id.
-        placeOfEvent:
-          description: Reference to the field capturing the place of the event (e.g. place
-            of birth). Defaults to the meta.createdAtLocation if unspecified.
-          type: object
-          properties:
-            $$field:
-              type: string
-              description: Id of the field to reference
-            $$subfield:
-              default: []
-              description: 'If the FieldValue is an object, subfield can be used to refer to
-                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-              type: array
-              items:
-                type: string
-            $$code:
-              description: Serialised client-side function body. When present the expression
-                is evaluated rather than dereferenced.
-              type: string
-          required:
-            - $$field
-            - $$subfield
-          additionalProperties: false
-        title:
-          description: Title template for the singular event, supporting variables (e.g.
-            "{applicant.name.firstname} {applicant.name.surname}").
-          $ref: "#/components/schemas/TranslationConfig"
-        fallbackTitle:
-          description: Fallback title shown when the main title resolves to an empty value.
-          $ref: "#/components/schemas/TranslationConfig"
-        summary:
-          description: Summary information displayed in the event overview.
-          $ref: "#/components/schemas/SummaryConfig"
         label:
           description: Human-readable label for the event type.
           $ref: "#/components/schemas/TranslationConfig"
-        actions:
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConfig"
-          description: Configuration of core and custom actions associated with the event.
-        actionOrder:
-          description: Order of actions in the action menu. Use either the action type for
-            core actions or the customActionType for custom actions.
-          type: array
-          items:
-            type: string
         advancedSearch:
           default: []
           description: Configuration of fields available in the advanced search feature.
           type: array
           items:
             $ref: "#/components/schemas/AdvancedSearchConfig"
-        flags:
-          default: []
-          description: Configuration of custom flags associated with the actions of this
-            event type.
+        versions:
+          minItems: 1
           type: array
           items:
-            $ref: "#/components/schemas/FlagConfig"
-        analytics:
-          default: true
-          description: Indicates whether the records of this event type are included in
-            analytics
-          type: boolean
-        icon:
-          description: Maps an icon name to a conditional. The icon of the first entry (in
-            definition order) whose conditional matches the event is used when
-            rendering it (e.g. in the "iconWithName"/"iconWithNameEvent"
-            workqueue columns). Falls back to the default status-based icon when
-            unset or when no conditional matches.
-          type: object
-          propertyNames:
-            type: string
-            enum:
-              - Archived
-              - Assigned
-              - Briefcase
-              - Certified
-              - Close
-              - Collapse
-              - Draft
-              - DuplicateYellow
-              - Expand
-              - ExternalValidate
-              - FilledCheck
-              - InReview
-              - Offline
-              - Registered
-              - RequiresUpdates
-              - Sent
-              - Validated
-              - WaitingApproval
-              - ChartActivity
-              - Activity
-              - Archive
-              - ArchiveTray
-              - ArrowLeft
-              - ArrowRight
-              - Buildings
-              - Circle
-              - CaretDown
-              - CaretLeft
-              - CaretRight
-              - ChartBar
-              - ChartLine
-              - ChatCircle
-              - CheckSquare
-              - Compass
-              - Check
-              - Copy
-              - Database
-              - DotsThreeVertical
-              - ArrowCounterClockwise
-              - MagnifyingGlassMinus
-              - MagnifyingGlassPlus
-              - Export
-              - Eye
-              - EyeSlash
-              - Envelope
-              - File
-              - FileLock
-              - FileSearch
-              - FileMinus
-              - FilePlus
-              - FileText
-              - FileX
-              - Handshake
-              - Gear
-              - GitBranch
-              - IdentificationCard
-              - List
-              - ListBullets
-              - Lock
-              - MagnifyingGlass
-              - MapPin
-              - Medal
-              - NotePencil
-              - Paperclip
-              - PaperPlaneTilt
-              - Pen
-              - PenNib
-              - Pencil
-              - PencilSimpleLine
-              - Phone
-              - Plus
-              - Printer
-              - SignOut
-              - Stamp
-              - Star
-              - Target
-              - TextT
-              - Trash
-              - UploadSimple
-              - User
-              - UserPlus
-              - Users
-              - WarningCircle
-              - X
-              - ChatText
-              - CircleWavyCheck
-              - CircleWavyQuestion
-              - ArchiveBox
-              - ArrowCircleDown
-              - FileArrowUp
-              - FileDotted
-              - Files
-              - PencilLine
-              - PencilCircle
-              - UserCircle
-              - Clock
-              - QrCode
-              - Webcam
-              - Sun
-              - DeviceTabletCamera
-              - Globe
-              - Fingerprint
-              - PushPin
-              - Timer
-          additionalProperties:
-            $ref: "#/components/schemas/Conditional"
+            type: object
+            properties:
+              id:
+                type: string
+                description: Identifier of the version, unique within the event (e.g.
+                  "birth-v2").
+              effectiveFrom:
+                default: 0001-01-01
+                description: Date (YYYY-MM-DD) from which this version is effective. A version
+                  without one is effective from the beginning of time
+                  ('0001-01-01').
+                type: string
+                format: date
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+              dateOfEvent:
+                description: Reference to the field capturing the date of the event (e.g. date
+                  of birth). Defaults to the event creation date if unspecified.
+                anyOf:
+                  - type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Id of the field to reference
+                      $$subfield:
+                        default: []
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                      $$code:
+                        description: Serialised client-side function body. When present the expression
+                          is evaluated rather than dereferenced.
+                        type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+                    description: Reference to a field value, with an optional client-side
+                      computation applied.
+                  - type: object
+                    properties:
+                      $$event:
+                        type: string
+                        enum:
+                          - createdAt
+                          - updatedAt
+                          - legalStatuses.NOTIFIED.createdAt
+                          - legalStatuses.NOTIFIED.acceptedAt
+                          - legalStatuses.DECLARED.createdAt
+                          - legalStatuses.DECLARED.acceptedAt
+                          - legalStatuses.REGISTERED.createdAt
+                          - legalStatuses.REGISTERED.acceptedAt
+                    required:
+                      - $$event
+                    additionalProperties: false
+                    description: Reference to a field defined in the event metadata, using the field
+                      id.
+              placeOfEvent:
+                description: Reference to the field capturing the place of the event (e.g. place
+                  of birth). Defaults to the meta.createdAtLocation if
+                  unspecified.
+                type: object
+                properties:
+                  $$field:
+                    type: string
+                    description: Id of the field to reference
+                  $$subfield:
+                    default: []
+                    description: 'If the FieldValue is an object, subfield can be used to refer to
+                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    type: array
+                    items:
+                      type: string
+                  $$code:
+                    description: Serialised client-side function body. When present the expression
+                      is evaluated rather than dereferenced.
+                    type: string
+                required:
+                  - $$field
+                  - $$subfield
+                additionalProperties: false
+              title:
+                description: Title template for the singular event, supporting variables (e.g.
+                  "{applicant.name.firstname} {applicant.name.surname}").
+                $ref: "#/components/schemas/TranslationConfig"
+              fallbackTitle:
+                description: Fallback title shown when the main title resolves to an empty
+                  value.
+                $ref: "#/components/schemas/TranslationConfig"
+              summary:
+                description: Summary information displayed in the event overview.
+                $ref: "#/components/schemas/SummaryConfig"
+              actions:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActionConfig"
+                description: Configuration of core and custom actions associated with the event.
+              actionOrder:
+                description: Order of actions in the action menu. Use either the action type for
+                  core actions or the customActionType for custom actions.
+                type: array
+                items:
+                  type: string
+              flags:
+                default: []
+                description: Configuration of custom flags associated with the actions of this
+                  event type.
+                type: array
+                items:
+                  $ref: "#/components/schemas/FlagConfig"
+              analytics:
+                default: true
+                description: Indicates whether the records of this event type are included in
+                  analytics
+                type: boolean
+              icon:
+                description: Maps an icon name to a conditional. The icon of the first entry (in
+                  definition order) whose conditional matches the event is used
+                  when rendering it (e.g. in the
+                  "iconWithName"/"iconWithNameEvent" workqueue columns). Falls
+                  back to the default status-based icon when unset or when no
+                  conditional matches.
+                type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    - Archived
+                    - Assigned
+                    - Briefcase
+                    - Certified
+                    - Close
+                    - Collapse
+                    - Draft
+                    - DuplicateYellow
+                    - Expand
+                    - ExternalValidate
+                    - FilledCheck
+                    - InReview
+                    - Offline
+                    - Registered
+                    - RequiresUpdates
+                    - Sent
+                    - Validated
+                    - WaitingApproval
+                    - ChartActivity
+                    - Activity
+                    - Archive
+                    - ArchiveTray
+                    - ArrowLeft
+                    - ArrowRight
+                    - Buildings
+                    - Circle
+                    - CaretDown
+                    - CaretLeft
+                    - CaretRight
+                    - ChartBar
+                    - ChartLine
+                    - ChatCircle
+                    - CheckSquare
+                    - Compass
+                    - Check
+                    - Copy
+                    - Database
+                    - DotsThreeVertical
+                    - ArrowCounterClockwise
+                    - MagnifyingGlassMinus
+                    - MagnifyingGlassPlus
+                    - Export
+                    - Eye
+                    - EyeSlash
+                    - Envelope
+                    - File
+                    - FileLock
+                    - FileSearch
+                    - FileMinus
+                    - FilePlus
+                    - FileText
+                    - FileX
+                    - Handshake
+                    - Gear
+                    - GitBranch
+                    - IdentificationCard
+                    - List
+                    - ListBullets
+                    - Lock
+                    - MagnifyingGlass
+                    - MapPin
+                    - Medal
+                    - NotePencil
+                    - Paperclip
+                    - PaperPlaneTilt
+                    - Pen
+                    - PenNib
+                    - Pencil
+                    - PencilSimpleLine
+                    - Phone
+                    - Plus
+                    - Printer
+                    - SignOut
+                    - Stamp
+                    - Star
+                    - Target
+                    - TextT
+                    - Trash
+                    - UploadSimple
+                    - User
+                    - UserPlus
+                    - Users
+                    - WarningCircle
+                    - X
+                    - ChatText
+                    - CircleWavyCheck
+                    - CircleWavyQuestion
+                    - ArchiveBox
+                    - ArrowCircleDown
+                    - FileArrowUp
+                    - FileDotted
+                    - Files
+                    - PencilLine
+                    - PencilCircle
+                    - UserCircle
+                    - Clock
+                    - QrCode
+                    - Webcam
+                    - Sun
+                    - DeviceTabletCamera
+                    - Globe
+                    - Fingerprint
+                    - PushPin
+                    - Timer
+                additionalProperties:
+                  $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - effectiveFrom
+              - title
+              - summary
+              - actions
+              - flags
+              - analytics
+            additionalProperties: false
+          description: Versions of the event configuration, each effective from its
+            `effectiveFrom`. An event configured without versions has a single
+            version, with id 'initial' and `effectiveFrom` '0001-01-01'.
       required:
         - id
-        - title
-        - summary
         - label
-        - actions
         - advancedSearch
-        - flags
-        - analytics
+        - versions
       additionalProperties: false
-      description: Configuration defining an event type registered in OpenCRVS (for
-        example birth or death).
+      description: Configuration of an event type registered in OpenCRVS (for example
+        birth or death), with every version of it.
     TranslationConfig:
       type: object
       properties:
@@ -2594,8 +2629,781 @@ components:
         - description
       additionalProperties: false
       description: Translation configuration
+    AdvancedSearchConfig:
+      type: object
+      properties:
+        title:
+          description: Advanced search tab title
+          $ref: "#/components/schemas/TranslationConfig"
+        fields:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                properties:
+                  config:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - fuzzy
+                          - exact
+                          - range
+                          - within
+                        description: Determines the search type of field. How to match value.
+                      searchFields:
+                        description: "
+
+                          \      Defines multiple form fields that should be
+                          searched when this field has a value.
+
+                          \      All specified fields will be combined using OR
+                          logic.
+
+
+                          \      Example: { searchFields: ['mother.name',
+                          'father.name', 'informant.name'] }
+
+                          \      Will search all fields and return a record if
+                          any of the fields match the search value.    \ 
+
+                          \      "
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - type
+                    additionalProperties: false
+                  type:
+                    description: "
+
+                      \      Explicitly specify the field type for searchFields.
+
+                      \      This is required when searchFields is defined, to
+                      show the correct control in the UI.
+
+                      \       \ 
+
+                      \      Example: FieldType.NAME for name fields,
+                      FieldType.TEXT for text fields, FieldType.DATE for date
+                      fields, etc.
+
+                      \      "
+                    type: string
+                    enum:
+                      - NAME
+                      - PHONE
+                      - ID
+                      - ADDRESS
+                      - TEXT
+                      - NUMBER
+                      - NUMBER_WITH_UNIT
+                      - TEXTAREA
+                      - EMAIL
+                      - DATE
+                      - AGE
+                      - DATE_RANGE
+                      - SELECT_DATE_RANGE
+                      - TIME
+                      - IMAGE_VIEW
+                      - PARAGRAPH
+                      - HEADING
+                      - PAGE_HEADER
+                      - RADIO_GROUP
+                      - FIELD_GROUP
+                      - FILE
+                      - FILE_WITH_OPTIONS
+                      - BULLET_LIST
+                      - CHECKBOX
+                      - SELECT
+                      - COUNTRY
+                      - LOCATION
+                      - DIVIDER
+                      - ADMINISTRATIVE_AREA
+                      - FACILITY
+                      - OFFICE
+                      - SIGNATURE
+                      - DATA
+                      - BUTTON
+                      - AUTOCOMPLETE
+                      - SEARCH
+                      - ALPHA_PRINT_BUTTON
+                      - HTTP
+                      - LINK_BUTTON
+                      - VERIFICATION_STATUS
+                      - QUERY_PARAM_READER
+                      - QR_READER
+                      - ID_READER
+                      - LOADER
+                      - ALPHA_HIDDEN
+                      - USER_ROLE
+                      - CUSTOM
+                  label:
+                    description: "
+
+                      \      Explicitly specify the label for searchFields.
+
+                      \      This is required when searchFields is
+                      defined.           \ 
+
+                      \      "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  options:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          description: The value of the option
+                        label:
+                          anyOf:
+                            - type: string
+                            - $ref: "#/components/schemas/TranslationConfig"
+                          description: The label of the option
+                        conditionals:
+                          default: []
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/ActionConditional"
+                      required:
+                        - value
+                        - label
+                      additionalProperties: false
+                  searchCriteriaLabelPrefix:
+                    description: "
+
+                      \    This property determines whether to add a prefix
+                      (such as \"Child\" or \"Applicant\") before the field
+                      label
+
+                      \    when rendering search parameter labels — for example,
+                      in the search results page to indicate which fields were
+                      used in the search.
+
+
+                      \    For example, a field config like { id:
+                      \"child.name.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would render as \"First Name(s)\" by
+                      default.
+
+
+                      \    A field config like { id: \"mother.firstname\",
+                      label: { defaultMessage: \"First Name(s)\" } } would also
+                      render as \"First Name(s)\" by default.
+
+
+                      \    So, if both child.name.firstname and mother.firstname
+                      are used in a search, the resulting search criteria labels
+                      would be \"First Name(s)\", \"First Name(s)\",
+
+                      \    which is ambiguous.
+
+
+                      \    Now, if we treat the field ID prefix as a label
+                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
+                      field label is already
+
+                      \    descriptive — like { id: \"applicant.firstname\",
+                      label: { defaultMessage: \"Applicant's First Name\" } } —
+                      then the resulting
+
+                      \    label would be \"Applicant Applicant's First Name\",
+                      which is redundant and awkward.
+
+
+                      \    By setting searchCriteriaLabelPrefix to a translation
+                      config object, we can explicitly define the desired prefix
+
+                      \    in the country-config > event.advancedSearch
+                      configuration. For example: field(\"child.dob\", {
+                      searchCriteriaLabelPrefix: TranslationConfig }).
+
+                      \    "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  conditionals:
+                    description: "
+
+                      \       In advanced search, we sometimes need to override
+                      the default field visibility conditionals.
+
+
+                      \       For example, Informant fields in the declaration
+                      form may have conditional logic
+
+                      \       that hides them based on other field values. Since
+                      the advanced search form reuses
+
+                      \       the declaration form config, those same
+                      conditionals would apply by default.
+
+
+                      \       However, in advanced search we often want to make
+                      all Informant fields searchable,
+
+                      \       regardless of their original visibility logic. To
+                      do this, we explicitly set their
+
+                      \       'conditionals' to an empty array ('[]') in the
+                      search config. This ensures they
+
+                      \       are always rendered in the advanced search form.
+
+                      \      "
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FieldConditional"
+                  validations:
+                    description: Option for overriding the field validations specifically for
+                      advanced search form.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ValidationConfig"
+                  allowedLocations:
+                    description: Override the allowedLocations for a location field in advanced
+                      search. Use this when the declaration form's
+                      allowedLocations references a scope (e.g. record.create)
+                      that search-only users don't have — specify record.search
+                      scope instead.
+                    type: object
+                    properties:
+                      $jurisdiction:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - administrativeArea
+                              - location
+                              - all
+                            description: Filters based on user jurisdiction relative to their office
+                              location in hierarchy.
+                          - type: object
+                            properties:
+                              $scope:
+                                type: string
+                                enum:
+                                  - organisation.read-locations
+                                  - user.read
+                                  - user.create
+                                  - user.edit
+                                  - user.search
+                                  - record.search
+                                  - record.create
+                                  - record.read
+                                  - record.declare
+                                  - record.notify
+                                  - record.edit
+                                  - record.reject
+                                  - record.archive
+                                  - record.unarchive
+                                  - record.review-duplicates
+                                  - record.register
+                                  - record.print-certified-copies
+                                  - record.request-correction
+                                  - record.correct
+                                  - record.revoke-registration
+                                  - record.reinstate-registration
+                                  - record.unassign-others
+                                  - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
+                                  - bypassratelimit
+                                  - record.reindex
+                                  - user.data-seeding
+                                  - integration.create
+                                  - integration.audit.read
+                                  - record.import
+                                  - config.update-all
+                                  - location.edit
+                                  - attachment.upload
+                                  - profile.electronic-signature
+                                  - user.read-only-my-audit
+                                  - performance.read
+                                  - performance.read-dashboards
+                                  - performance.vital-statistics-export
+                                  - workqueue
+                                  - dashboard.view
+                              $option:
+                                type: string
+                                enum:
+                                  - event
+                                  - placeOfEvent
+                                  - createdBy
+                                  - createdIn
+                                  - notifiedIn
+                                  - notifiedBy
+                                  - declaredIn
+                                  - declaredBy
+                                  - status
+                                  - registeredIn
+                                  - registeredBy
+                                  - flags
+                                  - accessLevel
+                                  - role
+                                  - ids
+                            required:
+                              - $scope
+                              - $option
+                            additionalProperties: false
+                    required:
+                      - $jurisdiction
+                    additionalProperties: false
+                  fieldId:
+                    type: string
+                  fieldType:
+                    type: string
+                    const: field
+                  defaultValue:
+                    description: Value the field opens with in advanced search. Omitted or true uses
+                      the declaration form's defaultValue, false opens the field
+                      empty, and any other value opens it with that value. Only
+                      text, number and date fields take a value; every other
+                      field type, and date fields searched as a range, only
+                      accept true or false.
+                    type:
+                      - boolean
+                      - string
+                      - number
+                required:
+                  - config
+                  - fieldId
+                  - fieldType
+                additionalProperties: false
+              - type: object
+                properties:
+                  config:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - fuzzy
+                          - exact
+                          - range
+                          - within
+                        description: Determines the search type of field. How to match value.
+                      searchFields:
+                        description: "
+
+                          \      Defines multiple form fields that should be
+                          searched when this field has a value.
+
+                          \      All specified fields will be combined using OR
+                          logic.
+
+
+                          \      Example: { searchFields: ['mother.name',
+                          'father.name', 'informant.name'] }
+
+                          \      Will search all fields and return a record if
+                          any of the fields match the search value.    \ 
+
+                          \      "
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - type
+                    additionalProperties: false
+                  type:
+                    description: "
+
+                      \      Explicitly specify the field type for searchFields.
+
+                      \      This is required when searchFields is defined, to
+                      show the correct control in the UI.
+
+                      \       \ 
+
+                      \      Example: FieldType.NAME for name fields,
+                      FieldType.TEXT for text fields, FieldType.DATE for date
+                      fields, etc.
+
+                      \      "
+                    type: string
+                    enum:
+                      - NAME
+                      - PHONE
+                      - ID
+                      - ADDRESS
+                      - TEXT
+                      - NUMBER
+                      - NUMBER_WITH_UNIT
+                      - TEXTAREA
+                      - EMAIL
+                      - DATE
+                      - AGE
+                      - DATE_RANGE
+                      - SELECT_DATE_RANGE
+                      - TIME
+                      - IMAGE_VIEW
+                      - PARAGRAPH
+                      - HEADING
+                      - PAGE_HEADER
+                      - RADIO_GROUP
+                      - FIELD_GROUP
+                      - FILE
+                      - FILE_WITH_OPTIONS
+                      - BULLET_LIST
+                      - CHECKBOX
+                      - SELECT
+                      - COUNTRY
+                      - LOCATION
+                      - DIVIDER
+                      - ADMINISTRATIVE_AREA
+                      - FACILITY
+                      - OFFICE
+                      - SIGNATURE
+                      - DATA
+                      - BUTTON
+                      - AUTOCOMPLETE
+                      - SEARCH
+                      - ALPHA_PRINT_BUTTON
+                      - HTTP
+                      - LINK_BUTTON
+                      - VERIFICATION_STATUS
+                      - QUERY_PARAM_READER
+                      - QR_READER
+                      - ID_READER
+                      - LOADER
+                      - ALPHA_HIDDEN
+                      - USER_ROLE
+                      - CUSTOM
+                  label:
+                    description: "
+
+                      \      Explicitly specify the label for searchFields.
+
+                      \      This is required when searchFields is
+                      defined.           \ 
+
+                      \      "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  options:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          description: The value of the option
+                        label:
+                          anyOf:
+                            - type: string
+                            - $ref: "#/components/schemas/TranslationConfig"
+                          description: The label of the option
+                        conditionals:
+                          default: []
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/ActionConditional"
+                      required:
+                        - value
+                        - label
+                      additionalProperties: false
+                  searchCriteriaLabelPrefix:
+                    description: "
+
+                      \    This property determines whether to add a prefix
+                      (such as \"Child\" or \"Applicant\") before the field
+                      label
+
+                      \    when rendering search parameter labels — for example,
+                      in the search results page to indicate which fields were
+                      used in the search.
+
+
+                      \    For example, a field config like { id:
+                      \"child.name.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would render as \"First Name(s)\" by
+                      default.
+
+
+                      \    A field config like { id: \"mother.firstname\",
+                      label: { defaultMessage: \"First Name(s)\" } } would also
+                      render as \"First Name(s)\" by default.
+
+
+                      \    So, if both child.name.firstname and mother.firstname
+                      are used in a search, the resulting search criteria labels
+                      would be \"First Name(s)\", \"First Name(s)\",
+
+                      \    which is ambiguous.
+
+
+                      \    Now, if we treat the field ID prefix as a label
+                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
+                      field label is already
+
+                      \    descriptive — like { id: \"applicant.firstname\",
+                      label: { defaultMessage: \"Applicant's First Name\" } } —
+                      then the resulting
+
+                      \    label would be \"Applicant Applicant's First Name\",
+                      which is redundant and awkward.
+
+
+                      \    By setting searchCriteriaLabelPrefix to a translation
+                      config object, we can explicitly define the desired prefix
+
+                      \    in the country-config > event.advancedSearch
+                      configuration. For example: field(\"child.dob\", {
+                      searchCriteriaLabelPrefix: TranslationConfig }).
+
+                      \    "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  conditionals:
+                    description: "
+
+                      \       In advanced search, we sometimes need to override
+                      the default field visibility conditionals.
+
+
+                      \       For example, Informant fields in the declaration
+                      form may have conditional logic
+
+                      \       that hides them based on other field values. Since
+                      the advanced search form reuses
+
+                      \       the declaration form config, those same
+                      conditionals would apply by default.
+
+
+                      \       However, in advanced search we often want to make
+                      all Informant fields searchable,
+
+                      \       regardless of their original visibility logic. To
+                      do this, we explicitly set their
+
+                      \       'conditionals' to an empty array ('[]') in the
+                      search config. This ensures they
+
+                      \       are always rendered in the advanced search form.
+
+                      \      "
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FieldConditional"
+                  validations:
+                    description: Option for overriding the field validations specifically for
+                      advanced search form.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ValidationConfig"
+                  allowedLocations:
+                    description: Override the allowedLocations for a location field in advanced
+                      search. Use this when the declaration form's
+                      allowedLocations references a scope (e.g. record.create)
+                      that search-only users don't have — specify record.search
+                      scope instead.
+                    type: object
+                    properties:
+                      $jurisdiction:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - administrativeArea
+                              - location
+                              - all
+                            description: Filters based on user jurisdiction relative to their office
+                              location in hierarchy.
+                          - type: object
+                            properties:
+                              $scope:
+                                type: string
+                                enum:
+                                  - organisation.read-locations
+                                  - user.read
+                                  - user.create
+                                  - user.edit
+                                  - user.search
+                                  - record.search
+                                  - record.create
+                                  - record.read
+                                  - record.declare
+                                  - record.notify
+                                  - record.edit
+                                  - record.reject
+                                  - record.archive
+                                  - record.unarchive
+                                  - record.review-duplicates
+                                  - record.register
+                                  - record.print-certified-copies
+                                  - record.request-correction
+                                  - record.correct
+                                  - record.revoke-registration
+                                  - record.reinstate-registration
+                                  - record.unassign-others
+                                  - record.custom-action
+                                  - record.action.accept
+                                  - record.action.reject
+                                  - bypassratelimit
+                                  - record.reindex
+                                  - user.data-seeding
+                                  - integration.create
+                                  - integration.audit.read
+                                  - record.import
+                                  - config.update-all
+                                  - location.edit
+                                  - attachment.upload
+                                  - profile.electronic-signature
+                                  - user.read-only-my-audit
+                                  - performance.read
+                                  - performance.read-dashboards
+                                  - performance.vital-statistics-export
+                                  - workqueue
+                                  - dashboard.view
+                              $option:
+                                type: string
+                                enum:
+                                  - event
+                                  - placeOfEvent
+                                  - createdBy
+                                  - createdIn
+                                  - notifiedIn
+                                  - notifiedBy
+                                  - declaredIn
+                                  - declaredBy
+                                  - status
+                                  - registeredIn
+                                  - registeredBy
+                                  - flags
+                                  - accessLevel
+                                  - role
+                                  - ids
+                            required:
+                              - $scope
+                              - $option
+                            additionalProperties: false
+                    required:
+                      - $jurisdiction
+                    additionalProperties: false
+                  fieldId:
+                    type: string
+                    enum:
+                      - event.trackingId
+                      - event.status
+                      - event.legalStatuses.REGISTERED.acceptedAt
+                      - event.legalStatuses.REGISTERED.createdAtLocation
+                      - event.legalStatuses.REGISTERED.registrationNumber
+                      - event.updatedAt
+                  fieldType:
+                    type: string
+                    const: event
+                required:
+                  - config
+                  - fieldId
+                  - fieldType
+                additionalProperties: false
+            type: object
+          description: Advanced search fields within the tab.
+      required:
+        - title
+        - fields
+      additionalProperties: false
+      description: Configuration of one advanced search tab. Each tab has a title and
+        a list of searchable fields — either declaration fields (via `field()`)
+        or event metadata (via `event()`).
+    ActionConditional:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              const: SHOW
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'SHOW' conditional is defined, the component is shown to the
+            user only if the condition is met
+        - type: object
+          properties:
+            type:
+              type: string
+              const: ENABLE
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'ENABLE' conditional is defined, the component is enabled only
+            if the condition is met
+      description: Conditional gating whether an action is shown (SHOW) or enabled
+        (ENABLE). When omitted from an action, the action is shown and enabled
+        for everyone.
+      type: object
     Conditional:
       description: JSON schema conditional configuration
+    FieldConditional:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              const: SHOW
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'SHOW' conditional is defined, the component is shown to the
+            user only if the condition is met
+        - type: object
+          properties:
+            type:
+              type: string
+              const: ENABLE
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'ENABLE' conditional is defined, the component is enabled only
+            if the condition is met
+        - type: object
+          properties:
+            type:
+              type: string
+              const: DISPLAY_ON_REVIEW
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
+            shown on the review page only if both the 'DISPLAY_ON_REVIEW' and
+            'SHOW' conditions are met. This should only be used for fields
+            within declaration forms, as they are the only ones with review
+            pages.
+      description: Conditional gating whether a form field is shown (SHOW), enabled
+        (ENABLE), or displayed on the review page (DISPLAY_ON_REVIEW). When
+        omitted, the field is shown and enabled for everyone, and is displayed
+        on review whenever it has a value.
+      type: object
+    ValidationConfig:
+      type: object
+      properties:
+        validator:
+          description: Conditional expression that must hold for the field value to be
+            considered valid.
+          $ref: "#/components/schemas/Conditional"
+        message:
+          description: Error message displayed when the validator does not hold.
+          $ref: "#/components/schemas/TranslationConfig"
+      required:
+        - validator
+        - message
+      additionalProperties: false
+      description: Validation rule applied to a form field. The validator is a
+        conditional expression that must hold for the field value to be
+        considered valid.
     SummaryConfig:
       type: object
       properties:
@@ -3742,72 +4550,6 @@ components:
         - fields
       additionalProperties: false
       description: A group of fields that are displayed together
-    FieldConditional:
-      oneOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              const: SHOW
-            conditional:
-              $ref: "#/components/schemas/Conditional"
-          required:
-            - type
-            - conditional
-          additionalProperties: false
-          description: If 'SHOW' conditional is defined, the component is shown to the
-            user only if the condition is met
-        - type: object
-          properties:
-            type:
-              type: string
-              const: ENABLE
-            conditional:
-              $ref: "#/components/schemas/Conditional"
-          required:
-            - type
-            - conditional
-          additionalProperties: false
-          description: If 'ENABLE' conditional is defined, the component is enabled only
-            if the condition is met
-        - type: object
-          properties:
-            type:
-              type: string
-              const: DISPLAY_ON_REVIEW
-            conditional:
-              $ref: "#/components/schemas/Conditional"
-          required:
-            - type
-            - conditional
-          additionalProperties: false
-          description: If 'DISPLAY_ON_REVIEW' conditional is defined, the component is
-            shown on the review page only if both the 'DISPLAY_ON_REVIEW' and
-            'SHOW' conditions are met. This should only be used for fields
-            within declaration forms, as they are the only ones with review
-            pages.
-      description: Conditional gating whether a form field is shown (SHOW), enabled
-        (ENABLE), or displayed on the review page (DISPLAY_ON_REVIEW). When
-        omitted, the field is shown and enabled for everyone, and is displayed
-        on review whenever it has a value.
-      type: object
-    ValidationConfig:
-      type: object
-      properties:
-        validator:
-          description: Conditional expression that must hold for the field value to be
-            considered valid.
-          $ref: "#/components/schemas/Conditional"
-        message:
-          description: Error message displayed when the validator does not hold.
-          $ref: "#/components/schemas/TranslationConfig"
-      required:
-        - validator
-        - message
-      additionalProperties: false
-      description: Validation rule applied to a form field. The validator is a
-        conditional expression that must hold for the field value to be
-        considered valid.
     Address:
       type: object
       properties:
@@ -4289,38 +5031,6 @@ components:
         - type
       additionalProperties: false
       description: Address input field – a combination of location and text fields
-    ActionConditional:
-      oneOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              const: SHOW
-            conditional:
-              $ref: "#/components/schemas/Conditional"
-          required:
-            - type
-            - conditional
-          additionalProperties: false
-          description: If 'SHOW' conditional is defined, the component is shown to the
-            user only if the condition is met
-        - type: object
-          properties:
-            type:
-              type: string
-              const: ENABLE
-            conditional:
-              $ref: "#/components/schemas/Conditional"
-          required:
-            - type
-            - conditional
-          additionalProperties: false
-          description: If 'ENABLE' conditional is defined, the component is enabled only
-            if the condition is met
-      description: Conditional gating whether an action is shown (SHOW) or enabled
-        (ENABLE). When omitted from an action, the action is shown and enabled
-        for everyone.
-      type: object
     TextField:
       type: object
       properties:
@@ -14210,8 +14920,7 @@ components:
         notificationForm:
           description: Notification form configuration. Its fields must be a subset of the
             declaration form fields, with matching types. The values submitted
-            on the notification form pre-fill the declaration. If not defined,
-            the declare action's declaration is used (with all fields optional).
+            on the notification form pre-fill the declaration.
           $ref: "#/components/schemas/DeclarationFormConfig"
         review:
           type: object
@@ -14229,9 +14938,7 @@ components:
             - fields
           additionalProperties: false
           description: Review page configuration for the notify action. Values of its
-            fields are stored as the NOTIFY action annotation. If not defined,
-            defineConfig generates it from the declare action's review (with all
-            fields optional).
+            fields are stored as the NOTIFY action annotation.
         form:
           description: Fields rendered on the action confirmation dialog. Submitted values
             are stored in the action annotation and shown in the audit history.
@@ -14242,6 +14949,7 @@ components:
         - label
         - flags
         - type
+        - notificationForm
         - review
       additionalProperties: false
       description: Configuration for the notify action, including the notification
@@ -15223,670 +15931,6 @@ components:
       additionalProperties: false
       description: Configuration for a country-defined custom action. An event may
         include any number of these.
-    AdvancedSearchConfig:
-      type: object
-      properties:
-        title:
-          description: Advanced search tab title
-          $ref: "#/components/schemas/TranslationConfig"
-        fields:
-          type: array
-          items:
-            oneOf:
-              - type: object
-                properties:
-                  config:
-                    type: object
-                    properties:
-                      type:
-                        type: string
-                        enum:
-                          - fuzzy
-                          - exact
-                          - range
-                          - within
-                        description: Determines the search type of field. How to match value.
-                      searchFields:
-                        description: "
-
-                          \      Defines multiple form fields that should be
-                          searched when this field has a value.
-
-                          \      All specified fields will be combined using OR
-                          logic.
-
-
-                          \      Example: { searchFields: ['mother.name',
-                          'father.name', 'informant.name'] }
-
-                          \      Will search all fields and return a record if
-                          any of the fields match the search value.    \ 
-
-                          \      "
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - type
-                    additionalProperties: false
-                  type:
-                    description: "
-
-                      \      Explicitly specify the field type for searchFields.
-
-                      \      This is required when searchFields is defined, to
-                      show the correct control in the UI.
-
-                      \       \ 
-
-                      \      Example: FieldType.NAME for name fields,
-                      FieldType.TEXT for text fields, FieldType.DATE for date
-                      fields, etc.
-
-                      \      "
-                    type: string
-                    enum:
-                      - NAME
-                      - PHONE
-                      - ID
-                      - ADDRESS
-                      - TEXT
-                      - NUMBER
-                      - NUMBER_WITH_UNIT
-                      - TEXTAREA
-                      - EMAIL
-                      - DATE
-                      - AGE
-                      - DATE_RANGE
-                      - SELECT_DATE_RANGE
-                      - TIME
-                      - IMAGE_VIEW
-                      - PARAGRAPH
-                      - HEADING
-                      - PAGE_HEADER
-                      - RADIO_GROUP
-                      - FIELD_GROUP
-                      - FILE
-                      - FILE_WITH_OPTIONS
-                      - BULLET_LIST
-                      - CHECKBOX
-                      - SELECT
-                      - COUNTRY
-                      - LOCATION
-                      - DIVIDER
-                      - ADMINISTRATIVE_AREA
-                      - FACILITY
-                      - OFFICE
-                      - SIGNATURE
-                      - DATA
-                      - BUTTON
-                      - AUTOCOMPLETE
-                      - SEARCH
-                      - ALPHA_PRINT_BUTTON
-                      - HTTP
-                      - LINK_BUTTON
-                      - VERIFICATION_STATUS
-                      - QUERY_PARAM_READER
-                      - QR_READER
-                      - ID_READER
-                      - LOADER
-                      - ALPHA_HIDDEN
-                      - USER_ROLE
-                      - CUSTOM
-                  label:
-                    description: "
-
-                      \      Explicitly specify the label for searchFields.
-
-                      \      This is required when searchFields is
-                      defined.           \ 
-
-                      \      "
-                    $ref: "#/components/schemas/TranslationConfig"
-                  options:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        value:
-                          type: string
-                          description: The value of the option
-                        label:
-                          anyOf:
-                            - type: string
-                            - $ref: "#/components/schemas/TranslationConfig"
-                          description: The label of the option
-                        conditionals:
-                          default: []
-                          type: array
-                          items:
-                            $ref: "#/components/schemas/ActionConditional"
-                      required:
-                        - value
-                        - label
-                      additionalProperties: false
-                  searchCriteriaLabelPrefix:
-                    description: "
-
-                      \    This property determines whether to add a prefix
-                      (such as \"Child\" or \"Applicant\") before the field
-                      label
-
-                      \    when rendering search parameter labels — for example,
-                      in the search results page to indicate which fields were
-                      used in the search.
-
-
-                      \    For example, a field config like { id:
-                      \"child.name.firstname\", label: { defaultMessage: \"First
-                      Name(s)\" } } would render as \"First Name(s)\" by
-                      default.
-
-
-                      \    A field config like { id: \"mother.firstname\",
-                      label: { defaultMessage: \"First Name(s)\" } } would also
-                      render as \"First Name(s)\" by default.
-
-
-                      \    So, if both child.name.firstname and mother.firstname
-                      are used in a search, the resulting search criteria labels
-                      would be \"First Name(s)\", \"First Name(s)\",
-
-                      \    which is ambiguous.
-
-
-                      \    Now, if we treat the field ID prefix as a label
-                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
-                      field label is already
-
-                      \    descriptive — like { id: \"applicant.firstname\",
-                      label: { defaultMessage: \"Applicant's First Name\" } } —
-                      then the resulting
-
-                      \    label would be \"Applicant Applicant's First Name\",
-                      which is redundant and awkward.
-
-
-                      \    By setting searchCriteriaLabelPrefix to a translation
-                      config object, we can explicitly define the desired prefix
-
-                      \    in the country-config > event.advancedSearch
-                      configuration. For example: field(\"child.dob\", {
-                      searchCriteriaLabelPrefix: TranslationConfig }).
-
-                      \    "
-                    $ref: "#/components/schemas/TranslationConfig"
-                  conditionals:
-                    description: "
-
-                      \       In advanced search, we sometimes need to override
-                      the default field visibility conditionals.
-
-
-                      \       For example, Informant fields in the declaration
-                      form may have conditional logic
-
-                      \       that hides them based on other field values. Since
-                      the advanced search form reuses
-
-                      \       the declaration form config, those same
-                      conditionals would apply by default.
-
-
-                      \       However, in advanced search we often want to make
-                      all Informant fields searchable,
-
-                      \       regardless of their original visibility logic. To
-                      do this, we explicitly set their
-
-                      \       'conditionals' to an empty array ('[]') in the
-                      search config. This ensures they
-
-                      \       are always rendered in the advanced search form.
-
-                      \      "
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/FieldConditional"
-                  validations:
-                    description: Option for overriding the field validations specifically for
-                      advanced search form.
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ValidationConfig"
-                  allowedLocations:
-                    description: Override the allowedLocations for a location field in advanced
-                      search. Use this when the declaration form's
-                      allowedLocations references a scope (e.g. record.create)
-                      that search-only users don't have — specify record.search
-                      scope instead.
-                    type: object
-                    properties:
-                      $jurisdiction:
-                        anyOf:
-                          - type: string
-                            enum:
-                              - administrativeArea
-                              - location
-                              - all
-                            description: Filters based on user jurisdiction relative to their office
-                              location in hierarchy.
-                          - type: object
-                            properties:
-                              $scope:
-                                type: string
-                                enum:
-                                  - organisation.read-locations
-                                  - user.read
-                                  - user.create
-                                  - user.edit
-                                  - user.search
-                                  - record.search
-                                  - record.create
-                                  - record.read
-                                  - record.declare
-                                  - record.notify
-                                  - record.edit
-                                  - record.reject
-                                  - record.archive
-                                  - record.unarchive
-                                  - record.review-duplicates
-                                  - record.register
-                                  - record.print-certified-copies
-                                  - record.request-correction
-                                  - record.correct
-                                  - record.revoke-registration
-                                  - record.reinstate-registration
-                                  - record.unassign-others
-                                  - record.custom-action
-                                  - record.action.accept
-                                  - record.action.reject
-                                  - bypassratelimit
-                                  - record.reindex
-                                  - user.data-seeding
-                                  - integration.create
-                                  - integration.audit.read
-                                  - record.import
-                                  - config.update-all
-                                  - location.edit
-                                  - attachment.upload
-                                  - profile.electronic-signature
-                                  - user.read-only-my-audit
-                                  - performance.read
-                                  - performance.read-dashboards
-                                  - performance.vital-statistics-export
-                                  - workqueue
-                                  - dashboard.view
-                              $option:
-                                type: string
-                                enum:
-                                  - event
-                                  - placeOfEvent
-                                  - createdBy
-                                  - createdIn
-                                  - notifiedIn
-                                  - notifiedBy
-                                  - declaredIn
-                                  - declaredBy
-                                  - status
-                                  - registeredIn
-                                  - registeredBy
-                                  - flags
-                                  - accessLevel
-                                  - role
-                                  - ids
-                            required:
-                              - $scope
-                              - $option
-                            additionalProperties: false
-                    required:
-                      - $jurisdiction
-                    additionalProperties: false
-                  fieldId:
-                    type: string
-                  fieldType:
-                    type: string
-                    const: field
-                required:
-                  - config
-                  - fieldId
-                  - fieldType
-                additionalProperties: false
-              - type: object
-                properties:
-                  config:
-                    type: object
-                    properties:
-                      type:
-                        type: string
-                        enum:
-                          - fuzzy
-                          - exact
-                          - range
-                          - within
-                        description: Determines the search type of field. How to match value.
-                      searchFields:
-                        description: "
-
-                          \      Defines multiple form fields that should be
-                          searched when this field has a value.
-
-                          \      All specified fields will be combined using OR
-                          logic.
-
-
-                          \      Example: { searchFields: ['mother.name',
-                          'father.name', 'informant.name'] }
-
-                          \      Will search all fields and return a record if
-                          any of the fields match the search value.    \ 
-
-                          \      "
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - type
-                    additionalProperties: false
-                  type:
-                    description: "
-
-                      \      Explicitly specify the field type for searchFields.
-
-                      \      This is required when searchFields is defined, to
-                      show the correct control in the UI.
-
-                      \       \ 
-
-                      \      Example: FieldType.NAME for name fields,
-                      FieldType.TEXT for text fields, FieldType.DATE for date
-                      fields, etc.
-
-                      \      "
-                    type: string
-                    enum:
-                      - NAME
-                      - PHONE
-                      - ID
-                      - ADDRESS
-                      - TEXT
-                      - NUMBER
-                      - NUMBER_WITH_UNIT
-                      - TEXTAREA
-                      - EMAIL
-                      - DATE
-                      - AGE
-                      - DATE_RANGE
-                      - SELECT_DATE_RANGE
-                      - TIME
-                      - IMAGE_VIEW
-                      - PARAGRAPH
-                      - HEADING
-                      - PAGE_HEADER
-                      - RADIO_GROUP
-                      - FIELD_GROUP
-                      - FILE
-                      - FILE_WITH_OPTIONS
-                      - BULLET_LIST
-                      - CHECKBOX
-                      - SELECT
-                      - COUNTRY
-                      - LOCATION
-                      - DIVIDER
-                      - ADMINISTRATIVE_AREA
-                      - FACILITY
-                      - OFFICE
-                      - SIGNATURE
-                      - DATA
-                      - BUTTON
-                      - AUTOCOMPLETE
-                      - SEARCH
-                      - ALPHA_PRINT_BUTTON
-                      - HTTP
-                      - LINK_BUTTON
-                      - VERIFICATION_STATUS
-                      - QUERY_PARAM_READER
-                      - QR_READER
-                      - ID_READER
-                      - LOADER
-                      - ALPHA_HIDDEN
-                      - USER_ROLE
-                      - CUSTOM
-                  label:
-                    description: "
-
-                      \      Explicitly specify the label for searchFields.
-
-                      \      This is required when searchFields is
-                      defined.           \ 
-
-                      \      "
-                    $ref: "#/components/schemas/TranslationConfig"
-                  options:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        value:
-                          type: string
-                          description: The value of the option
-                        label:
-                          anyOf:
-                            - type: string
-                            - $ref: "#/components/schemas/TranslationConfig"
-                          description: The label of the option
-                        conditionals:
-                          default: []
-                          type: array
-                          items:
-                            $ref: "#/components/schemas/ActionConditional"
-                      required:
-                        - value
-                        - label
-                      additionalProperties: false
-                  searchCriteriaLabelPrefix:
-                    description: "
-
-                      \    This property determines whether to add a prefix
-                      (such as \"Child\" or \"Applicant\") before the field
-                      label
-
-                      \    when rendering search parameter labels — for example,
-                      in the search results page to indicate which fields were
-                      used in the search.
-
-
-                      \    For example, a field config like { id:
-                      \"child.name.firstname\", label: { defaultMessage: \"First
-                      Name(s)\" } } would render as \"First Name(s)\" by
-                      default.
-
-
-                      \    A field config like { id: \"mother.firstname\",
-                      label: { defaultMessage: \"First Name(s)\" } } would also
-                      render as \"First Name(s)\" by default.
-
-
-                      \    So, if both child.name.firstname and mother.firstname
-                      are used in a search, the resulting search criteria labels
-                      would be \"First Name(s)\", \"First Name(s)\",
-
-                      \    which is ambiguous.
-
-
-                      \    Now, if we treat the field ID prefix as a label
-                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
-                      field label is already
-
-                      \    descriptive — like { id: \"applicant.firstname\",
-                      label: { defaultMessage: \"Applicant's First Name\" } } —
-                      then the resulting
-
-                      \    label would be \"Applicant Applicant's First Name\",
-                      which is redundant and awkward.
-
-
-                      \    By setting searchCriteriaLabelPrefix to a translation
-                      config object, we can explicitly define the desired prefix
-
-                      \    in the country-config > event.advancedSearch
-                      configuration. For example: field(\"child.dob\", {
-                      searchCriteriaLabelPrefix: TranslationConfig }).
-
-                      \    "
-                    $ref: "#/components/schemas/TranslationConfig"
-                  conditionals:
-                    description: "
-
-                      \       In advanced search, we sometimes need to override
-                      the default field visibility conditionals.
-
-
-                      \       For example, Informant fields in the declaration
-                      form may have conditional logic
-
-                      \       that hides them based on other field values. Since
-                      the advanced search form reuses
-
-                      \       the declaration form config, those same
-                      conditionals would apply by default.
-
-
-                      \       However, in advanced search we often want to make
-                      all Informant fields searchable,
-
-                      \       regardless of their original visibility logic. To
-                      do this, we explicitly set their
-
-                      \       'conditionals' to an empty array ('[]') in the
-                      search config. This ensures they
-
-                      \       are always rendered in the advanced search form.
-
-                      \      "
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/FieldConditional"
-                  validations:
-                    description: Option for overriding the field validations specifically for
-                      advanced search form.
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ValidationConfig"
-                  allowedLocations:
-                    description: Override the allowedLocations for a location field in advanced
-                      search. Use this when the declaration form's
-                      allowedLocations references a scope (e.g. record.create)
-                      that search-only users don't have — specify record.search
-                      scope instead.
-                    type: object
-                    properties:
-                      $jurisdiction:
-                        anyOf:
-                          - type: string
-                            enum:
-                              - administrativeArea
-                              - location
-                              - all
-                            description: Filters based on user jurisdiction relative to their office
-                              location in hierarchy.
-                          - type: object
-                            properties:
-                              $scope:
-                                type: string
-                                enum:
-                                  - organisation.read-locations
-                                  - user.read
-                                  - user.create
-                                  - user.edit
-                                  - user.search
-                                  - record.search
-                                  - record.create
-                                  - record.read
-                                  - record.declare
-                                  - record.notify
-                                  - record.edit
-                                  - record.reject
-                                  - record.archive
-                                  - record.unarchive
-                                  - record.review-duplicates
-                                  - record.register
-                                  - record.print-certified-copies
-                                  - record.request-correction
-                                  - record.correct
-                                  - record.revoke-registration
-                                  - record.reinstate-registration
-                                  - record.unassign-others
-                                  - record.custom-action
-                                  - record.action.accept
-                                  - record.action.reject
-                                  - bypassratelimit
-                                  - record.reindex
-                                  - user.data-seeding
-                                  - integration.create
-                                  - integration.audit.read
-                                  - record.import
-                                  - config.update-all
-                                  - location.edit
-                                  - attachment.upload
-                                  - profile.electronic-signature
-                                  - user.read-only-my-audit
-                                  - performance.read
-                                  - performance.read-dashboards
-                                  - performance.vital-statistics-export
-                                  - workqueue
-                                  - dashboard.view
-                              $option:
-                                type: string
-                                enum:
-                                  - event
-                                  - placeOfEvent
-                                  - createdBy
-                                  - createdIn
-                                  - notifiedIn
-                                  - notifiedBy
-                                  - declaredIn
-                                  - declaredBy
-                                  - status
-                                  - registeredIn
-                                  - registeredBy
-                                  - flags
-                                  - accessLevel
-                                  - role
-                                  - ids
-                            required:
-                              - $scope
-                              - $option
-                            additionalProperties: false
-                    required:
-                      - $jurisdiction
-                    additionalProperties: false
-                  fieldId:
-                    type: string
-                    enum:
-                      - event.trackingId
-                      - event.status
-                      - event.legalStatuses.REGISTERED.acceptedAt
-                      - event.legalStatuses.REGISTERED.createdAtLocation
-                      - event.legalStatuses.REGISTERED.registrationNumber
-                      - event.updatedAt
-                  fieldType:
-                    type: string
-                    const: event
-                required:
-                  - config
-                  - fieldId
-                  - fieldType
-                additionalProperties: false
-            type: object
-          description: Advanced search fields within the tab.
-      required:
-        - title
-        - fields
-      additionalProperties: false
-      description: Configuration of one advanced search tab. Each tab has a title and
-        a list of searchable fields — either declaration fields (via `field()`)
-        or event metadata (via `event()`).
     FlagConfig:
       type: object
       properties:
@@ -16018,6 +16062,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -16025,6 +16074,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
       additionalProperties: false
     ActionDocumentOutput:
       oneOf:
