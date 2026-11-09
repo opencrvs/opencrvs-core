@@ -105,17 +105,13 @@ async function deleteEventAttachments(
   }
 }
 
-export async function throwConflictIfActionNotAllowed(
-  eventId: UUID,
-  actionType: ActionType,
-  token: TokenWithBearer
+/** Throws tRPC HTTP 409 if the action is not available for the event in its current state. */
+function throwConflictIfActionNotAvailable(
+  event: EventDocument,
+  configuration: EventConfig,
+  actionType: ActionType
 ) {
-  const event = await getEventById(eventId)
-  const eventConfig = await getEventConfigurationById({
-    eventType: event.type,
-    token
-  })
-  const eventIndex = getCurrentEventState(event, eventConfig)
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const allowedActions: DisplayableAction[] =
     getAvailableActionsForEvent(eventIndex)
@@ -126,6 +122,19 @@ export async function throwConflictIfActionNotAllowed(
       message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
     })
   }
+}
+
+export async function throwConflictIfActionNotAllowed(
+  eventId: UUID,
+  actionType: ActionType,
+  token: TokenWithBearer
+) {
+  const event = await getEventById(eventId)
+  const eventConfig = await getEventConfigurationById({
+    eventType: event.type,
+    token
+  })
+  throwConflictIfActionNotAvailable(event, eventConfig, actionType)
 }
 
 export async function deleteEvent(
@@ -287,6 +296,94 @@ export function buildAction(
   }
 }
 
+/** Throws tRPC HTTP 400 if a file in the action declaration is not in the document store. */
+async function throwIfFilesNotFound(
+  input: ActionInputWithType,
+  configuration: EventConfig,
+  token: TokenWithBearer
+) {
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getDeclarationFields(configuration)
+  const fileValuesInCurrentAction = extractFileValues(
+    input.declaration,
+    fieldConfigs
+  )
+
+  for (const file of fileValuesInCurrentAction) {
+    if (!(await fileExists(file.file.path, token))) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File not found: ${file.file.path}`
+      })
+    }
+  }
+}
+
+/**
+ * Stores the requested action of an action request.
+ *
+ * An event has at most one requested action without an outcome: the action is stored only
+ * if it is available for the event, and an action is not available while another one is
+ * requested. The check and the insert run under a row lock on the event, so two requests
+ * that arrive together cannot both pass the check.
+ *
+ * A request that already stored its requested action (a retry after a failed confirmation,
+ * with the same transaction id) is not checked again and stores nothing new.
+ *
+ * @returns The updated event document with the requested action included.
+ */
+export async function addRequestedAction(
+  input: ActionInputWithType,
+  {
+    user,
+    token,
+    configuration
+  }: {
+    user: TrpcUserContext
+    token: TokenWithBearer
+    configuration: EventConfig
+  }
+): Promise<EventDocument> {
+  await throwIfFilesNotFound(input, configuration, token)
+
+  try {
+    await eventsRepo.createActionExclusively(
+      buildAction(input, ActionStatus.Requested, user),
+      (event) => {
+        const isRetry = event.actions.some(
+          (action) =>
+            action.status === ActionStatus.Requested &&
+            action.transactionId === input.transactionId &&
+            action.type === input.type
+        )
+
+        if (!isRetry) {
+          throwConflictIfActionNotAvailable(event, configuration, input.type)
+        }
+      }
+    )
+  } catch (error) {
+    if (error instanceof NoResultError) {
+      throw new EventNotFoundError(input.eventId)
+    }
+    // lock_not_available: another request kept the event locked for longer than the timeout
+    if ((error as { code?: string }).code === '55P03') {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: `Action '${input.type}' cannot be requested while another action request on the event is in progress`
+      })
+    }
+    throw error
+  }
+
+  const updatedEvent = await getEventById(input.eventId)
+
+  await draftsRepo.deleteDraftsByEventId(input.eventId)
+  await cleanupUnreferencedFiles(updatedEvent, token)
+
+  return updatedEvent
+}
+
 /**
  * Persists a new action for an event in the database.
  *
@@ -317,21 +414,7 @@ export async function addAction(
   }
 ): Promise<EventDocument> {
   const eventId = event.id
-  // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getDeclarationFields(configuration)
-  const fileValuesInCurrentAction = extractFileValues(
-    input.declaration,
-    fieldConfigs
-  )
-
-  for (const file of fileValuesInCurrentAction) {
-    if (!(await fileExists(file.file.path, token))) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: `File not found: ${file.file.path}`
-      })
-    }
-  }
+  await throwIfFilesNotFound(input, configuration, token)
 
   await eventsRepo.createAction(buildAction(input, status, user))
 
