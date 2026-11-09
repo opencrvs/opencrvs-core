@@ -259,6 +259,8 @@ export function getCleanedDeclarationDiff({
   // The form state can hold values for fields that are not in the submitted form,
   // e.g. a declaration-only field listening to a field the notification form shares.
   // The server rejects such fields, so they are dropped.
+  // Fields that are in the form but hidden are dropped below by omitHiddenPaginatedFields.
+  // That function keeps values of fields that are not in the form, so it cannot drop them.
   const formFieldIds = new Set(
     form.pages.flatMap((page) => page.fields.map((field) => field.id))
   )
