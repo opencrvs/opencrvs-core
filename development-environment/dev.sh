@@ -167,6 +167,24 @@ function ensure_secrets() {
   fi
 }
 
+# The git hooks are in .husky/. Git runs them only when core.hooksPath points
+# there. setup.sh set this value before, and this function sets it now. The
+# local git config is shared by all worktrees, so one call covers every
+# checkout. A value that a developer set is not changed.
+function ensure_git_hooks() {
+  git -C "$PROJECT_ROOT" rev-parse --git-dir >/dev/null 2>&1 || return 0
+
+  local current
+  current=$(git -C "$PROJECT_ROOT" config --get core.hooksPath || true)
+
+  if [ -z "$current" ]; then
+    git -C "$PROJECT_ROOT" config --local core.hooksPath .husky/
+    echo "Git hooks enabled: core.hooksPath is set to .husky/"
+  elif [ "$current" != ".husky/" ] && [ "$current" != ".husky" ]; then
+    echo "Warning: core.hooksPath is '$current', so the hooks in .husky/ do not run." >&2
+  fi
+}
+
 # `resolve` prints this environment's whole contract as `export VAR='value'`
 # lines on stdout (warnings go to stderr), so it is safe to eval. Sourcing it is
 # shared with every other script that needs the contract — see
@@ -232,6 +250,7 @@ if [ ! -f "$PROJECT_ROOT/.secrets/core-request-signing-key.pem" ]; then
 fi
 
 if $dependencies; then
+  ensure_git_hooks
   start_dependencies
   wait_for_dependencies
   echo
@@ -239,6 +258,7 @@ if $dependencies; then
   exit 0
 elif $services; then
   wait_for_dependencies
+  ensure_git_hooks
   ensure_secrets
   resolve_environment
   ensure_service_data_dirs
@@ -272,6 +292,7 @@ fi
 
 start_dependencies
 wait_for_dependencies
+ensure_git_hooks
 ensure_secrets
 resolve_environment
 ensure_service_data_dirs
