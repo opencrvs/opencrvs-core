@@ -191,6 +191,12 @@ paths:
                       format: uuid
                       pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     - type: "null"
+                configVersionId:
+                  description: Id of the event configuration version the client created the record
+                    under, e.g. while offline. Must be configured and not take
+                    effect in the future. Defaults to the version in effect when
+                    the server receives the record.
+                  type: string
               required:
                 - transactionId
                 - type
@@ -2693,7 +2699,7 @@ components:
             additionalProperties: false
           description: Versions of the event configuration, each effective from its
             `effectiveFrom`. An event configured without versions has a single
-            version, with id 'default' and `effectiveFrom` '0001-01-01'.
+            version, with id 'initial' and `effectiveFrom` '0001-01-01'.
       required:
         - id
         - label
@@ -14651,9 +14657,8 @@ components:
         - notificationForm
         - review
       additionalProperties: false
-      description: Configuration for the notify action, including the notification
-        form and its review page. When undefined, it is generated using the
-        DeclareActionConfig.
+      description: "Configuration for the notify action: the notification form and its
+        review page. An event without a NOTIFY action cannot be notified."
     DeclarationFormConfig:
       type: object
       properties:
@@ -15761,6 +15766,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -15768,6 +15778,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
       additionalProperties: false
     ActionDocument:
       oneOf:
@@ -17949,6 +17960,10 @@ components:
         type:
           type: string
           description: The type of event, such as birth, death, or marriage.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Records created before versioning have 'initial'.
         status:
           type: string
           enum:
@@ -19043,6 +19058,7 @@ components:
       required:
         - id
         - type
+        - configVersionId
         - status
         - legalStatuses
         - createdAt
