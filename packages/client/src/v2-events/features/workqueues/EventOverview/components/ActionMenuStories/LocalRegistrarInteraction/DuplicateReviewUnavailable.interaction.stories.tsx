@@ -18,12 +18,14 @@ import {
   createPrng,
   EventDocument,
   generateActionDocument,
+  generateActionDocuments,
   generateTrackingId,
   getCurrentEventState,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { potentialDuplicatesQueryKey } from '@client/v2-events/features/events/actions/dedup/getDuplicates'
@@ -50,7 +52,7 @@ const createAction = generateActionDocument({
   defaults: { createdBy: localRegistrar.v2.id }
 })
 
-const declareAction = generateActionDocument({
+const declareActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: { createdBy: localRegistrar.v2.id }
@@ -81,9 +83,15 @@ const eventUnderReview: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: eventId,
   trackingId,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: new Date(Date.now() - 1000).toISOString(),
   updatedAt: new Date(Date.now() - 1000).toISOString(),
-  actions: [createAction, declareAction, duplicateDetectedAction, assignAction]
+  actions: [
+    createAction,
+    ...declareActionPair,
+    duplicateDetectedAction,
+    assignAction
+  ]
 }
 
 /** The matched record — within jurisdiction, but slow to resolve via `getDuplicates`. */
@@ -91,6 +99,7 @@ const matchedEvent: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: duplicateId,
   trackingId: duplicateTrackingId,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: new Date(Date.now() - 2000).toISOString(),
   updatedAt: new Date(Date.now() - 2000).toISOString(),
   actions: [
@@ -98,7 +107,7 @@ const matchedEvent: EventDocument = {
       configuration: tennisClubMembershipEvent,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE
     })

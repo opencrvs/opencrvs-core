@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 

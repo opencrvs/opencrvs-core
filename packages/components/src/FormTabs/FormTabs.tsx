@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import { Tab, Tabs } from './components/Tabs'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 import { Text } from '../Text'
 import { Stack } from '../Stack'
 

@@ -9,18 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  tennisClubMembershipEvent,
   EventDocument,
-  EventIndex
+  EventIndex,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import {
   addLocalEventConfig,
   deleteLocalEvent,
-  setEventData,
+  findLocalEventConfig,
+  findLocalEventIndex,
+  seedLocalEventIndex,
   updateLocalEventIndex
 } from './api'
+import { byIdSearchKey, taggedKey } from './procedures/search'
 
 describe('deleteLocalEvent', () => {
   const eventDocument = tennisClubMembershipEventDocument
@@ -31,53 +34,52 @@ describe('deleteLocalEvent', () => {
       keys: vi.fn().mockResolvedValue([])
     } as unknown as CacheStorage
     queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
   })
 
   afterAll(() => {
     queryClient.clear()
   })
 
-  it('clears event.get cache entry', async () => {
+  it('clears the event document and its by-id search entry', async () => {
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id }),
       eventDocument
     )
-
-    setEventData(eventDocument.id, eventDocument)
+    queryClient.setQueryData(byIdSearchKey(id), {
+      results: [{ id } as EventIndex],
+      total: 1
+    })
 
     await deleteLocalEvent(eventDocument)
 
     expect(
       queryClient.getQueryData(
-        trpcOptionsProxy.event.search.queryKey({
-          query: {
-            type: 'and',
-            clauses: [{ id }]
-          }
-        })
+        trpcOptionsProxy.event.get.queryKey({ eventId: id })
       )
     ).toBeUndefined()
+    expect(queryClient.getQueryData(byIdSearchKey(id))).toBeUndefined()
   })
 })
 
 describe('updateLocalEventIndex', () => {
   beforeEach(() => {
     queryClient.clear()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
   })
 
   afterAll(() => {
     queryClient.clear()
   })
 
-  it('preserves total count in cached queries after update', () => {
+  it('updates the row in a tagged workqueue entry and preserves its total', () => {
     const eventDocument = tennisClubMembershipEventDocument
 
     // Prepare a cached query simulating a workqueue result
-    const queryKey = trpcOptionsProxy.event.search.queryKey({
-      query: { type: 'and', clauses: [{ status: 'PENDING' }] }
-    })
+    const queryKey = taggedKey(
+      { query: { type: 'and', clauses: [{ status: 'PENDING' }] } },
+      ['workqueue', 'recent']
+    )
 
     queryClient.setQueryData(queryKey, {
       total: 13,
@@ -109,5 +111,39 @@ describe('updateLocalEventIndex', () => {
       'REGISTERED'
     )
     expect(updated?.results.find((r) => r.id === 'abc')?.status).toBe('PENDING')
+  })
+})
+
+describe('findLocalEventConfig', () => {
+  const eventDocument = tennisClubMembershipEventDocument
+
+  beforeEach(() => {
+    queryClient.clear()
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
+  })
+
+  afterAll(() => {
+    queryClient.clear()
+  })
+
+  it("finds the cached configuration of the record's version", () => {
+    expect(findLocalEventConfig(eventDocument)).toMatchObject({
+      id: eventDocument.type
+    })
+  })
+
+  it("is undefined when the record's version is not cached", () => {
+    expect(
+      findLocalEventConfig({ ...eventDocument, configVersionId: 'v9' })
+    ).toBeUndefined()
+  })
+
+  it('leaves the record unseeded when its version is not cached', () => {
+    seedLocalEventIndex(eventDocument.id, {
+      ...eventDocument,
+      configVersionId: 'v9'
+    })
+
+    expect(findLocalEventIndex(eventDocument.id)).toBeUndefined()
   })
 })

@@ -14,7 +14,7 @@ import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
 import { getServiceToken } from './service/auth'
-import { getInMemoryEventConfigurations } from './service/config/config'
+import { getInMemoryVersionedEventConfigurations } from './service/config/config'
 import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
@@ -32,7 +32,7 @@ export async function main() {
   try {
     await ensureConnection()
     const serviceToken = await getServiceToken()
-    const configurations = await getInMemoryEventConfigurations(
+    const configurations = await getInMemoryVersionedEventConfigurations(
       `Bearer ${serviceToken}`
     )
     for (const configuration of configurations) {

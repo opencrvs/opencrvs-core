@@ -11,7 +11,6 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import {
   ActionType,
-  QueryType,
   SearchQuery,
   UUID,
   getCurrentEventState,
@@ -34,6 +33,11 @@ import { useEventCustomAction } from './procedures/actions/customAction'
 import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
+import {
+  byIdSearchOptions,
+  taggedSearchOptions,
+  SearchCacheTag
+} from './procedures/search'
 
 function getEventWithDraftOrThrow(
   id: string,
@@ -73,6 +77,16 @@ export function useEvents() {
   const eventConfigs = useEventConfigurations()
   const { useRemoteDraftByEventId } = useDrafts()
 
+  /** The result for a record the server has not indexed yet, from its draft. */
+  function buildDraftedResult(id: string, maybeDraft: Draft | undefined) {
+    const { event, draft, configuration } = getEventWithDraftOrThrow(
+      id,
+      eventConfigs,
+      maybeDraft
+    )
+    return buildDraftedEventResult(event, draft, configuration)
+  }
+
   return {
     useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
@@ -85,11 +99,11 @@ export function useEvents() {
     searchEvent: {
       useQuery: (
         query: SearchQuery,
+        tag: SearchCacheTag,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useQuery({
-          ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
+          ...taggedSearchOptions(query, tag),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -97,11 +111,11 @@ export function useEvents() {
       },
       useSuspenseQuery: (
         query: SearchQuery,
+        tag: SearchCacheTag,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useSuspenseQuery({
-          ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
+          ...taggedSearchOptions(query, tag),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -110,41 +124,13 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
-        const query = {
-          type: 'and',
-          clauses: [{ id }]
-        } satisfies QueryType
-
         const maybeDraft = useRemoteDraftByEventId(id)
-        const options = trpc.event.search.queryOptions({ query })
 
         return useQuery({
-          ...options,
-          queryKey: trpc.event.search.queryKey({ query }),
+          ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
           enabled: !findLocalEventIndex(id),
-          staleTime: 0,
           refetchOnMount: 'always',
-          queryFn: async (...args) => {
-            // Try Elasticsearch first
-            const queryFn = options.queryFn
-            if (!queryFn) {
-              throw new Error('Query function is not defined')
-            }
-
-            const res = await queryFn(...args)
-            if (res.total > 0) {
-              return res
-            }
-
-            // Search for locally created events if record is not found in ES
-            const { event, draft, configuration } = getEventWithDraftOrThrow(
-              id,
-              eventConfigs,
-              maybeDraft
-            )
-
-            return buildDraftedEventResult(event, draft, configuration)
-          },
+          staleTime: 0,
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? { results: [eventIndex], total: 1 } : undefined
@@ -152,37 +138,12 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
-        const query = {
-          type: 'and',
-          clauses: [{ id }]
-        } satisfies QueryType
-
-        const options = trpc.event.search.queryOptions({ query })
         const maybeDraft = useRemoteDraftByEventId(id)
 
         return useSuspenseQuery({
-          ...options,
-          queryKey: trpc.event.search.queryKey({ query }),
-          queryFn: async (...args) => {
-            // Try Elasticsearch first
-            const queryFn = options.queryFn
-            if (!queryFn) {
-              throw new Error('Query function is not defined')
-            }
-            const res = await queryFn(...args)
-            if (res.total > 0) {
-              return res
-            }
-
-            // Search for locally created events if record is not found in ES
-            const { event, draft, configuration } = getEventWithDraftOrThrow(
-              id,
-              eventConfigs,
-              maybeDraft
-            )
-
-            return buildDraftedEventResult(event, draft, configuration)
-          },
+          ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
+          refetchOnMount: 'always',
+          staleTime: 0,
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? { results: [eventIndex], total: 1 } : undefined

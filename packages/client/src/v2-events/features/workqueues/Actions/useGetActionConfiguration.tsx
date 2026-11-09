@@ -9,11 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useMemo } from 'react'
-import {
-  ActionType,
-  EventIndex,
-  WorkqueueActionType
-} from '@opencrvs/commons/client'
+import { ActionType, EventIndex } from '@opencrvs/commons/client'
+import { WorkqueueCtaType } from './utils'
 import {
   useAssignmentActionConfigurationResolver,
   useEventActionConfigurationResolver
@@ -32,7 +29,7 @@ import { useCustomActionConfigs } from './useCustomActionConfigs'
  */
 export function useGetWorkqueueActionConfiguration(
   event: EventIndex,
-  actionType: WorkqueueActionType
+  actionType: WorkqueueCtaType
 ) {
   const { resolveAction } = useEventActionConfigurationResolver(event)
 

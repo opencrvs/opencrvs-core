@@ -10,8 +10,7 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { List } from '@opencrvs/components/lib/List'
-import { Content } from '@opencrvs/components/lib/Content'
+import { List, Content } from '@opencrvs/components'
 import { userMessages as messages } from '@client/i18n/messages'
 import {
   useAssignedOffice,

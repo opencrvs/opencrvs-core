@@ -23,7 +23,9 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
   TestUserRole,
-  UUID
+  UUID,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -560,7 +562,7 @@ const mswConfig = {
   handlers: {
     events: [
       tRPCMsw.event.config.get.query(() => {
-        return [tennisClubMembershipEvent]
+        return [versionedTennisClubMembershipEvent]
       })
     ],
     user: [
@@ -807,8 +809,8 @@ const backToPersistenceMsw = {
   handlers: {
     events: [
       tRPCMsw.event.config.get.query(() => [
-        tennisClubMembershipEvent,
-        footballClubMembershipEvent
+        versionedTennisClubMembershipEvent,
+        versionedFootballClubMembershipEvent
       ]),
       tRPCMsw.event.search.query(() => ({
         results: [registeredEventIndex],

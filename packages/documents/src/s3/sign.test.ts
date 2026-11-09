@@ -8,14 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ensureDefaultBucket, putObject } from '@documents/s3/client'
 import { env, S3_PRESIGNED_URL_EXPIRY_IN_SECOND } from '@documents/s3/constants'
 import { signFileUrl } from '@documents/s3/sign'
 
 /*
  * Signing is local: it needs no store, only the credentials and the address
- * that browsers will use. So these tests run the real SDK.
+ * that browsers will use. Only the first test opens a URL, against the RustFS
+ * that test/global-setup.ts starts.
  */
 describe('signFileUrl', () => {
+  it('signs a URL that opens the object in the store', async () => {
+    await ensureDefaultBucket()
+    await putObject('events/e1/my photo+1.png', Buffer.from('content'), {
+      contentType: 'image/png'
+    })
+
+    const res = await fetch(await signFileUrl('events/e1/my photo+1.png'))
+
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toBe('image/png')
+    expect(await res.text()).toBe('content')
+  })
+
   it('signs a path-style URL for the public address', async () => {
     const url = new URL(await signFileUrl('events/e1/a.png'))
 

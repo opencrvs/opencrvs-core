@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from '../events/EventConfig'
 import { validate, compileClientFunction } from './validate'
 import {
   user,
@@ -31,6 +32,7 @@ import { event } from '../events/event'
 import { EncodedScope, TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 import { EventStatus, InherentFlags } from '../client'
+import { getEventWithCompleteAcceptedActions } from '../events/utils'
 
 /* eslint-disable max-lines */
 const DEFAULT_FORM = {
@@ -1119,6 +1121,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1156,6 +1159,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1260,6 +1264,145 @@ describe('"event" conditionals', () => {
           baseEvent
         )
       ).toBe(false)
+    })
+
+    it('counts a Requested and Accepted pair as a single action', () => {
+      const [acceptedPrint] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...acceptedPrint,
+        id: 'a0' as UUID,
+        status: ActionStatus.Requested
+      }
+      const eventWithOnePrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            requestedPrint,
+            { ...acceptedPrint, originalActionId: requestedPrint.id }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(2),
+          eventWithOnePrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+          eventWithOnePrint
+        )
+      ).toBe(true)
+    })
+
+    it('does not count pending or rejected actions', () => {
+      const [print] = baseEvent.$event.actions
+      const eventWithoutAcceptedPrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            { ...print, status: ActionStatus.Requested },
+            { ...print, id: 'a2' as UUID, status: ActionStatus.Rejected }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(1),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+    })
+
+    describe('given a print confirmed by country config', () => {
+      const [print] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...print,
+        id: 'r1' as UUID,
+        status: ActionStatus.Requested,
+        annotation: { 'collector.type': 'MOTHER' }
+      }
+      // A sync confirmation keeps the request input without its annotation.
+      const { annotation: _annotation, ...syncAcceptedPrint } = {
+        ...requestedPrint,
+        id: 'a3' as UUID,
+        status: ActionStatus.Accepted,
+        originalActionId: requestedPrint.id
+      }
+      // An async `accept` holds only what country config sent, created by the
+      // system user.
+      const asyncAcceptedPrint = {
+        id: 'a4' as UUID,
+        type: ActionType.PRINT_CERTIFICATE,
+        status: ActionStatus.Accepted,
+        originalActionId: requestedPrint.id,
+        createdAt: now,
+        transactionId: 'tx1',
+        createdByUserType: TokenUserType.enum.system,
+        createdBy: 'country-config',
+        createdAtLocation: 'loc1' as UUID,
+        declaration: {}
+      }
+      const printedOnce = (fields: Record<string, unknown>) =>
+        event
+          .hasAction(ActionType.PRINT_CERTIFICATE)
+          .withFields(fields)
+          .minCount(1)
+
+      it.each([
+        ['sync', syncAcceptedPrint],
+        ['async', asyncAcceptedPrint]
+      ])(
+        "matches the request's template, user and annotation once %s-confirmed",
+        (_, acceptedPrint) => {
+          const params = {
+            ...baseEvent,
+            $event: getEventWithCompleteAcceptedActions({
+              ...baseEvent.$event,
+              actions: [requestedPrint, acceptedPrint]
+            })
+          }
+
+          expect(
+            validate(
+              event
+                .hasAction(ActionType.PRINT_CERTIFICATE)
+                .withTemplate('TEMPLATE_1')
+                .minCount(1),
+              params
+            )
+          ).toBe(true)
+          expect(validate(printedOnce({ createdBy: 'user1' }), params)).toBe(
+            true
+          )
+          expect(
+            validate(printedOnce({ createdByRole: 'role1' }), params)
+          ).toBe(true)
+          expect(
+            validate(
+              printedOnce({ annotation: { 'collector.type': 'MOTHER' } }),
+              params
+            )
+          ).toBe(true)
+          expect(
+            validate(
+              event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+              params
+            )
+          ).toBe(true)
+        }
+      )
     })
   })
 })

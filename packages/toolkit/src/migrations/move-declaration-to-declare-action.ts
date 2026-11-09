@@ -45,104 +45,27 @@ import {
   PropertyAssignment,
   ShorthandPropertyAssignment,
   SourceFile,
-  SyntaxKind,
-  Type
+  SyntaxKind
 } from 'ts-morph'
 import path from 'path'
+import {
+  applyTextEdits,
+  findProperty,
+  indentationOf,
+  insertAt,
+  isOnlyComments,
+  isToolkitDefineConfigCall,
+  layoutOf,
+  location,
+  mayBeAction,
+  restOfLine,
+  TextEdit
+} from './utils'
 
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const DECLARATION_PROPERTY_NAME = 'declaration'
 const ACTIONS_PROPERTY_NAME = 'actions'
 const DECLARE_ACTION_TYPE = 'DECLARE'
-
-function location(node: Node) {
-  const relPath = path.relative(
-    process.cwd(),
-    node.getSourceFile().getFilePath()
-  )
-  return `${relPath}:${node.getStartLineNumber()}`
-}
-
-/**
- * Returns true if the call is to the `defineConfig` published by the toolkit,
- * as opposed to a function of the same name declared in the country config.
- */
-function isToolkitDefineConfigCall(call: CallExpression) {
-  const symbol = call.getExpression().getSymbol()
-  const resolved = symbol?.getAliasedSymbol() ?? symbol
-
-  if (resolved?.getName() !== DEFINE_CONFIG_NAME) {
-    return false
-  }
-
-  return resolved
-    .getDeclarations()
-    .some((declaration) => declaration.getSourceFile().isDeclarationFile())
-}
-
-/** Finds a property given by name, whether written `key: value` or shorthand. */
-function findProperty(literal: ObjectLiteralExpression, name: string) {
-  const property = literal.getProperty(name)
-
-  return Node.isPropertyAssignment(property) ||
-    Node.isShorthandPropertyAssignment(property)
-    ? property
-    : undefined
-}
-
-/**
- * Returns false only if the action type's `type` is known to be some other
- * action: a string literal, or a union of them, other than DECLARE.
- */
-function mayHaveDeclareType(actionType: Type, node: Node) {
-  const typeProperty = actionType.getProperty('type')
-
-  if (!typeProperty) {
-    return true
-  }
-
-  const type = typeProperty.getTypeAtLocation(node)
-  const values = type.isUnion() ? type.getUnionTypes() : [type]
-
-  return !values.every(
-    (value) =>
-      value.isStringLiteral() && value.getLiteralValue() !== DECLARE_ACTION_TYPE
-  )
-}
-
-/**
- * Returns true if the node may be the DECLARE action. An action not written
- * inline (a variable, a call, a spread) may be, unless its type shows it is
- * some other action.
- */
-function mayBeDeclareAction(node: Node) {
-  if (Node.isObjectLiteralExpression(node)) {
-    return isDeclareAction(node)
-  }
-
-  if (Node.isSpreadElement(node)) {
-    const arrayType = node.getExpression().getType()
-    const elementTypes = arrayType.isTuple()
-      ? arrayType.getTupleElements()
-      : [arrayType.getArrayElementType()]
-
-    return elementTypes.some(
-      (elementType) => !elementType || mayHaveDeclareType(elementType, node)
-    )
-  }
-
-  return mayHaveDeclareType(node.getType(), node)
-}
-
-function isDeclareAction(literal: ObjectLiteralExpression) {
-  const type = findProperty(literal, 'type')
-
-  return (
-    Node.isPropertyAssignment(type) &&
-    type.getInitializerOrThrow().getType().getLiteralValue() ===
-      DECLARE_ACTION_TYPE
-  )
-}
 
 /**
  * Finds the DECLARE action in `actions`, or logs why the config cannot be
@@ -161,7 +84,9 @@ function findDeclareAction(config: ObjectLiteralExpression) {
     return undefined
   }
 
-  const candidates = actionsValue.getElements().filter(mayBeDeclareAction)
+  const candidates = actionsValue
+    .getElements()
+    .filter((element) => mayBeAction(element, DECLARE_ACTION_TYPE))
 
   if (
     candidates.length !== 1 ||
@@ -183,84 +108,6 @@ function findDeclareAction(config: ObjectLiteralExpression) {
   }
 
   return declareAction
-}
-
-/** The whitespace the line the node starts on is indented by. */
-function indentationOf(node: Node) {
-  const text = node.getSourceFile().getFullText()
-  const lineStart = text.lastIndexOf('\n', node.getStart() - 1) + 1
-
-  return /^[ \t]*/.exec(text.slice(lineStart))?.[0] ?? ''
-}
-
-/** The text from the position to the end of its line, without the line break. */
-function restOfLine(text: string, position: number) {
-  const lineEnd = text.indexOf('\n', position)
-
-  return text.slice(position, lineEnd === -1 ? text.length : lineEnd)
-}
-
-function isOnlyComments(text: string) {
-  return /^\s*(?:\/\/.*|\/\*.*?\*\/\s*)*$/.test(text)
-}
-
-/**
- * Where a property sits in its object literal. A property on lines of its own
- * owns the comments on the lines above it and the comment after it on its last
- * line, and they move with it.
- */
-interface PropertyLayout {
-  ownsLines: boolean
-  /** The first comment above the property, or the property itself. */
-  start: number
-  /** After the comma following the property, or the property when it has none. */
-  end: number
-  hasComma: boolean
-  /** The comment after the property on its last line, with the space before it. */
-  trailingComment: string
-}
-
-function layoutOf(property: Node): PropertyLayout {
-  const text = property.getSourceFile().getFullText()
-  const next = property.getNextSibling()
-  const hasComma = next?.getKind() === SyntaxKind.CommaToken
-  const end = next && hasComma ? next.getEnd() : property.getEnd()
-  const trailing = restOfLine(text, end)
-
-  // A comment on the line the previous property ends on is that property's
-  const lineBreak = text
-    .slice(property.getFullStart(), property.getStart())
-    .indexOf('\n')
-
-  if (lineBreak === -1 || !isOnlyComments(trailing)) {
-    return {
-      ownsLines: false,
-      start: property.getStart(true),
-      end,
-      hasComma,
-      trailingComment: ''
-    }
-  }
-
-  const firstLine = property.getFullStart() + lineBreak + 1
-
-  return {
-    ownsLines: true,
-    start: firstLine + (/^\s*/.exec(text.slice(firstLine))?.[0].length ?? 0),
-    end,
-    hasComma,
-    trailingComment: trailing.trimEnd()
-  }
-}
-
-interface TextEdit {
-  start: number
-  end: number
-  text: string
-}
-
-function insertAt(position: number, text: string): TextEdit {
-  return { start: position, end: position, text }
 }
 
 /**
@@ -415,8 +262,6 @@ export function moveDeclarationToDeclareAction(sourceFile: SourceFile): number {
     .map(findConfigLiteral)
     .filter(Node.isObjectLiteralExpression)
 
-  // Collected as text edits and applied together, as editing a node through
-  // ts-morph invalidates nodes still waiting to be edited
   const edits: TextEdit[] = []
   let changes = 0
 
@@ -448,17 +293,7 @@ export function moveDeclarationToDeclareAction(sourceFile: SourceFile): number {
     return 0
   }
 
-  // Applied from the end of the file, so each edit leaves the positions of
-  // the ones still to apply untouched
-  const text = edits
-    .sort((a, b) => b.start - a.start)
-    .reduce(
-      (result, edit) =>
-        result.slice(0, edit.start) + edit.text + result.slice(edit.end),
-      sourceFile.getFullText()
-    )
-
-  sourceFile.replaceWithText(text)
+  applyTextEdits(sourceFile, edits)
 
   return changes
 }

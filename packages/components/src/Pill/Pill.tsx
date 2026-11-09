@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { IFont } from '../fonts'
+import { IFont } from '../tokens'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 

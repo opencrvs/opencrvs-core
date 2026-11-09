@@ -8,18 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// todo separate type for estimate and total
-export interface IDataPoint {
-  value: number
-  label: React.ReactNode
-  estimate?: boolean
-  total?: boolean
-  description?: string
-  categoricalData?: ICategoryDataPoint[]
-}
-interface ICategoryDataPoint {
-  name: string
-  label: string
-  icon: () => React.ReactNode
-  value: number
+export default async function teardown() {
+  await globalThis.__RUSTFS__?.stop()
 }

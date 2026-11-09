@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Button, Dialog, Toast } from '@opencrvs/components'
+import { Button, Dialog, Toast, Select } from '@opencrvs/components'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   userMessages,
@@ -23,7 +23,6 @@ import {
   SettingsRow
 } from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
-import { Select } from '@opencrvs/components/lib/Select'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { changeLanguage as changeLanguageActionCreator } from '@client/i18n/actions'

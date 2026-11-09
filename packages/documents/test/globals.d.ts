@@ -8,13 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import type { StartedTestContainer } from 'testcontainers'
 
-/**
- * @deprecated Please use a stricter type.
- */
-export interface IDynamicValues {
-  [key: string]: string
+declare global {
+  // eslint-disable-next-line no-var
+  var __RUSTFS__: StartedTestContainer | undefined
 }
-
-export { ColumnContentAlignment } from './Workqueue'
-export type { IColumn, IAction, IActionObject } from './Workqueue'

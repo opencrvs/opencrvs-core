@@ -19,15 +19,15 @@ import {
   EventIndex,
   EventConfig,
   WorkqueueColumn,
-  TranslationConfig,
-  WorkqueueActionType
+  TranslationConfig
 } from '@opencrvs/commons/client'
-import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
+  useWindowSize,
   ColumnContentAlignment,
   SORT_ORDER,
   Workqueue
-} from '@opencrvs/components/lib/Workqueue'
+} from '@opencrvs/components'
+import { WorkqueueCtaType } from '@client/v2-events/features/workqueues/Actions/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -67,7 +67,7 @@ export const SearchResultComponent = ({
   title: string
   totalResults: number
   tabBarContent?: React.ReactNode
-  action?: { type: WorkqueueActionType }
+  action?: { type: WorkqueueCtaType }
   emptyMessage?: TranslationConfig
   paginationVisibleOffline?: boolean
 }>) => {

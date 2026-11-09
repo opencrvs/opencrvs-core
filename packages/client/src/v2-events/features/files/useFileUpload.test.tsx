@@ -16,7 +16,8 @@ import { vi } from 'vitest'
 import {
   ActionType,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import {
   addLocalEventConfig,
@@ -65,7 +66,7 @@ describe('uploading a file for an event that only has a temporary id', () => {
     })
     const temporaryId = createTemporaryId()
 
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
 
     /*
      * Mimics what the event creation mutation does when the backend responds:
