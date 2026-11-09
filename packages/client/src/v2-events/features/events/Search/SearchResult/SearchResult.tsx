@@ -142,7 +142,6 @@ export const SearchResultComponent = ({
 
     return processEventsToRows({
       enrichedEvents: orderedEvents,
-      findEventConfiguration,
       outbox,
       action,
       isWideScreen,

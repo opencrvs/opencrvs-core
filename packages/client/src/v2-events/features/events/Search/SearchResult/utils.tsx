@@ -415,6 +415,7 @@ export function enrichEventsForWorkueue({
   ) => { title: string | null; useFallbackTitle: boolean }
 }): {
   enrichedEvent: EventIndex & { title: string | null }
+  eventConfig: EventConfig | undefined
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
 }[] {
   return events.map((event) => {
@@ -436,6 +437,7 @@ export function enrichEventsForWorkueue({
       : null
     return {
       enrichedEvent: { ...eventWithDraft, title },
+      eventConfig,
       localEventStatus
     }
   })
@@ -446,7 +448,6 @@ export function enrichEventsForWorkueue({
  */
 export function processEventsToRows({
   enrichedEvents,
-  findEventConfiguration,
   outbox,
   action,
   isWideScreen,
@@ -455,62 +456,62 @@ export function processEventsToRows({
 }: {
   enrichedEvents: {
     enrichedEvent: EventIndex & { title: string | null }
+    eventConfig: EventConfig | undefined
     localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
   }[]
-  findEventConfiguration: (event: EventIndex) => EventConfig | undefined
   outbox: OutboxEventIndex[]
   action?: { type: WorkqueueCtaType }
   isWideScreen: boolean
   isOnline: boolean
   intl: IntlShape
 }) {
-  return enrichedEvents.map(({ enrichedEvent, localEventStatus }) => {
-    const eventConfig = findEventConfiguration(enrichedEvent)
+  return enrichedEvents.map(
+    ({ enrichedEvent, eventConfig, localEventStatus }) => {
+      if (!eventConfig) {
+        // The record's version is not configured, so show none of its details or actions
+        return {
+          id: enrichedEvent.id,
+          actions: [],
+          title: <UnknownConfigVersionTitle event={enrichedEvent} />
+        }
+      }
 
-    if (!eventConfig) {
-      // The record's version is not configured, so show none of its details or actions
+      const actionComponents = buildAvailableActionComponents({
+        event: enrichedEvent,
+        localEventStatus,
+        action,
+        isWideScreen
+      })
+
+      const outboxMeta = outbox.find((o) => o.id === enrichedEvent.id)?.meta
+
       return {
-        id: enrichedEvent.id,
-        actions: [],
-        title: <UnknownConfigVersionTitle event={enrichedEvent} />
+        ...enrichedEvent,
+        actions: actionComponents,
+        label: eventConfig.label,
+        type: intl.formatMessage(eventConfig.label),
+        createdAt: formattedDuration(new Date(enrichedEvent.createdAt)),
+        updatedAt: formattedDuration(new Date(enrichedEvent.updatedAt)),
+        status: intl.formatMessage(messages.eventStatus, {
+          status: localEventStatus
+        }),
+        title: (
+          <SearchResultItemTitle
+            event={enrichedEvent}
+            eventConfig={eventConfig}
+            localEventStatus={localEventStatus}
+          />
+        ),
+        outbox: intl.formatMessage(
+          isOnline ? messages.processingAction : messages.waitingForAction,
+          {
+            action:
+              typeof outboxMeta?.actionType === 'string'
+                ? outboxMeta.actionType
+                : ''
+          }
+        )
       }
     }
-
-    const actionComponents = buildAvailableActionComponents({
-      event: enrichedEvent,
-      localEventStatus,
-      action,
-      isWideScreen
-    })
-
-    const outboxMeta = outbox.find((o) => o.id === enrichedEvent.id)?.meta
-
-    return {
-      ...enrichedEvent,
-      actions: actionComponents,
-      label: eventConfig.label,
-      type: intl.formatMessage(eventConfig.label),
-      createdAt: formattedDuration(new Date(enrichedEvent.createdAt)),
-      updatedAt: formattedDuration(new Date(enrichedEvent.updatedAt)),
-      status: intl.formatMessage(messages.eventStatus, {
-        status: localEventStatus
-      }),
-      title: (
-        <SearchResultItemTitle
-          event={enrichedEvent}
-          eventConfig={eventConfig}
-          localEventStatus={localEventStatus}
-        />
-      ),
-      outbox: intl.formatMessage(
-        isOnline ? messages.processingAction : messages.waitingForAction,
-        {
-          action:
-            typeof outboxMeta?.actionType === 'string'
-              ? outboxMeta.actionType
-              : ''
-        }
-      )
-    }
-  })
+  )
 }
