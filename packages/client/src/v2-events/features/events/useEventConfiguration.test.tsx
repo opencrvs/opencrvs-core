@@ -185,4 +185,34 @@ describe('useEventConfigurations', () => {
       expect(result.current[0].title.defaultMessage).toBe('Title of v2')
     )
   })
+
+  it('checks the date with one timer, however many components use it', async () => {
+    vi.setSystemTime(new Date('2030-01-01T17:30:00Z'))
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval')
+    const wrapper = await createWrapper()
+
+    const { result } = renderHook(
+      () => [useEventConfigurations(), useEventConfigurations()],
+      { wrapper }
+    )
+    await waitFor(() => expect(result.current[0][0].title).toEqual(base.title))
+
+    expect(
+      setIntervalSpy.mock.calls.filter(([, delay]) => delay === 60 * 1000)
+    ).toHaveLength(1)
+    setIntervalSpy.mockRestore()
+
+    act(() => {
+      vi.setSystemTime(new Date('2030-01-01T18:30:00Z'))
+      vi.advanceTimersByTime(60 * 1000)
+    })
+
+    await waitFor(() =>
+      expect(
+        result.current.map(
+          ([configuration]) => configuration.title.defaultMessage
+        )
+      ).toEqual(['Title of v2', 'Title of v2'])
+    )
+  })
 })

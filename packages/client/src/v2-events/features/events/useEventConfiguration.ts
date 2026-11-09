@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
@@ -35,34 +35,81 @@ export function useCountryTimeZone() {
   return useSelector(getOfflineData).config.SYSTEM_IANA_TIMEZONE
 }
 
-/** How often `useCountryToday` checks the date in the country. */
+/** How often the date in the country is checked while a component uses it. */
 const TODAY_CHECK_INTERVAL_MS = 60 * 1000
 
 /**
- * @returns the current time, updated only when the date changes in the country's
- * time zone. Components that depend on today's date render again at midnight,
- * not every minute.
+ * Today's date in the country, shared by every component that uses
+ * `useCountryToday`. Only refreshes when the day changes (when current date
+ * is not the same as refreshedAt date).
+ */
+const countryToday: {
+  refreshedAt: Date
+  timeZone?: string
+  listeners: Set<() => void>
+  intervalId?: ReturnType<typeof setInterval>
+} = { refreshedAt: new Date(), listeners: new Set() }
+
+/** @returns true when the date in the country changed since the last check */
+function refreshCountryToday() {
+  const now = new Date()
+  const { timeZone } = countryToday
+  if (
+    timeZone &&
+    toPlainDateInTimeZone(countryToday.refreshedAt, timeZone) ===
+      toPlainDateInTimeZone(now, timeZone)
+  ) {
+    return false
+  }
+  countryToday.refreshedAt = now
+  return true
+}
+
+function checkCountryToday() {
+  if (refreshCountryToday()) {
+    countryToday.listeners.forEach((listener) => listener())
+  }
+}
+
+function subscribeToCountryToday(listener: () => void) {
+  countryToday.listeners.add(listener)
+  if (!countryToday.intervalId) {
+    countryToday.intervalId = setInterval(
+      checkCountryToday,
+      TODAY_CHECK_INTERVAL_MS
+    )
+  }
+
+  return () => {
+    countryToday.listeners.delete(listener)
+    if (countryToday.listeners.size === 0) {
+      clearInterval(countryToday.intervalId)
+      countryToday.intervalId = undefined
+    }
+  }
+}
+
+function getCountryToday() {
+  // No timer runs while nothing uses the date, so it can be out of date
+  if (countryToday.listeners.size === 0) {
+    refreshCountryToday()
+  }
+  return countryToday.refreshedAt
+}
+
+/**
+ * @returns a time on today's date in the country's time zone. It is not the
+ * current time, so use only its date. The value changes only when the date
+ * changes. Components that depend on today's date render again at midnight, not
+ * every minute.
  */
 function useCountryToday() {
   const timeZone = useCountryTimeZone()
-  const [today, setToday] = useState(() => new Date())
-
-  useEffect(() => {
-    function update() {
-      const now = new Date()
-      setToday((previous) =>
-        toPlainDateInTimeZone(previous, timeZone) ===
-        toPlainDateInTimeZone(now, timeZone)
-          ? previous
-          : now
-      )
-    }
-    update()
-    const intervalId = setInterval(update, TODAY_CHECK_INTERVAL_MS)
-    return () => clearInterval(intervalId)
-  }, [timeZone])
-
-  return today
+  if (countryToday.timeZone !== timeZone) {
+    countryToday.timeZone = timeZone
+    countryToday.refreshedAt = new Date()
+  }
+  return useSyncExternalStore(subscribeToCountryToday, getCountryToday)
 }
 
 /**
