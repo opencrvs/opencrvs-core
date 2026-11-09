@@ -30,6 +30,12 @@ processors:
   - add_host_metadata:
       netinfo.enabled: true
   - decode_json_fields:
+    # Only decode messages that look like JSON objects, so plain-text logs
+    # from pods are left untouched instead of getting a parse error key.
+    #   match:     {"level":30,"msg":"request completed"}
+    #              {"level":30}   (leading whitespace is allowed)
+    #   non-match: 2026-11-06 10:00:00 LOG:  checkpoint starting
+    #              [INFO] {"not":"at line start"}
       when:
         and:
           - has_fields: ['kubernetes.pod.name']
