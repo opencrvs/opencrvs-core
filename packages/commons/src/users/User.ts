@@ -12,7 +12,7 @@
 import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from './authentication'
 import {
   EmailValue,
   FieldValue,

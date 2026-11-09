@@ -62,7 +62,7 @@ import {
 } from './ActionConfig'
 import { DeclarationFormConfig, FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import {
   PlainDate,
   plainDateToLocalDate,

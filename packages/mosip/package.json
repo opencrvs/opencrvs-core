@@ -24,12 +24,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@opencrvs/toolkit": "workspace:*",
-    "@types/hapi__hapi": "^20.0.0",
-    "@types/node-fetch": "^2.6.11",
-    "node-fetch": "2.6.7"
+    "@opencrvs/toolkit": "workspace:*"
   },
-  "peerDependencies": {
-    "node-fetch": "2.6.7"
-  }
+  "peerDependencies": {}
 }

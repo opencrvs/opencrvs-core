@@ -115,13 +115,19 @@ jobs:
           max_attempts: 3
           command: pnpm install --frozen-lockfile
 
+      # The tests use only the chromium project, and they run headless. The
+      # runner image already has the system libraries that Chromium needs, so
+      # we do not use --with-deps. --with-deps installs about 185 apt packages
+      # (mostly for WebKit and Firefox) as root. When apt is slow, the retry
+      # action cannot kill the root process at the timeout, and the job fails
+      # without a retry (nick-fields/retry#124).
       - uses: nick-fields/retry@v4
         name: Install Playwright Browsers
         if: steps.cache.outputs.cache-hit != 'true'
         with:
-          timeout_minutes: 10
+          timeout_minutes: 5
           max_attempts: 3
-          command: cd packages/testland && npx playwright install --with-deps
+          command: cd packages/testland && npx playwright install --only-shell chromium
 
       - name: Build toolkit (with commons and events)
         run: pnpm --dir packages/toolkit build:all
@@ -204,12 +210,14 @@ jobs:
       - name: Build toolkit (with commons and events)
         if: steps.toolkit-build.outcome != 'success'
         run: pnpm --dir packages/toolkit build:all
+      # See "Install Playwright Browsers" in cache-node-js.
       - uses: nick-fields/retry@v4
+        name: Install Playwright Browsers
         if: steps.cache.outputs.cache-hit != 'true'
         with:
-          timeout_minutes: 10
+          timeout_minutes: 5
           max_attempts: 3
-          command: cd packages/testland && npx playwright install --with-deps
+          command: cd packages/testland && npx playwright install --only-shell chromium
       - name: Run Playwright Tests
         working-directory: packages/testland
         run: |

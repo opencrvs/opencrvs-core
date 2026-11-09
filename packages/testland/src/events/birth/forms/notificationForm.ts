@@ -15,8 +15,7 @@ import {
   field,
   defineFormPage,
   FieldConfigInput,
-  PageTypes,
-  or
+  PageTypes
 } from '@opencrvs/toolkit/events'
 import {
   BIRTH_LATE_REGISTRATION_TARGET_DAYS,
@@ -32,7 +31,8 @@ import {
   invalidNameValidator,
   MAX_NAME_LENGTH
 } from '../validators'
-import { PHONE_NUMBER_REGEX } from './pages/informant'
+import { mother } from './pages/mother'
+import { connectToMOSIPIdReader } from '@countryconfig/events/mosip'
 
 /**
  * Child fields captured on a birth notification. The fields are taken from the
@@ -136,6 +136,32 @@ const differentFields: FieldConfigInput[] = [
   }
 ]
 
+/**
+ * Mother's identity fields are picked from the declaration form, including the
+ * MOSIP / E-Signet integration. `requireMotherDetails` in their conditionals is
+ * always true here, as the notification form has neither the informant's
+ * relation nor the "details not available" checkbox.
+ */
+const pickMotherFields = (ids: string[]) =>
+  mother.fields.filter(({ id }) => ids.includes(id))
+
+const motherIdReaderFields = pickMotherFields([
+  'mother.verified',
+  'mother.query-params',
+  'mother.verify-nid-http-fetch',
+  'mother.fetch-loader',
+  'mother.id-reader'
+])
+
+// The ID type is optional on a notification, so notifications without the
+// mother's ID stay valid. Once a type is chosen, its ID number is required.
+const motherIdFields = pickMotherFields([
+  'mother.idType',
+  'mother.nid',
+  'mother.passport',
+  'mother.brn'
+]).map((f) => (f.id === 'mother.idType' ? { ...f, required: false } : f))
+
 const childPage = defineFormPage({
   id: 'child',
   type: PageTypes.enum.FORM,
@@ -156,94 +182,68 @@ const mothersPage = defineFormPage({
     id: 'form.section.mother.title'
   },
   fields: [
-    {
-      id: 'mother.name',
-      type: FieldType.NAME,
-      required: true,
-      configuration: farajalandNameConfig,
-      hideLabel: true,
-      label: {
-        defaultMessage: "Mother's name",
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.mother.field.name.label'
-      },
-      validation: [invalidNameValidator('mother.name')]
-    },
-    {
-      id: 'mother.dob',
-      type: 'DATE',
-      required: true,
-      secured: true,
-      analytics: true,
-      validation: [
-        {
-          message: {
-            defaultMessage: 'Must be a valid birth date',
-            description: 'This is the error message for invalid date',
-            id: 'event.birth.action.declare.form.section.person.field.dob.error'
-          },
-          validator: field('mother.dob').isBefore().now()
+    ...motherIdReaderFields,
+    connectToMOSIPIdReader(
+      {
+        id: 'mother.name',
+        type: FieldType.NAME,
+        required: true,
+        configuration: farajalandNameConfig,
+        hideLabel: true,
+        label: {
+          defaultMessage: "Mother's name",
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.mother.field.name.label'
         },
-        {
-          message: {
-            defaultMessage:
-              "Birth date must be 18 years before child's birth date",
-            description:
-              "This is the error message for a birth date after child's birth date",
-            id: 'event.birth.action.declare.form.section.person.dob.afterChild'
-          },
-          validator: field('mother.dob')
-            .isBefore()
-            .days(6570)
-            .fromDate(field('child.dob'))
-        }
-      ],
-      label: {
-        defaultMessage: 'Date of birth',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.person.field.dob.label'
-      }
-    },
-    {
-      id: 'informant.phoneNo',
-      type: FieldType.PHONE,
-      required: false,
-      secured: true,
-      label: {
-        defaultMessage: 'Phone number',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.phoneNo.label'
+        validation: [invalidNameValidator('mother.name')]
       },
-      validation: [
-        {
-          message: {
-            defaultMessage:
-              'Must be a valid 10 digit number that starts with 0(7|9)',
-            description:
-              'The error message that appears on phone numbers where the first two characters must be 07 or 09, and length must be 10',
-            id: 'event.birth.action.declare.form.section.informant.field.phoneNo.error'
-          },
-          validator: or(
-            field('informant.phoneNo').matches(PHONE_NUMBER_REGEX),
-            field('informant.phoneNo').isFalsy()
-          )
-        }
-      ]
-    },
-    {
-      id: 'informant.email',
-      type: FieldType.EMAIL,
-      required: true,
-      secured: true,
-      label: {
-        defaultMessage: 'Email',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.email.label'
-      },
-      configuration: {
-        maxLength: 255
+      {
+        valuePath: 'data.name',
+        disableIf: ['pending', 'verified', 'authenticated']
       }
-    }
+    ),
+    connectToMOSIPIdReader(
+      {
+        id: 'mother.dob',
+        type: 'DATE',
+        required: true,
+        secured: true,
+        analytics: true,
+        validation: [
+          {
+            message: {
+              defaultMessage: 'Must be a valid birth date',
+              description: 'This is the error message for invalid date',
+              id: 'event.birth.action.declare.form.section.person.field.dob.error'
+            },
+            validator: field('mother.dob').isBefore().now()
+          },
+          {
+            message: {
+              defaultMessage:
+                "Birth date must be 18 years before child's birth date",
+              description:
+                "This is the error message for a birth date after child's birth date",
+              id: 'event.birth.action.declare.form.section.person.dob.afterChild'
+            },
+            validator: field('mother.dob')
+              .isBefore()
+              .days(6570)
+              .fromDate(field('child.dob'))
+          }
+        ],
+        label: {
+          defaultMessage: 'Date of birth',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.person.field.dob.label'
+        }
+      },
+      {
+        valuePath: 'data.birthDate',
+        disableIf: ['pending', 'verified', 'authenticated']
+      }
+    ),
+    ...motherIdFields
   ]
 })
 
