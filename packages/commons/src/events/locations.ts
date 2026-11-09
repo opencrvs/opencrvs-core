@@ -29,7 +29,7 @@ import {
   scopeUsesPrintCertifiedCopiesOptions,
   UserScopeV2,
   scopeUsesRoleOptions
-} from '../scopes'
+} from '../users/scopes'
 import { SystemContext, UserContext } from '../users/User'
 import { ContainsFlags, Flag } from './Flag'
 

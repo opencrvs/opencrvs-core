@@ -21,7 +21,8 @@ import {
   EventStatus,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  getUUID
+  getUUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { CACHE_NAME } from '@client/v2-events/cache'
@@ -39,6 +40,7 @@ export const storybookEventId = UUID.parse(
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: getUUID(),
   type: TENNIS_CLUB_MEMBERSHIP,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   trackingId: 'TEST12',
   status: EventStatus.enum.CREATED,
   createdAt: '2023-03-01T00:00:00.000Z',
@@ -74,6 +76,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52' as UUID,
   trackingId: 'TEST12',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [

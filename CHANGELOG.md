@@ -116,13 +116,19 @@ defineConfig({
   id: 'birth',
   label: { ... },
   versions: [
-    { id: 'v1', actions: [ ... ] },
+    { id: 'initial', actions: [ ... ] },
     { id: 'v2', effectiveFrom: '2027-01-01', actions: [ ... ] }
   ]
 })
 ```
 
-A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event. For now, the first version applies to every record.
+A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event.
+
+A version takes effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`). A record is created under the version in effect that day and keeps it for its whole life: every action on the record uses that version, even after a newer one takes effect. A record created offline keeps the version in effect when the user created it. The record stores the version's id as `configVersionId`.
+
+An event must have a version in effect today, and `defineConfig` rejects one that does not. It takes today in UTC−12, the last time zone to begin the day, so that the version is in effect whatever the country's time zone: east of it, a version taking effect today is rejected until midnight in UTC−12. Schedule an event's only version a day ahead.
+
+Records created before 2.2 are stamped with `initial`, the id `defineConfig` gives an event configured without versions. When you add `versions` to an existing event, give the version holding your current configuration the id `initial`, as above. Otherwise those records point at a version that does not exist: they fail to open, and the search reindex fails, naming the missing version. Never remove or rename a version that records use.
 
 `defineConfig` still accepts a flat configuration and wraps it in a single version, so existing event configurations need no change. It now returns a `VersionedEventConfig` instead of an `EventConfig`, though, so code that reads a version's fields off its result stops compiling:
 
@@ -135,9 +141,13 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 `opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
 
-**`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `default` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
+**`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
 
-[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601)
+**Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
+
+The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionId}`.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602)
 
 #### The `incomplete` flag is removed
 
@@ -173,7 +183,7 @@ A user whose role holds `record.notify` for an event type now fills in the notif
 - **Editing a notified record** uses the notification form too, and "Notify with edits" requires its required fields.
 - **The declare flow** only offers Declare and Register, and requires `record.declare`.
 
-A role should hold either `record.notify` or `record.declare` for an event type, not both. A role holding both now gets only the notify flow for that event type. Remove one of the two scopes.
+A role should hold either `record.notify` or `record.declare` for an event type, not both. Core now rejects a role that holds both for the same event type. Remove one of the two scopes. See "Core checks roles when it loads them".
 
 Update the client translations:
 
@@ -181,6 +191,30 @@ Update the client translations:
 - Rename `review.declare.incomplete.confirmModal.title` to `review.notify.confirmModal.title` ("Notify event?").
 - Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
 - `buttons.deleteDeclaration`, `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
+
+#### Core checks roles when it loads them
+
+The events service now checks the roles that country config serves at `GET /config/roles`. When a role breaks one of these rules, the events service does not start, and the error names each role and each problem [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981):
+
+- Each event type in a scope must be a configured event.
+- A role must not hold `record.notify` and `record.declare` for the same event type.
+- A role that holds `record.notify` for an event type must not hold a `record.edit` that can match `DECLARED` records of that event type. Limit that `record.edit` to the status `NOTIFIED`.
+- Each event type that a role holds `record.notify` for must have a `NOTIFY` action.
+
+To find these problems before you deploy, wrap the roles in `src/api/roles/roles.ts` with `defineRoles` from `@opencrvs/toolkit/roles`. It checks the same rules when the country config loads the roles, so a country config with invalid roles does not start:
+
+```ts
+import { defineRoles, Roles } from '@opencrvs/toolkit/roles'
+import { eventConfigs } from '@countryconfig/events'
+
+const roles: Roles = [
+  // ...
+]
+
+export default defineRoles(roles, eventConfigs)
+```
+
+The data seeder checks the same rules, and reports each role that breaks them.
 
 #### Object store settings renamed from `MINIO_*` to `S3_*`
 
@@ -256,6 +290,7 @@ The toolkit and the country configuration template work with any container regis
 
 ### Improvements
 
+- Roles no longer need a `label`. Nothing read it: the client names roles with the `event.history.role` message in `client.csv`, keyed by role id. The data seeder no longer rejects a role without a `label`, and ignores one that is still there. Country configurations can delete `label` from each role in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to in `countryconfig.csv`. A role id that `event.history.role` does not list is shown as "Unknown". [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
 - Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
 - Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)

@@ -16,7 +16,7 @@ import {
   getActionConfig,
   isValidIcon
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -51,7 +51,7 @@ import { useUserAllowedActions } from './useUserAllowedActions'
 export function useEventActionConfigurationResolver(event: EventIndex) {
   const { useDisplayableDrafts } = useDrafts()
   const drafts = useDisplayableDrafts()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { onClick, continueDraft, modals } = useEventActionsOnClick(event)
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
@@ -155,7 +155,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
  * per-row (e.g. `DownloadButton`), unlike the full resolver.
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
   const events = useEvents()
@@ -207,7 +207,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
  * Pattern needs to return a resolver function, since a hook should not be mapped through.
  */
 export function useAssignmentActionConfigurationResolver(event: EventIndex) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { resolveConditionals } = useResolveAssignmentActionConditionals(event)
   const { onAssign, onUnassign, modal } = useAssignmentActions(event)
 

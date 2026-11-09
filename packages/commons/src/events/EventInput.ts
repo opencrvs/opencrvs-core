@@ -18,7 +18,13 @@ export const EventInput = z
     type: z.string(),
     createdAtLocation: UUID.nullish().describe(
       'Location where the event occurred. Required for system users.'
-    )
+    ),
+    configVersionId: z
+      .string()
+      .optional()
+      .describe(
+        'Id of the event configuration version the client created the record under, e.g. while offline. Must be configured and not take effect in the future. Defaults to the version in effect when the server receives the record.'
+      )
   })
   .meta({ default: { transactionId: uuidv4(), type: 'birth' } })
 

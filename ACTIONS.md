@@ -4,18 +4,20 @@ Actions represent operations performed on an event record, such as a birth decla
 
 ## Core actions
 
-Core actions, as the name suggests, are defined within the core and are available for all event types. They often contain specific UI elements or logic. In v2.0, the available core actions are:
+Core actions, as the name suggests, are defined within the core and are available for all event types. They often contain specific UI elements or logic. The available core actions are:
 
 - `CREATE`
 - `READ`
 - `ASSIGN`\*† & `UNASSIGN`\*†
 - `DELETE`\*
 - `NOTIFY`\*
-- `DECLARE`\*, `VALIDATE`\* & `REGISTER`\*
+- `DECLARE`\* & `REGISTER`\*
+- `EDIT`\*
 - `REJECT`\*
-- `ARCHIVE`\*
+- `ARCHIVE`\* & `UNARCHIVE`\*
 - `PRINT_CERTIFICATE`\*
 - `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION`\* & `REJECT_CORRECTION`\*
+- `REVOKE_REGISTRATION`\* & `REINSTATE_REGISTRATION`\*
 - `DUPLICATE_DETECTED`\*\*, `MARK_AS_DUPLICATE`\* & `MARK_AS_NOT_DUPLICATE`\*
 
 _\* are configurable core actions, this is related to the action configurations section below._
@@ -23,14 +25,27 @@ _\*\* `DUPLICATE_DETECTED` only supports `flags` — it's system-generated and n
 _† `ASSIGN`/`UNASSIGN` support everything except `flags` (excluded as "meta actions")._
 
 Core actions can also change the event’s status, which custom actions cannot do.  
-In v2.0, the available event statuses are:
+The available event statuses are:
 
-`CREATED`, `NOTIFIED`, `DECLARED`, `REGISTERED`, `ARCHIVED`
+`CREATED`, `NOTIFIED`, `DECLARED`, `REGISTERED`, `REVOKED`, `ARCHIVED`
 
 The status is applied by the corresponding action.
 
-> [!NOTE]
-> Beyond v2.0, we will review which core actions could be removed (and implemented instead as custom actions within our Farajaland configuration). We expect the following actions may be transitioned to custom actions: `VALIDATE`, `REJECT`
+### `NOTIFY`
+
+`NOTIFY` sends an incomplete record to the office, for example when a health facility reports a birth before all of the details are known. The record then has the status `NOTIFIED`. A user can edit a notified record later, and then declare or register it.
+
+An event can be notified only when its configuration has a `NOTIFY` action configured.
+
+The `NOTIFY` action configuration has these parts:
+
+- `notificationForm` is the form that the notifier fills in. Each of its fields must also be in the declaration form, with the same type. The submitted values become part of the record declaration and pre-fill the declaration form later. The backend rejects values for fields that are not in the notification form, and it checks the required fields of the notification form.
+- `review` is the review page of the notify flow. The values of its fields are stored as the annotation of the `NOTIFY` action, not in the declaration.
+- `form` is optional. It contains the fields of the confirmation dialog. Their values are also stored as the annotation of the `NOTIFY` action.
+
+A user with the `record.notify` scope uses the notify flow. A role cannot have both `record.notify` and `record.declare` for the same event.
+
+A system client can use `event.actions.createAndNotify.request` to create and notify a record in one request. This needs the `record.create` and `record.notify` scopes.
 
 ## Custom actions
 

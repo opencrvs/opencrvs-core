@@ -37,8 +37,7 @@ const REQUIRED_NOTIFICATION_FIELDS = [
   'child.gender',
   'child.placeOfBirth',
   'mother.name',
-  'mother.dob',
-  'informant.email'
+  'mother.dob'
 ]
 
 test('Incomplete birth notification', async ({ page }) => {
@@ -132,8 +131,11 @@ test('Incomplete birth notification', async ({ page }) => {
     await expect(page.getByTestId('mother.name-value')).toHaveText(
       formatName(inputs.mother.name)
     )
-    await expect(page.getByTestId('informant.email-value')).toHaveText(
-      inputs.informantEmail
+    await expect(page.getByTestId('mother.idType-value')).toHaveText(
+      inputs.mother.identifier.type
+    )
+    await expect(page.getByTestId('mother.nid-value')).toHaveText(
+      inputs.mother.identifier.id
     )
 
     // Left for the declaration

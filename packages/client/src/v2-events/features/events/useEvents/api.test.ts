@@ -18,6 +18,9 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import {
   addLocalEventConfig,
   deleteLocalEvent,
+  findLocalEventConfig,
+  findLocalEventIndex,
+  seedLocalEventIndex,
   updateLocalEventIndex
 } from './api'
 import { byIdSearchKey, taggedKey } from './procedures/search'
@@ -108,5 +111,39 @@ describe('updateLocalEventIndex', () => {
       'REGISTERED'
     )
     expect(updated?.results.find((r) => r.id === 'abc')?.status).toBe('PENDING')
+  })
+})
+
+describe('findLocalEventConfig', () => {
+  const eventDocument = tennisClubMembershipEventDocument
+
+  beforeEach(() => {
+    queryClient.clear()
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
+  })
+
+  afterAll(() => {
+    queryClient.clear()
+  })
+
+  it("finds the cached configuration of the record's version", () => {
+    expect(findLocalEventConfig(eventDocument)).toMatchObject({
+      id: eventDocument.type
+    })
+  })
+
+  it("is undefined when the record's version is not cached", () => {
+    expect(
+      findLocalEventConfig({ ...eventDocument, configVersionId: 'v9' })
+    ).toBeUndefined()
+  })
+
+  it('leaves the record unseeded when its version is not cached', () => {
+    seedLocalEventIndex(eventDocument.id, {
+      ...eventDocument,
+      configVersionId: 'v9'
+    })
+
+    expect(findLocalEventIndex(eventDocument.id)).toBeUndefined()
   })
 })
