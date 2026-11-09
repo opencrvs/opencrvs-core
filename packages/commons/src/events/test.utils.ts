@@ -581,7 +581,8 @@ export function eventPayloadGenerator(
         ...input
       }),
       /**
-       * Notify allows sending incomplete data. Think it as 'partial declare' for now.
+       * NOTIFY submits the values of the notification form, and the record can stay incomplete.
+       * When `declaration` is not given, string values are left out of the generated declaration to make it incomplete.
        */
       notify: (
         eventId: string,
@@ -609,7 +610,6 @@ export function eventPayloadGenerator(
             isString
           )
 
-          // Remove some fields to simulate incomplete data
           declaration = partialDeclaration
         }
 
