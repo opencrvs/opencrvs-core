@@ -44,7 +44,7 @@ import { systemProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
-  addRequestedAction,
+  addAction,
   addAsyncRejectAction,
   ensureEventIndexed,
   processAction
@@ -203,9 +203,11 @@ export async function defaultRequestHandler(
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
-  const eventWithRequestedAction = await addRequestedAction(input, {
+  const eventWithRequestedAction = await addAction(input, {
+    event,
     user,
     token,
+    status: ActionStatus.Requested,
     configuration
   })
 

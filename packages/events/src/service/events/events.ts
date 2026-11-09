@@ -296,29 +296,6 @@ export function buildAction(
   }
 }
 
-/** Throws tRPC HTTP 400 if a file in the action declaration is not in the document store. */
-async function throwIfFilesNotFound(
-  input: ActionInputWithType,
-  configuration: EventConfig,
-  token: TokenWithBearer
-) {
-  // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getDeclarationFields(configuration)
-  const fileValuesInCurrentAction = extractFileValues(
-    input.declaration,
-    fieldConfigs
-  )
-
-  for (const file of fileValuesInCurrentAction) {
-    if (!(await fileExists(file.file.path, token))) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: `File not found: ${file.file.path}`
-      })
-    }
-  }
-}
-
 /**
  * Stores the requested action of an action request.
  *
@@ -329,23 +306,12 @@ async function throwIfFilesNotFound(
  *
  * A request that already stored its requested action (a retry after a failed confirmation,
  * with the same transaction id) is not checked again and stores nothing new.
- *
- * @returns The updated event document with the requested action included.
  */
-export async function addRequestedAction(
+async function createRequestedAction(
   input: ActionInputWithType,
-  {
-    user,
-    token,
-    configuration
-  }: {
-    user: TrpcUserContext
-    token: TokenWithBearer
-    configuration: EventConfig
-  }
-): Promise<EventDocument> {
-  await throwIfFilesNotFound(input, configuration, token)
-
+  user: TrpcUserContext,
+  configuration: EventConfig
+) {
   try {
     await eventsRepo.createActionExclusively(
       buildAction(input, ActionStatus.Requested, user),
@@ -375,13 +341,6 @@ export async function addRequestedAction(
     }
     throw error
   }
-
-  const updatedEvent = await getEventById(input.eventId)
-
-  await draftsRepo.deleteDraftsByEventId(input.eventId)
-  await cleanupUnreferencedFiles(updatedEvent, token)
-
-  return updatedEvent
 }
 
 /**
@@ -414,9 +373,27 @@ export async function addAction(
   }
 ): Promise<EventDocument> {
   const eventId = event.id
-  await throwIfFilesNotFound(input, configuration, token)
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getDeclarationFields(configuration)
+  const fileValuesInCurrentAction = extractFileValues(
+    input.declaration,
+    fieldConfigs
+  )
 
-  await eventsRepo.createAction(buildAction(input, status, user))
+  for (const file of fileValuesInCurrentAction) {
+    if (!(await fileExists(file.file.path, token))) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File not found: ${file.file.path}`
+      })
+    }
+  }
+
+  if (status === ActionStatus.Requested) {
+    await createRequestedAction(input, user, configuration)
+  } else {
+    await eventsRepo.createAction(buildAction(input, status, user))
+  }
 
   // We want to unassign only if:
   // - ActionStatus is not requested
