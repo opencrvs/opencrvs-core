@@ -122,11 +122,13 @@ describe('bulkImport', () => {
       files: {
         image: (eventId: string) => string
         signature: (eventId: string) => string
-      }
+      },
+      rng = createPrng(901)
     ) {
       const eventId = getUUID()
       const event = generateEventDocument({
         configuration: tennisClubMembershipEvent,
+        rng,
         actions: [
           { type: ActionType.CREATE, user: { id: userId } },
           {
@@ -162,10 +164,14 @@ describe('bulkImport', () => {
             image: (eventId) => `events/${eventId}/${getUUID()}.png`,
             signature: () => `users/${user.id}/${getUUID()}.png`
           }),
-          eventWithFiles(user.id, {
-            image: () => `${getUUID()}.png`,
-            signature: () => `${getUUID()}.png`
-          })
+          eventWithFiles(
+            user.id,
+            {
+              image: () => `${getUUID()}.png`,
+              signature: () => `${getUUID()}.png`
+            },
+            createPrng(902)
+          )
         ])
       ).resolves.not.toThrow()
     })
