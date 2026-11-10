@@ -48,4 +48,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   }
 `
 
-export const TextArea = (props: ITextAreaProps) => <StyledTextArea {...props} />
+export const TextArea = ({
+  autoComplete = 'off',
+  ...props
+}: ITextAreaProps) => <StyledTextArea autoComplete={autoComplete} {...props} />
