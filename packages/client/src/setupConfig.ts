@@ -47,7 +47,7 @@ const config = {
     }
   ],
   FEATURES: {
-    V2_EVENTS: false
+    LEGACY_RECORDS: false
   },
   LANGUAGES: ['en', 'bn', 'fr'],
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms',

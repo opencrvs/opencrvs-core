@@ -101,7 +101,6 @@ export const ClientConfig = z.object({
   ),
   FEATURES: z
     .object({
-      V2_EVENTS: z.boolean().optional().default(true),
       LEGACY_RECORDS: z
         .boolean()
         .optional()
@@ -111,7 +110,7 @@ export const ClientConfig = z.object({
         )
     })
     .optional()
-    .default({ V2_EVENTS: true, LEGACY_RECORDS: false })
+    .default({ LEGACY_RECORDS: false })
 })
 
 export type ClientConfig = z.infer<typeof ClientConfig>

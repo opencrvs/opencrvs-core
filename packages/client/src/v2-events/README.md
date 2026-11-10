@@ -31,11 +31,7 @@ We will be iterating over the structure during the project. Treat it as a starti
 
 ## Route structure
 
-By default, Events V2 loads from the root `('/')` route.
-To view the legacy event interface, append the query parameter `?V2_EVENTS=false` to the `('/)` URL and reload the app in your browser — this disables Events V2 and loads the old event views.
-To switch back, set the query parameter to `?V2_EVENTS=true`.
-
-Once Events V2 is fully released, it will replace the legacy event views as the default and the query parameter override will no longer work.
+Events V2 loads from the root `('/')` route.
 
 ### Creating route components
 
