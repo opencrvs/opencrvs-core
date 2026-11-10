@@ -301,7 +301,7 @@ The toolkit and the country configuration template work with any container regis
 ### Bug fixes
 
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
-- Text inputs now set `autocomplete="off"` in every environment, so the browser no longer suggests values that a user typed before. Before, the attribute was set only in production builds. The username and password fields of the login page set `autocomplete="username"` and `autocomplete="current-password"` for password managers. [#14181](https://github.com/opencrvs/opencrvs-core/issues/14181)
+- The username and password fields of the login page set `autocomplete="username"` and `autocomplete="current-password"` for password managers. [#14181](https://github.com/opencrvs/opencrvs-core/issues/14181)
 
 ### Security
 

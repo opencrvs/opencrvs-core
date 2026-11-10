@@ -127,8 +127,6 @@ export const TextInput = React.forwardRef<HTMLInputElement, ITextInputProps>(
       postfix,
       prefix,
       unit,
-      // The browser must not suggest values that a user typed before.
-      // A caller can set a value such as "username" for a password manager.
       autoComplete = 'off',
       ...otherProps
     },
