@@ -286,11 +286,14 @@ async function deleteEventData(updatedEvent: EventDocument) {
    * If we delete only the event.get, we will have stale data until event is explicitly searched again.
    * e.g. After performing declaration action, overview would show event as it was on 'created' state first, and then update.
    *
-   *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
+   *  NOTE: running removeQueries would remove the subscriptions as well. A refetch updates those.
+   *  Do not use resetQueries here. A reset puts back the initialData of the entry, which is the row
+   *  that the cache had when the user first opened the record. The overview then shows the previous status.
+   *  The action waits for the indexing, so the refetch gets the new state of the record.
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
   await Promise.all([
-    queryClient.resetQueries({ queryKey: byIdSearchKey(id) }),
+    refetchSearchQueryById(id),
     removeCachedFiles(updatedEvent)
   ])
 }

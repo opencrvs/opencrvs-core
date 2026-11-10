@@ -8,9 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { QueryObserver } from '@tanstack/react-query'
+import { http, HttpResponse } from 'msw'
+import { setupServer } from 'msw/node'
+import { serialize } from 'superjson'
 import {
   EventDocument,
   EventIndex,
+  EventStatus,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -23,11 +28,32 @@ import {
   seedLocalEventIndex,
   updateLocalEventIndex
 } from './api'
-import { byIdSearchKey, taggedKey } from './procedures/search'
+import {
+  byIdSearchKey,
+  byIdSearchOptions,
+  taggedKey
+} from './procedures/search'
 
 describe('deleteLocalEvent', () => {
   const eventDocument = tennisClubMembershipEventDocument
   const { id } = eventDocument
+  const server = setupServer()
+
+  /** Answers every event.search request with the given row of the record. */
+  function serveSearchResult(row: EventIndex) {
+    server.use(
+      http.get('/api/events/event.search', () =>
+        HttpResponse.json({
+          result: {
+            data: serialize({ results: [row], total: 1 }),
+            type: 'data'
+          }
+        })
+      )
+    )
+  }
+
+  beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 
   beforeEach(() => {
     global.caches = {
@@ -37,19 +63,19 @@ describe('deleteLocalEvent', () => {
     addLocalEventConfig(versionedTennisClubMembershipEvent)
   })
 
+  afterEach(() => server.resetHandlers())
+
   afterAll(() => {
+    server.close()
     queryClient.clear()
   })
 
-  it('clears the event document and its by-id search entry', async () => {
+  it('clears the event document', async () => {
+    serveSearchResult({ id } as EventIndex)
     queryClient.setQueryData(
       trpcOptionsProxy.event.get.queryKey({ eventId: id }),
       eventDocument
     )
-    queryClient.setQueryData(byIdSearchKey(id), {
-      results: [{ id } as EventIndex],
-      total: 1
-    })
 
     await deleteLocalEvent(eventDocument)
 
@@ -58,7 +84,37 @@ describe('deleteLocalEvent', () => {
         trpcOptionsProxy.event.get.queryKey({ eventId: id })
       )
     ).toBeUndefined()
-    expect(queryClient.getQueryData(byIdSearchKey(id))).toBeUndefined()
+  })
+
+  it('replaces the by-id search entry with the state of the record on the server', async () => {
+    const declared = { id, status: EventStatus.enum.DECLARED } as EventIndex
+    serveSearchResult(declared)
+
+    // searchEventById creates the by-id entry with initialData, which is the
+    // row that the cache has when the user opens the record.
+    const observer = new QueryObserver(queryClient, {
+      ...byIdSearchOptions(id, () => ({ results: [], total: 0 })),
+      initialData: { results: [declared], total: 1 }
+    })
+    // The user opens the record. The overview fetches the record, and then the
+    // user leaves the overview.
+    const unsubscribe = observer.subscribe(() => undefined)
+    await vi.waitFor(() =>
+      expect(
+        queryClient.getQueryState(byIdSearchKey(id))?.dataUpdateCount
+      ).toBe(1)
+    )
+    unsubscribe()
+
+    // The user registers the record.
+    serveSearchResult({ id, status: EventStatus.enum.REGISTERED } as EventIndex)
+    await deleteLocalEvent(eventDocument)
+
+    // A reset would put back the initialData, and the overview would show
+    // the previous status (#13729).
+    expect(
+      queryClient.getQueryData(byIdSearchKey(id))?.results[0]?.status
+    ).toBe(EventStatus.enum.REGISTERED)
   })
 })
 
