@@ -14,8 +14,11 @@ import {
   getEventConfigForRecord,
   getEventConfigOfVersion,
   resolveEffectiveVersion,
+  resolveEventConfigInTimeZone,
+  resolveEventConfigOnDate,
   VersionedEventConfig
 } from './EventConfig'
+import { PlainDate } from './PlainDate'
 import { toVersionedEventConfig } from './test.utils'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
@@ -86,6 +89,31 @@ describe('resolveEffectiveVersion()', () => {
         'UTC'
       )
     ).toBeUndefined()
+  })
+})
+
+describe('resolveEventConfigInTimeZone()', () => {
+  it('resolves the version in effect on the date of `now` in the time zone', () => {
+    // 2019-12-31 in UTC, already 2020-01-01 in Dhaka (UTC+6)
+    const now = new Date('2019-12-31T20:00:00Z')
+
+    expect(resolveEventConfigInTimeZone(config, 'UTC', now)).toBe(
+      getEventConfigOfVersion(config, 'v1')
+    )
+    expect(resolveEventConfigInTimeZone(config, 'Asia/Dhaka', now)).toBe(
+      getEventConfigOfVersion(config, 'v2')
+    )
+  })
+})
+
+describe('resolveEventConfigOnDate()', () => {
+  it('resolves the version in effect on the date', () => {
+    expect(resolveEventConfigOnDate(config, '2019-12-31' as PlainDate)).toBe(
+      getEventConfigOfVersion(config, 'v1')
+    )
+    expect(resolveEventConfigOnDate(config, '2020-01-01' as PlainDate)).toBe(
+      getEventConfigOfVersion(config, 'v2')
+    )
   })
 })
 
@@ -194,8 +222,6 @@ describe('getDeclarationFieldsOfAllVersions()', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  // https://github.com/opencrvs/opencrvs-core/issues/13973
-  // The ticket avobe will restrict multiple field type for same id
   it("keeps the newest version's field when versions define an id differently", () => {
     const fields = getDeclarationFieldsOfAllVersions({
       ...eventLevel,

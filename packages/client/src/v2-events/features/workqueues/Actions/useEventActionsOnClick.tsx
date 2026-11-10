@@ -56,10 +56,7 @@ export function useEventActionsOnClick(event: EventIndex) {
     modal: deleteModal
   } = useEventFormNavigation()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
-  const { handleRejection, rejectionModal } = useRejectionModal(
-    event.id,
-    event.type
-  )
+  const { handleRejection, rejectionModal } = useRejectionModal(event)
   const { onQuickAction, quickActionModal } = useQuickActionModal(
     eventConfiguration,
     event

@@ -17,7 +17,7 @@ import {
   getActionReview
 } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 
 /**
  * Form and review the Edit action is done against. A user who can notify the event type
@@ -26,7 +26,7 @@ import { useEventConfiguration } from '../../useEventConfiguration'
  */
 export function useEditForm(event: EventDocument) {
   const scopes = useSelector(getScope) ?? []
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const actionType = canUserNotifyEvent(scopes, event.type)
     ? ActionType.NOTIFY
     : ActionType.DECLARE

@@ -22,7 +22,7 @@ import {
   PlainDate,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
 
@@ -69,7 +69,7 @@ export function CustomActionContent({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
 
   const customActionFields = getCustomActionFields(
     eventConfiguration,

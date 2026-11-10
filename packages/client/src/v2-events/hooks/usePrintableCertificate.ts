@@ -38,7 +38,7 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
-import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '../features/events/useEventConfiguration'
 import { hasStringFilename } from '../utils'
 
 async function replaceS3UrlWithBase64(
@@ -99,7 +99,7 @@ export const usePrintableCertificate = ({
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { config: appConfig } = useSelector(getOfflineData)
   const { declaration, ...metadata } = getCurrentEventState(
     event,

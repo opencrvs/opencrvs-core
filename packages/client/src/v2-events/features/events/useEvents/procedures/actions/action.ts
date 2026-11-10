@@ -27,7 +27,7 @@ import {
   getEventValidatorContext,
   getActionConfig
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationResolver } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
   findLocalEventDocument,
@@ -286,7 +286,7 @@ interface Options extends Params {
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
-  const eventConfigurations = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   const validatorContext = useValidatorContext()
 
@@ -329,13 +329,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
        */
       findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
-    const eventConfiguration = eventConfigurations.find(
-      (e) => e.id === localEvent?.type
-    )
+    const eventConfiguration = localEvent && findEventConfiguration(localEvent)
 
     if (!eventConfiguration) {
       throw new Error(
-        `Event configuration not found for event: ${localEvent?.type}`
+        `Event configuration not found for event: ${localEvent?.type}, version: ${localEvent?.configVersionId}`
       )
     }
 
