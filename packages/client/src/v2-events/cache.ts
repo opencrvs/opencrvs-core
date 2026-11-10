@@ -273,10 +273,12 @@ export async function precacheFiles(
 }
 
 /**
- * Precaches the files of several users (e.g. a list's avatars) that are not
- * cached already, signing them in one call.
+ * Precaches the avatars of several users (e.g. a list's) that are not cached
+ * already, signing them in one call. Signatures are left out: a list shows
+ * none, and they would otherwise land on the device of everyone who may read
+ * those users.
  */
-export async function precacheUserFiles(userIds: UUID[]) {
+export async function precacheUserAvatars(userIds: UUID[]) {
   if (userIds.length === 0) {
     return
   }
@@ -288,7 +290,10 @@ export async function precacheUserFiles(userIds: UUID[]) {
   }
 
   try {
-    const urls = await trpcClient.user.files.presign.query({ userIds })
+    const urls = await trpcClient.user.files.presign.query({
+      userIds,
+      avatarsOnly: true
+    })
     const cachedUrls = await getCachedUrls(cache)
     const missingFiles = Object.keys(urls).filter(
       (path) => !cachedUrls.has(toAbsoluteUrl(path))

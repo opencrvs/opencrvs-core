@@ -27,11 +27,13 @@ async function canReadOtherUser(ctx: TrpcContext, userId: UUID) {
  * The users' files the caller may read: every user's avatar, since avatars
  * are shown wherever users are listed, and the signatures of the caller and
  * of the users the caller may read. Unknown users are left out, as are paths
- * that aren't a valid storage key.
+ * that aren't a valid storage key. With `avatarsOnly`, signatures are left
+ * out without checking who may read them.
  */
 export async function getReadableUserFiles(
   ctx: TrpcContext,
-  userIds: UUID[]
+  userIds: UUID[],
+  { avatarsOnly = false }: { avatarsOnly?: boolean } = {}
 ): Promise<DocumentPath[]> {
   const users = (await getUsersById(userIds)).filter(isUser)
 
@@ -40,7 +42,7 @@ export async function getReadableUserFiles(
       const avatar = user.avatar ? [user.avatar] : []
 
       // No signature to check access for, so only the avatar (if any) applies
-      if (!user.signature) {
+      if (avatarsOnly || !user.signature) {
         return avatar
       }
 

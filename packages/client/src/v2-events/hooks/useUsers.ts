@@ -34,7 +34,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFiles, precacheUserFiles } from '../cache'
+import { precacheFiles, precacheUserAvatars } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -114,7 +114,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
       // One call for every avatar; a failure is logged, not thrown, so the
       // users still load
-      await precacheUserFiles(
+      await precacheUserAvatars(
         freshUsers.flatMap((user) =>
           user.type === TokenUserType.enum.user && user.avatar
             ? [user.id as UUID]

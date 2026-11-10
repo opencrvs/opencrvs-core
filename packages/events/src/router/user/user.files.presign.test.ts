@@ -66,6 +66,16 @@ describe('user.files.presign', () => {
     expect(urls).toMatchObject({ [signature]: expect.any(String) })
   })
 
+  test('returns only avatars with avatarsOnly, even for a readable signature', async () => {
+    const { viewer, owner, avatar } = await setupUsersWithFiles()
+
+    const urls = await createTestClient(viewer, [
+      encodeScope({ type: 'user.read' })
+    ]).user.files.presign({ userIds: [owner.id as UUID], avatarsOnly: true })
+
+    expect(urls).toEqual({ [avatar]: expect.any(String) })
+  })
+
   test('returns a signature uploaded under a temporary id', async () => {
     const { owner } = await setupUsersWithFiles()
     const signature = `users/tmp-${getUUID()}/${getUUID()}.png`

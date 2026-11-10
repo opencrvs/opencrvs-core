@@ -748,15 +748,25 @@ export const userRouter = router({
     }),
   files: router({
     /**
-     * Presigned URLs for the users' avatars, and for the signatures the caller
-     * may read, keyed by the path stored on the user.
+     * Presigned URLs for the users' avatars, and (unless `avatarsOnly`) for
+     * the signatures the caller may read, keyed by the path stored on the user.
      */
     presign: userOnlyProcedure
-      // Same limit as user.list
-      .input(z.object({ userIds: z.array(UUID).min(1).max(100) }))
+      .input(
+        z.object({
+          // Same limit as user.list
+          userIds: z.array(UUID).min(1).max(100),
+          avatarsOnly: z.boolean().optional()
+        })
+      )
       .output(z.record(z.string(), z.string()))
       .query(async ({ input, ctx }) =>
-        presignFiles(await getReadableUserFiles(ctx, input.userIds), ctx.token)
+        presignFiles(
+          await getReadableUserFiles(ctx, input.userIds, {
+            avatarsOnly: input.avatarsOnly
+          }),
+          ctx.token
+        )
       )
   }),
   audit: auditRouter
