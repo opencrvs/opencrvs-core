@@ -977,8 +977,8 @@ register.selectInformant.marriageInformantTitle,Who is applying for marriage reg
 register.selectInformant.newBirthRegistration,The title that appears for new birth registrations,New birth declaration,Nouvelle déclaration de naissance
 register.selectInformant.newDeathRegistration,The title that appears for new death registrations,New death declaration,Nouvelle déclaration de décès
 register.selectInformant.parents,The description that appears when selecting the parent as informant,Mother & Father,Mère et père
+register.selectVitalEvent.configVersion,"Heading of the choice of the configuration version of a new record, shown when the country allows legacy records",Form version,Version du formulaire
 register.selectVitalEvent.errorMessage,Error Message to show when no event is being selected,Please select the type of event,Veuillez sélectionner le type d'événement
-register.selectVitalEvent.formVersion,"Heading of the choice of the form version of a new record, shown when the country allows legacy records",Form version,Version du formulaire
 register.selectVitalEvent.goToReviewButton,,Go to review,Aller à la révision
 register.selectVitalEvent.registerNewEventHeader,The section heading on the page,What type of event do you want to declare?,What type of event do you want to declare?
 register.selectVitalEvent.registerNewEventHeading,The section heading on the page,Event type,Quel type d'événement voulez-vous déclarer ?

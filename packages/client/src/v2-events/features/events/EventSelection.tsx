@@ -65,11 +65,11 @@ const messages = defineMessages({
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
-  formVersionHeading: {
-    id: 'register.selectVitalEvent.formVersion',
+  configVersionHeading: {
+    id: 'register.selectVitalEvent.configVersion',
     defaultMessage: 'Form version',
     description:
-      'Heading of the choice of the form version of a new record, shown when the country allows legacy records'
+      'Heading of the choice of the configuration version of a new record, shown when the country allows legacy records'
   },
   exitButton: {
     defaultMessage: 'EXIT',
@@ -178,7 +178,7 @@ function EventSelector() {
         {canPickVersion && (
           <>
             <Text element="h2" variant="h3">
-              {intl.formatMessage(messages.formVersionHeading)}
+              {intl.formatMessage(messages.configVersionHeading)}
             </Text>
             <RadioGroup
               name="configVersionId"
