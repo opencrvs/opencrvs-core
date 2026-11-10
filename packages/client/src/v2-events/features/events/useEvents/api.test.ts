@@ -13,9 +13,12 @@ import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { serialize } from 'superjson'
 import {
+  ActionType,
   EventDocument,
   EventIndex,
   EventStatus,
+  generateActionDocument,
+  tennisClubMembershipEvent,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -115,6 +118,37 @@ describe('deleteLocalEvent', () => {
     expect(
       queryClient.getQueryData(byIdSearchKey(id))?.results[0]?.status
     ).toBe(EventStatus.enum.REGISTERED)
+  })
+
+  it('shows the assignment from the response before the refetch is complete', async () => {
+    const registrarId = 'registrar-id'
+    serveSearchResult({ id, assignedTo: null } as EventIndex)
+
+    // The overview shows the record, assigned to the registrar.
+    queryClient.setQueryData(byIdSearchKey(id), {
+      results: [{ id, assignedTo: registrarId } as EventIndex],
+      total: 1
+    })
+
+    // The server unassigns the record after the action.
+    const deleted = deleteLocalEvent({
+      ...eventDocument,
+      actions: [
+        ...eventDocument.actions,
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.UNASSIGN,
+          defaults: { createdAt: new Date().toISOString() }
+        })
+      ]
+    })
+
+    // The refetch is still in progress.
+    expect(
+      queryClient.getQueryData(byIdSearchKey(id))?.results[0]?.assignedTo
+    ).toBeNull()
+
+    await deleted
   })
 })
 

@@ -278,6 +278,20 @@ async function deleteEventData(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
 
+  /*
+   * The server usually unassigns the record after an action. The refetch below
+   * takes a round trip, and until it is complete the cached rows show the
+   * assignment from before the action. Write the assignment from the response
+   * now, so that the overview does not show "assigned to you" for a moment.
+   */
+  const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
+  if (lastAssignment) {
+    setLocalEventIndexAssignment(
+      id,
+      lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
+    )
+  }
+
   queryClient.removeQueries({
     queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
   })
