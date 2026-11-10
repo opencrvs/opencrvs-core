@@ -112,7 +112,7 @@ export type EventConfigVersionInput = Omit<
 > & {
   /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
   id: string
-  /** Name of the version, shown to the user who picks the version of a new record. */
+  /** Name of the version, which the UI shows wherever it names the version. For example, `{event.configVersionLabel}` in the event summary. */
   label: TranslationConfig
   /** Date (YYYY-MM-DD) from which this version is effective. Without one, effective from the beginning of time. */
   effectiveFrom?: string
@@ -268,7 +268,7 @@ const _EventConfigVersion: z.ZodType<
       'Identifier of the version, unique within the event (e.g. "birth-v2").'
     ),
   label: TranslationConfig.describe(
-    'Name of the version, shown to the user who picks the version of a new record.'
+    'Name of the version, which the UI shows wherever it names the version. For example, "{event.configVersionLabel}" in the event summary.'
   ),
   effectiveFrom: z.iso
     .date()
