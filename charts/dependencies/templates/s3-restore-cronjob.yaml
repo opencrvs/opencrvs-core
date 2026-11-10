@@ -118,7 +118,7 @@ spec:
                 - -c
                 - |
                   kubectl exec rustfs-0 -c rsync -- \
-                    /bin/sh -c "rsync -avz --chown={{ .Values.rustfs.run_as_id }}:{{ .Values.rustfs.run_as_id }} -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' \$BACKUP_USER@\$BACKUP_HOST:\$BACKUP_REMOTE_DIR/minio/ /data"
+                    /bin/sh -c "rsync -avz --chown={{ .Values.rustfs.run_as_id }}:{{ .Values.rustfs.run_as_id }} -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' \$BACKUP_USER@\$BACKUP_HOST:\$BACKUP_REMOTE_DIR/{{ include "rustfs.backup_dir" . }}/ /data"
           restartPolicy: OnFailure
 {{- end }}
 {{- end }}

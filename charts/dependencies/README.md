@@ -229,16 +229,21 @@ rustfs:
     # Copy storage_class, storage_size and access_mode of minio.pvc, unchanged
 ```
 
-Keep these values in later releases, otherwise RustFS stops using that volume.
+Keep these values in later releases, otherwise RustFS stops using that volume. Do not rename the directory `/data/minio`: set `host_data_path` to it instead. The running MinIO would lose a renamed directory before the deployment replaces it.
 
 - **Back up the data first.** After RustFS has written to the volume, going back to MinIO is not clean: MinIO does not see the user metadata (such as `created-by`) of the objects that RustFS wrote. A copy of the volume taken before the migration is the way back.
 - **MinIO must be stopped before RustFS starts.** `helm upgrade` creates the RustFS StatefulSet before it deletes the one of MinIO. Scale MinIO down first (`kubectl scale statefulset minio --replicas=0`), so that the two never run on the same data.
-- **The PVC is kept.** With `pvc.name: minio` the chart renders the PVC `minio` itself, so Helm updates the PVC of the previous release instead of deleting it. Its `storage_class` and `storage_size` must be those of `minio.pvc`: Helm cannot change the storage class of a PVC.
+- **The PVC is kept.** With `pvc.name: minio` the chart renders the PVC `minio` itself, so Helm updates the PVC of the previous release instead of deleting it. Its `storage_class` and `storage_size` must be those of `minio.pvc`: Helm cannot change the storage class of a PVC. The chart adds the annotation `helm.sh/resource-policy: keep` to this PVC, so that Helm does not delete it later.
+- **Add the `keep` annotation to the PVC of MinIO before the upgrade (`storage_type: pvc`).** The PVC `minio` that the previous chart made has no `keep` annotation. If `rustfs.pvc.name` is not `minio`, or you make a mistake in the values, the new release does not contain that PVC and `helm upgrade` deletes it. The data is lost when the storage class deletes the volume together with the PVC. Add the annotation first, and check it:
+
+  ```bash
+  kubectl annotate pvc minio helm.sh/resource-policy=keep --overwrite
+  kubectl get pvc minio -o jsonpath='{.metadata.annotations}'
+  ```
+
 - **Keep the credentials.** RustFS reads the IAM data of MinIO with the root credentials, so `s3-opencrvs-users` must not change.
 - **Hostnames change.** The S3 API is now on `rustfs.<hostname>` and the console on `rustfs-console.<hostname>`. Point `s3.host` and `s3.public_endpoint` of the services chart at them, see [Use RustFS from the OpenCRVS services](#use-rustfs-from-the-opencrvs-services).
 - The `minio` values of `values.yaml` are not read any more, so move the settings that you had there to `rustfs`.
-
-For an environment that already exists, `environment:init` stores `RUSTFS_HOST_DATA_PATH=/data/minio` once and writes it to `host_data_path`. A new environment gets `/data/rustfs`. The directory is not renamed, because the running MinIO would lose it before the deployment replaces it.
 
 ### Configuration options
 
@@ -450,9 +455,17 @@ After publishing the custom images, point the chart to them through:
 RustFS is backed up and restored by the jobs `rustfs-backup` and `rustfs-restore`, with the scripts in `files/s3`. The settings are `rustfs.backup`, `rustfs.restore` and the global `backup` and `restore`.
 
 - **`dump`** reads the buckets through the S3 API with `mcli`, packs them into one archive, encrypts it and copies it to the backup server. The restore empties the buckets and writes the archive back. It works with any S3 store.
-- **`differential`** runs rsync in the `rsync` sidecar of the RustFS pod and copies the data directory to the backup server, `<server_dir>/minio`. It leaves out the IAM configuration of the store (`.minio.sys/config/iam/` and `.rustfs.sys/config/iam/`). The restore copies the files back into the running store and hands them to `10001:10001`, the user that RustFS runs as, because the backup server does not keep the owner of a file and RustFS does not start on files that it does not own. The sidecar runs as root and copies the SSH key before it uses it, because the kubelet makes a secret readable for the group of the pod (`fsGroup`) and ssh refuses such a key.
+- **`differential`** runs rsync in the `rsync` sidecar of the RustFS pod and copies the data directory to the backup server, `<server_dir>/<data_dir>`. It leaves out the IAM configuration of the store (`.minio.sys/config/iam/` and `.rustfs.sys/config/iam/`). The restore copies the files back into the running store and hands them to `10001:10001`, the user that RustFS runs as, because the backup server does not keep the owner of a file and RustFS does not start on files that it does not own.
 
-The archive is `<server_dir>/<date>/minio_backup_<date>.tar.gz.enc` and the data directory is `<server_dir>/minio`. These names come from the MinIO versions of the chart and are kept, so that the backups of an earlier version are found and restore into RustFS.
+> [!NOTE]
+> This note is for environments that you upgrade from MinIO.
+>
+> **`dump` backups.** The archive is `<server_dir>/<date>/rustfs_backup_<date>.tar.gz.enc`. A MinIO version of the chart named it `minio_backup_<date>.tar.gz.enc`. To restore an old archive, rename the file on the backup server to `rustfs_backup_<date>.tar.gz.enc`.
+>
+> **`differential` backups.** The directory `<data_dir>` on the backup server depends on the data that RustFS uses:
+>
+> - It is `minio` when `rustfs.host_data_path` ends with `/minio`. With `storage_type: pvc`, it is `minio` when `rustfs.pvc.name` is `minio`. RustFS then uses the directory of the MinIO backups and adds to it.
+> - In all other cases it is `rustfs`.
 
 ## Storage Configuration
 

@@ -13,6 +13,9 @@ metadata:
   labels:
     app: rustfs
   name: {{ .Values.rustfs.pvc.name }}
+  annotations:
+    # Helm does not delete the volume with the data when the release is removed or the PVC leaves it
+    "helm.sh/resource-policy": keep
 spec:
   {{- if .Values.rustfs.pvc.storage_class }}
   storageClassName: {{ .Values.rustfs.pvc.storage_class | quote }}

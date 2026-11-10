@@ -9,8 +9,8 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
+
 . /scripts/backup-functions.sh
-. /scripts/ensure-alpine-utils.sh
 
 # Initial variables configuration
 # Today's date is used for filenames if LABEL is not provided
@@ -21,15 +21,11 @@ BACKUP_DIR="/data"
 BACKUP_PATH=/tmp/s3-backup
 mkdir -p $BACKUP_PATH
 # Temporal archive path inside container
-# The archive keeps the name it had in the MinIO versions of the chart, so that the backups
-# of an earlier version are found and restore into RustFS
-ARCHIVE_PATH="/tmp/minio_backup_${BACKUP_DATE}.tar.gz"
+ARCHIVE_PATH="/tmp/rustfs_backup_${BACKUP_DATE}.tar.gz"
 # Remote directory on backup server
 REMOTE_DIR="${BACKUP_REMOTE_DIR:-"/home/$BACKUP_USER"}/$BACKUP_DATE"
 # Number of retries for backup creation
 MAX_RETRIES=10
-
-ensure_alpine_utils || exit 1
 
 # Check S3 endpoint and backup encryption password
 if [ -z "$S3_ENDPOINT" ]; then

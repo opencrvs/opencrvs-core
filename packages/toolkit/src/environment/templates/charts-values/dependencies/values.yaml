@@ -28,6 +28,8 @@ node_selector:
 rustfs:
   use_default_credentials: false
   host_data_path: {{rustfs_host_data_path}}
+  pvc:
+    name: {{rustfs_pvc_name}}
   {{#if restore_enabled}}
   restore:
     type: {{restore_type}}
