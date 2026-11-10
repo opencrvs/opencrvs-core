@@ -14,6 +14,7 @@ import { continueForm, login, loginWithNewUser } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ASSETS_DIR } from '@e2e/support/paths'
+import { getExpectedUsername } from '@e2e/support/test-data/api-actions'
 
 test('1. Create user -1', async ({ page, browser }) => {
   const userinfo = {
@@ -23,7 +24,10 @@ test('1. Create user -1', async ({ page, browser }) => {
     role: 'Registrar'
   }
   const signaturePath = path.join(ASSETS_DIR, 'sign1.png')
-  const username = `${userinfo.firstName[0]}.${userinfo.surname}`.toLowerCase()
+  const username = getExpectedUsername({
+    firstname: userinfo.firstName,
+    surname: userinfo.surname
+  })
   await test.step('1.1 User creation started by national system admin', async () => {
     await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
     await page.getByRole('button', { name: 'Team' }).click()
