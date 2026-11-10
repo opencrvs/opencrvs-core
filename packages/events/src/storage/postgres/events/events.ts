@@ -231,42 +231,27 @@ export const createAction = async (action: NewEventActions) => {
   })
 }
 
-/** How long a request waits for another request on the same event to store its action. */
-const EVENT_ROW_LOCK_TIMEOUT = '5s'
+/** Runs `fn` in a database transaction. It commits when `fn` returns and rolls back when it throws. */
+export async function transaction<T>(fn: (trx: Kysely<Schema>) => Promise<T>) {
+  return getClient().transaction().execute(fn)
+}
 
 /**
- * Creates an action after `assertAllowed` has accepted the event, while holding a row lock
- * on the event. Two requests on the same event run this one at a time, so the second one
- * reads the event with the action of the first.
- *
- * The lock is released when the transaction commits, right after the insert. The lock mode
- * does not conflict with the key share lock that inserts into `event_actions` take, so it
- * blocks only other callers of this function, not reads or other actions.
+ * Reads the event and locks its row until the transaction ends. A second transaction that
+ * calls this for the same event waits, and then reads the actions the first one stored.
+ * The lock does not block reads or the insert of other actions, for example READ.
  *
  * @throws NoResultError if the event does not exist
- * @throws a database error with code `55P03` (lock_not_available) if the lock is not
- * acquired within the timeout
  */
-export async function createActionExclusively(
-  action: NewEventActions,
-  assertAllowed: (event: EventDocument) => void
-) {
-  const db = getClient()
-  return db.transaction().execute(async (trx) => {
-    await sql`SET LOCAL lock_timeout = ${sql.lit(EVENT_ROW_LOCK_TIMEOUT)}`.execute(
-      trx
-    )
-    await trx
-      .selectFrom('events')
-      .select('id')
-      .where('id', '=', action.eventId)
-      .forNoKeyUpdate()
-      .executeTakeFirstOrThrow()
+export async function getEventByIdWithLockInTrx(id: UUID, trx: Kysely<Schema>) {
+  await trx
+    .selectFrom('events')
+    .select('id')
+    .where('id', '=', id)
+    .forNoKeyUpdate()
+    .executeTakeFirstOrThrow()
 
-    assertAllowed(await getEventByIdInTrx(action.eventId, trx))
-
-    return createActionInTrx(action, trx)
-  })
+  return getEventByIdInTrx(id, trx)
 }
 
 async function getOrCreateEventInTrx(

@@ -19,9 +19,9 @@ import {
   ActionType,
   ActionUpdate,
   AsyncRejectActionDocument,
-  DisplayableAction,
   EventConfig,
   EventDocument,
+  EventIndex,
   EventInput,
   EventStatus,
   FieldType,
@@ -105,21 +105,17 @@ async function deleteEventAttachments(
   }
 }
 
-/** Throws tRPC HTTP 409 if the action is not available for the event in its current state. */
+/** Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action. */
 function throwConflictIfActionNotAvailable(
-  event: EventDocument,
-  configuration: EventConfig,
+  event: EventIndex,
   actionType: ActionType
 ) {
-  const eventIndex = getCurrentEventState(event, configuration)
-
-  const allowedActions: DisplayableAction[] =
-    getAvailableActionsForEvent(eventIndex)
+  const allowedActions = getAvailableActionsForEvent(event)
 
   if (!allowedActions.includes(actionType)) {
     throw new TRPCError({
       code: 'CONFLICT',
-      message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
+      message: `Action '${actionType}' cannot be performed on an event in '${event.status}' state with [${event.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
     })
   }
 }
@@ -134,7 +130,10 @@ export async function throwConflictIfActionNotAllowed(
     eventType: event.type,
     token
   })
-  throwConflictIfActionNotAvailable(event, eventConfig, actionType)
+  throwConflictIfActionNotAvailable(
+    getCurrentEventState(event, eventConfig),
+    actionType
+  )
 }
 
 export async function deleteEvent(
@@ -297,50 +296,27 @@ export function buildAction(
 }
 
 /**
- * Stores the requested action of an action request.
+ * Stores the requested action of a new action request.
  *
- * An event has at most one requested action without an outcome: the action is stored only
- * if it is available for the event, and an action is not available while another one is
- * requested. The check and the insert run under a row lock on the event, so two requests
- * that arrive together cannot both pass the check.
- *
- * A request that already stored its requested action (a retry after a failed confirmation,
- * with the same transaction id) is not checked again and stores nothing new.
+ * The event is locked while it is checked and the action is stored. Of two requests that
+ * arrive together, the second one waits, sees the requested action of the first and gets
+ * 409: an event has at most one requested action waiting for its outcome.
  */
-async function createRequestedAction(
+async function addRequestedAction(
   input: ActionInputWithType,
   user: TrpcUserContext,
   configuration: EventConfig
 ) {
-  try {
-    await eventsRepo.createActionExclusively(
-      buildAction(input, ActionStatus.Requested, user),
-      (event) => {
-        const isRetry = event.actions.some(
-          (action) =>
-            action.status === ActionStatus.Requested &&
-            action.transactionId === input.transactionId &&
-            action.type === input.type
-        )
+  await eventsRepo.transaction(async (trx) => {
+    const event = await eventsRepo.getEventByIdWithLockInTrx(input.eventId, trx)
+    const eventIndex = getCurrentEventState(event, configuration)
+    throwConflictIfActionNotAvailable(eventIndex, input.type)
 
-        if (!isRetry) {
-          throwConflictIfActionNotAvailable(event, configuration, input.type)
-        }
-      }
+    await eventsRepo.createActionInTrx(
+      buildAction(input, ActionStatus.Requested, user),
+      trx
     )
-  } catch (error) {
-    if (error instanceof NoResultError) {
-      throw new EventNotFoundError(input.eventId)
-    }
-    // lock_not_available: another request kept the event locked for longer than the timeout
-    if ((error as { code?: string }).code === '55P03') {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        message: `Action '${input.type}' cannot be requested while another action request on the event is in progress`
-      })
-    }
-    throw error
-  }
+  })
 }
 
 /**
@@ -390,7 +366,7 @@ export async function addAction(
   }
 
   if (status === ActionStatus.Requested) {
-    await createRequestedAction(input, user, configuration)
+    await addRequestedAction(input, user, configuration)
   } else {
     await eventsRepo.createAction(buildAction(input, status, user))
   }

@@ -203,13 +203,25 @@ export async function defaultRequestHandler(
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
-  const eventWithRequestedAction = await addAction(input, {
-    event,
-    user,
-    token,
-    status: ActionStatus.Requested,
-    configuration
-  })
+  // A retry: the request was made before with the same transaction id and its requested
+  // action is stored, for example because the country config call failed. Send that action
+  // again instead of storing a new one, which the stored one would refuse.
+  const isRetry = event.actions.some(
+    (action) =>
+      action.status === ActionStatus.Requested &&
+      action.transactionId === input.transactionId &&
+      action.type === input.type
+  )
+
+  const eventWithRequestedAction = isRetry
+    ? event
+    : await addAction(input, {
+        event,
+        user,
+        token,
+        status: ActionStatus.Requested,
+        configuration
+      })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
   const eventActionToken = await getActionConfirmationToken(
