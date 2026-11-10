@@ -2365,8 +2365,9 @@ components:
                 description: Identifier of the version, unique within the event (e.g.
                   "birth-v2").
               label:
-                description: Name of the version, shown to the user who picks the version of a
-                  new record.
+                description: Name of the version, which the UI shows wherever it names the
+                  version. For example, "{event.configVersionLabel}" in the
+                  event summary.
                 $ref: "#/components/schemas/TranslationConfig"
               effectiveFrom:
                 default: 0001-01-01
