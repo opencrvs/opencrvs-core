@@ -29,6 +29,12 @@ import { useCountryToday } from '@client/v2-events/hooks/useCountryToday'
 const EVENT_CONFIGURATION_STALE_TIME_MS = 1 * 60 * 1000
 
 /**
+ * A tab that stays open on one page does not refetch the configuration. This
+ * refetch gets a new version to it within an hour.
+ */
+const EVENT_CONFIGURATION_REFETCH_INTERVAL_MS = 60 * 60 * 1000
+
+/**
  * Fetches configured events with every version of their configuration.
  */
 export function useVersionedEventConfigurations(): VersionedEventConfig[] {
@@ -37,7 +43,8 @@ export function useVersionedEventConfigurations(): VersionedEventConfig[] {
   return useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
     queryKey: trpc.event.config.get.queryKey(),
-    staleTime: import.meta.env.PROD ? EVENT_CONFIGURATION_STALE_TIME_MS : 0
+    staleTime: import.meta.env.PROD ? EVENT_CONFIGURATION_STALE_TIME_MS : 0,
+    refetchInterval: EVENT_CONFIGURATION_REFETCH_INTERVAL_MS
   }).data
 }
 
