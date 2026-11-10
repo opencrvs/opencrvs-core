@@ -100,9 +100,18 @@ export const ClientConfig = z.object({
     })
   ),
   FEATURES: z
-    .object({ V2_EVENTS: z.boolean().optional().default(true) })
+    .object({
+      V2_EVENTS: z.boolean().optional().default(true),
+      LEGACY_RECORDS: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe(
+          'Lets the user pick a past version of the event configuration when creating a record, for example to enter a record that was registered under an earlier form.'
+        )
+    })
     .optional()
-    .default({ V2_EVENTS: true })
+    .default({ V2_EVENTS: true, LEGACY_RECORDS: false })
 })
 
 export type ClientConfig = z.infer<typeof ClientConfig>
