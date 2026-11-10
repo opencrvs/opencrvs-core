@@ -12,9 +12,6 @@
 set -e
 
 . /scripts/backup-functions.sh
-. /scripts/ensure-alpine-utils.sh
-
-ensure_alpine_utils || exit 1
 
 if [ -z "$S3_ENDPOINT" ]; then
   echo "[$(date +%F\ %H:%M:%S)] [ERROR] Must provide S3_ENDPOINT environment variable"
@@ -27,8 +24,7 @@ RESTORE_DATE=${RESTORE_DATE:-$(date -d "yesterday" +%Y-%m-%d)}
 WORK_PATH="/tmp/s3-restore"
 mkdir -p "$WORK_PATH"
 # Path for decrypted archive
-# The archive keeps the name it had in the MinIO versions of the chart, see backup.sh
-ARCHIVE_NAME="minio_backup_${RESTORE_DATE}.tar.gz"
+ARCHIVE_NAME="rustfs_backup_${RESTORE_DATE}.tar.gz"
 ARCHIVE_PATH="/tmp/$ARCHIVE_NAME"
 
 # Remote directory on backup server

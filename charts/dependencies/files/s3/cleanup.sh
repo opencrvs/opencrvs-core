@@ -9,9 +9,7 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-. /scripts/ensure-alpine-utils.sh
 
-ensure_alpine_utils || exit 1
 S3_ALIAS=local-cleanup
 
 mcli alias set "$S3_ALIAS" "$S3_ENDPOINT" "$S3_ADMIN_ACCESS_KEY" "$S3_ADMIN_SECRET_KEY"

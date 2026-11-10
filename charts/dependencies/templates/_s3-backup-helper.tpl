@@ -45,3 +45,21 @@ Render differential backup properties
       )
   }}true{{- else }}false{{- end }}
 {{- end }}
+
+{{/*
+rustfs.backup_dir
+---
+Name of the directory of the differential backup, below the backup server directory.
+
+It is `minio` when RustFS uses the data of a MinIO: `rustfs.host_data_path` ends with `/minio`
+(host_path storage), or `rustfs.pvc.name` is `minio` (pvc storage). Then the backups of the MinIO
+versions of the chart, which are in `minio`, are found. In all other cases it is `rustfs`.
+*/}}
+{{- define "rustfs.backup_dir" -}}
+{{- $storageType := default .Values.storage_type .Values.rustfs.storage_type | default "pvc" -}}
+{{- if eq $storageType "host_path" -}}
+{{- if eq (base .Values.rustfs.host_data_path) "minio" }}minio{{ else }}rustfs{{ end -}}
+{{- else -}}
+{{- if eq .Values.rustfs.pvc.name "minio" }}minio{{ else }}rustfs{{ end -}}
+{{- end -}}
+{{- end }}

@@ -740,6 +740,11 @@ export async function runSetupEnvironment() {
   const rustfs_host_data_path =
     existingRustfsHostDataPath?.value ||
     (environment_exists ? '/data/minio' : '/data/rustfs')
+  // The PVC that RustFS uses follows the same decision. The name `minio` makes RustFS
+  // take over the PVC of MinIO, so it does not depend on the storage type.
+  const rustfs_pvc_name = rustfs_host_data_path.endsWith('/minio')
+    ? 'minio'
+    : 'rustfs'
 
   // Backup and restore configuration
   let backupHost =
@@ -1591,6 +1596,7 @@ export async function runSetupEnvironment() {
     two_fa_enabled,
     monitoring_enabled,
     rustfs_host_data_path,
+    rustfs_pvc_name,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',
