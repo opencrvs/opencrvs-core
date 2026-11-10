@@ -147,7 +147,9 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionId}`.
 
-[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602)
+**The client shows each record with its own version.** Record pages, actions, validation, workqueue rows and the duplicate comparison use the version that the record was created under. When a new version takes effect at midnight, the client uses it for new records. A form that is already open does not change.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602) [#13603](https://github.com/opencrvs/opencrvs-core/issues/13603)
 
 #### The `incomplete` flag is removed
 
