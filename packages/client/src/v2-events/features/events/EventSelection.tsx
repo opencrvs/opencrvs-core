@@ -36,10 +36,8 @@ import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLo
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import {
-  useCountryTimeZone,
-  useVersionedEventConfigurations
-} from './useEventConfiguration'
+import { useCountryTimeZone } from '@client/v2-events/hooks/useCountryToday'
+import { useVersionedEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'

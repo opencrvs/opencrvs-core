@@ -82,7 +82,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
       action={workqueueConfig.action}
       columns={workqueueConfig.columns}
       emptyMessage={workqueueConfig.emptyMessage}
-      eventConfigs={eventConfigs}
       queryData={events}
       title={intl.formatMessage(workqueueConfig.name)}
       totalResults={total}
