@@ -37,6 +37,7 @@ import {
   getAvailableActionsForEvent,
   getCurrentEventState,
   getDeclarationFields,
+  getFilePathsFromValues,
   getStatusFromActions,
   isActionVisible,
   isActionEnabled,
@@ -357,7 +358,11 @@ export async function addAction(
 ): Promise<EventDocument> {
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
-  assertFilesBelongToEvent(await getEventById(eventId), input)
+
+  // Most actions (e.g. READ) name no files; skip loading the record for them
+  if (getFilePathsFromValues(input).length > 0) {
+    assertFilesBelongToEvent(await getEventById(eventId), input)
+  }
 
   const fileValuesInCurrentAction = extractFileValues(
     input.declaration,
