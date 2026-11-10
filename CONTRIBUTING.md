@@ -18,7 +18,7 @@ We greatly appreciate any contributions to opencrvs-core
 3. Co-create development tasks with our team
 4. Fork the repo
 5. Create a branch with your changes
-6. Submit a PR
+6. Check your changes against the [pull request guidelines](docs/pull-request-guidelines.md), then submit a PR
 7. Address any comments the core contributors may have
 8. The core contributors will merge the code once it is ready, thanks for you contribution to ensure every individual on the planet is recognised, protected and provided for from birth!
 
