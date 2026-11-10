@@ -15,8 +15,10 @@ import {
   getEventConfigOfVersion,
   resolveEffectiveVersion,
   resolveEventConfigInTimeZone,
+  resolveEventConfigOnDate,
   VersionedEventConfig
 } from './EventConfig'
+import { PlainDate } from './PlainDate'
 import { toVersionedEventConfig } from './test.utils'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
@@ -99,6 +101,17 @@ describe('resolveEventConfigInTimeZone()', () => {
       getEventConfigOfVersion(config, 'v1')
     )
     expect(resolveEventConfigInTimeZone(config, 'Asia/Dhaka', now)).toBe(
+      getEventConfigOfVersion(config, 'v2')
+    )
+  })
+})
+
+describe('resolveEventConfigOnDate()', () => {
+  it('resolves the version in effect on the date', () => {
+    expect(resolveEventConfigOnDate(config, '2019-12-31' as PlainDate)).toBe(
+      getEventConfigOfVersion(config, 'v1')
+    )
+    expect(resolveEventConfigOnDate(config, '2020-01-01' as PlainDate)).toBe(
       getEventConfigOfVersion(config, 'v2')
     )
   })

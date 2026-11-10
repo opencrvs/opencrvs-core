@@ -21,7 +21,7 @@ import { Conditional } from './Conditional'
 import type { JSONSchema } from '../conditionals/conditionals'
 import { AvailableIcons } from '../icons'
 import { ActionType } from './ActionType'
-import { toPlainDateInTimeZone } from './PlainDate'
+import { PlainDate, toPlainDateInTimeZone } from './PlainDate'
 import { getOrThrow } from '../utils'
 import {
   validateActionOrder,
@@ -343,9 +343,19 @@ export function resolveEffectiveVersion(
   now: Date,
   timeZone: string
 ): EventConfigVersion | undefined {
-  const today = toPlainDateInTimeZone(now, timeZone)
+  return findVersionInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
+}
+
+/**
+ * @returns the version with the latest `effectiveFrom` not after `date`. Undefined
+ * when every version takes effect later.
+ */
+function findVersionInEffectOn(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfigVersion | undefined {
   return config.versions
-    .filter(({ effectiveFrom }) => effectiveFrom <= today)
+    .filter(({ effectiveFrom }) => effectiveFrom <= date)
     .sort(byEffectiveFrom)
     .at(-1)
 }
@@ -389,11 +399,23 @@ export function resolveEventConfigInTimeZone(
   timeZone: string,
   now: Date = new Date()
 ): EventConfig {
+  return resolveEventConfigOnDate(config, toPlainDateInTimeZone(now, timeZone))
+}
+
+/**
+ * @returns the configuration of the version in effect on `date`, a date in the
+ * country's time zone. For a record, use `getEventConfigForRecord` instead.
+ * @throws when no version is in effect on that date, which `defineConfig` rules out.
+ */
+export function resolveEventConfigOnDate(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfig {
   return toEventConfig(
     config,
     getOrThrow(
-      resolveEffectiveVersion(config, now, timeZone),
-      `Event '${config.id}' has no version in effect on ${now.toISOString()}`
+      findVersionInEffectOn(config, date),
+      `Event '${config.id}' has no version in effect on ${date}`
     )
   )
 }
