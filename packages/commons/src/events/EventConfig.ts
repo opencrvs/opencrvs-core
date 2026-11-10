@@ -323,6 +323,28 @@ export function toEventConfig(
   return resolved
 }
 
+/** @returns the version with id `versionId`, or undefined when it is not configured. */
+export function findConfigVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfigVersion | undefined {
+  return config.versions.find(({ id }) => id === versionId)
+}
+
+/**
+ * @returns the version with id `versionId`.
+ * @throws when that version is not configured.
+ */
+export function getConfigVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfigVersion {
+  return getOrThrow(
+    findConfigVersion(config, versionId),
+    `Event '${config.id}' has no version '${versionId}'`
+  )
+}
+
 /**
  * @returns the configuration of the version with id `versionId`.
  * @throws when the version is not configured.
@@ -331,13 +353,7 @@ export function getEventConfigOfVersion(
   config: VersionedEventConfig,
   versionId: string
 ): EventConfig {
-  return toEventConfig(
-    config,
-    getOrThrow(
-      config.versions.find(({ id }) => id === versionId),
-      `Event '${config.id}' has no version '${versionId}'`
-    )
-  )
+  return toEventConfig(config, getConfigVersion(config, versionId))
 }
 
 /** Orders versions by `effectiveFrom`, earliest first. */
@@ -403,9 +419,7 @@ export function findEventConfigForRecord(
   config: VersionedEventConfig,
   record: { configVersionId: string }
 ): EventConfig | undefined {
-  const version = config.versions.find(
-    ({ id }) => id === record.configVersionId
-  )
+  const version = findConfigVersion(config, record.configVersionId)
   return version && toEventConfig(config, version)
 }
 
@@ -417,10 +431,7 @@ export function getEventConfigForRecord(
   config: VersionedEventConfig,
   record: { configVersionId: string }
 ): EventConfig {
-  return getOrThrow(
-    findEventConfigForRecord(config, record),
-    `Event '${config.id}' has no version '${record.configVersionId}'`
-  )
+  return getEventConfigOfVersion(config, record.configVersionId)
 }
 
 /**

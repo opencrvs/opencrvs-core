@@ -27,6 +27,7 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
+import { useConfigVersionLabel } from '@client/v2-events/features/events/useEventConfiguration'
 import { InfoBox } from './InfoBox'
 
 const messages = {
@@ -139,6 +140,9 @@ export function EventSummary({
   const intl = useIntlFormatMessageWithFlattenedParams()
   const validatorContext = useValidatorContext(eventDocument)
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
+  const configVersionLabel = intl.formatMessage(
+    useConfigVersionLabel(eventIndex)
+  )
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
@@ -203,7 +207,10 @@ export function EventSummary({
          * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
          * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
          */
-        convertDateFieldsToUnixTimestamps(event)
+        {
+          ...convertDateFieldsToUnixTimestamps(event),
+          'event.configVersionLabel': configVersionLabel
+        }
       )
     }
   })
