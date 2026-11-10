@@ -121,6 +121,7 @@ export async function transaction<T>(fn: (trx: Kysely<Schema>) => Promise<T>) {
  * Reads the event and locks its row until the transaction ends. A second
  * transaction that calls this for the same event waits. The lock mode does not
  * block reads or the insert of other actions.
+ *
  * @throws NoResultError if the event does not exist
  */
 export async function getEventByIdWithLockInTrx(id: UUID, trx: Kysely<Schema>) {

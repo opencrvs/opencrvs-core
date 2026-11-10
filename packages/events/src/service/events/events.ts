@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
@@ -375,6 +375,31 @@ async function addRequestedAction(
 }
 
 /**
+ * Stores accept/reject action while locking the event.
+ */
+async function addConfirmationAction(
+  action: Parameters<typeof eventsRepo.createActionInTrx>[0]
+) {
+  await eventsRepo.transaction(async (trx) => {
+    const event = await eventsRepo.getEventByIdWithLockInTrx(
+      action.eventId,
+      trx
+    )
+
+    if (
+      event.actions.some((a) => a.originalActionId === action.originalActionId)
+    ) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: 'Action has already been accepted or rejected.'
+      })
+    }
+
+    await eventsRepo.createActionInTrx(action, trx)
+  })
+}
+
+/**
  * Persists a new action for an event in the database.
  *
  * @param input - The action payload including type and related data.
@@ -421,6 +446,9 @@ export async function addAction(
 
   if (status === ActionStatus.Requested) {
     await addRequestedAction(input, user, configuration)
+  } else if (input.originalActionId) {
+    await addConfirmationAction(buildAction(input, status, user))
+    // Actions that are accepted by default: e.g. READ, ASSIGN, UNASSIGN and DUPLICATE_DETECTED.
   } else {
     await eventsRepo.createAction(buildAction(input, status, user))
   }
@@ -575,7 +603,7 @@ export async function addAsyncRejectAction(
   }
 ) {
   const eventId = event.id
-  await eventsRepo.createAction({
+  await addConfirmationAction({
     eventId,
     transactionId,
     actionType: type,
