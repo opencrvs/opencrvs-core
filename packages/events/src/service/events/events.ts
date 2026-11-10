@@ -14,6 +14,7 @@ import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
 import {
   eventAttachmentPath,
+  EventIndex,
   logger,
   TokenUserType,
   TokenWithBearer,
@@ -25,7 +26,6 @@ import {
   ActionType,
   ActionUpdate,
   AsyncRejectActionDocument,
-  DisplayableAction,
   EventConfig,
   VersionedEventConfig,
   EventDocument,
@@ -103,6 +103,24 @@ function getValidFileValue(
 }
 
 /**
+ * Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action.
+ * @returns the current state of the event
+ */
+function throwConflictIfActionNotAvailable(
+  event: EventIndex,
+  actionType: ActionType
+) {
+  const allowedActions = getAvailableActionsForEvent(event)
+
+  if (!allowedActions.includes(actionType)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${actionType}' cannot be performed on an event in '${event.status}' state with [${event.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
+    })
+  }
+}
+
+/**
  * Ensure that an action is allowed depending on the current event state. This does two checks:
  * 1. Check that the action is allowed in the current event status and flags
  * 2. Check that any conditionals defined for the action are met
@@ -123,16 +141,7 @@ export async function throwConflictIfActionNotAllowed(
   })
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-
-  const allowedActions: DisplayableAction[] =
-    getAvailableActionsForEvent(eventIndex)
-
-  if (!allowedActions.includes(actionType)) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
-    })
-  }
+  throwConflictIfActionNotAvailable(eventIndex, actionType)
 
   const actionConfig = getActionConfig({
     actionType,
@@ -344,6 +353,28 @@ export function buildAction(
 }
 
 /**
+ * Stores the requested action of a new action request. The check and the insert
+ * run while the event is locked. Of two requests that arrive together, the
+ * second one sees the requested action of the first and gets a conflict error.
+ */
+async function addRequestedAction(
+  input: ActionInputWithType,
+  user: TrpcUserContext,
+  configuration: EventConfig
+) {
+  await eventsRepo.transaction(async (trx) => {
+    const event = await eventsRepo.getEventByIdWithLockInTrx(input.eventId, trx)
+    const eventIndex = getCurrentEventState(event, configuration)
+    throwConflictIfActionNotAvailable(eventIndex, input.type)
+
+    await eventsRepo.createActionInTrx(
+      buildAction(input, ActionStatus.Requested, user),
+      trx
+    )
+  })
+}
+
+/**
  * Persists a new action for an event in the database.
  *
  * @param input - The action payload including type and related data.
@@ -388,7 +419,11 @@ export async function addAction(
     }
   }
 
-  await eventsRepo.createAction(buildAction(input, status, user))
+  if (status === ActionStatus.Requested) {
+    await addRequestedAction(input, user, configuration)
+  } else {
+    await eventsRepo.createAction(buildAction(input, status, user))
+  }
 
   // We want to unassign only if:
   // - ActionStatus is not requested

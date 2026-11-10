@@ -113,6 +113,27 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
+export async function transaction<T>(fn: (trx: Kysely<Schema>) => Promise<T>) {
+  return getClient().transaction().execute(fn)
+}
+
+/**
+ * Reads the event and locks its row until the transaction ends. A second
+ * transaction that calls this for the same event waits. The lock mode does not
+ * block reads or the insert of other actions.
+ * @throws NoResultError if the event does not exist
+ */
+export async function getEventByIdWithLockInTrx(id: UUID, trx: Kysely<Schema>) {
+  await trx
+    .selectFrom('events')
+    .select('id')
+    .where('id', '=', id)
+    .forNoKeyUpdate()
+    .executeTakeFirstOrThrow()
+
+  return getEventByIdInTrx(id, trx)
+}
+
 /*
  * A failed fetch rejects, so the reindex fails instead of silently skipping the
  * chunk. The rejection is marked handled up front, so a prefetched chunk cannot
