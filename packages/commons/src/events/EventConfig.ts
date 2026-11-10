@@ -334,19 +334,6 @@ export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
 }
 
 /**
- * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
- * after the date of `now` in `timeZone`, the country's time zone, since versions take
- * effect at its midnight. Undefined when every version takes effect later.
- */
-export function resolveEffectiveVersion(
-  config: VersionedEventConfig,
-  now: Date,
-  timeZone: string
-): EventConfigVersion | undefined {
-  return findVersionInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
-}
-
-/**
  * @returns the version with the latest `effectiveFrom` not after `date`. Undefined
  * when every version takes effect later.
  */
@@ -358,6 +345,19 @@ function findVersionInEffectOn(
     .filter(({ effectiveFrom }) => effectiveFrom <= date)
     .sort(byEffectiveFrom)
     .at(-1)
+}
+
+/**
+ * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
+ * after the date of `now` in `timeZone`, the country's time zone, since versions take
+ * effect at its midnight. Undefined when every version takes effect later.
+ */
+export function resolveEffectiveVersion(
+  config: VersionedEventConfig,
+  now: Date,
+  timeZone: string
+): EventConfigVersion | undefined {
+  return findVersionInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
 }
 
 /**
@@ -389,20 +389,6 @@ export function getEventConfigForRecord(
 }
 
 /**
- * @returns the configuration of the version in effect on the date of `now` (today by
- * default) in `timeZone`, the country's time zone. For a record, use
- * `getEventConfigForRecord` instead.
- * @throws when no version is in effect on that date, which `defineConfig` rules out.
- */
-export function resolveEventConfigInTimeZone(
-  config: VersionedEventConfig,
-  timeZone: string,
-  now: Date = new Date()
-): EventConfig {
-  return resolveEventConfigOnDate(config, toPlainDateInTimeZone(now, timeZone))
-}
-
-/**
  * @returns the configuration of the version in effect on `date`, a date in the
  * country's time zone. For a record, use `getEventConfigForRecord` instead.
  * @throws when no version is in effect on that date, which `defineConfig` rules out.
@@ -418,6 +404,20 @@ export function resolveEventConfigOnDate(
       `Event '${config.id}' has no version in effect on ${date}`
     )
   )
+}
+
+/**
+ * @returns the configuration of the version in effect on the date of `now` (today by
+ * default) in `timeZone`, the country's time zone. For a record, use
+ * `getEventConfigForRecord` instead.
+ * @throws when no version is in effect on that date, which `defineConfig` rules out.
+ */
+export function resolveEventConfigInTimeZone(
+  config: VersionedEventConfig,
+  timeZone: string,
+  now: Date = new Date()
+): EventConfig {
+  return resolveEventConfigOnDate(config, toPlainDateInTimeZone(now, timeZone))
 }
 
 /**
