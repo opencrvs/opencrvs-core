@@ -202,6 +202,38 @@ export function assertFilesBelongToEvent(
   }
 }
 
+/**
+ * An imported record has no stored state to compare against, so it may name
+ * only its own attachments and pre-2.0 keys. An action's signature may also be
+ * one of its author's own files.
+ */
+export function assertImportedFilesBelongToEvent(event: EventDocument) {
+  function assertPath(path: string, signedBy?: string) {
+    const file = parseDocumentPath(path)
+    const allowed =
+      file?.kind === 'legacy' ||
+      (file?.kind === 'event' && file.eventId === event.id) ||
+      (file?.kind === 'user' && file.userId === signedBy)
+
+    if (!allowed) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File does not belong to this record: ${path}`
+      })
+    }
+  }
+
+  for (const action of event.actions) {
+    if ('declaration' in action) {
+      getFilePathsFromValues(action).forEach((path) => assertPath(path))
+    }
+
+    if ('createdBySignature' in action && action.createdBySignature) {
+      assertPath(action.createdBySignature, action.createdBy)
+    }
+  }
+}
+
 export const AttachmentInput = zfd.formData({
   file: zfd.file(),
   transactionId: zfd.text(),
