@@ -16,7 +16,6 @@ export interface ICustomProps {
   touched?: boolean
   focusInput?: boolean
   hideBorder?: boolean // Deprecated
-  autocomplete?: boolean
   isSmallSized?: boolean // Deprecated
   isDisabled?: boolean
   hasPrefix?: boolean
@@ -128,6 +127,9 @@ export const TextInput = React.forwardRef<HTMLInputElement, ITextInputProps>(
       postfix,
       prefix,
       unit,
+      // The browser must not suggest values that a user typed before.
+      // A caller can set a value such as "username" for a password manager.
+      autoComplete = 'off',
       ...otherProps
     },
     ref
@@ -144,9 +146,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, ITextInputProps>(
           autoFocus={focusInput}
           name={otherProps.id}
           {...otherProps}
-          autoComplete={
-            process.env.NODE_ENV === 'production' ? 'off' : undefined
-          }
+          autoComplete={autoComplete}
           maxLength={maxLength}
           disabled={isDisabled}
           error={error}
