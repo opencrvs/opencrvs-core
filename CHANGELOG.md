@@ -306,6 +306,22 @@ The toolkit and the country configuration template work with any container regis
 
 - Removed the unused `POST /upload` endpoint from the documents service, together with the `file-type` library it used. That library had a denial-of-service vulnerability, where a crafted file could stop the service from responding ([CVE-2026-31808](https://nvd.nist.gov/vuln/detail/CVE-2026-31808), Medium). The endpoint has had no consumer since the user-mgnt service was removed, and file uploads go through `POST /files`, so nothing changes in the application. The documents service is not reachable from outside the cluster. Only a country configuration that calls `http://documents:9050/upload` directly is affected, and it should send the file to `POST /files` instead. [#14326](https://github.com/opencrvs/opencrvs-core/pull/14326)
 
+
+## 2.1.3 Release Candidate
+
+### Bug fixes
+
+- The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
+- Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
+- Fix ElastAlert notifications being blocked by the default-deny egress network policy. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
+
+## 2.1.1
+
+### Improvements
+
+- Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
+
+
 ## 2.1.0
 
 ### Upgrade guidance
