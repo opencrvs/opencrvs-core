@@ -15,9 +15,11 @@ import {
   DocumentPath,
   encodeScope,
   getUUID,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  UUID
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { updateUserById } from '@events/storage/postgres/events/users'
 
 const readTennisClub = encodeScope({
   type: 'record.read',
@@ -83,6 +85,28 @@ describe('event.file.getPresignedUrl (deprecated)', () => {
     ).resolves.toMatchObject(presigned)
   })
 
+  test('presigns a signature uploaded under a temporary user id, given eventId', async () => {
+    const {
+      user,
+      users: [, otherUser],
+      generator
+    } = await setupTestCase()
+    const signature = `users/tmp-${getUUID()}/${getUUID()}.png`
+    await updateUserById(user.id as UUID, { signaturePath: signature })
+    // The client reads the signature from the user it's given, not the database
+    const signer = { ...user, signature: signature as DocumentPath }
+    const event = await createTestClient(signer).event.create(
+      generator.event.create()
+    )
+
+    await expect(
+      createTestClient(otherUser, [readTennisClub]).event.file.getPresignedUrl({
+        filePath: signature as DocumentPath,
+        eventId: event.id
+      })
+    ).resolves.toMatchObject(presigned)
+  })
+
   test("presigns a file in the caller's own draft", async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
@@ -113,6 +137,19 @@ describe('event.file.getPresignedUrl (deprecated)', () => {
     await expect(
       createTestClient(otherUser, [readTennisClub]).event.file.getPresignedUrl({
         filePath: `events/${event.id}/${getUUID()}.png` as DocumentPath
+      })
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+  })
+
+  test('refuses a path that escapes the record it may read, given eventId', async () => {
+    const { otherUser, event } = await setupDeclaredRecord()
+    const { event: victim, filePath: victimFile } = await setupDeclaredRecord()
+
+    await expect(
+      createTestClient(otherUser, [readTennisClub]).event.file.getPresignedUrl({
+        filePath:
+          `events/${event.id}/../${victim.id}/${victimFile.split('/').pop()}` as DocumentPath,
+        eventId: event.id
       })
     ).rejects.toMatchObject({ code: 'NOT_FOUND' })
   })

@@ -52,25 +52,16 @@ export const fileRouter = router({
     .use(middleware.canAccessEventWithScopes(['record.read']))
     .output(z.object({ presignedURL: z.string() }))
     .query(async ({ input, ctx }) => {
-      const file = parseDocumentPath(input.filePath)
-
-      if (!file) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `Unrecognized file path: ${input.filePath}`
-        })
-      }
-
       const event = await getEventById(ctx.eventId)
       const readable = await getReadableEventFiles(ctx, event)
 
-      if (!readable.includes(file.path)) {
+      if (!readable.includes(input.filePath)) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
-      const urls = await presignFiles([file.path], ctx.token)
+      const urls = await presignFiles([input.filePath], ctx.token)
 
-      return { presignedURL: urls[file.path] }
+      return { presignedURL: urls[input.filePath] }
     })
 })
 
