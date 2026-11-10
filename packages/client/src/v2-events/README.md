@@ -29,10 +29,6 @@ Client for managing custom events.
 
 We will be iterating over the structure during the project. Treat it as a starting point. Many times the important thing is to have any structure.
 
-## Route structure
-
-Events V2 loads from the root `('/')` route.
-
 ### Creating route components
 
 1. Each action route should be wrapped with `Action.tsx` component.

@@ -274,43 +274,6 @@ async function refreshAffectedSearchQueries(...eventIds: string[]) {
   ])
 }
 
-async function deleteEventData(updatedEvent: EventDocument) {
-  const { id } = updatedEvent
-  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
-
-  queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
-  })
-
-  /* When event is created, We derive local cache for search query from that (event with no declaration data).
-   * If we delete only the event.get, we will have stale data until event is explicitly searched again.
-   * e.g. After performing declaration action, overview would show event as it was on 'created' state first, and then update.
-   *
-   *  NOTE: running removeQueries would remove the subscriptions as well. Reset forces refetch for those.
-   *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
-   */
-  await Promise.all([
-    queryClient.resetQueries({ queryKey: byIdSearchKey(id) }),
-    removeCachedFiles(updatedEvent)
-  ])
-}
-
-export async function deleteLocalEvent(updatedEvent: EventDocument) {
-  await Promise.all([
-    deleteEventData(updatedEvent),
-    invalidateWorkqueueSearchQueries()
-  ])
-}
-
-/**
- * The record stays assigned after MARK_AS_NOT_DUPLICATE, so its local document
- * is patched in place rather than evicted, keeping it available offline.
- */
-export async function onMarkNotDuplicate(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
-  await refreshAffectedSearchQueries(updatedEvent.id)
-}
-
 /**
  * Write a new assignee onto every cached search result for an event.
  *
@@ -331,6 +294,62 @@ function setLocalEventIndexAssignment(id: string, assignedTo: string | null) {
         }
     )
   })
+}
+
+async function deleteEventData(updatedEvent: EventDocument) {
+  const { id } = updatedEvent
+  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+
+  /*
+   * The server usually unassigns the record after an action. The refetch below
+   * takes a round trip, and until it is complete the cached rows show the
+   * assignment from before the action. Write the assignment from the response
+   * now, so that the overview does not show "assigned to you" for a moment.
+   */
+  const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
+  if (lastAssignment) {
+    setLocalEventIndexAssignment(
+      id,
+      lastAssignment.type === ActionType.ASSIGN
+        ? lastAssignment.assignedTo
+        : null
+    )
+  }
+
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
+  })
+
+  /* When event is created, We derive local cache for search query from that (event with no declaration data).
+   * If we delete only the event.get, we will have stale data until event is explicitly searched again.
+   * e.g. After performing declaration action, overview would show event as it was on 'created' state first, and then update.
+   *
+   *  NOTE: running removeQueries would remove the subscriptions as well. A refetch updates those.
+   *  Do not use resetQueries here. A reset puts back the initialData of the entry, which is the row
+   *  that the cache had when the user first opened the record. The overview then shows the previous status.
+   *  The action waits for the indexing, so the refetch gets the new state of the record.
+   *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
+   */
+  await Promise.all([
+    refetchSearchQueryById(id),
+    removeCachedFiles(updatedEvent)
+  ])
+}
+
+export async function deleteLocalEvent(updatedEvent: EventDocument) {
+  await Promise.all([
+    deleteEventData(updatedEvent),
+    invalidateWorkqueueSearchQueries()
+  ])
+}
+
+/**
+ * The record stays assigned after MARK_AS_NOT_DUPLICATE, so its local document
+ * is patched in place rather than evicted, keeping it available offline.
+ */
+export async function onMarkNotDuplicate(updatedEvent: EventDocument) {
+  setEventData(updatedEvent.id, updatedEvent)
+  await refreshAffectedSearchQueries(updatedEvent.id)
 }
 
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
