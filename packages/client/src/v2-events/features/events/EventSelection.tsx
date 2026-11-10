@@ -115,7 +115,8 @@ function EventSelector() {
   const currentVersion = versionsInEffect.at(-1)
   // A country that allows legacy records lets the user create a record under a past version
   const canPickVersion =
-    window.config.FEATURES.LEGACY_RECORDS && versionsInEffect.length > 1
+    window.config.FEATURES._EXPERIMENTAL_LEGACY_RECORDS &&
+    versionsInEffect.length > 1
   const selectedVersionId = canPickVersion
     ? (versionId ?? currentVersion?.id)
     : currentVersion?.id

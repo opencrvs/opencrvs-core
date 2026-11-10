@@ -117,7 +117,10 @@ const createEventSpy =
 
 function withLegacyRecordsFeatureFlag(enabled: boolean) {
   const features = window.config.FEATURES
-  window.config.FEATURES = { ...features, LEGACY_RECORDS: enabled }
+  window.config.FEATURES = {
+    ...features,
+    _EXPERIMENTAL_LEGACY_RECORDS: enabled
+  }
   return () => {
     window.config.FEATURES = features
   }

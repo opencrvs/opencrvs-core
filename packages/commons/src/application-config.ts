@@ -101,16 +101,20 @@ export const ClientConfig = z.object({
   ),
   FEATURES: z
     .object({
-      LEGACY_RECORDS: z
+      /**
+       * @experimental The UI of this feature is not a supported feature in 2.2.
+       * It can change, or be removed, without notice.
+       */
+      _EXPERIMENTAL_LEGACY_RECORDS: z
         .boolean()
         .optional()
         .default(false)
         .describe(
-          'Lets the user pick a past version of the event configuration when creating a record, for example to enter a record that was registered under an earlier form.'
+          'Experimental. Lets the user pick a past version of the event configuration when creating a record, for example to enter a record that was registered under an earlier form. The UI of this feature is not a supported feature in 2.2. It can change, or be removed, without notice.'
         )
     })
     .optional()
-    .default({ LEGACY_RECORDS: false })
+    .default({ _EXPERIMENTAL_LEGACY_RECORDS: false })
 })
 
 export type ClientConfig = z.infer<typeof ClientConfig>

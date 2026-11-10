@@ -47,7 +47,7 @@ const config = {
     }
   ],
   FEATURES: {
-    LEGACY_RECORDS: false
+    _EXPERIMENTAL_LEGACY_RECORDS: false
   },
   LANGUAGES: ['en', 'bn', 'fr'],
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
