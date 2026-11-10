@@ -274,6 +274,28 @@ async function refreshAffectedSearchQueries(...eventIds: string[]) {
   ])
 }
 
+/**
+ * Write a new assignee onto every cached search result for an event.
+ *
+ * Only the assignment is patched, never the whole row: the server redacts a
+ * sealed record's index while leaving the document readable, so rebuilding the
+ * row from the local document would put the real title back on screen.
+ */
+function setLocalEventIndexAssignment(id: string, assignedTo: string | null) {
+  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey]) => {
+    queryClient.setQueryData<inferOutput<typeof trpcOptionsProxy.event.search>>(
+      queryKey,
+      (oldData) =>
+        oldData && {
+          ...oldData,
+          results: oldData.results.map((eventIndex) =>
+            eventIndex.id === id ? { ...eventIndex, assignedTo } : eventIndex
+          )
+        }
+    )
+  })
+}
+
 async function deleteEventData(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
@@ -288,7 +310,9 @@ async function deleteEventData(updatedEvent: EventDocument) {
   if (lastAssignment) {
     setLocalEventIndexAssignment(
       id,
-      lastAssignment.type === ActionType.ASSIGN ? lastAssignment.assignedTo : null
+      lastAssignment.type === ActionType.ASSIGN
+        ? lastAssignment.assignedTo
+        : null
     )
   }
 
@@ -326,28 +350,6 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
 export async function onMarkNotDuplicate(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
   await refreshAffectedSearchQueries(updatedEvent.id)
-}
-
-/**
- * Write a new assignee onto every cached search result for an event.
- *
- * Only the assignment is patched, never the whole row: the server redacts a
- * sealed record's index while leaving the document readable, so rebuilding the
- * row from the local document would put the real title back on screen.
- */
-function setLocalEventIndexAssignment(id: string, assignedTo: string | null) {
-  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey]) => {
-    queryClient.setQueryData<inferOutput<typeof trpcOptionsProxy.event.search>>(
-      queryKey,
-      (oldData) =>
-        oldData && {
-          ...oldData,
-          results: oldData.results.map((eventIndex) =>
-            eventIndex.id === id ? { ...eventIndex, assignedTo } : eventIndex
-          )
-        }
-    )
-  })
 }
 
 export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
