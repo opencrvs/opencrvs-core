@@ -94,9 +94,8 @@ function currentDocument() {
 }
 
 /**
- * Issue #13729: after an action changes the status of a record, the overview
- * showed the previous status for a moment when the user opened the record
- * again.
+ * After an action changes the status of a record, the overview showed the
+ * previous status for a moment when the user opened the record again.
  */
 export const DoesNotShowPreviousStatusAfterRegister: Story = {
   parameters: {
