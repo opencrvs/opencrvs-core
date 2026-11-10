@@ -16,7 +16,6 @@ export const stepOneFields = {
     name: 'username',
     disabled: false,
     type: 'text',
-    autoComplete: 'username',
     focusInput: false,
     label: messages.username
   },
@@ -25,7 +24,6 @@ export const stepOneFields = {
     name: 'password',
     disabled: false,
     type: 'password',
-    autoComplete: 'current-password',
     focusInput: false,
     label: messages.passwordLabel
   }
