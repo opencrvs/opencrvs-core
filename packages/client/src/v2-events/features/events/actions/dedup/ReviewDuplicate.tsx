@@ -164,16 +164,15 @@ function ReviewDuplicateBody({ event }: { event: EventDocument }) {
   // Each potential duplicate is read with the version it was created under.
   // A potential duplicate whose version is not available cannot be compared.
   const unknownVersionDuplicates: EventDocument[] = []
-  const potentialDuplicates = eventState.potentialDuplicates.reduce<
-    Record<
-      string,
-      {
-        event: EventDocument
-        eventConfiguration: EventConfig
-        eventState: EventIndex
-      }
-    >
-  >((acc, { id, trackingId }) => {
+  const potentialDuplicates: Record<
+    string,
+    {
+      event: EventDocument
+      eventConfiguration: EventConfig
+      eventState: EventIndex
+    }
+  > = {}
+  eventState.potentialDuplicates.forEach(({ id, trackingId }) => {
     const localEvent = findLocalEventDocument(id)
     if (!localEvent) {
       throw new Error(
@@ -183,15 +182,14 @@ function ReviewDuplicateBody({ event }: { event: EventDocument }) {
     const duplicateConfiguration = resolveEventConfiguration(localEvent)
     if (!duplicateConfiguration) {
       unknownVersionDuplicates.push(localEvent)
-      return acc
+      return
     }
-    acc[trackingId] = {
+    potentialDuplicates[trackingId] = {
       event: localEvent,
       eventConfiguration: duplicateConfiguration,
       eventState: getCurrentEventState(localEvent, duplicateConfiguration)
     }
-    return acc
-  }, {})
+  })
 
   const tabs: IFormTabs[] = [
     {
