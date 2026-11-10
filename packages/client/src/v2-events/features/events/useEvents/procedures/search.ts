@@ -88,7 +88,15 @@ function fetchTaggedSearch(ctx: QueryFunctionContext) {
   if (!options.queryFn) {
     throw new Error('queryFn is not defined for event.search')
   }
-  return options.queryFn({ ...ctx, queryKey: options.queryKey })
+
+  return options.queryFn({
+    client: ctx.client,
+    meta: ctx.meta,
+    queryKey: options.queryKey,
+    get signal() {
+      return ctx.signal
+    }
+  })
 }
 
 /**
