@@ -231,6 +231,29 @@ export const createAction = async (action: NewEventActions) => {
   })
 }
 
+/** Runs `fn` in a database transaction. It commits when `fn` returns and rolls back when it throws. */
+export async function transaction<T>(fn: (trx: Kysely<Schema>) => Promise<T>) {
+  return getClient().transaction().execute(fn)
+}
+
+/**
+ * Reads the event and locks its row until the transaction ends. A second transaction that
+ * calls this for the same event waits, and then reads the actions the first one stored.
+ * The lock does not block reads or the insert of other actions, for example READ.
+ *
+ * @throws NoResultError if the event does not exist
+ */
+export async function getEventByIdWithLockInTrx(id: UUID, trx: Kysely<Schema>) {
+  await trx
+    .selectFrom('events')
+    .select('id')
+    .where('id', '=', id)
+    .forNoKeyUpdate()
+    .executeTakeFirstOrThrow()
+
+  return getEventByIdInTrx(id, trx)
+}
+
 async function getOrCreateEventInTrx(
   input: NewEvents & Omit<NewEventActions, 'actionType' | 'eventId' | 'status'>,
   trx: Kysely<Schema>

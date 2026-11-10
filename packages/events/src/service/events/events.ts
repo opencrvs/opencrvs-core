@@ -19,9 +19,9 @@ import {
   ActionType,
   ActionUpdate,
   AsyncRejectActionDocument,
-  DisplayableAction,
   EventConfig,
   EventDocument,
+  EventIndex,
   EventInput,
   EventStatus,
   FieldType,
@@ -105,6 +105,21 @@ async function deleteEventAttachments(
   }
 }
 
+/** Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action. */
+function throwConflictIfActionNotAvailable(
+  event: EventIndex,
+  actionType: ActionType
+) {
+  const allowedActions = getAvailableActionsForEvent(event)
+
+  if (!allowedActions.includes(actionType)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${actionType}' cannot be performed on an event in '${event.status}' state with [${event.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
+    })
+  }
+}
+
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
@@ -115,17 +130,10 @@ export async function throwConflictIfActionNotAllowed(
     eventType: event.type,
     token
   })
-  const eventIndex = getCurrentEventState(event, eventConfig)
-
-  const allowedActions: DisplayableAction[] =
-    getAvailableActionsForEvent(eventIndex)
-
-  if (!allowedActions.includes(actionType)) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
-    })
-  }
+  throwConflictIfActionNotAvailable(
+    getCurrentEventState(event, eventConfig),
+    actionType
+  )
 }
 
 export async function deleteEvent(
@@ -288,6 +296,30 @@ export function buildAction(
 }
 
 /**
+ * Stores the requested action of a new action request.
+ *
+ * The event is locked while it is checked and the action is stored. Of two requests that
+ * arrive together, the second one waits, sees the requested action of the first and gets
+ * 409: an event has at most one requested action waiting for its outcome.
+ */
+async function addRequestedAction(
+  input: ActionInputWithType,
+  user: TrpcUserContext,
+  configuration: EventConfig
+) {
+  await eventsRepo.transaction(async (trx) => {
+    const event = await eventsRepo.getEventByIdWithLockInTrx(input.eventId, trx)
+    const eventIndex = getCurrentEventState(event, configuration)
+    throwConflictIfActionNotAvailable(eventIndex, input.type)
+
+    await eventsRepo.createActionInTrx(
+      buildAction(input, ActionStatus.Requested, user),
+      trx
+    )
+  })
+}
+
+/**
  * Persists a new action for an event in the database.
  *
  * @param input - The action payload including type and related data.
@@ -333,7 +365,11 @@ export async function addAction(
     }
   }
 
-  await eventsRepo.createAction(buildAction(input, status, user))
+  if (status === ActionStatus.Requested) {
+    await addRequestedAction(input, user, configuration)
+  } else {
+    await eventsRepo.createAction(buildAction(input, status, user))
+  }
 
   // We want to unassign only if:
   // - ActionStatus is not requested
