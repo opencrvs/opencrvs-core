@@ -398,7 +398,7 @@ await expect(
 - Test with the caller type that production uses. If a system client calls the endpoint, the test uses a system client.
 - Find fixtures by their properties, not by array index.
 - Write the values that the test depends on in full.
-- Define one data object and refer to it in the test. Do not copy the same payload many times.
+- Define one data object and refer to it in the test. Do not copy the same payload many times. Prefer data generators when possible.
 
 ```ts
 // Rejected
