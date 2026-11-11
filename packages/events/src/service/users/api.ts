@@ -253,7 +253,8 @@ async function deleteDraftsAndOrphanedEventsInTrx(
  *
  * TODO: remove once new users' files are stored under their real id and the
  * existing `users/tmp-` paths are migrated, along with `allowTemporary` in
- * `assertOwnSignaturePath` and its use in `isSignableKey`.
+ * `assertOwnSignaturePath` and `isOwnUserFile`, and its use in
+ * `isSignableKey`.
  */
 export function isTemporaryUserFile(path: string) {
   const prefix = 'users/tmp-'
@@ -261,6 +262,26 @@ export function isTemporaryUserFile(path: string) {
   return (
     path.startsWith(prefix) &&
     parseDocumentPath(path.replace(prefix, 'users/'))?.kind === 'user'
+  )
+}
+
+/**
+ * Whether a stored avatar or signature is one of the user's own files: under
+ * `users/{userId}/`, a pre-2.0 key, or with `allowTemporary`, a signature
+ * uploaded while the user was being created. Values stored before paths were
+ * checked on write may name any file, so they are checked again on read.
+ */
+export function isOwnUserFile(
+  path: string,
+  userId: UUID,
+  { allowTemporary = false }: { allowTemporary?: boolean } = {}
+) {
+  const file = parseDocumentPath(path)
+
+  return (
+    (file?.kind === 'user' && file.userId === userId) ||
+    file?.kind === 'legacy' ||
+    (allowTemporary && isTemporaryUserFile(path))
   )
 }
 

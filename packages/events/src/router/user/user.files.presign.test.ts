@@ -114,4 +114,43 @@ describe('user.files.presign', () => {
 
     expect(urls).not.toHaveProperty([invalid])
   })
+
+  test.each([
+    ['a record attachment', () => `events/${getUUID()}/${getUUID()}.png`],
+    ["another user's file", () => `users/${getUUID()}/${getUUID()}.png`]
+  ])('leaves out an avatar stored as %s', async (_, makePath) => {
+    const { viewer, owner } = await setupUsersWithFiles()
+    const avatar = makePath()
+    await updateUserById(owner.id as UUID, { profileImagePath: avatar })
+
+    const urls = await createTestClient(viewer, []).user.files.presign({
+      userIds: [owner.id as UUID]
+    })
+
+    expect(urls).not.toHaveProperty([avatar])
+  })
+
+  test('returns a pre-2.0 avatar', async () => {
+    const { viewer, owner } = await setupUsersWithFiles()
+    const avatar = `${getUUID()}.png`
+    await updateUserById(owner.id as UUID, { profileImagePath: avatar })
+
+    const urls = await createTestClient(viewer, []).user.files.presign({
+      userIds: [owner.id as UUID]
+    })
+
+    expect(urls).toMatchObject({ [avatar]: expect.any(String) })
+  })
+
+  test("leaves out a signature stored under another user's path, even with user.read", async () => {
+    const { viewer, owner } = await setupUsersWithFiles()
+    const signature = `users/${getUUID()}/${getUUID()}.png`
+    await updateUserById(owner.id as UUID, { signaturePath: signature })
+
+    const urls = await createTestClient(viewer, [
+      encodeScope({ type: 'user.read' })
+    ]).user.files.presign({ userIds: [owner.id as UUID] })
+
+    expect(urls).not.toHaveProperty([signature])
+  })
 })

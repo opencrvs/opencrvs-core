@@ -12,7 +12,7 @@ import { DocumentPath, logger, UUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { assertCanReadOtherUser } from '@events/router/middleware'
 import { isSignableKey } from '@events/service/files/authorize'
-import { getUsersById, isUser } from '@events/service/users/api'
+import { getUsersById, isOwnUserFile, isUser } from '@events/service/users/api'
 
 async function canReadOtherUser(ctx: TrpcContext, userId: UUID) {
   try {
@@ -23,11 +23,25 @@ async function canReadOtherUser(ctx: TrpcContext, userId: UUID) {
   }
 }
 
+function isOwnFile(
+  path: DocumentPath,
+  userId: UUID,
+  options?: { allowTemporary?: boolean }
+) {
+  const own = isOwnUserFile(path, userId, options)
+
+  if (!own) {
+    logger.warn(`Not presigning ${path}: not a file of user ${userId}`)
+  }
+
+  return own
+}
+
 /**
  * The users' files the caller may read: every user's avatar, since avatars
  * are shown wherever users are listed, and the signatures of the caller and
  * of the users the caller may read. Unknown users are left out, as are paths
- * that aren't a valid storage key. With `avatarsOnly`, signatures are left
+ * that aren't the user's own file or aren't a valid storage key. With `avatarsOnly`, signatures are left
  * out without checking who may read them.
  */
 export async function getReadableUserFiles(
@@ -39,14 +53,20 @@ export async function getReadableUserFiles(
 
   const files = await Promise.all(
     users.map(async (user) => {
-      const avatar = user.avatar ? [user.avatar] : []
+      const userId = user.id as UUID
+      const avatar =
+        user.avatar && isOwnFile(user.avatar, userId) ? [user.avatar] : []
 
       // No signature to check access for, so only the avatar (if any) applies
-      if (avatarsOnly || !user.signature) {
+      if (
+        avatarsOnly ||
+        !user.signature ||
+        !isOwnFile(user.signature, userId, { allowTemporary: true })
+      ) {
         return avatar
       }
 
-      if (!(await canReadOtherUser(ctx, user.id as UUID))) {
+      if (!(await canReadOtherUser(ctx, userId))) {
         logger.info(
           `Not presigning the signature of user ${user.id}: user ${ctx.user.id} may not read that user`
         )
