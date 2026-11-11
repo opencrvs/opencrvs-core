@@ -269,6 +269,8 @@ event.birth.custom.action.approve.field.notes.label,This is the label for the fi
 event.birth.custom.action.escalate.field.escalate-to.label,This is the label for escalate to field,Escalate to,Transmettre à
 event.birth.custom.action.escalate.field.escalate-to.option.officer-in-charge.label,Option label for provincial registrar in escalate to field,My state provincial registrar,L'officier d'état civil de ma province
 event.birth.custom.action.escalate.field.escalate-to.option.registrar-general.label,Option label for registrar general in escalate to field,Registrar General,Directeur général de l'état civil
+event.birth.custom.action.initial-only-action.audit-history-label,Audit history label of a custom action that only version 'initial' of the birth event has,initial only action,action uniquement initiale
+event.birth.custom.action.initial-only-action.label,Label of a custom action that only version 'initial' of the birth event has,initial only action,action uniquement initiale
 event.birth.custom.action.issue-vc.field.accepted-vc-offer.error,Validation message for citizen acceptance checkbox,Please confirm that the citizen has accepted the verifiable credential offer,Veuillez confirmer que le citoyen a accepté l’offre d’attestation vérifiable
 event.birth.custom.action.issue-vc.field.accepted-vc-offer.label,Checkbox label to confirm citizen acceptance of VC offer,I confirm the verifiable credential has been accepted.,Je confirme que l'attestation vérifiable a été acceptée.
 event.birth.custom.action.issue-vc.field.get-credential-offer.label,Label for HTTP call to get VC offer,Get Credential Offer,Obtenir l’offre d’attestation vérifiable
@@ -292,6 +294,8 @@ event.birth.custom.action.seal.field.requestingParty.label,This is the label for
 event.birth.custom.action.seal.label,This is shown as the action name anywhere the user can trigger the action from,Seal,Sceller
 event.birth.custom.action.unseal.audit-history-label,The label to show in audit history for the seal action,Unsealed,Descellé
 event.birth.custom.action.unseal.label,This is shown as the action name anywhere the user can trigger the action from,Unseal,Desceller
+event.birth.custom.action.v2-only-action.audit-history-label,Audit history label of a custom action that only version 'v2' of the birth event has,v2 only action,action uniquement v2
+event.birth.custom.action.v2-only-action.label,Label of a custom action that only version 'v2' of the birth event has,v2 only action,action uniquement v2
 event.birth.custom.action.validate-declaration.audit-history-label,The label to show in audit history for the validate action,Validated,Validé
 event.birth.custom.action.validate-declaration.field.comments.label,This is the label for the comments field for the validate declaration action,Comments,Commentaires
 event.birth.custom.action.validate-declaration.label,This is shown as the action name anywhere the user can trigger the action from,Validate,Valider

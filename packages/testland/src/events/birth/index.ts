@@ -46,16 +46,64 @@ import {
 } from '@countryconfig/events/utils'
 import { BIRTH_V2_EFFECTIVE_FROM, BirthVersion } from './versions'
 
+type CustomActionInput = Extract<
+  EventConfigVersionInput['actions'][number],
+  { type: typeof ActionType.CUSTOM }
+>
+
+/*
+ * Custom actions that only one version has, so that we can check that a record
+ * offers the actions of its own version only. They have no form and no conditionals.
+ */
+const INITIAL_ONLY_ACTION: CustomActionInput = {
+  type: ActionType.CUSTOM,
+  customActionType: 'INITIAL_ONLY_ACTION',
+  label: {
+    defaultMessage: 'Initial only action',
+    description:
+      "Label of a custom action that only version 'initial' of the birth event has",
+    id: 'event.birth.custom.action.initial-only-action.label'
+  },
+  auditHistoryLabel: {
+    defaultMessage: 'Initial only action',
+    description:
+      "Audit history label of a custom action that only version 'initial' of the birth event has",
+    id: 'event.birth.custom.action.initial-only-action.audit-history-label'
+  },
+  form: []
+}
+
+const V2_ONLY_ACTION: CustomActionInput = {
+  type: ActionType.CUSTOM,
+  customActionType: 'V2_ONLY_ACTION',
+  label: {
+    defaultMessage: 'V2 only action',
+    description:
+      "Label of a custom action that only version 'v2' of the birth event has",
+    id: 'event.birth.custom.action.v2-only-action.label'
+  },
+  auditHistoryLabel: {
+    defaultMessage: 'V2 only action',
+    description:
+      "Audit history label of a custom action that only version 'v2' of the birth event has",
+    id: 'event.birth.custom.action.v2-only-action.audit-history-label'
+  },
+  form: []
+}
+
 interface BirthVersionInput {
   id: BirthVersion
   label: TranslationConfig
   effectiveFrom?: string
+  /** Custom actions that only this version has */
+  versionActions: CustomActionInput[]
 }
 
 const birthVersion = ({
   id,
   label,
-  effectiveFrom
+  effectiveFrom,
+  versionActions
 }: BirthVersionInput): EventConfigVersionInput => ({
   id,
   label,
@@ -380,7 +428,8 @@ const birthVersion = ({
     'SEAL',
     'UNSEAL',
     // Also orders the custom revoke, which no role can perform any more
-    'REVOKE_REGISTRATION'
+    'REVOKE_REGISTRATION',
+    ...versionActions.map(({ customActionType }) => customActionType)
   ],
   actions: [
     {
@@ -1471,7 +1520,8 @@ const birthVersion = ({
           conditional: flag('sealed')
         }
       ]
-    }
+    },
+    ...versionActions
   ]
 })
 
@@ -1491,7 +1541,8 @@ export const birthEvent = defineConfig({
         description:
           'Name of the birth form version that was in use before 1 September 2026',
         id: 'event.birth.version.initial.label'
-      }
+      },
+      versionActions: [INITIAL_ONLY_ACTION]
     }),
     birthVersion({
       id: BirthVersion.V2,
@@ -1501,7 +1552,8 @@ export const birthEvent = defineConfig({
           'Name of the birth form version that is in use from 1 September 2026',
         id: 'event.birth.version.v2.label'
       },
-      effectiveFrom: BIRTH_V2_EFFECTIVE_FROM
+      effectiveFrom: BIRTH_V2_EFFECTIVE_FROM,
+      versionActions: [V2_ONLY_ACTION]
     })
   ]
 })
