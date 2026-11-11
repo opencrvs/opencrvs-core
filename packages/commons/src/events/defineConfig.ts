@@ -79,7 +79,10 @@ function validateNoVersionFieldsAtTopLevel(
     })
 }
 
-/** An event configured without `versions` is a single version, effective from the beginning of time. */
+/**
+ * An event configured without `versions` is a single version, effective from the
+ * beginning of time, with the label of the event.
+ */
 function toVersionedInput(
   config: EventConfigInput | VersionedEventConfigInput
 ): z.input<typeof VersionedEventConfig> {
@@ -93,7 +96,7 @@ function toVersionedInput(
     id,
     label,
     advancedSearch,
-    versions: [{ ...version, id: INITIAL_EVENT_CONFIG_VERSION_ID }]
+    versions: [{ ...version, id: INITIAL_EVENT_CONFIG_VERSION_ID, label }]
   }
 }
 
