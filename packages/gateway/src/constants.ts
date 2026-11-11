@@ -29,7 +29,6 @@ export const CLIENT_APP_URL = env.CLIENT_APP_URL
 
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const AUTH_URL = env.AUTH_URL
-export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const EVENTS_URL = env.EVENTS_URL
 export const DISABLE_RATE_LIMIT = env.DISABLE_RATE_LIMIT

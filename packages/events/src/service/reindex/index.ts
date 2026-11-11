@@ -229,7 +229,7 @@ export async function runReindex(token: TokenWithBearer) {
   await createReindexingStatusEntry(runId, startTimestamp)
 
   const versionedConfigurations =
-    await getInMemoryVersionedEventConfigurations(token)
+    await getInMemoryVersionedEventConfigurations()
 
   // Best-effort: leftover orphans are retried on the next run.
   await cleanupOrphanedIndices(

@@ -13,7 +13,6 @@ import { TRPCError } from '@trpc/server'
 import {
   EventDocument,
   getUUID,
-  TokenWithBearer,
   VersionedEventConfig
 } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
@@ -70,12 +69,11 @@ function assertEventsConfigured(
 }
 
 export async function bulkImportEvents(
-  events: EventDocument[],
-  token: TokenWithBearer
+  events: EventDocument[]
 ): Promise<BulkResponse> {
   const toIndex = []
 
-  const eventConfigs = await getInMemoryVersionedEventConfigurations(token)
+  const eventConfigs = await getInMemoryVersionedEventConfigurations()
   assertEventsConfigured(events, eventConfigs)
 
   for (const eventDocument of events) {
