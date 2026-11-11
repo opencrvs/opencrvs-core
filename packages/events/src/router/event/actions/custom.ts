@@ -51,7 +51,7 @@ export function customActionProcedures() {
         }
 
         const event = await getEventById(input.eventId)
-        const config = await getEventConfigurationForRecord({ event, token })
+        const config = await getEventConfigurationForRecord({ event })
 
         const actionConfig = config.actions.find(
           (a) =>

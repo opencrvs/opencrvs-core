@@ -340,8 +340,7 @@ export async function assertCanReviewDuplicatesOf(
       }
 
       const eventConfig = await getEventConfigurationForRecord({
-        event: duplicate,
-        token: ctx.token
+        event: duplicate
       })
 
       const eventIndexWithLocationHierarchy =

@@ -21,8 +21,8 @@ export const api = createTRPCClient<AppRouter>({
       url: env.EVENTS_URL,
       transformer: superjson,
       headers({ opList }) {
-        const headers = opList[0].context?.headers
-        return headers as HTTPHeaders
+        // A call without context, e.g. for public configuration, sends none.
+        return (opList[0].context?.headers ?? {}) as HTTPHeaders
       }
     })
   ]

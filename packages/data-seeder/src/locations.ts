@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
+import { fetchCountryConfig } from './country-config'
 import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
@@ -222,7 +222,7 @@ export function parseLocations(document: unknown): LocationRead {
 
 export async function readLocations(): Promise<LocationRead> {
   const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
+  const res = await fetchCountryConfig(url)
 
   if (!res.ok) {
     raise(formatUnwrittenFailure(`Expected to get the locations from ${url}`))

@@ -465,8 +465,7 @@ export function getDefaultActionProcedures(
         const event = ctx.event
 
         const eventConfiguration = await getEventConfigurationForRecord({
-          event: event,
-          token
+          event: event
         })
 
         // An action with an outcome has been handled already. A requested action without one
@@ -527,8 +526,7 @@ export function getDefaultActionProcedures(
         const { token, user, event, confirmationAction } = ctx
         const { actionId } = input
         const configuration = await getEventConfigurationForRecord({
-          event: event,
-          token
+          event: event
         })
 
         if (confirmationAction) {
@@ -599,8 +597,7 @@ export function getDefaultActionProcedures(
         }
 
         const configuration = await getVersionedEventConfigurationById({
-          eventType: event.type,
-          token: ctx.token
+          eventType: event.type
         })
 
         return addAsyncRejectAction(
