@@ -10,7 +10,9 @@
  */
 import { tennisClubMembershipEvent } from '../fixtures'
 import {
+  findConfigVersion,
   findEventConfigForRecord,
+  getConfigVersion,
   getEventConfigForRecord,
   getEventConfigOfVersion,
   resolveEffectiveVersion,
@@ -157,6 +159,24 @@ describe('findEventConfigForRecord()', () => {
     expect(
       findEventConfigForRecord(config, { configVersionId: 'v9' })
     ).toBeUndefined()
+  })
+})
+
+describe('getConfigVersion()', () => {
+  it('gives the version with the id', () => {
+    expect(getConfigVersion(config, 'v1')).toBe(config.versions[1])
+  })
+
+  it('throws when the version is not configured', () => {
+    expect(() => getConfigVersion(config, 'v9')).toThrow(
+      `Event '${config.id}' has no version 'v9'`
+    )
+  })
+})
+
+describe('findConfigVersion()', () => {
+  it('is undefined when the version is not configured', () => {
+    expect(findConfigVersion(config, 'v9')).toBeUndefined()
   })
 })
 

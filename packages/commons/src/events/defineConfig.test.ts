@@ -196,8 +196,38 @@ describe('defineConfig()', () => {
       ...versionFields
     } = tennisClubMembershipEvent
 
-    const v1 = { ...versionFields, id: INITIAL_EVENT_CONFIG_VERSION_ID }
-    const v2 = { ...versionFields, id: 'v2', effectiveFrom: '2027-03-01' }
+    const v1 = {
+      ...versionFields,
+      id: INITIAL_EVENT_CONFIG_VERSION_ID,
+      label: { id: 'v1.label', defaultMessage: 'V1', description: 'Version 1' }
+    }
+    const v2 = {
+      ...versionFields,
+      id: 'v2',
+      label: { id: 'v2.label', defaultMessage: 'V2', description: 'Version 2' },
+      effectiveFrom: '2027-03-01'
+    }
+
+    it('should keep the label of each version', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1, v2]
+      })
+
+      expect(config.versions.map((version) => version.label)).toEqual([
+        v1.label,
+        v2.label
+      ])
+    })
+
+    it('should give the single version of an event without versions the label of the event', () => {
+      const config = defineConfig(tennisClubMembershipEvent)
+
+      expect(config.versions).toHaveLength(1)
+      expect(config.versions[0].label).toEqual(tennisClubMembershipEvent.label)
+    })
 
     it('should accept two versions with distinct ids and dates', () => {
       const config = defineConfig({

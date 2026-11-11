@@ -112,6 +112,8 @@ export type EventConfigVersionInput = Omit<
 > & {
   /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
   id: string
+  /** Name of the version, which the UI shows wherever it names the version. For example, `{event.configVersionLabel}` in the event summary. */
+  label: TranslationConfig
   /** Date (YYYY-MM-DD) from which this version is effective. Without one, effective from the beginning of time. */
   effectiveFrom?: string
 }
@@ -242,6 +244,8 @@ export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
 /** One version of an event: what the event looks like from `effectiveFrom` on. */
 export type EventConfigVersion = Omit<EventConfig, EventLevelField> & {
   id: string
+  /** Name of the version. A version configured without `versions` has the label of the event. */
+  label: TranslationConfig
   /** Date (YYYY-MM-DD) from which this version is effective. '0001-01-01' when configured without one. */
   effectiveFrom: string
 }
@@ -263,6 +267,9 @@ const _EventConfigVersion: z.ZodType<
     .describe(
       'Identifier of the version, unique within the event (e.g. "birth-v2").'
     ),
+  label: TranslationConfig.describe(
+    'Name of the version, which the UI shows wherever it names the version. For example, "{event.configVersionLabel}" in the event summary.'
+  ),
   effectiveFrom: z.iso
     .date()
     .default(DEFAULT_EFFECTIVE_FROM)
@@ -300,7 +307,12 @@ export function toEventConfig(
     return cached
   }
 
-  const { id: _id, effectiveFrom: _effectiveFrom, ...fields } = version
+  const {
+    id: _id,
+    label: _label,
+    effectiveFrom: _effectiveFrom,
+    ...fields
+  } = version
   const resolved: EventConfig = {
     ...fields,
     id: config.id,
@@ -311,6 +323,28 @@ export function toEventConfig(
   return resolved
 }
 
+/** @returns the version with id `versionId`, or undefined when it is not configured. */
+export function findConfigVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfigVersion | undefined {
+  return config.versions.find(({ id }) => id === versionId)
+}
+
+/**
+ * @returns the version with id `versionId`.
+ * @throws when that version is not configured.
+ */
+export function getConfigVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfigVersion {
+  return getOrThrow(
+    findConfigVersion(config, versionId),
+    `Event '${config.id}' has no version '${versionId}'`
+  )
+}
+
 /**
  * @returns the configuration of the version with id `versionId`.
  * @throws when the version is not configured.
@@ -319,18 +353,25 @@ export function getEventConfigOfVersion(
   config: VersionedEventConfig,
   versionId: string
 ): EventConfig {
-  return toEventConfig(
-    config,
-    getOrThrow(
-      config.versions.find(({ id }) => id === versionId),
-      `Event '${config.id}' has no version '${versionId}'`
-    )
-  )
+  return toEventConfig(config, getConfigVersion(config, versionId))
 }
 
 /** Orders versions by `effectiveFrom`, earliest first. */
 export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
   return a.effectiveFrom.localeCompare(b.effectiveFrom)
+}
+
+/**
+ * @returns the versions that took effect on or before `date`. Earliest first, so the
+ * last one is the version in effect on `date`.
+ */
+function getVersionsInEffectOn(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfigVersion[] {
+  return config.versions
+    .filter(({ effectiveFrom }) => effectiveFrom <= date)
+    .sort(byEffectiveFrom)
 }
 
 /**
@@ -341,10 +382,20 @@ function findVersionInEffectOn(
   config: VersionedEventConfig,
   date: PlainDate
 ): EventConfigVersion | undefined {
-  return config.versions
-    .filter(({ effectiveFrom }) => effectiveFrom <= date)
-    .sort(byEffectiveFrom)
-    .at(-1)
+  return getVersionsInEffectOn(config, date).at(-1)
+}
+
+/**
+ * @returns the versions that took effect on or before the date of `now` in `timeZone`,
+ * the country's time zone.
+ * Earliest first, so the last one is the version in effect at `now`.
+ */
+export function getVersionsInEffect(
+  config: VersionedEventConfig,
+  now: Date,
+  timeZone: string
+): EventConfigVersion[] {
+  return getVersionsInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
 }
 
 /**
@@ -368,9 +419,7 @@ export function findEventConfigForRecord(
   config: VersionedEventConfig,
   record: { configVersionId: string }
 ): EventConfig | undefined {
-  const version = config.versions.find(
-    ({ id }) => id === record.configVersionId
-  )
+  const version = findConfigVersion(config, record.configVersionId)
   return version && toEventConfig(config, version)
 }
 
@@ -382,10 +431,7 @@ export function getEventConfigForRecord(
   config: VersionedEventConfig,
   record: { configVersionId: string }
 ): EventConfig {
-  return getOrThrow(
-    findEventConfigForRecord(config, record),
-    `Event '${config.id}' has no version '${record.configVersionId}'`
-  )
+  return getEventConfigOfVersion(config, record.configVersionId)
 }
 
 /**

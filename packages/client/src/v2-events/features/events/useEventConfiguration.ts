@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import {
   EventConfig,
   findEventConfigForRecord,
+  getConfigVersion,
   getEventConfigById,
   resolveEventConfigOnDate,
   VersionedEventConfig
@@ -109,6 +110,17 @@ export function useEventConfigurationForRecord(record: VersionedRecord): {
     },
     variant: 'notice'
   })
+}
+
+/**
+ * @returns the label of the version `record` was created under. Call it after
+ * `useEventConfigurationForRecord`, which shows an error page when that version is not configured.
+ */
+export function useConfigVersionLabel(record: VersionedRecord) {
+  return getConfigVersion(
+    useVersionedEventConfiguration(record.type),
+    record.configVersionId
+  ).label
 }
 
 /**
