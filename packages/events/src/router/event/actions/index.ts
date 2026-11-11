@@ -43,7 +43,6 @@ import {
 import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import { setBearerForToken } from '@events/router/middleware'
 import {
   systemOnlyProcedure,
   userAndSystemProcedure,
@@ -63,7 +62,6 @@ import {
   getVersionedEventConfigurationById
 } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
-import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { validateActionPayloadStructure } from '@events/router/middleware/validate/utils'
 import {
@@ -278,8 +276,6 @@ export async function defaultRequestHandler(
     withoutOwnRequestedAction(event, input)
   )
 
-  const eventActionToken = await getServiceToken()
-
   const eventWithRequestedAction = await addAction(input, {
     eventId: event.id,
     user,
@@ -293,8 +289,7 @@ export async function defaultRequestHandler(
   const { responseStatus, responseBody } = await requestActionConfirmation(
     input.type,
     input.transactionId,
-    eventWithRequestedAction,
-    setBearerForToken(eventActionToken)
+    eventWithRequestedAction
   )
 
   // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
