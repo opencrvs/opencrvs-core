@@ -24,13 +24,14 @@ import {
   Icon,
   RadioGroup,
   RadioSize,
-  Stack
+  Stack,
+  Text
 } from '@opencrvs/components'
 import {
   canUserCreateEvent,
   canUserNotifyEvent,
   getOrThrow,
-  resolveEffectiveVersion
+  getVersionsInEffect
 } from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
@@ -64,6 +65,12 @@ const messages = defineMessages({
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
+  configVersionHeading: {
+    id: 'register.selectVitalEvent.configVersion',
+    defaultMessage: 'Form version',
+    description:
+      'Heading of the choice of the configuration version of a new record, shown when the country allows legacy records'
+  },
   exitButton: {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
@@ -84,6 +91,7 @@ function EventSelector() {
   const intl = useIntl()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
+  const [versionId, setVersionId] = useState<string>()
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const versionedEventConfigurations = useVersionedEventConfigurations()
   const timeZone = useCountryTimeZone()
@@ -98,18 +106,29 @@ function EventSelector() {
     ({ id }) => canUserCreateEvent(scopes, id)
   )
 
+  const selectedEventConfiguration = allowedEventConfigurations.find(
+    ({ id }) => id === eventType
+  )
+  const versionsInEffect = selectedEventConfiguration
+    ? getVersionsInEffect(selectedEventConfiguration, new Date(), timeZone)
+    : []
+  const currentVersion = versionsInEffect.at(-1)
+  // A country that allows legacy records lets the user create a record under a past version
+  const canPickVersion =
+    window.config.FEATURES._EXPERIMENTAL_LEGACY_RECORDS &&
+    versionsInEffect.length > 1
+  const selectedVersionId = canPickVersion
+    ? (versionId ?? currentVersion?.id)
+    : currentVersion?.id
+
   function handleContinue() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
 
-    const eventConfig = getOrThrow(
-      allowedEventConfigurations.find(({ id }) => id === eventType),
-      `Configuration for event '${eventType}' not found`
-    )
     const version = getOrThrow(
-      resolveEffectiveVersion(eventConfig, new Date(), timeZone),
-      `Event '${eventType}' has no version in effect today`
+      versionsInEffect.find(({ id }) => id === selectedVersionId),
+      `Event '${eventType}' has no version '${selectedVersionId}' in effect today`
     )
 
     const eventId = createTemporaryId()
@@ -152,9 +171,28 @@ function EventSelector() {
           value={eventType}
           onChange={(val) => {
             setEventType(val)
+            setVersionId(undefined)
             setNoEventSelectedError(false)
           }}
         />
+
+        {canPickVersion && (
+          <>
+            <Text element="h2" variant="h3">
+              {intl.formatMessage(messages.configVersionHeading)}
+            </Text>
+            <RadioGroup
+              name="configVersionId"
+              options={versionsInEffect.map((version) => ({
+                value: version.id,
+                label: intl.formatMessage(version.label)
+              }))}
+              size={RadioSize.LARGE}
+              value={selectedVersionId ?? ''}
+              onChange={setVersionId}
+            />
+          </>
+        )}
 
         <Button
           key="select-vital-event-continue"

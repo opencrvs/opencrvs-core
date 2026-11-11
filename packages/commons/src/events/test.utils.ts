@@ -1676,6 +1676,7 @@ export function toVersionedEventConfig({
       {
         ...version,
         id: INITIAL_EVENT_CONFIG_VERSION_ID,
+        label,
         effectiveFrom: DEFAULT_EFFECTIVE_FROM
       }
     ]

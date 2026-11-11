@@ -87,6 +87,9 @@ registerRoute(
   new NetworkFirst({ plugins: [ignoreRetryParameter] })
 )
 
+// This caches the country logo that the loading screens show
+registerRoute(/api\/countryconfig\/content\/country-logo$/, new NetworkFirst())
+
 // Refuses to cache an app-shell response under a document's URL, and drops one already cached.
 const documentsOnly: WorkboxPlugin = {
   cacheWillUpdate: async ({ response }) =>

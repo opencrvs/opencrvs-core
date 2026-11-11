@@ -116,13 +116,15 @@ defineConfig({
   id: 'birth',
   label: { ... },
   versions: [
-    { id: 'initial', actions: [ ... ] },
-    { id: 'v2', effectiveFrom: '2027-01-01', actions: [ ... ] }
+    { id: 'initial', label: { ... }, actions: [ ... ] },
+    { id: 'v2', label: { ... }, effectiveFrom: '2027-01-01', actions: [ ... ] }
   ]
 })
 ```
 
 A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event.
+
+Each version must have a `label`. It is the name of the version, which the UI shows wherever it names the version. An event configured without `versions` gives its single version the label of the event.
 
 A version takes effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`). A record is created under the version in effect that day and keeps it for its whole life: every action on the record uses that version, even after a newer one takes effect. A record created offline keeps the version in effect when the user created it. The record stores the version's id as `configVersionId`.
 
@@ -145,11 +147,15 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 **Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
 
-The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionId}`.
+The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionLabel}` (the label of the version) or `{event.configVersionId}` (its id).
 
 **The client shows each record with its own version.** Record pages, actions, validation, workqueue rows and the duplicate comparison use the version that the record was created under. When a new version takes effect at midnight, the client uses it for new records. A form that is already open does not change.
 
 [#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602) [#13603](https://github.com/opencrvs/opencrvs-core/issues/13603)
+
+#### `FEATURES.V2_EVENTS` is removed
+
+The client did not read `FEATURES.V2_EVENTS`, and the `?V2_EVENTS` query parameter had no effect, so both are removed. If your client config sets `V2_EVENTS` in `FEATURES`, remove it, because the config no longer compiles with it.
 
 #### The `incomplete` flag is removed
 
@@ -251,6 +257,14 @@ Check conditionals that rely on the old counting:
 
 ### New features
 
+#### Create records under a past configuration version (experimental)
+
+A country can let users create a record under an earlier version of an event configuration, for example to enter a record that was registered on an older form. To turn this on, set `FEATURES: { _EXPERIMENTAL_LEGACY_RECORDS: true }` in the client config. Then, when an event has more than one version in effect, the event selection page asks for the form version. The version in effect today is selected by default. The feature is off by default.
+
+The feature is experimental. Its UI is not a supported feature in 2.2. It can change, or be removed, without notice.
+
+[#14015](https://github.com/opencrvs/opencrvs-core/issues/14015)
+
 #### `REVOKED` status with revoke and reinstate registration actions
 
 Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
@@ -302,7 +316,9 @@ The toolkit and the country configuration template work with any container regis
 
 ### Bug fixes
 
+- The loading screens of the client now show the country logo from `COUNTRY_LOGO` in the application config. Before, they always showed the OpenCRVS logo. The client gets the logo from the `/content/country-logo` endpoint of the country config. [#14180](https://github.com/opencrvs/opencrvs-core/issues/14180)
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
+- Show images from the declaration and from the print form on the certificate preview. Files from `FILE` and `FILE_WITH_OPTIONS` fields reached the certificate as relative paths, so the browser did not find them in its cache and showed a broken image [#14187](https://github.com/opencrvs/opencrvs-core/issues/14187)
 
 ### Security
 
