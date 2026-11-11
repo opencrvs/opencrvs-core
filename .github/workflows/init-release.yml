@@ -7,22 +7,15 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-# Starts a release. Run it manually with a semver version.
+# Starts a release. Run it manually with a semver version, e.g. 1.9.24.
 #
-# A "channel" is the <major>.<minor> a version belongs to: 1.9.17 is on 1.9,
-# 2.0.3 on 2.0. master tracks the channel that last shipped.
+# The release is made on its line's branch, release/<major>.<minor>.x
+# (1.9.24 -> release/1.9.x), which gets two commits: the version bump and an
+# empty CHANGELOG section for the version. A <minor>.0 version cuts the line's
+# branch from develop first.
 #
-# The release branch is cut from the previous patch, or from develop for a
-# minor or major, and gets the version bump and CHANGELOG commits. Where it
-# merges depends on its channel:
-#
-#   master's channel  release/<version> -> master, plus a merge-back into
-#                     develop
-#   an older channel  no PR to master. One merge-back PR into the next
-#                     unreleased patch of the nearest channel above: 1.9.17
-#                     merges into release/2.0.2 when 2.0.1 is the newest
-#                     published 2.0. The hotfix reaches master through that
-#                     channel's own release.
+# Carrying the release up into the newer lines and develop is done by the
+# forward-merge workflow (forward-merge-release-lines.yml), not here.
 name: Release - Start a new release
 on:
   workflow_dispatch:
@@ -34,247 +27,77 @@ on:
 
 env:
   VERSION: ${{ inputs.version }}
-  RELEASE_BRANCH: release/${{ inputs.version }}
 
 jobs:
   release_workflow:
     runs-on: ubuntu-latest
     steps:
       # Runs before the checkout, so it cannot read the repository.
-      - name: Determine the base branch
-        id: base
+      - name: Work out the release line
+        id: line
         run: |
           if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::'$VERSION' is not a semver version, e.g. 1.9.17"
+            echo "::error::'$VERSION' is not a semver version, e.g. 1.9.24"
             exit 1
           fi
 
-          IFS='.' read -r x y z <<< "$VERSION"
-          if [ "$z" = "0" ]; then
-            echo "base_branch=develop" >> $GITHUB_OUTPUT
-          else
-            echo "base_branch=release/$x.$y.$((z - 1))" >> $GITHUB_OUTPUT
-          fi
+          IFS='.' read -r x y _ <<< "$VERSION"
+          echo "branch=release/$x.$y.x" >> "$GITHUB_OUTPUT"
 
       # Full history is required so lerna can traverse the commit graph.
-      - name: Checkout ${{ steps.base.outputs.base_branch }}
+      - name: Checkout develop
         uses: actions/checkout@v7
         with:
-          ref: ${{ steps.base.outputs.base_branch }}
+          ref: develop
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      # An older channel climbs one channel at a time, so the target is the next
-      # unreleased patch of x.<y+1>, or of <x+1>.0 when x.<y+1> never shipped.
-      # That branch must already exist: its own release cuts it, with its own
-      # version bump and CHANGELOG.
-      - name: Determine the target branch
-        id: target
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          IFS='.' read -r x y _ <<< "$VERSION"
-          IFS='.' read -r mx my _ <<< "$(git show origin/master:package.json | jq -r .version)"
-          echo "master is on $mx.$my"
-
-          if [ "$x" -gt "$mx" ] || { [ "$x" -eq "$mx" ] && [ "$y" -ge "$my" ]; }; then
-            target=master
-            merge_back=develop
-          else
-            # every published release as "<major> <minor> <patch>". Major and
-            # minor stay separate fields so they compare as numbers — as one
-            # string, awk reads "1.10" and "1.1" as the same value.
-            published=$(gh release list --limit 200 --exclude-drafts --exclude-pre-releases \
-              --json tagName --jq '.[].tagName' \
-              | sed -n 's/^v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)$/\1 \2 \3/p')
-
-            for candidate in "$x $((y + 1))" "$((x + 1)) 0"; do
-              read -r cx cy <<< "$candidate"
-              patch=$(echo "$published" | awk -v a="$cx" -v b="$cy" '$1 == a && $2 == b { print $3 }' | sort -n | tail -1)
-              if [ -n "$patch" ]; then break; fi
-            done
-
-            if [ -z "$patch" ]; then
-              echo "::error::Neither $x.$((y + 1)).x nor $((x + 1)).0.x has a published release, so $VERSION has nothing to merge up into."
-              exit 1
-            fi
-
-            target="release/$cx.$cy.$((patch + 1))"
-            merge_back="$target"
-            echo "$cx.$cy.$patch is the newest published release above $x.$y"
-
-            if ! git ls-remote --exit-code --heads origin "$target" > /dev/null 2>&1; then
-              echo "::error::$target does not exist. Start the $cx.$cy.$((patch + 1)) release first."
-              exit 1
-            fi
-          fi
-
-          # Dots are stripped so the name passes core's branch-name check:
-          # 1.9.17 into 2.0.2 -> merge-back/release-1917-into-202.
-          slug="${merge_back#release/}"
-          echo "$VERSION -> $target, merging back into $merge_back"
-          echo "target_branch=$target" >> $GITHUB_OUTPUT
-          echo "merge_back_target=$merge_back" >> $GITHUB_OUTPUT
-          echo "mergeback_branch=merge-back/release-${VERSION//./}-into-${slug//./}" >> $GITHUB_OUTPUT
 
       - name: Configure the git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Pushed before any PR is opened, so both PRs carry these commits.
-      - name: Create the release branch
-        run: |
-          if git ls-remote --exit-code --heads origin "$RELEASE_BRANCH" > /dev/null 2>&1; then
-            echo "$RELEASE_BRANCH already exists, skipping."
-            exit 0
-          fi
-
-          git checkout -b "$RELEASE_BRANCH"
-
-          npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
-          yarn version --new-version "$VERSION" --no-git-tag-version
-          git add .
-          git commit -m "chore: update version to $VERSION"
-
-          # Prepend a "Release Candidate" section: sed drops the old
-          # "# Changelog" header so it can be rewritten above the new one.
-          sed -i '1,2d' CHANGELOG.md
-          {
-            echo "# Changelog"
-            echo ""
-            echo "## $VERSION Release Candidate"
-            echo ""
-            cat CHANGELOG.md
-          } > CHANGELOG.new
-          mv CHANGELOG.new CHANGELOG.md
-          git add CHANGELOG.md
-          git commit -m "docs: update changelog for $VERSION release candidate"
-
-          git push origin "$RELEASE_BRANCH"
-
-      # A dedicated branch keeps the commits that resolve conflicts with the
-      # target off the release branch. For an older channel it is cut from the
-      # target with the release merged in, so the PR diff is only what this
-      # channel adds. A merge needing a human is handed over in the job summary
-      # instead of failing the release.
-      #
-      # The branch is a snapshot and nothing updates it afterwards, so fixes
-      # that land on the release branch later have to be merged into it by hand
-      # before the PR goes in, or they never reach the target.
-      - name: Create the merge-back branch
-        id: merge_back
-        run: |
-          BRANCH="${{ steps.target.outputs.mergeback_branch }}"
-          TARGET="${{ steps.target.outputs.merge_back_target }}"
-
-          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
-            echo "$BRANCH already exists, skipping."
-            echo "created=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          if [ "$TARGET" = "develop" ]; then
-            git fetch origin "$RELEASE_BRANCH"
-            git checkout -b "$BRANCH" "origin/$RELEASE_BRANCH"
-          else
-            git fetch origin "$RELEASE_BRANCH" "$TARGET"
-            git checkout -b "$BRANCH" "origin/$TARGET"
-
-            if ! git merge --no-edit "origin/$RELEASE_BRANCH"; then
-              # Both channels bump the version fields and the CHANGELOG, so those
-              # always conflict and always resolve the same way: the target keeps
-              # its own. Anything else needs a human.
-              conflicts=$(git diff --name-only --diff-filter=U)
-              unexpected=$(echo "$conflicts" | grep -Ev '(^|/)package\.json$|^CHANGELOG\.md$' || true)
-
-              if [ -n "$unexpected" ]; then
-                git merge --abort
-                echo "::warning::$RELEASE_BRANCH does not merge cleanly into $TARGET; the merge-back branch and its PR were skipped."
-                {
-                  echo "### Merge $VERSION into $TARGET by hand"
-                  echo ""
-                  echo "Conflicts in: ${unexpected//$'\n'/, }"
-                  echo ""
-                  echo "Cut \`$BRANCH\` from \`$TARGET\`, merge \`$RELEASE_BRANCH\` in, resolve, push, then re-run this workflow to open the PR."
-                } >> "$GITHUB_STEP_SUMMARY"
-                echo "created=false" >> $GITHUB_OUTPUT
-                exit 0
-              fi
-
-              # A file the target deleted has no "ours" side, so it stays deleted.
-              while IFS= read -r file; do
-                if git ls-files --unmerged -- "$file" | awk '{print $3}' | grep -qx 2; then
-                  git checkout --ours -- "$file"
-                  git add -- "$file"
-                else
-                  git rm -q -f -- "$file"
-                fi
-              done <<< "$conflicts"
-
-              git commit --no-edit
-              echo "Kept $TARGET's copy of: ${conflicts//$'\n'/ }"
-              echo "auto_resolved=${conflicts//$'\n'/ }" >> $GITHUB_OUTPUT
-            fi
-          fi
-
-          git push origin "$BRANCH"
-          echo "created=true" >> $GITHUB_OUTPUT
-
-      - name: Create the pull requests
+      - name: Check out ${{ steps.line.outputs.branch }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINE_BRANCH: ${{ steps.line.outputs.branch }}
         run: |
-          BRANCH="${{ steps.target.outputs.mergeback_branch }}"
-          TARGET="${{ steps.target.outputs.merge_back_target }}"
-          RESOLVED="${{ steps.merge_back.outputs.auto_resolved }}"
-
-          # base, head, title, body. An already-open PR is left alone, so a
-          # re-run opens only the missing one.
-          create_pr() {
-            local open
-            open=$(gh pr list --head "$2" --base "$1" --state open --json number --jq '.[0].number // ""')
-            if [ -n "$open" ]; then
-              echo "PR $2 -> $1 already exists (#$open), skipping."
-            else
-              gh pr create --base "$1" --head "$2" --title "$3" --body "$4"
-            fi
-          }
-
-          BODY=""
-          if [ -f .github/TEMPLATES/RELEASE_PR_TEMPLATE.md ]; then
-            BODY=$(cat .github/TEMPLATES/RELEASE_PR_TEMPLATE.md)
-          fi
-
-          if [ "$TARGET" = "develop" ]; then
-            create_pr master "$RELEASE_BRANCH" "Release v$VERSION" "$BODY"
-            TITLE="chore: merge release v$VERSION back to develop"
-            NOTE="Merge release branch back to develop to include version bump and changelog updates."
+          if git ls-remote --exit-code --heads origin "$LINE_BRANCH" > /dev/null 2>&1; then
+            git checkout -B "$LINE_BRANCH" "origin/$LINE_BRANCH"
+          elif [[ $VERSION == *.0 ]]; then
+            echo "$LINE_BRANCH doesn't exist yet; cutting it from develop."
+            git checkout -b "$LINE_BRANCH"
           else
-            echo "$VERSION is on an older channel than master, so no release PR to master."
-            TITLE="chore: merge release v$VERSION into $TARGET"
-            NOTE="$BODY
-
-          ---
-
-          > **Note:** \`$VERSION\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release."
-
-            if [ -n "$RESOLVED" ]; then
-              NOTE="$NOTE
-
-          > The merge kept \`$TARGET\`'s copy of: $RESOLVED — the version bump and changelog entry belong to \`$VERSION\`'s own channel. Check that nothing else in those files needed to come across."
-            fi
+            echo "::error::$LINE_BRANCH does not exist. Start $LINE_BRANCH with its .0 release first."
+            exit 1
           fi
 
-          if [ "${{ steps.merge_back.outputs.created }}" = "true" ]; then
-            create_pr "$TARGET" "$BRANCH" "$TITLE" "$NOTE"
+      # Each commit is skipped when it is already there, so a re-run is safe.
+      - name: Bump the version and add a CHANGELOG section
+        env:
+          LINE_BRANCH: ${{ steps.line.outputs.branch }}
+        run: |
+          if [ "$(jq -r .version package.json)" = "$VERSION" ]; then
+            echo "package.json is already on $VERSION."
           else
-            echo "No merge-back branch to open a PR from — see the job summary."
+            npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
+            yarn version --new-version "$VERSION" --no-git-tag-version
+            git add .
+            git commit -m "chore: update version to $VERSION"
           fi
 
-      # The companion repos cut their release branches from the same branch this
-      # run was started on, and take the target branch worked out above rather
-      # than deriving it themselves.
+          if grep -qx "## $VERSION" CHANGELOG.md; then
+            echo "CHANGELOG.md already has a $VERSION section."
+          else
+            # Insert "## <version>" right below the "# Changelog" header.
+            sed -i "0,/^# Changelog$/s//# Changelog\n\n## $VERSION/" CHANGELOG.md
+            git add CHANGELOG.md
+            git commit -m "docs: add $VERSION to the changelog"
+          fi
+
+          git push origin "$LINE_BRANCH"
+
+      # The companion repos cut their own release branches. target_branch tells
+      # them which of core's branches the release is made on.
       #
       # TODO: countryconfig, testland and helm-charts only cut release branches on
       # the 1.9.x line; 2.0 ships its charts from this repo. Drop them from this
@@ -291,7 +114,7 @@ jobs:
               --repo "opencrvs/$1" \
               --ref "${{ github.ref_name }}" \
               -f version="$VERSION" \
-              -f target_branch="${{ steps.target.outputs.target_branch }}"
+              -f target_branch="${{ steps.line.outputs.branch }}"
             echo "Triggered init-release in $1"
           }
 
@@ -300,16 +123,21 @@ jobs:
           trigger opencrvs-testland "$TESTLAND_TOKEN"
           trigger helm-charts "$HELM_CHARTS_TOKEN"
 
+      # Cut from e2e's branch for the same line, or from develop if it has none.
       - name: Create the release branch in the e2e repo
         env:
           GH_TOKEN: ${{ secrets.E2E_WORKFLOW_TOKEN }}
+          RELEASE_BRANCH: release/${{ inputs.version }}
+          LINE_BRANCH: ${{ steps.line.outputs.branch }}
         run: |
           if gh api "repos/opencrvs/e2e/git/ref/heads/$RELEASE_BRANCH" > /dev/null 2>&1; then
             echo "$RELEASE_BRANCH already exists in e2e, skipping."
             exit 0
           fi
 
-          sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/${{ steps.base.outputs.base_branch }}" --jq .object.sha)
+          if ! sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/$LINE_BRANCH" --jq .object.sha 2>/dev/null); then
+            sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/develop" --jq .object.sha)
+          fi
           gh api repos/opencrvs/e2e/git/refs -f ref="refs/heads/$RELEASE_BRANCH" -f sha="$sha" > /dev/null
           echo "Created $RELEASE_BRANCH in e2e"
 
