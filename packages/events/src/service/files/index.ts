@@ -189,9 +189,13 @@ export function assertFilesBelongToEvent(
 
   for (const path of getFilePathsFromValues(values)) {
     const file = parseDocumentPath(path)
-    const isOwnAttachment = file?.kind === 'event' && file.eventId === event.id
+    // Stored under this record, or already named by it (e.g. a pre-2.0 key a
+    // correction carries over); anything else is rejected
+    const allowed =
+      (file?.kind === 'event' && file.eventId === event.id) ||
+      namedByRecord.includes(path)
 
-    if (!isOwnAttachment && !namedByRecord.includes(path)) {
+    if (!allowed) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: `File does not belong to this record: ${path}`
