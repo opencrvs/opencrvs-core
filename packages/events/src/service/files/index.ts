@@ -15,6 +15,7 @@ import { zfd } from 'zod-form-data'
 import * as z from 'zod/v4'
 import FormData from 'form-data'
 import {
+  ActionValues,
   AttachmentPath,
   DocumentPath,
   eventAttachmentPath,
@@ -182,10 +183,7 @@ export async function sweepUnreferencedFiles(
  */
 export function assertFilesBelongToEvent(
   event: EventDocument,
-  values: {
-    declaration: Record<string, unknown>
-    annotation?: Record<string, unknown> | null
-  }
+  values: ActionValues
 ) {
   const namedByRecord = getFilePathsFromEvent(event)
 

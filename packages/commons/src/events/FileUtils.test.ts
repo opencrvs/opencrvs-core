@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { DocumentPath } from '../documents'
 import { EventDocument } from './EventDocument'
 import { getFilePathsFromEvent, getFilePathsFromValues } from './FileUtils'
 
@@ -232,14 +233,14 @@ test('file references finder reads single and multi-file values from declaration
     getFilePathsFromValues({
       declaration: {
         'applicant.image': {
-          path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/a.jpeg',
+          path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/a.jpeg' as DocumentPath,
           type: 'image/jpeg',
           originalFilename: 'a.jpeg'
         },
         'applicant.name': 'not a file',
         'documents.proof': [
           {
-            path: 'b.png',
+            path: 'b.png' as DocumentPath,
             type: 'image/png',
             originalFilename: 'b.png',
             option: 'PASSPORT'
@@ -248,7 +249,7 @@ test('file references finder reads single and multi-file values from declaration
       },
       annotation: {
         'review.signature': {
-          path: 'users/0f1e2d3c-4b5a-4968-8776-655443322110/c.png',
+          path: 'users/0f1e2d3c-4b5a-4968-8776-655443322110/c.png' as DocumentPath,
           type: 'image/png',
           originalFilename: 'c.png'
         }

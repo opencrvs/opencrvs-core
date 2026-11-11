@@ -10,10 +10,13 @@
  */
 
 import { DocumentPath } from '../documents'
-import { Action, ActionDocument } from './ActionDocument'
+import { Action, ActionBase, ActionDocument } from './ActionDocument'
 import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
+
+/** The field values an action, a draft or an action input carries. */
+export type ActionValues = Pick<ActionBase, 'declaration' | 'annotation'>
 
 function carriesFieldValues(action: Action): action is ActionDocument {
   return 'declaration' in action
@@ -27,10 +30,7 @@ function carriesFieldValues(action: Action): action is ActionDocument {
 export function getFilePathsFromValues({
   declaration,
   annotation
-}: {
-  declaration: Record<string, unknown>
-  annotation?: Record<string, unknown> | null
-}): DocumentPath[] {
+}: ActionValues): DocumentPath[] {
   const values = [
     ...Object.values(declaration),
     ...Object.values(annotation ?? {})
