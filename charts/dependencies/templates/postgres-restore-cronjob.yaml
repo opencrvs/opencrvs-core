@@ -35,14 +35,8 @@ spec:
               env:
                 - name: POSTGRES_HOST
                   value: postgres-0.postgres.{{ .Release.Namespace }}.svc.cluster.local
-              {{- if .Values.postgres.use_default_credentials }}
-                - name: POSTGRES_USER
-                  value: postgres
-                - name: PGPASSWORD
-                  value: postgres
                 - name: POSTGRES_DB
                   value: postgres
-              {{- else }}
                 - name: POSTGRES_USER
                   valueFrom:
                     secretKeyRef:
@@ -53,7 +47,6 @@ spec:
                     secretKeyRef:
                       name: {{ .Values.postgres.admin_user_secret_name }}
                       key: POSTGRES_PASSWORD
-              {{- end }}
                 - name: ENCRYPT_PASS
                   valueFrom:
                     secretKeyRef:

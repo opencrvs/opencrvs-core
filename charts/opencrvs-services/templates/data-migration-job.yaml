@@ -29,7 +29,6 @@ spec:
                 secretKeyRef:
                   key: SUPER_USER_PASSWORD
                   name: opencrvs-superuser
-          {{- if or (eq .Values.postgres.auth_mode "auto") (eq .Values.postgres.auth_mode "disabled") }}
             - name: EVENTS_POSTGRES_URL
               valueFrom:
                 secretKeyRef:
@@ -40,7 +39,6 @@ spec:
                 secretKeyRef:
                   key: EVENTS_APP_POSTGRES_USER
                   name: {{ .Values.postgres.users_secret }}
-          {{- end }}
             - name: WAIT_HOSTS
               value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }}"
           {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}

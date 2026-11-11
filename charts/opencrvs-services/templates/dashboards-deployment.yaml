@@ -97,7 +97,6 @@ spec:
               value: {{ .Values.postgres.port | quote }}
             - name: METABASE_DATABASE_NAME
               value: "events"
-          {{- if not (eq .Values.postgres.auth_mode "managed") }}
             - name: METABASE_DATABASE_USER
               valueFrom:
                 secretKeyRef:
@@ -108,7 +107,6 @@ spec:
                 secretKeyRef:
                   key: EVENTS_ANALYTICS_POSTGRES_PASSWORD
                   name: {{ .Values.postgres.users_secret }}
-            {{- end }}
             - name: METABASE_JAR
               value: "/app/metabase.jar"
             - name: MB_DB_INIT_SQL_FILE

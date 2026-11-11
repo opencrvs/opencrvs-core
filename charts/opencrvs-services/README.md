@@ -95,30 +95,19 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Enable elasticsearch reindex cronjob. Required if database restore is configured.</td>
         </tr>
         <tr>
-            <td>elasticsearch.auth_mode</td>
-            <td>disabled</td>
-            <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
-                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret and urls_secret</li>
-                <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
-                It is recommended to use <code>auth_mode: auto</code> or <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
-            </td>
+            <td>elasticsearch.admin_password</td>
+            <td><code>n/a</code></td>
+            <td>Password of the user <code>elastic</code>. Used only when the secret <code>admin_user_secret_name</code> does not exist. Installation fails without it. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
         <tr>
             <td>elasticsearch.admin_user_secret_name</td>
             <td>elasticsearch-admin-user</td>
-            <td>Secret to store Elasticsearch admin user password, If <code>auth_mode: auto</code> is configured, OpenCRVS will connect to Elasticsearch server under <code>elastic</code> and create all required for OpenCRVS users.</td>
-        </tr>
-        <tr>
-            <td>elasticsearch.admin_user_secret_name</td>
-            <td>elasticsearch-admin-user</td>
-            <td>Secret to store Elasticsearch admin user password, If <code>auth_mode: auto</code> is configured, OpenCRVS will connect to Elasticsearch server under <code>elastic</code> and create all required for OpenCRVS users.</td>
+            <td>Secret with the admin password of Elasticsearch (key <code>ELASTIC_PASSWORD</code>). OpenCRVS connects as <code>elastic</code> and creates the users that it needs. Copy it from the dependencies chart, or let the chart create it from <code>elasticsearch.admin_password</code>.</td>
         </tr>
         <tr>
             <td>elasticsearch.urls_secret</td>
             <td>elasticsearch-opencrvs-urls</td>
-            <td>Secret to store Elasticsearch URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: auto</code> and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
+            <td>Secret with Elasticsearch URLs, usernames and passwords of OpenCRVS users. The chart creates it with random passwords when it does not exist. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
        <tr>
             <th>s3.{}</th>
@@ -158,7 +147,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>s3.users_secret</td>
             <td>s3-opencrvs-users</td>
-            <td>Secret name to store the S3 object store credentials. The services always read it, there is no <code>auth_mode</code> for the S3 object store. More information about credentials secret is at <a href="#s3-secret-s3users_secret">S3 Secret</a></td>
+            <td>Secret name to store the S3 object store credentials. The services always read it. More information about credentials secret is at <a href="#s3-secret-s3users_secret">S3 Secret</a></td>
         </tr>
         <tr>
             <th>postgres.{}</th>
@@ -171,25 +160,24 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Postgres hostname.</td>
         </tr>
         <tr>
-            <td>postgres.auth_mode</td>
-            <td>disabled</td>
-            <td>  Following values are allowed
-                <li><code>disabled</code>: Default Postgres user and password is used for postgres admin account (postgres/password)</li>
-                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Postgres admin user credentials</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by Postgres administrator, but helm will pick up data from users_secret and urls_secret</li>
-                <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
-                It is recommended to use <code>auth_mode: auto</code> or <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
-            </td>
+            <td>postgres.admin_username</td>
+            <td><code>n/a</code></td>
+            <td>Postgres admin user. Used only when the secret <code>admin_user_secret_name</code> does not exist. Installation fails without it. If you use the dependencies chart with <code>use_default_credentials: false</code>, the username can be random, so copy the secret or read the value from it. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+        </tr>
+        <tr>
+            <td>postgres.admin_password</td>
+            <td><code>n/a</code></td>
+            <td>Postgres admin password. Used only when the secret <code>admin_user_secret_name</code> does not exist. Installation fails without it. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
         <tr>
             <td>postgres.admin_user_secret_name</td>
             <td>postgres-admin-user</td>
-            <td>Secret to store Postgres admin user and password, If <code>auth_mode: auto</code> is configured, OpenCRVS will connect to Postgres server and create all required for OpenCRVS databases and users.</td>
+            <td>Secret with the Postgres admin user and password (keys <code>POSTGRES_USER</code> and <code>POSTGRES_PASSWORD</code>). OpenCRVS connects with it and creates the databases and users that it needs. Copy it from the dependencies chart, or let the chart create it from <code>postgres.admin_*</code>.</td>
         </tr>
         <tr>
             <td>postgres.urls_secret</td>
             <td>postgres-urls</td>
-            <td>Secret to store Postgres URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: &ltauto|disabled></code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
+            <td>Secret with Postgres URLs, usernames and passwords of OpenCRVS users. The chart creates it with random passwords when it does not exist. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
        <tr>
             <th>redis.{}</th>
@@ -202,19 +190,9 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Redis hostname configuration.</td>
         </tr>
         <tr>
-            <td>redis.auth_mode</td>
-            <td>disabled</td>
-            <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret</li>
-                <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
-                It is recommended to use <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
-            </td>
-        </tr>
-        <tr>
             <td>redis.users_secret</td>
             <td>redis-opencrvs-users</td>
-            <td>Secret name to store Redis credentials, more information about credentials secret is at <a href="#authentication-configuration">Authentication configuration</a></td>
+            <td>Secret with Redis credentials. Authentication is always enabled. The chart never creates this secret: copy it from the dependencies chart. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
        <tr>
             <th>Application configuration</th>
@@ -728,22 +706,59 @@ Set the same key in the dependencies chart's `values.yaml` to also restrict the 
 
 ## General information
 
-OpenCRVS has more then 10 microservices that require authentication to multiple datastores (Elasticsearch, Redis and the S3 object store. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
+OpenCRVS has more then 10 microservices that require authentication to multiple datastores (Postgres, Elasticsearch, Redis and the S3 object store). As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section.
 
-- No authentication enabled (`disabled`), password-less access to datastores.
-- Auto (`auto`) mode allows OpenCRVS chart to create users for Elasticsearch at installation time, but you need to provide admin credentials for that service. Mode is not supported by Redis.
-- In case when users are created by datastore administrator (`use_secret`) and DevOps gets those credentials, kubernetes secrets needs to be created manually as well. Check how to create secret in the section below.
-- DevOps may decide to manage secrets by own way and map to environment variables manually (`managed`). Check [Mapping secrets](#mapping-secrets) section for details. **NOTE**: This way is not recommended since we can't avoid human error and mapping secrets manually requires deep knowledge of OpenCRVS internals.
+Authentication is always enabled. The `auth_mode` value is removed from `postgres`, `elasticsearch` and `redis`. The chart follows the same rules for each datastore:
 
-Table contains list of required secrets for each `auth_mode` grouped by datastore:
+| Datastore     | Secret that the chart reads                     | If the secret does not exist                                                                 |
+| ------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| S3            | `s3.users_secret`                               | The chart creates it from `s3.admin_username` and `s3.admin_password`, or fails.             |
+| Postgres      | `postgres.admin_user_secret_name`               | The chart creates it from `postgres.admin_username` and `postgres.admin_password`, or fails. |
+| Postgres      | `postgres.users_secret`, `postgres.urls_secret` | The chart generates random passwords for the OpenCRVS users and creates both secrets.        |
+| Elasticsearch | `elasticsearch.admin_user_secret_name`          | The chart creates it from `elasticsearch.admin_password`, or fails.                          |
+| Elasticsearch | `elasticsearch.users_secret`, `urls_secret`     | The chart generates random passwords for the OpenCRVS users and creates both secrets.        |
+| Redis         | `redis.users_secret`                            | The chart does not create it. Copy it from the dependencies chart.                           |
 
-| Datastore     | auth_mode: auto        | default secret name      | auth_mode: use_secret | default secret name         |
-| ------------- | ---------------------- | ------------------------ | --------------------- | --------------------------- |
-| Postgres      | admin_user_secret_name | postgres-admin-user      | urls_secret           | postgres-urls               |
-| Elasticsearch | admin_user_secret_name | elasticsearch-admin-user | urls_secret           | elasticsearch-opencrvs-urls |
-| Redis         | not supported          |                          | users_secret          | redis-opencrvs-users        |
+The chart never changes an existing secret. For Postgres and Elasticsearch, the on-deploy jobs use the admin secret to create or update the users of OpenCRVS. The migration jobs also need it. `helm install` and `helm upgrade` fail if the admin secret and the `admin_*` values are missing. `helm template` cannot read the cluster, so it does not fail: it renders the secrets only when you give the values.
 
-The S3 object store is not in the table. It has no `auth_mode`: the services always read the secret `s3.users_secret`, and the chart creates it from `s3.admin_username` and `s3.admin_password` when it does not exist. See [S3 Secret](#s3-secret-s3users_secret).
+## Copy the secrets from the dependencies chart
+
+The dependencies chart creates the admin secrets in its own namespace. Copy them to the namespace of the opencrvs-services chart before you install it:
+
+```
+DEPENDENCIES_NAMESPACE=<dependencies namespace>
+OPENCRVS_NAMESPACE=<OpenCRVS namespace>
+for secret in s3-opencrvs-users postgres-admin-user elasticsearch-admin-user redis-opencrvs-users; do
+  kubectl get secret $secret -n $DEPENDENCIES_NAMESPACE -o yaml \
+    | sed "s#namespace: $DEPENDENCIES_NAMESPACE#namespace: $OPENCRVS_NAMESPACE#" \
+    | kubectl apply -n $OPENCRVS_NAMESPACE -f -
+done
+```
+
+Replace the placeholders with the namespaces. If you changed the secret names in the values, use your names. The dependencies chart creates these secrets with default credentials (`use_default_credentials: true`) or with random ones (`false`).
+
+## Pass the admin credentials as values
+
+Instead of copying, give the same admin credentials to the chart. The chart creates the secret when it does not exist:
+
+```yaml
+postgres:
+  admin_username: <username>
+  admin_password: <password>
+elasticsearch:
+  admin_password: <password> # password of the user `elastic`
+s3:
+  admin_username: <access key>
+  admin_password: <secret key>
+```
+
+The values must match the credentials of the datastores. If the dependencies chart uses default credentials, they are `postgres` / `postgres`, `elastic` / `elasticadmin` and `minioadmin` / `minioadmin`. An existing secret is not changed, so the values are ignored then. Redis has no such values: always copy `redis.users_secret`.
+
+## Migration from `auth_mode`
+
+- `disabled` is not supported. The chart fails with a message. Authentication is always enabled, so copy the secrets or pass the `admin_*` values.
+- `auto` and `use_secret` behave the same way: the chart uses an existing secret and creates a missing one. The on-deploy jobs always run.
+- `managed` is removed. Map your secrets with the `secrets` section of the service. The chart still adds the default variables, and the variables from your `secrets` section come after them.
 
 ## Secrets specification
 
@@ -753,8 +768,6 @@ The S3 object store is not in the table. It has no `auth_mode`: the services alw
 
 Default secret name: postgres-admin-user
 
-**auth_mode:** auto
-
 **Keys:**
 
 - POSTGRES_USER
@@ -763,8 +776,6 @@ Default secret name: postgres-admin-user
 #### postgres.urls_secret
 
 **Default secret name:** postgres-urls
-
-**auth_mode:** use_secret
 
 **Keys:**
 
@@ -791,8 +802,6 @@ postgres://user-mgnt:password@postgres-0.postgres.opencrvs-deps-dev.svc.cluster.
 
 **Default secret name:** elasticsearch-admin-user
 
-**auth_mode:** auto
-
 **Keys:**
 
 - ELASTIC_PASSWORD
@@ -802,8 +811,6 @@ postgres://user-mgnt:password@postgres-0.postgres.opencrvs-deps-dev.svc.cluster.
 #### elasticsearch.urls_secret
 
 **Default secret name:** elasticsearch-opencrvs-urls
-
-**auth_mode:** use_secret
 
 **Keys:**
 
@@ -871,8 +878,6 @@ The chart reads the cluster to find the secret. `helm template` has no cluster, 
 ### Redis Secret (redis.users_secret)
 
 **Default secret name:** redis-opencrvs-users
-
-**auth_mode:** use_secret
 
 **Keys:**
 
@@ -1019,7 +1024,7 @@ kubectl logs job/data-cleanup -f --all-containers=true
 
 # Adding Elasticsearch users
 
-When deploying OpenCRVS with Elasticsearch authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `elasticsearch` section.
+When deploying OpenCRVS , you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `elasticsearch` section.
 Following table shows list of available parameters:
 
 | Parameter  | Type | Default            | Description                                                       |

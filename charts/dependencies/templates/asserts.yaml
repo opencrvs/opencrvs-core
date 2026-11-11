@@ -1,6 +1,3 @@
-{{- if and .Values.monitoring.enabled .Values.elasticsearch.use_default_credentials }}
-{{- fail "Invalid configuration: Cannot enable both monitoring with default Elasticsearch credentials." }}
-{{- end }}
 {{- if not .Values.hostname }}
 {{- fail "Invalid configuration: hostname value is not defined, please check values.yaml and (or) GitHub environment DOMAIN variable" }}
 {{- end }}

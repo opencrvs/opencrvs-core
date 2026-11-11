@@ -36,23 +36,16 @@ spec:
               value: "http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040"
             - name: DOCUMENTS_URL
               value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
-          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
-            - name: ES_URL
-              value: "http://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
-          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
             - name: ES_URL
               valueFrom:
                 secretKeyRef:
                   key: SEARCH_ELASTIC_URL
                   name: {{ .Values.elasticsearch.urls_secret }}
-          {{- end }}
-          {{- if not (eq .Values.postgres.auth_mode "managed") }}
             - name: EVENTS_POSTGRES_URL
               valueFrom:
                 secretKeyRef:
                   key: events_app_db_url
                   name: {{ .Values.postgres.urls_secret }}
-          {{- end }}
           {{- include "render-env-vars" (dict "service_name" "events" "Values" .Values) }}
           {{- include "resources-helper" (dict "service_name" "events" "Values" .Values) | indent 10 }}
           {{- include "probes-helper" (dict "service_name" "events" "Values" .Values) | indent 10 }}
