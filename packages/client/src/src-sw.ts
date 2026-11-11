@@ -62,6 +62,8 @@ registerRoute(/http(.+)conditionals\.js$/, new NetworkFirst())
 registerRoute(/http(.+)config$/, new NetworkFirst())
 // This caches certificates fetched from the countryconfig microservice
 registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
+// This caches the country logo that the loading screens show
+registerRoute(/api\/countryconfig\/content\/country-logo$/, new NetworkFirst())
 
 // Refuses to cache an app-shell response under a document's URL, and drops one already cached.
 const documentsOnly: WorkboxPlugin = {
