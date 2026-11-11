@@ -19,16 +19,11 @@ elasticsearch:
   cronjob:
     enabled: false
     schedule: '0 2 * * *'
-  # auth_mode:
-  # - disabled: No authentication enabled, password-less access to databases
-  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
-  #               will pick up data from users_secret and urls_secret
-  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
-  #            please check README.md
-  # It is recommended to setup auto or use_secret values for server environment
-  auth_mode: disabled
-
+  # Authentication is always enabled. The chart reads the secret `admin_user_secret_name` (key ELASTIC_PASSWORD, user `elastic`).
+  # Copy it from the dependencies chart, see README.md. If the secret does not exist, the chart creates it from `admin_password`.
+  # `helm install` and `helm upgrade` fail without it. `helm template` cannot read the cluster, so it renders the secret only with it.
+  # An existing secret is never changed.
+  # admin_password:
   admin_user_secret_name: elasticsearch-admin-user
   urls_secret: elasticsearch-opencrvs-urls
   # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
@@ -68,13 +63,8 @@ s3:
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
-  # auth_mode:
-  # - disabled: No authentication enabled, password-less access to databases
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
-  #               will pick up data from users_secret
-  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
-  #            please check README.md
-  auth_mode: disabled
+  # Authentication is always enabled. The chart reads credentials from users_secret and never creates it.
+  # Copy it from the dependencies chart, see README.md.
   users_secret: redis-opencrvs-users
 
 postgres:
@@ -82,17 +72,14 @@ postgres:
   host: postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local
   port: 5432
   sslmode: disable
-  auth_mode: disabled
-  # auth_mode:
-  # - disabled: Default credentials are used postgres/postgres
-  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Postgres admin user
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by Postgres administrator, but helm
-  #               will pick up data from users_secret and urls_secret
-  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
-  #            please check README.md
-  # It is recommended to setup auto or use_secret values for server environment
-
-  # Postgres databases and users to create, if `use_default_credentials` is set to `false`.
+  # Authentication is always enabled. The chart reads the secret `admin_user_secret_name` (keys POSTGRES_USER and POSTGRES_PASSWORD).
+  # Copy it from the dependencies chart, see README.md. If the secret does not exist, the chart creates it from `admin_username`
+  # and `admin_password`. Both are required, because the administrator must already exist in Postgres: the chart cannot make up
+  # a name. `helm install` and `helm upgrade` fail without them. `helm template` cannot read the cluster, so it renders the
+  # secret only with them. An existing secret is never changed.
+  # The chart creates the users secret and the URLs secret with random passwords when they do not exist.
+  # admin_username:
+  # admin_password:
   admin_user_secret_name: postgres-admin-user
   users_secret: postgres-opencrvs-users
   urls_secret: postgres-urls

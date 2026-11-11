@@ -1,10 +1,10 @@
-{{- if not .Values.elasticsearch.use_default_credentials }}
-{{/* Prevent secret mutation between helm upgrades */}}
 {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.elasticsearch.admin_user_secret_name }}
 {{- if not $secret }}
-  {{- $default_password := randAlphaNum 32 }}
-  {{- if $.Values.chart_dev_mode }}
-    {{- $default_password = "elasticpassword" }}
+  {{- $password := .Values.elasticsearch.admin_password | default "" }}
+  {{- if .Values.elasticsearch.use_default_credentials }}
+    {{- $password = $password | default "elasticadmin" }}
+  {{- else }}
+    {{- $password = $password | default (randAlphaNum 32) }}
   {{- end }}
 ---
 apiVersion: v1
@@ -16,7 +16,5 @@ metadata:
     "helm.sh/resource-policy": keep
 type: Opaque
 data:
-  ELASTIC_PASSWORD: {{ $default_password | b64enc }}
-
-{{- end }}
+  ELASTIC_PASSWORD: {{ $password | b64enc }}
 {{- end }}
