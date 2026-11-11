@@ -9,6 +9,10 @@ Prefer the existing docs for key concepts instead of re-deriving:
 - **`ACTIONS.md`** — actions performed on an event record (core vs custom actions, event statuses, flag configurations, and action conditionals).
 - **`ADMINISTRATIVE-HIERARCHY.md`** — administrative areas (jurisdictional hierarchy) vs locations (offices/health facilities)
 
+## Coding standards
+
+`docs/coding-standards/README.md`: read it before you write or review code. It names the area page for each type of change: public interfaces, services, database, tests, client, infrastructure.
+
 ## Related repos
 
 Load these lazily when a task needs them:

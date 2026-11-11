@@ -21,6 +21,10 @@ Write everything a person reads (chat replies, PRs, issues, commits, code commen
 - Do not use nouns as verbs. Write "open a PR for this", not "PR this". Common verbs such as "log", "test" and "merge" are fine.
 - Use the common phrase, not the clever or rare one. Do not use metaphors or dash asides.
 
+## Coding standards
+
+`docs/coding-standards/README.md`: read it before you write or review code. It names the area page for each type of change: public interfaces, services, database, tests, client, infrastructure.
+
 ## Agent skills
 
 ### Domain docs
