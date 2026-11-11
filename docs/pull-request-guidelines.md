@@ -108,7 +108,7 @@ This includes changes to config, to the output of a public API, to scopes, to tr
 
 - Put the entry under the correct release and section (breaking changes, new features, improvements, bug fixes, security). Link the issue in the same format as the other entries.
 - For a breaking change, say what to use instead, why, and the exact steps. A diff or config example helps.
-- Put a risky change near the top of its section.
+- Document a breaking change, or a change that requires manual intervention to the top of its section.
 - When the PR changes behaviour, check that the existing entries are still correct.
 
 ### 2.5 Update `countryconfig-template` and `testland` in the same PR
