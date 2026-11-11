@@ -159,6 +159,7 @@ event.birth.action.declare.form.section.child.field.dob.label,This is the label 
 event.birth.action.declare.form.section.child.field.gender.label,This is the label for the field,Sex,Sexe
 event.birth.action.declare.form.section.child.field.name.label,This is the label for the field,Child's name,Nom de l'enfant
 event.birth.action.declare.form.section.child.field.nid.label,Label for national ID field for child,National ID,Pièce d'identité nationale
+event.birth.action.declare.form.section.child.field.placeOfBirth.initial.label,Label of the place of birth field in the birth form version that was in use before 1 September 2026,Facility of occurrence,Établissement de naissance
 event.birth.action.declare.form.section.child.field.placeOfBirth.label,This is the label for the field,Place of delivery,Lieu de l'accouchement
 event.birth.action.declare.form.section.child.field.reason.label,This is the label for the field,Reason for delayed registration,Motif de l'enregistrement tardif
 event.birth.action.declare.form.section.child.field.registrationNote.label,This is the label for the field,Registration note,Note d'enregistrement
@@ -320,6 +321,8 @@ event.birth.summary.informant.contact.empty,This is shown when there is no infor
 event.birth.summary.informant.contact.label,This is the label for the informant information,Contact,Contact
 event.birth.summary.informant.contact.value,This is the contact value of the informant,{informant.phoneNo} {informant.email},{informant.phoneNo} {informant.email}
 event.birth.title,This is the title of the summary,{child.name.firstname} {child.name.surname},{child.name.firstname} {child.name.surname}
+event.birth.version.initial.label,Name of the birth form version that was in use before 1 September 2026,Initial,Initiale
+event.birth.version.v2.label,Name of the birth form version that is in use from 1 September 2026,V2,V2
 event.death.action.Read.label,This is shown as the action name anywhere the user can trigger the action from,Read,Lire
 event.death.action.archive.label,This is shown as the action name anywhere the user can trigger the action from,Archive,Archiver
 event.death.action.certificate.form.cancel,This is the label for the verification cancellation button,Identity does not match,L'identité ne correspond pas
@@ -668,6 +671,7 @@ form.section.information.birth.bullet2,Form information for birth,As the legal I
 form.section.information.birth.bullet3.sms,Form information for birth,Once the declaration is processed you will receive an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.,Once the declaration is processed you will receive an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.
 form.section.information.birth.bullet4,Form information for birth,"Make sure you collect the certificate. A birth certificate is critical for this child, especially to make their life easy later on. It will help to access health services, school examinations and government benefits.",Attendez un SMS vous indiquant quand vous devez vous rendre au bureau pour retirer le certificat - Prenez votre carte d'identité avec vous.
 form.section.information.birth.bulletList.label,Label for the birth information bullet list,Birth Information,Birth Information
+form.section.information.birth.deprecatedVersion,Note on the introduction page of the birth form version that was in use before 1 September 2026,This is a deprecated form version. It was in use before 1 September 2026.,Ceci est une version obsolète du formulaire. Elle était utilisée avant le 1er septembre 2026.
 form.section.information.death.bullet1,,I am going to help you make a declaration of death.,Je vais vous aider à faire une déclaration de décès.
 form.section.information.death.bullet2,,As the legal Informant it is important that all the information provided by you is accurate.,"En tant qu'informateur légal, il est important que toutes les informations que vous fournissez soient exactes."
 form.section.information.death.bullet3,,Once the declaration is processed you will receive an email to tell you when to visit the office to collect the certificate - Take your ID with you.,"Une fois la déclaration traitée, vous recevrez un courriel vous indiquant quand vous rendre au bureau pour retirer le certificat - Munissez-vous d'une pièce d'identité."

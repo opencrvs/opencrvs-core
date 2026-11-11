@@ -21,12 +21,13 @@ import {
   user
 } from '@opencrvs/toolkit/events'
 import { securePageWhileSealed } from '@countryconfig/events/utils'
-import { child } from './pages/child'
-import { informant } from './pages/informant'
-import { introduction } from './pages/introduction'
-import { mother } from './pages/mother'
-import { father } from './pages/father'
+import { childPage } from './pages/child'
+import { informantPage } from './pages/informant'
+import { introductionPage } from './pages/introduction'
+import { motherPage } from './pages/mother'
+import { fatherPage } from './pages/father'
 import { documents } from './pages/documents'
+import { BirthVersion } from '../versions'
 
 export const BIRTH_DECLARATION_REVIEW = {
   title: {
@@ -95,16 +96,23 @@ export const BIRTH_DECLARATION_REVIEW = {
   ]
 }
 
-export const BIRTH_DECLARATION_FORM = defineDeclarationForm({
-  label: {
-    defaultMessage: 'Birth decalration form',
-    id: 'event.birth.action.declare.form.label',
-    description: 'This is what this form is referred as in the system'
-  },
+export function birthDeclarationForm(version: BirthVersion) {
+  return defineDeclarationForm({
+    label: {
+      defaultMessage: 'Birth decalration form',
+      id: 'event.birth.action.declare.form.label',
+      description: 'This is what this form is referred as in the system'
+    },
 
-  // A sealed birth record must not leak declaration data through the search
-  // index - see securePageWhileSealed.
-  pages: [introduction, child, informant, mother, father, documents].map(
-    securePageWhileSealed
-  )
-})
+    // A sealed birth record must not leak declaration data through the search
+    // index - see securePageWhileSealed.
+    pages: [
+      introductionPage(version),
+      childPage(version),
+      informantPage(version),
+      motherPage(version),
+      fatherPage(version),
+      documents
+    ].map(securePageWhileSealed)
+  })
+}

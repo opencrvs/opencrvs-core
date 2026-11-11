@@ -33,6 +33,7 @@ import {
   defaultStreetAddressConfiguration,
   getNestedFieldValidators
 } from '@countryconfig/events/utils'
+import { BirthVersion } from '../../versions'
 import {
   farajalandNameConfig,
   invalidNameValidator
@@ -218,345 +219,366 @@ export const attendantAtBirthOptions = createSelectOptions(
   attendantAtBirthMessageDescriptors
 )
 
-export const child = defineFormPage({
-  id: 'child',
-  type: PageTypes.enum.FORM,
-  title: {
-    defaultMessage: "Child's details",
-    description: 'Form section title for Child',
-    id: 'form.birth.child.title'
-  },
-  fields: [
-    {
-      id: 'child.nid',
-      type: FieldType.TEXT,
-      label: {
-        defaultMessage: 'National ID',
-        description: 'Label for national ID field for child',
-        id: 'event.birth.action.declare.form.section.child.field.nid.label'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: never()
-        }
-      ]
+export function childPage(version: BirthVersion) {
+  return defineFormPage({
+    id: 'child',
+    type: PageTypes.enum.FORM,
+    title: {
+      defaultMessage: "Child's details",
+      description: 'Form section title for Child',
+      id: 'form.birth.child.title'
     },
-    {
-      id: 'child.name',
-      type: FieldType.NAME,
-      required: true,
-      configuration: farajalandNameConfig,
-      hideLabel: true,
-      label: {
-        defaultMessage: "Child's name",
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.name.label'
-      },
-      validation: [invalidNameValidator('child.name')]
-    },
-    {
-      id: 'child.gender',
-      analytics: true,
-      type: FieldType.SELECT,
-      required: true,
-      label: {
-        defaultMessage: 'Sex',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.gender.label'
-      },
-      options: genderOptions
-    },
-    {
-      id: 'child.dob',
-      analytics: true,
-      type: 'DATE',
-      required: true,
-      secured: true,
-      validation: [
-        {
-          message: {
-            defaultMessage: 'Must be a valid Birthdate',
-            description: 'This is the error message for invalid date',
-            id: 'event.birth.action.declare.form.section.child.field.dob.error'
-          },
-          validator: field('child.dob').isBefore().now()
-        }
-      ],
-      label: {
-        defaultMessage: 'Date of birth',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.dob.label'
-      }
-    },
-    {
-      id: 'child.reason',
-      type: FieldType.TEXT,
-      required: true,
-      label: {
-        defaultMessage: 'Reason for delayed registration',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.reason.label'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: and(
-            not(
-              field('child.dob')
-                .isAfter()
-                .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-                .inPast()
-            ),
-            field('child.dob').isBefore().now()
-          )
-        }
-      ]
-    },
-    {
-      id: 'child.divider1',
-      type: FieldType.DIVIDER,
-      label: emptyMessage
-    },
-    {
-      id: 'child.placeOfBirth',
-      analytics: true,
-      type: FieldType.SELECT,
-      required: true,
-      secured: true,
-      label: {
-        defaultMessage: 'Place of delivery',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.placeOfBirth.label'
-      },
-      options: placeOfBirthOptions
-    },
-    {
-      id: 'child.birthLocation',
-      analytics: true,
-      type: FieldType.LOCATION,
-      required: true,
-      secured: true,
-      label: {
-        defaultMessage: 'Health Institution',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: field('child.placeOfBirth').isEqualTo(
-            PlaceOfBirth.HEALTH_FACILITY
-          )
-        }
-      ],
-      configuration: {
-        locationTypes: ['HEALTH_FACILITY'],
-        allowedLocations: user.jurisdiction(
-          user.scope('record.create').attribute('placeOfEvent')
-        ),
-        anchorToDateOfEvent: true,
-        activeOnly: true
-      }
-    },
-    {
-      id: 'child.birthLocation.privateHome',
-      analytics: true,
-      type: FieldType.ADDRESS,
-      required: true,
-      secured: true,
-      hideLabel: true,
-      label: {
-        defaultMessage: 'Child`s address',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: field('child.placeOfBirth').isEqualTo(
-            PlaceOfBirth.PRIVATE_HOME
-          )
-        }
-      ],
-      validation: [
-        {
-          message: {
-            defaultMessage: 'Invalid input',
-            description: 'Error message when generic field is invalid',
-            id: 'error.invalidInput'
-          },
-          validator: field(
-            'child.birthLocation.privateHome'
-          ).isValidAdministrativeLeafLevel()
+    fields: [
+      {
+        id: 'child.nid',
+        type: FieldType.TEXT,
+        label: {
+          defaultMessage: 'National ID',
+          description: 'Label for national ID field for child',
+          id: 'event.birth.action.declare.form.section.child.field.nid.label'
         },
-        ...getNestedFieldValidators(
-          'child.birthLocation.privateHome',
-          defaultStreetAddressConfiguration
-        )
-      ],
-      parent: field('child.placeOfBirth'),
-      defaultValue: {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        administrativeArea: user('administrativeAreaId')
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: never()
+          }
+        ]
       },
-      configuration: {
-        streetAddressForm: defaultStreetAddressConfiguration,
-        allowedLocations: user.jurisdiction(
-          user.scope('record.create').attribute('placeOfEvent')
-        ),
-        anchorToDateOfEvent: true,
-        activeOnly: true
-      }
-    },
-    {
-      id: 'child.birthLocation.other',
-      type: FieldType.ADDRESS,
-      required: true,
-      analytics: true,
+      {
+        id: 'child.name',
+        type: FieldType.NAME,
+        required: true,
+        configuration: farajalandNameConfig,
+        hideLabel: true,
+        label: {
+          defaultMessage: "Child's name",
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.name.label'
+        },
+        validation: [invalidNameValidator('child.name')]
+      },
+      {
+        id: 'child.gender',
+        analytics: true,
+        type: FieldType.SELECT,
+        required: true,
+        label: {
+          defaultMessage: 'Sex',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.gender.label'
+        },
+        options: genderOptions
+      },
+      {
+        id: 'child.dob',
+        analytics: true,
+        type: 'DATE',
+        required: true,
+        secured: true,
+        validation: [
+          {
+            message: {
+              defaultMessage: 'Must be a valid Birthdate',
+              description: 'This is the error message for invalid date',
+              id: 'event.birth.action.declare.form.section.child.field.dob.error'
+            },
+            validator: field('child.dob').isBefore().now()
+          }
+        ],
+        label: {
+          defaultMessage: 'Date of birth',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.dob.label'
+        }
+      },
+      {
+        id: 'child.reason',
+        type: FieldType.TEXT,
+        required: true,
+        label: {
+          defaultMessage: 'Reason for delayed registration',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.reason.label'
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: and(
+              not(
+                field('child.dob')
+                  .isAfter()
+                  .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
+                  .inPast()
+              ),
+              field('child.dob').isBefore().now()
+            )
+          }
+        ]
+      },
+      {
+        id: 'child.divider1',
+        type: FieldType.DIVIDER,
+        label: emptyMessage
+      },
+      {
+        id: 'child.placeOfBirth',
+        analytics: true,
+        type: FieldType.SELECT,
+        required: true,
+        secured: true,
+        label:
+          version === BirthVersion.V2
+            ? {
+                defaultMessage: 'Place of delivery',
+                description: 'This is the label for the field',
+                id: 'event.birth.action.declare.form.section.child.field.placeOfBirth.label'
+              }
+            : {
+                defaultMessage: 'Facility of occurrence',
+                description:
+                  'Label of the place of birth field in the birth form version that was in use before 1 September 2026',
+                id: 'event.birth.action.declare.form.section.child.field.placeOfBirth.initial.label'
+              },
+        options: placeOfBirthOptions
+      },
+      {
+        id: 'child.birthLocation',
+        analytics: true,
+        type: FieldType.LOCATION,
+        required: true,
+        secured: true,
+        label: {
+          defaultMessage: 'Health Institution',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: field('child.placeOfBirth').isEqualTo(
+              PlaceOfBirth.HEALTH_FACILITY
+            )
+          }
+        ],
+        configuration: {
+          locationTypes: ['HEALTH_FACILITY'],
+          allowedLocations: user.jurisdiction(
+            user.scope('record.create').attribute('placeOfEvent')
+          ),
+          anchorToDateOfEvent: true,
+          activeOnly: true
+        }
+      },
+      {
+        id: 'child.birthLocation.privateHome',
+        analytics: true,
+        type: FieldType.ADDRESS,
+        required: true,
+        secured: true,
+        hideLabel: true,
+        label: {
+          defaultMessage: 'Child`s address',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: field('child.placeOfBirth').isEqualTo(
+              PlaceOfBirth.PRIVATE_HOME
+            )
+          }
+        ],
+        validation: [
+          {
+            message: {
+              defaultMessage: 'Invalid input',
+              description: 'Error message when generic field is invalid',
+              id: 'error.invalidInput'
+            },
+            validator: field(
+              'child.birthLocation.privateHome'
+            ).isValidAdministrativeLeafLevel()
+          },
+          ...getNestedFieldValidators(
+            'child.birthLocation.privateHome',
+            defaultStreetAddressConfiguration
+          )
+        ],
+        parent: field('child.placeOfBirth'),
+        defaultValue: {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: user('administrativeAreaId')
+        },
+        configuration: {
+          streetAddressForm: defaultStreetAddressConfiguration,
+          allowedLocations: user.jurisdiction(
+            user.scope('record.create').attribute('placeOfEvent')
+          ),
+          anchorToDateOfEvent: true,
+          activeOnly: true
+        }
+      },
+      {
+        id: 'child.birthLocation.other',
+        type: FieldType.ADDRESS,
+        required: true,
+        analytics: true,
 
-      secured: true,
-      hideLabel: true,
-      label: {
-        defaultMessage: 'Child`s address',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: field('child.placeOfBirth').isEqualTo(PlaceOfBirth.OTHER)
-        }
-      ],
-      validation: [
-        {
-          message: {
-            defaultMessage: 'Invalid input',
-            description: 'Error message when generic field is invalid',
-            id: 'error.invalidInput'
-          },
-          validator: field(
-            'child.birthLocation.other'
-          ).isValidAdministrativeLeafLevel()
+        secured: true,
+        hideLabel: true,
+        label: {
+          defaultMessage: 'Child`s address',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
         },
-        ...getNestedFieldValidators(
-          'child.birthLocation.other',
-          defaultStreetAddressConfiguration
-        )
-      ],
-      parent: field('child.placeOfBirth'),
-      defaultValue: {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        administrativeArea: user('administrativeAreaId')
-      },
-      configuration: {
-        streetAddressForm: defaultStreetAddressConfiguration,
-        allowedLocations: user.jurisdiction(
-          user.scope('record.create').attribute('placeOfEvent')
-        ),
-        anchorToDateOfEvent: true,
-        activeOnly: true
-      }
-    },
-    {
-      id: 'child.birthLocationId',
-      type: FieldType.ALPHA_HIDDEN,
-      required: false,
-      label: {
-        defaultMessage: 'Health Institution',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
-      },
-      parent: [
-        field('child.placeOfBirth'),
-        field('child.birthLocation'),
-        field('child.birthLocation.privateHome'),
-        field('child.birthLocation.other')
-      ],
-      value: [
-        field('child.birthLocation'),
-        field('child.birthLocation.privateHome').get('administrativeArea'),
-        field('child.birthLocation.other').get('administrativeArea')
-      ]
-    },
-    {
-      id: 'child.divider2',
-      type: FieldType.DIVIDER,
-      label: emptyMessage
-    },
-    {
-      id: 'child.attendantAtBirth',
-      type: FieldType.SELECT,
-      analytics: true,
-      required: false,
-      label: {
-        defaultMessage: 'Attendant at birth',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.attendantAtBirth.label'
-      },
-      options: attendantAtBirthOptions
-    },
-    {
-      id: 'child.birthType',
-      analytics: true,
-      type: FieldType.SELECT,
-      required: false,
-      label: {
-        defaultMessage: 'Type of birth',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.birthType.label'
-      },
-      options: typeOfBirthOptions
-    },
-    {
-      id: 'child.weightAtBirth',
-      analytics: true,
-      type: FieldType.NUMBER,
-      required: false,
-      label: {
-        defaultMessage: 'Weight at birth',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.label'
-      },
-      validation: [
-        {
-          message: {
-            defaultMessage: 'Must be within 0 and 6',
-            description: 'This is the error message for invalid number range',
-            id: 'error.child.weightAtBirth.invalidNumberRange'
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: field('child.placeOfBirth').isEqualTo(
+              PlaceOfBirth.OTHER
+            )
+          }
+        ],
+        validation: [
+          {
+            message: {
+              defaultMessage: 'Invalid input',
+              description: 'Error message when generic field is invalid',
+              id: 'error.invalidInput'
+            },
+            validator: field(
+              'child.birthLocation.other'
+            ).isValidAdministrativeLeafLevel()
           },
-          validator: or(
-            field('child.weightAtBirth').isBetween(0, 6),
-            field('child.weightAtBirth').isUndefined()
+          ...getNestedFieldValidators(
+            'child.birthLocation.other',
+            defaultStreetAddressConfiguration
           )
+        ],
+        parent: field('child.placeOfBirth'),
+        defaultValue: {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: user('administrativeAreaId')
+        },
+        configuration: {
+          streetAddressForm: defaultStreetAddressConfiguration,
+          allowedLocations: user.jurisdiction(
+            user.scope('record.create').attribute('placeOfEvent')
+          ),
+          anchorToDateOfEvent: true,
+          activeOnly: true
         }
-      ],
-      configuration: {
-        min: 0,
-        postfix: {
-          defaultMessage: 'Kilograms (kg)',
-          description: 'This is the postfix for the weight field',
-          id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
-        }
-      }
-    },
-    {
-      id: 'child.registrationNote',
-      type: FieldType.TEXTAREA,
-      required: false,
-      label: {
-        defaultMessage: 'Registration note',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.child.field.registrationNote.label'
       },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: event.hasAction(ActionType.DECLARE)
-        }
-      ]
-    }
-  ]
-})
+      {
+        id: 'child.birthLocationId',
+        type: FieldType.ALPHA_HIDDEN,
+        required: false,
+        label: {
+          defaultMessage: 'Health Institution',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
+        },
+        parent: [
+          field('child.placeOfBirth'),
+          field('child.birthLocation'),
+          field('child.birthLocation.privateHome'),
+          field('child.birthLocation.other')
+        ],
+        value: [
+          field('child.birthLocation'),
+          field('child.birthLocation.privateHome').get('administrativeArea'),
+          field('child.birthLocation.other').get('administrativeArea')
+        ]
+      },
+      {
+        id: 'child.divider2',
+        type: FieldType.DIVIDER,
+        label: emptyMessage
+      },
+      {
+        id: 'child.attendantAtBirth',
+        type: FieldType.SELECT,
+        analytics: true,
+        required: false,
+        label: {
+          defaultMessage: 'Attendant at birth',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.attendantAtBirth.label'
+        },
+        options: attendantAtBirthOptions
+      },
+      ...(version === BirthVersion.V2
+        ? [
+            {
+              id: 'child.birthType',
+              analytics: true,
+              type: FieldType.SELECT,
+              required: false,
+              label: {
+                defaultMessage: 'Type of birth',
+                description: 'This is the label for the field',
+                id: 'event.birth.action.declare.form.section.child.field.birthType.label'
+              },
+              options: typeOfBirthOptions
+            }
+          ]
+        : []),
+      ...(version === BirthVersion.V2
+        ? [
+            {
+              id: 'child.weightAtBirth',
+              analytics: true,
+              type: FieldType.NUMBER,
+              required: false,
+              label: {
+                defaultMessage: 'Weight at birth',
+                description: 'This is the label for the field',
+                id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.label'
+              },
+              validation: [
+                {
+                  message: {
+                    defaultMessage: 'Must be within 0 and 6',
+                    description:
+                      'This is the error message for invalid number range',
+                    id: 'error.child.weightAtBirth.invalidNumberRange'
+                  },
+                  validator: or(
+                    field('child.weightAtBirth').isBetween(0, 6),
+                    field('child.weightAtBirth').isUndefined()
+                  )
+                }
+              ],
+              configuration: {
+                min: 0,
+                postfix: {
+                  defaultMessage: 'Kilograms (kg)',
+                  description: 'This is the postfix for the weight field',
+                  id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
+                }
+              }
+            }
+          ]
+        : []),
+      {
+        id: 'child.registrationNote',
+        type: FieldType.TEXTAREA,
+        required: false,
+        label: {
+          defaultMessage: 'Registration note',
+          description: 'This is the label for the field',
+          id: 'event.birth.action.declare.form.section.child.field.registrationNote.label'
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: event.hasAction(ActionType.DECLARE)
+          }
+        ]
+      }
+    ]
+  })
+}

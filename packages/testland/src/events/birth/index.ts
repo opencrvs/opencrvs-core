@@ -15,6 +15,8 @@ import {
   defineConfig,
   DocumentMimeType,
   event,
+  EventConfigVersionInput,
+  TranslationConfig,
   EventStatus,
   field,
   FieldType,
@@ -27,30 +29,37 @@ import {
   user
 } from '@opencrvs/toolkit/events'
 import {
-  BIRTH_DECLARATION_FORM,
+  birthDeclarationForm,
   BIRTH_DECLARATION_REVIEW
 } from './forms/declaration'
 import { advancedSearchBirth } from './advancedSearch'
 
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth } from './forms/pages/child'
-import { CORRECTION_FORM } from './forms/correctionForm'
-import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
+import { birthCorrectionForm } from './forms/correctionForm'
+import { birthNotificationForm } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
   Event,
   BIRTH_LATE_REGISTRATION_TARGET_DAYS
 } from '@countryconfig/events/utils'
+import { BIRTH_V2_EFFECTIVE_FROM, BirthVersion } from './versions'
 
-export const birthEvent = defineConfig({
-  id: Event.Birth,
-  declaration: BIRTH_DECLARATION_FORM,
-  label: {
-    defaultMessage: 'Birth',
-    description: 'This is what this event is referred as in the system',
-    id: 'event.birth.label'
-  },
+interface BirthVersionInput {
+  id: BirthVersion
+  label: TranslationConfig
+  effectiveFrom?: string
+}
+
+const birthVersion = ({
+  id,
+  label,
+  effectiveFrom
+}: BirthVersionInput): EventConfigVersionInput => ({
+  id,
+  label,
+  effectiveFrom,
   dateOfEvent: field('child.dob'),
   placeOfEvent: field('child.birthLocationId'),
   title: {
@@ -392,7 +401,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
       },
-      notificationForm: BIRTH_NOTIFICATION_FORM,
+      notificationForm: birthNotificationForm(id),
       review: {
         title: {
           defaultMessage:
@@ -418,6 +427,7 @@ export const birthEvent = defineConfig({
     },
     {
       type: ActionType.DECLARE,
+      declaration: birthDeclarationForm(id),
       label: {
         defaultMessage: 'Declare',
         description:
@@ -502,7 +512,10 @@ export const birthEvent = defineConfig({
       },
       flags: [
         { id: 'validated', operation: 'remove' },
-        { id: 'approval-required-for-late-registration', operation: 'remove' },
+        {
+          id: 'approval-required-for-late-registration',
+          operation: 'remove'
+        },
         {
           id: 'escalated-to-provincial-registrar',
           operation: 'remove',
@@ -1248,7 +1261,7 @@ export const birthEvent = defineConfig({
       conditionals: [
         { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
       ],
-      correctionForm: CORRECTION_FORM
+      correctionForm: birthCorrectionForm(id)
     },
     {
       type: ActionType.REJECT_CORRECTION,
@@ -1459,6 +1472,36 @@ export const birthEvent = defineConfig({
         }
       ]
     }
-  ],
-  advancedSearch: advancedSearchBirth
+  ]
+})
+
+export const birthEvent = defineConfig({
+  id: Event.Birth,
+  label: {
+    defaultMessage: 'Birth',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.birth.label'
+  },
+  advancedSearch: advancedSearchBirth,
+  versions: [
+    birthVersion({
+      id: BirthVersion.INITIAL,
+      label: {
+        defaultMessage: 'Initial',
+        description:
+          'Name of the birth form version that was in use before 1 September 2026',
+        id: 'event.birth.version.initial.label'
+      }
+    }),
+    birthVersion({
+      id: BirthVersion.V2,
+      label: {
+        defaultMessage: 'V2',
+        description:
+          'Name of the birth form version that is in use from 1 September 2026',
+        id: 'event.birth.version.v2.label'
+      },
+      effectiveFrom: BIRTH_V2_EFFECTIVE_FROM
+    })
+  ]
 })
