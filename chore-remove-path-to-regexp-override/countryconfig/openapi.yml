@@ -186,6 +186,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -193,6 +198,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
     ActionDocument:
       oneOf:
         - $ref: "#/components/schemas/CreatedAction"
@@ -2358,6 +2364,11 @@ components:
                 type: string
                 description: Identifier of the version, unique within the event (e.g.
                   "birth-v2").
+              label:
+                description: Name of the version, which the UI shows wherever it names the
+                  version. For example, "{event.configVersionLabel}" in the
+                  event summary.
+                $ref: "#/components/schemas/TranslationConfig"
               effectiveFrom:
                 default: 0001-01-01
                 description: Date (YYYY-MM-DD) from which this version is effective. A version
@@ -2587,6 +2598,7 @@ components:
                   $ref: "#/components/schemas/Conditional"
             required:
               - id
+              - label
               - effectiveFrom
               - title
               - summary
@@ -2596,7 +2608,7 @@ components:
             additionalProperties: false
           description: Versions of the event configuration, each effective from its
             `effectiveFrom`. An event configured without versions has a single
-            version, with id 'default' and `effectiveFrom` '0001-01-01'.
+            version, with id 'initial' and `effectiveFrom` '0001-01-01'.
       required:
         - id
         - label
@@ -3598,7 +3610,9 @@ components:
                     description: Field value template supports variables from configuration (e.g.
                       "{informant.phoneNo} {informant.email}") and EventMetadata
                       (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date,
-                      ::dd MMMM yyyy}").
+                      ::dd MMMM yyyy}"). "{event.configVersionLabel}" gives the
+                      label of the configuration version that the record was
+                      created under.
                     $ref: "#/components/schemas/TranslationConfig"
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
@@ -14946,9 +14960,8 @@ components:
         - notificationForm
         - review
       additionalProperties: false
-      description: Configuration for the notify action, including the notification
-        form and its review page. When undefined, it is generated using the
-        DeclareActionConfig.
+      description: "Configuration for the notify action: the notification form and its
+        review page. An event without a NOTIFY action cannot be notified."
     DeclarationFormConfig:
       type: object
       properties:
@@ -16056,6 +16069,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -16063,6 +16081,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
       additionalProperties: false
     ActionDocumentOutput:
       oneOf:
