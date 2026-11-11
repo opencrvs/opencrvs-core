@@ -54,7 +54,7 @@ postgres:
   {{/if}}
 
 redis:
-  auth_mode: acl
+  use_default_credentials: false
 
 monitoring:
   enabled: {{monitoring_enabled}}

@@ -1,0 +1,10 @@
+{{/*
+auth_mode was removed from postgres, elasticsearch and redis. The datastores always use credentials from secrets.
+The values auto, use_secret and managed are ignored. Only disabled changes the result, so it stops the installation.
+*/}}
+{{- range $name := list "postgres" "elasticsearch" "redis" }}
+{{- $datastore := index $.Values $name }}
+{{- if eq ($datastore.auth_mode | default "") "disabled" }}
+{{- fail (printf "%s.auth_mode: disabled is not supported anymore. Authentication is always enabled. See the Authentication configuration section of README.md" $name) }}
+{{- end }}
+{{- end }}

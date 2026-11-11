@@ -111,13 +111,11 @@ spec:
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
             - name: EVENTS_URL
               value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
-          {{- if not (eq .Values.postgres.auth_mode "managed") }}
             - name: ANALYTICS_DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   key: events_analytics_db_url
                   name: {{ .Values.postgres.urls_secret }}
-          {{- end }}
           {{- include "render-env-vars" (dict "service_name" "countryconfig" "Values" .Values) }}
           {{- include "resources-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 10 }}
           {{- include "probes-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 10 }}

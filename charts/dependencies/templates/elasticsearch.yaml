@@ -100,7 +100,6 @@ spec:
               value: 'false'
             - name: discovery.type
               value: single-node
-          {{- if not .Values.elasticsearch.use_default_credentials }}
             - name: ELASTIC_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -108,10 +107,6 @@ spec:
                   key: ELASTIC_PASSWORD
             - name: xpack.security.enabled
               value: 'true'
-          {{- else }}
-            - name: xpack.security.enabled
-              value: 'false'
-          {{- end }}
           {{- if or .Values.elasticsearch.secrets .Values.elasticsearch.env .Values.env }}
           {{- include "render-env-vars" (dict "service_name" "elasticsearch" "Values" .Values) }}
           {{- end }}
