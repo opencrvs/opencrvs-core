@@ -55,7 +55,7 @@ Find out why the bug happens before you change core behaviour. Reproduce it firs
 
 ### 1.3 Write a short description that a reviewer can check
 
-- Say what problem the PR solves. For a bug fix, give the root cause.
+- Describe which problem the PR solves. For a bug fix, give the root cause. If you are working on an issue, link it to the pull request. 
 - Say why the solution is correct. Reviewers read the code, so do not describe each change in it.
 - Explain every changed default, limit or constant. Reviewers will ask "is this intentional?".
 - Add before and after screenshots, or a recording, for a UI change.
