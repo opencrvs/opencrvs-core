@@ -20,9 +20,9 @@ function carriesFieldValues(action: Action): action is ActionDocument {
 }
 
 /**
- * Every file an action's values name, whatever field they're in. Reads and
- * writes must agree on this, so a record can't name a file that slips past
- * the check on write but is signed on read.
+ * Paths of every file in an action's declaration and annotation, from single-
+ * and multi-file values, whatever the field type. File checks on write and
+ * presigning on read both use this, so they always cover the same files.
  */
 export function getFilePathsFromValues({
   declaration,
